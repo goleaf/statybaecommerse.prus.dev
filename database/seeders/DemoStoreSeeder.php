@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Database\Seeders;
 
+use App\Enums\OrderStatus; // Enum ensures seeded statuses match schema.
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Channel;
@@ -26,6 +27,7 @@ use RuntimeException;
 final class DemoStoreSeeder extends Seeder
 {
     private const LOCALES = ['en', 'lt', 'lv'];
+
     private const DEFAULT_LOCALE = 'en';
 
     public function run(): void
@@ -115,223 +117,223 @@ final class DemoStoreSeeder extends Seeder
     {
         $definitions = [
             'makita' => [
-                'name' => 'Makita',
-                'slug' => 'makita',
-                'description' => 'Japanese power tool innovator trusted on Baltic job sites.',
-                'website' => 'https://www.makita.lt',
-                'is_enabled' => true,
-                'is_featured' => true,
-                'seo_title' => 'Makita Professional Power Tools',
+                'name'            => 'Makita',
+                'slug'            => 'makita',
+                'description'     => 'Japanese power tool innovator trusted on Baltic job sites.',
+                'website'         => 'https://www.makita.lt',
+                'is_enabled'      => true,
+                'is_featured'     => true,
+                'seo_title'       => 'Makita Professional Power Tools',
                 'seo_description' => 'Makita cordless and corded tools engineered for construction crews in the Baltics.',
             ],
             'bosch' => [
-                'name' => 'Bosch Professional',
-                'slug' => 'bosch-professional',
-                'description' => 'Bosch Pro range delivers durable tools and accessories for demanding teams.',
-                'website' => 'https://www.bosch-professional.com/lt/lt/',
-                'is_enabled' => true,
-                'is_featured' => true,
-                'seo_title' => 'Bosch Professional Tools',
+                'name'            => 'Bosch Professional',
+                'slug'            => 'bosch-professional',
+                'description'     => 'Bosch Pro range delivers durable tools and accessories for demanding teams.',
+                'website'         => 'https://www.bosch-professional.com/lt/lt/',
+                'is_enabled'      => true,
+                'is_featured'     => true,
+                'seo_title'       => 'Bosch Professional Tools',
                 'seo_description' => 'Discover Bosch rotary hammers, saws, and lighting for Baltic contractors.',
             ],
             'dewalt' => [
-                'name' => 'DeWalt',
-                'slug' => 'dewalt',
-                'description' => 'DeWalt delivers rugged jobsite tools for concrete, carpentry, and finishing trades.',
-                'website' => 'https://www.dewalt.eu/lt-lt',
-                'is_enabled' => true,
-                'is_featured' => true,
-                'seo_title' => 'DeWalt Jobsite Solutions',
+                'name'            => 'DeWalt',
+                'slug'            => 'dewalt',
+                'description'     => 'DeWalt delivers rugged jobsite tools for concrete, carpentry, and finishing trades.',
+                'website'         => 'https://www.dewalt.eu/lt-lt',
+                'is_enabled'      => true,
+                'is_featured'     => true,
+                'seo_title'       => 'DeWalt Jobsite Solutions',
                 'seo_description' => 'Explore DeWalt XR tools, kits, and safety gear built for the Baltics.',
             ],
             'hilti' => [
-                'name' => 'Hilti',
-                'slug' => 'hilti',
-                'description' => 'Hilti Nuron cordless solutions that excel in concrete and installation work.',
-                'website' => 'https://www.hilti.lt',
-                'is_enabled' => true,
-                'is_featured' => true,
-                'seo_title' => 'Hilti Nuron Systems',
+                'name'            => 'Hilti',
+                'slug'            => 'hilti',
+                'description'     => 'Hilti Nuron cordless solutions that excel in concrete and installation work.',
+                'website'         => 'https://www.hilti.lt',
+                'is_enabled'      => true,
+                'is_featured'     => true,
+                'seo_title'       => 'Hilti Nuron Systems',
                 'seo_description' => 'Hilti rotary hammers, lasers, and fastening systems trusted by Baltic pros.',
             ],
             'milwaukee' => [
-                'name' => 'Milwaukee',
-                'slug' => 'milwaukee',
-                'description' => 'Milwaukee M18 and MX FUEL solutions for mechanical, electrical, and plumbing teams.',
-                'website' => 'https://www.milwaukeetool.eu/lt-lt',
-                'is_enabled' => true,
-                'is_featured' => true,
-                'seo_title' => 'Milwaukee M18 & MX FUEL',
+                'name'            => 'Milwaukee',
+                'slug'            => 'milwaukee',
+                'description'     => 'Milwaukee M18 and MX FUEL solutions for mechanical, electrical, and plumbing teams.',
+                'website'         => 'https://www.milwaukeetool.eu/lt-lt',
+                'is_enabled'      => true,
+                'is_featured'     => true,
+                'seo_title'       => 'Milwaukee M18 & MX FUEL',
                 'seo_description' => 'Powerful Milwaukee cordless systems with jobsite-tuned safety gear and lighting.',
             ],
             'metabo' => [
-                'name' => 'Metabo',
-                'slug' => 'metabo',
-                'description' => 'Metabo grinders, saws, and extraction solutions crafted in Germany.',
-                'website' => 'https://www.metabo.com',
-                'is_enabled' => true,
-                'is_featured' => false,
-                'seo_title' => 'Metabo Industrial Power Tools',
+                'name'            => 'Metabo',
+                'slug'            => 'metabo',
+                'description'     => 'Metabo grinders, saws, and extraction solutions crafted in Germany.',
+                'website'         => 'https://www.metabo.com',
+                'is_enabled'      => true,
+                'is_featured'     => false,
+                'seo_title'       => 'Metabo Industrial Power Tools',
                 'seo_description' => 'Reliable Metabo tools with long service life for workshops and construction sites.',
             ],
             'festool' => [
-                'name' => 'Festool',
-                'slug' => 'festool',
-                'description' => 'Festool precision carpentry tools and dust extraction systems.',
-                'website' => 'https://www.festool.com',
-                'is_enabled' => true,
-                'is_featured' => false,
-                'seo_title' => 'Festool Precision Woodworking',
+                'name'            => 'Festool',
+                'slug'            => 'festool',
+                'description'     => 'Festool precision carpentry tools and dust extraction systems.',
+                'website'         => 'https://www.festool.com',
+                'is_enabled'      => true,
+                'is_featured'     => false,
+                'seo_title'       => 'Festool Precision Woodworking',
                 'seo_description' => 'Festool saws, sanders, and systainer sets for premium finishing work.',
             ],
             'ryobi' => [
-                'name' => 'Ryobi',
-                'slug' => 'ryobi',
-                'description' => 'Ryobi ONE+ DIY and light professional cordless systems for Baltic homes.',
-                'website' => 'https://www.ryobitools.eu',
-                'is_enabled' => true,
-                'is_featured' => false,
-                'seo_title' => 'Ryobi ONE+ Platform',
+                'name'            => 'Ryobi',
+                'slug'            => 'ryobi',
+                'description'     => 'Ryobi ONE+ DIY and light professional cordless systems for Baltic homes.',
+                'website'         => 'https://www.ryobitools.eu',
+                'is_enabled'      => true,
+                'is_featured'     => false,
+                'seo_title'       => 'Ryobi ONE+ Platform',
                 'seo_description' => 'Affordable Ryobi kits and garden tools compatible with the ONE+ battery platform.',
             ],
             'black-decker' => [
-                'name' => 'Black+Decker',
-                'slug' => 'black-decker',
-                'description' => 'Black+Decker kits cover essential drilling, cutting, and fastening tasks.',
-                'website' => 'https://www.blackanddecker.eu',
-                'is_enabled' => true,
-                'is_featured' => false,
-                'seo_title' => 'Black+Decker Tool Kits',
+                'name'            => 'Black+Decker',
+                'slug'            => 'black-decker',
+                'description'     => 'Black+Decker kits cover essential drilling, cutting, and fastening tasks.',
+                'website'         => 'https://www.blackanddecker.eu',
+                'is_enabled'      => true,
+                'is_featured'     => false,
+                'seo_title'       => 'Black+Decker Tool Kits',
                 'seo_description' => 'Practical Black+Decker kits for renovation crews and homeowners.',
             ],
             'stanley' => [
-                'name' => 'Stanley',
-                'slug' => 'stanley',
-                'description' => 'Stanley hand tools, lasers, and storage for installers and builders.',
-                'website' => 'https://www.stanleytools.com',
-                'is_enabled' => true,
-                'is_featured' => false,
-                'seo_title' => 'Stanley Measuring & Hand Tools',
+                'name'            => 'Stanley',
+                'slug'            => 'stanley',
+                'description'     => 'Stanley hand tools, lasers, and storage for installers and builders.',
+                'website'         => 'https://www.stanleytools.com',
+                'is_enabled'      => true,
+                'is_featured'     => false,
+                'seo_title'       => 'Stanley Measuring & Hand Tools',
                 'seo_description' => 'Trusted Stanley hand tools and laser levels for Baltic job sites.',
             ],
             'ridgid' => [
-                'name' => 'RIDGID',
-                'slug' => 'ridgid',
-                'description' => 'RIDGID mechanic-grade tools and storage built for extreme environments.',
-                'website' => 'https://www.ridgid.com',
-                'is_enabled' => true,
-                'is_featured' => false,
-                'seo_title' => 'RIDGID Heavy-Duty Tools',
+                'name'            => 'RIDGID',
+                'slug'            => 'ridgid',
+                'description'     => 'RIDGID mechanic-grade tools and storage built for extreme environments.',
+                'website'         => 'https://www.ridgid.com',
+                'is_enabled'      => true,
+                'is_featured'     => false,
+                'seo_title'       => 'RIDGID Heavy-Duty Tools',
                 'seo_description' => 'Socket sets and plumbing tools engineered for durability.',
             ],
             '3m' => [
-                'name' => '3M',
-                'slug' => '3m',
-                'description' => '3M safety solutions delivering certified respiratory and head protection.',
-                'website' => 'https://www.3m.com',
-                'is_enabled' => true,
-                'is_featured' => true,
-                'seo_title' => '3M Safety Gear',
+                'name'            => '3M',
+                'slug'            => '3m',
+                'description'     => '3M safety solutions delivering certified respiratory and head protection.',
+                'website'         => 'https://www.3m.com',
+                'is_enabled'      => true,
+                'is_featured'     => true,
+                'seo_title'       => '3M Safety Gear',
                 'seo_description' => '3M helmets and respirators that meet EU safety requirements.',
             ],
             'uvex' => [
-                'name' => 'uvex',
-                'slug' => 'uvex',
-                'description' => 'uvex head-to-toe personal protective equipment for industrial crews.',
-                'website' => 'https://www.uvex-safety.com',
-                'is_enabled' => true,
-                'is_featured' => false,
-                'seo_title' => 'uvex Personal Protective Equipment',
+                'name'            => 'uvex',
+                'slug'            => 'uvex',
+                'description'     => 'uvex head-to-toe personal protective equipment for industrial crews.',
+                'website'         => 'https://www.uvex-safety.com',
+                'is_enabled'      => true,
+                'is_featured'     => false,
+                'seo_title'       => 'uvex Personal Protective Equipment',
                 'seo_description' => 'Premium uvex helmets, boots, and eyewear for Baltic worksites.',
             ],
             'honeywell' => [
-                'name' => 'Honeywell Safety',
-                'slug' => 'honeywell-safety',
-                'description' => 'Honeywell personal protective equipment with reliable certification.',
-                'website' => 'https://sps.honeywell.com',
-                'is_enabled' => true,
-                'is_featured' => false,
-                'seo_title' => 'Honeywell Safety Solutions',
+                'name'            => 'Honeywell Safety',
+                'slug'            => 'honeywell-safety',
+                'description'     => 'Honeywell personal protective equipment with reliable certification.',
+                'website'         => 'https://sps.honeywell.com',
+                'is_enabled'      => true,
+                'is_featured'     => false,
+                'seo_title'       => 'Honeywell Safety Solutions',
                 'seo_description' => 'Honeywell respirators, helmets, and boots for compliant teams.',
             ],
             'philips' => [
-                'name' => 'Philips Lighting',
-                'slug' => 'philips-lighting',
-                'description' => 'Philips LED lighting and smart controls for industrial and site use.',
-                'website' => 'https://www.signify.com',
-                'is_enabled' => true,
-                'is_featured' => false,
-                'seo_title' => 'Philips LED Lighting',
+                'name'            => 'Philips Lighting',
+                'slug'            => 'philips-lighting',
+                'description'     => 'Philips LED lighting and smart controls for industrial and site use.',
+                'website'         => 'https://www.signify.com',
+                'is_enabled'      => true,
+                'is_featured'     => false,
+                'seo_title'       => 'Philips LED Lighting',
                 'seo_description' => 'Energy-efficient Philips lighting and power distribution.',
             ],
             'osram' => [
-                'name' => 'OSRAM',
-                'slug' => 'osram',
-                'description' => 'OSRAM work lights and electrical distribution products.',
-                'website' => 'https://www.osram.com',
-                'is_enabled' => true,
-                'is_featured' => false,
-                'seo_title' => 'OSRAM Work Lighting',
+                'name'            => 'OSRAM',
+                'slug'            => 'osram',
+                'description'     => 'OSRAM work lights and electrical distribution products.',
+                'website'         => 'https://www.osram.com',
+                'is_enabled'      => true,
+                'is_featured'     => false,
+                'seo_title'       => 'OSRAM Work Lighting',
                 'seo_description' => 'Durable OSRAM lights for night shifts and enclosed sites.',
             ],
             'legrand' => [
-                'name' => 'Legrand',
-                'slug' => 'legrand',
-                'description' => 'Legrand cable management, extension systems, and smart controls.',
-                'website' => 'https://www.legrand.com',
-                'is_enabled' => true,
-                'is_featured' => false,
-                'seo_title' => 'Legrand Power Distribution',
+                'name'            => 'Legrand',
+                'slug'            => 'legrand',
+                'description'     => 'Legrand cable management, extension systems, and smart controls.',
+                'website'         => 'https://www.legrand.com',
+                'is_enabled'      => true,
+                'is_featured'     => false,
+                'seo_title'       => 'Legrand Power Distribution',
                 'seo_description' => 'Extension cords, smart switches, and protection devices by Legrand.',
             ],
             'karcher' => [
-                'name' => 'Kärcher',
-                'slug' => 'karcher',
-                'description' => 'Kärcher pressure washers and cleaning systems built for professionals.',
-                'website' => 'https://www.kaercher.com',
-                'is_enabled' => true,
-                'is_featured' => true,
-                'seo_title' => 'Kärcher Professional Cleaning',
+                'name'            => 'Kärcher',
+                'slug'            => 'karcher',
+                'description'     => 'Kärcher pressure washers and cleaning systems built for professionals.',
+                'website'         => 'https://www.kaercher.com',
+                'is_enabled'      => true,
+                'is_featured'     => true,
+                'seo_title'       => 'Kärcher Professional Cleaning',
                 'seo_description' => 'High-pressure cleaners and accessories optimised for Baltic conditions.',
             ],
             'nilfisk' => [
-                'name' => 'Nilfisk',
-                'slug' => 'nilfisk',
-                'description' => 'Nilfisk industrial cleaning and pressure washing technology.',
-                'website' => 'https://www.nilfisk.com',
-                'is_enabled' => true,
-                'is_featured' => false,
-                'seo_title' => 'Nilfisk Pressure Washers',
+                'name'            => 'Nilfisk',
+                'slug'            => 'nilfisk',
+                'description'     => 'Nilfisk industrial cleaning and pressure washing technology.',
+                'website'         => 'https://www.nilfisk.com',
+                'is_enabled'      => true,
+                'is_featured'     => false,
+                'seo_title'       => 'Nilfisk Pressure Washers',
                 'seo_description' => 'Heavy-duty Nilfisk washers for vehicle fleets and equipment yards.',
             ],
             'stihl' => [
-                'name' => 'STIHL',
-                'slug' => 'stihl',
-                'description' => 'STIHL outdoor power equipment trusted by landscaping crews.',
-                'website' => 'https://www.stihl.com',
-                'is_enabled' => true,
-                'is_featured' => true,
-                'seo_title' => 'STIHL Outdoor Power Tools',
+                'name'            => 'STIHL',
+                'slug'            => 'stihl',
+                'description'     => 'STIHL outdoor power equipment trusted by landscaping crews.',
+                'website'         => 'https://www.stihl.com',
+                'is_enabled'      => true,
+                'is_featured'     => true,
+                'seo_title'       => 'STIHL Outdoor Power Tools',
                 'seo_description' => 'Trimmers and chainsaws engineered for Baltic weather.',
             ],
             'husqvarna' => [
-                'name' => 'Husqvarna',
-                'slug' => 'husqvarna',
-                'description' => 'Husqvarna landscaping machines and forestry solutions.',
-                'website' => 'https://www.husqvarna.com',
-                'is_enabled' => true,
-                'is_featured' => false,
-                'seo_title' => 'Husqvarna Landscaping Equipment',
+                'name'            => 'Husqvarna',
+                'slug'            => 'husqvarna',
+                'description'     => 'Husqvarna landscaping machines and forestry solutions.',
+                'website'         => 'https://www.husqvarna.com',
+                'is_enabled'      => true,
+                'is_featured'     => false,
+                'seo_title'       => 'Husqvarna Landscaping Equipment',
                 'seo_description' => 'Line trimmers and blowers for municipal and commercial users.',
             ],
             'einhell' => [
-                'name' => 'Einhell',
-                'slug' => 'einhell',
-                'description' => 'Einhell garden tools and light-construction equipment.',
-                'website' => 'https://www.einhell.com',
-                'is_enabled' => true,
-                'is_featured' => false,
-                'seo_title' => 'Einhell Garden Tools',
+                'name'            => 'Einhell',
+                'slug'            => 'einhell',
+                'description'     => 'Einhell garden tools and light-construction equipment.',
+                'website'         => 'https://www.einhell.com',
+                'is_enabled'      => true,
+                'is_featured'     => false,
+                'seo_title'       => 'Einhell Garden Tools',
                 'seo_description' => 'Cost-effective Einhell trimmers and washers for daily maintenance.',
             ],
         ];
@@ -363,7 +365,7 @@ final class DemoStoreSeeder extends Seeder
     }
 
     /**
-     * @param  array<string, mixed>  $definition
+     * @param  array<string, mixed>    $definition
      * @return array<string, Category>
      */
     private function storeCategory(string $key, array $definition, ?Category $parent = null): array
@@ -380,17 +382,17 @@ final class DemoStoreSeeder extends Seeder
         $category = Category::query()->updateOrCreate(
             ['slug' => $slug],
             [
-                'name' => $defaultTranslation['name'],
-                'slug' => $slug,
-                'description' => $defaultTranslation['description'],
-                'parent_id' => $parent?->getKey(),
-                'sort_order' => $definition['sort_order'] ?? 0,
-                'is_visible' => $definition['is_visible'] ?? true,
-                'is_enabled' => true,
-                'seo_title' => $defaultTranslation['seo_title'],
+                'name'            => $defaultTranslation['name'],
+                'slug'            => $slug,
+                'description'     => $defaultTranslation['description'],
+                'parent_id'       => $parent?->getKey(),
+                'sort_order'      => $definition['sort_order'] ?? 0,
+                'is_visible'      => $definition['is_visible'] ?? true,
+                'is_enabled'      => true,
+                'seo_title'       => $defaultTranslation['seo_title'],
                 'seo_description' => $defaultTranslation['seo_description'],
-                'show_in_menu' => $definition['show_in_menu'] ?? $parent === null,
-                'product_limit' => $definition['product_limit'] ?? null,
+                'show_in_menu'    => $definition['show_in_menu'] ?? $parent === null,
+                'product_limit'   => $definition['product_limit'] ?? null,
             ],
         );
 
@@ -419,24 +421,24 @@ final class DemoStoreSeeder extends Seeder
             CategoryTranslation::query()->updateOrCreate(
                 [
                     'category_id' => $category->getKey(),
-                    'locale' => $locale,
+                    'locale'      => $locale,
                 ],
                 [
-                    'name' => $data['name'],
-                    'slug' => $data['slug'],
-                    'description' => $data['description'],
+                    'name'              => $data['name'],
+                    'slug'              => $data['slug'],
+                    'description'       => $data['description'],
                     'short_description' => $data['short_description'],
-                    'seo_title' => $data['seo_title'],
-                    'seo_description' => $data['seo_description'],
-                    'seo_keywords' => $data['seo_keywords'],
+                    'seo_title'         => $data['seo_title'],
+                    'seo_description'   => $data['seo_description'],
+                    'seo_keywords'      => $data['seo_keywords'],
                 ],
             );
         }
     }
 
     /**
-     * @param  array<string, Brand>  $brands
-     * @param  array<string, Category>  $categories
+     * @param  array<string, Brand>                                              $brands
+     * @param  array<string, Category>                                           $categories
      * @return array{featured: array<string, Product>, all: array<int, Product>}
      */
     private function seedProducts(array $brands, array $categories): array
@@ -456,30 +458,30 @@ final class DemoStoreSeeder extends Seeder
             $product = Product::query()->updateOrCreate(
                 ['slug' => $definition['slug']],
                 [
-                    'type' => 'simple',
-                    'name' => $definition['translations'][self::DEFAULT_LOCALE]['name'],
-                    'slug' => $definition['slug'],
-                    'sku' => $definition['sku'],
-                    'summary' => $definition['summary'],
-                    'description' => $definition['description'],
-                    'short_description' => $definition['short_description'],
-                    'price' => $definition['price'],
-                    'sale_price' => $definition['sale_price'],
-                    'brand_id' => $brand->getKey(),
-                    'stock_quantity' => $definition['stock_quantity'],
+                    'type'                => 'simple',
+                    'name'                => $definition['translations'][self::DEFAULT_LOCALE]['name'],
+                    'slug'                => $definition['slug'],
+                    'sku'                 => $definition['sku'],
+                    'summary'             => $definition['summary'],
+                    'description'         => $definition['description'],
+                    'short_description'   => $definition['short_description'],
+                    'price'               => $definition['price'],
+                    'sale_price'          => $definition['sale_price'],
+                    'brand_id'            => $brand->getKey(),
+                    'stock_quantity'      => $definition['stock_quantity'],
                     'low_stock_threshold' => $definition['low_stock_threshold'],
-                    'manage_stock' => true,
-                    'weight' => $definition['weight'],
-                    'length' => $definition['length'],
-                    'width' => $definition['width'],
-                    'height' => $definition['height'],
-                    'is_visible' => true,
-                    'is_enabled' => true,
-                    'is_featured' => $definition['is_featured'],
-                    'status' => 'published',
-                    'published_at' => $definition['published_at'],
-                    'seo_title' => $definition['translations'][self::DEFAULT_LOCALE]['seo_title'],
-                    'seo_description' => $definition['translations'][self::DEFAULT_LOCALE]['seo_description'],
+                    'manage_stock'        => true,
+                    'weight'              => $definition['weight'],
+                    'length'              => $definition['length'],
+                    'width'               => $definition['width'],
+                    'height'              => $definition['height'],
+                    'is_visible'          => true,
+                    'is_enabled'          => true,
+                    'is_featured'         => $definition['is_featured'],
+                    'status'              => 'published',
+                    'published_at'        => $definition['published_at'],
+                    'seo_title'           => $definition['translations'][self::DEFAULT_LOCALE]['seo_title'],
+                    'seo_description'     => $definition['translations'][self::DEFAULT_LOCALE]['seo_description'],
                 ],
             );
 
@@ -498,7 +500,7 @@ final class DemoStoreSeeder extends Seeder
         return [
             'featured' => [
                 'rotaryHammer' => $featured['rotary-hammer'] ?? $allProducts[0],
-                'comboKit' => $featured['combo-kit'] ?? $allProducts[1] ?? $allProducts[0],
+                'comboKit'     => $featured['combo-kit'] ?? $allProducts[1] ?? $allProducts[0],
                 'safetyHelmet' => $featured['safety-helmet'] ?? $allProducts[2] ?? $allProducts[0],
             ],
             'all' => $allProducts,
@@ -506,8 +508,8 @@ final class DemoStoreSeeder extends Seeder
     }
 
     /**
-     * @param  array<string, Brand>  $brands
-     * @param  array<string, Category>  $categories
+     * @param  array<string, Brand>             $brands
+     * @param  array<string, Category>          $categories
      * @return array<int, array<string, mixed>>
      */
     private function buildProductDefinitions(array $brands, array $categories): array
@@ -539,7 +541,7 @@ final class DemoStoreSeeder extends Seeder
 
                 $brand = $brands[$brandKey];
                 $series = $modelDefinition['series'] ?? '';
-                $seriesLabel = $series !== '' ? $series.' ' : '';
+                $seriesLabel = $series !== '' ? $series . ' ' : '';
                 $specification = $modelDefinition['spec'] ?? [];
 
                 foreach ($modelDefinition['items'] as $itemDefinition) {
@@ -554,11 +556,11 @@ final class DemoStoreSeeder extends Seeder
                         $specification,
                         Arr::except($itemDefinition, ['price', 'sale_price', 'weight_kg']),
                         [
-                            'brand' => $brand->name,
-                            'model' => $itemDefinition['model'],
-                            'series' => $series,
+                            'brand'        => $brand->name,
+                            'model'        => $itemDefinition['model'],
+                            'series'       => $series,
                             'series_label' => $seriesLabel,
-                            'weight' => number_format((float) $weight, 1, '.', '').' kg',
+                            'weight'       => number_format((float) $weight, 1, '.', '') . ' kg',
                             'weight_value' => $weight,
                         ],
                     );
@@ -583,14 +585,14 @@ final class DemoStoreSeeder extends Seeder
                         $seoDescription = $this->renderTemplate($templates['seo_description'], $placeholders);
 
                         $translations[$locale] = [
-                            'name' => $name,
-                            'slug' => Str::slug($name),
-                            'summary' => $summary,
-                            'description' => $description,
+                            'name'              => $name,
+                            'slug'              => Str::slug($name),
+                            'summary'           => $summary,
+                            'description'       => $description,
                             'short_description' => $shortDescription,
-                            'seo_title' => $seoTitle,
-                            'seo_description' => $seoDescription,
-                            'meta_keywords' => implode(', ', array_filter([
+                            'seo_title'         => $seoTitle,
+                            'seo_description'   => $seoDescription,
+                            'meta_keywords'     => implode(', ', array_filter([
                                 $brand->name,
                                 $series,
                                 $placeholders['type_label'],
@@ -599,33 +601,33 @@ final class DemoStoreSeeder extends Seeder
                                 $placeholders['tools_included'] ?? null,
                             ])),
                             'alt_text' => $this->renderTemplate(match ($locale) {
-                                'lt' => '{brand} {model} {type_display} iliustracija',
-                                'lv' => '{brand} {model} {type_display} attēls',
+                                'lt'    => '{brand} {model} {type_display} iliustracija',
+                                'lv'    => '{brand} {model} {type_display} attēls',
                                 default => '{brand} {model} {type_display} product photo',
                             }, $placeholders),
                         ];
                     }
 
                     $definitions[] = [
-                        'type_key' => $typeKey,
-                        'brand' => $brandKey,
-                        'slug' => Str::slug($brand->slug.'-'.$itemDefinition['model'].'-'.$typeKey),
-                        'sku' => $sku,
-                        'summary' => $translations[self::DEFAULT_LOCALE]['summary'],
-                        'description' => $translations[self::DEFAULT_LOCALE]['description'],
-                        'short_description' => $translations[self::DEFAULT_LOCALE]['short_description'],
-                        'price' => $itemDefinition['price'],
-                        'sale_price' => $itemDefinition['sale_price'] ?? null,
-                        'stock_quantity' => $configuration['stock']['base'] + (($sequence - 1) % 4) * $configuration['stock']['step'],
+                        'type_key'            => $typeKey,
+                        'brand'               => $brandKey,
+                        'slug'                => Str::slug($brand->slug . '-' . $itemDefinition['model'] . '-' . $typeKey),
+                        'sku'                 => $sku,
+                        'summary'             => $translations[self::DEFAULT_LOCALE]['summary'],
+                        'description'         => $translations[self::DEFAULT_LOCALE]['description'],
+                        'short_description'   => $translations[self::DEFAULT_LOCALE]['short_description'],
+                        'price'               => $itemDefinition['price'],
+                        'sale_price'          => $itemDefinition['sale_price'] ?? null,
+                        'stock_quantity'      => $configuration['stock']['base'] + (($sequence - 1) % 4) * $configuration['stock']['step'],
                         'low_stock_threshold' => max(2, (int) floor($configuration['stock']['step'] / 2) + 1),
-                        'weight' => $weight,
-                        'length' => $configuration['dimensions']['length'],
-                        'width' => $configuration['dimensions']['width'],
-                        'height' => $configuration['dimensions']['height'],
-                        'is_featured' => ! $typeFeaturedAssigned,
-                        'published_at' => $now->copy()->subDays($sequence + count($definitions) % 30),
-                        'category_ids' => $categoryIds,
-                        'translations' => $translations,
+                        'weight'              => $weight,
+                        'length'              => $configuration['dimensions']['length'],
+                        'width'               => $configuration['dimensions']['width'],
+                        'height'              => $configuration['dimensions']['height'],
+                        'is_featured'         => ! $typeFeaturedAssigned,
+                        'published_at'        => $now->copy()->subDays($sequence + count($definitions) % 30),
+                        'category_ids'        => $categoryIds,
+                        'translations'        => $translations,
                     ];
 
                     $typeFeaturedAssigned = true;
@@ -637,7 +639,7 @@ final class DemoStoreSeeder extends Seeder
     }
 
     /**
-     * @param  array<string, Category>  $categories
+     * @param  array<string, Category> $categories
      * @return array<int, int>
      */
     private function resolveCategoryIds(string $categoryKey, array $categories): array
@@ -666,7 +668,7 @@ final class DemoStoreSeeder extends Seeder
         $customers = [
             'greta' => $this->upsertUser('greta@demo.test', 'Greta Mikalajūnaitė'),
             'jonas' => $this->upsertUser('jonas@demo.test', 'Jonas Kazlauskas'),
-            'ruta' => $this->upsertUser('ruta@demo.test', 'Rūta Petrauskienė'),
+            'ruta'  => $this->upsertUser('ruta@demo.test', 'Rūta Petrauskienė'),
         ];
 
         Collection::make($customers)->each(static function (User $user): void {
@@ -679,10 +681,10 @@ final class DemoStoreSeeder extends Seeder
     private function upsertUser(string $email, string $name): User
     {
         $attributes = User::factory()->state([
-            'email' => $email,
-            'name' => $name,
+            'email'            => $email,
+            'name'             => $name,
             'preferred_locale' => 'lt',
-            'is_admin' => false,
+            'is_admin'         => false,
         ])->raw();
 
         return User::query()->updateOrCreate(
@@ -692,8 +694,8 @@ final class DemoStoreSeeder extends Seeder
     }
 
     /**
-     * @param  array<string, User>  $customers
-     * @param  array{featured: array<string, Product>, all: array<int, Product>}  $catalog
+     * @param array<string, User>                                               $customers
+     * @param array{featured: array<string, Product>, all: array<int, Product>} $catalog
      */
     private function seedOrders(array $customers, array $catalog, Channel $channel, Zone $zone, Country $country): void
     {
@@ -706,42 +708,42 @@ final class DemoStoreSeeder extends Seeder
 
         $orders = [
             [
-                'number' => 'ORD-100001',
-                'user' => $customers['greta'],
-                'status' => 'completed',
+                'number'         => 'ORD-100001',
+                'user'           => $customers['greta'],
+                'status'         => OrderStatus::COMPLETED->value,
                 'payment_status' => 'paid',
-                'items' => [
+                'items'          => [
                     ['product' => $featured['rotaryHammer'], 'quantity' => 1],
                     ['product' => $featured['safetyHelmet'], 'quantity' => 2],
                 ],
-                'shipping' => 12.00,
-                'discount' => 0.00,
+                'shipping'      => 12.00,
+                'discount'      => 0.00,
                 'shipping_days' => 2,
             ],
             [
-                'number' => 'ORD-100002',
-                'user' => $customers['jonas'],
-                'status' => 'processing',
+                'number'         => 'ORD-100002',
+                'user'           => $customers['jonas'],
+                'status'         => OrderStatus::PROCESSING->value,
                 'payment_status' => 'paid',
-                'items' => [
+                'items'          => [
                     ['product' => $featured['comboKit'], 'quantity' => 1],
                     ['product' => $auxiliaryA, 'quantity' => 1],
                 ],
-                'shipping' => 9.50,
-                'discount' => 15.00,
+                'shipping'      => 9.50,
+                'discount'      => 15.00,
                 'shipping_days' => null,
             ],
             [
-                'number' => 'ORD-100003',
-                'user' => $customers['ruta'],
-                'status' => 'completed',
+                'number'         => 'ORD-100003',
+                'user'           => $customers['ruta'],
+                'status'         => OrderStatus::COMPLETED->value,
                 'payment_status' => 'paid',
-                'items' => [
+                'items'          => [
                     ['product' => $auxiliaryB, 'quantity' => 1],
                     ['product' => $auxiliaryC, 'quantity' => 3],
                 ],
-                'shipping' => 14.25,
-                'discount' => 5.00,
+                'shipping'      => 14.25,
+                'discount'      => 5.00,
                 'shipping_days' => 3,
             ],
         ];
@@ -761,23 +763,23 @@ final class DemoStoreSeeder extends Seeder
             $timestamps = $this->orderTimestamps($orderData['status'], $orderData['shipping_days']);
 
             $attributes = Order::factory()->state([
-                'number' => $orderData['number'],
-                'user_id' => $orderData['user']->getKey(),
-                'channel_id' => $channel->getKey(),
-                'zone_id' => $zone->getKey(),
-                'status' => $orderData['status'],
-                'payment_status' => $orderData['payment_status'],
-                'payment_method' => 'bank_transfer',
-                'partner_id' => null,
-                'subtotal' => $subtotal,
-                'tax_amount' => $tax,
-                'shipping_amount' => $shipping,
-                'discount_amount' => $discount,
-                'total' => $total,
-                'currency' => 'EUR',
-                'billing_address' => $this->addressFor($orderData['user'], $country),
+                'number'           => $orderData['number'],
+                'user_id'          => $orderData['user']->getKey(),
+                'channel_id'       => $channel->getKey(),
+                'zone_id'          => $zone->getKey(),
+                'status'           => $orderData['status'],
+                'payment_status'   => $orderData['payment_status'],
+                'payment_method'   => 'bank_transfer',
+                'partner_id'       => null,
+                'subtotal'         => $subtotal,
+                'tax_amount'       => $tax,
+                'shipping_amount'  => $shipping,
+                'discount_amount'  => $discount,
+                'total'            => $total,
+                'currency'         => 'EUR',
+                'billing_address'  => $this->addressFor($orderData['user'], $country),
                 'shipping_address' => $this->addressFor($orderData['user'], $country),
-                'notes' => null,
+                'notes'            => null,
             ] + $timestamps)->raw();
 
             $order = Order::query()->updateOrCreate(
@@ -793,15 +795,15 @@ final class DemoStoreSeeder extends Seeder
                 $quantity = $item['quantity'];
 
                 OrderItem::factory()->state([
-                    'order_id' => $order->getKey(),
-                    'product_id' => $product->getKey(),
+                    'order_id'           => $order->getKey(),
+                    'product_id'         => $product->getKey(),
                     'product_variant_id' => null,
-                    'name' => $product->name,
-                    'sku' => $product->sku,
-                    'quantity' => $quantity,
-                    'unit_price' => $product->price,
-                    'price' => $product->price,
-                    'total' => round($product->price * $quantity, 2),
+                    'name'               => $product->name,
+                    'sku'                => $product->sku,
+                    'quantity'           => $quantity,
+                    'unit_price'         => $product->price,
+                    'price'              => $product->price,
+                    'total'              => round($product->price * $quantity, 2),
                 ])->create();
             }
         }
@@ -812,12 +814,12 @@ final class DemoStoreSeeder extends Seeder
         $now = now();
 
         return match ($status) {
-            'completed' => [
-                'shipped_at' => $shippingDays !== null ? $now->copy()->subDays($shippingDays) : $now->copy()->subDays(2),
+            OrderStatus::COMPLETED->value => [
+                'shipped_at'   => $shippingDays !== null ? $now->copy()->subDays($shippingDays) : $now->copy()->subDays(2),
                 'delivered_at' => $now->copy()->subDay(),
             ],
             default => [
-                'shipped_at' => null,
+                'shipped_at'   => null,
                 'delivered_at' => null,
             ],
         };
@@ -826,13 +828,13 @@ final class DemoStoreSeeder extends Seeder
     private function addressFor(User $user, Country $country): array
     {
         return [
-            'name' => $user->name,
-            'email' => $user->email,
-            'phone' => '+37060000000',
-            'address' => 'Konstitucijos pr. 7',
-            'city' => 'Vilnius',
+            'name'        => $user->name,
+            'email'       => $user->email,
+            'phone'       => '+37060000000',
+            'address'     => 'Konstitucijos pr. 7',
+            'city'        => 'Vilnius',
             'postal_code' => '09308',
-            'country' => $country->name,
+            'country'     => $country->name,
         ];
     }
 
@@ -848,18 +850,18 @@ final class DemoStoreSeeder extends Seeder
             ProductTranslation::query()->updateOrCreate(
                 [
                     'product_id' => $product->getKey(),
-                    'locale' => $locale,
+                    'locale'     => $locale,
                 ],
                 [
-                    'name' => $data['name'],
-                    'slug' => $data['slug'],
-                    'summary' => $data['summary'],
-                    'description' => $data['description'],
+                    'name'              => $data['name'],
+                    'slug'              => $data['slug'],
+                    'summary'           => $data['summary'],
+                    'description'       => $data['description'],
                     'short_description' => $data['short_description'],
-                    'seo_title' => $data['seo_title'],
-                    'seo_description' => $data['seo_description'],
-                    'meta_keywords' => $data['meta_keywords'],
-                    'alt_text' => $data['alt_text'],
+                    'seo_title'         => $data['seo_title'],
+                    'seo_description'   => $data['seo_description'],
+                    'meta_keywords'     => $data['meta_keywords'],
+                    'alt_text'          => $data['alt_text'],
                 ],
             );
         }
@@ -870,17 +872,17 @@ final class DemoStoreSeeder extends Seeder
         ProductImage::withoutGlobalScopes()->where('product_id', $product->getKey())->delete();
 
         $paths = [
-            ['path' => "product-images/{$slug}/hero.jpg", 'alt' => $product->name.' hero'],
-            ['path' => "product-images/{$slug}/detail-1.jpg", 'alt' => $product->name.' detail view'],
-            ['path' => "product-images/{$slug}/detail-2.jpg", 'alt' => $product->name.' components'],
-            ['path' => "product-images/{$slug}/usage.jpg", 'alt' => $product->name.' in use'],
+            ['path' => "product-images/{$slug}/hero.jpg", 'alt' => $product->name . ' hero'],
+            ['path' => "product-images/{$slug}/detail-1.jpg", 'alt' => $product->name . ' detail view'],
+            ['path' => "product-images/{$slug}/detail-2.jpg", 'alt' => $product->name . ' components'],
+            ['path' => "product-images/{$slug}/usage.jpg", 'alt' => $product->name . ' in use'],
         ];
 
         foreach ($paths as $index => $data) {
             ProductImage::query()->create([
                 'product_id' => $product->getKey(),
-                'path' => $data['path'],
-                'alt_text' => $data['alt'],
+                'path'       => $data['path'],
+                'alt_text'   => $data['alt'],
                 'sort_order' => $index + 1,
             ]);
         }
@@ -892,69 +894,69 @@ final class DemoStoreSeeder extends Seeder
     private function basePlaceholderDefaults(): array
     {
         return [
-            'brand' => '',
-            'model' => '',
-            'series_label' => '',
-            'series' => '',
-            'power' => '',
-            'impact_energy' => '',
+            'brand'            => '',
+            'model'            => '',
+            'series_label'     => '',
+            'series'           => '',
+            'power'            => '',
+            'impact_energy'    => '',
             'blows_per_minute' => '',
-            'weight' => '',
-            'weight_value' => null,
-            'disc_diameter' => '',
-            'rpm' => '',
-            'blade_diameter' => '',
-            'cutting_depth' => '',
-            'tools_included' => '',
+            'weight'           => '',
+            'weight_value'     => null,
+            'disc_diameter'    => '',
+            'rpm'              => '',
+            'blade_diameter'   => '',
+            'cutting_depth'    => '',
+            'tools_included'   => '',
             'battery_capacity' => '',
-            'case_type' => '',
-            'accuracy' => '',
-            'range' => '',
-            'self_leveling' => '',
-            'pieces' => '',
-            'drive_size' => '',
-            'material' => '',
-            'blade_type' => '',
-            'body_material' => '',
-            'blade_storage' => '',
-            'safety' => '',
-            'rating' => '',
-            'suspension' => '',
-            'accessories' => '',
-            'valve' => '',
-            'straps' => '',
-            'filters' => '',
-            'upper_material' => '',
-            'outsole' => '',
-            'lining' => '',
-            'length' => '',
-            'gauge' => '',
-            'outlets' => '',
-            'ip_rating' => '',
-            'lumens' => '',
-            'power_source' => '',
-            'modes' => '',
-            'runtime' => '',
-            'protocol' => '',
-            'load' => '',
-            'app_support' => '',
-            'voice_control' => '',
-            'cutting_width' => '',
-            'line_diameter' => '',
-            'pressure' => '',
-            'flow_rate' => '',
-            'motor_type' => '',
-            'hose_length' => '',
-            'color_temp' => '',
-            'type_label' => '',
-            'type_display' => '',
+            'case_type'        => '',
+            'accuracy'         => '',
+            'range'            => '',
+            'self_leveling'    => '',
+            'pieces'           => '',
+            'drive_size'       => '',
+            'material'         => '',
+            'blade_type'       => '',
+            'body_material'    => '',
+            'blade_storage'    => '',
+            'safety'           => '',
+            'rating'           => '',
+            'suspension'       => '',
+            'accessories'      => '',
+            'valve'            => '',
+            'straps'           => '',
+            'filters'          => '',
+            'upper_material'   => '',
+            'outsole'          => '',
+            'lining'           => '',
+            'length'           => '',
+            'gauge'            => '',
+            'outlets'          => '',
+            'ip_rating'        => '',
+            'lumens'           => '',
+            'power_source'     => '',
+            'modes'            => '',
+            'runtime'          => '',
+            'protocol'         => '',
+            'load'             => '',
+            'app_support'      => '',
+            'voice_control'    => '',
+            'cutting_width'    => '',
+            'line_diameter'    => '',
+            'pressure'         => '',
+            'flow_rate'        => '',
+            'motor_type'       => '',
+            'hose_length'      => '',
+            'color_temp'       => '',
+            'type_label'       => '',
+            'type_display'     => '',
         ];
     }
 
     private function renderTemplate(string $template, array $placeholders): string
     {
         return str_replace(
-            array_map(static fn (string $key) => '{'.$key.'}', array_keys($placeholders)),
+            array_map(static fn (string $key) => '{' . $key . '}', array_keys($placeholders)),
             array_values($placeholders),
             $template,
         );
@@ -970,13 +972,13 @@ final class DemoStoreSeeder extends Seeder
         string $seoKeywords
     ): array {
         return [
-            'name' => $name,
-            'slug' => $slug,
-            'description' => $description,
+            'name'              => $name,
+            'slug'              => $slug,
+            'description'       => $description,
             'short_description' => $shortDescription,
-            'seo_title' => $seoTitle,
-            'seo_description' => $seoDescription,
-            'seo_keywords' => $seoKeywords,
+            'seo_title'         => $seoTitle,
+            'seo_description'   => $seoDescription,
+            'seo_keywords'      => $seoKeywords,
         ];
     }
 
@@ -987,8 +989,8 @@ final class DemoStoreSeeder extends Seeder
     {
         return [
             'power-tools' => [
-                'slug' => 'power-tools',
-                'sort_order' => 10,
+                'slug'         => 'power-tools',
+                'sort_order'   => 10,
                 'show_in_menu' => true,
                 'translations' => [
                     'en' => $this->categoryLocale(
@@ -1021,8 +1023,8 @@ final class DemoStoreSeeder extends Seeder
                 ],
                 'children' => [
                     'power-tools.rotary-hammers' => [
-                        'slug' => 'rotary-hammers',
-                        'sort_order' => 10,
+                        'slug'         => 'rotary-hammers',
+                        'sort_order'   => 10,
                         'translations' => [
                             'en' => $this->categoryLocale(
                                 'Rotary Hammers',
@@ -1054,8 +1056,8 @@ final class DemoStoreSeeder extends Seeder
                         ],
                     ],
                     'power-tools.angle-grinders' => [
-                        'slug' => 'angle-grinders',
-                        'sort_order' => 20,
+                        'slug'         => 'angle-grinders',
+                        'sort_order'   => 20,
                         'translations' => [
                             'en' => $this->categoryLocale(
                                 'Angle Grinders',
@@ -1087,8 +1089,8 @@ final class DemoStoreSeeder extends Seeder
                         ],
                     ],
                     'power-tools.circular-saws' => [
-                        'slug' => 'circular-saws',
-                        'sort_order' => 30,
+                        'slug'         => 'circular-saws',
+                        'sort_order'   => 30,
                         'translations' => [
                             'en' => $this->categoryLocale(
                                 'Circular Saws',
@@ -1120,8 +1122,8 @@ final class DemoStoreSeeder extends Seeder
                         ],
                     ],
                     'power-tools.cordless-kits' => [
-                        'slug' => 'cordless-kits',
-                        'sort_order' => 40,
+                        'slug'         => 'cordless-kits',
+                        'sort_order'   => 40,
                         'translations' => [
                             'en' => $this->categoryLocale(
                                 'Cordless Tool Kits',
@@ -1155,8 +1157,8 @@ final class DemoStoreSeeder extends Seeder
                 ],
             ],
             'hand-tools' => [
-                'slug' => 'hand-tools',
-                'sort_order' => 20,
+                'slug'         => 'hand-tools',
+                'sort_order'   => 20,
                 'show_in_menu' => true,
                 'translations' => [
                     'en' => $this->categoryLocale(
@@ -1189,8 +1191,8 @@ final class DemoStoreSeeder extends Seeder
                 ],
                 'children' => [
                     'hand-tools.measurement' => [
-                        'slug' => 'measurement-tools',
-                        'sort_order' => 10,
+                        'slug'         => 'measurement-tools',
+                        'sort_order'   => 10,
                         'translations' => [
                             'en' => $this->categoryLocale(
                                 'Measurement Tools',
@@ -1222,8 +1224,8 @@ final class DemoStoreSeeder extends Seeder
                         ],
                     ],
                     'hand-tools.wrench-sets' => [
-                        'slug' => 'wrench-sets',
-                        'sort_order' => 20,
+                        'slug'         => 'wrench-sets',
+                        'sort_order'   => 20,
                         'translations' => [
                             'en' => $this->categoryLocale(
                                 'Wrench & Socket Sets',
@@ -1255,8 +1257,8 @@ final class DemoStoreSeeder extends Seeder
                         ],
                     ],
                     'hand-tools.cutting-tools' => [
-                        'slug' => 'cutting-tools',
-                        'sort_order' => 30,
+                        'slug'         => 'cutting-tools',
+                        'sort_order'   => 30,
                         'translations' => [
                             'en' => $this->categoryLocale(
                                 'Cutting & Utility Tools',
@@ -1288,8 +1290,8 @@ final class DemoStoreSeeder extends Seeder
                         ],
                     ],
                     'hand-tools.layout-tools' => [
-                        'slug' => 'layout-tools',
-                        'sort_order' => 40,
+                        'slug'         => 'layout-tools',
+                        'sort_order'   => 40,
                         'translations' => [
                             'en' => $this->categoryLocale(
                                 'Layout & Marking',
@@ -1323,8 +1325,8 @@ final class DemoStoreSeeder extends Seeder
                 ],
             ],
             'building-materials' => [
-                'slug' => 'building-materials',
-                'sort_order' => 30,
+                'slug'         => 'building-materials',
+                'sort_order'   => 30,
                 'show_in_menu' => true,
                 'translations' => [
                     'en' => $this->categoryLocale(
@@ -1357,8 +1359,8 @@ final class DemoStoreSeeder extends Seeder
                 ],
                 'children' => [
                     'building-materials.drywall' => [
-                        'slug' => 'drywall',
-                        'sort_order' => 10,
+                        'slug'         => 'drywall',
+                        'sort_order'   => 10,
                         'translations' => [
                             'en' => $this->categoryLocale(
                                 'Drywall & Plasterboard',
@@ -1390,8 +1392,8 @@ final class DemoStoreSeeder extends Seeder
                         ],
                     ],
                     'building-materials.insulation' => [
-                        'slug' => 'insulation',
-                        'sort_order' => 20,
+                        'slug'         => 'insulation',
+                        'sort_order'   => 20,
                         'translations' => [
                             'en' => $this->categoryLocale(
                                 'Insulation Materials',
@@ -1423,8 +1425,8 @@ final class DemoStoreSeeder extends Seeder
                         ],
                     ],
                     'building-materials.cement-mixes' => [
-                        'slug' => 'cement-mixes',
-                        'sort_order' => 30,
+                        'slug'         => 'cement-mixes',
+                        'sort_order'   => 30,
                         'translations' => [
                             'en' => $this->categoryLocale(
                                 'Cement & Mortar Mixes',
@@ -1456,8 +1458,8 @@ final class DemoStoreSeeder extends Seeder
                         ],
                     ],
                     'building-materials.roofing' => [
-                        'slug' => 'roofing',
-                        'sort_order' => 40,
+                        'slug'         => 'roofing',
+                        'sort_order'   => 40,
                         'translations' => [
                             'en' => $this->categoryLocale(
                                 'Roofing Systems',
@@ -1491,8 +1493,8 @@ final class DemoStoreSeeder extends Seeder
                 ],
             ],
             'safety-equipment' => [
-                'slug' => 'safety-equipment',
-                'sort_order' => 40,
+                'slug'         => 'safety-equipment',
+                'sort_order'   => 40,
                 'show_in_menu' => true,
                 'translations' => [
                     'en' => $this->categoryLocale(
@@ -1525,8 +1527,8 @@ final class DemoStoreSeeder extends Seeder
                 ],
                 'children' => [
                     'safety-equipment.protective-gear' => [
-                        'slug' => 'protective-helmets',
-                        'sort_order' => 10,
+                        'slug'         => 'protective-helmets',
+                        'sort_order'   => 10,
                         'translations' => [
                             'en' => $this->categoryLocale(
                                 'Helmets & Head Protection',
@@ -1558,8 +1560,8 @@ final class DemoStoreSeeder extends Seeder
                         ],
                     ],
                     'safety-equipment.respiratory-protection' => [
-                        'slug' => 'respiratory-protection',
-                        'sort_order' => 20,
+                        'slug'         => 'respiratory-protection',
+                        'sort_order'   => 20,
                         'translations' => [
                             'en' => $this->categoryLocale(
                                 'Respiratory Protection',
@@ -1591,8 +1593,8 @@ final class DemoStoreSeeder extends Seeder
                         ],
                     ],
                     'safety-equipment.footwear' => [
-                        'slug' => 'safety-footwear',
-                        'sort_order' => 30,
+                        'slug'         => 'safety-footwear',
+                        'sort_order'   => 30,
                         'translations' => [
                             'en' => $this->categoryLocale(
                                 'Safety Footwear',
@@ -1624,8 +1626,8 @@ final class DemoStoreSeeder extends Seeder
                         ],
                     ],
                     'safety-equipment.hearing-protection' => [
-                        'slug' => 'hearing-protection',
-                        'sort_order' => 40,
+                        'slug'         => 'hearing-protection',
+                        'sort_order'   => 40,
                         'translations' => [
                             'en' => $this->categoryLocale(
                                 'Hearing Protection',
@@ -1659,8 +1661,8 @@ final class DemoStoreSeeder extends Seeder
                 ],
             ],
             'electrical-lighting' => [
-                'slug' => 'electrical-lighting',
-                'sort_order' => 50,
+                'slug'         => 'electrical-lighting',
+                'sort_order'   => 50,
                 'show_in_menu' => true,
                 'translations' => [
                     'en' => $this->categoryLocale(
@@ -1693,8 +1695,8 @@ final class DemoStoreSeeder extends Seeder
                 ],
                 'children' => [
                     'electrical-lighting.cabling' => [
-                        'slug' => 'power-cabling',
-                        'sort_order' => 10,
+                        'slug'         => 'power-cabling',
+                        'sort_order'   => 10,
                         'translations' => [
                             'en' => $this->categoryLocale(
                                 'Power Cables & Reels',
@@ -1726,8 +1728,8 @@ final class DemoStoreSeeder extends Seeder
                         ],
                     ],
                     'electrical-lighting.work-lighting' => [
-                        'slug' => 'work-lighting',
-                        'sort_order' => 20,
+                        'slug'         => 'work-lighting',
+                        'sort_order'   => 20,
                         'translations' => [
                             'en' => $this->categoryLocale(
                                 'Work Lighting',
@@ -1759,8 +1761,8 @@ final class DemoStoreSeeder extends Seeder
                         ],
                     ],
                     'electrical-lighting.smart-systems' => [
-                        'slug' => 'smart-systems',
-                        'sort_order' => 30,
+                        'slug'         => 'smart-systems',
+                        'sort_order'   => 30,
                         'translations' => [
                             'en' => $this->categoryLocale(
                                 'Smart Controls',
@@ -1792,8 +1794,8 @@ final class DemoStoreSeeder extends Seeder
                         ],
                     ],
                     'electrical-lighting.switchgear' => [
-                        'slug' => 'switchgear',
-                        'sort_order' => 40,
+                        'slug'         => 'switchgear',
+                        'sort_order'   => 40,
                         'translations' => [
                             'en' => $this->categoryLocale(
                                 'Panels & Switchgear',
@@ -1827,8 +1829,8 @@ final class DemoStoreSeeder extends Seeder
                 ],
             ],
             'outdoor-garden' => [
-                'slug' => 'outdoor-garden',
-                'sort_order' => 60,
+                'slug'         => 'outdoor-garden',
+                'sort_order'   => 60,
                 'show_in_menu' => true,
                 'translations' => [
                     'en' => $this->categoryLocale(
@@ -1861,8 +1863,8 @@ final class DemoStoreSeeder extends Seeder
                 ],
                 'children' => [
                     'outdoor-garden.outdoor-power' => [
-                        'slug' => 'outdoor-power',
-                        'sort_order' => 10,
+                        'slug'         => 'outdoor-power',
+                        'sort_order'   => 10,
                         'translations' => [
                             'en' => $this->categoryLocale(
                                 'Outdoor Power Tools',
@@ -1894,8 +1896,8 @@ final class DemoStoreSeeder extends Seeder
                         ],
                     ],
                     'outdoor-garden.water-management' => [
-                        'slug' => 'water-management',
-                        'sort_order' => 20,
+                        'slug'         => 'water-management',
+                        'sort_order'   => 20,
                         'translations' => [
                             'en' => $this->categoryLocale(
                                 'Water Management',
@@ -1927,8 +1929,8 @@ final class DemoStoreSeeder extends Seeder
                         ],
                     ],
                     'outdoor-garden.landscaping' => [
-                        'slug' => 'landscaping',
-                        'sort_order' => 30,
+                        'slug'         => 'landscaping',
+                        'sort_order'   => 30,
                         'translations' => [
                             'en' => $this->categoryLocale(
                                 'Landscaping Accessories',
@@ -1960,8 +1962,8 @@ final class DemoStoreSeeder extends Seeder
                         ],
                     ],
                     'outdoor-garden.storage' => [
-                        'slug' => 'outdoor-storage',
-                        'sort_order' => 40,
+                        'slug'         => 'outdoor-storage',
+                        'sort_order'   => 40,
                         'translations' => [
                             'en' => $this->categoryLocale(
                                 'Outdoor Storage',
@@ -1996,6 +1998,7 @@ final class DemoStoreSeeder extends Seeder
             ],
         ];
     }
+
     /**
      * @return array<string, array<string, mixed>>
      */
@@ -2003,12 +2006,12 @@ final class DemoStoreSeeder extends Seeder
     {
         return [
             'rotary-hammer' => [
-                'category_key' => 'power-tools.rotary-hammers',
-                'sku_prefix' => 'PT-RH',
-                'dimensions' => ['length' => 42.0, 'width' => 12.0, 'height' => 26.0],
+                'category_key'   => 'power-tools.rotary-hammers',
+                'sku_prefix'     => 'PT-RH',
+                'dimensions'     => ['length' => 42.0, 'width' => 12.0, 'height' => 26.0],
                 'default_weight' => 3.6,
-                'stock' => ['base' => 28, 'step' => 6],
-                'type_label' => [
+                'stock'          => ['base' => 28, 'step' => 6],
+                'type_label'     => [
                     'en' => 'rotary hammer',
                     'lt' => 'rotacinis perforatorius',
                     'lv' => 'rotācijas perforators',
@@ -2020,36 +2023,36 @@ final class DemoStoreSeeder extends Seeder
                 ],
                 'templates' => [
                     'en' => [
-                        'name' => '{brand} {model} {series_label}{type_display}',
+                        'name'              => '{brand} {model} {series_label}{type_display}',
                         'short_description' => 'Brushless {type_label} delivering {impact_energy} impact energy on the {power} platform.',
-                        'summary' => 'Cordless {type_label} engineered for demanding concrete drilling and chiselling.',
-                        'description' => '<p>The {brand} {model} {series_label}{type_label} is built for crews that need consistent impact power.</p><ul><li>{impact_energy} impact energy with {blows_per_minute} blows per minute.</li><li>Balanced housing weighing only {weight} to reduce fatigue.</li><li>Runs on the {power} ecosystem so batteries swap across the fleet.</li></ul>',
-                        'seo_title' => '{brand} {model} {type_display} – {power}',
-                        'seo_description' => 'Order the {brand} {model} {type_label} with {impact_energy} impact energy for fast concrete drilling.',
+                        'summary'           => 'Cordless {type_label} engineered for demanding concrete drilling and chiselling.',
+                        'description'       => '<p>The {brand} {model} {series_label}{type_label} is built for crews that need consistent impact power.</p><ul><li>{impact_energy} impact energy with {blows_per_minute} blows per minute.</li><li>Balanced housing weighing only {weight} to reduce fatigue.</li><li>Runs on the {power} ecosystem so batteries swap across the fleet.</li></ul>',
+                        'seo_title'         => '{brand} {model} {type_display} – {power}',
+                        'seo_description'   => 'Order the {brand} {model} {type_label} with {impact_energy} impact energy for fast concrete drilling.',
                     ],
                     'lt' => [
-                        'name' => '{brand} {model} {series_label}{type_display}',
+                        'name'              => '{brand} {model} {series_label}{type_display}',
                         'short_description' => 'Bešepetėlis {type_label} su {impact_energy} smūgio energija ir {power} platforma.',
-                        'summary' => 'Akumuliatorinis {type_label}, skirtas intensyviam gręžimui ir kalimui betone.',
-                        'description' => '<p>{brand} {model} {series_label}{type_label} sukurtas brigadoms, kurioms reikia patikimos smūgio galios.</p><ul><li>{impact_energy} smūgio energija ir iki {blows_per_minute} smūgių per minutę.</li><li>Subalansuotas korpusas sveria tik {weight}, todėl sumažina nuovargį.</li><li>Veikia su {power} platforma, todėl baterijos keičiamos tarp įrankių.</li></ul>',
-                        'seo_title' => '{brand} {model} {type_display} – {power}',
-                        'seo_description' => 'Įsigykite {brand} {model} {type_label} su {impact_energy} smūgio energija greitam darbui betone.',
+                        'summary'           => 'Akumuliatorinis {type_label}, skirtas intensyviam gręžimui ir kalimui betone.',
+                        'description'       => '<p>{brand} {model} {series_label}{type_label} sukurtas brigadoms, kurioms reikia patikimos smūgio galios.</p><ul><li>{impact_energy} smūgio energija ir iki {blows_per_minute} smūgių per minutę.</li><li>Subalansuotas korpusas sveria tik {weight}, todėl sumažina nuovargį.</li><li>Veikia su {power} platforma, todėl baterijos keičiamos tarp įrankių.</li></ul>',
+                        'seo_title'         => '{brand} {model} {type_display} – {power}',
+                        'seo_description'   => 'Įsigykite {brand} {model} {type_label} su {impact_energy} smūgio energija greitam darbui betone.',
                     ],
                     'lv' => [
-                        'name' => '{brand} {model} {series_label}{type_display}',
+                        'name'              => '{brand} {model} {series_label}{type_display}',
                         'short_description' => 'Bezoglītes {type_label} ar {impact_energy} trieciena enerģiju un {power} platformu.',
-                        'summary' => 'Akumulatora {type_label}, kas paredzēts intensīvai urbšanai un kalšanai betonā.',
-                        'description' => '<p>{brand} {model} {series_label}{type_label} izstrādāts brigādēm, kurām nepieciešama stabila trieciena jauda.</p><ul><li>{impact_energy} trieciena enerģija un līdz {blows_per_minute} triecieniem minūtē.</li><li>Līdzsvarots korpuss, kas sver tikai {weight}, samazina nogurumu.</li><li>Darbojas ar {power} platformu, tāpēc baterijas var dalīt starp instrumentiem.</li></ul>',
-                        'seo_title' => '{brand} {model} {type_display} – {power}',
-                        'seo_description' => 'Pasūtiet {brand} {model} {type_label} ar {impact_energy} trieciena enerģiju ātrai urbšanai betonā.',
+                        'summary'           => 'Akumulatora {type_label}, kas paredzēts intensīvai urbšanai un kalšanai betonā.',
+                        'description'       => '<p>{brand} {model} {series_label}{type_label} izstrādāts brigādēm, kurām nepieciešama stabila trieciena jauda.</p><ul><li>{impact_energy} trieciena enerģija un līdz {blows_per_minute} triecieniem minūtē.</li><li>Līdzsvarots korpuss, kas sver tikai {weight}, samazina nogurumu.</li><li>Darbojas ar {power} platformu, tāpēc baterijas var dalīt starp instrumentiem.</li></ul>',
+                        'seo_title'         => '{brand} {model} {type_display} – {power}',
+                        'seo_description'   => 'Pasūtiet {brand} {model} {type_label} ar {impact_energy} trieciena enerģiju ātrai urbšanai betonā.',
                     ],
                 ],
                 'models' => [
                     [
-                        'brand' => 'makita',
+                        'brand'  => 'makita',
                         'series' => 'XGT',
-                        'spec' => [
-                            'power' => '40V XGT',
+                        'spec'   => [
+                            'power'            => '40V XGT',
                             'blows_per_minute' => '0-4800 bpm',
                         ],
                         'items' => [
@@ -2059,10 +2062,10 @@ final class DemoStoreSeeder extends Seeder
                         ],
                     ],
                     [
-                        'brand' => 'bosch',
+                        'brand'  => 'bosch',
                         'series' => 'PROFACTOR',
-                        'spec' => [
-                            'power' => '18V ProCORE',
+                        'spec'   => [
+                            'power'            => '18V ProCORE',
                             'blows_per_minute' => '0-4600 bpm',
                         ],
                         'items' => [
@@ -2072,10 +2075,10 @@ final class DemoStoreSeeder extends Seeder
                         ],
                     ],
                     [
-                        'brand' => 'hilti',
+                        'brand'  => 'hilti',
                         'series' => 'Nuron',
-                        'spec' => [
-                            'power' => '22V Nuron',
+                        'spec'   => [
+                            'power'            => '22V Nuron',
                             'blows_per_minute' => '0-5000 bpm',
                         ],
                         'items' => [
@@ -2087,12 +2090,12 @@ final class DemoStoreSeeder extends Seeder
                 ],
             ],
             'angle-grinder' => [
-                'category_key' => 'power-tools.angle-grinders',
-                'sku_prefix' => 'PT-AG',
-                'dimensions' => ['length' => 36.0, 'width' => 11.5, 'height' => 13.5],
+                'category_key'   => 'power-tools.angle-grinders',
+                'sku_prefix'     => 'PT-AG',
+                'dimensions'     => ['length' => 36.0, 'width' => 11.5, 'height' => 13.5],
                 'default_weight' => 2.4,
-                'stock' => ['base' => 32, 'step' => 5],
-                'type_label' => [
+                'stock'          => ['base' => 32, 'step' => 5],
+                'type_label'     => [
                     'en' => 'angle grinder',
                     'lt' => 'kampinis šlifuoklis',
                     'lv' => 'leņķa slīpmašīna',
@@ -2104,35 +2107,35 @@ final class DemoStoreSeeder extends Seeder
                 ],
                 'templates' => [
                     'en' => [
-                        'name' => '{brand} {model} {series_label}{type_display}',
+                        'name'              => '{brand} {model} {series_label}{type_display}',
                         'short_description' => 'Compact {type_label} with {disc_diameter} disc capacity and {rpm} motor speed.',
-                        'summary' => 'Designed for cutting and grinding metal or masonry with controlled torque.',
-                        'description' => '<p>The {brand} {model} grinder keeps productivity high with a slim grip and safety brake.</p><ul><li>{disc_diameter} cutting capacity supported by a {rpm} brushless motor.</li><li>Weighs {weight} for fatigue-free overhead work.</li><li>Part of the {power} system for shared batteries and chargers.</li></ul>',
-                        'seo_title' => '{brand} {model} {type_display} – {disc_diameter} disc',
-                        'seo_description' => 'Get the {brand} {model} {type_label} with {disc_diameter} disc size and {rpm} speed for precise cutting.',
+                        'summary'           => 'Designed for cutting and grinding metal or masonry with controlled torque.',
+                        'description'       => '<p>The {brand} {model} grinder keeps productivity high with a slim grip and safety brake.</p><ul><li>{disc_diameter} cutting capacity supported by a {rpm} brushless motor.</li><li>Weighs {weight} for fatigue-free overhead work.</li><li>Part of the {power} system for shared batteries and chargers.</li></ul>',
+                        'seo_title'         => '{brand} {model} {type_display} – {disc_diameter} disc',
+                        'seo_description'   => 'Get the {brand} {model} {type_label} with {disc_diameter} disc size and {rpm} speed for precise cutting.',
                     ],
                     'lt' => [
-                        'name' => '{brand} {model} {series_label}{type_display}',
+                        'name'              => '{brand} {model} {series_label}{type_display}',
                         'short_description' => 'Kompaktiškas {type_label} su {disc_diameter} disku ir {rpm} variklio greičiu.',
-                        'summary' => 'Sukurtas metalo ir mūro pjovimui bei šlifavimui su valdomu sukimo momentu.',
-                        'description' => '<p>{brand} {model} šlifuoklis užtikrina našumą dėl plonos rankenos ir saugos stabdžio.</p><ul><li>{disc_diameter} disko talpa ir {rpm} bešepetėlio variklio greitis.</li><li>Sveria {weight}, todėl patogu dirbti virš galvos.</li><li>Priklauso {power} sistemai, todėl baterijas galima keisti tarp įrankių.</li></ul>',
-                        'seo_title' => '{brand} {model} {type_display} – {disc_diameter} diskas',
-                        'seo_description' => 'Įsigykite {brand} {model} {type_label} su {disc_diameter} disku ir {rpm} greičiu tiksliam pjovimui.',
+                        'summary'           => 'Sukurtas metalo ir mūro pjovimui bei šlifavimui su valdomu sukimo momentu.',
+                        'description'       => '<p>{brand} {model} šlifuoklis užtikrina našumą dėl plonos rankenos ir saugos stabdžio.</p><ul><li>{disc_diameter} disko talpa ir {rpm} bešepetėlio variklio greitis.</li><li>Sveria {weight}, todėl patogu dirbti virš galvos.</li><li>Priklauso {power} sistemai, todėl baterijas galima keisti tarp įrankių.</li></ul>',
+                        'seo_title'         => '{brand} {model} {type_display} – {disc_diameter} diskas',
+                        'seo_description'   => 'Įsigykite {brand} {model} {type_label} su {disc_diameter} disku ir {rpm} greičiu tiksliam pjovimui.',
                     ],
                     'lv' => [
-                        'name' => '{brand} {model} {series_label}{type_display}',
+                        'name'              => '{brand} {model} {series_label}{type_display}',
                         'short_description' => 'Kompakta {type_label} ar {disc_diameter} disku un {rpm} motora ātrumu.',
-                        'summary' => 'Paredzēta metāla un mūra griešanai vai slīpēšanai ar kontrolētu griezes momentu.',
-                        'description' => '<p>{brand} {model} slīpmašīna nodrošina produktivitāti ar šauru korpusu un drošības bremzi.</p><ul><li>{disc_diameter} diska kapacitāte un {rpm} bezoglītes motors.</li><li>Svars {weight}, lai samazinātu nogurumu virs galvas darbos.</li><li>Darbojas {power} sistēmā koplietojamām baterijām.</li></ul>',
-                        'seo_title' => '{brand} {model} {type_display} – {disc_diameter} disks',
-                        'seo_description' => 'Iegādājieties {brand} {model} {type_label} ar {disc_diameter} disku un {rpm} ātrumu precīzai griešanai.',
+                        'summary'           => 'Paredzēta metāla un mūra griešanai vai slīpēšanai ar kontrolētu griezes momentu.',
+                        'description'       => '<p>{brand} {model} slīpmašīna nodrošina produktivitāti ar šauru korpusu un drošības bremzi.</p><ul><li>{disc_diameter} diska kapacitāte un {rpm} bezoglītes motors.</li><li>Svars {weight}, lai samazinātu nogurumu virs galvas darbos.</li><li>Darbojas {power} sistēmā koplietojamām baterijām.</li></ul>',
+                        'seo_title'         => '{brand} {model} {type_display} – {disc_diameter} disks',
+                        'seo_description'   => 'Iegādājieties {brand} {model} {type_label} ar {disc_diameter} disku un {rpm} ātrumu precīzai griešanai.',
                     ],
                 ],
                 'models' => [
                     [
-                        'brand' => 'dewalt',
+                        'brand'  => 'dewalt',
                         'series' => 'XR',
-                        'spec' => [
+                        'spec'   => [
                             'power' => '18V XR',
                         ],
                         'items' => [
@@ -2142,9 +2145,9 @@ final class DemoStoreSeeder extends Seeder
                         ],
                     ],
                     [
-                        'brand' => 'milwaukee',
+                        'brand'  => 'milwaukee',
                         'series' => 'M18 FUEL',
-                        'spec' => [
+                        'spec'   => [
                             'power' => 'M18 FUEL',
                         ],
                         'items' => [
@@ -2154,9 +2157,9 @@ final class DemoStoreSeeder extends Seeder
                         ],
                     ],
                     [
-                        'brand' => 'metabo',
+                        'brand'  => 'metabo',
                         'series' => 'LiHD',
-                        'spec' => [
+                        'spec'   => [
                             'power' => '18V LiHD',
                         ],
                         'items' => [
@@ -2169,12 +2172,12 @@ final class DemoStoreSeeder extends Seeder
             ],
 
             'circular-saw' => [
-                'category_key' => 'power-tools.circular-saws',
-                'sku_prefix' => 'PT-CS',
-                'dimensions' => ['length' => 45.0, 'width' => 24.0, 'height' => 28.0],
+                'category_key'   => 'power-tools.circular-saws',
+                'sku_prefix'     => 'PT-CS',
+                'dimensions'     => ['length' => 45.0, 'width' => 24.0, 'height' => 28.0],
                 'default_weight' => 4.5,
-                'stock' => ['base' => 30, 'step' => 4],
-                'type_label' => [
+                'stock'          => ['base' => 30, 'step' => 4],
+                'type_label'     => [
                     'en' => 'circular saw',
                     'lt' => 'diskinis pjūklas',
                     'lv' => 'ripzāģis',
@@ -2186,35 +2189,35 @@ final class DemoStoreSeeder extends Seeder
                 ],
                 'templates' => [
                     'en' => [
-                        'name' => '{brand} {model} {series_label}{type_display}',
+                        'name'              => '{brand} {model} {series_label}{type_display}',
                         'short_description' => 'Cordless {type_label} with {blade_diameter} blade and {cutting_depth} cutting depth.',
-                        'summary' => 'Engineered for framing and sheet goods with precise bevel adjustments.',
-                        'description' => '<p>The {brand} {model} delivers straight cuts with guided rails and clean plunge action.</p><ul><li>{blade_diameter} blade paired with {power} drive for smooth cuts.</li><li>Accurate {cutting_depth} depth control keeps tear-out low.</li><li>Balanced design at {weight} for all-day framing work.</li></ul>',
-                        'seo_title' => '{brand} {model} {type_display} – {blade_diameter} blade',
-                        'seo_description' => 'Purchase the {brand} {model} {type_label} with {blade_diameter} blade and {cutting_depth} depth for efficient framing.',
+                        'summary'           => 'Engineered for framing and sheet goods with precise bevel adjustments.',
+                        'description'       => '<p>The {brand} {model} delivers straight cuts with guided rails and clean plunge action.</p><ul><li>{blade_diameter} blade paired with {power} drive for smooth cuts.</li><li>Accurate {cutting_depth} depth control keeps tear-out low.</li><li>Balanced design at {weight} for all-day framing work.</li></ul>',
+                        'seo_title'         => '{brand} {model} {type_display} – {blade_diameter} blade',
+                        'seo_description'   => 'Purchase the {brand} {model} {type_label} with {blade_diameter} blade and {cutting_depth} depth for efficient framing.',
                     ],
                     'lt' => [
-                        'name' => '{brand} {model} {series_label}{type_display}',
+                        'name'              => '{brand} {model} {series_label}{type_display}',
                         'short_description' => 'Akumuliatorinis {type_label} su {blade_diameter} disku ir {cutting_depth} pjovimo gyliu.',
-                        'summary' => 'Sukurtas karkasų ir plokščių pjovimui su tiksliu nuolydžio reguliavimu.',
-                        'description' => '<p>{brand} {model} užtikrina tiesius pjūvius su kreipiančiomis ir švariu įgilintu pjovimu.</p><ul><li>{blade_diameter} diskas ir {power} pavara lygiam pjovimui.</li><li>Tikslus {cutting_depth} gylio reguliavimas sumažina išplėšimus.</li><li>Subalansuota konstrukcija, sverianti {weight}, leidžia dirbti visą dieną.</li></ul>',
-                        'seo_title' => '{brand} {model} {type_display} – {blade_diameter} diskas',
-                        'seo_description' => 'Įsigykite {brand} {model} {type_label} su {blade_diameter} disku ir {cutting_depth} gyliu efektyviam karkaso pjovimui.',
+                        'summary'           => 'Sukurtas karkasų ir plokščių pjovimui su tiksliu nuolydžio reguliavimu.',
+                        'description'       => '<p>{brand} {model} užtikrina tiesius pjūvius su kreipiančiomis ir švariu įgilintu pjovimu.</p><ul><li>{blade_diameter} diskas ir {power} pavara lygiam pjovimui.</li><li>Tikslus {cutting_depth} gylio reguliavimas sumažina išplėšimus.</li><li>Subalansuota konstrukcija, sverianti {weight}, leidžia dirbti visą dieną.</li></ul>',
+                        'seo_title'         => '{brand} {model} {type_display} – {blade_diameter} diskas',
+                        'seo_description'   => 'Įsigykite {brand} {model} {type_label} su {blade_diameter} disku ir {cutting_depth} gyliu efektyviam karkaso pjovimui.',
                     ],
                     'lv' => [
-                        'name' => '{brand} {model} {series_label}{type_display}',
+                        'name'              => '{brand} {model} {series_label}{type_display}',
                         'short_description' => 'Akumulatora {type_label} ar {blade_diameter} ripu un {cutting_depth} griešanas dziļumu.',
-                        'summary' => 'Paredzēts karkasa un plākšņu materiāliem ar precīzu slīpuma regulēšanu.',
-                        'description' => '<p>{brand} {model} nodrošina taisnus griezumus ar vadotnēm un tīru iegremdējamu darbību.</p><ul><li>{blade_diameter} ripas un {power} piedziņa vienmērīgiem griezumiem.</li><li>Precīza {cutting_depth} dziļuma kontrole mazina šķembas.</li><li>Līdzsvarots dizains ar {weight} svaru ļauj strādāt visu dienu.</li></ul>',
-                        'seo_title' => '{brand} {model} {type_display} – {blade_diameter} ripa',
-                        'seo_description' => 'Iegādājieties {brand} {model} {type_label} ar {blade_diameter} ripu un {cutting_depth} dziļumu efektīvai karkasa zāģēšanai.',
+                        'summary'           => 'Paredzēts karkasa un plākšņu materiāliem ar precīzu slīpuma regulēšanu.',
+                        'description'       => '<p>{brand} {model} nodrošina taisnus griezumus ar vadotnēm un tīru iegremdējamu darbību.</p><ul><li>{blade_diameter} ripas un {power} piedziņa vienmērīgiem griezumiem.</li><li>Precīza {cutting_depth} dziļuma kontrole mazina šķembas.</li><li>Līdzsvarots dizains ar {weight} svaru ļauj strādāt visu dienu.</li></ul>',
+                        'seo_title'         => '{brand} {model} {type_display} – {blade_diameter} ripa',
+                        'seo_description'   => 'Iegādājieties {brand} {model} {type_label} ar {blade_diameter} ripu un {cutting_depth} dziļumu efektīvai karkasa zāģēšanai.',
                     ],
                 ],
                 'models' => [
                     [
-                        'brand' => 'festool',
+                        'brand'  => 'festool',
                         'series' => 'TSC',
-                        'spec' => [
+                        'spec'   => [
                             'power' => '18V Twin Battery',
                         ],
                         'items' => [
@@ -2224,9 +2227,9 @@ final class DemoStoreSeeder extends Seeder
                         ],
                     ],
                     [
-                        'brand' => 'makita',
+                        'brand'  => 'makita',
                         'series' => 'LXT',
-                        'spec' => [
+                        'spec'   => [
                             'power' => '18V LXT',
                         ],
                         'items' => [
@@ -2236,9 +2239,9 @@ final class DemoStoreSeeder extends Seeder
                         ],
                     ],
                     [
-                        'brand' => 'dewalt',
+                        'brand'  => 'dewalt',
                         'series' => 'XR FlexVolt',
-                        'spec' => [
+                        'spec'   => [
                             'power' => '54V XR FlexVolt',
                         ],
                         'items' => [
@@ -2251,12 +2254,12 @@ final class DemoStoreSeeder extends Seeder
             ],
 
             'combo-kit' => [
-                'category_key' => 'power-tools.cordless-kits',
-                'sku_prefix' => 'PT-CK',
-                'dimensions' => ['length' => 55.0, 'width' => 35.0, 'height' => 32.0],
+                'category_key'   => 'power-tools.cordless-kits',
+                'sku_prefix'     => 'PT-CK',
+                'dimensions'     => ['length' => 55.0, 'width' => 35.0, 'height' => 32.0],
                 'default_weight' => 11.0,
-                'stock' => ['base' => 24, 'step' => 3],
-                'type_label' => [
+                'stock'          => ['base' => 24, 'step' => 3],
+                'type_label'     => [
                     'en' => 'combo kit',
                     'lt' => 'įrankių rinkinys',
                     'lv' => 'instrumentu komplekts',
@@ -2268,35 +2271,35 @@ final class DemoStoreSeeder extends Seeder
                 ],
                 'templates' => [
                     'en' => [
-                        'name' => '{brand} {model} {series_label}{type_display}',
+                        'name'              => '{brand} {model} {series_label}{type_display}',
                         'short_description' => '{tools_included} with {battery_capacity} batteries and {case_type}.',
-                        'summary' => 'Complete {power} {type_label} for multi-trade crews with shared batteries.',
-                        'description' => '<p>The {brand} {model} kit keeps crews productive from drilling to cutting.</p><ul><li>{tools_included} cover daily jobsite tasks.</li><li>Supplied with {battery_capacity} batteries on the {power} system.</li><li>Delivered in {case_type} for organised transport.</li></ul>',
-                        'seo_title' => '{brand} {model} {type_display} – {tools_included}',
-                        'seo_description' => 'Bundle the {brand} {model} kit with {battery_capacity} batteries and {case_type} storage on the {power} platform.',
+                        'summary'           => 'Complete {power} {type_label} for multi-trade crews with shared batteries.',
+                        'description'       => '<p>The {brand} {model} kit keeps crews productive from drilling to cutting.</p><ul><li>{tools_included} cover daily jobsite tasks.</li><li>Supplied with {battery_capacity} batteries on the {power} system.</li><li>Delivered in {case_type} for organised transport.</li></ul>',
+                        'seo_title'         => '{brand} {model} {type_display} – {tools_included}',
+                        'seo_description'   => 'Bundle the {brand} {model} kit with {battery_capacity} batteries and {case_type} storage on the {power} platform.',
                     ],
                     'lt' => [
-                        'name' => '{brand} {model} {series_label}{type_display}',
+                        'name'              => '{brand} {model} {series_label}{type_display}',
                         'short_description' => '{tools_included} su {battery_capacity} akumuliatoriais ir {case_type}.',
-                        'summary' => 'Pilnas {power} {type_label} skirtingoms brigadoms su bendromis baterijomis.',
-                        'description' => '<p>{brand} {model} rinkinys padeda komandoms nuo gręžimo iki pjovimo.</p><ul><li>{tools_included} padengia kasdienius darbų aikštelės poreikius.</li><li>Pridėti {battery_capacity} akumuliatoriai {power} platformai.</li><li>Supakuota į {case_type} patogiam transportavimui.</li></ul>',
-                        'seo_title' => '{brand} {model} {type_display} – {tools_included}',
-                        'seo_description' => 'Rinkinyje yra {battery_capacity} akumuliatoriai ir {case_type} dėklai {power} platformai.',
+                        'summary'           => 'Pilnas {power} {type_label} skirtingoms brigadoms su bendromis baterijomis.',
+                        'description'       => '<p>{brand} {model} rinkinys padeda komandoms nuo gręžimo iki pjovimo.</p><ul><li>{tools_included} padengia kasdienius darbų aikštelės poreikius.</li><li>Pridėti {battery_capacity} akumuliatoriai {power} platformai.</li><li>Supakuota į {case_type} patogiam transportavimui.</li></ul>',
+                        'seo_title'         => '{brand} {model} {type_display} – {tools_included}',
+                        'seo_description'   => 'Rinkinyje yra {battery_capacity} akumuliatoriai ir {case_type} dėklai {power} platformai.',
                     ],
                     'lv' => [
-                        'name' => '{brand} {model} {series_label}{type_display}',
+                        'name'              => '{brand} {model} {series_label}{type_display}',
                         'short_description' => '{tools_included} ar {battery_capacity} baterijām un {case_type}.',
-                        'summary' => 'Pilns {power} {type_label} dažādu darbu komandām ar kopīgām baterijām.',
-                        'description' => '<p>{brand} {model} komplekts uztur produktivitāti no urbšanas līdz zāģēšanai.</p><ul><li>{tools_included} nosedz ikdienas būvlaukuma uzdevumus.</li><li>Iekļautas {battery_capacity} baterijas {power} platformai.</li><li>Piegādāts {case_type} ērtai pārvadāšanai.</li></ul>',
-                        'seo_title' => '{brand} {model} {type_display} – {tools_included}',
-                        'seo_description' => 'Komplekts ar {battery_capacity} baterijām un {case_type} glabāšanu {power} platformai.',
+                        'summary'           => 'Pilns {power} {type_label} dažādu darbu komandām ar kopīgām baterijām.',
+                        'description'       => '<p>{brand} {model} komplekts uztur produktivitāti no urbšanas līdz zāģēšanai.</p><ul><li>{tools_included} nosedz ikdienas būvlaukuma uzdevumus.</li><li>Iekļautas {battery_capacity} baterijas {power} platformai.</li><li>Piegādāts {case_type} ērtai pārvadāšanai.</li></ul>',
+                        'seo_title'         => '{brand} {model} {type_display} – {tools_included}',
+                        'seo_description'   => 'Komplekts ar {battery_capacity} baterijām un {case_type} glabāšanu {power} platformai.',
                     ],
                 ],
                 'models' => [
                     [
-                        'brand' => 'makita',
+                        'brand'  => 'makita',
                         'series' => 'LXT',
-                        'spec' => [
+                        'spec'   => [
                             'power' => '18V LXT',
                         ],
                         'items' => [
@@ -2306,9 +2309,9 @@ final class DemoStoreSeeder extends Seeder
                         ],
                     ],
                     [
-                        'brand' => 'dewalt',
+                        'brand'  => 'dewalt',
                         'series' => 'XR',
-                        'spec' => [
+                        'spec'   => [
                             'power' => '18V XR',
                         ],
                         'items' => [
@@ -2318,9 +2321,9 @@ final class DemoStoreSeeder extends Seeder
                         ],
                     ],
                     [
-                        'brand' => 'milwaukee',
+                        'brand'  => 'milwaukee',
                         'series' => 'M18 FUEL',
-                        'spec' => [
+                        'spec'   => [
                             'power' => 'M18 FUEL',
                         ],
                         'items' => [
@@ -2333,12 +2336,12 @@ final class DemoStoreSeeder extends Seeder
             ],
 
             'laser-level' => [
-                'category_key' => 'hand-tools.measurement',
-                'sku_prefix' => 'HT-LL',
-                'dimensions' => ['length' => 20.0, 'width' => 15.0, 'height' => 15.0],
+                'category_key'   => 'hand-tools.measurement',
+                'sku_prefix'     => 'HT-LL',
+                'dimensions'     => ['length' => 20.0, 'width' => 15.0, 'height' => 15.0],
                 'default_weight' => 1.5,
-                'stock' => ['base' => 40, 'step' => 6],
-                'type_label' => [
+                'stock'          => ['base' => 40, 'step' => 6],
+                'type_label'     => [
                     'en' => 'laser level',
                     'lt' => 'lazerinis nivelyras',
                     'lv' => 'lāzera līmeņrādis',
@@ -2350,35 +2353,35 @@ final class DemoStoreSeeder extends Seeder
                 ],
                 'templates' => [
                     'en' => [
-                        'name' => '{brand} {model} {series_label}{type_display}',
+                        'name'              => '{brand} {model} {series_label}{type_display}',
                         'short_description' => 'Self-leveling {type_label} with {accuracy} accuracy across {range} working distance.',
-                        'summary' => 'Bright beams with {modes} modes powered by {power_source}.',
-                        'description' => '<p>Set reference lines indoors and outdoors with the {brand} {model}.</p><ul><li>{self_leveling} keeps lines true within {accuracy}.</li><li>Projects up to {range} with flexible {modes} modes.</li><li>Runs on {power_source} for {runtime} continuous operation.</li></ul>',
-                        'seo_title' => '{brand} {model} {type_display} – {accuracy} accuracy',
-                        'seo_description' => 'Level faster with the {brand} {model} {type_label} offering {accuracy} precision and {range} range.',
+                        'summary'           => 'Bright beams with {modes} modes powered by {power_source}.',
+                        'description'       => '<p>Set reference lines indoors and outdoors with the {brand} {model}.</p><ul><li>{self_leveling} keeps lines true within {accuracy}.</li><li>Projects up to {range} with flexible {modes} modes.</li><li>Runs on {power_source} for {runtime} continuous operation.</li></ul>',
+                        'seo_title'         => '{brand} {model} {type_display} – {accuracy} accuracy',
+                        'seo_description'   => 'Level faster with the {brand} {model} {type_label} offering {accuracy} precision and {range} range.',
                     ],
                     'lt' => [
-                        'name' => '{brand} {model} {series_label}{type_display}',
+                        'name'              => '{brand} {model} {series_label}{type_display}',
                         'short_description' => 'Savaime išsilyginantis {type_label} su {accuracy} tikslumu ir {range} atstumu.',
-                        'summary' => 'Ryškūs spinduliai su {modes} režimais, maitinami {power_source}.',
-                        'description' => '<p>Nustatykite atskaitos linijas su {brand} {model} įrenginiu.</p><ul><li>{self_leveling} palaiko tikslumą iki {accuracy}.</li><li>Projektuoja iki {range} su lanksčiais {modes} režimais.</li><li>Veikia su {power_source} iki {runtime} nepertraukiamo darbo.</li></ul>',
-                        'seo_title' => '{brand} {model} {type_display} – {accuracy} tikslumas',
-                        'seo_description' => 'Darbus paspartinkite su {brand} {model} {type_label}, kuris pasižymi {accuracy} tikslumu ir {range} nuotoliu.',
+                        'summary'           => 'Ryškūs spinduliai su {modes} režimais, maitinami {power_source}.',
+                        'description'       => '<p>Nustatykite atskaitos linijas su {brand} {model} įrenginiu.</p><ul><li>{self_leveling} palaiko tikslumą iki {accuracy}.</li><li>Projektuoja iki {range} su lanksčiais {modes} režimais.</li><li>Veikia su {power_source} iki {runtime} nepertraukiamo darbo.</li></ul>',
+                        'seo_title'         => '{brand} {model} {type_display} – {accuracy} tikslumas',
+                        'seo_description'   => 'Darbus paspartinkite su {brand} {model} {type_label}, kuris pasižymi {accuracy} tikslumu ir {range} nuotoliu.',
                     ],
                     'lv' => [
-                        'name' => '{brand} {model} {series_label}{type_display}',
+                        'name'              => '{brand} {model} {series_label}{type_display}',
                         'short_description' => 'Pašizlīdzinošs {type_label} ar {accuracy} precizitāti un {range} darbības attālumu.',
-                        'summary' => 'Spilgtas starojums ar {modes} režīmiem, ko nodrošina {power_source}.',
-                        'description' => '<p>Iestatiet atsauces līnijas ar {brand} {model} instrumentu.</p><ul><li>{self_leveling} saglabā precizitāti līdz {accuracy}.</li><li>Projecē līdz {range} ar pielāgojamiem {modes} režīmiem.</li><li>Darbība no {power_source} līdz {runtime} nepārtraukti.</li></ul>',
-                        'seo_title' => '{brand} {model} {type_display} – {accuracy} precizitāte',
-                        'seo_description' => 'Izlīdziniet ātrāk ar {brand} {model} {type_label}, nodrošinot {accuracy} precizitāti un {range} diapazonu.',
+                        'summary'           => 'Spilgtas starojums ar {modes} režīmiem, ko nodrošina {power_source}.',
+                        'description'       => '<p>Iestatiet atsauces līnijas ar {brand} {model} instrumentu.</p><ul><li>{self_leveling} saglabā precizitāti līdz {accuracy}.</li><li>Projecē līdz {range} ar pielāgojamiem {modes} režīmiem.</li><li>Darbība no {power_source} līdz {runtime} nepārtraukti.</li></ul>',
+                        'seo_title'         => '{brand} {model} {type_display} – {accuracy} precizitāte',
+                        'seo_description'   => 'Izlīdziniet ātrāk ar {brand} {model} {type_label}, nodrošinot {accuracy} precizitāti un {range} diapazonu.',
                     ],
                 ],
                 'models' => [
                     [
-                        'brand' => 'bosch',
+                        'brand'  => 'bosch',
                         'series' => 'Professional',
-                        'spec' => [
+                        'spec'   => [
                             'power_source' => '12V Li-ion',
                         ],
                         'items' => [
@@ -2388,9 +2391,9 @@ final class DemoStoreSeeder extends Seeder
                         ],
                     ],
                     [
-                        'brand' => 'dewalt',
+                        'brand'  => 'dewalt',
                         'series' => 'XR',
-                        'spec' => [
+                        'spec'   => [
                             'power_source' => '12V XR Li-ion',
                         ],
                         'items' => [
@@ -2400,9 +2403,9 @@ final class DemoStoreSeeder extends Seeder
                         ],
                     ],
                     [
-                        'brand' => 'hilti',
+                        'brand'  => 'hilti',
                         'series' => 'Nuron',
-                        'spec' => [
+                        'spec'   => [
                             'power_source' => '22V Nuron Li-ion',
                         ],
                         'items' => [
@@ -2415,12 +2418,12 @@ final class DemoStoreSeeder extends Seeder
             ],
 
             'socket-set' => [
-                'category_key' => 'hand-tools.wrench-sets',
-                'sku_prefix' => 'HT-SS',
-                'dimensions' => ['length' => 45.0, 'width' => 30.0, 'height' => 12.0],
+                'category_key'   => 'hand-tools.wrench-sets',
+                'sku_prefix'     => 'HT-SS',
+                'dimensions'     => ['length' => 45.0, 'width' => 30.0, 'height' => 12.0],
                 'default_weight' => 6.0,
-                'stock' => ['base' => 34, 'step' => 5],
-                'type_label' => [
+                'stock'          => ['base' => 34, 'step' => 5],
+                'type_label'     => [
                     'en' => 'socket set',
                     'lt' => 'galvučių rinkinys',
                     'lv' => 'uzgaļu komplekts',
@@ -2432,35 +2435,35 @@ final class DemoStoreSeeder extends Seeder
                 ],
                 'templates' => [
                     'en' => [
-                        'name' => '{brand} {model} {series_label}{type_display}',
+                        'name'              => '{brand} {model} {series_label}{type_display}',
                         'short_description' => '{pieces} {type_label} with {drive_size} drive in {case_type}.',
-                        'summary' => 'Organised for mechanics with {material} components and secure latches.',
-                        'description' => '<p>The {brand} {model} kit keeps sockets sorted for workshop or service-van use.</p><ul><li>{pieces} assortment covering common metric sizes.</li><li>{drive_size} drive with durable {material} construction.</li><li>Stored inside {case_type} for transport and storage.</li></ul>',
-                        'seo_title' => '{brand} {model} {type_display} – {pieces}',
-                        'seo_description' => 'Equip crews with the {brand} {model} {type_label} featuring {drive_size} drive and {case_type}.',
+                        'summary'           => 'Organised for mechanics with {material} components and secure latches.',
+                        'description'       => '<p>The {brand} {model} kit keeps sockets sorted for workshop or service-van use.</p><ul><li>{pieces} assortment covering common metric sizes.</li><li>{drive_size} drive with durable {material} construction.</li><li>Stored inside {case_type} for transport and storage.</li></ul>',
+                        'seo_title'         => '{brand} {model} {type_display} – {pieces}',
+                        'seo_description'   => 'Equip crews with the {brand} {model} {type_label} featuring {drive_size} drive and {case_type}.',
                     ],
                     'lt' => [
-                        'name' => '{brand} {model} {series_label}{type_display}',
+                        'name'              => '{brand} {model} {series_label}{type_display}',
                         'short_description' => '{pieces} {type_label} su {drive_size} ir {case_type}.',
-                        'summary' => 'Tvarkingas komplektas meistrams iš {material} komponentų su patikimais užraktais.',
-                        'description' => '<p>{brand} {model} rinkinys palaiko tvarką dirbtuvėse ar serviso automobilyje.</p><ul><li>{pieces} komplektacija kasdieniams metrinio standarto dydžiams.</li><li>{drive_size} pavara ir patvarus {material} korpusas.</li><li>Laikoma {case_type} patogiam transportavimui.</li></ul>',
-                        'seo_title' => '{brand} {model} {type_display} – {pieces}',
-                        'seo_description' => 'Aprūpinkite brigadas {brand} {model} {type_label}, turinčiu {drive_size} ir {case_type}.',
+                        'summary'           => 'Tvarkingas komplektas meistrams iš {material} komponentų su patikimais užraktais.',
+                        'description'       => '<p>{brand} {model} rinkinys palaiko tvarką dirbtuvėse ar serviso automobilyje.</p><ul><li>{pieces} komplektacija kasdieniams metrinio standarto dydžiams.</li><li>{drive_size} pavara ir patvarus {material} korpusas.</li><li>Laikoma {case_type} patogiam transportavimui.</li></ul>',
+                        'seo_title'         => '{brand} {model} {type_display} – {pieces}',
+                        'seo_description'   => 'Aprūpinkite brigadas {brand} {model} {type_label}, turinčiu {drive_size} ir {case_type}.',
                     ],
                     'lv' => [
-                        'name' => '{brand} {model} {series_label}{type_display}',
+                        'name'              => '{brand} {model} {series_label}{type_display}',
                         'short_description' => '{pieces} {type_label} ar {drive_size} un {case_type}.',
-                        'summary' => 'Sakārtots komplekts mehāniķiem ar {material} detaļām un drošām aizdarēm.',
-                        'description' => '<p>{brand} {model} komplekts uztur kārtību darbnīcā vai servisa busā.</p><ul><li>{pieces} atlase ikdienas metriskajiem izmēriem.</li><li>{drive_size} piedziņa ar izturīgu {material} konstrukciju.</li><li>Glabājas {case_type} ērtai pārvadāšanai.</li></ul>',
-                        'seo_title' => '{brand} {model} {type_display} – {pieces}',
-                        'seo_description' => 'Nodrošiniet komandas ar {brand} {model} {type_label}, kas ietver {drive_size} un {case_type}.',
+                        'summary'           => 'Sakārtots komplekts mehāniķiem ar {material} detaļām un drošām aizdarēm.',
+                        'description'       => '<p>{brand} {model} komplekts uztur kārtību darbnīcā vai servisa busā.</p><ul><li>{pieces} atlase ikdienas metriskajiem izmēriem.</li><li>{drive_size} piedziņa ar izturīgu {material} konstrukciju.</li><li>Glabājas {case_type} ērtai pārvadāšanai.</li></ul>',
+                        'seo_title'         => '{brand} {model} {type_display} – {pieces}',
+                        'seo_description'   => 'Nodrošiniet komandas ar {brand} {model} {type_label}, kas ietver {drive_size} un {case_type}.',
                     ],
                 ],
                 'models' => [
                     [
-                        'brand' => 'ridgid',
+                        'brand'  => 'ridgid',
                         'series' => 'Pro',
-                        'spec' => [
+                        'spec'   => [
                             'material' => 'Chrome vanadium steel',
                         ],
                         'items' => [
@@ -2470,9 +2473,9 @@ final class DemoStoreSeeder extends Seeder
                         ],
                     ],
                     [
-                        'brand' => 'stanley',
+                        'brand'  => 'stanley',
                         'series' => 'FatMax',
-                        'spec' => [
+                        'spec'   => [
                             'material' => 'Chrome vanadium steel',
                         ],
                         'items' => [
@@ -2482,9 +2485,9 @@ final class DemoStoreSeeder extends Seeder
                         ],
                     ],
                     [
-                        'brand' => 'milwaukee',
+                        'brand'  => 'milwaukee',
                         'series' => 'Packout',
-                        'spec' => [
+                        'spec'   => [
                             'material' => 'Alloy steel',
                         ],
                         'items' => [
@@ -2497,12 +2500,12 @@ final class DemoStoreSeeder extends Seeder
             ],
 
             'utility-knife' => [
-                'category_key' => 'hand-tools.cutting-tools',
-                'sku_prefix' => 'HT-UK',
-                'dimensions' => ['length' => 18.0, 'width' => 6.0, 'height' => 3.0],
+                'category_key'   => 'hand-tools.cutting-tools',
+                'sku_prefix'     => 'HT-UK',
+                'dimensions'     => ['length' => 18.0, 'width' => 6.0, 'height' => 3.0],
                 'default_weight' => 0.4,
-                'stock' => ['base' => 60, 'step' => 8],
-                'type_label' => [
+                'stock'          => ['base' => 60, 'step' => 8],
+                'type_label'     => [
                     'en' => 'utility knife',
                     'lt' => 'universalus peilis',
                     'lv' => 'universālais nazis',
@@ -2514,35 +2517,35 @@ final class DemoStoreSeeder extends Seeder
                 ],
                 'templates' => [
                     'en' => [
-                        'name' => '{brand} {model} {series_label}{type_display}',
+                        'name'              => '{brand} {model} {series_label}{type_display}',
                         'short_description' => 'Lightweight {type_label} with {blade_type} blade and {safety}.',
-                        'summary' => 'Ergonomic {body_material} handle with {blade_storage} for spare blades.',
-                        'description' => '<p>The {brand} {model} tackles drywall, flooring, and packaging.</p><ul><li>{blade_type} blade stays sharp for long cuts.</li><li>{body_material} housing sits secure in the hand.</li><li>{blade_storage} keeps replacements ready with {safety} protection.</li></ul>',
-                        'seo_title' => '{brand} {model} {type_display} – {blade_type}',
-                        'seo_description' => 'Choose the {brand} {model} {type_label} featuring {body_material} grip and {safety}.',
+                        'summary'           => 'Ergonomic {body_material} handle with {blade_storage} for spare blades.',
+                        'description'       => '<p>The {brand} {model} tackles drywall, flooring, and packaging.</p><ul><li>{blade_type} blade stays sharp for long cuts.</li><li>{body_material} housing sits secure in the hand.</li><li>{blade_storage} keeps replacements ready with {safety} protection.</li></ul>',
+                        'seo_title'         => '{brand} {model} {type_display} – {blade_type}',
+                        'seo_description'   => 'Choose the {brand} {model} {type_label} featuring {body_material} grip and {safety}.',
                     ],
                     'lt' => [
-                        'name' => '{brand} {model} {series_label}{type_display}',
+                        'name'              => '{brand} {model} {series_label}{type_display}',
                         'short_description' => 'Lengvas {type_label} su {blade_type} geležte ir {safety}.',
-                        'summary' => 'Ergonomiška {body_material} rankena su {blade_storage} atsarginėms geležtėms.',
-                        'description' => '<p>{brand} {model} tinka gipskartoniui, grindims ir pakuotėms.</p><ul><li>{blade_type} geležtė ilgai išlieka aštri.</li><li>{body_material} korpusas patogiai laikosi rankoje.</li><li>{blade_storage} saugo atsargines geležtes su {safety} apsauga.</li></ul>',
-                        'seo_title' => '{brand} {model} {type_display} – {blade_type}',
-                        'seo_description' => 'Rinkitės {brand} {model} {type_label} su {body_material} rankena ir {safety}.',
+                        'summary'           => 'Ergonomiška {body_material} rankena su {blade_storage} atsarginėms geležtėms.',
+                        'description'       => '<p>{brand} {model} tinka gipskartoniui, grindims ir pakuotėms.</p><ul><li>{blade_type} geležtė ilgai išlieka aštri.</li><li>{body_material} korpusas patogiai laikosi rankoje.</li><li>{blade_storage} saugo atsargines geležtes su {safety} apsauga.</li></ul>',
+                        'seo_title'         => '{brand} {model} {type_display} – {blade_type}',
+                        'seo_description'   => 'Rinkitės {brand} {model} {type_label} su {body_material} rankena ir {safety}.',
                     ],
                     'lv' => [
-                        'name' => '{brand} {model} {series_label}{type_display}',
+                        'name'              => '{brand} {model} {series_label}{type_display}',
                         'short_description' => 'Viegls {type_label} ar {blade_type} asmeni un {safety}.',
-                        'summary' => 'Ergonomisks {body_material} korpuss ar {blade_storage} rezerves asmeņiem.',
-                        'description' => '<p>{brand} {model} ir piemērots ģipškartonam, grīdām un iepakojumam.</p><ul><li>{blade_type} asmens nodrošina ilgu griešanu.</li><li>{body_material} korpuss ērti turas rokā.</li><li>{blade_storage} glabā rezerves asmeņus ar {safety} aizsardzību.</li></ul>',
-                        'seo_title' => '{brand} {model} {type_display} – {blade_type}',
-                        'seo_description' => 'Izvēlieties {brand} {model} {type_label} ar {body_material} korpusu un {safety}.',
+                        'summary'           => 'Ergonomisks {body_material} korpuss ar {blade_storage} rezerves asmeņiem.',
+                        'description'       => '<p>{brand} {model} ir piemērots ģipškartonam, grīdām un iepakojumam.</p><ul><li>{blade_type} asmens nodrošina ilgu griešanu.</li><li>{body_material} korpuss ērti turas rokā.</li><li>{blade_storage} glabā rezerves asmeņus ar {safety} aizsardzību.</li></ul>',
+                        'seo_title'         => '{brand} {model} {type_display} – {blade_type}',
+                        'seo_description'   => 'Izvēlieties {brand} {model} {type_label} ar {body_material} korpusu un {safety}.',
                     ],
                 ],
                 'models' => [
                     [
-                        'brand' => 'stanley',
+                        'brand'  => 'stanley',
                         'series' => 'FatMax',
-                        'spec' => [
+                        'spec'   => [
                             'body_material' => 'bi-material grip',
                         ],
                         'items' => [
@@ -2552,9 +2555,9 @@ final class DemoStoreSeeder extends Seeder
                         ],
                     ],
                     [
-                        'brand' => 'milwaukee',
+                        'brand'  => 'milwaukee',
                         'series' => 'Fastback',
-                        'spec' => [
+                        'spec'   => [
                             'body_material' => 'metal core',
                         ],
                         'items' => [
@@ -2564,9 +2567,9 @@ final class DemoStoreSeeder extends Seeder
                         ],
                     ],
                     [
-                        'brand' => 'dewalt',
+                        'brand'  => 'dewalt',
                         'series' => 'XR',
-                        'spec' => [
+                        'spec'   => [
                             'body_material' => 'aluminium body',
                         ],
                         'items' => [
@@ -2579,12 +2582,12 @@ final class DemoStoreSeeder extends Seeder
             ],
 
             'safety-helmet' => [
-                'category_key' => 'safety-equipment.protective-gear',
-                'sku_prefix' => 'SE-SH',
-                'dimensions' => ['length' => 30.0, 'width' => 24.0, 'height' => 20.0],
+                'category_key'   => 'safety-equipment.protective-gear',
+                'sku_prefix'     => 'SE-SH',
+                'dimensions'     => ['length' => 30.0, 'width' => 24.0, 'height' => 20.0],
                 'default_weight' => 0.6,
-                'stock' => ['base' => 80, 'step' => 10],
-                'type_label' => [
+                'stock'          => ['base' => 80, 'step' => 10],
+                'type_label'     => [
                     'en' => 'safety helmet',
                     'lt' => 'apsauginis šalmas',
                     'lv' => 'drošības ķivere',
@@ -2596,35 +2599,35 @@ final class DemoStoreSeeder extends Seeder
                 ],
                 'templates' => [
                     'en' => [
-                        'name' => '{brand} {model} {series_label}{type_display}',
+                        'name'              => '{brand} {model} {series_label}{type_display}',
                         'short_description' => 'Certified {type_label} meeting {rating} with {suspension}.',
-                        'summary' => 'Comfortable shell includes {accessories} for jobsite integration.',
-                        'description' => '<p>Keep crews compliant and protected with the {brand} {model}.</p><ul><li>{rating} certification for Baltic construction and industry.</li><li>{suspension} delivers all-day comfort.</li><li>{accessories} expand compatibility with face and hearing protection.</li></ul>',
-                        'seo_title' => '{brand} {model} {type_display} – {rating}',
-                        'seo_description' => 'Protect teams with the {brand} {model} {type_label} featuring {suspension} and {accessories}.',
+                        'summary'           => 'Comfortable shell includes {accessories} for jobsite integration.',
+                        'description'       => '<p>Keep crews compliant and protected with the {brand} {model}.</p><ul><li>{rating} certification for Baltic construction and industry.</li><li>{suspension} delivers all-day comfort.</li><li>{accessories} expand compatibility with face and hearing protection.</li></ul>',
+                        'seo_title'         => '{brand} {model} {type_display} – {rating}',
+                        'seo_description'   => 'Protect teams with the {brand} {model} {type_label} featuring {suspension} and {accessories}.',
                     ],
                     'lt' => [
-                        'name' => '{brand} {model} {series_label}{type_display}',
+                        'name'              => '{brand} {model} {series_label}{type_display}',
                         'short_description' => 'Sertifikuotas {type_label}, atitinkantis {rating}, su {suspension}.',
-                        'summary' => 'Patogus korpusas su {accessories}, pritaikytas darbų aikštelėms.',
-                        'description' => '<p>Apsaugokite brigadas su {brand} {model}.</p><ul><li>{rating} sertifikatas Baltijos statyboms ir pramonei.</li><li>{suspension} užtikrina komfortą visą dieną.</li><li>{accessories} leidžia derinti su veido ir klausos apsauga.</li></ul>',
-                        'seo_title' => '{brand} {model} {type_display} – {rating}',
-                        'seo_description' => 'Pasirinkite {brand} {model} {type_label} su {suspension} ir {accessories}.',
+                        'summary'           => 'Patogus korpusas su {accessories}, pritaikytas darbų aikštelėms.',
+                        'description'       => '<p>Apsaugokite brigadas su {brand} {model}.</p><ul><li>{rating} sertifikatas Baltijos statyboms ir pramonei.</li><li>{suspension} užtikrina komfortą visą dieną.</li><li>{accessories} leidžia derinti su veido ir klausos apsauga.</li></ul>',
+                        'seo_title'         => '{brand} {model} {type_display} – {rating}',
+                        'seo_description'   => 'Pasirinkite {brand} {model} {type_label} su {suspension} ir {accessories}.',
                     ],
                     'lv' => [
-                        'name' => '{brand} {model} {series_label}{type_display}',
+                        'name'              => '{brand} {model} {series_label}{type_display}',
                         'short_description' => 'Sertificēta {type_label}, kas atbilst {rating}, ar {suspension}.',
-                        'summary' => 'Ērta čaula ar {accessories}, pielāgota būvlaukumiem.',
-                        'description' => '<p>Aizsargājiet komandas ar {brand} {model}.</p><ul><li>{rating} sertifikācija Baltijas būvniecībai un industrijai.</li><li>{suspension} nodrošina komfortu visas dienas garumā.</li><li>{accessories} ļauj kombinēt ar sejas un dzirdes aizsardzību.</li></ul>',
-                        'seo_title' => '{brand} {model} {type_display} – {rating}',
-                        'seo_description' => 'Izvēlieties {brand} {model} {type_label} ar {suspension} un {accessories}.',
+                        'summary'           => 'Ērta čaula ar {accessories}, pielāgota būvlaukumiem.',
+                        'description'       => '<p>Aizsargājiet komandas ar {brand} {model}.</p><ul><li>{rating} sertifikācija Baltijas būvniecībai un industrijai.</li><li>{suspension} nodrošina komfortu visas dienas garumā.</li><li>{accessories} ļauj kombinēt ar sejas un dzirdes aizsardzību.</li></ul>',
+                        'seo_title'         => '{brand} {model} {type_display} – {rating}',
+                        'seo_description'   => 'Izvēlieties {brand} {model} {type_label} ar {suspension} un {accessories}.',
                     ],
                 ],
                 'models' => [
                     [
-                        'brand' => '3m',
+                        'brand'  => '3m',
                         'series' => 'SecureFit',
-                        'spec' => [
+                        'spec'   => [
                             'rating' => 'EN 397',
                         ],
                         'items' => [
@@ -2634,9 +2637,9 @@ final class DemoStoreSeeder extends Seeder
                         ],
                     ],
                     [
-                        'brand' => 'uvex',
+                        'brand'  => 'uvex',
                         'series' => 'Pheos',
-                        'spec' => [
+                        'spec'   => [
                             'rating' => 'EN 397',
                         ],
                         'items' => [
@@ -2646,9 +2649,9 @@ final class DemoStoreSeeder extends Seeder
                         ],
                     ],
                     [
-                        'brand' => 'honeywell',
+                        'brand'  => 'honeywell',
                         'series' => 'North Zone',
-                        'spec' => [
+                        'spec'   => [
                             'rating' => 'EN 397',
                         ],
                         'items' => [
@@ -2661,12 +2664,12 @@ final class DemoStoreSeeder extends Seeder
             ],
 
             'respirator' => [
-                'category_key' => 'safety-equipment.respiratory-protection',
-                'sku_prefix' => 'SE-RP',
-                'dimensions' => ['length' => 28.0, 'width' => 20.0, 'height' => 15.0],
+                'category_key'   => 'safety-equipment.respiratory-protection',
+                'sku_prefix'     => 'SE-RP',
+                'dimensions'     => ['length' => 28.0, 'width' => 20.0, 'height' => 15.0],
                 'default_weight' => 0.8,
-                'stock' => ['base' => 75, 'step' => 8],
-                'type_label' => [
+                'stock'          => ['base' => 75, 'step' => 8],
+                'type_label'     => [
                     'en' => 'respirator',
                     'lt' => 'respiratorius',
                     'lv' => 'respirators',
@@ -2678,35 +2681,35 @@ final class DemoStoreSeeder extends Seeder
                 ],
                 'templates' => [
                     'en' => [
-                        'name' => '{brand} {model} {series_label}{type_display}',
+                        'name'              => '{brand} {model} {series_label}{type_display}',
                         'short_description' => 'Reusable {type_label} with {filters} and {valve}.',
-                        'summary' => 'Secure fit using {straps} to keep protection consistent all shift.',
-                        'description' => '<p>The {brand} {model} defends against dust and aerosols.</p><ul><li>{filters} provide certified filtration performance.</li><li>{valve} reduces breathing resistance.</li><li>{straps} maintain a reliable seal for active crews.</li></ul>',
-                        'seo_title' => '{brand} {model} {type_display} – {filters}',
-                        'seo_description' => 'Protect breathing zones with the {brand} {model} {type_label} featuring {filters} and {valve}.',
+                        'summary'           => 'Secure fit using {straps} to keep protection consistent all shift.',
+                        'description'       => '<p>The {brand} {model} defends against dust and aerosols.</p><ul><li>{filters} provide certified filtration performance.</li><li>{valve} reduces breathing resistance.</li><li>{straps} maintain a reliable seal for active crews.</li></ul>',
+                        'seo_title'         => '{brand} {model} {type_display} – {filters}',
+                        'seo_description'   => 'Protect breathing zones with the {brand} {model} {type_label} featuring {filters} and {valve}.',
                     ],
                     'lt' => [
-                        'name' => '{brand} {model} {series_label}{type_display}',
+                        'name'              => '{brand} {model} {series_label}{type_display}',
                         'short_description' => 'Daugkartinis {type_label} su {filters} ir {valve}.',
-                        'summary' => 'Tvirtas prigludimas su {straps}, išliekantis visą pamainą.',
-                        'description' => '<p>{brand} {model} saugo nuo dulkių ir aerozolių.</p><ul><li>{filters} užtikrina sertifikuotą filtraciją.</li><li>{valve} sumažina kvėpavimo pasipriešinimą.</li><li>{straps} palaiko sandarumą aktyvioms brigadoms.</li></ul>',
-                        'seo_title' => '{brand} {model} {type_display} – {filters}',
-                        'seo_description' => 'Apsaugokite kvėpavimą su {brand} {model} {type_label}, turinčiu {filters} ir {valve}.',
+                        'summary'           => 'Tvirtas prigludimas su {straps}, išliekantis visą pamainą.',
+                        'description'       => '<p>{brand} {model} saugo nuo dulkių ir aerozolių.</p><ul><li>{filters} užtikrina sertifikuotą filtraciją.</li><li>{valve} sumažina kvėpavimo pasipriešinimą.</li><li>{straps} palaiko sandarumą aktyvioms brigadoms.</li></ul>',
+                        'seo_title'         => '{brand} {model} {type_display} – {filters}',
+                        'seo_description'   => 'Apsaugokite kvėpavimą su {brand} {model} {type_label}, turinčiu {filters} ir {valve}.',
                     ],
                     'lv' => [
-                        'name' => '{brand} {model} {series_label}{type_display}',
+                        'name'              => '{brand} {model} {series_label}{type_display}',
                         'short_description' => 'Atkārtoti lietojams {type_label} ar {filters} un {valve}.',
-                        'summary' => 'Droša piegulēšana ar {straps}, kas saglabā aizsardzību visas maiņas garumā.',
-                        'description' => '<p>{brand} {model} aizsargā pret putekļiem un aerosoliem.</p><ul><li>{filters} nodrošina sertificētu filtrāciju.</li><li>{valve} samazina elpošanas pretestību.</li><li>{straps} uztur uzticamu blīvējumu aktīvām komandām.</li></ul>',
-                        'seo_title' => '{brand} {model} {type_display} – {filters}',
-                        'seo_description' => 'Sargājiet elpceļus ar {brand} {model} {type_label}, kuram ir {filters} un {valve}.',
+                        'summary'           => 'Droša piegulēšana ar {straps}, kas saglabā aizsardzību visas maiņas garumā.',
+                        'description'       => '<p>{brand} {model} aizsargā pret putekļiem un aerosoliem.</p><ul><li>{filters} nodrošina sertificētu filtrāciju.</li><li>{valve} samazina elpošanas pretestību.</li><li>{straps} uztur uzticamu blīvējumu aktīvām komandām.</li></ul>',
+                        'seo_title'         => '{brand} {model} {type_display} – {filters}',
+                        'seo_description'   => 'Sargājiet elpceļus ar {brand} {model} {type_label}, kuram ir {filters} un {valve}.',
                     ],
                 ],
                 'models' => [
                     [
-                        'brand' => '3m',
+                        'brand'  => '3m',
                         'series' => 'Half Mask',
-                        'spec' => [
+                        'spec'   => [
                             'filters' => 'P3 bayonet filters',
                         ],
                         'items' => [
@@ -2716,9 +2719,9 @@ final class DemoStoreSeeder extends Seeder
                         ],
                     ],
                     [
-                        'brand' => 'honeywell',
+                        'brand'  => 'honeywell',
                         'series' => 'North',
-                        'spec' => [
+                        'spec'   => [
                             'filters' => 'P3 cartridges',
                         ],
                         'items' => [
@@ -2728,9 +2731,9 @@ final class DemoStoreSeeder extends Seeder
                         ],
                     ],
                     [
-                        'brand' => 'uvex',
+                        'brand'  => 'uvex',
                         'series' => 'silv-Air',
-                        'spec' => [
+                        'spec'   => [
                             'filters' => 'FFP replaceable filters',
                         ],
                         'items' => [
@@ -2743,12 +2746,12 @@ final class DemoStoreSeeder extends Seeder
             ],
 
             'safety-boot' => [
-                'category_key' => 'safety-equipment.footwear',
-                'sku_prefix' => 'SE-SB',
-                'dimensions' => ['length' => 38.0, 'width' => 28.0, 'height' => 26.0],
+                'category_key'   => 'safety-equipment.footwear',
+                'sku_prefix'     => 'SE-SB',
+                'dimensions'     => ['length' => 38.0, 'width' => 28.0, 'height' => 26.0],
                 'default_weight' => 1.8,
-                'stock' => ['base' => 90, 'step' => 12],
-                'type_label' => [
+                'stock'          => ['base' => 90, 'step' => 12],
+                'type_label'     => [
                     'en' => 'safety boot',
                     'lt' => 'apsauginis batas',
                     'lv' => 'drošības zābaks',
@@ -2760,35 +2763,35 @@ final class DemoStoreSeeder extends Seeder
                 ],
                 'templates' => [
                     'en' => [
-                        'name' => '{brand} {model} {series_label}{type_display}',
+                        'name'              => '{brand} {model} {series_label}{type_display}',
                         'short_description' => 'Water-resistant {type_label} rated {rating} with {upper_material} upper.',
-                        'summary' => 'Shock-absorbing {outsole} and {lining} keep crews comfortable.',
-                        'description' => '<p>The {brand} {model} boot endures rugged Baltic job sites.</p><ul><li>{rating} protection meets toe-cap and puncture standards.</li><li>{upper_material} combines durability with weather resistance.</li><li>{outsole} paired with {lining} keeps footing secure and feet warm.</li></ul>',
-                        'seo_title' => '{brand} {model} {type_display} – {rating}',
-                        'seo_description' => 'Equip crews with {brand} {model} {type_label} using {upper_material} and {outsole}.',
+                        'summary'           => 'Shock-absorbing {outsole} and {lining} keep crews comfortable.',
+                        'description'       => '<p>The {brand} {model} boot endures rugged Baltic job sites.</p><ul><li>{rating} protection meets toe-cap and puncture standards.</li><li>{upper_material} combines durability with weather resistance.</li><li>{outsole} paired with {lining} keeps footing secure and feet warm.</li></ul>',
+                        'seo_title'         => '{brand} {model} {type_display} – {rating}',
+                        'seo_description'   => 'Equip crews with {brand} {model} {type_label} using {upper_material} and {outsole}.',
                     ],
                     'lt' => [
-                        'name' => '{brand} {model} {series_label}{type_display}',
+                        'name'              => '{brand} {model} {series_label}{type_display}',
                         'short_description' => 'Atsparūs vandeniui {type_label} su {upper_material} ir {rating}.',
-                        'summary' => 'Smūgius sugeriantis {outsole} ir {lining} užtikrina komfortą.',
-                        'description' => '<p>{brand} {model} batai atlaiko sudėtingas Baltijos sąlygas.</p><ul><li>{rating} apsauga atitinka pirštų ir pradūrimo standartus.</li><li>{upper_material} užtikrina patvarumą ir atsparumą orams.</li><li>{outsole} ir {lining} palaiko stabilumą ir šilumą.</li></ul>',
-                        'seo_title' => '{brand} {model} {type_display} – {rating}',
-                        'seo_description' => 'Aprūpinkite brigadas {brand} {model} {type_label} su {upper_material} ir {outsole}.',
+                        'summary'           => 'Smūgius sugeriantis {outsole} ir {lining} užtikrina komfortą.',
+                        'description'       => '<p>{brand} {model} batai atlaiko sudėtingas Baltijos sąlygas.</p><ul><li>{rating} apsauga atitinka pirštų ir pradūrimo standartus.</li><li>{upper_material} užtikrina patvarumą ir atsparumą orams.</li><li>{outsole} ir {lining} palaiko stabilumą ir šilumą.</li></ul>',
+                        'seo_title'         => '{brand} {model} {type_display} – {rating}',
+                        'seo_description'   => 'Aprūpinkite brigadas {brand} {model} {type_label} su {upper_material} ir {outsole}.',
                     ],
                     'lv' => [
-                        'name' => '{brand} {model} {series_label}{type_display}',
+                        'name'              => '{brand} {model} {series_label}{type_display}',
                         'short_description' => 'Ūdensizturīgi {type_label} ar {upper_material} un {rating}.',
-                        'summary' => 'Triecienu absorbējošs {outsole} un {lining} sniedz komfortu.',
-                        'description' => '<p>{brand} {model} apavi iztur skarbus Baltijas objektus.</p><ul><li>{rating} aizsardzība atbilst purngalu un caurduršanas prasībām.</li><li>{upper_material} nodrošina izturību un aizsardzību pret laikapstākļiem.</li><li>{outsole} kopā ar {lining} nodrošina drošu saķeri un siltumu.</li></ul>',
-                        'seo_title' => '{brand} {model} {type_display} – {rating}',
-                        'seo_description' => 'Nodrošiniet komandas ar {brand} {model} {type_label}, kas izmanto {upper_material} un {outsole}.',
+                        'summary'           => 'Triecienu absorbējošs {outsole} un {lining} sniedz komfortu.',
+                        'description'       => '<p>{brand} {model} apavi iztur skarbus Baltijas objektus.</p><ul><li>{rating} aizsardzība atbilst purngalu un caurduršanas prasībām.</li><li>{upper_material} nodrošina izturību un aizsardzību pret laikapstākļiem.</li><li>{outsole} kopā ar {lining} nodrošina drošu saķeri un siltumu.</li></ul>',
+                        'seo_title'         => '{brand} {model} {type_display} – {rating}',
+                        'seo_description'   => 'Nodrošiniet komandas ar {brand} {model} {type_label}, kas izmanto {upper_material} un {outsole}.',
                     ],
                 ],
                 'models' => [
                     [
-                        'brand' => 'uvex',
+                        'brand'  => 'uvex',
                         'series' => '1 G2',
-                        'spec' => [
+                        'spec'   => [
                             'rating' => 'S3',
                         ],
                         'items' => [
@@ -2798,9 +2801,9 @@ final class DemoStoreSeeder extends Seeder
                         ],
                     ],
                     [
-                        'brand' => 'honeywell',
+                        'brand'  => 'honeywell',
                         'series' => 'Safety Footwear',
-                        'spec' => [
+                        'spec'   => [
                             'rating' => 'S3',
                         ],
                         'items' => [
@@ -2810,9 +2813,9 @@ final class DemoStoreSeeder extends Seeder
                         ],
                     ],
                     [
-                        'brand' => 'dewalt',
+                        'brand'  => 'dewalt',
                         'series' => 'Work Boots',
-                        'spec' => [
+                        'spec'   => [
                             'rating' => 'S3',
                         ],
                         'items' => [
@@ -2825,12 +2828,12 @@ final class DemoStoreSeeder extends Seeder
             ],
 
             'extension-cord' => [
-                'category_key' => 'electrical-lighting.cabling',
-                'sku_prefix' => 'EL-EC',
-                'dimensions' => ['length' => 40.0, 'width' => 32.0, 'height' => 18.0],
+                'category_key'   => 'electrical-lighting.cabling',
+                'sku_prefix'     => 'EL-EC',
+                'dimensions'     => ['length' => 40.0, 'width' => 32.0, 'height' => 18.0],
                 'default_weight' => 4.0,
-                'stock' => ['base' => 70, 'step' => 6],
-                'type_label' => [
+                'stock'          => ['base' => 70, 'step' => 6],
+                'type_label'     => [
                     'en' => 'extension cord',
                     'lt' => 'prailgintuvas',
                     'lv' => 'pagarinātājs',
@@ -2842,35 +2845,35 @@ final class DemoStoreSeeder extends Seeder
                 ],
                 'templates' => [
                     'en' => [
-                        'name' => '{brand} {model} {series_label}{type_display}',
+                        'name'              => '{brand} {model} {series_label}{type_display}',
                         'short_description' => 'Heavy-duty {length} {type_label} with {outlets} and {ip_rating} rating.',
-                        'summary' => 'Flexible {gauge} cable with thermal protection for demanding sites.',
-                        'description' => '<p>Distribute temporary power safely with the {brand} {model} reel.</p><ul><li>{length} reach built with {gauge} cable.</li><li>{outlets} ready for jobsite equipment.</li><li>{ip_rating} ingress rating keeps moisture and dust out.</li></ul>',
-                        'seo_title' => '{brand} {model} {type_display} – {length}',
-                        'seo_description' => 'Extend power with the {brand} {model} {type_label} offering {outlets} and {ip_rating} protection.',
+                        'summary'           => 'Flexible {gauge} cable with thermal protection for demanding sites.',
+                        'description'       => '<p>Distribute temporary power safely with the {brand} {model} reel.</p><ul><li>{length} reach built with {gauge} cable.</li><li>{outlets} ready for jobsite equipment.</li><li>{ip_rating} ingress rating keeps moisture and dust out.</li></ul>',
+                        'seo_title'         => '{brand} {model} {type_display} – {length}',
+                        'seo_description'   => 'Extend power with the {brand} {model} {type_label} offering {outlets} and {ip_rating} protection.',
                     ],
                     'lt' => [
-                        'name' => '{brand} {model} {series_label}{type_display}',
+                        'name'              => '{brand} {model} {series_label}{type_display}',
                         'short_description' => 'Tvirtas {length} {type_label} su {outlets} ir {ip_rating} apsauga.',
-                        'summary' => 'Lankstus {gauge} kabelis su terminiu saugikliu sudėtingoms sąlygoms.',
-                        'description' => '<p>Saugiai paskirstykite laikiną energiją su {brand} {model} ritė.</p><ul><li>{length} ilgio {gauge} kabelis.</li><li>{outlets} pritaikytos statybvietės įrangai.</li><li>{ip_rating} apsauga nuo drėgmės ir dulkių.</li></ul>',
-                        'seo_title' => '{brand} {model} {type_display} – {length}',
-                        'seo_description' => 'Išplėskite maitinimą naudodami {brand} {model} {type_label} su {outlets} ir {ip_rating} apsauga.',
+                        'summary'           => 'Lankstus {gauge} kabelis su terminiu saugikliu sudėtingoms sąlygoms.',
+                        'description'       => '<p>Saugiai paskirstykite laikiną energiją su {brand} {model} ritė.</p><ul><li>{length} ilgio {gauge} kabelis.</li><li>{outlets} pritaikytos statybvietės įrangai.</li><li>{ip_rating} apsauga nuo drėgmės ir dulkių.</li></ul>',
+                        'seo_title'         => '{brand} {model} {type_display} – {length}',
+                        'seo_description'   => 'Išplėskite maitinimą naudodami {brand} {model} {type_label} su {outlets} ir {ip_rating} apsauga.',
                     ],
                     'lv' => [
-                        'name' => '{brand} {model} {series_label}{type_display}',
+                        'name'              => '{brand} {model} {series_label}{type_display}',
                         'short_description' => 'Izturīgs {length} {type_label} ar {outlets} un {ip_rating} aizsardzību.',
-                        'summary' => 'Elastīgs {gauge} kabelis ar termisko aizsardzību prasīgiem objektiem.',
-                        'description' => '<p>Droši sadaliet pagaidu elektroapgādi ar {brand} {model} spoli.</p><ul><li>{length} garums ar {gauge} kabeli.</li><li>{outlets} der aprīkojumam būvlaukumā.</li><li>{ip_rating} aizsardzība pret mitrumu un putekļiem.</li></ul>',
-                        'seo_title' => '{brand} {model} {type_display} – {length}',
-                        'seo_description' => 'Paplašiniet elektroapgādi ar {brand} {model} {type_label}, kas nodrošina {outlets} un {ip_rating} aizsardzību.',
+                        'summary'           => 'Elastīgs {gauge} kabelis ar termisko aizsardzību prasīgiem objektiem.',
+                        'description'       => '<p>Droši sadaliet pagaidu elektroapgādi ar {brand} {model} spoli.</p><ul><li>{length} garums ar {gauge} kabeli.</li><li>{outlets} der aprīkojumam būvlaukumā.</li><li>{ip_rating} aizsardzība pret mitrumu un putekļiem.</li></ul>',
+                        'seo_title'         => '{brand} {model} {type_display} – {length}',
+                        'seo_description'   => 'Paplašiniet elektroapgādi ar {brand} {model} {type_label}, kas nodrošina {outlets} un {ip_rating} aizsardzību.',
                     ],
                 ],
                 'models' => [
                     [
-                        'brand' => 'legrand',
+                        'brand'  => 'legrand',
                         'series' => 'Professional',
-                        'spec' => [
+                        'spec'   => [
                             'gauge' => 'H07RN-F 3G2.5',
                         ],
                         'items' => [
@@ -2880,9 +2883,9 @@ final class DemoStoreSeeder extends Seeder
                         ],
                     ],
                     [
-                        'brand' => 'stanley',
+                        'brand'  => 'stanley',
                         'series' => 'FatMax',
-                        'spec' => [
+                        'spec'   => [
                             'gauge' => 'H07RN-F 3G2.5',
                         ],
                         'items' => [
@@ -2892,9 +2895,9 @@ final class DemoStoreSeeder extends Seeder
                         ],
                     ],
                     [
-                        'brand' => 'milwaukee',
+                        'brand'  => 'milwaukee',
                         'series' => 'Packout Power',
-                        'spec' => [
+                        'spec'   => [
                             'gauge' => 'Rubber 3G2.5',
                         ],
                         'items' => [
@@ -2907,12 +2910,12 @@ final class DemoStoreSeeder extends Seeder
             ],
 
             'led-worklight' => [
-                'category_key' => 'electrical-lighting.work-lighting',
-                'sku_prefix' => 'EL-WL',
-                'dimensions' => ['length' => 32.0, 'width' => 25.0, 'height' => 35.0],
+                'category_key'   => 'electrical-lighting.work-lighting',
+                'sku_prefix'     => 'EL-WL',
+                'dimensions'     => ['length' => 32.0, 'width' => 25.0, 'height' => 35.0],
                 'default_weight' => 3.5,
-                'stock' => ['base' => 60, 'step' => 7],
-                'type_label' => [
+                'stock'          => ['base' => 60, 'step' => 7],
+                'type_label'     => [
                     'en' => 'work light',
                     'lt' => 'darbo šviestuvas',
                     'lv' => 'darba gaisma',
@@ -2924,35 +2927,35 @@ final class DemoStoreSeeder extends Seeder
                 ],
                 'templates' => [
                     'en' => [
-                        'name' => '{brand} {model} {series_label}{type_display}',
+                        'name'              => '{brand} {model} {series_label}{type_display}',
                         'short_description' => 'Portable {type_label} delivering {lumens} with {modes} modes.',
-                        'summary' => 'Runs on {power_source} with up to {runtime} runtime and {color_temp} output.',
-                        'description' => '<p>Illuminate fit-out and service work with the {brand} {model}.</p><ul><li>{lumens} brightness keeps areas visible.</li><li>{modes} adapt to the task.</li><li>Powered by {power_source} for {runtime} of operation.</li></ul>',
-                        'seo_title' => '{brand} {model} {type_display} – {lumens}',
-                        'seo_description' => 'Light jobsites using the {brand} {model} {type_label} with {lumens} output and {runtime} runtime.',
+                        'summary'           => 'Runs on {power_source} with up to {runtime} runtime and {color_temp} output.',
+                        'description'       => '<p>Illuminate fit-out and service work with the {brand} {model}.</p><ul><li>{lumens} brightness keeps areas visible.</li><li>{modes} adapt to the task.</li><li>Powered by {power_source} for {runtime} of operation.</li></ul>',
+                        'seo_title'         => '{brand} {model} {type_display} – {lumens}',
+                        'seo_description'   => 'Light jobsites using the {brand} {model} {type_label} with {lumens} output and {runtime} runtime.',
                     ],
                     'lt' => [
-                        'name' => '{brand} {model} {series_label}{type_display}',
+                        'name'              => '{brand} {model} {series_label}{type_display}',
                         'short_description' => 'Nešiojamas {type_label}, skleidžiantis {lumens} su {modes} režimais.',
-                        'summary' => 'Veikia su {power_source} iki {runtime}, užtikrinant {color_temp} šviesą.',
-                        'description' => '<p>Apšvieskite apdailos ir aptarnavimo darbus su {brand} {model}.</p><ul><li>{lumens} ryškumas užtikrina matomumą.</li><li>{modes} prisitaiko prie užduoties.</li><li>{power_source} leidžia dirbti iki {runtime}.</li></ul>',
-                        'seo_title' => '{brand} {model} {type_display} – {lumens}',
-                        'seo_description' => 'Apšvieskite objektus su {brand} {model} {type_label}, kuris veikia {runtime} ir skleidžia {color_temp}.',
+                        'summary'           => 'Veikia su {power_source} iki {runtime}, užtikrinant {color_temp} šviesą.',
+                        'description'       => '<p>Apšvieskite apdailos ir aptarnavimo darbus su {brand} {model}.</p><ul><li>{lumens} ryškumas užtikrina matomumą.</li><li>{modes} prisitaiko prie užduoties.</li><li>{power_source} leidžia dirbti iki {runtime}.</li></ul>',
+                        'seo_title'         => '{brand} {model} {type_display} – {lumens}',
+                        'seo_description'   => 'Apšvieskite objektus su {brand} {model} {type_label}, kuris veikia {runtime} ir skleidžia {color_temp}.',
                     ],
                     'lv' => [
-                        'name' => '{brand} {model} {series_label}{type_display}',
+                        'name'              => '{brand} {model} {series_label}{type_display}',
                         'short_description' => 'Pārnēsājama {type_label}, kas nodrošina {lumens} ar {modes} režīmiem.',
-                        'summary' => 'Darbojas ar {power_source} līdz {runtime}, nodrošinot {color_temp} gaismu.',
-                        'description' => '<p>Apgaismojiet montāžas un servisa darbus ar {brand} {model}.</p><ul><li>{lumens} nodrošina izcilu redzamību.</li><li>{modes} pielāgojas uzdevumam.</li><li>{power_source} nodrošina darbu līdz {runtime}.</li></ul>',
-                        'seo_title' => '{brand} {model} {type_display} – {lumens}',
-                        'seo_description' => 'Apgaismojiet objektus ar {brand} {model} {type_label}, kas darbojas {runtime} un sniedz {color_temp} gaismu.',
+                        'summary'           => 'Darbojas ar {power_source} līdz {runtime}, nodrošinot {color_temp} gaismu.',
+                        'description'       => '<p>Apgaismojiet montāžas un servisa darbus ar {brand} {model}.</p><ul><li>{lumens} nodrošina izcilu redzamību.</li><li>{modes} pielāgojas uzdevumam.</li><li>{power_source} nodrošina darbu līdz {runtime}.</li></ul>',
+                        'seo_title'         => '{brand} {model} {type_display} – {lumens}',
+                        'seo_description'   => 'Apgaismojiet objektus ar {brand} {model} {type_label}, kas darbojas {runtime} un sniedz {color_temp} gaismu.',
                     ],
                 ],
                 'models' => [
                     [
-                        'brand' => 'milwaukee',
+                        'brand'  => 'milwaukee',
                         'series' => 'M18',
-                        'spec' => [
+                        'spec'   => [
                             'power_source' => 'M18 battery',
                         ],
                         'items' => [
@@ -2962,9 +2965,9 @@ final class DemoStoreSeeder extends Seeder
                         ],
                     ],
                     [
-                        'brand' => 'dewalt',
+                        'brand'  => 'dewalt',
                         'series' => 'XR',
-                        'spec' => [
+                        'spec'   => [
                             'power_source' => '18V XR battery',
                         ],
                         'items' => [
@@ -2974,9 +2977,9 @@ final class DemoStoreSeeder extends Seeder
                         ],
                     ],
                     [
-                        'brand' => 'philips',
+                        'brand'  => 'philips',
                         'series' => 'ClearFlood',
-                        'spec' => [
+                        'spec'   => [
                             'power_source' => '230V AC',
                         ],
                         'items' => [
@@ -2989,12 +2992,12 @@ final class DemoStoreSeeder extends Seeder
             ],
 
             'string-trimmer' => [
-                'category_key' => 'outdoor-garden.outdoor-power',
-                'sku_prefix' => 'OG-ST',
-                'dimensions' => ['length' => 165.0, 'width' => 25.0, 'height' => 25.0],
+                'category_key'   => 'outdoor-garden.outdoor-power',
+                'sku_prefix'     => 'OG-ST',
+                'dimensions'     => ['length' => 165.0, 'width' => 25.0, 'height' => 25.0],
                 'default_weight' => 4.2,
-                'stock' => ['base' => 45, 'step' => 5],
-                'type_label' => [
+                'stock'          => ['base' => 45, 'step' => 5],
+                'type_label'     => [
                     'en' => 'string trimmer',
                     'lt' => 'žoliapjovė',
                     'lv' => 'zāles trimmeris',
@@ -3006,35 +3009,35 @@ final class DemoStoreSeeder extends Seeder
                 ],
                 'templates' => [
                     'en' => [
-                        'name' => '{brand} {model} {series_label}{type_display}',
+                        'name'              => '{brand} {model} {series_label}{type_display}',
                         'short_description' => 'Cordless {type_label} with {cutting_width} cutting width and {line_diameter} line.',
-                        'summary' => 'Efficient {motor_type} paired with {power_source} runs up to {runtime}.',
-                        'description' => '<p>Maintain landscaping edges with the {brand} {model}.</p><ul><li>{cutting_width} swath clears grass quickly.</li><li>{line_diameter} cutting line feeds smoothly.</li><li>{motor_type} powered by {power_source} delivers {runtime} runtime.</li></ul>',
-                        'seo_title' => '{brand} {model} {type_display} – {cutting_width}',
-                        'seo_description' => 'Trim with the {brand} {model} {type_label} offering {cutting_width} width and {runtime} runtime.',
+                        'summary'           => 'Efficient {motor_type} paired with {power_source} runs up to {runtime}.',
+                        'description'       => '<p>Maintain landscaping edges with the {brand} {model}.</p><ul><li>{cutting_width} swath clears grass quickly.</li><li>{line_diameter} cutting line feeds smoothly.</li><li>{motor_type} powered by {power_source} delivers {runtime} runtime.</li></ul>',
+                        'seo_title'         => '{brand} {model} {type_display} – {cutting_width}',
+                        'seo_description'   => 'Trim with the {brand} {model} {type_label} offering {cutting_width} width and {runtime} runtime.',
                     ],
                     'lt' => [
-                        'name' => '{brand} {model} {series_label}{type_display}',
+                        'name'              => '{brand} {model} {series_label}{type_display}',
                         'short_description' => 'Akumuliatorinė {type_label} su {cutting_width} pjovimo pločiu ir {line_diameter} valu.',
-                        'summary' => 'Efektyvus {motor_type} su {power_source} veikia iki {runtime}.',
-                        'description' => '<p>Prižiūrėkite veją su {brand} {model}.</p><ul><li>{cutting_width} plotis greitai nušienauja kraštus.</li><li>{line_diameter} valas patikimai paduodamas.</li><li>{motor_type}, maitinamas {power_source}, užtikrina {runtime} darbą.</li></ul>',
-                        'seo_title' => '{brand} {model} {type_display} – {cutting_width}',
-                        'seo_description' => 'Naudokite {brand} {model} {type_label} su {cutting_width} ir {runtime} veikimu.',
+                        'summary'           => 'Efektyvus {motor_type} su {power_source} veikia iki {runtime}.',
+                        'description'       => '<p>Prižiūrėkite veją su {brand} {model}.</p><ul><li>{cutting_width} plotis greitai nušienauja kraštus.</li><li>{line_diameter} valas patikimai paduodamas.</li><li>{motor_type}, maitinamas {power_source}, užtikrina {runtime} darbą.</li></ul>',
+                        'seo_title'         => '{brand} {model} {type_display} – {cutting_width}',
+                        'seo_description'   => 'Naudokite {brand} {model} {type_label} su {cutting_width} ir {runtime} veikimu.',
                     ],
                     'lv' => [
-                        'name' => '{brand} {model} {series_label}{type_display}',
+                        'name'              => '{brand} {model} {series_label}{type_display}',
                         'short_description' => 'Akumulatora {type_label} ar {cutting_width} pļaušanas platumu un {line_diameter} auklu.',
-                        'summary' => 'Efektīvs {motor_type} un {power_source} darbojas līdz {runtime}.',
-                        'description' => '<p>Kopiet ainavu ar {brand} {model}.</p><ul><li>{cutting_width} josla ātri apstrādā malas.</li><li>{line_diameter} aukla uztur stabilu griešanu.</li><li>{motor_type}, ko darbina {power_source}, nodrošina {runtime} darbu.</li></ul>',
-                        'seo_title' => '{brand} {model} {type_display} – {cutting_width}',
-                        'seo_description' => 'Izvēlieties {brand} {model} {type_label} ar {cutting_width} un {runtime} darbību.',
+                        'summary'           => 'Efektīvs {motor_type} un {power_source} darbojas līdz {runtime}.',
+                        'description'       => '<p>Kopiet ainavu ar {brand} {model}.</p><ul><li>{cutting_width} josla ātri apstrādā malas.</li><li>{line_diameter} aukla uztur stabilu griešanu.</li><li>{motor_type}, ko darbina {power_source}, nodrošina {runtime} darbu.</li></ul>',
+                        'seo_title'         => '{brand} {model} {type_display} – {cutting_width}',
+                        'seo_description'   => 'Izvēlieties {brand} {model} {type_label} ar {cutting_width} un {runtime} darbību.',
                     ],
                 ],
                 'models' => [
                     [
-                        'brand' => 'stihl',
+                        'brand'  => 'stihl',
                         'series' => 'FSA',
-                        'spec' => [
+                        'spec'   => [
                             'power_source' => 'AP battery system',
                         ],
                         'items' => [
@@ -3044,9 +3047,9 @@ final class DemoStoreSeeder extends Seeder
                         ],
                     ],
                     [
-                        'brand' => 'husqvarna',
+                        'brand'  => 'husqvarna',
                         'series' => 'Battery',
-                        'spec' => [
+                        'spec'   => [
                             'power_source' => '36V battery',
                         ],
                         'items' => [
@@ -3056,9 +3059,9 @@ final class DemoStoreSeeder extends Seeder
                         ],
                     ],
                     [
-                        'brand' => 'einhell',
+                        'brand'  => 'einhell',
                         'series' => 'Power X-Change',
-                        'spec' => [
+                        'spec'   => [
                             'power_source' => 'Power X-Change battery',
                         ],
                         'items' => [
@@ -3071,12 +3074,12 @@ final class DemoStoreSeeder extends Seeder
             ],
 
             'pressure-washer' => [
-                'category_key' => 'outdoor-garden.water-management',
-                'sku_prefix' => 'OG-PW',
-                'dimensions' => ['length' => 85.0, 'width' => 35.0, 'height' => 40.0],
+                'category_key'   => 'outdoor-garden.water-management',
+                'sku_prefix'     => 'OG-PW',
+                'dimensions'     => ['length' => 85.0, 'width' => 35.0, 'height' => 40.0],
                 'default_weight' => 17.0,
-                'stock' => ['base' => 30, 'step' => 4],
-                'type_label' => [
+                'stock'          => ['base' => 30, 'step' => 4],
+                'type_label'     => [
                     'en' => 'pressure washer',
                     'lt' => 'aukšto slėgio plovykla',
                     'lv' => 'augstspiediena mazgātājs',
@@ -3088,35 +3091,35 @@ final class DemoStoreSeeder extends Seeder
                 ],
                 'templates' => [
                     'en' => [
-                        'name' => '{brand} {model} {series_label}{type_display}',
+                        'name'              => '{brand} {model} {series_label}{type_display}',
                         'short_description' => 'Professional {type_label} delivering {pressure} with {flow_rate} flow.',
-                        'summary' => 'Durable {motor_type} paired with {hose_length} and {accessories}.',
-                        'description' => '<p>Deep clean equipment and surfaces with the {brand} {model}.</p><ul><li>{pressure} pressure tackles concrete and heavy dirt.</li><li>{flow_rate} flow keeps rinsing efficient.</li><li>{motor_type} supports continuous use with {hose_length} and {accessories} included.</li></ul>',
-                        'seo_title' => '{brand} {model} {type_display} – {pressure}',
-                        'seo_description' => 'Upgrade washing capacity with the {brand} {model} {type_label} providing {pressure} and {flow_rate}.',
+                        'summary'           => 'Durable {motor_type} paired with {hose_length} and {accessories}.',
+                        'description'       => '<p>Deep clean equipment and surfaces with the {brand} {model}.</p><ul><li>{pressure} pressure tackles concrete and heavy dirt.</li><li>{flow_rate} flow keeps rinsing efficient.</li><li>{motor_type} supports continuous use with {hose_length} and {accessories} included.</li></ul>',
+                        'seo_title'         => '{brand} {model} {type_display} – {pressure}',
+                        'seo_description'   => 'Upgrade washing capacity with the {brand} {model} {type_label} providing {pressure} and {flow_rate}.',
                     ],
                     'lt' => [
-                        'name' => '{brand} {model} {series_label}{type_display}',
+                        'name'              => '{brand} {model} {series_label}{type_display}',
                         'short_description' => 'Profesionali {type_label}, tiekianti {pressure} ir {flow_rate}.',
-                        'summary' => 'Patvarus {motor_type} su {hose_length} ir {accessories}.',
-                        'description' => '<p>Valykite įrangą ir dangas su {brand} {model}.</p><ul><li>{pressure} slėgis įveikia betoną ir sunkias nešvaras.</li><li>{flow_rate} srautas efektyviai nuplauna.</li><li>{motor_type} palaiko nuolatinį darbą, komplektuojama su {hose_length} ir {accessories}.</li></ul>',
-                        'seo_title' => '{brand} {model} {type_display} – {pressure}',
-                        'seo_description' => 'Pagerinkite plovimo galimybes su {brand} {model} {type_label}, kuri pasižymi {pressure} ir {flow_rate}.',
+                        'summary'           => 'Patvarus {motor_type} su {hose_length} ir {accessories}.',
+                        'description'       => '<p>Valykite įrangą ir dangas su {brand} {model}.</p><ul><li>{pressure} slėgis įveikia betoną ir sunkias nešvaras.</li><li>{flow_rate} srautas efektyviai nuplauna.</li><li>{motor_type} palaiko nuolatinį darbą, komplektuojama su {hose_length} ir {accessories}.</li></ul>',
+                        'seo_title'         => '{brand} {model} {type_display} – {pressure}',
+                        'seo_description'   => 'Pagerinkite plovimo galimybes su {brand} {model} {type_label}, kuri pasižymi {pressure} ir {flow_rate}.',
                     ],
                     'lv' => [
-                        'name' => '{brand} {model} {series_label}{type_display}',
+                        'name'              => '{brand} {model} {series_label}{type_display}',
                         'short_description' => 'Profesionāls {type_label} ar {pressure} un {flow_rate} plūsmu.',
-                        'summary' => 'Izturīgs {motor_type} ar {hose_length} un {accessories}.',
-                        'description' => '<p>Tīriet aprīkojumu un virsmas ar {brand} {model}.</p><ul><li>{pressure} spiediens tiek galā ar betonu un smagiem netīrumiem.</li><li>{flow_rate} plūsma padara skalošanu efektīvu.</li><li>{motor_type} nodrošina nepārtrauktu darbu ar {hose_length} un {accessories} komplektā.</li></ul>',
-                        'seo_title' => '{brand} {model} {type_display} – {pressure}',
-                        'seo_description' => 'Uzlabojiet mazgāšanu ar {brand} {model} {type_label}, kas nodrošina {pressure} un {flow_rate}.',
+                        'summary'           => 'Izturīgs {motor_type} ar {hose_length} un {accessories}.',
+                        'description'       => '<p>Tīriet aprīkojumu un virsmas ar {brand} {model}.</p><ul><li>{pressure} spiediens tiek galā ar betonu un smagiem netīrumiem.</li><li>{flow_rate} plūsma padara skalošanu efektīvu.</li><li>{motor_type} nodrošina nepārtrauktu darbu ar {hose_length} un {accessories} komplektā.</li></ul>',
+                        'seo_title'         => '{brand} {model} {type_display} – {pressure}',
+                        'seo_description'   => 'Uzlabojiet mazgāšanu ar {brand} {model} {type_label}, kas nodrošina {pressure} un {flow_rate}.',
                     ],
                 ],
                 'models' => [
                     [
-                        'brand' => 'karcher',
+                        'brand'  => 'karcher',
                         'series' => 'HD',
-                        'spec' => [
+                        'spec'   => [
                             'motor_type' => 'induction motor',
                         ],
                         'items' => [
@@ -3126,9 +3129,9 @@ final class DemoStoreSeeder extends Seeder
                         ],
                     ],
                     [
-                        'brand' => 'nilfisk',
+                        'brand'  => 'nilfisk',
                         'series' => 'MC',
-                        'spec' => [
+                        'spec'   => [
                             'motor_type' => '1450 rpm motor',
                         ],
                         'items' => [
@@ -3138,9 +3141,9 @@ final class DemoStoreSeeder extends Seeder
                         ],
                     ],
                     [
-                        'brand' => 'bosch',
+                        'brand'  => 'bosch',
                         'series' => 'GHP',
-                        'spec' => [
+                        'spec'   => [
                             'motor_type' => 'induction motor',
                         ],
                         'items' => [
@@ -3153,5 +3156,4 @@ final class DemoStoreSeeder extends Seeder
             ],
         ];
     }
-
 }
