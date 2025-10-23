@@ -78,7 +78,7 @@ final class MenuItemResource extends Resource
                                     ->options(
                                         static fn (): array => Menu::withoutGlobalScopes()
                                             ->pluck('name', 'id')
-                                            ->all()
+                                            ->toArray()
                                     )
                                     ->required()
                                     ->searchable(),
@@ -100,9 +100,8 @@ final class MenuItemResource extends Resource
                                             )
                                             ->orderBy('label')
                                             ->pluck('label', 'id')
-                                            ->all();
-                                    })
-                                    ->reactive()
+                                            ->toArray()
+                                    )
                                     ->searchable()
                                     ->preload(),
                                 TextInput::make('label')
@@ -199,7 +198,7 @@ final class MenuItemResource extends Resource
                     ->options(
                         static fn (): array => Menu::withoutGlobalScopes()
                             ->pluck('name', 'id')
-                            ->all()
+                            ->toArray()
                     )
                     ->searchable(),
                 SelectFilter::make('parent_id')
@@ -218,8 +217,8 @@ final class MenuItemResource extends Resource
                         return $query
                             ->orderBy('label')
                             ->pluck('label', 'id')
-                            ->all();
-                    })
+                            ->toArray()
+                    )
                     ->searchable(),
                 TernaryFilter::make('is_visible')
                     ->label(__('admin.menu_items.is_visible')),
