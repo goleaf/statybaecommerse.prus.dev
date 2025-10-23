@@ -59,7 +59,7 @@
 
     <!-- Scripts -->
     @php
-        $shouldLoadViteAssets = ! app()->runningUnitTests() || file_exists(public_path('build/manifest.json'));
+        $shouldLoadViteAssets = \App\Support\ViteManifest::isPopulated();
     @endphp
 
     @if ($shouldLoadViteAssets)
