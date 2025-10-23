@@ -25,11 +25,19 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
+use Filament\Infolists\Components\IconEntry;
+use Filament\Infolists\Components\KeyValueEntry;
+use Filament\Schemas\Components\Section as InfolistSection;
+use Filament\Infolists\Components\TextEntry;
+use Filament\Schemas\Components\Grid as SchemaGrid;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Number;
 use UnitEnum;
 
 final class ReferralCampaignResource extends Resource
@@ -72,13 +80,11 @@ final class ReferralCampaignResource extends Resource
                                 TextInput::make('name')
                                     ->label(__('admin.referral_campaigns.name'))
                                     ->required()
-                                    ->maxLength(255)
-                                    ->translatable(),
+                                    ->maxLength(255),
                                 Textarea::make('description')
                                     ->label(__('admin.referral_campaigns.description'))
                                     ->maxLength(65535)
-                                    ->nullable()
-                                    ->translatable(),
+                                    ->nullable(),
                                 Toggle::make('is_active')
                                     ->label(__('admin.referral_campaigns.is_active'))
                                     ->inline(false)
@@ -228,6 +234,72 @@ final class ReferralCampaignResource extends Resource
                 ]),
             ])
             ->defaultSort('created_at', 'desc');
+    }
+
+    public static function infolist(Schema $schema): Schema
+    {
+        return $schema
+            ->components([
+                InfolistSection::make(__('admin.referral_campaigns.basic_information'))
+                    ->schema([
+                        SchemaGrid::make(2)
+                            ->schema([
+                                TextEntry::make('localized_name')
+                                    ->label(__('admin.referral_campaigns.name'))
+                                    ->columnSpan(1),
+                                TextEntry::make('name_en')
+                                    ->label(__('admin.referral_campaigns.name') . ' (EN)')
+                                    ->state(fn (ReferralCampaign $record): ?string => $record->getTranslation('name', 'en'))
+                                    ->columnSpan(1)
+                                    ->visible(fn (ReferralCampaign $record): bool => filled($record->getTranslation('name', 'en'))),
+                                TextEntry::make('localized_description')
+                                    ->label(__('admin.referral_campaigns.description'))
+                                    ->columnSpan(1)
+                                    ->wrap(),
+                                IconEntry::make('is_active')
+                                    ->label(__('admin.referral_campaigns.is_active'))
+                                    ->boolean()
+                                    ->columnSpan(1),
+                                TextEntry::make('reward_amount')
+                                    ->label(__('admin.referral_campaigns.reward_amount'))
+                                    ->formatStateUsing(fn (ReferralCampaign $record): string => Number::currency($record->reward_amount ?? 0, 'EUR', locale: app()->getLocale()))
+                                    ->columnSpan(1),
+                                TextEntry::make('reward_type')
+                                    ->label(__('admin.referral_campaigns.reward_type'))
+                                    ->badge()
+                                    ->state(fn (ReferralCampaign $record): ?string => $record->reward_type)
+                                    ->columnSpan(1),
+                                TextEntry::make('start_date')
+                                    ->label(__('admin.referral_campaigns.start_date'))
+                                    ->dateTime()
+                                    ->columnSpan(1),
+                                TextEntry::make('end_date')
+                                    ->label(__('admin.referral_campaigns.end_date'))
+                                    ->dateTime()
+                                    ->columnSpan(1),
+                            ])
+                            ->columns(2),
+                    ]),
+                InfolistSection::make(__('admin.referral_campaigns.advanced_settings'))
+                    ->schema([
+                        KeyValueEntry::make('conditions')
+                            ->label(__('admin.referral_campaigns.conditions'))
+                            ->keyLabel(__('admin.referral_campaigns.condition_key'))
+                            ->valueLabel(__('admin.referral_campaigns.condition_value'))
+                            ->visible(fn (?array $state): bool => filled($state)),
+                        KeyValueEntry::make('metadata')
+                            ->label(__('admin.referral_campaigns.metadata'))
+                            ->keyLabel(__('admin.referral_campaigns.metadata_key'))
+                            ->valueLabel(__('admin.referral_campaigns.metadata_value'))
+                            ->visible(fn (?array $state): bool => filled($state)),
+                    ])
+                    ->columns(1),
+            ]);
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()->withoutGlobalScopes();
     }
 
     public static function getRelations(): array
