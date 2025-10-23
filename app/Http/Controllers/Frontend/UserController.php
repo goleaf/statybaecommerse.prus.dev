@@ -15,6 +15,7 @@ use App\Http\Requests\Frontend\UpdateUserProfileRequest;
 use App\Http\Requests\Frontend\UpdateUserSocialLinksRequest;
 use App\Models\Document;
 use App\Models\User;
+use App\Support\Storage\SecureStorage;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;

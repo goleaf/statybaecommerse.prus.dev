@@ -46,9 +46,7 @@ final class ProductImageResource extends Resource
                     ->image()
                     ->disk('public')
                     ->directory('product-images')
-                    ->visibility('public')
-                    ->dehydrateStateUsing(static fn (?string $state): ?string => $state ? 'storage/' . ltrim($state, '/') : null)
-                    ->formatStateUsing(static fn (?string $state): ?string => $state && str_starts_with($state, 'storage/') ? substr($state, strlen('storage/')) : $state),
+                    ->visibility('private'),
                 Forms\Components\TextInput::make('alt_text')
                     ->label('Alt Text')
                     ->maxLength(255),

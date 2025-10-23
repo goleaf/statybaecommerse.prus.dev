@@ -135,6 +135,53 @@ final class PostResource extends Resource
                                     ->required()
                                     ->maxLength(255)
                                     ->unique(Post::class, 'slug', ignoreRecord: true),
+                            ]),
+                        Textarea::make('excerpt')
+                            ->label(__('posts.excerpt'))
+                            ->maxLength(500)
+                            ->rows(3),
+                        RichEditor::make('content')
+                            ->label(__('posts.content'))
+                            ->required()
+                            ->columnSpanFull(),
+                    ]),
+                Section::make(__('posts.media'))
+                    ->schema([
+                        FileUpload::make('featured_image')
+                            ->label(__('posts.featured_image'))
+                            ->image()
+                            ->directory('posts')
+                            ->visibility('private'),
+                        FileUpload::make('gallery')
+                            ->label(__('posts.gallery'))
+                            ->image()
+                            ->multiple()
+                            ->directory('posts/gallery')
+                            ->visibility('private'),
+                    ]),
+                Section::make(__('posts.seo'))
+                    ->schema([
+                        TextInput::make('meta_title')
+                            ->label(__('posts.meta_title'))
+                            ->maxLength(255),
+                        Textarea::make('meta_description')
+                            ->label(__('posts.meta_description'))
+                            ->maxLength(160)
+                            ->rows(3),
+                    ]),
+                Section::make(__('posts.settings'))
+                    ->schema([
+                        Grid::make(2)
+                            ->schema([
+                                Select::make('status')
+                                    ->label(__('posts.status'))
+                                    ->options([
+                                        'draft' => __('posts.status.draft'),
+                                        'published' => __('posts.status.published'),
+                                        'archived' => __('posts.status.archived'),
+                                    ])
+                                    ->default('draft')
+                                    ->required(),
                                 Select::make('user_id')
                                     ->label(__('posts.fields.user_id'))
                                     ->relationship('user', 'name')

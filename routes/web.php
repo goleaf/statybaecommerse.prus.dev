@@ -5,7 +5,7 @@ declare(strict_types=1);
 use App\Http\Controllers\Api\V1\HealthController;
 use App\Http\Controllers\ApiDocsController;
 use App\Http\Controllers\LocaleController;
-use App\Http\Controllers\MailPreviewController;
+use App\Http\Controllers\SecureMediaDownloadController;
 use App\Models\Discount;
 use Illuminate\Support\Facades\Route;
 
