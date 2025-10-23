@@ -6,6 +6,9 @@ namespace App\Logging\Processors;
 
 use DateTimeInterface;
 use DateTimeZone;
+
+use function getmypid;
+
 use Monolog\LogRecord;
 
 final class KibanaContextProcessor
@@ -30,9 +33,12 @@ final class KibanaContextProcessor
         $environment = $this->environment !== '' ? $this->environment : (string) config('app.env', 'production');
 
         $extra['service'] = [
-            'name' => $serviceName,
+            'name'        => $serviceName,
             'environment' => $environment,
         ];
+
+        // Capture the current PHP process identifier so Kibana can filter logs per runtime worker.
+        $pid = getmypid();
 
         if ($pid !== false) {
             $extra['process'] = [
