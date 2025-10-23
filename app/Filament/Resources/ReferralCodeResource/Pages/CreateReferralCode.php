@@ -7,11 +7,11 @@ namespace App\Filament\Resources\ReferralCodeResource\Pages;
 use App\Filament\Resources\ReferralCodeResource;
 use Filament\Resources\Pages\CreateRecord;
 use LaraZeus\SpatieTranslatable\Actions\LocaleSwitcher;
-use LaraZeus\SpatieTranslatable\Resources\Pages\CreateRecord\Concerns\Translatable as TranslatableCreateRecord;
+use LaraZeus\SpatieTranslatable\Resources\Pages\CreateRecord\Concerns\Translatable;
 
 final class CreateReferralCode extends CreateRecord
 {
-    use TranslatableCreateRecord;
+    use Translatable;
 
     protected static string $resource = ReferralCodeResource::class;
 

@@ -82,7 +82,8 @@
             "Database\\Seeders\\Cities\\": "database/seeders/cities/"
         },
         "files": [
-            "app/helpers.php"
+            "app/helpers.php",
+            "bootstrap/filament_compat.php"
         ]
     },
     "autoload-dev": {

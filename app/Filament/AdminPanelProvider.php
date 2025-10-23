@@ -36,6 +36,18 @@ class AdminPanelProvider extends PanelProvider
 
     public function panel(Panel $panel): Panel
     {
+        $configuredLocales = array_values(array_filter(
+            (array) config('shared.localization.supported_locales', [])
+        ));
+
+        if ($configuredLocales === []) {
+            $configuredLocales = [config('app.locale') ?? 'en'];
+        }
+
+        $translatablePlugin = SpatieTranslatablePlugin::make()
+            ->defaultLocales($configuredLocales)
+            ->persist();
+
         if ($this->isTestingEnvironment()) {
             return $panel
                 ->default()
@@ -48,7 +60,7 @@ class AdminPanelProvider extends PanelProvider
                     'primary' => Color::Blue,
                 ])
                 ->plugins([
-                    $this->makeSpatieTranslatablePlugin(),
+                    $translatablePlugin,
                 ])
                 ->resources([
                     \App\Filament\Resources\ApiKeyResource::class,
@@ -94,7 +106,7 @@ class AdminPanelProvider extends PanelProvider
                 'primary' => Color::Blue,
             ])
             ->plugins([
-                $this->makeSpatieTranslatablePlugin(),
+                $translatablePlugin,
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')

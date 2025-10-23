@@ -12,13 +12,13 @@ use App\Filament\WidgetTabs\Concerns\HasWidgetTabs;
 use Filament\Actions;
 use Illuminate\Database\Eloquent\Builder;
 use LaraZeus\SpatieTranslatable\Actions\LocaleSwitcher;
-use LaraZeus\SpatieTranslatable\Resources\Pages\ListRecords\Concerns\Translatable as TranslatableListRecords;
+use LaraZeus\SpatieTranslatable\Resources\Pages\ListRecords\Concerns\Translatable;
 
 final class ListAddresses extends BaseListRecords
 {
     use HasResizableColumns;
     use HasWidgetTabs;
-    use TranslatableListRecords;
+    use Translatable;
 
     protected static string $resource = AddressResource::class;
 

@@ -8,11 +8,11 @@ use App\Filament\Pages\Support\BaseListRecords;
 use App\Filament\Resources\PriceListItemResource;
 use Filament\Actions;
 use LaraZeus\SpatieTranslatable\Actions\LocaleSwitcher;
-use LaraZeus\SpatieTranslatable\Resources\Pages\ListRecords\Concerns\Translatable as TranslatableListRecords;
+use LaraZeus\SpatieTranslatable\Resources\Pages\ListRecords\Concerns\Translatable;
 
 final class ListPriceListItems extends BaseListRecords
 {
-    use TranslatableListRecords;
+    use Translatable;
 
     protected static string $resource = PriceListItemResource::class;
 
