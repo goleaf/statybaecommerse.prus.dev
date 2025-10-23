@@ -11,9 +11,9 @@ use Throwable;
 
 final class DataImportCommand extends Command
 {
-    protected string $signature = 'data:import';
+    protected $signature = 'data:import';
 
-    protected string $description = 'Import data into the application.';
+    protected $description = 'Import data into the application.';
 
     public function handle(): int
     {

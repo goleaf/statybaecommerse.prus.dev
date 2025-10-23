@@ -50,8 +50,7 @@ final class SystemSettingCategoryTranslationResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    /** @var string|BackedEnum|null */
-    protected static $navigationIcon = 'heroicon-o-language';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-language';
 
     /**
      * @var string|UnitEnum|null Navigation group assignment stored without a typed property to avoid enum collisions.
