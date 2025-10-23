@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+namespace App\Filament\Resources\Channels\RelationManagers;
+
 use Filament\Actions\AssociateAction;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
@@ -22,7 +24,7 @@ class DiscountsRelationManager extends BaseRelationManager
 
     public function form(Schema $schema): Schema
     {
-        return $schema
+        return $form
             ->schema([
                 TextInput::make('name')
                     ->required()
