@@ -4,106 +4,101 @@ declare(strict_types=1);
 
 namespace Tests\Concerns;
 
+use Exception;
 use Illuminate\Testing\TestResponse;
 use League\OpenAPIValidation\PSR7\Exception\ValidationFailed;
 use League\OpenAPIValidation\PSR7\OperationAddress;
 use League\OpenAPIValidation\PSR7\ResponseValidator;
 use League\OpenAPIValidation\PSR7\ValidatorBuilder;
 use Nyholm\Psr7\Factory\Psr17Factory;
+use PHPUnit\Framework\ExpectationFailedException;
 use Psr\Http\Message\ResponseInterface;
-use Symfony\Bridge\PsrHttpMessage\Factory\PsrHttpFactory;
-use Symfony\Component\Cache\Adapter\ArrayAdapter;
+use Throwable;
 
-/**
- * Helper methods that convert Laravel JSON responses into PSR-7 responses and validate
- * them against the published OpenAPI contract for public collection endpoints. Centralising
- * this logic keeps the tests expressive while ensuring we fail fast when the transport layer changes.
- */
+use function base_path;
+use function file_exists;
+use function sprintf;
+use function strtoupper;
+
 trait AssertsAgainstOpenApi
 {
-    /**
-     * Cached response validator instance so we only parse the OpenAPI document once per test run.
-     */
-    private static ?ResponseValidator $collectionResponseValidator = null;
+    private static ?ResponseValidator $openApiResponseValidator = null;
 
     /**
-     * Cached PSR-17/PSR-18 bridge factory so that response conversions remain cheap.
+     * @param  TestResponse<\Symfony\Component\HttpFoundation\Response>  $response
      */
-    private static ?PsrHttpFactory $psrHttpFactory = null;
-
-    /**
-     * Validate the given response against the OpenAPI schema using the provided operation metadata.
-     *
-     * @param TestResponse $response The Laravel JSON response returned by the application under test.
-     * @param string       $path     The OpenAPI path template (e.g. `/collections/api/search`).
-     * @param string       $method   The HTTP method in lower- or upper-case form (defaults to GET).
-     */
-    protected function assertResponseMatchesCollectionOpenApi(TestResponse $response, string $path, string $method = 'get'): void
+    protected function assertResponseMatchesOpenApi(TestResponse $response, string $path, string $method = 'GET'): void
     {
-        $psrResponse = $this->convertToPsrResponse($response);
+        $validator = self::getResponseValidator();
+        $operation = new OperationAddress($path, strtoupper($method));
+        $psrResponse = $this->toPsrResponse($response);
 
         try {
-            $this->getCollectionResponseValidator()->validate(
-                $psrResponse,
-                new OperationAddress($path, strtolower($method))
-            );
-            $this->addToAssertionCount(1);
+            $validator->validate($operation, $psrResponse);
         } catch (ValidationFailed $exception) {
-            $this->fail(sprintf(
-                'OpenAPI validation failed for [%s %s]: %s',
-                strtoupper($method),
-                $path,
-                $exception->getMessage()
-            ));
+            throw new ExpectationFailedException(
+                sprintf('Failed asserting response matches OpenAPI schema for [%s %s]: %s', strtoupper($method), $path, $exception->getMessage()),
+                null,
+                $exception
+            );
+        } catch (Throwable $exception) {
+            $previous = $exception instanceof Exception
+                ? $exception
+                : new Exception($exception->getMessage(), 0, $exception);
+
+            throw new ExpectationFailedException(
+                sprintf('OpenAPI validation failed for [%s %s]: %s', strtoupper($method), $path, $exception->getMessage()),
+                null,
+                $previous
+            );
         }
     }
 
-    /**
-     * Convert a Laravel test response to a PSR-7 implementation that the validator understands.
-     */
-    private function convertToPsrResponse(TestResponse $response): ResponseInterface
+    private static function getResponseValidator(): ResponseValidator
     {
-        return $this->getPsrHttpFactory()->createResponse($response->baseResponse);
-    }
-
-    /**
-     * Lazily load the response validator for the collection contract.
-     */
-    private function getCollectionResponseValidator(): ResponseValidator
-    {
-        if (self::$collectionResponseValidator instanceof ResponseValidator) {
-            return self::$collectionResponseValidator;
+        if (self::$openApiResponseValidator instanceof ResponseValidator) {
+            return self::$openApiResponseValidator;
         }
 
-        $builder = (new ValidatorBuilder)
-            ->fromYamlFile($this->collectionOpenApiSpecPath())
-            ->setCache(new ArrayAdapter);
+        $schemaPath = base_path('public/openapi.json');
 
-        self::$collectionResponseValidator = $builder->getResponseValidator();
-
-        return self::$collectionResponseValidator;
-    }
-
-    /**
-     * Provide the absolute path to the OpenAPI document describing the storefront collection endpoints.
-     */
-    private function collectionOpenApiSpecPath(): string
-    {
-        return base_path('docs/openapi/collections.public.yaml');
-    }
-
-    /**
-     * Lazily create the PSR HTTP factory used to transform Symfony responses into PSR-7 responses.
-     */
-    private function getPsrHttpFactory(): PsrHttpFactory
-    {
-        if (self::$psrHttpFactory instanceof PsrHttpFactory) {
-            return self::$psrHttpFactory;
+        if (! file_exists($schemaPath)) {
+            throw new ExpectationFailedException(sprintf('OpenAPI schema file was not found at %s', $schemaPath));
         }
 
-        $psr17Factory = new Psr17Factory;
-        self::$psrHttpFactory = new PsrHttpFactory($psr17Factory, $psr17Factory, $psr17Factory, $psr17Factory);
+        self::$openApiResponseValidator = (new ValidatorBuilder)
+            ->fromJsonFile($schemaPath)
+            ->getResponseValidator();
 
-        return self::$psrHttpFactory;
+        return self::$openApiResponseValidator;
+    }
+
+    /**
+     * @param  TestResponse<\Symfony\Component\HttpFoundation\Response>  $response
+     */
+    private function toPsrResponse(TestResponse $response): ResponseInterface
+    {
+        $factory = new Psr17Factory;
+        $psrResponse = $factory->createResponse($response->getStatusCode());
+
+        foreach ($response->headers->all() as $header => $values) {
+            foreach ($values as $value) {
+                if ($value === null) {
+                    continue;
+                }
+
+                $psrResponse = $psrResponse->withAddedHeader($header, $value);
+            }
+        }
+
+        if (! $psrResponse->hasHeader('Content-Type')) {
+            $contentType = (string) $response->headers->get('Content-Type', 'application/json');
+            $psrResponse = $psrResponse->withHeader('Content-Type', $contentType);
+        }
+
+        $content = $response->getContent();
+        $psrResponse = $psrResponse->withBody($factory->createStream($content === false ? '' : $content));
+
+        return $psrResponse;
     }
 }
