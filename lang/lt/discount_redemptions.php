@@ -6,8 +6,6 @@ return [
     'title'  => 'Nuolaidų panaudojimai',
     'plural' => 'Nuolaidų panaudojimai',
     'single' => 'Nuolaidos panaudojimas',
-    'list_item_label' => 'Nuolaida :discount',
-    'list_item_tooltip' => 'Sutaupyta :amount su kodu :code',
 
     'sections' => [
         'associations'           => 'Susijusios reikšmės',
