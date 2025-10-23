@@ -4,28 +4,24 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use BackedEnum;
-use Filament\Schemas\Schema;
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\CampaignConversionResource\Pages;
 use App\Models\Campaign;
 use App\Models\CampaignConversion;
-use App\Models\Order;
 use App\Models\User;
+use BackedEnum;
 use Filament\Forms;
-use Filament\Schemas\Components\Grid as SchemaGrid;
-use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Grid as SchemaGrid;
+use Filament\Schemas\Components\Section as SchemaSection;
+use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Enums\FiltersLayout;
-use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Support\Number;
@@ -50,7 +46,7 @@ final class CampaignConversionResource extends Resource
         return __('campaign_conversions.title');
     }
 
-    public static function getNavigationGroup(): string|\UnitEnum|null
+    public static function getNavigationGroup(): string|UnitEnum|null
     {
         return self::$navigationGroup instanceof NavigationGroup
             ? self::$navigationGroup->label()
@@ -68,19 +64,27 @@ final class CampaignConversionResource extends Resource
     }
 
     /**
-     * Hide this resource from the Filament navigation in the test environment
-     * to avoid navigation URL generation failures in HTTP feature tests that
-     * do not exercise this resource directly.
+     * Hide this resource from the Filament navigation when the application is
+     * executing PHPUnit scenarios so feature tests do not attempt to resolve
+     * missing admin routes, while still delegating to the parent behaviour in
+     * every other environment.
      */
     public static function shouldRegisterNavigation(): bool
     {
-        return ! app()->environment('testing');
+        if (app()->runningUnitTests()) {
+            // During tests we completely disable navigation registration to
+            // avoid Filament attempting to reference routes that are not
+            // bootstrapped inside lightweight HTTP feature tests.
+            return false;
+        }
+
+        return parent::shouldRegisterNavigation();
     }
 
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Schema $schema): Schema   
+    public static function form(Schema $schema): Schema
     {
         return $schema->schema([
             SchemaSection::make(__('campaign_conversions.basic_information'))
@@ -187,8 +191,8 @@ final class CampaignConversionResource extends Resource
                             Select::make('device_type')
                                 ->label(__('campaign_conversions.form.device_type'))
                                 ->options([
-                                    'mobile' => __('campaign_conversions.device_types.mobile'),
-                                    'tablet' => __('campaign_conversions.device_types.tablet'),
+                                    'mobile'  => __('campaign_conversions.device_types.mobile'),
+                                    'tablet'  => __('campaign_conversions.device_types.tablet'),
                                     'desktop' => __('campaign_conversions.device_types.desktop'),
                                     'unknown' => __('campaign_conversions.device_types.unknown'),
                                 ])
@@ -226,7 +230,7 @@ final class CampaignConversionResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         // Configure the table definition for the streamlined Filament v4 return type.
         return $table
@@ -246,7 +250,7 @@ final class CampaignConversionResource extends Resource
                     ->label(__('campaign_conversions.table.conversion_type'))
                     ->badge()
                     ->sortable()
-                    ->formatStateUsing(fn (?string $state): string => $state ? __('campaign_conversions.conversion_types.'.$state) : '-')
+                    ->formatStateUsing(fn (?string $state): string => $state ? __('campaign_conversions.conversion_types.' . $state) : '-')
                     ->toggleable(),
                 TextColumn::make('conversion_value')
                     ->label(__('campaign_conversions.conversion_value'))
@@ -267,13 +271,13 @@ final class CampaignConversionResource extends Resource
                 SelectFilter::make('conversion_type')
                     ->label(__('campaign_conversions.filters.conversion_type'))
                     ->options([
-                        'purchase' => __('campaign_conversions.conversion_types.purchase'),
-                        'signup' => __('campaign_conversions.conversion_types.signup'),
-                        'download' => __('campaign_conversions.conversion_types.download'),
+                        'purchase'     => __('campaign_conversions.conversion_types.purchase'),
+                        'signup'       => __('campaign_conversions.conversion_types.signup'),
+                        'download'     => __('campaign_conversions.conversion_types.download'),
                         'subscription' => __('campaign_conversions.conversion_types.subscription'),
-                        'lead' => __('campaign_conversions.conversion_types.lead'),
-                        'trial' => __('campaign_conversions.conversion_types.trial'),
-                        'custom' => __('campaign_conversions.conversion_types.custom'),
+                        'lead'         => __('campaign_conversions.conversion_types.lead'),
+                        'trial'        => __('campaign_conversions.conversion_types.trial'),
+                        'custom'       => __('campaign_conversions.conversion_types.custom'),
                     ])
                     ->native(false),
             ])
@@ -300,13 +304,13 @@ final class CampaignConversionResource extends Resource
                                 ->label(__('campaign_conversions.infolist.campaign')),
                             TextEntry::make('conversion_type')
                                 ->label(__('campaign_conversions.infolist.conversion_type'))
-                                ->formatStateUsing(fn (?string $state): string => $state ? __('campaign_conversions.conversion_types.'.$state) : '-'),
+                                ->formatStateUsing(fn (?string $state): string => $state ? __('campaign_conversions.conversion_types.' . $state) : '-'),
                             TextEntry::make('conversion_value')
                                 ->label(__('campaign_conversions.infolist.conversion_value'))
-                                ->formatStateUsing(fn ($state): string => '€'.number_format((float) $state, 2)),
+                                ->formatStateUsing(fn ($state): string => '€' . number_format((float) $state, 2)),
                             TextEntry::make('status')
                                 ->label(__('campaign_conversions.infolist.status'))
-                                ->formatStateUsing(fn (?string $state): string => $state ? __('campaign_conversions.statuses.'.$state) : '-'),
+                                ->formatStateUsing(fn (?string $state): string => $state ? __('campaign_conversions.statuses.' . $state) : '-'),
                             TextEntry::make('converted_at')
                                 ->label(__('campaign_conversions.infolist.converted_at'))
                                 ->dateTime(),
@@ -350,7 +354,7 @@ final class CampaignConversionResource extends Resource
                         ->schema([
                             TextEntry::make('device_type')
                                 ->label(__('campaign_conversions.infolist.device_type'))
-                                ->formatStateUsing(fn (?string $state): string => $state ? __('campaign_conversions.device_types.'.$state) : '-'),
+                                ->formatStateUsing(fn (?string $state): string => $state ? __('campaign_conversions.device_types.' . $state) : '-'),
                             TextEntry::make('browser')
                                 ->label(__('campaign_conversions.infolist.browser')),
                             TextEntry::make('os')
@@ -369,21 +373,21 @@ final class CampaignConversionResource extends Resource
                         ->schema([
                             TextEntry::make('roi')
                                 ->label(__('campaign_conversions.infolist.roi'))
-                                ->formatStateUsing(fn ($state): string => $state === null ? '-' : number_format((float) $state * 100, 2).' %'),
+                                ->formatStateUsing(fn ($state): string => $state === null ? '-' : number_format((float) $state * 100, 2) . ' %'),
                             TextEntry::make('roas')
                                 ->label(__('campaign_conversions.infolist.roas')),
                             TextEntry::make('cost_per_conversion')
                                 ->label(__('campaign_conversions.infolist.cost_per_conversion'))
-                                ->formatStateUsing(fn ($state): string => $state === null ? '-' : '€'.number_format((float) $state, 2)),
+                                ->formatStateUsing(fn ($state): string => $state === null ? '-' : '€' . number_format((float) $state, 2)),
                             TextEntry::make('lifetime_value')
                                 ->label(__('campaign_conversions.infolist.lifetime_value'))
-                                ->formatStateUsing(fn ($state): string => $state === null ? '-' : '€'.number_format((float) $state, 2)),
+                                ->formatStateUsing(fn ($state): string => $state === null ? '-' : '€' . number_format((float) $state, 2)),
                             TextEntry::make('customer_acquisition_cost')
                                 ->label(__('campaign_conversions.infolist.customer_acquisition_cost'))
-                                ->formatStateUsing(fn ($state): string => $state === null ? '-' : '€'.number_format((float) $state, 2)),
+                                ->formatStateUsing(fn ($state): string => $state === null ? '-' : '€' . number_format((float) $state, 2)),
                             TextEntry::make('conversion_rate')
                                 ->label(__('campaign_conversions.infolist.conversion_rate'))
-                                ->formatStateUsing(fn ($state): string => $state === null ? '-' : number_format((float) $state * 100, 2).' %'),
+                                ->formatStateUsing(fn ($state): string => $state === null ? '-' : number_format((float) $state * 100, 2) . ' %'),
                         ]),
                 ]),
             InfolistSection::make(__('campaign_conversions.infolist.additional_information'))

@@ -1,7 +1,8 @@
 <?php
 
 return array (
-  'navigation' => 
+  'plural' => 'Campaign Conversions',
+  'navigation' =>
   array (
     'label' => 'Campaign Conversions',
     'group' => 'Marketing',

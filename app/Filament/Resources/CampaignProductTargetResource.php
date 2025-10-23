@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use Filament\Schemas\Schema;
 use App\Filament\Resources\CampaignProductTargetResource\Pages;
 use App\Models\CampaignProductTarget;
 use App\Models\Scopes\ActiveScope;
@@ -16,10 +14,8 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-// Import the schema grid helper to avoid runtime resolution issues during form rendering.
-use Filament\Schemas\Components\Grid as SchemaGrid;
 use Filament\Forms\Components\KeyValue;
-use Filament\Schemas\Components\Section as SchemaSection;
+// Import the schema grid helper to avoid runtime resolution issues during form rendering.
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -30,6 +26,9 @@ use Filament\Infolists\Components\Section as InfolistSection;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Grid as SchemaGrid;
+use Filament\Schemas\Components\Section as SchemaSection;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
@@ -62,7 +61,20 @@ final class CampaignProductTargetResource extends Resource
 
     public static function getNavigationLabel(): string
     {
-        return __('campaign_product_targets.navigation');
+        // Resolve the label from the nested translation key first so newer
+        // language files can supply an explicit navigation label while still
+        // honouring the legacy flat key when upgrading older installations.
+        $label = __('campaign_product_targets.navigation.label');
+
+        if (is_array($label) || ! is_string($label) || $label === '') {
+            // Fallback to the legacy translation entry that returned a plain
+            // string before the nested structure existed.
+            $label = __('campaign_product_targets.navigation');
+        }
+
+        // Provide a hard-coded default as a final guard so Filament can still
+        // render the navigation item without breaking localisation loaders.
+        return is_string($label) && $label !== '' ? $label : 'Campaign Targets';
     }
 
     public static function getPluralModelLabel(): string
@@ -78,7 +90,7 @@ final class CampaignProductTargetResource extends Resource
     /**
      * Define the Campaign Product Target form with conditional selectors and marketing metadata.
      */
-    public static function form(Schema $schema): Schema   
+    public static function form(Schema $schema): Schema
     {
         return $schema->schema([
             SchemaSection::make(__('campaign_product_targets.basic_information'))
@@ -187,7 +199,7 @@ final class CampaignProductTargetResource extends Resource
     /**
      * Configure the marketing oriented table with rich filtering, search, and bulk campaign actions.
      */
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         // Configure the table definition for the streamlined Filament v4 return type.
         return $table
@@ -359,7 +371,7 @@ final class CampaignProductTargetResource extends Resource
     /**
      * Provide a structured infolist for the record view page.
      */
-    public static function infolist(Schema $schema): Schema   
+    public static function infolist(Schema $schema): Schema
     {
         return $schema->schema([
             InfolistSection::make(__('campaign_product_targets.view.sections.overview'))
