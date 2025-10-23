@@ -179,23 +179,22 @@ final class ReferralCodeResource extends Resource
             ->filters([
                 // Alias filter expected by tests
                 TernaryFilter::make('active')
-                    ->attribute('is_active')
                     ->label(__('referral.filters.is_active'))
+                    ->attribute('is_active')
                     ->trueLabel('active')
                     ->falseLabel('inactive')
-                    ->default(true)
                     ->query(function (Builder $query, array $data): Builder {
-                        $rawState = array_key_exists('value', $data) ? $data['value'] : true;
+                        $rawState = $data['value'] ?? null;
 
-                        if ($rawState === null || $rawState === '') {
-                            return $query;
-                        }
-
-                        $shouldShowActive = filter_var($rawState, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
-
-                        if ($shouldShowActive === null) {
-                            return $query;
-                        }
+                        $shouldShowActive = match (true) {
+                            is_bool($rawState) => $rawState,
+                            $rawState === null => true,
+                            default => filter_var(
+                                $rawState,
+                                FILTER_VALIDATE_BOOLEAN,
+                                FILTER_NULL_ON_FAILURE,
+                            ) ?? true,
+                        };
 
                         return $query->where('is_active', $shouldShowActive);
                     }),
