@@ -6,6 +6,7 @@ namespace App\Providers\Filament;
 
 use Andreia\FilamentNordTheme\FilamentNordThemePlugin;
 use App\Support\Nav;
+use App\Support\ViteManifest;
 use Asmit\ResizedColumn\ResizedColumnPlugin;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use App\Filament\Resources\ProductResource;
@@ -194,12 +195,12 @@ final class AdminPanelProvider extends PanelProvider
             ->when(app()->environment('testing'),
                 fn (Panel $p) => $p->plugins($this->testingPlugins()),
                 fn (Panel $p) => $p->plugins($this->configuredPlugins()))
-            // Enable the custom Filament theme in non-testing environments. The Vite manifest is not
-            // available during feature tests, so we skip the theme there to keep rendering resilient.
+            // Enable the custom Filament theme only when the compiled manifest exposes the entry.
+            // Feature tests stub an empty manifest, so we skip the theme there to keep rendering resilient.
             ->when(
-                app()->environment('testing'),
-                fn (Panel $p): Panel => $p,
-                fn (Panel $p): Panel => $p->viteTheme('resources/css/filament/admin/theme.scss')
+                ViteManifest::hasEntry('resources/css/filament/admin/theme.scss') && ! app()->environment('testing'),
+                fn (Panel $p): Panel => $p->viteTheme('resources/css/filament/admin/theme.scss'),
+                fn (Panel $p): Panel => $p
             )
             ->spa();
     }
@@ -334,7 +335,13 @@ final class AdminPanelProvider extends PanelProvider
 
         $navigationGroups = [];
 
-        foreach (Nav::navigationGroups() as $group) {
+        $discoveredGroups = rescue(
+            static fn (): array => Nav::navigationGroups(),
+            [],
+            report: false,
+        );
+
+        foreach ($discoveredGroups as $group) {
             $override = $overrides[$group['key']] ?? null;
             $label = $override['label'] ?? $group['label'];
             $icon = $override['icon'] ?? $group['icon'];

@@ -16,6 +16,11 @@ class ChannelFactory extends Factory
 {
     protected $model = Channel::class;
 
+    /**
+     * @var array<string, true>
+     */
+    private static array $generatedCodes = [];
+
     public function definition(): array
     {
         $name = $this->faker->unique()->company() . ' Channel';
@@ -31,19 +36,7 @@ class ChannelFactory extends Factory
         // Guarantee the code respects the alpha_dash rule even when company names contain punctuation.
         $baseCode = $baseCode !== '' ? $baseCode : Str::upper(Str::random(8));
 
-        $generateCode = fn (): string => Str::limit(
-            $baseCode . '_' . Str::upper(Str::random(4)),
-            20,
-            ''
-        );
-
-        $code = $generateCode();
-
-        if (Schema::hasTable((new Channel())->getTable())) {
-            while (Channel::where('code', $code)->exists()) {
-                $code = $generateCode();
-            }
-        }
+        $code = $this->generateUniqueCode($baseCode);
 
         return [
             // Identity and descriptive metadata.
@@ -86,5 +79,53 @@ class ChannelFactory extends Factory
             'is_default'  => true,
             'is_enabled'  => true,
         ]);
+    }
+
+    /**
+     * Generate a unique channel code while avoiding collisions within the current factory run
+     * and the persisted database records when the table exists.
+     */
+    private function generateUniqueCode(string $baseCode): string
+    {
+        $table = (new Channel())->getTable();
+        $tableExists = Schema::hasTable($table);
+
+        // Ensure we always have a valid uppercase base to work with.
+        $normalisedBase = trim($baseCode, '_');
+        $normalisedBase = $normalisedBase !== '' ? $normalisedBase : Str::upper(Str::random(8));
+
+        $attempts = 0;
+
+        while ($attempts < 100) {
+            $attempts++;
+
+            $candidate = Str::limit(
+                $normalisedBase . '_' . Str::upper(Str::random(6)),
+                20,
+                ''
+            );
+
+            if ($candidate === '') {
+                continue;
+            }
+
+            if (isset(self::$generatedCodes[$candidate])) {
+                continue;
+            }
+
+            if ($tableExists && Channel::where('code', $candidate)->exists()) {
+                continue;
+            }
+
+            self::$generatedCodes[$candidate] = true;
+
+            return $candidate;
+        }
+
+        // Fallback to a full random code if we exhausted attempts (extremely unlikely).
+        $fallback = Str::upper(Str::random(20));
+        self::$generatedCodes[$fallback] = true;
+
+        return $fallback;
     }
 }

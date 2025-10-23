@@ -399,10 +399,15 @@ final class Nav
             }
 
             $labelKey = (string) ($group['label'] ?? $key);
+            $resolvedLabel = trans($labelKey, locale: 'en');
+
+            if (is_array($resolvedLabel)) {
+                $resolvedLabel = $labelKey;
+            }
 
             $groups[$key] = [
                 'key'       => $key,
-                'label'     => trans($labelKey, locale: 'en'),
+                'label'     => (string) $resolvedLabel,
                 'label_key' => $labelKey,
                 'icon'      => $group['icon'] ?? null,
                 'sort'      => $order++,

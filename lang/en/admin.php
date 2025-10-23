@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 return [
     'menu_items' => require __DIR__.'/admin/menu_items.php',
+    'dashboard' => require __DIR__.'/admin/dashboard.php',
     'settings' => [
         'navigation_label'   => 'Settings',
         'plural_model_label' => 'Settings',

@@ -29,12 +29,12 @@ final class CollectionResource extends Resource
     /**
      * Group the resource under the "Products" navigation entry.
      */
-    protected static ?string $navigationGroup = 'Products';
+    protected static \UnitEnum|string|null $navigationGroup = 'Products';
 
     /**
      * Display icon used by Filament's sidebar.
      */
-    protected static ?string $navigationIcon = 'heroicon-o-folder';
+    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-folder';
 
     /**
      * Lightweight form definition that exposes the most important
