@@ -40,7 +40,8 @@ final class CollectionApiTest extends TestCase
                 ],
             ]);
 
-        $this->assertResponseMatchesOpenApi($response, '/collections/api/search');
+        // Ensure the payload matches the published OpenAPI contract for collection listings.
+        $this->assertResponseMatchesCollectionOpenApi($response, '/collections/api/search');
     }
 
     public function test_collections_api_search_functionality(): void
@@ -60,7 +61,8 @@ final class CollectionApiTest extends TestCase
             ->assertJsonFragment(['name' => 'Summer Collection'])
             ->assertJsonMissing(['name' => 'Winter Collection']);
 
-        $this->assertResponseMatchesOpenApi($response, '/collections/api/search');
+        // Confirm the filtered payload still honours the OpenAPI response rules.
+        $this->assertResponseMatchesCollectionOpenApi($response, '/collections/api/search');
     }
 
     public function test_collections_api_by_type_manual(): void
@@ -80,7 +82,8 @@ final class CollectionApiTest extends TestCase
             ->assertJsonFragment(['name' => $manualCollection->name])
             ->assertJsonMissing(['name' => $automaticCollection->name]);
 
-        $this->assertResponseMatchesOpenApi($response, '/collections/api/by-type/{type}');
+        // Validate the manual type slice against the schema.
+        $this->assertResponseMatchesCollectionOpenApi($response, '/collections/api/by-type/{type}');
     }
 
     public function test_collections_api_by_type_automatic(): void
@@ -100,7 +103,8 @@ final class CollectionApiTest extends TestCase
             ->assertJsonFragment(['name' => $automaticCollection->name])
             ->assertJsonMissing(['name' => $manualCollection->name]);
 
-        $this->assertResponseMatchesOpenApi($response, '/collections/api/by-type/{type}');
+        // Ensure automatic slices stay in sync with the OpenAPI document.
+        $this->assertResponseMatchesCollectionOpenApi($response, '/collections/api/by-type/{type}');
     }
 
     public function test_collections_api_with_products(): void
@@ -117,7 +121,8 @@ final class CollectionApiTest extends TestCase
             ->assertJsonFragment(['name' => $collectionWithProducts->name])
             ->assertJsonMissing(['name' => $collectionWithoutProducts->name]);
 
-        $this->assertResponseMatchesOpenApi($response, '/collections/api/with-products');
+        // Schema validation keeps the "with products" slice predictable for consumers.
+        $this->assertResponseMatchesCollectionOpenApi($response, '/collections/api/with-products');
     }
 
     public function test_collections_api_popular(): void
@@ -138,7 +143,8 @@ final class CollectionApiTest extends TestCase
                 ],
             ]);
 
-        $this->assertResponseMatchesOpenApi($response, '/collections/api/popular');
+        // Confirm the popular feed respects the response contract.
+        $this->assertResponseMatchesCollectionOpenApi($response, '/collections/api/popular');
     }
 
     public function test_collections_api_statistics(): void
@@ -165,7 +171,8 @@ final class CollectionApiTest extends TestCase
                 'manual_collections'    => 1,
             ]);
 
-        $this->assertResponseMatchesOpenApi($response, '/collections/api/statistics');
+        // The aggregate statistics endpoint must also align with the shared schema.
+        $this->assertResponseMatchesCollectionOpenApi($response, '/collections/api/statistics');
     }
 
     public function test_collection_products_api(): void
@@ -192,7 +199,8 @@ final class CollectionApiTest extends TestCase
             ])
             ->assertJsonFragment(['name' => $product->name]);
 
-        $this->assertResponseMatchesOpenApi($response, '/collections/{collection}/products');
+        // Validate the product listing payload for a visible collection.
+        $this->assertResponseMatchesCollectionOpenApi($response, '/collections/{collection}/products');
     }
 
     public function test_collection_products_api_pagination(): void
@@ -210,7 +218,8 @@ final class CollectionApiTest extends TestCase
                 'meta',
             ]);
 
-        $this->assertResponseMatchesOpenApi($response, '/collections/{collection}/products');
+        // Confirm paginated responses still satisfy the transport schema.
+        $this->assertResponseMatchesCollectionOpenApi($response, '/collections/{collection}/products');
     }
 
     public function test_collection_products_api_with_brand_filter(): void
@@ -225,7 +234,8 @@ final class CollectionApiTest extends TestCase
         $response->assertOk()
             ->assertJsonFragment(['name' => $product->name]);
 
-        $this->assertResponseMatchesOpenApi($response, '/collections/{collection}/products');
+        // Validate brand filtered results against the schema.
+        $this->assertResponseMatchesCollectionOpenApi($response, '/collections/{collection}/products');
     }
 
     public function test_collection_products_api_with_category_filter(): void
@@ -241,7 +251,8 @@ final class CollectionApiTest extends TestCase
         $response->assertOk()
             ->assertJsonFragment(['name' => $product->name]);
 
-        $this->assertResponseMatchesOpenApi($response, '/collections/{collection}/products');
+        // Category filtered payload must respect the OpenAPI contract too.
+        $this->assertResponseMatchesCollectionOpenApi($response, '/collections/{collection}/products');
     }
 
     public function test_collection_products_api_with_price_filter(): void
@@ -254,7 +265,8 @@ final class CollectionApiTest extends TestCase
 
         $response->assertOk();
 
-        $this->assertResponseMatchesOpenApi($response, '/collections/{collection}/products');
+        // Even range filtered responses must match the documented schema.
+        $this->assertResponseMatchesCollectionOpenApi($response, '/collections/{collection}/products');
     }
 
     public function test_collection_products_api_with_sorting(): void
@@ -268,7 +280,8 @@ final class CollectionApiTest extends TestCase
 
         $response->assertOk();
 
-        $this->assertResponseMatchesOpenApi($response, '/collections/{collection}/products');
+        // Sorting should not change the contract structure.
+        $this->assertResponseMatchesCollectionOpenApi($response, '/collections/{collection}/products');
     }
 
     public function test_collection_products_api_empty_collection(): void
@@ -278,10 +291,12 @@ final class CollectionApiTest extends TestCase
         $response = $this->getJson("/collections/{$collection->slug}/products");
 
         $response->assertOk()
-            ->assertJsonCount(0, 'data')
-            ->assertExactJson($this->jsonFixture('api/collections/products-empty.json'));
+            ->assertJsonCount(0, 'data');
 
-        $this->assertResponseMatchesOpenApi($response, '/collections/{collection}/products');
+        $this->assertResponseMatchesCollectionOpenApi($response, '/collections/{collection}/products');
+
+        // Snapshot the empty payload to guard against accidental shape changes.
+        $this->assertJsonMatchesFixture($response, 'tests/Fixtures/collections/collection-products-empty.json');
     }
 
     public function test_collection_products_api_hidden_collection_returns_404(): void
@@ -290,10 +305,12 @@ final class CollectionApiTest extends TestCase
 
         $response = $this->getJson("/collections/{$collection->slug}/products");
 
-        $response->assertNotFound()
-            ->assertExactJson($this->jsonFixture('api/errors/not-found.json'));
+        $response->assertNotFound();
 
-        $this->assertResponseMatchesOpenApi($response, '/collections/{collection}/products');
+        $this->assertResponseMatchesCollectionOpenApi($response, '/collections/{collection}/products');
+
+        // Document the not-found payload that the storefront surfaces.
+        $this->assertJsonMatchesFixture($response, 'tests/Fixtures/collections/collection-products-not-found.json');
     }
 
     public function test_collection_products_api_inactive_collection_returns_404(): void
@@ -302,10 +319,12 @@ final class CollectionApiTest extends TestCase
 
         $response = $this->getJson("/collections/{$collection->slug}/products");
 
-        $response->assertNotFound()
-            ->assertExactJson($this->jsonFixture('api/errors/not-found.json'));
+        $response->assertNotFound();
 
-        $this->assertResponseMatchesOpenApi($response, '/collections/{collection}/products');
+        $this->assertResponseMatchesCollectionOpenApi($response, '/collections/{collection}/products');
+
+        // Reuse the documented not-found payload for inactive collections as well.
+        $this->assertJsonMatchesFixture($response, 'tests/Fixtures/collections/collection-products-not-found.json');
     }
 
     public function test_collections_api_returns_only_visible_collections(): void
@@ -319,7 +338,8 @@ final class CollectionApiTest extends TestCase
             ->assertJsonFragment(['name' => $visibleCollection->name])
             ->assertJsonMissing(['name' => $hiddenCollection->name]);
 
-        $this->assertResponseMatchesOpenApi($response, '/collections/api/search');
+        // Visible collections feed must stay compliant with the schema.
+        $this->assertResponseMatchesCollectionOpenApi($response, '/collections/api/search');
     }
 
     public function test_collections_api_returns_only_active_collections(): void
@@ -333,7 +353,8 @@ final class CollectionApiTest extends TestCase
             ->assertJsonFragment(['name' => $activeCollection->name])
             ->assertJsonMissing(['name' => $inactiveCollection->name]);
 
-        $this->assertResponseMatchesOpenApi($response, '/collections/api/search');
+        // Active collection filtering still returns the documented structure.
+        $this->assertResponseMatchesCollectionOpenApi($response, '/collections/api/search');
     }
 
     public function test_collections_api_with_limit_parameter(): void
@@ -345,7 +366,8 @@ final class CollectionApiTest extends TestCase
         $response->assertOk()
             ->assertJsonCount(5, 'data');
 
-        $this->assertResponseMatchesOpenApi($response, '/collections/api/search');
+        // Limiting the search result size should not change the schema.
+        $this->assertResponseMatchesCollectionOpenApi($response, '/collections/api/search');
     }
 
     public function test_collections_api_with_offset_parameter(): void
@@ -357,7 +379,8 @@ final class CollectionApiTest extends TestCase
         $response->assertOk()
             ->assertJsonCount(5, 'data');
 
-        $this->assertResponseMatchesOpenApi($response, '/collections/api/search');
+        // Offset pagination flows must also line up with the contract.
+        $this->assertResponseMatchesCollectionOpenApi($response, '/collections/api/search');
     }
 
     public function test_collections_api_with_display_type_filter(): void
@@ -371,7 +394,8 @@ final class CollectionApiTest extends TestCase
             ->assertJsonFragment(['name' => $gridCollection->name])
             ->assertJsonMissing(['name' => $listCollection->name]);
 
-        $this->assertResponseMatchesOpenApi($response, '/collections/api/search');
+        // Schema validation for display type filtering keeps API docs honest.
+        $this->assertResponseMatchesCollectionOpenApi($response, '/collections/api/search');
     }
 
     public function test_collections_api_with_products_count_filter(): void
@@ -388,28 +412,23 @@ final class CollectionApiTest extends TestCase
             ->assertJsonFragment(['name' => $collectionWithProducts->name])
             ->assertJsonMissing(['name' => $collectionWithoutProducts->name]);
 
-        $this->assertResponseMatchesOpenApi($response, '/collections/api/search');
+        // Validate the has_products filter against the shared OpenAPI spec.
+        $this->assertResponseMatchesCollectionOpenApi($response, '/collections/api/search');
     }
 
     /**
-     * @return array<string, mixed>
+     * Compare the JSON payload with an on-disk fixture after normalising encoding and ordering.
      */
-    private function jsonFixture(string $relativePath): array
+    private function assertJsonMatchesFixture(TestResponse $response, string $relativePath): void
     {
-        $path = base_path('tests/Fixtures/'.$relativePath);
+        $fixturePath = base_path($relativePath);
 
-        if (! is_file($path)) {
-            self::fail(sprintf('The JSON fixture %s could not be found.', $relativePath));
-        }
+        $normalizedJson = json_encode(
+            json_decode($response->getContent(), true, 512, JSON_THROW_ON_ERROR),
+            JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES
+        );
 
-        $contents = file_get_contents($path);
-        if ($contents === false) {
-            self::fail(sprintf('The JSON fixture %s could not be read.', $relativePath));
-        }
-
-        /** @var array<string, mixed> $decoded */
-        $decoded = json_decode($contents, true, 512, JSON_THROW_ON_ERROR);
-
-        return $decoded;
+        self::assertFileExists($fixturePath);
+        self::assertJsonStringEqualsJsonFile($fixturePath, (string) $normalizedJson);
     }
 }

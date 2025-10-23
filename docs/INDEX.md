@@ -40,5 +40,6 @@ A curated map of the most useful documents for day-to-day development and operat
 - [CHANGELOG](CHANGELOG.md) – high-level log of significant migrations and releases.
 - [PERFORMANCE_REPORT](PERFORMANCE_REPORT.md) – benchmarks and performance tuning recommendations.
 - [tests/README](../tests/README.md) – tour of automated test coverage for backend and UI.
+- [Public Collections API schema](openapi/collections.public.yaml) – contract exercised by automated OpenAPI validation for storefront collection endpoints.
 
 Need another guide? Search the `docs/` directory for keywords or open a summary above to continue exploring the knowledge base.
