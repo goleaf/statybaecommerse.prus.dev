@@ -7,7 +7,7 @@ namespace App\Filament\Resources;
 use App\Support\Concerns\HasNav;
 
 use App\Filament\Resources\SliderTranslationResource\Pages;
-use App\Models\Slider;
+use App\Models\SliderTranslation;
 use BackedEnum;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
@@ -23,6 +23,7 @@ use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Support\Str;
 use UnitEnum;
 
 /**
@@ -74,11 +75,9 @@ final class SliderTranslationResource extends Resource
                         ->components([
                             Select::make('slider_id')
                                 ->label(__('admin.slider_translations.slider'))
-                                ->options(fn (): array => Slider::query()
-                                    ->orderBy('name')
-                                    ->pluck('name', 'id')
-                                    ->all())
+                                ->relationship('slider', 'name')
                                 ->required()
+                                ->preload()
                                 ->searchable(),
                             Select::make('locale')
                                 ->label(__('admin.slider_translations.locale'))
@@ -119,7 +118,7 @@ final class SliderTranslationResource extends Resource
                 TextColumn::make('locale')
                     ->label(__('admin.slider_translations.locale'))
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
+                    ->color(fn (?string $state): string => match ($state) {
                         'en'    => 'success',
                         'lt'    => 'info',
                         'de'    => 'warning',
@@ -135,7 +134,11 @@ final class SliderTranslationResource extends Resource
                     ->tooltip(function (TextColumn $column): ?string {
                         $state = (string) $column->getState();
 
-                        return mb_strlen($state) > 50 ? $state : null;
+                        if (! is_string($state)) {
+                            return null;
+                        }
+
+                        return Str::length($state) > 50 ? $state : null;
                     }),
                 TextColumn::make('description')
                     ->label(__('admin.slider_translations.description'))
@@ -143,7 +146,11 @@ final class SliderTranslationResource extends Resource
                     ->tooltip(function (TextColumn $column): ?string {
                         $state = (string) $column->getState();
 
-                        return mb_strlen($state) > 50 ? $state : null;
+                        if (! is_string($state)) {
+                            return null;
+                        }
+
+                        return Str::length($state) > 50 ? $state : null;
                     }),
                 TextColumn::make('button_text')
                     ->label(__('admin.slider_translations.button_text'))
@@ -151,7 +158,11 @@ final class SliderTranslationResource extends Resource
                     ->tooltip(function (TextColumn $column): ?string {
                         $state = (string) $column->getState();
 
-                        return mb_strlen($state) > 30 ? $state : null;
+                        if (! is_string($state)) {
+                            return null;
+                        }
+
+                        return Str::length($state) > 30 ? $state : null;
                     }),
                 TextColumn::make('created_at')
                     ->label(__('admin.common.created_at'))
@@ -160,12 +171,10 @@ final class SliderTranslationResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                SelectFilter::make('slider_id')
+                SelectFilter::make('slider')
                     ->label(__('admin.slider_translations.slider'))
-                    ->options(fn (): array => Slider::query()
-                        ->orderBy('name')
-                        ->pluck('name', 'id')
-                        ->all())
+                    ->relationship('slider', 'name')
+                    ->preload()
                     ->searchable(),
                 SelectFilter::make('locale')
                     ->label(__('admin.slider_translations.locale'))
