@@ -28,29 +28,20 @@ use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\Collection;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Saade\FilamentFullCalendar\FilamentFullCalendarPlugin;
+use Illuminate\Support\Facades\URL;
+use pxlrbt\FilamentExcel\FilamentExport;
 
 final class AdminPanelProvider extends PanelProvider
 {
-    /** @var array<string, mixed>|null */
-    private static ?array $filamentConfigCache = null;
-
-    public function __construct(?Application $app = null)
+    public function boot(): void
     {
-        if ($app instanceof Application) {
-            parent::__construct($app);
-
-            return;
-        }
-
-        $container = Container::getInstance();
-
-        if ($container instanceof Application) {
-            parent::__construct($container);
-
-            return;
-        }
-
-        $this->app = null;
+        FilamentExport::createExportUrlUsing(
+            static fn ($export): string => URL::temporarySignedRoute(
+                'exports.signed-download',
+                now()->addMinutes(60),
+                ['export' => $export],
+            ),
+        );
     }
 
     public function panel(Panel $panel): Panel
