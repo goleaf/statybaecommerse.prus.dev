@@ -240,7 +240,7 @@
                 <!-- Actions -->
                 <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
                     <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                        {{ __('attributes.actions') }}
+                        {{ __('attributes.actions.heading') }}
                     </h3>
                     <div class="space-y-2">
                         <a href="{{ route('attribute-values.by-attribute', $attributeValue->attribute) }}"
