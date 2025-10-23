@@ -9,6 +9,7 @@ use App\Services\SearchService;
 use BackedEnum;
 use UnitEnum;
 use Filament\Pages\Page;
+use UnitEnum;
 
 final class SearchExplorer extends Page
 {
