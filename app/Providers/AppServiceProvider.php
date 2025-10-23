@@ -6,6 +6,8 @@ namespace App\Providers;
 
 use App\Contracts\HealthReporter as HealthReporterContract;
 use App\Filament\Components\LiveNotificationFeed;
+use App\Mail\Auth\PasswordResetMail;
+use App\Mail\Auth\VerifyEmailMail;
 use App\Models\DiscountCode;
 use App\Models\DiscountRedemption;
 use App\Models\Document;
@@ -28,16 +30,12 @@ use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Console\Scheduling\Schedule;
-use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
+use Illuminate\Contracts\Auth\MustVerifyEmail as MustVerifyEmailContract;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response as HttpResponse;
-use Illuminate\Notifications\Messages\MailMessage;
-use Illuminate\Queue\Events\JobExceptionOccurred;
-use Illuminate\Queue\Events\JobFailed;
-use Illuminate\Queue\Events\JobProcessed;
-use Illuminate\Queue\Events\JobProcessing;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\Facades\View;
@@ -269,27 +267,37 @@ class AppServiceProvider extends ServiceProvider
 
         // Use localized Markdown templates for auth notifications
         ResetPassword::toMailUsing(function ($notifiable, string $url) {
-            $locale = method_exists($notifiable, 'preferredLocale') ? ($notifiable->preferredLocale() ?: app()->getLocale()) : app()->getLocale();
-            $minutes = (int) config('auth.passwords.' . config('auth.defaults.passwords') . '.expire');
+            $minutes = (int) config('auth.passwords.'.config('auth.defaults.passwords').'.expire');
 
-            return (new MailMessage)
-                ->locale($locale)
-                ->subject(__('mail.reset_password_subject', [], $locale))
-                ->markdown('emails.auth.password-reset', [
-                    'url'     => $url,
-                    'minutes' => $minutes,
-                ]);
+            if (! $notifiable instanceof CanResetPasswordContract) {
+                return new PasswordResetMail($url, $minutes, app()->getLocale());
+            }
+
+            $locale = $this->resolveNotifiableLocale($notifiable);
+            $mail = new PasswordResetMail($url, $minutes, $locale);
+
+            $email = $notifiable->getEmailForPasswordReset();
+            if ($email !== '') {
+                $mail->to($email);
+            }
+
+            return $mail;
         });
 
         VerifyEmail::toMailUsing(function ($notifiable, string $url) {
-            $locale = method_exists($notifiable, 'preferredLocale') ? ($notifiable->preferredLocale() ?: app()->getLocale()) : app()->getLocale();
+            if (! $notifiable instanceof MustVerifyEmailContract) {
+                return new VerifyEmailMail($url, app()->getLocale());
+            }
 
-            return (new MailMessage)
-                ->locale($locale)
-                ->subject(__('mail.verify_email_subject', [], $locale))
-                ->markdown('emails.auth.verify', [
-                    'url' => $url,
-                ]);
+            $locale = $this->resolveNotifiableLocale($notifiable);
+            $mail = new VerifyEmailMail($url, $locale);
+
+            $email = $notifiable->getEmailForVerification();
+            if ($email !== '') {
+                $mail->to($email);
+            }
+
+            return $mail;
         });
 
         // Configure document service global variables for e-commerce (skip during console commands)
@@ -327,52 +335,16 @@ class AppServiceProvider extends ServiceProvider
         }
     }
 
-    private function registerQueueTracing(): void
+    private function resolveNotifiableLocale(object $notifiable): string
     {
-        Queue::createPayloadUsing(function ($connection, $queue, array $payload): array {
-            $context = Trace::current();
-
-            return [
-                'trace' => [
-                    'trace_id' => $context->traceId(),
-                    'parent_span_id' => $context->spanId(),
-                    'correlation_id' => $context->correlationId(),
-                    'trace_flags' => $context->traceFlags(),
-                ],
-            ];
-        });
-
-        Queue::before(function (JobProcessing $event): void {
-            $payload = $event->job->payload();
-            $trace = $payload['trace'] ?? null;
-
-            if (\is_array($trace)) {
-                Trace::store(TraceContext::generate(
-                    traceId: (string) ($trace['trace_id'] ?? ''),
-                    parentSpanId: (string) ($trace['parent_span_id'] ?? ''),
-                    correlationId: (string) ($trace['correlation_id'] ?? ''),
-                    traceFlags: (string) ($trace['trace_flags'] ?? TraceContext::DEFAULT_TRACE_FLAGS),
-                ));
-            } else {
-                Trace::store(TraceContext::generate());
+        if (method_exists($notifiable, 'preferredLocale')) {
+            $preferred = $notifiable->preferredLocale();
+            if (is_string($preferred) && $preferred !== '') {
+                return $preferred;
             }
-        });
+        }
 
-        $cleanup = static function (): void {
-            Trace::forget();
-        };
-
-        Queue::after(function (JobProcessed $event) use ($cleanup): void {
-            $cleanup();
-        });
-
-        Queue::exceptionOccurred(function (JobExceptionOccurred $event) use ($cleanup): void {
-            $cleanup();
-        });
-
-        Queue::failing(function (JobFailed $event) use ($cleanup): void {
-            $cleanup();
-        });
+        return app()->getLocale();
     }
 
     private function registerModelObservers(): void
