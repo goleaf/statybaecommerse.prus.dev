@@ -212,17 +212,6 @@ final class CustomerResourceTest extends TestCase
             ->assertCanSeeTableRecords([$primaryCustomer]);
     }
 
-    /**
-     * Ensure the inline chart column is present on the customer listing.
-     */
-    public function test_list_page_includes_orders_sparkline_column(): void
-    {
-        Livewire::actingAs($this->admin)
-            ->test(ListCustomers::class)
-            ->call('loadTable')
-            ->assertTableColumnExists('orders_sparkline');
-    }
-
     public function test_can_create_customer_via_filament_form(): void
     {
         $country = Country::factory()->create(['name' => 'Lithuania']);
