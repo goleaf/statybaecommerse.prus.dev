@@ -17,12 +17,12 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
-use Filament\Infolists\Components\IconEntry;
 use Filament\Infolists\Components\KeyValueEntry;
 use Filament\Infolists\Components\Section as InfolistSection;
+use Filament\Infolists\Components\IconEntry;
 use Filament\Infolists\Components\TextEntry;
-use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
+use Filament\Resources\Resource;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
@@ -39,19 +39,17 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use UnitEnum;
 
 final class CampaignCustomerSegmentResource extends Resource
 {
     protected static ?string $model = CampaignCustomerSegment::class;
 
-    /**
-     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
-     */
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-users';
 
     protected static ?string $recordTitleAttribute = 'segment_type';
 
-    public static function getNavigationGroup(): ?string
+    public static function getNavigationGroup(): UnitEnum|string|null
     {
         return 'Marketing';
     }
@@ -93,9 +91,9 @@ final class CampaignCustomerSegmentResource extends Resource
                             Select::make('segment_type')
                                 ->label(__('campaign_customer_segments.segment_type'))
                                 ->options([
-                                    'demographic'   => __('campaign_customer_segments.types.demographic'),
-                                    'behavioral'    => __('campaign_customer_segments.types.behavioral'),
-                                    'geographic'    => __('campaign_customer_segments.types.geographic'),
+                                    'demographic' => __('campaign_customer_segments.types.demographic'),
+                                    'behavioral' => __('campaign_customer_segments.types.behavioral'),
+                                    'geographic' => __('campaign_customer_segments.types.geographic'),
                                     'psychographic' => __('campaign_customer_segments.types.psychographic'),
                                 ])
                                 ->required(),
@@ -159,11 +157,11 @@ final class CampaignCustomerSegmentResource extends Resource
                     ->label(__('campaign_customer_segments.segment_type'))
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'demographic'   => 'primary',
-                        'behavioral'    => 'success',
-                        'geographic'    => 'info',
+                        'demographic' => 'primary',
+                        'behavioral' => 'success',
+                        'geographic' => 'info',
                         'psychographic' => 'warning',
-                        default         => 'gray',
+                        default => 'gray',
                     })
                     ->formatStateUsing(fn (string $state): string => __('campaign_customer_segments.types.' . $state))
                     ->sortable(),
@@ -215,9 +213,9 @@ final class CampaignCustomerSegmentResource extends Resource
                 SelectFilter::make('segment_type')
                     ->label(__('campaign_customer_segments.segment_type'))
                     ->options([
-                        'demographic'   => __('campaign_customer_segments.types.demographic'),
-                        'behavioral'    => __('campaign_customer_segments.types.behavioral'),
-                        'geographic'    => __('campaign_customer_segments.types.geographic'),
+                        'demographic' => __('campaign_customer_segments.types.demographic'),
+                        'behavioral' => __('campaign_customer_segments.types.behavioral'),
+                        'geographic' => __('campaign_customer_segments.types.geographic'),
                         'psychographic' => __('campaign_customer_segments.types.psychographic'),
                     ]),
                 TernaryFilter::make('is_active')
@@ -296,10 +294,10 @@ final class CampaignCustomerSegmentResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index'  => Pages\ListCampaignCustomerSegments::route('/'),
+            'index' => Pages\ListCampaignCustomerSegments::route('/'),
             'create' => Pages\CreateCampaignCustomerSegment::route('/create'),
-            'view'   => Pages\ViewCampaignCustomerSegment::route('/{record}'),
-            'edit'   => Pages\EditCampaignCustomerSegment::route('/{record}/edit'),
+            'view' => Pages\ViewCampaignCustomerSegment::route('/{record}'),
+            'edit' => Pages\EditCampaignCustomerSegment::route('/{record}/edit'),
         ];
     }
 
@@ -316,7 +314,7 @@ final class CampaignCustomerSegmentResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        $count = self::getEloquentQuery()->count();
+        $count = static::getEloquentQuery()->count();
 
         return $count > 0 ? (string) $count : null;
     }
