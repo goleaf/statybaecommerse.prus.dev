@@ -12,15 +12,16 @@ use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\EnabledScope;
 use App\Support\Authorization\AuthorizationMatrix;
 use Filament\Actions;
-use Filament\Actions\Action;
-use Filament\Actions\BulkAction;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
-use Filament\Actions\ForceDeleteBulkAction;
-use Filament\Actions\RestoreBulkAction;
-use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\BulkAction;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ForceDeleteBulkAction;
+use Filament\Tables\Actions\RestoreBulkAction;
+use Filament\Tables\Actions\ViewAction;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -53,72 +54,7 @@ final class BrandResource extends Resource
 
     public static function canAccess(): bool
     {
-        return AuthorizationMatrix::check('brands', 'viewAny');
-    }
-
-    public static function shouldRegisterNavigation(): bool
-    {
-        return AuthorizationMatrix::check('brands', 'viewAny');
-    }
-
-    public static function canViewAny(): bool
-    {
-        return AuthorizationMatrix::check('brands', 'viewAny');
-    }
-
-    public static function canView(Model $record): bool
-    {
-        return AuthorizationMatrix::check('brands', 'view');
-    }
-
-    public static function canCreate(): bool
-    {
-        return AuthorizationMatrix::check('brands', 'create');
-    }
-
-    public static function canEdit(Model $record): bool
-    {
-        return AuthorizationMatrix::check('brands', 'update');
-    }
-
-    public static function canDelete(Model $record): bool
-    {
-        return AuthorizationMatrix::check('brands', 'delete');
-    }
-
-    public static function canForceDelete(Model $record): bool
-    {
-        return AuthorizationMatrix::check('brands', 'delete');
-    }
-
-    public static function canRestore(Model $record): bool
-    {
-        return AuthorizationMatrix::check('brands', 'update');
-    }
-
-    public static function canViewAny(): bool
-    {
-        return Gate::allows('viewAny', Brand::class);
-    }
-
-    public static function canView(Brand $record): bool
-    {
-        return Gate::allows('view', $record);
-    }
-
-    public static function canCreate(): bool
-    {
-        return Gate::allows('create', Brand::class);
-    }
-
-    public static function canEdit(Brand $record): bool
-    {
-        return Gate::allows('update', $record);
-    }
-
-    public static function canDelete(Brand $record): bool
-    {
-        return Gate::allows('delete', $record);
+        return static::canViewAny();
     }
 
     public static function getEloquentQuery(): Builder
@@ -310,12 +246,12 @@ final class BrandResource extends Resource
                     ->query(fn (Builder $query) => $query->where('created_at', '>=', now()->subDays(30))),
             ])
             ->actions([
-                Actions\ViewAction::make()
-                    ->visible(fn () => AuthorizationMatrix::check('brands', 'view')),
+                ViewAction::make()
+                    ->visible(fn (Brand $record): bool => static::authorizeBrand($record, 'view')),
                 EditAction::make()
-                    ->visible(fn () => AuthorizationMatrix::check('brands', 'update')),
+                    ->visible(fn (Brand $record): bool => static::authorizeBrand($record, 'update')),
                 DeleteAction::make()
-                    ->visible(fn () => AuthorizationMatrix::check('brands', 'delete')),
+                    ->visible(fn (Brand $record): bool => static::authorizeBrand($record, 'delete')),
                 Action::make('toggle_active')
                     ->label(fn (Brand $record): string => $record->is_active ? __('brands.deactivate') : __('brands.activate'))
                     ->icon(fn (Brand $record): string => $record->is_active ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
@@ -329,7 +265,7 @@ final class BrandResource extends Resource
                             ->send();
                     })
                     ->requiresConfirmation()
-                    ->visible(fn () => AuthorizationMatrix::check('brands', 'update')),
+                    ->visible(fn (Brand $record): bool => static::authorizeBrand($record, 'update')),
                 Action::make('toggle_featured')
                     ->label(fn (Brand $record): string => $record->is_featured ? __('brands.unfeature') : __('brands.feature'))
                     ->icon(fn (Brand $record): string => $record->is_featured ? 'heroicon-o-star' : 'heroicon-o-star')
@@ -343,16 +279,16 @@ final class BrandResource extends Resource
                             ->send();
                     })
                     ->requiresConfirmation()
-                    ->visible(fn () => AuthorizationMatrix::check('brands', 'update')),
+                    ->visible(fn (Brand $record): bool => static::authorizeBrand($record, 'update')),
             ])
             ->bulkActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make()
-                        ->visible(fn () => AuthorizationMatrix::check('brands', 'delete')),
+                        ->visible(fn (): bool => static::authorizeBrand(null, 'delete')),
                     RestoreBulkAction::make()
-                        ->visible(fn () => AuthorizationMatrix::check('brands', 'update')),
+                        ->visible(fn (): bool => static::authorizeBrand(null, 'restore')),
                     ForceDeleteBulkAction::make()
-                        ->visible(fn () => AuthorizationMatrix::check('brands', 'delete')),
+                        ->visible(fn (): bool => static::authorizeBrand(null, 'delete')),
                     BulkAction::make('enable')
                         ->label(__('brands.enable_selected'))
                         ->icon('heroicon-o-check')
@@ -367,7 +303,7 @@ final class BrandResource extends Resource
                                 ->success()
                                 ->send();
                         })
-                        ->visible(fn () => AuthorizationMatrix::check('brands', 'update')),
+                        ->visible(fn (): bool => static::authorizeBrand(null, 'update')),
                     BulkAction::make('disable')
                         ->label(__('brands.disable_selected'))
                         ->icon('heroicon-o-x-mark')
@@ -382,7 +318,7 @@ final class BrandResource extends Resource
                                 ->success()
                                 ->send();
                         })
-                        ->visible(fn () => AuthorizationMatrix::check('brands', 'update')),
+                        ->visible(fn (): bool => static::authorizeBrand(null, 'update')),
                     BulkAction::make('feature')
                         ->label(__('brands.feature_selected'))
                         ->icon('heroicon-o-star')
@@ -395,7 +331,7 @@ final class BrandResource extends Resource
                                 ->send();
                         })
                         ->requiresConfirmation()
-                        ->visible(fn () => AuthorizationMatrix::check('brands', 'update')),
+                        ->visible(fn (): bool => static::authorizeBrand(null, 'update')),
                     BulkAction::make('unfeature')
                         ->label(__('brands.unfeature_selected'))
                         ->icon('heroicon-o-star')
@@ -408,10 +344,45 @@ final class BrandResource extends Resource
                                 ->send();
                         })
                         ->requiresConfirmation()
-                        ->visible(fn () => AuthorizationMatrix::check('brands', 'update')),
-                ]),
+                        ->visible(fn (): bool => static::authorizeBrand(null, 'update')),
+                ])->visible(fn (): bool => static::authorizeBrand(null, 'update') || static::authorizeBrand(null, 'delete') || static::authorizeBrand(null, 'restore')),
             ])
             ->defaultSort('name');
+    }
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        return static::canViewAny();
+    }
+
+    public static function canViewAny(): bool
+    {
+        return static::authorizeBrand(null, 'viewAny');
+    }
+
+    public static function canCreate(): bool
+    {
+        return static::authorizeBrand(null, 'create');
+    }
+
+    public static function canView(Brand $record): bool
+    {
+        return static::authorizeBrand($record, 'view');
+    }
+
+    public static function canEdit(Brand $record): bool
+    {
+        return static::authorizeBrand($record, 'update');
+    }
+
+    public static function canDelete(Brand $record): bool
+    {
+        return static::authorizeBrand($record, 'delete');
+    }
+
+    public static function canRestore(Brand $record): bool
+    {
+        return static::authorizeBrand($record, 'restore');
     }
 
     /**
@@ -435,5 +406,18 @@ final class BrandResource extends Resource
             'view'   => Pages\ViewBrand::route('/{record}'),
             'edit'   => Pages\EditBrand::route('/{record}/edit'),
         ];
+    }
+
+    private static function authorizeBrand(?Brand $brand, string $ability): bool
+    {
+        $user = auth()->user();
+
+        if (! $user) {
+            return false;
+        }
+
+        return $brand instanceof Brand
+            ? $user->can($ability, $brand)
+            : $user->can($ability, Brand::class);
     }
 }

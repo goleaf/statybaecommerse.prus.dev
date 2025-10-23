@@ -19,15 +19,13 @@ use App\Services\Export\ExportColumn;
 use App\Services\Export\ExportService;
 use App\Services\Export\Exporters\ProductExport;
 use BackedEnum;
-use DefStudio\SearchableInput\Forms\Components\SearchableInput;
-use Filament\Actions\ActionGroup;
-use Filament\Actions\BulkAction;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
-use Filament\Actions\ViewAction;
-use Filament\Forms\Components\CheckboxList;
+use Filament\Tables\Actions\ActionGroup;
+use Filament\Tables\Actions\BulkAction;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ViewAction;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\KeyValue;
@@ -571,12 +569,12 @@ final class ProductResource extends Resource implements DefinesExportColumns
             ->actions([
                 ActionGroup::make([
                     ViewAction::make()
-                        ->visible(fn () => AuthorizationMatrix::check('products', 'view')),
+                        ->visible(fn (Product $record): bool => static::authorizeProduct($record, 'view')),
                     EditAction::make()
-                        ->visible(fn () => AuthorizationMatrix::check('products', 'update')),
+                        ->visible(fn (Product $record): bool => static::authorizeProduct($record, 'update')),
                     DeleteAction::make()
-                        ->visible(fn () => AuthorizationMatrix::check('products', 'delete')),
-                ]),
+                        ->visible(fn (Product $record): bool => static::authorizeProduct($record, 'delete')),
+                ])->visible(fn (Product $record): bool => static::authorizeProduct($record, 'view') || static::authorizeProduct($record, 'update') || static::authorizeProduct($record, 'delete')),
             ])
             ->bulkActions([
                 BulkActionGroup::make([
@@ -633,7 +631,7 @@ final class ProductResource extends Resource implements DefinesExportColumns
                                 ->success()
                                 ->send();
                         })
-                        ->visible(fn () => AuthorizationMatrix::check('products', 'update')),
+                        ->visible(fn (): bool => static::authorizeProduct(null, 'update')),
                     BulkAction::make('unpublish')
                         ->label(__('products.actions.unpublish'))
                         ->icon('heroicon-o-eye-slash')
@@ -644,7 +642,7 @@ final class ProductResource extends Resource implements DefinesExportColumns
                                 ->success()
                                 ->send();
                         })
-                        ->visible(fn () => AuthorizationMatrix::check('products', 'update')),
+                        ->visible(fn (): bool => static::authorizeProduct(null, 'update')),
                     BulkAction::make('feature')
                         ->label(__('products.actions.feature'))
                         ->icon('heroicon-o-star')
@@ -655,7 +653,7 @@ final class ProductResource extends Resource implements DefinesExportColumns
                                 ->success()
                                 ->send();
                         })
-                        ->visible(fn () => AuthorizationMatrix::check('products', 'update')),
+                        ->visible(fn (): bool => static::authorizeProduct(null, 'update')),
                     BulkAction::make('unfeature')
                         ->label(__('products.actions.unfeature'))
                         ->icon('heroicon-o-star')
@@ -666,7 +664,7 @@ final class ProductResource extends Resource implements DefinesExportColumns
                                 ->success()
                                 ->send();
                         })
-                        ->visible(fn () => AuthorizationMatrix::check('products', 'update')),
+                        ->visible(fn (): bool => static::authorizeProduct(null, 'update')),
                     BulkAction::make('update_stock')
                         ->label(__('products.actions.update_stock'))
                         ->icon('heroicon-o-cube')
@@ -690,7 +688,7 @@ final class ProductResource extends Resource implements DefinesExportColumns
                                 ->success()
                                 ->send();
                         })
-                        ->visible(fn () => AuthorizationMatrix::check('products', 'update')),
+                        ->visible(fn (): bool => static::authorizeProduct(null, 'update')),
                     BulkAction::make('update_prices')
                         ->label(__('products.actions.update_prices'))
                         ->icon('heroicon-o-currency-euro')
@@ -717,69 +715,48 @@ final class ProductResource extends Resource implements DefinesExportColumns
                                 ->title(__('products.notifications.prices_updated'))
                                 ->success()
                                 ->send();
-                        }),
-                    BulkAction::make('export_products')
-                        ->label(__('exports.actions.export_products'))
-                        ->icon('heroicon-o-arrow-down-tray')
-                        ->color('gray')
-                        ->form([
-                            Select::make('format')
-                                ->label(__('exports.form.format'))
-                                ->options(collect(ExportFormat::cases())->mapWithKeys(fn (ExportFormat $format) => [$format->value => $format->label()])->all())
-                                ->default(ExportFormat::Csv->value)
-                                ->required(),
-                            CheckboxList::make('columns')
-                                ->label(__('exports.form.columns'))
-                                ->options(self::exportColumnOptions())
-                                ->default(array_keys(self::exportColumnOptions()))
-                                ->columns(2)
-                                ->required(),
-                        ])
-                        ->action(function (Collection $records, array $data): void {
-                            /** @var ExportService $exportService */
-                            $exportService = app(ExportService::class);
-
-                            $exportService->queueResourceExport(
-                                resourceClass: self::class,
-                                records: $records,
-                                columnKeys: $data['columns'],
-                                format: ExportFormat::from($data['format']),
-                                requestedBy: auth()->user(),
-                            );
-
-                            Notification::make()
-                                ->title(__('exports.notifications.queued'))
-                                ->body(__('exports.notifications.queued_body'))
-                                ->success()
-                                ->send();
-                        }),
-                    DeleteBulkAction::make(),
-                ]),
+                        })
+                        ->visible(fn (): bool => static::authorizeProduct(null, 'update')),
+                    DeleteBulkAction::make()
+                        ->visible(fn (): bool => static::authorizeProduct(null, 'delete')),
+                ])->visible(fn (): bool => static::authorizeProduct(null, 'update') || static::authorizeProduct(null, 'delete')),
             ])
             ->defaultSort('created_at', 'desc');
     }
 
-    /**
-     * @return array<string, ExportColumn>
-     */
-    public static function availableExportColumns(): array
+    public static function shouldRegisterNavigation(): bool
     {
-        return [
-            'name' => new ExportColumn('name', __('products.fields.name'), fn (Product $product): string => (string) $product->name),
-            'sku' => new ExportColumn('sku', __('products.fields.sku'), fn (Product $product): string => (string) $product->sku),
-            'price' => new ExportColumn('price', __('products.fields.price'), fn (Product $product): string => (string) $product->price),
-            'status' => new ExportColumn('status', __('products.fields.status'), fn (Product $product): string => (string) $product->status),
-            'is_visible' => new ExportColumn('is_visible', __('products.fields.is_visible'), fn (Product $product): string => $product->is_visible ? __('exports.boolean.yes') : __('exports.boolean.no')),
-            'created_at' => new ExportColumn('created_at', __('products.fields.created_at'), fn (Product $product): string => optional($product->created_at)->toDateTimeString() ?? ''),
-        ];
+        return static::canViewAny();
     }
 
-    /**
-     * @return array<string, string>
-     */
-    private static function exportColumnOptions(): array
+    public static function canViewAny(): bool
     {
-        return array_map(static fn (ExportColumn $column): string => $column->label, self::availableExportColumns());
+        return static::authorizeProduct(null, 'viewAny');
+    }
+
+    public static function canCreate(): bool
+    {
+        return static::authorizeProduct(null, 'create');
+    }
+
+    public static function canView(Product $record): bool
+    {
+        return static::authorizeProduct($record, 'view');
+    }
+
+    public static function canEdit(Product $record): bool
+    {
+        return static::authorizeProduct($record, 'update');
+    }
+
+    public static function canDelete(Product $record): bool
+    {
+        return static::authorizeProduct($record, 'delete');
+    }
+
+    public static function canRestore(Product $record): bool
+    {
+        return static::authorizeProduct($record, 'restore');
     }
 
     public static function getRelations(): array
@@ -813,34 +790,16 @@ final class ProductResource extends Resource implements DefinesExportColumns
         ];
     }
 
-    /**
-     * @return array<int, string>
-     */
-    private static function searchProductSuggestions(string $search): array
+    private static function authorizeProduct(?Product $product, string $ability): bool
     {
-        $term = trim($search);
+        $user = auth()->user();
 
-        if ($term === '') {
-            return [];
+        if (! $user) {
+            return false;
         }
 
-        return Product::query()
-            ->select(['name', 'sku'])
-            ->where(function (Builder $query) use ($term): void {
-                $query
-                    ->where('name', 'like', "%{$term}%")
-                    ->orWhere('sku', 'like', "%{$term}%");
-            })
-            ->orderBy('name')
-            ->limit(15)
-            ->get()
-            ->map(static function (Product $product): string {
-                $sku = $product->sku;
-
-                return ltrim(($sku ? "[{$sku}] " : '') . $product->name);
-            })
-            ->unique()
-            ->values()
-            ->all();
+        return $product instanceof Product
+            ? $user->can($ability, $product)
+            : $user->can($ability, Product::class);
     }
 }

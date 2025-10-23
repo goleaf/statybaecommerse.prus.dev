@@ -20,6 +20,10 @@ final class ListProducts extends BaseListRecords
 
     protected function getHeaderActions(): array
     {
+        if (! ProductResource::canCreate()) {
+            return [];
+        }
+
         return [
             Actions\CreateAction::make()
                 ->visible(fn () => AuthorizationMatrix::check('products', 'create')),

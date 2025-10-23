@@ -21,6 +21,10 @@ final class ListOrders extends BaseListRecords
 
     protected function getHeaderActions(): array
     {
+        if (! OrderResource::canCreate()) {
+            return [];
+        }
+
         return [
             LocaleSwitcher::make(), // Provide a quick language toggle for the grid view.
             Actions\CreateAction::make()

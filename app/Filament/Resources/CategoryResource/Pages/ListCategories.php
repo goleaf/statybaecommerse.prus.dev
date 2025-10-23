@@ -15,6 +15,10 @@ final class ListCategories extends BaseListRecords
 
     protected function getHeaderActions(): array
     {
+        if (! CategoryResource::canCreate()) {
+            return [];
+        }
+
         return [
             Actions\CreateAction::make()
                 ->visible(fn () => AuthorizationMatrix::check('categories', 'create')),

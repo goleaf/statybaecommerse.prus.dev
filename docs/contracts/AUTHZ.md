@@ -1,55 +1,51 @@
-# Authorization Contract
+# Authorization Matrix
 
-This document captures the canonical role/ability matrix enforced by our
-policies and Filament resources. The matrix mirrors the grants applied by
-`Database\Seeders\BasicFilamentSeeder` and related seeders.
+This document captures the canonical authorization contract for the admin panel and API.
+Roles and abilities are defined in `config/permissions.php` and synchronised to policies,
+Filament resources, and database seeders.
 
 ## Roles
 
-- **super_admin** – unrestricted access (also short-circuited by `Gate::before`).
-- **admin** – full management access except destructive customer/order removal
-  and role management.
-- **manager** – operational access focused on read/update flows.
-- **editor** – catalogue & legal content management (no destructive powers).
-- **user** – storefront customer; no admin panel abilities.
+| Role     | Summary |
+|----------|---------|
+| `admin`  | Full control over catalog, orders, and user management. |
+| `manager`| Create/update catalog items, manage orders, and review users. No destructive actions. |
+| `editor` | Update existing catalog content without creating or deleting records. |
+| `viewer` | Read-only access to catalog and order data. |
 
-> The legacy `administrator` role is treated like a super administrator through
-> the global gate override in `AuthServiceProvider`.
+Aliases are mapped for backwards compatibility: `administrator` and `super_admin`
+inherit `admin` abilities, while `user` inherits `viewer` abilities.
 
-## Core resource permissions
+## Abilities by Domain
 
-| Resource  | Ability | super_admin | admin | manager | editor | user |
-|-----------|---------|-------------|-------|---------|--------|------|
-| Products  | view    | ✅ | ✅ | ✅ | ✅ | 🚫 |
-|           | create  | ✅ | ✅ | 🚫 | ✅ | 🚫 |
-|           | update  | ✅ | ✅ | ✅ | ✅ | 🚫 |
-|           | delete  | ✅ | ✅ | 🚫 | 🚫 | 🚫 |
-| Categories| view    | ✅ | ✅ | ✅ | ✅ | 🚫 |
-|           | create  | ✅ | ✅ | 🚫 | ✅ | 🚫 |
-|           | update  | ✅ | ✅ | ✅ | ✅ | 🚫 |
-|           | delete  | ✅ | ✅ | 🚫 | 🚫 | 🚫 |
-| Brands    | view    | ✅ | ✅ | ✅ | ✅ | 🚫 |
-|           | create  | ✅ | ✅ | 🚫 | ✅ | 🚫 |
-|           | update  | ✅ | ✅ | ✅ | ✅ | 🚫 |
-|           | delete  | ✅ | ✅ | 🚫 | 🚫 | 🚫 |
-| Orders    | view    | ✅ | ✅ | ✅ | 🚫 | ➖ (own only) |
-|           | create  | ✅ | ✅ | 🚫 | 🚫 | ➖ (own only) |
-|           | update  | ✅ | ✅ | ✅ | 🚫 | ➖ (own only, while cancellable) |
-|           | delete  | ✅ | 🚫 | 🚫 | 🚫 | ➖ (own only, while cancellable) |
-| Customers | view    | ✅ | ✅ | ✅ | 🚫 | ➖ (own record) |
-|           | create  | ✅ | ✅ | 🚫 | 🚫 | ➖ (self-registration) |
-|           | update  | ✅ | ✅ | ✅ | 🚫 | ➖ (own record) |
-|           | delete  | ✅ | 🚫 | 🚫 | 🚫 | ➖ (own record) |
-| Legals    | view    | ✅ | ✅ | 🚫 | ✅ | ✅ |
-|           | create  | ✅ | ✅ | 🚫 | ✅ | 🚫 |
-|           | update  | ✅ | ✅ | 🚫 | ✅ | 🚫 |
-|           | delete  | ✅ | ✅ | 🚫 | 🚫 | 🚫 |
-| Settings  | view    | ✅ | ✅ | 🚫 | 🚫 | 🚫 |
-|           | edit    | ✅ | ✅ | 🚫 | 🚫 | 🚫 |
+Each ability is expressed as `<entity>.<action>`. Policies consume the matrix and enforce
+least-privilege defaults.
 
-Legend: ✅ allowed, 🚫 forbidden, ➖ allowed only for the authenticated
-customer acting on their own data (enforced inside policies).
+| Entity   | Admin | Manager | Editor | Viewer |
+|----------|:-----:|:-------:|:------:|:------:|
+| Product  | viewAny, view, create, update, delete, restore | viewAny, view, create, update | viewAny, view, update | viewAny, view |
+| Category | viewAny, view, create, update, delete, restore | viewAny, view, create, update | viewAny, view, update | viewAny, view |
+| Brand    | viewAny, view, create, update, delete, restore | viewAny, view, create, update | viewAny, view, update | viewAny, view |
+| Order    | viewAny, view, create, update, delete, restore | viewAny, view, update | viewAny, view | viewAny, view |
+| User     | viewAny, view, create, update, delete, restore | viewAny, view | – | – |
 
-The policies registered in `AuthServiceProvider` enforce the matrix above and
-are consumed across controllers and Filament resources using `Gate::allows`
-checks and `$this->authorize()` calls.
+`admin` can perform destructive actions (`delete`, `restore`); other roles cannot. Managers
+receive order-update access for operational workflows. Editors are restricted to updates on
+catalog records, and viewers have read-only access.
+
+## Seeding
+
+`database/seeders/RolesAndPermissionsSeeder.php` reads the configuration matrix, creates any
+missing roles/permissions, and aligns aliases. `database/seeders/AdminUserSeeder.php` provisions
+`superuser@example.com` with the `admin` and `administrator` roles for initial access.
+
+## Filament Behaviour
+
+Filament resources call their respective policies for navigation, page access, table actions,
+and header actions. Unsupported actions are hidden in the UI and return HTTP 403 when accessed
+directly.
+
+## API Alignment
+
+Policies are registered in `App\Providers\AuthServiceProvider` and guard both Filament and API
+controllers to ensure consistent enforcement.

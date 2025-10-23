@@ -4,61 +4,43 @@ declare(strict_types=1);
 
 namespace App\Policies;
 
-use App\Models\AdminUser;
 use App\Models\Product;
 use App\Models\User;
+use App\Policies\Concerns\HandlesRolePermissions;
+use Illuminate\Auth\Access\HandlesAuthorization;
 
-/**
- * Authorization policy for managing products through permissions.
- */
 final class ProductPolicy
 {
-    /**
-     * Determine whether the user can view any products.
-     */
-    public function viewAny(User|AdminUser $user): bool
+    use HandlesAuthorization;
+    use HandlesRolePermissions;
+
+    public function viewAny(User $user): bool
     {
-        return $this->hasPermission($user, 'view_products');
+        return $this->allows($user, 'product', 'viewAny');
     }
 
-    /**
-     * Determine whether the user can view the product.
-     */
-    public function view(User|AdminUser $user, Product $product): bool
+    public function view(User $user, Product $product): bool
     {
-        return $this->hasPermission($user, 'view_products');
+        return $this->allows($user, 'product', 'view');
     }
 
-    /**
-     * Determine whether the user can create products.
-     */
-    public function create(User|AdminUser $user): bool
+    public function create(User $user): bool
     {
-        return $this->hasPermission($user, 'create_products');
+        return $this->allows($user, 'product', 'create');
     }
 
-    /**
-     * Determine whether the user can update the product.
-     */
-    public function update(User|AdminUser $user, Product $product): bool
+    public function update(User $user, Product $product): bool
     {
-        return $this->hasPermission($user, 'edit_products');
+        return $this->allows($user, 'product', 'update');
     }
 
-    /**
-     * Determine whether the user can delete the product.
-     */
-    public function delete(User|AdminUser $user, Product $product): bool
+    public function delete(User $user, Product $product): bool
     {
-        return $this->hasPermission($user, 'delete_products');
+        return $this->allows($user, 'product', 'delete');
     }
 
-    private function hasPermission(User|AdminUser $user, string $permission): bool
+    public function restore(User $user, Product $product): bool
     {
-        if (! method_exists($user, 'can')) {
-            return false;
-        }
-
-        return (bool) $user->can($permission);
+        return $this->allows($user, 'product', 'restore');
     }
 }
