@@ -28,6 +28,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 */
 #[ObservedBy([MenuObserver::class])]
 #[ScopedBy([ActiveScope::class])]
+#[ObservedBy([MenuObserver::class])]
 final class Menu extends Model
 {
     use HasFactory;

@@ -7,6 +7,7 @@ namespace App\Observers;
 use App\Models\Product;
 use App\Services\CacheInvalidationService;
 use App\Services\Images\GradientImageService;
+use App\UseCases\Product\InvalidateProductCache;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -29,12 +30,16 @@ final class ProductObserver
 
         // Skip placeholder image generation during tests to prevent memory issues
         if (app()->environment('testing')) {
+            app(InvalidateProductCache::class)();
+
             return;
         }
         try {
             $collection = 'gallery';
             // Default collection name for product images
             if ($product->getMedia($collection)->isNotEmpty()) {
+                app(InvalidateProductCache::class)();
+
                 return;
             }
             /** @var GradientImageService $generator */
@@ -44,6 +49,23 @@ final class ProductObserver
         } catch (\Throwable $e) {
             Log::warning('Failed to attach placeholder image for product', ['product_id' => $product->id, 'error' => $e->getMessage()]);
         }
+
+        app(InvalidateProductCache::class)();
+    }
+
+    public function updated(Product $product): void
+    {
+        app(InvalidateProductCache::class)();
+    }
+
+    public function deleted(Product $product): void
+    {
+        app(InvalidateProductCache::class)();
+    }
+
+    public function restored(Product $product): void
+    {
+        app(InvalidateProductCache::class)();
     }
 
     public function updated(Product $product): void

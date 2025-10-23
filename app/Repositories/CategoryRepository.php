@@ -5,72 +5,66 @@ declare(strict_types=1);
 namespace App\Repositories;
 
 use App\Models\Category;
-use App\Support\Cache\CacheKeys;
-use App\Support\Cache\CacheTagHelper;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Cache;
+use App\UseCases\Category\InvalidateCategoryCache;
+use Illuminate\Contracts\Cache\Repository as CacheRepository;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Str;
 
 final class CategoryRepository
 {
-    public function navigation(int $limit = 8, ?string $locale = null): Collection
+    private const TREE_CACHE_TTL_MINUTES = 10;
+
+    public function __construct(private readonly CacheRepository $cache)
     {
-        $resolvedLocale = $locale ?? app()->getLocale();
-        $cacheKey = CacheKeys::navigationCategories($limit, $resolvedLocale);
+    }
 
-        $callback = static function () use ($limit, $resolvedLocale): Collection {
-            $categories = Category::query()
-                ->topLevelVisible()
-                ->withLocale($resolvedLocale)
-                ->with([
-                    'children' => static fn ($query) => $query
-                        ->visible()
-                        ->ordered()
-                        ->withLocale($resolvedLocale)
-                        ->limit(5),
-                ])
-                ->limit($limit)
+    public function getVisibleTree(): Collection
+    {
+        $version = $this->cacheVersion(InvalidateCategoryCache::TREE_VERSION_KEY);
+        $cacheKey = sprintf('categories:tree:%s', $version);
+
+        return $this->cache->remember($cacheKey, now()->addMinutes(self::TREE_CACHE_TTL_MINUTES), static function () {
+            return Category::query()
+                ->visible()
+                ->roots()
+                ->ordered()
+                ->with(['children' => static function ($query): void {
+                    $query->visible()->ordered();
+                }])
                 ->get();
-
-            return $categories->map(static function (Category $category): array {
-                return [
-                    'id' => $category->id,
-                    'name' => $category->getTranslatedName(),
-                    'slug' => $category->slug,
-                    'url' => route('categories.show', $category->slug),
-                    'icon' => $category->icon,
-                    'children' => $category->children->map(static function (Category $child): array {
-                        return [
-                            'id' => $child->id,
-                            'name' => $child->getTranslatedName(),
-                            'slug' => $child->slug,
-                            'url' => route('categories.show', $child->slug),
-                        ];
-                    })->all(),
-                ];
-            });
-        };
-
-        // Merge category and locale tags so navigation caches respect the
-        // global invalidation service when catalogue data shifts.
-        $tags = CacheTagHelper::merge(
-            CacheTagHelper::categories(),
-            CacheTagHelper::locale($resolvedLocale)
-        );
-
-        return $this->remember($cacheKey, CacheKeys::TTL_FIVE_MINUTES, $callback, $tags);
+        });
     }
 
     /**
-     * @param  array<int, string>  $tags
+     * @param  array<string, mixed>  $filters
      */
-    private function remember(string $key, int $ttlSeconds, callable $callback, array $tags = []): Collection
+    public function paginateVisible(array $filters, int $perPage): LengthAwarePaginator
     {
-        $expiresAt = now()->addSeconds($ttlSeconds);
+        $query = Category::query()
+            ->visible()
+            ->ordered()
+            ->withProductCounts();
 
-        if ($tags !== [] && CacheTagHelper::supportsTags()) {
-            return Cache::tags($tags)->remember($key, $expiresAt, $callback);
+        if (! empty($filters['search'])) {
+            $query->where(function ($builder) use ($filters): void {
+                $builder->where('name', 'like', '%'.$filters['search'].'%')
+                    ->orWhere('description', 'like', '%'.$filters['search'].'%');
+            });
         }
 
-        return Cache::remember($key, $expiresAt, $callback);
+        return $query->paginate($perPage);
+    }
+
+    public function loadForShow(Category $category): Category
+    {
+        return $category->load(['children' => static function ($query): void {
+            $query->ordered();
+        }, 'parent']);
+    }
+
+    private function cacheVersion(string $key): string
+    {
+        return $this->cache->rememberForever($key, static fn (): string => Str::uuid()->toString());
     }
 }
