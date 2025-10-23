@@ -4,6 +4,11 @@ return [
     // Common
     'exceptions_orders_not_found' => 'Užsakymas :order nerastas.',
     'exceptions_inventory_insufficient' => 'Atsargų SKU :sku nepakanka.',
+    'errors_not_found' => 'Puslapis nerastas',
+    'errors_server_error' => 'Serverio klaida',
+    'errors_validation_failed' => 'Patikrinkite įvestus duomenis',
+    'errors_unauthorized' => 'Neturite teisių',
+    'errors_forbidden' => 'Prieiga uždrausta',
     'common' => [
         'back_to_list' => 'Grįžti į sąrašą',
         'back_to_list_tooltip' => 'Grįžti į sąrašo rodinį',

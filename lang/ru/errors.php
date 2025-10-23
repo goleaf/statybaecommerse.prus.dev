@@ -2,47 +2,27 @@
 
 declare(strict_types=1);
 
+use App\Support\ErrorCode;
+
 return [
-    'error' => [
-        // @translators: Сообщение при отсутствии страницы или записи (HTTP 404).
-        'not_found' => 'Страница не найдена',
+    // @translators: Displayed when a requested page or record is missing (HTTP 404).
+    ErrorCode::NotFound->value => 'Страница не найдена',
 
-        // @translators: Показывается при непредвиденной ошибке сервера (HTTP 500).
-        'server' => 'Ошибка сервера',
+    // @translators: Shown when the system encounters an unexpected failure (HTTP 500).
+    ErrorCode::ServerError->value => 'Ошибка сервера',
 
-        // @translators: Используется, когда введённые данные не проходят проверку.
-        'validation' => 'Проверьте введённые данные',
+    // @translators: Used when form submission fails validation and users must review inputs.
+    ErrorCode::ValidationFailed->value => 'Проверьте введённые данные',
 
-        // @translators: Указывает, что пользователь должен войти в систему.
-        'unauthorized' => 'Нет доступа',
+    // @translators: Indicates the user needs to log in before accessing the requested content.
+    ErrorCode::Unauthorized->value => 'Нет доступа',
 
-        // @translators: Указывает, что у вошедшего пользователя нет прав для действия.
-        'forbidden' => 'Доступ запрещён',
-    ],
+    // @translators: Indicates the user is logged in but does not have permission for the action.
+    ErrorCode::Forbidden->value => 'Доступ запрещён',
 
-    'orders' => [
-        // @translators: Показывается, когда заказ с указанным номером не найден.
-        'not_found' => 'Заказ :order не найден.',
-    ],
+    // @translators: Displayed when an order number could not be located in the system.
+    ErrorCode::OrderNotFound->value => 'Заказ :order не найден.',
 
-    // @translators: Сообщает о недостаточном количестве товара для указанного SKU.
-    ErrorCodes::INVENTORY_INSUFFICIENT => 'Недостаточно запасов для артикула :sku.',
-
-    'messages' => [
-        // @translators: Универсальное сообщение для API при неожиданных ошибках сервера.
-        'server_error' => 'Произошла ошибка. Пожалуйста, повторите попытку позже.',
-    ],
-
-    'pages' => [
-        'unexpected' => [
-            // @translators: Заголовок на общей странице ошибки при непредвиденной ситуации.
-            'title' => 'Произошла непредвиденная ошибка',
-            // @translators: Описание на общей странице ошибки при непредвиденной ситуации.
-            'description' => 'Наша команда уже уведомлена и разбирается с проблемой. Если ошибка повторяется, сообщите службе поддержки идентификатор трассировки.',
-            // @translators: Текст основной кнопки на странице ошибки.
-            'primary' => 'Вернуться на главную',
-            // @translators: Текст дополнительной кнопки на странице ошибки.
-            'secondary' => 'Связаться с поддержкой',
-        ],
-    ],
+    // @translators: Shown when there is not enough stock to fulfill a request for a SKU.
+    ErrorCode::InventoryInsufficient->value => 'Недостаточно запасов для артикула :sku.',
 ];

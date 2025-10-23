@@ -4,8 +4,10 @@ use App\Http\Middleware\AttachCorrelationId;
 use App\Http\Middleware\AddSecurityHeaders;
 use App\Providers\SecurityServiceProvider;
 use App\Services\TranslationService;
-use App\Support\ErrorCodes;
-use App\Support\RequestContext;
+use App\Support\ErrorCode;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Auth\AuthenticationException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -13,7 +15,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
-use Throwable;
+use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 require_once __DIR__.'/../app/Support/filament_compat.php';
 
@@ -53,18 +58,100 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        $exceptions->render(function (DomainException $exception, Request $request) {
-            $locale = RequestContext::resolveLocale($request);
-            $traceId = RequestContext::resolveTraceId($request);
-            $correlationHeader = RequestContext::correlationHeader();
+        $shouldRenderJson = static function (Request $request): bool {
+            return $request->expectsJson() || $request->is('api/*');
+        };
 
+        $resolveLocale = static function (Request $request): string {
+            $availableLocales = TranslationService::getAvailableLocales();
+            $locale = TranslationService::getDefaultLocale();
+            $header = $request->headers->get('Accept-Language');
+
+            if (is_string($header) && $header !== '') {
+                $candidates = array_map('trim', explode(',', $header));
+
+                foreach ($candidates as $candidate) {
+                    if ($candidate === '') {
+                        continue;
+                    }
+
+                    $parts = array_map('trim', explode(';', $candidate));
+                    $language = strtolower($parts[0]);
+                    $quality = 1.0;
+
+                    foreach (array_slice($parts, 1) as $parameter) {
+                        if (str_starts_with($parameter, 'q=')) {
+                            $value = substr($parameter, 2);
+                            if (is_numeric($value)) {
+                                $quality = (float) $value;
+                            }
+
+                            break;
+                        }
+                    }
+
+                    if ($quality < 0.7) {
+                        continue;
+                    }
+
+                    if (in_array($language, $availableLocales, true)) {
+                        $locale = $language;
+                        break;
+                    }
+                }
+            }
+
+            if (! in_array($locale, $availableLocales, true)) {
+                $locale = TranslationService::getDefaultLocale();
+            }
+
+            app()->setLocale($locale);
+            app()->instance('request_locale', $locale);
+
+            return $locale;
+        };
+
+        $resolveTraceId = static function (Request $request): string {
+            $attributeCorrelationRaw = $request->attributes->get('correlation_id');
+            $attributeCorrelationId = is_string($attributeCorrelationRaw) ? $attributeCorrelationRaw : null;
+
+            if ($attributeCorrelationId !== null && $attributeCorrelationId !== '') {
+                return $attributeCorrelationId;
+            }
+
+            if (app()->bound('request_correlation_id')) {
+                $resolvedCorrelation = app()->make('request_correlation_id');
+
+                if (is_string($resolvedCorrelation) && $resolvedCorrelation !== '') {
+                    return $resolvedCorrelation;
+                }
+            }
+
+            return Str::uuid()->toString();
+        };
+
+        $resolveCorrelationHeader = static function (): string {
+            $correlationHeaderConfig = config('app.correlation_header', 'X-Correlation-ID');
+
+            return is_string($correlationHeaderConfig) && $correlationHeaderConfig !== ''
+                ? $correlationHeaderConfig
+                : 'X-Correlation-ID';
+        };
+
+        $exceptions->render(function (DomainException $exception, Request $request) use ($shouldRenderJson, $resolveLocale, $resolveTraceId, $resolveCorrelationHeader) {
+            if (! $shouldRenderJson($request)) {
+                return null;
+            }
+
+            $locale = $resolveLocale($request);
+            $traceId = $resolveTraceId($request);
             $message = TranslationService::get($exception->translationKey(), $exception->context(), $locale);
+            $correlationHeader = $resolveCorrelationHeader();
 
             Log::withContext([
                 'trace_id' => $traceId,
-                'correlation_id' => $traceId,
                 'locale' => $locale,
-                'error_code' => $exception->errorCode(),
+                'error_code' => $exception->errorCode()->value,
                 'request_path' => $request->path(),
                 'request_method' => $request->method(),
             ]);
@@ -76,81 +163,87 @@ return Application::configure(basePath: dirname(__DIR__))
                 'context' => $exception->context(),
             ]);
 
-            $payload = [
-                'error' => [
-                    'code' => $exception->errorCode(),
-                    'message' => $message,
-                    'locale' => $locale,
-                ],
-                'meta' => [
-                    'trace_id' => $traceId,
-                    'correlation_id' => $traceId,
-                    'timestamp' => now()->toIso8601String(),
-                ],
+            $details = [
+                'locale' => $locale,
             ];
 
             if ($exception->context() !== []) {
-                $payload['error']['context'] = $exception->context();
+                $details['context'] = $exception->context();
             }
 
             return response()
-                ->json($payload, $exception->status())
+                ->json([
+                    'code' => $exception->errorCode()->value,
+                    'message' => $message,
+                    'details' => $details,
+                    'trace_id' => $traceId,
+                ], $exception->status())
                 ->header($correlationHeader, $traceId)
                 ->header('Content-Language', $locale);
         });
 
-        $exceptions->render(function (Throwable $throwable, Request $request) {
-            if ($throwable instanceof DomainException) {
+        $exceptions->render(function (Throwable $throwable, Request $request) use ($shouldRenderJson, $resolveLocale, $resolveTraceId, $resolveCorrelationHeader) {
+            if ($throwable instanceof DomainException || ! $shouldRenderJson($request)) {
                 return null;
             }
 
-            $locale = RequestContext::resolveLocale($request);
-            $traceId = RequestContext::resolveTraceId($request);
-            $correlationHeader = RequestContext::correlationHeader();
+            $locale = $resolveLocale($request);
+            $traceId = $resolveTraceId($request);
+            $correlationHeader = $resolveCorrelationHeader();
+
+            $errorCode = match (true) {
+                $throwable instanceof ValidationException => ErrorCode::ValidationFailed,
+                $throwable instanceof AuthenticationException => ErrorCode::Unauthorized,
+                $throwable instanceof AuthorizationException => ErrorCode::Forbidden,
+                $throwable instanceof ModelNotFoundException, $throwable instanceof NotFoundHttpException => ErrorCode::NotFound,
+                $throwable instanceof HttpExceptionInterface && $throwable->getStatusCode() === 404 => ErrorCode::NotFound,
+                $throwable instanceof HttpExceptionInterface && $throwable->getStatusCode() === 401 => ErrorCode::Unauthorized,
+                $throwable instanceof HttpExceptionInterface && $throwable->getStatusCode() === 403 => ErrorCode::Forbidden,
+                $throwable instanceof HttpExceptionInterface && $throwable->getStatusCode() === 422 => ErrorCode::ValidationFailed,
+                default => ErrorCode::ServerError,
+            };
+
+            $status = match (true) {
+                $throwable instanceof ValidationException => $throwable->status,
+                $throwable instanceof HttpExceptionInterface => $throwable->getStatusCode(),
+                default => $errorCode->defaultStatus(),
+            };
+
+            $details = [
+                'locale' => $locale,
+            ];
+
+            if ($throwable instanceof ValidationException) {
+                $details['errors'] = $throwable->errors();
+            }
+
+            if ($throwable instanceof HttpExceptionInterface && $throwable->getMessage() !== '') {
+                $details['hint'] = $throwable->getMessage();
+            }
+
+            $message = TranslationService::get($errorCode->translationKey(), [], $locale);
 
             Log::withContext([
                 'trace_id' => $traceId,
-                'correlation_id' => $traceId,
                 'locale' => $locale,
+                'error_code' => $errorCode->value,
                 'request_path' => $request->path(),
                 'request_method' => $request->method(),
             ]);
 
-            Log::error('Unhandled exception rendered.', [
+            Log::error('Exception rendered as structured API response.', [
                 'exception' => $throwable::class,
+                'status' => $status,
                 'message' => $throwable->getMessage(),
             ]);
 
-            if (RequestContext::isApiRequest($request)) {
-                $message = Lang::get('errors.messages.server_error', [], $locale);
-                if ($message === 'errors.messages.server_error') {
-                    $message = __('Something went wrong. Please try again later.', [], $locale);
-                }
-
-                $payload = [
-                    'error' => [
-                        'code' => ErrorCodes::SERVER_ERROR,
-                        'message' => $message,
-                        'locale' => $locale,
-                    ],
-                    'meta' => [
-                        'trace_id' => $traceId,
-                        'correlation_id' => $traceId,
-                        'timestamp' => now()->toIso8601String(),
-                    ],
-                ];
-
-                return response()
-                    ->json($payload, 500)
-                    ->header($correlationHeader, $traceId)
-                    ->header('Content-Language', $locale);
-            }
-
             return response()
-                ->view('errors.unexpected', [
-                    'traceId' => $traceId,
-                    'correlationId' => $traceId,
-                ], 500)
+                ->json([
+                    'code' => $errorCode->value,
+                    'message' => $message,
+                    'details' => $details,
+                    'trace_id' => $traceId,
+                ], $status)
                 ->header($correlationHeader, $traceId)
                 ->header('Content-Language', $locale);
         });

@@ -2,47 +2,27 @@
 
 declare(strict_types=1);
 
+use App\Support\ErrorCode;
+
 return [
-    'error' => [
-        // @translators: Rodoma, kai prašomas puslapis ar įrašas nerandamas (HTTP 404).
-        'not_found' => 'Puslapis nerastas',
+    // @translators: Displayed when a requested page or record is missing (HTTP 404).
+    ErrorCode::NotFound->value => 'Puslapis nerastas',
 
-        // @translators: Rodoma, kai sistema susiduria su nenumatyta serverio klaida (HTTP 500).
-        'server' => 'Serverio klaida',
+    // @translators: Shown when the system encounters an unexpected failure (HTTP 500).
+    ErrorCode::ServerError->value => 'Serverio klaida',
 
-        // @translators: Naudojama, kai įvesti duomenys neatitinka validacijos taisyklių.
-        'validation' => 'Patikrinkite įvestus duomenis',
+    // @translators: Used when form submission fails validation and users must review inputs.
+    ErrorCode::ValidationFailed->value => 'Patikrinkite įvestus duomenis',
 
-        // @translators: Rodoma, kai vartotojas turi prisijungti prie sistemos.
-        'unauthorized' => 'Neturite teisių',
+    // @translators: Indicates the user needs to log in before accessing the requested content.
+    ErrorCode::Unauthorized->value => 'Neturite teisių',
 
-        // @translators: Rodoma, kai vartotojas prisijungęs, bet neturi reikiamų teisių veiksmui.
-        'forbidden' => 'Prieiga uždrausta',
-    ],
+    // @translators: Indicates the user is logged in but does not have permission for the action.
+    ErrorCode::Forbidden->value => 'Prieiga uždrausta',
 
-    'orders' => [
-        // @translators: Rodoma, kai sistema neranda užsakymo pagal pateiktą numerį.
-        'not_found' => 'Užsakymas :order nerastas.',
-    ],
+    // @translators: Displayed when an order number could not be located in the system.
+    ErrorCode::OrderNotFound->value => 'Užsakymas :order nerastas.',
 
-    // @translators: Rodoma, kai pasirinktos prekės SKU atsargų neužtenka užsakymui įvykdyti.
-    ErrorCodes::INVENTORY_INSUFFICIENT => 'SKU :sku atsargų nepakanka.',
-
-    'messages' => [
-        // @translators: Bendrinė žinutė API atsakymams, kai įvyksta nenumatyta serverio klaida.
-        'server_error' => 'Įvyko klaida. Bandykite dar kartą vėliau.',
-    ],
-
-    'pages' => [
-        'unexpected' => [
-            // @translators: Antraštė, rodoma bendrame klaidų puslapyje, kai įvyksta nenumatyta klaida.
-            'title' => 'Įvyko nenumatyta klaida',
-            // @translators: Aprašymas, rodoma bendrame klaidų puslapyje, kai įvyksta nenumatyta klaida.
-            'description' => 'Mūsų komanda jau gavo pranešimą ir tiria problemą. Jei tai kartojasi, pasidalykite sekimo ID su palaikymo komanda.',
-            // @translators: Pagrindinio veiksmo mygtuko tekstas bendrame klaidų puslapyje.
-            'primary' => 'Grįžti į pradžią',
-            // @translators: Antrojo veiksmo mygtuko tekstas bendrame klaidų puslapyje.
-            'secondary' => 'Susisiekti su palaikymu',
-        ],
-    ],
+    // @translators: Shown when there is not enough stock to fulfill a request for a SKU.
+    ErrorCode::InventoryInsufficient->value => 'SKU :sku atsargų nepakanka.',
 ];
