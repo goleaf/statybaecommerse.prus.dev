@@ -10,10 +10,8 @@ final class ProductRepository
 {
     public function count(?string $connection = null): int
     {
-        if ($connection !== null) {
-            return Product::on($connection)->newQuery()->count();
-        }
+        $builder = $connection ? Product::on($connection) : Product::query();
 
-        return Product::query()->count();
+        return $builder->count();
     }
 }
