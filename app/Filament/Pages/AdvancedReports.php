@@ -4,13 +4,15 @@ declare(strict_types=1);
 
 namespace App\Filament\Pages;
 
-use BackedEnum;
 use Filament\Pages\Page;
 use UnitEnum;
 
 final class AdvancedReports extends Page
 {
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar-square';
+    /**
+     * Navigation icon override (string|\BackedEnum|null).
+     */
+    protected static $navigationIcon = 'heroicon-o-chart-bar-square';
 
     public static function getNavigationGroup(): string|UnitEnum|null
     {

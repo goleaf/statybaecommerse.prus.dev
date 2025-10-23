@@ -7,12 +7,6 @@ namespace App\Filament\Resources;
 use App\Forms\Components\Flatpickr;
 use App\Filament\Resources\VariantPricingRuleResource\Pages;
 use App\Models\VariantPricingRule;
-use App\Support\Filament\Components\Flatpickr;
-use Filament\Actions\Action;
-use Filament\Actions\BulkAction;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -35,7 +29,6 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Number;
-use UnitEnum;
 use App\Support\Filament\Components\Flatpickr;
 use Filament\Schemas\Schema;
 
@@ -48,7 +41,8 @@ final class VariantPricingRuleResource extends Resource
 {
     protected static ?string $model = VariantPricingRule::class;
 
-    protected static UnitEnum|string|null $navigationGroup = 'Products';
+    /** @var string|\UnitEnum|null Ensure the navigation group remains compatible with Filament enums. */
+    protected static $navigationGroup = 'Products';
 
     protected static ?int $navigationSort = 10;
 
@@ -217,12 +211,15 @@ final class VariantPricingRuleResource extends Resource
                 TextColumn::make('value')
                     ->label(__('variant_pricing_rules.value'))
                     ->numeric()
-                    ->formatStateUsing(function (string $state, VariantPricingRule $record): string {
+                    ->formatStateUsing(function (float|int|string|null $state, VariantPricingRule $record): string {
+                        // Clarify percentage formatting versus fixed-amount presentation for administrators.
                         if ($record->type === 'percentage') {
-                            return $state . '%';
+                            $value = is_numeric($state) ? (float) $state : 0.0;
+
+                            return Number::format($value, 2).'%';
                         }
 
-                        return (string) Number::currency((float) $state, 'EUR');
+                        return Number::currency((float) ($state ?? 0), 'EUR');
                     }),
                 TextColumn::make('min_quantity')
                     ->label(__('variant_pricing_rules.min_quantity'))
