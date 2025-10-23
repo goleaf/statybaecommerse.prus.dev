@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit bootstrap="vendor/autoload.php"
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
+         bootstrap="vendor/autoload.php"
          colors="true"
          beStrictAboutTestsThatDoNotTestAnything="false"
          beStrictAboutOutputDuringTests="false">
     <testsuites>
-        <testsuite name="RateLimit">
-            <file>tests/Feature/Api/AuthenticatedUserRateLimitTest.php</file>
-            <file>tests/Feature/Api/AutocompleteRateLimitTest.php</file>
-            <file>tests/Feature/Api/ExportDownloadRateLimitTest.php</file>
+        <testsuite name="API Rate Limiting">
+            <file>tests/Feature/Api/ApiRateLimitTest.php</file>
         </testsuite>
     </testsuites>
     <php>
