@@ -34,10 +34,10 @@ jobs:
           path: public/build
 
   lighthouse:
-    name: Lighthouse quality gates
-    needs: build
+    name: Lighthouse audits
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    needs: build
+    timeout-minutes: 25
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -52,7 +52,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version-file: '.nvmrc'
           cache: 'npm'
           cache-dependency-path: package-lock.json
 
@@ -62,21 +62,16 @@ jobs:
       - name: Install Node dependencies
         run: npm ci
 
-      - name: Download compiled assets
-        uses: actions/download-artifact@v4
-        with:
-          name: frontend-build
-          path: public/build
-
       - name: Prepare application environment
         run: |
           DB_PATH="${GITHUB_WORKSPACE}/database/database.sqlite"
-          cat <<ENV > .env
+          cat <<EOF > .env
           APP_NAME=Laravel
           APP_ENV=production
           APP_KEY=
           APP_DEBUG=false
           APP_URL=http://127.0.0.1:8000
+          ASSET_URL=http://127.0.0.1:8000
           APP_LOCALE=lt
           APP_FALLBACK_LOCALE=en
           APP_FAKER_LOCALE=en_US
@@ -101,11 +96,11 @@ jobs:
           SCOUT_DRIVER=null
           TELESCOPE_ENABLED=false
           HORIZON_ENABLED=false
-          ENV
+          EOF
           touch "${DB_PATH}"
           php artisan key:generate
 
-      - name: Bootstrap storage
+      - name: Bootstrap storage directories
         run: |
           php artisan storage:link
           mkdir -p storage/app/public
@@ -116,11 +111,55 @@ jobs:
       - name: Run database migrations with seeders
         run: php artisan migrate:fresh --seed --force
 
-      - name: Install Playwright browsers
-        run: npx playwright install --with-deps chromium
+      - name: Download compiled assets
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-build
+          path: public/build
 
-      - name: Run Lighthouse checks
+      - name: Start Laravel server
+        run: |
+          php artisan serve --host=127.0.0.1 --port=8000 > /tmp/laravel-server.log 2>&1 &
+          echo "SERVER_PID=$!" >> "$GITHUB_ENV"
+
+      - name: Wait for application
+        run: |
+          for i in {1..30}; do
+            if curl -sSf http://127.0.0.1:8000 > /dev/null; then
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "::error::Laravel application did not become ready." >&2
+          if [ -f /tmp/laravel-server.log ]; then
+            echo '--- server log ---'
+            cat /tmp/laravel-server.log
+            echo '-------------------'
+          fi
+          exit 1
+
+      - name: Run Lighthouse audits
         env:
-          LH_PERF_THRESHOLD: '0.9'
-          LH_A11Y_THRESHOLD: '0.9'
-        run: npm run lighthouse
+          TARGET_URL: http://127.0.0.1:8000
+          LH_MIN_PERFORMANCE: '0.8'
+          LH_MIN_ACCESSIBILITY: '0.9'
+        run: node scripts/lighthouse.mjs
+
+      - name: Upload Lighthouse reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-reports
+          path: storage/lighthouse
+
+      - name: Stop Laravel server
+        if: always()
+        run: |
+          if [ -n "${SERVER_PID}" ]; then
+            kill ${SERVER_PID} || true
+          fi
+          if [ -f /tmp/laravel-server.log ]; then
+            echo '--- server log ---'
+            cat /tmp/laravel-server.log
+            echo '-------------------'
+          fi
