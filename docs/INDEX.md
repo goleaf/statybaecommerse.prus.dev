@@ -34,6 +34,7 @@ A curated map of the most useful documents for day-to-day development and operat
 - [TERMINAL_FREEZING_FIXES](TERMINAL_FREEZING_FIXES.md) – remedies for common local environment hiccups.
 - [Cache Policy](CachePolicy.md) – cache key conventions, TTLs, and when to refresh derived data.
 - [CURRENT_SYSTEM_STATUS](CURRENT_SYSTEM_STATUS.md) – snapshot of live issues, mitigations, and follow-up owners.
+- [PR Branch Cleanup Workflow](../.github/workflows/pr-branch-cleanup.yml) – documents the automation that deletes local branches when pull requests close without merging.
 
 ## Explore Further
 - [Analysis & Summary Index](analysis/INDEX.md) – master index to deep-dive research, audits, and rollout recaps.
