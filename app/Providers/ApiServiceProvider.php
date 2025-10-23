@@ -108,13 +108,54 @@ final class ApiServiceProvider extends ServiceProvider
     {
         $config = (array) config('security.rate_limiting.api.read', []);
 
-        return $this->normalizeRateLimitConfig($config, $this->defaultRateLimitConfig());
+        if (is_int($definitions)) {
+            return [Limit::perMinute(max(1, $definitions))->by($key)];
+        }
+
+        if (! is_array($definitions) || $definitions === []) {
+            $default = (int) ($fallback ?? config('security.rate_limiting.defaults.minute', 60));
+
+            // Fall back to the global default minute window when the dedicated configuration is missing.
+            return [Limit::perMinute(max(1, $default))->by($key)];
+        }
+
+        $limits = $this->resolveLimit($definitions, $key);
+
+        if ($limits === []) {
+            $default = (int) ($fallback ?? config('security.rate_limiting.defaults.minute', 60));
+
+            // Reuse the default limit whenever none of the configured scopes produced a valid limiter.
+            return [Limit::perMinute(max(1, $default))->by($key)];
+        }
+
+        return $limits;
     }
 
     /**
-     * @return array{per_user:int|null,per_ip:int|null}
+     * Normalize a limit definition array into the concrete RateLimiter Limit objects.
+     *
+     * @param array<int|string, mixed> $definitions
+     * @return array<int, Limit>
      */
-    private function writeRateLimitConfig(): array
+    private function resolveLimit(array $definitions, string $key): array
+    {
+        $limits = [];
+
+        foreach ($definitions as $scope => $value) {
+            $limit = $this->normalizeLimit($scope, $value, $key);
+
+            if ($limit !== null) {
+                $limits[] = $limit;
+            }
+        }
+
+        return $limits;
+    }
+
+    /**
+     * Convert a single scope definition into a Limit instance when valid.
+     */
+    private function normalizeLimit(int|string $scope, mixed $value, string $key): ?Limit
     {
         $config = (array) config('security.rate_limiting.api.write', []);
 

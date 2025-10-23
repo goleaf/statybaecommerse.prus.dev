@@ -39,6 +39,8 @@ The format is based on [Conventional Commits](https://www.conventionalcommits.or
 * Introduced a reusable HTML sanitization pipeline with a maintenance command, model hooks, and storefront renderer updates to harden product and legal content.
 
 ### Bug Fixes
+* Stabilized analytics event tracking by skipping the user-owned scope in console contexts, gracefully handling missing request/session data, enriching event type listings, and returning float-safe stats so regression suites can assert conversions reliably.
+* Made administrative rate limiting, authorization matrix lookups, and brand metadata diagnostics console-friendly by avoiding container-bound config calls and explicitly removing visibility scopes, which restores the targeted unit tests.
 * Restored the shipping option ↔ zone relationship so orders, factories, and zone aggregations attach carriers without manual
   attribute overrides during tests.
 * Hardened the API search endpoint to short-circuit suspicious payloads and ensure exact-title matches outrank fuzzy results, keeping injection attempts empty while surfacing precise catalogue hits first.

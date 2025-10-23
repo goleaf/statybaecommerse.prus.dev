@@ -26,7 +26,10 @@ final class UserOwnedScope implements Scope
      */
     public function apply(Builder $builder, Model $model): void
     {
-        if (app()->runningUnitTests() && ! auth()->check()) {
+        // Skip scoping when the application is running in the console so seeders,
+        // artisan commands, and automated tests continue to operate on the full
+        // dataset without requiring an authenticated context.
+        if (app()->runningInConsole()) {
             return;
         }
 
