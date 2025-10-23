@@ -25,7 +25,10 @@ final class SearchableComponentHelper
     /**
      * Hydrate a SearchableInput component using an already loaded model instance.
      *
-     * @param Closure(Model): string $labelResolver
+     * @template TModel of Model
+     *
+     * @param TModel|null              $model
+     * @param callable(TModel): string $labelResolver Resolve the label for the hydrated option.
      */
     public static function hydrateFromRecord(
         SearchableInput $component,
@@ -47,8 +50,10 @@ final class SearchableComponentHelper
     /**
      * Hydrate a SearchableInput component by resolving a model lazily.
      *
-     * @param Closure(int): (Model|null) $resolver
-     * @param Closure(Model): string     $labelResolver
+     * @template TModel of Model
+     *
+     * @param callable(int): (TModel|null) $finder        Retrieve the model from a persisted store.
+     * @param callable(TModel): string     $labelResolver Resolve the label for the hydrated option.
      */
     public static function hydrateUsingResolver(
         SearchableInput $component,
@@ -70,23 +75,43 @@ final class SearchableComponentHelper
     }
 
     /**
-     * Assign a nullable integer identifier based on the raw SearchableInput state.
+     * Persist a nullable relation identifier by normalising the raw component state first.
+     *
+     * When the resolved identifier is null, the associated SearchableInput component is
+     * also cleared to keep its options and label in sync with the stored value. Refer to
+     * docs/forms/SEARCHABLE_INPUT_HELPER.md for behavioural notes around this helper.
      */
-    public static function assignNullableId(Set $set, string $property, ?string $state): void
-    {
-        if ($state === null || $state === '') {
-            $set($property, null);
+    public static function syncNullableIntState(
+        int|string|null $state,
+        Set $set,
+        string $field,
+        ?SearchableInput $component = null
+    ): void {
+        $identifier = self::normaliseIdentifier($state);
+
+        if ($identifier === null) {
+            $set($field, null);
+
+            if ($component !== null) {
+                self::clearComponent($component);
+            }
 
             return;
         }
 
-        $set($property, (int) $state);
+        $set($field, $identifier);
     }
 
     /**
      * Synchronize a lookup component with an associated payload array (e.g. address metadata).
      *
-     * @param Closure(int): (?array) $payloadResolver
+     * @template TModel of Model
+     *
+     * @param int|string|null                        $state           Raw component state that may be null, empty, or a string identifier.
+     * @param callable(int): (TModel|null)           $finder          Resolve the model backing the lookup.
+     * @param callable(TModel): array<string, mixed> $payloadResolver Build the normalized payload for dependent components.
+     * @param callable(TModel): string|null          $labelResolver   Optionally resolve an explicit label for the lookup component.
+     * @param array<string, mixed>                   $emptyPayload    Provide the default payload when no selection exists.
      */
     public static function syncLookupPayload(
         Set $set,
