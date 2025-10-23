@@ -49,9 +49,7 @@ final class VariantAnalyticsResource extends Resource
     protected static ?string $model = VariantAnalytics::class;
 
     /**
-     * Display the analytics icon while supporting BackedEnum navigation icons.
-     *
-     * @var string|\BackedEnum|null
+     * @var string|\BackedEnum|null Filament v4 expects an untyped navigation icon property.
      */
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar-square';
 
