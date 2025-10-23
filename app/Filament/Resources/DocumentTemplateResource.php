@@ -4,21 +4,24 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Support\Concerns\HasNav;
-
+use App\Enums\DocumentTemplateCategory;
+use App\Enums\DocumentTemplateType;
 use App\Filament\Resources\DocumentTemplateResource\Pages;
 use App\Models\DocumentTemplate;
 use BackedEnum;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
-use Filament\Actions\ViewAction;
+use Filament\Actions\DeleteBulkAction as TableDeleteBulkAction;
+use Filament\Actions\EditAction as TableEditAction;
+use Filament\Actions\ViewAction as TableViewAction;
+use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Tabs;
+use Filament\Forms\Components\Tabs\Tab;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -35,6 +38,7 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
+use UnitEnum;
 
 final class DocumentTemplateResource extends Resource
 {
@@ -80,69 +84,67 @@ final class DocumentTemplateResource extends Resource
         return $form->schema([
             Tabs::make('document_template_form')
                 ->tabs([
-                    Tab::make(__('admin/document_templates.form.tabs.basic_information'))
+                    Tab::make(__('document_templates.form.tabs.basic_information'))
                         ->schema([
-                            Section::make(__('admin/document_templates.form.sections.basic_information'))
+                            Section::make(__('document_templates.form.sections.basic_information'))
                                 ->schema([
                                     Grid::make(2)
                                         ->schema([
                                             TextInput::make('name')
-                                                ->label(__('admin/document_templates.form.fields.name'))
+                                                ->label(__('document_templates.form.fields.name'))
                                                 ->required()
                                                 ->maxLength(255),
                                             TextInput::make('slug')
-                                                ->label(__('admin/document_templates.form.fields.slug'))
+                                                ->label(__('document_templates.form.fields.slug'))
                                                 ->maxLength(255)
                                                 ->unique(ignoreRecord: true),
                                         ]),
                                     Textarea::make('description')
-                                        ->label(__('admin/document_templates.form.fields.description'))
+                                        ->label(__('document_templates.form.fields.description'))
                                         ->rows(3)
                                         ->maxLength(500)
                                         ->columnSpanFull(),
                                     Grid::make(2)
                                         ->schema([
                                             Select::make('type')
-                                                ->label(__('admin/document_templates.form.fields.type'))
+                                                ->label(__('document_templates.form.fields.type'))
                                                 ->options(DocumentTemplateType::options())
                                                 ->required()
                                                 ->searchable(),
                                             Select::make('category')
-                                                ->label(__('admin/document_templates.form.fields.category'))
+                                                ->label(__('document_templates.form.fields.category'))
                                                 ->options(DocumentTemplateCategory::options())
                                                 ->required()
                                                 ->searchable(),
                                         ]),
                                     Toggle::make('is_active')
-                                        ->label(__('admin/document_templates.form.fields.is_active'))
+                                        ->label(__('document_templates.form.fields.is_active'))
                                         ->default(true),
                                 ]),
                         ]),
-                    Tab::make(__('admin/document_templates.form.tabs.content'))
+                    Tab::make(__('document_templates.form.tabs.content'))
                         ->schema([
-                            Section::make(__('admin/document_templates.form.sections.content'))
+                            Section::make(__('document_templates.form.sections.content'))
                                 ->schema([
                                     RichEditor::make('content')
-                                        ->label(__('admin/document_templates.form.fields.content'))
+                                        ->label(__('document_templates.form.fields.content'))
                                         ->required()
-                                        // Strip editor-generated tags so templates persist exactly as authored in tests and exports.
-                                        ->mutateDehydratedStateUsing(fn (?string $state): ?string => $state !== null ? trim(strip_tags($state)) : null)
                                         ->columnSpanFull(),
                                 ]),
                         ]),
-                    Tab::make(__('admin/document_templates.form.tabs.variables'))
+                    Tab::make(__('document_templates.form.tabs.variables'))
                         ->schema([
-                            Section::make(__('admin/document_templates.form.sections.variables'))
+                            Section::make(__('document_templates.form.sections.variables'))
                                 ->schema([
                                     Repeater::make('variables')
-                                        ->label(__('admin/document_templates.form.fields.variables'))
+                                        ->label(__('document_templates.form.fields.variables'))
                                         ->schema([
                                             TextInput::make('name')
-                                                ->label(__('admin/document_templates.form.fields.variable_name'))
+                                                ->label(__('document_templates.form.fields.variable_name'))
                                                 ->required()
                                                 ->maxLength(255),
                                             TextInput::make('description')
-                                                ->label(__('admin/document_templates.form.fields.variable_description'))
+                                                ->label(__('document_templates.form.fields.variable_description'))
                                                 ->required()
                                                 ->maxLength(255),
                                         ])
@@ -154,26 +156,26 @@ final class DocumentTemplateResource extends Resource
                                         }),
                                 ]),
                         ]),
-                    Tab::make(__('admin/document_templates.form.tabs.settings'))
+                    Tab::make(__('document_templates.form.tabs.settings'))
                         ->schema([
-                            Section::make(__('admin/document_templates.form.sections.settings'))
+                            Section::make(__('document_templates.form.sections.settings'))
                                 ->schema([
                                     KeyValue::make('settings')
-                                        ->label(__('admin/document_templates.form.fields.settings'))
-                                        ->keyLabel(__('admin/document_templates.form.fields.setting_key'))
-                                        ->valueLabel(__('admin/document_templates.form.fields.setting_value'))
+                                        ->label(__('document_templates.form.fields.settings'))
+                                        ->keyLabel(__('document_templates.form.fields.setting_key'))
+                                        ->valueLabel(__('document_templates.form.fields.setting_value'))
                                         ->addButtonLabel(__('filament-forms::components.key_value.buttons.add'))
                                         ->default([])
                                         ->reorderable()
                                         ->columnSpanFull(),
                                 ]),
                         ]),
-                    Tab::make(__('admin/document_templates.form.tabs.preview'))
+                    Tab::make(__('document_templates.form.tabs.preview'))
                         ->schema([
-                            Section::make(__('admin/document_templates.form.sections.preview'))
+                            Section::make(__('document_templates.form.sections.preview'))
                                 ->schema([
                                     Placeholder::make('template_preview')
-                                        ->label(__('admin/document_templates.form.fields.template_preview'))
+                                        ->label(__('document_templates.form.fields.template_preview'))
                                         ->content(fn (callable $get): HtmlString => self::renderPreview($get))
                                         ->columnSpanFull()
                                         ->extraAttributes(['class' => 'prose max-w-none dark:prose-invert space-y-4']),
@@ -225,10 +227,10 @@ final class DocumentTemplateResource extends Resource
             ])
             ->filters([
                 SelectFilter::make('type')
-                    ->label(__('admin/document_templates.filters.type'))
+                    ->label(__('document_templates.type'))
                     ->options(DocumentTemplateType::options()),
                 SelectFilter::make('category')
-                    ->label(__('admin/document_templates.filters.category'))
+                    ->label(__('document_templates.category'))
                     ->options(DocumentTemplateCategory::options()),
                 TernaryFilter::make('is_active')
                     ->label(__('admin/document_templates.filters.is_active')),
@@ -271,9 +273,6 @@ final class DocumentTemplateResource extends Resource
 
     /**
      * Normalize the variables state from the form into an associative array.
-     *
-     * @param  array<int, array{name?: string|null, description?: string|null}>|array<string, mixed>|null $state
-     * @return array<string, string>
      */
     private static function normalizeVariablesState(?array $state): array
     {
@@ -282,50 +281,19 @@ final class DocumentTemplateResource extends Resource
         }
 
         if (! array_is_list($state)) {
-            $normalized = [];
-
-            foreach ($state as $name => $description) {
-                if (! (is_string($name) || is_int($name))) {
-                    continue;
-                }
-
-                $nameString = (string) $name;
-
-                if ($nameString === '') {
-                    continue;
-                }
-
-                $normalized[$nameString] = is_string($description) ? $description : (string) ($description ?? '');
-            }
-
-            return $normalized;
+            return array_filter($state, fn ($description, $name): bool => filled($name), ARRAY_FILTER_USE_BOTH);
         }
 
-        $normalized = [];
-
-        foreach ($state as $item) {
-            if (! is_array($item)) {
-                continue;
-            }
-
-            $nameRaw = $item['name'] ?? '';
-
-            if (! is_string($nameRaw) || $nameRaw === '') {
-                continue;
-            }
-
-            $descriptionRaw = $item['description'] ?? '';
-            $normalized[$nameRaw] = is_string($descriptionRaw) ? $descriptionRaw : (string) $descriptionRaw;
-        }
-
-        return $normalized;
+        return collect($state)
+            ->filter(fn (array $item): bool => filled($item['name'] ?? null))
+            ->mapWithKeys(fn (array $item): array => [
+                $item['name'] => $item['description'] ?? '',
+            ])
+            ->all();
     }
 
     /**
      * Expand the stored variables into a repeater-friendly structure.
-     *
-     * @param  array<int, array{name?: string|null, description?: string|null}>|array<string, mixed>|null $state
-     * @return array<int, array{name: string, description: string}>
      */
     private static function expandVariablesState(?array $state): array
     {
@@ -334,70 +302,46 @@ final class DocumentTemplateResource extends Resource
         }
 
         if (array_is_list($state)) {
-            $expanded = [];
-
-            foreach ($state as $item) {
-                if (! is_array($item)) {
-                    continue;
-                }
-
-                $nameRaw = $item['name'] ?? '';
-                $descriptionRaw = $item['description'] ?? '';
-
-                $expanded[] = [
-                    'name'        => is_string($nameRaw) ? $nameRaw : (string) $nameRaw,
-                    'description' => is_string($descriptionRaw) ? $descriptionRaw : (string) $descriptionRaw,
-                ];
-            }
-
-            return $expanded;
+            return collect($state)
+                ->map(fn (array $item): array => [
+                    'name'        => $item['name'] ?? '',
+                    'description' => $item['description'] ?? '',
+                ])
+                ->all();
         }
 
-        $expanded = [];
-
-        foreach ($state as $name => $description) {
-            if (! (is_string($name) || is_int($name))) {
-                continue;
-            }
-
-            $expanded[] = [
-                'name'        => (string) $name,
-                'description' => is_string($description) ? $description : (string) ($description ?? ''),
-            ];
-        }
-
-        return $expanded;
+        return collect($state)
+            ->map(fn ($description, $name): array => [
+                'name'        => $name,
+                'description' => (string) $description,
+            ])
+            ->values()
+            ->all();
     }
 
     /**
      * Render the preview content with placeholder data.
-     *
-     * @param callable(string): mixed $get
      */
     private static function renderPreview(callable $get): HtmlString
     {
-        $rawContent = $get('content');
-        $content = is_string($rawContent) ? $rawContent : '';
+        $content = (string) $get('content');
 
         if ($content === '') {
             return new HtmlString('<em>' . e(__('filament::common.no_data')) . '</em>');
         }
 
-        $variablesInput = $get('variables');
-        $variables = is_array($variablesInput) ? self::normalizeVariablesState($variablesInput) : [];
+        $variables = self::normalizeVariablesState($get('variables'));
 
         if ($variables === []) {
             $variables = [
-                'title'       => __('admin/document_templates.form.fields.variable_name'),
-                'description' => __('admin/document_templates.form.fields.variable_description'),
+                'title'       => __('document_templates.form.fields.variable_name'),
+                'description' => __('document_templates.form.fields.variable_description'),
             ];
         }
 
-        /** @var array<string, string> $variables */
         foreach ($variables as $key => $description) {
-            $label = $description !== '' ? $description : Str::headline((string) $key);
-            $replacement = '<span class="font-semibold">' . e((string) $label) . '</span>';
-            $content = str_replace('{{' . (string) $key . '}}', $replacement, $content);
+            $replacement = '<span class="font-semibold">' . e($description !== '' ? $description : Str::headline((string) $key)) . '</span>';
+            $content = str_replace('{{' . $key . '}}', $replacement, $content);
         }
 
         return new HtmlString($content);
