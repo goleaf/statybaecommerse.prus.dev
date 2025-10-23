@@ -42,21 +42,19 @@ use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use UnitEnum;
-use Filament\Schemas\Schema;
 
 final class EnumManagementResource extends Resource
 {
     protected static ?string $model = EnumValue::class;
 
     /**
-     * @var string|\BackedEnum|null
+     * Keep the navigation icon typed so Filament surfaces enum-backed icons reliably.
      */
-    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-squares-2x2';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-squares-2x2';
 
     protected static ?int $navigationSort = 2;
 
-    public static function getNavigationGroup(): string|\UnitEnum|null
+    public static function getNavigationGroup(): \UnitEnum|string|null
     {
         return trans('admin.enums.navigation_groups.system');
     }
