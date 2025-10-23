@@ -6,39 +6,34 @@ namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
 use App\Models\Category;
-use App\Services\Frontend\CategoryPageDataProvider;
-use Illuminate\Contracts\View\View;
-use Illuminate\Http\Request;
-use Illuminate\Support\Str;
+use App\Models\Product;
 use Illuminate\View\View;
 
 final class CategoryController extends Controller
 {
-    public function __construct(private readonly CategoryPageDataProvider $dataProvider)
+    public function index(): View
     {
+        $categories = Category::query()
+            ->withCount('products')
+            ->orderBy('name')
+            ->get();
+
+        return view('frontend.categories.index', compact('categories'));
     }
 
-    public function index(Request $request): View
+    public function show(Category $category): View
     {
-        return view('frontend.categories.index', [
-            'categories' => $this->dataProvider->indexCategories(),
-        ]);
-    }
+        $category->load(['children']);
 
-    public function show(Request $request, Category $category): View
-    {
-        $category = $this->dataProvider->loadCategory($category);
-        $filters = $this->dataProvider->resolveFilters($request);
-        $products = $this->dataProvider->products($category, $filters, 12)->withQueryString();
+        $products = Product::query()
+            ->with(['brand'])
+            ->whereHas('categories', fn ($query) => $query->whereKey($category->getKey()))
+            ->paginate(12)
+            ->withQueryString();
 
         return view('frontend.categories.show', [
             'category' => $category,
-            'breadcrumbs' => $this->dataProvider->breadcrumbs($category),
-            'childCategories' => $this->dataProvider->childCategories($category),
             'products' => $products,
-            'availableSorts' => $this->dataProvider->availableSorts(),
-            'activeFilters' => $filters,
-            'brands' => $this->dataProvider->brands(),
         ]);
     }
 }

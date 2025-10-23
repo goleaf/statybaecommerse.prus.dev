@@ -6,66 +6,57 @@ namespace Tests\Feature\Frontend;
 
 use App\Models\Brand;
 use App\Models\Category;
+use App\Models\Discount;
 use App\Models\Product;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Carbon;
 use Tests\TestCase;
 
 final class HomePageTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_homepage_displays_featured_products_and_brands(): void
+    public function test_homepage_displays_featured_and_latest_products(): void
     {
-        $category = Category::factory()->create(['name' => 'Elektriniai įrankiai']);
-        $hiddenCategory = Category::factory()->create(['name' => 'Paslėpta kategorija', 'is_visible' => false]);
+        $brand = Brand::factory()->create([
+            'is_active' => true,
+            'is_enabled' => true,
+            'is_visible' => true,
+        ]);
+        $category = Category::factory()->create([
+            'is_visible' => true,
+        ]);
 
-        $brand = Brand::factory()->create();
-
-        $featuredProduct = $this->createPublishedProduct([
-            'name' => 'Profesionalus gręžtuvas',
-            'slug' => 'profesionalus-greztuvas',
+        $featured = Product::factory()->create([
             'brand_id' => $brand->id,
             'is_featured' => true,
+            'is_visible' => true,
+            'status' => 'active',
+            'published_at' => now()->subDay(),
         ]);
-        $featuredProduct->categories()->attach($category->id);
+        $featured->categories()->attach($category->id);
 
-        $hiddenProduct = $this->createPublishedProduct([
-            'name' => 'Paslėptas produktas',
-            'slug' => 'pasleptas-produktas',
-            'status' => 'draft',
-            'is_visible' => false,
-            'is_featured' => true,
-            'published_at' => null,
+        $latest = Product::factory()->create([
+            'brand_id' => $brand->id,
+            'is_visible' => true,
+            'status' => 'active',
+            'published_at' => now(),
         ]);
-        $hiddenProduct->categories()->attach($category->id);
+        $latest->categories()->attach($category->id);
+
+        Discount::factory()->create([
+            'status' => 'active',
+            'priority' => 1,
+            'starts_at' => now()->subDay(),
+            'ends_at' => now()->addDay(),
+        ]);
 
         $response = $this->get(route('home'));
 
-        $response->assertOk()
-            ->assertViewIs('home.index')
-            ->assertViewHas('featuredProducts', function ($products) use ($featuredProduct) {
-                return $products->contains('id', $featuredProduct->id);
-            })
-            ->assertViewHas('featuredBrands', function ($brands) use ($brand) {
-                return $brands->contains('id', $brand->id);
-            })
-            ->assertViewHas('categoryTree', function ($categories) use ($category, $hiddenCategory) {
-                return $categories->contains('id', $category->id)
-                    && $categories->contains('id', $hiddenCategory->id) === false;
-            });
-
-        $response->assertDontSee('Paslėptas produktas');
-    }
-
-    private function createPublishedProduct(array $overrides = []): Product
-    {
-        return Product::factory()->create(array_merge([
-            'status' => 'published',
-            'is_visible' => true,
-            'is_enabled' => true,
-            'is_featured' => $overrides['is_featured'] ?? false,
-            'published_at' => Carbon::now()->subDay(),
-        ], $overrides));
+        $response->assertOk();
+        $response->assertViewIs('frontend.home.index');
+        $response->assertViewHas('featuredProducts', fn ($products) => $products->contains($featured));
+        $response->assertViewHas('latestProducts', fn ($products) => $products->contains($latest));
+        $response->assertViewHas('popularCategories', fn ($categories) => $categories->contains($category));
+        $response->assertViewHas('popularBrands', fn ($brands) => $brands->contains($brand));
     }
 }

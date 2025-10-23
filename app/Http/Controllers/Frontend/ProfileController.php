@@ -9,27 +9,16 @@ use App\Http\Controllers\Controller;
 use App\Models\Address;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 final class ProfileController extends Controller
 {
     public function index(Request $request): View
     {
-        $user = $request->user();
-
-        $orders = $user?->orders()->latest()->limit(5)->get() ?? collect();
-        $addresses = $user?->addresses()->latest()->limit(3)->get() ?? collect();
-
-        $stats = [
-            'orders_count' => $user?->orders()->count() ?? 0,
-            'total_spent' => $user?->orders()->sum('total') ?? 0,
-        ];
-
         return view('frontend.profile.index', [
-            'user' => $user,
-            'orders' => $orders,
-            'addresses' => $addresses,
-            'stats' => $stats,
+            'user' => $request->user()->load('addresses'),
         ]);
     }
 
@@ -44,89 +33,96 @@ final class ProfileController extends Controller
     {
         $user = $request->user();
 
-        $data = $request->validate([
+        $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'max:255'],
-            'phone' => ['nullable', 'string', 'max:50'],
+            'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->getKey())],
+            'password' => ['nullable', 'confirmed', 'min:8'],
         ]);
 
-        $user->update($data);
+        $user->name = $validated['name'];
+        $user->email = $validated['email'];
 
-        return redirect()->route('frontend.profile.index')->with('status', __('Profile updated successfully.'));
+        if (! empty($validated['password'])) {
+            $user->password = Hash::make($validated['password']);
+        }
+
+        $user->save();
+
+        return redirect()->route('frontend.profile.index')->with('status', 'profile-updated');
     }
 
     public function addresses(Request $request): View
     {
         return view('frontend.profile.addresses', [
-            'user' => $request->user(),
             'addresses' => $request->user()->addresses()->latest()->get(),
+            'types' => AddressType::cases(),
         ]);
     }
 
     public function storeAddress(Request $request): RedirectResponse
     {
-        $addressData = $this->validateAddress($request);
+        $validated = $this->validateAddress($request);
 
-        $user = $request->user();
+        $address = $request->user()->addresses()->create($validated);
 
-        if ($addressData['is_default']) {
-            $user->addresses()->update(['is_default' => false]);
+        if ($address->is_default) {
+            $this->ensureSingleDefault($request, $address);
         }
 
-        $user->addresses()->create($addressData);
-
-        return redirect()->route('frontend.profile.addresses')->with('status', __('Address added successfully.'));
+        return redirect()->route('frontend.profile.addresses')->with('status', 'address-created');
     }
 
     public function updateAddress(Request $request, Address $address): RedirectResponse
     {
-        abort_unless($request->user()->is($address->user), 403);
+        $validated = $this->validateAddress($request, $address);
 
-        $addressData = $this->validateAddress($request);
+        $address->update($validated);
 
-        if ($addressData['is_default']) {
-            $request->user()->addresses()->where('id', '!=', $address->id)->update(['is_default' => false]);
+        if ($address->is_default) {
+            $this->ensureSingleDefault($request, $address);
         }
 
-        $address->update($addressData);
-
-        return redirect()->route('frontend.profile.addresses')->with('status', __('Address updated successfully.'));
+        return redirect()->route('frontend.profile.addresses')->with('status', 'address-updated');
     }
 
-    public function deleteAddress(Request $request, Address $address): RedirectResponse
+    public function deleteAddress(Address $address): RedirectResponse
     {
-        abort_unless($request->user()->is($address->user), 403);
-
         $address->delete();
 
-        return redirect()->route('frontend.profile.addresses')->with('status', __('Address removed.'));
+        return redirect()->route('frontend.profile.addresses')->with('status', 'address-deleted');
     }
 
-    private function validateAddress(Request $request): array
+    private function validateAddress(Request $request, ?Address $address = null): array
     {
         $validated = $request->validate([
-            'first_name' => ['required', 'string', 'max:255'],
-            'last_name' => ['required', 'string', 'max:255'],
-            'company' => ['nullable', 'string', 'max:255'],
+            'type' => ['required', Rule::in(array_map(fn (AddressType $type) => $type->value, AddressType::cases()))],
+            'first_name' => ['required', 'string', 'max:120'],
+            'last_name' => ['required', 'string', 'max:120'],
             'address_line_1' => ['required', 'string', 'max:255'],
             'address_line_2' => ['nullable', 'string', 'max:255'],
-            'city' => ['required', 'string', 'max:255'],
-            'state' => ['nullable', 'string', 'max:255'],
-            'postal_code' => ['required', 'string', 'max:50'],
+            'city' => ['required', 'string', 'max:120'],
+            'state' => ['nullable', 'string', 'max:120'],
+            'postal_code' => ['required', 'string', 'max:32'],
             'country_code' => ['required', 'string', 'size:2'],
             'phone' => ['nullable', 'string', 'max:50'],
-            'type' => ['nullable', 'string', 'max:50'],
+            'email' => ['nullable', 'email', 'max:255'],
             'is_default' => ['sometimes', 'boolean'],
             'is_billing' => ['sometimes', 'boolean'],
             'is_shipping' => ['sometimes', 'boolean'],
+            'notes' => ['nullable', 'string'],
         ]);
 
-        $validated['is_default'] = $request->boolean('is_default');
-        $validated['is_billing'] = $request->boolean('is_billing');
-        $validated['is_shipping'] = $request->boolean('is_shipping');
-        $validated['type'] = $validated['type'] ?? 'shipping';
-        $validated['user_id'] = $request->user()->id;
+        $validated['is_default'] = (bool) ($validated['is_default'] ?? false);
+        $validated['is_billing'] = (bool) ($validated['is_billing'] ?? false);
+        $validated['is_shipping'] = (bool) ($validated['is_shipping'] ?? false);
 
         return $validated;
+    }
+
+    private function ensureSingleDefault(Request $request, Address $address): void
+    {
+        $request->user()->addresses()
+            ->whereKeyNot($address->getKey())
+            ->update(['is_default' => false]);
     }
 }
