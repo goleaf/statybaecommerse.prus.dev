@@ -51,17 +51,17 @@ class LithuanianBuilderShopSeeder extends Seeder
 
     private function createRolesAndPermissions(): void
     {
-        $roles = [AuthorizationRole::ADMIN, AuthorizationRole::MANAGER];
+        $roleNames = ['admin', 'manager'];
 
-        foreach ($roles as $role) {
-            $permissions = AuthorizationMatrix::permissionsForRole($role);
+        foreach ($roleNames as $roleName) {
+            $permissions = AuthorizationMatrix::permissionsForRole($roleName);
 
             foreach ($permissions as $permission) {
                 Permission::firstOrCreate(['name' => $permission, 'guard_name' => 'web']);
             }
 
-            $roleModel = Role::firstOrCreate(['name' => $role->value, 'guard_name' => 'web']);
-            $roleModel->syncPermissions($permissions);
+            $role = Role::firstOrCreate(['name' => $roleName, 'guard_name' => 'web']);
+            $role->syncPermissions($permissions);
         }
 
         $additionalPermissions = ['view_reports'];
@@ -69,8 +69,8 @@ class LithuanianBuilderShopSeeder extends Seeder
         foreach ($additionalPermissions as $permission) {
             $permissionModel = Permission::firstOrCreate(['name' => $permission, 'guard_name' => 'web']);
 
-            foreach ($roles as $role) {
-                Role::findByName($role->value, 'web')->givePermissionTo($permissionModel);
+            foreach ($roleNames as $roleName) {
+                Role::findByName($roleName, 'web')->givePermissionTo($permissionModel);
             }
         }
     }
