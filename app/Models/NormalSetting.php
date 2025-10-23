@@ -173,21 +173,14 @@ final class NormalSetting extends Model
     public static function setValue(string $key, $value, string $group = 'general', ?string $locale = null): void
     {
         $locale = $locale ?? app()->getLocale();
-        $type = match (true) {
-            is_array($value) => 'array',
-            is_object($value) => 'json',
-            is_bool($value) => 'boolean',
-            is_numeric($value) => 'number',
-            default => 'text',
-        };
-
         self::updateOrCreate(
             ['key' => $key, 'locale' => $locale],
             [
-                'group' => $group,
-                'type' => $type,
-                'value' => $value,
-            ],
+                'value'     => $value,
+                'group'     => $group,
+                'type'      => is_array($value) || is_object($value) ? 'json' : 'text',
+                'is_active' => true,
+            ]
         );
     }
 

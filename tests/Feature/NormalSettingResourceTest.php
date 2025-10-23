@@ -8,6 +8,7 @@ use App\Filament\Resources\NormalSettingResource\Pages\ListNormalSettings;
 use App\Models\NormalSetting;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Livewire\Livewire;
 use Tests\TestCase;
 
 final class NormalSettingResourceTest extends TestCase
@@ -89,11 +90,11 @@ final class NormalSettingResourceTest extends TestCase
         $this->actingAs($this->admin);
 
         $settingData = [
-            'key' => 'test_setting',
-            'value' => 'test_value',
-            'description' => 'Test description',
-            'type' => 'text',
-            'is_public' => true,
+            'key'          => 'test_setting',
+            'value'        => 'test_value',
+            'description'  => 'Test description',
+            'type'         => 'string',
+            'is_public'    => true,
             'is_encrypted' => false,
             'is_active'    => true,
         ];
@@ -103,7 +104,7 @@ final class NormalSettingResourceTest extends TestCase
         $this->assertDatabaseHas('enhanced_settings', [
             'key'   => 'test_setting',
             'value' => 'test_value',
-            'type' => 'text',
+            'type'  => 'string',
         ]);
     }
 
@@ -138,11 +139,11 @@ final class NormalSettingResourceTest extends TestCase
         $this->actingAs($this->admin);
 
         $updateData = [
-            'key' => 'updated_setting',
-            'value' => 'updated_value',
-            'description' => 'Updated description',
-            'type' => 'number',
-            'is_public' => false,
+            'key'          => 'updated_setting',
+            'value'        => 'updated_value',
+            'description'  => 'Updated description',
+            'type'         => 'integer',
+            'is_public'    => false,
             'is_encrypted' => true,
             'is_active'    => false,
         ];
@@ -153,7 +154,7 @@ final class NormalSettingResourceTest extends TestCase
             'id'    => $setting->id,
             'key'   => 'updated_setting',
             'value' => 'updated_value',
-            'type' => 'number',
+            'type'  => 'integer',
         ]);
     }
 
