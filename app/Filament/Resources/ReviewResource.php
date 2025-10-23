@@ -35,7 +35,6 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use BackedEnum;
 
 final class ReviewResource extends Resource
 {
@@ -44,9 +43,7 @@ final class ReviewResource extends Resource
     protected static ?string $model = Review::class;
 
     /**
-     * Navigation icon for Filament navigation.
-     *
-     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
+     * @var string|\BackedEnum|null Normalize Filament icon typing for consistency.
      */
     protected static $navigationIcon = 'heroicon-o-star';
 
@@ -54,7 +51,18 @@ final class ReviewResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'title';
 
-    protected static ?string $navigationGroup = 'Content Management';
+    /**
+     * @var string|\BackedEnum|null Allow enum-backed navigation grouping.
+     */
+    protected static $navigationGroup = NavigationGroup::ContentManagement;
+
+    public static function getNavigationGroup(): ?string
+    {
+        // Convert enum-backed navigation groups into translated labels automatically.
+        $group = static::$navigationGroup;
+
+        return $group instanceof NavigationGroup ? $group->label() : $group;
+    }
 
     public static function getNavigationLabel(): string
     {
@@ -178,15 +186,8 @@ final class ReviewResource extends Resource
                     ->label(__('reviews.fields.rating'))
                     ->sortable()
                     ->alignCenter()
-                    ->placeholder(__('reviews.placeholders.no_rating'))
-                    ->formatStateUsing(
-                        function (?int $state): string {
-                            // Guard against missing ratings to avoid formatting exceptions in table views.
-                            return $state !== null
-                                ? str_repeat('⭐', $state)
-                                : __('reviews.placeholders.no_rating');
-                        }
-                    ),
+                    // Provide a translated fallback whenever the rating is missing to avoid formatting crashes.
+                    ->formatStateUsing(fn (?int $state): string => $state !== null && $state > 0 ? str_repeat('⭐', $state) : __('reviews.placeholders.no_rating')),
                 BadgeColumn::make('status')
                     ->label(__('reviews.fields.status'))
                     ->getStateUsing(fn (Review $record): string => $record->getStatus())
@@ -418,26 +419,14 @@ final class ReviewResource extends Resource
                         TextEntry::make('rating')
                             ->label(__('reviews.fields.rating'))
                             ->badge()
-                            ->placeholder(__('reviews.placeholders.no_rating'))
-                            ->color(
-                                function (?int $state): string {
-                                    // Provide consistent colour coding even when the rating is absent.
-                                    return match ($state) {
-                                        1, 2 => 'danger',
-                                        3 => 'warning',
-                                        4, 5 => 'success',
-                                        default => 'gray',
-                                    };
-                                }
-                            )
-                            ->formatStateUsing(
-                                function (?int $state): string {
-                                    // Fall back to translated placeholder text when the rating has not been submitted yet.
-                                    return $state !== null
-                                        ? str_repeat('⭐', $state)
-                                        : __('reviews.placeholders.no_rating');
-                                }
-                            ),
+                            ->color(fn (?int $state): string => match ($state) {
+                                1, 2 => 'danger',
+                                3 => 'warning',
+                                4, 5 => 'success',
+                                default => 'gray',
+                            })
+                            // Mirror the table fallback so infolists never attempt to repeat a star with a null value.
+                            ->formatStateUsing(fn (?int $state): string => $state !== null && $state > 0 ? str_repeat('⭐', $state) : __('reviews.placeholders.no_rating')),
                     ])
                     ->columns(2),
                 InfolistSection::make(__('reviews.sections.content'))

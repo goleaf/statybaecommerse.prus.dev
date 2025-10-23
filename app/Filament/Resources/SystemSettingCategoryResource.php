@@ -50,9 +50,17 @@ final class SystemSettingCategoryResource extends Resource
 
     protected static ?string $model = SystemSettingCategory::class;
 
+    /**
+     * @var string|\BackedEnum|null Keep navigation grouping aligned with the shared enum helper.
+     */
+    protected static $navigationGroup = NavigationGroup::System;
+
     public static function getNavigationGroup(): ?string
     {
-        return NavigationGroup::System->label();
+        // Harmonize enum and string groups to avoid leaking raw enum values in the UI.
+        $group = static::$navigationGroup;
+
+        return $group instanceof NavigationGroup ? $group->label() : $group;
     }
 
     protected static ?int $navigationSort = 2;
