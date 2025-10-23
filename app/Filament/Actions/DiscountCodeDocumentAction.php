@@ -13,7 +13,6 @@ use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Response;
-use Throwable;
 
 final class DiscountCodeDocumentAction
 {
@@ -71,7 +70,7 @@ final class DiscountCodeDocumentAction
                     return response($document->content ?? '', 200, [
                         'Content-Type' => 'text/html',
                     ]);
-                } catch (Throwable $e) {
+                } catch (\Throwable $e) {
                     Notification::make()
                         ->title(__('admin.notifications.document_generation_failed'))
                         ->body($e->getMessage())
@@ -88,20 +87,20 @@ final class DiscountCodeDocumentAction
         $record->loadMissing('discount');
 
         return [
-            'DISCOUNT_CODE'        => $record->code,
-            'DISCOUNT_NAME'        => $record->discount?->name ?? '',
+            'DISCOUNT_CODE' => $record->code,
+            'DISCOUNT_NAME' => $record->discount?->name ?? '',
             'DISCOUNT_DESCRIPTION' => $record->description,
-            'DISCOUNT_VALUE'       => $record->discount?->value ?? '',
-            'DISCOUNT_TYPE'        => $record->discount?->type ?? '',
-            'USAGE_LIMIT'          => $record->usage_limit ?? 'Unlimited',
-            'USAGE_COUNT'          => $record->usage_count,
-            'REMAINING_USES'       => $record->remaining_uses ?? 'Unlimited',
-            'STARTS_AT'            => $record->starts_at?->format('d/m/Y H:i') ?? 'Immediately',
-            'EXPIRES_AT'           => $record->expires_at?->format('d/m/Y H:i') ?? 'Never',
-            'STATUS'               => $record->status,
-            'IS_ACTIVE'            => $record->is_active ? 'Yes' : 'No',
-            'CREATED_AT'           => $record->created_at?->format('d/m/Y H:i') ?? '',
-            'UPDATED_AT'           => $record->updated_at?->format('d/m/Y H:i') ?? '',
+            'DISCOUNT_VALUE' => $record->discount?->value ?? '',
+            'DISCOUNT_TYPE' => $record->discount?->type ?? '',
+            'USAGE_LIMIT' => $record->usage_limit ?? 'Unlimited',
+            'USAGE_COUNT' => $record->usage_count,
+            'REMAINING_USES' => $record->remaining_uses ?? 'Unlimited',
+            'STARTS_AT' => $record->starts_at?->format('d/m/Y H:i') ?? 'Immediately',
+            'EXPIRES_AT' => $record->expires_at?->format('d/m/Y H:i') ?? 'Never',
+            'STATUS' => $record->status,
+            'IS_ACTIVE' => $record->is_active ? 'Yes' : 'No',
+            'CREATED_AT' => $record->created_at?->format('d/m/Y H:i') ?? '',
+            'UPDATED_AT' => $record->updated_at?->format('d/m/Y H:i') ?? '',
         ];
     }
 }

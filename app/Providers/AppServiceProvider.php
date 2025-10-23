@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Contracts\DocumentServiceContract;
 use App\Contracts\HealthReporter as HealthReporterContract;
 use App\Contracts\SystemNotificationSender;
 use App\Filament\Components\LiveNotificationFeed;
@@ -60,7 +61,7 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->singleton(HealthReporterContract::class, HealthReporter::class);
-        $this->app->singleton(SystemNotificationSender::class, LiveNotificationService::class);
+        $this->app->bind(DocumentServiceContract::class, DocumentService::class);
 
         if ($this->app->runningInConsole()) {
             // Register import utilities and override the core db:seed command with a profiled variant.

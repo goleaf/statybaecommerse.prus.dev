@@ -13,7 +13,6 @@ use Filament\Notifications\Notification;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Response;
-use Throwable;
 
 final class DocumentAction
 {
@@ -68,7 +67,7 @@ final class DocumentAction
                     return response($document->content ?? '', 200, [
                         'Content-Type' => 'text/html',
                     ]);
-                } catch (Throwable $e) {
+                } catch (\Throwable $e) {
                     Notification::make()
                         ->title(__('admin.notifications.document_generation_failed'))
                         ->body($e->getMessage())

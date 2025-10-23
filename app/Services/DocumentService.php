@@ -9,11 +9,11 @@ use App\Models\Document;
 use App\Models\DocumentTemplate;
 use App\Models\User;
 use App\Notifications\DocumentGenerated;
+use App\Support\Storage\SecureStorage;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
-use App\Support\Storage\SecureStorage;
 use Illuminate\Support\Facades\Storage;
 use RuntimeException;
 

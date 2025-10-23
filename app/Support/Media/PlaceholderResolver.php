@@ -45,7 +45,11 @@ final class PlaceholderResolver
             return $this->cache[$key];
         }
 
-        $query = Media::query();
+        try {
+            $query = Media::query();
+        } catch (\Throwable $exception) {
+            return $this->cache[$key] = null;
+        }
 
         if (isset($definition['uuid']) && is_string($definition['uuid']) && $definition['uuid'] !== '') {
             $query->where('uuid', $definition['uuid']);
@@ -88,6 +92,6 @@ final class PlaceholderResolver
             return $fallback;
         }
 
-        return asset($fallback);
+        return safe_asset($fallback);
     }
 }
