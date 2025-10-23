@@ -20,7 +20,8 @@ This snapshot complements the changelog by listing functional capabilities that 
 - Analytical reports, project retrospectives, and rollout summaries consolidated inside [`docs/analysis/`](docs/analysis/).
 
 ## Latest Update
-- Partner API middleware now returns documented JSON error payloads for missing keys, insufficient scopes, and rate limits so third-party integrations receive predictable statuses and tooling can assert the contract.
+- Notification API mutation responses now omit redundant message wrappers and cast throttling headers to strings so 429 flows
+  return clean problem payloads instead of Symfony type errors.
 - Brands page now features a light-themed layout, shared card components, and refreshed translations so the partner directory feels consistent across locales.
 - Product API endpoints now honour eager-loaded review aggregates so cached rating/count metrics stay in sync while
   trimming redundant queries from feature and regression suites.

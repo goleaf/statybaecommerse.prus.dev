@@ -244,8 +244,6 @@
                 "additionalProperties": true,
                 "required": [
                     "generated_at",
-                    "query",
-                    "pagination",
                     "total",
                     "limit"
                 ],
@@ -254,39 +252,6 @@
                         "type": "string",
                         "format": "date-time"
                     },
-                    "query": {
-                        "type": "object",
-                        "additionalProperties": true,
-                        "required": [
-                            "page",
-                            "per_page",
-                            "sort",
-                            "filters"
-                        ],
-                        "properties": {
-                            "page": {
-                                "type": "integer",
-                                "minimum": 1
-                            },
-                            "per_page": {
-                                "type": "integer",
-                                "minimum": 1
-                            },
-                            "sort": {
-                                "type": "array",
-                                "items": {
-                                    "$ref": "#/components/schemas/AppliedSort"
-                                }
-                            },
-                            "filters": {
-                                "type": "object",
-                                "additionalProperties": true
-                            }
-                        }
-                    },
-                    "pagination": {
-                        "$ref": "#/components/schemas/PaginationMeta"
-                    },
                     "total": {
                         "type": "integer",
                         "minimum": 0
@@ -294,6 +259,15 @@
                     "limit": {
                         "type": "integer",
                         "minimum": 1
+                    },
+                    "query": {
+                        "description": "Optional future filters snapshot when present in the response.",
+                        "type": "object",
+                        "additionalProperties": true
+                    },
+                    "pagination": {
+                        "description": "Optional pagination metadata when exposed by future iterations.",
+                        "$ref": "#/components/schemas/PaginationMeta"
                     }
                 }
             },
@@ -458,8 +432,7 @@
                 "type": "object",
                 "additionalProperties": false,
                 "required": [
-                    "url",
-                    "thumbnail"
+                    "url"
                 ],
                 "properties": {
                     "url": {
@@ -467,11 +440,23 @@
                         "format": "uri"
                     },
                     "thumbnail": {
-                        "type": "string",
-                        "format": "uri"
+                        "description": "Thumbnails are nullable when no conversion has been generated yet.",
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "format": "uri"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
                     },
                     "alt": {
-                        "type": "string"
+                        "description": "Optional alt text bubbled from media custom properties.",
+                        "type": [
+                            "string",
+                            "null"
+                        ]
                     }
                 }
             },
