@@ -187,9 +187,9 @@ final class AdminPanelProvider extends PanelProvider
             ->when(app()->environment('testing'),
                 fn (Panel $p) => $p->plugins($this->testingPlugins()),
                 fn (Panel $p) => $p->plugins($this->configuredPlugins()))
-            // Avoid referencing a missing Vite manifest while running the test suite by disabling the
-            // theme override, but keep the compiled theme for every other environment.
-            ->when(! app()->environment('testing'),
+            // Enable the custom Filament theme during normal execution, but fall back to the bundled app theme during tests to avoid Vite manifest lookups.
+            ->when(app()->environment('testing'),
+                fn (Panel $p) => $p->theme('app'),
                 fn (Panel $p) => $p->viteTheme('resources/css/filament/admin/theme.css'))
             ->spa();
     }

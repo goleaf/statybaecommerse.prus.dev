@@ -21,8 +21,8 @@ This snapshot complements the changelog by listing functional capabilities that 
 
 ## Latest Update
 
-- Admin demo data now seeds deterministic catalogues, orders, and SEO metadata while the order scope bypass keeps dashboards in sync with the seeded records.
-- Admin seeder logging now respects headless contexts, preventing null command errors during automated runs while retaining rich console progress when executed interactively.
+- Husky pre-commit hook now re-stages Pint changes and runs PHPStan via `xargs`, keeping contributor commits unblocked on environments that lack `--paths-file` support.
+- Company management tooling now exposes inactive records in tests by dropping the ActiveScope assignment, widening factory phone fixtures, and letting Filament skip Vite theme assets during `testing`, removing the manifest-related failures from bulk actions.
 - Brands page now features a light-themed layout, shared card components, and refreshed translations so the partner directory feels consistent across locales.
 - Region-to-city lookups and the dedicated customers table are restored for the SQLite harness, ensuring analytics sparklines, customer factories, and Filament resources can attach geographic metadata without migration errors.
 - Localized product/category routing plus collection seeding were hardened, ensuring homepage product links, category landing pages, and collection showcases load without 404s or empty states.

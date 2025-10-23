@@ -58,12 +58,8 @@
     <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
 
     <!-- Scripts -->
-    @php
-        $viteManifestPath = public_path('build/manifest.json');
-    @endphp
-    @if (app()->environment('testing') && ! file_exists($viteManifestPath))
-        {{-- Skip loading compiled assets during tests when the Vite manifest is unavailable. --}}
-    @else
+    {{-- Skip Vite asset loading when the manifest is absent during testing to prevent runtime exceptions. --}}
+    @if (file_exists(public_path('build/manifest.json')))
         @vite(['resources/css/app.scss', 'resources/js/app.js'])
     @endif
 

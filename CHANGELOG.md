@@ -8,8 +8,9 @@ The format is based on [Conventional Commits](https://www.conventionalcommits.or
 
 ### Bug Fixes
 
-- Stabilized the comprehensive AdminSeeder by seeding deterministic countries, categories, variants, orders, and SEO entries while skipping the ActiveScope on orders, so duplicate runs stay idempotent and Filament dashboards can list the seeded orders without extra overrides.
-- Guarded the AdminSeeder's console logging behind a helper so tests and CI pipelines can execute the seeder without triggering null command errors while still surfacing progress in interactive runs.
+- Fixed the Husky pre-commit hook to stream staged PHP files through `xargs`, restoring PHPStan compatibility on releases that lack `--paths-file` support so contributors can commit without bypassing the hook.
+- Stabilized the company management flows by removing the global ActiveScope, widening factory/test fixtures, and letting Filament fall back to the bundled theme during tests so inactive records can be created, toggled, and listed without manifest errors.
+- Re-enabled flexible system setting translations by replacing the locale uniqueness constraint with an index, restoring soft delete support, and trimming the fillable contract so replication and counting scenarios match the documented API.
 - Preserved Attribute validation rule strings while still decoding JSON arrays, refreshed the Filament form so arrays render as comma-separated chips, and added regression coverage for both storage paths.
 - Reintroduced the `regions` schema with defensive guards and rebuilt the `customers`/`orders` relationship so SQLite-backed factories and analytics widgets can create location-aware records without missing column errors during tests.
 - Resolved localized product and category routing by honouring translated slugs during route model binding and updating storefront links so product detail pages load reliably from the home feed and other localized listings.

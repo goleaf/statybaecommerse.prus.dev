@@ -10,7 +10,13 @@ use App\Filament\Resources\CampaignProductTargetResource\Pages;
 use App\Models\CampaignProductTarget;
 use App\Models\Scopes\ActiveScope;
 use BackedEnum;
-use Filament\Schemas\Components\Grid;
+use Filament\Actions\BulkAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
+use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
 use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Select;
@@ -24,12 +30,6 @@ use Filament\Infolists\Components\TextEntry;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
-use Filament\Tables\Actions\BulkAction;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteAction;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
@@ -51,7 +51,7 @@ final class CampaignProductTargetResource extends Resource
     /**
      * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
      */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar'; // Use a core heroicon to avoid missing asset exceptions in tests.
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar'; // Use an icon that exists in Heroicons v2.
 
     protected static ?string $recordTitleAttribute = 'target_type';
 
