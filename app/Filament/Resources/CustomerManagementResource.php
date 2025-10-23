@@ -137,7 +137,7 @@ final class CustomerManagementResource extends Resource
             Section::make(__('customers.preferences'))
                 ->schema([
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Select::make('preferred_locale')
                                 ->label(__('customers.preferred_language'))
                                 ->options([
@@ -154,7 +154,7 @@ final class CustomerManagementResource extends Resource
                                 ->default('EUR'),
                         ]),
                     Grid::make(2)
-                        ->schema([
+                        ->components([
                             Toggle::make('notification_preferences->newsletter_subscription')
                                 ->label(__('customers.newsletter_subscription'))
                                 ->default(false),
