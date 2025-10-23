@@ -8,6 +8,7 @@
 - Shipping option entities once again declare their zone relationship, eligibility checks, and filter scopes, ensuring fulfilment automation and tests can target the correct carrier records without custom query shims.
 
 ## Data integrity & seeding
+- Demo store seeder now calls the collection and collection-product seeders, ensuring curated collections always feature representative products during fresh installs and automated demos.
 - PHPUnit harness now provisions a shared `database/testing.sqlite` file, runs a focused SQLite migration that seeds Spatie permission tables and variant attribute pivots, and registers Filament SearchableInput payload macros so suites share deterministic schema state without losing compatibility.
 - Test harness provisioning now uses an on-disk SQLite database and metadata-aware factories, preventing the user attribution observer tests from failing with missing tables or JSON columns.
 - Orders now seed using the broadened `orders.status` enum (covering confirmed/completed/returned) so MySQL no longer truncates demo data during `php artisan migrate:fresh --seed` and admin analytics stay in sync.
@@ -22,7 +23,8 @@
 - Coupon application responses now round computed totals instead of calling `Number::parseFloat` on floats, keeping the discount API stable across PHP 8.3 test runs.
 
 ## Storefront discovery
-- Recently viewed endpoints now downgrade draft catalogue entries to ID-only payloads while keeping full media metadata for published products, so guest history panels stay deterministic without leaking unpublished product details.
+- Brands directory was redesigned with a light-themed layout, shared card components, and refreshed translations for English and Lithuanian so partner browsing feels polished across locales.
+- Search endpoint hardening now rejects suspicious SQL fragments and adds an explicit exact-match boost so precise catalogue queries surface first and malicious payloads return empty buckets.
 - Search type filters now normalise mixed-case identifiers from clients, ensuring storefront queries stay restricted to the requested product, category, or brand buckets instead of ballooning to every result group.
 
 ## API contracts
