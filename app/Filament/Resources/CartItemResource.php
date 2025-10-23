@@ -10,25 +10,22 @@ use App\Filament\Resources\CartItemResource\Pages;
 use App\Models\CartItem;
 use App\Models\Product;
 use App\Models\ProductVariant;
-use App\Support\Filament\Components\Flatpickr;
-use App\Support\Filament\SearchableInputHelper;
-use App\Support\Search\ProductSearch;
-use BackedEnum;
-use DefStudio\SearchableInput\Forms\Components\SearchableInput;
-use Filament\Actions\Action;
-use Filament\Actions\BulkAction;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
 use Filament\Forms;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
+use Filament\Forms\Get;
+use Filament\Forms\Set;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\BulkAction;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
@@ -85,59 +82,14 @@ final class CartItemResource extends Resource
                                 ->required(fn (?CartItem $record): bool => $record === null)
                                 ->dehydrated(fn (?CartItem $record): bool => $record === null)
                                 ->live()
-                                ->searchUsing(fn (string $search): array => ProductSearch::complex($search))
-                                ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null ? (int) $state : null)
-                                ->afterStateHydrated(function (SearchableInput $component, ?int $state, ?CartItem $record): void {
-                                    // Hydrate via helper to keep metadata contract in sync with documentation.
-                                    SearchableInputHelper::hydrate(
-                                        $component,
-                                        $state,
-                                        static function (int $value) use ($record): ?array {
-                                            $product = $record?->product ?? Product::query()
-                                                ->select(['id', 'sku', 'name'])
-                                                ->find($value);
-
-                                            if (! $product instanceof Product) {
-                                                return null;
-                                            }
-
-                                            return [
-                                                'value' => $product->getKey(),
-                                                'label' => ProductSearch::label($product),
-                                            ];
-                                        },
-                                    );
-                                })
-                                // See docs/forms/SEARCHABLE_INPUT_METADATA.md for SearchResult metadata conventions.
-                                ->afterStateUpdated(function (?string $state, Forms\Set $set): void {
-                                    if ($state === null || $state === '') {
-                                        // Clear dependent metadata when the lookup resets.
-                                        SearchableInputHelper::clear($set, [
-                                            'product_id'         => null,
-                                            'product_name'       => null,
-                                            'product_sku'        => null,
-                                            'unit_price'         => null,
-                                            'product_variant_id' => null,
-                                        ]);
-
-                                        return;
-                                    }
-
-                                    $product = Product::query()
-                                        ->select(['id', 'name', 'sku', 'price'])
-                                        ->find((int) $state);
-
-                                    if (! $product instanceof Product) {
-                                        return;
-                                    }
-
-                                    $set('product_id', $product->getKey());
-                                    $set('product_name', $product->name);
-                                    $set('product_sku', $product->sku);
-                                    $set('unit_price', $product->price);
-
-                                    if ($product->variants()->exists()) {
-                                        $set('product_variant_id', null);
+                                ->afterStateUpdated(function ($state, Set $set) {
+                                    if ($state) {
+                                        $product = Product::find($state);
+                                        if ($product) {
+                                            $set('product_name', $product->name);
+                                            $set('product_sku', $product->sku);
+                                            $set('unit_price', $product->price);
+                                        }
                                     }
                                 }),
                         ]),
@@ -147,7 +99,7 @@ final class CartItemResource extends Resource
                         ->searchable()
                         ->preload()
                         ->live()
-                        ->afterStateUpdated(function ($state, Forms\Set $set): void {
+                        ->afterStateUpdated(function ($state, Set $set) {
                             if ($state) {
                                 $variant = ProductVariant::find($state);
                                 if ($variant) {
@@ -174,7 +126,7 @@ final class CartItemResource extends Resource
                                 ->minValue(1)
                                 ->default(1)
                                 ->required()
-                                ->afterStateUpdated(function ($state, Forms\Get $get, Forms\Set $set): void {
+                                ->afterStateUpdated(function ($state, Get $get, Set $set) {
                                     $unitPrice = (float) $get('unit_price');
                                     $quantity = (int) $state;
                                     $total = $unitPrice * $quantity;
@@ -205,7 +157,7 @@ final class CartItemResource extends Resource
                                 ->numeric()
                                 ->required()
                                 ->live()
-                                ->afterStateUpdated(function ($state, Forms\Get $get, Forms\Set $set): void {
+                                ->afterStateUpdated(function ($state, Get $get, Set $set) {
                                     $unitPrice = (float) $state;
                                     $quantity = (int) $get('quantity');
                                     $total = $unitPrice * $quantity;
@@ -217,7 +169,7 @@ final class CartItemResource extends Resource
                                 ->numeric()
                                 ->default(0)
                                 ->live()
-                                ->afterStateUpdated(function ($state, Forms\Get $get, Forms\Set $set): void {
+                                ->afterStateUpdated(function ($state, Get $get, Set $set) {
                                     $unitPrice = (float) $get('unit_price');
                                     $quantity = (int) $get('quantity');
                                     $discount = (float) $state;

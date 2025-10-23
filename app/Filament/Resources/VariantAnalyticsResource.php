@@ -9,6 +9,12 @@ use App\Support\Concerns\HasNav;
 use App\Filament\Resources\VariantAnalyticsResource\Pages;
 use App\Models\VariantAnalytics;
 use BackedEnum;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\BulkAction;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ViewAction;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
@@ -48,6 +54,7 @@ final class VariantAnalyticsResource extends Resource
 {
     use HasNav;
 
+    /** @var string|\BackedEnum|null */
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar-square';
 
     protected static BackedEnum|UnitEnum|string|null $navigationGroup = 'Inventory';
