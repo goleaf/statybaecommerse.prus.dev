@@ -10,13 +10,13 @@ use App\Filament\Resources\NewsImageResource\Pages;
 use App\Filament\Resources\NewsResource;
 use App\Models\News;
 use App\Models\NewsImage;
-use BackedEnum;
 use App\Support\Storage\SecureStorage;
-use Filament\Tables\Actions\Action;
-use Filament\Tables\Actions\ActionGroup;
-use Filament\Tables\Actions\BulkAction;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteAction;
+use BackedEnum;
+use Filament\Actions\Action;
+use Filament\Actions\ActionGroup;
+use Filament\Actions\BulkAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Placeholder;
@@ -89,7 +89,24 @@ final class NewsImageResource extends Resource
                                     ->schema([
                                         Select::make('news_id')
                                             ->label(__('admin.news_images.news'))
-                                            ->options(News::pluck('title', 'id'))
+                                            ->options(function (): array {
+                                                return News::query()
+                                                    ->where('is_visible', true)
+                                                    ->whereNotNull('published_at')
+                                                    ->where('published_at', '<=', now())
+                                                    ->orderByDesc('published_at')
+                                                    ->get()
+                                                    ->mapWithKeys(static function (News $news): array {
+                                                        $title = (string) $news->title;
+
+                                                        if ($title === '') {
+                                                            $title = (string) ($news->author_name ?? 'News #' . $news->id);
+                                                        }
+
+                                                        return [$news->id => $title];
+                                                    })
+                                                    ->all();
+                                            })
                                             ->required()
                                             ->searchable()
                                             ->preload()
@@ -181,7 +198,7 @@ final class NewsImageResource extends Resource
 
                                                 if ($imageInfo) {
                                                     $set('dimensions', [
-                                                        'width' => $imageInfo[0],
+                                                        'width'  => $imageInfo[0],
                                                         'height' => $imageInfo[1],
                                                     ]);
                                                 }
@@ -215,7 +232,7 @@ final class NewsImageResource extends Resource
                                                     ->label(__('admin.news_images.file_size'))
                                                     ->numeric()
                                                     ->disabled()
-                                                    ->formatStateUsing(fn ($state) => $state ? number_format($state / 1024, 2).' KB' : ''),
+                                                    ->formatStateUsing(fn ($state) => $state ? number_format($state / 1024, 2) . ' KB' : ''),
                                                 TextInput::make('mime_type')
                                                     ->label(__('admin.news_images.mime_type'))
                                                     ->disabled(),
@@ -250,13 +267,13 @@ final class NewsImageResource extends Resource
 
                                                 $info = [];
                                                 if ($fileSize) {
-                                                    $info[] = __('admin.news_images.file_size').': '.number_format($fileSize / 1024, 2).' KB';
+                                                    $info[] = __('admin.news_images.file_size') . ': ' . number_format($fileSize / 1024, 2) . ' KB';
                                                 }
                                                 if ($mimeType) {
-                                                    $info[] = __('admin.news_images.mime_type').': '.$mimeType;
+                                                    $info[] = __('admin.news_images.mime_type') . ': ' . $mimeType;
                                                 }
                                                 if ($dimensions && isset($dimensions['width']) && isset($dimensions['height'])) {
-                                                    $info[] = __('admin.news_images.dimensions').': '.$dimensions['width'].'x'.$dimensions['height'];
+                                                    $info[] = __('admin.news_images.dimensions') . ': ' . $dimensions['width'] . 'x' . $dimensions['height'];
                                                 }
 
                                                 return implode(' | ', $info);
@@ -346,7 +363,7 @@ final class NewsImageResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('file_size')
                     ->label(__('admin.news_images.file_size'))
-                    ->formatStateUsing(fn ($state) => $state ? number_format($state / 1024, 2).' KB' : '')
+                    ->formatStateUsing(fn ($state) => $state ? number_format($state / 1024, 2) . ' KB' : '')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->badge()
@@ -370,7 +387,7 @@ final class NewsImageResource extends Resource
                 TextColumn::make('dimensions')
                     ->label(__('admin.news_images.dimensions'))
                     ->formatStateUsing(fn ($state) => $state && isset($state['width'], $state['height'])
-                        ? $state['width'].'x'.$state['height']
+                        ? $state['width'] . 'x' . $state['height']
                         : '')
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->badge()
@@ -389,7 +406,24 @@ final class NewsImageResource extends Resource
             ->filters([
                 SelectFilter::make('news_id')
                     ->label(__('admin.news_images.news'))
-                    ->options(News::pluck('title', 'id'))
+                    ->options(function (): array {
+                        return News::query()
+                            ->where('is_visible', true)
+                            ->whereNotNull('published_at')
+                            ->where('published_at', '<=', now())
+                            ->orderByDesc('published_at')
+                            ->get()
+                            ->mapWithKeys(static function (News $news): array {
+                                $title = (string) $news->title;
+
+                                if ($title === '') {
+                                    $title = (string) ($news->author_name ?? 'News #' . $news->id);
+                                }
+
+                                return [$news->id => $title];
+                            })
+                            ->all();
+                    })
                     ->searchable()
                     ->preload()
                     ->multiple(),
@@ -510,10 +544,10 @@ final class NewsImageResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index'  => Pages\ListNewsImages::route('/'),
-            'create' => Pages\CreateNewsImage::route('/create'),
-            'view'   => Pages\ViewNewsImage::route('/{record}'),
-            'edit'   => Pages\EditNewsImage::route('/{record}/edit'),
+            'index'  => Pages\ListNewsImages::route('/panel'),
+            'create' => Pages\CreateNewsImage::route('/panel/create'),
+            'view'   => Pages\ViewNewsImage::route('/panel/{record}'),
+            'edit'   => Pages\EditNewsImage::route('/panel/{record}/edit'),
         ];
     }
 }

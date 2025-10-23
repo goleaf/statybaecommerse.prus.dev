@@ -94,8 +94,16 @@ final class DocumentResource extends Resource
                                         'image/jpeg',
                                         'image/png',
                                         'image/webp',
+                                        '.pdf',
+                                        '.doc',
+                                        '.docx',
+                                        '.xls',
+                                        '.xlsx',
+                                        '.jpg',
+                                        '.jpeg',
+                                        '.png',
+                                        '.webp',
                                     ])
-                                    ->allowedFileExtensions(['pdf', 'doc', 'docx', 'xls', 'xlsx', 'jpg', 'jpeg', 'png', 'webp'])
                                     ->maxSize(10 * 1024),
                                 Textarea::make('description')
                                     ->label(__('admin.documents.form.fields.description'))

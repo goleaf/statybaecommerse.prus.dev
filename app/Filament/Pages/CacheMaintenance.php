@@ -17,16 +17,13 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Route;
 use Throwable;
+use UnitEnum;
+
 final class CacheMaintenance extends Page
 {
-    /**
-     * Navigation icon that Filament displays for this page.
-     *
-     * @var string|BackedEnum|null Filament navigation icon identifier.
-     */
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-server-stack';
 
-    protected static string|UnitEnum|null $navigationGroup = 'System';
+    protected static UnitEnum|string|null $navigationGroup = 'System';
 
     protected static ?string $title = 'Cache Maintenance';
 

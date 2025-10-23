@@ -18,16 +18,18 @@ use App\Models\FeatureFlag;
 use App\Models\SystemSetting;
 use App\Observers\UserAttributionObserver;
 use App\Services\DocumentService;
-use App\Services\LiveNotificationService;
 use App\Support\Health\HealthReporter;
-use App\Support\Queue\QueueFailureHandler;
+use App\Support\Storage\SecureStorage;
+use App\Support\Tracing\Trace;
+use App\Support\Tracing\TraceContext;
+use App\Support\Uploads\SecureUploadHandler;
 use App\View\Creators\CartDataCreator;
 use App\View\Creators\GlobalDataCreator;
 use App\View\Creators\LocalizationCreator;
 use App\View\Creators\NavigationCreator;
 use App\View\Creators\SeoDataCreator;
 use App\View\Creators\UserDataCreator;
-use Illuminate\Cache\RateLimiting\Limit;
+use Artisan;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Console\Scheduling\Schedule;
@@ -48,8 +50,12 @@ use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\Number;
 use Illuminate\Support\ServiceProvider;
-use Livewire\Features\SupportTesting\Testable;
+
+use function in_array;
+use function is_array;
+
 use Livewire\Livewire;
+use Storage;
 use Throwable;
 
 class AppServiceProvider extends ServiceProvider
@@ -140,12 +146,10 @@ class AppServiceProvider extends ServiceProvider
         if (class_exists(\Filament\Tables\Columns\ImageColumn::class)) {
             \Filament\Tables\Columns\ImageColumn::configureUsing(
                 static function (\Filament\Tables\Columns\ImageColumn $column): void {
-                    if (! method_exists($column, 'formatStateUsing')) {
-                        return;
-                    }
+                    $column->state(
+                        static function (\Filament\Tables\Columns\ImageColumn $column): mixed {
+                            $state = $column->getStateFromRecord();
 
-                    $column->formatStateUsing(
-                        static function ($state): ?string {
                             if (! is_string($state) || $state === '') {
                                 return $state;
                             }
@@ -253,7 +257,7 @@ class AppServiceProvider extends ServiceProvider
             $schedule->call(function (): void {
                 // Rotate exports older than 7 days with timeout protection
                 $timeout = now()->addMinutes(3);  // 3 minute timeout for export rotation
-                $disk = \Storage::disk(SecureStorage::disk());
+                $disk = Storage::disk(SecureStorage::disk());
                 $dir = 'exports';
                 if ($disk->exists($dir)) {
                     $files = collect($disk->files($dir))
@@ -271,21 +275,16 @@ class AppServiceProvider extends ServiceProvider
 
         // Use localized Markdown templates for auth notifications
         ResetPassword::toMailUsing(function ($notifiable, string $url) {
-            $minutes = (int) config('auth.passwords.'.config('auth.defaults.passwords').'.expire');
+            $locale = method_exists($notifiable, 'preferredLocale') ? ($notifiable->preferredLocale() ?: app()->getLocale()) : app()->getLocale();
+            $minutes = (int) config('auth.passwords.' . config('auth.defaults.passwords') . '.expire');
 
-            if (! $notifiable instanceof CanResetPasswordContract) {
-                return new PasswordResetMail($url, $minutes, app()->getLocale());
-            }
-
-            $locale = $this->resolveNotifiableLocale($notifiable);
-            $mail = new PasswordResetMail($url, $minutes, $locale);
-
-            $email = $notifiable->getEmailForPasswordReset();
-            if ($email !== '') {
-                $mail->to($email);
-            }
-
-            return $mail;
+            return (new MailMessage)
+                ->locale($locale)
+                ->subject(__('mail.reset_password_subject', [], $locale))
+                ->markdown('emails.auth.password-reset', [
+                    'url'     => $url,
+                    'minutes' => $minutes,
+                ]);
         });
 
         VerifyEmail::toMailUsing(function ($notifiable, string $url) {
@@ -341,8 +340,49 @@ class AppServiceProvider extends ServiceProvider
 
     private function registerQueueMonitoring(): void
     {
-        Queue::failing(function (JobFailed $event): void {
-            app(QueueFailureHandler::class)->handle($event);
+        Queue::createPayloadUsing(function ($connection, $queue, array $payload): array {
+            $context = Trace::current();
+
+            return [
+                'trace' => [
+                    'trace_id'       => $context->traceId(),
+                    'parent_span_id' => $context->spanId(),
+                    'correlation_id' => $context->correlationId(),
+                    'trace_flags'    => $context->traceFlags(),
+                ],
+            ];
+        });
+
+        Queue::before(function (JobProcessing $event): void {
+            $payload = $event->job->payload();
+            $trace = $payload['trace'] ?? null;
+
+            if (is_array($trace)) {
+                Trace::store(TraceContext::generate(
+                    traceId: (string) ($trace['trace_id'] ?? ''),
+                    parentSpanId: (string) ($trace['parent_span_id'] ?? ''),
+                    correlationId: (string) ($trace['correlation_id'] ?? ''),
+                    traceFlags: (string) ($trace['trace_flags'] ?? TraceContext::DEFAULT_TRACE_FLAGS),
+                ));
+            } else {
+                Trace::store(TraceContext::generate());
+            }
+        });
+
+        $cleanup = static function (): void {
+            Trace::forget();
+        };
+
+        Queue::after(function (JobProcessed $event) use ($cleanup): void {
+            $cleanup();
+        });
+
+        Queue::exceptionOccurred(function (JobExceptionOccurred $event) use ($cleanup): void {
+            $cleanup();
+        });
+
+        Queue::failing(function (JobFailed $event) use ($cleanup): void {
+            $cleanup();
         });
     }
 
