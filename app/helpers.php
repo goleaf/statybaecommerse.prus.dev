@@ -321,9 +321,17 @@ if (! function_exists('safe_asset')) {
 if (! function_exists('media_placeholder_url')) {
     function media_placeholder_url(string $key, ?string $variant = null, ?string $default = null): string
     {
-        $resolver = app(App\Support\Media\PlaceholderResolver::class);
+        try {
+            $resolver = app(App\Support\Media\PlaceholderResolver::class);
 
-        return $resolver->resolve($key, $variant, $default) ?? ($default ?? '');
+            return $resolver->resolve($key, $variant, $default) ?? ($default ?? '');
+        } catch (\Throwable $exception) {
+            if (! app()->runningInConsole()) {
+                report($exception);
+            }
+
+            return $default ?? '';
+        }
     }
 }
 
@@ -358,7 +366,7 @@ if (! function_exists('media_img')) {
     /**
      * Render a responsive <img> tag for a Spatie media item.
      *
-     * @param  array<string, mixed>  $attributes
+     * @param array<string, mixed> $attributes
      */
     function media_img(\Spatie\MediaLibrary\MediaCollections\Models\Media $media, array $attributes = []): HtmlString
     {
@@ -369,7 +377,7 @@ if (! function_exists('media_img')) {
                 $url = $media->getUrl($name);
                 if (is_string($url) && $url !== $media->getUrl()) {
                     $variants[$name] = [
-                        'url' => $url,
+                        'url'   => $url,
                         'width' => $details['width'] ?? null,
                     ];
                 }
@@ -386,21 +394,21 @@ if (! function_exists('media_img')) {
         $srcset = collect($variants)
             ->filter(fn ($variant) => isset($variant['url']))
             ->map(function (array $variant) {
-                $descriptor = isset($variant['width']) ? $variant['width'].'w' : null;
+                $descriptor = isset($variant['width']) ? $variant['width'] . 'w' : null;
 
-                return trim($variant['url'].' '.($descriptor ?? ''));
+                return trim($variant['url'] . ' ' . ($descriptor ?? ''));
             })
             ->filter()
             ->implode(', ');
 
         $attributes = array_merge(
             [
-                'src' => $src,
-                'alt' => $alt,
-                'loading' => $loading,
+                'src'      => $src,
+                'alt'      => $alt,
+                'loading'  => $loading,
                 'decoding' => $attributes['decoding'] ?? 'async',
-                'sizes' => $sizes,
-                'dir' => $dir,
+                'sizes'    => $sizes,
+                'dir'      => $dir,
             ],
             Arr::except($attributes, ['alt', 'loading', 'sizes', 'decoding'])
         );
@@ -420,11 +428,11 @@ if (! function_exists('media_img')) {
                     return null;
                 }
 
-                return $key.'="'.e((string) $value).'"';
+                return $key . '="' . e((string) $value) . '"';
             })
             ->filter()
             ->implode(' ');
 
-        return new HtmlString('<img '.$attrString.' />');
+        return new HtmlString('<img ' . $attrString . ' />');
     }
 }

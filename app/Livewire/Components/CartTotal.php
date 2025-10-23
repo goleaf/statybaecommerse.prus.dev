@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace App\Livewire\Components;
 
-use App\Services\Pricing\PriceCalculator;
+use DB;
 use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\On;
 use Livewire\Component;
+use Throwable;
 
 /**
  * CartTotal
@@ -44,9 +45,8 @@ class CartTotal extends Component
         $sessionKey = session()->getId();
         if (class_exists(\Darryldecode\Cart\Facades\CartFacade::class)) {
             try {
-                // @phpstan-ignore-next-line
                 return (float) \Darryldecode\Cart\Facades\CartFacade::session($sessionKey)->getSubTotal();
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
                 return 0.0;
             }
         }
@@ -99,9 +99,8 @@ class CartTotal extends Component
         $subtotal = 0.0;
         if (class_exists(\Darryldecode\Cart\Facades\CartFacade::class)) {
             try {
-                // @phpstan-ignore-next-line
                 $subtotal = (float) \Darryldecode\Cart\Facades\CartFacade::session($sessionKey)->getSubTotal();
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
                 $subtotal = 0.0;
             }
         }
@@ -127,11 +126,10 @@ class CartTotal extends Component
         $items = [];
         if (class_exists(\Darryldecode\Cart\Facades\CartFacade::class)) {
             try {
-                // @phpstan-ignore-next-line
                 foreach (\Darryldecode\Cart\Facades\CartFacade::session(session()->getId())->getContent() as $item) {
                     $items[] = ['product_id' => optional($item->associatedModel)->id, 'variant_id' => method_exists($item->associatedModel, 'getKey') ? $item->associatedModel->getKey() : null, 'quantity' => (int) $item->quantity, 'unit_price' => (float) $item->price];
                 }
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
                 // fail-open: no items when cart driver fails
                 $items = [];
             }
@@ -141,16 +139,16 @@ class CartTotal extends Component
         $partnerTier = null;
         if ($userId) {
             try {
-                $groupIds = (array) \DB::table('sh_customer_group_user')->where('user_id', $userId)->pluck('group_id')->all();
-                $partnerTier = \DB::table('sh_partner_users as pu')->join('sh_partners as p', 'p.id', '=', 'pu.partner_id')->where('pu.user_id', $userId)->value('p.tier');
-            } catch (\Throwable $e) {
+                $groupIds = (array) DB::table('sh_customer_group_user')->where('user_id', $userId)->pluck('group_id')->all();
+                $partnerTier = DB::table('sh_partner_users as pu')->join('sh_partners as p', 'p.id', '=', 'pu.partner_id')->where('pu.user_id', $userId)->value('p.tier');
+            } catch (Throwable $e) {
                 // ignore if tables not present
             }
         }
         $context = ['currency_code' => current_currency(), 'channel_id' => optional(config('app.url')), 'user_id' => $userId, 'group_ids' => $groupIds, 'partner_tier' => $partnerTier, 'now' => now(), 'code' => $code, 'cart' => ['subtotal' => $amount, 'items' => $items]];
         try {
             return (array) $engine->evaluate($context);
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             return [];
         }
     }
