@@ -53,7 +53,9 @@ return Application::configure(basePath: dirname(__DIR__))
             'permissions' => Spatie\Permission\Middleware\PermissionMiddleware::class,
             'role_or_permission' => Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
             'localize' => App\Http\Middleware\SetLocale::class,
-            'partner.api' => App\Http\Middleware\EnsurePartnerApiKey::class,
+            'partner.api' => App\Http\Middleware\PartnerApiAuthenticate::class,
+            'partner.api.scope' => App\Http\Middleware\EnsurePartnerApiScope::class,
+            'partner.api.rate_limit' => App\Http\Middleware\PartnerApiRateLimit::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
