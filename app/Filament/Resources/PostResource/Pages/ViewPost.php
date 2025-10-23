@@ -31,7 +31,9 @@ final class ViewPost extends ViewRecord
             ListEntry::make('postQuickLinks')
                 ->heading(__('Quick links'))
                 ->state(function (Post $record): array {
-                    return [
+                    $record->loadMissing(['user']);
+
+                    $items = [
                         ListItem::make()
                             ->id('post-storefront-' . $record->getKey())
                             ->label(__('View on storefront'))
@@ -43,6 +45,43 @@ final class ViewPost extends ViewRecord
                             ]))
                             ->toArray(),
                     ];
+
+                    if ($record->user !== null) {
+                        $items[] = ListItem::make()
+                            ->id('post-author-' . $record->user->getKey())
+                            ->label(__('posts.view_author_profile'))
+                            ->icon('heroicon-m-user-circle')
+                            ->color('info')
+                            ->url(UserResource::getUrl('view', ['record' => $record->user]))
+                            ->tooltip(__('posts.browse_by_author', [
+                                'author' => $record->user->name ?? __('users.single'),
+                            ]))
+                            ->toArray();
+                    }
+
+                    return $items;
+                }),
+            ListEntry::make('postTags')
+                ->heading(__('posts.tags'))
+                ->list()
+                ->state(function (Post $record): array {
+                    $tags = collect(explode(',', (string) $record->getTranslatedTags()))
+                        ->map(fn (string $tag): string => trim($tag))
+                        ->filter()
+                        ->values();
+
+                    return $tags
+                        ->map(function (string $tag, int $index) use ($record): array {
+                            return ListItem::make()
+                                ->id('post-tag-' . $record->getKey() . '-' . $index)
+                                ->label($tag)
+                                ->icon('heroicon-m-hashtag')
+                                ->color('warning')
+                                ->url(route('frontend.search.index', ['q' => $tag]))
+                                ->tooltip(__('posts.search_tagged', ['tag' => $tag]))
+                                ->toArray();
+                        })
+                        ->all();
                 }),
             ListEntry::make('postApprovals')
                 ->heading(__('Moderation history'))

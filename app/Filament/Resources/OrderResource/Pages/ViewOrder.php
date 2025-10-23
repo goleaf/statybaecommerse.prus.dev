@@ -7,6 +7,8 @@ namespace App\Filament\Resources\OrderResource\Pages;
 use App\Filament\Resources\DiscountRedemptionResource;
 use App\Filament\Resources\DocumentResource;
 use App\Filament\Resources\OrderResource;
+use App\Models\DiscountRedemption;
+use App\Models\Document;
 use App\Models\Order;
 use App\Models\OrderItem;
 use Filament\Actions;
@@ -64,6 +66,57 @@ final class ViewOrder extends ViewRecord
                             ]))
                             ->toArray(),
                     ];
+                }),
+            ListEntry::make('orderDiscountRedemptions')
+                ->heading(__('discount_redemptions.title'))
+                ->list()
+                ->state(function (Order $record): array {
+                    $record->loadMissing(['discountRedemptions.discount', 'discountRedemptions.code']);
+                    $currency = $record->currency ?? config('shared.localization.default_currency', 'EUR');
+
+                    return $record->discountRedemptions
+                        ->map(function (DiscountRedemption $redemption) use ($currency): array {
+                            $discount = $redemption->discount;
+                            $code = $redemption->code;
+                            $discountName = $discount?->getTranslation('name') ?? $discount?->name ?? __('discount_redemptions.single');
+                            $codeValue = $code?->code ?? $redemption->getTranslation('status_description');
+
+                            return ListItem::make()
+                                ->id('order-discount-redemption-' . $redemption->getKey())
+                                ->label(__('discount_redemptions.list_item_label', ['discount' => $discountName]))
+                                ->icon('heroicon-m-ticket')
+                                ->color('warning')
+                                ->url(DiscountRedemptionResource::getUrl('view', ['record' => $redemption]))
+                                ->tooltip(__('discount_redemptions.list_item_tooltip', [
+                                    'amount' => Number::currency($redemption->amount_saved, $currency),
+                                    'code'   => $codeValue,
+                                ]))
+                                ->toArray();
+                        })
+                        ->all();
+                }),
+            ListEntry::make('orderDocuments')
+                ->heading(__('orders.documents'))
+                ->list()
+                ->state(function (Order $record): array {
+                    $record->loadMissing(['documents.template']);
+
+                    return $record->documents
+                        ->map(function (Document $document): array {
+                            $title = $document->title ?? $document->name ?? __('orders.document');
+
+                            return ListItem::make()
+                                ->id('order-document-' . $document->getKey())
+                                ->label($title)
+                                ->icon('heroicon-m-document-text')
+                                ->color('info')
+                                ->url(DocumentResource::getUrl('view', ['record' => $document]))
+                                ->tooltip(__('orders.document_version_tooltip', [
+                                    'version' => $document->version ?? 1,
+                                ]))
+                                ->toArray();
+                        })
+                        ->all();
                 }),
             ListEntry::make('orderItemsSummary')
                 ->heading(__('orders.order_items'))
