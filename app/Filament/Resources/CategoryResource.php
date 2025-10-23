@@ -30,15 +30,14 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
-use Illuminate\Support\Stringable;
 use Pixelpeter\FilamentLanguageTabs\Forms\Components\LanguageTabs;
 
 final class CategoryResource extends Resource
 {
-    /** @var string|BackedEnum|null Explicit docblock avoids deprecated typed properties in Filament v4. */
+    /** @var string|BackedEnum|null Keep compatibility with Filament v4 navigation icon expectations. */
     protected static $navigationIcon = 'heroicon-o-tag';
 
-    /** @var string|BackedEnum|null Navigation grouped via enum for clarity without needing UnitEnum import. */
+    /** @var string|BackedEnum|null Align the resource under the Products navigation section. */
     protected static $navigationGroup = NavigationGroup::Products;
 
     protected static ?int $navigationSort = 3;
@@ -99,8 +98,7 @@ final class CategoryResource extends Resource
 
     public static function form(Form $form): Form
     {
-        // Filament 4 expects returning the Form builder instance.
-        return $form->components([
+        return $form->schema([
             Section::make(__('categories.basic_information'))
                 ->schema([
                     Grid::make(2)
@@ -213,14 +211,11 @@ final class CategoryResource extends Resource
                         $state = $column->getState();
                         $record = $column->getRecord();
                         if ($record->parent) {
-                            // Use Str helper so localized multibyte characters stay intact when nesting category names.
+                            // Use the Str helper to avoid deprecated string helper aliases while building the breadcrumb label.
                             return Str::of($record->parent->name)
-                                ->when(
-                                    filled($state),
-                                    fn (Stringable $stringable): Stringable => $stringable->append(' → ' . (string) $state),
-                                    fn (Stringable $stringable): Stringable => $stringable,
-                                )
-                                ->value();
+                                ->append(' → ')
+                                ->append((string) $state)
+                                ->toString();
                         }
 
                         return $state;

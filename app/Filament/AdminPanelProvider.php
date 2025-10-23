@@ -36,64 +36,17 @@ class AdminPanelProvider extends PanelProvider
 
     public function panel(Panel $panel): Panel
     {
-        $configuredLocales = array_values(array_filter(
-            (array) config('shared.localization.supported_locales', [])
-        ));
-
-        if ($configuredLocales === []) {
-            $configuredLocales = [config('app.locale') ?? 'en'];
-        }
-
-        $translatablePlugin = SpatieTranslatablePlugin::make()
-            ->defaultLocales($configuredLocales)
-            ->persist();
+        $configuredPanel = $this->applyBaseConfiguration($panel);
 
         if ($this->isTestingEnvironment()) {
-            return $panel
-                ->default()
-                ->id('admin')
-                ->path('/admin')
-                ->login()
-                ->topbar(false)
-                ->userMenu(position: UserMenuPosition::Sidebar)
-                ->colors([
-                    'primary' => Color::Blue,
-                ])
-                // Keep the testing panel lean so sqlite memory databases never load heavy resources that expect extra tables.
+            // Keep the testing panel lightweight to avoid boot-time crashes that stem from heavy resource bootstrapping.
+            return $configuredPanel
                 ->resources([])
                 ->pages([])
-                ->widgets([])
-                ->middleware([
-                    \Illuminate\Session\Middleware\StartSession::class,
-                    \Illuminate\View\Middleware\ShareErrorsFromSession::class,
-                    \Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class,
-                    \Illuminate\Routing\Middleware\SubstituteBindings::class,
-                    \Illuminate\Auth\Middleware\Authenticate::class,
-                ])
-                ->authMiddleware([
-                    \Illuminate\Auth\Middleware\Authenticate::class,
-                ])
-                // Register the admin theme and companion JavaScript so plugin assets (including the combobox)
-                // are built for local testing environments.
-                ->viteTheme([
-                    'resources/css/filament/admin/theme.css',
-                    'resources/js/filament/admin/theme.js',
-                ]);
+                ->widgets([]);
         }
 
-        return $panel
-            ->default()
-            ->id('admin')
-            ->path('/admin')
-            ->login()
-            ->topbar(false)
-            ->userMenu(position: UserMenuPosition::Sidebar)
-            ->colors([
-                'primary' => Color::Blue,
-            ])
-            ->plugins([
-                $translatablePlugin,
-            ])
+        return $configuredPanel
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
             // ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
@@ -104,22 +57,6 @@ class AdminPanelProvider extends PanelProvider
                 GeneralStatsOverview::class,
                 SalesByMonthChart::class,
                 StatsOverviewWidget::class,
-            ])
-            ->middleware([
-                \Illuminate\Session\Middleware\StartSession::class,
-                \Illuminate\View\Middleware\ShareErrorsFromSession::class,
-                \Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class,
-                \Illuminate\Routing\Middleware\SubstituteBindings::class,
-                \Illuminate\Auth\Middleware\Authenticate::class,
-            ])
-            ->authMiddleware([
-                \Illuminate\Auth\Middleware\Authenticate::class,
-            ])
-            // Register the admin theme and companion JavaScript so plugin assets (including the combobox)
-            // are available throughout the production panel.
-            ->viteTheme([
-                'resources/css/filament/admin/theme.css',
-                'resources/js/filament/admin/theme.js',
             ]);
     }
 
@@ -164,77 +101,6 @@ class AdminPanelProvider extends PanelProvider
             ->authMiddleware([
                 \Illuminate\Auth\Middleware\Authenticate::class,
             ])
-            ->viteTheme('resources/css/filament/admin/theme.scss');
-    }
-
-    private function isTestingEnvironment(): bool
-    {
-        if (! function_exists('app')) {
-            return false;
-        }
-
-        $application = app();
-
-        if (! $application instanceof ApplicationContract) {
-            return false;
-        }
-
-        if (! method_exists($application, 'environment')) {
-            return false;
-        }
-
-        return $application->environment('testing');
-    }
-
-    private function makeSpatieTranslatablePlugin(): SpatieTranslatablePlugin
-    {
-        $plugin = SpatieTranslatablePlugin::make()
-            ->persist();
-
-        $locales = $this->resolveSupportedLocales();
-
-        if ($locales !== []) {
-            $plugin->defaultLocales($locales);
-        }
-
-        return $plugin;
-    }
-
-    /**
-     * @return array<int, string>
-     */
-    private function resolveSupportedLocales(): array
-    {
-        $configured = config('app.supported_locales', []);
-
-        if (is_string($configured)) {
-            $configured = array_map('trim', explode(',', $configured));
-        } elseif (! is_array($configured)) {
-            $configured = [];
-        }
-
-        $locales = array_filter(array_map(
-            static fn ($locale): string => (string) $locale,
-            $configured,
-        ));
-
-        $fallbackLocale = (string) config('app.fallback_locale', '');
-        $defaultLocale = (string) config('app.locale', 'en');
-
-        if ($fallbackLocale !== '') {
-            $locales[] = $fallbackLocale;
-        }
-
-        if ($defaultLocale !== '') {
-            $locales[] = $defaultLocale;
-        }
-
-        $locales = array_values(array_unique(array_filter($locales)));
-
-        if ($locales === []) {
-            return [$defaultLocale !== '' ? $defaultLocale : 'en'];
-        }
-
-        return $locales;
+            ->viteTheme('resources/css/filament/admin/theme.css');
     }
 }

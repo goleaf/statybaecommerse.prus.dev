@@ -12,31 +12,11 @@ use App\Models\ProductVariant;
 use App\Models\VariantAnalytics;
 use App\Support\Filament\Components\Flatpickr;
 use BackedEnum;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\KeyValue;
-use Filament\Forms\Components\Placeholder;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Tabs;
-use Filament\Forms\Components\Tabs\Tab;
-use Filament\Forms\Components\TextInput;
+use Filament\Forms;
+use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Support\Facades\Number;
-use Filament\Tables\Actions\Action;
-use Filament\Tables\Actions\BulkAction;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\ViewAction;
-use Filament\Tables\Columns\BadgeColumn;
-use Filament\Tables\Columns\TextColumn;
-use BackedEnum;
-use Filament\Tables\Filters\DateFilter;
-use Filament\Tables\Filters\Filter;
-use BackedEnum;
-use Filament\Tables\Filters\SelectFilter;
-use Filament\Tables\Filters\TernaryFilter;
+use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
@@ -53,7 +33,7 @@ final class VariantAnalyticsResource extends Resource
     protected static ?string $model = VariantAnalytics::class;
 
     /**
-     * @var string|BackedEnum|null Ensure Filament interprets the icon while supporting enums.
+     * @var string|BackedEnum|null Ensure Filament interprets the icon while supporting enums without forcing an import.
      */
     protected static $navigationIcon = 'heroicon-o-chart-bar-square';
 
@@ -108,72 +88,76 @@ final class VariantAnalyticsResource extends Resource
                         Forms\Components\Tabs\Tab::make(__('admin.variant_analytics.basic_info'))
                             ->icon('heroicon-o-information-circle')
                             ->schema([
-                                Section::make(__('admin.variant_analytics.basic_info'))
-                                    ->columns(2)
+                                Forms\Components\Section::make(__('admin.variant_analytics.basic_info'))
                                     ->schema([
-                                        Select::make('variant_id')
-                                            ->label(__('admin.variant_analytics.variant'))
-                                            ->relationship('variant', 'name')
-                                            ->required()
-                                            ->searchable()
-                                            ->preload()
-                                            ->live()
-                                            ->afterStateUpdated(static function (int|string|null $state, callable $set): void {
-                                                if ($state === null || $state === '') {
-                                                    return;
-                                                }
+                                        Forms\Components\Grid::make(2)
+                                            ->schema([
+                                                Forms\Components\Select::make('variant_id')
+                                                    ->label(__('admin.variant_analytics.variant'))
+                                                    ->relationship('variant', 'name')
+                                                    ->required()
+                                                    ->searchable()
+                                                    ->preload()
+                                                    ->live()
+                                                    ->afterStateUpdated(static function (int|string|null $state, callable $set): void {
+                                                        if ($state === null || $state === '') {
+                                                            return;
+                                                        }
 
                                                 $variant = \App\Models\ProductVariant::find($state);
                                                 if ($variant === null) {
                                                     return;
                                                 }
 
-                                                $set('variant_name', $variant->name);
-                                                $set('product_name', $variant->product->name ?? '');
-                                            }),
-                                        Flatpickr::makeDate('date')
-                                            ->label(__('admin.variant_analytics.date'))
-                                            ->required()
-                                            ->default(now())
-                                            ->maxDate(now())
-                                            ->live(),
-                                        Placeholder::make('variant_name')
-                                            ->label(__('admin.variant_analytics.variant_name'))
-                                            ->content(static fn (?VariantAnalytics $record): string => $record?->variant?->name ?? '')
-                                            ->columnSpanFull()
-                                            ->visible(static fn (?VariantAnalytics $record): bool => $record !== null),
-                                        Placeholder::make('product_name')
-                                            ->label(__('admin.variant_analytics.product_name'))
-                                            ->content(static fn (?VariantAnalytics $record): string => $record?->variant?->product?->name ?? '')
-                                            ->columnSpanFull()
-                                            ->visible(static fn (?VariantAnalytics $record): bool => $record !== null),
+                                                        $set('variant_name', $variant->name);
+                                                        $set('product_name', $variant->product->name ?? '');
+                                                    }),
+                                                Flatpickr::makeDate('date')
+                                                    ->label(__('admin.variant_analytics.date'))
+                                                    ->required()
+                                                    ->default(now())
+                                                    ->maxDate(now())
+                                                    ->live(),
+                                            ]),
+                                        Forms\Components\Grid::make(2)
+                                            ->schema([
+                                                Forms\Components\Placeholder::make('variant_name')
+                                                    ->label(__('admin.variant_analytics.variant_name'))
+                                                    ->content(static fn (?VariantAnalytics $record): string => $record?->variant?->name ?? '')
+                                                    ->visible(static fn (?VariantAnalytics $record): bool => $record !== null),
+                                                Forms\Components\Placeholder::make('product_name')
+                                                    ->label(__('admin.variant_analytics.product_name'))
+                                                    ->content(static fn (?VariantAnalytics $record): string => $record?->variant?->product?->name ?? '')
+                                                    ->visible(static fn (?VariantAnalytics $record): bool => $record !== null),
+                                            ]),
                                     ]),
                             ]),
                         Forms\Components\Tabs\Tab::make(__('admin.variant_analytics.metrics'))
                             ->icon('heroicon-o-chart-bar')
                             ->schema([
-                                Section::make(__('admin.variant_analytics.traffic_metrics'))
-                                    ->columns(3)
+                                Forms\Components\Section::make(__('admin.variant_analytics.traffic_metrics'))
                                     ->schema([
-                                        TextInput::make('views')
-                                            ->label(__('admin.variant_analytics.views'))
-                                            ->numeric()
-                                            ->minValue(0)
-                                            ->default(0)
-                                            ->live()
-                                            ->suffix('views'),
-                                        TextInput::make('clicks')
-                                            ->label(__('admin.variant_analytics.clicks'))
-                                            ->numeric()
-                                            ->minValue(0)
-                                            ->default(0)
-                                            ->live()
-                                            ->suffix('clicks'),
-                                        Placeholder::make('click_through_rate')
-                                            ->label(__('admin.variant_analytics.ctr'))
-                                            ->content(static function (callable $get): string {
-                                                $views = (float) $get('views');
-                                                $clicks = (float) $get('clicks');
+                                        Forms\Components\Grid::make(3)
+                                            ->schema([
+                                                Forms\Components\TextInput::make('views')
+                                                    ->label(__('admin.variant_analytics.views'))
+                                                    ->numeric()
+                                                    ->minValue(0)
+                                                    ->default(0)
+                                                    ->live()
+                                                    ->suffix('views'),
+                                                Forms\Components\TextInput::make('clicks')
+                                                    ->label(__('admin.variant_analytics.clicks'))
+                                                    ->numeric()
+                                                    ->minValue(0)
+                                                    ->default(0)
+                                                    ->live()
+                                                    ->suffix('clicks'),
+                                                Forms\Components\Placeholder::make('click_through_rate')
+                                                    ->label(__('admin.variant_analytics.ctr'))
+                                                    ->content(static function (callable $get): string {
+                                                        $views = (float) $get('views');
+                                                        $clicks = (float) $get('clicks');
 
                                                         if ($views > 0.0) {
                                                             // Use the shared Number facade to guarantee consistent percentage formatting.
@@ -184,40 +168,43 @@ final class VariantAnalyticsResource extends Resource
                                                     }),
                                             ]),
                                     ]),
-                                Section::make(__('admin.variant_analytics.conversion_metrics'))
-                                    ->columns(3)
+                                Forms\Components\Section::make(__('admin.variant_analytics.conversion_metrics'))
                                     ->schema([
-                                        TextInput::make('add_to_cart')
-                                            ->label(__('admin.variant_analytics.add_to_cart'))
-                                            ->numeric()
-                                            ->minValue(0)
-                                            ->default(0)
-                                            ->live()
-                                            ->suffix('adds'),
-                                        TextInput::make('purchases')
-                                            ->label(__('admin.variant_analytics.purchases'))
-                                            ->numeric()
-                                            ->minValue(0)
-                                            ->default(0)
-                                            ->live()
-                                            ->suffix('purchases'),
-                                        TextInput::make('revenue')
-                                            ->label(__('admin.variant_analytics.revenue'))
-                                            ->numeric()
-                                            ->minValue(0)
-                                            ->step(0.0001)
-                                            ->default(0)
-                                            ->live()
-                                            ->prefix('€'),
+                                        Forms\Components\Grid::make(3)
+                                            ->schema([
+                                                Forms\Components\TextInput::make('add_to_cart')
+                                                    ->label(__('admin.variant_analytics.add_to_cart'))
+                                                    ->numeric()
+                                                    ->minValue(0)
+                                                    ->default(0)
+                                                    ->live()
+                                                    ->suffix('adds'),
+                                                Forms\Components\TextInput::make('purchases')
+                                                    ->label(__('admin.variant_analytics.purchases'))
+                                                    ->numeric()
+                                                    ->minValue(0)
+                                                    ->default(0)
+                                                    ->live()
+                                                    ->suffix('purchases'),
+                                                Forms\Components\TextInput::make('revenue')
+                                                    ->label(__('admin.variant_analytics.revenue'))
+                                                    ->numeric()
+                                                    ->minValue(0)
+                                                    ->step(0.0001)
+                                                    ->default(0)
+                                                    ->live()
+                                                    ->prefix('€'),
+                                            ]),
                                     ]),
-                                Section::make(__('admin.variant_analytics.calculated_metrics'))
-                                    ->columns(3)
+                                Forms\Components\Section::make(__('admin.variant_analytics.calculated_metrics'))
                                     ->schema([
-                                        Placeholder::make('add_to_cart_rate')
-                                            ->label(__('admin.variant_analytics.atc_rate'))
-                                            ->content(static function (callable $get): string {
-                                                $clicks = (float) $get('clicks');
-                                                $addToCart = (float) $get('add_to_cart');
+                                        Forms\Components\Grid::make(3)
+                                            ->schema([
+                                                Forms\Components\Placeholder::make('add_to_cart_rate')
+                                                    ->label(__('admin.variant_analytics.atc_rate'))
+                                                    ->content(static function (callable $get): string {
+                                                        $clicks = (float) $get('clicks');
+                                                        $addToCart = (float) $get('add_to_cart');
 
                                                         if ($clicks > 0.0) {
                                                             // Keep add-to-cart percentages aligned with Filament's formatting helper.
@@ -226,7 +213,7 @@ final class VariantAnalyticsResource extends Resource
 
                                                         return Number::percentage(0.0, 2);
                                                     }),
-                                                Placeholder::make('purchase_rate')
+                                                Forms\Components\Placeholder::make('purchase_rate')
                                                     ->label(__('admin.variant_analytics.purchase_rate'))
                                                     ->content(static function (callable $get): string {
                                                         $addToCart = (float) $get('add_to_cart');
@@ -239,7 +226,7 @@ final class VariantAnalyticsResource extends Resource
 
                                                         return Number::percentage(0.0, 2);
                                                     }),
-                                                TextInput::make('conversion_rate')
+                                                Forms\Components\TextInput::make('conversion_rate')
                                                     ->label(__('admin.variant_analytics.conversion_rate'))
                                                     ->numeric()
                                                     ->minValue(0)
@@ -284,7 +271,7 @@ final class VariantAnalyticsResource extends Resource
                     ->toggleable()
                     ->copyable()
                     ->description(static fn (?VariantAnalytics $record): ?string => $record?->variant?->product?->name),
-                TextColumn::make('variant.sku')
+                Tables\Columns\TextColumn::make('variant.sku')
                     ->label(__('admin.variant_analytics.sku'))
                     ->searchable()
                     ->sortable()
@@ -334,7 +321,7 @@ final class VariantAnalyticsResource extends Resource
 
                         return 'danger';
                     }),
-                TextColumn::make('add_to_cart')
+                Tables\Columns\TextColumn::make('add_to_cart')
                     ->label(__('admin.variant_analytics.add_to_cart'))
                     ->numeric()
                     ->sortable()
@@ -365,7 +352,7 @@ final class VariantAnalyticsResource extends Resource
 
                         return 'danger';
                     }),
-                TextColumn::make('purchases')
+                Tables\Columns\TextColumn::make('purchases')
                     ->label(__('admin.variant_analytics.purchases'))
                     ->numeric()
                     ->sortable()
@@ -396,7 +383,7 @@ final class VariantAnalyticsResource extends Resource
 
                         return 'danger';
                     }),
-                TextColumn::make('revenue')
+                Tables\Columns\TextColumn::make('revenue')
                     ->label(__('admin.variant_analytics.revenue'))
                     ->money('EUR')
                     ->sortable()
@@ -433,7 +420,7 @@ final class VariantAnalyticsResource extends Resource
 
                         return 'danger';
                     }),
-                BadgeColumn::make('performance_status')
+                Tables\Columns\BadgeColumn::make('performance_status')
                     ->label(__('admin.variant_analytics.performance_status'))
                     ->getStateUsing(static function (VariantAnalytics $record): string {
                         $conversionRate = (float) $record->conversion_rate;
