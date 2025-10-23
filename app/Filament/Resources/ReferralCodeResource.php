@@ -208,11 +208,7 @@ final class ReferralCodeResource extends Resource
                     ->query(function (Builder $query, array $data): Builder {
                         $value = $data['reward_type'] ?? $data['value'] ?? null;
 
-                        if ($value === null) {
-                            return $query;
-                        }
-
-                        return $query->where('reward_type', $value);
+                        return $value ? $query->where('reward_type', $value) : $query;
                     }),
                 SelectFilter::make('user_id')
                     ->label(__('referral.filters.user'))
