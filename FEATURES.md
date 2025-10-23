@@ -17,7 +17,7 @@ This snapshot complements the changelog by listing functional capabilities that 
 - Analytical reports, project retrospectives, and rollout summaries consolidated inside [`docs/analysis/`](docs/analysis/).
 
 ## Latest Update
-- Country administration now honours Filament v4 schemas, widget tabs, and activation workflows even for inactive records by aliasing new action components, auto-filling city/address metadata during tests, and dropping the legacy ActiveScope filter from listings.
+- Filament autocomplete fields now ignore restrictive global scopes during lookups, so merchandising and catalog admins can find freshly seeded records without waiting for scope configuration tweaks.
 - Brands page now features a light-themed layout, shared card components, and refreshed translations so the partner directory feels consistent across locales.
 - Product variant showcase metrics now read raw stock fields so Livewire updates avoid extra inventory queries while keeping counts accurate in real time.
 - Region-to-city lookups and the dedicated customers table are restored for the SQLite harness, ensuring analytics sparklines, customer factories, and Filament resources can attach geographic metadata without migration errors.

@@ -7,7 +7,8 @@ The format is based on [Conventional Commits](https://www.conventionalcommits.or
 ## [Unreleased]
 
 ### Bug Fixes
-* Prevented the product variant showcase metrics from triggering extra inventory lookups by reading raw stock attributes, keeping cached counts query-free during Livewire interactions.
+* Ensured the Filament autocomplete select strips model global scopes before searching so admin lookups return newly seeded reco
+  rds and cached queries stay in sync with trimmed input.
 * Re-enabled flexible system setting translations by replacing the locale uniqueness constraint with an index, restoring soft delete support, and trimming the fillable contract so replication and counting scenarios match the documented API.
 * Preserved Attribute validation rule strings while still decoding JSON arrays, refreshed the Filament form so arrays render as comma-separated chips, and added regression coverage for both storage paths.
 * Reintroduced the `regions` schema with defensive guards and rebuilt the `customers`/`orders` relationship so SQLite-backed factories and analytics widgets can create location-aware records without missing column errors during tests.
