@@ -11,14 +11,22 @@ use Illuminate\Contracts\Support\Arrayable;
 use Stringable;
 
 /**
- * Shared glue for SearchableInput components so search result labels and payloads stay consistent.
+ * Shared utilities for hydrating and synchronising DefStudio SearchableInput components.
+ *
+ * The helper keeps Filament forms concise by pushing the canonical SearchResult payload
+ * back into the component every time we hydrate persisted state or update the live value.
  */
 final class SearchableComponentHelper
 {
+    private function __construct()
+    {
+        // Prevent instantiation because this helper only exposes static behaviour.
+    }
+
     /**
      * Hydrate a searchable component with its canonical SearchResult option.
      *
-     * @param Closure(int|string):?SearchResult $resolveResult Resolves a persisted state into a SearchResult DTO.
+     * @param Closure(int|string):(?SearchResult) $resolveResult Resolves a persisted state into a SearchResult DTO.
      */
     public static function hydrate(SearchableInput $component, int|string|null $state, Closure $resolveResult): void
     {
@@ -45,8 +53,8 @@ final class SearchableComponentHelper
      * The helper keeps the component options in sync with the canonical payload and wipes
      * everything when the state is empty so Livewire does not keep stale labels or metadata.
      *
-     * @param Closure(int|string):?SearchResult $resolveResult Resolves the current state into a SearchResult DTO.
-     * @param callable(string, mixed):void      $set           Filament's Set helper (or compatible callable) for updating state.
+     * @param callable(string, mixed):void        $set           Filament's Set helper (or compatible callable) for updating state.
+     * @param Closure(int|string):(?SearchResult) $resolveResult Resolves the current state into a SearchResult DTO.
      */
     public static function sync(
         SearchableInput $component,
@@ -88,7 +96,7 @@ final class SearchableComponentHelper
     }
 
     /**
-     * Inject the canonical SearchResult into the component options so Livewire re-renders the stored label.
+     * Push the canonical SearchResult payload back into the component.
      */
     private static function applyResult(SearchableInput $component, SearchResult $result): void
     {

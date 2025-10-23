@@ -27,7 +27,7 @@ Each service scopes queries, limits results to 15 entries, and returns either pl
 
 ### Searchable component helper
 
-The `App\Support\Search\SearchableComponentHelper` centralises `afterStateHydrated` and `afterStateUpdated` logic so every Filament form clears payloads and Livewire options consistently. Use `hydrate()` to repopulate labels when editing a record and `syncSelectedRecord()` to update related attributes (such as `product_id`) while clearing stale state when the field is emptied. The helper also exposes a `clear()` utility that resets both the selected value and dropdown options, ensuring the plugin does not keep orphaned payload metadata in the form state.
+The `App\Support\Filament\SearchableComponentHelper` centralises `afterStateHydrated` and `afterStateUpdated` logic so every Filament form clears payloads and Livewire options consistently. Use `SearchableComponentHelper::hydrate()` to repopulate labels when editing a record and `SearchableComponentHelper::sync()` to update related attributes (such as `product_id`) while clearing stale state when the field is emptied. The helper also exposes a `clear()` utility that resets both the selected value and dropdown options, ensuring the plugin does not keep orphaned payload metadata in the form state.
 
 ### Theme requirements
 
