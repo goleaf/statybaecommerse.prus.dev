@@ -20,12 +20,8 @@ A multilingual Laravel 12 + Filament v4 storefront and admin panel for managing 
 
 ## Documentation
 - Start with the curated [documentation index](docs/INDEX.md) for the setup → deploy → data model → admin guide → troubleshooting path.
-- Browse the rest of the knowledge base directly in [docs/](docs/).
-- Before contributing new guides, skim the [Documentation Style Guide](docs/CONTRIBUTING_DOCS.md) to keep tone and structure consistent.
-- When adding large diagrams or appendices, double-check that each file stays under 2MB so the documentation size guard in CI continues to pass.
-
-## Latest updates
-- Feature flag administration now surfaces inactive and disabled flags so operators can audit and re-enable them without reaching for database tooling.
+- Follow the living [documentation style guide](docs/STYLE_GUIDE.md) when adding reports, runbooks, or contracts so navigation stays predictable.
+- Browse the rest of the knowledge base directly in [docs/](docs/), especially the dedicated [analysis](docs/analysis), [runbooks](docs/runbooks), and [contracts](docs/contracts) directories introduced during the consolidation effort.
 
 ## Requirements
 - PHP 8.2+ with `ext-sqlite3`, `ext-fileinfo`, and `ext-gd`
@@ -115,7 +111,7 @@ composer run dev
 
 ## Further reading
 - Start with [docs/INDEX.md](docs/INDEX.md) for a curated guide to deployment runbooks, feature deep-dives, and historical archives.
-- Need domain-level context? Check [docs/analysis/COMPANY_RESOURCE_ANALYSIS.md](docs/analysis/COMPANY_RESOURCE_ANALYSIS.md) and the project summaries in `docs/`.
-- Want a system tour? Review [docs/ARCHITECTURE_OVERVIEW.md](docs/ARCHITECTURE_OVERVIEW.md) for component breakdowns and integration diagrams.
+- Need domain-level context? Check [docs/analysis/COMPANY_RESOURCE_ANALYSIS.md](docs/analysis/COMPANY_RESOURCE_ANALYSIS.md) and the project summaries collected under [docs/analysis/](docs/analysis/).
+- Want a system tour? Review [docs/ARCHITECTURE_OVERVIEW.md](docs/ARCHITECTURE_OVERVIEW.md) for component breakdowns and integration diagrams, then keep the runbooks in [docs/runbooks/](docs/runbooks/) close for operational workflows.
 
 Happy building!

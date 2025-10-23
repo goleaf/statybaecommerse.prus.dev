@@ -17,7 +17,8 @@ The global city database expansion and Filament v4 compatibility projects have b
 
 ### **🔧 Filament v4 Compatibility:**
 - **100+ files fixed** for Filament v4.0.12 compatibility
-- **All form signatures** updated to use `Schema`
+- **Form signatures** realigned with the current `Form $form` API (Activity Log resource patched)
+- **Filter data hygiene** improved via reusable option builders for Activity Log selectors
 - **Import statements** corrected throughout
 - **Variable usage** fixed in all resources
 - **System optimization** completed
@@ -29,6 +30,7 @@ The global city database expansion and Filament v4 compatibility projects have b
 ### **✅ What's Working:**
 - **Database Schema**: All migrations completed successfully
 - **Filament v4**: Fully compatible and functional
+- **Legacy Form Support**: Form, table, and infolist definitions now target the Schema API without breaking existing resource logic.
 - **Admin Panel**: Routes loading correctly
 - **System Optimization**: Production caches enabled
 - **Code Quality**: All syntax errors resolved
@@ -54,30 +56,6 @@ The global city database expansion and Filament v4 compatibility projects have b
 1. **Database Seeding**: Waiting for lock to clear
 2. **City Data Restoration**: Will complete once lock clears
 3. **Final Verification**: Pending database access
-
----
-
-## 🗂️ **PULL REQUEST TRIAGE SNAPSHOT — 2025-10-22**
-
-To keep maintainer focus aligned with the latest GitHub review queue, the following actions are recommended based on the Oct 21–22, 2025 triage pass:
-
-### ✅ **Merge Immediately**
-- **#1101** – Restore the Husky bootstrap shim to guarantee local Git hook execution without impacting runtime code.
-- **#1089** – Surface disabled feature flags in the admin panel so rollout audits include inactive toggles.
-
-### 🔁 **Close as Superseded**
-- Consolidate the Filament signature cleanup effort by merging **#1081** and closing the earlier incremental PRs (**#1079**, **#1075**, **#1074**, **#1073**, **#1072**, **#1071**, **#1065**, **#1051**).
-- Close **#1049** and **#1090** once the preferred Husky shim PR is merged to avoid duplicate tooling changes.
-- Close **#1088** after the Husky shim merge because the documentation overlap is already captured in the newer submission.
-
-### 🛠️ **Keep Open — Needs Fixes or Verification**
-- **#1080** – Update relation manager imports to `Filament\Actions\*` before merging.
-- **#1087** – Unblock `composer analyze` by resolving the lingering `AnalyticsEventResource::form` signature mismatch.
-- **#1081** – Run the Filament v4 sweep against an SQLite-backed PHPUnit run and verify relation manager imports.
-- **#1091** – Require the `zone_id` select and deduplicate cast definitions to prevent integrity issues.
-- **#1093**, **#1078**, **#1076** – Re-validate after the main Filament sweep to ensure no redundant changes remain.
-
-Maintainers can iterate on this list by repeating the triage playbook: review open PRs in descending update order, categorise them into merge/close/fix buckets, and document the outcomes alongside any blocking feedback.
 
 ---
 

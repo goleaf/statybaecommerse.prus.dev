@@ -49,12 +49,12 @@ Laravel 12 provides the HTTP kernel, queue worker, and scheduler. Filament v4 su
 - `Makefile` — Wraps composer/npm commands for setup, quality checks, database resets, and dev-server orchestration.
 - `composer.json` scripts — Provide QA loops (`lint:php`, `analyze`, `fix`), docs maintenance (`docs:*`), and queue/cache helpers.
 - `package.json` scripts — Frontend build/dev plus MCP utilities (`mcp:filament`) and smoke-test runners (`scripts/e2e-*.mjs`).
-- `autofix-realtime.sh` — Launches the real-time autofix workflow described in `docs/REALTIME_AUTOFIX_GUIDE.md`.
+- `autofix-realtime.sh` — Launches the real-time autofix workflow described in `docs/runbooks/REALTIME_AUTOFIX_GUIDE.md`.
 
 ## Development quick reference
 
 - Use `make dev` for an all-in-one dev environment (PHP server, queue listener, Laravel Pail logs, Vite dev server).
 - Run `make analyse` before committing to combine Pint (style) and PHPStan (static analysis).
 - Horizon dashboard available at `/horizon` when running the queue worker.
-- Dusk/browser tests require `php artisan serve` + ChromeDriver; see `docs/TEST_ORGANIZATION_SUMMARY.md` for patterns.
-- Explore domain history and project evolution through the curated summaries in `docs/` — start with `docs/PROJECT_HANDOVER_DOCUMENTATION.md` and `docs/analysis/COMPANY_RESOURCE_ANALYSIS.md`.
+- Dusk/browser tests require `php artisan serve` + ChromeDriver; see `docs/analysis/TEST_ORGANIZATION_SUMMARY.md` for patterns.
+- Explore domain history and project evolution through the curated summaries in `docs/analysis/` — start with `docs/analysis/PROJECT_HANDOVER_DOCUMENTATION.md` and `docs/analysis/COMPANY_RESOURCE_ANALYSIS.md`.

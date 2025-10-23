@@ -9,9 +9,44 @@ on:
       - main
 
 jobs:
+  documentation-size:
+    name: Documentation Size Guard
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Ensure documentation files remain below 2 MB
+        run: |
+          python <<'PY'
+from pathlib import Path
+import sys
+
+# Guardrail: keep Markdown and ancillary docs below 2 MB so they stay reviewable in Git.
+limit_bytes = 2 * 1024 * 1024
+violations = []
+
+for path in Path("docs").rglob("*"):
+    if not path.is_file():
+        continue
+    size = path.stat().st_size
+    if size > limit_bytes:
+        violations.append((path, size))
+
+if violations:
+    print("The following documentation files exceed the 2 MB limit:")
+    for path, size in violations:
+        print(f" - {path} ({size} bytes)")
+    sys.exit(1)
+
+# Provide positive feedback to make CI logs easier to parse.
+print("All documentation files are below the 2 MB threshold.")
+PY
+
   migration-freeze:
     name: Migration Freeze Guard
     runs-on: ubuntu-latest
+    needs: documentation-size
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
