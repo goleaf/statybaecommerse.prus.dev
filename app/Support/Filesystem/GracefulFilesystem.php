@@ -56,7 +56,7 @@ final class GracefulFilesystem extends Filesystem
             // Symfony's Finder occasionally lags behind fresh directories in fast test loops.
             $directories = array_values(array_filter(
                 glob(rtrim($directory, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . '*', GLOB_ONLYDIR) ?: [],
-                static fn ($path): bool => is_string($path) && $path !== ''
+                static fn (string $path): bool => is_string($path) && $path !== ''
             ));
         }
 
@@ -100,7 +100,8 @@ final class GracefulFilesystem extends Filesystem
     }
 
     /**
-     * Mirror parent directory creation while remembering the path for subsequent lookups.
+     * Ensure downstream callers inherit the parent behaviour while also keeping
+     * track of the directory for later cache hits and preparing backup storage.
      */
     public function makeDirectory($path, $mode = 0755, $recursive = false, $force = false)
     {
@@ -108,9 +109,22 @@ final class GracefulFilesystem extends Filesystem
 
         if ($created) {
             self::remember($path);
+            $this->ensureSqliteBackupFile((string) $path);
         }
 
         return $created;
+    }
+
+    /**
+     * Guarantee directory existence mirrors Laravel's Filesystem while also
+     * preparing SQLite backup files whenever the configured path lives within
+     * the requested directory.
+     */
+    public function ensureDirectoryExists($path, $mode = 0755, $recursive = true): void
+    {
+        parent::ensureDirectoryExists($path, $mode, $recursive);
+
+        $this->ensureSqliteBackupFile((string) $path);
     }
 
     /**
@@ -141,5 +155,58 @@ final class GracefulFilesystem extends Filesystem
         }
 
         return true;
+    }
+
+    /**
+     * Lazily create the configured SQLite backup database when its directory is prepared.
+     */
+    private function ensureSqliteBackupFile(string $directory): void
+    {
+        $connection = config('backup.connection');
+
+        if (! is_string($connection) || $connection === '') {
+            return;
+        }
+
+        $config = config("database.connections.{$connection}");
+
+        if (! is_array($config) || ($config['driver'] ?? null) !== 'sqlite') {
+            return;
+        }
+
+        $databasePath = $config['database'] ?? null;
+
+        if (! is_string($databasePath) || $databasePath === '') {
+            return;
+        }
+
+        if (str_contains($databasePath, ':memory:') || str_contains($databasePath, 'mode=memory')) {
+            return;
+        }
+
+        $targetDirectory = rtrim(dirname($databasePath), DIRECTORY_SEPARATOR);
+        $normalisedDirectory = rtrim($directory, DIRECTORY_SEPARATOR);
+
+        if ($targetDirectory === '' || $targetDirectory !== $normalisedDirectory) {
+            return;
+        }
+
+        if ($this->exists($databasePath)) {
+            return;
+        }
+
+        // Touch the configured SQLite database so future connection attempts succeed immediately.
+        $handle = @fopen($databasePath, 'cb');
+
+        if ($handle === false) {
+            logger()->warning('filesystem.unable_to_initialize_backup_sqlite', [
+                'path' => $databasePath,
+            ]);
+
+            return;
+        }
+
+        fclose($handle);
+        @chmod($databasePath, 0o666);
     }
 }

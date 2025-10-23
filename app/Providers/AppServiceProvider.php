@@ -7,6 +7,7 @@ namespace App\Providers;
 use App\Console\Commands\ProfiledSeedCommand;
 use App\Contracts\DocumentServiceContract;
 use App\Contracts\HealthReporter as HealthReporterContract;
+use App\Database\Connectors\GracefulSQLiteConnector;
 use App\Domain\Product\Repositories\ProductRepositoryInterface;
 use App\Filament\Components\LiveNotificationFeed;
 use App\Infrastructure\Product\Repositories\EloquentProductRepository;
@@ -99,6 +100,9 @@ class AppServiceProvider extends ServiceProvider
         // Replace the default filesystem binding with the graceful shim for deterministic backup tests.
         $this->app->singleton(Filesystem::class, static fn (): Filesystem => new GracefulFilesystem);
         $this->app->alias(Filesystem::class, 'files');
+
+        // Provide a SQLite connector that creates the backing file before Laravel resolves the connection.
+        $this->app->bind('db.connector.sqlite', static fn (): GracefulSQLiteConnector => new GracefulSQLiteConnector);
 
         if ($this->app->runningInConsole()) {
             // Register import utilities and override the core db:seed command with a profiled variant.
@@ -299,8 +303,8 @@ class AppServiceProvider extends ServiceProvider
             }
 
             $signature = $apiKey instanceof ApiKey
-                ? 'partner-api:'.$apiKey->getKey()
-                : 'partner-api:anonymous:'.sha1($request->header('X-Api-Key', '').'|'.$request->ip());
+                ? 'partner-api:' . $apiKey->getKey()
+                : 'partner-api:anonymous:' . sha1($request->header('X-Api-Key', '') . '|' . $request->ip());
 
             $limit = $apiKey instanceof ApiKey
                 ? $apiKey->toRateLimit()
