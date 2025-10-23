@@ -9,7 +9,6 @@ use App\Support\Concerns\HasNav;
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\ReportResource\Pages;
 use App\Models\Report;
-use App\Support\Filament\Components\Flatpickr;
 use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
@@ -42,6 +41,7 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Str;
 use UnitEnum;
 
 final class ReportResource extends Resource
@@ -51,14 +51,20 @@ final class ReportResource extends Resource
     /**
      * @var UnitEnum|string|null
      */
-    
+    public static function getNavigationGroup(): UnitEnum|string|null
+    {
+        return NavigationGroup::Reports;
+    }
 
     protected static ?string $model = Report::class;
 
     /**
      * @var string|BackedEnum|null
      */
-    
+    public static function getNavigationIcon(): BackedEnum|\Illuminate\Contracts\Support\Htmlable|string|null
+    {
+        return 'heroicon-o-document-chart-bar';
+    }
 
     protected static ?int $navigationSort = 17;
 
@@ -230,13 +236,13 @@ final class ReportResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->colors([
-                        'success' => ['sales'],
-                        'info' => ['inventory'],
-                        'warning' => ['customer'],
-                        'primary' => ['product'],
-                        'danger' => ['financial'],
+                        'success'   => ['sales'],
+                        'info'      => ['inventory'],
+                        'warning'   => ['customer'],
+                        'primary'   => ['product'],
+                        'danger'    => ['financial'],
                         'secondary' => ['analytics'],
-                        'gray' => ['custom'],
+                        'gray'      => ['custom'],
                     ])
                     ->formatStateUsing(fn (string $state): string => __("reports.types.{$state}")),
                 BadgeColumn::make('category')
@@ -244,13 +250,13 @@ final class ReportResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->colors([
-                        'success' => ['sales'],
-                        'info' => ['marketing'],
-                        'warning' => ['operations'],
-                        'danger' => ['finance'],
-                        'primary' => ['customer_service'],
+                        'success'   => ['sales'],
+                        'info'      => ['marketing'],
+                        'warning'   => ['operations'],
+                        'danger'    => ['finance'],
+                        'primary'   => ['customer_service'],
                         'secondary' => ['inventory'],
-                        'gray' => ['analytics'],
+                        'gray'      => ['analytics'],
                     ])
                     ->formatStateUsing(fn (string $state): string => __("reports.categories.{$state}")),
                 TextColumn::make('generator.name')
