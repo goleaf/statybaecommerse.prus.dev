@@ -15,6 +15,20 @@ final class CategoryCatalogueDataProvider
 
     public function __construct(private readonly ProductCatalogueDataProvider $products) {}
 
+    public function index(): array
+    {
+        $categories = Category::query()
+            ->with(['children' => static function (Builder $query): void {
+                $query->orderBy('name');
+            }])
+            ->orderBy('name')
+            ->get();
+
+        return [
+            'categories' => $categories,
+        ];
+    }
+
     public function show(Category $category, array $filters = []): array
     {
         $category->loadMissing(['parent', 'children']);
