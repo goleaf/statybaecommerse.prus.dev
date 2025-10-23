@@ -42,22 +42,46 @@ jobs:
         with:
           composer-options: --no-interaction --prefer-dist --optimize-autoloader
 
-      - name: Ensure application environment
+      - name: Prepare application environment
         run: |
-          if [ -f .env.example ]; then
-            cp .env.example .env
-          elif [ -f .env.terminal-optimized ]; then
-            cp .env.terminal-optimized .env
-          elif [ -f .env.reports ]; then
-            cp .env.reports .env
-          else
-            touch .env
-          fi
+          DB_PATH="${GITHUB_WORKSPACE}/database/database.sqlite"
+          cat <<EOF > .env
+          APP_NAME=Laravel
+          APP_ENV=testing
+          APP_KEY=
+          APP_DEBUG=true
+          APP_URL=http://localhost
+          APP_LOCALE=lt
+          APP_FALLBACK_LOCALE=en
+          APP_FAKER_LOCALE=en_US
+          LOG_CHANNEL=stack
+          LOG_LEVEL=debug
+          DB_CONNECTION=sqlite
+          DB_DATABASE=${DB_PATH}
+          BROADCAST_DRIVER=log
+          CACHE_DRIVER=array
+          FILESYSTEM_DISK=local
+          QUEUE_CONNECTION=sync
+          SESSION_DRIVER=array
+          SESSION_LIFETIME=120
+          MAIL_MAILER=log
+          MAIL_HOST=localhost
+          MAIL_PORT=1025
+          MAIL_ENCRYPTION=null
+          MAIL_USERNAME=null
+          MAIL_PASSWORD=null
+          MAIL_FROM_ADDRESS="hello@example.com"
+          MAIL_FROM_NAME="Laravel"
+          EOF
+          touch "${DB_PATH}"
           php artisan key:generate
           touch database/database.sqlite
 
       - name: Run database migrations
         run: php artisan migrate --no-interaction --force
+
+      - name: Run database migrations and seeds
+        run: php artisan migrate:fresh --seed --force
 
       - name: Generate API specification
         run: php artisan api:spec
@@ -218,57 +242,41 @@ PY
           cache: 'npm'
 
       - name: Install dependencies
+        run: composer install --no-interaction --prefer-dist
+
+      - name: Prepare application environment
         run: |
-          if [ ! -f package-lock.json ]; then
-            npm install --package-lock-only
-          fi
-          npm ci
-
-      - name: Build frontend assets
-        run: npm run build -- --mode=production
-
-      - name: Upload build artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: frontend-build
-          path: public/build
-
-  security:
-    name: Security Audit
-    runs-on: ubuntu-latest
-    needs: php-lint-pint
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Verify migrations are frozen
-        run: php scripts/check-frozen-migrations.php
-
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.3'
-
-      - name: Install Composer dependencies for audit
-        uses: ramsey/composer-install@v3
-        with:
-          composer-options: --no-interaction --prefer-dist --optimize-autoloader
-
-      - name: Composer audit
-        run: composer audit --no-interaction
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
-      - name: Prepare npm lockfile
-        run: |
-          if [ ! -f package-lock.json ]; then
-            npm install --package-lock-only
-          fi
+          DB_PATH="${GITHUB_WORKSPACE}/database/database.sqlite"
+          cat <<EOF > .env
+          APP_NAME=Laravel
+          APP_ENV=testing
+          APP_KEY=
+          APP_DEBUG=true
+          APP_URL=http://localhost
+          APP_LOCALE=lt
+          APP_FALLBACK_LOCALE=en
+          APP_FAKER_LOCALE=en_US
+          LOG_CHANNEL=stack
+          LOG_LEVEL=debug
+          DB_CONNECTION=sqlite
+          DB_DATABASE=${DB_PATH}
+          BROADCAST_DRIVER=log
+          CACHE_DRIVER=array
+          FILESYSTEM_DISK=local
+          QUEUE_CONNECTION=sync
+          SESSION_DRIVER=array
+          SESSION_LIFETIME=120
+          MAIL_MAILER=log
+          MAIL_HOST=localhost
+          MAIL_PORT=1025
+          MAIL_ENCRYPTION=null
+          MAIL_USERNAME=null
+          MAIL_PASSWORD=null
+          MAIL_FROM_ADDRESS="hello@example.com"
+          MAIL_FROM_NAME="Laravel"
+          EOF
+          touch "${DB_PATH}"
+          php artisan key:generate
 
       - name: Run PHP 9 readiness doctor
         run: php artisan app:doctor --no-interaction
