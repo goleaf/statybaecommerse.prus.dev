@@ -43,7 +43,7 @@ use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use BackedEnum;
+use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use BackedEnum;
@@ -58,9 +58,7 @@ final class VariantAnalyticsResource extends Resource
 {
     use HasNav;
 
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar-square';
-
-    protected static BackedEnum|UnitEnum|string|null $navigationGroup = 'Inventory';
+    protected static UnitEnum|string|null $navigationGroup = 'Inventory';
 
     protected static ?int $navigationSort = 2;
 
@@ -82,6 +80,11 @@ final class VariantAnalyticsResource extends Resource
     public static function getModelLabel(): string
     {
         return __('admin.variant_analytics.model_label');
+    }
+
+    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
+    {
+        return 'heroicon-o-chart-bar-square';
     }
 
     public static function form(Form $form): Form

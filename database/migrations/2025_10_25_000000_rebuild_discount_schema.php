@@ -110,6 +110,34 @@ return new class extends Migration
     private function rebuildDiscountRedemptions(): void
     {
         if (! Schema::hasTable('discount_redemptions')) {
+            Schema::create('discount_redemptions', function (Blueprint $table): void {
+                $table->id();
+                $table->foreignId('discount_id')->nullable()->constrained('discounts')->nullOnDelete();
+                $table->foreignId('code_id')->nullable()->constrained('discount_codes')->nullOnDelete();
+                $table->foreignId('order_id')->nullable()->constrained('orders')->nullOnDelete();
+                $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
+                $table->decimal('amount_saved', 12, 2)->default(0);
+                $table->char('currency_code', 3)->nullable();
+                $table->timestamp('redeemed_at')->nullable();
+                $table->string('status')->default('pending');
+                $table->string('notes')->nullable();
+                $table->ipAddress('ip_address')->nullable();
+                $table->string('user_agent')->nullable();
+                $table->json('metadata')->nullable();
+                $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
+                $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
+                $table->timestamps();
+                $table->softDeletes();
+
+                $table->index(['discount_id', 'status'], 'discount_redemptions_discount_status_idx');
+                $table->index(['code_id', 'user_id'], 'discount_redemptions_code_user_idx');
+                $table->index(['user_id', 'status'], 'discount_redemptions_user_status_idx');
+                $table->index(['order_id', 'status'], 'discount_redemptions_order_status_idx');
+                $table->index(['redeemed_at']);
+                $table->index(['created_by']);
+                $table->index(['updated_by']);
+            });
+
             return;
         }
 

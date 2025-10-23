@@ -42,15 +42,11 @@ it('has correct model', function (): void {
 });
 
 it('has correct navigation group', function (): void {
-    expect(DiscountRedemptionResource::getNavigationGroup())->toBe(
-        Nav::groupForResource(DiscountRedemptionResource::class)
-    );
+    expect(DiscountRedemptionResource::getNavigationGroup())->toBe('Discounts');
 });
 
 it('has correct navigation icon', function (): void {
-    expect(DiscountRedemptionResource::getNavigationIcon())->toBe(
-        Nav::iconForResource(DiscountRedemptionResource::class)
-    );
+    expect(DiscountRedemptionResource::getNavigationIcon())->toBe('heroicon-o-receipt-percent');
 });
 
 it('has correct navigation sort', function (): void {
@@ -77,5 +73,5 @@ it('has navigation badge', function (): void {
 });
 
 it('has navigation badge color', function (): void {
-    expect(DiscountRedemptionResource::getNavigationBadgeColor())->toBe('warning');
+    expect(DiscountRedemptionResource::getNavigationBadgeColor())->toBeNull();
 });
