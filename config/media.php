@@ -36,4 +36,34 @@ return [
         'medium' => ['width' => 720, 'height' => 720],
         'large' => ['width' => 1440, 'height' => 1440],
     ],
+
+    'placeholders' => [
+        'app' => [
+            'fallback' => 'images/placeholder.jpg',
+        ],
+        'product' => [
+            'uuid' => env('MEDIA_PLACEHOLDER_PRODUCT_UUID'),
+            'fallback' => 'images/placeholder-product.jpg',
+            'variants' => [
+                'thumb' => 'thumb',
+                'medium' => 'medium',
+                'large' => 'large',
+                'default' => null,
+            ],
+        ],
+        'product_png' => [
+            'uuid' => env('MEDIA_PLACEHOLDER_PRODUCT_PNG_UUID'),
+            'fallback' => 'images/placeholder-product.png',
+            'variants' => [
+                'thumb' => 'thumb',
+                'medium' => 'medium',
+                'large' => 'large',
+                'default' => null,
+            ],
+        ],
+        'og' => [
+            'uuid' => env('MEDIA_PLACEHOLDER_OG_UUID'),
+            'fallback' => 'images/og-default.jpg',
+        ],
+    ],
 ];
