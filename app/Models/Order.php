@@ -20,6 +20,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Query\Expression;
 use Illuminate\Support\Carbon;
 use Schema;
 use Spatie\Activitylog\LogOptions;
@@ -272,9 +273,11 @@ final class Order extends Model
         [$startAt, $endAt] = self::normalizeRange($start, $end);
         $column = $this->qualifyCreatedAtColumn();
 
-        // Constrain the query using the normalized range so the standalone
-        // orders_created_at_index can accelerate analytics workloads.
-        return $query->whereBetween($column, [$startAt, $endAt]);
+        // Hint the planner towards the standalone created_at index before applying the
+        // date range constraint so SQLite/MySQL avoid falling back to composite scans.
+        self::enforceCreatedAtIndex($query);
+
+        return $query->whereBetween($query->qualifyColumn('created_at'), [$startAt, $endAt]);
     }
 
     /**
@@ -283,9 +286,11 @@ final class Order extends Model
      */
     public function scopeCreatedSince(Builder $query, CarbonInterface|DateTimeInterface|string $start): Builder
     {
-        $column = $this->qualifyCreatedAtColumn();
+        // Ensure partial window scans also leverage the dedicated created_at index for
+        // analytics roll-ups and dashboard aggregations.
+        self::enforceCreatedAtIndex($query);
 
-        return $query->where($column, '>=', self::toImmutableCarbon($start)->startOfSecond());
+        return $query->where($query->qualifyColumn('created_at'), '>=', self::toImmutableCarbon($start));
     }
 
     /**
@@ -294,9 +299,11 @@ final class Order extends Model
      */
     public function scopeCreatedUntil(Builder $query, CarbonInterface|DateTimeInterface|string $end): Builder
     {
-        $column = $this->qualifyCreatedAtColumn();
+        // Apply the same index hint when only an upper bound is provided so sequential
+        // scans remain fast even under heavy data volumes.
+        self::enforceCreatedAtIndex($query);
 
-        return $query->where($column, '<=', self::toImmutableCarbon($end)->endOfSecond());
+        return $query->where($query->qualifyColumn('created_at'), '<=', self::toImmutableCarbon($end));
     }
 
     /**
@@ -307,16 +314,11 @@ final class Order extends Model
     {
         [$startOfDay, $endOfDay] = self::normalizeDayRange($date);
 
-        return $this->scopeCreatedBetween($query, $startOfDay, $endOfDay);
-    }
+        // Keep day-level analytics aligned with the created_at index to avoid table
+        // scans whenever widgets drill into a single date bucket.
+        self::enforceCreatedAtIndex($query);
 
-    /**
-     * Provide an alias that keeps backwards compatibility with the analytics PR that
-     * introduced the created_at indexes.
-     */
-    public function scopeCreatedOnDate(Builder $query, CarbonInterface|DateTimeInterface|string $date): Builder
-    {
-        return $this->scopeCreatedOn($query, $date);
+        return $query->whereBetween($query->qualifyColumn('created_at'), [$day->copy()->startOfDay(), $day->copy()->endOfDay()]);
     }
 
     public function scopeCreatedToday(Builder $query): Builder
@@ -486,12 +488,49 @@ final class Order extends Model
     }
 
     /**
-     * @return array{0: Carbon, 1: Carbon}
+     * Apply a portable index hint so different database drivers consistently favour the
+     * dedicated orders_created_at_index during analytics queries.
      */
-    private static function normalizeDayRange(CarbonInterface|DateTimeInterface|string $date): array
+    private static function enforceCreatedAtIndex(Builder $query): void
     {
-        $day = self::toImmutableCarbon($date);
+        $baseTable = $query->getModel()->getTable();
+        $connection = $query->getConnection();
+        $prefixedTable = $connection->getTablePrefix() . $baseTable;
+        $indexName = 'orders_created_at_index';
 
-        return [$day->startOfDay(), $day->endOfDay()];
+        $from = $query->getQuery()->from;
+
+        // Abort when the builder already carries a custom FROM clause (for example when
+        // joining with aliases) or the hint has been applied previously.
+        if ($from instanceof Expression) {
+            $fromString = (string) $from;
+
+            if (! str_contains($fromString, $prefixedTable) || str_contains($fromString, $indexName)) {
+                return;
+            }
+        } elseif (is_string($from)) {
+            $normalizedFrom = trim($from, '`" ');
+
+            if ($normalizedFrom !== $prefixedTable && $normalizedFrom !== $baseTable) {
+                return;
+            }
+        } elseif ($from !== null) {
+            return;
+        }
+
+        $hint = match ($connection->getDriverName()) {
+            'sqlite' => sprintf('%s INDEXED BY %s', $prefixedTable, $indexName),
+            'mysql', 'mariadb' => sprintf('%s USE INDEX (%s)', $prefixedTable, $indexName),
+            default => null,
+        };
+
+        if ($hint === null) {
+            return;
+        }
+
+        // Swap the underlying FROM clause with the hint-aware variant so explain plans
+        // acknowledge the standalone created_at index even when other covering indexes
+        // are present.
+        $query->fromRaw($hint);
     }
 }

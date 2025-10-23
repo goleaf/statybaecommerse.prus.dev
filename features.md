@@ -17,6 +17,7 @@
 - Orders now seed using the broadened `orders.status` enum (covering confirmed/completed/returned) so MySQL no longer truncates demo data during `php artisan migrate:fresh --seed` and admin analytics stay in sync.
 - Data import tooling keeps its foreign key safety net covered in tests by invoking the protected truncation helper via reflection, allowing the final Artisan command to remain sealed while still exercising failure recovery.
 - Created_at index migrations now detect pre-existing keys case-insensitively (with driver-specific fallbacks) and the demo currency/country seeds align with multilingual schemas, so `php artisan migrate:fresh --seed` completes reliably across supported databases.
+- Order analytics scopes now hint the standalone created-at index, the orders table seeds that index on fresh installs, and the refined ActiveScope lets diagnostics seeders retain processing orders for regression coverage.
 - Discount rebuild migrations now temporarily relax foreign key checks only while replaying legacy rows, preventing the `discount_codes_created_by_foreign` MySQL error during full refreshes without sacrificing referential integrity.
 - User and author foreign keys on rebuilt discount tables now attach after verifying the `users` table compatibility, ensuring MySQL restores with mixed storage engines keep migrating without tripping the `discount_codes_created_by_foreign` system-table check.
 - User-product interaction factories now default to alternate interaction types

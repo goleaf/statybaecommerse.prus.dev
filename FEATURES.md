@@ -34,6 +34,10 @@ This snapshot complements the changelog by listing functional capabilities that 
   exposing their translation model and defaulting fresh `converted_at` values, so
   completed, pending, and other lifecycle records remain accessible to analytics
   tooling without fighting an `is_active` filter that the table never exposed.
+- Order analytics scopes now explicitly target the standalone created-at index,
+  the orders migration seeds that index for clean installs, and diagnostics
+  seeders once again persist processing orders after refining the shared active
+  scope defaults.
 - Restored the default RefreshDatabase migration flow after the toggleable table Pest suite and ensured the news category factory seeds visible records so unit coverage can assert parent/child/category pivots without global scope interference.
 - Catalog contract docs now capture the streamlined product meta payload and nullable media thumbnails so integrators see the same shape published by the API presenter.
 - API validation errors now bundle localized violation lists with a fallback English reason so partner integrations can act on stable messaging even when the initial validation precedes locale negotiation.

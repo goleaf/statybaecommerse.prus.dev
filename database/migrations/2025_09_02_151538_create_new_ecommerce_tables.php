@@ -171,6 +171,9 @@ return new class extends Migration
                 $table->index(['status', 'created_at']);
                 $table->index(['user_id', 'created_at']);
                 $table->index(['customer_id', 'created_at']);
+                // Surface the standalone created_at index that analytics scopes rely on so
+                // range queries can skip composite indexes during reporting workloads.
+                $table->index('created_at', 'orders_created_at_index');
             });
         }
 
