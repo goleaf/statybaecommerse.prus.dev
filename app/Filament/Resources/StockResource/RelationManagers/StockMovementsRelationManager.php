@@ -21,6 +21,7 @@ use Filament\Tables\Grouping\Group;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
 
 class StockMovementsRelationManager extends BaseRelationManager
 {
@@ -180,6 +181,7 @@ class StockMovementsRelationManager extends BaseRelationManager
                     ->query(fn (Builder $query): Builder => $query->where('moved_at', '>=', now()->startOfYear())),
             ])
             ->headerActions([
+                RelationManagerRepeaterAction::make(),
                 Tables\Actions\CreateAction::make()
                     ->mutateFormDataUsing(function (array $data): array {
                         $data['user_id'] = auth()->id();

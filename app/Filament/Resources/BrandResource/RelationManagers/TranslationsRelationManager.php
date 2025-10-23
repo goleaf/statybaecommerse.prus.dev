@@ -12,6 +12,7 @@ use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
 
 final class TranslationsRelationManager extends BaseRelationManager
 {
@@ -142,6 +143,7 @@ final class TranslationsRelationManager extends BaseRelationManager
                     ->native(false),
             ])
             ->headerActions([
+                RelationManagerRepeaterAction::make(),
                 Tables\Actions\CreateAction::make(),
             ])
             ->actions([

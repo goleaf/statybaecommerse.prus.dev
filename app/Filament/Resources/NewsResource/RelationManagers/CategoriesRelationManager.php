@@ -13,6 +13,7 @@ use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
 
 final class CategoriesRelationManager extends BaseRelationManager
 {
@@ -142,6 +143,7 @@ final class CategoriesRelationManager extends BaseRelationManager
                     ->native(false),
             ])
             ->headerActions([
+                RelationManagerRepeaterAction::make(),
                 Tables\Actions\CreateAction::make(),
                 Tables\Actions\AttachAction::make(),
             ])

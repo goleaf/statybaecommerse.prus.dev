@@ -9,6 +9,7 @@ use Filament\Actions\AttachAction;
 use Filament\Actions\DetachAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
 
 class DocumentsRelationManager extends BaseRelationManager
 {
@@ -40,6 +41,7 @@ class DocumentsRelationManager extends BaseRelationManager
                     ->formatStateUsing(fn ($state) => $state ? number_format($state / 1024, 2) . ' KB' : ''),
             ])
             ->headerActions([
+                RelationManagerRepeaterAction::make(),
                 AttachAction::make()
                     ->preloadRecordSelect(),
             ])

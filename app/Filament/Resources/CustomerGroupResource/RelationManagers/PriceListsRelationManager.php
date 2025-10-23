@@ -9,6 +9,7 @@ use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
 
 final class PriceListsRelationManager extends BaseRelationManager
 {
@@ -55,6 +56,7 @@ final class PriceListsRelationManager extends BaseRelationManager
                     ->label(__('price_lists.is_default')),
             ])
             ->headerActions([
+                RelationManagerRepeaterAction::make(),
                 Tables\Actions\AttachAction::make()
                     ->label(__('customer_groups.attach_price_list')),
             ])

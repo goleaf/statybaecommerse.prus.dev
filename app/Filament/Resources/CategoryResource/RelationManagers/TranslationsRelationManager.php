@@ -144,53 +144,7 @@ final class TranslationsRelationManager extends BaseRelationManager
                     ]),
             ])
             ->headerActions([
-                RelationManagerRepeaterAction::make()
-                    ->label('Quick edit translations')
-                    ->icon('heroicon-m-pencil-square')
-                    ->modalHeading('Edit category translations')
-                    ->modalWidth('5xl')
-                    ->configureRepeater(function (Repeater $repeater): Repeater {
-                        return $repeater
-                            ->collapsible()
-                            ->defaultItems(0)
-                            ->schema([
-                                Hidden::make('id'),
-                                Select::make('locale')
-                                    ->label(__('translations.locale'))
-                                    ->options([
-                                        'en' => 'English',
-                                        'lt' => 'Lietuvių',
-                                    ])
-                                    ->required()
-                                    ->searchable()
-                                    ->disabled(fn (callable $get): bool => filled($get('id')))
-                                    ->dehydrated(true),
-                                TextInput::make('name')
-                                    ->label(__('translations.name'))
-                                    ->required()
-                                    ->maxLength(255),
-                                TextInput::make('slug')
-                                    ->label(__('translations.slug'))
-                                    ->required()
-                                    ->maxLength(255),
-                                Textarea::make('description')
-                                    ->label(__('translations.description'))
-                                    ->rows(3)
-                                    ->columnSpanFull(),
-                                Textarea::make('short_description')
-                                    ->label(__('translations.short_description'))
-                                    ->rows(2)
-                                    ->maxLength(500)
-                                    ->columnSpanFull(),
-                                TextInput::make('seo_title')
-                                    ->label(__('translations.seo_title'))
-                                    ->maxLength(255),
-                                Textarea::make('seo_description')
-                                    ->label(__('translations.seo_description'))
-                                    ->rows(2)
-                                    ->maxLength(500),
-                            ]);
-                    }),
+                RelationManagerRepeaterAction::make(),
                 CreateAction::make(),
             ])
             ->actions([

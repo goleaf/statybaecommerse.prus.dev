@@ -24,6 +24,7 @@ use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
 
 final class ReviewsRelationManager extends BaseRelationManager
 {
@@ -113,6 +114,7 @@ final class ReviewsRelationManager extends BaseRelationManager
                 TrashedFilter::make(),
             ])
             ->headerActions([
+                RelationManagerRepeaterAction::make(),
                 Tables\Actions\CreateAction::make(),
             ])
             ->actions([

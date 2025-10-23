@@ -22,6 +22,7 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Str;
+use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
 
 final class ProductsRelationManager extends BaseRelationManager
 {
@@ -153,6 +154,7 @@ final class ProductsRelationManager extends BaseRelationManager
                     }),
             ])
             ->headerActions([
+                RelationManagerRepeaterAction::make(),
                 AttachAction::make()
                     ->preloadRecordSelect()
                     ->form(fn (AttachAction $action): array => [

@@ -9,6 +9,7 @@ use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
 
 final class ConditionsRelationManager extends BaseRelationManager
 {
@@ -124,6 +125,7 @@ final class ConditionsRelationManager extends BaseRelationManager
                     ->label('Active Only'),
             ])
             ->headerActions([
+                RelationManagerRepeaterAction::make(),
                 Tables\Actions\CreateAction::make(),
             ])
             ->actions([

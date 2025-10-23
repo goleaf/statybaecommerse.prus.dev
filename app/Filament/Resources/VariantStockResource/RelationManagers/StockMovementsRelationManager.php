@@ -18,6 +18,7 @@ use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
 
 class StockMovementsRelationManager extends BaseRelationManager
 {
@@ -136,6 +137,7 @@ class StockMovementsRelationManager extends BaseRelationManager
                     ->query(fn (Builder $query): Builder => $query->recent()),
             ])
             ->headerActions([
+                RelationManagerRepeaterAction::make(),
                 Tables\Actions\CreateAction::make(),
             ])
             ->actions([

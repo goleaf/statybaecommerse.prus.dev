@@ -20,6 +20,7 @@ use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
 
 class TranslationsRelationManager extends BaseRelationManager
 {
@@ -192,6 +193,7 @@ class TranslationsRelationManager extends BaseRelationManager
                 //
             ])
             ->headerActions([
+                RelationManagerRepeaterAction::make(),
                 CreateAction::make()
                     ->label('Add Translation')
                     ->icon('heroicon-o-plus'),

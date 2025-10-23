@@ -23,8 +23,8 @@ use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Str;
+use Str;
+use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
 
 final class ChildrenRelationManager extends BaseRelationManager
 {
@@ -48,7 +48,7 @@ final class ChildrenRelationManager extends BaseRelationManager
                                 ->required()
                                 ->maxLength(255)
                                 ->live()
-                                ->afterStateUpdated(fn (?string $state, Set $set) => $set('slug', Str::slug($state ?? '')))
+                                ->afterStateUpdated(fn ($state, callable $set) => $set('slug', Str::slug($state)))
                                 ->helperText(__('system_setting_categories.children.name_help')),
                             TextInput::make('slug')
                                 ->label(__('system_setting_categories.children.slug'))
@@ -160,6 +160,7 @@ final class ChildrenRelationManager extends BaseRelationManager
                     ->native(false),
             ])
             ->headerActions([
+                RelationManagerRepeaterAction::make(),
                 CreateAction::make(),
             ])
             ->actions([

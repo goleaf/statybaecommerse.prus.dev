@@ -16,6 +16,7 @@ use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
 
 class CategoriesRelationManager extends BaseRelationManager
 {
@@ -69,6 +70,7 @@ class CategoriesRelationManager extends BaseRelationManager
                     ->boolean(),
             ])
             ->headerActions([
+                RelationManagerRepeaterAction::make(),
                 AttachAction::make()
                     ->preloadRecordSelect(),
                 CreateAction::make(),

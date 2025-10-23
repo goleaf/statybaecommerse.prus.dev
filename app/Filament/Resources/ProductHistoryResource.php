@@ -16,6 +16,7 @@ use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables\Columns\TextColumn;
@@ -32,7 +33,10 @@ final class ProductHistoryResource extends Resource
 
     protected static ?string $model = ProductHistory::class;
 
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-clock';
+    /**
+     * Icon used in the navigation menu. Type: string|BackedEnum|null.
+     */
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-clock';
 
     /**
      * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.

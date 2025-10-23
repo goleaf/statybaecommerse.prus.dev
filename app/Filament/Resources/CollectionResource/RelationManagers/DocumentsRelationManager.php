@@ -13,6 +13,7 @@ use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
 
 final class DocumentsRelationManager extends BaseRelationManager
 {
@@ -161,6 +162,7 @@ final class DocumentsRelationManager extends BaseRelationManager
                     ->preload(),
             ])
             ->headerActions([
+                RelationManagerRepeaterAction::make(),
                 Tables\Actions\CreateAction::make()
                     ->label(__('admin.documents.actions.create_document')),
                 Tables\Actions\Action::make('generate_document')

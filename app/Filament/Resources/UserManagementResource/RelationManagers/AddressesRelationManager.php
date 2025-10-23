@@ -24,6 +24,7 @@ use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
 
 final class AddressesRelationManager extends BaseRelationManager
 {
@@ -39,24 +40,17 @@ final class AddressesRelationManager extends BaseRelationManager
                     ->label(__('addresses.first_name'))
                     ->required()
                     ->maxLength(255),
-                TextInput::make('last_name')
-                    ->label(__('addresses.last_name'))
-                    ->required()
-                    ->maxLength(255),
-                TextInput::make('company')
-                    ->label(__('addresses.company'))
-                    ->maxLength(255),
-                TextInput::make('phone')
-                    ->label(__('addresses.phone'))
-                    ->tel()
-                    ->maxLength(255),
-                TextInput::make('email')
-                    ->label(__('addresses.email'))
-                    ->email()
-                    ->maxLength(255),
-                Select::make('type')
-                    ->label(__('addresses.type'))
-                    ->options(AddressType::options())
+                Forms\Components\TextInput::make('address_line_1'),
+                Forms\Components\TextInput::make('address_line_2'),
+                Forms\Components\TextInput::make('city'),
+                Forms\Components\TextInput::make('state'),
+                Forms\Components\TextInput::make('postal_code'),
+                Forms\Components\TextInput::make('country'),
+                Forms\Components\Select::make('type')
+                    ->options([
+                        'billing'  => 'Billing',
+                        'shipping' => 'Shipping',
+                    ])
                     ->required(),
             ]),
             Grid::make(2)->schema([
@@ -124,10 +118,12 @@ final class AddressesRelationManager extends BaseRelationManager
                 TextColumn::make('type')
                     ->label(__('addresses.type'))
                     ->badge()
-                    ->formatStateUsing(fn (?string $state): string => $state ? AddressType::from($state)->label() : '—')
-                    ->color(fn (?string $state): string => $state ? AddressType::from($state)->color() : 'gray'),
-                IconColumn::make('is_default')
-                    ->label(__('addresses.is_default'))
+                    ->color(fn (string $state): string => match ($state) {
+                        'billing'  => 'info',
+                        'shipping' => 'success',
+                        default    => 'gray',
+                    }),
+                Tables\Columns\IconColumn::make('is_default')
                     ->boolean(),
                 IconColumn::make('is_active')
                     ->label(__('addresses.is_active'))
@@ -148,6 +144,7 @@ final class AddressesRelationManager extends BaseRelationManager
                 TrashedFilter::make(),
             ])
             ->headerActions([
+                RelationManagerRepeaterAction::make(),
                 Tables\Actions\CreateAction::make(),
             ])
             ->actions([

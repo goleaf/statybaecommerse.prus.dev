@@ -9,6 +9,7 @@ use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
 
 final class DiscountsRelationManager extends BaseRelationManager
 {
@@ -69,6 +70,7 @@ final class DiscountsRelationManager extends BaseRelationManager
                     ->label(__('discounts.is_active')),
             ])
             ->headerActions([
+                RelationManagerRepeaterAction::make(),
                 Tables\Actions\AttachAction::make()
                     ->label(__('customer_groups.attach_discount')),
             ])
