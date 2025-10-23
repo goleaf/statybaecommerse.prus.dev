@@ -4,14 +4,15 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\DiscountRedemptionResource\RelationManagers;
 
-use App\Forms\Components\Flatpickr;
-use Filament\Forms;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
+use App\Support\Filament\Components\Flatpickr;
+use Filament\Forms;
+use Filament\Forms\Components\Repeater;
+use Filament\Forms\Form;
 use Filament\Support\Enums\FontWeight;
 use Filament\Tables;
 use Filament\Tables\Table;
-use App\Support\Filament\Components\Flatpickr;
-use Filament\Schemas\Schema;
+use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
 
 class UserRelationManager extends BaseRelationManager
 {
@@ -111,7 +112,15 @@ class UserRelationManager extends BaseRelationManager
                     ->label('Email Verified'),
             ])
             ->headerActions([
-                RelationManagerRepeaterAction::make(),
+                RelationManagerRepeaterAction::make()
+                    ->label('Quick edit ' . $this->getPluralModelLabel())
+                    ->icon('heroicon-m-pencil-square')
+                    ->modalHeading('Edit ' . $this->getPluralModelLabel())
+                    ->modalWidth('5xl')
+                    ->configureRepeater(function (Repeater $repeater): Repeater {
+                        // Provide a quick-edit modal for managing records inline.
+                        return $repeater->schema($this->getQuickEditSchema());
+                    }),
                 Tables\Actions\CreateAction::make(),
                 Tables\Actions\AttachAction::make(),
             ])

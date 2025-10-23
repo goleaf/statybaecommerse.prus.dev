@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\DiscountResource\RelationManagers;
 
-use App\Forms\Components\Flatpickr;
+use App\Filament\RelationManagers\Support\BaseRelationManager;
 use App\Models\DiscountCode;
 use App\Support\Filament\Components\Flatpickr;
 use Filament\Forms;
-use App\Filament\RelationManagers\Support\BaseRelationManager;
+use Filament\Forms\Components\Repeater;
+use Filament\Forms\Form;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use App\Support\Filament\Components\Flatpickr;
-use Filament\Schemas\Schema;
+use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
 
 final class CodesRelationManager extends BaseRelationManager
 {
@@ -90,7 +90,15 @@ final class CodesRelationManager extends BaseRelationManager
                     ->label('Expired'),
             ])
             ->headerActions([
-                RelationManagerRepeaterAction::make(),
+                RelationManagerRepeaterAction::make()
+                    ->label('Quick edit ' . $this->getPluralModelLabel())
+                    ->icon('heroicon-m-pencil-square')
+                    ->modalHeading('Edit ' . $this->getPluralModelLabel())
+                    ->modalWidth('5xl')
+                    ->configureRepeater(function (Repeater $repeater): Repeater {
+                        // Provide a quick-edit modal for managing records inline.
+                        return $repeater->schema($this->getQuickEditSchema());
+                    }),
                 Tables\Actions\CreateAction::make(),
             ])
             ->actions([
