@@ -35,6 +35,7 @@ The format is based on [Conventional Commits](https://www.conventionalcommits.or
 * Introduced a reusable HTML sanitization pipeline with a maintenance command, model hooks, and storefront renderer updates to harden product and legal content.
 
 ### Bug Fixes
+* Staged the stock reservation foreign keys until the products and variant inventory tables exist so `php artisan migrate:fresh --seed` succeeds on clean installs without sacrificing cascading deletes.
 * Corrected shipping option delivery window formatting so zero-day estimates and partially filled ranges no longer collapse to a placeholder dash in admin tables.
 * Ensured the test bootstrap reloads JSON translation directories so Filament commerce navigation labels resolve to localized values instead of falling back to raw keys during regression runs.
 * Ensured the Feature Flag resource surfaces inactive and disabled toggles so administrators can audit rollout states without adjusting global scopes.
