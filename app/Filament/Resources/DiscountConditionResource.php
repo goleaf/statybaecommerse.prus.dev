@@ -41,7 +41,6 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
-use Novadaemon\FilamentCombobox\Combobox;
 
 final class DiscountConditionResource extends Resource
 {
@@ -149,8 +148,8 @@ final class DiscountConditionResource extends Resource
                                         Combobox::make('products')
                                             ->label(__('discount_conditions.products'))
                                             ->relationship('products', 'name')
-                                            ->preload()
-                                            ->boxSearchs()
+                                            ->relationshipDefaults()
+                                            // Shared Combobox defaults cover preload and search for relationships.
                                             ->height('340px')
                                             ->optionsLabel(__('discount_conditions.products_options_label'))
                                             ->selectedLabel(__('discount_conditions.products_selected_label'))
@@ -159,8 +158,8 @@ final class DiscountConditionResource extends Resource
                                         Combobox::make('categories')
                                             ->label(__('discount_conditions.categories'))
                                             ->relationship('categories', 'name')
-                                            ->preload()
-                                            ->boxSearchs()
+                                            ->relationshipDefaults()
+                                            // Shared Combobox defaults cover preload and search for relationships.
                                             ->height('340px')
                                             ->optionsLabel(__('discount_conditions.categories_options_label'))
                                             ->selectedLabel(__('discount_conditions.categories_selected_label'))

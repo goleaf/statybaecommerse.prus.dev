@@ -10,7 +10,7 @@ use App\Filament\Components\Combobox;
 use App\Filament\Resources\NewsResource\Pages;
 use App\Filament\Resources\NewsResource\RelationManagers;
 use App\Models\News;
-use App\Models\Translations\NewsTranslation;
+use App\Support\Filament\Components\Flatpickr;
 use BackedEnum;
 use Filament\Forms;
 use Filament\Infolists;
@@ -25,9 +25,7 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Pixelpeter\FilamentLanguageTabs\Forms\Components\LanguageTabs;
-use Novadaemon\FilamentCombobox\Combobox;
 use RuntimeException;
-use App\Support\Filament\Components\Flatpickr;
 
 class NewsResource extends Resource
 {
@@ -142,14 +140,16 @@ class NewsResource extends Resource
                     Combobox::make('categories')
                         ->label(__('news.fields.categories'))
                         ->relationship('categories', 'name')
-                        ->boxSearchs()
+                        ->relationshipDefaults(preload: false)
+                        // Shared Combobox defaults add async search + JS rendering.
                         ->height('320px')
                         ->optionsLabel(__('news.combobox.categories.available'))
                         ->selectedLabel(__('news.combobox.categories.selected')),
                     Combobox::make('tags')
                         ->label(__('news.fields.tags'))
                         ->relationship('tags', 'name')
-                        ->boxSearchs()
+                        ->relationshipDefaults(preload: false)
+                        // Shared Combobox defaults add async search + JS rendering.
                         ->height('320px')
                         ->optionsLabel(__('news.combobox.tags.available'))
                         ->selectedLabel(__('news.combobox.tags.selected')),

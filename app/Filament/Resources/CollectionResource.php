@@ -8,7 +8,6 @@ use App\Filament\Components\Combobox;
 use App\Filament\Resources\CollectionResource\Pages;
 use App\Models\Collection;
 use BackedEnum;
-use Novadaemon\FilamentCombobox\Combobox;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Components\Textarea;
@@ -191,10 +190,9 @@ final class CollectionResource extends Resource
                         ->label(__('translations.products'))
                         ->relationship('products', 'name')
                         ->multiple()
-                        ->searchable()
-                        ->boxSearchs()
-                        ->height('350px')
-                        ->preload(),
+                        ->relationshipDefaults()
+                        // Shared Combobox defaults manage search, preload, and JS rendering.
+                        ->height('350px'),
                 ]),
             Section::make(__('collections.seo_info'))
                 ->schema([

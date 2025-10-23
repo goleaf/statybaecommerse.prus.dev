@@ -18,7 +18,6 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
-use Novadaemon\FilamentCombobox\Combobox;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -123,7 +122,8 @@ final class RecommendationBlockResource extends Resource
                     Combobox::make('products')
                         ->label(__('recommendation_blocks.products'))
                         ->relationship('products', 'name', fn (Builder $query) => $query->withoutGlobalScopes())
-                        ->boxSearchs()
+                        ->relationshipDefaults(preload: false)
+                        // Shared Combobox defaults apply JS rendering and search helpers.
                         ->height('320px')
                         ->afterStateHydrated(function ($state, callable $set): void {
                             $set('products', collect($state)->sort()->values()->all());

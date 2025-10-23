@@ -1,6 +1,6 @@
 # Combobox field reference
 
-The admin panel now leans on the `novadaemon/filament-combobox` plugin for relationship pickers that benefit from a two-column, searchable layout. The package ships with Filament and is available to every resource through `Filament\Forms\Components\Combobox`.【F:composer.json†L11-L46】
+The admin panel now leans on the `novadaemon/filament-combobox` plugin for relationship pickers that benefit from a two-column, searchable layout. The package ships with Filament and is available to every resource through the project wrapper `App\Filament\Components\Combobox`, which layers shared defaults on top of the upstream component.【F:composer.json†L11-L46】【F:app/Filament/Components/Combobox.php†L9-L49】
 
 To keep behaviour consistent across modules, prefer the thin wrapper at `App\Filament\Components\Combobox`, which preconfigures search panes, panel height, native select behaviour, and eager loading while exposing helper methods for localised column headers.【F:app/Filament/Components/Combobox.php†L7-L67】
 
@@ -29,7 +29,8 @@ Stick with Filament’s native `Select` or `RelationManager` flows when you only
 
 Every implementation follows a small set of options:
 
-- `boxSearchs([bool $visible])` toggles the plugin’s search inputs. Call it without arguments to show the inputs on demand, or pass `true` when you want them visible immediately (as in the “simple” recommendation config).【F:app/Filament/Resources/CampaignResource.php†L140-L177】【F:app/Filament/Resources/RecommendationConfigResourceSimple.php†L124-L151】
+- `relationshipDefaults(bool $preload = true, bool $showSearchBox = true)` is the wrapper helper that preloads the relationship, enables the search UI, and keeps the component in non-native mode across resources. Use the parameters to skip preloading (e.g., when a global scope needs to stay lazy) or hide the search box entirely.【F:app/Filament/Components/Combobox.php†L29-L49】【F:app/Filament/Resources/RecommendationBlockResource.php†L102-L131】
+- `boxSearchs([bool $visible])` remains available for edge cases when you need to override the wrapper defaults manually.【F:app/Filament/Components/Combobox.php†L37-L45】
 - `height('###px')` keeps the dual lists tall enough for comfortable browsing (320–360 px in current resources).【F:app/Filament/Resources/NewsResource.php†L134-L153】【F:app/Filament/Resources/CampaignResource.php†L140-L177】
 - `optionsLabel()` / `selectedLabel()` override the column headers so translators can localize “available” vs “selected” phrasing per resource.【F:app/Filament/Resources/NewsResource.php†L134-L153】【F:app/Filament/Resources/CampaignResource.php†L140-L177】【F:app/Filament/Resources/DiscountConditionResource.php†L142-L166】
 - Combine with standard Filament modifiers such as `relationship()`, `multiple()`, `preload()`, `searchable()`, and `createOptionForm()` to match the data model while keeping the combobox experience consistent.【F:app/Filament/Resources/CollectionResource.php†L165-L175】【F:app/Filament/Resources/RecommendationConfigResourceSimple.php†L124-L162】
