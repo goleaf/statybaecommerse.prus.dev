@@ -51,7 +51,7 @@ final class CampaignViewResource extends Resource
     {
         return $form
             ->schema([
-                Tabs::make(__('campaign_views.section_title'))
+                Tabs::make(__('campaign_views.tabs_label'))
                     ->tabs([
                         Tab::make(__('campaign_views.tabs.basic_information'))
                             ->icon('heroicon-o-information-circle')
@@ -66,7 +66,8 @@ final class CampaignViewResource extends Resource
                                     ->label(__('campaign_views.customer'))
                                     ->relationship('customer', 'name')
                                     ->searchable()
-                                    ->preload(),
+                                    ->preload()
+                                    ->placeholder(__('campaign_views.guest')),
                                 TextInput::make('ip_address')
                                     ->label(__('campaign_views.ip_address'))
                                     ->ip()
