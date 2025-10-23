@@ -37,23 +37,16 @@ final class CreateProduct extends CreateRecord
 
     protected function mutateFormDataBeforeCreate(array $data): array
     {
-        [$data, $translations] = $this->extractTranslationsFromForm($data);
-        $this->languageTabsPayload = $this->sanitizeTranslatablePayload($translations);
+        /** @var HtmlSanitizer $sanitizer */
+        $sanitizer = app(HtmlSanitizer::class);
 
-        $data = $this->mutateMainDataWithDefaultLocale($data, $this->languageTabsPayload);
-
-        $defaultLocale = $this->getDefaultLocale();
-        $defaultName = $this->languageTabsPayload[$defaultLocale]['name'] ?? $data['name'] ?? null;
-        $defaultSlug = $this->languageTabsPayload[$defaultLocale]['slug'] ?? null;
-
-        if (blank($defaultSlug) && filled($defaultName)) {
-            $slug = Str::slug($defaultName);
-            $this->languageTabsPayload[$defaultLocale]['slug'] = $slug;
-            $data['slug'] = $slug;
+        if (array_key_exists('description', $data)) {
+            $data['description'] = $sanitizer->sanitize($data['description']);
         }
 
-        if (empty($data['slug']) && filled($defaultName)) {
-            $data['slug'] = Str::slug($defaultName);
+        // Generate slug if not provided
+        if (empty($data['slug'])) {
+            $data['slug'] = Str::slug($data['name']);
         }
 
         if (! isset($data['published_at']) && ($data['is_visible'] ?? false)) {

@@ -14,14 +14,7 @@ use App\Models\FeatureFlag;
 use App\Models\SystemSetting;
 use App\Observers\UserAttributionObserver;
 use App\Services\DocumentService;
-use App\Support\Filament\SearchableComponentHelper;
-use App\Support\Health\HealthReporter;
 use App\Support\Html\HtmlSanitizer;
-use App\Support\Security\CspNonce;
-use App\Support\Storage\SecureStorage;
-use App\Support\Tracing\Trace;
-use App\Support\Tracing\TraceContext;
-use App\Support\Uploads\SecureUploadHandler;
 use App\View\Creators\CartDataCreator;
 use App\View\Creators\GlobalDataCreator;
 use App\View\Creators\LocalizationCreator;
@@ -68,14 +61,7 @@ class AppServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        $this->app->singleton(HealthReporterContract::class, HealthReporter::class);
-        $this->app->bind(DocumentServiceContract::class, DocumentService::class);
-
-        // Share a single sanitizer instance so every consumer reuses the same allow-list configuration.
-        $this->app->singleton(HtmlSanitizer::class, static fn (): HtmlSanitizer => new HtmlSanitizer);
-
-        // Scope CSP nonces per request so all downstream consumers reference the same token.
-        $this->app->scoped(CspNonce::class, static fn (): CspNonce => new CspNonce);
+        $this->app->singleton(HtmlSanitizer::class);
 
         if ($this->app->runningInConsole()) {
             // Register import utilities and override the core db:seed command with a profiled variant.
