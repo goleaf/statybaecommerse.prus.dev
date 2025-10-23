@@ -19,6 +19,8 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Forms\Form;
+use Filament\Forms\Set;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Forms\Components\Grid;
@@ -96,13 +98,18 @@ final class LocationResource extends Resource
                                 ->searchable()
                                 ->preload()
                                 ->live()
-                                ->afterStateUpdated(function ($state, Set $set) {
-                                    if ($state) {
-                                        $country = Country::find($state);
-                                        if ($country) {
-                                            $set('country_code', $country->code);
-                                        }
+                                ->afterStateUpdated(static function (int|string|null $state, Set $set): void {
+                                    // Use Filament's Set helper so dependent fields stay in sync when the country changes.
+                                    if ($state === null || $state === '') {
+                                        return;
                                     }
+
+                                    $country = Country::find($state);
+                                    if ($country === null) {
+                                        return;
+                                    }
+
+                                    $set('country_code', $country->code);
                                 }),
                             Select::make('city_id')
                                 ->label(__('locations.fields.city'))
@@ -110,13 +117,18 @@ final class LocationResource extends Resource
                                 ->searchable()
                                 ->preload()
                                 ->live()
-                                ->afterStateUpdated(function ($state, Set $set) {
-                                    if ($state) {
-                                        $city = City::find($state);
-                                        if ($city) {
-                                            $set('city_code', $city->code);
-                                        }
+                                ->afterStateUpdated(static function (int|string|null $state, Set $set): void {
+                                    // Ensure the linked city code reflects the currently selected city via Set helper updates.
+                                    if ($state === null || $state === '') {
+                                        return;
                                     }
+
+                                    $city = City::find($state);
+                                    if ($city === null) {
+                                        return;
+                                    }
+
+                                    $set('city_code', $city->code);
                                 }),
                             TextInput::make('country_code')
                                 ->label(__('locations.fields.country_code'))
