@@ -9,7 +9,7 @@ use Filament\Pages\Page;
 
 final class EmailMarketingPage extends Page
 {
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-envelope-open';
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-envelope-open';
 
     protected string $view = 'filament.pages.email-marketing-page';
 

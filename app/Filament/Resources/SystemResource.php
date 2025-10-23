@@ -892,13 +892,15 @@ final class SystemResource extends Resource
      */
     public static function getNavigationBadge(): ?string
     {
-        return (string) self::getModel()::withoutGlobalScopes()->count();
+        $count = (int) self::getModel()::withoutGlobalScopes()->count();
+
+        return $count > 0 ? (string) $count : null;
     }
 
     /**
      * Get navigation badge color.
      */
-    public static function getNavigationBadgeColor(): ?string
+    public static function getNavigationBadgeColor(): string|array|null
     {
         $count = self::getModel()::count();
 

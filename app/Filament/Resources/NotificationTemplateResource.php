@@ -87,37 +87,42 @@ final class NotificationTemplateResource extends Resource
                                         return;
                                     }
 
-                                            if ($get !== null && $get('slug')) {
-                                                return;
-                                            }
-
-                                            $set('slug', Str::slug($state));
-                                        }
-                                    ),
-                                TextInput::make('slug')
-                                    ->label(__('admin.notification_templates.slug'))
-                                    ->required()
-                                    ->maxLength(255)
-                                    ->unique(NotificationTemplate::class, 'slug', ignoreRecord: true)
-                                    ->rules(['alpha_dash']),
-                                Select::make('type')
-                                    ->label(__('admin.notification_templates.type'))
-                                    ->options([
-                                        'email'  => __('admin.notification_templates.types.email'),
-                                        'sms'    => __('admin.notification_templates.types.sms'),
-                                        'push'   => __('admin.notification_templates.types.push'),
-                                        'in_app' => __('admin.notification_templates.types.in_app'),
-                                    ])
-                                    ->required()
-                                    ->default('email')
-                                    ->live(),
-                                TextInput::make('event')
-                                    ->label(__('admin.notification_templates.event'))
-                                    ->required()
-                                    ->maxLength(255)
-                                    ->helperText(__('admin.notification_templates.event_help')),
-                            ]),
-                    ]),
+                                    $set('slug', Str::slug((string) $state));
+                                }
+                            ),
+                        TextInput::make('slug')
+                            ->label(__('admin.notification_templates.slug'))
+                            ->required()
+                            ->maxLength(255)
+                            ->live(onBlur: true)
+                            ->afterStateUpdated(
+                                static function (?string $state, callable $set): void {
+                                    $set('slug', filled($state) ? Str::slug($state) : null);
+                                }
+                            )
+                            ->dehydrateStateUsing(
+                                static fn (?string $state): ?string => filled($state) ? Str::slug($state) : null
+                            )
+                            ->unique(NotificationTemplate::class, 'slug', ignoreRecord: true)
+                            ->rules(['alpha_dash']),
+                        Select::make('type')
+                            ->label(__('admin.notification_templates.type'))
+                            ->options([
+                                'email'  => __('admin.notification_templates.types.email'),
+                                'sms'    => __('admin.notification_templates.types.sms'),
+                                'push'   => __('admin.notification_templates.types.push'),
+                                'in_app' => __('admin.notification_templates.types.in_app'),
+                            ])
+                            ->required()
+                            ->default('email')
+                            ->live(),
+                        TextInput::make('event')
+                            ->label(__('admin.notification_templates.event'))
+                            ->required()
+                            ->maxLength(255)
+                            ->helperText(__('admin.notification_templates.event_help')),
+                    ])
+                    ->columns(2),
                 Section::make(__('admin.notification_templates.content'))
                     ->schema([
                         TextInput::make('subject')

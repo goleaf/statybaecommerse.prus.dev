@@ -220,8 +220,10 @@ final class DocumentResource extends Resource
         return ['name', 'description'];
     }
 
-    public static function getNavigationBadge(): string
+    public static function getNavigationBadge(): ?string
     {
-        return (string) Document::count();
+        $count = (int) Document::count();
+
+        return $count > 0 ? (string) $count : null;
     }
 }

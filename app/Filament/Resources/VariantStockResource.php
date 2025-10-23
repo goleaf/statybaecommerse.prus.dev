@@ -8,6 +8,7 @@ use App\Forms\Components\Flatpickr;
 use App\Filament\Resources\VariantStockResource\Pages;
 use App\Models\Location;
 use App\Models\VariantInventory;
+use App\Support\Filament\Components\Flatpickr;
 use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
@@ -32,7 +33,6 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use UnitEnum;
-use App\Support\Filament\Components\Flatpickr;
 
 final class VariantStockResource extends Resource
 {
@@ -256,7 +256,7 @@ final class VariantStockResource extends Resource
         return $count > 0 ? (string) $count : null;
     }
 
-    public static function getNavigationBadgeColor(): ?string
+    public static function getNavigationBadgeColor(): string|array|null
     {
         $hasOut = VariantInventory::query()->withoutGlobalScopes()->where('stock', '=', 0)->exists();
         if ($hasOut) {
