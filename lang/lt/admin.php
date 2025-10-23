@@ -74,7 +74,17 @@ return [
         'description' => 'Aprašymas',
         'button_text' => 'Mygtuko tekstas',
     ],
-    'menu_items' => require __DIR__ . '/admin/menu_items.php',
+    'inventory' => [
+        'actions' => [
+            'create' => 'Sukurti atsargų įrašą',
+        ],
+        'tabs' => [
+            'all' => 'Visos atsargos',
+            'in_stock' => 'Yra atsargų',
+            'low_stock' => 'Mažai atsargų',
+            'out_of_stock' => 'Atsargų nėra',
+        ],
+    ],
     'variant_combinations' => [
         'navigation_label' => 'Variantų kombinacijos',
         'plural_model_label' => 'Variantų kombinacijos',
