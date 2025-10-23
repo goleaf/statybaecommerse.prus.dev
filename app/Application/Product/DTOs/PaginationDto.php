@@ -34,19 +34,38 @@ final class PaginationDto
 
     public function getLastPage(): int
     {
+        // Keep the last page calculation encapsulated for reuse in contract transforms.
         return (int) ceil($this->total / $this->perPage);
     }
 
     public function toArray(): array
     {
-        // Provide the structure expected by our public contract schema.
+        // Preserve the legacy behaviour so existing call-sites continue to receive full pagination metadata.
+        return $this->toContractMeta();
+    }
+
+    public function toContractData(): array
+    {
+        // Produce the minimal pagination payload permitted by the documented OpenAPI schema.
         return [
             'current_page' => $this->currentPage,
-            'last_page' => max(1, $this->getLastPage()),
-            'per_page' => $this->perPage,
-            'total' => $this->total,
-            'from' => $this->total === 0 ? 0 : ($this->perPage * ($this->currentPage - 1)) + 1,
-            'to' => $this->total === 0 ? 0 : min($this->total, $this->perPage * $this->currentPage),
+            'last_page'    => max(1, $this->getLastPage()),
+            'per_page'     => $this->perPage,
+            'total'        => $this->total,
         ];
+    }
+
+    public function toContractMeta(): array
+    {
+        // Extend the pagination details with range markers expected within the meta pagination snapshot.
+        $hasResults = $this->total > 0;
+
+        return array_merge(
+            $this->toContractData(),
+            [
+                'from' => $hasResults ? ($this->perPage * ($this->currentPage - 1)) + 1 : null,
+                'to'   => $hasResults ? min($this->total, $this->perPage * $this->currentPage) : null,
+            ],
+        );
     }
 }
