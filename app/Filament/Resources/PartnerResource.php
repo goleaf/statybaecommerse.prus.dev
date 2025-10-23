@@ -25,11 +25,7 @@ final class PartnerResource extends Resource
 
     protected static ?string $model = Partner::class;
 
-    /**
-     * Navigation icon for Filament navigation.
-     *
-     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
-     */
+    /** @var string|\BackedEnum|null Navigation icon identifier required by Filament. */
     protected static $navigationIcon = 'heroicon-o-user-group';
 
     /**
@@ -43,7 +39,7 @@ final class PartnerResource extends Resource
 
     public static function form(Form $form): Form
     {
-        // Filament 4 expects returning the Form builder instance.
+        // Compose the partner form using the Section helper to keep layouts consistent.
         return $form
             ->schema([
                 Section::make(__('admin.partners.sections.basic_information'))
@@ -176,7 +172,7 @@ final class PartnerResource extends Resource
         return [
             'index'  => Pages\ListPartners::route('/'),
             'create' => Pages\CreatePartner::route('/create'),
-            'view'   => Pages\ViewPartner::route('/{record}'), // Provide a dedicated read-only partner detail page.
+            'view'   => Pages\ViewPartner::route('/{record}'),
             'edit'   => Pages\EditPartner::route('/{record}/edit'),
         ];
     }

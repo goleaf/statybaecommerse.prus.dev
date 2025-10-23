@@ -101,18 +101,20 @@ class FilamentNavigationGroupFixer
                 }
             }
 
-            // Always deduplicate UnitEnum imports even if the file lacks a navigation group.
-            $dedupedContent = $this->dedupeUnitEnumImport($content);
-            if ($dedupedContent !== $content) {
-                // Record the cleanup to make reporting transparent.
-                $content = $dedupedContent;
+            // Remove stray UnitEnum imports that previous runs may have left behind.
+            $content = $this->removeStrayUnitEnumImport($content);
+
+            // Deduplicate imports after the cleanup step to keep the file tidy.
+            $content = $this->dedupeUnitEnumImport($content);
+
+            if ($content !== $originalContent) {
                 $modified = true;
             }
 
             // Only write if content changed
             if ($modified) {
                 file_put_contents($filePath, $content);
-                echo "  ✅ {$relativePath} - Fixed navigation group types\n";
+                echo "  ✅ {$relativePath} - Normalized navigation metadata\n";
                 $this->processedFiles[] = $relativePath;
             } else {
                 echo "  ⏭️  {$relativePath} - No changes needed\n";
@@ -206,9 +208,6 @@ class FilamentNavigationGroupFixer
 
         $newContent = implode("\n", $lines);
 
-        // Deduplicate multiple UnitEnum imports just in case
-        $newContent = $this->dedupeUnitEnumImport($newContent);
-
         return $modified ? $newContent : $content;
     }
 
@@ -231,6 +230,32 @@ class FilamentNavigationGroupFixer
         }
 
         return implode("\n", $out);
+    }
+
+    private function removeStrayUnitEnumImport(string $content): string
+    {
+        // If UnitEnum never appears beyond the import, the file does not need the statement.
+        if (strpos($content, 'use UnitEnum;') === false) {
+            return $content;
+        }
+
+        if (substr_count($content, 'UnitEnum') > 1) {
+            return $content;
+        }
+
+        $lines = explode("\n", $content);
+        $filtered = [];
+
+        foreach ($lines as $line) {
+            if (trim($line) === 'use UnitEnum;') {
+                // Skip the unused import to keep the file clean.
+                continue;
+            }
+
+            $filtered[] = $line;
+        }
+
+        return implode("\n", $filtered);
     }
 
     private function generateReport(): void

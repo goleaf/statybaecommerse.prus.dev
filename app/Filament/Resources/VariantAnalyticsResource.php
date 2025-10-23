@@ -50,18 +50,13 @@ final class VariantAnalyticsResource extends Resource
 {
     protected static ?string $model = VariantAnalytics::class;
 
-    /**
-     * Navigation icon for Filament navigation.
-     *
-     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
-     */
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-chart-bar-square';
+    /** @var string|\BackedEnum|null */
+    protected static $navigationIcon = 'heroicon-o-chart-bar-square';
 
-    /** @var string|\BackedEnum|\UnitEnum|null Ensure inventory analytics stay grouped centrally. */
     /**
-     * Navigation group for Filament navigation.
+     * @var string|\BackedEnum|null
      *
-     * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
+     * Keep the navigation entry grouped with the rest of the inventory dashboards.
      */
     protected static $navigationGroup = NavigationGroup::Inventory;
 
