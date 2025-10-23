@@ -5,11 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources\UserProductInteractions;
 use App\Support\Concerns\HasNav;
 
-use App\Filament\Resources\UserProductInteractions\Pages\CreateUserProductInteraction;
-use App\Filament\Resources\UserProductInteractions\Pages\EditUserProductInteraction;
-use App\Filament\Resources\UserProductInteractions\Pages\ListUserProductInteractions;
-use App\Filament\Resources\UserProductInteractions\Schemas\UserProductInteractionForm;
-use App\Filament\Resources\UserProductInteractions\Tables\UserProductInteractionsTable;
+use App\Filament\Resources\UserProductInteractionResource as LegacyUserProductInteractionResource;
 use App\Models\UserProductInteraction;
 use BackedEnum;
 use Filament\Forms\Form;
@@ -26,29 +22,43 @@ class UserProductInteractionResource extends Resource
 
     
 
+    public static function getNavigationGroup(): ?string
+    {
+        return LegacyUserProductInteractionResource::getNavigationGroup();
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        return LegacyUserProductInteractionResource::getNavigationLabel();
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return LegacyUserProductInteractionResource::getPluralModelLabel();
+    }
+
+    public static function getModelLabel(): string
+    {
+        return LegacyUserProductInteractionResource::getModelLabel();
+    }
+
     public static function form(Form $form): Form
     {
-        return UserProductInteractionForm::configure($form);
+        return LegacyUserProductInteractionResource::form($form);
     }
 
     public static function table(Table $table): Table
     {
-        return UserProductInteractionsTable::configure($table);
+        return LegacyUserProductInteractionResource::table($table);
     }
 
     public static function getRelations(): array
     {
-        return [
-            //
-        ];
+        return LegacyUserProductInteractionResource::getRelations();
     }
 
     public static function getPages(): array
     {
-        return [
-            'index'  => ListUserProductInteractions::route('/'),
-            'create' => CreateUserProductInteraction::route('/create'),
-            'edit'   => EditUserProductInteraction::route('/{record}/edit'),
-        ];
+        return LegacyUserProductInteractionResource::getPages();
     }
 }
