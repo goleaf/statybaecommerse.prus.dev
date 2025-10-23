@@ -19,8 +19,10 @@ final class ApiServiceProvider extends ServiceProvider
     public function boot(): void
     {
         RateLimiter::for('api.default', function (Request $request): array {
-            // Preserve the historical alias while delegating to the layered read throttle.
-            return $this->layeredLimits($request, 'api.read', $this->defaultRateLimitConfig());
+            // Use a dedicated bucket for the default throttle so runtime overrides do not share state
+            // with the read limiter, which previously caused higher read limits to mask stricter
+            // default constraints (as seen in the profile endpoint regression).
+            return $this->layeredLimits($request, 'api.default', $this->defaultRateLimitConfig());
         });
 
         RateLimiter::for('api.read', function (Request $request): array {
