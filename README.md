@@ -39,9 +39,9 @@ A multilingual Laravel 12 + Filament v4 storefront and admin panel for managing 
 - **Configurable system setting dependencies** with operator-specific value fields, translated labels, and duplication safeguards for precise feature toggles.
 
 -### Latest updates
-
-- Husky pre-commit hook now streams staged PHP files via `xargs`, keeping PHPStan compatible with the locked toolchain and letting Pint-formatted commits land without manual hook bypasses.
-- Company management tests now run without a Vite manifest by dropping the Company ActiveScope, widening factory phone data, and letting Filament reuse the bundled theme when `app()->environment('testing')` is true, so CRUD and bulk toggles stay green locally.
+- Livewire component tests now auto-assign Filament resources and inject lightweight
+  table markup, allowing base `ListRecords`/`ViewRecord` assertions to run without
+  patching vendor classes while CampaignView coverage stays green.
 - Attribute validation rules now persist plain strings alongside array-based rule lists, the Filament Attribute editor hydrates
   those values without forcing JSON, and new regression coverage keeps both storage paths stable.
 - Attribute group selectors now reuse a shared translation helper so historical slugs render as human-readable labels across Filament forms, filters, and tables instead of exposing raw keys.
