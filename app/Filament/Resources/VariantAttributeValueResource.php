@@ -11,13 +11,6 @@ use App\Models\Attribute;
 use App\Models\ProductVariant;
 use App\Models\VariantAttributeValue;
 use BackedEnum;
-use Filament\Actions\Action;
-use Filament\Actions\BulkAction;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Actions\DeleteAction;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
-use Filament\Actions\ViewAction;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -27,7 +20,13 @@ use Filament\Forms\Form;
 use Filament\Forms\Set;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Support\Enums\FontWeight;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\BulkAction;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
@@ -51,7 +50,10 @@ final class VariantAttributeValueResource extends Resource
 
     protected static ?string $model = VariantAttributeValue::class;
 
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-tag';
+    /**
+     * @var BackedEnum|string|null Navigation icon for the resource.
+     */
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-tag';
 
     /**
      * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
@@ -89,17 +91,12 @@ final class VariantAttributeValueResource extends Resource
                                 ->searchable()
                                 ->preload()
                                 ->live()
-                                ->afterStateUpdated(function (?int $state, Set $set): void {
-                                    if (! $state) {
-                                        $set('variant_name', null);
-
-                                        return;
-                                    }
-
-                                    $variant = ProductVariant::find($state);
-
-                                    if ($variant) {
-                                        $set('variant_name', $variant->name);
+                                ->afterStateUpdated(function ($state, $set): void {
+                                    if ($state) {
+                                        $variant = ProductVariant::find($state);
+                                        if ($variant) {
+                                            $set('variant_name', $variant->name);
+                                        }
                                     }
                                 }),
                             TextInput::make('variant_name')
@@ -116,17 +113,12 @@ final class VariantAttributeValueResource extends Resource
                                 ->searchable()
                                 ->preload()
                                 ->live()
-                                ->afterStateUpdated(function (?int $state, Set $set): void {
-                                    if (! $state) {
-                                        $set('attribute_name', null);
-
-                                        return;
-                                    }
-
-                                    $attribute = Attribute::find($state);
-
-                                    if ($attribute) {
-                                        $set('attribute_name', $attribute->name);
+                                ->afterStateUpdated(function ($state, $set): void {
+                                    if ($state) {
+                                        $attribute = Attribute::find($state);
+                                        if ($attribute) {
+                                            $set('attribute_name', $attribute->name);
+                                        }
                                     }
                                 }),
                             TextInput::make('attribute_name')
@@ -144,9 +136,9 @@ final class VariantAttributeValueResource extends Resource
                                 ->required()
                                 ->maxLength(255)
                                 ->live()
-                                ->afterStateUpdated(function (?string $state, Set $set): void {
-                                    if (! $state) {
-                                        return;
+                                ->afterStateUpdated(function ($state, $set): void {
+                                    if ($state) {
+                                        $set('attribute_value_slug', Str::slug($state));
                                     }
 
                                     $set('attribute_value_slug', Str::slug($state));
