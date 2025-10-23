@@ -6,13 +6,13 @@ namespace App\Enums;
 
 enum ExportStatus: string
 {
-    case Queued = 'queued';
-    case Processing = 'processing';
-    case Completed = 'completed';
-    case Failed = 'failed';
+    case PENDING = 'pending';
+    case PROCESSING = 'processing';
+    case COMPLETED = 'completed';
+    case FAILED = 'failed';
 
-    public function isTerminal(): bool
+    public function isFinal(): bool
     {
-        return $this === self::Completed || $this === self::Failed;
+        return $this === self::COMPLETED || $this === self::FAILED;
     }
 }

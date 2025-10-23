@@ -4,81 +4,64 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Enums\ExportFormat;
 use App\Enums\ExportStatus;
-use Illuminate\Database\Eloquent\Casts\Attribute;
+use App\Enums\ExportType;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Support\Str;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\URL;
 
-/**
- * @property array<int, string> $columns
- * @property array<string, mixed>|null $exportable_options
- * @property ExportStatus $status
- */
 final class Export extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'uuid',
-        'name',
+        'requested_by',
+        'type',
         'format',
         'status',
-        'exportable_type',
+        'filters',
         'columns',
-        'exportable_options',
+        'file_name',
+        'file_path',
+        'mime_type',
+        'locale',
+        'timezone',
         'total_rows',
-        'processed_rows',
-        'artifact_disk',
-        'artifact_path',
-        'artifact_filename',
-        'requested_at',
         'completed_at',
-        'failed_at',
-        'failure_reason',
-        'requested_by',
+        'expires_at',
     ];
 
-    protected $casts = [
-        'columns' => 'array',
-        'exportable_options' => 'array',
-        'requested_at' => 'datetime',
-        'completed_at' => 'datetime',
-        'failed_at' => 'datetime',
-        'status' => ExportStatus::class,
-    ];
-
-    protected static function booted(): void
+    protected function casts(): array
     {
-        self::creating(function (self $export): void {
-            if (! $export->getAttribute('uuid')) {
-                $export->setAttribute('uuid', (string) Str::uuid());
-            }
-
-            if (! $export->getAttribute('requested_at')) {
-                $export->setAttribute('requested_at', now());
-            }
-        });
+        return [
+            'filters' => 'array',
+            'columns' => 'array',
+            'completed_at' => 'datetime',
+            'expires_at' => 'datetime',
+            'type' => ExportType::class,
+            'format' => ExportFormat::class,
+            'status' => ExportStatus::class,
+        ];
     }
 
-    public function requestedBy(): BelongsTo
+    public function requester(): BelongsTo
     {
         return $this->belongsTo(User::class, 'requested_by');
     }
 
-    public function getRouteKeyName(): string
+    public function signedUrl(?Carbon $expiresAt = null): string
     {
-        return 'uuid';
+        $expiry = $expiresAt ?? $this->expires_at ?? now()->addMinutes((int) config('exports.ttl_minutes', 1440));
+
+        return URL::temporarySignedRoute('api.exports.download', $expiry, ['export' => $this->getKey()]);
     }
 
-    public function scopeQueued($query)
+    public function columnLabels(): array
     {
-        return $query->where('status', ExportStatus::Queued);
-    }
-
-    protected function fileExtension(): Attribute
-    {
-        return Attribute::make(get: fn (): string => $this->format);
+        return Arr::pluck($this->columns ?? [], 'label', 'key');
     }
 }

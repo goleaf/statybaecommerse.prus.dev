@@ -4,63 +4,49 @@ declare(strict_types=1);
 
 namespace App\Services\Export\Writers;
 
+use App\Models\Export;
 use App\Services\Export\Contracts\ExportWriter;
 use Illuminate\Support\Facades\Storage;
+use Spatie\SimpleExcel\SimpleExcelWriter;
 
 final class XlsxExportWriter implements ExportWriter
 {
-    private string $disk;
+    private ?SimpleExcelWriter $writer = null;
 
-    private string $path;
-
-    /**
-     * @var array<int, array<int, string>>
-     */
-    private array $rows = [];
-
-    public function open(string $disk, string $path, array $headers): void
+    public function open(Export $export, array $columns, string $path): void
     {
-        $this->disk = $disk;
-        $this->path = $path;
-        $this->rows = [$headers];
+        Storage::disk('local')->makeDirectory(dirname($path));
+
+        $fullPath = Storage::disk('local')->path($path);
+
+        $this->writer = SimpleExcelWriter::create($fullPath);
+        $this->writer->addHeader(array_column($columns, 'label'));
     }
 
-    public function append(array $row): void
+    public function append(iterable $rows): void
     {
-        $this->rows[] = $row;
+        if (! $this->writer instanceof SimpleExcelWriter) {
+            return;
+        }
+
+        foreach ($rows as $row) {
+            $this->writer->addRow(array_values($row));
+        }
     }
 
     public function close(): void
     {
-        $xml = $this->buildSpreadsheetXml($this->rows);
-        Storage::disk($this->disk)->put($this->path, $xml);
+        $this->writer?->close();
+        $this->writer = null;
     }
 
-    /**
-     * @param  array<int, array<int, string>>  $rows
-     */
-    private function buildSpreadsheetXml(array $rows): string
+    public function extension(): string
     {
-        $document = [
-            '<?xml version="1.0" encoding="UTF-8"?>',
-            '<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">',
-            '  <Worksheet ss:Name="Export">',
-            '    <Table>',
-        ];
+        return 'xlsx';
+    }
 
-        foreach ($rows as $row) {
-            $document[] = '      <Row>';
-            foreach ($row as $cell) {
-                $escaped = htmlspecialchars($cell ?? '', ENT_XML1 | ENT_COMPAT, 'UTF-8');
-                $document[] = sprintf('        <Cell><Data ss:Type="String">%s</Data></Cell>', $escaped);
-            }
-            $document[] = '      </Row>';
-        }
-
-        $document[] = '    </Table>';
-        $document[] = '  </Worksheet>';
-        $document[] = '</Workbook>';
-
-        return implode("\n", $document);
+    public function mimeType(): string
+    {
+        return 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
     }
 }

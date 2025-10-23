@@ -4,22 +4,17 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
-use App\Models\AdminUser;
-use App\Models\Brand;
-use App\Models\Category;
-use App\Models\Order;
-use App\Models\Product;
-use App\Models\User;
-use App\Policies\BrandPolicy;
-use App\Policies\CategoryPolicy;
-use App\Policies\OrderPolicy;
-use App\Policies\ProductPolicy;
-use App\Policies\UserPolicy;
+use App\Models\Export;
+use App\Policies\ExportPolicy;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Gate;
 
 class AuthServiceProvider extends ServiceProvider
 {
+    protected $policies = [
+        Export::class => ExportPolicy::class,
+    ];
+
     /**
      * The policy mappings for the application.
      */

@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\Api\V1\HealthController;
+use App\Http\Controllers\Api\ExportDownloadController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -50,7 +50,8 @@ Route::prefix('api/v1')
     }
 })->name('api.autocomplete.search');
 
-Route::prefix('v1')->group(function (): void {
-    Route::get('health', [HealthController::class, 'health'])->name('api.v1.health');
-    Route::get('ready', [HealthController::class, 'ready'])->name('api.v1.ready');
+Route::middleware(['auth:sanctum'])->prefix('v1')->group(function (): void {
+    Route::get('exports/{export}', ExportDownloadController::class)
+        ->middleware('signed')
+        ->name('api.exports.download');
 });
