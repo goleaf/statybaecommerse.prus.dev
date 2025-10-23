@@ -9,3 +9,5 @@
 @source '../../../../resources/views/filament';
 @source '../../../../vendor/defstudio/filament-searchable-input/resources/**/*.blade.php';
 @source '../../../../vendor/saade/filament-fullcalendar/resources/views/**/*.blade.php';
+/* Ensure Tailwind scans badgeable column plugin Blade templates for style extraction. */
+@source '../../../../vendor/awcodes/filament-badgeable-column/resources/**/*.blade.php';
