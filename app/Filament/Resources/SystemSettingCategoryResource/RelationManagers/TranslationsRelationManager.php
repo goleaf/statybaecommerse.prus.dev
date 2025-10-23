@@ -12,11 +12,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
-use Filament\Tables\Actions\CreateAction;
-use Filament\Tables\Actions\DeleteAction;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\ViewAction;
+use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
@@ -98,16 +94,20 @@ final class TranslationsRelationManager extends BaseRelationManager
                     ->searchable()
                     ->sortable()
                     ->limit(50)
-                    ->tooltip(fn (TextColumn $column): ?string => (is_string($state = $column->getState()) && strlen($state) > 50)
-                        ? $state
-                        : null),
+                    ->tooltip(static function (TextColumn $column): ?string {
+                        $state = $column->getState();
+
+                        return is_string($state) && mb_strlen($state) > 50 ? $state : null;
+                    }),
 
                 TextColumn::make('description')
                     ->label(__('system_setting_categories.translations.description'))
                     ->limit(100)
-                    ->tooltip(fn (TextColumn $column): ?string => (is_string($state = $column->getState()) && strlen($state) > 100)
-                        ? $state
-                        : null)
+                    ->tooltip(static function (TextColumn $column): ?string {
+                        $state = $column->getState();
+
+                        return is_string($state) && mb_strlen($state) > 100 ? $state : null;
+                    })
                     ->toggleable(isToggledHiddenByDefault: true),
 
                 TextColumn::make('created_at')
@@ -138,24 +138,15 @@ final class TranslationsRelationManager extends BaseRelationManager
                     ->native(false),
             ])
             ->headerActions([
-                RelationManagerRepeaterAction::make()
-                    ->label('Quick edit ' . $this->getPluralModelLabel())
-                    ->icon('heroicon-m-pencil-square')
-                    ->modalHeading('Edit ' . $this->getPluralModelLabel())
-                    ->modalWidth('5xl')
-                    ->configureRepeater(function (Repeater $repeater): Repeater {
-                        // Provide a quick-edit modal for managing records inline.
-                        return $repeater->schema($this->getQuickEditSchema());
-                    }),
-                CreateAction::make(),
+                Tables\Actions\CreateAction::make(),
             ])
             ->actions([
-                ViewAction::make(),
-                EditAction::make(),
-                DeleteAction::make(),
+                Tables\Actions\ViewAction::make(),
+                Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
-                DeleteBulkAction::make(),
+                Tables\Actions\DeleteBulkAction::make(),
             ])
             ->defaultSort('locale');
     }

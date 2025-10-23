@@ -13,18 +13,15 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
-use Filament\Tables\Actions\CreateAction;
-use Filament\Tables\Actions\DeleteAction;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\ViewAction;
+use Filament\Forms\Set;
+use Filament\Tables;
 use Filament\Tables\Columns\ColorColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Str;
-use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Str;
 
 final class ChildrenRelationManager extends BaseRelationManager
 {
@@ -49,7 +46,14 @@ final class ChildrenRelationManager extends BaseRelationManager
                                 ->required()
                                 ->maxLength(255)
                                 ->live()
-                                ->afterStateUpdated(fn ($state, callable $set) => $set('slug', Str::slug($state)))
+                                ->afterStateUpdated(static function (?string $state, Set $set): void {
+                                    // Keep child slugs aligned with the displayed label for clarity.
+                                    if ($state === null || $state === '') {
+                                        return;
+                                    }
+
+                                    $set('slug', Str::slug($state));
+                                })
                                 ->helperText(__('system_setting_categories.children.name_help')),
                             TextInput::make('slug')
                                 ->label(__('system_setting_categories.children.slug'))
@@ -113,13 +117,15 @@ final class ChildrenRelationManager extends BaseRelationManager
                 TextColumn::make('description')
                     ->label(__('system_setting_categories.children.description'))
                     ->limit(50)
-                    ->tooltip(fn (TextColumn $column): ?string => (is_string($state = $column->getState()) && strlen($state) > 50)
-                        ? $state
-                        : null)
+                    ->tooltip(static function (TextColumn $column): ?string {
+                        $state = $column->getState();
+
+                        return is_string($state) && mb_strlen($state) > 50 ? $state : null;
+                    })
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('icon')
                     ->label(__('system_setting_categories.children.icon'))
-                    ->formatStateUsing(fn ($state) => $state ?: 'heroicon-o-cog-6-tooth')
+                    ->formatStateUsing(static fn (?string $state): string => $state ?: 'heroicon-o-cog-6-tooth')
                     ->toggleable(isToggledHiddenByDefault: true),
                 ColorColumn::make('color')
                     ->label(__('system_setting_categories.children.color'))
@@ -132,7 +138,7 @@ final class ChildrenRelationManager extends BaseRelationManager
                     ->color('primary'),
                 TextColumn::make('active_settings_count')
                     ->label(__('system_setting_categories.children.active_settings_count'))
-                    ->counts(['settings' => fn (Builder $query): Builder => $query->where('is_active', true)])
+                    ->counts(['settings' => static fn (Builder $query): Builder => $query->where('is_active', true)])
                     ->sortable()
                     ->badge()
                     ->color('success'),
@@ -162,24 +168,15 @@ final class ChildrenRelationManager extends BaseRelationManager
                     ->native(false),
             ])
             ->headerActions([
-                RelationManagerRepeaterAction::make()
-                    ->label('Quick edit ' . $this->getPluralModelLabel())
-                    ->icon('heroicon-m-pencil-square')
-                    ->modalHeading('Edit ' . $this->getPluralModelLabel())
-                    ->modalWidth('5xl')
-                    ->configureRepeater(function (Repeater $repeater): Repeater {
-                        // Provide a quick-edit modal for managing records inline.
-                        return $repeater->schema($this->getQuickEditSchema());
-                    }),
-                CreateAction::make(),
+                Tables\Actions\CreateAction::make(),
             ])
             ->actions([
-                ViewAction::make(),
-                EditAction::make(),
-                DeleteAction::make(),
+                Tables\Actions\ViewAction::make(),
+                Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
-                DeleteBulkAction::make(),
+                Tables\Actions\DeleteBulkAction::make(),
             ])
             ->defaultSort('sort_order');
     }
