@@ -15,6 +15,12 @@ use App\Services\Export\ExportColumn;
 use App\Services\Export\Exporters\OrderExport;
 use App\Services\Export\ExportService;
 use App\Support\Authorization\AuthorizationMatrix;
+use App\Support\Search\CustomerSearch;
+use Awcodes\BadgeableColumn\Components\Badge;
+use Awcodes\BadgeableColumn\Components\BadgeableColumn;
+use BackedEnum;
+use DefStudio\SearchableInput\Forms\Components\SearchableInput;
+use Exception;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Tables\Actions\BulkActionGroup;
@@ -38,8 +44,7 @@ use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
-use Filament\Support\Enums\MaxWidth;
-use Filament\Tables\Columns\BadgeColumn;
+use Filament\Support\Enums\Size;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ViewColumn;
 use Filament\Tables\Filters\Filter;
@@ -507,57 +512,57 @@ final class OrderResource extends Resource implements DefinesExportColumns
 
         return $table
             ->columns([
-                TextColumn::make('number')
+                BadgeableColumn::make('number')
                     ->label(__('orders.fields.order_number'))
                     ->searchable()
                     ->sortable()
                     ->copyable()
-                    ->weight('bold'),
-                ViewColumn::make('quick_links')
-                    ->label(__('Quick links'))
-                    ->view('filament.tables.columns.list-group')
-                    ->state(function (Order $record): array {
-                        $localeUrlGenerator = app(LocaleUrlGenerator::class);
-                        $locales = collect($localeUrlGenerator->supportedLocales());
+                    ->prefixBadges([
+                        Badge::make('order-status')
+                            ->label(fn (Order $record): string => __('orders.statuses.' . ($record->status ?? 'pending')))
+                            ->color(fn (Order $record): string => match ($record->status) {
+                                'delivered', 'completed' => 'success',
+                                'processing', 'confirmed' => 'primary',
+                                'shipped' => 'info',
+                                'cancelled', 'returned' => 'danger',
+                                default => 'warning',
+                            }),
+                        Badge::make('payment-status')
+                            ->label(fn (Order $record): string => __('orders.payment_statuses.' . ($record->payment_status ?? 'pending')))
+                            ->color(fn (Order $record): string => match ($record->payment_status) {
+                                'paid' => 'success',
+                                'refunded', 'partially_refunded' => 'gray',
+                                'failed' => 'danger',
+                                default  => 'warning',
+                            }),
+                    ])
+                    ->suffixBadges(function (Order $record): array {
+                        $badges = [];
 
-                        $items = $locales
-                            ->map(function (string $locale) use ($record, $localeUrlGenerator): ?array {
-                                $url = $localeUrlGenerator->localizedRoute(
-                                    'localized.orders.show',
-                                    ['order' => $record->number],
-                                    $locale,
-                                );
+                        $shippingStatus = $record->shipping?->status;
 
-                                if (! $url && Route::has('frontend.orders.show')) {
-                                    $url = route('frontend.orders.show', $record);
-                                }
-
-                                if (! $url) {
-                                    return null;
-                                }
-
-                                return [
-                                    'label' => __('Order (:locale)', ['locale' => strtoupper($locale)]),
-                                    'url'   => $url,
-                                    'icon'  => 'heroicon-o-arrow-top-right-on-square',
-                                    'color' => 'primary',
-                                ];
-                            })
-                            ->filter()
-                            ->values();
-
-                        if (Route::has('api.orders.show')) {
-                            $items->push([
-                                'label' => __('Order API (:number)', ['number' => $record->number]),
-                                'url'   => route('api.orders.show', ['order' => $record->number]),
-                                'icon'  => 'heroicon-o-code-bracket',
-                                'color' => 'info',
-                            ]);
+                        if ($shippingStatus) {
+                            $badges[] = Badge::make('shipping-status')
+                                ->label(__('admin.enums.shipping_statuses.' . $shippingStatus))
+                                ->color(match ($shippingStatus) {
+                                    'delivered' => 'success',
+                                    'returned'  => 'danger',
+                                    'in_transit', 'shipped' => 'info',
+                                    default => 'primary',
+                                });
                         }
 
-                        return $items->all();
+                        if (in_array($record->payment_status, ['paid', 'captured', 'settled', 'authorized'], true)) {
+                            $badges[] = Badge::make('paid')
+                                ->label(__('orders.payment_statuses.paid'))
+                                ->color('success');
+                        }
+
+                        return $badges;
                     })
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->asPills()
+                    ->separator('•')
+                    ->size(Size::Small),
                 TextColumn::make('user.name')
                     ->label(__('orders.fields.customer'))
                     ->limit(30)
@@ -567,28 +572,6 @@ final class OrderResource extends Resource implements DefinesExportColumns
                         return strlen($state) > 30 ? $state : null;
                     })
                     ->searchable()
-                    ->sortable(),
-                BadgeColumn::make('status')
-                    ->label(__('orders.fields.status'))
-                    ->colors([
-                        'warning'   => 'pending',
-                        'primary'   => 'processing',
-                        'info'      => 'shipped',
-                        'success'   => 'delivered',
-                        'danger'    => 'cancelled',
-                        'secondary' => 'refunded',
-                    ])
-                    ->formatStateUsing(fn (string $state): string => __("orders.status.{$state}"))
-                    ->sortable(),
-                BadgeColumn::make('payment_status')
-                    ->label(__('orders.fields.payment_status'))
-                    ->colors([
-                        'warning'   => 'pending',
-                        'success'   => 'paid',
-                        'danger'    => 'failed',
-                        'secondary' => 'refunded',
-                    ])
-                    ->formatStateUsing(fn (string $state): string => __("orders.payment_status.{$state}"))
                     ->sortable(),
                 TextColumn::make('total')
                     ->label(__('orders.fields.total'))
@@ -1016,6 +999,15 @@ final class OrderResource extends Resource implements DefinesExportColumns
             'view'   => Pages\ViewOrder::route('/{record}'),
             'edit'   => Pages\EditOrder::route('/{record}/edit'),
         ];
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()->with([
+            'user:id,name,email',
+            'shipping:id,order_id,status',
+            'channel:id,name',
+        ]);
     }
 
     /**

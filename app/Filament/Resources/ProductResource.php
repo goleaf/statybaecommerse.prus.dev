@@ -19,6 +19,8 @@ use App\Services\Export\ExportColumn;
 use App\Services\Export\Exporters\ProductExport;
 use App\Services\Export\ExportService;
 use App\Support\Authorization\AuthorizationMatrix;
+use Awcodes\BadgeableColumn\Components\Badge;
+use Awcodes\BadgeableColumn\Components\BadgeableColumn;
 use BackedEnum;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Actions\ActionGroup;
@@ -49,8 +51,7 @@ use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Components\Tabs\Tab;
-use Filament\Support\Enums\MaxWidth;
-use Filament\Tables\Columns\BadgeColumn;
+use Filament\Support\Enums\Size;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -436,53 +437,61 @@ final class ProductResource extends Resource implements DefinesExportColumns
                     ->label(__('products.fields.image'))
                     ->circular()
                     ->size(50),
-                TextColumn::make('name')
+                BadgeableColumn::make('name')
                     ->label(__('products.fields.name'))
                     ->searchable()
                     ->sortable()
-                    ->limit(50),
-                ViewColumn::make('quick_links')
-                    ->label(__('Quick links'))
-                    ->view('filament.tables.columns.list-group')
-                    ->state(function (Product $record): array {
-                        $localeUrlGenerator = app(LocaleUrlGenerator::class);
-                        $locales = collect($localeUrlGenerator->supportedLocales());
+                    ->prefixBadges([
+                        Badge::make('status')
+                            ->label(fn (Product $record): string => __('products.status.' . $record->status))
+                            ->color(fn (Product $record): string => match ($record->status) {
+                                'published' => 'success',
+                                'draft'     => 'gray',
+                                'archived'  => 'warning',
+                                default     => 'primary',
+                            }),
+                    ])
+                    ->suffixBadges(function (Product $record): array {
+                        $badges = [];
+                        $locale = app()->getLocale();
 
-                        return $locales
-                            ->map(function (string $locale) use ($record, $localeUrlGenerator): ?array {
-                                $slug = $record->getTranslation('slug', $locale) ?: $record->slug;
+                        $categoryBadges = $record->categories->map(function ($category) use ($locale): Badge {
+                            $label = method_exists($category, 'getTranslation')
+                                ? (string) $category->getTranslation('name', $locale)
+                                : (string) $category->name;
 
-                                if (! $slug) {
-                                    return null;
-                                }
+                            return Badge::make('category-' . $category->getKey())
+                                ->label($label)
+                                ->color('primary');
+                        })->all();
 
-                                $url = $localeUrlGenerator->localizedRoute(
-                                    'localized.products.show',
-                                    ['product' => $slug],
-                                    $locale,
-                                ) ?? route('products.show', ['product' => $slug]);
+                        if ($categoryBadges !== []) {
+                            $badges = array_merge($badges, $categoryBadges);
+                        }
 
-                                if (! $url) {
-                                    return null;
-                                }
+                        if ($record->is_featured) {
+                            $badges[] = Badge::make('featured')
+                                ->label(__('products.fields.is_featured'))
+                                ->color('warning');
+                        }
 
-                                $name = $record->getTranslation('name', $locale) ?: $record->name;
+                        if ($record->manage_stock) {
+                            if ($record->stock_quantity <= 0) {
+                                $badges[] = Badge::make('out-of-stock')
+                                    ->label(__('products.filters.out_of_stock'))
+                                    ->color('danger');
+                            } elseif ($record->low_stock_threshold !== null && $record->stock_quantity <= $record->low_stock_threshold) {
+                                $badges[] = Badge::make('low-stock')
+                                    ->label(__('products.filters.low_stock'))
+                                    ->color('warning');
+                            }
+                        }
 
-                                return [
-                                    'label' => __('Storefront (:locale): :name', [
-                                        'locale' => strtoupper($locale),
-                                        'name'   => $name,
-                                    ]),
-                                    'url'   => $url,
-                                    'icon'  => 'heroicon-o-arrow-top-right-on-square',
-                                    'color' => 'primary',
-                                ];
-                            })
-                            ->filter()
-                            ->values()
-                            ->all();
+                        return $badges;
                     })
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->asPills()
+                    ->separator('•')
+                    ->size(Size::Small),
                 TextColumn::make('sku')
                     ->label(__('products.fields.sku'))
                     ->searchable()
@@ -512,13 +521,6 @@ final class ProductResource extends Resource implements DefinesExportColumns
                         $state <= 10 => 'warning',
                         default      => 'success',
                     }),
-                BadgeColumn::make('status')
-                    ->label(__('products.fields.status'))
-                    ->colors([
-                        'draft'     => 'gray',
-                        'published' => 'success',
-                        'archived'  => 'warning',
-                    ]),
                 IconColumn::make('is_visible')
                     ->label(__('products.fields.is_visible'))
                     ->boolean(),
@@ -834,6 +836,7 @@ final class ProductResource extends Resource implements DefinesExportColumns
             ->with([
                 'brand:id,name',
                 'primaryImage',
+                'categories.translations',
             ])
             ->withCount([
                 'reviews as approved_reviews_count' => fn (Builder $query): Builder => $query->where('is_approved', true),

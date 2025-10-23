@@ -8,6 +8,8 @@ use App\Support\Concerns\HasNav;
 
 use App\Filament\Resources\CouponResource\Pages;
 use App\Models\Coupon;
+use Awcodes\BadgeableColumn\Components\Badge;
+use Awcodes\BadgeableColumn\Components\BadgeableColumn;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
@@ -19,12 +21,20 @@ use Filament\Forms\Form;
 use Filament\Forms\Get;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Tables\Columns\BadgeColumn;
+use Filament\Support\Enums\Size;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\BulkAction;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Tapp\FilamentValueRangeFilter\Filters\ValueRangeFilter;
 
@@ -186,14 +196,64 @@ final class CouponResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('code')
+                BadgeableColumn::make('code')
                     ->label(__('coupons.code'))
                     ->searchable()
                     ->sortable()
-                    ->weight('bold')
                     ->copyable()
-                    ->badge()
-                    ->color('blue'),
+                    ->prefixBadges([
+                        Badge::make('status')
+                            ->label(fn (Coupon $record): string => $record->is_active ? __('discount_codes.active') : __('discount_codes.inactive'))
+                            ->color(fn (Coupon $record): string => $record->is_active ? 'success' : 'danger'),
+                    ])
+                    ->suffixBadges(function (Coupon $record): array {
+                        $badges = [];
+
+                        if ($record->type) {
+                            $badges[] = Badge::make('type-' . $record->type)
+                                ->label(__('discount_codes.types.' . $record->type))
+                                ->color('primary');
+                        }
+
+                        if ($record->is_public) {
+                            $badges[] = Badge::make('visibility-public')
+                                ->label(__('discount_codes.is_public'))
+                                ->color('success');
+                        } else {
+                            $badges[] = Badge::make('visibility-private')
+                                ->label(__('discount_codes.private_only'))
+                                ->color('gray');
+                        }
+
+                        if ($record->is_auto_apply) {
+                            $badges[] = Badge::make('auto-apply')
+                                ->label(__('discount_codes.is_auto_apply'))
+                                ->color('info');
+                        }
+
+                        if ($record->is_stackable) {
+                            $badges[] = Badge::make('stackable')
+                                ->label(__('discount_codes.is_stackable'))
+                                ->color('warning');
+                        }
+
+                        if ($record->valid_from) {
+                            $badges[] = Badge::make('valid-from')
+                                ->label(__('discount_codes.valid_from') . ': ' . $record->valid_from->format('Y-m-d'))
+                                ->color('secondary');
+                        }
+
+                        if ($record->valid_until) {
+                            $badges[] = Badge::make('valid-until')
+                                ->label(__('discount_codes.valid_until') . ': ' . $record->valid_until->format('Y-m-d'))
+                                ->color('secondary');
+                        }
+
+                        return $badges;
+                    })
+                    ->asPills()
+                    ->separator('•')
+                    ->size(Size::Small),
                 TextColumn::make('name')
                     ->label(__('coupons.name'))
                     ->limit(50),
@@ -234,15 +294,10 @@ final class CouponResource extends Resource
                     ->color(fn ($state, Coupon $record): string => $record->usage_limit && $state >= $record->usage_limit ? 'danger' : 'success'),
                 TextColumn::make('remaining_uses')
                     ->label(__('coupons.remaining_uses'))
-                    ->getStateUsing(fn (Coupon $record): ?int => $record->usage_limit ? max($record->usage_limit - $record->used_count, 0) : null)
-                    ->color(fn (?int $state): ?string => $state === null ? null : ($state <= 0 ? 'danger' : 'success')),
-                BadgeColumn::make('is_active')
-                    ->label(__('coupons.status'))
-                    ->formatStateUsing(fn (bool $state): string => $state ? __('coupons.active') : __('coupons.inactive'))
-                    ->colors([
-                        'success' => true,
-                        'danger'  => false,
-                    ]),
+                    ->color(fn ($state): string => $state <= 0 ? 'danger' : 'success'),
+                TextColumn::make('customerGroup.name')
+                    ->label(__('coupons.customer_group'))
+                    ->color('gray'),
                 IconColumn::make('is_public')
                     ->label(__('coupons.is_public'))
                     ->boolean(),
@@ -381,6 +436,11 @@ final class CouponResource extends Resource
                 ]),
             ])
             ->defaultSort('created_at', 'desc');
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()->with(['customerGroup:id,name']);
     }
 
     /**

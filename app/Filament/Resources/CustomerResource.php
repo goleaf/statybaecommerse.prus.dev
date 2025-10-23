@@ -10,6 +10,8 @@ use App\Filament\Resources\CustomerResource\Pages;
 use App\Models\City;
 use App\Models\Customer;
 use App\Models\Scopes\ActiveScope;
+use Awcodes\BadgeableColumn\Components\Badge;
+use Awcodes\BadgeableColumn\Components\BadgeableColumn;
 use BackedEnum;
 use Filament\Forms;
 use Filament\Forms\Components\Select;
@@ -25,6 +27,7 @@ use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get as SchemaGet;
 use Filament\Schemas\Components\Utilities\Set as SchemaSet;
+use Filament\Support\Enums\Size;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Actions\BulkActionGroup;
@@ -184,34 +187,41 @@ final class CustomerResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('name')
+                BadgeableColumn::make('name')
                     ->label(__('customers.name'))
                     ->searchable()
                     ->sortable()
-                    ->weight('bold'),
-                ViewColumn::make('quick_links')
-                    ->label(__('Quick links'))
-                    ->view('filament.tables.columns.list-group')
-                    ->state(function (Customer $record): array {
-                        return collect([
-                            filled($record->email) ? [
-                                'label' => __('Email :email', ['email' => $record->email]),
-                                'url'   => 'mailto:' . $record->email,
-                                'icon'  => 'heroicon-o-envelope',
-                                'color' => 'info',
-                            ] : null,
-                            filled($record->phone) ? [
-                                'label' => __('Call :phone', ['phone' => $record->phone]),
-                                'url'   => 'tel:' . preg_replace('/[^0-9+]/', '', (string) $record->phone),
-                                'icon'  => 'heroicon-o-phone',
-                                'color' => 'success',
-                            ] : null,
-                        ])
-                            ->filter()
-                            ->values()
-                            ->all();
+                    ->prefixBadges([
+                        Badge::make('status')
+                            ->label(fn (Customer $record): string => $record->is_active ? __('customers.badges.active') : __('customers.badges.inactive'))
+                            ->color(fn (Customer $record): string => $record->is_active ? 'success' : 'danger'),
+                    ])
+                    ->suffixBadges(function (Customer $record): array {
+                        $badges = [];
+
+                        if ($record->company?->name) {
+                            $badges[] = Badge::make('company-' . $record->company->getKey())
+                                ->label($record->company->name)
+                                ->color('warning');
+                        }
+
+                        if ($record->country?->name) {
+                            $badges[] = Badge::make('country-' . $record->country->getKey())
+                                ->label($record->country->name)
+                                ->color('primary');
+                        }
+
+                        if ($record->city?->name) {
+                            $badges[] = Badge::make('city-' . $record->city->getKey())
+                                ->label($record->city->name)
+                                ->color('info');
+                        }
+
+                        return $badges;
                     })
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->asPills()
+                    ->separator('•')
+                    ->size(Size::Small),
                 TextColumn::make('email')
                     ->label(__('customers.email'))
                     ->searchable()
@@ -424,8 +434,14 @@ final class CustomerResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()->withoutGlobalScopes([
-            ActiveScope::class,
-        ]);
+        return parent::getEloquentQuery()
+            ->withoutGlobalScopes([
+                ActiveScope::class,
+            ])
+            ->with([
+                'country:id,name',
+                'city:id,name',
+                'company:id,name',
+            ]);
     }
 }

@@ -70,6 +70,10 @@ return [
     'unverified_only' => 'Unverified Only',
     'active_only'     => 'Active Only',
     'inactive_only'   => 'Inactive Only',
+    'badges' => [
+        'active' => 'Active',
+        'inactive' => 'Inactive',
+    ],
     'created_from'    => 'Created From',
     'created_until'   => 'Created Until',
 
