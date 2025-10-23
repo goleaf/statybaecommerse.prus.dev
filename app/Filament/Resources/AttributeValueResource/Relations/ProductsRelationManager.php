@@ -22,7 +22,7 @@ class ProductsRelationManager extends BaseRelationManager
 
     protected static ?string $pluralModelLabel = 'Products';
 
-    public function form(Schema $form): Schema
+    public function form(Form $form): Form
     {
         return $schema
             ->schema([
@@ -39,7 +39,7 @@ class ProductsRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
         return $table
             ->recordTitleAttribute('name')

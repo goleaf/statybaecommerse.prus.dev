@@ -53,7 +53,7 @@ final class VariantStockHistoryResource extends Resource
         return __('admin.variant_stock_histories.single');
     }
 
-    public static function form(Schema $form): Schema
+    public static function form(Form $form): Form
     {
         return $form->schema([
             Section::make(__('admin.variant_stock_histories.sections.basic_info'))
@@ -130,7 +130,7 @@ final class VariantStockHistoryResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

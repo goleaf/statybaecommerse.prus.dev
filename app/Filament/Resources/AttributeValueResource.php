@@ -77,7 +77,7 @@ final class AttributeValueResource extends Resource
         return __('attribute_values.plural');
     }
 
-    public static function form(Schema $form): Schema
+    public static function form(Form $form): Form
     {
         return $form->schema([
             Section::make(__('attribute_values.basic_information'))
@@ -158,7 +158,7 @@ final class AttributeValueResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

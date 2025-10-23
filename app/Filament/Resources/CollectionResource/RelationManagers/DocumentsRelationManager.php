@@ -20,7 +20,7 @@ final class DocumentsRelationManager extends BaseRelationManager
 
     protected static ?string $title = 'Collection Documents';
 
-    public function form(Schema $form): Schema
+    public function form(Form $form): Form
     {
         return $schema
             ->schema([
@@ -72,7 +72,7 @@ final class DocumentsRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
         return $table
             ->recordTitleAttribute('title')

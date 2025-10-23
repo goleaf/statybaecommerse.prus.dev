@@ -20,8 +20,9 @@ class OrdersRelationManager extends BaseRelationManager
 
     protected static ?string $pluralModelLabel = 'Orders';
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
+        // Filament 4 expects the fluent Table builder, so we configure it before returning.
         return $table
             ->columns([
                 TextColumn::make('number')

@@ -65,7 +65,7 @@ final class AdminUserResource extends Resource
      * Configure the Filament form schema using the v4 Schema contract so the
      * resource signature remains compatible with the upstream Resource base class.
      */
-    public static function form(Schema $form): Schema
+    public static function form(Form $form): Form
     {
         return $form->schema([
             Section::make(__('admin.admin_users.form.sections.basic_information'))
@@ -140,7 +140,7 @@ final class AdminUserResource extends Resource
      * Configure the Filament table while returning the Table instance to satisfy
      * Filament v4's stricter resource method typing.
      */
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

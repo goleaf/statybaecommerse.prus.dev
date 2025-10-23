@@ -79,7 +79,7 @@ final class CacheMaintenance extends Page
         return (bool) ($user->is_admin ?? false);
     }
 
-    public function form(Schema $form): Schema
+    public function form(Form $form): Form
     {
         return $form
             ->schema([

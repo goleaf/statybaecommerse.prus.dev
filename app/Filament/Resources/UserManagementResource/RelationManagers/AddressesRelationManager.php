@@ -27,7 +27,7 @@ final class AddressesRelationManager extends BaseRelationManager
 
     protected static ?string $title = 'Addresses';
 
-    public function form(Schema $form): Schema
+    public function form(Form $form): Form
     {
         return $form->schema([
             Grid::make(2)->schema([
@@ -90,7 +90,7 @@ final class AddressesRelationManager extends BaseRelationManager
         ]);
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
         return $table
             ->recordTitleAttribute('full_name')

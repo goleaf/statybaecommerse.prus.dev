@@ -22,12 +22,12 @@ class ReferralCodeStatisticsResource extends Resource
 
     protected static BackedEnum|string|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    public static function form(Schema $form): Schema
+    public static function form(Form $form): Form
     {
         return ReferralCodeStatisticsForm::configure($form);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return ReferralCodeStatisticsTable::configure($table);
     }

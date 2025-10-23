@@ -29,7 +29,7 @@ final class TopSellingProductsWidget extends BaseWidget
         return __('analytics.top_selling_products');
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
         $query = Product::query()
             ->select(['products.*'])

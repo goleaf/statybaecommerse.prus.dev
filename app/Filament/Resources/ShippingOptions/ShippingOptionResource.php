@@ -25,12 +25,12 @@ class ShippingOptionResource extends Resource
 
     protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    public static function form(Schema $form): Schema
+    public static function form(Form $form): Form
     {
         return ShippingOptionForm::configure($form);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return ShippingOptionsTable::configure($table);
     }

@@ -31,7 +31,7 @@ class TranslationsRelationManager extends BaseRelationManager
 
     protected static ?string $pluralModelLabel = 'Translations';
 
-    public function form(Schema $form): Schema
+    public function form(Form $form): Form
     {
         return $this->sanitizePayload($data);
     }
@@ -124,7 +124,7 @@ class TranslationsRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
         return $table
             ->recordTitleAttribute('title')

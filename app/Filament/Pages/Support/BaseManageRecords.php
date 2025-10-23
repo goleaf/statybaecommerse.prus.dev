@@ -14,7 +14,7 @@ abstract class BaseManageRecords extends ManageRecords
     use ConfiguresToggleableTableLayout;
     use HasToggleableTable;
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
         $table = parent::table($table);
 

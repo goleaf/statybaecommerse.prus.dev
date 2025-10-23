@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Enums\NavigationGroup;
+use BackedEnum;
+use UnitEnum;
 use App\Filament\Resources\EnumManagementResource\Pages;
 use App\Models\EnumValue;
 use Filament\Actions\Action;
@@ -53,10 +55,10 @@ final class EnumManagementResource extends Resource
      *
      * @var string|\BackedEnum|null
      */
-    protected static $navigationIcon = 'heroicon-o-squares-2x2';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-squares-2x2';
 
-    /** @var string|\BackedEnum|null Pin enum tools to the shared System navigation section. */
-    protected static $navigationGroup = NavigationGroup::System;
+    /** @var UnitEnum|string|null Pin enum tools to the shared System navigation section. */
+    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::System;
 
     protected static ?int $navigationSort = 2;
 

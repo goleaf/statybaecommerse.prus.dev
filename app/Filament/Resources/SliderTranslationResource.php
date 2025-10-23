@@ -66,7 +66,7 @@ final class SliderTranslationResource extends Resource
         return __('admin.slider_translations.model_label');
     }
 
-    public static function form(Schema $form): Schema
+    public static function form(Form $form): Form
     {
         return $form->schema([
             Section::make(__('admin.slider_translations.basic_information'))
@@ -106,7 +106,7 @@ final class SliderTranslationResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

@@ -26,7 +26,7 @@ final class TopPerformingSliders extends BaseWidget
         'xl' => 1,
     ];
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
         $startDate = $this->pageFilters['startDate'] ?? now()->subDays(30);
         $endDate = $this->pageFilters['endDate'] ?? now();

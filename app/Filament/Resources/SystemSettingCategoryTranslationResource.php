@@ -74,7 +74,7 @@ final class SystemSettingCategoryTranslationResource extends Resource
         return __('admin.system_setting_category_translations.model_label');
     }
 
-    public static function form(Schema $form): Schema
+    public static function form(Form $form): Form
     {
         return $form->schema([
             Section::make(__('admin.system_setting_category_translations.basic_information'))
@@ -118,7 +118,7 @@ final class SystemSettingCategoryTranslationResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

@@ -24,7 +24,7 @@ final class MenuItemsRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'allItems';
 
-    public function form(Schema $form): Schema
+    public function form(Form $form): Form
     {
         return $form->schema([
             Grid::make(2)
@@ -63,7 +63,7 @@ final class MenuItemsRelationManager extends BaseRelationManager
         ]);
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
         return $table
             ->columns([

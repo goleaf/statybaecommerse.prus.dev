@@ -62,7 +62,7 @@ final class UserProductInteractionResource extends Resource
         return __('admin.user_product_interactions.model_label');
     }
 
-    public static function form(Schema $form): Schema
+    public static function form(Form $form): Form
     {
         $basicInformationSection = SchemaSection::make(__('admin.user_product_interactions.basic_information'))
             ->schema([
@@ -225,7 +225,7 @@ final class UserProductInteractionResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->deferLoading(false)

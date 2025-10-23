@@ -65,7 +65,7 @@ final class CampaignResource extends Resource
         return __('campaigns.models.campaign');
     }
 
-    public static function form(Schema $form): Schema
+    public static function form(Form $form): Form
     {
         return $form->schema([
             Section::make(__('campaigns.sections.basic_information'))
@@ -231,7 +231,7 @@ final class CampaignResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

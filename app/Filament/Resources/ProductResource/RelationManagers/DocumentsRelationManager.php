@@ -22,7 +22,7 @@ class DocumentsRelationManager extends BaseRelationManager
 
     protected static ?string $pluralModelLabel = 'Documents';
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
         return $table
             ->columns([

@@ -69,7 +69,7 @@ final class CampaignCustomerSegmentResource extends Resource
         return __('campaign_customer_segments.single');
     }
 
-    public static function form(Schema $form): Schema
+    public static function form(Form $form): Form
     {
         return $form->schema([
             Section::make(__('campaign_customer_segments.tabs.basic_information'))
@@ -140,7 +140,7 @@ final class CampaignCustomerSegmentResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

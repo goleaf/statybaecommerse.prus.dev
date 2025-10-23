@@ -63,7 +63,7 @@ final class ReferralStatisticsResource extends Resource
         return __('referral_statistics.single');
     }
 
-    public static function form(Schema $form): Schema
+    public static function form(Form $form): Form
     {
         return $form
             ->columns(3)
@@ -143,7 +143,7 @@ final class ReferralStatisticsResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([

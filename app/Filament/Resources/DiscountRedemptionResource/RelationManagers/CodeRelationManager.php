@@ -23,7 +23,7 @@ class CodeRelationManager extends BaseRelationManager
 
     protected static ?string $pluralModelLabel = 'Codes';
 
-    public function form(Schema $form): Schema
+    public function form(Form $form): Form
     {
         return $schema
             ->schema([
@@ -68,7 +68,7 @@ class CodeRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table|array
+    public function table(Table $table): Table
     {
         return $table
             ->recordTitleAttribute('code')

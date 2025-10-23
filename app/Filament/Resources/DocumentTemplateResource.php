@@ -79,7 +79,7 @@ final class DocumentTemplateResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Schema $form): Schema
+    public static function form(Form $form): Form
     {
         return $form->schema([
             Tabs::make('document_template_form')
@@ -189,7 +189,7 @@ final class DocumentTemplateResource extends Resource
     /**
      * Configure the Filament table with columns, filters, and actions.
      */
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->modifyQueryUsing(fn (Builder $query): Builder => $query->withCount('documents'))
