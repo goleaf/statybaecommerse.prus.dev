@@ -1,4 +1,5 @@
-@import '../../vendor/filament/support/dist/index.css';
+@use 'tailwindcss';
+@use './filament/widget-tabs' as *;
 
 @source '../../vendor/filament/**/*.blade.php';
 @source '../../vendor/defstudio/filament-searchable-input/resources/**/*.blade.php';

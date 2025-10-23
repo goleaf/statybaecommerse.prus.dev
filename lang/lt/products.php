@@ -47,6 +47,10 @@ return [
         'reviews_count' => 'Atsiliepimų Skaičius',
         'average_rating' => 'Vidutinis Įvertinimas',
         'price_increase_percentage' => 'Kainų Padidinimo Procentas',
+        'variant_attribute_matrix' => 'Variacijų atributų matrica',
+    ],
+    'sections' => [
+        'variant_matrix' => 'Variacijų prieinamumo matrica',
     ],
     'status' => [
         'draft' => 'Juodraštis',
@@ -88,8 +92,18 @@ return [
     'helpers' => [
         'price_increase' => 'Įveskite procentą kainų padidinimui (pvz., 10 reiškia 10% padidinimą)',
     ],
-    'sparkline' => [
-        'revenue_label' => 'Pajamos per paskutines :days dienas',
+    'matrix' => [
+        'helper_text' => 'Pasirinkite, kurie SKU palaiko kiekvieną atributą.',
+        'rows' => [
+            'size' => 'Dydis',
+            'color' => 'Spalva',
+            'material' => 'Medžiaga',
+        ],
+        'columns' => [
+            'primary' => 'Pagrindinis SKU',
+            'bundle' => 'Komplekto SKU',
+            'limited' => 'Riboto leidimo SKU',
+        ],
     ],
     'widgets' => [
         'total_products' => 'Iš viso produktų',

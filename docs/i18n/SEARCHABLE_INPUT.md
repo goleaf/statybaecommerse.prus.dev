@@ -31,7 +31,7 @@ The `App\Support\Filament\SearchableComponentHelper` centralises `afterStateHydr
 
 ### Theme requirements
 
-The admin panel registers `resources/css/filament/admin/theme.css` as its custom theme. This stylesheet sources Filament app files, in-house components, and the plugin blade views so Tailwind can compile all utility classes:
+The admin panel registers `resources/css/filament/admin/theme.scss` as its custom theme. This stylesheet sources Filament app files, in-house components, and the plugin blade views so Tailwind can compile all utility classes:
 
 ```css
 @tailwind base;

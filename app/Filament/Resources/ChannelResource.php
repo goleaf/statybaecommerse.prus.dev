@@ -8,6 +8,7 @@ use App\Support\Concerns\HasNav;
 
 use App\Filament\Resources\ChannelResource\Pages;
 use App\Models\Channel;
+use App\Support\Forms\MatrixFactory;
 use BackedEnum;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteBulkAction;
@@ -143,6 +144,29 @@ final class ChannelResource extends Resource
                                     ->default('after'),
                             ]),
                     ]),
+                Section::make(__('admin.channels.payment_matrix_section'))
+                    ->schema([
+                        MatrixFactory::checkboxGrid(
+                            'payment_matrix',
+                            [
+                                'lt' => __('admin.channels.payment_rows.lt'),
+                                'lv' => __('admin.channels.payment_rows.lv'),
+                                'ee' => __('admin.channels.payment_rows.ee'),
+                                'pl' => __('admin.channels.payment_rows.pl'),
+                                'eu' => __('admin.channels.payment_rows.eu'),
+                            ],
+                            [
+                                'web'         => __('admin.channels.payment_columns.web'),
+                                'pos'         => __('admin.channels.payment_columns.pos'),
+                                'marketplace' => __('admin.channels.payment_columns.marketplace'),
+                            ],
+                            __('admin.channels.payment_matrix_label'),
+                        )
+                            ->helperText(__('admin.channels.payment_matrix_help'))
+                            ->columnSpanFull()
+                            ->live(),
+                    ])
+                    ->columns(1),
                 Section::make(__('admin.channels.status'))
                     ->schema([
                         Grid::make(3)
