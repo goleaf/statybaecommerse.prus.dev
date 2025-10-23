@@ -6,7 +6,7 @@ namespace App\Providers;
 
 use App\Domain\Product\Repositories\ProductRepositoryInterface;
 use App\Filament\Components\LiveNotificationFeed;
-use App\Infrastructure\Product\Repositories\EloquentProductRepository;
+use App\Services\CacheInvalidationService;
 use App\Services\DocumentService;
 use App\Support\Filament\SearchableComponentHelper;
 use App\Support\Health\HealthReporter;
@@ -230,13 +230,11 @@ class AppServiceProvider extends ServiceProvider
         // Legacy Shopper components removed - using native Filament resources
 
         Model::saved(function ($model): void {
-            // Flush cache entries for supported aggregates whenever their models change.
             app(CacheInvalidationService::class)->flushForModel($model);
             $this->flushSitemapIfCatalog($model);
             $this->flushDiscountsIfNeeded($model);
         });
         Model::deleted(function ($model): void {
-            // Ensure deletions purge dependent caches as well.
             app(CacheInvalidationService::class)->flushForModel($model);
             $this->flushSitemapIfCatalog($model);
             $this->flushDiscountsIfNeeded($model);

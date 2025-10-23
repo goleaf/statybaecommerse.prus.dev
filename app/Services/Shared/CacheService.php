@@ -26,6 +26,7 @@ final class CacheService
     private const LONG_TTL = 86400;
 
     // 24 hours
+
     private readonly bool $supportsTags;
 
     public function __construct()
@@ -36,11 +37,11 @@ final class CacheService
     /**
      * Handle rememberShort functionality with proper error handling.
      *
-     * @template TValue
+     * @template TCacheValue
      *
-     * @param  Closure(): TValue  $callback
+     * @param  Closure(): TCacheValue  $callback
      * @param  array<int, string>  $tags
-     * @return TValue
+     * @return TCacheValue
      */
     public function rememberShort(string $key, Closure $callback, ?int $ttl = null, array $tags = []): mixed
     {
@@ -50,11 +51,11 @@ final class CacheService
     /**
      * Handle rememberDefault functionality with proper error handling.
      *
-     * @template TValue
+     * @template TCacheValue
      *
-     * @param  Closure(): TValue  $callback
+     * @param  Closure(): TCacheValue  $callback
      * @param  array<int, string>  $tags
-     * @return TValue
+     * @return TCacheValue
      */
     public function rememberDefault(string $key, Closure $callback, ?int $ttl = null, array $tags = []): mixed
     {
@@ -64,11 +65,11 @@ final class CacheService
     /**
      * Handle rememberLong functionality with proper error handling.
      *
-     * @template TValue
+     * @template TCacheValue
      *
-     * @param  Closure(): TValue  $callback
+     * @param  Closure(): TCacheValue  $callback
      * @param  array<int, string>  $tags
-     * @return TValue
+     * @return TCacheValue
      */
     public function rememberLong(string $key, Closure $callback, ?int $ttl = null, array $tags = []): mixed
     {
@@ -76,11 +77,11 @@ final class CacheService
     }
 
     /**
-     * @template TValue
+     * @template TCacheValue
      *
      * @param  array<int, string>  $tags
-     * @param  Closure(): TValue  $callback
-     * @return TValue
+     * @param  Closure(): TCacheValue  $callback
+     * @return TCacheValue
      */
     private function rememberWithTags(array $tags, string $key, int|\DateInterval $ttl, Closure $callback): mixed
     {
@@ -183,14 +184,14 @@ final class CacheService
                     $this->generateHomeKey('featured_products', $locale, $currency),
                     fn () => \App\Models\Product::query()->with(['translations', 'brand', 'media', 'prices'])->where('is_visible', true)->where('is_featured', true)->limit(8)->get(),
                     null,
-                    CacheTagHelper::merge(CacheTagHelper::products(), CacheTagHelper::locale($locale)),
+                    CacheTagHelper::products(),
                 );
                 // Warm up top categories
                 $this->rememberLong(
                     $this->generateHomeKey('top_categories', $locale),
                     fn () => \App\Models\Category::query()->with(['translations', 'media'])->where('is_visible', true)->whereNull('parent_id')->withCount('products')->orderBy('products_count', 'desc')->limit(8)->get(),
                     null,
-                    CacheTagHelper::merge(CacheTagHelper::categories(), CacheTagHelper::locale($locale)),
+                    CacheTagHelper::categories(),
                 );
             }
         }

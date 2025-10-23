@@ -5,10 +5,8 @@ declare(strict_types=1);
 namespace App\View\Creators;
 
 use App\Models\Brand;
-use App\Repositories\CategoryRepository;
-use App\Repositories\MenuRepository;
-use App\Services\Shared\CacheService as SharedCacheService;
-use App\Support\Cache\CacheKeys;
+use App\Models\Category;
+use App\Services\Shared\CacheService;
 use App\Support\Cache\CacheTagHelper;
 use Illuminate\Contracts\View\View;
 
@@ -78,7 +76,22 @@ final class NavigationCreator
      */
     private function getTopCategories()
     {
-        return $this->categoryRepository->navigation(8);
+        return $this->cacheService->rememberLong(
+            'navigation.top_categories.'.app()->getLocale(),
+            fn () => Category::query()
+                ->with(['translations' => function ($q) {
+                    $q->where('locale', app()->getLocale());
+                }])
+                ->where('is_visible', true)
+                ->whereNull('parent_id')
+                ->orderBy('sort_order')
+                ->limit(8)
+                ->cursor()
+                ->takeUntilTimeout(now()->addSeconds(5))
+                ->collect(),
+            null,
+            CacheTagHelper::categories()
+        );
     }
 
     /**
@@ -86,31 +99,71 @@ final class NavigationCreator
      */
     private function getFeaturedBrands()
     {
-        $locale = app()->getLocale();
-
-        // Cache featured brands with locale-aware tags so the invalidation service
-        // can flush navigation payloads whenever catalogue content changes.
-        return $this->cacheService->rememberDefault(
-            CacheKeys::navigationFeaturedBrands($locale),
-            function () use ($locale) {
-                return Brand::query()
-                    ->with(['translations' => static function ($query) use ($locale): void {
-                        $query->where('locale', $locale);
-                    }])
-                    ->where('is_enabled', true)
-                    ->where('is_featured', true)
-                    ->orderBy('sort_order')
-                    ->limit(6)
-                    ->cursor()
-                    ->takeUntilTimeout(now()->addSeconds(5))
-                    ->collect();
-            },
-            1800,
-            CacheTagHelper::merge(CacheTagHelper::brands(), CacheTagHelper::locale($locale))
+        return $this->cacheService->rememberLong(
+            'navigation.featured_brands.'.app()->getLocale(),
+            fn () => Brand::query()
+                ->with(['translations' => function ($q) {
+                    $q->where('locale', app()->getLocale());
+                }])
+                ->where('is_enabled', true)
+                ->where('is_featured', true)
+                ->orderBy('sort_order')
+                ->limit(6)
+                ->cursor()
+                ->takeUntilTimeout(now()->addSeconds(5))
+                ->collect(),
+            null,
+            CacheTagHelper::brands()
         );
     }
 
     /**
      * Get complete navigation menu structure.
      */
+    private function getNavigationMenu(): array
+    {
+        return $this->cacheService->rememberLong(
+            'navigation.menu.'.app()->getLocale(),
+            function () {
+                $categories = $this->getTopCategories();
+                $brands = $this->getFeaturedBrands();
+
+                return [
+                    'categories' => $categories->map(function ($category) {
+                        return [
+                            'id' => $category->id,
+                            'name' => $category->getTranslatedName(),
+                            'slug' => $category->slug,
+                            'url' => route('categories.show', $category->slug),
+                            'icon' => $category->icon,
+                            'children' => $category->children()
+                                ->where('is_visible', true)
+                                ->orderBy('sort_order')
+                                ->limit(5)
+                                ->cursor()
+                                ->takeUntilTimeout(now()->addSeconds(5))
+                                ->collect()
+                                ->map(fn ($child) => [
+                                    'id' => $child->id,
+                                    'name' => $child->getTranslatedName(),
+                                    'slug' => $child->slug,
+                                    'url' => route('categories.show', $child->slug),
+                                ]),
+                        ];
+                    }),
+                    'brands' => $brands->map(function ($brand) {
+                        return [
+                            'id' => $brand->id,
+                            'name' => $brand->getTranslatedName(),
+                            'slug' => $brand->slug,
+                            'url' => route('brands.show', $brand->slug),
+                            'logo' => $brand->logo_url,
+                        ];
+                    }),
+                ];
+            },
+            null,
+            CacheTagHelper::merge(CacheTagHelper::categories(), CacheTagHelper::brands())
+        );
+    }
 }

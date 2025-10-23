@@ -25,7 +25,7 @@ final class ProductObserver
      */
     public function created(Product $product): void
     {
-        $this->flushProductCaches();
+        $this->invalidateCaches($product);
 
         // Skip placeholder image generation during tests to prevent memory issues
         if (app()->environment('testing')) {
@@ -48,28 +48,16 @@ final class ProductObserver
 
     public function updated(Product $product): void
     {
-        $this->flushProductCaches();
+        $this->invalidateCaches($product);
     }
 
     public function deleted(Product $product): void
     {
-        $this->flushProductCaches();
+        $this->invalidateCaches($product);
     }
 
-    public function restored(Product $product): void
+    private function invalidateCaches(Product $product): void
     {
-        $this->flushProductCaches();
-    }
-
-    public function forceDeleted(Product $product): void
-    {
-        $this->flushProductCaches();
-    }
-
-    private function flushProductCaches(): void
-    {
-        // Delegate to the central cache invalidation orchestrator so both taggable
-        // stores and array/file fallbacks are refreshed consistently.
-        $this->cacheInvalidationService->flushProducts();
+        app(CacheInvalidationService::class)->flushForModel($product);
     }
 }

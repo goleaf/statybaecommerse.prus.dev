@@ -8,7 +8,9 @@ use App\Models\Order;
 use App\Models\Product;
 use App\Models\Review;
 use App\Models\User;
-use App\Support\Cache\CacheKeys;
+use App\Services\CacheInvalidationService;
+use App\Support\Cache\CacheTagHelper;
+use Illuminate\Cache\TaggableStore;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
@@ -91,8 +93,8 @@ final class LiveDashboard extends Component
     {
         $cacheKey = "live_dashboard_stats_{$this->timeRange}";
 
-        return Cache::remember($cacheKey, 60, function () {
-            $rangeStart = $this->getTimeRangeStart();
+        return $this->rememberDashboard($cacheKey, 60, function () {
+            $timeCondition = $this->getTimeCondition();
 
             return [
                 'products' => [
@@ -131,8 +133,8 @@ final class LiveDashboard extends Component
     {
         $cacheKey = "live_dashboard_activity_{$this->timeRange}";
 
-        return Cache::remember($cacheKey, 120, function () {
-            $rangeStart = $this->getTimeRangeStart();
+        return $this->rememberDashboard($cacheKey, 120, function () {
+            $timeCondition = $this->getTimeCondition();
 
             return [
                 'recent_orders' => Order::with(['user'])
@@ -184,7 +186,9 @@ final class LiveDashboard extends Component
     #[Computed(persist: true, seconds: 300)]
     public function performanceMetrics(): array
     {
-        return Cache::remember(CacheKeys::dashboardPerformance($this->timeRange), CacheKeys::TTL_FIVE_MINUTES, function () {
+        $cacheKey = "live_dashboard_performance_{$this->timeRange}";
+
+        return $this->rememberDashboard($cacheKey, 300, function () {
             return [
                 'page_views' => rand(1000, 5000),
                 // Mock data - replace with real analytics
@@ -227,9 +231,18 @@ final class LiveDashboard extends Component
      */
     private function clearCache(): void
     {
-        Cache::forget(CacheKeys::dashboardStats($this->timeRange));
-        Cache::forget(CacheKeys::dashboardActivity($this->timeRange));
-        Cache::forget(CacheKeys::dashboardPerformance($this->timeRange));
+        app(CacheInvalidationService::class)->flushDashboards();
+    }
+
+    private function rememberDashboard(string $key, int $ttl, callable $callback): array
+    {
+        $store = Cache::getStore();
+
+        if ($store instanceof TaggableStore) {
+            return Cache::tags(CacheTagHelper::dashboards())->remember($key, $ttl, $callback);
+        }
+
+        return Cache::remember($key, $ttl, $callback);
     }
 
     /**
