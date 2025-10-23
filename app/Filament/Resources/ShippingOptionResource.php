@@ -21,6 +21,7 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
+use Filament\Forms\Get;
 use Filament\Resources\Resource;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -29,7 +30,6 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Support\Number;
 use Illuminate\Support\Str;
-use Tapp\FilamentValueRangeFilter\Filters\ValueRangeFilter;
 use UnitEnum;
 
 /**
@@ -231,23 +231,9 @@ final class ShippingOptionResource extends Resource
                     ->sortable(),
                 TextColumn::make('estimated_days_min')
                     ->label(__('admin.shipping_options.estimated_days'))
-                    ->formatStateUsing(
-                        function ($state, ShippingOption $record): string {
-                            // Present a stable "min-max" window when both values exist; otherwise surface a dash for clarity.
-                            $minimum = is_numeric($state) ? (int) $state : null;
-                            $maximum = is_numeric($record->estimated_days_max) ? (int) $record->estimated_days_max : null;
-
-                            if ($minimum === null || $maximum === null) {
-                                return '-';
-                            }
-
-                            if ($minimum === $maximum) {
-                                return sprintf('%d %s', $minimum, __('admin.shipping_options.days'));
-                            }
-
-                            return sprintf('%d-%d %s', $minimum, $maximum, __('admin.shipping_options.days'));
-                        }
-                    ),
+                    ->formatStateUsing(fn ($record) => $record->estimated_days_min && $record->estimated_days_max
+                        ? "{$record->estimated_days_min}-{$record->estimated_days_max} " . __('admin.shipping_options.days')
+                        : '-'),
                 IconColumn::make('is_enabled')
                     ->label(__('admin.shipping_options.is_enabled'))
                     ->boolean(),
