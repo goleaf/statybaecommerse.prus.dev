@@ -10,4 +10,20 @@ Update your Git hook to source "$(dirname "$0")/h" instead of "$(dirname "$0")/h
 This repository ships with the new shim so the local Node and PHP toolchains stay on PATH.
 MSG
 
-exit 1
+if [ -f "$HOME/.huskyrc" ]; then
+    echo "husky - '~/.huskyrc' is DEPRECATED, please move your code to ~/.config/husky/init.sh"
+fi
+i="${XDG_CONFIG_HOME:-$HOME/.config}/husky/init.sh"
+[ -f "$i" ] && . "$i"
+
+[ "${HUSKY-}" = "0" ] && exit 0
+
+export PATH="node_modules/.bin:$PATH"
+# Ensure Git hooks execute using the repository's local toolchain so commands remain consistent across environments.
+# This guard also gives us one place to adapt whenever Husky v10 introduces its new bootstrap entrypoint semantics.
+sh -e "$s" "$@"
+c=$?
+
+[ $c != 0 ] && echo "husky - $n script failed (code $c)"
+[ $c = 127 ] && echo "husky - command not found in PATH=$PATH"
+exit $c
