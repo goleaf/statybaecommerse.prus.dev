@@ -6,6 +6,8 @@ namespace App\Filament\Widgets;
 
 use App\Models\Slider;
 use App\Support\Search\ContentLinkSearch;
+use App\Support\Search\SearchableComponentHelper;
+use DefStudio\SearchableInput\DTO\SearchResult;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Exception;
 use Filament\Actions\Action;
@@ -50,10 +52,21 @@ final class SliderQuickActionsWidget extends Widget implements HasActions, HasFo
                     ->maxLength(255),
                 SearchableInput::make('button_url')
                     ->label(__('translations.button_url'))
-                    ->placeholder(__('translations.button_url_placeholder'))
-                    ->helperText(__('translations.button_url_helper'))
-                    ->searchUsing(fn (string $term): array => ContentLinkSearch::suggest($term))
-                    ->maxLength(255),
+                    ->placeholder(__('translations.slider_link_placeholder'))
+                    ->maxLength(255)
+                    ->searchUsing(fn (string $value): array => ContentLinkSearch::results($value))
+                    ->dehydrateStateUsing(fn (?string $state): ?string => $state !== null && $state !== '' ? $state : null)
+                    ->afterStateHydrated(function (SearchableInput $component, ?string $state): void {
+                        ContentLinkSearch::hydrateComponent($component, $state);
+                    })
+                    ->onItemSelected(function (SearchResult $item, SearchableInput $component): void {
+                        SearchableComponentHelper::apply($component, $item);
+                    })
+                    ->afterStateUpdated(function (?string $state, SearchableInput $component): void {
+                        if ($state === null || $state === '') {
+                            SearchableComponentHelper::forget($component);
+                        }
+                    }),
                 ColorPicker::make('background_color')
                     ->label(__('translations.background_color'))
                     ->default('#ffffff'),

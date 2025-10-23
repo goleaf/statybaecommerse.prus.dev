@@ -7,6 +7,7 @@ namespace App\Support\Search;
 use App\Models\Address;
 use App\Models\City;
 use DefStudio\SearchableInput\DTO\SearchResult;
+use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
 
@@ -119,20 +120,32 @@ final class AddressSearch
             ->get();
 
         return $addresses
-            ->map(function (Address $address): SearchResult {
-                /** @var int|string|null $identifier */
-                $identifier = $address->getKey();
-                $payload = self::payload($address);
-
-                $result = SearchResult::make((string) ($identifier ?? ''), $payload['label']);
-
-                return $result
-                    ->withData('address_id', $address->getKey())
-                    ->withData('payload', $payload);
-            })
+            ->map(static fn (Address $address): SearchResult => self::toResult($address))
             ->all();
     }
 
+    public static function hydrateComponent(SearchableInput $component, ?int $state): void
+    {
+        if ($state === null) {
+            SearchableComponentHelper::forget($component);
+
+            return;
+        }
+
+        $address = Address::query()
+            ->select(['id', 'address_line_1', 'address_line_2', 'city', 'state', 'postal_code', 'country_code'])
+            ->find($state);
+
+        if (! $address instanceof Address) {
+            return;
+        }
+
+        SearchableComponentHelper::apply($component, self::toResult($address));
+    }
+
+    /**
+     * @return array<string, string>
+     */
     public static function payload(Address $address): array
     {
         /** @var string|null $line1 */
@@ -287,5 +300,20 @@ final class AddressSearch
     private static function stringValue(mixed $value): string
     {
         return is_string($value) ? $value : '';
+    }
+
+    private static function toResult(Address $address): SearchResult
+    {
+        /** @var int|string|null $identifier */
+        $identifier = $address->getKey();
+        $label = self::formatAddress($address);
+
+        $result = SearchResult::make((string) ($identifier ?? ''), $label);
+
+        $result
+            ->withData('address_id', $address->getKey())
+            ->withData('payload', self::payload($address));
+
+        return $result;
     }
 }

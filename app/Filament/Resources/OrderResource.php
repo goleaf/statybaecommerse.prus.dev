@@ -8,10 +8,7 @@ use App\Forms\Components\Flatpickr;
 use App\Data\ExportRequestData;
 use App\Filament\Resources\OrderResource\Pages;
 use App\Filament\Resources\OrderResource\RelationManagers;
-use App\Models\Address;
-use App\Models\Channel;
 use App\Models\Order;
-use App\Models\Partner;
 use App\Services\Pricing\PriceCalculator;
 use App\Support\Authorization\AuthorizationMatrix;
 use App\Support\Filament\Components\Flatpickr;
@@ -20,6 +17,7 @@ use App\Support\Search\AddressSearch;
 use App\Support\Search\ChannelSearch;
 use App\Support\Search\CustomerSearch;
 use App\Support\Search\PartnerSearch;
+use App\Support\Search\SearchableComponentHelper;
 use App\Support\Seo\LocaleUrlGenerator;
 use BackedEnum;
 use DefStudio\SearchableInput\DTO\SearchResult;
@@ -395,71 +393,61 @@ final class OrderResource extends Resource implements DefinesExportColumns
                     Grid::make(2)
                         ->schema([
                             SearchableInput::make('billing_address_lookup')
-                                ->label(__('orders.fields.billing_address'))
-                                ->placeholder(__('orders.placeholders.billing_address'))
-                                ->helperText(__('orders.helpers.billing_address'))
-                                ->searchUsing(fn (string $term): array => AddressSearch::results($term))
-                                ->afterStateHydrated(function (SearchableInput $component, $state, ?Order $record): void {
-                                    $payload = $record?->getAttribute('billing_address');
-
-                                    if (! is_array($payload) || ! isset($payload['address_id'])) {
-                                        return;
-                                    }
-
-                                    $id = (int) $payload['address_id'];
-                                    $label = (string) ($payload['label'] ?? AddressSearch::formatPayload($payload));
-
-                                    $component
-                                        ->state((string) $id)
-                                        ->options([
-                                            (string) $id => $label,
-                                        ]);
+                                ->label(__('orders.lookups.billing_address'))
+                                ->placeholder(__('orders.lookups.address_placeholder'))
+                                ->searchUsing(fn (string $value): array => AddressSearch::results($value))
+                                ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null && $state !== '' ? (int) $state : null)
+                                ->afterStateHydrated(function (SearchableInput $component, ?int $state): void {
+                                    AddressSearch::hydrateComponent($component, $state);
                                 })
-                                ->afterStateUpdated(function (?string $state, Set $set): void {
+                                ->onItemSelected(function (SearchResult $item, SearchableInput $component, Set $set): void {
+                                    SearchableComponentHelper::apply($component, $item);
+                                    $payload = $item->get('payload');
+
+                                    $set('billing_address', is_array($payload) ? $payload : []);
+                                })
+                                ->afterStateUpdated(function (?string $state, Set $set, SearchableInput $component): void {
                                     if ($state === null || $state === '') {
-                                        $set('billing_address', null);
+                                        SearchableComponentHelper::forget($component);
+                                        $set('billing_address', []);
 
                                         return;
                                     }
 
-                                    $payload = AddressSearch::payloadFromId((int) $state);
+                                    $result = SearchableComponentHelper::recall($component);
+                                    $payload = $result?->get('payload');
 
-                                    if ($payload !== null) {
+                                    if (is_array($payload)) {
                                         $set('billing_address', $payload);
                                     }
                                 })
                                 ->dehydrated(false),
                             SearchableInput::make('shipping_address_lookup')
-                                ->label(__('orders.fields.shipping_address'))
-                                ->placeholder(__('orders.placeholders.shipping_address'))
-                                ->helperText(__('orders.helpers.shipping_address'))
-                                ->searchUsing(fn (string $term): array => AddressSearch::results($term))
-                                ->afterStateHydrated(function (SearchableInput $component, $state, ?Order $record): void {
-                                    $payload = $record?->getAttribute('shipping_address');
-
-                                    if (! is_array($payload) || ! isset($payload['address_id'])) {
-                                        return;
-                                    }
-
-                                    $id = (int) $payload['address_id'];
-                                    $label = (string) ($payload['label'] ?? AddressSearch::formatPayload($payload));
-
-                                    $component
-                                        ->state((string) $id)
-                                        ->options([
-                                            (string) $id => $label,
-                                        ]);
+                                ->label(__('orders.lookups.shipping_address'))
+                                ->placeholder(__('orders.lookups.address_placeholder'))
+                                ->searchUsing(fn (string $value): array => AddressSearch::results($value))
+                                ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null && $state !== '' ? (int) $state : null)
+                                ->afterStateHydrated(function (SearchableInput $component, ?int $state): void {
+                                    AddressSearch::hydrateComponent($component, $state);
                                 })
-                                ->afterStateUpdated(function (?string $state, Set $set): void {
+                                ->onItemSelected(function (SearchResult $item, SearchableInput $component, Set $set): void {
+                                    SearchableComponentHelper::apply($component, $item);
+                                    $payload = $item->get('payload');
+
+                                    $set('shipping_address', is_array($payload) ? $payload : []);
+                                })
+                                ->afterStateUpdated(function (?string $state, Set $set, SearchableInput $component): void {
                                     if ($state === null || $state === '') {
-                                        $set('shipping_address', null);
+                                        SearchableComponentHelper::forget($component);
+                                        $set('shipping_address', []);
 
                                         return;
                                     }
 
-                                    $payload = AddressSearch::payloadFromId((int) $state);
+                                    $result = SearchableComponentHelper::recall($component);
+                                    $payload = $result?->get('payload');
 
-                                    if ($payload !== null) {
+                                    if (is_array($payload)) {
                                         $set('shipping_address', $payload);
                                     }
                                 })
@@ -514,38 +502,44 @@ final class OrderResource extends Resource implements DefinesExportColumns
                                 ->placeholder(__('orders.placeholders.channel'))
                                 ->searchUsing(fn (string $term): array => ChannelSearch::results($term))
                                 ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null && $state !== '' ? (int) $state : null)
-                                ->afterStateHydrated(function (SearchableInput $component, ?int $state, ?Order $record): void {
-                                    if ($state === null || ! $record?->channel) {
+                                ->afterStateHydrated(function (SearchableInput $component, ?int $state): void {
+                                    ChannelSearch::hydrateComponent($component, $state);
+                                })
+                                ->onItemSelected(function (SearchResult $item, SearchableInput $component, Set $set): void {
+                                    SearchableComponentHelper::apply($component, $item);
+                                    $set('channel_id', (int) $item->value());
+                                })
+                                ->afterStateUpdated(function (?string $state, Set $set, SearchableInput $component): void {
+                                    if ($state === null || $state === '') {
+                                        SearchableComponentHelper::forget($component);
+                                        $set('channel_id', null);
+
                                         return;
                                     }
 
-                                    $component
-                                        ->state((string) $state)
-                                        ->options([
-                                            (string) $record->channel_id => ChannelSearch::label($record->channel),
-                                        ]);
-                                })
-                                ->afterStateUpdated(function (?string $state, Set $set): void {
-                                    $set('channel_id', $state !== null && $state !== '' ? (int) $state : null);
+                                    $set('channel_id', (int) $state);
                                 }),
                             SearchableInput::make('partner_id')
                                 ->label(__('orders.fields.partner'))
                                 ->placeholder(__('orders.placeholders.partner'))
                                 ->searchUsing(fn (string $term): array => PartnerSearch::results($term))
                                 ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null && $state !== '' ? (int) $state : null)
-                                ->afterStateHydrated(function (SearchableInput $component, ?int $state, ?Order $record): void {
-                                    if ($state === null || ! $record?->partner) {
+                                ->afterStateHydrated(function (SearchableInput $component, ?int $state): void {
+                                    PartnerSearch::hydrateComponent($component, $state);
+                                })
+                                ->onItemSelected(function (SearchResult $item, SearchableInput $component, Set $set): void {
+                                    SearchableComponentHelper::apply($component, $item);
+                                    $set('partner_id', (int) $item->value());
+                                })
+                                ->afterStateUpdated(function (?string $state, Set $set, SearchableInput $component): void {
+                                    if ($state === null || $state === '') {
+                                        SearchableComponentHelper::forget($component);
+                                        $set('partner_id', null);
+
                                         return;
                                     }
 
-                                    $component
-                                        ->state((string) $state)
-                                        ->options([
-                                            (string) $record->partner_id => PartnerSearch::label($record->partner),
-                                        ]);
-                                })
-                                ->afterStateUpdated(function (?string $state, Set $set): void {
-                                    $set('partner_id', $state !== null && $state !== '' ? (int) $state : null);
+                                    $set('partner_id', (int) $state);
                                 }),
                         ]),
                 ])

@@ -10,9 +10,6 @@ use UnitEnum;
 
 final class AdvancedReports extends Page
 {
-    /**
-     * Navigation icon override (string|\BackedEnum|null).
-     */
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar-square';
 
     public static function getNavigationGroup(): string|UnitEnum|null
