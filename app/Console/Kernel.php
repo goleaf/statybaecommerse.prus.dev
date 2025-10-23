@@ -15,7 +15,8 @@ final class Kernel extends ConsoleKernel
      * @var array<int, class-string<\Illuminate\Console\Command>>
      */
     protected $commands = [
-        \App\Console\Commands\AuditDatabaseIndexesCommand::class,
+        \App\Console\Commands\BackupPrepareCommand::class,
+        \App\Console\Commands\BackupVerifyCommand::class,
         \App\Console\Commands\FixCodeStyleCommand::class,
         \App\Console\Commands\ValidateCodeStyleCommand::class,
         \App\Console\Commands\CodeStyleWatchCommand::class,

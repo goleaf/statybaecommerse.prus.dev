@@ -47,11 +47,9 @@ return [
             'report' => false,
         ],
 
-        'secure-media' => [
+        'backups' => [
             'driver' => 'local',
-            'root' => storage_path('app/secure-media'),
-            'visibility' => 'private',
-            'serve' => true,
+            'root' => storage_path('app/backups'),
             'throw' => false,
             'report' => false,
         ],

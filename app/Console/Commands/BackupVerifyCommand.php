@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
-use Illuminate\Contracts\Filesystem\Filesystem;
+use Illuminate\Database\Connection;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Carbon;
+use Illuminate\Database\Schema\Builder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
@@ -15,298 +15,147 @@ use JsonException;
 
 final class BackupVerifyCommand extends Command
 {
-    /**
-     * @var string
-     */
-    protected $signature = 'backup:verify {path? : Backup directory to verify} {--disk=} {--connection=}';
+    protected $signature = 'backup:verify {--disk=backups : Storage disk hosting the artifacts} {--path=artifacts/backup.json : Relative artifact path on the disk} {--connection= : Database connection used for verification}';
 
-    /**
-     * @var string
-     */
-    protected $description = 'Verify backup artifacts by loading them into an ephemeral database connection.';
+    protected $description = 'Verify a prepared backup artifact against an ephemeral database connection.';
 
-    /**
-     * @throws JsonException
-     */
     public function handle(): int
     {
-        $diskName = $this->resolveDiskName($this->option('disk'));
-        $directory = $this->resolveDirectory(config('backup.directory', 'backups'));
+        $diskName = (string) $this->option('disk');
+        $path = (string) $this->option('path');
+        $connection = $this->option('connection');
+        $defaultConnection = config('database.default');
+        $connectionName = is_string($connection) && $connection !== ''
+            ? $connection
+            : (is_string($defaultConnection) && $defaultConnection !== '' ? $defaultConnection : 'sqlite');
+        /** @var non-empty-string $connectionName */
+        $disk = Storage::disk($diskName);
 
-        $storage = Storage::disk($diskName);
-        $pathArgument = $this->argument('path');
-        $path = $this->resolvePath($storage, $directory, is_string($pathArgument) ? $pathArgument : null);
-        if ($path === null) {
-            $this->components->error('No backup artifacts were found to verify.');
+        if (! $disk->exists($path)) {
+            $this->components->error(sprintf('Backup artifact [%s] was not found on disk [%s].', $path, $diskName));
+
+            return self::FAILURE;
+        }
+
+        $contents = $disk->get($path);
+
+        if (! is_string($contents)) {
+            $this->components->error('Unable to read the backup artifact contents.');
 
             return self::FAILURE;
         }
 
-        /** @var array<int|string, mixed> $manifest */
-        $manifest = $this->readJson($storage, $path.'/manifest.json');
-        /** @var array<int, array<string, mixed>> $users */
-        $users = $this->normaliseUserRecords($this->readJson($storage, $path.'/users.json'));
-        /** @var array<int, array<string, mixed>> $products */
-        $products = $this->normaliseProductRecords($this->readJson($storage, $path.'/products.json'));
-
-        $connection = $this->resolveConnectionName($this->option('connection'));
-        $this->ensureEphemeralConnection($connection);
-
-        $schema = Schema::connection($connection);
-        $schema->dropIfExists('users');
-        $schema->dropIfExists('products');
-
-        $schema->create('users', function (Blueprint $table): void {
-            $table->unsignedBigInteger('id');
-            $table->string('name');
-            $table->string('email');
-            $table->timestamp('created_at')->nullable();
-            $table->timestamp('updated_at')->nullable();
-            $table->primary('id');
-        });
-
-        $schema->create('products', function (Blueprint $table): void {
-            $table->unsignedBigInteger('id');
-            $table->string('name');
-            $table->string('sku');
-            $table->decimal('price', 12)->nullable();
-            $table->integer('stock_quantity')->nullable();
-            $table->timestamp('created_at')->nullable();
-            $table->timestamp('updated_at')->nullable();
-            $table->primary('id');
-        });
-
-        $connectionInstance = DB::connection($connection);
-        $connectionInstance->transaction(function () use ($connectionInstance, $products, $users): void {
-            if ($users !== []) {
-                $connectionInstance->table('users')->insert($users);
-            }
-
-            if ($products !== []) {
-                $connectionInstance->table('products')->insert($products);
-            }
-        });
-
-        $userCount = $connectionInstance->table('users')->count();
-        $productCount = $connectionInstance->table('products')->count();
-
-        $counts = [];
-        if (isset($manifest['counts']) && is_array($manifest['counts'])) {
-            $counts = $manifest['counts'];
-        }
-
-        $expectedUsers = isset($counts['users']) && is_numeric($counts['users'])
-            ? (int) $counts['users']
-            : count($users);
-        $expectedProducts = isset($counts['products']) && is_numeric($counts['products'])
-            ? (int) $counts['products']
-            : count($products);
-
-        $this->components->info(sprintf('Verified %d users and %d products.', $userCount, $productCount));
-
-        if ($userCount !== $expectedUsers || $productCount !== $expectedProducts) {
-            $this->components->error('Artifact counts did not match manifest expectations.');
+        try {
+            $payload = json_decode($contents, true, 512, JSON_THROW_ON_ERROR);
+        } catch (JsonException $exception) {
+            $this->components->error('Unable to decode backup artifact: '.$exception->getMessage());
 
             return self::FAILURE;
         }
+
+        if (! is_array($payload)) {
+            $this->components->error('The backup artifact does not contain a valid payload structure.');
+
+            return self::FAILURE;
+        }
+
+        $userRecords = array_values(array_filter(
+            is_array($payload['users'] ?? null) ? $payload['users'] : [],
+            static fn ($item): bool => is_array($item),
+        ));
+
+        $productRecords = array_values(array_filter(
+            is_array($payload['products'] ?? null) ? $payload['products'] : [],
+            static fn ($item): bool => is_array($item),
+        ));
+
+        $users = collect($userRecords);
+        $products = collect($productRecords);
+
+        /** @var Connection $ephemeral */
+        $ephemeral = DB::connection($connectionName);
+        $ephemeral->getPdo();
+
+        $schema = Schema::connection($connectionName);
+
+        $this->createBackupTables($schema);
+
+        $ephemeral->transaction(function () use ($ephemeral, $users, $products): void {
+            $users->each(static function ($user) use ($ephemeral): void {
+                $userId = $user['id'] ?? null;
+
+                if (! is_numeric($userId)) {
+                    return;
+                }
+
+                $ephemeral->table('backup_users')->insert([
+                    'id' => (int) $userId,
+                    'name' => $user['name'] ?? null,
+                    'email' => $user['email'] ?? null,
+                    'locale' => $user['locale'] ?? null,
+                ]);
+            });
+
+            $products->each(static function ($product) use ($ephemeral): void {
+                $productId = $product['id'] ?? null;
+
+                if (! is_numeric($productId)) {
+                    return;
+                }
+
+                $ephemeral->table('backup_products')->insert([
+                    'id' => (int) $productId,
+                    'name' => $product['name'] ?? null,
+                    'slug' => $product['slug'] ?? null,
+                    'sku' => $product['sku'] ?? null,
+                ]);
+            });
+        });
+
+        $userCount = (int) $ephemeral->table('backup_users')->count();
+        $productCount = (int) $ephemeral->table('backup_products')->count();
+
+        if ($userCount !== $users->count() || $productCount !== $products->count()) {
+            $this->components->error('Backup verification failed: counts do not match.');
+
+            return self::FAILURE;
+        }
+
+        $this->components->info(sprintf(
+            'Backup verified on connection [%s]: %d users, %d products.',
+            $connectionName,
+            $userCount,
+            (int) $productCount,
+        ));
+
+        $this->dropBackupTables($schema);
 
         return self::SUCCESS;
     }
 
-    private function resolvePath(Filesystem $storage, string $directory, ?string $pathArgument): ?string
+    private function createBackupTables(Builder $schema): void
     {
-        if (is_string($pathArgument) && $pathArgument !== '') {
-            $candidate = trim($pathArgument, '/');
-            if ($storage->exists($candidate.'/manifest.json')) {
-                return $candidate;
-            }
-        }
+        $schema->dropIfExists('backup_users');
+        $schema->dropIfExists('backup_products');
 
-        $baseDirectory = $directory === '.' ? null : $directory;
-        $directories = $baseDirectory !== null
-            ? $storage->directories($baseDirectory)
-            : $storage->directories();
+        $schema->create('backup_users', static function (Blueprint $table): void {
+            $table->unsignedBigInteger('id')->primary();
+            $table->string('name')->nullable();
+            $table->string('email')->nullable();
+            $table->string('locale')->nullable();
+        });
 
-        if (empty($directories)) {
-            return null;
-        }
-
-        rsort($directories);
-
-        foreach ($directories as $candidate) {
-            if ($storage->exists($candidate.'/manifest.json')) {
-                return $candidate;
-            }
-
-            foreach ($storage->directories($candidate) as $nested) {
-                if ($storage->exists($nested.'/manifest.json')) {
-                    return $nested;
-                }
-            }
-        }
-
-        return null;
+        $schema->create('backup_products', static function (Blueprint $table): void {
+            $table->unsignedBigInteger('id')->primary();
+            $table->string('name')->nullable();
+            $table->string('slug')->nullable();
+            $table->string('sku')->nullable();
+        });
     }
 
-    private function ensureEphemeralConnection(string $connection): void
+    private function dropBackupTables(Builder $schema): void
     {
-        if (config()->has('database.connections.'.$connection)) {
-            DB::purge($connection);
-
-            return;
-        }
-
-        config()->set('database.connections.'.$connection, [
-            'driver' => 'sqlite',
-            'database' => ':memory:',
-            'prefix' => '',
-            'foreign_key_constraints' => true,
-        ]);
-
-        DB::purge($connection);
-    }
-
-    /**
-     * @return array<int|string, mixed>
-     *
-     * @throws JsonException
-     */
-    private function readJson(Filesystem $storage, string $path): array
-    {
-        if (! $storage->exists($path)) {
-            return [];
-        }
-
-        $contents = $storage->get($path);
-
-        $decoded = json_decode((string) $contents, true, 512, JSON_THROW_ON_ERROR);
-
-        return is_array($decoded) ? $decoded : [];
-    }
-
-    private function normalizeTimestamp(?string $timestamp): ?string
-    {
-        if ($timestamp === null || $timestamp === '') {
-            return null;
-        }
-
-        return Carbon::parse($timestamp)->toDateTimeString();
-    }
-
-    private function resolveDiskName(mixed $diskOption): string
-    {
-        if (is_string($diskOption) && $diskOption !== '') {
-            return $diskOption;
-        }
-
-        $configured = config('backup.disk');
-        if (is_string($configured) && $configured !== '') {
-            return $configured;
-        }
-
-        $default = config('filesystems.default');
-
-        return is_string($default) && $default !== '' ? $default : 'local';
-    }
-
-    private function resolveDirectory(mixed $directory): string
-    {
-        if (is_string($directory) && $directory !== '') {
-            $trimmed = trim($directory, '/');
-
-            return $trimmed === '' ? '.' : $trimmed;
-        }
-
-        return 'backups';
-    }
-
-    private function resolveConnectionName(mixed $connectionOption): string
-    {
-        if (is_string($connectionOption) && $connectionOption !== '') {
-            return $connectionOption;
-        }
-
-        $configured = config('backup.verify.connection');
-        if (is_string($configured) && $configured !== '') {
-            return $configured;
-        }
-
-        return 'sqlite';
-    }
-
-    /**
-     * @param  array<int|string, mixed>  $users
-     * @return array<int, array{id: int, name: string, email: string, created_at: string|null, updated_at: string|null}>
-     */
-    private function normaliseUserRecords(array $users): array
-    {
-        $normalised = [];
-
-        foreach ($users as $user) {
-            if (! is_array($user)) {
-                continue;
-            }
-
-            $id = $user['id'] ?? null;
-            $name = $user['name'] ?? null;
-            $email = $user['email'] ?? null;
-
-            if (! is_numeric($id) || ! is_string($name) || ! is_string($email)) {
-                continue;
-            }
-
-            $createdAt = isset($user['created_at']) && is_string($user['created_at']) ? $user['created_at'] : null;
-            $updatedAt = isset($user['updated_at']) && is_string($user['updated_at']) ? $user['updated_at'] : null;
-
-            $normalised[] = [
-                'id' => (int) $id,
-                'name' => $name,
-                'email' => $email,
-                'created_at' => $this->normalizeTimestamp($createdAt),
-                'updated_at' => $this->normalizeTimestamp($updatedAt),
-            ];
-        }
-
-        return $normalised;
-    }
-
-    /**
-     * @param  array<int|string, mixed>  $products
-     * @return array<int, array{id: int, name: string, sku: string, price: float|null, stock_quantity: int|null, created_at: string|null, updated_at: string|null}>
-     */
-    private function normaliseProductRecords(array $products): array
-    {
-        $normalised = [];
-
-        foreach ($products as $product) {
-            if (! is_array($product)) {
-                continue;
-            }
-
-            $id = $product['id'] ?? null;
-            $name = $product['name'] ?? null;
-            $sku = $product['sku'] ?? null;
-
-            if (! is_numeric($id) || ! is_string($name) || ! is_string($sku)) {
-                continue;
-            }
-
-            $priceValue = $product['price'] ?? null;
-            $stockValue = $product['stock_quantity'] ?? null;
-            $createdAt = isset($product['created_at']) && is_string($product['created_at']) ? $product['created_at'] : null;
-            $updatedAt = isset($product['updated_at']) && is_string($product['updated_at']) ? $product['updated_at'] : null;
-
-            $normalised[] = [
-                'id' => (int) $id,
-                'name' => $name,
-                'sku' => $sku,
-                'price' => is_numeric($priceValue) ? (float) $priceValue : null,
-                'stock_quantity' => is_numeric($stockValue) ? (int) $stockValue : null,
-                'created_at' => $this->normalizeTimestamp($createdAt),
-                'updated_at' => $this->normalizeTimestamp($updatedAt),
-            ];
-        }
-
-        return $normalised;
+        $schema->dropIfExists('backup_users');
+        $schema->dropIfExists('backup_products');
     }
 }
