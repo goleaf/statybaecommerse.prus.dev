@@ -25,8 +25,8 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Carbon;
+use Laravel\Scout\Searchable;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\MediaLibrary\HasMedia;
@@ -43,7 +43,23 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @property mixed  $appends
  * @property mixed  $table
  * @property string $translationModel
- * @property array  $translatable
+ * @property array $translatable
+ * @property int $id
+ * @property string $name
+ * @property string|null $slug
+ * @property string|null $short_description
+ * @property string|null $description
+ * @property string|null $sku
+ * @property float|string|null $price
+ * @property bool $is_featured
+ * @property bool $is_visible
+ * @property \Illuminate\Support\Carbon|null $published_at
+ * @property-read Brand|null $brand
+ * @property-read string|null $thumbnail
+ * @property-read string|null $main_image
+ * @property-read int $sales_count
+ * @property-read int $reviews_count
+ * @property-read float $average_rating
  *
  * @method static \Illuminate\Database\Eloquent\Builder|Product newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Product newQuery()
@@ -55,7 +71,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
 #[ScopedBy([ActiveScope::class, PublishedScope::class, VisibleScope::class])]
 final class Product extends Model implements HasMedia, TranslatableRecord
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, Searchable, SoftDeletes;
     use HasProductPricing;
     use HasTranslations;
     use InteractsWithMedia;
@@ -79,23 +95,58 @@ final class Product extends Model implements HasMedia, TranslatableRecord
     // Translation fields that should be handled by the translation system
     protected array $translatable = ['name', 'slug', 'description', 'short_description', 'seo_title', 'seo_description'];
 
-    protected static function booted(): void
+    public function shouldBeSearchable(): bool
     {
-        self::saving(static function (Product $product): void {
-            /** @var HtmlSanitizer $sanitizer */
-            $sanitizer = app(HtmlSanitizer::class);
+        if (config('search.driver') !== 'scout' || ! config('search.scout.enabled')) {
+            return false;
+        }
 
-            foreach (['description', 'short_description'] as $field) {
-                $value = $product->{$field};
+        if (! $this->is_visible || empty($this->slug)) {
+            return false;
+        }
 
-                if (! is_string($value) || trim($value) === '') {
-                    continue;
-                }
+        if ($this->published_at === null) {
+            return false;
+        }
 
-                // Ensure persisted rich text never exceeds the sanitized allow-list.
-                $product->{$field} = $sanitizer->sanitize($value);
-            }
-        });
+        if ($this->published_at instanceof Carbon && $this->published_at->isFuture()) {
+            return false;
+        }
+
+        $price = $this->price;
+
+        return $price !== null && (float) $price > 0.0;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function toSearchableArray(): array
+    {
+        $this->loadMissing('brand');
+
+        $price = (float) ($this->price ?? 0.0);
+        $locale = app()->getLocale();
+        $publishedAt = $this->published_at;
+
+        return [
+            'id' => $this->getKey(),
+            'type' => 'product',
+            'name' => $this->name,
+            'slug' => $this->slug,
+            'short_description' => $this->short_description,
+            'description' => $this->description,
+            'translated_name' => $this->trans('name', $locale),
+            'translated_description' => $this->trans('description', $locale),
+            'price' => $price,
+            'brand_name' => $this->brand?->name,
+            'sales_count' => (int) ($this->sales_count ?? 0),
+            'reviews_count' => (int) ($this->reviews_count ?? 0),
+            'average_rating' => (float) ($this->average_rating ?? 0),
+            'is_featured' => (bool) $this->is_featured,
+            'published_at' => $publishedAt instanceof Carbon ? $publishedAt->toDateTimeString() : null,
+            'is_visible' => (bool) $this->is_visible,
+        ];
     }
 
     /**
