@@ -84,10 +84,10 @@ class ListInventories extends BaseListRecords
             }
         }
 
-        return $this->applyWidgetTabFilters($query);
+        return $query;
     }
 
-    public function getWidgetTabs(): array
+    public function getTabs(): array
     {
         return [
             'all' => WidgetTab::make(__('admin.inventory.tabs.all'))

@@ -6,19 +6,14 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\InventoryResource\Pages;
 use App\Models\Inventory;
-use App\Models\Product;
-use App\Support\Filament\SearchableComponentHelper;
-use App\Support\Search\ProductSearch;
 use BackedEnum;
-use DefStudio\SearchableInput\Forms\Components\SearchableInput;
+use Closure;
 use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
-use Filament\Forms\Set;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables\Actions\Action;
@@ -33,19 +28,12 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use pxlrbt\FilamentExcel\Actions\Tables\ExportAction;
-use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
-use pxlrbt\FilamentExcel\Columns\Column;
-use pxlrbt\FilamentExcel\Exports\ExcelExport;
 use UnitEnum;
 
 final class InventoryResource extends Resource
 {
     protected static ?string $model = Inventory::class;
 
-    /**
-     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
-     */
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-cube';
 
     protected static ?int $navigationSort = 2;
@@ -77,47 +65,12 @@ final class InventoryResource extends Resource
                 ->schema([
                     Grid::make(2)
                         ->schema([
-                            SearchableInput::make('product_id')
+                            Select::make('product_id')
                                 ->label(__('Product'))
-                                ->placeholder('SKU / EAN / name')
-                                ->required()
-                                ->searchUsing(fn (string $search): array => ProductSearch::complex($search))
-                                ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null ? (int) $state : null)
-                                ->afterStateHydrated(function (SearchableInput $component, ?int $state, ?Inventory $record): void {
-                                    // Hydrate via shared helper to reuse canonical payload normalisation across resources.
-                                    SearchableComponentHelper::hydrate(
-                                        $component,
-                                        $state,
-                                        static function (int $value) use ($record): ?Product {
-                                            return self::resolveInventoryProduct($value, $record);
-                                        },
-                                        static function (Product $product): array {
-                                            return self::normaliseInventoryProduct($product);
-                                        },
-                                    );
-                                })
-                                ->afterStateUpdated(function (SearchableInput $component, ?string $state, Set $set): void {
-                                    // Synchronise the persisted foreign key alongside a cached payload snapshot.
-                                    SearchableComponentHelper::syncSelectedRecord(
-                                        $component,
-                                        $state,
-                                        $set,
-                                        'product_id',
-                                        static function (string $value): ?Product {
-                                            return self::resolveInventoryProduct((int) $value);
-                                        },
-                                        static function (Product $product): array {
-                                            return self::normaliseInventoryProduct($product);
-                                        },
-                                        'product_payload',
-                                        self::defaultInventoryProductPayload(),
-                                    );
-                                })
-                                ->live(), // Live mode ensures metadata stays in sync while administrators adjust the lookup.
-                            Hidden::make('product_payload')
-                                ->default(self::defaultInventoryProductPayload())
-                                ->dehydrated(false)
-                                ->columnSpanFull(), // Cache the canonical payload for downstream automation without persisting it.
+                                ->relationship('product', 'name')
+                                ->searchable()
+                                ->preload()
+                                ->required(),
                             Select::make('location_id')
                                 ->label(__('Location'))
                                 ->relationship('location', 'name')
@@ -246,13 +199,6 @@ final class InventoryResource extends Resource
                         return $query->where('is_tracked', (bool) (int) $value);
                     }),
             ])
-            ->headerActions([
-                ExportAction::make()
-                    ->label(__('Export'))
-                    ->exports([
-                        self::makeInventoryExport(),
-                    ]),
-            ])
             ->actions([
                 ViewAction::make(),
                 EditAction::make(),
@@ -369,11 +315,6 @@ final class InventoryResource extends Resource
             ])
             ->bulkActions([
                 BulkActionGroup::make([
-                    ExportBulkAction::make()
-                        ->label(__('Export selected'))
-                        ->exports([
-                            self::makeInventoryExport(),
-                        ]),
                     DeleteBulkAction::make(),
                     BulkAction::make('adjust_stock')
                         ->label(__('Adjust Stock'))
@@ -458,117 +399,6 @@ final class InventoryResource extends Resource
                 ]),
             ])
             ->defaultSort('created_at', 'desc');
-    }
-
-    /**
-     * Resolve the inventory product for helper hydration while avoiding redundant queries.
-     */
-    private static function resolveInventoryProduct(int $productId, ?Inventory $record = null): ?Product
-    {
-        if ($record instanceof Inventory) {
-            $product = $record->product;
-
-            if ($product instanceof Product && (int) $product->getKey() === $productId) {
-                return $product;
-            }
-        }
-
-        return Product::query()
-            ->select(['id', 'sku', 'name', 'price'])
-            ->find($productId);
-    }
-
-    /**
-     * Normalise the product metadata into the tuple consumed by the searchable helper.
-     *
-     * @return array{value:int, label:string, payload: array<string, mixed>}
-     */
-    private static function normaliseInventoryProduct(Product $product): array
-    {
-        $identifier = (int) $product->getKey();
-
-        /** @var string|null $rawSku */
-        $rawSku = $product->getAttribute('sku');
-        $sku = is_string($rawSku) ? $rawSku : '';
-
-        $price = $product->getAttribute('price');
-        $numericPrice = is_numeric($price) ? (float) $price : 0.0;
-
-        return [
-            'value'   => $identifier,
-            'label'   => ProductSearch::label($product),
-            'payload' => [
-                'product_id' => $identifier,
-                'sku'        => $sku,
-                'name'       => self::resolveInventoryProductName($product),
-                'price'      => $numericPrice,
-            ],
-        ];
-    }
-
-    /**
-     * Extract a translated product name suitable for payload metadata.
-     */
-    private static function resolveInventoryProductName(Product $product): string
-    {
-        $rawName = $product->getAttribute('name');
-
-        if (is_array($rawName)) {
-            $locale = app()->getLocale();
-            $value = $rawName[$locale] ?? reset($rawName);
-
-            return is_string($value) ? $value : '';
-        }
-
-        return is_string($rawName) ? $rawName : '';
-    }
-
-    /**
-     * Provide the default payload shape so cached metadata always exposes predictable keys.
-     *
-     * @return array<string, mixed>
-     */
-    private static function defaultInventoryProductPayload(): array
-    {
-        return [
-            'id'         => null,
-            'label'      => '',
-            'product_id' => null,
-            'sku'        => '',
-            'name'       => '',
-            'price'      => 0.0,
-        ];
-    }
-
-    private static function makeInventoryExport(): ExcelExport
-    {
-        return ExcelExport::make('stock_snapshot')
-            ->fromTable()
-            ->queue()
-            ->withChunkSize(500)
-            ->withColumns([
-                Column::make('product.sku')
-                    ->heading(__('SKU')),
-                Column::make('product.name')
-                    ->heading(__('Product')),
-                Column::make('location.name')
-                    ->heading(__('Location')),
-                Column::make('quantity')
-                    ->heading(__('Quantity'))
-                    ->formatStateUsing(static fn (?int $state): string => number_format((int) $state)),
-                Column::make('reserved')
-                    ->heading(__('Reserved'))
-                    ->formatStateUsing(static fn (?int $state): string => number_format((int) $state)),
-                Column::make('available_quantity')
-                    ->heading(__('Available'))
-                    ->formatStateUsing(static fn (?int $state): string => number_format((int) $state)),
-                Column::make('incoming')
-                    ->heading(__('Incoming'))
-                    ->formatStateUsing(static fn (?int $state): string => number_format((int) $state)),
-                Column::make('threshold')
-                    ->heading(__('Threshold'))
-                    ->formatStateUsing(static fn (?int $state): string => number_format((int) $state)),
-            ]);
     }
 
     public static function getRelations(): array
