@@ -19,13 +19,11 @@ use UnitEnum;
 
 final class PartnerTierResource extends Resource
 {
-    use HasNav;
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-star';
+
+    protected static UnitEnum|string|null $navigationGroup = 'Marketing';
 
     protected static ?string $model = PartnerTier::class;
-
-    
-
-    
 
     protected static ?int $navigationSort = 2;
 
