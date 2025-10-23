@@ -50,6 +50,7 @@ return [
     'verified'     => 'Verified',
     'unverified'   => 'Unverified',
     'orders_count' => 'Orders Count',
+    'orders_trend' => 'Orders Trend',
     'total_spent'  => 'Total Spent',
     'created_at'   => 'Created At',
     'updated_at'   => 'Updated At',

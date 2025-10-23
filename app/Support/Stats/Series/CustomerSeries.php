@@ -68,8 +68,7 @@ final class CustomerSeries
                 ->selectRaw('COUNT(*) as orders_sum')
                 ->selectRaw('SUM(total) as revenue_sum')
                 ->where('customer_id', $customer->getKey())
-                // Use the created_at scope so the aggregate query benefits from the standalone index.
-                ->createdBetween($start, $end)
+                ->whereBetween('created_at', [$start, $end])
                 ->where(static function (Builder $query): void {
                     self::applyPaidConstraints($query);
                 })

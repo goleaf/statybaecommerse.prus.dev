@@ -50,6 +50,7 @@ return [
     'verified'     => 'Подтверждён',
     'unverified'   => 'Не подтверждён',
     'orders_count' => 'Количество заказов',
+    'orders_trend' => 'Динамика заказов',
     'total_spent'  => 'Всего потрачено',
     'created_at'   => 'Создано',
     'updated_at'   => 'Обновлено',
@@ -86,4 +87,7 @@ return [
     'bulk_verified_success'    => 'Выбранные записи успешно подтверждены',
     'bulk_activated_success'   => 'Выбранные записи успешно активированы',
     'bulk_deactivated_success' => 'Выбранные записи успешно деактивированы',
+    'sparkline' => [
+        'orders_label' => 'Заказы за последние :days дней',
+    ],
 ];

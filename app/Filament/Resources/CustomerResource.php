@@ -7,7 +7,7 @@ namespace App\Filament\Resources;
 use App\Support\Concerns\HasNav;
 
 use App\Filament\Resources\CustomerResource\Pages;
-use App\Filament\Widgets\InlineCharts\CustomerLtv12MonthsChart;
+use App\Filament\Widgets\InlineCharts\CustomerOrdersSparkline;
 use App\Models\City;
 use App\Models\Customer;
 use App\Models\Scopes\ActiveScope;
@@ -45,7 +45,7 @@ use pxlrbt\FilamentExcel\Columns\Column;
 use pxlrbt\FilamentExcel\Exports\ExcelExport;
 use Tapp\FilamentValueRangeFilter\Filters\ValueRangeFilter;
 use UnitEnum;
-use Filament\Schemas\Schema;
+use LaraZeus\InlineChart\Tables\Columns\InlineChart;
 
 final class CustomerResource extends Resource
 {
@@ -283,13 +283,13 @@ final class CustomerResource extends Resource
                     ->label(__('customers.orders_count'))
                     ->counts('orders')
                     ->sortable(),
-                InlineChartColumn::make('ltv_12m')
-                    ->label(__('LTV (12m)'))
-                    ->chart(CustomerLtv12MonthsChart::class)
-                    ->maxWidth(320)
-                    ->maxHeight(60)
-                    ->description(__('Monthly revenue (12m)'))
-                    ->toggleable(),
+                // Inline orders sparkline to visualize recent activity without leaving the table.
+                InlineChart::make('orders_sparkline')
+                    ->label(__('customers.orders_trend'))
+                    ->chart(CustomerOrdersSparkline::class)
+                    ->maxWidth(160)
+                    ->maxHeight(48)
+                    ->icon('heroicon-o-chart-bar'),
                 TextColumn::make('created_at')
                     ->label(__('customers.created_at'))
                     ->dateTime()

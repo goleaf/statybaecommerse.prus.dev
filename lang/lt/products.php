@@ -92,18 +92,8 @@ return [
     'helpers' => [
         'price_increase' => 'Įveskite procentą kainų padidinimui (pvz., 10 reiškia 10% padidinimą)',
     ],
-    'matrix' => [
-        'helper_text' => 'Pasirinkite, kurie SKU palaiko kiekvieną atributą.',
-        'rows' => [
-            'size' => 'Dydis',
-            'color' => 'Spalva',
-            'material' => 'Medžiaga',
-        ],
-        'columns' => [
-            'primary' => 'Pagrindinis SKU',
-            'bundle' => 'Komplekto SKU',
-            'limited' => 'Riboto leidimo SKU',
-        ],
+    'sparkline' => [
+        'revenue_label' => 'Pajamos per paskutines :days dienas',
     ],
     'widgets' => [
         'total_products' => 'Iš viso produktų',
