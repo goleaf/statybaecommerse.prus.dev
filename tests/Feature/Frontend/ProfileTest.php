@@ -34,16 +34,24 @@ final class ProfileTest extends TestCase
 
     public function test_edit_page_handles_missing_countries_table(): void
     {
-        $this->withTableAvailability(['countries' => false], function (): void {
-            $user = User::factory()->create();
+        Schema::shouldReceive('hasTable')
+            ->with('countries')
+            ->andReturnFalse();
+
+        Schema::shouldReceive('hasTable')
+            ->withArgs(static fn (string $table): bool => $table !== 'countries')
+            ->andReturnTrue();
 
             $response = $this->actingAs($user)->get(route('frontend.profile.edit'));
 
-            $response
-                ->assertOk()
-                ->assertViewIs('profile.edit')
-                ->assertViewHas('countries', static fn ($countries): bool => $countries instanceof Collection && $countries->isEmpty());
-        });
+        $response = $this->actingAs($user)->get(route('frontend.profile.edit'));
+
+        $response
+            ->assertOk()
+            ->assertViewIs('profile.edit')
+            ->assertViewHas('countries', static fn ($countries): bool => $countries instanceof Collection && $countries->isEmpty());
+
+        Schema::flushFacadeCache();
     }
 
     public function test_user_can_update_profile_information(): void
@@ -155,8 +163,17 @@ final class ProfileTest extends TestCase
 
     public function test_user_can_create_address_when_lookup_tables_are_missing(): void
     {
-        $this->withTableAvailability(['countries' => false, 'cities' => false], function (): void {
-            $user = User::factory()->create();
+        Schema::shouldReceive('hasTable')
+            ->with('countries')
+            ->andReturnFalse();
+
+        Schema::shouldReceive('hasTable')
+            ->with('cities')
+            ->andReturnFalse();
+
+        Schema::shouldReceive('hasTable')
+            ->withArgs(static fn (string $table): bool => ! in_array($table, ['countries', 'cities'], true))
+            ->andReturnTrue();
 
             $payload = [
                 'type' => AddressType::SHIPPING->value,
@@ -172,13 +189,16 @@ final class ProfileTest extends TestCase
 
             $response->assertRedirect(route('frontend.profile.addresses'));
 
-            $this->assertDatabaseHas('addresses', [
-                'user_id' => $user->id,
-                'address_line_1' => 'Gedimino pr. 1',
-                'city' => 'Vilnius',
-                'postal_code' => '01103',
-            ]);
-        });
+        $response->assertRedirect(route('frontend.profile.addresses'));
+
+        $this->assertDatabaseHas('addresses', [
+            'user_id' => $user->id,
+            'address_line_1' => 'Gedimino pr. 1',
+            'city' => 'Vilnius',
+            'postal_code' => '01103',
+        ]);
+
+        Schema::flushFacadeCache();
     }
 
     public function test_user_can_update_existing_address(): void
