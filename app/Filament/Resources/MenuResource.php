@@ -11,7 +11,13 @@ use App\Filament\Resources\MenuResource\RelationManagers\MenuItemsRelationManage
 use App\Models\Menu;
 use App\Models\Scopes\ActiveScope;
 use BackedEnum;
+use Filament\Actions\Action;
+use Filament\Actions\BulkAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
 use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -20,13 +26,7 @@ use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Tables\Actions\Action;
-use Filament\Tables\Actions\BulkAction;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteAction;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\ViewAction;
+use Filament\Tables;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -210,8 +210,12 @@ final class MenuResource extends Resource
 
                         $duplicate->save();
 
+                        $title = $record->is_active
+                            ? __('menus.activated_successfully')
+                            : __('menus.deactivated_successfully');
+
                         Notification::make()
-                            ->title(__('menus.duplicated_successfully'))
+                            ->title($title)
                             ->success()
                             ->send();
                     }),

@@ -40,6 +40,7 @@ use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use BackedEnum;
@@ -49,11 +50,14 @@ final class EnumManagementResource extends Resource
 {
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-squares-2x2';
 
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-squares-2x2';
-
     protected static ?int $navigationSort = 2;
 
-    public static function getNavigationGroup(): string
+    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
+    {
+        return 'heroicon-o-squares-2x2';
+    }
+
+    public static function getNavigationGroup(): UnitEnum|string|null
     {
         return trans('admin.enums.navigation_groups.system');
     }
