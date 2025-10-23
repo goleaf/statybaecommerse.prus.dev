@@ -4,14 +4,9 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
-use App\Console\Commands\ProfiledSeedCommand;
+use App\Domain\Product\Repositories\ProductRepositoryInterface;
 use App\Filament\Components\LiveNotificationFeed;
-use App\Models\DiscountCode;
-use App\Models\DiscountRedemption;
-use App\Models\Document;
-use App\Models\EmailCampaign;
-use App\Models\SystemSetting;
-use App\Observers\UserAttributionObserver;
+use App\Infrastructure\Product\Repositories\EloquentProductRepository;
 use App\Services\DocumentService;
 use App\Support\Filament\SearchableComponentHelper;
 use App\Support\Health\HealthReporter;
@@ -90,7 +85,6 @@ class AppServiceProvider extends ServiceProvider
             });
         }
 
-        // Bind the domain-level product repository to its Eloquent implementation.
         $this->app->bind(ProductRepositoryInterface::class, EloquentProductRepository::class);
     }
 

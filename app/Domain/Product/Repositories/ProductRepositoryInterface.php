@@ -10,9 +10,6 @@ use App\Domain\Product\ValueObjects\ProductCatalogQuery;
 use App\Domain\Product\ValueObjects\ProductSearchCriteria;
 use App\Domain\Product\ValueObjects\ProductSlug;
 
-/**
- * Contract describing the read operations supported for products.
- */
 interface ProductRepositoryInterface
 {
     public function search(ProductSearchCriteria $criteria): ProductCollection;

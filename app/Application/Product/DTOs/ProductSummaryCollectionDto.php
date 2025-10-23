@@ -6,9 +6,6 @@ namespace App\Application\Product\DTOs;
 
 use App\Domain\Product\Collections\ProductCollection;
 
-/**
- * Thin wrapper ensuring we work with a consistent list of product summary DTOs.
- */
 final class ProductSummaryCollectionDto
 {
     /** @var list<ProductSummaryDto> */
@@ -37,11 +34,8 @@ final class ProductSummaryCollectionDto
         return count($this->items);
     }
 
-    /**
-     * @return list<ProductSummaryDto>
-     */
-    public function all(): array
+    public function toArray(): array
     {
-        return $this->items;
+        return array_map(static fn (ProductSummaryDto $product) => $product->toArray(), $this->items);
     }
 }
