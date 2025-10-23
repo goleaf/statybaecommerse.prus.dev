@@ -70,7 +70,7 @@ final class UserWishlistResource extends Resource
 
     public static function form(Form $form): Form
     {
-        // Filament 4 expects returning the Form builder instance.
+        // Configure the wishlist creation and editing form components.
         return $form
             ->components([
                 Select::make('user_id')
@@ -98,7 +98,7 @@ final class UserWishlistResource extends Resource
 
     public static function table(Table $table): Table
     {
-        // Filament 4 expects returning the Table builder instance.
+        // Define table columns, filters, and actions for wishlist management.
         return $table
             ->columns([
                 TextColumn::make('user.name')
