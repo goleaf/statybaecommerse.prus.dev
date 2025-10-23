@@ -12,8 +12,6 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Notifications\Notification;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Collection;
 
@@ -97,6 +95,7 @@ final class SystemSettingHistoriesTable
                             'type' => 'string',
                             'value' => $record->old_value,
                         ]);
+
                         Notification::make()
                             ->title(__('admin.system_setting_histories.value_restored_successfully'))
                             ->success()
