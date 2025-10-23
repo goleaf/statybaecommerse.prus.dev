@@ -10,12 +10,6 @@ use App\Filament\Resources\MenuResource\Pages;
 use App\Filament\Resources\MenuResource\RelationManagers\MenuItemsRelationManager;
 use App\Models\Menu;
 use App\Models\Scopes\ActiveScope;
-use BackedEnum;
-use Filament\Actions\Action;
-use Filament\Actions\BulkAction;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Section;
@@ -41,8 +35,14 @@ final class MenuResource extends Resource
 
     protected static ?string $model = Menu::class;
 
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-rectangle-stack';
+    /**
+     * @var string|\BackedEnum|null
+     */
+    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-rectangle-stack';
 
+    /**
+     * @var string|\UnitEnum|null
+     */
     protected static \UnitEnum|string|null $navigationGroup = 'Content';
 
     /**
@@ -187,10 +187,10 @@ final class MenuResource extends Resource
                         // Flip the active flag before Filament resolves the success notification payload.
                         $record->update(['is_active' => ! $record->is_active]);
                     })
-                    ->successNotificationTitle(fn (Menu $record): string => $record->is_active
+                    ->successNotificationTitle(fn (Menu $record): string => (string) ($record->is_active
                         ? __('menus.activated_successfully')
                         : __('menus.deactivated_successfully')
-                    ),
+                    )),
                 Action::make('duplicate')
                     ->label(__('menus.duplicate'))
                     ->icon('heroicon-o-document-duplicate')

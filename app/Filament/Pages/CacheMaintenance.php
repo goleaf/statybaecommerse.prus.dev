@@ -19,9 +19,12 @@ use Throwable;
 
 final class CacheMaintenance extends Page
 {
-    protected static ?string $navigationIcon = 'heroicon-o-server-stack';
+    /**
+     * @var string|\BackedEnum|null
+     */
+    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-server-stack';
 
-    public static function getNavigationGroup(): ?string
+    public static function getNavigationGroup(): string
     {
         return 'System';
     }

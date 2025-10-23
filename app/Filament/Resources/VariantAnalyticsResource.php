@@ -9,7 +9,6 @@ use App\Filament\Resources\VariantAnalyticsResource\Pages;
 use App\Models\ProductVariant;
 use App\Models\VariantAnalytics;
 use App\Support\Filament\Components\Flatpickr;
-use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
@@ -58,7 +57,7 @@ final class VariantAnalyticsResource extends Resource
     /**
      * @var string|\BackedEnum|null
      */
-    protected static $navigationIcon = 'heroicon-o-chart-bar-square';
+    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar-square';
 
     protected static ?string $navigationGroup = NavigationGroup::Inventory->value;
 
