@@ -23,6 +23,7 @@
 - User and author foreign keys on rebuilt discount tables now attach after verifying the `users` table compatibility, ensuring MySQL restores with mixed storage engines keep migrating without tripping the `discount_codes_created_by_foreign` system-table check.
 
 ## Discounts & promotions
+- Discount redemption listings now leverage a dedicated status scope branch so pending, redeemed, expired, and cancelled entries remain visible for Filament CRUD workflows, regression tests, and seeded demo data.
 - Coupon migrations now provision maximum discount caps, per-user usage limits, and product/category scoping columns so factories, admin forms, and API tests share the same schema snapshot during refreshes.
 - Coupon application responses now round computed totals instead of calling `Number::parseFloat` on floats, keeping the discount API stable across PHP 8.3 test runs.
 
