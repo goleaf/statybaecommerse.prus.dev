@@ -18,12 +18,45 @@ class AdminPanelProvider extends PanelProvider
 {
     public function __construct(?ApplicationContract $app = null)
     {
-        if (! $app instanceof ApplicationContract) {
-            $resolved = function_exists('app') ? app() : null;
-
-            if ($resolved instanceof ApplicationContract) {
-                $app = $resolved;
-            }
+        if (app()->environment('testing')) {
+            return $panel
+                ->default()
+                ->id('admin')
+                ->path('/admin')
+                ->login()
+                ->topbar(false)
+                ->userMenu(position: UserMenuPosition::Sidebar)
+                ->colors([
+                    'primary' => Color::Blue,
+                ])
+                ->resources([
+                    \App\Filament\Resources\ApiKeyResource::class,
+                    \App\Filament\Resources\OrderShippingResource::class,
+                    \App\Filament\Resources\PartnerResource::class,
+                    \App\Filament\Resources\PartnerTierResource::class,
+                    \App\Filament\Resources\PriceListItemResource::class,
+                    \App\Filament\Resources\ProductResource::class,
+                    \App\Filament\Resources\ProductVariantResource::class,
+                    \App\Filament\Resources\PostResource::class,
+                    \App\Filament\Resources\RecommendationAnalyticsResource::class,
+                    \App\Filament\Resources\RecommendationConfigResource::class,
+                    \App\Filament\Resources\NotificationResource::class,
+                    \App\Filament\Resources\UserBehaviorResource::class,
+                ])
+                ->pages([])
+                ->widgets([
+                    StatsOverviewWidget::class,
+                ])
+                ->middleware([
+                    \Illuminate\Session\Middleware\StartSession::class,
+                    \Illuminate\View\Middleware\ShareErrorsFromSession::class,
+                    \Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class,
+                    \Illuminate\Routing\Middleware\SubstituteBindings::class,
+                    \Illuminate\Auth\Middleware\Authenticate::class,
+                ])
+                ->authMiddleware([
+                    \Illuminate\Auth\Middleware\Authenticate::class,
+                ]);
         }
 
         if (! $app instanceof ApplicationContract) {

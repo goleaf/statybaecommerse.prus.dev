@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace Database\Factories;
 
+use App\Enums\ApiKeyScope;
 use App\Models\ApiKey;
-use App\Models\Partner;
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Support\Str;
 
 /**
  * @extends Factory<ApiKey>
@@ -18,19 +17,23 @@ final class ApiKeyFactory extends Factory
 
     public function definition(): array
     {
-        return [
-            'name' => $this->faker->company.' API Key',
-            'key' => Str::random(40),
-            'secret' => Str::random(64),
-            'permissions' => ['inventory.read'],
-            'rate_limits' => null,
-            'partner_id' => Partner::factory(),
-            'is_active' => true,
-        ];
-    }
+        $cases = ApiKeyScope::cases();
 
-    public function inactive(): self
-    {
-        return $this->state(fn () => ['is_active' => false]);
+        $scopes = collect($cases)
+            ->shuffle()
+            ->take(random_int(1, count($cases)))
+            ->map(static fn (ApiKeyScope $scope): string => $scope->value)
+            ->values()
+            ->all();
+
+        return [
+            'name' => $this->faker->unique()->words(2, true),
+            'key' => ApiKey::generatePlainTextKey(),
+            'secret' => ApiKey::generatePlainTextSecret(),
+            'permissions' => $scopes,
+            'rate_limits' => ['default' => random_int(60, 600)],
+            'is_active' => true,
+            'last_used_at' => now()->subMinutes(random_int(1, 1440)),
+        ];
     }
 }

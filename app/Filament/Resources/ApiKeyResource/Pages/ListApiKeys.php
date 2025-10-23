@@ -4,19 +4,18 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\ApiKeyResource\Pages;
 
-use App\Filament\Pages\Support\BaseListRecords;
 use App\Filament\Resources\ApiKeyResource;
-use Filament\Actions;
+use Filament\Actions\CreateAction;
+use Filament\Resources\Pages\ListRecords;
 
-final class ListApiKeys extends BaseListRecords
+final class ListApiKeys extends ListRecords
 {
     protected static string $resource = ApiKeyResource::class;
 
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make()
-                ->label(__('api_keys.actions.create')),
+            CreateAction::make(),
         ];
     }
 }
