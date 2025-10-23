@@ -27,13 +27,6 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Schemas\Schema;
-use Filament\Tables;
-use Filament\Tables\Actions\Action;
-use Filament\Tables\Actions\BulkAction;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
@@ -41,16 +34,13 @@ use Filament\Tables\Table;
 use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use Filament\Schemas\Schema;
-use BackedEnum;
+use Illuminate\Support\Str;
 
 use Filament\Schemas\Schema;
 use BackedEnum;
 final class CartItemResource extends Resource
 {
-    /**
-     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
-     */
+    /** @var string|BackedEnum|null Navigation icon configured per Filament v4 guidance. */
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-shopping-cart';
 
     protected static ?string $model = CartItem::class;
@@ -94,7 +84,8 @@ final class CartItemResource extends Resource
                             SearchableInput::make('product_id')
                                 ->label(__('cart_items.product'))
                                 ->placeholder('SKU / EAN / name')
-                                ->required()
+                                ->required(fn (?CartItem $record): bool => $record === null)
+                                ->dehydrated(fn (?CartItem $record): bool => $record === null)
                                 ->live()
                                 ->searchUsing(fn (string $search): array => ProductSearch::complex($search))
                                 ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null ? (int) $state : null)

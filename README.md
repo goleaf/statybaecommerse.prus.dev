@@ -39,7 +39,8 @@ A multilingual Laravel 12 + Filament v4 storefront and admin panel for managing 
 - **Configurable system setting dependencies** with operator-specific value fields, translated labels, and duplication safeguards for precise feature toggles.
 
 -### Latest updates
-- Channel resource pages now show only the bound record on the view screen, skip product global scopes for relationship checks, adopt sanitized factory codes, and use the Filament v4 `assertFormSet` signature so the channel suite passes end-to-end.
+- Cart item management in the Filament admin now honours the selected product filter across list views and exports, ensuring QA and debugging sessions see only the intended product rows.
+- Recently viewed storefront API calls now bypass visibility scopes and return session-ordered product IDs, keeping wishlist toggles and customer history widgets consistent even when draft catalogue entries populate the session during automated tests.
 - Attribute validation rules now persist plain strings alongside array-based rule lists, the Filament Attribute editor hydrates
   those values without forcing JSON, and new regression coverage keeps both storage paths stable.
 - Attribute group selectors now reuse a shared translation helper so historical slugs render as human-readable labels across Filament forms, filters, and tables instead of exposing raw keys.
