@@ -1,6 +1,8 @@
 <?php
 
-use App\Exceptions\CodeStyleException;
+use App\Exceptions\Domain\DomainException;
+use App\Http\Middleware\AttachCorrelationId;
+use App\Services\TranslationService;
 use App\Support\ErrorCodes;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\AuthenticationException;
@@ -18,15 +20,13 @@ use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\TooManyRequestsHttpException;
 
-// Load the Filament compatibility shims before the application boots so the
-// legacy class aliases are always available during early package discovery.
-require_once __DIR__ . '/filament_compat.php';
+require_once __DIR__.'/../app/Support/filament_compat.php';
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
-        web: __DIR__ . '/../routes/web.php',
-        api: __DIR__ . '/../routes/api.php',
-        commands: __DIR__ . '/../routes/console.php',
+        web: __DIR__.'/../routes/web.php',
+        api: __DIR__.'/../routes/api.php',
+        commands: __DIR__.'/../routes/console.php',
         health: '/up',
         then: function (): void {
             Route::middleware('web')
@@ -59,79 +59,189 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        $resolveCorrelationId = static function (Request $request): string {
-            $correlationId = $request->attributes->get('correlation_id');
-
-            if (! is_string($correlationId) || $correlationId === '') {
-                $correlationId = (string) Str::uuid();
-                $request->attributes->set('correlation_id', $correlationId);
+        $correlationId = static function (Request $request): string {
+            $current = $request->attributes->get('correlation_id');
+            if (is_string($current) && $current !== '') {
+                return $current;
             }
 
-            return $correlationId;
+            if (app()->bound('request_correlation_id')) {
+                $bound = app()->make('request_correlation_id');
+                if (is_string($bound) && $bound !== '') {
+                    $request->attributes->set('correlation_id', $bound);
+
+                    return $bound;
+                }
+            }
+
+            $generated = Str::uuid()->toString();
+            $request->attributes->set('correlation_id', $generated);
+            app()->instance('request_correlation_id', $generated);
+
+            return $generated;
         };
 
-        $exceptions->report(function (\Throwable $throwable) use ($resolveCorrelationId): void {
-            $request = request();
-            $correlationId = $request instanceof Request
-                ? $resolveCorrelationId($request)
-                : (string) Str::uuid();
+        $resolveLocale = static function (Request $request): string {
+            $availableLocales = TranslationService::getAvailableLocales();
+            $resolved = $request->attributes->get('resolved_locale');
+            if (is_string($resolved) && $resolved !== '' && in_array($resolved, $availableLocales, true)) {
+                return $resolved;
+            }
+            $current = app()->getLocale();
+            if (is_string($current) && $current !== '' && in_array($current, $availableLocales, true)) {
+                return $current;
+            }
 
-            Log::error($throwable->getMessage(), [
+            $preferred = $request->getPreferredLanguage($availableLocales);
+            if (is_string($preferred) && $preferred !== '') {
+                return $preferred;
+            }
+
+            return TranslationService::getDefaultLocale();
+        };
+
+        $respond = static function (
+            Request $request,
+            string $errorCode,
+            int $status,
+            array $context = [],
+            array $errorExtras = [],
+            array $metaExtras = []
+        ) use ($correlationId, $resolveLocale) {
+            $locale = $resolveLocale($request);
+            app()->setLocale($locale);
+
+            $message = TranslationService::get(ErrorCodes::translationKey($errorCode), $context, $locale);
+
+            $correlation = $correlationId($request);
+
+            $payload = [
+                'error' => array_merge([
+                    'code' => $errorCode,
+                    'message' => $message,
+                    'status' => $status,
+                ], $errorExtras),
+                'meta' => array_merge([
+                    'correlation_id' => $correlation,
+                    'locale' => $locale,
+                ], $metaExtras),
+            ];
+
+            $response = response()->json($payload, $status);
+            $response->headers->set(config('app.correlation_header', 'X-Correlation-ID'), $correlation);
+
+            return $response;
+        };
+
+        $logException = static function (
+            Throwable $throwable,
+            Request $request,
+            string $errorCode,
+            int $status,
+            array $context = [],
+            ?string $level = null
+        ) use ($correlationId): void {
+            $level ??= $status >= 500 ? 'error' : 'warning';
+
+            Log::log($level, 'Handled request exception.', [
+                'error_code' => $errorCode,
+                'status' => $status,
+                'correlation_id' => $correlationId($request),
+                'context' => $context,
+                'request' => [
+                    'method' => $request->getMethod(),
+                    'path' => $request->path(),
+                ],
                 'exception' => $throwable,
-                'correlation_id' => $correlationId,
             ]);
+        };
+
+        $exceptions->render(function (DomainException $exception, Request $request) use ($respond, $logException) {
+            $status = $exception->status();
+            $errorCode = $exception->errorCode();
+            $context = $exception->context();
+
+            $logException($exception, $request, $errorCode, $status, $context, 'warning');
+
+            return $respond($request, $errorCode, $status, $context);
         });
 
-        $exceptions->render(function (\Throwable $throwable, Request $request) use ($resolveCorrelationId) {
-            if (! $request->expectsJson() && ! $request->wantsJson()) {
-                return null;
-            }
+        $exceptions->render(function (AuthenticationException $exception, Request $request) use ($respond, $logException) {
+            $status = 401;
+            $errorCode = ErrorCodes::UNAUTHORIZED;
 
-            $correlationId = $resolveCorrelationId($request);
+            $logException($exception, $request, $errorCode, $status, [], 'notice');
 
-            [$status, $code] = match (true) {
-                $throwable instanceof ValidationException => [422, ErrorCodes::VALIDATION_FAILED],
-                $throwable instanceof AuthenticationException => [401, ErrorCodes::AUTHENTICATION_FAILED],
-                $throwable instanceof AuthorizationException => [403, ErrorCodes::AUTHORIZATION_FAILED],
-                $throwable instanceof ModelNotFoundException => [404, ErrorCodes::MODEL_NOT_FOUND],
-                $throwable instanceof NotFoundHttpException => [404, ErrorCodes::ROUTE_NOT_FOUND],
-                $throwable instanceof MethodNotAllowedHttpException => [405, ErrorCodes::METHOD_NOT_ALLOWED],
-                $throwable instanceof TooManyRequestsHttpException => [429, ErrorCodes::TOO_MANY_REQUESTS],
-                $throwable instanceof CodeStyleException => [422, ErrorCodes::CODE_STYLE_VIOLATION],
-                $throwable instanceof HttpExceptionInterface => [
-                    $throwable->getStatusCode(),
-                    match ($throwable->getStatusCode()) {
-                        503 => ErrorCodes::SERVICE_UNAVAILABLE,
-                        404 => ErrorCodes::ROUTE_NOT_FOUND,
-                        405 => ErrorCodes::METHOD_NOT_ALLOWED,
-                        401 => ErrorCodes::AUTHENTICATION_FAILED,
-                        403 => ErrorCodes::AUTHORIZATION_FAILED,
-                        429 => ErrorCodes::TOO_MANY_REQUESTS,
-                        default => ErrorCodes::UNKNOWN_ERROR,
-                    },
-                ],
-                $throwable instanceof \RuntimeException => [500, ErrorCodes::RUNTIME_ERROR],
-                default => [500, ErrorCodes::UNKNOWN_ERROR],
+            return $respond($request, $errorCode, $status);
+        });
+
+        $exceptions->render(function (AuthorizationException $exception, Request $request) use ($respond, $logException) {
+            $status = 403;
+            $errorCode = ErrorCodes::FORBIDDEN;
+
+            $logException($exception, $request, $errorCode, $status, [], 'notice');
+
+            return $respond($request, $errorCode, $status);
+        });
+
+        $exceptions->render(function (ValidationException $exception, Request $request) use ($respond, $logException) {
+            $status = $exception->status;
+            $errorCode = ErrorCodes::VALIDATION_FAILED;
+            $errors = $exception->errors();
+
+            $logException($exception, $request, $errorCode, $status, ['errors' => $errors], 'info');
+
+            return $respond(
+                $request,
+                $errorCode,
+                $status,
+                context: [],
+                errorExtras: ['details' => $errors],
+            );
+        });
+
+        $exceptions->render(function (ModelNotFoundException $exception, Request $request) use ($respond, $logException) {
+            $status = 404;
+            $errorCode = ErrorCodes::NOT_FOUND;
+
+            $logException(
+                $exception,
+                $request,
+                $errorCode,
+                $status,
+                ['model' => $exception->getModel()],
+                'notice'
+            );
+
+            return $respond($request, $errorCode, $status);
+        });
+
+        $exceptions->render(function (HttpExceptionInterface $exception, Request $request) use ($respond, $logException) {
+            $status = $exception->getStatusCode();
+            $errorCode = match (true) {
+                $exception instanceof NotFoundHttpException => ErrorCodes::NOT_FOUND,
+                $exception instanceof MethodNotAllowedHttpException => ErrorCodes::METHOD_NOT_ALLOWED,
+                $exception instanceof TooManyRequestsHttpException => ErrorCodes::TOO_MANY_REQUESTS,
+                $status === 400 => ErrorCodes::BAD_REQUEST,
+                $status === 401 => ErrorCodes::UNAUTHORIZED,
+                $status === 403 => ErrorCodes::FORBIDDEN,
+                $status >= 500 => ErrorCodes::SERVER_ERROR,
+                default => ErrorCodes::BAD_REQUEST,
             };
 
-            $messageKey = "errors.$code";
-            $message = trans($messageKey);
+            $level = $status >= 500 ? 'error' : 'warning';
+            $logException($exception, $request, $errorCode, $status, [], $level);
 
-            if ($message === $messageKey) {
-                $fallbackKey = 'errors.' . ErrorCodes::UNKNOWN_ERROR;
-                $fallback = trans($fallbackKey);
-                $message = $fallback === $fallbackKey
-                    ? __('An unexpected error occurred.')
-                    : $fallback;
-            }
+            return $respond($request, $errorCode, $status);
+        });
 
-            return response()->json([
-                'error' => [
-                    'code' => $code,
-                    'message' => $message,
-                    'correlation_id' => $correlationId,
-                ],
-            ], $status);
+        $exceptions->render(function (Throwable $exception, Request $request) use ($respond, $logException) {
+            $status = 500;
+            $errorCode = ErrorCodes::SERVER_ERROR;
+
+            $logException($exception, $request, $errorCode, $status);
+
+            return $respond($request, $errorCode, $status);
         });
     })
     ->withProviders([
