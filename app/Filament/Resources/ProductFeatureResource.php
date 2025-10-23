@@ -10,10 +10,6 @@ use App\Enums\NavigationGroup;
 use App\Filament\Resources\ProductFeatureResource\Pages;
 use App\Models\ProductFeature;
 use BackedEnum;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Actions\DeleteAction;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -60,7 +56,13 @@ final class ProductFeatureResource extends Resource
                 ->searchable()
                 ->preload(),
             Forms\Components\Select::make('feature_type')
-                ->options(self::FEATURE_TYPE_OPTIONS)
+                ->options([
+                    'specification' => 'Specification',
+                    'benefit'       => 'Benefit',
+                    'feature'       => 'Feature',
+                    'technical'     => 'Technical',
+                    'performance'   => 'Performance',
+                ])
                 ->searchable(),
             Forms\Components\TextInput::make('feature_key')
                 ->label('Feature Key')
