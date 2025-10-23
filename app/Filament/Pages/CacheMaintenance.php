@@ -21,7 +21,7 @@ use UnitEnum;
 
 final class CacheMaintenance extends Page
 {
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-server-stack';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-server-stack';
 
     protected static UnitEnum|string|null $navigationGroup = 'System';
 

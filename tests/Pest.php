@@ -30,6 +30,25 @@ beforeAll(function () {
     // Ensure Filament uses the web guard for tests
     config()->set('filament.auth.guard', 'web');
 
+    $manifestPath = public_path('build/manifest.json');
+    if (! is_dir(dirname($manifestPath))) {
+        mkdir(dirname($manifestPath), 0777, true);
+    }
+    if (! file_exists($manifestPath)) {
+        file_put_contents($manifestPath, json_encode([
+            'resources/css/app.scss' => [
+                'file' => 'css/app.css',
+                'src' => 'resources/css/app.scss',
+                'isEntry' => true,
+            ],
+            'resources/js/app.js' => [
+                'file' => 'js/app.js',
+                'src' => 'resources/js/app.js',
+                'isEntry' => true,
+            ],
+        ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+    }
+
     // Stub missing Filament resource routes referenced by navigation during tests
     if (! Route::has('filament.admin.resources.system-settings.index')) {
         Route::get('/__stub/system-settings', fn () => 'ok')
