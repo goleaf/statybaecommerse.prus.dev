@@ -39,7 +39,8 @@ A multilingual Laravel 12 + Filament v4 storefront and admin panel for managing 
 - **Configurable system setting dependencies** with operator-specific value fields, translated labels, and duplication safeguards for precise feature toggles.
 
 -### Latest updates
-- Partner API middleware now returns structured JSON responses for missing keys, insufficient scopes, and rate limit breaches so external integrations and the regression suite receive the documented status codes instead of 500 errors.
+- Validation fallback logic now syncs the translator to the fallback locale before replaying rules, ensuring the shared English
+  problem reason always resolves placeholders correctly even if the initial validation ran in another language.
 - Attribute validation rules now persist plain strings alongside array-based rule lists, the Filament Attribute editor hydrates
   those values without forcing JSON, and new regression coverage keeps both storage paths stable.
 - Attribute group selectors now reuse a shared translation helper so historical slugs render as human-readable labels across Filament forms, filters, and tables instead of exposing raw keys.
