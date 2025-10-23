@@ -6,6 +6,7 @@ use App\Console\Commands\DataImportCommand;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use ReflectionMethod;
 
 it('restores foreign key enforcement after truncation failure', function (): void {
     Schema::dropIfExists('fk_children');
@@ -22,16 +23,14 @@ it('restores foreign key enforcement after truncation failure', function (): voi
     });
 
     try {
-        $command = new DataImportCommand;
+        $command = new DataImportCommand();
 
-        // Bind a helper closure so we can access the protected truncateTable method without extending the final command.
-        $callTruncate = \Closure::bind(
-            function (string $table): void {
-                $this->truncateTable($table);
-            },
-            $command,
-            DataImportCommand::class,
-        );
+        $callTruncate = static function (string $table) use ($command): void {
+            // Use reflection to invoke the protected truncateTable helper while respecting the command's final contract.
+            $method = new ReflectionMethod(DataImportCommand::class, 'truncateTable');
+            $method->setAccessible(true);
+            $method->invoke($command, $table);
+        };
 
         expect(foreignKeyState())->toBe(1);
 
