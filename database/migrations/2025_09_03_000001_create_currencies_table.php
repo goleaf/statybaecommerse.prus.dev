@@ -16,7 +16,8 @@ return new class extends Migration
             $table->json('name');
             $table->json('description')->nullable();
             $table->string('code', 3)->unique();
-            $table->string('iso_code', 3)->nullable()->unique();
+            // Allow ISO style references such as "USD-840" without truncation while staying compact for indexes.
+            $table->string('iso_code', 10)->nullable()->unique();
             $table->string('symbol', 10)->nullable();
             $table->decimal('exchange_rate', 10, 6)->default(1);
             $table->string('base_currency', 3)->default('EUR');

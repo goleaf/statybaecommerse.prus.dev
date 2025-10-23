@@ -23,6 +23,7 @@ The format is based on [Conventional Commits](https://www.conventionalcommits.or
 * Harmonised the campaign conversion translation model wiring, defaulted
   `converted_at` during factory creation, and kept the SQLite-friendly scopes in
   sync so ROI/ROAS dashboards and unit tests stop dropping recent conversions.
+* Unblocked the Filament currency resource by widening the ISO code column, dropping conflicting global scopes, and polishing formatting helpers so CRUD, filtering, and relationship tests cover the full currency lifecycle again.
 * Normalized API validation problem responses to always include a fallback English reason alongside the localized message list so integrators receive consistent messaging even when the initial validation ran before locale negotiation completed.
 * Ensured forbidden problem responses raised through `AccessDeniedHttpException` retain the explicit denial reason in the error context, mirroring the structure used for authorization exceptions and keeping client-side handlers uniform.
 * Enabled admin user email verification actions to update timestamps via fillable attributes, unlock bulk selected-record handling, and freeze Pest clocks for deterministic assertions across the Filament resource tests.

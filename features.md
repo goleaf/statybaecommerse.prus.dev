@@ -7,6 +7,9 @@
 - Shipping option delivery ranges in the Filament admin now display a precise window even when carriers promise same-day (0 day) service or when only one bound is stored, helping staff quickly spot incomplete data.
 - Shipping option entities once again declare their zone relationship, eligibility checks, and filter scopes, ensuring fulfilment automation and tests can target the correct carrier records without custom query shims.
 
+## Pricing & Currency
+- Filament currency administration now accepts extended ISO identifiers, surfaces inactive entries for auditing, and respects per-currency separators when rendering formatted amounts.
+
 ## Data integrity & seeding
 - User behavior analytics now skip storefront scopes when linking products or categories, and category factories suffix slugs with unique tokens so SQLite test runs avoid null relations and duplicate key violations.
 - Demo store seeder now calls the collection and collection-product seeders, ensuring curated collections always feature representative products during fresh installs and automated demos.
