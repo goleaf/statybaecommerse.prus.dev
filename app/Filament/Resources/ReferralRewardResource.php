@@ -33,9 +33,8 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\Relation;
-use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable as SpatieTranslatableResource;
 use UnitEnum;
 
 final class ReferralRewardResource extends Resource
@@ -261,14 +260,22 @@ final class ReferralRewardResource extends Resource
                     BulkAction::make('apply')
                         ->label(__('referral_rewards.actions.apply_selected'))
                         ->requiresConfirmation()
-                        ->action(static function (Collection $records): void {
-                            $records->each(static fn (ReferralReward $record) => $record->apply());
+                        ->action(function (iterable $records): void {
+                            foreach ($records as $record) {
+                                if ($record instanceof ReferralReward) {
+                                    $record->apply();
+                                }
+                            }
                         }),
                     BulkAction::make('expire')
                         ->label(__('referral_rewards.actions.expire_selected'))
                         ->requiresConfirmation()
-                        ->action(static function (Collection $records): void {
-                            $records->each(static fn (ReferralReward $record) => $record->markAsExpired());
+                        ->action(function (iterable $records): void {
+                            foreach ($records as $record) {
+                                if ($record instanceof ReferralReward) {
+                                    $record->markAsExpired();
+                                }
+                            }
                         }),
                     DeleteBulkAction::make(),
                 ]),
@@ -332,7 +339,7 @@ final class ReferralRewardResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        $modelClass = self::getModel();
+        $modelClass = static::getModel();
         $count = (int) $modelClass::count();
 
         return $count > 0 ? (string) $count : null;
@@ -347,8 +354,8 @@ final class ReferralRewardResource extends Resource
             ->withoutGlobalScopes()
             ->with([
                 'referral' => static fn (Relation $relation) => $relation->withoutGlobalScopes(),
-                'user'     => static fn (Relation $relation) => $relation->withoutGlobalScopes(),
-                'order'    => static fn (Relation $relation) => $relation->withoutGlobalScopes(),
+                'user' => static fn (Relation $relation) => $relation->withoutGlobalScopes(),
+                'order' => static fn (Relation $relation) => $relation->withoutGlobalScopes(),
             ]);
     }
 }
