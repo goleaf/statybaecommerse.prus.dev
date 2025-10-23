@@ -124,11 +124,7 @@ class CreateOrder
                 // ignore payment errors in stub
             }
             // Clear cart
-            app(CartLifecycleService::class)->clearAfterCheckout(
-                $customer?->id,
-                $sessionId,
-                $order->payment_status ?? null
-            );
+            CartFacade::session($sessionId)->clear();
             // Queue order confirmation email with user's preferred locale
             try {
                 $mailable = new OrderPlaced($order);

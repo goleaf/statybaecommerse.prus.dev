@@ -1,15 +1,23 @@
 includes:
   - vendor/larastan/larastan/extension.neon
-  - vendor/phpstan/phpstan-deprecation-rules/rules.neon
-  - vendor/phpstan/phpstan/conf/bleedingEdge.neon
+  - phpstan-baseline.neon
 
 parameters:
   level: 9
   paths:
     - config
-  bootstrapFiles:
-    - stubs/optional-packages.php
-  phpVersion: 80214
+  scanFiles:
+    - stubs/phpstan/livewire-components.php
+  checkExplicitMixed: true
+  checkImplicitMixed: true
+  checkMissingTypehints: true
+  checkMissingVarTagTypehint: true
+  checkMissingCallableSignature: true
+  checkTooWideReturnTypesInProtectedAndPublicMethods: true
+  checkTooWideParameterOutInProtectedAndPublicMethods: true
+  checkTooWideThrowTypesInProtectedAndPublicMethods: true
+  reportMaybesInMethodSignatures: true
+  reportMaybesInPropertyPhpDocTypes: true
   treatPhpDocTypesAsCertain: true
   reportUnmatchedIgnoredErrors: true
   tmpDir: storage/framework/cache/phpstan
