@@ -30,6 +30,11 @@ final class HtmlSanitizer
      */
     private array $globalAttributes;
 
+    /**
+     * @var array<int, string>
+     */
+    private array $dangerousElements;
+
     public function __construct()
     {
         // Allow only semantic elements that are expected inside product descriptions or legal documents.
@@ -55,6 +60,9 @@ final class HtmlSanitizer
 
         // Allow a minimal global attribute set for accessibility and CSS hooks.
         $this->globalAttributes = ['class', 'id', 'lang', 'dir', 'title', 'aria-label', 'aria-hidden', 'role'];
+
+        // Mark elements that must be removed entirely instead of keeping their inner HTML.
+        $this->dangerousElements = ['script', 'style', 'template'];
     }
 
     public function sanitize(?string $html): string
@@ -108,7 +116,12 @@ final class HtmlSanitizer
             }
 
             if (! in_array($tag, $this->allowedElements, true)) {
-                $this->unwrapNode($node);
+                if (in_array($tag, $this->dangerousElements, true)) {
+                    // Remove the entire element when it may contain executable payloads.
+                    $this->removeNode($node);
+                } else {
+                    $this->unwrapNode($node);
+                }
 
                 return;
             }
@@ -166,6 +179,17 @@ final class HtmlSanitizer
         $parent->removeChild($element);
     }
 
+    private function removeNode(DOMElement $element): void
+    {
+        $parent = $element->parentNode;
+        if (! $parent instanceof DOMNode) {
+            return;
+        }
+
+        // Drop the node completely to avoid executing or rendering malicious payloads.
+        $parent->removeChild($element);
+    }
+
     private function isAllowedAttribute(string $tag, string $name, string $value): bool
     {
         if (str_starts_with($name, 'on')) {
@@ -211,11 +235,14 @@ final class HtmlSanitizer
             return true;
         }
 
-        $scheme = strtolower((string) parse_url($url, PHP_URL_SCHEME));
+        $scheme = parse_url($url, PHP_URL_SCHEME);
 
-        if ($scheme === '' || $scheme === null) {
+        if ($scheme === false || $scheme === null || $scheme === '') {
+            // Treat missing schemes (relative URLs) as safe destinations for anchors.
             return true;
         }
+
+        $scheme = strtolower((string) $scheme);
 
         return in_array($scheme, ['http', 'https', 'mailto', 'tel'], true);
     }
@@ -231,11 +258,14 @@ final class HtmlSanitizer
             return true;
         }
 
-        $scheme = strtolower((string) parse_url($url, PHP_URL_SCHEME));
+        $scheme = parse_url($url, PHP_URL_SCHEME);
 
-        if ($scheme === '' || $scheme === null) {
+        if ($scheme === false || $scheme === null || $scheme === '') {
+            // Allow scheme-less image paths so relative assets remain valid after sanitization.
             return true;
         }
+
+        $scheme = strtolower((string) $scheme);
 
         if (in_array($scheme, ['http', 'https'], true)) {
             return true;
