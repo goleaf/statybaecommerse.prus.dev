@@ -67,8 +67,9 @@ use pxlrbt\FilamentExcel\Actions\Tables\ExportAction;
 use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
 use pxlrbt\FilamentExcel\Columns\Column;
 use pxlrbt\FilamentExcel\Exports\ExcelExport;
-use Tapp\FilamentValueRangeFilter\Filters\ValueRangeFilter;
-use UnitEnum;
+use App\Support\Filament\Components\Flatpickr;
+use LaraZeus\InlineChart\Tables\Columns\InlineChart;
+use Filament\Schemas\Schema;
 
 /**
  * ProductResource
@@ -175,7 +176,7 @@ final class ProductResource extends Resource implements DefinesExportColumns
         return __('products.single');
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Schema $form): Schema
     {
 
         $form = $schema; // Preserve legacy variable naming for existing schema definitions.

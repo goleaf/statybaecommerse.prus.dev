@@ -30,7 +30,7 @@ class EmailCampaignResource extends Resource
      */
     protected static $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    public static function form(Form $form): Form
+    public static function form(Schema $form): Schema
     {
         // Delegate form configuration to the dedicated schema class for consistency across panels.
         return EmailCampaignForm::configure($form);

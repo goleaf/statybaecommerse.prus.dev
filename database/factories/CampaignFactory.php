@@ -26,10 +26,15 @@ final class CampaignFactory extends Factory
 
         // Ensure unique slug
         $slug = $baseSlug;
-        $counter = 1;
-        while (\App\Models\Campaign::where('slug', $slug)->exists()) {
-            $slug = $baseSlug . '-' . $counter;
-            $counter++;
+
+        if (Schema::hasTable('discount_campaigns')) {
+            // Guard the uniqueness loop so test migrations can bootstrap before querying a non-existent table.
+            $counter = 1;
+
+            while (\App\Models\Campaign::where('slug', $slug)->exists()) {
+                $slug = $baseSlug . '-' . $counter;
+                $counter++;
+            }
         }
 
         return [
@@ -38,8 +43,8 @@ final class CampaignFactory extends Factory
             'starts_at'  => $this->faker->dateTimeBetween('-1 week', 'now'),
             'ends_at'    => $this->faker->dateTimeBetween('now', '+3 months'),
             'channel_id' => function () {
-                // Skip channel lookups entirely when the supporting table has not been migrated yet.
                 if (! Schema::hasTable('channels')) {
+                    // When the channels table is not yet migrated (common during in-memory test bootstraps), leave the foreign key null.
                     return null;
                 }
 

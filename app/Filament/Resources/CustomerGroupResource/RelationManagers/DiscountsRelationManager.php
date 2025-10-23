@@ -17,7 +17,7 @@ final class DiscountsRelationManager extends BaseRelationManager
 
     protected static ?string $title = 'customer_groups.relation_discounts';
 
-    public function form(Schema $schema): Schema
+    public function form(Schema $form): Schema
     {
 
         $form = $schema; // Preserve legacy variable naming for existing schema definitions.

@@ -29,18 +29,12 @@ class MenuItemResource extends Resource
      */
     protected static $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    /**
-     * Build and return the Filament form definition for menu items.
-     */
-    public static function form(Form $form): Form
+    public static function form(Schema $form): Schema
     {
         // Delegate the schema composition to the dedicated form configurator.
         return MenuItemForm::configure($form);
     }
 
-    /**
-     * Build and return the Filament table definition for menu items.
-     */
     public static function table(Table $table): Table
     {
         // Delegate the column and action configuration to the shared table class.

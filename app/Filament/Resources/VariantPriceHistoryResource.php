@@ -17,7 +17,7 @@ use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use UnitEnum;
+use Filament\Schemas\Schema;
 
 final class VariantPriceHistoryResource extends Resource
 {
@@ -30,10 +30,10 @@ final class VariantPriceHistoryResource extends Resource
      *
      * @var string|\BackedEnum|\UnitEnum|\UnitEnum|null
      */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-currency-euro';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-currency-euro';
 
-    /** @var string|BackedEnum|null Navigation grouping centralized via enum. */
-    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::System;
+    /** @var string|\BackedEnum|null Navigation grouping centralized via enum. */
+    protected static string|\UnitEnum|null $navigationGroup = NavigationGroup::System;
 
     protected static ?int $navigationSort = 20;
 
@@ -45,7 +45,7 @@ final class VariantPriceHistoryResource extends Resource
         return $group instanceof NavigationGroup ? $group->label() : $group;
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Schema $form): Schema
     {
 
         $form = $schema; // Preserve legacy variable naming for existing schema definitions.

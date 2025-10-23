@@ -11,6 +11,8 @@ use App\Models\ReferralCodeUsageLog;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
+use UnitEnum;
+use Filament\Schemas\Schema;
 
 /**
  * ReferralCodeUsageLogResource
@@ -49,7 +51,7 @@ final class ReferralCodeUsageLogResource extends Resource
         return __('admin.referral_code_usage_logs.model_label');
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Schema $form): Schema
     {
 
         $form = $schema; // Preserve legacy variable naming for existing schema definitions.

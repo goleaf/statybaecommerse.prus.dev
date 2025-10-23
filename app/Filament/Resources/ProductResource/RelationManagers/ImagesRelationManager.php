@@ -22,7 +22,7 @@ final class ImagesRelationManager extends BaseRelationManager
 
     protected static ?string $title = 'Product Images';
 
-    public function form(Schema $schema): Schema
+    public function form(Schema $form): Schema
     {
 
         $form = $schema; // Preserve legacy variable naming for existing schema definitions.

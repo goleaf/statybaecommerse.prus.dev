@@ -46,6 +46,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable as SpatieTranslatableResource;
+use Filament\Schemas\Schema;
 
 /**
  * AddressResource
@@ -101,7 +102,7 @@ final class AddressResource extends Resource
     /**
      * Configure the Filament form schema using the v4 Schema container pipeline.
      */
-    public static function form(Schema $schema): Schema
+    public static function form(Schema $form): Schema
     {
         return $schema->components([
             Section::make(__('translations.address_information'))

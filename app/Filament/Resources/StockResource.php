@@ -31,6 +31,8 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use UnitEnum;
+use Filament\Schemas\Schema;
 
 /**
  * StockResource
@@ -69,7 +71,7 @@ final class StockResource extends Resource
         return __('inventory.single');
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Schema $form): Schema
     {
 
         $form = $schema; // Preserve legacy variable naming for existing schema definitions.
