@@ -10,7 +10,7 @@ use App\Http\Controllers\Api\V1\HealthController;
 use App\Http\Controllers\Api\V1\SearchController;
 use Illuminate\Support\Facades\Route;
 
-Route::prefix('api/v1')
+Route::prefix('v1')
     ->middleware('throttle:api.read')
     ->name('api.v1.')
     ->group(function (): void {
@@ -49,5 +49,5 @@ Route::prefix('partner')
     });
 
 Route::get('audit-logs', [AuditLogController::class, 'index'])
-    ->middleware(['throttle:api.default'])
+    ->middleware(['throttle:api.read'])
     ->name('api.audit-logs.index');

@@ -16,19 +16,21 @@ Baseline rate limits also live in `config/security.php` and are registered by `A
 
 ### API limits
 
-All API limiters enforce both per-user and per-IP budgets. Each request consumes from both buckets when a user session is presen
-t; unauthenticated calls only count against the IP budget.
+Layered limiters now protect each surface with a per-user and per-IP budget. The throttle middleware raises a JSON
+`429 Too Many Requests` response and emits a structured warning log whenever either layer is exceeded.
 
-| Limiter | Per-user | Per-IP | Notes |
+| Limiter | Per-user default | Per-IP default | Notes |
 | --- | --- | --- | --- |
-| `api.read` (alias: `api.default`) | 60 requests/minute | 60 requests/minute | Shared by health, readiness, and search endpoints. |
-| `api.write` | 60 requests/minute | 60 requests/minute | Baseline limiter for mutating endpoints. |
-| `api.notifications.read` | 60 requests/minute | 60 requests/minute | Covers notification list, stats, and search endpoints. |
-| `api.notifications.write` | 60 requests/minute | 60 requests/minute | Applies to notification mark-as-read/unread and delete flows. |
-| `api.autocomplete` | 30 requests/minute | 30 requests/minute | Dedicated limiter for the autocomplete POST endpoint. |
+| `api.read` (alias `api.default`) | 60 requests/minute | 60 requests/minute | Applies to the entire `/api/v1` namespace unless overridden. |
+| `api.write` | 60 requests/minute | 60 requests/minute | Use for mutating operations outside the notifications module. |
+| `api.notifications.read` | 60 requests/minute | 60 requests/minute | Guard read-only notification calls. |
+| `api.notifications.write` | 60 requests/minute | 60 requests/minute | Guard mark-as-read/unread/delete calls. |
+| `api.autocomplete` | 30 requests/minute | 30 requests/minute | Detached from the read limiter so search suggestions stay responsive. |
+| `api.profile` | 60 requests/minute | 60 requests/minute | Additional layer on top of the read limiter for `/api/v1/user`. |
+| `frontend.checkout` | 10 requests/minute | 10 requests/minute | Applies to storefront checkout APIs. |
 
-Override the API defaults with the `API_RATE_LIMIT_*` environment variables. Exceeding a budget logs a warning with the request'
-s correlation ID for traceability.
+Tune the thresholds with the new `*_PER_USER` and `*_PER_IP` environment variables described in `config/security.php`.
+Setting a value to `0` or `null` disables that layer while keeping the other intact.
 
 ### Authentication limits
 

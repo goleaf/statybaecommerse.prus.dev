@@ -19,30 +19,47 @@ final class ApiServiceProvider extends ServiceProvider
     public function boot(): void
     {
         RateLimiter::for('api.default', function (Request $request): array {
-            return $this->limitsFor('security.rate_limiting.api.default', $request);
+            // Preserve the historical alias while delegating to the layered read throttle.
+            return $this->layeredLimits($request, 'api.read', $this->readRateLimitConfig());
         });
 
-        RateLimiter::for('api.notifications', function (Request $request): array {
-            return $this->limitsFor('security.rate_limiting.api.notifications', $request, 'notifications');
+        RateLimiter::for('api.read', function (Request $request): array {
+            return $this->layeredLimits($request, 'api.read', $this->readRateLimitConfig());
+        });
+
+        RateLimiter::for('api.write', function (Request $request): array {
+            return $this->layeredLimits($request, 'api.write', $this->writeRateLimitConfig());
+        });
+
+        RateLimiter::for('api.notifications.read', function (Request $request): array {
+            return $this->layeredLimits($request, 'api.notifications.read', $this->notificationRateLimitConfig('read'));
+        });
+
+        RateLimiter::for('api.notifications.write', function (Request $request): array {
+            return $this->layeredLimits($request, 'api.notifications.write', $this->notificationRateLimitConfig('write'));
         });
 
         RateLimiter::for('api.autocomplete', function (Request $request): array {
-            return $this->limitsFor('security.rate_limiting.api.autocomplete', $request, 'autocomplete');
+            return $this->layeredLimits($request, 'api.autocomplete', $this->autocompleteRateLimitConfig());
         });
 
         RateLimiter::for('api.profile', function (Request $request): array {
-            return $this->limitsFor('security.rate_limiting.api.profile', $request, 'profile');
+            return $this->layeredLimits($request, 'api.profile', $this->profileRateLimitConfig());
         });
 
         RateLimiter::for('frontend.checkout', function (Request $request): array {
-            return $this->limitsFor('security.rate_limiting.frontend.checkout', $request, 'checkout');
+            return $this->layeredLimits($request, 'frontend.checkout', $this->checkoutRateLimitConfig());
         });
 
         RateLimiter::for('partner.api', function (Request $request): array {
             $apiKey = $this->resolvePartnerApiKey($request);
 
             if ($apiKey === null) {
-                return [Limit::perMinute(60)->by('partner_api:anonymous:' . $request->ip())];
+                $ip = (string) $request->ip();
+                $identifier = $ip !== '' ? $ip : 'unknown';
+                $key = 'partner_api:anonymous:' . $identifier;
+
+                return [$this->buildLimit('partner.api.anonymous', $key, 60)];
             }
 
             $key = $apiKey->rateLimiterKey();
@@ -52,97 +69,263 @@ final class ApiServiceProvider extends ServiceProvider
                 return [Limit::none()->by($key)];
             }
 
-            return [Limit::perMinute(max(1, (int) $limit))->by($key)];
+            return [$this->buildLimit('partner.api', $key, max(1, (int) $limit))];
         });
     }
 
     /**
-     * @param  array{per_user:int|null,per_ip:int|null}  $config
+     * Compose layered limits for a logical bucket.
+     *
+     * @param  array{per_user:int|null,per_ip:int|null} $config
      * @return array<int, Limit>
      */
-    private function limitsFor(Request $request, string $bucket, array $config): array
+    private function layeredLimits(Request $request, string $bucket, array $config): array
     {
-        $userId = $request->user()?->getAuthIdentifier();
-        $key = $userId !== null ? 'user:' . $userId : 'ip:' . $request->ip();
+        // Compose per-user and per-IP throttles so we can block abusive actors individually.
+        $limits = [
+            $this->perUserLimit($request, $bucket, $config['per_user']),
+            $this->perIpLimit($request, $bucket, $config['per_ip']),
+        ];
 
-        return $suffix === '' ? $key : $key . '|' . $suffix;
+        $filtered = array_values(array_filter($limits, static fn (?Limit $limit): bool => $limit !== null));
+
+        if ($filtered !== []) {
+            return $filtered;
+        }
+
+        $fallback = $this->defaultRateLimitConfig();
+
+        return array_values(array_filter([
+            $this->perUserLimit($request, $bucket, $fallback['per_user']),
+            $this->perIpLimit($request, $bucket, $fallback['per_ip']),
+        ], static fn (?Limit $limit): bool => $limit !== null));
     }
 
     /**
-     * @return array<int, Limit>
+     * @return array{per_user:int|null,per_ip:int|null}
      */
-    private function limitsFor(string $configKey, Request $request, string $suffix = '', ?int $fallback = null): array
+    private function readRateLimitConfig(): array
     {
-        $definitions = config($configKey, []);
-        $key = $this->rateLimitKey($request, $suffix);
+        $config = (array) config('security.rate_limiting.api.read', []);
 
-        if (is_int($definitions)) {
-            return [Limit::perMinute(max(1, $definitions))->by($key)];
-        }
-
-        if (! is_array($definitions) || $definitions === []) {
-            $default = (int) ($fallback ?? config('security.rate_limiting.defaults.minute', 60));
-
-            // Fall back to the global default minute window when the dedicated configuration is missing.
-            return [Limit::perMinute(max(1, $default))->by($key)];
-        }
-
-        $limits = [];
-
-        foreach ($definitions as $scope => $value) {
-            $limit = $this->resolveLimit($scope, $value, $key);
-
-            if ($limit !== null) {
-                $limits[] = $limit;
-            }
-        }
-
-        if ($limits === []) {
-            $default = (int) ($fallback ?? config('security.rate_limiting.defaults.minute', 60));
-
-            // Reuse the default limit whenever none of the configured scopes produced a valid limiter.
-            return [Limit::perMinute(max(1, $default))->by($key)];
-        }
-
-        return $limits;
+        return $this->normalizeRateLimitConfig($config, $this->defaultRateLimitConfig());
     }
 
-    private function resolveLimit(int|string $scope, mixed $value, string $key): ?Limit
+    /**
+     * @return array{per_user:int|null,per_ip:int|null}
+     */
+    private function writeRateLimitConfig(): array
     {
-        if (is_array($value)) {
-            $maxAttempts = (int) ($value['max_attempts'] ?? $value['max'] ?? 0);
-            $decayMinutes = (int) ($value['decay_minutes'] ?? $value['decay'] ?? 0);
+        $config = (array) config('security.rate_limiting.api.write', []);
 
-            if ($maxAttempts > 0 && $decayMinutes > 0) {
-                return Limit::perMinutes($decayMinutes, $maxAttempts)->by($key);
-            }
+        return $this->normalizeRateLimitConfig($config, $this->defaultRateLimitConfig());
+    }
 
+    /**
+     * @return array{per_user:int|null,per_ip:int|null}
+     */
+    private function notificationRateLimitConfig(string $type): array
+    {
+        $config = (array) data_get(config('security.rate_limiting.api.notifications', []), $type, []);
+
+        return $this->normalizeRateLimitConfig($config, $this->defaultRateLimitConfig());
+    }
+
+    /**
+     * @return array{per_user:int|null,per_ip:int|null}
+     */
+    private function autocompleteRateLimitConfig(): array
+    {
+        $config = (array) config('security.rate_limiting.api.autocomplete', []);
+
+        return $this->normalizeRateLimitConfig($config, [
+            'per_user' => 30,
+            'per_ip'   => 30,
+        ]);
+    }
+
+    /**
+     * @return array{per_user:int|null,per_ip:int|null}
+     */
+    private function profileRateLimitConfig(): array
+    {
+        $config = (array) config('security.rate_limiting.api.profile', []);
+
+        return $this->normalizeRateLimitConfig($config, $this->readRateLimitConfig());
+    }
+
+    /**
+     * @return array{per_user:int|null,per_ip:int|null}
+     */
+    private function checkoutRateLimitConfig(): array
+    {
+        $config = (array) config('security.rate_limiting.frontend.checkout', []);
+
+        return $this->normalizeRateLimitConfig($config, [
+            'per_user' => 10,
+            'per_ip'   => 10,
+        ]);
+    }
+
+    /**
+     * @return array{per_user:int|null,per_ip:int|null}
+     */
+    private function defaultRateLimitConfig(): array
+    {
+        $baseline = max(1, (int) config('security.rate_limiting.defaults.minute', 60));
+        $config = config('security.rate_limiting.api.default');
+
+        if (! is_array($config)) {
+            $value = $this->normalizeLimitValue($config, $baseline);
+
+            return [
+                'per_user' => $value,
+                'per_ip'   => $value,
+            ];
+        }
+
+        return $this->normalizeRateLimitConfig($config, [
+            'per_user' => $baseline,
+            'per_ip'   => $baseline,
+        ]);
+    }
+
+    /**
+     * @param  array<string, mixed>                     $config
+     * @param  array{per_user:int|null,per_ip:int|null} $fallback
+     * @return array{per_user:int|null,per_ip:int|null}
+     */
+    private function normalizeRateLimitConfig(array $config, array $fallback): array
+    {
+        return [
+            'per_user' => array_key_exists('per_user', $config)
+                ? $this->normalizeLimitValue($config['per_user'], $fallback['per_user'])
+                : $fallback['per_user'],
+            'per_ip' => array_key_exists('per_ip', $config)
+                ? $this->normalizeLimitValue($config['per_ip'], $fallback['per_ip'])
+                : $fallback['per_ip'],
+        ];
+    }
+
+    private function normalizeLimitValue(mixed $value, ?int $fallback): ?int
+    {
+        if ($value === null) {
             return null;
         }
 
         if (! is_numeric($value)) {
+            return $fallback;
+        }
+
+        $normalized = (int) $value;
+
+        if ($normalized <= 0) {
             return null;
         }
 
-        $maxAttempts = (int) $value;
+        return $normalized;
+    }
 
-        if ($maxAttempts <= 0) {
+    private function perUserLimit(Request $request, string $bucket, ?int $maxAttempts): ?Limit
+    {
+        if ($maxAttempts === null || $maxAttempts <= 0) {
             return null;
         }
 
-        if (! is_string($scope) || $scope === '') {
-            return Limit::perMinute($maxAttempts)->by($key);
+        $userId = $request->user()?->getAuthIdentifier();
+
+        if (! is_string($userId) && ! is_int($userId)) {
+            return null;
         }
 
-        return match (strtolower($scope)) {
-            'minute', 'minutes', 'per_minute' => Limit::perMinute($maxAttempts)->by($key),
-            'second', 'seconds', 'per_second' => Limit::perSeconds($maxAttempts, 1)->by($key),
-            'hour', 'hours', 'per_hour' => Limit::perHour($maxAttempts)->by($key),
-            'day', 'days', 'per_day', 'daily' => Limit::perDay($maxAttempts)->by($key),
-            'week', 'weeks', 'per_week', 'weekly' => Limit::perMinutes(10080, $maxAttempts)->by($key),
-            'month', 'months', 'per_month', 'monthly' => Limit::perMinutes(43200, $maxAttempts)->by($key),
-            default => null,
-        };
+        $key = $this->formatKey('user', (string) $userId, $bucket);
+
+        return $this->buildLimit($bucket . '.user', $key, $maxAttempts);
+    }
+
+    private function perIpLimit(Request $request, string $bucket, ?int $maxAttempts): ?Limit
+    {
+        if ($maxAttempts === null || $maxAttempts <= 0) {
+            return null;
+        }
+
+        $ip = (string) $request->ip();
+        $identifier = $ip !== '' ? $ip : 'unknown';
+        $key = $this->formatKey('ip', $identifier, $bucket);
+
+        return $this->buildLimit($bucket . '.ip', $key, $maxAttempts);
+    }
+
+    private function buildLimit(string $name, string $key, int $maxAttempts): Limit
+    {
+        return Limit::perMinute($maxAttempts)
+            ->by($key)
+            ->response(function (Request $request, array $headers) use ($name, $key, $maxAttempts): SymfonyResponse {
+                // Emit a structured warning whenever a throttle threshold is exceeded.
+                $this->logRateLimitExceeded($request, $name, $key, $maxAttempts);
+
+                return $this->tooManyRequestsResponse($request, $headers);
+            });
+    }
+
+    private function formatKey(string $type, string $identifier, string $bucket): string
+    {
+        return sprintf('%s:%s|%s', $type, $identifier, $bucket);
+    }
+
+    private function logRateLimitExceeded(Request $request, string $name, string $key, int $maxAttempts): void
+    {
+        $route = $request->route();
+
+        Log::warning('API request throttled.', [
+            'correlation_id' => $this->resolveCorrelationId($request),
+            'rate_limiter'   => $name,
+            'rate_limit_key' => $key,
+            'max_attempts'   => $maxAttempts,
+            'request_method' => $request->method(),
+            'request_path'   => $request->path(),
+            'route_name'     => $route !== null ? $route->getName() : null,
+            'user_id'        => $request->user()?->getAuthIdentifier(),
+            'ip_address'     => $request->ip(),
+        ]);
+    }
+
+    private function resolveCorrelationId(Request $request): string
+    {
+        $attribute = $request->attributes->get('correlation_id');
+
+        if (is_string($attribute) && $attribute !== '') {
+            return $attribute;
+        }
+
+        if (app()->bound('request_correlation_id')) {
+            $resolved = app()->make('request_correlation_id');
+
+            if (is_string($resolved) && $resolved !== '') {
+                return $resolved;
+            }
+        }
+
+        return Str::uuid()->toString();
+    }
+
+    /**
+     * @param array<string, int|string> $headers
+     */
+    private function tooManyRequestsResponse(Request $request, array $headers): SymfonyResponse
+    {
+        $response = response()
+            ->json([
+                'error' => [
+                    'code'    => 'rate_limit_exceeded',
+                    'message' => __('Too many requests.'),
+                ],
+            ], SymfonyResponse::HTTP_TOO_MANY_REQUESTS)
+            ->withHeaders($headers);
+
+        $headerName = config('app.correlation_header', 'X-Correlation-ID');
+
+        return $response->header($headerName, $this->resolveCorrelationId($request));
     }
 
     private function resolvePartnerApiKey(Request $request): ?ApiKey

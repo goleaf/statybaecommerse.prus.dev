@@ -26,6 +26,7 @@
 ## Security hardening
 - Documented the open proposal in PR #289 to layer per-user and per-IP throttling buckets across read, write, notification, and autocomplete APIs with correlation-aware logging so security reviewers can coordinate the upcoming rollout.
 - Request-scoped CSP nonces now propagate through middleware, helpers, Livewire, and Vite so every inline Blade script/style satisfies the stricter nonce-based CSP and updated HSTS/permissions policy headers.
+- Layered API throttles introduce per-user and per-IP budgets for read, write, and notification buckets while emitting structured 429 responses and correlation-aware logs to simplify abuse investigations.
 
 ## Tooling polish
 - GitHub Actions CI now executes a PHP 8.2/8.3 matrix with cached Composer installs, coverage uploads, and a reusable ESLint flat config so frontend and backend checks run together.

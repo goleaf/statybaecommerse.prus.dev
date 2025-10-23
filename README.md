@@ -87,6 +87,7 @@ composer run dev
 
 ## Latest maintenance
 
+- 2025-10-25: Introduced layered per-user and per-IP API throttles with structured 429 responses, refreshed rate limiting configuration, and updated security runbooks to document the new read/write buckets.
 - 2025-10-24: Reinstated the Husky bootstrap shim file contents and permissions so Git hooks execute using the local toolchain again while continuing to surface the upstream v10 deprecation warning banner for contributor awareness.
 - 2025-10-24: Hardened content security policies with request-scoped nonces, refreshed inline Blade assets to inject the helper automatically, and expanded rate limiting configuration so API throttles can stack per-minute and per-hour limits.
 

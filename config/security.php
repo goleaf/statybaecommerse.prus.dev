@@ -87,24 +87,40 @@ return [
         ],
         'api' => [
             'default' => [
-                'minute' => (int) env('API_RATE_LIMIT_DEFAULT', 60),
-                'hour'   => (int) env('API_RATE_LIMIT_DEFAULT_HOURLY', 600),
+                'per_user' => (int) env('API_RATE_LIMIT_DEFAULT_PER_USER', (int) env('API_RATE_LIMIT_DEFAULT', 60)),
+                'per_ip' => (int) env('API_RATE_LIMIT_DEFAULT_PER_IP', (int) env('API_RATE_LIMIT_DEFAULT', 60)),
+            ],
+            'read' => [
+                'per_user' => (int) env('API_RATE_LIMIT_READ_PER_USER', (int) env('API_RATE_LIMIT_DEFAULT_PER_USER', (int) env('API_RATE_LIMIT_DEFAULT', 60))),
+                'per_ip' => (int) env('API_RATE_LIMIT_READ_PER_IP', (int) env('API_RATE_LIMIT_DEFAULT_PER_IP', (int) env('API_RATE_LIMIT_DEFAULT', 60))),
+            ],
+            'write' => [
+                'per_user' => (int) env('API_RATE_LIMIT_WRITE_PER_USER', (int) env('API_RATE_LIMIT_DEFAULT_PER_USER', (int) env('API_RATE_LIMIT_DEFAULT', 60))),
+                'per_ip' => (int) env('API_RATE_LIMIT_WRITE_PER_IP', (int) env('API_RATE_LIMIT_DEFAULT_PER_IP', (int) env('API_RATE_LIMIT_DEFAULT', 60))),
             ],
             'notifications' => [
-                'minute' => (int) env('API_RATE_LIMIT_NOTIFICATIONS', 60),
-                'hour'   => (int) env('API_RATE_LIMIT_NOTIFICATIONS_HOURLY', 240),
+                'read' => [
+                    'per_user' => (int) env('API_RATE_LIMIT_NOTIFICATIONS_READ_PER_USER', (int) env('API_RATE_LIMIT_NOTIFICATIONS', 60)),
+                    'per_ip' => (int) env('API_RATE_LIMIT_NOTIFICATIONS_READ_PER_IP', (int) env('API_RATE_LIMIT_NOTIFICATIONS', 60)),
+                ],
+                'write' => [
+                    'per_user' => (int) env('API_RATE_LIMIT_NOTIFICATIONS_WRITE_PER_USER', (int) env('API_RATE_LIMIT_NOTIFICATIONS', 60)),
+                    'per_ip' => (int) env('API_RATE_LIMIT_NOTIFICATIONS_WRITE_PER_IP', (int) env('API_RATE_LIMIT_NOTIFICATIONS', 60)),
+                ],
             ],
             'autocomplete' => [
-                'minute' => (int) env('API_RATE_LIMIT_AUTOCOMPLETE', 30),
-                'hour'   => (int) env('API_RATE_LIMIT_AUTOCOMPLETE_HOURLY', 120),
+                'per_user' => (int) env('API_RATE_LIMIT_AUTOCOMPLETE_PER_USER', (int) env('API_RATE_LIMIT_AUTOCOMPLETE', 30)),
+                'per_ip' => (int) env('API_RATE_LIMIT_AUTOCOMPLETE_PER_IP', (int) env('API_RATE_LIMIT_AUTOCOMPLETE', 30)),
             ],
             'profile' => [
-                'minute' => (int) env('API_RATE_LIMIT_PROFILE', 60),
+                'per_user' => (int) env('API_RATE_LIMIT_PROFILE_PER_USER', (int) env('API_RATE_LIMIT_PROFILE', 60)),
+                'per_ip' => (int) env('API_RATE_LIMIT_PROFILE_PER_IP', (int) env('API_RATE_LIMIT_PROFILE', 60)),
             ],
         ],
         'frontend' => [
             'checkout' => [
-                'minute' => (int) env('FRONTEND_RATE_LIMIT_CHECKOUT', 10),
+                'per_user' => (int) env('FRONTEND_RATE_LIMIT_CHECKOUT_PER_USER', (int) env('FRONTEND_RATE_LIMIT_CHECKOUT', 10)),
+                'per_ip' => (int) env('FRONTEND_RATE_LIMIT_CHECKOUT_PER_IP', (int) env('FRONTEND_RATE_LIMIT_CHECKOUT', 10)),
             ],
         ],
         'auth' => [
