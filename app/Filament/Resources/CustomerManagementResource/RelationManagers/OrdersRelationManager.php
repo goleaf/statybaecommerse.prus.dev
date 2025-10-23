@@ -7,8 +7,6 @@ namespace App\Filament\Resources\CustomerManagementResource\RelationManagers;
 use App\Enums\OrderStatus;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
 use App\Models\Order;
-use App\Support\Filament\Components\Flatpickr;
-use App\Support\Filament\SearchableInputHelper;
 use DefStudio\SearchableInput\DTO\SearchResult;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Actions\AssociateAction;
@@ -25,10 +23,10 @@ use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
+use Filament\Forms\Set;
 use Filament\Infolists\Components\Grid;
 use Filament\Infolists\Components\Section as InfolistSection;
 use Filament\Infolists\Components\TextEntry;
-use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\IconColumn;
@@ -321,7 +319,56 @@ class OrdersRelationManager extends BaseRelationManager
                 CreateAction::make()
                     ->label(__('orders.create_order')),
                 AssociateAction::make()
-                    ->label(__('orders.associate_order')),
+                    ->label(__('orders.associate_order'))
+                    ->form([
+                        SearchableInput::make('recordId')
+                            ->label(__('orders.order'))
+                            ->placeholder(__('orders.search_placeholder'))
+                            ->searchUsing(function (string $search): array {
+                                $term = trim($search);
+
+                                return Order::query()
+                                    ->select(['id', 'number', 'status', 'total'])
+                                    ->when($term !== '', function (Builder $query) use ($term): void {
+                                        $query->where(function (Builder $nested) use ($term): void {
+                                            $nested
+                                                ->where('number', 'like', "%{$term}%")
+                                                ->orWhere('status', 'like', "%{$term}%");
+                                        });
+                                    })
+                                    ->orderByDesc('created_at')
+                                    ->limit(15)
+                                    ->get()
+                                    ->map(function (Order $order): SearchResult {
+                                        $number = (string) ($order->getAttribute('number') ?? '');
+                                        $status = (string) ($order->getAttribute('status') ?? '');
+                                        $total = (float) ($order->getAttribute('total') ?? 0.0);
+                                        $label = trim(sprintf('#%s — %s — €%s', $number, __('orders.statuses.' . $status) ?? $status, number_format($total, 2)));
+
+                                        return SearchResult::make((string) $order->getKey(), $label)
+                                            ->withData('order_id', $order->getKey());
+                                    })
+                                    ->all();
+                            })
+                            ->required()
+                            ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null && $state !== '' ? (int) $state : null)
+                            ->onItemSelected(function (SearchResult $item): void {
+                                app()->call(function (Set $set) use ($item): void {
+                                    $rawId = $item->get('order_id');
+
+                                    if (! is_numeric($rawId)) {
+                                        $rawId = $item->value();
+                                    }
+
+                                    if (! is_numeric($rawId)) {
+                                        return;
+                                    }
+
+                                    $set('recordId', (int) $rawId);
+                                });
+                            })
+                            ->suffixIcon('heroicon-o-queue-list'),
+                    ]),
             ])
             ->recordActions([
                 ViewAction::make(),

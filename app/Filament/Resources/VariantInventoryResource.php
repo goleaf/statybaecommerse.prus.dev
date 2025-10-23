@@ -7,12 +7,14 @@ namespace App\Filament\Resources;
 use App\Support\Concerns\HasNav;
 
 use App\Filament\Resources\VariantInventoryResource\Pages;
+use App\Models\Partner;
 use App\Models\VariantInventory;
 use App\Support\Filament\Components\Flatpickr;
 use App\Support\Filament\SearchableInputHelper;
 use App\Support\Search\LocationSearch;
 use App\Support\Search\ProductVariantSearch;
 use BackedEnum;
+use DefStudio\SearchableInput\DTO\SearchResult;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
@@ -29,6 +31,7 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
+use Filament\Forms\Set;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ListRecords;
 use Filament\Resources\Resource;
@@ -175,9 +178,72 @@ final class VariantInventoryResource extends Resource
                                     ->time(false)
                                     ->format('Y-m-d')
                                     ->label(__('admin.variant_inventory.expiry_date')),
-                                TextInput::make('supplier_id')
+                                SearchableInput::make('supplier_id')
                                     ->label(__('admin.variant_inventory.supplier_id'))
-                                    ->numeric(),
+                                    ->placeholder(__('admin.variant_inventory.search_supplier_placeholder'))
+                                    ->searchUsing(function (string $search): array {
+                                        $term = trim($search);
+
+                                        return Partner::query()
+                                            ->select(['id', 'name', 'code'])
+                                            ->when($term !== '', function (Builder $query) use ($term): void {
+                                                $query->where(function (Builder $nested) use ($term): void {
+                                                    $nested
+                                                        ->where('name', 'like', "%{$term}%")
+                                                        ->orWhere('code', 'like', "%{$term}%");
+                                                });
+                                            })
+                                            ->orderBy('name')
+                                            ->limit(15)
+                                            ->get()
+                                            ->map(function (Partner $partner): SearchResult {
+                                                $code = (string) ($partner->getAttribute('code') ?? '');
+                                                $name = (string) ($partner->getAttribute('name') ?? '');
+                                                $label = trim(sprintf('[%s] %s', $code !== '' ? $code : '—', $name));
+
+                                                return SearchResult::make((string) $partner->getKey(), $label)
+                                                    ->withData('supplier_id', $partner->getKey());
+                                            })
+                                            ->all();
+                                    })
+                                    ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null && $state !== '' ? (int) $state : null)
+                                    ->afterStateHydrated(function (SearchableInput $component, ?int $state, ?VariantInventory $record): void {
+                                        if ($state === null) {
+                                            return;
+                                        }
+
+                                        $partner = $record?->supplier ?? Partner::query()->select(['id', 'name', 'code'])->find($state);
+
+                                        if (! $partner instanceof Partner) {
+                                            return;
+                                        }
+
+                                        $code = (string) ($partner->getAttribute('code') ?? '');
+                                        $name = (string) ($partner->getAttribute('name') ?? '');
+                                        $label = trim(sprintf('[%s] %s', $code !== '' ? $code : '—', $name));
+
+                                        $component
+                                            ->state((string) $state)
+                                            ->options([
+                                                (string) $partner->getKey() => $label,
+                                            ]);
+                                    })
+                                    ->onItemSelected(function (SearchResult $item): void {
+                                        app()->call(function (Set $set) use ($item): void {
+                                            $rawId = $item->get('supplier_id');
+
+                                            if (! is_numeric($rawId)) {
+                                                $rawId = $item->value();
+                                            }
+
+                                            if (! is_numeric($rawId)) {
+                                                return;
+                                            }
+
+                                            $set('supplier_id', (int) $rawId);
+                                        });
+                                    })
+                                    ->suffixIcon('heroicon-o-building-storefront'),
                             ]),
                     ]),
                 Section::make(__('admin.variant_inventory.additional_info'))
