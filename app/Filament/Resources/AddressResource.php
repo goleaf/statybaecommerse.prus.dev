@@ -44,7 +44,7 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable as TranslatableResource;
+use UnitEnum;
 
 /**
  * AddressResource
@@ -71,7 +71,10 @@ final class AddressResource extends Resource
     /**
      * Get navigation group
      */
-    
+    public static function getNavigationGroup(): string|UnitEnum|null
+    {
+        return 'Orders';
+    }
 
     /**
      * Get model label

@@ -89,7 +89,9 @@ final class SliderForm
                                     ->columnSpan(1),
                                 SearchableInput::make('button_url')
                                     ->label(__('admin.sliders.button_url'))
-                                    ->placeholder(__('admin.sliders.link_search.placeholder'))
+                                    ->placeholder(__('admin.sliders.button_url_placeholder'))
+                                    ->helperText(__('admin.sliders.button_url_helper'))
+                                    ->searchUsing(fn (string $term): array => ContentLinkSearch::suggest($term))
                                     ->maxLength(255)
                                     ->searchUsing(fn (string $value): array => ContentLinkSearch::results($value))
                                     ->dehydrateStateUsing(fn (?string $state): ?string => $state !== null && $state !== '' ? $state : null)

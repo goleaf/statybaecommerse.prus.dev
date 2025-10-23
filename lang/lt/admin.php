@@ -218,10 +218,60 @@ return [
         'make_available_description'     => 'Tai padarys visas pasirinktas kombinacijas prieinamomis',
         'make_unavailable_description'   => 'Tai padarys visas pasirinktas kombinacijas neprieinamomis',
     ],
+    'content_links' => [
+        'placeholders' => [
+            'search' => 'Ieškokite vidinių puslapių, produktų arba įklijuokite URL',
+        ],
+        'types' => [
+            'static' => 'Statinis puslapis',
+            'product' => 'Produktas',
+            'category' => 'Kategorija',
+            'collection' => 'Kolekcija',
+            'campaign' => 'Kampanija',
+            'post' => 'Įrašas',
+            'news' => 'Naujiena',
+        ],
+        'static' => [
+            'home' => [
+                'label' => 'Pagrindinis puslapis',
+                'description' => 'Pagrindinis parduotuvės prisistatymo puslapis.',
+            ],
+            'products' => [
+                'label' => 'Visi produktai',
+                'description' => 'Produktų sąrašas su filtrais ir paieška.',
+            ],
+            'categories' => [
+                'label' => 'Kategorijų apžvalga',
+                'description' => 'Peržiūrėkite visas parduotuvės kategorijas.',
+            ],
+            'collections' => [
+                'label' => 'Kolekcijos',
+                'description' => 'Kuruotų kolekcijų pristatymo puslapis.',
+            ],
+            'cart' => [
+                'label' => 'Krepšelis',
+                'description' => 'Kliento pirkinių krepšelio suvestinė.',
+            ],
+            'checkout' => [
+                'label' => 'Apmokėjimas',
+                'description' => 'Apmokėjimo proceso pradžia.',
+            ],
+            'account' => [
+                'label' => 'Kliento paskyra',
+                'description' => 'Prisijungusio kliento paskyros valdymo skydelis.',
+            ],
+        ],
+    ],
     'variant_inventory' => [
         'navigation_label'   => 'Variantų inventorius',
         'plural_model_label' => 'Variantų inventoriai',
         'model_label'        => 'Variantų inventorius',
+
+        'placeholders' => [
+            'variant' => 'Ieškokite produktų variantų pagal pavadinimą ar SKU',
+            'location' => 'Ieškokite vietų pagal pavadinimą ar kodą',
+            'supplier' => 'Ieškokite tiekėjų pagal pavadinimą ar el. paštą',
+        ],
 
         // Basic Information
         'basic_information' => 'Pagrindinė informacija',

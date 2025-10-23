@@ -99,7 +99,9 @@ final class SliderResource extends Resource
                         ->columnSpanFull(),
                     SearchableInput::make('button_url')
                         ->label(__('sliders.button_url'))
-                        ->placeholder(__('sliders.link_search.placeholder'))
+                        ->placeholder(__('sliders.button_url_placeholder'))
+                        ->helperText(__('sliders.button_url_helper'))
+                        ->searchUsing(fn (string $term): array => ContentLinkSearch::suggest($term))
                         ->maxLength(255)
                         ->searchUsing(fn (string $value): array => ContentLinkSearch::results($value))
                         ->dehydrateStateUsing(fn (?string $state): ?string => $state !== null && $state !== '' ? $state : null)

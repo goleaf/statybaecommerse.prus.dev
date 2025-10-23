@@ -48,6 +48,10 @@ return [
     'price' => 'Kaina',
     'name' => 'Pavadinimas',
     'showing' => 'Rodoma',
+    'button_url' => 'Mygtuko URL',
+    'button_url_placeholder' => 'Ieškokite turinio arba įklijuokite URL',
+    'button_url_helper' => 'Pasirinkite vidinį puslapį, produktą arba įveskite išorinį URL.',
+    'slide_link' => 'Skaidrės nuoroda',
     // Address Types
     'address_type_shipping'             => 'Pristatymo adresas',
     'address_type_billing'              => 'Atsiskaitymo adresas',

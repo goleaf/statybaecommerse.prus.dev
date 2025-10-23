@@ -56,7 +56,7 @@ final class CampaignConversionResource extends Resource
         return __('campaign_conversions.title');
     }
 
-    public static function getNavigationGroup(): ?string
+    public static function getNavigationGroup(): string|UnitEnum|null
     {
         return self::$navigationGroup instanceof NavigationGroup
             ? self::$navigationGroup->label()

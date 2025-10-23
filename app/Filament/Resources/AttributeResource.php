@@ -27,6 +27,7 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use UnitEnum;
 
 final class AttributeResource extends Resource
 {
@@ -36,7 +37,7 @@ final class AttributeResource extends Resource
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-tag';
 
-    public static function getNavigationGroup(): ?string
+    public static function getNavigationGroup(): string|UnitEnum|null
     {
         return 'Products';
     }

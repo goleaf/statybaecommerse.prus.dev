@@ -395,49 +395,73 @@ final class OrderResource extends Resource implements DefinesExportColumns
                     Grid::make(2)
                         ->schema([
                             SearchableInput::make('billing_address_lookup')
-                                ->label(__('orders.lookups.billing_address'))
-                                ->placeholder(__('orders.lookups.address_placeholder'))
-                                ->searchUsing(fn (string $value): array => AddressSearch::results($value))
-                                ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null && $state !== '' ? (int) $state : null)
-                                ->afterStateUpdated(function (?int $state, Set $set): void {
-                                    if ($state === null) {
-                                        $set('billing_address', []);
+                                ->label(__('orders.fields.billing_address'))
+                                ->placeholder(__('orders.placeholders.billing_address'))
+                                ->helperText(__('orders.helpers.billing_address'))
+                                ->searchUsing(fn (string $term): array => AddressSearch::results($term))
+                                ->afterStateHydrated(function (SearchableInput $component, $state, ?Order $record): void {
+                                    $payload = $record?->getAttribute('billing_address');
+
+                                    if (! is_array($payload) || ! isset($payload['address_id'])) {
+                                        return;
+                                    }
+
+                                    $id = (int) $payload['address_id'];
+                                    $label = (string) ($payload['label'] ?? AddressSearch::formatPayload($payload));
+
+                                    $component
+                                        ->state((string) $id)
+                                        ->options([
+                                            (string) $id => $label,
+                                        ]);
+                                })
+                                ->afterStateUpdated(function (?string $state, Set $set): void {
+                                    if ($state === null || $state === '') {
+                                        $set('billing_address', null);
 
                                         return;
                                     }
 
-                                    $address = Address::query()
-                                        ->select(['id', 'address_line_1', 'address_line_2', 'city', 'state', 'postal_code', 'country_code'])
-                                        ->find($state);
+                                    $payload = AddressSearch::payloadFromId((int) $state);
 
-                                    if (! $address instanceof Address) {
-                                        return;
+                                    if ($payload !== null) {
+                                        $set('billing_address', $payload);
                                     }
-
-                                    $set('billing_address', AddressSearch::payload($address));
                                 })
                                 ->dehydrated(false),
                             SearchableInput::make('shipping_address_lookup')
-                                ->label(__('orders.lookups.shipping_address'))
-                                ->placeholder(__('orders.lookups.address_placeholder'))
-                                ->searchUsing(fn (string $value): array => AddressSearch::results($value))
-                                ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null && $state !== '' ? (int) $state : null)
-                                ->afterStateUpdated(function (?int $state, Set $set): void {
-                                    if ($state === null) {
-                                        $set('shipping_address', []);
+                                ->label(__('orders.fields.shipping_address'))
+                                ->placeholder(__('orders.placeholders.shipping_address'))
+                                ->helperText(__('orders.helpers.shipping_address'))
+                                ->searchUsing(fn (string $term): array => AddressSearch::results($term))
+                                ->afterStateHydrated(function (SearchableInput $component, $state, ?Order $record): void {
+                                    $payload = $record?->getAttribute('shipping_address');
+
+                                    if (! is_array($payload) || ! isset($payload['address_id'])) {
+                                        return;
+                                    }
+
+                                    $id = (int) $payload['address_id'];
+                                    $label = (string) ($payload['label'] ?? AddressSearch::formatPayload($payload));
+
+                                    $component
+                                        ->state((string) $id)
+                                        ->options([
+                                            (string) $id => $label,
+                                        ]);
+                                })
+                                ->afterStateUpdated(function (?string $state, Set $set): void {
+                                    if ($state === null || $state === '') {
+                                        $set('shipping_address', null);
 
                                         return;
                                     }
 
-                                    $address = Address::query()
-                                        ->select(['id', 'address_line_1', 'address_line_2', 'city', 'state', 'postal_code', 'country_code'])
-                                        ->find($state);
+                                    $payload = AddressSearch::payloadFromId((int) $state);
 
-                                    if (! $address instanceof Address) {
-                                        return;
+                                    if ($payload !== null) {
+                                        $set('shipping_address', $payload);
                                     }
-
-                                    $set('shipping_address', AddressSearch::payload($address));
                                 })
                                 ->dehydrated(false),
                         ]),
@@ -487,26 +511,18 @@ final class OrderResource extends Resource implements DefinesExportColumns
                         ->schema([
                             SearchableInput::make('channel_id')
                                 ->label(__('orders.fields.channel'))
-                                ->placeholder(__('orders.lookups.channel_placeholder'))
-                                ->searchUsing(fn (string $value): array => ChannelSearch::results($value))
+                                ->placeholder(__('orders.placeholders.channel'))
+                                ->searchUsing(fn (string $term): array => ChannelSearch::results($term))
                                 ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null && $state !== '' ? (int) $state : null)
-                                ->afterStateHydrated(function (SearchableInput $component, ?int $state): void {
-                                    if ($state === null) {
-                                        return;
-                                    }
-
-                                    $channel = Channel::query()
-                                        ->select(['id', 'name', 'code', 'type'])
-                                        ->find($state);
-
-                                    if (! $channel instanceof Channel) {
+                                ->afterStateHydrated(function (SearchableInput $component, ?int $state, ?Order $record): void {
+                                    if ($state === null || ! $record?->channel) {
                                         return;
                                     }
 
                                     $component
                                         ->state((string) $state)
                                         ->options([
-                                            (string) $channel->getKey() => ChannelSearch::label($channel),
+                                            (string) $record->channel_id => ChannelSearch::label($record->channel),
                                         ]);
                                 })
                                 ->afterStateUpdated(function (?string $state, Set $set): void {
@@ -514,26 +530,18 @@ final class OrderResource extends Resource implements DefinesExportColumns
                                 }),
                             SearchableInput::make('partner_id')
                                 ->label(__('orders.fields.partner'))
-                                ->placeholder(__('orders.lookups.partner_placeholder'))
-                                ->searchUsing(fn (string $value): array => PartnerSearch::results($value))
+                                ->placeholder(__('orders.placeholders.partner'))
+                                ->searchUsing(fn (string $term): array => PartnerSearch::results($term))
                                 ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null && $state !== '' ? (int) $state : null)
-                                ->afterStateHydrated(function (SearchableInput $component, ?int $state): void {
-                                    if ($state === null) {
-                                        return;
-                                    }
-
-                                    $partner = Partner::query()
-                                        ->select(['id', 'name', 'code', 'contact_email'])
-                                        ->find($state);
-
-                                    if (! $partner instanceof Partner) {
+                                ->afterStateHydrated(function (SearchableInput $component, ?int $state, ?Order $record): void {
+                                    if ($state === null || ! $record?->partner) {
                                         return;
                                     }
 
                                     $component
                                         ->state((string) $state)
                                         ->options([
-                                            (string) $partner->getKey() => PartnerSearch::label($partner),
+                                            (string) $record->partner_id => PartnerSearch::label($record->partner),
                                         ]);
                                 })
                                 ->afterStateUpdated(function (?string $state, Set $set): void {

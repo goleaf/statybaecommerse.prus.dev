@@ -37,12 +37,13 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
+use UnitEnum;
 
 final class DocumentTemplateResource extends Resource
 {
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-document-text';
 
-    public static function getNavigationGroup(): ?string
+    public static function getNavigationGroup(): string|UnitEnum|null
     {
         return 'Documents';
     }

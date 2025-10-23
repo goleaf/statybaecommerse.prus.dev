@@ -4,13 +4,15 @@ declare(strict_types=1);
 
 namespace App\Support\Search;
 
+use App\Models\Campaign;
 use App\Models\Category;
-use App\Models\Collection as ProductCollection;
+use App\Models\Collection;
+use App\Models\News;
 use App\Models\Post;
 use App\Models\Product;
 use DefStudio\SearchableInput\DTO\SearchResult;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Collection;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 use Throwable;
@@ -18,85 +20,186 @@ use Throwable;
 final class ContentLinkSearch
 {
     /**
+     * Build a combined list of internal content links that can be suggested when selecting slider links.
+     *
      * @return array<int, SearchResult>
      */
-    public static function results(string $term, int $limit = 15): array
+    public static function suggest(string $term, int $limit = 15): array
     {
-        $search = trim($term);
-
         $results = collect();
 
-        $results = $results->merge(self::staticResults($search));
+        $results = $results->merge(self::staticResults($term));
 
-        if ($search !== '') {
-            $results = $results
-                ->merge(self::productResults($search, $limit))
-                ->merge(self::categoryResults($search, $limit))
-                ->merge(self::collectionResults($search, $limit))
-                ->merge(self::postResults($search, $limit));
+        $remaining = $limit - $results->count();
+        if ($remaining <= 0) {
+            return $results->take($limit)->values()->all();
         }
 
-        return $results
-            ->filter()
-            ->unique(fn (SearchResult $result): string => $result->value())
-            ->take($limit)
+        foreach ([
+            fn (int $l): array => self::productResults($term, $l),
+            fn (int $l): array => self::categoryResults($term, $l),
+            fn (int $l): array => self::collectionResults($term, $l),
+            fn (int $l): array => self::campaignResults($term, $l),
+            fn (int $l): array => self::postResults($term, $l),
+            fn (int $l): array => self::newsResults($term, $l),
+        ] as $builder) {
+            $portion = $builder($remaining);
+
+            if ($portion === []) {
+                continue;
+            }
+
+            $results = $results->merge($portion);
+            $remaining = $limit - $results->count();
+
+            if ($remaining <= 0) {
+                break;
+            }
+        }
+
+        return $results->take($limit)->values()->all();
+    }
+
+    /**
+     * @return array<int, SearchResult>
+     */
+    private static function staticResults(string $term): array
+    {
+        $term = Str::lower(trim($term));
+
+        return collect(self::staticLinks())
+            ->filter(function (array $link) use ($term): bool {
+                if ($term === '') {
+                    return true;
+                }
+
+                $haystack = Str::lower($link['label'] . ' ' . $link['description']);
+
+                return Str::contains($haystack, $term);
+            })
+            ->map(function (array $link): SearchResult {
+                $result = SearchResult::make($link['url'], $link['label']);
+
+                return $result
+                    ->withData('type', 'static')
+                    ->withData('icon', $link['icon'])
+                    ->withData('description', $link['description']);
+            })
             ->values()
             ->all();
     }
 
-    private static function staticResults(string $term): Collection
+    /**
+     * @return array<int, array{label: string, description: string, url: string, icon: string}>
+     */
+    private static function staticLinks(): array
     {
-        $links = self::staticLinks();
-        $needle = Str::lower($term);
+        $links = [
+            [
+                'route'       => 'home',
+                'fallback'    => '/',
+                'icon'        => 'heroicon-o-home',
+                'label'       => __('admin.content_links.static.home.label'),
+                'description' => __('admin.content_links.static.home.description'),
+            ],
+            [
+                'route'       => 'frontend.products.index',
+                'fallback'    => '/products',
+                'icon'        => 'heroicon-o-rectangle-stack',
+                'label'       => __('admin.content_links.static.products.label'),
+                'description' => __('admin.content_links.static.products.description'),
+            ],
+            [
+                'route'       => 'frontend.categories.index',
+                'fallback'    => '/categories',
+                'icon'        => 'heroicon-o-squares-2x2',
+                'label'       => __('admin.content_links.static.categories.label'),
+                'description' => __('admin.content_links.static.categories.description'),
+            ],
+            [
+                'route'       => 'frontend.collections.index',
+                'fallback'    => '/collections',
+                'icon'        => 'heroicon-o-collection',
+                'label'       => __('admin.content_links.static.collections.label'),
+                'description' => __('admin.content_links.static.collections.description'),
+            ],
+            [
+                'route'       => 'frontend.cart.index',
+                'fallback'    => '/cart',
+                'icon'        => 'heroicon-o-shopping-cart',
+                'label'       => __('admin.content_links.static.cart.label'),
+                'description' => __('admin.content_links.static.cart.description'),
+            ],
+            [
+                'route'       => 'frontend.checkout.index',
+                'fallback'    => '/checkout',
+                'icon'        => 'heroicon-o-credit-card',
+                'label'       => __('admin.content_links.static.checkout.label'),
+                'description' => __('admin.content_links.static.checkout.description'),
+            ],
+            [
+                'route'       => 'frontend.profile.index',
+                'fallback'    => '/profile',
+                'icon'        => 'heroicon-o-user-circle',
+                'label'       => __('admin.content_links.static.account.label'),
+                'description' => __('admin.content_links.static.account.description'),
+            ],
+        ];
 
         return collect($links)
-            ->filter(static function (array $link) use ($needle): bool {
-                if ($needle === '') {
-                    return true;
-                }
+            ->map(function (array $link): ?array {
+                $url = self::resolveUrl($link['route'], $link['fallback']);
 
-                $haystack = Str::lower(trim(sprintf('%s %s %s', $link['label'] ?? '', $link['description'] ?? '', $link['url'] ?? '')));
-
-                return Str::contains($haystack, $needle);
-            })
-            ->map(static function (array $link): ?SearchResult {
-                $url = $link['url'] ?? null;
-
-                if (! is_string($url) || $url === '') {
+                if ($url === null) {
                     return null;
                 }
 
-                $label = is_string($link['label'] ?? null) ? $link['label'] : $url;
-                $description = is_string($link['description'] ?? null) ? $link['description'] : '';
-                $key = is_string($link['key'] ?? null) ? $link['key'] : null;
-
-                $result = SearchResult::make($url, $label);
-                $result
-                    ->withData('type', 'static')
-                    ->withData('description', $description);
-
-                if ($key !== null) {
-                    $result->withData('key', $key);
-                }
-
-                return $result;
+                return [
+                    'label'       => $link['label'],
+                    'description' => $link['description'],
+                    'url'         => $url,
+                    'icon'        => $link['icon'],
+                ];
             })
             ->filter()
-            ->values();
+            ->values()
+            ->all();
     }
 
-    private static function productResults(string $term, int $limit): Collection
+    private static function resolveUrl(string $route, string $fallback): ?string
     {
-        /** @var \Illuminate\Database\Eloquent\Collection<int, Product> $products */
+        if (Route::has($route)) {
+            try {
+                return route($route);
+            } catch (Throwable $exception) {
+                // Fallback below.
+            }
+        }
+
+        $url = url($fallback);
+
+        return is_string($url) ? $url : null;
+    }
+
+    /**
+     * @return array<int, SearchResult>
+     */
+    private static function productResults(string $term, int $limit): array
+    {
+        if ($limit <= 0) {
+            return [];
+        }
+
+        /** @var EloquentCollection<int, Product> $products */
         $products = Product::query()
-            ->select(['id', 'slug', 'name'])
-            ->when($term !== '', static function (Builder $builder) use ($term): void {
-                $builder->where(static function (Builder $query) use ($term): void {
+            ->select(['id', 'name', 'slug', 'sku'])
+            ->when(trim($term) !== '', function (Builder $builder) use ($term): void {
+                $builder->where(function (Builder $query) use ($term): void {
                     $query
-                        ->where('name->lt', 'like', "%{$term}%")
-                        ->orWhere('name->en', 'like', "%{$term}%")
-                        ->orWhere('name', 'like', "%{$term}%")
-                        ->orWhere('slug', 'like', "%{$term}%");
+                        ->where('name->en', 'like', "%{$term}%")
+                        ->orWhere('name->lt', 'like', "%{$term}%")
+                        ->orWhere('slug', 'like', "%{$term}%")
+                        ->orWhere('sku', 'like', "%{$term}%");
                 });
             })
             ->orderByDesc('updated_at')
@@ -104,39 +207,65 @@ final class ContentLinkSearch
             ->get();
 
         return $products
-            ->map(static function (Product $product): ?SearchResult {
-                $url = self::safeRoute('frontend.products.show', $product);
+            ->map(function (Product $product): ?SearchResult {
+                $url = self::resolveProductUrl($product);
 
                 if ($url === null) {
                     return null;
                 }
 
-                $name = self::resolveTranslatable($product->getAttribute('name'));
-                $label = trim(sprintf('%s • %s', self::typeLabel('product'), $name !== '' ? $name : (string) $product->getAttribute('slug')));
-
+                $label = sprintf('%s · %s', __('admin.content_links.types.product'), self::productLabel($product));
                 $result = SearchResult::make($url, $label);
-                $result
-                    ->withData('type', 'product')
-                    ->withData('product_id', $product->getKey())
-                    ->withData('slug', $product->getAttribute('slug'));
 
-                return $result;
+                return $result
+                    ->withData('type', 'product')
+                    ->withData('icon', 'heroicon-o-cube')
+                    ->withData('sku', (string) ($product->getAttribute('sku') ?? ''))
+                    ->withData('name', self::resolveTranslatableName($product->getAttribute('name')));
             })
             ->filter()
-            ->values();
+            ->values()
+            ->all();
     }
 
-    private static function categoryResults(string $term, int $limit): Collection
+    private static function resolveProductUrl(Product $product): ?string
     {
-        /** @var \Illuminate\Database\Eloquent\Collection<int, Category> $categories */
+        if (! Route::has('frontend.products.show')) {
+            return null;
+        }
+
+        try {
+            return route('frontend.products.show', $product);
+        } catch (Throwable $exception) {
+            return null;
+        }
+    }
+
+    private static function productLabel(Product $product): string
+    {
+        $sku = $product->getAttribute('sku');
+        $name = self::resolveTranslatableName($product->getAttribute('name'));
+
+        return trim(sprintf('[%s] %s', $sku ?: '—', $name));
+    }
+
+    /**
+     * @return array<int, SearchResult>
+     */
+    private static function categoryResults(string $term, int $limit): array
+    {
+        if ($limit <= 0) {
+            return [];
+        }
+
+        /** @var EloquentCollection<int, Category> $categories */
         $categories = Category::query()
-            ->select(['id', 'slug', 'name'])
-            ->when($term !== '', static function (Builder $builder) use ($term): void {
-                $builder->where(static function (Builder $query) use ($term): void {
+            ->select(['id', 'name', 'slug'])
+            ->when(trim($term) !== '', function (Builder $builder) use ($term): void {
+                $builder->where(function (Builder $query) use ($term): void {
                     $query
-                        ->where('name->lt', 'like', "%{$term}%")
-                        ->orWhere('name->en', 'like', "%{$term}%")
-                        ->orWhere('name', 'like', "%{$term}%")
+                        ->where('name->en', 'like', "%{$term}%")
+                        ->orWhere('name->lt', 'like', "%{$term}%")
                         ->orWhere('slug', 'like', "%{$term}%");
                 });
             })
@@ -145,39 +274,46 @@ final class ContentLinkSearch
             ->get();
 
         return $categories
-            ->map(static function (Category $category): ?SearchResult {
-                $url = self::safeRoute('frontend.categories.show', $category);
-
-                if ($url === null) {
+            ->map(function (Category $category): ?SearchResult {
+                if (! Route::has('frontend.categories.show')) {
                     return null;
                 }
 
-                $name = self::resolveTranslatable($category->getAttribute('name'));
-                $label = trim(sprintf('%s • %s', self::typeLabel('category'), $name !== '' ? $name : (string) $category->getAttribute('slug')));
+                try {
+                    $url = route('frontend.categories.show', $category);
+                } catch (Throwable $exception) {
+                    return null;
+                }
 
+                $label = sprintf('%s · %s', __('admin.content_links.types.category'), self::resolveTranslatableName($category->getAttribute('name')));
                 $result = SearchResult::make($url, $label);
-                $result
-                    ->withData('type', 'category')
-                    ->withData('category_id', $category->getKey())
-                    ->withData('slug', $category->getAttribute('slug'));
 
-                return $result;
+                return $result
+                    ->withData('type', 'category')
+                    ->withData('icon', 'heroicon-o-tag');
             })
             ->filter()
-            ->values();
+            ->values()
+            ->all();
     }
 
-    private static function collectionResults(string $term, int $limit): Collection
+    /**
+     * @return array<int, SearchResult>
+     */
+    private static function collectionResults(string $term, int $limit): array
     {
-        /** @var \Illuminate\Database\Eloquent\Collection<int, ProductCollection> $collections */
-        $collections = ProductCollection::query()
-            ->select(['id', 'slug', 'name'])
-            ->when($term !== '', static function (Builder $builder) use ($term): void {
-                $builder->where(static function (Builder $query) use ($term): void {
+        if ($limit <= 0) {
+            return [];
+        }
+
+        /** @var EloquentCollection<int, Collection> $collections */
+        $collections = Collection::query()
+            ->select(['id', 'name', 'slug'])
+            ->when(trim($term) !== '', function (Builder $builder) use ($term): void {
+                $builder->where(function (Builder $query) use ($term): void {
                     $query
-                        ->where('name->lt', 'like', "%{$term}%")
-                        ->orWhere('name->en', 'like', "%{$term}%")
-                        ->orWhere('name', 'like', "%{$term}%")
+                        ->where('name->en', 'like', "%{$term}%")
+                        ->orWhere('name->lt', 'like', "%{$term}%")
                         ->orWhere('slug', 'like', "%{$term}%");
                 });
             })
@@ -186,40 +322,93 @@ final class ContentLinkSearch
             ->get();
 
         return $collections
-            ->map(static function (ProductCollection $collection): ?SearchResult {
-                $url = self::safeRoute('frontend.collections.show', $collection);
-
-                if ($url === null) {
+            ->map(function (Collection $collection): ?SearchResult {
+                if (! Route::has('frontend.collections.show')) {
                     return null;
                 }
 
-                $name = self::resolveTranslatable($collection->getAttribute('name'));
-                $label = trim(sprintf('%s • %s', self::typeLabel('collection'), $name !== '' ? $name : (string) $collection->getAttribute('slug')));
+                try {
+                    $url = route('frontend.collections.show', $collection);
+                } catch (Throwable $exception) {
+                    return null;
+                }
 
+                $label = sprintf('%s · %s', __('admin.content_links.types.collection'), self::resolveTranslatableName($collection->getAttribute('name')));
                 $result = SearchResult::make($url, $label);
-                $result
-                    ->withData('type', 'collection')
-                    ->withData('collection_id', $collection->getKey())
-                    ->withData('slug', $collection->getAttribute('slug'));
 
-                return $result;
+                return $result
+                    ->withData('type', 'collection')
+                    ->withData('icon', 'heroicon-o-clipboard-document-list');
             })
             ->filter()
-            ->values();
+            ->values()
+            ->all();
     }
 
-    private static function postResults(string $term, int $limit): Collection
+    /**
+     * @return array<int, SearchResult>
+     */
+    private static function campaignResults(string $term, int $limit): array
     {
-        /** @var \Illuminate\Database\Eloquent\Collection<int, Post> $posts */
+        if ($limit <= 0) {
+            return [];
+        }
+
+        /** @var EloquentCollection<int, Campaign> $campaigns */
+        $campaigns = Campaign::query()
+            ->select(['id', 'name', 'slug'])
+            ->when(trim($term) !== '', function (Builder $builder) use ($term): void {
+                $builder->where(function (Builder $query) use ($term): void {
+                    $query
+                        ->where('name', 'like', "%{$term}%")
+                        ->orWhere('slug', 'like', "%{$term}%");
+                });
+            })
+            ->orderByDesc('starts_at')
+            ->limit($limit)
+            ->get();
+
+        return $campaigns
+            ->map(function (Campaign $campaign): ?SearchResult {
+                if (! Route::has('frontend.campaigns.show')) {
+                    return null;
+                }
+
+                try {
+                    $url = route('frontend.campaigns.show', $campaign);
+                } catch (Throwable $exception) {
+                    return null;
+                }
+
+                $label = sprintf('%s · %s', __('admin.content_links.types.campaign'), (string) $campaign->getAttribute('name'));
+                $result = SearchResult::make($url, $label);
+
+                return $result
+                    ->withData('type', 'campaign')
+                    ->withData('icon', 'heroicon-o-megaphone');
+            })
+            ->filter()
+            ->values()
+            ->all();
+    }
+
+    /**
+     * @return array<int, SearchResult>
+     */
+    private static function postResults(string $term, int $limit): array
+    {
+        if ($limit <= 0) {
+            return [];
+        }
+
+        /** @var EloquentCollection<int, Post> $posts */
         $posts = Post::query()
-            ->select(['id', 'slug', 'title', 'title_translations'])
-            ->when($term !== '', static function (Builder $builder) use ($term): void {
-                $builder->where(static function (Builder $query) use ($term): void {
+            ->select(['id', 'title', 'slug'])
+            ->when(trim($term) !== '', function (Builder $builder) use ($term): void {
+                $builder->where(function (Builder $query) use ($term): void {
                     $query
                         ->where('title', 'like', "%{$term}%")
-                        ->orWhere('slug', 'like', "%{$term}%")
-                        ->orWhere('title_translations->lt', 'like', "%{$term}%")
-                        ->orWhere('title_translations->en', 'like', "%{$term}%");
+                        ->orWhere('slug', 'like', "%{$term}%");
                 });
             })
             ->orderByDesc('published_at')
@@ -227,113 +416,80 @@ final class ContentLinkSearch
             ->get();
 
         return $posts
-            ->map(static function (Post $post): ?SearchResult {
-                $url = self::safeRoute('frontend.posts.show', $post);
-
-                if ($url === null) {
+            ->map(function (Post $post): ?SearchResult {
+                if (! Route::has('frontend.posts.show')) {
                     return null;
                 }
 
-                $title = self::resolveTranslatable($post->getAttribute('title'));
-                if ($title === '') {
-                    /** @var array<string, mixed>|null $translations */
-                    $translations = $post->getAttribute('title_translations');
-                    if (is_array($translations)) {
-                        $title = self::resolveTranslatable($translations);
-                    }
+                try {
+                    $url = route('frontend.posts.show', $post);
+                } catch (Throwable $exception) {
+                    return null;
                 }
 
-                $label = trim(sprintf('%s • %s', self::typeLabel('post'), $title !== '' ? $title : (string) $post->getAttribute('slug')));
-
+                $label = sprintf('%s · %s', __('admin.content_links.types.post'), (string) $post->getAttribute('title'));
                 $result = SearchResult::make($url, $label);
-                $result
-                    ->withData('type', 'post')
-                    ->withData('post_id', $post->getKey())
-                    ->withData('slug', $post->getAttribute('slug'));
 
-                return $result;
+                return $result
+                    ->withData('type', 'post')
+                    ->withData('icon', 'heroicon-o-document-text');
             })
             ->filter()
-            ->values();
+            ->values()
+            ->all();
     }
 
     /**
-     * @return array<int, array<string, string|null>>
+     * @return array<int, SearchResult>
      */
-    private static function staticLinks(): array
+    private static function newsResults(string $term, int $limit): array
     {
-        $raw = trans('sliders.link_search.static_links');
-
-        if (! is_array($raw)) {
+        if ($limit <= 0) {
             return [];
         }
 
-        $links = [];
+        /** @var EloquentCollection<int, News> $newsItems */
+        $newsItems = News::query()
+            ->select(['id', 'title', 'slug'])
+            ->when(trim($term) !== '', function (Builder $builder) use ($term): void {
+                $builder->where(function (Builder $query) use ($term): void {
+                    $query
+                        ->where('title', 'like', "%{$term}%")
+                        ->orWhere('slug', 'like', "%{$term}%");
+                });
+            })
+            ->orderByDesc('published_at')
+            ->limit($limit)
+            ->get();
 
-        foreach ($raw as $key => $config) {
-            if (! is_array($config)) {
-                continue;
-            }
+        return $newsItems
+            ->map(function (News $news): ?SearchResult {
+                if (! Route::has('frontend.news.show')) {
+                    return null;
+                }
 
-            $url = self::resolveStaticUrl($config);
+                try {
+                    $url = route('frontend.news.show', $news);
+                } catch (Throwable $exception) {
+                    return null;
+                }
 
-            if ($url === null) {
-                continue;
-            }
+                $label = sprintf('%s · %s', __('admin.content_links.types.news'), (string) $news->getAttribute('title'));
+                $result = SearchResult::make($url, $label);
 
-            $links[] = [
-                'key'         => is_string($key) ? $key : null,
-                'url'         => $url,
-                'label'       => is_string($config['label'] ?? null) ? $config['label'] : $url,
-                'description' => is_string($config['description'] ?? null) ? $config['description'] : '',
-            ];
-        }
-
-        return $links;
+                return $result
+                    ->withData('type', 'news')
+                    ->withData('icon', 'heroicon-o-newspaper');
+            })
+            ->filter()
+            ->values()
+            ->all();
     }
 
-    private static function resolveStaticUrl(array $config): ?string
-    {
-        $route = $config['route'] ?? null;
-        $url = $config['url'] ?? null;
-
-        if (is_string($route) && $route !== '') {
-            $parameters = $config['parameters'] ?? [];
-
-            if (! is_array($parameters)) {
-                $parameters = [];
-            }
-
-            $generated = self::safeRoute($route, $parameters);
-
-            if ($generated !== null) {
-                return $generated;
-            }
-        }
-
-        if (is_string($url) && $url !== '') {
-            return $url;
-        }
-
-        return null;
-    }
-
-    private static function safeRoute(string $name, mixed $parameters): ?string
-    {
-        if (! Route::has($name)) {
-            return null;
-        }
-
-        try {
-            $url = route($name, $parameters, false);
-
-            return is_string($url) ? $url : null;
-        } catch (Throwable) {
-            return null;
-        }
-    }
-
-    private static function resolveTranslatable(mixed $value): string
+    /**
+     * Resolve translated or plain string names stored as arrays.
+     */
+    private static function resolveTranslatableName(mixed $value): string
     {
         if (is_string($value)) {
             return $value;
@@ -341,25 +497,11 @@ final class ContentLinkSearch
 
         if (is_array($value)) {
             $locale = app()->getLocale();
+            $translated = $value[$locale] ?? reset($value);
 
-            $localized = $value[$locale] ?? collect($value)
-                ->filter(static fn ($candidate): bool => is_string($candidate))
-                ->first();
-
-            return is_string($localized) ? $localized : '';
+            return is_string($translated) ? $translated : '';
         }
 
         return '';
-    }
-
-    private static function typeLabel(string $type): string
-    {
-        $label = trans("sliders.link_search.types.{$type}");
-
-        if (is_string($label) && $label !== '') {
-            return $label;
-        }
-
-        return Str::headline($type);
     }
 }

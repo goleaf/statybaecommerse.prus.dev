@@ -45,7 +45,6 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use UnitEnum;
-use App\Support\Filament\Components\Flatpickr;
 
 /**
  * System Resource - Comprehensive System Management
@@ -95,7 +94,10 @@ final class SystemResource extends Resource
     /**
      * Handle getNavigationGroup functionality with proper error handling.
      */
-    
+    public static function getNavigationGroup(): string|UnitEnum|null
+    {
+        return 'System';
+    }
 
     /**
      * Handle getPluralModelLabel functionality with proper error handling.

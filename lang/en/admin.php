@@ -321,10 +321,60 @@ return [
         'data' => 'Data',
         'data_help' => 'Optional metadata captured when the action occurred.',
     ],
+    'content_links' => [
+        'placeholders' => [
+            'search' => 'Search internal pages, products or paste an URL',
+        ],
+        'types' => [
+            'static' => 'Static page',
+            'product' => 'Product',
+            'category' => 'Category',
+            'collection' => 'Collection',
+            'campaign' => 'Campaign',
+            'post' => 'Post',
+            'news' => 'News',
+        ],
+        'static' => [
+            'home' => [
+                'label' => 'Homepage',
+                'description' => 'Main landing page of the storefront.',
+            ],
+            'products' => [
+                'label' => 'All products',
+                'description' => 'Product listing page with filters and search.',
+            ],
+            'categories' => [
+                'label' => 'Category overview',
+                'description' => 'Browse all storefront categories.',
+            ],
+            'collections' => [
+                'label' => 'Collections',
+                'description' => 'Curated collection landing page.',
+            ],
+            'cart' => [
+                'label' => 'Cart',
+                'description' => 'Customer shopping cart summary.',
+            ],
+            'checkout' => [
+                'label' => 'Checkout',
+                'description' => 'Checkout flow starting step.',
+            ],
+            'account' => [
+                'label' => 'Customer account',
+                'description' => 'Authenticated customer account dashboard.',
+            ],
+        ],
+    ],
     'variant_inventory' => [
         'navigation_label'   => 'Variant Inventory',
         'plural_model_label' => 'Variant Inventories',
         'model_label'        => 'Variant Inventory',
+
+        'placeholders' => [
+            'variant' => 'Search product variants by name or SKU',
+            'location' => 'Search locations by name or code',
+            'supplier' => 'Search suppliers by name or email',
+        ],
 
         // Basic Information
         'basic_information' => 'Basic Information',

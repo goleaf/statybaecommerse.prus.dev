@@ -8,6 +8,7 @@ use App\Models\Product;
 use App\Models\ProductVariant;
 use DefStudio\SearchableInput\DTO\SearchResult;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 
 final class ProductVariantSearch
 {
@@ -16,117 +17,112 @@ final class ProductVariantSearch
      */
     public static function results(string $term, int $limit = 15): array
     {
-        /** @var \Illuminate\Database\Eloquent\Collection<int, ProductVariant> $variants */
-        $variants = self::query($term)
+        /** @var EloquentCollection<int, ProductVariant> $variants */
+        $variants = ProductVariant::query()
+            ->select(['id', 'product_id', 'name', 'sku', 'price'])
+            ->with(['product:id,name,sku'])
+            ->when(trim($term) !== '', function (Builder $builder) use ($term): void {
+                $builder->where(function (Builder $query) use ($term): void {
+                    $query
+                        ->where('name', 'like', "%{$term}%")
+                        ->orWhere('sku', 'like', "%{$term}%")
+                        ->orWhereHas('product', function (Builder $productQuery) use ($term): void {
+                            $productQuery
+                                ->where('name', 'like', "%{$term}%")
+                                ->orWhere('sku', 'like', "%{$term}%");
+                        });
+                });
+            })
+            ->orderByDesc('updated_at')
             ->limit($limit)
-            ->with(['product:id,sku,name'])
             ->get();
 
         return $variants
-            ->map(static function (ProductVariant $variant): SearchResult {
-                /** @var int|string|null $identifier */
-                $identifier = $variant->getKey();
+            ->map(function (ProductVariant $variant): SearchResult {
+                $identifier = (string) $variant->getKey();
+                $result = SearchResult::make($identifier, self::label($variant));
 
-                /** @var string|null $rawName */
-                $rawName = $variant->getAttribute('name');
-                /** @var string|null $rawSku */
-                $rawSku = $variant->getAttribute('sku');
-                /** @var float|int|string|null $rawPrice */
-                $rawPrice = $variant->getAttribute('price');
+                $payload = self::payload($variant);
 
-                $name = $rawName ?? '';
-                $sku = $rawSku ?? '';
-                $price = is_numeric($rawPrice) ? (float) $rawPrice : 0.0;
-
-                $product = $variant->getRelationValue('product');
-                $productName = $product instanceof Product ? self::resolveName($product->getAttribute('name')) : '';
-                $productSku = $product instanceof Product ? (string) ($product->getAttribute('sku') ?? '') : '';
-
-                $labelFragments = array_filter([
-                    $sku !== '' ? $sku : null,
-                    $name !== '' ? $name : null,
-                    $productName !== '' ? __('orders.lookups.variant_product', ['product' => $productName]) : null,
-                ]);
-
-                $label = trim(implode(' • ', $labelFragments));
-
-                $result = SearchResult::make((string) ($identifier ?? ''), $label !== '' ? $label : __('orders.lookups.variant_unknown'));
-
-                $result
+                return $result
                     ->withData('variant_id', $variant->getKey())
-                    ->withData('sku', $sku)
-                    ->withData('name', $name)
-                    ->withData('price', $price)
                     ->withData('product_id', $variant->getAttribute('product_id'))
-                    ->withData('product_sku', $productSku)
-                    ->withData('product_name', $productName);
-
-                return $result;
+                    ->withData('sku', $payload['sku'])
+                    ->withData('name', $payload['name'])
+                    ->withData('product_name', $payload['product_name'])
+                    ->withData('price', $payload['price'])
+                    ->withData('payload', $payload);
             })
             ->all();
     }
 
     public static function label(ProductVariant $variant): string
     {
-        /** @var string|null $rawName */
-        $rawName = $variant->getAttribute('name');
+        $product = $variant->getRelationValue('product');
+
+        $productName = $product instanceof Product
+            ? self::resolveProductName($product)
+            : '';
+
+        /** @var string|null $rawVariantName */
+        $rawVariantName = $variant->getAttribute('name');
         /** @var string|null $rawSku */
         $rawSku = $variant->getAttribute('sku');
 
-        $name = $rawName ?? '';
-        $sku = $rawSku ?? '';
+        $variantName = $rawVariantName ?? '';
+        $sku = $rawSku ?? '—';
+
+        return trim(sprintf('[%s] %s — %s', $sku !== '' ? $sku : '—', $productName, $variantName));
+    }
+
+    public static function payload(ProductVariant $variant): array
+    {
         $product = $variant->getRelationValue('product');
-        $productName = $product instanceof Product ? self::resolveName($product->getAttribute('name')) : '';
 
-        $labelFragments = array_filter([
-            $sku !== '' ? $sku : null,
-            $name !== '' ? $name : null,
-            $productName !== '' ? __('orders.lookups.variant_product', ['product' => $productName]) : null,
-        ]);
+        $productName = $product instanceof Product
+            ? self::resolveProductName($product)
+            : '';
 
-        $label = trim(implode(' • ', $labelFragments));
+        /** @var float|int|string|null $rawPrice */
+        $rawPrice = $variant->getAttribute('price');
+        $price = is_numeric($rawPrice) ? (float) $rawPrice : 0.0;
 
-        return $label !== '' ? $label : __('orders.lookups.variant_unknown');
+        return [
+            'variant_id'   => $variant->getKey(),
+            'product_id'   => $variant->getAttribute('product_id'),
+            'sku'          => (string) ($variant->getAttribute('sku') ?? ''),
+            'name'         => (string) ($variant->getAttribute('name') ?? ''),
+            'product_name' => $productName,
+            'price'        => $price,
+        ];
     }
 
-    /**
-     * @return Builder<ProductVariant>
-     */
-    private static function query(string $term): Builder
+    public static function hydrate(int $variantId): ?array
     {
-        $search = trim($term);
+        $variant = ProductVariant::query()
+            ->select(['id', 'product_id', 'name', 'sku', 'price'])
+            ->with(['product:id,name,sku'])
+            ->find($variantId);
 
-        return ProductVariant::query()
-            ->select(['id', 'product_id', 'sku', 'name', 'price'])
-            ->when($search !== '', static function (Builder $builder) use ($search): void {
-                $builder->where(static function (Builder $query) use ($search): void {
-                    $query
-                        ->where('sku', 'like', "%{$search}%")
-                        ->orWhere('name', 'like', "%{$search}%")
-                        ->orWhere('variant_name_lt', 'like', "%{$search}%")
-                        ->orWhere('variant_name_en', 'like', "%{$search}%");
-                });
-            })
-            ->orderByDesc('updated_at');
+        if (! $variant instanceof ProductVariant) {
+            return null;
+        }
+
+        return self::payload($variant);
     }
 
-    private static function resolveName(mixed $value): string
+    private static function resolveProductName(Product $product): string
     {
-        if (is_array($value)) {
+        /** @var string|null $rawName */
+        $rawName = $product->getAttribute('name');
+
+        if (is_array($rawName)) {
             $locale = app()->getLocale();
+            $value = $rawName[$locale] ?? reset($rawName);
 
-            $localized = $value[$locale] ?? collect($value)
-                ->filter(static fn ($candidate): bool => is_string($candidate))
-                ->first();
-
-            return is_string($localized) ? $localized : '';
+            return is_string($value) ? $value : '';
         }
 
-        if (is_string($value)) {
-            return $value;
-        }
-
-        return '';
+        return is_string($rawName) ? $rawName : '';
     }
 }
-

@@ -8,6 +8,7 @@ use App\Forms\Components\Flatpickr;
 use App\Filament\Resources\CampaignResource\Pages;
 use App\Filament\Resources\CampaignResource\RelationManagers\TranslationsRelationManager;
 use App\Models\Campaign;
+use App\Support\Filament\Components\Flatpickr;
 use App\Support\Filament\Filters\DateRangeFilter;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
@@ -33,7 +34,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
 use Novadaemon\FilamentCombobox\Combobox;
-use App\Support\Filament\Components\Flatpickr;
+use UnitEnum;
 
 final class CampaignResource extends Resource
 {
@@ -50,7 +51,10 @@ final class CampaignResource extends Resource
         return __('campaigns.navigation.campaigns');
     }
 
-    
+    public static function getNavigationGroup(): string|UnitEnum|null
+    {
+        return 'Marketing';
+    }
 
     public static function getPluralModelLabel(): string
     {
@@ -302,7 +306,7 @@ final class CampaignResource extends Resource
                     ->form([
                         Flatpickr::makeRange('range')
                             ->label(self::label('campaigns.fields.created_at', 'Created at'))
-                            
+
                             ->format('Y-m-d')
                             ->displayFormat('Y-m-d'),
                     ])
