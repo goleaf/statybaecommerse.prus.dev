@@ -4,18 +4,19 @@ declare(strict_types=1);
 
 namespace App\Support\Filament\Components;
 
-use Filament\Forms\Components\Flatpickr as BaseFlatpickr;
+use Coolsam\Flatpickr\Forms\Components\Flatpickr as BaseFlatpickr;
 
 final class Flatpickr
 {
     private const DATE_FORMAT = 'Y-m-d';
+
     private const DATE_TIME_FORMAT = 'Y-m-d H:i:s';
+
     private const DATE_TIME_NO_SECONDS_FORMAT = 'Y-m-d H:i';
+
     private const TIME_FORMAT = 'H:i';
 
-    private function __construct()
-    {
-    }
+    private function __construct() {}
 
     public static function makeDate(
         string $name,

@@ -49,6 +49,8 @@ final class CompanyResource extends Resource
 
     /**
      * Configure the Filament form schema with fields and validation.
+     *
+     * @param Form $schema
      */
     public static function form(Form $form): Form
     {
@@ -133,7 +135,7 @@ final class CompanyResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('size')
                     ->label(__('companies.size'))
-                    ->formatStateUsing(fn (?string $state): string => $state !== null ? __("companies.sizes.{$state}") : '—')
+                    ->formatStateUsing(fn (?string $state): ?string => $state === null ? null : __('companies.sizes.' . $state))
                     ->badge()
                     ->color(fn (?string $state): string => match ($state) {
                         'small'  => 'green',

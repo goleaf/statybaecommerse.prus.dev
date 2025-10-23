@@ -9,6 +9,7 @@ use App\Filament\Resources\VariantAnalyticsResource\Pages;
 use App\Models\ProductVariant;
 use App\Models\VariantAnalytics;
 use App\Support\Filament\Components\Flatpickr;
+use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
@@ -44,6 +45,7 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use UnitEnum;
 
 /**
  * VariantAnalyticsResource
@@ -105,7 +107,7 @@ final class VariantAnalyticsResource extends Resource
                                                     ->searchable()
                                                     ->preload()
                                                     ->live()
-                                                    ->afterStateUpdated(function ($state, callable $set): void {
+                                                    ->afterStateUpdated(function (?int $state, callable $set): void {
                                                         if ($state) {
                                                             $variant = \App\Models\ProductVariant::find($state);
                                                             if ($variant) {
@@ -125,36 +127,12 @@ final class VariantAnalyticsResource extends Resource
                                             ->schema([
                                                 Forms\Components\Placeholder::make('variant_name')
                                                     ->label(__('admin.variant_analytics.variant_name'))
-                                                    ->content(function (?VariantAnalytics $record, Get $get): string {
-                                                        $variant = $record?->variant;
-
-                                                        if (! $variant && $variantId = $get('variant_id')) {
-                                                            $variant = ProductVariant::query()
-                                                                ->with('product:id,name')
-                                                                ->find($variantId);
-                                                        }
-
-                                                        return (string) ($variant?->name ?? '');
-                                                    })
-                                                    ->visible(fn (?VariantAnalytics $record, Get $get): bool => $record !== null || filled($get('variant_id'))),
+                                                    ->content(fn (?VariantAnalytics $record): string => $record?->variant?->name ?? '')
+                                                    ->visible(fn (?VariantAnalytics $record): bool => $record !== null),
                                                 Placeholder::make('product_name')
                                                     ->label(__('admin.variant_analytics.product_name'))
-                                                    ->content(function (?VariantAnalytics $record, Get $get): string {
-                                                        $variant = $record?->variant;
-
-                                                        if ($variant && ! $variant->relationLoaded('product')) {
-                                                            $variant->loadMissing('product');
-                                                        }
-
-                                                        if (! $variant && $variantId = $get('variant_id')) {
-                                                            $variant = ProductVariant::query()
-                                                                ->with('product:id,name')
-                                                                ->find($variantId);
-                                                        }
-
-                                                        return (string) ($variant?->product?->name ?? '');
-                                                    })
-                                                    ->visible(fn (?VariantAnalytics $record, Get $get): bool => $record !== null || filled($get('variant_id'))),
+                                                    ->content(fn (?VariantAnalytics $record): string => $record?->variant?->product?->name ?? '')
+                                                    ->visible(fn (?VariantAnalytics $record): bool => $record !== null),
                                             ]),
                                     ]),
                             ]),
@@ -181,7 +159,7 @@ final class VariantAnalyticsResource extends Resource
                                                     ->suffix('clicks'),
                                                 Forms\Components\Placeholder::make('click_through_rate')
                                                     ->label(__('admin.variant_analytics.ctr'))
-                                                    ->content(static function (callable $get): string {
+                                                    ->content(function (callable $get): string {
                                                         $views = (float) $get('views');
                                                         $clicks = (float) $get('clicks');
                                                         if ($views > 0) {
@@ -227,7 +205,7 @@ final class VariantAnalyticsResource extends Resource
                                             ->schema([
                                                 Forms\Components\Placeholder::make('add_to_cart_rate')
                                                     ->label(__('admin.variant_analytics.atc_rate'))
-                                                    ->content(static function (callable $get): string {
+                                                    ->content(function (callable $get): string {
                                                         $clicks = (float) $get('clicks');
                                                         $addToCart = (float) $get('add_to_cart');
                                                         if ($clicks > 0) {
@@ -239,7 +217,7 @@ final class VariantAnalyticsResource extends Resource
                                                     }),
                                                 Forms\Components\Placeholder::make('purchase_rate')
                                                     ->label(__('admin.variant_analytics.purchase_rate'))
-                                                    ->content(static function (callable $get): string {
+                                                    ->content(function (callable $get): string {
                                                         $addToCart = (float) $get('add_to_cart');
                                                         $purchases = (float) $get('purchases');
                                                         if ($addToCart > 0) {
@@ -292,7 +270,7 @@ final class VariantAnalyticsResource extends Resource
                     ->sortable()
                     ->toggleable()
                     ->copyable()
-                    ->description(fn (VariantAnalytics $record): string => $record->variant?->product?->name ?? $record->product?->name ?? ''),
+                    ->description(fn (VariantAnalytics $record): string => $record->variant->product->name ?? ''),
                 TextColumn::make('variant.sku')
                     ->label(__('admin.variant_analytics.sku'))
                     ->searchable()
@@ -320,27 +298,17 @@ final class VariantAnalyticsResource extends Resource
                     ->color('info'),
                 Tables\Columns\TextColumn::make('click_through_rate')
                     ->label(__('admin.variant_analytics.ctr'))
-                    ->getStateUsing(fn ($record) => $record->click_through_rate)
-                    ->formatStateUsing(fn ($state) => number_format($state, 2) . '%')
+                    ->getStateUsing(fn (VariantAnalytics $record): float => (float) $record->click_through_rate)
+                    ->formatStateUsing(fn (float|int|null $state): string => number_format((float) $state, 2) . '%')
                     ->sortable(false)
                     ->toggleable()
                     ->badge()
-                    ->color(static function (float|int|null $state): string {
-                        if ($state === null) {
-                            return 'gray';
-                        }
-
-                        if ($state >= 5) {
-                            return 'success';
-                        }
-
-                        if ($state >= 2) {
-                            return 'warning';
-                        }
-
-                        return 'danger';
+                    ->color(fn (float|int|null $state): string => match (true) {
+                        (float) $state >= 5 => 'success',
+                        (float) $state >= 2 => 'warning',
+                        default             => 'danger',
                     }),
-                Tables\Columns\TextColumn::make('add_to_cart')
+                TextColumn::make('add_to_cart')
                     ->label(__('admin.variant_analytics.add_to_cart'))
                     ->numeric()
                     ->sortable()
@@ -348,27 +316,17 @@ final class VariantAnalyticsResource extends Resource
                     ->color('warning'),
                 Tables\Columns\TextColumn::make('add_to_cart_rate')
                     ->label(__('admin.variant_analytics.atc_rate'))
-                    ->getStateUsing(fn ($record) => $record->add_to_cart_rate)
-                    ->formatStateUsing(fn ($state) => number_format($state, 2) . '%')
+                    ->getStateUsing(fn (VariantAnalytics $record): float => (float) $record->add_to_cart_rate)
+                    ->formatStateUsing(fn (float|int|null $state): string => number_format((float) $state, 2) . '%')
                     ->sortable(false)
                     ->toggleable()
                     ->badge()
-                    ->color(static function (float|int|null $state): string {
-                        if ($state === null) {
-                            return 'gray';
-                        }
-
-                        if ($state >= 20) {
-                            return 'success';
-                        }
-
-                        if ($state >= 10) {
-                            return 'warning';
-                        }
-
-                        return 'danger';
+                    ->color(fn (float|int|null $state): string => match (true) {
+                        (float) $state >= 20 => 'success',
+                        (float) $state >= 10 => 'warning',
+                        default              => 'danger',
                     }),
-                Tables\Columns\TextColumn::make('purchases')
+                TextColumn::make('purchases')
                     ->label(__('admin.variant_analytics.purchases'))
                     ->numeric()
                     ->sortable()
@@ -376,27 +334,17 @@ final class VariantAnalyticsResource extends Resource
                     ->color('success'),
                 Tables\Columns\TextColumn::make('purchase_rate')
                     ->label(__('admin.variant_analytics.purchase_rate'))
-                    ->getStateUsing(fn ($record) => $record->purchase_rate)
-                    ->formatStateUsing(fn ($state) => number_format($state, 2) . '%')
+                    ->getStateUsing(fn (VariantAnalytics $record): float => (float) $record->purchase_rate)
+                    ->formatStateUsing(fn (float|int|null $state): string => number_format((float) $state, 2) . '%')
                     ->sortable(false)
                     ->toggleable()
                     ->badge()
-                    ->color(static function (float|int|null $state): string {
-                        if ($state === null) {
-                            return 'gray';
-                        }
-
-                        if ($state >= 30) {
-                            return 'success';
-                        }
-
-                        if ($state >= 15) {
-                            return 'warning';
-                        }
-
-                        return 'danger';
+                    ->color(fn (float|int|null $state): string => match (true) {
+                        (float) $state >= 30 => 'success',
+                        (float) $state >= 15 => 'warning',
+                        default              => 'danger',
                     }),
-                Tables\Columns\TextColumn::make('revenue')
+                TextColumn::make('revenue')
                     ->label(__('admin.variant_analytics.revenue'))
                     ->money('EUR')
                     ->sortable()
@@ -404,35 +352,25 @@ final class VariantAnalyticsResource extends Resource
                     ->color('success'),
                 Tables\Columns\TextColumn::make('average_revenue_per_purchase')
                     ->label(__('admin.variant_analytics.avg_revenue'))
-                    ->getStateUsing(static fn (VariantAnalytics $record): float => (float) $record->average_revenue_per_purchase)
+                    ->getStateUsing(fn (VariantAnalytics $record): float => (float) $record->average_revenue_per_purchase)
                     ->money('EUR')
                     ->sortable(false)
                     ->toggleable()
                     ->color('info'),
                 Tables\Columns\TextColumn::make('conversion_rate')
                     ->label(__('admin.variant_analytics.conversion_rate'))
-                    ->formatStateUsing(fn ($state) => number_format($state, 2) . '%')
+                    ->formatStateUsing(fn (float|int|null $state): string => number_format((float) $state, 2) . '%')
                     ->sortable()
                     ->toggleable()
                     ->badge()
-                    ->color(static function (float|int|null $state): string {
-                        if ($state === null) {
-                            return 'gray';
-                        }
-
-                        if ($state >= 5) {
-                            return 'success';
-                        }
-
-                        if ($state >= 2) {
-                            return 'warning';
-                        }
-
-                        return 'danger';
+                    ->color(fn (float|int|null $state): string => match (true) {
+                        (float) $state >= 5 => 'success',
+                        (float) $state >= 2 => 'warning',
+                        default             => 'danger',
                     }),
-                Tables\Columns\BadgeColumn::make('performance_status')
+                BadgeColumn::make('performance_status')
                     ->label(__('admin.variant_analytics.performance_status'))
-                    ->getStateUsing(static function (VariantAnalytics $record): string {
+                    ->getStateUsing(function (VariantAnalytics $record): string {
                         $conversionRate = (float) $record->conversion_rate;
                         $revenue = (float) $record->revenue;
 
@@ -446,7 +384,7 @@ final class VariantAnalyticsResource extends Resource
 
                         return 'low';
                     })
-                    ->formatStateUsing(fn ($state) => match ($state) {
+                    ->formatStateUsing(fn (?string $state): string => match ($state) {
                         'high'   => __('admin.variant_analytics.high_performing'),
                         'medium' => __('admin.variant_analytics.medium_performing'),
                         'low'    => __('admin.variant_analytics.low_performing'),
@@ -578,8 +516,8 @@ final class VariantAnalyticsResource extends Resource
                     ->trueLabel(__('admin.variant_analytics.last_7_days'))
                     ->falseLabel(__('admin.variant_analytics.older_than_7_days'))
                     ->queries(
-                        true: static fn (Builder $query): Builder => $query->where('date', '>=', now()->subDays(7)),
-                        false: static fn (Builder $query): Builder => $query->where('date', '<', now()->subDays(7)),
+                        true: fn (Builder $query): Builder => $query->where('date', '>=', now()->subDays(7)),
+                        false: fn (Builder $query): Builder => $query->where('date', '<', now()->subDays(7)),
                     ),
             ])
             // Leverage the Tables\Actions namespace to stay aligned with Filament v4 conventions during table configuration.
