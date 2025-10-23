@@ -7,6 +7,7 @@ namespace App\Filament\Resources;
 use App\Support\Concerns\HasNav;
 
 use App\Filament\Resources\VariantCombinationResource\Pages;
+use App\Models\Product;
 use App\Models\VariantCombination;
 use BackedEnum;
 use Filament\Actions\Action;
@@ -22,6 +23,7 @@ use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
+use Filament\Forms\Set;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables\Actions\HeaderAction;
@@ -74,7 +76,7 @@ final class VariantCombinationResource extends Resource
     public static function form(Form $form): Form
     {
         return $form
-            ->components([
+            ->schema([
                 Section::make(__('admin.variant_combinations.basic_information'))
                     ->description(__('admin.variant_combinations.basic_information_description'))
                     ->schema([
@@ -87,16 +89,24 @@ final class VariantCombinationResource extends Resource
                                     ->searchable()
                                     ->preload()
                                     ->reactive()
-                                    ->afterStateUpdated(function ($state, callable $set): void {
-                                        if ($state) {
-                                            $product = Product::find($state);
-                                            if ($product && $product->attributes()->exists()) {
-                                                $attributes = $product->attributes()->pluck('name', 'id')->toArray();
-                                                $set('available_attributes', $attributes);
-                                            }
-                                        } else {
+                                    ->afterStateUpdated(function ($state, Set $set): void {
+                                        if (! $state) {
                                             $set('available_attributes', []);
+
+                                            return;
                                         }
+
+                                        $product = Product::find($state);
+
+                                        if (! $product) {
+                                            $set('available_attributes', []);
+
+                                            return;
+                                        }
+
+                                        $attributes = $product->attributes()->pluck('name', 'id')->toArray();
+
+                                        $set('available_attributes', $attributes);
                                     }),
                                 Toggle::make('is_available')
                                     ->label(__('admin.variant_combinations.is_available'))
@@ -109,6 +119,7 @@ final class VariantCombinationResource extends Resource
                     ->schema([
                         KeyValue::make('attribute_combinations')
                             ->label(__('admin.variant_combinations.attribute_combinations'))
+                            ->default([])
                             ->keyLabel(__('admin.variant_combinations.attribute'))
                             ->valueLabel(__('admin.variant_combinations.value'))
                             ->columnSpanFull()
@@ -150,28 +161,26 @@ final class VariantCombinationResource extends Resource
                     ->label(__('admin.variant_combinations.product'))
                     ->sortable()
                     ->searchable()
-                    ->url(fn ($record) => route('filament.admin.resources.products.view', $record->product_id))
+                    ->url(fn (VariantCombination $record): ?string => $record->product_id
+                        ? route('filament.admin.resources.products.view', $record->product_id)
+                        : null)
                     ->color('primary'),
                 TextColumn::make('attribute_combinations')
                     ->label(__('admin.variant_combinations.attribute_combinations'))
-                    ->formatStateUsing(function ($state) {
-                        if (is_array($state)) {
-                            return collect($state)->map(function ($value, $key) {
-                                return $key.': '.$value;
-                            })->join(', ');
-                        }
-
-                        return $state;
-                    })
+                    ->formatStateUsing(fn ($state): string => self::formatAttributeCombinations($state))
                     ->limit(50)
                     ->tooltip(function (TextColumn $column): ?string {
                         $state = $column->getState();
 
-                        if (! is_string($state)) {
+                        if ($state === null || $state === '') {
                             return null;
                         }
 
-                        return mb_strlen($state) > 50 ? $state : null;
+                        $stateString = is_array($state)
+                            ? self::formatAttributeCombinations($state)
+                            : (string) $state;
+
+                        return strlen($stateString) > 50 ? $stateString : null;
                     })
                     ->searchable()
                     ->sortable(),
@@ -382,5 +391,23 @@ final class VariantCombinationResource extends Resource
             'view'   => Pages\ViewVariantCombination::route('/{record}'),
             'edit'   => Pages\EditVariantCombination::route('/{record}/edit'),
         ];
+    }
+
+    /**
+     * Format the attribute combinations state for display.
+     */
+    private static function formatAttributeCombinations(mixed $state): string
+    {
+        if ($state === null || $state === '' || $state === []) {
+            return '';
+        }
+
+        if (is_array($state)) {
+            return collect($state)
+                ->map(static fn ($value, $key) => $key.': '.$value)
+                ->join(', ');
+        }
+
+        return (string) $state;
     }
 }
