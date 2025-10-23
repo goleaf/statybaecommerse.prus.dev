@@ -8,13 +8,13 @@ use App\Filament\Tables\Concerns\ConfiguresToggleableTableLayout;
 use App\Models\User;
 use BackedEnum;
 use Filament\Pages\Page;
+use UnitEnum;
 use Filament\Tables;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
-
 
 final class UserImpersonation extends Page implements HasTable
 {
