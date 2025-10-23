@@ -245,11 +245,18 @@ final class LiveDashboard extends Component
     }
 
     /**
-     * Cache dashboard datasets under the shared dashboard tag when available.
+     * Remember dashboard fragments while honouring cache tag support.
+     *
+     * @template TValue
+     *
+     * @param  callable(): TValue  $callback
+     * @return TValue
      */
-    private function rememberDashboard(string $key, int $ttl, callable $callback): array
+    private function rememberDashboard(string $key, int $ttl, callable $callback): mixed
     {
-        if (Cache::supportsTags()) {
+        $store = Cache::getStore();
+
+        if ($store instanceof TaggableStore) {
             return Cache::tags(CacheTagHelper::dashboards())->remember($key, $ttl, $callback);
         }
 

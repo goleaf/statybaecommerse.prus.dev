@@ -10,7 +10,7 @@ use App\Models\Product;
 use App\Support\Cache\CacheKeys;
 use App\Support\Cache\CacheTagHelper;
 use Closure;
-use DateInterval;
+use Illuminate\Cache\TaggableStore;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Cache;
 
@@ -97,13 +97,13 @@ final class CacheService
     /**
      * @template TValue
      *
-     * @param  array<int, string> $tags
+     * @param  array<int, string>  $tags
      * @param  Closure(): TValue  $callback
      * @return TValue
      */
-    private static function rememberWithTags(array $tags, string $key, int|DateInterval $ttl, Closure $callback)
+    private static function rememberWithTags(array $tags, string $key, int|\DateInterval $ttl, Closure $callback): mixed
     {
-        if ($tags !== [] && Cache::supportsTags()) {
+        if ($tags !== [] && Cache::getStore() instanceof TaggableStore) {
             return Cache::tags($tags)->remember($key, $ttl, $callback);
         }
 

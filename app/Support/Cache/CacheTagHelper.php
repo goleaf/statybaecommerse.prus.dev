@@ -4,100 +4,101 @@ declare(strict_types=1);
 
 namespace App\Support\Cache;
 
+use Illuminate\Cache\TaggableStore;
+use Illuminate\Support\Facades\Cache;
+
 /**
- * Helper utility that centralizes cache tag groups for catalog features.
+ * Helper for assembling cache tag groups in a consistent manner.
+ *
+ * Filament panels and Livewire components both rely on deterministic tag
+ * values so that invalidation routines (and the upcoming maintenance widgets)
+ * can flush scoped caches without resorting to broad `Cache::flush()` calls.
  */
 final class CacheTagHelper
 {
     /**
-     * Tags used for product centric caches (lists, shelves, aggregates).
-     *
+     * Shared tag identifiers used across the storefront and dashboard layers.
+     */
+    public const PRODUCTS = 'products';
+
+    public const CATEGORIES = 'categories';
+
+    public const BRANDS = 'brands';
+
+    public const COLLECTIONS = 'collections';
+
+    public const DASHBOARDS = 'dashboard';
+
+    /**
      * @return array<int, string>
      */
     public static function products(): array
     {
-        return self::unique([
-            'products',
-            CacheKeys::productAggregateTag(),
-            CacheKeys::homeTag(),
-            CacheKeys::dashboardTag(),
-            CacheKeys::navigationTag(),
-        ]);
+        return [CacheTags::products()];
     }
 
     /**
-     * Tags used for category centric caches (navigation, filters, counts).
-     *
      * @return array<int, string>
      */
     public static function categories(): array
     {
-        return self::unique([
-            'categories',
-            CacheKeys::navigationTag(),
-            CacheKeys::homeTag(),
-        ]);
+        return [CacheTags::categories()];
     }
 
     /**
-     * Tags used for brand centric caches.
-     *
      * @return array<int, string>
      */
     public static function brands(): array
     {
-        return self::unique([
-            'brands',
-            CacheKeys::navigationTag(),
-            CacheKeys::homeTag(),
-        ]);
+        return [CacheTags::brands()];
     }
 
     /**
-     * Tags used for collection centric caches.
-     *
      * @return array<int, string>
      */
     public static function collections(): array
     {
-        return self::unique([
-            'collections',
-            CacheKeys::homeTag(),
-        ]);
+        return [CacheTags::collections()];
     }
 
     /**
-     * Tags used for dashboard/statistical caches.
-     *
      * @return array<int, string>
      */
     public static function dashboards(): array
     {
-        return self::unique([
-            'dashboards',
-            CacheKeys::dashboardTag(),
-        ]);
+        return [CacheTags::dashboard()];
     }
 
     /**
-     * Merge multiple tag groups while preventing duplicates or empty values.
+     * Tag helper for locale-aware caches such as the storefront widgets.
      *
-     * @param  array<int, string> ...$groups
+     * @return array<int, string>
+     */
+    public static function locale(string $locale): array
+    {
+        return [CacheTags::locale($locale)];
+    }
+
+    /**
+     * Merge multiple tag groups, removing duplicates to keep the payload lean.
+     *
+     * @param  array<int, string>  ...$groups
      * @return array<int, string>
      */
     public static function merge(array ...$groups): array
     {
-        return self::unique(array_merge(...$groups));
+        if ($groups === []) {
+            return [];
+        }
+
+        return array_values(array_unique(array_merge(...$groups)));
     }
 
     /**
-     * Normalize a set of tags by filtering empties and removing duplicates.
-     *
-     * @param  array<int, string> $tags
-     * @return array<int, string>
+     * Determine if the underlying cache store supports tag operations.
      */
-    private static function unique(array $tags): array
+    public static function supportsTags(): bool
     {
-        return array_values(array_unique(array_filter($tags, static fn ($tag) => filled($tag))));
+        return Cache::getStore() instanceof TaggableStore;
     }
 }

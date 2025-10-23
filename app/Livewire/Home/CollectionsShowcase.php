@@ -14,6 +14,8 @@ use Filament\Schemas\Contracts\HasSchemas;
 use Filament\Schemas\Schema;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use Illuminate\Cache\TaggableStore;
+use Illuminate\Support\Facades\Cache;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 
@@ -26,23 +28,27 @@ final class CollectionsShowcase extends Component implements HasSchemas
     {
         $locale = app()->getLocale();
 
-        return app(SharedCacheService::class)->rememberLong(
-            CacheKeys::homeCollections($locale),
-            function () use ($locale) {
-                return ProductCollection::query()
-                    ->with('media')
-                    ->with(['translations' => function ($q) use ($locale) {
-                        $q->where('locale', $locale);
-                    }])
-                    ->withCount(['products'])
-                    ->visible()
-                    ->active()
-                    ->ordered()
-                    ->get();
-            },
-            CacheKeys::TTL_FIVE_MINUTES,
-            CacheTagHelper::collections(),
-        );
+        $store = Cache::getStore();
+
+        $callback = function () use ($locale) {
+            return ProductCollection::query()
+                ->with('media')
+                ->with(['translations' => function ($q) use ($locale) {
+                    $q->where('locale', $locale);
+                }])
+                ->withCount(['products'])
+                ->visible()
+                ->active()
+                ->ordered()
+                ->get();
+        };
+
+        if ($store instanceof TaggableStore) {
+            return Cache::tags(CacheTagHelper::merge(CacheTagHelper::collections(), CacheTagHelper::locale($locale)))
+                ->remember(CacheKeys::homeCollections($locale), CacheKeys::TTL_FIVE_MINUTES, $callback);
+        }
+
+        return Cache::remember(CacheKeys::homeCollections($locale), CacheKeys::TTL_FIVE_MINUTES, $callback);
     }
 
     public function collectionsSchema(Schema $schema): Schema

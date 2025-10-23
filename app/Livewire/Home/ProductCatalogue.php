@@ -17,6 +17,8 @@ use Filament\Schemas\Contracts\HasSchemas;
 use Filament\Schemas\Schema;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Contracts\View\View;
+use Illuminate\Cache\TaggableStore;
+use Illuminate\Support\Facades\Cache;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -63,18 +65,19 @@ final class ProductCatalogue extends Component implements HasSchemas
     {
         $locale = app()->getLocale();
 
-        return app(SharedCacheService::class)->rememberLong(
-            CacheKeys::homeCatalogueCategories($locale),
-            function (): array {
-                return Category::query()
-                    ->where('is_visible', true)
-                    ->orderBy('name')
-                    ->pluck('name', 'id')
-                    ->toArray();
-            },
-            CacheKeys::TTL_FIVE_MINUTES,
-            CacheTagHelper::categories(),
-        );
+        $store = Cache::getStore();
+        $callback = static fn (): array => Category::query()
+            ->where('is_visible', true)
+            ->orderBy('name')
+            ->pluck('name', 'id')
+            ->toArray();
+
+        if ($store instanceof TaggableStore) {
+            return Cache::tags(CacheTagHelper::merge(CacheTagHelper::categories(), CacheTagHelper::locale($locale)))
+                ->remember(CacheKeys::homeCatalogueCategories($locale), CacheKeys::TTL_FIVE_MINUTES, $callback);
+        }
+
+        return Cache::remember(CacheKeys::homeCatalogueCategories($locale), CacheKeys::TTL_FIVE_MINUTES, $callback);
     }
 
     #[Computed]
