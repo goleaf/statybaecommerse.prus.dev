@@ -21,8 +21,8 @@ A multilingual Laravel 12 + Filament v4 storefront and admin panel for managing 
 - The HTML sanitization maintenance command now prints styled summary lines and the product status schema accepts modern enum values like `active`, preventing fresh test runs from failing on CHECK constraints.
 - Attribute validation rules now persist plain strings alongside array-based rule lists, the Filament Attribute editor hydrates
   those values without forcing JSON, and new regression coverage keeps both storage paths stable.
-- Customer group creation now auto-generates slugs from the supplied code or localized name so SQLite-powered tests and admin
-  forms stop failing on the NOT NULL constraint while keeping consistent identifiers for storefront targeting.
+- Product variant showcase metrics now reuse cached stock counts via raw attributes, keeping Livewire interactions snappy by
+  avoiding redundant inventory queries when toggling variants.
 - Region-aware address tables and the dedicated `customers` dataset are back online for the SQLite harness, letting factories and
   analytics widgets build customer journeys without missing foreign keys during PHPUnit runs.
 - SearchableInput payload macros are registered lazily with safer fallbacks, and the SQLite testing harness now spins up one

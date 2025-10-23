@@ -7,8 +7,7 @@ The format is based on [Conventional Commits](https://www.conventionalcommits.or
 ## [Unreleased]
 
 ### Bug Fixes
-* Routed the reports generation Artisan command through the job dispatcher so the dedicated `reports` queue and retry profile apply every time the CLI helper is executed.
-* Updated the HTML sanitization console output to use the new component signature, eliminating runtime argument errors when summarising sanitized record counts.
+* Prevented the product variant showcase metrics from triggering extra inventory lookups by reading raw stock attributes, keeping cached counts query-free during Livewire interactions.
 * Re-enabled flexible system setting translations by replacing the locale uniqueness constraint with an index, restoring soft delete support, and trimming the fillable contract so replication and counting scenarios match the documented API.
 * Preserved Attribute validation rule strings while still decoding JSON arrays, refreshed the Filament form so arrays render as comma-separated chips, and added regression coverage for both storage paths.
 * Reintroduced the `regions` schema with defensive guards and rebuilt the `customers`/`orders` relationship so SQLite-backed factories and analytics widgets can create location-aware records without missing column errors during tests.
