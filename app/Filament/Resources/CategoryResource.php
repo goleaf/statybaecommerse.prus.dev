@@ -18,8 +18,8 @@ use App\Support\Concerns\HasNav;
 use BackedEnum;
 use Filament\Forms\Components\ColorPicker;
 use Filament\Forms\Components\FileUpload;
-use Filament\Schemas\Components\Grid as SchemaGrid;
-use Filament\Schemas\Components\Section as SchemaSection;
+use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -28,11 +28,11 @@ use Filament\Forms\Form;
 use Filament\Forms\Set;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Schemas\Schema;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\ColorColumn;
@@ -46,14 +46,18 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
-use Pixelpeter\FilamentLanguageTabs\Forms\Components\LanguageTabs;
 
 final class CategoryResource extends Resource
 {
     use HasNav;
 
-    /** Aligns the navigation icon with Filament's expectations. */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-tag';
+    /**
+     * Aligns the navigation icon with Filament's expectations while keeping
+     * compatibility with enum-backed icons used elsewhere in the admin panel.
+     *
+     * @var string|BackedEnum|null
+     */
+    protected static $navigationIcon = 'heroicon-o-tag';
 
     /** Align the resource under the Products navigation section. */
     protected static \UnitEnum|string|null $navigationGroup = NavigationGroup::Products;
@@ -114,57 +118,49 @@ final class CategoryResource extends Resource
         return __('categories.single');
     }
 
-    public static function form(Schema $schema): Schema   
+    public static function form(Form $form): Form
     {
-        return $schema->schema([
-            SchemaSection::make(__('categories.basic_information'))
-                ->components([
-                    LanguageTabs::make([
-                        TextInput::make('name')
-                            ->label(__('categories.name'))
-                            ->required()
-                            ->maxLength(255)
-                            // Keep the slug synchronised with the initial name while creating new categories for faster authoring.
-                            ->live(onBlur: true)
-                            ->afterStateUpdated(function (string $operation, ?string $state, Set $set): void {
-                                if ($operation === 'create') {
-                                    $set('slug', Str::slug((string) $state));
-                                }
-                            }),
-                        TextInput::make('slug')
-                            ->label(__('categories.slug'))
-                            ->required()
-                            ->maxLength(255)
-                            // Enforce clean, URL-friendly slugs and keep them unique for routing safety.
-                            ->unique(ignoreRecord: true)
-                            ->rule('alpha_dash')
-                            ->live(onBlur: true)
-                            ->afterStateUpdated(function (?string $state, Set $set): void {
-                                // Normalise user edits so the slug never diverges from the expected format.
+        return $form->schema([
+            Section::make(__('categories.basic_information'))
+                ->schema([
+                    TextInput::make('name')
+                        ->label(__('categories.name'))
+                        ->required()
+                        ->maxLength(255)
+                        // Keep the slug synchronised with the initial name while creating new categories for faster authoring.
+                        ->live(onBlur: true)
+                        ->afterStateUpdated(function (string $operation, ?string $state, Set $set): void {
+                            if ($operation === 'create') {
                                 $set('slug', Str::slug((string) $state));
-                            }),
-                        Textarea::make('description')
-                            ->label(__('categories.description'))
-                            ->rows(3),
-                        Textarea::make('short_description')
-                            ->label(__('categories.short_description'))
-                            ->rows(2)
-                            ->maxLength(500),
-                    ]),
+                            }
+                        }),
+                    TextInput::make('slug')
+                        ->label(__('categories.slug'))
+                        ->required()
+                        ->maxLength(255)
+                        // Enforce clean, URL-friendly slugs and keep them unique for routing safety.
+                        ->unique(ignoreRecord: true)
+                        ->rule('alpha_dash')
+                        ->live(onBlur: true)
+                        ->afterStateUpdated(function (?string $state, Set $set): void {
+                            // Normalise user edits so the slug never diverges from the expected format.
+                            $set('slug', Str::slug((string) $state));
+                        }),
+                    Textarea::make('description')
+                        ->label(__('categories.description'))
+                        ->rows(3),
+                    Textarea::make('short_description')
+                        ->label(__('categories.short_description'))
+                        ->rows(2)
+                        ->maxLength(500),
                     Select::make('parent_id')
                         ->label(__('categories.parent_category'))
                         ->relationship('parent', 'name')
                         ->searchable()
-                        ->preload()
-                        ->createOptionForm([
-                            TextInput::make('name')
-                                ->label(__('categories.name'))
-                                ->required()
-                                ->maxLength(255),
-                        ]),
+                        ->preload(),
                 ]),
-            SchemaSection::make(__('categories.media'))
-                ->components([
+            Section::make(__('categories.media'))
+                ->schema([
                     FileUpload::make('image')
                         ->label(__('categories.image'))
                         ->image()
@@ -186,10 +182,10 @@ final class CategoryResource extends Resource
                         ->directory('categories/banners')
                         ->visibility('private'),
                 ]),
-            SchemaSection::make(__('categories.appearance'))
-                ->components([
-                    SchemaGrid::make(2)
-                        ->components([
+            Section::make(__('categories.appearance'))
+                ->schema([
+                    Grid::make(2)
+                        ->schema([
                             ColorPicker::make('color')
                                 ->label(__('categories.color'))
                                 ->hex(),
@@ -200,22 +196,20 @@ final class CategoryResource extends Resource
                                 ->minValue(0),
                         ]),
                 ]),
-            SchemaSection::make(__('categories.seo'))
-                ->components([
-                    LanguageTabs::make([
-                        TextInput::make('seo_title')
-                            ->label(__('categories.seo_title'))
-                            ->maxLength(255),
-                        Textarea::make('seo_description')
-                            ->label(__('categories.seo_description'))
-                            ->rows(2)
-                            ->maxLength(500),
-                    ]),
+            Section::make(__('categories.seo'))
+                ->schema([
+                    TextInput::make('seo_title')
+                        ->label(__('categories.seo_title'))
+                        ->maxLength(255),
+                    Textarea::make('seo_description')
+                        ->label(__('categories.seo_description'))
+                        ->rows(2)
+                        ->maxLength(500),
                 ]),
-            SchemaSection::make(__('categories.settings'))
-                ->components([
-                    SchemaGrid::make(2)
-                        ->components([
+            Section::make(__('categories.settings'))
+                ->schema([
+                    Grid::make(2)
+                        ->schema([
                             Toggle::make('is_active')
                                 ->label(__('categories.is_active'))
                                 ->default(true),
@@ -308,19 +302,31 @@ final class CategoryResource extends Resource
                     ->options([
                         '1' => __('categories.active_only'),
                         '0' => __('categories.inactive_only'),
-                    ]),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        // Cast the selected option into a boolean-friendly integer before filtering.
+                        return isset($data['value']) ? $query->where('is_active', (bool) (int) $data['value']) : $query;
+                    }),
                 SelectFilter::make('is_visible')
                     ->label(__('categories.visibility'))
                     ->options([
                         '1' => __('categories.visible_only'),
                         '0' => __('categories.hidden_only'),
-                    ]),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        // The explicit cast avoids edge cases with database drivers returning strings.
+                        return isset($data['value']) ? $query->where('is_visible', (bool) (int) $data['value']) : $query;
+                    }),
                 SelectFilter::make('is_featured')
                     ->label(__('categories.featured_status'))
                     ->options([
                         '1' => __('categories.featured_only'),
                         '0' => __('categories.not_featured'),
-                    ]),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        // Provide deterministic filtering for featured vs non-featured categories.
+                        return isset($data['value']) ? $query->where('is_featured', (bool) (int) $data['value']) : $query;
+                    }),
                 TrashedFilter::make(),
             ])
             ->actions([
@@ -328,6 +334,8 @@ final class CategoryResource extends Resource
                     ->visible(fn () => AuthorizationMatrix::check('categories', 'view')),
                 EditAction::make()
                     ->visible(fn () => AuthorizationMatrix::check('categories', 'update')),
+                DeleteAction::make()
+                    ->visible(fn () => AuthorizationMatrix::check('categories', 'delete')),
                 Action::make('toggle_active')
                     ->label(fn (Category $record): string => $record->is_active ? __('categories.deactivate') : __('categories.activate'))
                     ->icon(fn (Category $record): string => $record->is_active ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
