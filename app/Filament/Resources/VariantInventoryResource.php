@@ -92,7 +92,7 @@ final class VariantInventoryResource extends Resource
                 Section::make(__('admin.variant_inventory.basic_information'))
                     ->columns(2)
                     ->schema([
-                        // Searchable variant selector keeps inventory tied to a specific product option.
+                        // Row 1: searchable selectors align with the two-column section layout.
                         SearchableInput::make('variant_id')
                             ->label(__('admin.variant_inventory.variant'))
                             ->placeholder(__('admin.variant_inventory.variant_placeholder'))
@@ -122,7 +122,6 @@ final class VariantInventoryResource extends Resource
                             ->afterStateUpdated(function (?string $state, Set $set): void {
                                 $set('variant_id', $state !== null && $state !== '' ? (int) $state : null);
                             }),
-                        // Searchable location selector aligns the inventory entry with the correct warehouse location.
                         SearchableInput::make('location_id')
                             ->label(__('admin.variant_inventory.location'))
                             ->placeholder(__('admin.variant_inventory.location_placeholder'))
@@ -151,7 +150,7 @@ final class VariantInventoryResource extends Resource
                             ->afterStateUpdated(function (?string $state, Set $set): void {
                                 $set('location_id', $state !== null && $state !== '' ? (int) $state : null);
                             }),
-                        // Warehouse-specific metadata keeps batches organized for stockroom teams.
+                        // Row 2: warehouse and batch identifiers reuse the same column count for clarity.
                         TextInput::make('warehouse_code')
                             ->label(__('admin.variant_inventory.warehouse_code'))
                             ->maxLength(50),
@@ -162,7 +161,7 @@ final class VariantInventoryResource extends Resource
                 Section::make(__('admin.variant_inventory.stock_levels'))
                     ->columns(3)
                     ->schema([
-                        // Core stock tracking figures displayed per location.
+                        // Row 1: live stock metrics distribute across three columns for parity with the list view.
                         TextInput::make('stock')
                             ->label(__('admin.variant_inventory.stock'))
                             ->numeric()
@@ -178,7 +177,7 @@ final class VariantInventoryResource extends Resource
                             ->numeric()
                             ->default(0)
                             ->minValue(0),
-                        // Forecasting values to anticipate stock movement.
+                        // Row 2: planning metrics stay aligned with the same three-column rhythm.
                         TextInput::make('incoming')
                             ->label(__('admin.variant_inventory.incoming'))
                             ->numeric()
@@ -198,7 +197,7 @@ final class VariantInventoryResource extends Resource
                 Section::make(__('admin.variant_inventory.pricing'))
                     ->columns(2)
                     ->schema([
-                        // Pricing and supplier controls for procurement coordination.
+                        // Row 1: core pricing fields remain paired for quick comparison.
                         TextInput::make('cost_per_unit')
                             ->label(__('admin.variant_inventory.cost_per_unit'))
                             ->numeric()
@@ -209,6 +208,7 @@ final class VariantInventoryResource extends Resource
                             ->numeric()
                             ->default(0)
                             ->minValue(0),
+                        // Row 2: supplier scheduling data follows the same alignment pattern.
                         Flatpickr::makeDate('expiry_date')
                             ->label(__('admin.variant_inventory.expiry_date')),
                         TextInput::make('supplier_id')
@@ -218,7 +218,7 @@ final class VariantInventoryResource extends Resource
                 Section::make(__('admin.variant_inventory.additional_info'))
                     ->columns(2)
                     ->schema([
-                        // Status toggles allow ops teams to track lifecycle states.
+                        // Row 1: tracking toggle with status select for operational state management.
                         Toggle::make('is_tracked')
                             ->label(__('admin.variant_inventory.is_tracked'))
                             ->default(true),
@@ -230,11 +230,12 @@ final class VariantInventoryResource extends Resource
                                 'discontinued' => __('admin.variant_inventory.status_discontinued'),
                             ])
                             ->default('active'),
-                        // Notes span the full width to capture operational remarks.
+                        // Row 2: notes span the full section width to encourage longer narratives when needed.
                         Textarea::make('notes')
                             ->label(__('admin.variant_inventory.notes'))
                             ->rows(3)
-                            ->columnSpan(2),
+                            ->columnSpanFull(),
+                        // Row 3: restock timestamps stay paired in the shared column layout.
                         Flatpickr::makeDate('last_restocked_at')
                             ->label(__('admin.variant_inventory.last_restocked_at')),
                         Flatpickr::makeDate('last_sold_at')
@@ -243,7 +244,7 @@ final class VariantInventoryResource extends Resource
                 Section::make(__('admin.variant_inventory.calculated_fields'))
                     ->columns(3)
                     ->schema([
-                        // Read-only insights help merchandisers quickly gauge stock health.
+                        // Calculated data points mirror the display table column trio for consistency.
                         Placeholder::make('is_low_stock')
                             ->label(__('admin.variant_inventory.is_low_stock'))
                             ->content(fn (?VariantInventory $record): string => $record ? ($record->is_low_stock ? __('admin.variant_inventory.yes') : __('admin.variant_inventory.no')) : '-'),
