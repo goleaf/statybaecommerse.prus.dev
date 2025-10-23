@@ -19,7 +19,7 @@
 
 ### Changed
 - Swapped Campaign resource schemas to Filament v4 `Section`/`Grid` components, refreshed table action imports, and synced the related translation manager plus Variant Analytics navigation icon docblock with v4 conventions.
-- Documented the Variant Inventory resource's Select form component import so dropdown dependencies stay transparent for reviewers.
+- Refined the Variant Inventory resource form to rely on section column layouts instead of nested grids, improving readability while keeping bespoke spans for operational notes and ensuring importer select components remain organized.
 - Restored typed navigation icons for the Menu, Enum Management, and Variant Analytics resources while cleaning up redundant `UnitEnum` imports in favor of fully qualified annotations.
 - Shifted Category and Variant Analytics resources onto the Filament tables namespace helpers, introduced `Str`-based label formatting, and pared down the testing admin panel bootstrap to prevent missing table crashes during Pest runs.
 - Routed the Menu activation toggle through Filament's success notification system to standardize feedback messaging.
