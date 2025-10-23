@@ -39,15 +39,18 @@ final class EnumValueResource extends Resource
 
     protected static ?string $model = EnumValue::class;
 
-    /**
-     * Ensure enum values live under the same translated system navigation group.
-     */
-    protected static string|BackedEnum|null $navigationGroup = NavigationGroup::System;
+    /** @var string|\BackedEnum|null Provide a consistent icon for value maintenance. */
+    protected static $navigationIcon = 'heroicon-o-squares-2x2';
+
+    /** @var string|\BackedEnum|null Keep enum value tools inside the System cluster. */
+    protected static $navigationGroup = NavigationGroup::System;
 
     public static function getNavigationGroup(): ?string
     {
-        // Delegate to the NavigationGroup enum for consistent localization.
-        return NavigationGroup::System->label();
+        // Resolve the translated label from the shared navigation enum.
+        $group = static::$navigationGroup;
+
+        return $group instanceof NavigationGroup ? $group->label() : $group;
     }
 
     protected static ?int $navigationSort = 1;
@@ -67,7 +70,7 @@ final class EnumValueResource extends Resource
         return __('admin.enum_values.navigation_label');
     }
 
-    public static function form(Schema $form): Schema
+    public static function form(Form $form): Form
     {
         return $form->schema([
             Section::make(__('admin.enum_values.form.sections.basic_information'))
@@ -134,17 +137,17 @@ final class EnumValueResource extends Resource
                         ->columnSpanFull(),
                     Placeholder::make('usage_count')
                         ->label(__('admin.enum_values.form.fields.usage_count'))
-                        ->content(fn ($record) => $record?->usage_count ?? 0),
+                        ->content(static fn (?EnumValue $record): int => (int) ($record?->usage_count ?? 0)),
                     Placeholder::make('formatted_value')
                         ->label(__('admin.enum_values.form.fields.formatted_value'))
-                        ->content(fn ($record) => $record?->formatted_value ?? '-'),
+                        ->content(static fn (?EnumValue $record): string => $record?->formatted_value ?? '-'),
                 ])
                 ->columns(2)
                 ->collapsible(),
         ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([
@@ -153,7 +156,7 @@ final class EnumValueResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
+                    ->color(static fn (string $state): string => match ($state) {
                         'navigation_group' => 'primary',
                         'order_status'     => 'success',
                         'payment_status'   => 'warning',

@@ -55,17 +55,17 @@ final class EnumManagementResource extends Resource
      */
     protected static $navigationIcon = 'heroicon-o-squares-2x2';
 
-    /**
-     * Keep the resource inside the system navigation group using a BackedEnum.
-     */
-    protected static string|BackedEnum|null $navigationGroup = NavigationGroup::System;
+    /** @var string|\BackedEnum|null Pin enum tools to the shared System navigation section. */
+    protected static $navigationGroup = NavigationGroup::System;
 
     protected static ?int $navigationSort = 2;
 
     public static function getNavigationGroup(): ?string
     {
-        // Translate the enum label so the navigation heading remains localized.
-        return NavigationGroup::System->label();
+        // Share the navigation label via enum for localization consistency.
+        $group = static::$navigationGroup;
+
+        return $group instanceof NavigationGroup ? $group->label() : $group;
     }
 
     public static function getNavigationLabel(): string
@@ -83,7 +83,7 @@ final class EnumManagementResource extends Resource
         return trans('admin.enums.single');
     }
 
-    public static function form(Schema $form): Schema
+    public static function form(Form $form): Form
     {
         return $form->schema([
             Tabs::make('enum_management_tabs')
@@ -167,7 +167,7 @@ final class EnumManagementResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table|array
+    public static function table(Table $table): Table
     {
         return $table
             ->columns([
