@@ -4,24 +4,18 @@ declare(strict_types=1);
 
 namespace App\Data\Notifications;
 
-final class NotificationStatsData
+use Illuminate\Contracts\Support\Arrayable;
+use JsonSerializable;
+
+final class NotificationStatsData implements Arrayable, JsonSerializable
 {
-    private function __construct(
-        private readonly int $total,
-        private readonly int $read,
-        private readonly int $unread,
-        private readonly int $urgent,
-    ) {
-    }
+    public function __construct(
+        public readonly int $total,
+        public readonly int $read,
+        public readonly int $unread,
+        public readonly int $urgent,
+    ) {}
 
-    public static function fromCounts(int $total, int $read, int $unread, int $urgent): self
-    {
-        return new self($total, $read, $unread, $urgent);
-    }
-
-    /**
-     * @return array<string, int>
-     */
     public function toArray(): array
     {
         return [
@@ -30,5 +24,10 @@ final class NotificationStatsData
             'unread' => $this->unread,
             'urgent' => $this->urgent,
         ];
+    }
+
+    public function jsonSerialize(): array
+    {
+        return $this->toArray();
     }
 }
