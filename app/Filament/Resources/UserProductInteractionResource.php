@@ -63,6 +63,9 @@ final class UserProductInteractionResource extends Resource
         return __('admin.user_product_interactions.model_label');
     }
 
+    /**
+     * Ensure Filament v4 receives a concrete Form instance for schema binding.
+     */
     public static function form(Form $form): Form
     {
         return $schema
@@ -105,6 +108,7 @@ final class UserProductInteractionResource extends Resource
 
                                         return Product::create($data)->getKey();
                                     }),
+                                // Map each interaction type to its localized label for admins.
                                 Select::make('interaction_type')
                                     ->label(__('admin.user_product_interactions.interaction_type'))
                                     ->options([
@@ -226,6 +230,9 @@ final class UserProductInteractionResource extends Resource
         ]);
     }
 
+    /**
+     * Return a Table instance to satisfy Filament v4 table expectations.
+     */
     public static function table(Table $table): Table
     {
         // Configure the table definition for the streamlined Filament v4 return type.

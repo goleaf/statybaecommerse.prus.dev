@@ -70,7 +70,7 @@ composer run dev
 
 ## Latest maintenance
 
-- 2025-10-21: Ensured the User Product Interaction Filament resource now uses the proper `Form`/`Table` return signatures mandated by Filament v4 so panel boot no longer fails when seeding analytics data during PR #534 verification.
+- 2025-10-21: Tightened the User Product Interaction Filament resource to return concrete `Form` and `Table` instances so Filament v4 boots cleanly when analytics interactions are seeded.
 
 ## Architecture cheatsheet
 
