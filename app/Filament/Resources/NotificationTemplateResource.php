@@ -14,7 +14,6 @@ use Filament\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -74,22 +73,36 @@ final class NotificationTemplateResource extends Resource
                             ->required()
                             ->maxLength(255)
                             ->live(onBlur: true)
-                            ->afterStateUpdated(function (string $operation, ?string $state, callable $set): void {
-                                if ($operation !== 'create') {
-                                    return;
-                                }
+                            ->afterStateUpdated(
+                                function (string $operation, ?string $state, callable $set, ?callable $get = null): void {
+                                    if ($operation !== 'create') {
+                                        return;
+                                    }
 
-                                $set('slug', Str::slug((string) $state));
-                            }),
+                                    if ($get !== null && filled($get('slug'))) {
+                                        return;
+                                    }
+
+                                    if (! filled($state)) {
+                                        return;
+                                    }
+
+                                    $set('slug', Str::slug((string) $state));
+                                }
+                            ),
                         TextInput::make('slug')
                             ->label(__('admin.notification_templates.slug'))
                             ->required()
                             ->maxLength(255)
                             ->live(onBlur: true)
-                            ->afterStateUpdated(function (?string $state, callable $set): void {
-                                $set('slug', Str::slug((string) $state));
-                            })
-                            ->dehydrateStateUsing(fn (?string $state): ?string => filled($state) ? Str::slug($state) : null)
+                            ->afterStateUpdated(
+                                static function (?string $state, callable $set): void {
+                                    $set('slug', filled($state) ? Str::slug($state) : null);
+                                }
+                            )
+                            ->dehydrateStateUsing(
+                                static fn (?string $state): ?string => filled($state) ? Str::slug($state) : null
+                            )
                             ->unique(NotificationTemplate::class, 'slug', ignoreRecord: true)
                             ->rules(['alpha_dash']),
                         Select::make('type')
@@ -108,7 +121,8 @@ final class NotificationTemplateResource extends Resource
                             ->required()
                             ->maxLength(255)
                             ->helperText(__('admin.notification_templates.event_help')),
-                    ]),
+                    ])
+                    ->columns(2),
                 Section::make(__('admin.notification_templates.content'))
                     ->schema([
                         TextInput::make('subject')
@@ -128,12 +142,9 @@ final class NotificationTemplateResource extends Resource
                     ]),
                 Section::make(__('admin.notification_templates.status'))
                     ->schema([
-                        Grid::make(1)
-                            ->schema([
-                                Toggle::make('is_active')
-                                    ->label(__('admin.notification_templates.is_active'))
-                                    ->default(true),
-                            ]),
+                        Toggle::make('is_active')
+                            ->label(__('admin.notification_templates.is_active'))
+                            ->default(true),
                     ]),
             ]);
     }
@@ -172,12 +183,15 @@ final class NotificationTemplateResource extends Resource
                         static function (TextColumn $column): ?string {
                             $state = $column->getState();
 
-                        if (! is_string($state)) {
-                            return null;
-                        }
+                            if (! is_string($state)) {
+                                return null;
+                            }
 
-                        return mb_strlen($state) > 50 ? $state : null;
-                    }),
+                            $state = trim($state);
+
+                            return mb_strlen($state) > 50 ? $state : null;
+                        }
+                    ),
                 IconColumn::make('is_active')
                     ->label(__('admin.notification_templates.is_active'))
                     ->boolean(),

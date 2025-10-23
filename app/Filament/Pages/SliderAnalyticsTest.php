@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Pages;
 
-use BackedEnum;
 use Filament\Pages\Dashboard as BaseDashboard;
 
 final class SliderAnalyticsTest extends BaseDashboard
@@ -13,7 +12,10 @@ final class SliderAnalyticsTest extends BaseDashboard
 
     protected static ?string $navigationLabel = 'Slider Analytics Test';
 
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar';
+    /**
+     * @var string|\BackedEnum|null
+     */
+    protected static $navigationIcon = 'heroicon-o-chart-bar';
 
     protected static ?int $navigationSort = 3;
 
