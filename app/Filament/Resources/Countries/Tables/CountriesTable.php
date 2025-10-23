@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\Countries\Tables;
 
-use Filament\Actions\BulkAction;
-use Filament\Actions\BulkActionGroup as TableBulkActionGroup;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
-use Filament\Actions\ForceDeleteBulkAction;
-use Filament\Actions\RestoreBulkAction;
-use Filament\Actions\ViewAction;
 use Filament\Notifications\Notification;
+use Filament\Tables\Actions\BulkAction;
+use Filament\Tables\Actions\BulkActionGroup as TableBulkActionGroup;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ForceDeleteBulkAction;
+use Filament\Tables\Actions\RestoreBulkAction;
+use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -19,6 +19,7 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
+use Illuminate\Support\Collection;
 
 /**
  * CountriesTable
@@ -208,7 +209,7 @@ final class CountriesTable
                         ->label(__('countries.activate_selected'))
                         ->icon('heroicon-o-check-circle')
                         ->color('success')
-                        ->action(function ($records): void {
+                        ->action(function (Collection $records): void {
                             $records->each->update(['is_active' => true]);
                             Notification::make()
                                 ->title(__('countries.activated_successfully'))
@@ -220,7 +221,7 @@ final class CountriesTable
                         ->label(__('countries.deactivate_selected'))
                         ->icon('heroicon-o-x-circle')
                         ->color('danger')
-                        ->action(function ($records): void {
+                        ->action(function (Collection $records): void {
                             $records->each->update(['is_active' => false]);
                             Notification::make()
                                 ->title(__('countries.deactivated_successfully'))
@@ -235,6 +236,6 @@ final class CountriesTable
             ])
             ->defaultSort('sort_order', 'asc')
             ->striped()
-            ->paginated([10, 25, 50, 100]);
+            ->paginationPageOptions([10, 25, 50, 100]);
     }
 }

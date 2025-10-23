@@ -8,7 +8,7 @@ use App\Filament\Tables\Concerns\ConfiguresToggleableTableLayout;
 use App\Models\Product;
 use BackedEnum;
 use UnitEnum;
-use Filament\Actions\BulkAction;
+use Filament\Tables\Actions\BulkAction;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Pages\Page;
@@ -17,6 +17,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
+
 final class InventoryManagement extends Page implements HasTable
 {
     use ConfiguresToggleableTableLayout;
@@ -28,7 +29,10 @@ final class InventoryManagement extends Page implements HasTable
      */
     protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-archive-box';
 
-    protected static \UnitEnum|string|null $navigationGroup = 'Products';
+    public static function getNavigationGroup(): UnitEnum|string|null
+    {
+        return 'Products';
+    }
 
     public static function getSlug(?\Filament\Panel $panel = null): string
     {
