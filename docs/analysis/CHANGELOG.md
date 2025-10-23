@@ -3,8 +3,6 @@
 ## [Unreleased]
 
 ### Added
-- Added a standalone `BattleService` with deterministic casualty and loot calculations, complete with PHPUnit coverage to keep
-  the Travian battle simulation behaviour reproducible for future tooling work.
 - Enabled Laravel Sanctum API token support, including guard configuration, middleware aliases, and the published personal access token migration.
 - Introduced dedicated rate limiters for the authenticated user endpoint and storefront checkout requests.
 - Documented consistent JSON problem responses for the profile and checkout flows, falling back to user-owned carts when sessions rotate.
