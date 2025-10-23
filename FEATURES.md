@@ -20,7 +20,9 @@ This snapshot complements the changelog by listing functional capabilities that 
 - Analytical reports, project retrospectives, and rollout summaries consolidated inside [`docs/analysis/`](docs/analysis/).
 
 ## Latest Update
-- Admin guard flows now short-circuit to the Filament login when guests hit `/admin`, skip Vite asset inclusion during automated tests, and rely on seeded permissions so the dashboard URL remains verifiable without compiling assets.
+
+- Admin demo data now seeds deterministic catalogues, orders, and SEO metadata while the order scope bypass keeps dashboards in sync with the seeded records.
+- Admin seeder logging now respects headless contexts, preventing null command errors during automated runs while retaining rich console progress when executed interactively.
 - Brands page now features a light-themed layout, shared card components, and refreshed translations so the partner directory feels consistent across locales.
 - Region-to-city lookups and the dedicated customers table are restored for the SQLite harness, ensuring analytics sparklines, customer factories, and Filament resources can attach geographic metadata without migration errors.
 - Localized product/category routing plus collection seeding were hardened, ensuring homepage product links, category landing pages, and collection showcases load without 404s or empty states.

@@ -12,7 +12,9 @@ use Illuminate\Database\Eloquent\Scope;
 /**
  * ActiveScope
  *
- * Global scope that keeps model queries limited to active or visible records when supported by the table schema.
+ * Eloquent model representing the ActiveScope entity with comprehensive relationships, scopes, and business logic for the e-commerce system.
+ *
+ * @mixin \Eloquent
  */
 final class ActiveScope implements Scope
 {
@@ -22,9 +24,7 @@ final class ActiveScope implements Scope
     public function apply(Builder $builder, Model $model): void
     {
         if ($model instanceof Order) {
-            // Orders rely on rich status transitions (pending, processing, etc.) and
-            // should not inherit the generic "active" filtering that other lookup
-            // tables require.
+            // Orders use dedicated status scopes; avoid duplicating constraints that hide seeded records.
             return;
         }
 
