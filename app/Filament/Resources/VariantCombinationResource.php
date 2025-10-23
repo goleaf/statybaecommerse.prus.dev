@@ -89,11 +89,15 @@ final class VariantCombinationResource extends Resource
                                     ->searchable()
                                     ->preload()
                                     ->reactive()
-                                    ->afterStateUpdated(function ($state, Set $set): void {
-                                        if (! $state) {
+                                    ->afterStateUpdated(function ($state, callable $set): void {
+                                        if ($state) {
+                                            $product = Product::find($state);
+                                            if ($product && $product->attributes()->exists()) {
+                                                $attributes = $product->attributes()->pluck('name', 'id')->toArray();
+                                                $set('available_attributes', $attributes);
+                                            }
+                                        } else {
                                             $set('available_attributes', []);
-
-                                            return;
                                         }
 
                                         $product = Product::find($state);
@@ -167,20 +171,24 @@ final class VariantCombinationResource extends Resource
                     ->color('primary'),
                 TextColumn::make('attribute_combinations')
                     ->label(__('admin.variant_combinations.attribute_combinations'))
-                    ->formatStateUsing(fn ($state): string => self::formatAttributeCombinations($state))
+                    ->formatStateUsing(function ($state) {
+                        if (is_array($state)) {
+                            return collect($state)->map(function ($value, $key) {
+                                return $key . ': ' . $value;
+                            })->join(', ');
+                        }
+
+                        return $state;
+                    })
                     ->limit(50)
                     ->tooltip(function (TextColumn $column): ?string {
                         $state = $column->getState();
 
-                        if ($state === null || $state === '') {
+                        if (! is_string($state)) {
                             return null;
                         }
 
-                        $stateString = is_array($state)
-                            ? self::formatAttributeCombinations($state)
-                            : (string) $state;
-
-                        return strlen($stateString) > 50 ? $stateString : null;
+                        return mb_strlen($state) > 50 ? $state : null;
                     })
                     ->searchable()
                     ->sortable(),
@@ -189,7 +197,7 @@ final class VariantCombinationResource extends Resource
                     ->formatStateUsing(fn ($state) => $state ? __('admin.variant_combinations.available') : __('admin.variant_combinations.unavailable'))
                     ->colors([
                         'success' => fn ($state) => $state,
-                        'danger' => fn ($state) => ! $state,
+                        'danger'  => fn ($state) => ! $state,
                     ])
                     ->sortable(),
                 TextColumn::make('combination_hash')
@@ -234,8 +242,8 @@ final class VariantCombinationResource extends Resource
                     ->falseLabel(__('admin.variant_combinations.unavailable_only')),
                 Filter::make('valid_combinations')
                     ->label(__('admin.variant_combinations.valid_combinations_only'))
-                    ->query(fn (Builder $query): Builder => $query->whereHas('product', function (Builder $query) {
-                        $query->whereHas('attributes');
+                    ->query(fn (Builder $query): Builder => $query->whereHas('product', function (Builder $query): Builder {
+                        return $query->whereHas('attributes');
                     }))
                     ->toggle(),
                 Filter::make('recent_combinations')
