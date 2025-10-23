@@ -6,7 +6,7 @@ namespace App\Filament\Resources\OrderResource\RelationManagers;
 
 use App\Filament\RelationManagers\Support\BaseRelationManager;
 use App\Models\OrderItem;
-use App\Support\Filament\Forms\SearchableVariantFieldHelper;
+use App\Support\Filament\ProductVariantFieldHelper;
 use App\Support\Search\ProductVariantSearch;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Actions\Action;
@@ -73,13 +73,9 @@ final class OrderItemsRelationManager extends BaseRelationManager
                                     ->placeholder(__('orders.placeholders.product_variant'))
                                     ->searchUsing(fn (string $term): array => ProductVariantSearch::results($term))
                                     ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null && $state !== '' ? (int) $state : null)
-                                    // Helper workflow documented in docs/forms/SEARCHABLE_INPUT_METADATA.md.
-                                    ->afterStateHydrated(fn (SearchableInput $component, ?int $state, ?OrderItem $record): void => SearchableVariantFieldHelper::hydrate(
-                                        $component,
-                                        $state,
-                                        $record?->productVariant
-                                    ))
-                                    ->afterStateUpdated(fn (?string $state, Set $set, Get $get): void => SearchableVariantFieldHelper::handleUpdated($state, $set, $get)),
+                                    // Refer to docs/filament/variant-lookup-helpers.md for helper usage guidance.
+                                    ->afterStateHydrated(fn (SearchableInput $component, ?int $state) => ProductVariantFieldHelper::hydrateSearchableVariant($component, $state))
+                                    ->afterStateUpdated(fn (?string $state, Set $set, Get $get) => ProductVariantFieldHelper::handleVariantSelection($state, $set, $get)),
                                 TextInput::make('quantity')
                                     ->label(__('orders.quantity'))
                                     ->numeric()
