@@ -8,76 +8,9 @@
     $searchTitle = $searchTitle ?? __('Search for what you need');
     $searchPlaceholder = $searchPlaceholder ?? __('Search products...');
     $links = $links ?? [];
-    $topCategoriesTitle = $topCategoriesTitle ?? __('Top Categories');
-    $topCategories = collect($topCategories ?? [])
-        ->filter(static fn ($category) => is_array($category) && filled($category['label'] ?? null) && filled($category['url'] ?? null))
-        ->values();
-    $contactCta = is_array($contactCta ?? null) ? $contactCta : null;
     $locale = app()->getLocale();
     $homeRoute = route('localized.home', ['locale' => $locale]) ?? url('/');
     $searchRoute = route('search', ['locale' => $locale]) ?? '/search';
-    $correlationHeaderConfig = config('app.correlation_header', 'X-Correlation-ID');
-    $correlationHeader = is_string($correlationHeaderConfig) && $correlationHeaderConfig !== ''
-        ? $correlationHeaderConfig
-        : 'X-Correlation-ID';
-
-    $traceId = $traceId ?? null;
-    $correlationId = $correlationId ?? null;
-
-    if (! is_string($traceId) || $traceId === '') {
-        if (is_string($correlationId) && $correlationId !== '') {
-            $traceId = $correlationId;
-        }
-    }
-
-    if (! is_string($traceId) || $traceId === '') {
-        if (app()->bound('request_correlation_id')) {
-            $resolvedCorrelation = app()->make('request_correlation_id');
-            if (is_string($resolvedCorrelation) && $resolvedCorrelation !== '') {
-                $traceId = $resolvedCorrelation;
-            }
-        }
-    }
-
-    if ((! is_string($traceId) || $traceId === '') && function_exists('request')) {
-        $request = request();
-
-        if ($request !== null) {
-            $attributeCorrelation = $request->attributes->get('correlation_id');
-            if (is_string($attributeCorrelation) && $attributeCorrelation !== '') {
-                $traceId = $attributeCorrelation;
-            }
-
-            if (! is_string($traceId) || $traceId === '') {
-                $headerCorrelation = (string) $request->headers->get($correlationHeader, '');
-                if ($headerCorrelation !== '') {
-                    $traceId = $headerCorrelation;
-                }
-            }
-        }
-    }
-
-    if (! is_string($traceId) || $traceId === '') {
-        $traceId = null;
-    }
-
-    $correlationId = $traceId;
-
-    $localizedSupportEmail = __('company_email');
-    $fallbackSupportEmail = config('mail.from.address', 'support@example.com');
-    $resolvedSupportEmail = $localizedSupportEmail !== 'company_email'
-        ? $localizedSupportEmail
-        : $fallbackSupportEmail;
-
-    $supportEmail = $supportEmail ?? $resolvedSupportEmail;
-    $supportTitle = $supportTitle ?? __('Need more help?');
-    $supportDescription = $supportDescription ?? __('If the problem continues, contact our support team and share the trace ID below so we can assist you quickly.');
-    $statusPageUrl = $statusPageUrl ?? (\Illuminate\Support\Facades\Route::has('status.page')
-        ? route('status.page', ['locale' => $locale])
-        : url('/status'));
-    $supportPageUrl = $supportPageUrl ?? (\Illuminate\Support\Facades\Route::has('localized.support.index')
-        ? route('localized.support.index', ['locale' => $locale])
-        : url('/support'));
 
     $iconLibrary = [
         'categories' => '<svg class="w-8 h-8 text-blue-600 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 11h10"></path></svg>',
@@ -172,35 +105,6 @@
                     </div>
                 @endif
 
-                @if($topCategories->isNotEmpty())
-                    <div class="mt-12">
-                        <h3 class="text-lg font-semibold text-gray-700 mb-6 text-center">{{ $topCategoriesTitle }}</h3>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            @foreach($topCategories as $category)
-                                <a href="{{ $category['url'] }}"
-                                   class="p-5 bg-white rounded-2xl border border-gray-200 hover:border-blue-300 hover:shadow-soft transition-all duration-200">
-                                    <div class="flex items-start gap-4">
-                                        <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-50 text-blue-600 font-semibold">
-                                            {{ $category['label'][0] ?? '•' }}
-                                        </div>
-                                        <div class="flex-1">
-                                            <div class="flex items-center justify-between gap-2">
-                                                <span class="text-base font-semibold text-gray-900">{{ $category['label'] }}</span>
-                                                @if(!empty($category['product_count']))
-                                                    <span class="text-xs font-medium text-blue-600 bg-blue-50 px-2.5 py-1 rounded-full">{{ trans_choice(__('frontend.collections.stats.products'), (int) $category['product_count'], ['count' => (int) $category['product_count']]) }}</span>
-                                                @endif
-                                            </div>
-                                            @if(!empty($category['description']))
-                                                <p class="mt-2 text-sm text-gray-500">{{ $category['description'] }}</p>
-                                            @endif
-                                        </div>
-                                    </div>
-                                </a>
-                            @endforeach
-                        </div>
-                    </div>
-                @endif
-
                 @if(!empty($links))
                     <div class="mt-12">
                         <h3 class="text-lg font-semibold text-gray-700 mb-6">{{ __('Popular Pages') }}</h3>
@@ -215,68 +119,6 @@
                         </div>
                     </div>
                 @endif
-
-                @if($contactCta)
-                    <div class="mt-12">
-                        <div class="bg-blue-50 border border-blue-100 rounded-3xl p-8 text-left sm:flex sm:items-center sm:justify-between sm:gap-8">
-                            <div class="max-w-xl">
-                                <h3 class="text-2xl font-semibold text-gray-900 mb-3">{{ $contactCta['title'] ?? __('Need more help?') }}</h3>
-                                <p class="text-sm text-gray-600">{{ $contactCta['description'] ?? __('Reach out to our support team and we will guide you to the right place.') }}</p>
-                            </div>
-                            @if(!empty($contactCta['actions']) && is_array($contactCta['actions']))
-                                <div class="mt-6 sm:mt-0 flex flex-col sm:flex-row gap-3">
-                                    @foreach($contactCta['actions'] as $action)
-                                        @continue(!is_array($action) || empty($action['label']) || empty($action['url']))
-                                        @php($style = $action['style'] ?? 'primary')
-                                        <a href="{{ $action['url'] }}"
-                                           @class([
-                                               'px-6 py-3 rounded-xl font-semibold text-center transition-colors duration-200',
-                                               'bg-blue-600 text-white hover:bg-blue-700' => $style === 'primary',
-                                               'border-2 border-blue-200 text-blue-700 hover:border-blue-300 hover:bg-blue-100' => $style !== 'primary',
-                                           ])>
-                                            {{ $action['label'] }}
-                                        </a>
-                                    @endforeach
-                                </div>
-                            @endif
-                        </div>
-                    </div>
-                @endif
-
-                <div class="mt-12 border-t border-gray-100 pt-8">
-                    <h2 class="text-lg font-semibold text-gray-800 text-center mb-3">{{ $supportTitle }}</h2>
-                    <p class="text-sm text-gray-500 max-w-xl mx-auto text-center">{{ $supportDescription }}</p>
-
-                    @if($traceId !== null)
-                        <div class="mt-6 flex items-center justify-center">
-                            <div class="inline-flex flex-col sm:flex-row sm:items-center gap-2 bg-gray-50 border border-gray-200 rounded-xl px-5 py-3">
-                                <span class="text-xs font-semibold uppercase tracking-wide text-gray-500">{{ __('Trace ID') }}</span>
-                                <span class="font-mono text-sm text-gray-800">{{ $traceId }}</span>
-                            </div>
-                        </div>
-                    @endif
-
-                    <div class="mt-6 flex flex-col sm:flex-row justify-center gap-4">
-                        @if(is_string($supportEmail) && $supportEmail !== '')
-                            <a href="mailto:{{ $supportEmail }}"
-                               class="border-2 border-gray-200 text-gray-700 px-6 py-3 rounded-xl font-semibold hover:border-gray-400 hover:bg-gray-50 transition-colors duration-200">
-                                {{ __('Email Support') }}
-                            </a>
-                        @endif
-
-                        <a href="{{ $supportPageUrl }}"
-                           class="border-2 border-gray-200 text-gray-700 px-6 py-3 rounded-xl font-semibold hover:border-gray-400 hover:bg-gray-50 transition-colors duration-200">
-                            {{ __('Visit Help Center') }}
-                        </a>
-
-                        <a href="{{ $statusPageUrl }}"
-                           class="border-2 border-gray-200 text-gray-700 px-6 py-3 rounded-xl font-semibold hover:border-gray-400 hover:bg-gray-50 transition-colors duration-200">
-                            {{ __('View System Status') }}
-                        </a>
-                    </div>
-
-                    <p class="mt-6 text-xs text-gray-400 text-center">{{ __('Share the trace ID with our support team so we can find your request faster.') }}</p>
-                </div>
             </div>
         </div>
     </div>

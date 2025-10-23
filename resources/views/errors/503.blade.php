@@ -27,8 +27,6 @@
         'label' => __('Return Home'),
         'url' => $homeUrl,
     ],
-    'supportTitle' => __('Need an update?'),
-    'supportDescription' => __('Check our status page or reach out to support and we will notify you as soon as we are back.'),
     'links' => [
         [
             'label' => __('Browse Products'),
