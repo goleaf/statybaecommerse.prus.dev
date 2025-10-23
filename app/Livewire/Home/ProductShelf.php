@@ -8,7 +8,6 @@ use App\Livewire\Concerns\WithCart;
 use App\Livewire\Concerns\WithNotifications;
 use App\Models\Product;
 use App\Support\Cache\CacheKeys;
-use App\Support\Cache\CacheTagHelper;
 use Filament\Infolists\Components\ViewEntry;
 use Filament\Schemas\Concerns\InteractsWithSchemas;
 use Filament\Schemas\Contracts\HasSchemas;
@@ -55,10 +54,7 @@ final class ProductShelf extends Component implements HasSchemas
     {
         $locale = app()->getLocale();
 
-        $cacheKey = CacheKeys::homeShelf($this->preset, $this->limit, $locale);
-        $store = Cache::getStore();
-
-        $callback = function () use ($locale): EloquentCollection {
+        return Cache::remember(CacheKeys::homeShelf($this->preset, $this->limit, $locale), CacheKeys::TTL_MINUTE, function () use ($locale): EloquentCollection {
             $query = Product::query()
                 ->with(['brand', 'media', 'categories'])
                 ->with(['translations' => function ($q) use ($locale) {

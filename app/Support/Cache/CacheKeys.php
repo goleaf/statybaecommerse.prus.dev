@@ -1,69 +1,16 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Support\Cache;
-
-use JsonException;
 
 final class CacheKeys
 {
     public const TTL_MINUTE = 60;
-
     public const TTL_TWO_MINUTES = 120;
-
     public const TTL_FIVE_MINUTES = 300;
-
     public const TTL_ONE_HOUR = 3600;
-
     public const TTL_TWO_HOURS = 7200;
-
     public const TTL_SIX_HOURS = 21600;
-
     public const TTL_ONE_DAY = 86400;
-
-    public static function productVisibleCount(): string
-    {
-        return 'product:visible:count';
-    }
-
-    public static function productTotalCount(): string
-    {
-        return 'product:aggregate:count';
-    }
-
-    public static function userTotalCount(): string
-    {
-        return 'user:aggregate:count';
-    }
-
-    public static function dashboardMetric(string $metric, string $locale): string
-    {
-        return sprintf('dashboard:metrics:%s:%s', $metric, $locale);
-    }
-
-    public static function productAggregateTag(): string
-    {
-        return 'product:aggregate';
-    }
-
-    public static function userAggregateTag(): string
-    {
-        return 'user:aggregate';
-    }
-
-    /**
-     * Build the cache key for customer order activity sparklines.
-     */
-    public static function customerOrdersSeries(int $customerId, int $days): string
-    {
-        return sprintf('customer:series:orders:%d:%d', $customerId, $days);
-    }
-
-    public static function orderAggregateTag(): string
-    {
-        return 'order:aggregate';
-    }
 
     public static function homeStats(string $locale): string
     {
@@ -115,19 +62,6 @@ final class CacheKeys
         return sprintf('product:featured:list:%d', $limit);
     }
 
-    public static function productLatestList(int $limit): string
-    {
-        return sprintf('product:latest:list:%d', $limit);
-    }
-
-    /**
-     * Build the cache key for sparkline-ready product sales series.
-     */
-    public static function productSalesSeries(int $productId, int $days): string
-    {
-        return sprintf('product:series:sales:%d:%d', $productId, $days);
-    }
-
     public static function categoryPopularList(int $limit): string
     {
         return sprintf('category:popular:list:%d', $limit);
@@ -141,34 +75,6 @@ final class CacheKeys
     public static function categoryNavigationTree(): string
     {
         return 'category:navigation:tree';
-    }
-
-    public static function navigationCategories(int $limit, string $locale): string
-    {
-        return sprintf('navigation:categories:%d:%s', $limit, $locale);
-    }
-
-    /**
-     * Cache key for locale-specific featured brand navigation payloads.
-     */
-    public static function navigationFeaturedBrands(string $locale): string
-    {
-        return sprintf('navigation:featured-brands:%s', $locale);
-    }
-
-    public static function menuCollectionKey(?string $location, string $locale): string
-    {
-        return sprintf('menu:collection:%s:%s', $location ?? 'all', $locale);
-    }
-
-    public static function menuByKey(string $key, string $locale): string
-    {
-        return sprintf('menu:key:%s:%s', $key, $locale);
-    }
-
-    public static function menuByLocation(string $location, string $locale): string
-    {
-        return sprintf('menu:location:%s:%s', $location, $locale);
     }
 
     public static function dashboardStats(string $range): string
@@ -188,19 +94,7 @@ final class CacheKeys
 
     public static function dashboardSummary(): string
     {
-        // Maintain backwards compatibility for consumers that still call the
-        // legacy helper while ensuring we use the unified cache namespace.
-        return self::dashboardSimplifiedSummary();
-    }
-
-    public static function dashboardSimplifiedSummary(): string
-    {
-        return 'dashboard:simplified-stats:summary';
-    }
-
-    public static function dashboardSimplifiedChart(string $startDate, string $endDate): string
-    {
-        return sprintf('dashboard:simplified-stats:chart:%s:%s', $startDate, $endDate);
+        return 'dashboard:simplified:summary';
     }
 
     public static function currencyEnabledList(): string
@@ -223,11 +117,6 @@ final class CacheKeys
         return sprintf('category:%d', $categoryId);
     }
 
-    public static function menuTag(int $menuId): string
-    {
-        return sprintf('menu:%d', $menuId);
-    }
-
     public static function brandTag(int $brandId): string
     {
         return sprintf('brand:%d', $brandId);
@@ -238,107 +127,13 @@ final class CacheKeys
         return 'home';
     }
 
-    public static function navigationTag(): string
-    {
-        return 'navigation';
-    }
-
     public static function dashboardTag(): string
     {
         return 'dashboard';
     }
 
-    public static function categoryIndexBrands(string $locale): string
-    {
-        return sprintf('category:index:brands:%s', $locale);
-    }
-
-    public static function categoryIndexCollections(string $locale): string
-    {
-        return sprintf('category:index:collections:%s', $locale);
-    }
-
-    /**
-     * @param  array<string, mixed>  $filters
-     */
-    public static function categoryIndexFacetBrands(string $locale, array $filters): string
-    {
-        return sprintf('category:index:facet-brands:%s:%s', $locale, self::hashFromArray($filters));
-    }
-
-    /**
-     * @param  array<string, mixed>  $filters
-     */
-    public static function categoryIndexFacetCollections(string $locale, array $filters): string
-    {
-        return sprintf('category:index:facet-collections:%s:%s', $locale, self::hashFromArray($filters));
-    }
-
-    /**
-     * @param  array<string, mixed>  $filters
-     */
-    public static function categoryIndexFacetCategories(string $locale, array $filters): string
-    {
-        return sprintf('category:index:facet-categories:%s:%s', $locale, self::hashFromArray($filters));
-    }
-
-    /**
-     * @param  array<string, mixed>  $filters
-     */
-    public static function categoryIndexCategories(string $locale, array $filters): string
-    {
-        return sprintf('category:index:categories:%s:%s', $locale, self::hashFromArray($filters));
-    }
-
-    /**
-     * @param  array<string, mixed>  $options
-     */
-    public static function categoryShowProducts(int $categoryId, string $locale, array $options): string
-    {
-        return sprintf('category:show:%d:products:%s:%s', $categoryId, $locale, self::hashFromArray($options));
-    }
-
-    public static function productDetail(int $productId, string $locale): string
-    {
-        return sprintf('product:detail:%d:%s', $productId, $locale);
-    }
-
-    public static function productRecentHistories(int $productId): string
-    {
-        return sprintf('product:%d:recent-histories', $productId);
-    }
-
-    public static function productRecentReviews(int $productId): string
-    {
-        return sprintf('product:%d:recent-reviews', $productId);
-    }
-
     private static function homeKey(string $segment, string $locale): string
     {
         return sprintf('home:%s:%s', $segment, $locale);
-    }
-
-    /**
-     * @param  array<mixed>  $values
-     *
-     * @throws JsonException
-     */
-    private static function encodeArray(array $values): string
-    {
-        return json_encode($values, JSON_THROW_ON_ERROR);
-    }
-
-    /**
-     * @param  array<mixed>  $values
-     */
-    private static function hashFromArray(array $values): string
-    {
-        try {
-            return substr(sha1(self::encodeArray($values)), 0, 16);
-        } catch (JsonException) {
-            // Fallback to PHP serialisation if JSON encoding fails; we still
-            // cap the hash at 16 characters to keep keys compact.
-            return substr(sha1(serialize($values)), 0, 16);
-        }
     }
 }
