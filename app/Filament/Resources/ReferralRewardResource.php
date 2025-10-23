@@ -51,13 +51,6 @@ final class ReferralRewardResource extends Resource
 
     protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Referral;
 
-    public static function getNavigationGroup(): ?string
-    {
-        return self::$navigationGroup instanceof NavigationGroup
-            ? self::$navigationGroup->label()
-            : self::$navigationGroup;
-    }
-
     public static function form(Form $form): Form
     {
         return $form
@@ -67,19 +60,31 @@ final class ReferralRewardResource extends Resource
                     ->schema([
                         Forms\Components\Select::make('referral_id')
                             ->label(__('referral_rewards.fields.referral'))
-                            ->relationship('referral', 'referral_code', fn (Builder $query): Builder => $query->withoutGlobalScopes())
+                            ->relationship(
+                                name: 'referral',
+                                titleAttribute: 'referral_code',
+                                modifyQueryUsing: fn (Builder $query) => $query->withoutGlobalScopes(),
+                            )
                             ->searchable()
                             ->preload()
                             ->nullable(),
                         Forms\Components\Select::make('user_id')
                             ->label(__('referral_rewards.fields.user'))
-                            ->relationship('user', 'name', fn (Builder $query): Builder => $query->withoutGlobalScopes())
+                            ->relationship(
+                                name: 'user',
+                                titleAttribute: 'name',
+                                modifyQueryUsing: fn (Builder $query) => $query->withoutGlobalScopes(),
+                            )
                             ->searchable()
                             ->preload()
                             ->required(),
                         Forms\Components\Select::make('order_id')
                             ->label(__('referral_rewards.fields.order'))
-                            ->relationship('order', 'id', fn (Builder $query): Builder => $query->withoutGlobalScopes())
+                            ->relationship(
+                                name: 'order',
+                                titleAttribute: 'id',
+                                modifyQueryUsing: fn (Builder $query) => $query->withoutGlobalScopes(),
+                            )
                             ->searchable()
                             ->preload()
                             ->nullable(),
