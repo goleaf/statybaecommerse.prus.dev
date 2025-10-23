@@ -4,19 +4,46 @@ declare(strict_types=1);
 
 namespace App\Filament\Concerns;
 
-use Asmit\ResizedColumn\HasResizableColumn;
+use Asmit\ResizedColumn\HasResizableColumn as BaseHasResizableColumn;
 use Filament\Facades\Filament;
+use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Contracts\Auth\Guard;
 
 trait HasResizableColumns
 {
-    use HasResizableColumn {
-        getUserId as protected getDefaultResizableColumnUserId;
+    use BaseHasResizableColumn {
+        getUserId as private getBaseUserId;
     }
 
-    protected function getUserId(): int|string|null
+    protected function getUserId(): mixed
     {
-        $auth = Filament::auth();
+        $guard = $this->getFilamentGuard();
 
-        return $auth?->id() ?? $this->getDefaultResizableColumnUserId();
+        if ($guard instanceof Guard) {
+            $identifier = method_exists($guard, 'id') ? $guard->id() : null;
+
+            if ($identifier !== null) {
+                return $identifier;
+            }
+
+            $user = $guard->user();
+
+            if ($user instanceof Authenticatable) {
+                return $user->getAuthIdentifier();
+            }
+        }
+
+        return $this->getBaseUserId();
+    }
+
+    private function getFilamentGuard(): ?Guard
+    {
+        $panel = Filament::getCurrentPanel();
+
+        if ($panel === null) {
+            return null;
+        }
+
+        return Filament::auth();
     }
 }

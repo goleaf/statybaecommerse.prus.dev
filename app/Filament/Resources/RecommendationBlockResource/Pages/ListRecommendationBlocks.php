@@ -8,17 +8,14 @@ use App\Filament\Concerns\HasResizableColumns;
 use App\Filament\Resources\RecommendationBlockResource;
 use App\Filament\WidgetTabs\Components\WidgetTab;
 use App\Filament\WidgetTabs\Concerns\HasWidgetTabs;
-use App\Support\Recommendations\RecommendationBlockOptions;
 use Filament\Actions;
-use Filament\Resources\Components\Tab;
 use Filament\Resources\Pages\ListRecords;
-use App\Filament\WidgetTabs\Components\WidgetTab;
-use App\Filament\WidgetTabs\Concerns\HasWidgetTabs;
 use Illuminate\Database\Eloquent\Builder;
 
 final class ListRecommendationBlocks extends BaseListRecords
 {
     use HasResizableColumns;
+    use HasWidgetTabs;
 
     protected static string $resource = RecommendationBlockResource::class;
 

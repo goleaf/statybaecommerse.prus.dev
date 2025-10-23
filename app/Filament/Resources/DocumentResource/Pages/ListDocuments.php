@@ -10,13 +10,12 @@ use App\Filament\WidgetTabs\Components\WidgetTab;
 use App\Filament\WidgetTabs\Concerns\HasWidgetTabs;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
-use App\Filament\WidgetTabs\Components\WidgetTab;
-use App\Filament\WidgetTabs\Concerns\HasWidgetTabs;
 use Illuminate\Database\Eloquent\Builder;
 
 class ListDocuments extends BaseListRecords
 {
     use HasResizableColumns;
+    use HasWidgetTabs;
 
     protected static string $resource = DocumentResource::class;
 

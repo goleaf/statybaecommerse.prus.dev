@@ -15,14 +15,13 @@ use App\Filament\Resources\CountryResource\Widgets\EuMembersWidget;
 use App\Filament\WidgetTabs\Components\WidgetTab;
 use App\Filament\WidgetTabs\Concerns\HasWidgetTabs;
 use App\Filament\WidgetTabs\Enums\WidgetTabTheme;
-use Filament\Actions;
-use Filament\Resources\Components\Tab;
 use Filament\Resources\Pages\ListRecords;
 use Illuminate\Database\Eloquent\Builder;
 
 class ListCountries extends BaseListRecords
 {
     use HasResizableColumns;
+    use HasWidgetTabs;
 
     protected static string $resource = CountryResource::class;
 
