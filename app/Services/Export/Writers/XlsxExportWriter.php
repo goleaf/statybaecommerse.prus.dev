@@ -4,46 +4,63 @@ declare(strict_types=1);
 
 namespace App\Services\Export\Writers;
 
-use App\Models\Export;
+use App\Services\Export\Contracts\ExportWriter;
 use Illuminate\Support\Facades\Storage;
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 final class XlsxExportWriter implements ExportWriter
 {
-    private Spreadsheet $spreadsheet;
-
-    private int $rowPointer = 1;
+    private string $disk;
 
     private string $path;
 
-    public function open(Export $export, array $headers): void
+    /**
+     * @var array<int, array<int, string>>
+     */
+    private array $rows = [];
+
+    public function open(string $disk, string $path, array $headers): void
     {
-        $this->spreadsheet = new Spreadsheet;
-        $sheet = $this->spreadsheet->getActiveSheet();
-        $sheet->fromArray($headers, null, 'A1');
-        $this->rowPointer = 2;
-        $this->path = sprintf('exports/%s.%s', $export->id, $export->format->extension());
+        $this->disk = $disk;
+        $this->path = $path;
+        $this->rows = [$headers];
     }
 
-    public function appendRows(iterable $rows): void
+    public function append(array $row): void
     {
-        $sheet = $this->spreadsheet->getActiveSheet();
+        $this->rows[] = $row;
+    }
+
+    public function close(): void
+    {
+        $xml = $this->buildSpreadsheetXml($this->rows);
+        Storage::disk($this->disk)->put($this->path, $xml);
+    }
+
+    /**
+     * @param  array<int, array<int, string>>  $rows
+     */
+    private function buildSpreadsheetXml(array $rows): string
+    {
+        $document = [
+            '<?xml version="1.0" encoding="UTF-8"?>',
+            '<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">',
+            '  <Worksheet ss:Name="Export">',
+            '    <Table>',
+        ];
+
         foreach ($rows as $row) {
-            $sheet->fromArray([$row], null, 'A'.$this->rowPointer);
-            $this->rowPointer++;
+            $document[] = '      <Row>';
+            foreach ($row as $cell) {
+                $escaped = htmlspecialchars($cell ?? '', ENT_XML1 | ENT_COMPAT, 'UTF-8');
+                $document[] = sprintf('        <Cell><Data ss:Type="String">%s</Data></Cell>', $escaped);
+            }
+            $document[] = '      </Row>';
         }
-    }
 
-    public function close(): string
-    {
-        $disk = Storage::disk(config('export.disk'));
-        $disk->makeDirectory('exports');
-        $fullPath = $disk->path($this->path);
-        $writer = new Xlsx($this->spreadsheet);
-        $writer->save($fullPath);
-        $this->spreadsheet->disconnectWorksheets();
+        $document[] = '    </Table>';
+        $document[] = '  </Worksheet>';
+        $document[] = '</Workbook>';
 
-        return $this->path;
+        return implode("\n", $document);
     }
 }

@@ -4,14 +4,13 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Enums\ExportType;
-use App\Filament\Actions\RequestExportBulkAction;
+use App\Data\ExportRequestData;
 use App\Filament\Resources\UserResource\Pages;
 use App\Models\User;
-use App\Services\Export\Contracts\DefinesExportColumns;
 use App\Services\Export\ExportColumn;
-use App\Services\Export\ExportFormat;
 use App\Services\Export\ExportService;
+use App\Services\Export\Exporters\UserExport;
+use BackedEnum;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
@@ -253,9 +252,9 @@ final class UserResource extends Resource implements DefinesExportColumns
                             Select::make('format')
                                 ->label(__('Format'))
                                 ->options([
-                                    'csv'  => 'CSV',
+                                    'csv' => 'CSV',
                                     'xlsx' => 'XLSX',
-                                    'pdf'  => 'PDF',
+                                    'pdf' => 'PDF',
                                 ])
                                 ->default('csv')
                                 ->required(),
@@ -287,8 +286,7 @@ final class UserResource extends Resource implements DefinesExportColumns
                                 ->success()
                                 ->send();
                         })
-                        ->deselectRecordsAfterCompletion()
-                        ->visible(fn () => AuthorizationMatrix::check('users', 'viewAny')),
+                        ->deselectRecordsAfterCompletion(),
                     BulkAction::make('activate')
                         ->label(__('users.actions.activate'))
                         ->icon('heroicon-o-check-circle')

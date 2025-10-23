@@ -6,47 +6,41 @@ namespace App\Notifications;
 
 use App\Models\Export;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-final class ExportReadyNotification extends Notification implements ShouldQueue
+final class ExportReadyNotification extends Notification
 {
     use Queueable;
 
-    public function __construct(private readonly Export $export)
-    {
-        $this->onQueue('exports');
+    public function __construct(
+        private readonly Export $export,
+        private readonly string $downloadUrl,
+    ) {
     }
 
     public function via(object $notifiable): array
     {
-        return ['database', 'mail'];
+        return ['mail', 'database'];
     }
 
     public function toMail(object $notifiable): MailMessage
     {
-        $url = $this->export->signedUrl();
-
-        $expiry = $this->export->expires_at?->clone()->timezone($this->export->timezone);
-
-        return (new MailMessage())
-            ->subject(__('Your export is ready'))
-            ->greeting(__('Hello :name', ['name' => $notifiable->name ?? __('there')]))
-            ->line(__('The export :name has been generated successfully.', ['name' => $this->export->file_name]))
-            ->action(__('Download export'), $url)
-            ->line(__('This link will expire on :date.', ['date' => $expiry?->toDayDateTimeString() ?? 'N/A']))
-            ->line(__('If you did not request this file please contact support.'));
+        return (new MailMessage)
+            ->subject(__('Your export ":name" is ready', ['name' => $this->export->name]))
+            ->line(__('The export you requested has finished processing.'))
+            ->line(__('Format: :format', ['format' => strtoupper($this->export->format)]))
+            ->action(__('Download export'), $this->downloadUrl)
+            ->line(__('The link will expire in :minutes minutes.', ['minutes' => 60]));
     }
 
     public function toArray(object $notifiable): array
     {
         return [
             'export_id' => $this->export->getKey(),
-            'file_name' => $this->export->file_name,
-            'format' => $this->export->format->value,
-            'download_url' => $this->export->signedUrl(),
-            'expires_at' => optional($this->export->expires_at)?->toIso8601String(),
+            'name' => $this->export->name,
+            'format' => $this->export->format,
+            'download_url' => $this->downloadUrl,
         ];
     }
 }

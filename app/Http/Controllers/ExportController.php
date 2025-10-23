@@ -7,7 +7,6 @@ namespace App\Http\Controllers;
 use App\Enums\ExportStatus;
 use App\Models\Export;
 use App\Services\Export\ExportService;
-use App\Support\Exports\ExportUrlGenerator;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Contracts\View\View as ViewContract;
 use Illuminate\Http\RedirectResponse;
@@ -24,7 +23,9 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
  */
 class ExportController extends Controller
 {
-    public function __construct(private readonly ExportService $service) {}
+    public function __construct(private readonly ExportService $service)
+    {
+    }
 
     /**
      * Display a listing of the resource with pagination and filtering.
@@ -37,7 +38,7 @@ class ExportController extends Controller
             ->get();
 
         $files = $exports->map(function (Export $export): array {
-            $disk = $export->artifact_disk ?? config('media-security.disk', 'secure-media');
+            $disk = $export->artifact_disk ?? config('filesystems.exports_disk', 'public');
             $path = $export->artifact_path;
 
             $size = null;
@@ -49,7 +50,7 @@ class ExportController extends Controller
                 'name' => $export->artifact_filename ?? basename((string) $path),
                 'path' => $path,
                 'size' => $size,
-                'url' => ExportUrlGenerator::temporarySignedDownloadUrl($export, 60),
+                'url' => $this->service->downloadUrl($export, 60),
             ];
         })->filter(fn (array $file): bool => $file['path'] !== null)->values()->all();
 
@@ -67,7 +68,7 @@ class ExportController extends Controller
             ->first();
 
         if ($export instanceof Export && $export->status === ExportStatus::Completed) {
-            return redirect()->away(ExportUrlGenerator::temporarySignedDownloadUrl($export));
+            return redirect()->away($this->service->downloadUrl($export));
         }
 
         $path = 'exports/'.$filename;

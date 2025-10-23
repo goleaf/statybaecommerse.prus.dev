@@ -4,39 +4,43 @@ declare(strict_types=1);
 
 namespace App\Services\Export\Writers;
 
-use App\Models\Export;
+use App\Services\Export\Contracts\ExportWriter;
 use Illuminate\Support\Facades\Storage;
 
 final class CsvExportWriter implements ExportWriter
 {
+    private const DELIMITER = ',';
+
+    private const ENCLOSURE = '"';
+
     private $handle;
+
+    private string $disk;
 
     private string $path;
 
-    public function open(Export $export, array $headers): void
+    public function open(string $disk, string $path, array $headers): void
     {
-        $disk = Storage::disk(config('export.disk'));
-        $filename = sprintf('%s.%s', $export->id, $export->format->extension());
-        $this->path = 'exports/'.$filename;
-        $disk->makeDirectory('exports');
-        $fullPath = $disk->path($this->path);
-        $this->handle = fopen($fullPath, 'w');
-        fputcsv($this->handle, $headers);
+        $this->disk = $disk;
+        $this->path = $path;
+        $this->handle = fopen('php://temp', 'r+');
+        fputcsv($this->handle, $headers, self::DELIMITER, self::ENCLOSURE);
     }
 
-    public function appendRows(iterable $rows): void
+    public function append(array $row): void
     {
-        foreach ($rows as $row) {
-            fputcsv($this->handle, array_map(fn ($value) => is_scalar($value) ? $value : json_encode($value, JSON_THROW_ON_ERROR), $row));
-        }
+        fputcsv($this->handle, $row, self::DELIMITER, self::ENCLOSURE);
     }
 
-    public function close(): string
+    public function close(): void
     {
-        if (is_resource($this->handle)) {
-            fclose($this->handle);
+        if (! is_resource($this->handle)) {
+            return;
         }
 
-        return $this->path;
+        rewind($this->handle);
+        $contents = stream_get_contents($this->handle) ?: '';
+        fclose($this->handle);
+        Storage::disk($this->disk)->put($this->path, $contents);
     }
 }
