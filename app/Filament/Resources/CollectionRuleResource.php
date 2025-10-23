@@ -8,10 +8,7 @@ use App\Support\Concerns\HasNav;
 
 use App\Filament\Resources\CollectionRuleResource\Pages;
 use App\Models\CollectionRule;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\ViewAction;
+use BackedEnum;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Section;
@@ -23,6 +20,10 @@ use Filament\Notifications\Notification as FilamentNotification;
 use Filament\Resources\Resource;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\BulkAction;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\DateFilter;
@@ -251,7 +252,6 @@ final class CollectionRuleResource extends Resource
                     ->action(function (CollectionRule $record, array $data): void {
                         // Persist the reordered position once the modal-backed action is confirmed.
                         $record->update(['position' => $data['position'] ?? 0]);
-
                         FilamentNotification::make()
                             ->title(__('admin.collection_rules.reordered_successfully'))
                             ->success()
