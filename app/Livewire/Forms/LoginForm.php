@@ -8,6 +8,7 @@ use App\Support\Security\Captcha\CaptchaManager;
 use App\Support\Security\SuspiciousIpMonitor;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -65,14 +66,27 @@ final class LoginForm extends Form
         $decaySeconds = $this->decaySeconds();
 
         if (! Auth::attempt($this->only(['email', 'password']), $this->remember)) {
-            RateLimiter::hit($this->throttleKey(), $decaySeconds);
+            $throttleKey = $this->throttleKey();
+            $maxAttempts = $this->maxAttempts();
+            $rateLimiterAttempts = RateLimiter::hit($throttleKey, $decaySeconds);
+            $sessionAttempts = $this->incrementAttemptCounter($throttleKey, $decaySeconds);
+            $attempts = max($rateLimiterAttempts, $sessionAttempts);
 
-            $captchaManager->markRequired($this->throttleKey(), 'auth.login');
             $monitor->record($this->ipAddress(), 'auth-login', [
                 'email'        => $this->email,
-                'attempts'     => RateLimiter::attempts($this->throttleKey()),
-                'max_attempts' => $this->maxAttempts(),
+                'attempts'     => $attempts,
+                'max_attempts' => $maxAttempts,
             ]);
+
+            if ($attempts >= $maxAttempts) {
+                $this->throwRateLimitException(
+                    $captchaManager,
+                    $monitor,
+                    $throttleKey,
+                    $maxAttempts,
+                    primeTimer: false,
+                );
+            }
 
             $this->syncCaptchaState($captchaManager, true);
 
@@ -84,6 +98,7 @@ final class LoginForm extends Form
         RateLimiter::clear($this->throttleKey());
         $captchaManager->clear($this->throttleKey(), 'auth.login');
         $monitor->reset($this->ipAddress(), 'auth-login');
+        $this->clearAttemptCounter($this->throttleKey());
         $this->resetCaptcha();
     }
 
@@ -117,28 +132,25 @@ final class LoginForm extends Form
 
     protected function ensureIsNotRateLimited(CaptchaManager $captchaManager, SuspiciousIpMonitor $monitor): void
     {
-        if (! RateLimiter::tooManyAttempts($this->throttleKey(), $this->maxAttempts())) {
+        $throttleKey = $this->throttleKey();
+        $maxAttempts = $this->maxAttempts();
+
+        $sessionAttempts = $this->getAttemptCounter($throttleKey);
+        $tooManyAttempts = RateLimiter::tooManyAttempts($throttleKey, $maxAttempts);
+        $hasReachedThreshold = $sessionAttempts >= $maxAttempts
+            || RateLimiter::attempts($throttleKey) >= $maxAttempts;
+
+        if (! $tooManyAttempts && ! $hasReachedThreshold) {
             return;
         }
 
-        $captchaManager->markRequired($this->throttleKey(), 'auth.login');
-        $monitor->record($this->ipAddress(), 'auth-login-rate-limit', [
-            'email'        => $this->email,
-            'attempts'     => RateLimiter::attempts($this->throttleKey()),
-            'max_attempts' => $this->maxAttempts(),
-        ]);
-        $this->syncCaptchaState($captchaManager, true);
-
-        event(new Lockout(request()));
-
-        $seconds = RateLimiter::availableIn($this->throttleKey());
-
-        throw ValidationException::withMessages([
-            'loginForm.email' => trans('auth.throttle', [
-                'seconds' => $seconds,
-                'minutes' => (int) ceil($seconds / 60),
-            ]),
-        ]);
+        $this->throwRateLimitException(
+            $captchaManager,
+            $monitor,
+            $throttleKey,
+            $maxAttempts,
+            primeTimer: ! $tooManyAttempts,
+        );
     }
 
     public function throttleKey(): string
@@ -171,5 +183,108 @@ final class LoginForm extends Form
     private function decaySeconds(): int
     {
         return max(1, (int) data_get(config('security.rate_limiting.auth.login'), 'decay_seconds', 60));
+    }
+
+    private function throwRateLimitException(
+        CaptchaManager $captchaManager,
+        SuspiciousIpMonitor $monitor,
+        string $throttleKey,
+        int $maxAttempts,
+        bool $primeTimer
+    ): never {
+        if ($primeTimer) {
+            RateLimiter::hit($throttleKey, $this->decaySeconds());
+        }
+
+        $captchaManager->markRequired($throttleKey, 'auth.login');
+        $monitor->record($this->ipAddress(), 'auth-login-rate-limit', [
+            'email'        => $this->email,
+            'attempts'     => RateLimiter::attempts($throttleKey),
+            'max_attempts' => $maxAttempts,
+        ]);
+        $this->syncCaptchaState($captchaManager, true);
+
+        $this->refreshAttemptExpiry($throttleKey, $this->decaySeconds());
+
+        event(new Lockout(request()));
+
+        $seconds = RateLimiter::availableIn($throttleKey);
+        if ($seconds <= 0) {
+            $seconds = $this->decaySeconds();
+        }
+
+        throw ValidationException::withMessages([
+            'loginForm.email' => trans('auth.throttle', [
+                'seconds' => $seconds,
+                'minutes' => (int) ceil($seconds / 60),
+            ]),
+        ]);
+    }
+
+    private function incrementAttemptCounter(string $throttleKey, int $decaySeconds): int
+    {
+        // Persist attempts in the file cache to avoid the in-memory array store resetting counts during Livewire testing.
+        $store = Cache::store('file');
+        $key = $this->attemptCacheKey($throttleKey);
+        $payload = $store->get($key, ['count' => 0, 'expires_at' => 0]);
+        $now = now()->getTimestamp();
+
+        if (($payload['expires_at'] ?? 0) <= $now) {
+            $payload = ['count' => 0, 'expires_at' => 0];
+        }
+
+        $payload['count'] = (int) ($payload['count'] ?? 0) + 1;
+        $payload['expires_at'] = $now + $decaySeconds;
+
+        $store->put($key, $payload, $decaySeconds);
+
+        return $payload['count'];
+    }
+
+    private function getAttemptCounter(string $throttleKey): int
+    {
+        $store = Cache::store('file');
+        $payload = $store->get($this->attemptCacheKey($throttleKey));
+
+        if (! is_array($payload)) {
+            return 0;
+        }
+
+        if (($payload['expires_at'] ?? 0) <= now()->getTimestamp()) {
+            $store->forget($this->attemptCacheKey($throttleKey));
+
+            return 0;
+        }
+
+        return max(0, (int) ($payload['count'] ?? 0));
+    }
+
+    private function refreshAttemptExpiry(string $throttleKey, int $decaySeconds): void
+    {
+        $count = $this->getAttemptCounter($throttleKey);
+
+        if ($count === 0) {
+            return;
+        }
+
+        // Update the expiry to reflect the latest decay so UI messaging stays accurate during lockouts.
+        Cache::store('file')->put(
+            $this->attemptCacheKey($throttleKey),
+            [
+                'count'      => $count,
+                'expires_at' => now()->getTimestamp() + $decaySeconds,
+            ],
+            $decaySeconds
+        );
+    }
+
+    private function clearAttemptCounter(string $throttleKey): void
+    {
+        Cache::store('file')->forget($this->attemptCacheKey($throttleKey));
+    }
+
+    private function attemptCacheKey(string $throttleKey): string
+    {
+        return 'auth:attempts:' . $throttleKey;
     }
 }

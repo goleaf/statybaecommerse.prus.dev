@@ -13,7 +13,7 @@ Route::middleware('guest')->group(function (): void {
     Route::get('login', \App\Livewire\Auth\Login::class)
         ->middleware('throttle:auth.login')
         ->name('login');
-    Route::view('forgot-password', 'livewire.pages.auth.forgot-password')
+    Route::get('forgot-password', \App\Livewire\Pages\Auth\ForgotPassword::class)
         ->middleware('throttle:auth.password-reset')
         ->name('password.request');
     Route::view('reset-password/{token}', 'livewire.pages.auth.reset-password')
