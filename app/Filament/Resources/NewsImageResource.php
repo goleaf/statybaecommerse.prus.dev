@@ -262,7 +262,11 @@ final class NewsImageResource extends Resource
 
                         return strlen($state) > 40 ? $state : null;
                     })
-                    ->url(fn ($record) => route('admin.news.edit', $record->news_id))
+                    ->url(
+                        fn (NewsImage $record): ?string => $record->news_id
+                            ? route('filament.admin.resources.news.edit', ['record' => $record->news_id])
+                            : null
+                    )
                     ->color('primary'),
                 TextColumn::make('alt_text')
                     ->label(__('admin.news_images.alt_text'))
