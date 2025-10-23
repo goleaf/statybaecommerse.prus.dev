@@ -312,7 +312,16 @@ final class VariantInventoryResource extends Resource
                             ->label(__('admin.variant_inventory.stock_status'))
                             ->content(fn (?VariantInventory $record): string => $record ? __('admin.variant_inventory.status_' . $record->stock_status) : '-'),
                     ])
-                    ->visible(fn (?VariantInventory $record): bool => $record !== null),
+                    ->visible(fn ($record) => $record !== null),
+                SchemaSection::make(__('admin.variant_inventory.audit_section'))
+                    ->schema([
+                        Textarea::make('audit_reason')
+                            ->label(__('admin.variant_inventory.audit_reason'))
+                            ->helperText(__('admin.variant_inventory.audit_reason_help'))
+                            ->visible(fn (?VariantInventory $record): bool => (bool) ($record?->exists))
+                            ->columnSpanFull(),
+                    ])
+                    ->columns(1),
             ]);
     }
 

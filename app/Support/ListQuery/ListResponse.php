@@ -9,7 +9,7 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 final class ListResponse
 {
     /**
-     * @param array<string, mixed>|list<mixed> $data
+     * @param  array<string, mixed>|list<mixed>  $data
      * @return array<string, mixed>
      */
     public static function fromPaginator(LengthAwarePaginator $paginator, ListQuery $query, array $data, array $extraMeta = []): array

@@ -24,8 +24,7 @@ final class SearchService
         private readonly CategorySearchRepository $categoryRepository,
         private readonly BrandSearchRepository $brandRepository,
         private readonly SearchRankingService $rankingService,
-        private readonly SearchCacheService $cacheService,
-        private readonly ScoutSearchEngine $scoutSearchEngine
+        private readonly SearchCacheService $cacheService
     ) {}
 
     /**
