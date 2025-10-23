@@ -27,6 +27,8 @@ use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 require_once __DIR__.'/../app/Support/filament_compat.php';
 
+// Load the Filament compatibility shims before the application boots so the
+// legacy class aliases are always available during early package discovery.
 require_once __DIR__ . '/filament_compat.php';
 
 $appEnvironment = (string) env('APP_ENV', 'production');

@@ -32,12 +32,11 @@ use Illuminate\Support\Collection;
 use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable;
 use UnitEnum;
 use App\Support\Filament\Components\Flatpickr;
-use Filament\Schemas\Schema;
+use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable as SpatieTranslatableResource;
 
 final class ReferralCodeResource extends Resource
 {
-    use Translatable;
-
+    use SpatieTranslatableResource; // Enable locale-aware management for Spatie translatable attributes.
     protected static ?string $model = ReferralCode::class;
 
     /**

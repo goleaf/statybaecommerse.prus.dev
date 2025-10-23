@@ -39,7 +39,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Hash;
 use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable;
 use UnitEnum;
-use Filament\Schemas\Schema;
+use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable as SpatieTranslatableResource;
 
 /**
  * UserResource
@@ -48,7 +48,7 @@ use Filament\Schemas\Schema;
  */
 final class UserResource extends Resource implements DefinesExportColumns
 {
-    use Translatable;
+    use SpatieTranslatableResource; // Enable locale-aware management for Spatie translatable attributes.
 
     protected static ?string $model = User::class;
 

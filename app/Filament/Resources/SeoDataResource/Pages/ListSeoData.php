@@ -11,20 +11,20 @@ use App\Filament\WidgetTabs\Concerns\HasWidgetTabs;
 use Filament\Actions;
 use Illuminate\Database\Eloquent\Builder;
 use LaraZeus\SpatieTranslatable\Actions\LocaleSwitcher;
-use LaraZeus\SpatieTranslatable\Resources\Pages\ListRecords\Concerns\Translatable;
+use LaraZeus\SpatieTranslatable\Resources\Pages\ListRecords\Concerns\Translatable as SpatieTranslatableListRecords;
 
 final class ListSeoData extends BaseListRecords
 {
     use HasResizableColumns;
     use HasWidgetTabs;
-    use Translatable;
+    use SpatieTranslatableListRecords; // Track the active locale for listing translated records.
 
     protected static string $resource = SeoDataResource::class;
 
     protected function getHeaderActions(): array
     {
         return [
-            LocaleSwitcher::make(),
+            LocaleSwitcher::make(), // Provide a quick language toggle for the grid view.
             Actions\CreateAction::make(),
         ];
     }

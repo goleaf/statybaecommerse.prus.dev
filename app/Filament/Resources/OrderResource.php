@@ -39,6 +39,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Set;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable as SpatieTranslatableResource;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Support\Enums\Size;
@@ -77,7 +78,7 @@ use Filament\Schemas\Schema;
  */
 final class OrderResource extends Resource implements DefinesExportColumns
 {
-    use Translatable;
+    use SpatieTranslatableResource; // Enable locale-aware management for Spatie translatable attributes.
 
     protected static ?string $model = Order::class;
 

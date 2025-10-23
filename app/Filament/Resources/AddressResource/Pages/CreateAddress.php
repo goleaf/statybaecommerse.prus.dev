@@ -8,11 +8,11 @@ use App\Enums\AddressType;
 use App\Filament\Resources\AddressResource;
 use Filament\Resources\Pages\CreateRecord;
 use LaraZeus\SpatieTranslatable\Actions\LocaleSwitcher;
-use LaraZeus\SpatieTranslatable\Resources\Pages\CreateRecord\Concerns\Translatable;
+use LaraZeus\SpatieTranslatable\Resources\Pages\CreateRecord\Concerns\Translatable as SpatieTranslatableCreateRecord;
 
 final class CreateAddress extends CreateRecord
 {
-    use Translatable;
+    use SpatieTranslatableCreateRecord; // Keep track of locale-specific form payloads during creation.
 
     protected static string $resource = AddressResource::class;
 
