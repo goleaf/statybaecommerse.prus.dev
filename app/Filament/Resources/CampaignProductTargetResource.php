@@ -16,7 +16,8 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\Grid;
+// Import the schema grid helper to avoid runtime resolution issues during form rendering.
+use Filament\Schemas\Components\Grid as SchemaGrid;
 use Filament\Forms\Components\KeyValue;
 use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Forms\Components\Select;
