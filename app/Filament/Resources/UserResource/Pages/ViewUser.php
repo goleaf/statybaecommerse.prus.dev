@@ -8,11 +8,11 @@ use App\Filament\Resources\UserResource;
 use Filament\Actions\EditAction;
 use Filament\Resources\Pages\ViewRecord;
 use LaraZeus\SpatieTranslatable\Actions\LocaleSwitcher;
-use LaraZeus\SpatieTranslatable\Resources\Pages\ViewRecord\Concerns\Translatable;
+use LaraZeus\SpatieTranslatable\Resources\Pages\ViewRecord\Concerns\Translatable as TranslatableViewRecord;
 
 class ViewUser extends ViewRecord
 {
-    use Translatable;
+    use TranslatableViewRecord;
 
     protected static string $resource = UserResource::class;
 

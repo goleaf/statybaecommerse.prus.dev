@@ -11,11 +11,11 @@ use App\Filament\Resources\ReferralCodeResource\Widgets\ReferralCodeUsageChartWi
 use App\Filament\Resources\ReferralCodeResource\Widgets\TopReferralCodesWidget;
 use Filament\Actions;
 use LaraZeus\SpatieTranslatable\Actions\LocaleSwitcher;
-use LaraZeus\SpatieTranslatable\Resources\Pages\ListRecords\Concerns\Translatable;
+use LaraZeus\SpatieTranslatable\Resources\Pages\ListRecords\Concerns\Translatable as TranslatableListRecords;
 
 final class ListReferralCodes extends BaseListRecords
 {
-    use Translatable;
+    use TranslatableListRecords;
 
     protected static string $resource = ReferralCodeResource::class;
 

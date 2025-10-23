@@ -30,12 +30,12 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Collection;
-use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable;
+use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable as TranslatableResource;
 use UnitEnum;
 
 final class CustomerGroupResource extends Resource
 {
-    use Translatable;
+    use TranslatableResource;
 
     protected static ?string $model = CustomerGroup::class;
 

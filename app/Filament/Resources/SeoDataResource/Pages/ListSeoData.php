@@ -11,13 +11,13 @@ use App\Filament\WidgetTabs\Concerns\HasWidgetTabs;
 use Filament\Actions;
 use Illuminate\Database\Eloquent\Builder;
 use LaraZeus\SpatieTranslatable\Actions\LocaleSwitcher;
-use LaraZeus\SpatieTranslatable\Resources\Pages\ListRecords\Concerns\Translatable;
+use LaraZeus\SpatieTranslatable\Resources\Pages\ListRecords\Concerns\Translatable as TranslatableListRecords;
 
 final class ListSeoData extends BaseListRecords
 {
     use HasResizableColumns;
     use HasWidgetTabs;
-    use Translatable;
+    use TranslatableListRecords;
 
     protected static string $resource = SeoDataResource::class;
 

@@ -11,11 +11,11 @@ use App\Filament\Resources\OrderResource\Widgets\OrderRevenueTrend;
 use App\Support\Authorization\AuthorizationMatrix;
 use Filament\Actions;
 use LaraZeus\SpatieTranslatable\Actions\LocaleSwitcher;
-use LaraZeus\SpatieTranslatable\Resources\Pages\ListRecords\Concerns\Translatable;
+use LaraZeus\SpatieTranslatable\Resources\Pages\ListRecords\Concerns\Translatable as TranslatableListRecords;
 
 final class ListOrders extends BaseListRecords
 {
-    use Translatable;
+    use TranslatableListRecords;
 
     protected static string $resource = OrderResource::class;
 

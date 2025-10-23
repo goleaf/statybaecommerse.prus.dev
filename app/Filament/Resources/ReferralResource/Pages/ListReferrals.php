@@ -8,11 +8,11 @@ use App\Filament\Pages\Support\BaseListRecords;
 use App\Filament\Resources\ReferralResource;
 use Filament\Actions;
 use LaraZeus\SpatieTranslatable\Actions\LocaleSwitcher;
-use LaraZeus\SpatieTranslatable\Resources\Pages\ListRecords\Concerns\Translatable;
+use LaraZeus\SpatieTranslatable\Resources\Pages\ListRecords\Concerns\Translatable as TranslatableListRecords;
 
 final class ListReferrals extends BaseListRecords
 {
-    use Translatable;
+    use TranslatableListRecords;
 
     protected static string $resource = ReferralResource::class;
 

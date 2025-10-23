@@ -7,11 +7,11 @@ namespace App\Filament\Resources\SeoDataResource\Pages;
 use App\Filament\Resources\SeoDataResource;
 use Filament\Resources\Pages\CreateRecord;
 use LaraZeus\SpatieTranslatable\Actions\LocaleSwitcher;
-use LaraZeus\SpatieTranslatable\Resources\Pages\CreateRecord\Concerns\Translatable;
+use LaraZeus\SpatieTranslatable\Resources\Pages\CreateRecord\Concerns\Translatable as TranslatableCreateRecord;
 
 final class CreateSeoData extends CreateRecord
 {
-    use Translatable;
+    use TranslatableCreateRecord;
 
     protected static string $resource = SeoDataResource::class;
 
@@ -19,7 +19,6 @@ final class CreateSeoData extends CreateRecord
     {
         return [
             LocaleSwitcher::make(),
-            ...parent::getHeaderActions(),
         ];
     }
 

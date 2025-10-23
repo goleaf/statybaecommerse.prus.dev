@@ -9,11 +9,11 @@ use App\Filament\Resources\UserResource;
 use App\Support\Authorization\AuthorizationMatrix;
 use Filament\Actions\CreateAction;
 use LaraZeus\SpatieTranslatable\Actions\LocaleSwitcher;
-use LaraZeus\SpatieTranslatable\Resources\Pages\ListRecords\Concerns\Translatable;
+use LaraZeus\SpatieTranslatable\Resources\Pages\ListRecords\Concerns\Translatable as TranslatableListRecords;
 
 class ListUsers extends BaseListRecords
 {
-    use Translatable;
+    use TranslatableListRecords;
 
     protected static string $resource = UserResource::class;
 

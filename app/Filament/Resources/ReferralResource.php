@@ -23,13 +23,13 @@ use Filament\Resources\Resource;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable;
+use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable as TranslatableResource;
 use UnitEnum;
 use App\Support\Filament\Components\Flatpickr;
 
 final class ReferralResource extends Resource
 {
-    use Translatable;
+    use TranslatableResource;
 
     protected static ?string $model = Referral::class;
 
