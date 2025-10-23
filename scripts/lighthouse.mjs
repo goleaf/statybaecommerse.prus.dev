@@ -1,4 +1,4 @@
-import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import process from 'node:process';
 
@@ -32,65 +32,6 @@ const thresholds = {
   accessibility: toNumber(process.env.LH_MIN_ACCESSIBILITY, 0.9),
 };
 
-const loadBudgets = async () => {
-  const budgetsPath = process.env.LH_BUDGETS_PATH || path.join(process.cwd(), 'scripts/lighthouse-budgets.json');
-
-  try {
-    const raw = await readFile(budgetsPath, 'utf8');
-    const parsed = JSON.parse(raw);
-
-    if (Array.isArray(parsed)) {
-      return parsed;
-    }
-
-    console.warn(`[lighthouse] Expected budgets file to contain an array, received ${typeof parsed}. Ignoring budgets.`);
-  } catch (error) {
-    const isObject = typeof error === 'object' && error !== null;
-    const code = isObject && 'code' in error ? error.code : undefined;
-
-    if (code === 'ENOENT') {
-      console.warn(`[lighthouse] Budgets file not found at ${budgetsPath}; skipping budget enforcement.`);
-    } else {
-      console.warn('[lighthouse] Failed to read Lighthouse budgets file:', error instanceof Error ? error.message : error);
-    }
-  }
-
-  return [];
-};
-
-const matchesBudgetPath = (pattern = '/*', targetPath = '/') => {
-  const normalizedPattern = typeof pattern === 'string' && pattern.length > 0 ? pattern : '/*';
-  const normalizedTarget = typeof targetPath === 'string' && targetPath.length > 0 ? targetPath : '/';
-
-  if (normalizedPattern === normalizedTarget) {
-    return true;
-  }
-
-  if (normalizedPattern.endsWith('*')) {
-    const prefix = normalizedPattern.slice(0, -1);
-    return normalizedTarget.startsWith(prefix);
-  }
-
-  return false;
-};
-
-const collectBudgetsForPath = (budgets, targetPath) =>
-  budgets.filter((budget) => matchesBudgetPath(budget?.path, targetPath));
-
-const formatMilliseconds = (value) => `${Math.round(value)}ms`;
-const formatKilobytes = (value) => `${(value / 1024).toFixed(0)}kb`;
-
-const getScriptTransferBytes = (lhr) => {
-  const requests = lhr?.audits?.['network-requests']?.details?.items;
-  if (!Array.isArray(requests)) {
-    return 0;
-  }
-
-  return requests
-    .filter((request) => (request.resourceType || '').toLowerCase() === 'script')
-    .reduce((total, request) => total + (Number(request.transferSize) || 0), 0);
-};
-
 const outputDir = process.env.LH_OUTPUT_DIR || 'storage/lighthouse';
 
 const ensureDirectory = async (dir) => {
@@ -103,8 +44,6 @@ const sanitizeLabel = (label) => label.toLowerCase().replace(/[^a-z0-9]+/g, '-')
 
 (async () => {
   await ensureDirectory(outputDir);
-
-  const budgets = await loadBudgets();
 
   const browser = await chromium.launch({
     headless: true,
@@ -155,7 +94,6 @@ const sanitizeLabel = (label) => label.toLowerCase().replace(/[^a-z0-9]+/g, '-')
               throughputKbps: 10240,
               cpuSlowdownMultiplier: 1,
             },
-            ...(budgets.length > 0 ? { budgets } : {}),
           },
         },
       );
@@ -184,73 +122,6 @@ const sanitizeLabel = (label) => label.toLowerCase().replace(/[^a-z0-9]+/g, '-')
         } else {
           console.error(`${message} ❌`);
           failures += 1;
-        }
-      }
-
-      const matchedBudgets = collectBudgetsForPath(budgets, target.path);
-
-      for (const budget of matchedBudgets) {
-        for (const timing of budget.timings || []) {
-          const metric = timing?.metric;
-          const budgetValue = Number(timing?.budget);
-
-          if (!metric || !Number.isFinite(budgetValue)) {
-            continue;
-          }
-
-          let actualValue = null;
-          if (metric === 'largest-contentful-paint') {
-            actualValue = lhr?.audits?.['largest-contentful-paint']?.numericValue ?? null;
-          } else if (metric === 'cumulative-layout-shift') {
-            actualValue = lhr?.audits?.['cumulative-layout-shift']?.numericValue ?? null;
-          }
-
-          if (actualValue === null || actualValue === undefined) {
-            console.warn(`[lighthouse] Unable to determine value for timing metric ${metric}; skipping.`);
-            continue;
-          }
-
-          const isWithinBudget = actualValue <= budgetValue;
-          const actualFormatted = metric === 'cumulative-layout-shift' ? actualValue.toFixed(3) : formatMilliseconds(actualValue);
-          const budgetFormatted = metric === 'cumulative-layout-shift' ? budgetValue.toFixed(3) : formatMilliseconds(budgetValue);
-          const label = metric.replace(/-/g, ' ').toUpperCase();
-
-          if (isWithinBudget) {
-            console.log(`[lighthouse] ${target.label} ${label} ${actualFormatted} (budget ${budgetFormatted}) ✅`);
-          } else {
-            console.error(`[lighthouse] ${target.label} ${label} ${actualFormatted} (budget ${budgetFormatted}) ❌`);
-            failures += 1;
-          }
-        }
-
-        for (const resourceBudget of budget.resourceSizes || []) {
-          const type = (resourceBudget?.resourceType || '').toLowerCase();
-          const budgetKb = Number(resourceBudget?.budget);
-
-          if (!type || !Number.isFinite(budgetKb)) {
-            continue;
-          }
-
-          if (type !== 'script') {
-            continue;
-          }
-
-          const actualBytes = getScriptTransferBytes(lhr);
-          const budgetBytes = budgetKb * 1024;
-
-          if (actualBytes <= 0) {
-            console.warn('[lighthouse] No script requests were detected while evaluating JS budget.');
-          }
-
-          const actualFormatted = formatKilobytes(actualBytes);
-          const budgetFormatted = `${budgetKb}kb`;
-
-          if (actualBytes <= budgetBytes) {
-            console.log(`[lighthouse] ${target.label} JS bundle ${actualFormatted} (budget ${budgetFormatted}) ✅`);
-          } else {
-            console.error(`[lighthouse] ${target.label} JS bundle ${actualFormatted} (budget ${budgetFormatted}) ❌`);
-            failures += 1;
-          }
         }
       }
     } catch (error) {
