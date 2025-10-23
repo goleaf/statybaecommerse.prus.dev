@@ -8,11 +8,13 @@ use App\Filament\Components\Combobox;
 use App\Filament\Resources\CampaignResource\Pages;
 use App\Filament\Resources\CampaignResource\RelationManagers\TranslationsRelationManager;
 use App\Models\Campaign;
+use App\Support\Filament\Filters\DateRangeFilter;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms;
-
+use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Flatpickr;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -310,9 +312,9 @@ final class CampaignResource extends Resource
                     ->relationship('channel', 'name'),
                 Filter::make('created_at')
                     ->form([
-                        Flatpickr::makeRange('range')
+                        Flatpickr::make('range')
                             ->label(self::label('campaigns.fields.created_at', 'Created at'))
-
+                            ->rangePicker()
                             ->format('Y-m-d')
                             ->displayFormat('Y-m-d'),
                     ])

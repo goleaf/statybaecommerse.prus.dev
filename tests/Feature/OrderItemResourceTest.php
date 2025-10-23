@@ -228,7 +228,7 @@ final class OrderItemResourceTest extends TestCase
             ->filterTable('created_at', [
                 'range' => [
                     'start' => now()->subDay()->format('Y-m-d'),
-                    'end'   => now()->addDay()->format('Y-m-d'),
+                    'end' => now()->addDay()->format('Y-m-d'),
                 ],
             ])
             ->assertCanSeeTableRecords([$recentOrderItem])

@@ -4,15 +4,17 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\ProductComparisons\Tables;
 
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteBulkAction;
+use App\Support\Filament\Filters\DateRangeFilter;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Forms\Components\Flatpickr;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-use Coolsam\FilamentFlatpickr\Forms\Components\Flatpickr;
+use Illuminate\Database\Eloquent\Builder;
 
 class ProductComparisonsTable
 {
@@ -52,16 +54,11 @@ class ProductComparisonsTable
                     ->relationship('product', 'name'),
                 Filter::make('created_at')
                     ->form([
-                        Flatpickr::make('created_from')
-                            ->time(false)
-                            ->format('Y-m-d')
+                        Flatpickr::make('range')
+                            ->label(__('product_comparisons.created_at'))
                             ->rangePicker()
-                            ->label(__('product_comparisons.created_from')),
-                        Flatpickr::make('created_until')
-                            ->time(false)
                             ->format('Y-m-d')
-                            ->rangePicker()
-                            ->label(__('product_comparisons.created_until')),
+                            ->displayFormat('Y-m-d'),
                     ])
                     ->query(fn (Builder $query, array $data): Builder => DateRangeFilter::apply(
                         $query,

@@ -10,7 +10,7 @@ use App\Models\Coupon;
 use App\Models\Order;
 use App\Services\Pricing\PriceCalculator;
 use App\Support\Authorization\AuthorizationMatrix;
-use App\Support\Search\CouponSearch;
+use App\Support\Filament\Filters\DateRangeFilter;
 use App\Support\Search\CustomerSearch;
 use App\Support\Seo\LocaleUrlGenerator;
 use BackedEnum;
@@ -27,6 +27,7 @@ use Filament\Actions\Exports\ExportColumn;
 use Filament\Actions\ViewAction;
 use Filament\Forms;
 use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Flatpickr;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Placeholder;
@@ -718,28 +719,17 @@ final class OrderResource extends Resource implements DefinesExportColumns
                     ->label(__('orders.fields.items_count')),
                 Filter::make('created_at')
                     ->form([
-                        Flatpickr::make('created_from')
-                            ->time(false)
-                            ->format('Y-m-d')
+                        Flatpickr::make('range')
+                            ->label(__('orders.created_at'))
                             ->rangePicker()
-                            ->label(__('orders.created_from')),
-                        Flatpickr::make('created_until')
-                            ->time(false)
                             ->format('Y-m-d')
-                            ->rangePicker()
-                            ->label(__('orders.created_until')),
+                            ->displayFormat('Y-m-d'),
                     ])
-                    ->query(function (Builder $query, array $data): Builder {
-                        return $query
-                            ->when(
-                                $data['created_from'] ?? null,
-                                fn (Builder $q, $date): Builder => $q->whereDate('created_at', '>=', $date),
-                            )
-                            ->when(
-                                $data['created_until'] ?? null,
-                                fn (Builder $q, $date): Builder => $q->whereDate('created_at', '<=', $date),
-                            );
-                    }),
+                    ->query(fn (Builder $query, array $data): Builder => DateRangeFilter::apply(
+                        $query,
+                        $data['range'] ?? null,
+                        'created_at',
+                    )),
                 TrashedFilter::make(),
             ])
             ->filtersFormWidth(MaxWidth::Large)

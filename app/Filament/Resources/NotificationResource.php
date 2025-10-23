@@ -15,7 +15,8 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-
+use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Flatpickr;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -27,6 +28,7 @@ use Filament\Notifications\Notification as FilamentNotification;
 use Filament\Resources\Resource;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
+use App\Support\Filament\Filters\SingleDateFilter;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
@@ -242,9 +244,20 @@ final class NotificationResource extends Resource
                     ->query(fn (Builder $query): Builder => $query->whereNotNull('read_at')),
                 Filter::make('unread')
                     ->label(__('admin.notifications.filters.unread'))
-                    ->query(fn (Builder $query): Builder => $query->whereNull('read_at')),
-                DateFilter::make('created_at')
-                    ->label(__('admin.notifications.filters.created_at')),
+                    ->query(fn (Builder $query): Builder => $query->where('is_read', false)),
+                Filter::make('created_at')
+                    ->label(__('admin.notifications.filters.created_at'))
+                    ->form([
+                        Flatpickr::make('value')
+                            ->label(__('admin.notifications.filters.created_at'))
+                            ->format('Y-m-d')
+                            ->displayFormat('Y-m-d'),
+                    ])
+                    ->query(fn (Builder $query, array $data): Builder => SingleDateFilter::apply(
+                        $query,
+                        $data['value'] ?? null,
+                        'created_at',
+                    )),
                 Filter::make('recent')
                     ->label(__('admin.notifications.filters.recent'))
                     ->query(fn (Builder $query): Builder => $query->where('created_at', '>=', now()->subDays(7))),
