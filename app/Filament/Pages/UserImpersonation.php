@@ -39,9 +39,6 @@ final class UserImpersonation extends Page implements HasTable
 
     protected string $view = 'filament.pages.user-impersonation';
 
-    /**
-     * Configure the impersonation table actions for support agents.
-     */
     public function table(Table $table): Table
     {
         $table = $table
@@ -77,6 +74,7 @@ final class UserImpersonation extends Page implements HasTable
                     }),
             ]);
 
+        // Respect the shared table layout preferences so impersonation remains accessible and consistent.
         return $this->applyToggleableTableLayout($table);
     }
 }

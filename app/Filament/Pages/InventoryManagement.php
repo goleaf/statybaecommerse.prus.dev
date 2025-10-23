@@ -43,9 +43,6 @@ final class InventoryManagement extends Page implements HasTable
         return 'Inventory Management';
     }
 
-    /**
-     * Build the product inventory table with adjustable bulk controls.
-     */
     public function table(Table $table): Table
     {
         $table = $table
@@ -88,6 +85,7 @@ final class InventoryManagement extends Page implements HasTable
                     }),
             ]);
 
+        // Delegate to the shared helper so column toggle preferences are applied consistently.
         return $this->applyToggleableTableLayout($table);
     }
 }
