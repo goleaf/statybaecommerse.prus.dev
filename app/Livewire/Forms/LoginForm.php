@@ -64,17 +64,10 @@ final class LoginForm extends Form
 
         $decaySeconds = $this->decaySeconds();
 
+        $decaySeconds = (int) config('security.rate_limiting.login.decay_seconds', 60);
+
         if (! Auth::attempt($this->only(['email', 'password']), $this->remember)) {
             RateLimiter::hit($this->throttleKey(), $decaySeconds);
-
-            $captchaManager->markRequired($this->throttleKey(), 'auth.login');
-            $monitor->record($this->ipAddress(), 'auth-login', [
-                'email'        => $this->email,
-                'attempts'     => RateLimiter::attempts($this->throttleKey()),
-                'max_attempts' => $this->maxAttempts(),
-            ]);
-
-            $this->syncCaptchaState($captchaManager, true);
 
             throw ValidationException::withMessages([
                 'loginForm.email' => trans('auth.failed'),
@@ -89,11 +82,9 @@ final class LoginForm extends Form
 
     public function syncCaptchaState(?CaptchaManager $captchaManager = null, bool $forceRefresh = false): void
     {
-        $captchaManager ??= app(CaptchaManager::class);
+        $maxAttempts = (int) config('security.rate_limiting.login.max_attempts', 5);
 
-        if (! $captchaManager->shouldChallenge($this->throttleKey(), 'auth.login')) {
-            $this->resetCaptcha();
-
+        if (! RateLimiter::tooManyAttempts($this->throttleKey(), $maxAttempts)) {
             return;
         }
 
@@ -133,12 +124,16 @@ final class LoginForm extends Form
 
         $seconds = RateLimiter::availableIn($this->throttleKey());
 
-        throw ValidationException::withMessages([
+        $exception = ValidationException::withMessages([
             'loginForm.email' => trans('auth.throttle', [
                 'seconds' => $seconds,
                 'minutes' => (int) ceil($seconds / 60),
             ]),
         ]);
+
+        $exception->status = 429;
+
+        throw $exception;
     }
 
     public function throttleKey(): string
