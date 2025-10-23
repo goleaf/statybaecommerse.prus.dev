@@ -15,6 +15,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use App\Support\Filament\Components\Flatpickr;
 
 final class ItemsRelationManager extends BaseRelationManager
 {

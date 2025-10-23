@@ -7,13 +7,10 @@ namespace App\Filament\Resources;
 use App\Forms\Components\Flatpickr;
 use App\Filament\Resources\NotificationResource\Pages;
 use App\Models\Notification;
-use App\Support\Concerns\HasNav;
+use App\Support\Filament\Components\Flatpickr;
 use App\Support\Filament\Filters\SingleDateFilter;
 use BackedEnum;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
-use Filament\Actions\ViewAction;
+use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -23,19 +20,20 @@ use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification as FilamentNotification;
 use Filament\Resources\Resource;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\BulkAction;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
-use App\Support\Filament\Filters\SingleDateFilter;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Str;
-use UnitEnum;
-use App\Support\Filament\Components\Flatpickr;
 
 final class NotificationResource extends Resource
 {
@@ -55,9 +53,12 @@ final class NotificationResource extends Resource
 
     protected static bool $shouldRegisterNavigation = false;
 
-    
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-bell';
 
-    
+    public static function getNavigationGroup(): ?string
+    {
+        return 'System';
+    }
 
     protected static ?int $navigationSort = 3;
 
@@ -232,12 +233,16 @@ final class NotificationResource extends Resource
                         'warning' => 'Warning',
                         'error'   => 'Error',
                     ]),
-                Filter::make('is_read')
-                    ->label(__('admin.notifications.filters.read'))
-                    ->query(fn (Builder $query): Builder => $query->whereNotNull('read_at')),
-                Filter::make('unread')
-                    ->label(__('admin.notifications.filters.unread'))
-                    ->query(fn (Builder $query): Builder => $query->where('is_read', false)),
+                TernaryFilter::make('read_at')
+                    ->label(__('notifications.read_status'))
+                    ->placeholder(__('notifications.all_notifications'))
+                    ->trueLabel(__('notifications.read'))
+                    ->falseLabel(__('notifications.unread'))
+                    ->nullable()
+                    ->queries(
+                        true: fn (Builder $query): Builder => $query->whereNotNull('read_at'),
+                        false: fn (Builder $query): Builder => $query->whereNull('read_at'),
+                    ),
                 Filter::make('created_at')
                     ->label(__('admin.notifications.filters.created_at'))
                     ->form([
@@ -246,37 +251,45 @@ final class NotificationResource extends Resource
                             ->format('Y-m-d')
                             ->displayFormat('Y-m-d'),
                     ])
-                    ->query(fn (Builder $query, array $data): Builder => SingleDateFilter::apply(
+                    ->modifyQueryUsing(fn (Builder $query, array $data): Builder => SingleDateFilter::apply(
                         $query,
                         $data['value'] ?? null,
                         'created_at',
                     )),
                 Filter::make('recent')
                     ->label(__('admin.notifications.filters.recent'))
-                    ->query(fn (Builder $query): Builder => $query->where('created_at', '>=', now()->subDays(7))),
+                    ->modifyQueryUsing(fn (Builder $query): Builder => $query->where('created_at', '>=', now()->subDays(7))),
             ])
             ->recordActions([
                 ViewAction::make(),
                 EditAction::make(),
-                TableAction::make('mark_as_read')
+                Action::make('mark_as_read')
                     ->label(__('admin.notifications.actions.mark_as_read'))
                     ->icon('heroicon-o-check-circle')
                     ->color('success')
-                    ->visible(fn (Notification $record): bool => ! $record->is_read)
+                    ->visible(fn (Notification $record): bool => $record->read_at === null)
                     ->action(function (Notification $record): void {
-                        $record->update(['read_at' => now()]);
+                        $record->forceFill([
+                            'is_read' => true,
+                            'read_at' => now(),
+                        ])->save();
+
                         FilamentNotification::make()
                             ->title(__('admin.notifications.marked_as_read'))
                             ->success()
                             ->send();
                     }),
-                TableAction::make('mark_as_unread')
+                Action::make('mark_as_unread')
                     ->label(__('admin.notifications.actions.mark_as_unread'))
                     ->icon('heroicon-o-x-circle')
                     ->color('gray')
-                    ->visible(fn (Notification $record): bool => $record->is_read)
+                    ->visible(fn (Notification $record): bool => $record->read_at !== null)
                     ->action(function (Notification $record): void {
-                        $record->update(['read_at' => null]);
+                        $record->forceFill([
+                            'is_read' => false,
+                            'read_at' => null,
+                        ])->save();
+
                         FilamentNotification::make()
                             ->title(__('admin.notifications.marked_as_unread'))
                             ->success()
@@ -292,26 +305,34 @@ final class NotificationResource extends Resource
                         ->color('success')
                         ->action(function (Collection $records): void {
                             $records->each(function (Notification $record): void {
-                                $record->update(['read_at' => now()]);
+                                $record->forceFill([
+                                    'is_read' => true,
+                                    'read_at' => now(),
+                                ])->save();
                             });
                             FilamentNotification::make()
                                 ->title(__('admin.notifications.bulk_marked_as_read'))
                                 ->success()
                                 ->send();
-                        }),
+                        })
+                        ->deselectRecordsAfterCompletion(),
                     BulkAction::make('bulk_mark_as_unread')
                         ->label(__('admin.notifications.actions.bulk_mark_as_unread'))
                         ->icon('heroicon-o-x-circle')
                         ->color('gray')
                         ->action(function (Collection $records): void {
                             $records->each(function (Notification $record): void {
-                                $record->update(['read_at' => null]);
+                                $record->forceFill([
+                                    'is_read' => false,
+                                    'read_at' => null,
+                                ])->save();
                             });
                             FilamentNotification::make()
                                 ->title(__('admin.notifications.bulk_marked_as_unread'))
                                 ->success()
                                 ->send();
-                        }),
+                        })
+                        ->deselectRecordsAfterCompletion(),
                 ]),
             ])
             ->defaultSort('created_at', 'desc');

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 use App\Enums\NavigationGroup;
+use BackedEnum;
 use App\Filament\Resources\VariantAnalyticsResource\Pages;
 use App\Models\ProductVariant;
 use App\Models\VariantAnalytics;
@@ -45,6 +46,7 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use UnitEnum;
 
 /**
  * VariantAnalyticsResource
@@ -57,7 +59,7 @@ final class VariantAnalyticsResource extends Resource
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar-square';
 
-    protected static UnitEnum|string|null $navigationGroup = 'Inventory';
+    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Inventory;
 
     protected static ?int $navigationSort = 2;
 
