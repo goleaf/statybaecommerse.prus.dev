@@ -6,6 +6,7 @@ namespace App\DataTransfer;
 
 use App\DataTransfer\Contracts\DataTransferContract;
 use App\Models\User;
+use Carbon\CarbonInterface;
 use Illuminate\Filesystem\FilesystemAdapter;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Hash;
@@ -32,13 +33,22 @@ final class UserProfilesDataTransfer implements DataTransferContract
         $records = User::withoutGlobalScopes()
             ->orderBy('email')
             ->get(['email', 'name', 'preferred_locale', 'is_active', 'email_verified_at'])
-            ->map(fn (User $user): array => [
-                'email' => $user->email,
-                'name' => $user->name,
-                'preferred_locale' => $user->preferred_locale,
-                'is_active' => $user->is_active,
-                'email_verified_at' => optional($user->email_verified_at)?->toAtomString(),
-            ])
+            ->map(function (User $user): array {
+                $rawTimestamp = $user->getAttribute('email_verified_at');
+                $normalisedTimestamp = null;
+
+                if ($rawTimestamp instanceof CarbonInterface) {
+                    $normalisedTimestamp = $rawTimestamp->copy()->shiftTimezone('UTC')->toAtomString();
+                }
+
+                return [
+                    'email'             => $user->email,
+                    'name'              => $user->name,
+                    'preferred_locale'  => $user->preferred_locale,
+                    'is_active'         => $user->is_active,
+                    'email_verified_at' => $normalisedTimestamp,
+                ];
+            })
             ->values()
             ->all();
 
@@ -57,6 +67,10 @@ final class UserProfilesDataTransfer implements DataTransferContract
         }
 
         $contents = $disk->get($path);
+        if (! is_string($contents)) {
+            throw new RuntimeException('Import file must be a string payload.');
+        }
+
         $records = $this->deserialize($format, $contents);
 
         foreach ($records as $record) {
@@ -64,9 +78,9 @@ final class UserProfilesDataTransfer implements DataTransferContract
 
             $user = User::withoutGlobalScopes()->firstOrNew(['email' => $data['email']]);
             $user->fill([
-                'name' => $data['name'],
-                'preferred_locale' => $data['preferred_locale'],
-                'is_active' => $data['is_active'],
+                'name'              => $data['name'],
+                'preferred_locale'  => $data['preferred_locale'],
+                'is_active'         => $data['is_active'],
                 'email_verified_at' => $data['email_verified_at'],
             ]);
 
@@ -86,13 +100,13 @@ final class UserProfilesDataTransfer implements DataTransferContract
     }
 
     /**
-     * @param  array<int, array<string, mixed>>  $records
+     * @param array<int, array<string, mixed>> $records
      */
     private function serialize(string $format, array $records): string
     {
         return match ($format) {
-            'json' => json_encode($records, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR),
-            'csv' => $this->toCsv($records),
+            'json'  => json_encode($records, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR),
+            'csv'   => $this->toCsv($records),
             default => throw new InvalidArgumentException("Unsupported format [{$format}]."),
         };
     }
@@ -103,14 +117,14 @@ final class UserProfilesDataTransfer implements DataTransferContract
     private function deserialize(string $format, string $contents): array
     {
         return match ($format) {
-            'json' => $this->fromJson($contents),
-            'csv' => $this->fromCsv($contents),
+            'json'  => $this->fromJson($contents),
+            'csv'   => $this->fromCsv($contents),
             default => throw new InvalidArgumentException("Unsupported format [{$format}]."),
         };
     }
 
     /**
-     * @param  array<int, array<string, mixed>>  $records
+     * @param array<int, array<string, mixed>> $records
      */
     private function toCsv(array $records): string
     {
@@ -126,8 +140,14 @@ final class UserProfilesDataTransfer implements DataTransferContract
             $row = [];
             foreach ($headers as $header) {
                 $value = $record[$header] ?? null;
+
+                if ($value !== null && ! is_scalar($value)) {
+                    throw new InvalidArgumentException("Record value for [{$header}] must be scalar or null.");
+                }
+
                 if (is_bool($value)) {
                     $row[] = $value ? '1' : '0';
+
                     continue;
                 }
 
@@ -159,7 +179,18 @@ final class UserProfilesDataTransfer implements DataTransferContract
             throw new InvalidArgumentException('JSON import payload must decode to an array.');
         }
 
-        return array_values(array_filter($decoded, static fn ($item) => is_array($item)));
+        $rows = [];
+
+        foreach ($decoded as $item) {
+            if (! is_array($item)) {
+                continue;
+            }
+
+            /** @var array<string, mixed> $item */
+            $rows[] = $item;
+        }
+
+        return $rows;
     }
 
     /**
@@ -207,29 +238,39 @@ final class UserProfilesDataTransfer implements DataTransferContract
                 $values[$header] = $row[$index] ?? null;
             }
 
-            if (empty(array_filter($values, static fn ($value) => $value !== null && $value !== ''))) {
+            $hasValue = false;
+            foreach ($values as $value) {
+                if ($value !== null && $value !== '') {
+                    $hasValue = true;
+                    break;
+                }
+            }
+
+            if (! $hasValue) {
                 continue;
             }
 
+            /** @var array<string, string|null> $values */
             $rows[] = $values;
         }
 
         fclose($handle);
 
-        return array_values(array_filter($rows, static fn ($row) => is_array($row)));
+        return $rows;
     }
 
     /**
-     * @param  array<string, mixed>  $record
+     * @param  array<string, mixed> $record
      * @return array<string, mixed>
      */
     private function validateRecord(array $record): array
     {
+        /** @var array{email: string, name: string, preferred_locale: string|null, is_active: mixed, email_verified_at: string|null} $data */
         $data = Validator::make($record, [
-            'email' => ['required', 'string', 'email'],
-            'name' => ['required', 'string', 'max:255'],
-            'preferred_locale' => ['nullable', 'string', 'in:en,lt'],
-            'is_active' => ['nullable'],
+            'email'             => ['required', 'string', 'email'],
+            'name'              => ['required', 'string', 'max:255'],
+            'preferred_locale'  => ['nullable', 'string', 'in:en,lt'],
+            'is_active'         => ['nullable'],
             'email_verified_at' => ['nullable', 'string'],
         ])->validate();
 
@@ -238,11 +279,15 @@ final class UserProfilesDataTransfer implements DataTransferContract
         $data['is_active'] = $data['is_active'] ?? true;
 
         $timestamp = $data['email_verified_at'] ?? null;
-        if (is_string($timestamp) && trim($timestamp) === '') {
-            $timestamp = null;
+        if (is_string($timestamp)) {
+            $timestamp = trim($timestamp);
+
+            if ($timestamp === '') {
+                $timestamp = null;
+            }
         }
 
-        $data['email_verified_at'] = $timestamp !== null ? Carbon::parse($timestamp) : now();
+        $data['email_verified_at'] = is_string($timestamp) ? Carbon::parse($timestamp) : now();
 
         return $data;
     }

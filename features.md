@@ -18,6 +18,7 @@
 - Created_at index migrations now detect pre-existing keys case-insensitively (with driver-specific fallbacks) and the demo currency/country seeds align with multilingual schemas, so `php artisan migrate:fresh --seed` completes reliably across supported databases.
 - Discount rebuild migrations now temporarily relax foreign key checks only while replaying legacy rows, preventing the `discount_codes_created_by_foreign` MySQL error during full refreshes without sacrificing referential integrity.
 - User and author foreign keys on rebuilt discount tables now attach after verifying the `users` table compatibility, ensuring MySQL restores with mixed storage engines keep migrating without tripping the `discount_codes_created_by_foreign` system-table check.
+- User profile data contract exports now emit UTC timestamps and validate CSV/JSON payloads defensively, keeping the round-trip import/export workflow in sync with the documented fixtures.
 
 ## Discounts & promotions
 - Coupon migrations now provision maximum discount caps, per-user usage limits, and product/category scoping columns so factories, admin forms, and API tests share the same schema snapshot during refreshes.
@@ -33,6 +34,7 @@
 
 ## Admin panel resilience
 - Attribute administration keeps validation rule strings verbatim, surfaces array-based rules as comma-separated chips, and pairs with regression tests that prove both paths round-trip correctly through Filament.
+- Filament dashboard tests spin up a minimal widget stack with a temporary Vite manifest and heroicon fallback while keeping full resource/page discovery active, and a dedicated admin authenticate middleware redirects guests to the Filament login screen, keeping feature coverage aligned with browser flows.
 - Filament dashboard access checks now fall back to open access when no
   permissions are configured and inline sparkline widgets respect the base
   nullable model contract, eliminating the latest regression tests failures.
