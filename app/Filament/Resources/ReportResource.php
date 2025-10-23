@@ -96,6 +96,8 @@ final class ReportResource extends Resource
                     ->schema([
                         TextInput::make('name')
                             ->label(__('reports.fields.name'))
+                            ->translateLabel()
+                            ->translatable()
                             ->required()
                             ->maxLength(255)
                             ->live()
@@ -137,12 +139,16 @@ final class ReportResource extends Resource
                     ->schema([
                         Textarea::make('description')
                             ->label(__('reports.fields.description'))
+                            ->translateLabel()
+                            ->translatable()
                             ->maxLength(65535)
                             ->nullable()
                             ->rows(3)
                             ->columnSpanFull(),
                         Textarea::make('content')
                             ->label(__('reports.fields.content'))
+                            ->translateLabel()
+                            ->translatable()
                             ->maxLength(65535)
                             ->nullable()
                             ->rows(5)
@@ -236,13 +242,13 @@ final class ReportResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->colors([
-                        'success'   => ['sales'],
-                        'info'      => ['inventory'],
-                        'warning'   => ['customer'],
-                        'primary'   => ['product'],
-                        'danger'    => ['financial'],
-                        'secondary' => ['analytics'],
-                        'gray'      => ['custom'],
+                        'sales'     => 'success',
+                        'inventory' => 'info',
+                        'customer'  => 'warning',
+                        'product'   => 'primary',
+                        'financial' => 'danger',
+                        'analytics' => 'secondary',
+                        'custom'    => 'gray',
                     ])
                     ->formatStateUsing(fn (string $state): string => __("reports.types.{$state}")),
                 BadgeColumn::make('category')
@@ -250,13 +256,13 @@ final class ReportResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->colors([
-                        'success'   => ['sales'],
-                        'info'      => ['marketing'],
-                        'warning'   => ['operations'],
-                        'danger'    => ['finance'],
-                        'primary'   => ['customer_service'],
-                        'secondary' => ['inventory'],
-                        'gray'      => ['analytics'],
+                        'sales'            => 'success',
+                        'marketing'        => 'info',
+                        'operations'       => 'warning',
+                        'finance'          => 'danger',
+                        'customer_service' => 'primary',
+                        'inventory'        => 'secondary',
+                        'analytics'        => 'gray',
                     ])
                     ->formatStateUsing(fn (string $state): string => __("reports.categories.{$state}")),
                 TextColumn::make('generator.name')
