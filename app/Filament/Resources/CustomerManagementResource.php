@@ -123,7 +123,7 @@ final class CustomerManagementResource extends Resource
                         ]),
                     Grid::make(2)
                         ->schema([
-                            Flatpickr::makeDateTime('date_of_birth')
+                            DateTimePicker::make('date_of_birth')
                                 ->label(__('customers.date_of_birth'))
                                 ->displayFormat('Y-m-d'),
                             Select::make('gender')
@@ -138,7 +138,7 @@ final class CustomerManagementResource extends Resource
             Section::make(__('customers.preferences'))
                 ->schema([
                     Grid::make(2)
-                        ->components([
+                        ->schema([
                             Select::make('preferred_locale')
                                 ->label(__('customers.preferred_language'))
                                 ->options([
@@ -155,7 +155,7 @@ final class CustomerManagementResource extends Resource
                                 ->default('EUR'),
                         ]),
                     Grid::make(2)
-                        ->components([
+                        ->schema([
                             Toggle::make('notification_preferences->newsletter_subscription')
                                 ->label(__('customers.newsletter_subscription'))
                                 ->default(false),
@@ -188,9 +188,8 @@ final class CustomerManagementResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('customerGroups.name')
                     ->label(__('customers.customer_group'))
-                    ->badge()
-                    ->separator(', '),
-                BadgeColumn::make('email_verified_at')
+                    ->sortable(),
+                TextColumn::make('email_verified_at')
                     ->label(__('customers.email_status'))
                     ->badge()
                     ->formatStateUsing(fn (?string $state): string => filled($state) ? __('customers.verified') : __('customers.unverified'))
