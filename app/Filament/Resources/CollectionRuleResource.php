@@ -9,10 +9,7 @@ use App\Support\Concerns\HasNav;
 use App\Filament\Resources\CollectionRuleResource\Pages;
 use App\Models\CollectionRule;
 use BackedEnum;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
-use Filament\Actions\ViewAction;
+use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -34,7 +31,6 @@ use Filament\Tables\Filters\DateFilter;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use UnitEnum;
@@ -45,7 +41,7 @@ final class CollectionRuleResource extends Resource
 
     protected static ?string $model = CollectionRule::class;
 
-    
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-cog-6-tooth';
 
     
 
@@ -232,13 +228,6 @@ final class CollectionRuleResource extends Resource
                     ->label(__('admin.collection_rules.actions.reorder'))
                     ->icon('heroicon-o-arrows-up-down')
                     ->color('info')
-                    ->modalIcon('heroicon-o-arrows-up-down')
-                    ->modalHeading(__('admin.collection_rules.actions.reorder'))
-                    ->modalSubmitActionLabel(__('admin.collection_rules.actions.reorder'))
-                    ->fillForm(fn (CollectionRule $record): array => [
-                        // Prefill the modal with the existing position to streamline quick nudges.
-                        'position' => $record->position,
-                    ])
                     ->form([
                         TextInput::make('position')
                             ->label(__('admin.collection_rules.form.fields.position'))
@@ -246,7 +235,6 @@ final class CollectionRuleResource extends Resource
                             ->required(),
                     ])
                     ->action(function (CollectionRule $record, array $data): void {
-                        // Persist the updated ordering after the modal confirmation and broadcast success.
                         $record->update(['position' => $data['position'] ?? 0]);
                         FilamentNotification::make()
                             ->title(__('admin.collection_rules.reordered_successfully'))
