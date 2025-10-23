@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 
+use BackedEnum;
 use Filament\Schemas\Schema;
 use App\Filament\Resources\VariantInventoryResource\Pages;
 use App\Models\Location;
@@ -25,7 +26,7 @@ use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Placeholder;
-use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Forms\Components\Select; // Select component import keeps dropdown definitions consistent across the resource.
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -82,7 +83,7 @@ final class VariantInventoryResource extends Resource
     {
         return $schema
             ->schema([
-                Section::make(__('admin.variant_inventory.basic_information'))
+                SchemaSection::make(__('admin.variant_inventory.basic_information'))
                     ->columns(2)
                     ->schema([
                         // Row 1: searchable selectors align with the two-column section layout.
@@ -214,7 +215,7 @@ final class VariantInventoryResource extends Resource
                             ->label(__('admin.variant_inventory.batch_number'))
                             ->maxLength(100),
                     ]),
-                Section::make(__('admin.variant_inventory.stock_levels'))
+                SchemaSection::make(__('admin.variant_inventory.stock_levels'))
                     ->columns(3)
                     ->schema([
                         // Row 1: live stock metrics distribute across three columns for parity with the list view.
@@ -250,7 +251,7 @@ final class VariantInventoryResource extends Resource
                             ->default(0)
                             ->minValue(0),
                     ]),
-                Section::make(__('admin.variant_inventory.pricing'))
+                SchemaSection::make(__('admin.variant_inventory.pricing'))
                     ->columns(2)
                     ->schema([
                         // Row 1: core pricing fields remain paired for quick comparison.
@@ -271,7 +272,7 @@ final class VariantInventoryResource extends Resource
                             ->label(__('admin.variant_inventory.supplier_id'))
                             ->numeric(),
                     ]),
-                Section::make(__('admin.variant_inventory.additional_info'))
+                SchemaSection::make(__('admin.variant_inventory.additional_info'))
                     ->columns(2)
                     ->schema([
                         // Row 1: tracking toggle with status select for operational state management.
@@ -297,7 +298,7 @@ final class VariantInventoryResource extends Resource
                         Flatpickr::makeDate('last_sold_at')
                             ->label(__('admin.variant_inventory.last_sold_at')),
                     ]),
-                Section::make(__('admin.variant_inventory.calculated_fields'))
+                SchemaSection::make(__('admin.variant_inventory.calculated_fields'))
                     ->columns(3)
                     ->schema([
                         // Calculated data points mirror the display table column trio for consistency.

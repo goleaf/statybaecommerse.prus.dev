@@ -22,6 +22,8 @@ use App\Support\Seo\LocaleUrlGenerator;
 use Awcodes\BadgeableColumn\Components\Badge;
 use Awcodes\BadgeableColumn\Components\BadgeableColumn;
 use BackedEnum;
+use App\Services\Export\ExportColumn;
+use App\Services\Export\Contracts\DefinesExportColumns;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkAction;
@@ -31,23 +33,19 @@ use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\RichEditor;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Tabs;
-use Filament\Forms\Components\Tabs\Tab;
 use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
-use Filament\Schemas\Components\Tabs;
-use Filament\Schemas\Components\Tabs\Tab;
+use Filament\Schemas\Components\Grid as SchemaGrid;
+use Filament\Schemas\Components\Section as SchemaSection;
+use Filament\Schemas\Components\Tabs as SchemaTabs;
+use Filament\Schemas\Components\Tabs\Tab as SchemaTab;
 use Filament\Support\Enums\MaxWidth;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -133,32 +131,6 @@ final class ProductResource extends Resource implements DefinesExportColumns
     protected static ?int $navigationSort = 1;
 
     protected static ?string $recordTitleAttribute = 'name';
-
-    public static function canViewAny(): bool
-    {
-        return Gate::allows('viewAny', Product::class);
-    }
-
-    public static function canView(Product $record): bool
-    {
-        return Gate::allows('view', $record);
-    }
-
-    public static function canCreate(): bool
-    {
-        return Gate::allows('create', Product::class);
-    }
-
-    public static function canEdit(Product $record): bool
-    {
-        return Gate::allows('update', $record);
-    }
-
-    public static function canDelete(Product $record): bool
-    {
-        return Gate::allows('delete', $record);
-    }
-
     public static function getNavigationLabel(): string
     {
         return __('products.title');
@@ -178,11 +150,11 @@ final class ProductResource extends Resource implements DefinesExportColumns
     {
         return $schema
             ->components([
-                Tabs::make('Product Information')
+                SchemaTabs::make('Product Information')
                     ->tabs([
-                        Tab::make('Basic Information')
+                        SchemaTab::make('Basic Information')
                             ->components([
-                                Section::make('Product Details')
+                                SchemaSection::make('Product Details')
                                     ->components([
                                         LanguageTabs::make([
                                             TextInput::make('name')
@@ -218,7 +190,7 @@ final class ProductResource extends Resource implements DefinesExportColumns
                                                 ->rows(3)
                                                 ->maxLength(500),
                                         ]),
-                                        Grid::make(2)
+                                        SchemaGrid::make(2)
                                             ->schema([
                                                 TextInput::make('name')
                                                     ->label(__('products.fields.name'))
@@ -268,9 +240,9 @@ final class ProductResource extends Resource implements DefinesExportColumns
                                             ->rows(3)
                                             ->maxLength(500),
                                     ]),
-                                Section::make('Pricing & Inventory')
+                                SchemaSection::make('Pricing & Inventory')
                                     ->components([
-                                        Grid::make(3)
+                                        SchemaGrid::make(3)
                                             ->components([
                                                 TextInput::make('price')
                                                     ->label(__('products.fields.price'))
@@ -289,7 +261,7 @@ final class ProductResource extends Resource implements DefinesExportColumns
                                                     ->prefix('€')
                                                     ->step(0.01),
                                             ]),
-                                        Grid::make(2)
+                                        SchemaGrid::make(2)
                                             ->components([
                                                 Toggle::make('manage_stock')
                                                     ->label(__('products.fields.manage_stock'))
@@ -298,7 +270,7 @@ final class ProductResource extends Resource implements DefinesExportColumns
                                                     ->label(__('products.fields.track_stock'))
                                                     ->default(true),
                                             ]),
-                                        Grid::make(2)
+                                        SchemaGrid::make(2)
                                             ->components([
                                                 Quantity::make('stock_quantity')
                                                     ->label(__('products.fields.stock_quantity'))
@@ -313,9 +285,9 @@ final class ProductResource extends Resource implements DefinesExportColumns
                                             ]),
                                     ]),
                             ]),
-                        Tab::make('Media & SEO')
+                        SchemaTab::make('Media & SEO')
                             ->components([
-                                Section::make('Product Images')
+                                SchemaSection::make('Product Images')
                                     ->components([
                                         FileUpload::make('images')
                                             ->label(__('products.fields.images'))
@@ -328,7 +300,7 @@ final class ProductResource extends Resource implements DefinesExportColumns
                                             ->reorderable()
                                             ->appendFiles(),
                                     ]),
-                                Section::make('SEO Settings')
+                                SchemaSection::make('SEO Settings')
                                     ->components([
                                         LanguageTabs::make([
                                             TextInput::make('seo_title')
@@ -341,11 +313,11 @@ final class ProductResource extends Resource implements DefinesExportColumns
                                         ]),
                                     ]),
                             ]),
-                        Tab::make('Settings & Options')
+                        SchemaTab::make('Settings & Options')
                             ->components([
-                                Section::make('Product Settings')
+                                SchemaSection::make('Product Settings')
                                     ->components([
-                                        Grid::make(2)
+                                        SchemaGrid::make(2)
                                             ->components([
                                                 Select::make('brand_id')
                                                     ->label(__('products.fields.brand'))
@@ -361,7 +333,7 @@ final class ProductResource extends Resource implements DefinesExportColumns
                                                     ])
                                                     ->default('draft'),
                                             ]),
-                                        Grid::make(3)
+                                        SchemaGrid::make(3)
                                             ->components([
                                                 Toggle::make('is_visible')
                                                     ->label(__('products.fields.is_visible'))
@@ -375,9 +347,9 @@ final class ProductResource extends Resource implements DefinesExportColumns
                                             ->label(__('products.fields.published_at'))
                                             ->default(now()),
                                     ]),
-                                Section::make('Physical Properties')
+                                SchemaSection::make('Physical Properties')
                                     ->components([
-                                        Grid::make(4)
+                                        SchemaGrid::make(4)
                                             ->components([
                                                 TextInput::make('weight')
                                                     ->label(__('products.fields.weight'))
@@ -402,9 +374,9 @@ final class ProductResource extends Resource implements DefinesExportColumns
                                             ]),
                                     ]),
                             ]),
-                        Tab::make('Variants & Attributes')
+                        SchemaTab::make('Variants & Attributes')
                             ->components([
-                                Section::make(__('products.sections.variant_matrix'))
+                                SchemaSection::make(__('products.sections.variant_matrix'))
                                     ->components([
                                         MatrixFactory::checkboxGrid(
                                             'variant_attribute_matrix',
@@ -426,9 +398,9 @@ final class ProductResource extends Resource implements DefinesExportColumns
                                     ])
                                     ->columns(1),
                             ]),
-                        Tab::make('Advanced')
+                        SchemaTab::make('Advanced')
                             ->components([
-                                Section::make('Additional Data')
+                                SchemaSection::make('Additional Data')
                                     ->components([
                                         KeyValue::make('metadata')
                                             ->label(__('products.fields.metadata'))
@@ -831,6 +803,60 @@ final class ProductResource extends Resource implements DefinesExportColumns
                 ]),
             ])
             ->defaultSort('created_at', 'desc');
+    }
+
+    /**
+     * @return array<string, ExportColumn>
+     */
+    public static function availableExportColumns(): array
+    {
+        return [
+            'sku' => new ExportColumn(
+                'sku',
+                __('products.fields.sku'),
+                'sku'
+            ),
+            'name' => new ExportColumn(
+                'name',
+                __('products.fields.name'),
+                resolver: static fn (Product $product): string => (string) $product->getTranslation('name', app()->getLocale()) ?: (string) ($product->name ?? '')
+            ),
+            'status' => new ExportColumn(
+                'status',
+                __('products.fields.status'),
+                resolver: static fn (Product $product): string => (string) ($product->status ?? '')
+            ),
+            'price' => new ExportColumn(
+                'price',
+                __('products.fields.price'),
+                resolver: static fn (Product $product): string => $product->price !== null ? number_format((float) $product->price, 2, '.', '') : ''
+            ),
+            'stock_quantity' => new ExportColumn(
+                'stock_quantity',
+                __('products.fields.stock_quantity'),
+                resolver: static fn (Product $product): string => (string) ($product->stock_quantity ?? 0)
+            ),
+            'is_visible' => new ExportColumn(
+                'is_visible',
+                __('products.fields.is_visible'),
+                'is_visible'
+            ),
+            'brand' => new ExportColumn(
+                'brand',
+                __('products.fields.brand'),
+                resolver: static fn (Product $product): string => (string) ($product->brand?->name ?? '')
+            ),
+            'published_at' => new ExportColumn(
+                'published_at',
+                __('products.fields.published_at'),
+                resolver: static fn (Product $product): string => optional($product->published_at)->toDateTimeString() ?? ''
+            ),
+            'created_at' => new ExportColumn(
+                'created_at',
+                __('products.fields.created_at'),
+                resolver: static fn (Product $product): string => optional($product->created_at)->toDateTimeString() ?? ''
+            ),
+        ];
     }
 
     /**

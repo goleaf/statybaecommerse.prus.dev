@@ -16,7 +16,7 @@ use Filament\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\KeyValue;
-use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -52,7 +52,7 @@ final class ReferralResource extends Resource
         // Use the schema-based configuration to stay aligned with Filament v4 resource expectations.
         return $schema
             ->schema([
-                Section::make('Referral Details')
+                SchemaSection::make('Referral Details')
                     ->columns(2)
                     ->components([
                         Select::make('referrer_id')

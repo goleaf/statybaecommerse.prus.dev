@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources\DiscountCodeResource\RelationManagers;
 
 
+use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Schemas\Schema;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;

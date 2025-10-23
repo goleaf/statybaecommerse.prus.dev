@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources\SystemSettingCategoryResource\RelationManagers;
 
 
+use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Schemas\Schema;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
@@ -36,9 +37,9 @@ final class SettingsRelationManager extends BaseRelationManager
     public function form(Schema $schema): Schema   
     {
         return $schema->schema([
-            Section::make(__('system_setting_categories.settings.basic_information'))
+            SchemaSection::make(__('system_setting_categories.settings.basic_information'))
                 ->schema([
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             TextInput::make('key')
                                 ->label(__('system_setting_categories.settings.key'))
@@ -67,9 +68,9 @@ final class SettingsRelationManager extends BaseRelationManager
                         ->helperText(__('system_setting_categories.settings.description_help')),
                 ]),
 
-            Section::make(__('system_setting_categories.settings.configuration'))
+            SchemaSection::make(__('system_setting_categories.settings.configuration'))
                 ->schema([
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             Select::make('type')
                                 ->label(__('system_setting_categories.settings.type'))
@@ -95,7 +96,7 @@ final class SettingsRelationManager extends BaseRelationManager
                                 ->helperText(__('system_setting_categories.settings.default_value_help')),
                         ]),
 
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             TextInput::make('sort_order')
                                 ->label(__('system_setting_categories.settings.sort_order'))
@@ -110,7 +111,7 @@ final class SettingsRelationManager extends BaseRelationManager
                         ]),
                 ]),
 
-            Section::make(__('system_setting_categories.settings.validation'))
+            SchemaSection::make(__('system_setting_categories.settings.validation'))
                 ->schema([
                     Textarea::make('validation_rules')
                         ->label(__('system_setting_categories.settings.validation_rules'))

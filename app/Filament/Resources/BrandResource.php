@@ -27,8 +27,8 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Grid as SchemaGrid;
+use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -131,7 +131,7 @@ final class BrandResource extends Resource
     public static function form(Schema $schema): Schema   
     {
         return $schema->components([
-            Section::make(__('brands.basic_information'))
+            SchemaSection::make(__('brands.basic_information'))
                 ->components([
                     LanguageTabs::make([
                         TextInput::make('name')
@@ -155,7 +155,7 @@ final class BrandResource extends Resource
                         ->rows(3)
                         ->columnSpanFull(),
                 ]),
-            Section::make(__('admin/brands.sections.media'))
+            SchemaSection::make(__('admin/brands.sections.media'))
                 ->schema([
                     FileUpload::make('logo')
                         ->label(__('admin/brands.fields.logo'))
@@ -182,7 +182,7 @@ final class BrandResource extends Resource
                         ->preserveFilenames()
                         ->visibility('private'),
                 ]),
-            Section::make(__('admin/brands.sections.seo'))
+            SchemaSection::make(__('admin/brands.sections.seo'))
                 ->schema([
                     TextInput::make('seo_title')
                         ->label(__('admin/brands.fields.seo_title'))
@@ -192,9 +192,9 @@ final class BrandResource extends Resource
                         ->rows(2)
                         ->maxLength(500),
                 ]),
-            Section::make(__('admin/brands.sections.settings'))
+            SchemaSection::make(__('admin/brands.sections.settings'))
                 ->schema([
-                    Grid::make(3)
+                    SchemaGrid::make(3)
                         ->components([
                             Toggle::make('is_enabled')
                                 ->label(__('admin/brands.fields.is_enabled'))
@@ -388,41 +388,6 @@ final class BrandResource extends Resource
                 ]),
             ])
             ->defaultSort('name');
-    }
-
-    public static function shouldRegisterNavigation(): bool
-    {
-        return static::canViewAny();
-    }
-
-    public static function canViewAny(): bool
-    {
-        return static::authorizeBrand(null, 'viewAny');
-    }
-
-    public static function canCreate(): bool
-    {
-        return static::authorizeBrand(null, 'create');
-    }
-
-    public static function canView(Brand $record): bool
-    {
-        return static::authorizeBrand($record, 'view');
-    }
-
-    public static function canEdit(Brand $record): bool
-    {
-        return static::authorizeBrand($record, 'update');
-    }
-
-    public static function canDelete(Brand $record): bool
-    {
-        return static::authorizeBrand($record, 'delete');
-    }
-
-    public static function canRestore(Brand $record): bool
-    {
-        return static::authorizeBrand($record, 'restore');
     }
 
     /**

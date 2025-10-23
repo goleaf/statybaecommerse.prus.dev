@@ -10,8 +10,7 @@ use Filament\Actions;
 
 final class ListPrices extends BaseListRecords
 {
-    use HasResizableColumns;
-
+    
     protected static string $resource = PriceResource::class;
 
     protected function getHeaderActions(): array

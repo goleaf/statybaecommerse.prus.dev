@@ -26,15 +26,6 @@ final class CreateSeoData extends CreateRecord
     {
         return $this->getResource()::getUrl('index');
     }
-
-    protected function getHeaderActions(): array
-    {
-        return [
-            LocaleSwitcher::make(), // Allow admins to switch locales before entering translated values.
-            ...parent::getHeaderActions(),
-        ];
-    }
-
     protected function mutateFormDataBeforeCreate(array $data): array
     {
         // Set default values

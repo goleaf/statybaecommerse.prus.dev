@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources\OrderResource\RelationManagers;
 
 
+use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Schemas\Schema;
 use App\Models\Document;
 use App\Support\Filament\Components\Flatpickr;
@@ -22,8 +23,8 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Grid as SchemaGrid;
+use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -60,11 +61,11 @@ final class OrderDocumentsRelationManager extends BaseRelationManager
     {
         return $schema
             ->schema([
-                Section::make(__('orders.document_information'))
+                SchemaSection::make(__('orders.document_information'))
                     ->description(__('orders.document_information_description'))
                     ->icon('heroicon-o-document')
                     ->schema([
-                        Grid::make(2)
+                        SchemaGrid::make(2)
                             ->schema([
                                 Select::make('document_template_id')
                                     ->label(__('orders.document_template'))
@@ -90,7 +91,7 @@ final class OrderDocumentsRelationManager extends BaseRelationManager
                                     ])
                                     ->required(),
                             ]),
-                        Grid::make(2)
+                        SchemaGrid::make(2)
                             ->schema([
                                 TextInput::make('version')
                                     ->label(__('orders.document_version'))
@@ -110,7 +111,7 @@ final class OrderDocumentsRelationManager extends BaseRelationManager
                             ]),
                     ])
                     ->collapsible(),
-                Section::make(__('orders.file_upload'))
+                SchemaSection::make(__('orders.file_upload'))
                     ->description(__('orders.file_upload_description'))
                     ->icon('heroicon-o-cloud-arrow-up')
                     ->schema([
@@ -120,7 +121,7 @@ final class OrderDocumentsRelationManager extends BaseRelationManager
                             ->maxSize(10240)  // 10MB
                             ->directory('order-documents')
                             ->visibility('private'),
-                        Grid::make(2)
+                        SchemaGrid::make(2)
                             ->schema([
                                 TextInput::make('file_size')
                                     ->label(__('orders.file_size'))
@@ -132,11 +133,11 @@ final class OrderDocumentsRelationManager extends BaseRelationManager
                             ]),
                     ])
                     ->collapsible(),
-                Section::make(__('orders.access_control'))
+                SchemaSection::make(__('orders.access_control'))
                     ->description(__('orders.access_control_description'))
                     ->icon('heroicon-o-shield-check')
                     ->schema([
-                        Grid::make(2)
+                        SchemaGrid::make(2)
                             ->schema([
                                 Toggle::make('is_public')
                                     ->label(__('orders.is_public'))
@@ -147,7 +148,7 @@ final class OrderDocumentsRelationManager extends BaseRelationManager
                                     ->default(true)
                                     ->helperText(__('orders.is_downloadable_help')),
                             ]),
-                        Grid::make(2)
+                        SchemaGrid::make(2)
                             ->schema([
                                 TextInput::make('access_password')
                                     ->label(__('orders.access_password'))
@@ -158,7 +159,7 @@ final class OrderDocumentsRelationManager extends BaseRelationManager
                             ]),
                     ])
                     ->collapsible(),
-                Section::make(__('orders.additional_details'))
+                SchemaSection::make(__('orders.additional_details'))
                     ->description(__('orders.additional_details_description'))
                     ->icon('heroicon-o-document-text')
                     ->schema([

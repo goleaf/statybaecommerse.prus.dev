@@ -8,6 +8,7 @@ use Filament\Pages\Dashboard as BaseDashboard;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Model as EloquentModel;
 use Illuminate\Support\Facades\Gate;
+use BackedEnum;
 
 class Dashboard extends BaseDashboard
 {

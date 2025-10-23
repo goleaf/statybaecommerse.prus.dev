@@ -13,8 +13,8 @@ use App\Models\Product;
 use App\Support\Filament\SearchableInputHelper;
 use App\Support\Search\ProductSearch;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Grid as SchemaGrid;
+use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Set;
 use Filament\Resources\Resource;
@@ -42,7 +42,7 @@ final class PriceResource extends Resource
     {
         return $schema
             ->schema([
-                Section::make(__('admin.prices.priceable_association'))
+                SchemaSection::make(__('admin.prices.priceable_association'))
                     ->description(__('admin.prices.priceable_association_description'))
                     ->schema([
                         MorphToSelect::make('priceable')
@@ -72,10 +72,10 @@ final class PriceResource extends Resource
                             ->helperText(__('admin.prices.currency_helper')),
                     ])
                     ->columns(2),
-                Section::make(__('admin.prices.pricing_details'))
+                SchemaSection::make(__('admin.prices.pricing_details'))
                     ->description(__('admin.prices.pricing_details_description'))
                     ->schema([
-                        Grid::make(3)
+                        SchemaGrid::make(3)
                             ->schema([
                                 SearchableInput::make('product_id')
                                     ->label(__('admin.prices.product'))
@@ -157,10 +157,10 @@ final class PriceResource extends Resource
                             ->default('regular')
                             ->helperText(__('admin.prices.price_type_helper')),
                     ]),
-                Section::make(__('admin.prices.lifecycle'))
+                SchemaSection::make(__('admin.prices.lifecycle'))
                     ->description(__('admin.prices.lifecycle_description'))
                     ->schema([
-                        Grid::make(2)
+                        SchemaGrid::make(2)
                             ->schema([
                                 DateTimePicker::make('starts_at')
                                     ->label(__('admin.prices.starts_at'))
@@ -178,7 +178,7 @@ final class PriceResource extends Resource
                             ->default(true)
                             ->helperText(__('admin.prices.is_enabled_helper')),
                     ]),
-                Section::make(__('admin.prices.metadata'))
+                SchemaSection::make(__('admin.prices.metadata'))
                     ->description(__('admin.prices.metadata_description'))
                     ->schema([
                         KeyValue::make('metadata')
@@ -189,9 +189,9 @@ final class PriceResource extends Resource
                             ->columnSpanFull()
                             ->helperText(__('admin.prices.metadata_helper')),
                     ]),
-                Section::make(__('admin.prices.sections.pricing'))
+                SchemaSection::make(__('admin.prices.sections.pricing'))
                     ->schema([
-                        Grid::make(2)
+                        SchemaGrid::make(2)
                             ->schema([
                                 TextInput::make('amount')
                                     ->label(__('admin.prices.fields.amount'))
@@ -211,9 +211,9 @@ final class PriceResource extends Resource
                             ->minValue(0)
                             ->step(0.01),
                     ]),
-                Section::make(__('admin.prices.sections.validity'))
+                SchemaSection::make(__('admin.prices.sections.validity'))
                     ->schema([
-                        Grid::make(2)
+                        SchemaGrid::make(2)
                             ->schema([
                                 DateTimePicker::make('starts_at')
                                     ->label(__('admin.prices.fields.starts_at'))
@@ -224,7 +224,7 @@ final class PriceResource extends Resource
                                     ->after('starts_at'),
                             ]),
                     ]),
-                Section::make(__('admin.prices.sections.metadata'))
+                SchemaSection::make(__('admin.prices.sections.metadata'))
                     ->schema([
                         KeyValue::make('metadata')
                             ->label(__('admin.prices.fields.metadata'))

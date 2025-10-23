@@ -11,8 +11,7 @@ use Filament\Actions;
 
 final class ListCategories extends BaseListRecords
 {
-    use HasResizableColumns;
-
+    
     protected static string $resource = CategoryResource::class;
 
     protected function getHeaderActions(): array

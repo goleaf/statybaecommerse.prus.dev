@@ -19,9 +19,9 @@ use Filament\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Grid as SchemaGrid;
 use Filament\Forms\Components\Placeholder;
-use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -76,7 +76,7 @@ final class EnumValueResource extends Resource
     public static function form(Schema $schema): Schema   
     {
         return $schema->schema([
-            Section::make(__('admin.enum_values.form.sections.basic_information'))
+            SchemaSection::make(__('admin.enum_values.form.sections.basic_information'))
                 ->schema([
                     Select::make('type')
                         ->label(__('admin.enum_values.form.fields.type'))
@@ -113,7 +113,7 @@ final class EnumValueResource extends Resource
                         ->rows(3)
                         ->maxLength(1000)
                         ->helperText(__('admin.enum_values.form.fields.description_help')),
-                    Grid::make(3)
+                    SchemaGrid::make(3)
                         ->schema([
                             TextInput::make('sort_order')
                                 ->label(__('admin.enum_values.form.fields.sort_order'))
@@ -131,7 +131,7 @@ final class EnumValueResource extends Resource
                         ]),
                 ])
                 ->columns(1),
-            Section::make(__('admin.enum_values.form.sections.metadata'))
+            SchemaSection::make(__('admin.enum_values.form.sections.metadata'))
                 ->schema([
                     Textarea::make('metadata')
                         ->label(__('admin.enum_values.form.fields.metadata'))

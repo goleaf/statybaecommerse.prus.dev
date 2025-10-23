@@ -5,11 +5,12 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 
-use Filament\Schemas\Schema;
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\NormalSettingTranslationResource\Pages;
 use App\Models\NormalSetting;
 use App\Models\NormalSettingTranslation;
+use BackedEnum;
+use Filament\Schemas\Schema;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
@@ -21,6 +22,7 @@ use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Contracts\Support\Htmlable;
 use UnitEnum;
 
 /**
@@ -41,7 +43,7 @@ final class NormalSettingTranslationResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'display_name';
 
-    public static function getNavigationIcon(): BackedEnum|\Illuminate\Contracts\Support\Htmlable|string|null
+    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
     {
         return 'heroicon-o-language';
     }
@@ -70,9 +72,9 @@ final class NormalSettingTranslationResource extends Resource
     {
         return $schema
             ->schema([
-                Section::make(__('admin.normal_setting_translations.basic_information'))
+                SchemaSection::make(__('admin.normal_setting_translations.basic_information'))
                     ->schema([
-                        Grid::make(2)
+                        SchemaGrid::make(2)
                             ->schema([
                                 Select::make('enhanced_setting_id')
                                     ->label(__('admin.normal_setting_translations.enhanced_setting'))

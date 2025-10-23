@@ -10,8 +10,7 @@ use Filament\Actions\CreateAction;
 
 final class ListRecommendationAnalytics extends BaseListRecords
 {
-    use HasResizableColumns;
-
+    
     protected static string $resource = RecommendationAnalyticsResource::class;
 
     protected function getHeaderActions(): array

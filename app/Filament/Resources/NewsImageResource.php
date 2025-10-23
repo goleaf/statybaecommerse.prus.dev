@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 
-use App\Support\Concerns\HasNav;
 use Filament\Schemas\Schema;
+use App\Support\Concerns\HasNav;
 use App\Filament\Resources\NewsImageResource\Pages;
 use App\Models\News;
 use App\Models\NewsImage;
@@ -37,9 +37,11 @@ use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Storage;
+use BackedEnum;
 use UnitEnum;
 
 final class NewsImageResource extends Resource
@@ -50,7 +52,7 @@ final class NewsImageResource extends Resource
 
     
 
-    public static function getNavigationIcon(): BackedEnum|string|null
+    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
     {
         return 'heroicon-o-photo';
     }
@@ -76,12 +78,12 @@ final class NewsImageResource extends Resource
     {
         return $schema
             ->schema([
-                Tabs::make(__('admin.news_images.tabs'))
+                SchemaTabs::make(__('admin.news_images.tabs'))
                     ->tabs([
-                        Tab::make(__('admin.news_images.basic_information'))
+                        SchemaTab::make(__('admin.news_images.basic_information'))
                             ->icon('heroicon-o-photo')
                             ->schema([
-                                Section::make(__('admin.news_images.basic_information'))
+                                SchemaSection::make(__('admin.news_images.basic_information'))
                                     ->description(__('admin.news_images.basic_information_description'))
                                     ->schema([
                                         Select::make('news_id')
@@ -200,7 +202,7 @@ final class NewsImageResource extends Resource
                                                     ]);
                                                 }
                                             }),
-                                        Grid::make(2)
+                                        SchemaGrid::make(2)
                                             ->schema([
                                                 TextInput::make('alt_text')
                                                     ->label(__('admin.news_images.alt_text'))
@@ -219,7 +221,7 @@ final class NewsImageResource extends Resource
                                             ->columnSpanFull()
                                             ->maxLength(500)
                                             ->helperText(__('admin.news_images.caption_help')),
-                                        Grid::make(3)
+                                        SchemaGrid::make(3)
                                             ->schema([
                                                 Toggle::make('is_featured')
                                                     ->label(__('admin.news_images.is_featured'))
@@ -236,13 +238,13 @@ final class NewsImageResource extends Resource
                                             ]),
                                     ]),
                             ]),
-                        Tab::make(__('admin.news_images.technical_details'))
+                        SchemaTab::make(__('admin.news_images.technical_details'))
                             ->icon('heroicon-o-cog-6-tooth')
                             ->schema([
-                                Section::make(__('admin.news_images.technical_details'))
+                                SchemaSection::make(__('admin.news_images.technical_details'))
                                     ->description(__('admin.news_images.technical_details_description'))
                                     ->schema([
-                                        Grid::make(2)
+                                        SchemaGrid::make(2)
                                             ->schema([
                                                 TextInput::make('dimensions.width')
                                                     ->label(__('admin.news_images.width'))
@@ -277,10 +279,10 @@ final class NewsImageResource extends Resource
                                             }),
                                     ]),
                             ]),
-                        Tab::make(__('admin.news_images.seo_metadata'))
+                        SchemaTab::make(__('admin.news_images.seo_metadata'))
                             ->icon('heroicon-o-magnifying-glass')
                             ->schema([
-                                Section::make(__('admin.news_images.seo_metadata'))
+                                SchemaSection::make(__('admin.news_images.seo_metadata'))
                                     ->description(__('admin.news_images.seo_metadata_description'))
                                     ->schema([
                                         TextInput::make('alt_text')

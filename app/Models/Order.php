@@ -365,31 +365,6 @@ final class Order extends Model
         // Also include lifecycle statuses that imply payment captured
         return $query->orWhereIn('status', ['processing', 'confirmed', 'shipped', 'delivered', 'completed']);
     }
-
-    public function scopeCreatedBetween(Builder $query, CarbonInterface $start, CarbonInterface $end): Builder
-    {
-        $column = $this->qualifyCreatedAtColumn();
-
-        $startBound = $start->toImmutable()->startOfSecond();
-        $endBound = $end->toImmutable()->endOfSecond();
-
-        return $query->whereBetween($column, [$startBound, $endBound]);
-    }
-
-    public function scopeCreatedSince(Builder $query, CarbonInterface $start): Builder
-    {
-        $column = $this->qualifyCreatedAtColumn();
-
-        return $query->where($column, '>=', $start->toImmutable()->startOfSecond());
-    }
-
-    public function scopeCreatedThisMonth(Builder $query): Builder
-    {
-        $now = Carbon::now();
-
-        return $query->createdBetween($now->copy()->startOfMonth(), $now);
-    }
-
     public function scopeCreatedOnDate(Builder $query, CarbonInterface $date): Builder
     {
         $day = $date->toImmutable();

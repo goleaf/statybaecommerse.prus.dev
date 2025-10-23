@@ -305,17 +305,6 @@ class SimplifiedStatsWidget extends BaseWidget
      *
      * @return array<string, mixed>
      */
-    private function rememberDashboard(string $key, int|DateInterval $ttl, callable $callback): array
-    {
-        $store = Cache::getStore();
-
-        if ($store instanceof TaggableStore) {
-            return Cache::tags(CacheTagHelper::dashboards())->remember($key, $ttl, $callback);
-        }
-
-        return Cache::remember($key, $ttl, $callback);
-    }
-
     protected function getReferenceTime(): Carbon
     {
         return $this->referenceTime ??= Carbon::now();

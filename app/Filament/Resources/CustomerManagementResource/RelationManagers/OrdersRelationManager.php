@@ -20,7 +20,7 @@ use Filament\Actions\DissociateAction;
 use Filament\Actions\DissociateBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Set;
@@ -45,7 +45,7 @@ class OrdersRelationManager extends BaseRelationManager
     {
         return $schema
             ->components([
-                Section::make(__('orders.basic_information'))
+                SchemaSection::make(__('orders.basic_information'))
                     ->schema([
                         TextInput::make('order_number')
                             ->label(__('orders.order_number'))
@@ -111,9 +111,9 @@ class OrdersRelationManager extends BaseRelationManager
                             ->default('EUR')
                             ->maxLength(3),
                     ]),
-                Section::make(__('orders.shipping_information'))
+                SchemaSection::make(__('orders.shipping_information'))
                     ->schema([
-                        Grid::make(2)
+                        SchemaGrid::make(2)
                             ->schema([
                                 SearchableInput::make('shipping_address_lookup')
                                     ->label(__('orders.shipping_address'))
@@ -186,7 +186,7 @@ class OrdersRelationManager extends BaseRelationManager
                                     })
                                     ->dehydrated(false),
                             ]),
-                        Grid::make(2)
+                        SchemaGrid::make(2)
                             ->schema([
                                 KeyValue::make('shipping_address')
                                     ->label(__('orders.shipping_address'))
@@ -205,7 +205,7 @@ class OrdersRelationManager extends BaseRelationManager
                         Flatpickr::makeDateTime('delivered_at')
                             ->label(__('orders.delivered_at')),
                     ]),
-                Section::make(__('orders.additional_information'))
+                SchemaSection::make(__('orders.additional_information'))
                     ->schema([
                         Textarea::make('notes')
                             ->label(__('orders.notes'))
@@ -228,7 +228,7 @@ class OrdersRelationManager extends BaseRelationManager
             ->components([
                 InfolistSection::make(__('orders.basic_information'))
                     ->schema([
-                        Grid::make(2)
+                        SchemaGrid::make(2)
                             ->schema([
                                 TextEntry::make('id')
                                     ->label(__('orders.id')),
@@ -255,7 +255,7 @@ class OrdersRelationManager extends BaseRelationManager
                     ]),
                 InfolistSection::make(__('orders.shipping_information'))
                     ->schema([
-                        Grid::make(2)
+                        SchemaGrid::make(2)
                             ->schema([
                                 TextEntry::make('shipping_address')
                                     ->label(__('orders.shipping_address')),

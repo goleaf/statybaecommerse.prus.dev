@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 
+use BackedEnum;
 use Filament\Schemas\Schema;
 use App\Filament\Resources\VariantCombinationResource\Pages;
 use App\Models\Product;
@@ -15,10 +16,10 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Grid as SchemaGrid;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Placeholder;
-use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
@@ -70,10 +71,10 @@ final class VariantCombinationResource extends Resource
     {
         return $schema
             ->components([
-                Section::make(__('admin.variant_combinations.basic_information'))
+                SchemaSection::make(__('admin.variant_combinations.basic_information'))
                     ->description(__('admin.variant_combinations.basic_information_description'))
                     ->schema([
-                        Grid::make(2)
+                        SchemaGrid::make(2)
                             ->schema([
                                 Select::make('product_id')
                                     ->label(__('admin.variant_combinations.product'))
@@ -111,7 +112,7 @@ final class VariantCombinationResource extends Resource
                                     ->helperText(__('admin.variant_combinations.is_available_help')),
                             ]),
                     ]),
-                Section::make(__('admin.variant_combinations.attribute_combinations'))
+                SchemaSection::make(__('admin.variant_combinations.attribute_combinations'))
                     ->description(__('admin.variant_combinations.attribute_combinations_description'))
                     ->schema([
                         KeyValue::make('attribute_combinations')
@@ -125,7 +126,7 @@ final class VariantCombinationResource extends Resource
                             ->deleteActionLabel(__('admin.variant_combinations.remove_attribute'))
                             ->reorderable(),
                     ]),
-                Section::make(__('admin.variant_combinations.additional_information'))
+                SchemaSection::make(__('admin.variant_combinations.additional_information'))
                     ->description(__('admin.variant_combinations.additional_information_description'))
                     ->schema([
                         Placeholder::make('combination_hash')

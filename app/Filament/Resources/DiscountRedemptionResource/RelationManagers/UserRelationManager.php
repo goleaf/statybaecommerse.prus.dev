@@ -27,7 +27,7 @@ class UserRelationManager extends BaseRelationManager
     {
         return $schema
             ->schema([
-                Forms\Components\Section::make('User Information')
+                Forms\Components\SchemaSection::make('User Information')
                     ->schema([
                         Forms\Components\TextInput::make('name')
                             ->required()

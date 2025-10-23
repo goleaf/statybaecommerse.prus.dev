@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources\SystemSettingCategoryResource\RelationManagers;
 
 
+use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Schemas\Schema;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
@@ -33,9 +34,9 @@ final class TranslationsRelationManager extends BaseRelationManager
     public function form(Schema $schema): Schema   
     {
         return $schema->schema([
-            Section::make(__('system_setting_categories.translations.basic_information'))
+            SchemaSection::make(__('system_setting_categories.translations.basic_information'))
                 ->schema([
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             Select::make('locale')
                                 ->label(__('system_setting_categories.translations.locale'))

@@ -10,8 +10,7 @@ use Filament\Actions;
 
 final class ListEnumValues extends BaseListRecords
 {
-    use HasResizableColumns;
-
+    
     protected static string $resource = EnumResource::class;
 
     protected function getHeaderActions(): array

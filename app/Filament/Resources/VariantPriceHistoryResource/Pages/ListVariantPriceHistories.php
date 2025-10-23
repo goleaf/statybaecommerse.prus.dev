@@ -10,8 +10,7 @@ use Filament\Actions;
 
 final class ListVariantPriceHistories extends BaseListRecords
 {
-    use HasResizableColumns;
-
+    
     protected static string $resource = VariantPriceHistoryResource::class;
 
     protected function getHeaderActions(): array

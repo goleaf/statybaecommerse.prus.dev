@@ -10,8 +10,7 @@ use Filament\Actions;
 
 class ListAdminUsers extends BaseListRecords
 {
-    use HasResizableColumns;
-
+    
     protected static string $resource = AdminUserResource::class;
 
     protected function getHeaderActions(): array

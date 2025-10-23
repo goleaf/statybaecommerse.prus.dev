@@ -15,8 +15,8 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Grid as SchemaGrid;
+use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
@@ -65,9 +65,9 @@ final class ReferralCodeStatisticsResource extends Resource
     {
         return $schema
             ->schema([
-                Section::make(__('admin.referral_code_statistics.basic_information'))
+                SchemaSection::make(__('admin.referral_code_statistics.basic_information'))
                     ->schema([
-                        Grid::make(2)
+                        SchemaGrid::make(2)
                             ->schema([
                                 Select::make('referral_code_id')
                                     ->label(__('admin.referral_code_statistics.referral_code'))
@@ -80,9 +80,9 @@ final class ReferralCodeStatisticsResource extends Resource
                                     ->default(now()),
                             ]),
                     ]),
-                Section::make(__('admin.referral_code_statistics.metrics'))
+                SchemaSection::make(__('admin.referral_code_statistics.metrics'))
                     ->schema([
-                        Grid::make(2)
+                        SchemaGrid::make(2)
                             ->schema([
                                 TextInput::make('total_views')
                                     ->label(__('admin.referral_code_statistics.total_views'))

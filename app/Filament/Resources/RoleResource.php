@@ -11,7 +11,7 @@ use App\Filament\Resources\RoleResource\Pages;
 use App\Models\Role;
 use App\Support\Authorization\AuthorizationMatrix;
 use BackedEnum;
-use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
@@ -101,7 +101,7 @@ final class RoleResource extends Resource
     {
         return $schema
             ->schema([
-                Section::make(__('roles.sections.general'))
+                SchemaSection::make(__('roles.sections.general'))
                     ->schema([
                         TextInput::make('name')
                             ->label(__('roles.fields.name'))

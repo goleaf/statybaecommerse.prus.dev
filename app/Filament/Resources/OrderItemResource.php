@@ -15,17 +15,14 @@ use App\Support\Filament\Filters\DateRangeFilter;
 use App\Support\Search\ProductSearch;
 use App\Support\Search\ProductVariantSearch;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Grid as SchemaGrid;
+use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Actions\BulkActionGroup;
@@ -85,9 +82,9 @@ final class OrderItemResource extends Resource
     public static function form(Schema $schema): Schema   
     {
         return $schema->schema([
-            Section::make(__('orders.sections.order_items'))
+            SchemaSection::make(__('orders.sections.order_items'))
                 ->schema([
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             Select::make('order_id')
                                 ->label(__('order_items.order'))
@@ -184,7 +181,7 @@ final class OrderItemResource extends Resource
                                     $set('total', number_format($total, 2, '.', ''));
                                 }),
                         ]),
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             SearchableInput::make('product_variant_id')
                                 ->label(__('order_items.product_variant'))
@@ -217,7 +214,7 @@ final class OrderItemResource extends Resource
                                 ->label(__('order_items.product_name'))
                                 ->maxLength(255),
                         ]),
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             TextInput::make('sku')
                                 ->label(__('order_items.product_sku'))
@@ -236,9 +233,9 @@ final class OrderItemResource extends Resource
                                 }),
                         ]),
                 ]),
-            Section::make(__('order_items.pricing'))
+            SchemaSection::make(__('order_items.pricing'))
                 ->schema([
-                    Grid::make(3)
+                    SchemaGrid::make(3)
                         ->schema([
                             TextInput::make('unit_price')
                                 ->label(__('order_items.unit_price'))
@@ -270,7 +267,7 @@ final class OrderItemResource extends Resource
                                 ->disabled(),
                         ]),
                 ]),
-            Section::make(__('order_items.additional_information'))
+            SchemaSection::make(__('order_items.additional_information'))
                 ->schema([
                     Textarea::make('notes')
                         ->label(__('order_items.notes'))

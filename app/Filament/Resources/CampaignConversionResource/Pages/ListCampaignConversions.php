@@ -13,8 +13,7 @@ use Filament\Actions;
 
 final class ListCampaignConversions extends BaseListRecords
 {
-    use HasResizableColumns;
-
+    
     protected static string $resource = CampaignConversionResource::class;
 
     protected function getHeaderActions(): array

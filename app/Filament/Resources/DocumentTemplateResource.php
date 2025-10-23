@@ -25,10 +25,10 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
-use Filament\Schemas\Components\Tabs;
-use Filament\Schemas\Components\Tabs\Tab;
+use Filament\Schemas\Components\Grid as SchemaGrid;
+use Filament\Schemas\Components\Section as SchemaSection;
+use Filament\Schemas\Components\Tabs as SchemaTabs;
+use Filament\Schemas\Components\Tabs\Tab as SchemaTab;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -85,13 +85,13 @@ final class DocumentTemplateResource extends Resource
     public static function form(Schema $schema): Schema   
     {
         return $schema->schema([
-            Tabs::make('document_template_form')
+            SchemaTabs::make('document_template_form')
                 ->tabs([
-                    Tab::make(__('admin/document_templates.form.tabs.basic_information'))
+                    SchemaTab::make(__('admin/document_templates.form.tabs.basic_information'))
                         ->schema([
-                            Section::make(__('admin/document_templates.form.sections.basic_information'))
+                            SchemaSection::make(__('admin/document_templates.form.sections.basic_information'))
                                 ->schema([
-                                    Grid::make(2)
+                                    SchemaGrid::make(2)
                                         ->schema([
                                             TextInput::make('name')
                                                 ->label(__('admin/document_templates.form.fields.name'))
@@ -107,7 +107,7 @@ final class DocumentTemplateResource extends Resource
                                         ->rows(3)
                                         ->maxLength(500)
                                         ->columnSpanFull(),
-                                    Grid::make(2)
+                                    SchemaGrid::make(2)
                                         ->schema([
                                             Select::make('type')
                                                 ->label(__('admin/document_templates.form.fields.type'))
@@ -125,9 +125,9 @@ final class DocumentTemplateResource extends Resource
                                         ->default(true),
                                 ]),
                         ]),
-                    Tab::make(__('admin/document_templates.form.tabs.content'))
+                    SchemaTab::make(__('admin/document_templates.form.tabs.content'))
                         ->schema([
-                            Section::make(__('admin/document_templates.form.sections.content'))
+                            SchemaSection::make(__('admin/document_templates.form.sections.content'))
                                 ->schema([
                                     RichEditor::make('content')
                                         ->label(__('admin/document_templates.form.fields.content'))
@@ -137,9 +137,9 @@ final class DocumentTemplateResource extends Resource
                                         ->columnSpanFull(),
                                 ]),
                         ]),
-                    Tab::make(__('admin/document_templates.form.tabs.variables'))
+                    SchemaTab::make(__('admin/document_templates.form.tabs.variables'))
                         ->schema([
-                            Section::make(__('admin/document_templates.form.sections.variables'))
+                            SchemaSection::make(__('admin/document_templates.form.sections.variables'))
                                 ->schema([
                                     Repeater::make('variables')
                                         ->label(__('admin/document_templates.form.fields.variables'))
@@ -161,9 +161,9 @@ final class DocumentTemplateResource extends Resource
                                         }),
                                 ]),
                         ]),
-                    Tab::make(__('admin/document_templates.form.tabs.settings'))
+                    SchemaTab::make(__('admin/document_templates.form.tabs.settings'))
                         ->schema([
-                            Section::make(__('admin/document_templates.form.sections.settings'))
+                            SchemaSection::make(__('admin/document_templates.form.sections.settings'))
                                 ->schema([
                                     KeyValue::make('settings')
                                         ->label(__('admin/document_templates.form.fields.settings'))
@@ -175,9 +175,9 @@ final class DocumentTemplateResource extends Resource
                                         ->columnSpanFull(),
                                 ]),
                         ]),
-                    Tab::make(__('admin/document_templates.form.tabs.preview'))
+                    SchemaTab::make(__('admin/document_templates.form.tabs.preview'))
                         ->schema([
-                            Section::make(__('admin/document_templates.form.sections.preview'))
+                            SchemaSection::make(__('admin/document_templates.form.sections.preview'))
                                 ->schema([
                                     Placeholder::make('template_preview')
                                         ->label(__('admin/document_templates.form.fields.template_preview'))

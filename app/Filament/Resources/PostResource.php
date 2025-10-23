@@ -17,9 +17,9 @@ use Awcodes\BadgeableColumn\Components\Badge;
 use Awcodes\BadgeableColumn\Components\BadgeableColumn;
 use BackedEnum;
 use Filament\Forms;
-use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Grid as SchemaGrid;
 use Filament\Forms\Components\RichEditor;
-use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Components\TagsInput;
@@ -112,7 +112,7 @@ final class PostResource extends Resource
     {
         return $schema
             ->components([
-                Section::make(__('posts.sections.basic_information'))
+                SchemaSection::make(__('posts.sections.basic_information'))
                     ->components([
                         LanguageTabs::make([
                             TextInput::make('title')
@@ -134,7 +134,7 @@ final class PostResource extends Resource
                                 ->required()
                                 ->columnSpanFull(),
                         ]),
-                        Grid::make(2)
+                        SchemaGrid::make(2)
                             ->schema([
                                 TextInput::make('title')
                                     ->label(__('posts.fields.title'))
@@ -159,7 +159,7 @@ final class PostResource extends Resource
                                     ->required(),
                             ]),
                     ]),
-                Section::make(__('posts.sections.media'))
+                SchemaSection::make(__('posts.sections.media'))
                     ->components([
                         SpatieMediaLibraryFileUpload::make('images')
                             ->label(__('posts.fields.images'))
@@ -172,7 +172,7 @@ final class PostResource extends Resource
                             ->image()
                             ->multiple(),
                     ]),
-                Section::make(__('posts.sections.seo'))
+                SchemaSection::make(__('posts.sections.seo'))
                     ->components([
                         LanguageTabs::make([
                             TextInput::make('meta_title')
@@ -184,9 +184,9 @@ final class PostResource extends Resource
                                 ->rows(3),
                         ]),
                     ]),
-                Section::make(__('posts.sections.settings'))
+                SchemaSection::make(__('posts.sections.settings'))
                     ->components([
-                        Grid::make(2)
+                        SchemaGrid::make(2)
                             ->components([
                                 Select::make('status')
                                     ->label(__('posts.fields.status'))
@@ -203,7 +203,7 @@ final class PostResource extends Resource
                                     ->label(__('posts.fields.published_at'))
                                     ->default(now()),
                             ]),
-                        Grid::make(2)
+                        SchemaGrid::make(2)
                             ->components([
                                 Toggle::make('featured')
                                     ->label(__('posts.fields.featured')),
@@ -700,12 +700,6 @@ final class PostResource extends Resource
     /**
      * @return Builder<Post>
      */
-    public static function getEloquentQuery(): Builder
-    {
-        return parent::getEloquentQuery()
-            ->with(['user:id,name']);
-    }
-
     /**
      * Get the relations for this resource.
      */

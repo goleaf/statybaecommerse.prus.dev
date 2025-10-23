@@ -107,9 +107,9 @@ final class AddressResource extends Resource
     public static function form(Schema $schema): Schema
     {
         return $schema->schema([
-            Section::make(__('translations.address_information'))
+            SchemaSection::make(__('translations.address_information'))
                 ->components([
-                    Grid::make(2)->components([
+                    SchemaGrid::make(2)->components([
                         SearchableInput::make('user_id')
                             ->label(__('translations.user'))
                             ->placeholder('Name, email or phone')
@@ -159,7 +159,7 @@ final class AddressResource extends Resource
                             ->required()
                             ->default(AddressType::SHIPPING->value),
                     ]),
-                    Grid::make(2)->components([
+                    SchemaGrid::make(2)->components([
                         TextInput::make('first_name')
                             ->label(__('translations.first_name'))
                             ->maxLength(255),
@@ -167,7 +167,7 @@ final class AddressResource extends Resource
                             ->label(__('translations.last_name'))
                             ->maxLength(255),
                     ]),
-                    Grid::make(2)->components([
+                    SchemaGrid::make(2)->components([
                         TextInput::make('company_name')
                             ->label(__('translations.company'))
                             ->maxLength(255),
@@ -176,7 +176,7 @@ final class AddressResource extends Resource
                             ->maxLength(50),
                     ]),
                 ]),
-            Section::make(__('translations.address_details'))
+            SchemaSection::make(__('translations.address_details'))
                 ->components([
                     SearchableInput::make('address_line_1')
                         ->label(__('translations.address_line_1'))
@@ -187,7 +187,7 @@ final class AddressResource extends Resource
                     TextInput::make('address_line_2')
                         ->label(__('translations.address_line_2'))
                         ->maxLength(255),
-                    Grid::make(3)->components([
+                    SchemaGrid::make(3)->components([
                         TextInput::make('apartment')
                             ->label(__('translations.apartment'))
                             ->maxLength(100),
@@ -198,7 +198,7 @@ final class AddressResource extends Resource
                             ->label(__('translations.building'))
                             ->maxLength(100),
                     ]),
-                    Grid::make(3)->components([
+                    SchemaGrid::make(3)->components([
                         SearchableInput::make('city')
                             ->label(__('translations.city'))
                             ->placeholder(__('translations.city'))
@@ -213,7 +213,7 @@ final class AddressResource extends Resource
                             ->required()
                             ->maxLength(20),
                     ]),
-                    Grid::make(2)->components([
+                    SchemaGrid::make(2)->components([
                         Select::make('country_code')
                             ->label(__('translations.country'))
                             ->options(fn (): array => Country::query()->orderBy('name')->pluck('name', 'cca2')->all())
@@ -279,9 +279,9 @@ final class AddressResource extends Resource
                             ->dehydrated(false),
                     ]),
                 ]),
-            Section::make(__('translations.contact_information'))
+            SchemaSection::make(__('translations.contact_information'))
                 ->components([
-                    Grid::make(2)->components([
+                    SchemaGrid::make(2)->components([
                         TextInput::make('phone')
                             ->label(__('translations.phone'))
                             ->tel()
@@ -295,7 +295,7 @@ final class AddressResource extends Resource
                         ->label(__('translations.landmark'))
                         ->maxLength(255),
                 ]),
-            Section::make(__('translations.additional_information'))
+            SchemaSection::make(__('translations.additional_information'))
                 ->components([
                     Textarea::make('notes')
                         ->label(__('translations.notes'))
@@ -308,9 +308,9 @@ final class AddressResource extends Resource
                         ->rows(3)
                         ->columnSpanFull(),
                 ]),
-            Section::make(__('translations.settings'))
+            SchemaSection::make(__('translations.settings'))
                 ->components([
-                    Grid::make(2)->components([
+                    SchemaGrid::make(2)->components([
                         Toggle::make('is_default')
                             ->label(__('translations.is_default'))
                             ->helperText(__('translations.is_default_help')),
@@ -319,7 +319,7 @@ final class AddressResource extends Resource
                             ->default(true)
                             ->helperText(__('translations.is_active_help')),
                     ]),
-                    Grid::make(2)->components([
+                    SchemaGrid::make(2)->components([
                         Toggle::make('is_billing')
                             ->label(__('translations.is_billing'))
                             ->helperText(__('translations.is_billing_help')),

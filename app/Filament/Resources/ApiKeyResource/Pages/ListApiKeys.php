@@ -10,8 +10,7 @@ use Filament\Actions;
 
 final class ListApiKeys extends BaseListRecords
 {
-    use HasResizableColumns;
-
+    
     protected static string $resource = ApiKeyResource::class;
 
     protected function getHeaderActions(): array

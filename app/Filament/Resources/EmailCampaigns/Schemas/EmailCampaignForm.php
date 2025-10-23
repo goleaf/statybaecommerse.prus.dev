@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\EmailCampaigns\Schemas;
 
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Grid as SchemaGrid;
+use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -18,7 +18,7 @@ class EmailCampaignForm
     {
         return $schema
             ->components([
-                Section::make('Email campaign details')
+                SchemaSection::make('Email campaign details')
                     ->schema([
                         TextInput::make('name')
                             ->label('Name')
@@ -28,7 +28,7 @@ class EmailCampaignForm
                             ->label('Description')
                             ->rows(3)
                             ->columnSpanFull(),
-                        Grid::make(2)
+                        SchemaGrid::make(2)
                             ->schema([
                                 TextInput::make('subject')
                                     ->label('Subject')
@@ -40,7 +40,7 @@ class EmailCampaignForm
                                     ->required()
                                     ->maxLength(255),
                             ]),
-                        Grid::make(2)
+                        SchemaGrid::make(2)
                             ->schema([
                                 TextInput::make('from_name')
                                     ->label('From name')
@@ -56,7 +56,7 @@ class EmailCampaignForm
                         Textarea::make('html_content')
                             ->label('HTML content')
                             ->columnSpanFull(),
-                        Grid::make(2)
+                        SchemaGrid::make(2)
                             ->schema([
                                 TextInput::make('status')
                                     ->label('Status')
@@ -66,7 +66,7 @@ class EmailCampaignForm
                                     ->label('Active')
                                     ->default(true),
                             ]),
-                        Grid::make(2)
+                        SchemaGrid::make(2)
                             ->schema([
                                 Flatpickr::makeDateTime('scheduled_at')
                                     ->label('Scheduled at'),

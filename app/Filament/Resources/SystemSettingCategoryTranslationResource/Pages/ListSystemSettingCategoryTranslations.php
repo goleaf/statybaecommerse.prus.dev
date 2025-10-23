@@ -10,8 +10,7 @@ use Filament\Actions\CreateAction;
 
 final class ListSystemSettingCategoryTranslations extends BaseListRecords
 {
-    use HasResizableColumns;
-
+    
     protected static string $resource = SystemSettingCategoryTranslationResource::class;
 
     protected function getHeaderActions(): array

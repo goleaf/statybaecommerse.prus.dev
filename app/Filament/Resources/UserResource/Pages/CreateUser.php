@@ -26,12 +26,4 @@ class CreateUser extends CreateRecord
     {
         return $data;
     }
-
-    protected function getHeaderActions(): array
-    {
-        return [
-            LocaleSwitcher::make(), // Allow admins to switch locales before entering translated values.
-            ...parent::getHeaderActions(),
-        ];
-    }
 }

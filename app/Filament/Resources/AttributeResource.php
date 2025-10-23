@@ -5,14 +5,15 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 
-use App\Support\Concerns\HasNav;
 use Filament\Schemas\Schema;
 use App\Filament\Resources\AttributeResource\Pages;
 use App\Models\Attribute;
+use App\Support\Concerns\HasNav;
+use BackedEnum;
 use Filament\Actions;
-use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Grid as SchemaGrid;
 use Filament\Forms\Components\Repeater;
-use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -66,9 +67,9 @@ final class AttributeResource extends Resource
     public static function form(Schema $schema): Schema   
     {
         return $schema->schema([
-            Section::make(__('attributes.basic_information'))
+            SchemaSection::make(__('attributes.basic_information'))
                 ->schema([
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             TextInput::make('name')
                                 ->label(__('attributes.name'))
@@ -86,7 +87,7 @@ final class AttributeResource extends Resource
                         ->maxLength(500)
                         ->columnSpanFull(),
                 ]),
-            Section::make(__('attributes.type_settings'))
+            SchemaSection::make(__('attributes.type_settings'))
                 ->schema([
                     Select::make('type')
                         ->label(__('attributes.type'))
@@ -126,9 +127,9 @@ final class AttributeResource extends Resource
                         ->label(__('attributes.is_filterable'))
                         ->default(true),
                 ]),
-            Section::make(__('attributes.validation'))
+            SchemaSection::make(__('attributes.validation'))
                 ->schema([
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             TextInput::make('min_length')
                                 ->label(__('attributes.min_length'))
@@ -212,7 +213,7 @@ final class AttributeResource extends Resource
                         })
                         ->columnSpanFull(),
                 ]),
-            Section::make(__('attributes.options'))
+            SchemaSection::make(__('attributes.options'))
                 ->schema([
                     Repeater::make('options')
                         ->label(__('attributes.options'))
@@ -235,9 +236,9 @@ final class AttributeResource extends Resource
                         ->columns(4)
                         ->addActionLabel(__('attributes.add_option')),
                 ]),
-            Section::make(__('attributes.settings'))
+            SchemaSection::make(__('attributes.settings'))
                 ->schema([
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             Toggle::make('is_active')
                                 ->label(__('attributes.is_active'))

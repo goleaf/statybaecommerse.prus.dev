@@ -15,8 +15,8 @@ use Filament\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Grid as SchemaGrid;
+use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -66,9 +66,9 @@ final class StockMovementResource extends Resource
     public static function form(Schema $schema): Schema   
     {
         return $schema->schema([
-            Section::make(__('stock_movement.sections.basic_information'))
+            SchemaSection::make(__('stock_movement.sections.basic_information'))
                 ->components([
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->components([
                             Select::make('variant_inventory_id')
                                 ->label(__('stock_movement.fields.variant_inventory'))
@@ -84,7 +84,7 @@ final class StockMovementResource extends Resource
                                 ->preload()
                                 ->columnSpan(1),
                         ]),
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->components([
                             Quantity::make('quantity')
                                 ->label(__('stock_movement.fields.quantity'))
@@ -104,7 +104,7 @@ final class StockMovementResource extends Resource
                         ]),
                 ])
                 ->columns(1),
-            Section::make(__('stock_movement.sections.details'))
+            SchemaSection::make(__('stock_movement.sections.details'))
                 ->components([
                     TextInput::make('reason')
                         ->label(__('stock_movement.fields.reason'))

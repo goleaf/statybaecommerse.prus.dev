@@ -10,8 +10,7 @@ use Filament\Actions\CreateAction;
 
 class ListVariantInventories extends BaseListRecords
 {
-    use HasResizableColumns;
-
+    
     protected static string $resource = VariantInventoryResource::class;
 
     protected function getHeaderActions(): array

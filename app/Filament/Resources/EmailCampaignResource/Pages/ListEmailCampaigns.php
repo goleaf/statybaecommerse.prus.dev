@@ -10,8 +10,7 @@ use Filament\Actions;
 
 class ListEmailCampaigns extends BaseListRecords
 {
-    use HasResizableColumns;
-
+    
     protected static string $resource = EmailCampaignResource::class;
 
     protected function getHeaderActions(): array

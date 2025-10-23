@@ -10,8 +10,7 @@ use Filament\Actions\CreateAction;
 
 class ListSettings extends BaseListRecords
 {
-    use HasResizableColumns;
-
+    
     protected static string $resource = SettingResource::class;
 
     protected function getHeaderActions(): array

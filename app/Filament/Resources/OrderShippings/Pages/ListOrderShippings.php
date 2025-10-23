@@ -10,8 +10,7 @@ use Filament\Actions\CreateAction;
 
 class ListOrderShippings extends BaseListRecords
 {
-    use HasResizableColumns;
-
+    
     protected static string $resource = OrderShippingResource::class;
 
     protected function getHeaderActions(): array

@@ -26,7 +26,7 @@ use Filament\Actions\ViewAction as TableViewAction;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\KeyValue;
-use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -83,9 +83,9 @@ final class CountryResource extends Resource
     {
         return $schema
             ->schema([
-                Section::make(__('countries.sections.basic_info'))
+                SchemaSection::make(__('countries.sections.basic_info'))
                     ->schema([
-                        Grid::make(3)
+                        SchemaGrid::make(3)
                             ->schema([
                                 TextInput::make('name')
                                     ->label(__('countries.fields.name'))
@@ -97,7 +97,7 @@ final class CountryResource extends Resource
                                     ->maxLength(255)
                                     ->columnSpan(1),
                             ]),
-                        Grid::make(4)
+                        SchemaGrid::make(4)
                             ->schema([
                                 TextInput::make('cca2')
                                     ->label(__('countries.fields.cca2'))
@@ -117,7 +117,7 @@ final class CountryResource extends Resource
                                     ->label(__('countries.fields.iso_code'))
                                     ->maxLength(10),
                             ]),
-                        Grid::make(2)
+                        SchemaGrid::make(2)
                             ->schema([
                                 TextInput::make('region')
                                     ->label(__('countries.fields.region'))
@@ -132,9 +132,9 @@ final class CountryResource extends Resource
                             ->columnSpanFull(),
                     ])
                     ->columns(2),
-                Section::make(__('countries.sections.location_info'))
+                SchemaSection::make(__('countries.sections.location_info'))
                     ->schema([
-                        Grid::make(3)
+                        SchemaGrid::make(3)
                             ->schema([
                                 TextInput::make('latitude')
                                     ->label(__('countries.fields.latitude'))
@@ -150,7 +150,7 @@ final class CountryResource extends Resource
                                     ->label(__('countries.fields.timezone'))
                                     ->maxLength(50),
                             ]),
-                        Grid::make(2)
+                        SchemaGrid::make(2)
                             ->schema([
                                 KeyValue::make('timezones')
                                     ->label(__('countries.fields.timezones'))
@@ -165,9 +165,9 @@ final class CountryResource extends Resource
                             ]),
                     ])
                     ->columns(2),
-                Section::make(__('countries.sections.economic_info'))
+                SchemaSection::make(__('countries.sections.economic_info'))
                     ->schema([
-                        Grid::make(3)
+                        SchemaGrid::make(3)
                             ->schema([
                                 TextInput::make('currency_code')
                                     ->label(__('countries.fields.currency_code'))
@@ -181,7 +181,7 @@ final class CountryResource extends Resource
                                     ->maxLength(10)
                                     ->helperText(__('countries.validation.phone_code_invalid')),
                             ]),
-                        Grid::make(3)
+                        SchemaGrid::make(3)
                             ->schema([
                                 TextInput::make('phone_calling_code')
                                     ->label(__('countries.fields.phone_calling_code'))
@@ -197,7 +197,7 @@ final class CountryResource extends Resource
                                 Hidden::make('currencies')
                                     ->default([]),
                             ]),
-                        Grid::make(2)
+                        SchemaGrid::make(2)
                             ->schema([
                                 Toggle::make('is_eu_member')
                                     ->label(__('countries.fields.is_eu_member'))
@@ -208,9 +208,9 @@ final class CountryResource extends Resource
                             ]),
                     ])
                     ->columns(2),
-                Section::make(__('countries.sections.metadata'))
+                SchemaSection::make(__('countries.sections.metadata'))
                     ->schema([
-                        Grid::make(2)
+                        SchemaGrid::make(2)
                             ->schema([
                                 TextInput::make('flag')
                                     ->label(__('countries.fields.flag'))
@@ -219,7 +219,7 @@ final class CountryResource extends Resource
                                     ->label(__('countries.fields.svg_flag'))
                                     ->maxLength(255),
                             ]),
-                        Grid::make(3)
+                        SchemaGrid::make(3)
                             ->schema([
                                 Toggle::make('is_active')
                                     ->label(__('countries.fields.is_active'))

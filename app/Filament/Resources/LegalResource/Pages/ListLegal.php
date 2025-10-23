@@ -10,8 +10,7 @@ use Filament\Actions;
 
 final class ListLegal extends BaseListRecords
 {
-    use HasResizableColumns;
-
+    
     protected static string $resource = LegalResource::class;
 
     protected function getHeaderActions(): array

@@ -13,8 +13,8 @@ use App\Support\Filament\Components\Flatpickr;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Tabs;
-use Filament\Schemas\Components\Tabs\Tab;
+use Filament\Schemas\Components\Tabs as SchemaTabs;
+use Filament\Schemas\Components\Tabs\Tab as SchemaTab;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
@@ -51,9 +51,9 @@ final class CampaignViewResource extends Resource
     {
         return $schema
             ->schema([
-                Tabs::make(__('campaign_views.section_title'))
+                SchemaTabs::make(__('campaign_views.section_title'))
                     ->tabs([
-                        Tab::make(__('campaign_views.tabs.basic_information'))
+                        SchemaTab::make(__('campaign_views.tabs.basic_information'))
                             ->icon('heroicon-o-information-circle')
                             ->schema([
                                 Select::make('campaign_id')

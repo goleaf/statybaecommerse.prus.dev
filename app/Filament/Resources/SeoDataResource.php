@@ -32,7 +32,7 @@ use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
@@ -79,7 +79,7 @@ final class SeoDataResource extends Resource
         return $schema
             ->columns(3)
             ->schema([
-                Section::make(__('seo_data.sections.basic_info'))
+                SchemaSection::make(__('seo_data.sections.basic_info'))
                     ->description(__('seo_data.sections.basic_info_description'))
                     ->columns(2)
                     ->schema([
@@ -120,7 +120,7 @@ final class SeoDataResource extends Resource
                             ->default('lt')
                             ->maxLength(10),
                     ]),
-                Section::make(__('seo_data.sections.seo_content'))
+                SchemaSection::make(__('seo_data.sections.seo_content'))
                     ->description(__('seo_data.sections.seo_content_description'))
                     ->columns(1)
                     ->schema([
@@ -196,7 +196,7 @@ final class SeoDataResource extends Resource
                             ->url()
                             ->maxLength(255),
                     ]),
-                Section::make(__('seo_data.sections.robots'))
+                SchemaSection::make(__('seo_data.sections.robots'))
                     ->description(__('seo_data.sections.robots_description'))
                     ->columns(2)
                     ->schema([
@@ -209,7 +209,7 @@ final class SeoDataResource extends Resource
                             ->inline(false)
                             ->default(false),
                     ]),
-                Section::make(__('seo_data.sections.advanced'))
+                SchemaSection::make(__('seo_data.sections.advanced'))
                     ->description(__('seo_data.sections.advanced_description'))
                     ->collapsible()
                     ->schema([
@@ -424,7 +424,7 @@ final class SeoDataResource extends Resource
         // Provide the infolist schema using the Filament v4 return type.
         return $schema
             ->components([
-                Section::make(__('seo_data.sections.basic_info'))
+                SchemaSection::make(__('seo_data.sections.basic_info'))
                     ->columns(2)
                     ->schema([
                         TextEntry::make('title')
@@ -453,7 +453,7 @@ final class SeoDataResource extends Resource
                             ->badge()
                             ->color('info'),
                     ]),
-                Section::make(__('seo_data.sections.seo_content'))
+                SchemaSection::make(__('seo_data.sections.seo_content'))
                     ->schema([
                         TextEntry::make('description')
                             ->label(__('seo_data.fields.description'))
@@ -466,7 +466,7 @@ final class SeoDataResource extends Resource
                             ->url(fn (?string $state): ?string => $state)
                             ->placeholder(__('seo_data.placeholders.no_canonical_url')),
                     ]),
-                Section::make(__('seo_data.sections.robots'))
+                SchemaSection::make(__('seo_data.sections.robots'))
                     ->columns(2)
                     ->schema([
                         IconEntry::make('no_index')
@@ -486,7 +486,7 @@ final class SeoDataResource extends Resource
                                 $record->no_follow ? 'nofollow' : null,
                             ])->filter()->implode(', ') ?: '—'),
                     ]),
-                Section::make(__('seo_data.sections.seo_analysis'))
+                SchemaSection::make(__('seo_data.sections.seo_analysis'))
                     ->columns(2)
                     ->schema([
                         TextEntry::make('seo_score')
@@ -514,7 +514,7 @@ final class SeoDataResource extends Resource
                                 ->filter()
                                 ->count()),
                     ]),
-                Section::make(__('seo_data.sections.advanced'))
+                SchemaSection::make(__('seo_data.sections.advanced'))
                     ->collapsible()
                     ->schema([
                         RepeatableEntry::make('meta_tags')
@@ -544,7 +544,7 @@ final class SeoDataResource extends Resource
                                 ->all())
                             ->placeholder(__('seo_data.placeholders.no_structured_data')),
                     ]),
-                Section::make(__('seo_data.sections.timestamps'))
+                SchemaSection::make(__('seo_data.sections.timestamps'))
                     ->columns(2)
                     ->collapsible()
                     ->schema([

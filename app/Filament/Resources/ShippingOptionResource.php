@@ -15,8 +15,8 @@ use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Grid as SchemaGrid;
+use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -72,9 +72,9 @@ final class ShippingOptionResource extends Resource
     {
         return $schema
             ->schema([
-                Section::make(__('admin.shipping_options.basic_information'))
+                SchemaSection::make(__('admin.shipping_options.basic_information'))
                     ->schema([
-                        Grid::make(2)
+                        SchemaGrid::make(2)
                             ->schema([
                                 TextInput::make('name')
                                     ->label(__('admin.shipping_options.name'))
@@ -114,9 +114,9 @@ final class ShippingOptionResource extends Resource
                             ->maxLength(1000)
                             ->rows(3),
                     ]),
-                Section::make(__('admin.shipping_options.pricing'))
+                SchemaSection::make(__('admin.shipping_options.pricing'))
                     ->schema([
-                        Grid::make(2)
+                        SchemaGrid::make(2)
                             ->schema([
                                 TextInput::make('price')
                                     ->label(__('admin.shipping_options.price'))
@@ -135,9 +135,9 @@ final class ShippingOptionResource extends Resource
                                     ->required(),
                             ]),
                     ]),
-                Section::make(__('admin.shipping_options.constraints'))
+                SchemaSection::make(__('admin.shipping_options.constraints'))
                     ->schema([
-                        Grid::make(2)
+                        SchemaGrid::make(2)
                             ->schema([
                                 TextInput::make('min_weight')
                                     ->label(__('admin.shipping_options.min_weight'))
@@ -161,7 +161,7 @@ final class ShippingOptionResource extends Resource
                                     ->step(0.01),
                             ]),
                     ]),
-                Section::make(__('admin.shipping_options.availability'))
+                SchemaSection::make(__('admin.shipping_options.availability'))
                     ->schema([
                         MatrixFactory::checkboxGrid(
                             'shipping_matrix',
@@ -173,9 +173,9 @@ final class ShippingOptionResource extends Resource
                             ->rowSelectRequired(false),
                     ])
                     ->collapsible(),
-                Section::make(__('admin.shipping_options.delivery'))
+                SchemaSection::make(__('admin.shipping_options.delivery'))
                     ->schema([
-                        Grid::make(2)
+                        SchemaGrid::make(2)
                             ->schema([
                                 TextInput::make('estimated_days_min')
                                     ->label(__('admin.shipping_options.estimated_days_min'))
@@ -189,9 +189,9 @@ final class ShippingOptionResource extends Resource
                                     ->minValue(1),
                             ]),
                     ]),
-                Section::make(__('admin.shipping_options.status'))
+                SchemaSection::make(__('admin.shipping_options.status'))
                     ->schema([
-                        Grid::make(3)
+                        SchemaGrid::make(3)
                             ->schema([
                                 Toggle::make('is_enabled')
                                     ->label(__('admin.shipping_options.is_enabled'))

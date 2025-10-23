@@ -17,7 +17,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Grid as SchemaGrid;
 use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
@@ -61,7 +61,7 @@ final class ProductSimilarityResource extends Resource
         return $form->schema([
             SchemaSection::make(__('product_similarities.basic_information'))
                 ->schema([
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             Select::make('product_id')
                                 ->label(__('product_similarities.product'))
@@ -77,7 +77,7 @@ final class ProductSimilarityResource extends Resource
                                 ->required()
                                 ->rule('different:product_id'),
                         ]),
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             Select::make('algorithm_type')
                                 ->label(__('product_similarities.algorithm_type'))

@@ -10,8 +10,7 @@ use Filament\Actions;
 
 final class ListCompanies extends BaseListRecords
 {
-    use HasResizableColumns;
-
+    
     protected static string $resource = CompanyResource::class;
 
     protected function getHeaderActions(): array

@@ -15,8 +15,8 @@ use Filament\Actions\BulkAction;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Grid as SchemaGrid;
+use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -80,9 +80,9 @@ final class DiscountCodeResource extends Resource
     public static function form(Schema $schema): Schema   
     {
         return $schema->schema([
-            Section::make(__('discount_codes.basic_information'))
+            SchemaSection::make(__('discount_codes.basic_information'))
                 ->schema([
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             Select::make('discount_id')
                                 ->label(__('discount_codes.discount'))
@@ -109,9 +109,9 @@ final class DiscountCodeResource extends Resource
                         ->maxLength(500)
                         ->columnSpanFull(),
                 ]),
-            Section::make(__('discount_codes.discount_settings'))
+            SchemaSection::make(__('discount_codes.discount_settings'))
                 ->schema([
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             Select::make('type')
                                 ->label(__('discount_codes.type'))
@@ -133,7 +133,7 @@ final class DiscountCodeResource extends Resource
                                 ->minValue(0)
                                 ->helperText(__('discount_codes.value_help')),
                         ]),
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             TextInput::make('minimum_amount')
                                 ->label(__('discount_codes.minimum_amount'))
@@ -145,9 +145,9 @@ final class DiscountCodeResource extends Resource
                                 ->minValue(0),
                         ]),
                 ]),
-            Section::make(__('discount_codes.usage_limits'))
+            SchemaSection::make(__('discount_codes.usage_limits'))
                 ->schema([
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             TextInput::make('usage_limit')
                                 ->label(__('discount_codes.usage_limit'))
@@ -160,7 +160,7 @@ final class DiscountCodeResource extends Resource
                                 ->minValue(1)
                                 ->helperText(__('discount_codes.usage_limit_per_user_help')),
                         ]),
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             TextInput::make('usage_count')
                                 ->label(__('discount_codes.used_count'))
@@ -176,9 +176,9 @@ final class DiscountCodeResource extends Resource
                                 ->disabled(),
                         ]),
                 ]),
-            Section::make(__('discount_codes.validity'))
+            SchemaSection::make(__('discount_codes.validity'))
                 ->schema([
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             Flatpickr::makeDateTime('valid_from')
                                 ->label(__('discount_codes.valid_from'))
@@ -189,7 +189,7 @@ final class DiscountCodeResource extends Resource
                                 ->displayFormat('d/m/Y H:i'),
                         ]),
                 ]),
-            Section::make(__('discount_codes.targeting'))
+            SchemaSection::make(__('discount_codes.targeting'))
                 ->schema([
                     Select::make('customer_group_id')
                         ->label(__('discount_codes.customer_group'))
@@ -207,9 +207,9 @@ final class DiscountCodeResource extends Resource
                         ->label(__('discount_codes.is_first_time_only'))
                         ->default(false),
                 ]),
-            Section::make(__('discount_codes.settings'))
+            SchemaSection::make(__('discount_codes.settings'))
                 ->schema([
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             Toggle::make('is_active')
                                 ->label(__('discount_codes.is_active'))
@@ -218,7 +218,7 @@ final class DiscountCodeResource extends Resource
                                 ->label(__('discount_codes.is_public'))
                                 ->default(false),
                         ]),
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             Toggle::make('is_auto_apply')
                                 ->label(__('discount_codes.is_auto_apply'))

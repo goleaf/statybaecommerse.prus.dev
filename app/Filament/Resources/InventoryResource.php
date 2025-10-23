@@ -11,7 +11,6 @@ use App\Models\Inventory;
 use App\Models\Product;
 use App\Support\Filament\SearchableComponentHelper;
 use App\Support\Search\ProductSearch;
-use App\Support\Search\SearchableComponentHelper;
 use App\Support\Search\SearchResultPayload;
 use BackedEnum;
 use Closure;
@@ -77,9 +76,9 @@ final class InventoryResource extends Resource
     public static function form(Schema $schema): Schema   
     {
         return $schema->schema([
-            Section::make(__('Inventory Details'))
+            SchemaSection::make(__('Inventory Details'))
                 ->schema([
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             SearchableInput::make('product_id')
                                 ->label(__('Product'))
@@ -130,7 +129,7 @@ final class InventoryResource extends Resource
                                 ->preload()
                                 ->required(),
                         ]),
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             Quantity::make('quantity')
                                 ->label(__('Quantity'))
@@ -144,7 +143,7 @@ final class InventoryResource extends Resource
                                 ->steps(1)
                                 ->default(0),
                         ]),
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             Quantity::make('incoming')
                                 ->label(__('Incoming'))

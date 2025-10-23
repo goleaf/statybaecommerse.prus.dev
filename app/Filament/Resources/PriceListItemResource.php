@@ -17,8 +17,8 @@ use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Grid as SchemaGrid;
+use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -93,9 +93,9 @@ final class PriceListItemResource extends Resource
     {
         return $schema
             ->schema([
-                Section::make(__('price_list_items.basic_information'))
+                SchemaSection::make(__('price_list_items.basic_information'))
                     ->schema([
-                        Grid::make(2)
+                        SchemaGrid::make(2)
                             ->schema([
                                 Select::make('price_list_id')
                                     ->label(__('price_list_items.price_list'))
@@ -123,9 +123,9 @@ final class PriceListItemResource extends Resource
                             ->maxLength(1000)
                             ->rows(3),
                     ]),
-                Section::make(__('price_list_items.pricing'))
+                SchemaSection::make(__('price_list_items.pricing'))
                     ->schema([
-                        Grid::make(2)
+                        SchemaGrid::make(2)
                             ->schema([
                                 TextInput::make('net_amount')
                                     ->label(__('price_list_items.net_amount'))
@@ -140,7 +140,7 @@ final class PriceListItemResource extends Resource
                                     ->step(0.01)
                                     ->minValue(0),
                             ]),
-                        Grid::make(2)
+                        SchemaGrid::make(2)
                             ->schema([
                                 TextInput::make('min_quantity')
                                     ->label(__('price_list_items.min_quantity'))
@@ -152,9 +152,9 @@ final class PriceListItemResource extends Resource
                                     ->minValue(1),
                             ]),
                     ]),
-                Section::make(__('price_list_items.validity'))
+                SchemaSection::make(__('price_list_items.validity'))
                     ->schema([
-                        Grid::make(2)
+                        SchemaGrid::make(2)
                             ->schema([
                                 Flatpickr::makeDateTime('valid_from')
                                     ->label(__('price_list_items.valid_from'))
@@ -165,7 +165,7 @@ final class PriceListItemResource extends Resource
                                     ->after('valid_from')
                                     ->helperText(__('price_list_items.valid_until_help')),
                             ]),
-                        Grid::make(2)
+                        SchemaGrid::make(2)
                             ->schema([
                                 Toggle::make('is_active')
                                     ->label(__('price_list_items.is_active'))
@@ -176,7 +176,7 @@ final class PriceListItemResource extends Resource
                                     ->helperText(__('price_list_items.is_featured_help')),
                             ]),
                     ]),
-                Section::make(__('price_list_items.settings'))
+                SchemaSection::make(__('price_list_items.settings'))
                     ->schema([
                         TextInput::make('priority')
                             ->label(__('price_list_items.priority'))

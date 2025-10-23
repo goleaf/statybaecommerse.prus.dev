@@ -10,8 +10,7 @@ use Filament\Actions;
 
 final class ListStockMovements extends BaseListRecords
 {
-    use HasResizableColumns;
-
+    
     protected static string $resource = StockMovementResource::class;
 
     protected function getHeaderActions(): array

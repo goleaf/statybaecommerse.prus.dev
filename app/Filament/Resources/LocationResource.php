@@ -23,8 +23,8 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Grid as SchemaGrid;
+use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Tables;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -63,9 +63,9 @@ final class LocationResource extends Resource
     public static function form(Schema $schema): Schema   
     {
         return $schema->schema([
-            Section::make(__('locations.basic_information'))
+            SchemaSection::make(__('locations.basic_information'))
                 ->components([
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->components([
                             TextInput::make('name')
                                 ->label(__('locations.fields.name'))
@@ -82,9 +82,9 @@ final class LocationResource extends Resource
                         ->rows(3)
                         ->columnSpanFull(),
                 ]),
-            Section::make(__('locations.geographic_information'))
+            SchemaSection::make(__('locations.geographic_information'))
                 ->components([
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->components([
                             Select::make('country_id')
                                 ->label(__('locations.fields.country'))
@@ -138,9 +138,9 @@ final class LocationResource extends Resource
                                 ->disabled(),
                         ]),
                 ]),
-            Section::make(__('locations.coordinates'))
+            SchemaSection::make(__('locations.coordinates'))
                 ->components([
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->components([
                             TextInput::make('latitude')
                                 ->label(__('locations.fields.latitude'))
@@ -156,9 +156,9 @@ final class LocationResource extends Resource
                                 ->maxValue(180),
                         ]),
                 ]),
-            Section::make(__('locations.address_information'))
+            SchemaSection::make(__('locations.address_information'))
                 ->components([
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->components([
                             TextInput::make('address_line_1')
                                 ->label(__('locations.fields.address_line_1'))
@@ -182,9 +182,9 @@ final class LocationResource extends Resource
                         ->valueLabel(__('locations.fields.address_value'))
                         ->addActionLabel(__('locations.actions.add_address_field')),
                 ]),
-            Section::make(__('locations.contact_information'))
+            SchemaSection::make(__('locations.contact_information'))
                 ->components([
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->components([
                             TextInput::make('phone')
                                 ->label(__('locations.fields.phone'))
@@ -201,7 +201,7 @@ final class LocationResource extends Resource
                         ->maxLength(255)
                         ->columnSpanFull(),
                 ]),
-            Section::make(__('locations.fields.opening_hours'))
+            SchemaSection::make(__('locations.fields.opening_hours'))
                 ->components([
                     Repeater::make('opening_hours')
                         ->label(__('locations.fields.opening_hours'))
@@ -231,7 +231,7 @@ final class LocationResource extends Resource
                         ->collapsible()
                         ->itemLabel(fn (array $state): ?string => $state['day'] ?? null),
                 ]),
-            Section::make(__('locations.details.contact_info'))
+            SchemaSection::make(__('locations.details.contact_info'))
                 ->components([
                     KeyValue::make('contact_info')
                         ->label(__('locations.fields.contact_info'))
@@ -239,9 +239,9 @@ final class LocationResource extends Resource
                         ->valueLabel(__('locations.fields.contact_value'))
                         ->addActionLabel(__('locations.actions.add_contact_field')),
                 ]),
-            Section::make(__('locations.business_settings'))
+            SchemaSection::make(__('locations.business_settings'))
                 ->components([
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->components([
                             Toggle::make('is_active')
                                 ->label(__('locations.fields.is_enabled'))

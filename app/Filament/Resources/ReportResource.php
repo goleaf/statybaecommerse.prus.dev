@@ -27,7 +27,7 @@ use Filament\Infolists\Components\TextEntry;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\EmptyState;
-use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\IconColumn;
@@ -82,7 +82,7 @@ final class ReportResource extends Resource
         return $schema
             ->columns(3)
             ->schema([
-                Section::make(__('reports.sections.basic_info'))
+                SchemaSection::make(__('reports.sections.basic_info'))
                     ->description(__('reports.sections.basic_info_description'))
                     ->columns(2)
                     ->schema([
@@ -125,7 +125,7 @@ final class ReportResource extends Resource
                             ])
                             ->required(),
                     ]),
-                Section::make(__('reports.sections.content'))
+                SchemaSection::make(__('reports.sections.content'))
                     ->description(__('reports.sections.content_description'))
                     ->columns(1)
                     ->schema([
@@ -146,7 +146,7 @@ final class ReportResource extends Resource
                             ->rows(5)
                             ->columnSpanFull(),
                     ]),
-                Section::make(__('reports.sections.settings'))
+                SchemaSection::make(__('reports.sections.settings'))
                     ->description(__('reports.sections.settings_description'))
                     ->columns(2)
                     ->schema([
@@ -174,7 +174,7 @@ final class ReportResource extends Resource
                             ])
                             ->visible(fn ($get) => $get('is_scheduled')),
                     ]),
-                Section::make(__('reports.sections.date_range'))
+                SchemaSection::make(__('reports.sections.date_range'))
                     ->description(__('reports.sections.date_range_description'))
                     ->columns(2)
                     ->schema([
@@ -190,7 +190,7 @@ final class ReportResource extends Resource
                             ->nullable()
                             ->disabled(),
                     ]),
-                Section::make(__('reports.sections.advanced'))
+                SchemaSection::make(__('reports.sections.advanced'))
                     ->description(__('reports.sections.advanced_description'))
                     ->collapsible()
                     ->schema([
@@ -479,7 +479,7 @@ final class ReportResource extends Resource
         // Provide the infolist schema using the Filament v4 return type.
         return $schema
             ->schema([
-                Section::make(__('reports.sections.basic_info'))
+                SchemaSection::make(__('reports.sections.basic_info'))
                     ->schema([
                         TextEntry::make('name')
                             ->label(__('reports.fields.name'))
@@ -518,7 +518,7 @@ final class ReportResource extends Resource
                             ->formatStateUsing(fn (string $state): string => __("reports.categories.{$state}")),
                     ])
                     ->columns(2),
-                Section::make(__('reports.sections.content'))
+                SchemaSection::make(__('reports.sections.content'))
                     ->schema([
                         TextEntry::make('description')
                             ->label(__('reports.fields.description'))
@@ -529,7 +529,7 @@ final class ReportResource extends Resource
                             ->columnSpanFull()
                             ->placeholder(__('reports.placeholders.no_content')),
                     ]),
-                Section::make(__('reports.sections.settings'))
+                SchemaSection::make(__('reports.sections.settings'))
                     ->schema([
                         IconEntry::make('is_active')
                             ->label(__('reports.fields.is_active'))
@@ -550,7 +550,7 @@ final class ReportResource extends Resource
                             ->placeholder(__('reports.placeholders.no_schedule')),
                     ])
                     ->columns(2),
-                Section::make(__('reports.sections.stats'))
+                SchemaSection::make(__('reports.sections.stats'))
                     ->schema([
                         TextEntry::make('view_count')
                             ->label(__('reports.fields.view_count'))
@@ -571,7 +571,7 @@ final class ReportResource extends Resource
                             ->placeholder(__('reports.placeholders.never_generated')),
                     ])
                     ->columns(2),
-                Section::make(__('reports.sections.advanced'))
+                SchemaSection::make(__('reports.sections.advanced'))
                     ->collapsible()
                     ->schema([
                         EmptyState::make(__('reports.placeholders.no_filters'))
@@ -629,7 +629,7 @@ final class ReportResource extends Resource
                             ])
                             ->placeholder(__('reports.placeholders.no_metadata')),
                     ]),
-                Section::make(__('reports.sections.timestamps'))
+                SchemaSection::make(__('reports.sections.timestamps'))
                     ->schema([
                         TextEntry::make('created_at')
                             ->label(__('reports.fields.created_at'))

@@ -16,8 +16,8 @@ use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Grid as SchemaGrid;
+use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -71,9 +71,9 @@ final class StockResource extends Resource
     public static function form(Schema $schema): Schema   
     {
         return $schema->schema([
-            Section::make(__('inventory.product_information'))
+            SchemaSection::make(__('inventory.product_information'))
                 ->schema([
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             Select::make('product_id')
                                 ->label(__('inventory.product'))
@@ -103,9 +103,9 @@ final class StockResource extends Resource
                         ->dehydrated(false)
                         ->disabled(),
                 ]),
-            Section::make(__('inventory.stock_information'))
+            SchemaSection::make(__('inventory.stock_information'))
                 ->schema([
-                    Grid::make(3)
+                    SchemaGrid::make(3)
                         ->schema([
                             Quantity::make('quantity')
                                 ->label(__('inventory.quantity'))
@@ -124,7 +124,7 @@ final class StockResource extends Resource
                                 ->steps(1)
                                 ->default(0),
                         ]),
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             Quantity::make('threshold')
                                 ->label(__('inventory.threshold'))

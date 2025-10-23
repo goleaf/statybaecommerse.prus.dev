@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources\UserManagementResource\RelationManagers;
 
 
+use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Schemas\Schema;
 use Filament\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
@@ -46,7 +47,7 @@ final class AddressesRelationManager extends BaseRelationManager
                     ])
                     ->required(),
             ]),
-            Grid::make(2)->schema([
+            SchemaGrid::make(2)->schema([
                 TextInput::make('address_line_1')
                     ->label(__('addresses.address_line_1'))
                     ->required()
@@ -70,7 +71,7 @@ final class AddressesRelationManager extends BaseRelationManager
                     ->searchable()
                     ->preload(),
             ]),
-            Grid::make(2)->schema([
+            SchemaGrid::make(2)->schema([
                 Toggle::make('is_default')
                     ->label(__('addresses.is_default'))
                     ->default(false),

@@ -276,17 +276,6 @@ final class LiveDashboard extends Component
      * @param  callable(): TValue $callback
      * @return TValue
      */
-    private function rememberDashboard(string $key, int $ttl, callable $callback): mixed
-    {
-        $store = Cache::getStore();
-
-        if ($store instanceof TaggableStore) {
-            return Cache::tags(CacheTagHelper::dashboards())->remember($key, $ttl, $callback);
-        }
-
-        return Cache::remember($key, $ttl, $callback);
-    }
-
     /**
      * Render the Livewire component view with current state.
      */

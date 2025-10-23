@@ -13,7 +13,7 @@ use App\Support\Filament\Components\Flatpickr;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -71,7 +71,7 @@ final class PriceListResource extends Resource
     public static function form(Schema $schema): Schema   
     {
         return $schema->schema([
-            Section::make(__('price_lists.basic_information'))
+            SchemaSection::make(__('price_lists.basic_information'))
                 ->columns(2)
                 ->schema([
                     TextInput::make('name')
@@ -99,7 +99,7 @@ final class PriceListResource extends Resource
                         ->default(0),
                 ])
                 ->columns(2),
-            Section::make(__('price_lists.settings'))
+            SchemaSection::make(__('price_lists.settings'))
                 ->schema([
                     Toggle::make('is_enabled')
                         ->label(__('price_lists.is_active'))

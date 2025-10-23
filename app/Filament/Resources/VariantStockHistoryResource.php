@@ -11,8 +11,8 @@ use App\Filament\Resources\VariantStockHistoryResource\Pages;
 use App\Models\VariantStockHistory;
 use App\Support\Filament\Components\Flatpickr;
 use App\Support\Filament\Filters\DateRangeFilter;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Grid as SchemaGrid;
+use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
@@ -57,7 +57,7 @@ final class VariantStockHistoryResource extends Resource
     public static function form(Schema $schema): Schema   
     {
         return $schema->schema([
-            Section::make(__('admin.variant_stock_histories.sections.basic_info'))
+            SchemaSection::make(__('admin.variant_stock_histories.sections.basic_info'))
                 ->description(__('admin.variant_stock_histories.sections.basic_info_description'))
                 ->schema([
                     Select::make('variant_id')
@@ -66,7 +66,7 @@ final class VariantStockHistoryResource extends Resource
                         ->required()
                         ->searchable()
                         ->preload(),
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             TextInput::make('old_quantity')
                                 ->label(__('admin.variant_stock_histories.fields.old_quantity'))
@@ -99,7 +99,7 @@ final class VariantStockHistoryResource extends Resource
                     TextInput::make('quantity_change')
                         ->label(__('admin.variant_stock_histories.fields.quantity_change'))
                         ->disabled(),
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             Select::make('change_type')
                                 ->label(__('admin.variant_stock_histories.fields.change_type'))
@@ -110,7 +110,7 @@ final class VariantStockHistoryResource extends Resource
                                 ->options(self::getChangeReasonOptions())
                                 ->required(),
                         ]),
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             Select::make('changed_by')
                                 ->label(__('admin.variant_stock_histories.fields.changed_by'))

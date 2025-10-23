@@ -17,9 +17,9 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Grid as SchemaGrid;
 use Filament\Forms\Components\KeyValue;
-use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -86,10 +86,10 @@ final class UserBehaviorResource extends Resource
     {
         return $schema
             ->schema([
-                Section::make(__('admin.user_behaviors.basic_information'))
+                SchemaSection::make(__('admin.user_behaviors.basic_information'))
                     ->description(__('admin.user_behaviors.basic_information_description'))
                     ->schema([
-                        Grid::make(2)
+                        SchemaGrid::make(2)
                             ->schema([
                                 Select::make('user_id')
                                     ->label(__('admin.user_behaviors.user'))
@@ -103,7 +103,7 @@ final class UserBehaviorResource extends Resource
                                     ->maxLength(255)
                                     ->columnSpan(1),
                             ]),
-                        Grid::make(2)
+                        SchemaGrid::make(2)
                             ->schema([
                                 Select::make('product_id')
                                     ->label(__('admin.user_behaviors.product'))
@@ -129,10 +129,10 @@ final class UserBehaviorResource extends Resource
                             ->displayFormat('d/m/Y H:i:s'),
                     ])
                     ->columns(1),
-                Section::make(__('admin.user_behaviors.technical_details'))
+                SchemaSection::make(__('admin.user_behaviors.technical_details'))
                     ->description(__('admin.user_behaviors.technical_details_description'))
                     ->schema([
-                        Grid::make(2)
+                        SchemaGrid::make(2)
                             ->schema([
                                 TextInput::make('ip_address')
                                     ->label(__('admin.user_behaviors.ip_address'))
@@ -150,7 +150,7 @@ final class UserBehaviorResource extends Resource
                             ->columnSpanFull(),
                     ])
                     ->columns(1),
-                Section::make(__('admin.user_behaviors.metadata'))
+                SchemaSection::make(__('admin.user_behaviors.metadata'))
                     ->description(__('admin.user_behaviors.metadata_description'))
                     ->schema([
                         KeyValue::make('metadata')

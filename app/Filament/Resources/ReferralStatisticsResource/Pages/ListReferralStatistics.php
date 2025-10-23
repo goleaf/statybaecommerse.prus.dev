@@ -10,8 +10,7 @@ use Filament\Actions;
 
 final class ListReferralStatistics extends BaseListRecords
 {
-    use HasResizableColumns;
-
+    
     protected static string $resource = ReferralStatisticsResource::class;
 
     protected function getHeaderActions(): array

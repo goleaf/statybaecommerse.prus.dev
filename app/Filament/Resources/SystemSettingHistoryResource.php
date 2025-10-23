@@ -23,8 +23,8 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Grid as SchemaGrid;
+use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
@@ -68,9 +68,9 @@ final class SystemSettingHistoryResource extends Resource
     {
         return $schema
             ->schema([
-                Section::make(__('admin.system_setting_histories.basic_information'))
+                SchemaSection::make(__('admin.system_setting_histories.basic_information'))
                     ->schema([
-                        Grid::make(2)
+                        SchemaGrid::make(2)
                             ->schema([
                                 Select::make('system_setting_id')
                                     ->label(__('admin.system_setting_histories.system_setting'))

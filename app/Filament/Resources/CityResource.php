@@ -11,14 +11,14 @@ use App\Filament\Resources\CityResource\Pages;
 use App\Models\City;
 use App\Models\Country;
 use Filament\Forms;
-use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Grid as SchemaGrid;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Tables;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
@@ -71,9 +71,9 @@ final class CityResource extends Resource
     public static function form(Schema $schema): Schema   
     {
         return $schema->schema([
-            Section::make(__('cities.basic_information'))
+            SchemaSection::make(__('cities.basic_information'))
                 ->schema([
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             TextInput::make('name')
                                 ->label(__('cities.name'))
@@ -110,7 +110,7 @@ final class CityResource extends Resource
                                 }
                             }
                         }),
-                    Grid::make(3)
+                    SchemaGrid::make(3)
                         ->schema([
                             TextInput::make('code')
                                 ->label(__('cities.code'))
@@ -132,9 +132,9 @@ final class CityResource extends Resource
                         ->maxLength(500)
                         ->columnSpanFull(),
                 ]),
-            Section::make(__('cities.coordinates'))
+            SchemaSection::make(__('cities.coordinates'))
                 ->schema([
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             TextInput::make('latitude')
                                 ->label(__('cities.latitude'))
@@ -152,9 +152,9 @@ final class CityResource extends Resource
                                 ->helperText(__('cities.longitude_help')),
                         ]),
                 ]),
-            Section::make(__('cities.demographics'))
+            SchemaSection::make(__('cities.demographics'))
                 ->schema([
-                    Grid::make(3)
+                    SchemaGrid::make(3)
                         ->schema([
                             TextInput::make('population')
                                 ->label(__('cities.population'))
@@ -174,7 +174,7 @@ final class CityResource extends Resource
                                 ->minValue(0)
                                 ->helperText(__('cities.density_help')),
                         ]),
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             TextInput::make('elevation')
                                 ->label(__('cities.elevation'))
@@ -187,9 +187,9 @@ final class CityResource extends Resource
                                 ->helperText(__('cities.timezone_help')),
                         ]),
                 ]),
-            Section::make(__('cities.localization'))
+            SchemaSection::make(__('cities.localization'))
                 ->schema([
-                    Grid::make(3)
+                    SchemaGrid::make(3)
                         ->schema([
                             TextInput::make('currency_code')
                                 ->label(__('cities.currency_code'))
@@ -205,9 +205,9 @@ final class CityResource extends Resource
                                 ->helperText(__('cities.phone_code_help')),
                         ]),
                 ]),
-            Section::make(__('cities.hierarchy'))
+            SchemaSection::make(__('cities.hierarchy'))
                 ->schema([
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             Select::make('parent_id')
                                 ->label(__('cities.parent_city'))
@@ -225,9 +225,9 @@ final class CityResource extends Resource
                                 ->helperText(__('cities.level_help')),
                         ]),
                 ]),
-            Section::make(__('cities.settings'))
+            SchemaSection::make(__('cities.settings'))
                 ->schema([
-                    Grid::make(3)
+                    SchemaGrid::make(3)
                         ->schema([
                             Toggle::make('is_active')
                                 ->label(__('cities.is_active'))
@@ -237,7 +237,7 @@ final class CityResource extends Resource
                             Toggle::make('is_default')
                                 ->label(__('cities.is_default')),
                         ]),
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             TextInput::make('sort_order')
                                 ->label(__('cities.sort_order'))

@@ -11,8 +11,7 @@ use Filament\Actions;
 
 final class ListBrands extends BaseListRecords
 {
-    use HasResizableColumns;
-
+    
     protected static string $resource = BrandResource::class;
 
     protected function getHeaderActions(): array

@@ -5,10 +5,11 @@ declare(strict_types=1);
 namespace App\Filament\Resources\CategoryResource\RelationManagers;
 
 
+use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Schemas\Schema;
 use Filament\Forms\Components\ColorPicker;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Grid as SchemaGrid;
+use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -22,6 +23,7 @@ use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Illuminate\Support\Str;
 
 final class ChildrenRelationManager extends BaseRelationManager
 {
@@ -36,9 +38,9 @@ final class ChildrenRelationManager extends BaseRelationManager
     public function form(Schema $schema): Schema   
     {
         return $schema->schema([
-            Section::make(__('categories.basic_information'))
+            SchemaSection::make(__('categories.basic_information'))
                 ->schema([
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             TextInput::make('name')
                                 ->label(__('categories.name'))
@@ -61,9 +63,9 @@ final class ChildrenRelationManager extends BaseRelationManager
                         ->maxLength(500)
                         ->columnSpanFull(),
                 ]),
-            Section::make(__('categories.appearance'))
+            SchemaSection::make(__('categories.appearance'))
                 ->schema([
-                    Grid::make(3)
+                    SchemaGrid::make(3)
                         ->schema([
                             ColorPicker::make('color')
                                 ->label(__('categories.color'))
@@ -81,9 +83,9 @@ final class ChildrenRelationManager extends BaseRelationManager
                                 ->helperText(__('categories.product_limit_help')),
                         ]),
                 ]),
-            Section::make(__('categories.settings'))
+            SchemaSection::make(__('categories.settings'))
                 ->schema([
-                    Grid::make(3)
+                    SchemaGrid::make(3)
                         ->schema([
                             Toggle::make('is_active')
                                 ->label(__('categories.is_active'))
@@ -95,7 +97,7 @@ final class ChildrenRelationManager extends BaseRelationManager
                                 ->label(__('categories.is_enabled'))
                                 ->default(true),
                         ]),
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             Toggle::make('is_featured')
                                 ->label(__('categories.is_featured')),

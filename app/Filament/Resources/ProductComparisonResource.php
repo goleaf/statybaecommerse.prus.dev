@@ -19,7 +19,7 @@ use Filament\Actions\ViewAction;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Grid as SchemaGrid;
 use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
@@ -79,7 +79,7 @@ final class ProductComparisonResource extends Resource
         return $schema->schema([
             SchemaSection::make(__('product_comparisons.basic_information'))
                 ->components([
-                    Grid::make(2)->components([
+                    SchemaGrid::make(2)->components([
                         Select::make('user_id')
                             ->label(__('product_comparisons.user'))
                             ->relationship('user', 'name')

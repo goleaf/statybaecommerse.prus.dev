@@ -7,7 +7,6 @@ namespace App\Filament\Pages;
 use BackedEnum;
 use App\Filament\Tables\Concerns\ConfiguresToggleableTableLayout;
 use App\Models\Product;
-use Filament\Actions\BulkAction;
 use Filament\Forms\Components\Select;
 use Filament\Pages\Page;
 use Filament\Tables\Actions\BulkAction;
@@ -27,8 +26,6 @@ final class InventoryManagement extends Page implements HasTable
      * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
      */
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-archive-box';
-
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-archive-box';
 
     public static function getNavigationGroup(): BackedEnum|string|null
     {

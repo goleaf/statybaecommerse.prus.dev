@@ -104,9 +104,9 @@ final class SystemSettingCategoryResource extends Resource
     {
         return $schema
             ->schema([
-                Section::make(__('system_setting_categories.basic_information'))
+                SchemaSection::make(__('system_setting_categories.basic_information'))
                     ->schema([
-                        Grid::make(2)
+                        SchemaGrid::make(2)
                             ->schema([
                                 TextInput::make('name')
                                     ->label(__('system_setting_categories.name'))
@@ -141,9 +141,9 @@ final class SystemSettingCategoryResource extends Resource
                             ->rows(3)
                             ->helperText(__('system_setting_categories.description_help')),
                     ]),
-                Section::make(__('system_setting_categories.appearance'))
+                SchemaSection::make(__('system_setting_categories.appearance'))
                     ->schema([
-                        Grid::make(2)
+                        SchemaGrid::make(2)
                             ->schema([
                                 TextInput::make('icon')
                                     ->label(__('system_setting_categories.icon'))
@@ -155,7 +155,7 @@ final class SystemSettingCategoryResource extends Resource
                                     ->helperText(__('system_setting_categories.color_help')),
                             ]),
                     ]),
-                Section::make(__('system_setting_categories.hierarchy'))
+                SchemaSection::make(__('system_setting_categories.hierarchy'))
                     ->schema([
                         Select::make('parent_id')
                             ->label(__('system_setting_categories.parent'))
@@ -165,9 +165,9 @@ final class SystemSettingCategoryResource extends Resource
                             ->preload()
                             ->helperText(__('system_setting_categories.parent_help')),
                     ]),
-                Section::make(__('system_setting_categories.configuration'))
+                SchemaSection::make(__('system_setting_categories.configuration'))
                     ->schema([
-                        Grid::make(2)
+                        SchemaGrid::make(2)
                             ->schema([
                                 TextInput::make('sort_order')
                                     ->label(__('system_setting_categories.sort_order'))

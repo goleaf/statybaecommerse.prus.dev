@@ -22,7 +22,7 @@ final class CustomersRelationManager extends BaseRelationManager
     {
         return $schema
             ->schema([
-                Forms\Components\Section::make(__('customers.basic_information'))
+                Forms\Components\SchemaSection::make(__('customers.basic_information'))
                     ->columns(2)
                     ->schema([
                         Forms\Components\TextInput::make('name')
@@ -41,7 +41,7 @@ final class CustomersRelationManager extends BaseRelationManager
                             ->label(__('addresses.postal_code'))
                             ->maxLength(20),
                     ]),
-                Forms\Components\Section::make(__('customers.address_information'))
+                Forms\Components\SchemaSection::make(__('customers.address_information'))
                     ->columns(2)
                     ->schema([
                         Forms\Components\Textarea::make('address')
@@ -60,7 +60,7 @@ final class CustomersRelationManager extends BaseRelationManager
                             ->valueLabel('Value')
                             ->columnSpanFull(),
                     ]),
-                Forms\Components\Section::make(__('customers.account_settings'))
+                Forms\Components\SchemaSection::make(__('customers.account_settings'))
                     ->columns(2)
                     ->schema([
                         Forms\Components\Toggle::make('is_active')

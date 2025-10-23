@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources\NewsCategoryResource\RelationManagers;
 
 
+use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Schemas\Schema;
 use App\Models\NewsCategory;
 use Filament\Forms;
@@ -25,7 +26,7 @@ final class ChildrenRelationManager extends BaseRelationManager
     {
         return $schema
             ->schema([
-                Forms\Components\Section::make('Category Information')
+                Forms\Components\SchemaSection::make('Category Information')
                     ->schema([
                         Forms\Components\TextInput::make('name')
                             ->required()

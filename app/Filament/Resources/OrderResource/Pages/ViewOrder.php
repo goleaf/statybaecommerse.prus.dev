@@ -163,7 +163,7 @@ final class ViewOrder extends ViewRecord
                         })
                         ->all();
                 }),
-            Section::make(__('orders.order_items'))
+            SchemaSection::make(__('orders.order_items'))
                 ->schema([
                     TableRepeatableEntry::make('items')
                         ->label(__('orders.order_items'))

@@ -66,9 +66,9 @@ final class LegalResource extends Resource
     {
         return $schema
             ->schema([
-                Forms\Components\Section::make(__('legal.basic_information'))
+                Forms\Components\SchemaSection::make(__('legal.basic_information'))
                     ->schema([
-                        Forms\Components\Grid::make(2)
+                        Forms\Components\SchemaGrid::make(2)
                             ->schema([
                                 Forms\Components\TextInput::make('key')
                                     ->label(__('legal.key'))
@@ -105,13 +105,13 @@ final class LegalResource extends Resource
                             ->reorderable(),
                     ])
                     ->columns(1),
-                Forms\Components\Section::make(__('legal.translations'))
+                Forms\Components\SchemaSection::make(__('legal.translations'))
                     ->schema([
                         Forms\Components\Repeater::make('translations')
                             ->label(__('legal.translations'))
                             ->relationship('translations')
                             ->schema([
-                                Forms\Components\Grid::make(2)
+                                Forms\Components\SchemaGrid::make(2)
                                     ->schema([
                                         Forms\Components\Select::make('locale')
                                             ->label(__('legal.locale'))
@@ -146,7 +146,7 @@ final class LegalResource extends Resource
                                     ->label(__('legal.content'))
                                     ->required()
                                     ->columnSpanFull(),
-                                Forms\Components\Grid::make(2)
+                                Forms\Components\SchemaGrid::make(2)
                                     ->schema([
                                         Forms\Components\TextInput::make('seo_title')
                                             ->label(__('legal.seo_title'))

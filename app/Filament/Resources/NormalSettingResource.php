@@ -10,8 +10,8 @@ use Filament\Schemas\Schema;
 use App\Filament\Resources\NormalSettingResource\Pages;
 use App\Models\NormalSetting;
 use Filament\Forms\Components\Select;
-use Filament\Schemas\Components\Tabs;
-use Filament\Schemas\Components\Tabs\Tab;
+use Filament\Schemas\Components\Tabs as SchemaTabs;
+use Filament\Schemas\Components\Tabs\Tab as SchemaTab;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -56,9 +56,9 @@ final class NormalSettingResource extends Resource
     public static function form(Schema $schema): Schema   
     {
         return $schema->schema([
-            Tabs::make(__('normal_settings.tabs.label'))
+            SchemaTabs::make(__('normal_settings.tabs.label'))
                 ->tabs([
-                    Tab::make(__('admin.normal_settings.basic_information'))
+                    SchemaTab::make(__('admin.normal_settings.basic_information'))
                         ->icon('heroicon-o-information-circle')
                         ->schema([
                             TextInput::make('key')
@@ -86,7 +86,7 @@ final class NormalSettingResource extends Resource
                                 ->required()
                                 ->native(false),
                         ]),
-                    Tab::make(__('admin.normal_settings.settings'))
+                    SchemaTab::make(__('admin.normal_settings.settings'))
                         ->icon('heroicon-o-cog-6-tooth')
                         ->schema([
                             Toggle::make('is_public')

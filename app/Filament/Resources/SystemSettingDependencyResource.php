@@ -27,8 +27,8 @@ use Filament\Forms\Form;
 use Filament\Forms\Get;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Grid as SchemaGrid;
+use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
@@ -72,10 +72,10 @@ final class SystemSettingDependencyResource extends Resource
     public static function form(Schema $schema): Schema   
     {
         return $schema->schema([
-            Section::make(__('admin.system_setting_dependencies.basic_information'))
+            SchemaSection::make(__('admin.system_setting_dependencies.basic_information'))
                 ->description(__('admin.system_setting_dependencies.basic_information_description'))
                 ->schema([
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             Select::make('setting_id')
                                 ->label(__('admin.system_setting_dependencies.setting'))
@@ -95,7 +95,7 @@ final class SystemSettingDependencyResource extends Resource
                                 ->helperText(__('admin.system_setting_dependencies.depends_on_setting_help')),
                         ]),
                     // Allow operators and value-based conditions to be configured separately for clarity.
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             Select::make('condition')
                                 ->label(__('admin.system_setting_dependencies.condition'))
@@ -132,7 +132,7 @@ final class SystemSettingDependencyResource extends Resource
                                 ], true)),
                         ])
                         ->columnSpanFull(),
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             Toggle::make('is_active')
                                 ->label(__('admin.system_setting_dependencies.is_active'))

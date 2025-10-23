@@ -9,8 +9,7 @@ use App\Filament\Resources\ActivityLogResource;
 
 final class ListActivityLogs extends BaseListRecords
 {
-    use HasResizableColumns;
-
+    
     protected static string $resource = ActivityLogResource::class;
 
     public function mount(): void

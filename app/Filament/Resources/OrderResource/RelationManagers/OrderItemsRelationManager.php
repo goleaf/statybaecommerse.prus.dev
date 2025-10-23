@@ -25,8 +25,8 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Get;
 use Filament\Forms\Set;
 use Filament\Notifications\Notification;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Grid as SchemaGrid;
+use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -63,11 +63,11 @@ final class OrderItemsRelationManager extends BaseRelationManager
     {
         return $schema
             ->schema([
-                Section::make(__('orders.item_information'))
+                SchemaSection::make(__('orders.item_information'))
                     ->description(__('orders.item_information_description'))
                     ->icon('heroicon-o-cube')
                     ->schema([
-                        Grid::make(2)
+                        SchemaGrid::make(2)
                             ->components([
                                 SearchableInput::make('product_variant_id')
                                     ->label(__('orders.product_variant'))
@@ -107,7 +107,7 @@ final class OrderItemsRelationManager extends BaseRelationManager
                                         $set('total', $unitPrice * $state);
                                     }),
                             ]),
-                        Grid::make(3)
+                        SchemaGrid::make(3)
                             ->schema([
                                 TextInput::make('unit_price')
                                     ->label(__('orders.fields.unit_price'))
@@ -163,7 +163,7 @@ final class OrderItemsRelationManager extends BaseRelationManager
                             }),
                     ])
                     ->collapsible(),
-                Section::make(__('orders.additional_details'))
+                SchemaSection::make(__('orders.additional_details'))
                     ->description(__('orders.additional_details_description'))
                     ->icon('heroicon-o-document-text')
                     ->schema([

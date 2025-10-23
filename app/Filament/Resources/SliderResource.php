@@ -18,8 +18,8 @@ use function collect;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Forms\Components\ColorPicker;
 use Filament\Forms\Components\FileUpload;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Grid as SchemaGrid;
+use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -81,9 +81,9 @@ final class SliderResource extends Resource
     public static function form(Schema $schema): Schema   
     {
         return $schema->schema([
-            Section::make(__('sliders.basic_information'))
+            SchemaSection::make(__('sliders.basic_information'))
                 ->schema([
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             TextInput::make('title')
                                 ->label(__('sliders.title'))
@@ -124,7 +124,7 @@ final class SliderResource extends Resource
                         })
                         ->columnSpanFull(),
                 ]),
-            Section::make(__('sliders.media'))
+            SchemaSection::make(__('sliders.media'))
                 ->schema([
                     FileUpload::make('image')
                         ->label(__('sliders.image'))
@@ -133,9 +133,9 @@ final class SliderResource extends Resource
                         ->disk('public')
                         ->columnSpanFull(),
                 ]),
-            Section::make(__('sliders.appearance'))
+            SchemaSection::make(__('sliders.appearance'))
                 ->schema([
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             ColorPicker::make('background_color')
                                 ->label(__('sliders.background_color'))
@@ -150,7 +150,7 @@ final class SliderResource extends Resource
                         ->default(0)
                         ->minValue(0),
                 ]),
-            Section::make(__('sliders.settings'))
+            SchemaSection::make(__('sliders.settings'))
                 ->schema([
                     Toggle::make('is_active')
                         ->label(__('sliders.is_active'))

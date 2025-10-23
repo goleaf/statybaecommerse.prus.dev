@@ -118,7 +118,7 @@ final class ViewCustomer extends ViewRecord
                         })
                         ->all();
                 }),
-            Section::make(__('customers.address_information'))
+            SchemaSection::make(__('customers.address_information'))
                 ->schema([
                     TableRepeatableEntry::make('addresses')
                         ->label(__('customers.address_information'))

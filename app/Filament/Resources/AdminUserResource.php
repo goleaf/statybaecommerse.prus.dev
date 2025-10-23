@@ -15,9 +15,9 @@ use Filament\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Grid as SchemaGrid;
 use Filament\Forms\Components\Placeholder;
-use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification as FilamentNotification;
 use Filament\Resources\Resource;
@@ -70,9 +70,9 @@ final class AdminUserResource extends Resource
     public static function form(Schema $schema): Schema   
     {
         return $schema->schema([
-            Section::make(__('admin.admin_users.form.sections.basic_information'))
+            SchemaSection::make(__('admin.admin_users.form.sections.basic_information'))
                 ->schema([
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             TextInput::make('name')
                                 ->label(__('admin.admin_users.form.fields.name'))
@@ -87,7 +87,7 @@ final class AdminUserResource extends Resource
                                 ->maxLength(255)
                                 ->columnSpan(1),
                         ]),
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             TextInput::make('password')
                                 ->label(__('admin.admin_users.form.fields.password'))
@@ -106,7 +106,7 @@ final class AdminUserResource extends Resource
                         ]),
                 ])
                 ->columns(1),
-            Section::make(__('admin.admin_users.form.sections.account_details'))
+            SchemaSection::make(__('admin.admin_users.form.sections.account_details'))
                 ->schema([
                     Placeholder::make('email_verified_at')
                         ->label(__('admin.admin_users.form.fields.email_verified_at'))

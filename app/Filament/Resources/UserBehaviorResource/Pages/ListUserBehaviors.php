@@ -10,8 +10,7 @@ use Filament\Actions;
 
 final class ListUserBehaviors extends BaseListRecords
 {
-    use HasResizableColumns;
-
+    
     protected static string $resource = UserBehaviorResource::class;
 
     protected function getHeaderActions(): array

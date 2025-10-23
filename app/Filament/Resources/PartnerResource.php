@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 
+use BackedEnum;
 use App\Support\Concerns\HasNav;
 use Filament\Schemas\Schema;
 use App\Filament\Resources\PartnerResource\Pages;
@@ -42,7 +43,7 @@ final class PartnerResource extends Resource
         // Build the Partner form using the Section helper to keep layouts consistent.
         return $schema
             ->schema([
-                Section::make(__('admin.partners.sections.basic_information'))
+                SchemaSection::make(__('admin.partners.sections.basic_information'))
                     ->schema([
                         Forms\Components\TextInput::make('name')
                             ->label(__('admin.partners.name'))
@@ -62,7 +63,7 @@ final class PartnerResource extends Resource
                             ->default(true),
                     ])
                     ->columns(2),
-                Section::make(__('admin.partners.sections.contact_information'))
+                SchemaSection::make(__('admin.partners.sections.contact_information'))
                     ->schema([
                         Forms\Components\TextInput::make('contact_email')
                             ->label(__('admin.partners.contact_email'))
@@ -74,7 +75,7 @@ final class PartnerResource extends Resource
                             ->maxLength(255),
                     ])
                     ->columns(2),
-                Section::make(__('admin.partners.sections.financial_settings'))
+                SchemaSection::make(__('admin.partners.sections.financial_settings'))
                     ->schema([
                         Forms\Components\TextInput::make('discount_rate')
                             ->label(__('admin.partners.discount_rate'))
@@ -90,7 +91,7 @@ final class PartnerResource extends Resource
                             ->step(0.0001),
                     ])
                     ->columns(2),
-                Section::make(__('admin.partners.sections.media'))
+                SchemaSection::make(__('admin.partners.sections.media'))
                     ->schema([
                         Forms\Components\FileUpload::make('logo')
                             ->label(__('admin.partners.logo'))

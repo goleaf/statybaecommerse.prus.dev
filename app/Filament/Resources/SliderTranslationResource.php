@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 
+use BackedEnum;
 use Filament\Schemas\Schema;
 use App\Filament\Resources\SliderTranslationResource\Pages;
 use App\Models\SliderTranslation;
@@ -61,7 +62,7 @@ final class SliderTranslationResource extends Resource
         return $schema->schema([
             SchemaSection::make(__('admin.slider_translations.basic_information'))
                 ->components([
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->components([
                             Select::make('slider_id')
                                 ->label(__('admin.slider_translations.slider'))

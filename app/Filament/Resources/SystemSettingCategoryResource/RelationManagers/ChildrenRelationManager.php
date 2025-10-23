@@ -5,10 +5,11 @@ declare(strict_types=1);
 namespace App\Filament\Resources\SystemSettingCategoryResource\RelationManagers;
 
 
+use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Schemas\Schema;
 use Filament\Forms\Components\ColorPicker;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Grid as SchemaGrid;
+use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -36,9 +37,9 @@ final class ChildrenRelationManager extends BaseRelationManager
     public function form(Schema $schema): Schema   
     {
         return $schema->schema([
-            Section::make(__('system_setting_categories.children.basic_information'))
+            SchemaSection::make(__('system_setting_categories.children.basic_information'))
                 ->schema([
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             TextInput::make('name')
                                 ->label(__('system_setting_categories.children.name'))
@@ -58,9 +59,9 @@ final class ChildrenRelationManager extends BaseRelationManager
                         ->rows(3)
                         ->helperText(__('system_setting_categories.children.description_help')),
                 ]),
-            Section::make(__('system_setting_categories.children.appearance'))
+            SchemaSection::make(__('system_setting_categories.children.appearance'))
                 ->schema([
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             TextInput::make('icon')
                                 ->label(__('system_setting_categories.children.icon'))
@@ -72,9 +73,9 @@ final class ChildrenRelationManager extends BaseRelationManager
                                 ->helperText(__('system_setting_categories.children.color_help')),
                         ]),
                 ]),
-            Section::make(__('system_setting_categories.children.configuration'))
+            SchemaSection::make(__('system_setting_categories.children.configuration'))
                 ->schema([
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             TextInput::make('sort_order')
                                 ->label(__('system_setting_categories.children.sort_order'))

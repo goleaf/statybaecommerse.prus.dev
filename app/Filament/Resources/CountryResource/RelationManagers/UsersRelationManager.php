@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources\CountryResource\RelationManagers;
 
 
+use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Schemas\Schema;
 use App\Models\User;
 use Filament\Forms;
@@ -22,7 +23,7 @@ final class UsersRelationManager extends BaseRelationManager
     {
         return $schema
             ->schema([
-                Forms\Components\Section::make(__('users.title'))
+                Forms\Components\SchemaSection::make(__('users.title'))
                     ->columns(2)
                     ->schema([
                         Forms\Components\TextInput::make('name')
@@ -52,7 +53,7 @@ final class UsersRelationManager extends BaseRelationManager
                             ])
                             ->default('en'),
                     ]),
-                Forms\Components\Section::make(__('customers.account_settings'))
+                Forms\Components\SchemaSection::make(__('customers.account_settings'))
                     ->columns(2)
                     ->schema([
                         Forms\Components\Toggle::make('is_active')
@@ -66,7 +67,7 @@ final class UsersRelationManager extends BaseRelationManager
                             ->label('Admin')
                             ->helperText('Grants administrative access for this user'),
                     ]),
-                Forms\Components\Section::make(__('users.fields.bio'))
+                Forms\Components\SchemaSection::make(__('users.fields.bio'))
                     ->schema([
                         Forms\Components\Textarea::make('bio')
                             ->label(__('users.fields.bio'))

@@ -10,7 +10,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Schemas\Schema;
 use Str;
 
@@ -20,7 +20,7 @@ class NewsTagForm
     {
         return $schema
             ->components([
-                Section::make(__('admin.news_tags.form.sections.basic_information'))
+                SchemaSection::make(__('admin.news_tags.form.sections.basic_information'))
                     ->columns(1)
                     ->components([
                         TextInput::make('name')
@@ -39,7 +39,7 @@ class NewsTagForm
                             ->maxLength(1000)
                             ->columnSpanFull(),
                     ]),
-                Section::make(__('admin.news_tags.form.sections.translations'))
+                SchemaSection::make(__('admin.news_tags.form.sections.translations'))
                     ->columns(1)
                     ->collapsible()
                     ->components([
@@ -69,7 +69,7 @@ class NewsTagForm
                                     ->columnSpan(2),
                             ]),
                     ]),
-                Section::make(__('admin.news_tags.form.sections.metadata'))
+                SchemaSection::make(__('admin.news_tags.form.sections.metadata'))
                     ->columns(3)
                     ->components([
                         Toggle::make('is_visible')

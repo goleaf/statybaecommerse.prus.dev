@@ -22,7 +22,7 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Section as SchemaSection;
 use Novadaemon\FilamentCombobox\Combobox;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -91,7 +91,7 @@ final class RecommendationBlockResource extends Resource
     public static function form(Schema $schema): Schema   
     {
         return $schema->schema([
-            Section::make(__('recommendation_blocks.basic_information'))
+            SchemaSection::make(__('recommendation_blocks.basic_information'))
                 ->schema([
                     TextInput::make('name')
                         ->label(__('recommendation_blocks.fields.name'))
@@ -119,7 +119,7 @@ final class RecommendationBlockResource extends Resource
                         ->required()
                         ->native(false),
                 ]),
-            Section::make(__('recommendation_blocks.sections.products'))
+            SchemaSection::make(__('recommendation_blocks.sections.products'))
                 ->schema([
                     Combobox::make('products')
                         ->label(__('recommendation_blocks.products'))
@@ -142,7 +142,7 @@ final class RecommendationBlockResource extends Resource
                         ->minValue(1)
                         ->maxValue(50),
                 ]),
-            Section::make(__('recommendation_blocks.sections.settings'))
+            SchemaSection::make(__('recommendation_blocks.sections.settings'))
                 ->schema([
                     Toggle::make('is_active')
                         ->label(__('recommendation_blocks.fields.is_active'))

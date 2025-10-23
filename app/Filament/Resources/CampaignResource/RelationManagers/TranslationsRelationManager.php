@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources\CampaignResource\RelationManagers;
 
 
+use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Schemas\Schema;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;

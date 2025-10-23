@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 
+use BackedEnum;
 use App\Support\Concerns\HasNav;
 use Filament\Schemas\Schema;
 use App\Filament\Resources\FeatureFlagResource\Pages;
@@ -15,7 +16,7 @@ use App\Support\Filament\Components\Flatpickr;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Placeholder;
-use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -65,65 +66,6 @@ final class FeatureFlagResource extends Resource
     }
 
     /**
-     * Ensure administrators can query every feature flag regardless of default scopes.
-     */
-    public static function getEloquentQuery(): Builder
-    {
-        // Removing the Active and Enabled scopes keeps disabled flags visible for auditing and reactivation.
-        return parent::getEloquentQuery()->withoutGlobalScopes([
-            ActiveScope::class,
-            EnabledScope::class,
-        ]);
-    }
-
-    /**
-     * Handle getNavigationLabel functionality with proper error handling.
-     */
-    public static function getNavigationLabel(): string
-    {
-        return __('feature_flags.title');
-    }
-
-    public static function getEloquentQuery(): Builder
-    {
-        return parent::getEloquentQuery()->withoutGlobalScopes([
-            ActiveScope::class,
-            EnabledScope::class,
-        ]);
-    }
-
-    /**
-     * Extend the base query so administrators can audit inactive and disabled flags.
-     */
-    public static function getEloquentQuery(): Builder
-    {
-        return parent::getEloquentQuery()->withoutGlobalScopes([
-            ActiveScope::class,
-            EnabledScope::class,
-        ]);
-    }
-
-    /**
-     * Handle getPluralModelLabel functionality with proper error handling.
-     */
-    public static function getPluralModelLabel(): string
-    {
-        return __('feature_flags.plural');
-    }
-
-    /**
-     * Extend the base query to include inactive or disabled feature flags for administrative visibility.
-     */
-    public static function getEloquentQuery(): Builder
-    {
-        // Removing the active/enabled scopes ensures administrators can review every feature flag status.
-        return parent::getEloquentQuery()->withoutGlobalScopes([
-            ActiveScope::class,
-            EnabledScope::class,
-        ]);
-    }
-
-    /**
      * Handle getModelLabel functionality with proper error handling.
      */
     public static function getModelLabel(): string
@@ -137,9 +79,9 @@ final class FeatureFlagResource extends Resource
     public static function form(Schema $schema): Schema   
     {
         return $schema->schema([
-            Section::make(__('feature_flags.basic_information'))
+            SchemaSection::make(__('feature_flags.basic_information'))
                 ->components([
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->components([
                             TextInput::make('name')
                                 ->label(__('feature_flags.name'))
@@ -158,9 +100,9 @@ final class FeatureFlagResource extends Resource
                         ->maxLength(500)
                         ->columnSpanFull(),
                 ]),
-            Section::make(__('feature_flags.status'))
+            SchemaSection::make(__('feature_flags.status'))
                 ->components([
-                    Grid::make(3)
+                    SchemaGrid::make(3)
                         ->components([
                             Toggle::make('is_active')
                                 ->label(__('feature_flags.is_active'))
@@ -173,9 +115,9 @@ final class FeatureFlagResource extends Resource
                                 ->default(false),
                         ]),
                 ]),
-            Section::make(__('feature_flags.scheduling'))
+            SchemaSection::make(__('feature_flags.scheduling'))
                 ->components([
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->components([
                             Flatpickr::makeDateTime('starts_at')
                                 ->label(__('feature_flags.starts_at'))
@@ -185,9 +127,9 @@ final class FeatureFlagResource extends Resource
                                 ->nullable(),
                         ]),
                 ]),
-            Section::make(__('feature_flags.configuration'))
+            SchemaSection::make(__('feature_flags.configuration'))
                 ->components([
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->components([
                             Select::make('environment')
                                 ->label(__('feature_flags.environment'))
@@ -216,7 +158,7 @@ final class FeatureFlagResource extends Resource
                         ->minValue(0)
                         ->maxValue(100),
                 ]),
-            Section::make(__('feature_flags.conditions'))
+            SchemaSection::make(__('feature_flags.conditions'))
                 ->components([
                     KeyValue::make('conditions')
                         ->label(__('feature_flags.conditions'))
@@ -224,10 +166,10 @@ final class FeatureFlagResource extends Resource
                         ->valueLabel(__('feature_flags.condition_value'))
                         ->columnSpanFull(),
                 ]),
-            Section::make('Attribution')
+            SchemaSection::make('Attribution')
                 ->visible(fn (?FeatureFlag $record): bool => $record !== null)
                 ->components([
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->components([
                             Placeholder::make('created_by_display')
                                 ->label(__('system.created_by'))
