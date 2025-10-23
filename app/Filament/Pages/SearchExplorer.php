@@ -11,8 +11,10 @@ use UnitEnum;
 
 final class SearchExplorer extends Page
 {
-    /** @var string|\BackedEnum|null */
-    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-magnifying-glass-circle';
+    /**
+     * @var string|\BackedEnum|null Navigation icon override maintained as docblock for enum compatibility.
+     */
+    protected static $navigationIcon = 'heroicon-o-magnifying-glass-circle';
 
     public static function getNavigationGroup(): BackedEnum|string|null
     {

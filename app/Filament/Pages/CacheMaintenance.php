@@ -20,8 +20,10 @@ use Filament\Schemas\Schema;
 use Filament\Schemas\Schema;
 final class CacheMaintenance extends Page
 {
-    /** @var string|\BackedEnum|null */
-    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-server-stack';
+    /**
+     * @var string|\BackedEnum|null Navigation icon override kept untyped for Filament panel compatibility.
+     */
+    protected static $navigationIcon = 'heroicon-o-server-stack';
 
     public static function getNavigationGroup(): BackedEnum|string|null
     {

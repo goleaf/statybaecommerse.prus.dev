@@ -1,9 +1,8 @@
-# Feature highlights
+# Feature Highlights
 
-## Content safety and compliance
-- Established an allow-listed HTML sanitizer that runs on product descriptions, translations, and legal documents to prevent script injection.
-- Added a storefront `<x-sanitized-html>` component so any rendered rich text automatically passes through the sanitizer.
-- Shipped the `php artisan maintenance:sanitize-html` command to reprocess legacy content in bulk.
+## Admin panel resilience
+- Docblock-based Filament navigation icons are reaffirmed to avoid enum property collisions introduced in PR #533.
+- Variant stock history change reasons now map both `damage` and `theft` outcomes to the `danger` badge without duplicate keys, keeping badge colors predictable.
 
-## Operational tooling
-- Existing maintenance commands remain alongside the new sanitization job, giving operators a single entry point for content hygiene tasks.
+## Tooling polish
+- The `data:import` Artisan command exposes typed signature and description properties so maintainers can quickly identify its purpose when running `php artisan list`.

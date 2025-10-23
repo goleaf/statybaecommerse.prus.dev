@@ -97,6 +97,11 @@ composer run dev
 | Build production assets | `make build` |
 | Generate coverage locally | `php artisan test --coverage` |
 
+## Latest maintenance notes
+- Re-applied the documented docblock pattern for Filament navigation icons to stay aligned with v4 schema upgrades after the #533 regression.
+- Consolidated variant stock history danger badge mappings so both damage and theft events share the intended styling.
+- Clarified the `data:import` command metadata with typed properties to improve Artisan list readability.
+
 ## Composer script quick reference
 | Script | What it does |
 | --- | --- |
