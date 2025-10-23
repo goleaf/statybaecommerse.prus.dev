@@ -23,6 +23,7 @@ This snapshot complements the changelog by listing functional capabilities that 
 - Test infrastructure now provisions an on-disk SQLite database and conditionally seeds customer group metadata, preventing the observer test suite from failing with missing table or column errors.
 - API search now short-circuits suspicious payloads and boosts exact-title matches so catalogue lookups stay precise while SQL injection attempts return empty responses.
 - Search experiences normalise mixed-case `types[]` filters so targeted product/category/brand lookups keep the requested scope even when storefront clients send capitalised identifiers.
+- Developer experience improvements ensure PHPUnit and Pest share a persistent SQLite test database, preventing missing-table failures when exercising product APIs locally.
 - The custom Edit Profile page now imports `Filament\\Schemas\\Schema`, keeping Filament authentication tooling aligned with v4 expectations and eliminating namespace-related fatal errors during automated runs.
 - Discount Redemption admin tooling now groups under Marketing with a warning navigation badge, uses Filament v4 badge styling for status indicators, and ships with a HasTable-aware Pest harness so table schemas build successfully during tests.
 - Pest-powered test helpers now wrap the `login()` helper in a function-existence guard so repeated bootstrap cycles during `php artisan test` runs avoid fatal redeclaration errors.
