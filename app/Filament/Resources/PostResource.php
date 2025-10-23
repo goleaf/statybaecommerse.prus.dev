@@ -50,6 +50,10 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use UnitEnum;
+use Maatwebsite\Excel\Excel;
+use pxlrbt\FilamentExcel\Actions\ExportBulkAction as ExcelExportBulkAction;
+use pxlrbt\FilamentExcel\Columns\Column as ExcelColumn;
+use pxlrbt\FilamentExcel\Exports\ExcelExport;
 
 /**
  * PostResource
