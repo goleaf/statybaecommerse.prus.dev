@@ -2,49 +2,126 @@
 
 declare(strict_types=1);
 
-use App\Support\Filament\SearchableComponentHelper;
-use App\Support\Search\SearchResultPayload;
-use DefStudio\SearchableInput\DTO\SearchResult;
+use App\Support\Filament\Components\SearchableComponentHelper;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
+use Filament\Forms\Set;
+use Filament\Schemas\Components\Component;
 
-// This regression test ensures clearing the component wipes both the display option and stored payload metadata.
-it('clears the searchable component state when the selection is removed', function (): void {
+it('hydrates the searchable input with the normalised payload', function (): void {
     $component = SearchableInput::make('product_id');
-
-    $result = SearchResultPayload::normalise(
-        SearchResult::make('42', 'Demo Product'),
-        [
-            'product_id' => 42,
-            'sku'        => 'SKU-42',
-            'name'       => 'Demo Product',
-            'price'      => 99.0,
-        ],
-    );
 
     SearchableComponentHelper::hydrate(
         component: $component,
-        state: 42,
-        resolveResult: static fn (): SearchResult => $result,
+        state: 5,
+        resolveRecord: static fn (int $identifier): array => [
+            'id' => $identifier,
+            'name' => 'Demo Product',
+        ],
+        normalizePayload: static fn (array $record): array => [
+            'value' => $record['id'],
+            'label' => $record['name'],
+            'payload' => [
+                'product_id' => $record['id'],
+                'sku' => 'DEMO-001',
+            ],
+        ],
     );
 
-    expect($component->getOptions())->toHaveCount(1);
+    expect($component->getState())->toBe('5')
+        ->and($component->getOptions())
+        ->toMatchArray(['5' => 'Demo Product'])
+        ->and($component->getPayload())
+        ->toMatchArray([
+            'product_id' => 5,
+            'sku' => 'DEMO-001',
+        ]);
+});
 
-    $captured = [];
+it('syncs selected records and clears stale selections', function (): void {
+    $component = SearchableInput::make('product_id');
 
-    SearchableComponentHelper::sync(
+    $set = new class extends Set {
+        /** @var array<string, mixed> */
+        public array $values = [];
+
+        public function __construct()
+        {
+            parent::__construct(new class extends Component {
+                protected string $view = 'filament-support::components.actions';
+            });
+        }
+
+        public function __invoke(string | Component $path, mixed $state, bool $isAbsolute = false, bool $shouldCallUpdatedHooks = false): mixed
+        {
+            $this->values[(string) $path] = $state;
+
+            return $state;
+        }
+    };
+
+    $syncedPayload = [];
+    $cleared = false;
+
+    SearchableComponentHelper::syncSelectedRecord(
+        component: $component,
+        state: '42',
+        set: $set,
+        attribute: 'product_id',
+        resolveRecord: static fn (string $identifier): array => [
+            'id' => (int) $identifier,
+            'name' => 'Inventory Widget',
+        ],
+        normalizePayload: static fn (array $record): array => [
+            'value' => $record['id'],
+            'label' => $record['name'],
+            'payload' => [
+                'product_id' => $record['id'],
+                'price' => 19.99,
+            ],
+        ],
+        onSync: static function (array $normalised) use (&$syncedPayload): void {
+            $syncedPayload = $normalised['payload'];
+        },
+        onClear: static function () use (&$cleared): void {
+            $cleared = true;
+        },
+    );
+
+    expect($set->values['product_id'] ?? null)->toBe(42)
+        ->and($component->getState())->toBe('42')
+        ->and($component->getOptions())
+        ->toMatchArray(['42' => 'Inventory Widget'])
+        ->and($component->getPayload())
+        ->toMatchArray([
+            'product_id' => 42,
+            'price' => 19.99,
+        ])
+        ->and($syncedPayload)
+        ->toMatchArray([
+            'product_id' => 42,
+            'price' => 19.99,
+        ])
+        ->and($cleared)->toBeFalse();
+
+    SearchableComponentHelper::syncSelectedRecord(
         component: $component,
         state: '',
-        set: function (string $field, $value) use (&$captured): void {
-            $captured[$field] = $value;
+        set: $set,
+        attribute: 'product_id',
+        resolveRecord: static fn (string $identifier): ?array => null,
+        normalizePayload: static fn (array $record): array => $record,
+        onSync: static function (): void {
+            // No-op for the empty branch.
         },
-        targetField: 'product_id',
-        resolveResult: static fn (): SearchResult => $result,
+        onClear: static function () use (&$cleared): void {
+            $cleared = true;
+        },
     );
 
-    expect($captured['product_id'] ?? null)
-        ->toBeNull()
-        ->and($component->getOptions())
+    expect($set->values['product_id'] ?? null)->toBeNull()
+        ->and($component->getState())->toBeNull()
+        ->and($component->getOptions())->toBeEmpty()
+        ->and($component->getPayload())
         ->toBe([])
-        ->and($component->getState())
-        ->toBeNull();
+        ->and($cleared)->toBeTrue();
 });

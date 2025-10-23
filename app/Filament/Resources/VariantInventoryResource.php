@@ -11,7 +11,7 @@ use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Models\VariantInventory;
 use App\Support\Filament\Components\Flatpickr;
-use App\Support\Filament\SearchableInputHelper;
+use App\Support\Filament\Components\SearchableComponentHelper;
 use App\Support\Search\LocationSearch;
 use App\Support\Search\PartnerSearch;
 use App\Support\Search\ProductVariantSearch;
@@ -126,32 +126,35 @@ final class VariantInventoryResource extends Resource
                                     },
                                 );
                             })
-                            ->afterStateUpdated(function (?string $state, Set $set): void {
-                                if ($state === null || $state === '') {
-                                    SearchableInputHelper::clear($set, [
-                                        'variant_id'      => null,
-                                        'variant_payload' => [],
-                                    ]);
-
-                                    return;
-                                }
-
-                                $variant = ProductVariant::query()
-                                    ->select(['id', 'product_id', 'sku', 'name', 'price'])
-                                    ->with(['product:id,sku,name'])
-                                    ->find((int) $state);
-
-                                if (! $variant instanceof ProductVariant) {
-                                    SearchableInputHelper::clear($set, [
-                                        'variant_id'      => null,
-                                        'variant_payload' => [],
-                                    ]);
-
-                                    return;
-                                }
-
-                                $set('variant_id', $variant->getKey());
-                                $set('variant_payload', self::normaliseVariantPayload($variant));
+                            ->afterStateUpdated(function (SearchableInput $component, ?string $state, Set $set): void {
+                                SearchableComponentHelper::syncSelectedRecord(
+                                    component: $component,
+                                    state: $state,
+                                    set: $set,
+                                    attribute: 'variant_id',
+                                    resolveRecord: static function (string $variantId): ?ProductVariant {
+                                        // Keep the finder aligned with the hydrate() query to avoid mismatched payloads.
+                                        return ProductVariant::query()
+                                            ->select(['id', 'product_id', 'sku', 'name', 'price'])
+                                            ->with(['product:id,sku,name'])
+                                            ->find((int) $variantId);
+                                    },
+                                    normalizePayload: static function (ProductVariant $variant): array {
+                                        return [
+                                            'value'   => $variant->getKey(),
+                                            'label'   => ProductVariantSearch::label($variant),
+                                            'payload' => self::normaliseVariantPayload($variant),
+                                        ];
+                                    },
+                                    onSync: static function (array $normalised) use ($set): void {
+                                        // Cache the resolved metadata for downstream automation without persisting it.
+                                        $set('variant_payload', $normalised['payload']);
+                                    },
+                                    onClear: static function () use ($set): void {
+                                        // Avoid leaking stale variant metadata when the lookup is cleared or fails.
+                                        $set('variant_payload', []);
+                                    },
+                                );
                             }),
                         Hidden::make('variant_payload')
                             ->default([])
@@ -184,31 +187,34 @@ final class VariantInventoryResource extends Resource
                                     },
                                 );
                             })
-                            ->afterStateUpdated(function (?string $state, Set $set): void {
-                                if ($state === null || $state === '') {
-                                    SearchableInputHelper::clear($set, [
-                                        'location_id'      => null,
-                                        'location_payload' => [],
-                                    ]);
-
-                                    return;
-                                }
-
-                                $location = Location::query()
-                                    ->select(['id', 'name', 'code', 'city', 'country_code'])
-                                    ->find((int) $state);
-
-                                if (! $location instanceof Location) {
-                                    SearchableInputHelper::clear($set, [
-                                        'location_id'      => null,
-                                        'location_payload' => [],
-                                    ]);
-
-                                    return;
-                                }
-
-                                $set('location_id', $location->getKey());
-                                $set('location_payload', self::normaliseLocationPayload($location));
+                            ->afterStateUpdated(function (SearchableInput $component, ?string $state, Set $set): void {
+                                SearchableComponentHelper::syncSelectedRecord(
+                                    component: $component,
+                                    state: $state,
+                                    set: $set,
+                                    attribute: 'location_id',
+                                    resolveRecord: static function (string $locationId): ?Location {
+                                        // Mirror the hydrate() finder so cached payloads always match the dropdown label.
+                                        return Location::query()
+                                            ->select(['id', 'name', 'code', 'city', 'country_code'])
+                                            ->find((int) $locationId);
+                                    },
+                                    normalizePayload: static function (Location $location): array {
+                                        return [
+                                            'value'   => $location->getKey(),
+                                            'label'   => LocationSearch::label($location),
+                                            'payload' => self::normaliseLocationPayload($location),
+                                        ];
+                                    },
+                                    onSync: static function (array $normalised) use ($set): void {
+                                        // Store the enriched location metadata for Livewire reactions without saving it.
+                                        $set('location_payload', $normalised['payload']);
+                                    },
+                                    onClear: static function () use ($set): void {
+                                        // Reset dependent fields whenever the lookup is cleared or fails to resolve.
+                                        $set('location_payload', []);
+                                    },
+                                );
                             }),
                         Hidden::make('location_payload')
                             ->default([])

@@ -31,6 +31,7 @@ use App\View\Creators\NavigationCreator;
 use App\View\Creators\SeoDataCreator;
 use App\View\Creators\UserDataCreator;
 use Artisan;
+use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Console\Scheduling\Schedule;
@@ -52,7 +53,6 @@ use Illuminate\Support\Number;
 use Illuminate\Support\ServiceProvider;
 
 use function in_array;
-use function is_array;
 
 use Livewire\Features\SupportTesting\Testable;
 use Livewire\Livewire;
@@ -117,6 +117,46 @@ class AppServiceProvider extends ServiceProvider
 
                 return $this;
             });
+        }
+
+        if (! class_exists(\Filament\Forms\Form::class) && class_exists(\Filament\Schemas\Schema::class)) {
+            class_alias(\Filament\Schemas\Schema::class, \Filament\Forms\Form::class);
+        }
+
+        if (! class_exists(\Filament\Forms\Components\Section::class) && class_exists(\Filament\Schemas\Components\Section::class)) {
+            class_alias(\Filament\Schemas\Components\Section::class, \Filament\Forms\Components\Section::class);
+        }
+
+        if (! class_exists(\Filament\Forms\Components\Grid::class) && class_exists(\Filament\Schemas\Components\Grid::class)) {
+            class_alias(\Filament\Schemas\Components\Grid::class, \Filament\Forms\Components\Grid::class);
+        }
+
+        if (! class_exists(\Filament\Forms\Get::class) && class_exists(\Filament\Schemas\Components\Utilities\Get::class)) {
+            class_alias(\Filament\Schemas\Components\Utilities\Get::class, \Filament\Forms\Get::class);
+        }
+
+        if (! class_exists(\Filament\Forms\Set::class) && class_exists(\Filament\Schemas\Components\Utilities\Set::class)) {
+            class_alias(\Filament\Schemas\Components\Utilities\Set::class, \Filament\Forms\Set::class);
+        }
+
+        if (class_exists(SearchableInput::class)) {
+            if (! SearchableInput::hasMacro('payload')) {
+                SearchableInput::macro('payload', function (array $payload): SearchableInput {
+                    /** @var SearchableInput $this */
+                    $this->meta('searchable_input_payload', $payload);
+
+                    return $this;
+                });
+            }
+
+            if (! SearchableInput::hasMacro('getPayload')) {
+                SearchableInput::macro('getPayload', function (): array {
+                    /** @var SearchableInput $this */
+                    $payload = $this->getMeta('searchable_input_payload');
+
+                    return is_array($payload) ? $payload : [];
+                });
+            }
         }
 
         if (class_exists(\Filament\Forms\Components\FileUpload::class)) {
