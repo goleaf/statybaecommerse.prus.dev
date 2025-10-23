@@ -6,13 +6,15 @@ namespace App\Http\Middleware;
 
 use App\Models\ApiKey;
 use Closure;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
 use Symfony\Component\HttpFoundation\Response;
 
 final class EnsurePartnerApiRateLimit
 {
+    /**
+     * @param Closure(Request): Response $next
+     */
     public function handle(Request $request, Closure $next): Response
     {
         $apiKey = $request->attributes->get('partner_api_key');
@@ -28,11 +30,13 @@ final class EnsurePartnerApiRateLimit
         }
 
         $rateLimiterKey = $apiKey->rateLimiterKey();
-        $decaySeconds = (int) config('services.partner_api.rate_limit.decay_seconds', 60);
+        $configuredDecay = config('services.partner_api.rate_limit.decay_seconds', 60);
+        $decaySeconds = is_numeric($configuredDecay) ? (int) $configuredDecay : 60;
 
         if (RateLimiter::tooManyAttempts($rateLimiterKey, $limit)) {
             $retryAfter = RateLimiter::availableIn($rateLimiterKey);
 
+            // Respond with a 429 payload so clients know when they can retry.
             return $this->reject($retryAfter, $limit);
         }
 
@@ -48,10 +52,7 @@ final class EnsurePartnerApiRateLimit
         return $response;
     }
 
-    /**
-     * Emit a throttling response with explicit retry metadata.
-     */
-    private function reject(int $retryAfter, int $limit): JsonResponse
+    private function reject(int $retryAfter, int $limit): Response
     {
         $response = response()->json([
             'message' => 'Partner API rate limit exceeded.',
@@ -61,6 +62,7 @@ final class EnsurePartnerApiRateLimit
         $response->headers->set('X-RateLimit-Limit', (string) $limit);
         $response->headers->set('X-RateLimit-Remaining', '0');
 
+        // Return the response directly so Laravel does not treat it as an unhandled exception.
         return $response;
     }
 }

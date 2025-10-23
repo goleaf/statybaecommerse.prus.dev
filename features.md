@@ -46,7 +46,7 @@
 - Catalogue search now rebuilds product metrics from related tables, honours the `product_categories` pivot, and tolerates Redis being unavailable so the API behaves consistently across MySQL and SQLite deployments.
 
 ## API contracts
-
+- Partner API middleware now delivers the documented JSON error envelopes for missing credentials, insufficient scopes, and rate limit violations so partner integrations and automated tests can rely on stable status codes.
 - OpenAPI documentation now mirrors the lean product meta payload and nullable media thumbnails emitted by the presenter, keeping schema validators and client SDKs in sync with production responses.
 - Product endpoints now reuse eager-loaded review counts and averages, keeping API consumers aligned with cached
   storefront metrics while trimming duplicate queries from feature coverage.

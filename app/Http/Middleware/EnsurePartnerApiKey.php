@@ -6,27 +6,34 @@ namespace App\Http\Middleware;
 
 use App\Models\ApiKey;
 use Closure;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 final class EnsurePartnerApiKey
 {
+    /**
+     * @param Closure(Request): Response $next
+     */
     public function handle(Request $request, Closure $next, string ...$requiredScopes): Response
     {
         $providedKey = $this->resolveProvidedKey($request);
 
         if ($providedKey === null) {
+            // Return an explicit JSON error response so downstream handlers see the expected status code.
             return $this->reject('Missing partner API key.', Response::HTTP_UNAUTHORIZED);
         }
 
         $apiKey = $this->findActiveKey($providedKey);
 
         if ($apiKey === null) {
+            // Stop processing when the provided key cannot be matched to an active record.
             return $this->reject('Invalid or inactive partner API key.', Response::HTTP_FORBIDDEN);
         }
 
-        if ($requiredScopes !== [] && ! $apiKey->hasAnyScope($requiredScopes)) {
+        $normalizedScopes = array_values($requiredScopes);
+
+        if ($normalizedScopes !== [] && ! $apiKey->hasAnyScope($normalizedScopes)) {
+            // Surface a forbidden response whenever the key lacks the required scopes.
             return $this->reject('Insufficient partner API permissions.', Response::HTTP_FORBIDDEN);
         }
 
@@ -37,8 +44,8 @@ final class EnsurePartnerApiKey
         $request->attributes->set('partner_api_key', $apiKey);
         $request->attributes->set('partner_api_abilities', $abilities);
 
-        if ($requiredScopes !== []) {
-            $request->attributes->set('partner_api_required_scopes', array_values($requiredScopes));
+        if ($normalizedScopes !== []) {
+            $request->attributes->set('partner_api_required_scopes', $normalizedScopes);
         }
 
         return $next($request);
@@ -46,7 +53,10 @@ final class EnsurePartnerApiKey
 
     private function resolveProvidedKey(Request $request): ?string
     {
-        $headerName = (string) config('services.partner_api.header', 'X-Api-Key');
+        $configuredHeader = config('services.partner_api.header', 'X-Api-Key');
+        $headerName = is_string($configuredHeader) && $configuredHeader !== ''
+            ? $configuredHeader
+            : 'X-Api-Key';
         $header = $request->headers->get($headerName);
 
         if (! is_string($header)) {
@@ -71,11 +81,9 @@ final class EnsurePartnerApiKey
         return $apiKey;
     }
 
-    /**
-     * Issue a standardized JSON error payload for partner API failures.
-     */
-    private function reject(string $message, int $status): JsonResponse
+    private function reject(string $message, int $status): Response
     {
+        // Build a small JSON payload to keep client assertions deterministic.
         return response()->json([
             'message' => $message,
         ], $status);

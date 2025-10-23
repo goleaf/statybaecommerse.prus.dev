@@ -20,9 +20,7 @@ This snapshot complements the changelog by listing functional capabilities that 
 - Analytical reports, project retrospectives, and rollout summaries consolidated inside [`docs/analysis/`](docs/analysis/).
 
 ## Latest Update
-
-- Husky pre-commit hook now re-stages Pint changes and runs PHPStan via `xargs`, keeping contributor commits unblocked on environments that lack `--paths-file` support.
-- Company management tooling now exposes inactive records in tests by dropping the ActiveScope assignment, widening factory phone fixtures, and letting Filament skip Vite theme assets during `testing`, removing the manifest-related failures from bulk actions.
+- Partner API middleware now returns documented JSON error payloads for missing keys, insufficient scopes, and rate limits so third-party integrations receive predictable statuses and tooling can assert the contract.
 - Brands page now features a light-themed layout, shared card components, and refreshed translations so the partner directory feels consistent across locales.
 - Product API endpoints now honour eager-loaded review aggregates so cached rating/count metrics stay in sync while
   trimming redundant queries from feature and regression suites.
