@@ -4,56 +4,62 @@ declare(strict_types=1);
 
 use App\Models\Product;
 use App\Models\User;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
-it('prepares and verifies backup artifacts on an ephemeral connection', function (): void {
-    /** @var \Tests\TestCase $this */
+use function Pest\Laravel\artisan;
+
+it('prepares artifacts and verifies them on an ephemeral connection', function (): void {
     Storage::fake('backups');
 
-    $users = User::factory()->count(3)->create();
-    $products = Product::factory()->count(4)->create();
+    Config::set('backup.disk', 'backups');
+    Config::set('backup.directory', 'artifacts');
+    Config::set('backup.verify.connection', 'backup_ephemeral');
+    Config::set('database.connections.backup_ephemeral', [
+        'driver' => 'sqlite',
+        'database' => ':memory:',
+        'prefix' => '',
+        'foreign_key_constraints' => true,
+    ]);
 
-    /** @var \Illuminate\Testing\PendingCommand $prepareCommand */
-    $prepareCommand = $this->artisan('backup:prepare', ['--disk' => 'backups']);
-    $prepareCommand->assertSuccessful();
+    $users = User::factory()->count(3)->create([
+        'name' => 'Test Admin',
+    ]);
+
+    $products = Product::factory()->count(4)->create([
+        'manage_stock' => true,
+        'stock_quantity' => 25,
+        'is_visible' => true,
+    ]);
+
+    /** @var \Illuminate\Testing\PendingCommand $prepare */
+    $prepare = artisan('backup:prepare');
+    $prepare->assertSuccessful();
 
     $disk = Storage::disk('backups');
-    $disk->assertExists('artifacts/users.json');
-    $disk->assertExists('artifacts/products.json');
+    $artifactRoot = collect($disk->directories('artifacts'))->sort()->last();
+    expect($artifactRoot)->not()->toBeNull();
+    assert(is_string($artifactRoot));
 
-    $backupDbPath = storage_path('framework/testing/backup.sqlite');
-    if (file_exists($backupDbPath)) {
-        unlink($backupDbPath);
-    }
+    expect($disk->exists($artifactRoot.'/users.json'))->toBeTrue();
+    expect($disk->exists($artifactRoot.'/products.json'))->toBeTrue();
+    expect($disk->exists($artifactRoot.'/manifest.json'))->toBeTrue();
 
-    if (! is_dir(dirname($backupDbPath))) {
-        mkdir(dirname($backupDbPath), 0777, true);
-    }
+    /** @var array{counts?: array{users?: int, products?: int}} $manifest */
+    $manifest = json_decode((string) $disk->get($artifactRoot.'/manifest.json'), true, 512, JSON_THROW_ON_ERROR);
+    expect(Arr::get($manifest, 'counts.users'))->toBe($users->count());
+    expect(Arr::get($manifest, 'counts.products'))->toBe($products->count());
 
-    Config::set('database.connections.backup', [
-        'driver' => 'sqlite',
-        'database' => $backupDbPath,
-        'prefix' => '',
-        'foreign_key_constraints' => false,
+    /** @var \Illuminate\Testing\PendingCommand $verify */
+    $verify = artisan('backup:verify', [
+        'path' => $artifactRoot,
+        '--connection' => 'backup_ephemeral',
     ]);
+    $verify->assertSuccessful();
 
-    /** @var \Illuminate\Testing\PendingCommand $verifyCommand */
-    $verifyCommand = $this->artisan('backup:verify', [
-        '--disk' => 'backups',
-        '--connection' => 'backup',
-    ]);
-    $verifyCommand->assertSuccessful();
-
-    $backupConnection = DB::connection('backup');
-
-    expect($backupConnection->table('users')->count())->toBe($users->count());
-    expect($backupConnection->table('products')->count())->toBe($products->count());
-
-    $backupConnection->disconnect();
-
-    if (file_exists($backupDbPath)) {
-        unlink($backupDbPath);
-    }
+    $ephemeral = DB::connection('backup_ephemeral');
+    expect($ephemeral->table('users')->count())->toBe($users->count());
+    expect($ephemeral->table('products')->count())->toBe($products->count());
 });
