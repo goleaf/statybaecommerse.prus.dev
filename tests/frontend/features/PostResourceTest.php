@@ -66,7 +66,23 @@ it('can edit a post', function (): void {
     expect($post->fresh()->title)->toBe($newTitle);
 });
 
-it('can view a post', function (): void {
+it('saves tags as a comma separated string', function () {
+    $post = Post::factory()->create([
+        'user_id' => $this->user->id,
+        'tags' => 'alpha, beta',
+    ]);
+
+    Livewire::test(EditPost::class, ['record' => $post->getRouteKey()])
+        ->fillForm([
+            'tags' => ['news', 'updates', 'features'],
+        ])
+        ->call('save')
+        ->assertHasNoFormErrors();
+
+    expect($post->fresh()->tags)->toBe('news, updates, features');
+});
+
+it('can view a post', function () {
     $post = Post::factory()->create(['user_id' => $this->user->id]);
 
     Livewire::test(ViewPost::class, ['record' => $post->getRouteKey()])
