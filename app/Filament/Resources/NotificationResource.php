@@ -34,6 +34,7 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use UnitEnum;
 
 final class NotificationResource extends Resource
 {
@@ -233,15 +234,13 @@ final class NotificationResource extends Resource
                         'warning' => 'Warning',
                         'error'   => 'Error',
                     ]),
-                TernaryFilter::make('read_at')
-                    ->label(__('notifications.read_status'))
-                    ->placeholder(__('notifications.all_notifications'))
-                    ->trueLabel(__('notifications.read'))
-                    ->falseLabel(__('notifications.unread'))
-                    ->nullable()
+                TernaryFilter::make('is_read')
+                    ->label(__('admin.notifications.filters.read'))
+                    ->trueLabel(__('admin.notifications.filters.read'))
+                    ->falseLabel(__('admin.notifications.filters.unread'))
                     ->queries(
-                        true: fn (Builder $query): Builder => $query->whereNotNull('read_at'),
-                        false: fn (Builder $query): Builder => $query->whereNull('read_at'),
+                        true: fn (Builder $query): Builder => $query->where('is_read', true),
+                        false: fn (Builder $query): Builder => $query->where('is_read', false),
                     ),
                 Filter::make('created_at')
                     ->label(__('admin.notifications.filters.created_at'))
@@ -267,7 +266,7 @@ final class NotificationResource extends Resource
                     ->label(__('admin.notifications.actions.mark_as_read'))
                     ->icon('heroicon-o-check-circle')
                     ->color('success')
-                    ->visible(fn (Notification $record): bool => $record->read_at === null)
+                    ->visible(fn (Notification $record): bool => ! $record->is_read)
                     ->action(function (Notification $record): void {
                         $record->forceFill([
                             'is_read' => true,
@@ -283,7 +282,7 @@ final class NotificationResource extends Resource
                     ->label(__('admin.notifications.actions.mark_as_unread'))
                     ->icon('heroicon-o-x-circle')
                     ->color('gray')
-                    ->visible(fn (Notification $record): bool => $record->read_at !== null)
+                    ->visible(fn (Notification $record): bool => $record->is_read)
                     ->action(function (Notification $record): void {
                         $record->forceFill([
                             'is_read' => false,
@@ -310,12 +309,12 @@ final class NotificationResource extends Resource
                                     'read_at' => now(),
                                 ])->save();
                             });
+
                             FilamentNotification::make()
                                 ->title(__('admin.notifications.bulk_marked_as_read'))
                                 ->success()
                                 ->send();
-                        })
-                        ->deselectRecordsAfterCompletion(),
+                        }),
                     BulkAction::make('bulk_mark_as_unread')
                         ->label(__('admin.notifications.actions.bulk_mark_as_unread'))
                         ->icon('heroicon-o-x-circle')
@@ -327,6 +326,7 @@ final class NotificationResource extends Resource
                                     'read_at' => null,
                                 ])->save();
                             });
+
                             FilamentNotification::make()
                                 ->title(__('admin.notifications.bulk_marked_as_unread'))
                                 ->success()

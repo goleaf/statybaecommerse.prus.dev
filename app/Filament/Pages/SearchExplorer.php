@@ -11,7 +11,7 @@ use Filament\Pages\Page;
 
 final class SearchExplorer extends Page
 {
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-magnifying-glass-circle';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-magnifying-glass-circle';
 
     public static function getNavigationGroup(): string|UnitEnum|null
     {
