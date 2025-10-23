@@ -18,8 +18,7 @@
 - Raised the floor for `novadaemon/filament-combobox` to `^2.0.1` as part of the scheduled Filament maintenance sweep so we can ship the upstream dropdown focus bugfix in the next admin UI release.
 
 ### Changed
-- Hardened the campaign product target schema migration with the columns used by the model/resource and guarded the legacy product image path normalization against missing columns.
-- Converted Variant Analytics navigation icon handling to an explicit accessor and removed duplicate UnitEnum imports from custom Filament widgets to satisfy PHP 8.4 autoloading rules.
+- Synced the MenuItems resource helpers with Filament's v4 form API, enforced stricter select/text validation, normalized icon declarations, and scrubbed duplicate `UnitEnum` imports from affected admin pages.
 - Restored typed navigation icons for the Menu, Enum Management, and Variant Analytics resources while cleaning up redundant `UnitEnum` imports in favor of fully qualified annotations.
 - Corrected Variant Pricing Rule table action imports and monetary formatting while standardizing Filament page navigation icon annotations to avoid enum autoload collisions during admin workflows.
 - Routed the Menu activation toggle through Filament's success notification system to standardize feedback messaging.

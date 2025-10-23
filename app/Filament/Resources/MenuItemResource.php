@@ -10,9 +10,8 @@ use App\Filament\Resources\MenuItemResource\Pages;
 use App\Models\Menu;
 use App\Models\MenuItem;
 use App\Models\Scopes\VisibleScope;
-use BackedEnum;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\Grid as FormGrid;
@@ -28,8 +27,6 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use UnitEnum;
-use Filament\Schemas\Schema;
 
 /**
  * MenuItemResource
@@ -42,14 +39,11 @@ final class MenuItemResource extends Resource
 
     protected static ?string $model = MenuItem::class;
 
-    protected static UnitEnum|string|null $navigationGroup = 'Content';
+    /** @var string|\UnitEnum|null Group content resources under the CMS navigation section. */
+    protected static $navigationGroup = 'Content';
 
-    /**
-     * Navigation icon that Filament displays for this resource.
-     *
-     * @var string|BackedEnum|null Filament navigation icon identifier.
-     */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-rectangle-stack';
+    /** @var string|\BackedEnum|null Keep the navigation icon compatible with Filament's string-based discovery. */
+    protected static $navigationIcon = 'heroicon-o-rectangle-stack';
 
     protected static ?int $navigationSort = 5;
 
