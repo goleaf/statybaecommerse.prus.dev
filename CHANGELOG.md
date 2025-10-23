@@ -6,8 +6,15 @@ The format is based on [Conventional Commits](https://www.conventionalcommits.or
 
 ## [Unreleased]
 
-### Features & Enhancements
-* Expanded the VariantInventory and VariantAnalytics resources with refreshed stock availability attributes and enhanced performance metric definitions for upcoming releases.
+### Added
+* Introduced a comprehensive Campaign Product Target Filament resource with multilingual form, table, and view tooling.
+
+### Changed
+* Hardened campaign targeting migrations to mirror the model schema and protected product image path normalisation from unsafe data.
+* Simplified supporting analytics UI by exposing the Variant Analytics navigation icon via an accessor and normalising the enhanced ecommerce widget navigation metadata.
+
+### Documentation
+* Captured the above improvements in the changelog for release tracking.
 
 ## [0.1.0] - 2025-10-20
 
