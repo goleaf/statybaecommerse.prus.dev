@@ -165,48 +165,30 @@ components:
           type: integer
           minimum: 1
     ProductCatalogMeta:
+      # Keep the meta payload aligned with ProductContractPresenter::fromCatalog().
       type: object
       additionalProperties: true
       required:
         - generated_at
-        - query
-        - pagination
         - total
         - limit
       properties:
         generated_at:
           type: string
           format: date-time
-        query:
-          type: object
-          additionalProperties: true
-          required:
-            - page
-            - per_page
-            - sort
-            - filters
-          properties:
-            page:
-              type: integer
-              minimum: 1
-            per_page:
-              type: integer
-              minimum: 1
-            sort:
-              type: array
-              items:
-                $ref: '#/components/schemas/AppliedSort'
-            filters:
-              type: object
-              additionalProperties: true
-        pagination:
-          $ref: '#/components/schemas/PaginationMeta'
         total:
           type: integer
           minimum: 0
         limit:
           type: integer
           minimum: 1
+        query:
+          description: Optional future filters snapshot when present in the response.
+          type: object
+          additionalProperties: true
+        pagination:
+          description: Optional pagination metadata when exposed by future iterations.
+          $ref: '#/components/schemas/PaginationMeta'
     Product:
       type: object
       additionalProperties: false
@@ -316,16 +298,21 @@ components:
       additionalProperties: false
       required:
         - url
-        - thumbnail
       properties:
         url:
           type: string
           format: uri
         thumbnail:
-          type: string
-          format: uri
+          description: Thumbnails are nullable when no conversion has been generated yet.
+          anyOf:
+            - type: string
+              format: uri
+            - type: 'null'
         alt:
-          type: string
+          description: Optional alt text bubbled from media custom properties.
+          type:
+            - string
+            - 'null'
     ProductVariant:
       type: object
       additionalProperties: false

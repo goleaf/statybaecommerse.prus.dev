@@ -43,7 +43,6 @@ The format is based on [Conventional Commits](https://www.conventionalcommits.or
 * Introduced a reusable HTML sanitization pipeline with a maintenance command, model hooks, and storefront renderer updates to harden product and legal content.
 
 ### Bug Fixes
-* Stabilized the cart lifecycle unit suite by provisioning a dedicated lightweight `cart_items` schema during tests, ensuring checkout cleanup assertions run without the full migration stack and continue guarding session/user clearing logic.
 * Updated the product catalogue OpenAPI metadata schema to match the presenter payload and documented nullable media fields, eliminating validation mismatches during contract tests.
 * Added the missing coupon schema columns (maximum discount caps, per-user limits, and scoped product/category JSON fields) so Laravel migrations and factories align, restoring the API coupon application test suite.
 * Rounded coupon discount calculations inside the application service to prevent `Number::parseFloat` type errors when returning pricing payloads during checkout flows.
