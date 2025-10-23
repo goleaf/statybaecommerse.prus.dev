@@ -4,12 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\Sliders\Schemas;
 
-use App\Support\Filament\SearchableInputHelper;
-use App\Support\Search\ContentLinkSearch;
-use DefStudio\SearchableInput\Forms\Components\SearchableInput;
-use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
+use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -48,8 +43,10 @@ final class SliderForm
                 Section::make(__('admin.sliders.media'))
                     ->description(__('admin.sliders.media_description'))
                     ->components([
-                        FileUpload::make('image')
+                        SpatieMediaLibraryFileUpload::make('slider_images')
                             ->label(__('admin.sliders.image'))
+                            ->collection('slider_images')
+                            ->disk('public')
                             ->image()
                             ->imageEditor()
                             ->imageEditorAspectRatios([
@@ -57,8 +54,20 @@ final class SliderForm
                                 '4:3',
                                 '1:1',
                             ])
-                            ->directory('sliders/images')
-                            ->visibility('private')
+                            ->maxSize(5120)  // 5MB
+                            ->required(fn (string $operation): bool => $operation === 'create')
+                            ->columnSpanFull(),
+                        SpatieMediaLibraryFileUpload::make('slider_backgrounds')
+                            ->label(__('admin.sliders.background_image'))
+                            ->collection('slider_backgrounds')
+                            ->disk('public')
+                            ->image()
+                            ->imageEditor()
+                            ->imageEditorAspectRatios([
+                                '16:9',
+                                '4:3',
+                                '1:1',
+                            ])
                             ->maxSize(5120)  // 5MB
                             ->columnSpanFull(),
                     ])
