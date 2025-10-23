@@ -21,8 +21,8 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
-use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 
 // Load the Filament compatibility shims before the application boots so the
 // legacy class aliases are always available during early package discovery.
@@ -557,6 +557,8 @@ $app = Application::configure(basePath: dirname(__DIR__))
 
         $providers[] = App\Providers\LocaleServiceProvider::class;
         $providers[] = App\Providers\Filament\AdminPanelProvider::class;
+        // Register the Livewire testing helpers so resource hooks and test assets load reliably.
+        $providers[] = App\Providers\LivewireTestingServiceProvider::class;
         $providers[] = SecurityServiceProvider::class;
 
         return $providers;

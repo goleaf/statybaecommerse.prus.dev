@@ -7,16 +7,16 @@ The format is based on [Conventional Commits](https://www.conventionalcommits.or
 ## [Unreleased]
 
 ### Bug Fixes
-
-- Fixed the Husky pre-commit hook to stream staged PHP files through `xargs`, restoring PHPStan compatibility on releases that lack `--paths-file` support so contributors can commit without bypassing the hook.
-- Stabilized the company management flows by removing the global ActiveScope, widening factory/test fixtures, and letting Filament fall back to the bundled theme during tests so inactive records can be created, toggled, and listed without manifest errors.
-- Re-enabled flexible system setting translations by replacing the locale uniqueness constraint with an index, restoring soft delete support, and trimming the fillable contract so replication and counting scenarios match the documented API.
-- Preserved Attribute validation rule strings while still decoding JSON arrays, refreshed the Filament form so arrays render as comma-separated chips, and added regression coverage for both storage paths.
-- Reintroduced the `regions` schema with defensive guards and rebuilt the `customers`/`orders` relationship so SQLite-backed factories and analytics widgets can create location-aware records without missing column errors during tests.
-- Resolved localized product and category routing by honouring translated slugs during route model binding and updating storefront links so product detail pages load reliably from the home feed and other localized listings.
-- Restored the dashboard permission guard to default to open access when no abilities are configured and aligned inline sparkline widgets with Filament's nullable model contract, clearing the latest unit test regressions around navigation metadata and dataset checksums.
-- Replaced the CampaignCustomerSegment global ActiveScope with targeted query helpers so unit tests can fetch inactive records while dashboards retain expressive filters for campaign, type, and group segmentation.
-- Removed the generic ActiveScope from campaign conversion analytics so status-
+* Stabilized Filament Livewire tests by wiring resource-aware hooks, adding a
+  lightweight ViewRecord table stub, and seeding Vite manifest assets so
+  CampaignView coverage passes without vendor patches.
+* Re-enabled flexible system setting translations by replacing the locale uniqueness constraint with an index, restoring soft delete support, and trimming the fillable contract so replication and counting scenarios match the documented API.
+* Preserved Attribute validation rule strings while still decoding JSON arrays, refreshed the Filament form so arrays render as comma-separated chips, and added regression coverage for both storage paths.
+* Reintroduced the `regions` schema with defensive guards and rebuilt the `customers`/`orders` relationship so SQLite-backed factories and analytics widgets can create location-aware records without missing column errors during tests.
+* Resolved localized product and category routing by honouring translated slugs during route model binding and updating storefront links so product detail pages load reliably from the home feed and other localized listings.
+* Restored the dashboard permission guard to default to open access when no abilities are configured and aligned inline sparkline widgets with Filament's nullable model contract, clearing the latest unit test regressions around navigation metadata and dataset checksums.
+* Replaced the CampaignCustomerSegment global ActiveScope with targeted query helpers so unit tests can fetch inactive records while dashboards retain expressive filters for campaign, type, and group segmentation.
+* Removed the generic ActiveScope from campaign conversion analytics so status-
   filtered scopes (campaign, type, device, medium, etc.) once again return
   completed records in unit tests and dashboards instead of being filtered out
   by a non-existent `is_active` flag.
