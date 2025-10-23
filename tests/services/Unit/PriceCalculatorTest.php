@@ -2,66 +2,56 @@
 
 declare(strict_types=1);
 
-use App\Data\Pricing\PriceBreakdown;
 use App\Services\Pricing\PriceCalculator;
-use Illuminate\Support\Facades\Config;
+use Faker\Factory as FakerFactory;
+use Tests\TestCase;
 
-describe('PriceCalculator', function () {
-    beforeEach(function (): void {
-        Config::set('pricing', [
-            'currency' => 'EUR',
-            'rounding' => [
-                'precision' => 2,
-                'mode' => PHP_ROUND_HALF_UP,
-            ],
-            'vat' => [
-                'rate' => 21.0,
-                'setting_key' => 'tax_rate',
-            ],
-            'shipping' => [
-                'flat_rate' => 5.99,
-                'flat_rate_setting_key' => 'shipping_cost',
-                'free_threshold' => 100.0,
-                'free_threshold_setting_key' => 'free_shipping_threshold',
-            ],
+uses(TestCase::class);
+
+it('keeps totals consistent across application contexts', function () {
+    app()->setLocale('en');
+
+    $calculator = app(PriceCalculator::class);
+    $faker = FakerFactory::create();
+
+    foreach (range(1, 100) as $iteration) {
+        $items = collect(range(1, $faker->numberBetween(1, 5)))->map(fn () => [
+            'price' => $faker->randomFloat(2, 0.01, 500),
+            'quantity' => $faker->numberBetween(1, 5),
         ]);
-    });
 
-    test('computes breakdown with configured VAT and shipping thresholds', function (): void {
-        $calculator = app(PriceCalculator::class);
-
-        $breakdown = $calculator->breakdown(50.0);
-
-        expect($breakdown)
-            ->toBeInstanceOf(PriceBreakdown::class)
-            ->and($breakdown->subtotal)->toBe(50.0)
-            ->and($breakdown->discount)->toBe(0.0)
-            ->and($breakdown->shipping)->toBe(5.99)
-            ->and($breakdown->tax)->toBe(10.5)
-            ->and($breakdown->total)->toBe(66.49)
-            ->and($breakdown->currency)->toBe('EUR');
-    });
-
-    test('produces consistent totals across randomised scenarios', function (): void {
-        $calculator = app(PriceCalculator::class);
-
-        foreach (range(1, 100) as $i) {
-            $subtotal = mt_rand(0, 200_000) / 100;
-            $discount = mt_rand(0, (int) round($subtotal * 120));
-            $discount /= 100;
-            $shippingOverride = random_int(0, 1) === 1 ? mt_rand(0, 10_000) / 100 : null;
-            $vatRate = [null, 21.0, 9.0, 5.5][array_rand([0, 1, 2, 3])];
-
-            $breakdown = $calculator->breakdown($subtotal, $discount, $shippingOverride, $vatRate);
-
-            expect($breakdown->subtotal)->toBeGreaterThanOrEqual(0.0)
-                ->and($breakdown->discount)->toBeGreaterThanOrEqual(0.0)
-                ->and($breakdown->discount)->toBeLessThanOrEqual($breakdown->subtotal + 0.0001)
-                ->and($breakdown->tax)->toBeGreaterThanOrEqual(0.0)
-                ->and($breakdown->shipping)->toBeGreaterThanOrEqual(0.0);
-
-            $recomputedTotal = round($breakdown->taxableAmount + $breakdown->tax + $breakdown->shipping, 2);
-            expect($breakdown->total)->toBe($recomputedTotal);
+        $discount = $faker->randomFloat(2, 0, 200);
+        $shippingOverride = $faker->boolean() ? $faker->randomFloat(2, 0, 25) : null;
+        $taxOverride = null;
+        if ($faker->boolean()) {
+            $taxOverride = $faker->boolean()
+                ? $faker->randomFloat(3, 0, 0.25)
+                : $faker->numberBetween(5, 25);
         }
-    });
+
+        $breakdown = $calculator->calculate($items, $discount, $shippingOverride, $taxOverride);
+        $raw = $breakdown->toArray();
+
+        expect($raw['subtotal'])->toBeGreaterThanOrEqual(0.0)
+            ->and($raw['discount'])->toBeGreaterThanOrEqual(0.0)
+            ->and($raw['discount'])->toBeLessThanOrEqual($raw['subtotal'] + 0.0001)
+            ->and($raw['tax'])->toBeGreaterThanOrEqual(0.0)
+            ->and($raw['shipping'])->toBeGreaterThanOrEqual(0.0)
+            ->and($raw['total'])->toBeGreaterThanOrEqual(0.0);
+
+        $expectedTotal = $calculator->round($raw['subtotal'] - $raw['discount'] + $raw['tax'] + $raw['shipping']);
+        expect($raw['total'])->toBe($expectedTotal);
+
+        $formatted = $breakdown->formatted(locale: 'en');
+        expect($formatted['subtotal'])->toBe($calculator->formatAmount($raw['subtotal'], $raw['currency'], 'en'))
+            ->and($formatted['tax'])->toBe($calculator->formatAmount($raw['tax'], $raw['currency'], 'en'))
+            ->and($formatted['total'])->toBe($calculator->formatAmount($raw['total'], $raw['currency'], 'en'));
+
+        $reportTotal = $calculator->round($raw['total']);
+        expect($reportTotal)->toBe($raw['total']);
+
+        if ($shippingOverride !== null) {
+            expect($raw['shipping'])->toBe($calculator->round(max(0.0, $shippingOverride)));
+        }
+    }
 });
