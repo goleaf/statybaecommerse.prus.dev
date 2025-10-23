@@ -115,10 +115,10 @@ final class CartItemResource extends Resource
                                     );
                                 })
                                 // See docs/forms/SEARCHABLE_INPUT_METADATA.md for SearchResult metadata conventions.
-                                ->afterStateUpdated(function (?string $state, Forms\Set $set): void {
+                                ->afterStateUpdated(function (SearchableInput $component, ?string $state, Forms\Set $set): void {
                                     if ($state === null || $state === '') {
                                         // Clear dependent metadata when the lookup resets.
-                                        SearchableInputHelper::clear($set, [
+                                        SearchableInputHelper::clear($component, $set, [
                                             'product_id'         => null,
                                             'product_name'       => null,
                                             'product_sku'        => null,

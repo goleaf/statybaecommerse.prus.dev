@@ -191,9 +191,9 @@ final class WishlistItemResource extends Resource
                                         );
                                     })
                                     // See docs/forms/SEARCHABLE_INPUT_METADATA.md for SearchResult metadata conventions.
-                                    ->afterStateUpdated(function (?string $state, callable $set): void {
+                                    ->afterStateUpdated(function (SearchableInput $component, ?string $state, callable $set): void {
                                         if ($state === null || $state === '') {
-                                            SearchableInputHelper::clear($set, [
+                                            SearchableInputHelper::clear($component, $set, [
                                                 'product_id' => null,
                                                 'variant_id' => null,
                                             ]);

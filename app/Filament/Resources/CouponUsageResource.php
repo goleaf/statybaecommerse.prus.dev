@@ -100,10 +100,10 @@ final class CouponUsageResource extends Resource
                                                         },
                                                     );
                                                 })
-                                                ->afterStateUpdated(function (?string $state, Set $set): void {
+                                                ->afterStateUpdated(function (SearchableInput $component, ?string $state, Set $set): void {
                                                     if ($state === null || $state === '') {
                                                         // Clear the persisted relation id when the lookup resets.
-                                                        SearchableInputHelper::clear($set, ['coupon_id' => null]);
+                                                        SearchableInputHelper::clear($component, $set, ['coupon_id' => null]);
 
                                                         return;
                                                     }
@@ -139,9 +139,9 @@ final class CouponUsageResource extends Resource
                                                         },
                                                     );
                                                 })
-                                                ->afterStateUpdated(function (?string $state, Set $set): void {
+                                                ->afterStateUpdated(function (SearchableInput $component, ?string $state, Set $set): void {
                                                     if ($state === null || $state === '') {
-                                                        SearchableInputHelper::clear($set, ['user_id' => null]);
+                                                        SearchableInputHelper::clear($component, $set, ['user_id' => null]);
 
                                                         return;
                                                     }

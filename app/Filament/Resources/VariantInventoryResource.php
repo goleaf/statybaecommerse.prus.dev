@@ -11,7 +11,7 @@ use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Models\VariantInventory;
 use App\Support\Filament\Components\Flatpickr;
-use App\Support\Filament\Components\SearchableComponentHelper;
+use App\Support\Filament\SearchableInputHelper;
 use App\Support\Search\LocationSearch;
 use App\Support\Search\PartnerSearch;
 use App\Support\Search\ProductVariantSearch;
@@ -105,56 +105,55 @@ final class VariantInventoryResource extends Resource
                             ->searchUsing(fn (string $value): array => ProductVariantSearch::results($value))
                             ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null && $state !== '' ? (int) $state : null)
                             ->afterStateHydrated(function (SearchableInput $component, ?int $state): void {
-                                // Hydrate via helper for metadata consistency.
                                 SearchableInputHelper::hydrate(
                                     $component,
                                     $state,
-                                    static function (int $value): ?array {
+                                    static function (int $identifier): ?array {
                                         $variant = ProductVariant::query()
                                             ->select(['id', 'product_id', 'sku', 'name', 'price'])
                                             ->with(['product:id,sku,name'])
-                                            ->find($value);
+                                            ->find($identifier);
 
                                         if (! $variant instanceof ProductVariant) {
                                             return null;
                                         }
 
                                         return [
-                                            'value' => $variant->getKey(),
-                                            'label' => ProductVariantSearch::label($variant),
-                                        ];
-                                    },
-                                );
-                            })
-                            ->afterStateUpdated(function (SearchableInput $component, ?string $state, Set $set): void {
-                                SearchableComponentHelper::syncSelectedRecord(
-                                    component: $component,
-                                    state: $state,
-                                    set: $set,
-                                    attribute: 'variant_id',
-                                    resolveRecord: static function (string $variantId): ?ProductVariant {
-                                        // Keep the finder aligned with the hydrate() query to avoid mismatched payloads.
-                                        return ProductVariant::query()
-                                            ->select(['id', 'product_id', 'sku', 'name', 'price'])
-                                            ->with(['product:id,sku,name'])
-                                            ->find((int) $variantId);
-                                    },
-                                    normalizePayload: static function (ProductVariant $variant): array {
-                                        return [
                                             'value'   => $variant->getKey(),
                                             'label'   => ProductVariantSearch::label($variant),
                                             'payload' => self::normaliseVariantPayload($variant),
                                         ];
                                     },
-                                    onSync: static function (array $normalised) use ($set): void {
-                                        // Cache the resolved metadata for downstream automation without persisting it.
-                                        $set('variant_payload', $normalised['payload']);
-                                    },
-                                    onClear: static function () use ($set): void {
-                                        // Avoid leaking stale variant metadata when the lookup is cleared or fails.
-                                        $set('variant_payload', []);
-                                    },
-                                );
+                                ); // See docs/filament/searchable-inputs.md for helper expectations.
+                            })
+                            ->afterStateUpdated(function (SearchableInput $component, ?string $state, Set $set): void {
+                                $identifier = is_string($state) ? trim($state) : '';
+
+                                if ($identifier === '') {
+                                    SearchableInputHelper::clear($component, $set, [
+                                        'variant_id'      => null,
+                                        'variant_payload' => [],
+                                    ]);
+
+                                    return;
+                                }
+
+                                $variant = ProductVariant::query()
+                                    ->select(['id', 'product_id', 'sku', 'name', 'price'])
+                                    ->with(['product:id,sku,name'])
+                                    ->find((int) $identifier);
+
+                                if (! $variant instanceof ProductVariant) {
+                                    SearchableInputHelper::clear($component, $set, [
+                                        'variant_id'      => null,
+                                        'variant_payload' => [],
+                                    ]);
+
+                                    return;
+                                }
+
+                                $set('variant_id', $variant->getKey());
+                                $set('variant_payload', self::normaliseVariantPayload($variant));
                             }),
                         Hidden::make('variant_payload')
                             ->default([])
@@ -167,54 +166,53 @@ final class VariantInventoryResource extends Resource
                             ->searchUsing(fn (string $value): array => LocationSearch::results($value))
                             ->dehydrateStateUsing(fn (?string $state): ?int => $state !== null && $state !== '' ? (int) $state : null)
                             ->afterStateHydrated(function (SearchableInput $component, ?int $state): void {
-                                // Hydrate via helper to mirror docs/forms/SEARCHABLE_INPUT_METADATA.md lifecycle.
                                 SearchableInputHelper::hydrate(
                                     $component,
                                     $state,
-                                    static function (int $value): ?array {
+                                    static function (int $identifier): ?array {
                                         $location = Location::query()
                                             ->select(['id', 'name', 'code', 'city', 'country_code'])
-                                            ->find($value);
+                                            ->find($identifier);
 
                                         if (! $location instanceof Location) {
                                             return null;
                                         }
 
                                         return [
-                                            'value' => $location->getKey(),
-                                            'label' => LocationSearch::label($location),
-                                        ];
-                                    },
-                                );
-                            })
-                            ->afterStateUpdated(function (SearchableInput $component, ?string $state, Set $set): void {
-                                SearchableComponentHelper::syncSelectedRecord(
-                                    component: $component,
-                                    state: $state,
-                                    set: $set,
-                                    attribute: 'location_id',
-                                    resolveRecord: static function (string $locationId): ?Location {
-                                        // Mirror the hydrate() finder so cached payloads always match the dropdown label.
-                                        return Location::query()
-                                            ->select(['id', 'name', 'code', 'city', 'country_code'])
-                                            ->find((int) $locationId);
-                                    },
-                                    normalizePayload: static function (Location $location): array {
-                                        return [
                                             'value'   => $location->getKey(),
                                             'label'   => LocationSearch::label($location),
                                             'payload' => self::normaliseLocationPayload($location),
                                         ];
                                     },
-                                    onSync: static function (array $normalised) use ($set): void {
-                                        // Store the enriched location metadata for Livewire reactions without saving it.
-                                        $set('location_payload', $normalised['payload']);
-                                    },
-                                    onClear: static function () use ($set): void {
-                                        // Reset dependent fields whenever the lookup is cleared or fails to resolve.
-                                        $set('location_payload', []);
-                                    },
-                                );
+                                ); // See docs/filament/searchable-inputs.md for helper expectations.
+                            })
+                            ->afterStateUpdated(function (SearchableInput $component, ?string $state, Set $set): void {
+                                $identifier = is_string($state) ? trim($state) : '';
+
+                                if ($identifier === '') {
+                                    SearchableInputHelper::clear($component, $set, [
+                                        'location_id'      => null,
+                                        'location_payload' => [],
+                                    ]);
+
+                                    return;
+                                }
+
+                                $location = Location::query()
+                                    ->select(['id', 'name', 'code', 'city', 'country_code'])
+                                    ->find((int) $identifier);
+
+                                if (! $location instanceof Location) {
+                                    SearchableInputHelper::clear($component, $set, [
+                                        'location_id'      => null,
+                                        'location_payload' => [],
+                                    ]);
+
+                                    return;
+                                }
+
+                                $set('location_id', $location->getKey());
+                                $set('location_payload', self::normaliseLocationPayload($location));
                             }),
                         Hidden::make('location_payload')
                             ->default([])
