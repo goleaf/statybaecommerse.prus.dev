@@ -13,6 +13,7 @@ use Closure;
 use Illuminate\Cache\TaggableStore;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Cache;
+use App\Support\Cache\CacheKeys;
 
 /**
  * CacheService
@@ -26,12 +27,7 @@ final class CacheService
      */
     public static function getFeaturedProducts(int $limit = 8): Collection
     {
-        return self::rememberWithTags(
-            CacheTagHelper::products(),
-            CacheKeys::productFeaturedList($limit),
-            CacheKeys::TTL_ONE_HOUR,
-            fn () => Product::where('is_featured', true)->where('is_visible', true)->with(['brand', 'categories', 'media'])->limit($limit)->get(),
-        );
+        return Cache::remember(CacheKeys::productFeaturedList($limit), CacheKeys::TTL_ONE_HOUR, fn () => Product::where('is_featured', true)->where('is_visible', true)->with(['brand', 'categories', 'media'])->limit($limit)->get());
     }
 
     /**
@@ -39,12 +35,7 @@ final class CacheService
      */
     public static function getPopularCategories(int $limit = 6): Collection
     {
-        return self::rememberWithTags(
-            CacheTagHelper::categories(),
-            CacheKeys::categoryPopularList($limit),
-            CacheKeys::TTL_ONE_HOUR,
-            fn () => Category::where('is_visible', true)->where('is_featured', true)->with(['media'])->withCount('products')->orderBy('products_count', 'desc')->limit($limit)->get(),
-        );
+        return Cache::remember(CacheKeys::categoryPopularList($limit), CacheKeys::TTL_ONE_HOUR, fn () => Category::where('is_visible', true)->where('is_featured', true)->with(['media'])->withCount('products')->orderBy('products_count', 'desc')->limit($limit)->get());
     }
 
     /**
@@ -52,12 +43,7 @@ final class CacheService
      */
     public static function getTopBrands(int $limit = 10): Collection
     {
-        return self::rememberWithTags(
-            CacheTagHelper::brands(),
-            CacheKeys::brandTopList($limit),
-            CacheKeys::TTL_ONE_HOUR,
-            fn () => Brand::where('is_visible', true)->where('is_featured', true)->with(['media'])->withCount('products')->orderBy('products_count', 'desc')->limit($limit)->get(),
-        );
+        return Cache::remember(CacheKeys::brandTopList($limit), CacheKeys::TTL_ONE_HOUR, fn () => Brand::where('is_visible', true)->where('is_featured', true)->with(['media'])->withCount('products')->orderBy('products_count', 'desc')->limit($limit)->get());
     }
 
     /**
@@ -65,8 +51,7 @@ final class CacheService
      */
     public static function getNavigationCategories(): Collection
     {
-        return self::rememberWithTags(
-            CacheTagHelper::categories(),
+        return Cache::remember(
             CacheKeys::categoryNavigationTree(),
             CacheKeys::TTL_ONE_DAY,
             fn () => Category::where('is_visible', true)->whereNull('parent_id')->with(['children' => function ($query) {
@@ -80,7 +65,10 @@ final class CacheService
      */
     public static function clearProductCaches(): void
     {
-        app(CacheInvalidationService::class)->flushProducts();
+        Cache::forget(CacheKeys::productFeaturedList(8));
+        Cache::forget(CacheKeys::categoryPopularList(6));
+        Cache::forget(CacheKeys::brandTopList(10));
+        Cache::forget(CacheKeys::categoryNavigationTree());
     }
 
     /**

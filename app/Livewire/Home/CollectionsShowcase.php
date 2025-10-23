@@ -6,7 +6,6 @@ namespace App\Livewire\Home;
 
 use App\Models\Collection as ProductCollection;
 use App\Support\Cache\CacheKeys;
-use App\Support\Cache\CacheTagHelper;
 use Filament\Infolists\Components\ViewEntry;
 use Filament\Schemas\Concerns\InteractsWithSchemas;
 use Filament\Schemas\Contracts\HasSchemas;
@@ -27,7 +26,7 @@ final class CollectionsShowcase extends Component implements HasSchemas
     {
         $locale = app()->getLocale();
 
-        $store = Cache::getStore();
+        return Cache::remember(CacheKeys::homeCollections($locale), CacheKeys::TTL_FIVE_MINUTES, function () use ($locale) {
 
         $callback = function () use ($locale) {
             return ProductCollection::query()

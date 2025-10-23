@@ -9,8 +9,6 @@ use App\Models\Product;
 use App\Models\Review;
 use App\Models\User;
 use App\Support\Cache\CacheKeys;
-use App\Support\Cache\CacheTagHelper;
-use App\Support\Cache\CacheTags;
 use Carbon\Carbon;
 use DateTimeInterface;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
@@ -206,21 +204,9 @@ class SimplifiedStatsWidget extends BaseWidget
         $now = $this->getReferenceTime();
         $lastMonth = $now->copy()->subMonth();
 
-        return $this->rememberDashboardCache(
-            [
-                CacheTags::dashboard(),
-                CacheTags::orders(),
-                CacheTags::users(),
-                CacheTags::products(),
-                CacheTags::categories(),
-                CacheTags::brands(),
-                CacheTags::reviews(),
-            ],
-            CacheKeys::dashboardSimplifiedSummary(),
-            now()->addSeconds(300),
-            function () use ($lastMonth): array {
-                $orderStats = Order::query()
-                    ->selectRaw('
+        return Cache::remember(CacheKeys::dashboardSummary(), CacheKeys::TTL_MINUTE, function () use ($lastMonth) {
+            $orderStats = Order::query()
+                ->selectRaw('
                     SUM(CASE WHEN status != ? THEN total ELSE 0 END) as total_revenue,
                     SUM(CASE WHEN status != ? AND created_at >= ? THEN total ELSE 0 END) as last_month_revenue,
                     COUNT(*) as total_orders,
