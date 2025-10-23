@@ -12,7 +12,7 @@ use App\Observers\ProductObserver;
 use App\Support\Html\HtmlSanitizer;
 use App\Traits\HasProductPricing;
 use App\Traits\HasTranslations;
-use DateTimeInterface;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Builder;
@@ -412,7 +412,7 @@ final class Product extends Model implements HasMedia, TranslatableRecord
 
     public function reserveStock(
         int $quantity,
-        ?DateTimeInterface $expiresAt = null,
+        ?\DateTimeInterface $expiresAt = null,
         array $meta = [],
         ?string $referenceType = null,
         ?string $referenceId = null
@@ -436,13 +436,13 @@ final class Product extends Model implements HasMedia, TranslatableRecord
             }
 
             return $product->stockReservations()->create([
-                'quantity'       => $quantity,
-                'status'         => StockReservation::STATUS_RESERVED,
-                'reserved_at'    => now(),
-                'expires_at'     => $expiresAt,
-                'meta'           => $meta ?: null,
+                'quantity' => $quantity,
+                'status' => StockReservation::STATUS_RESERVED,
+                'reserved_at' => now(),
+                'expires_at' => $expiresAt,
+                'meta' => $meta ?: null,
                 'reference_type' => $referenceType,
-                'reference_id'   => $referenceId,
+                'reference_id' => $referenceId,
             ]);
         });
 

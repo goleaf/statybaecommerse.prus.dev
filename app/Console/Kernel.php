@@ -33,6 +33,7 @@ final class Kernel extends ConsoleKernel
         \App\Console\Commands\BackupVerifyCommand::class,
         \App\Console\Commands\I18nAuditCommand::class,
         \App\Console\Commands\ValidateContractCommand::class,
+        \App\Console\Commands\ReconcileInventoryCommand::class,
     ];
 
     protected function schedule(Schedule $schedule): void
@@ -74,6 +75,13 @@ final class Kernel extends ConsoleKernel
                 ->withoutOverlapping()
                 ->runInBackground();
         }
+
+        $schedule
+            ->command('inventory:reconcile')
+            ->everyFifteenMinutes()
+            ->onOneServer()
+            ->withoutOverlapping()
+            ->runInBackground();
     }
 
     protected function commands(): void
