@@ -38,7 +38,7 @@ use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Queue\Events\JobProcessing;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Queue;
+use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\LazyCollection;
@@ -83,6 +83,14 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        if (class_exists(\Illuminate\Foundation\Vite::class) && method_exists(\Illuminate\Foundation\Vite::class, 'useCspNonce')) {
+            Vite::useCspNonce(fn (): string => csp_nonce());
+        }
+
+        if (method_exists(Livewire::class, 'setScriptNonce')) {
+            Livewire::setScriptNonce(fn (): string => csp_nonce());
+        }
+
         $this->registerModelObservers();
 
         $this->registerQueueTracing();

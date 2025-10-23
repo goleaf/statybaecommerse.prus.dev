@@ -12,13 +12,22 @@ return [
             'Permissions-Policy' => implode(', ', [
                 'accelerometer=()',
                 'camera=()',
+                'fullscreen=(self)',
                 'geolocation=()',
                 'gyroscope=()',
                 'magnetometer=()',
                 'microphone=()',
                 'payment=()',
                 'usb=()',
+                'display-capture=()',
             ]),
+        ],
+        'hsts' => [
+            'enabled' => (bool) env('SECURITY_HSTS_ENABLED', true),
+            'max_age' => (int) env('SECURITY_HSTS_MAX_AGE', 63072000),
+            'include_subdomains' => (bool) env('SECURITY_HSTS_INCLUDE_SUBDOMAINS', true),
+            'preload' => (bool) env('SECURITY_HSTS_PRELOAD', false),
+            'enforce_on_http' => (bool) env('SECURITY_HSTS_ENFORCE_ON_HTTP', false),
         ],
         'content_security_policy' => [
             'default-src' => ["'self'"],
@@ -28,16 +37,18 @@ return [
             'object-src' => ["'none'"],
             'script-src' => [
                 "'self'",
-                "'unsafe-inline'",
-                "'unsafe-eval'",
+                "'strict-dynamic'",
+                '{{nonce}}',
                 'https://unpkg.com',
             ],
+            'script-src-attr' => ["'none'"],
             'style-src' => [
                 "'self'",
-                "'unsafe-inline'",
+                '{{nonce}}',
                 'https://fonts.bunny.net',
                 'https://unpkg.com',
             ],
+            'style-src-attr' => ["'none'"],
             'font-src' => [
                 "'self'",
                 'https://fonts.bunny.net',
@@ -55,9 +66,48 @@ return [
     ],
     'rate_limiting' => [
         'api' => [
-            'default' => (int) env('API_RATE_LIMIT_DEFAULT', 60),
-            'notifications' => (int) env('API_RATE_LIMIT_NOTIFICATIONS', 60),
-            'autocomplete' => (int) env('API_RATE_LIMIT_AUTOCOMPLETE', 30),
+            'default' => [
+                'user' => [
+                    'max_attempts' => (int) env('API_RATE_LIMIT_DEFAULT_USER_MAX_ATTEMPTS', 120),
+                    'decay_seconds' => (int) env('API_RATE_LIMIT_DEFAULT_USER_DECAY', 60),
+                ],
+                'ip' => [
+                    'max_attempts' => (int) env('API_RATE_LIMIT_DEFAULT_IP_MAX_ATTEMPTS', 240),
+                    'decay_seconds' => (int) env('API_RATE_LIMIT_DEFAULT_IP_DECAY', 120),
+                ],
+                'global' => [
+                    'max_attempts' => (int) env('API_RATE_LIMIT_DEFAULT_GLOBAL_MAX_ATTEMPTS', 1200),
+                    'decay_seconds' => (int) env('API_RATE_LIMIT_DEFAULT_GLOBAL_DECAY', 60),
+                ],
+            ],
+            'notifications' => [
+                'user' => [
+                    'max_attempts' => (int) env('API_RATE_LIMIT_NOTIFICATIONS_USER_MAX_ATTEMPTS', 90),
+                    'decay_seconds' => (int) env('API_RATE_LIMIT_NOTIFICATIONS_USER_DECAY', 60),
+                ],
+                'ip' => [
+                    'max_attempts' => (int) env('API_RATE_LIMIT_NOTIFICATIONS_IP_MAX_ATTEMPTS', 180),
+                    'decay_seconds' => (int) env('API_RATE_LIMIT_NOTIFICATIONS_IP_DECAY', 120),
+                ],
+                'global' => [
+                    'max_attempts' => (int) env('API_RATE_LIMIT_NOTIFICATIONS_GLOBAL_MAX_ATTEMPTS', 600),
+                    'decay_seconds' => (int) env('API_RATE_LIMIT_NOTIFICATIONS_GLOBAL_DECAY', 300),
+                ],
+            ],
+            'autocomplete' => [
+                'user' => [
+                    'max_attempts' => (int) env('API_RATE_LIMIT_AUTOCOMPLETE_USER_MAX_ATTEMPTS', 45),
+                    'decay_seconds' => (int) env('API_RATE_LIMIT_AUTOCOMPLETE_USER_DECAY', 60),
+                ],
+                'ip' => [
+                    'max_attempts' => (int) env('API_RATE_LIMIT_AUTOCOMPLETE_IP_MAX_ATTEMPTS', 90),
+                    'decay_seconds' => (int) env('API_RATE_LIMIT_AUTOCOMPLETE_IP_DECAY', 120),
+                ],
+                'global' => [
+                    'max_attempts' => (int) env('API_RATE_LIMIT_AUTOCOMPLETE_GLOBAL_MAX_ATTEMPTS', 300),
+                    'decay_seconds' => (int) env('API_RATE_LIMIT_AUTOCOMPLETE_GLOBAL_DECAY', 300),
+                ],
+            ],
         ],
         'auth' => [
             'login' => [
