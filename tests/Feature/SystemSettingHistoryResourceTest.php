@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
-use App\Filament\Resources\SystemSettingHistoryResource;
-use App\Support\Nav;
+use App\Filament\Resources\SystemSettingHistories\Pages\CreateSystemSettingHistory;
+use App\Filament\Resources\SystemSettingHistories\Pages\EditSystemSettingHistory;
+use App\Filament\Resources\SystemSettingHistories\Pages\ListSystemSettingHistories;
+use App\Filament\Resources\SystemSettingHistories\SystemSettingHistoryResource;
 use App\Models\SystemSetting;
 use App\Models\SystemSettingCategory;
 use App\Models\SystemSettingHistory;
