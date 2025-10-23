@@ -50,17 +50,19 @@ final class VariantAnalyticsResource extends Resource
     protected static ?string $model = VariantAnalytics::class;
 
     /**
-     * Typed navigation icon ensures the analytics section resolves enum-backed overrides cleanly.
+     * @var string|BackedEnum|null Typed navigation icon ensures the analytics section resolves enum-backed overrides cleanly.
      */
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar-square';
 
-    /** @var UnitEnum|string|null Ensure inventory analytics stay grouped centrally. */
-    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Inventory;
+    /**
+     * @var string|BackedEnum|null Ensure inventory analytics stay grouped centrally.
+     */
+    protected static $navigationGroup = NavigationGroup::Inventory;
 
     public static function getNavigationGroup(): string|UnitEnum|null
     {
         // Centralize the NavigationGroup handling to leverage enum labels.
-        $group = static::$navigationGroup;
+        $group = self::$navigationGroup;
 
         return $group instanceof NavigationGroup ? $group->label() : $group;
     }

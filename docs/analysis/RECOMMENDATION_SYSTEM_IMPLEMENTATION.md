@@ -130,6 +130,14 @@ A comprehensive, intelligent product recommendation system has been successfully
   - User interaction statistics
   - Algorithm effectiveness tracking
 
+#### 5. ProductSimilarityResource
+- **Location**: `app/Filament/Resources/ProductSimilarities/ProductSimilarityResource.php`
+- **Features**:
+  - Curate cached similarity pairs with score validation and algorithm tags
+  - Filter similarities by product, algorithm type, or score ranges directly from the grid
+  - Inspect calculation metadata to troubleshoot recommendation results
+  - Localised navigation labels ensure operators in both English and Lithuanian panels stay aligned
+
 ## 🔧 Smart Recommendation Service
 
 ### Main Service Features
