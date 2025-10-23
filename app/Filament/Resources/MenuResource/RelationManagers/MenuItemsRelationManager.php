@@ -18,6 +18,7 @@ use Filament\Tables\Actions\EditAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use Filament\Schemas\Schema;
 
@@ -26,7 +27,7 @@ final class MenuItemsRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'allItems';
 
-    public function form(Form $form): Form
+    public function form(Schema $form): Schema
     {
         return $schema->schema([
             Grid::make(2)

@@ -13,6 +13,7 @@ use Filament\Forms;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use App\Support\Filament\Components\Flatpickr;
 use Filament\Schemas\Schema;
@@ -28,7 +29,7 @@ final class UsagesRelationManager extends BaseRelationManager
 
     protected static ?string $pluralModelLabel = 'Usages';
 
-    public function form(Form $form): Form
+    public function form(Schema $form): Schema
     {
         return $schema->schema([
             Forms\Components\Select::make('user_id')

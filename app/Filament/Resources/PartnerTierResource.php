@@ -13,6 +13,7 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Illuminate\Support\Number;
 use UnitEnum;
 use Filament\Schemas\Schema;
@@ -34,7 +35,7 @@ final class PartnerTierResource extends Resource
 
     protected static ?int $navigationSort = 2;
 
-    public static function form(Form $form): Form
+    public static function form(Schema $form): Schema
     {
         return $schema
             ->schema([

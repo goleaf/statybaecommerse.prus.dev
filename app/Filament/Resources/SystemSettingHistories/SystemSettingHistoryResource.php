@@ -28,7 +28,7 @@ class SystemSettingHistoryResource extends Resource
 
     protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    public static function form(Form $form): Form
+    public static function form(Schema $form): Schema
     {
         return SystemSettingHistoryForm::configure($schema);
     }

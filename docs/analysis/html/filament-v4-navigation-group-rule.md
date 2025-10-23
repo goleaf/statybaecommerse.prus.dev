@@ -19,8 +19,7 @@
    protected static $navigationGroup = NavigationGroup::Products;
    
    // CORRECT:
-   /** @var UnitEnum|string|null */
-   protected static $navigationGroup = NavigationGroup::Products;
+   protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Products;
    ```
 
 3. **Auto-Fix UnitEnum Import**
@@ -42,11 +41,10 @@
    - Any class with `$navigationGroup` property
 
 5. **Validation Rules**
-   - Type MUST be `UnitEnum|string|null`
+   - Type MUST be `UnitEnum|string|null` on the property declaration
    - Import MUST include `use UnitEnum;`
    - NO duplicate imports
-   - NO type declarations on the property itself
-   - Use docblock for type hinting
+   - Docblocks remain optional now that the property itself is typed
 
 6. **Error Prevention**
    - Run linting check after any Filament file edit

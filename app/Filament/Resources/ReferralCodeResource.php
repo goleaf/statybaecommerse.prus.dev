@@ -28,6 +28,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable as SpatieTranslatableResource;
@@ -42,7 +43,7 @@ final class ReferralCodeResource extends Resource
 
     protected static string|\UnitEnum|null $navigationGroup = 'Referral';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $form): Schema
     {
         return $schema
             ->components([

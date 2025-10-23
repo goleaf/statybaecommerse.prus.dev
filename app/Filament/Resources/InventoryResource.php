@@ -33,6 +33,7 @@ use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use pxlrbt\FilamentExcel\Actions\Tables\ExportAction;
@@ -71,7 +72,7 @@ final class InventoryResource extends Resource
         return __('Inventory');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $form): Schema
     {
         return $schema->schema([
             Section::make(__('Inventory Details'))

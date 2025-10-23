@@ -56,7 +56,7 @@ final class RecommendationAnalyticsResource extends Resource
         return __('recommendation_analytics.model_label');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $form): Schema
     {
         return RecommendationAnalyticsForm::configure($schema);
     }

@@ -19,7 +19,7 @@ final class UsersRelationManager extends BaseRelationManager
 
     protected static ?string $title = 'customer_groups.relation_users';
 
-    public function form(Form $form): Form
+    public function form(Schema $form): Schema
     {
         return $schema
             ->schema([

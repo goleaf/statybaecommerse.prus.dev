@@ -23,7 +23,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Novadaemon\FilamentCombobox\Combobox;
+use Filament\Schemas\Schema;
 use UnitEnum;
 use Filament\Schemas\Schema;
 
@@ -55,7 +55,7 @@ final class RecommendationConfigResource extends Resource
         return __('recommendation_configs.single');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $form): Schema
     {
         return $schema->schema([
             Section::make(__('recommendation_config.sections.basic_info'))

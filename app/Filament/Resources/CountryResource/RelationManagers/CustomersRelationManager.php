@@ -10,6 +10,7 @@ use Filament\Forms;
 use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use Filament\Schemas\Schema;
 
@@ -20,7 +21,7 @@ final class CustomersRelationManager extends BaseRelationManager
 
     protected static ?string $title = 'Customers';
 
-    public function form(Form $form): Form
+    public function form(Schema $form): Schema
     {
         return $schema
             ->schema([

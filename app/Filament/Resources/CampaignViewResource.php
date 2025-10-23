@@ -17,6 +17,7 @@ use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use UnitEnum;
 use App\Support\Filament\Components\Flatpickr;
 use Filament\Schemas\Schema;
@@ -49,7 +50,7 @@ final class CampaignViewResource extends Resource
         return __('campaign_views.navigation');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $form): Schema
     {
         return $schema
             ->schema([

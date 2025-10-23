@@ -44,6 +44,7 @@ use Filament\Tables\Filters\QueryBuilder\Constraints\TextConstraint;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable as SpatieTranslatableResource;
@@ -107,7 +108,7 @@ final class AddressResource extends Resource
      * Keeping the Form wrapper avoids mismatches with auto-discovery checks that expect Filament
      * resource signatures to follow the documented `Form $form` pattern during application boot.
      */
-    public static function form(Form $form): Form
+    public static function form(Schema $form): Schema
     {
         return $schema->schema([
             Section::make(__('translations.address_information'))

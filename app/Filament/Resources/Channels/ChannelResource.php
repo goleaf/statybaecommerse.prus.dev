@@ -15,6 +15,7 @@ use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -32,7 +33,7 @@ class ChannelResource extends Resource
         return 'heroicon-o-rectangle-stack';
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $form): Schema
     {
         return ChannelForm::configure($schema);
     }

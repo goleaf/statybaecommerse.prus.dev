@@ -27,6 +27,7 @@ use Filament\Schemas\Components\Section;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
@@ -65,7 +66,7 @@ final class SystemSettingHistoryResource extends Resource
         return __('admin.system_setting_histories.model_label');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $form): Schema
     {
         return $schema
             ->schema([

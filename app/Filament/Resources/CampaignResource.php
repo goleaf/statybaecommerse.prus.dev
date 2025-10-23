@@ -30,6 +30,7 @@ use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
 use Novadaemon\FilamentCombobox\Combobox;
@@ -67,7 +68,7 @@ final class CampaignResource extends Resource
         return __('campaigns.models.campaign');
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Schema $form): Schema
     {
         return $schema->schema([
             // Section component keeps the basic information grouped for clarity in Filament v4.

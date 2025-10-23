@@ -23,7 +23,7 @@ final class DocumentsRelationManager extends BaseRelationManager
 
     protected static ?string $title = 'admin.sections.documents';
 
-    public function form(Form $form): Form
+    public function form(Schema $form): Schema
     {
         return $schema
             ->components([

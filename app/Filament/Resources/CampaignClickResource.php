@@ -32,7 +32,9 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Illuminate\Support\Collection;
+use Filament\Schemas\Schema;
+use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
 use Filament\Schemas\Schema;
 
@@ -76,7 +78,7 @@ final class CampaignClickResource extends Resource
      * @param  Forms\Form  $schema
      * @return Schemas\Form
      */
-    public static function form(Form $form): Form
+    public static function form(Schema $form): Schema
     {
         return $schema->schema([
             Section::make(__('campaign_clicks.basic_information'))

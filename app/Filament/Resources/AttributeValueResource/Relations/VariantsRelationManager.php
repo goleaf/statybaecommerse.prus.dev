@@ -10,6 +10,7 @@ use Filament\Forms;
 use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Schemas\Schema;
@@ -25,7 +26,7 @@ class VariantsRelationManager extends BaseRelationManager
 
     protected static ?string $pluralModelLabel = 'Variants';
 
-    public function form(Form $form): Form
+    public function form(Schema $form): Schema
     {
         return $schema
             ->schema([

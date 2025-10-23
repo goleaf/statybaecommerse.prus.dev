@@ -20,6 +20,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use Filament\Schemas\Schema;
 
@@ -34,7 +35,7 @@ final class ProductsRelationManager extends BaseRelationManager
 
     protected static ?string $pluralModelLabel = 'Products';
 
-    public function form(Form $form): Form
+    public function form(Schema $form): Schema
     {
         return $schema->schema([
             TextInput::make('name')

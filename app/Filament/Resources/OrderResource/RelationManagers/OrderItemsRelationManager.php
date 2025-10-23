@@ -31,6 +31,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
@@ -60,7 +61,7 @@ final class OrderItemsRelationManager extends BaseRelationManager
     /**
      * Configure the form schema for order items.
      */
-    public function form(Form $form): Form
+    public function form(Schema $form): Schema
     {
         return $schema
             ->schema([

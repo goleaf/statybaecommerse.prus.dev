@@ -27,7 +27,7 @@ final class TranslationsRelationManager extends BaseRelationManager
 
     protected static ?string $title = 'Translations';
 
-    public function form(Schema $schema): Schema
+    public function form(Schema $form): Schema
     {
         return $schema->schema([
             // Select helper keeps locale choices consistent across the admin panel.

@@ -33,6 +33,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Collection;
 use UnitEnum;
 use Filament\Schemas\Schema;
@@ -67,7 +68,7 @@ final class AnalyticsEventResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Form $form): Form
+    public static function form(Schema $form): Schema
     {
         return $schema->components([
             Section::make(__('analytics_events.basic_information'))

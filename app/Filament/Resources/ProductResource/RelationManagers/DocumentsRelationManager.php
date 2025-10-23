@@ -9,7 +9,7 @@ use Filament\Actions\AttachAction;
 use Filament\Actions\DetachAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
-use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
+use Filament\Schemas\Schema;
 
 class DocumentsRelationManager extends BaseRelationManager
 {

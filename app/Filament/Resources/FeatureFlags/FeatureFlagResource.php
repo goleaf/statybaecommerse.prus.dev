@@ -16,6 +16,7 @@ use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Filament\Schemas\Schema;
+use BackedEnum;
 
 use Filament\Schemas\Schema;
 class FeatureFlagResource extends Resource
@@ -26,7 +27,7 @@ class FeatureFlagResource extends Resource
 
     protected static BackedEnum|string|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    public static function form(Form $form): Form
+    public static function form(Schema $form): Schema
     {
         return FeatureFlagForm::configure($schema);
     }

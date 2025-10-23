@@ -18,6 +18,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use App\Support\Filament\Components\Flatpickr;
 use Filament\Schemas\Schema;
@@ -33,7 +34,7 @@ final class RedemptionsRelationManager extends BaseRelationManager
 
     protected static ?string $pluralModelLabel = 'Redemptions';
 
-    public function form(Form $form): Form
+    public function form(Schema $form): Schema
     {
         return $schema->schema([
             Section::make('Redemption Details')

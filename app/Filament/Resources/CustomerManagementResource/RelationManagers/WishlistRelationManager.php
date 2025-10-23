@@ -21,7 +21,7 @@ final class WishlistRelationManager extends BaseRelationManager
 
     protected static ?string $title = 'Wishlist';
 
-    public function form(Form $form): Form
+    public function form(Schema $form): Schema
     {
         return $schema
             ->components([

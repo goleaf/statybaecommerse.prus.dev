@@ -19,9 +19,9 @@ use Filament\Schemas\Schema;
 use Filament\Support\Facades\FilamentNumber;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use Filament\Schemas\Schema;
 use UnitEnum;
 
 use Filament\Schemas\Schema;
@@ -38,10 +38,10 @@ final class VariantAnalyticsResource extends Resource
     /**
      * @var string|BackedEnum|null Flag the analytics icon while staying compatible with Filament v4 conventions.
      */
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-chart-bar-square';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar-square';
 
     /** @var string|\BackedEnum|null Anchor inventory analytics beneath the shared navigation enum. */
-    protected static string | \UnitEnum | null $navigationGroup = NavigationGroup::Inventory;
+    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Inventory;
 
     public static function getNavigationGroup(): ?string
     {
@@ -73,7 +73,7 @@ final class VariantAnalyticsResource extends Resource
         return __('admin.variant_analytics.model_label');
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Schema $form): Schema
     {
         return $schema
             ->schema([

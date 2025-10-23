@@ -26,6 +26,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Illuminate\Support\Str;
 use UnitEnum;
 use Filament\Schemas\Schema;
@@ -64,7 +65,7 @@ final class NotificationTemplateResource extends Resource
         return __('admin.notification_templates.model_label');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $form): Schema
     {
         return $schema
             ->schema([

@@ -12,6 +12,7 @@ use Filament\Schemas\Schema;
 use Filament\Support\Enums\FontWeight;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use App\Support\Filament\Components\Flatpickr;
 use Filament\Schemas\Schema;
 
@@ -26,7 +27,7 @@ class UserRelationManager extends BaseRelationManager
 
     protected static ?string $pluralModelLabel = 'Users';
 
-    public function form(Form $form): Form
+    public function form(Schema $form): Schema
     {
         return $schema
             ->schema([

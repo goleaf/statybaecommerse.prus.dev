@@ -32,7 +32,7 @@ class TranslationsRelationManager extends BaseRelationManager
 
     protected static ?string $pluralModelLabel = 'Translations';
 
-    public function form(Form $form): Form
+    public function form(Schema $form): Schema
     {
         return $schema
             ->schema([

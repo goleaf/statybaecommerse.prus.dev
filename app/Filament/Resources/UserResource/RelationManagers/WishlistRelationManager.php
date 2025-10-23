@@ -10,6 +10,7 @@ use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 
 class WishlistRelationManager extends BaseRelationManager
 {

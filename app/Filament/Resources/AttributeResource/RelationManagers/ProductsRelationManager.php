@@ -21,7 +21,7 @@ final class ProductsRelationManager extends BaseRelationManager
 
     protected static ?string $title = 'Products';
 
-    public function form(Form $form): Form
+    public function form(Schema $form): Schema
     {
         return $schema
             ->schema([

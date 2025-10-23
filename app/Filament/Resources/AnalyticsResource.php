@@ -21,9 +21,10 @@ use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Grouping\Group;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
-use Filament\Schemas\Schema;
+use BackedEnum;
 
 use Filament\Schemas\Schema;
 final class AnalyticsResource extends Resource
@@ -69,7 +70,7 @@ final class AnalyticsResource extends Resource
         return 'warning';
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $form): Schema
     {
         return $schema;
     }

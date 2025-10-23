@@ -14,6 +14,7 @@ use Filament\Forms\Components\Repeater;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
 use Filament\Schemas\Schema;
@@ -25,7 +26,7 @@ final class VariantsRelationManager extends BaseRelationManager
 
     protected static ?string $title = 'Product Variants';
 
-    public function form(Form $form): Form
+    public function form(Schema $form): Schema
     {
         return $schema
             ->components([
