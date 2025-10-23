@@ -43,8 +43,7 @@ A multilingual Laravel 12 + Filament v4 storefront and admin panel for managing 
   fixtures during regression runs.
 - Attribute validation rules now persist plain strings alongside array-based rule lists, the Filament Attribute editor hydrates
   those values without forcing JSON, and new regression coverage keeps both storage paths stable.
-- Product variant showcase metrics now reuse cached stock counts via raw attributes, keeping Livewire interactions snappy by
-  avoiding redundant inventory queries when toggling variants.
+- Attribute group selectors now reuse a shared translation helper so historical slugs render as human-readable labels across Filament forms, filters, and tables instead of exposing raw keys.
 - Region-aware address tables and the dedicated `customers` dataset are back online for the SQLite harness, letting factories and
   analytics widgets build customer journeys without missing foreign keys during PHPUnit runs.
 - SearchableInput payload macros are registered lazily with safer fallbacks, and the SQLite testing harness now spins up one

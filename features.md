@@ -52,7 +52,7 @@
 ## Admin panel resilience
 - Campaign customer segment resources now ship with Filament v4 action aliases, refreshed Livewire testing macros, and relaxed unique constraints so admin CRUD flows and regression coverage remain stable after the framework upgrade.
 - Attribute administration keeps validation rule strings verbatim, surfaces array-based rules as comma-separated chips, and pairs with regression tests that prove both paths round-trip correctly through Filament.
-- Collection resource navigation metadata, translations, and fillable casts now mirror the Filament v4 schema so admin menus, factories, and the comprehensive resource tests target the same contract.
+- Attribute group filters, columns, and form selectors now share a translation fallback so legacy group slugs render as readable labels instead of raw keys throughout the Filament admin.
 - Filament dashboard access checks now fall back to open access when no
   permissions are configured and inline sparkline widgets respect the base
   nullable model contract, eliminating the latest regression tests failures.
