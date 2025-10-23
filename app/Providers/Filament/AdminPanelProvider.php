@@ -48,6 +48,13 @@ final class AdminPanelProvider extends PanelProvider
 
     public function panel(Panel $panel): Panel
     {
+        if (app()->environment('testing') && (bool) env('FILAMENT_DISABLE_FOR_TESTS', false)) {
+            return $panel
+                ->default()
+                ->id('admin')
+                ->path('admin');
+        }
+
         $resourceClasses = array_values(array_filter(
             (array) config('filament.navigation.resources', []),
             static fn (mixed $resource): bool => is_string($resource),

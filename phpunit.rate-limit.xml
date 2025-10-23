@@ -7,7 +7,7 @@
          beStrictAboutOutputDuringTests="false">
     <testsuites>
         <testsuite name="API Rate Limiting">
-            <file>tests/Feature/Api/ApiRateLimitTest.php</file>
+            <directory suffix="Test.php">tests/Feature/Api/RateLimiting</directory>
         </testsuite>
     </testsuites>
     <php>
@@ -24,5 +24,6 @@
         <env name="PULSE_ENABLED" value="false"/>
         <env name="TELESCOPE_ENABLED" value="false"/>
         <env name="NIGHTWATCH_ENABLED" value="false"/>
+        <env name="FILAMENT_DISABLE_FOR_TESTS" value="true"/>
     </php>
 </phpunit>

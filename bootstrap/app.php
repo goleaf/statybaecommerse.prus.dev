@@ -360,7 +360,11 @@ $app = Application::configure(basePath: dirname(__DIR__))
                     );
 
                     foreach ($throwable->getHeaders() as $name => $value) {
-                        $response->headers->set($name, $value);
+                        $normalized = is_array($value)
+                            ? array_map(static fn ($item) => (string) $item, $value)
+                            : (string) $value;
+
+                        $response->headers->set($name, $normalized);
                     }
 
                     return $response;
