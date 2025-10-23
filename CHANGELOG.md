@@ -7,7 +7,7 @@ The format is based on [Conventional Commits](https://www.conventionalcommits.or
 ## [Unreleased]
 
 ### Features & Enhancements
-* Introduced operator-aware system setting dependencies with explicit condition values, refreshed Filament forms, and resilient evaluation helpers for richer admin automation.
+* Refactored the localized search results page with a guided hero, contextual metrics, and refreshed empty states so catalog queries like Makita surface faster insights and recovery actions.
 
 ### Maintenance
 * Fixed the custom Filament edit profile page to import the correct Schema class, eliminating fatal compatibility errors during automated tests.
