@@ -8,7 +8,7 @@ use App\Filament\Pages\Support\BaseListRecords;
 use App\Filament\Resources\RecommendationAnalytics\RecommendationAnalyticsResource;
 use Filament\Actions\CreateAction;
 
-final class ListRecommendationAnalytics extends BaseListRecords
+final class ListRecommendationAnalytics extends ListRecords
 {
     protected static string $resource = RecommendationAnalyticsResource::class;
 
