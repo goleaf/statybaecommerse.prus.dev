@@ -111,7 +111,10 @@ abstract class TestCase extends BaseTestCase
             $loader = $translator->getLoader();
 
             if ($loader instanceof TranslationLoader && method_exists($loader, 'addJsonPath')) {
+                // Ensure base lang/ JSON files remain available when tests rebuild translators.
                 $loader->addJsonPath(lang_path());
+                // Also expose resources/lang JSON directories so admin commerce labels resolve.
+                $loader->addJsonPath(resource_path('lang'));
             }
         }
 

@@ -17,6 +17,7 @@ A multilingual Laravel 12 + Filament v4 storefront and admin panel for managing 
 - **Configurable system setting dependencies** with operator-specific value fields, translated labels, and duplication safeguards for precise feature toggles.
 
 ### Latest updates
+- Test bootstrap now registers both `lang/` and `resources/lang/` JSON translation directories so admin navigation labels render localized text during regression tests.
 - Cache tag conflicts from PR #120 are resolved: dashboard widgets, storefront navigation, and product shelves now share locale-aware tags with automatic invalidation hooks so cached payloads refresh the moment catalogue records change, and new feature tests guard the behaviour.
 - A new cache invalidation service now coordinates dashboard and storefront tag flushing, and the cart/checkout flows gained JSON regression tests to keep the customer journey stable across releases.
 - The Filament schema upgrade tooling now normalizes navigation icon docblocks and reruns cleanly across every resource, keeping the v4 Schema migration safe to execute repeatedly without manual cleanup.
