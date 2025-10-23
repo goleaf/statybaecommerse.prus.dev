@@ -6,7 +6,6 @@ namespace App\Models;
 
 use App\Models\Scopes\ActiveScope;
 use App\Observers\UserObserver;
-use App\Support\Storage\SecureStorage;
 use App\Traits\HasSafeSerialization;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
