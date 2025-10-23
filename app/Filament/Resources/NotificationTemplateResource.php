@@ -74,17 +74,25 @@ final class NotificationTemplateResource extends Resource
                                     ->required()
                                     ->maxLength(255)
                                     ->live(onBlur: true)
-                                    ->afterStateUpdated(function (string $operation, mixed $state, callable $set): void {
-                                        if ($operation !== 'create' || ! is_string($state)) {
-                                            return;
-                                        }
+                                    ->afterStateUpdated(
+                                        function (string $operation, ?string $state, callable $set, ?callable $get = null): void {
+                                            if ($operation !== 'create') {
+                                                return;
+                                            }
 
-                                        $slug = Str::slug($state);
+                                            $state = $state ?? '';
 
-                                        if ($slug !== '') {
-                                            $set('slug', $slug);
+                                            if ($state === '') {
+                                                return;
+                                            }
+
+                                            if ($get !== null && $get('slug')) {
+                                                return;
+                                            }
+
+                                            $set('slug', Str::slug($state));
                                         }
-                                    }),
+                                    ),
                                 TextInput::make('slug')
                                     ->label(__('admin.notification_templates.slug'))
                                     ->required()
