@@ -1,5 +1,6 @@
 #!/usr/bin/env sh
-# Run commitlint without the deprecated Husky bootstrap so future updates remain noise-free.
+# Bootstrap Husky's maintained helper so PATH and environment tweaks remain consistent.
+. "$(dirname -- "$0")/_/h"
 
 set -eu
 
