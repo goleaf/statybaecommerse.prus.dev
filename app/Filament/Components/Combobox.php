@@ -4,64 +4,50 @@ declare(strict_types=1);
 
 namespace App\Filament\Components;
 
-use Closure;
 use Novadaemon\FilamentCombobox\Combobox as BaseCombobox;
 
 /**
- * Application wrapper around the Filament combobox plugin.
- *
- * Centralises default configuration and exposes helper shortcuts for
- * consistent labelling across admin resources.
+ * Shared wrapper around the vendor Combobox component to centralize
+ * the defaults we want across Filament resources.
  */
-final class Combobox extends BaseCombobox
+class Combobox extends BaseCombobox
 {
+    /**
+     * Bootstrap sensible defaults immediately after instantiation.
+     */
     public static function make(?string $name = null): static
     {
+        /** @var static $component */
         $component = parent::make($name);
 
-        // Apply the shared UX defaults immediately so every combobox feels consistent.
-        return $component
-            ->boxSearchs(true)
-            ->height('340px')
-            ->native(false)
-            ->preload();
+        return $component->applyBaseDefaults();
     }
 
     /**
-     * Apply static column labels without repeating boilerplate closures.
+     * Ensure the select renders with the modern combobox experience.
      */
-    public function withLabels(string $optionsLabel, string $selectedLabel): static
+    protected function applyBaseDefaults(): static
     {
-        // Delegate to the closure-based helper so late binding remains possible if needed.
-        return $this->withLabelClosures(
-            static fn (): string => $optionsLabel,
-            static fn (): string => $selectedLabel,
-        );
+        // The wrapper always forces the JavaScript-powered dropdown.
+        $this->native(false);
+
+        return $this;
     }
 
     /**
-     * Resolve the dual-list headers from translation keys for localisation.
+     * Apply the common relationship behaviours used throughout the admin.
      */
-    public function withLocalizedLabels(string $optionsKey, string $selectedKey): static
+    public function relationshipDefaults(bool $shouldPreload = true, bool $shouldEnableSearchBox = true): static
     {
-        // Wrap the translation calls in closures so the current locale is honoured at render time.
-        return $this->withLabelClosures(
-            static fn (): string => __($optionsKey),
-            static fn (): string => __($selectedKey),
-        );
-    }
+        if ($shouldPreload) {
+            $this->preload();
+        }
 
-    /**
-     * Accept arbitrary label resolver callbacks for advanced use cases.
-     *
-     * @param Closure():string $optionsResolver  Lazily resolves the available column heading.
-     * @param Closure():string $selectedResolver Lazily resolves the selected column heading.
-     */
-    public function withLabelClosures(Closure $optionsResolver, Closure $selectedResolver): static
-    {
-        // Let the underlying component manage the callbacks, but keep the fluent chain intact.
-        return $this
-            ->optionsLabel($optionsResolver)
-            ->selectedLabel($selectedResolver);
+        if ($shouldEnableSearchBox) {
+            $this->boxSearchs();
+        }
+
+        // Searching is universally expected when the combobox is displayed.
+        return $this->searchable();
     }
 }
