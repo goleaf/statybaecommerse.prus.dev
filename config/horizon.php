@@ -15,11 +15,7 @@ return [
     |
     */
 
-    'domain' => value(static function () {
-        $domain = env('HORIZON_DOMAIN');
-
-        return is_string($domain) && $domain !== '' ? $domain : null;
-    }),
+    'domain' => value(env('HORIZON_DOMAIN')) ?: null,
 
     /*
     |--------------------------------------------------------------------------
