@@ -6,7 +6,6 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\EnumManagementResource\Pages;
 use App\Models\EnumValue;
-use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
@@ -50,9 +49,9 @@ final class EnumManagementResource extends Resource
     protected static ?string $model = EnumValue::class;
 
     /**
-     * Navigation icon identifier displayed in the Filament sidebar (string or BackedEnum).
+     * @var string|\BackedEnum|null
      */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-squares-2x2';
+    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-squares-2x2';
 
     protected static ?int $navigationSort = 2;
 

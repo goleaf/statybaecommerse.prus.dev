@@ -27,14 +27,17 @@ final class RecommendationSystemManagement extends Page
 
     protected static ?string $slug = 'recommendation-system-management';
 
-    public static function getNavigationGroup(): ?string
+    public static function getNavigationGroup(): string
     {
         return 'Analytics';
     }
 
     protected static ?int $navigationSort = 40;
 
-    protected static ?string $navigationIcon = 'heroicon-o-sparkles';
+    /**
+     * @var string|\BackedEnum|null
+     */
+    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-sparkles';
 
     protected string $view = 'filament.pages.recommendation-system-management';
 
