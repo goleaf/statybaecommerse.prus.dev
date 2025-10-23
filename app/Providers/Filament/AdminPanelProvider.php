@@ -82,6 +82,34 @@ final class AdminPanelProvider extends PanelProvider
             ->defaultLocales($defaultLocales)
             ->persist();
 
+        $plugins = [
+            FilamentShieldPlugin::make(),
+        ];
+
+        if (class_exists(FilamentFullCalendarPlugin::class)) {
+            $plugins[] = FilamentFullCalendarPlugin::make()
+                ->selectable(true)
+                ->editable(true)
+                ->timezone('Europe/Vilnius')
+                ->locale('lt');
+        }
+
+        $plugins[] = TableLayoutTogglePlugin::make()
+            ->setDefaultLayout('grid')
+            ->persistLayoutUsing(
+                persister: LocalStoragePersister::class,
+                cacheStore: 'redis',
+                cacheTtl: 60 * 24,
+            )
+            ->shareLayoutBetweenPages(false)
+            ->displayToggleAction()
+            ->toggleActionHook('tables::toolbar.search.after')
+            ->listLayoutButtonIcon('heroicon-o-list-bullet')
+            ->gridLayoutButtonIcon('heroicon-o-squares-2x2');
+
+        $plugins[] = FilamentNordThemePlugin::make();
+        $plugins[] = ResizedColumnPlugin::make()->preserveOnDB();
+
         return $panel
             ->default()
             ->id('admin')
@@ -160,33 +188,7 @@ final class AdminPanelProvider extends PanelProvider
             ->when(
                 app()->environment('testing'),
                 fn (Panel $p) => $p->plugins([]),
-                fn (Panel $p) => $p->plugins(array_values(array_filter([
-                    $this->optionalPlugin(FilamentShieldPlugin::class),
-                    $this->makeFullCalendarPlugin(),
-                    $this->optionalPlugin(
-                        TableLayoutTogglePlugin::class,
-                        static function (TableLayoutTogglePlugin $plugin): TableLayoutTogglePlugin {
-                            return $plugin
-                                ->setDefaultLayout('grid')
-                                ->persistLayoutUsing(
-                                    persister: LocalStoragePersister::class,
-                                    cacheStore: 'redis',
-                                    cacheTtl: 60 * 24,
-                                )
-                                ->shareLayoutBetweenPages(false)
-                                ->displayToggleAction()
-                                ->toggleActionHook('tables::toolbar.search.after')
-                                ->listLayoutButtonIcon('heroicon-o-list-bullet')
-                                ->gridLayoutButtonIcon('heroicon-o-squares-2x2');
-                        },
-                    ),
-                    $this->optionalPlugin(FilamentNordThemePlugin::class),
-                    $this->optionalPlugin(
-                        ResizedColumnPlugin::class,
-                        static fn (ResizedColumnPlugin $plugin): ResizedColumnPlugin => $plugin->preserveOnDB(),
-                    ),
-                ]))),
-            )
+                fn (Panel $p) => $p->plugins($plugins))
             // Enable the custom Filament theme so third-party plugin views (like the searchable input)
             // are compiled with Tailwind during the build step.
             ->viteTheme('resources/css/filament/admin/theme.scss')

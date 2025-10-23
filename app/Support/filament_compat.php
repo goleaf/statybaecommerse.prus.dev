@@ -54,19 +54,8 @@ namespace Asmit\ResizedColumn {
     }
 }
 
-namespace Filament\Tables\Actions {
-    $aliases = [
-        'Action' => \Filament\Actions\Action::class,
-        'BulkAction' => \Filament\Actions\BulkAction::class,
-        'BulkActionGroup' => \Filament\Actions\BulkActionGroup::class,
-        'DeleteAction' => \Filament\Actions\DeleteAction::class,
-        'DeleteBulkAction' => \Filament\Actions\DeleteBulkAction::class,
-        'EditAction' => \Filament\Actions\EditAction::class,
-    ];
-
-    foreach ($aliases as $alias => $class) {
-        if (! class_exists($alias) && class_exists($class)) {
-            class_alias($class, $alias);
-        }
+namespace {
+    if (! class_exists(\Filament\Infolists\Infolist::class) && class_exists(\Filament\Schemas\Schema::class)) {
+        class_alias(\Filament\Schemas\Schema::class, \Filament\Infolists\Infolist::class);
     }
 }
