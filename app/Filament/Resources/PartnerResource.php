@@ -174,8 +174,7 @@ final class PartnerResource extends Resource
         return [
             'index'  => Pages\ListPartners::route('/'),
             'create' => Pages\CreatePartner::route('/create'),
-            // Expose a dedicated read-only route for partner inspection.
-            'view'   => Pages\ViewPartner::route('/{record}'),
+            'view'   => Pages\ViewPartner::route('/{record}'), // Provide a dedicated read-only partner detail page.
             'edit'   => Pages\EditPartner::route('/{record}/edit'),
         ];
     }

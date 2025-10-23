@@ -8,6 +8,9 @@ use App\Filament\Resources\PartnerResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ViewRecord;
 
+/**
+ * Display-only Partner resource page that mirrors the edit details without mutation.
+ */
 final class ViewPartner extends ViewRecord
 {
     protected static string $resource = PartnerResource::class;
