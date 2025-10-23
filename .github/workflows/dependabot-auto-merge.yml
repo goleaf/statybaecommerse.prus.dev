@@ -1,48 +1,29 @@
-name: Dependabot PR Management
+name: Dependabot Auto Merge
 
 on:
-  pull_request_target:
-    types:
-      - opened
-      - synchronize
-      - reopened
+  pull_request:
+    types: [opened, reopened, synchronize]
+  pull_request_review:
+    types: [submitted]
+  check_suite:
+    types: [completed]
 
 permissions:
   contents: write
   pull-requests: write
 
 jobs:
-  label-and-automerge:
+  auto-merge:
     if: github.actor == 'dependabot[bot]'
     runs-on: ubuntu-latest
     steps:
-      - name: Fetch Dependabot metadata
+      - name: Fetch metadata
         id: metadata
         uses: dependabot/fetch-metadata@v2
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Ensure labels exist
-        uses: peter-evans/create-or-update-label@v4
-        with:
-          name: dependencies
-          description: Dependencies updates
-          color: 0E8A16
-
-      - name: Ensure automerge label exists
-        uses: peter-evans/create-or-update-label@v4
-        with:
-          name: automerge
-          description: Automatically merge when checks succeed
-          color: 1D76DB
-
-      - name: Apply dependencies label
-        run: gh pr edit ${{ github.event.pull_request.number }} --add-label "dependencies"
+      - name: Enable auto-merge for eligible updates
+        if: steps.metadata.outputs.update-type == 'version-update:semver-minor' || steps.metadata.outputs.update-type == 'version-update:semver-patch'
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Apply automerge label for patch updates
-        if: steps.metadata.outputs.update-type == 'version-update:semver-patch'
-        run: gh pr edit ${{ github.event.pull_request.number }} --add-label "automerge"
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh pr merge --auto --merge "$PR_URL"
