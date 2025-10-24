@@ -138,7 +138,8 @@
                 <x-search-module
                                  class="w-full"
                                  :max-results="10"
-                                 :min-query-length="2" />
+                                 :min-query-length="2"
+                                 :filters="request()->query()" />
             </div>
 
             <div class="flex items-center gap-3">
@@ -230,7 +231,8 @@
                                                      :search-types="['products', 'categories', 'brands']"
                                                      :enable-suggestions="true"
                                                      :enable-recent-searches="true"
-                                                     :enable-popular-searches="false" />
+                                                     :enable-popular-searches="false"
+                                                     :filters="request()->query()" />
         </div>
 
 
@@ -284,7 +286,8 @@
                     <x-search-module
                                      class="w-full"
                                      :max-results="6"
-                                     :min-query-length="2" />
+                                     :min-query-length="2"
+                                     :filters="request()->query()" />
                 </div>
                 <nav class="grid gap-2 text-sm font-medium text-slate-700">
                     @if ($quickLinks->firstWhere('key', 'categories'))

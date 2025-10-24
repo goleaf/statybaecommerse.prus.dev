@@ -29,7 +29,10 @@ final class SystemSettingDependency extends Model
 
     protected static function booted(): void
     {
-        static::resolveRelationUsing('dependsOnSetting', fn (self $model): BelongsTo => $model->dependsOnSettingRelation());
+        static::resolveRelationUsing(
+            'dependsOnSetting',
+            static fn (self $model): BelongsTo => $model->dependsOnSettingRelation()
+        );
     }
 
     public function __call($method, $parameters)
@@ -55,34 +58,25 @@ final class SystemSettingDependency extends Model
         'is_active' => 'boolean',
     ];
 
-    /**
-     * Handle setting functionality with proper error handling.
-     */
     public function setting(): BelongsTo
     {
         return $this->belongsTo(SystemSetting::class, 'setting_id');
     }
 
-    /**
-     * Relation to the source setting this dependency listens to.
-     */
+    /** @deprecated Use the dependsOnSetting relation instead. */
+    public function dependsOn(): BelongsTo
+    {
+        return $this->dependsOnSettingRelation();
+    }
+
     public function dependsOnSettingRelation(): BelongsTo
     {
         return $this->belongsTo(SystemSetting::class, 'depends_on_setting_id');
     }
 
-    /**
-     * Accessor exposing the relation under the expected attribute name.
-     */
     public function getDependsOnSettingAttribute(): ?SystemSetting
     {
         return $this->getRelationValue('dependsOnSettingRelation');
-    }
-
-    /** @deprecated Use dependsOnSettingRelation() or the dependsOnSetting attribute instead. */
-    public function dependsOn(): BelongsTo
-    {
-        return $this->dependsOnSettingRelation();
     }
 
     /**
@@ -90,7 +84,7 @@ final class SystemSettingDependency extends Model
      *
      * @param mixed $query
      */
-    public function scopeActive($query)
+    public function scopeActive(Builder $query): Builder
     {
         return $query->where('is_active', true);
     }
@@ -100,7 +94,7 @@ final class SystemSettingDependency extends Model
      *
      * @param mixed $query
      */
-    public function scopeInactive($query)
+    public function scopeInactive(Builder $query): Builder
     {
         return $query->where('is_active', false);
     }
@@ -111,7 +105,7 @@ final class SystemSettingDependency extends Model
      * @param mixed $query
      * @param mixed $settingId
      */
-    public function scopeForSetting($query, $settingId)
+    public function scopeForSetting(Builder $query, int|string $settingId): Builder
     {
         return $query->where('setting_id', $settingId);
     }
@@ -127,24 +121,17 @@ final class SystemSettingDependency extends Model
         return $query->where('depends_on_setting_id', $settingId);
     }
 
-    /**
-     * Handle scopeWithCondition functionality with proper error handling.
-     *
-     * @param mixed $query
-     * @param mixed $condition
-     */
-    public function scopeWithCondition($query, $condition)
+    public function scopeWithCondition(Builder $query, string $condition): Builder
     {
-        return $query->where(function ($q) use ($condition): void {
-            $q
-                ->where('condition', 'like', "%{$condition}%")
-                ->orWhere('condition_value', 'like', "%{$condition}%");
+        $like = '%'.$condition.'%';
+
+        return $query->where(function (Builder $builder) use ($like): void {
+            $builder
+                ->where('condition', 'like', $like)
+                ->orWhere('condition_value', 'like', $like);
         });
     }
 
-    /**
-     * Scope the query to dependencies matching the given condition operator.
-     */
     public function scopeByCondition(Builder $query, string $operator): Builder
     {
         $normalizedOperator = strtolower($operator);
@@ -163,7 +150,7 @@ final class SystemSettingDependency extends Model
      * @param mixed $from
      * @param mixed $to
      */
-    public function scopeCreatedBetween($query, $from, $to)
+    public function scopeCreatedBetween(Builder $query, mixed $from, mixed $to): Builder
     {
         return $query->whereBetween('created_at', [$from, $to]);
     }
@@ -175,85 +162,67 @@ final class SystemSettingDependency extends Model
      * @param mixed $from
      * @param mixed $to
      */
-    public function scopeUpdatedBetween($query, $from, $to)
+    public function scopeUpdatedBetween(Builder $query, mixed $from, mixed $to): Builder
     {
         return $query->whereBetween('updated_at', [$from, $to]);
     }
 
-    /**
-     * Handle scopeSearch functionality with proper error handling.
-     *
-     * @param mixed $query
-     * @param mixed $search
-     */
-    public function scopeSearch($query, $search)
+    public function scopeSearch(Builder $query, string $search): Builder
     {
-        return $query->where(function ($q) use ($search): void {
-            $q
-                ->where('condition', 'like', "%{$search}%")
-                ->orWhere('condition_value', 'like', "%{$search}%")
-                ->orWhereHas('setting', function ($q) use ($search): void {
-                    $q
-                        ->where('key', 'like', "%{$search}%")
-                        ->orWhere('name', 'like', "%{$search}%");
+        $search = trim($search);
+
+        if ($search === '') {
+            return $query;
+        }
+
+        $like = '%'.$search.'%';
+
+        return $query->where(function (Builder $builder) use ($like): void {
+            $builder
+                ->where('condition', 'like', $like)
+                ->orWhere('condition_value', 'like', $like)
+                ->orWhereHas('setting', function (Builder $relation) use ($like): void {
+                    $relation
+                        ->where('key', 'like', $like)
+                        ->orWhere('name', 'like', $like);
                 })
-                ->orWhereHas('dependsOnSetting', function ($q) use ($search): void {
-                    $q
-                        ->where('key', 'like', "%{$search}%")
-                        ->orWhere('name', 'like', "%{$search}%");
+                ->orWhereHas('dependsOnSetting', function (Builder $relation) use ($like): void {
+                    $relation
+                        ->where('key', 'like', $like)
+                        ->orWhere('name', 'like', $like);
                 });
         });
     }
 
-    /**
-     * Handle scopeOrderByCreatedAt functionality with proper error handling.
-     *
-     * @param mixed $query
-     */
-    public function scopeOrderByCreatedAt($query)
+    public function scopeOrderByCreatedAt(Builder $query, string $direction = 'desc'): Builder
     {
-        return $query->orderBy('created_at', 'desc');
+        return $query->orderBy('created_at', $direction);
     }
 
-    /**
-     * Handle scopeOrderByUpdatedAt functionality with proper error handling.
-     *
-     * @param mixed $query
-     */
-    public function scopeOrderByUpdatedAt($query)
+    public function scopeOrderByUpdatedAt(Builder $query, string $direction = 'desc'): Builder
     {
-        return $query->orderBy('updated_at', 'desc');
+        return $query->orderBy('updated_at', $direction);
     }
 
-    /**
-     * Handle scopeOrderByCondition functionality with proper error handling.
-     *
-     * @param mixed $query
-     */
-    public function scopeOrderByCondition($query)
+    public function scopeOrderByCondition(Builder $query, string $direction = 'desc'): Builder
     {
-        return $query->orderBy('condition', 'desc');
+        return $query->orderBy('condition', $direction);
     }
 
-    /**
-     * Handle scopeOrderByActiveStatus functionality with proper error handling.
-     *
-     * @param mixed $query
-     */
-    public function scopeOrderByActiveStatus($query)
+    public function scopeOrderByActiveStatus(Builder $query, string $direction = 'desc'): Builder
     {
-        return $query->orderBy('is_active', 'desc');
+        return $query->orderBy('is_active', $direction);
     }
 
-    /**
-     * Handle isConditionMet functionality with proper error handling.
-     */
     public function isConditionMet(): bool
     {
-        if (! $this->dependsOnSetting) {
+        $dependsOnSetting = $this->getRelationValue('dependsOnSettingRelation');
+
+        if (! $dependsOnSetting) {
             return false;
         }
-        $dependencyValue = $this->dependsOnSetting->value;
+
+        $dependencyValue = $dependsOnSetting->value;
         $operator = strtolower(trim((string) ($this->condition ?? '')));
         $expectedValue = $this->condition_value;
 

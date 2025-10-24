@@ -21,6 +21,9 @@ use App\Models\Scopes\PublishedScope;
 use App\Models\Scopes\StatusScope;
 use App\Models\Scopes\VisibleScope;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Schema;
+use JsonException;
 
 /**
  * Eloquent-backed repository for domain product read models.
@@ -33,7 +36,7 @@ final class EloquentProductRepository implements ProductRepositoryInterface
     {
         $query = Product::query()
             // Allow draft fixtures during tests while downstream specs filter displayable records.
-            ->withoutGlobalScopes([ActiveScope::class, PublishedScope::class, VisibleScope::class])
+            ->withoutGlobalScopes([ActiveScope::class, PublishedScope::class, VisibleScope::class, SoftDeletingScope::class])
             ->where('is_visible', true)
             ->where(static function ($builder) use ($criteria): void {
                 $term = $criteria->getQuery();
@@ -54,6 +57,8 @@ final class EloquentProductRepository implements ProductRepositoryInterface
                 },
             ], 'quantity');
 
+        $this->applySoftDeleteConstraint($query);
+
         $timeout = now()->addSeconds($criteria->getTimeoutSeconds());
 
         $products = $query->limit($criteria->getLimit())
@@ -70,7 +75,7 @@ final class EloquentProductRepository implements ProductRepositoryInterface
     public function getCatalogProducts(ProductCatalogQuery $query): ProductCollection
     {
         $builder = Product::query()
-            ->withoutGlobalScopes([ActiveScope::class, PublishedScope::class, VisibleScope::class])
+            ->withoutGlobalScopes([ActiveScope::class, PublishedScope::class, VisibleScope::class, SoftDeletingScope::class])
             ->where('is_visible', true)
             ->with([
                 'brand' => static fn ($relation) => $relation->withoutGlobalScopes([ActiveScope::class, EnabledScope::class]),
@@ -84,6 +89,8 @@ final class EloquentProductRepository implements ProductRepositoryInterface
                     $relation->active();
                 },
             ], 'quantity');
+
+        $this->applySoftDeleteConstraint($builder);
 
         if ($query->getCategorySlug()) {
             $builder->whereHas('categories', static function ($relation) use ($query): void {
@@ -114,7 +121,8 @@ final class EloquentProductRepository implements ProductRepositoryInterface
 
     public function findBySlug(ProductSlug $slug): ?DomainProduct
     {
-        $product = Product::query()
+        $builder = Product::query()
+            ->withoutGlobalScopes([SoftDeletingScope::class])
             ->where('slug', $slug->getValue())
             ->with(['brand', 'categories', 'variants', 'media'])
             ->withSum([
@@ -122,8 +130,11 @@ final class EloquentProductRepository implements ProductRepositoryInterface
                 'stockReservations as reserved_stock_quantity' => static function (Builder $relation): void {
                     $relation->active();
                 },
-            ], 'quantity')
-            ->first();
+            ], 'quantity');
+
+        $this->applySoftDeleteConstraint($builder);
+
+        $product = $builder->first();
 
         return $product ? $this->mapToDomainProduct($product) : null;
     }
@@ -206,7 +217,7 @@ final class EloquentProductRepository implements ProductRepositoryInterface
     private function resolveTranslatableString(Product $product, string $attribute): ?string
     {
         // Access the raw attribute directly to avoid triggering additional queries during hydration.
-        $value = $product->getAttribute($attribute);
+        $value = $this->normaliseTranslatableValue($product->getAttribute($attribute));
 
         if (is_string($value) && $value !== '') {
             return $value;
@@ -239,5 +250,35 @@ final class EloquentProductRepository implements ProductRepositoryInterface
 
         // When nothing usable exists, signal the absence with null so callers can decide on a default.
         return null;
+    }
+
+    private function normaliseTranslatableValue(mixed $value): mixed
+    {
+        if (! is_string($value)) {
+            return $value;
+        }
+
+        $trimmed = trim($value);
+
+        if ($trimmed === '' || ! str_starts_with($trimmed, '{')) {
+            return $value;
+        }
+
+        try {
+            $decoded = json_decode($value, true, 512, JSON_THROW_ON_ERROR);
+        } catch (JsonException) {
+            return $value;
+        }
+
+        return is_array($decoded) ? $decoded : $value;
+    }
+
+    private function applySoftDeleteConstraint(Builder $builder): void
+    {
+        $table = $builder->getModel()->getTable();
+
+        if (Schema::hasColumn($table, 'deleted_at')) {
+            $builder->whereNull("{$table}.deleted_at");
+        }
     }
 }

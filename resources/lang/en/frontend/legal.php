@@ -43,6 +43,7 @@ return [
     // Messages
     'document_not_found' => 'Document not found',
     'document_not_available' => 'Document is currently unavailable',
+    'document_unavailable' => 'Our :document is currently unavailable.',
     'document_under_review' => 'Document is under review',
     'document_coming_soon' => 'Document will be published soon',
 

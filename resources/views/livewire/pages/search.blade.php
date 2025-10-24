@@ -205,7 +205,7 @@
                     {{ __('search_clear_query') }}
                 </button>
                 <a
-                    href="{{ route('collections.index', ['locale' => app()->getLocale()]) }}"
+                    href="{{ route('localized.collections.index', ['locale' => app()->getLocale()]) }}"
                     class="inline-flex items-center gap-2 rounded-full bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow transition hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-200"
                 >
                     <x-heroicon-o-rectangle-stack class="h-4 w-4" />

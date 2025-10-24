@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\AuditLogController;
 use App\Http\Controllers\Api\AuthenticatedUserController;
 use App\Http\Controllers\Api\AutocompleteSearchController;
 use App\Http\Controllers\Api\NotificationController;
+use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\ExportDownloadController;
 use App\Http\Controllers\Api\V1\HealthController;
 use App\Http\Controllers\Api\V1\SearchController;
@@ -30,6 +31,22 @@ Route::middleware('auth:sanctum')
             Route::post('/{notification}/mark-unread', [NotificationController::class, 'markAsUnread'])->name('mark-as-unread');
             Route::delete('/{notification}', [NotificationController::class, 'destroy'])->name('destroy');
         });
+    });
+
+Route::prefix('products')
+    ->name('api.products.')
+    ->group(function (): void {
+        Route::get('search', [ProductController::class, 'search'])
+            ->middleware('throttle:api.read')
+            ->name('search');
+
+        Route::get('catalog', [ProductController::class, 'catalog'])
+            ->middleware('throttle:api.read')
+            ->name('catalog');
+
+        Route::get('{slug}', [ProductController::class, 'show'])
+            ->middleware('throttle:api.read')
+            ->name('show');
     });
 
 Route::prefix('v1')

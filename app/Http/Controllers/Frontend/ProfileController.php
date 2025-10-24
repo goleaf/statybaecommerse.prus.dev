@@ -54,12 +54,32 @@ final class ProfileController extends Controller
 
         $validated = $request->validate($this->profileRules($user));
 
-        $user->name = $validated['name'];
+        $fullName = $validated['name'] ?? trim(implode(' ', array_filter([
+            $validated['first_name'] ?? null,
+            $validated['last_name'] ?? null,
+        ], static fn ($value): bool => $value !== null && $value !== '')));
 
-        [$derivedFirstName, $derivedLastName] = $this->splitName($validated['name']);
+        if ($fullName === '') {
+            $fullName = trim((string) $user->name);
+        }
 
-        $user->first_name = $validated['first_name'] ?? $derivedFirstName;
-        $user->last_name = $validated['last_name'] ?? $derivedLastName;
+        if ($fullName === '') {
+            $fullName = trim(implode(' ', array_filter([
+                $user->first_name,
+                $user->last_name,
+            ], static fn ($value): bool => $value !== null && $value !== '')));
+        }
+
+        if ($fullName === '') {
+            $fullName = (string) $user->email;
+        }
+
+        [$derivedFirstName, $derivedLastName] = $this->splitName($fullName);
+
+        $user->name = $fullName;
+
+        $user->first_name = $validated['first_name'] ?? $derivedFirstName ?? $user->first_name;
+        $user->last_name = $validated['last_name'] ?? $derivedLastName ?? $user->last_name;
         $user->email = $validated['email'];
         $user->phone = $validated['phone'] ?? null;
         $user->phone_number = $validated['phone'] ?? null;
@@ -280,7 +300,7 @@ final class ProfileController extends Controller
     private function profileRules(User $user): array
     {
         return [
-            'name' => ['required', 'string', 'max:255'],
+            'name' => ['sometimes', 'nullable', 'string', 'max:255'],
             'first_name' => ['sometimes', 'nullable', 'string', 'max:120'],
             'last_name' => ['sometimes', 'nullable', 'string', 'max:120'],
             'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->getKey())],
@@ -332,4 +352,3 @@ final class ProfileController extends Controller
         return [$firstName, $lastName];
     }
 }
-

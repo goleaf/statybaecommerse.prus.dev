@@ -34,6 +34,7 @@ use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
+use JsonException;
 
 /**
  * Product
@@ -162,6 +163,60 @@ final class Product extends Model implements HasMedia, TranslatableRecord
                 }
             }
         });
+    }
+
+    /**
+     * Normalize translatable attributes to JSON when arrays are assigned.
+     *
+     * @param  mixed  $value
+     */
+    public function setAttribute($key, $value)
+    {
+        if (isset($this->translatable)
+            && in_array($key, $this->translatable, true)
+            && is_array($value)) {
+            $value = $this->serialiseTranslatableAttribute($value);
+        }
+
+        return parent::setAttribute($key, $value);
+    }
+
+    /**
+     * Encode the provided translations while filtering empty payloads.
+     *
+     * @param  array<string|int, mixed>  $value
+     */
+    private function serialiseTranslatableAttribute(array $value): string
+    {
+        $normalised = [];
+
+        foreach ($value as $locale => $translation) {
+            if ($translation === null) {
+                continue;
+            }
+
+            if (is_scalar($translation)) {
+                $stringValue = trim((string) $translation);
+
+                if ($stringValue === '') {
+                    continue;
+                }
+
+                $normalised[(string) $locale] = $stringValue;
+            }
+        }
+
+        if ($normalised === []) {
+            return '';
+        }
+
+        try {
+            return json_encode($normalised, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
+        } catch (JsonException) {
+            $fallback = json_encode($normalised, JSON_UNESCAPED_UNICODE);
+
+            return is_string($fallback) ? $fallback : '{}';
+        }
     }
 
     /**

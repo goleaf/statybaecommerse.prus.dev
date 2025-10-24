@@ -22,7 +22,7 @@ final class BrandBrowsingTest extends TestCase
         $response = $this->get(route('frontend.brands.index'));
 
         $response->assertOk()
-            ->assertViewIs('brands.index')
+            ->assertViewIs('frontend.brands.index')
             ->assertSee('Makita Tools LT');
     }
 
@@ -34,7 +34,7 @@ final class BrandBrowsingTest extends TestCase
         $response = $this->get(route('frontend.brands.show', $brand));
 
         $response->assertOk()
-            ->assertViewIs('brands.show')
+            ->assertViewIs('frontend.brands.show')
             ->assertViewHas('products', function ($paginator) use ($product) {
                 return $paginator->contains('id', $product->id);
             });
@@ -47,7 +47,7 @@ final class BrandBrowsingTest extends TestCase
         $response = $this->get(route('frontend.brands.show', $brand));
 
         $response->assertOk()
-            ->assertViewIs('brands.show')
+            ->assertViewIs('frontend.brands.show')
             ->assertSee('No products found for this brand yet.');
     }
 

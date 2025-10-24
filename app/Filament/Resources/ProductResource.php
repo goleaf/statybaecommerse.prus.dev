@@ -6,6 +6,7 @@ namespace App\Filament\Resources;
 
 
 use App\Data\ExportRequestData;
+use App\Enums\NavigationGroup;
 use App\Filament\Resources\ProductResource\Pages;
 use App\Filament\Resources\ProductResource\RelationManagers\AttributesRelationManager;
 use App\Filament\Resources\ProductResource\RelationManagers\CategoriesRelationManager;
@@ -23,6 +24,7 @@ use App\Support\Authorization\AuthorizationMatrix;
 use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
 use App\Support\Filament\Schemas\TestingSchemaHost;
 use App\Support\Forms\MatrixFactory;
+use App\Support\Concerns\HasNav;
 use App\Support\Seo\LocaleUrlGenerator;
 use Awcodes\BadgeableColumn\Components\Badge;
 use Awcodes\BadgeableColumn\Components\BadgeableColumn;
@@ -63,7 +65,6 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
-use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
@@ -83,7 +84,10 @@ use Tapp\FilamentValueRangeFilter\Filters\ValueRangeFilter;
  */
 final class ProductResource extends Resource implements DefinesExportColumns
 {
+    use HasNav;
+
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-cube';
+    protected static \UnitEnum|string|null $navigationGroup = NavigationGroup::Products->value;
 
     protected static ?string $model = Product::class;
 
@@ -125,16 +129,6 @@ final class ProductResource extends Resource implements DefinesExportColumns
     public static function canRestore(Model $record): bool
     {
         return AuthorizationMatrix::check('products', 'update');
-    }
-
-    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
-    {
-        return 'heroicon-o-cube';
-    }
-
-    public static function getNavigationGroup(): \UnitEnum|string|null
-    {
-        return 'Products';
     }
 
     protected static ?int $navigationSort = 1;

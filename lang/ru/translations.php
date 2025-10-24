@@ -136,8 +136,14 @@ return [
     'info' => 'Информация',
     'loading' => 'Загрузка...',
     'please_wait' => 'Пожалуйста, подождите...',
-    'try_again' => 'Попробовать снова',
-    'something_went_wrong' => 'Что-то пошло не так',
+   'try_again' => 'Попробовать снова',
+   'something_went_wrong' => 'Что-то пошло не так',
+    // Cookie consent banner
+    'cookie_prompt_label' => 'Баннер согласия на использование файлов cookie',
+    'cookie_prompt_title' => 'Мы ценим вашу конфиденциальность',
+    'cookie_prompt_description' => 'Мы используем файлы cookie для персонализации контента и анализа трафика. Подробнее в наших',
+    'cookie_prompt_reject' => 'Отклонить необязательные cookie',
+    'cookie_prompt_accept' => 'Принять все cookie',
     // Footer
     'newsletter_title' => 'Подписка на рассылку',
     'newsletter_description' => 'Получайте последние новости и специальные предложения',

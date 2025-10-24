@@ -446,6 +446,7 @@ return [
         'required' => 'Erforderlich',
         'last_updated' => 'Zuletzt aktualisiert',
         'document_unavailable' => 'Dieses Dokument ist derzeit nicht verfügbar. Bitte kontaktieren Sie uns für Unterstützung.',
+        'document_under_review' => 'Dieses Dokument wird derzeit überprüft. Bitte versuchen Sie es später erneut.',
         'terms_of_service' => 'Allgemeine Geschäftsbedingungen',
         'privacy_policy' => 'Datenschutzerklärung',
         'cookie_policy' => 'Cookie-Richtlinie',

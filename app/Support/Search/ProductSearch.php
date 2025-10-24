@@ -8,6 +8,7 @@ use App\Models\Product;
 use DefStudio\SearchableInput\DTO\SearchResult;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Schema;
+use JsonException;
 
 final class ProductSearch
 {
@@ -174,7 +175,7 @@ final class ProductSearch
 
     private static function resolveName(Product $product): string
     {
-        $rawName = $product->getAttribute('name');
+        $rawName = self::normaliseTranslatableValue($product->getAttribute('name'));
 
         if (is_array($rawName)) {
             $locale = app()->getLocale();
@@ -184,5 +185,26 @@ final class ProductSearch
         }
 
         return is_string($rawName) ? $rawName : '';
+    }
+
+    private static function normaliseTranslatableValue(mixed $value): mixed
+    {
+        if (! is_string($value)) {
+            return $value;
+        }
+
+        $trimmed = trim($value);
+
+        if ($trimmed === '' || ! str_starts_with($trimmed, '{')) {
+            return $value;
+        }
+
+        try {
+            $decoded = json_decode($value, true, 512, JSON_THROW_ON_ERROR);
+        } catch (JsonException) {
+            return $value;
+        }
+
+        return is_array($decoded) ? $decoded : $value;
     }
 }

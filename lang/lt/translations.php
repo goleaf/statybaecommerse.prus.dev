@@ -46,6 +46,12 @@ return [
     'price'            => 'Kaina',
     'name'             => 'Pavadinimas',
     'showing'          => 'Rodoma',
+    // Cookie consent banner
+    'cookie_prompt_label'       => 'Slapukų sutikimo juosta',
+    'cookie_prompt_title'       => 'Gerbiame jūsų privatumą',
+    'cookie_prompt_description' => 'Naudojame slapukus turiniui suasmeninti ir srautui analizuoti. Plačiau skaitykite mūsų',
+    'cookie_prompt_reject'      => 'Atmesti nebūtinuosius slapukus',
+    'cookie_prompt_accept'      => 'Leisti visus slapukus',
     // Address Types
     'address_type_shipping'             => 'Pristatymo adresas',
     'address_type_billing'              => 'Atsiskaitymo adresas',
