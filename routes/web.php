@@ -42,6 +42,9 @@ Route::middleware(['web'])->group(function () {
     // Product Variants Showcase
     Route::get('/variant-showcase', App\Livewire\ProductVariantShowcase::class)->name('variant-showcase');
 
+    // Sequential test status dashboard
+    Route::get('/test-results', App\Livewire\TestResultsDashboard::class)->name('test-results');
+
     Route::prefix('news')->name('news.')->group(function (): void {
         Route::get('/', [NewsController::class, 'index'])->name('index');
         Route::get('/category/{slug}', [NewsController::class, 'category'])->name('category');
