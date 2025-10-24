@@ -170,7 +170,6 @@ final class CustomerGroup extends Model
     protected function casts(): array
     {
         return [
-            'discount_percentage'  => 'decimal:2',
             'discount_fixed'       => 'decimal:2',
             'has_special_pricing'  => 'boolean',
             'has_volume_discounts' => 'boolean',
@@ -191,13 +190,13 @@ final class CustomerGroup extends Model
     /**
      * Present the discount percentage as a normalised string for consistency in tests and UI renders.
      *
-     * @return Attribute<string|null, never>
+     * @return Attribute<float|null, float|string|null>
      */
     protected function discountPercentage(): Attribute
     {
         return Attribute::make(
-            // Normalise to a two-decimal string so decimal casts and legacy tests stay in sync.
-            get: static function ($value): ?string {
+            // Normalise to a float with two decimal precision for modernised integrations.
+            get: static function ($value): ?float {
                 if ($value === null) {
                     return null;
                 }
@@ -207,7 +206,18 @@ final class CustomerGroup extends Model
                     return null;
                 }
 
-                return number_format((float) $value, 2, '.', '');
+                return round((float) $value, 2);
+            },
+            set: static function ($value): ?float {
+                if ($value === null || $value === '') {
+                    return null;
+                }
+
+                if (! is_numeric($value)) {
+                    return null;
+                }
+
+                return round((float) $value, 2);
             },
         );
     }

@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
 use App\Support\Concerns\HasNav;
-use Filament\Schemas\Schema;
 use App\Filament\Resources\CompanyResource\Pages;
 use App\Models\Company;
 use Filament\Actions\Action;
@@ -18,13 +16,15 @@ use Filament\Actions\ViewAction;
 use Filament\Forms;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Grid as SchemaGrid;
+use Filament\Schemas\Components\Section as SchemaSection;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\Builder; // Import the Builder contract so custom filter queries resolve correctly.
 
 final class CompanyResource extends Resource
 {
@@ -51,12 +51,12 @@ final class CompanyResource extends Resource
     /**
      * Build the form schema for creating and editing companies.
      */
-    public static function form(Schema $schema): Schema   
+    public static function form(Schema $schema): Schema
     {
         return $schema->schema([
-            Forms\Components\SchemaSection::make(__('companies.basic_information'))
+            SchemaSection::make(__('companies.basic_information'))
                 ->schema([
-                    Forms\Components\SchemaGrid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             Forms\Components\TextInput::make('name')
                                 ->label(__('companies.name'))
@@ -81,7 +81,7 @@ final class CompanyResource extends Resource
                         ->maxLength(500)
                         ->columnSpanFull(),
                 ]),
-            Forms\Components\SchemaSection::make(__('companies.business_information'))
+            SchemaSection::make(__('companies.business_information'))
                 ->schema([
                     Forms\Components\TextInput::make('industry')
                         ->label(__('companies.industry'))
@@ -98,7 +98,7 @@ final class CompanyResource extends Resource
                         ->nullable()
                         ->default(null),
                 ]),
-            Forms\Components\SchemaSection::make(__('companies.settings'))
+            SchemaSection::make(__('companies.settings'))
                 ->schema([
                     Forms\Components\Toggle::make('is_active')
                         ->label(__('companies.is_active'))
@@ -110,7 +110,7 @@ final class CompanyResource extends Resource
     /**
      * Configure the table for listing company records in the admin panel.
      */
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         // Configure the table definition for the streamlined Filament v4 return type.
         return $table
@@ -174,16 +174,12 @@ final class CompanyResource extends Resource
             ->filters([
                 SelectFilter::make('size')
                     ->label(__('companies.size'))
-                    // Provide explicit filters for unset sizes while keeping "all" as the default placeholder state.
+                    // Provide size-based filtering while keeping "all" as the default placeholder.
                     ->placeholder(__('companies.size_filter_placeholder'))
                     ->options([
                         'small'  => __('companies.sizes.small'),
                         'medium' => __('companies.sizes.medium'),
                         'large'  => __('companies.sizes.large'),
-                        '__null' => __('filament::common.none'),
-                    ])
-                    ->queries([
-                        '__null' => static fn (Builder $query): Builder => $query->whereNull('size'),
                     ]),
                 TernaryFilter::make('is_active')
                     ->trueLabel(__('companies.active_only'))

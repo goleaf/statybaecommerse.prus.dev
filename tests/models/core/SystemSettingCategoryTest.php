@@ -51,7 +51,7 @@ final class SystemSettingCategoryTest extends TestCase
         $parentCategory = SystemSettingCategory::factory()->create();
         $childCategory = SystemSettingCategory::factory()->create(['parent_id' => $parentCategory->id]);
 
-        $this->assertEquals($parentCategory->id, $childCategory->parent->first()->id);
+        $this->assertEquals($parentCategory->id, $childCategory->parent->id);
     }
 
     public function test_system_setting_category_scope_active(): void
@@ -90,7 +90,11 @@ final class SystemSettingCategoryTest extends TestCase
     public function test_system_setting_category_scope_with_settings(): void
     {
         $category = SystemSettingCategory::factory()->create();
-        SystemSetting::factory()->create(['category_id' => $category->id, 'is_active' => true]);
+        SystemSetting::factory()->create([
+            'category_id' => $category->id,
+            'is_active' => true,
+            'is_public' => false,
+        ]);
         SystemSetting::factory()->create(['category_id' => $category->id, 'is_active' => false]);
 
         $categoryWithSettings = SystemSettingCategory::withSettings()->find($category->id);
@@ -102,8 +106,16 @@ final class SystemSettingCategoryTest extends TestCase
     public function test_get_settings_count(): void
     {
         $category = SystemSettingCategory::factory()->create();
-        SystemSetting::factory()->create(['category_id' => $category->id, 'is_active' => true]);
-        SystemSetting::factory()->create(['category_id' => $category->id, 'is_active' => true]);
+        SystemSetting::factory()->create([
+            'category_id' => $category->id,
+            'is_active' => true,
+            'is_public' => false,
+        ]);
+        SystemSetting::factory()->create([
+            'category_id' => $category->id,
+            'is_active' => true,
+            'is_public' => false,
+        ]);
         SystemSetting::factory()->create(['category_id' => $category->id, 'is_active' => false]);
 
         $count = $category->getSettingsCount();
@@ -297,7 +309,11 @@ final class SystemSettingCategoryTest extends TestCase
             'color' => 'blue',
         ]);
 
-        SystemSetting::factory()->create(['category_id' => $category->id, 'is_active' => true]);
+        SystemSetting::factory()->create([
+            'category_id' => $category->id,
+            'is_active' => true,
+            'is_public' => false,
+        ]);
         SystemSetting::factory()->create(['category_id' => $category->id, 'is_active' => true, 'is_public' => true]);
 
         $tree = $category->getTreeStructure();

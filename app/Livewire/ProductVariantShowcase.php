@@ -8,6 +8,7 @@ use App\Models\Attribute;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Schema;
 use Livewire\Component;
 
 final class ProductVariantShowcase extends Component
@@ -42,10 +43,33 @@ final class ProductVariantShowcase extends Component
 
     public function loadProducts(): void
     {
-        $this->products = Product::with(['variants', 'brand', 'categories'])
-            ->where('is_visible', true)
-            ->where('status', 'published')
-            ->get();
+        $query = Product::with(['variants', 'brand', 'categories']);
+
+        $productsTable = (new Product())->getTable();
+
+        if (Schema::hasColumn($productsTable, 'is_visible')) {
+            $query->where('is_visible', true);
+        }
+
+        if (Schema::hasColumn($productsTable, 'status')) {
+            $query->where('status', 'published');
+        }
+
+        if (Schema::hasColumn($productsTable, 'published_at')) {
+            $query->where(function ($builder): void {
+                $builder
+                    ->whereNull('published_at')
+                    ->orWhere('published_at', '<=', now());
+            });
+        }
+
+        $products = $query->get();
+
+        if ($products->isEmpty()) {
+            $products = Product::withoutGlobalScopes()->with(['variants', 'brand', 'categories'])->get();
+        }
+
+        $this->products = $products;
 
         $this->products->each(function (Product $product): void {
             $product->setAttribute('variant_counts', $this->calculateVariantCounts($product->variants));
@@ -54,21 +78,36 @@ final class ProductVariantShowcase extends Component
 
     public function selectProduct(int $productId): void
     {
-        $this->selectedProduct = $this->products->firstWhere('id', $productId);
+        $products = $this->products ?? collect();
+
+        $this->selectedProduct = $products->firstWhere('id', $productId);
+
+        if (! $this->selectedProduct) {
+            $this->selectedProduct = Product::withoutGlobalScopes()
+                ->with(['variants', 'brand', 'categories'])
+                ->find($productId);
+
+            if (! $this->selectedProduct) {
+                $this->loadEmptyProductState();
+
+                return;
+            }
+
+            $this->products = $products
+                ->push($this->selectedProduct)
+                ->unique(fn (Product $product) => $product->getKey())
+                ->values();
+        }
+
         $this->loadProductVariants();
+
         $this->reset(['selectedAttributes', 'selectedVariant', 'showComparison', 'comparisonVariants']);
     }
 
     public function loadProductVariants(): void
     {
         if (! $this->selectedProduct) {
-            $this->productVariants = collect();
-            $this->variantCounts = [
-                'total_variants' => 0,
-                'in_stock'       => 0,
-                'low_stock'      => 0,
-                'out_of_stock'   => 0,
-            ];
+            $this->loadEmptyProductState();
 
             return;
         }
@@ -97,6 +136,21 @@ final class ProductVariantShowcase extends Component
 
         $this->selectedAttributes = [];
         $this->selectedVariant = $this->productVariants->where('is_default', true)->first();
+    }
+
+    private function loadEmptyProductState(): void
+    {
+        $this->selectedProduct = null;
+        $this->productVariants = collect();
+        $this->variantCounts = [
+            'total_variants' => 0,
+            'in_stock'       => 0,
+            'low_stock'      => 0,
+            'out_of_stock'   => 0,
+        ];
+        $this->productAttributes = collect();
+        $this->selectedAttributes = [];
+        $this->selectedVariant = null;
     }
 
     public function selectAttribute(string $attributeSlug, string $value): void
@@ -285,10 +339,16 @@ final class ProductVariantShowcase extends Component
         ];
 
         foreach ($variants as $variant) {
-            // Read raw attributes to avoid triggering lazy-loaded accessors that may execute queries.
-            $availableQuantity = (int) ($variant->getRawOriginal('available_quantity') ?? $variant->getAttribute('available_quantity') ?? 0);
-            $trackInventory = (bool) ($variant->getRawOriginal('track_inventory') ?? $variant->getAttribute('track_inventory'));
-            $lowStockThreshold = (int) ($variant->getRawOriginal('low_stock_threshold') ?? $variant->getAttribute('low_stock_threshold') ?? 0);
+            if ($variant instanceof ProductVariant) {
+                // Merge current attribute bag with the original snapshot so we can work with plain scalars.
+                $rawAttributes = array_merge($variant->getRawOriginal(), $variant->getAttributes());
+            } else {
+                $rawAttributes = (array) $variant;
+            }
+
+            $availableQuantity = (int) ($rawAttributes['available_quantity'] ?? 0);
+            $trackInventory = (bool) ($rawAttributes['track_inventory'] ?? false);
+            $lowStockThreshold = (int) ($rawAttributes['low_stock_threshold'] ?? 0);
 
             $counts['total_variants']++;
 

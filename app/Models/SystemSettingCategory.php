@@ -407,6 +407,20 @@ final class SystemSettingCategory extends Model
      */
     public function getTreeStructure(): array
     {
-        return ['id' => $this->id, 'name' => $this->getTranslatedName(), 'slug' => $this->slug, 'description' => $this->getTranslatedDescription(), 'icon' => $this->getIconClass(), 'color' => $this->color, 'settings_count' => $this->getSettingsCount(), 'public_settings_count' => $this->getPublicSettingsCount(), 'children' => $this->getChildren()->map->getTreeStructure()];
+        return [
+            'id' => $this->id,
+            'name' => $this->getTranslatedName(),
+            'slug' => $this->slug,
+            'description' => $this->getTranslatedDescription(),
+            'icon' => $this->getIconClass(),
+            'color' => $this->color,
+            'settings_count' => $this->getSettingsCount(),
+            'public_settings_count' => $this->getPublicSettingsCount(),
+            'children' => $this->getChildren()
+                ->map
+                ->getTreeStructure()
+                ->values()
+                ->all(),
+        ];
     }
 }

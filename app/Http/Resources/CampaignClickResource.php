@@ -69,8 +69,6 @@ class CampaignClickResource extends JsonResource
 
         $localized = CarbonImmutable::parse($value, 'UTC')->setTimezone(config('app.timezone', 'UTC'));
 
-        // Emit the timestamp using the app timezone value but normalise to the API's contract format with a Z suffix for
-        // backward compatibility with existing fixtures.
         return $localized->format('Y-m-d\TH:i:s.u\Z');
     }
 }

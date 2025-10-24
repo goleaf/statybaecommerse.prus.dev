@@ -11,37 +11,6 @@ use App\Http\Controllers\Api\V1\HealthController;
 use App\Http\Controllers\Api\V1\SearchController;
 use Illuminate\Support\Facades\Route;
 
-Route::prefix('v1')
-    ->middleware('throttle:api.read')
-    ->name('api.v1.')
-    ->group(function (): void {
-        Route::get('/health', [HealthController::class, 'health'])
-            ->name('health');
-
-        Route::get('/ready', [HealthController::class, 'ready'])
-            ->name('ready');
-
-        Route::get('/search', SearchController::class)
-            ->name('search');
-
-        Route::middleware('auth:sanctum')->group(function (): void {
-            Route::get('/user', AuthenticatedUserController::class)
-                // Ability checks are handled inside ShowAuthenticatedUserRequest so we only keep the
-                // dedicated profile rate limit middleware on the route definition itself.
-                ->middleware(['throttle:api.profile'])
-                ->name('user.show');
-
-            Route::post('/autocomplete-search', AutocompleteSearchController::class)
-                // AutocompleteRequest performs the Sanctum ability validation which keeps response
-                // messaging consistent with the rest of our API layer while we retain rate limiting.
-                ->middleware(['throttle:api.autocomplete'])
-                ->withoutMiddleware('throttle:api.default')
-                ->name('autocomplete.search');
-
-            require __DIR__ . '/api/notifications.php';
-        });
-    });
-
 Route::middleware('auth:sanctum')
     ->prefix('notifications')
     ->as('api.notifications.')
@@ -60,6 +29,37 @@ Route::middleware('auth:sanctum')
             Route::post('/{notification}/mark-read', [NotificationController::class, 'markAsRead'])->name('mark-as-read');
             Route::post('/{notification}/mark-unread', [NotificationController::class, 'markAsUnread'])->name('mark-as-unread');
             Route::delete('/{notification}', [NotificationController::class, 'destroy'])->name('destroy');
+        });
+    });
+
+Route::prefix('v1')
+    ->middleware('throttle:api.read')
+    ->name('api.v1.')
+    ->group(function (): void {
+        Route::get('/health', [HealthController::class, 'health'])
+            ->name('health');
+
+        Route::get('/ready', [HealthController::class, 'ready'])
+            ->name('ready');
+
+        Route::get('/search', SearchController::class)
+            ->name('search');
+
+        Route::middleware('auth:sanctum')->group(function (): void {
+            Route::get('/user', AuthenticatedUserController::class)
+                // Ability checks are handled inside ShowAuthenticatedUserRequest so we keep the dedicated
+                // profile limiter while also enforcing the shared default bucket for consistent test coverage.
+                ->middleware(['throttle:api.default', 'throttle:api.profile'])
+                ->name('user.show');
+
+            Route::post('/autocomplete-search', AutocompleteSearchController::class)
+                // AutocompleteRequest performs the Sanctum ability validation which keeps response
+                // messaging consistent with the rest of our API layer while we retain rate limiting.
+                ->middleware(['throttle:api.autocomplete'])
+                ->withoutMiddleware('throttle:api.default')
+                ->name('autocomplete.search');
+
+            require __DIR__ . '/api/notifications.php';
         });
     });
 

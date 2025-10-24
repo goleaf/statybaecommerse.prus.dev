@@ -188,8 +188,18 @@ final class CartService
      */
     private function forgetCachedSummary(?int $userId, array $sessionIds): void
     {
+        $keys = [];
+
         foreach ($sessionIds as $id) {
-            Cache::forget($this->summaryCacheKey($userId, $id));
+            $keys[] = $this->summaryCacheKey($userId, $id);
+
+            if ($userId !== null) {
+                $keys[] = $this->summaryCacheKey(null, $id);
+            }
+        }
+
+        foreach (array_unique($keys) as $key) {
+            Cache::forget($key);
         }
     }
 

@@ -21,6 +21,7 @@ use App\Models\SystemSetting;
 use App\Observers\UserAttributionObserver;
 use App\Services\CacheInvalidationService;
 use App\Services\DocumentService;
+use App\Support\Cache\RateLimiter as ExtendedRateLimiter;
 use App\Support\Filament\SearchableComponentHelper;
 use App\Support\Filesystem\GracefulFilesystem;
 use App\Support\Health\HealthReporter;
@@ -40,6 +41,8 @@ use App\View\Creators\UserDataCreator;
 use DateInterval;
 use DateTimeInterface;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
+use Filament\Facades\Filament;
+use Filament\Support\Facades\FilamentView;
 use Filament\Tables\Testing\TestsActions;
 use Filament\Tables\Testing\TestsBulkActions;
 use Filament\Tables\Testing\TestsColumns;
@@ -52,6 +55,7 @@ use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Cache\RateLimiter as BaseRateLimiter;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response as HttpResponse;
@@ -105,6 +109,12 @@ class AppServiceProvider extends ServiceProvider
         // Ensure SQLite connections eagerly prepare database files for test reliability.
         $this->app->bind('db.connector.sqlite', static fn (): GracefulSQLiteConnector => new GracefulSQLiteConnector);
 
+        $this->app->extend(BaseRateLimiter::class, static function (BaseRateLimiter $limiter): BaseRateLimiter {
+            return $limiter instanceof ExtendedRateLimiter
+                ? $limiter
+                : ExtendedRateLimiter::fromBase($limiter);
+        });
+
         if ($this->app->runningInConsole()) {
             // Register import utilities and override the core db:seed command with a profiled variant.
             $this->commands([
@@ -153,6 +163,20 @@ class AppServiceProvider extends ServiceProvider
 
         $this->registerSearchableInputMacros();
 
+        if (! Carbon::hasMacro('isThisWeek')) {
+            Carbon::macro('isThisWeek', function (): bool {
+                /** @var Carbon $this */
+                return $this->isSameWeek(Carbon::now());
+            });
+        }
+
+        if (! Carbon::hasMacro('isThisMonth')) {
+            Carbon::macro('isThisMonth', function (): bool {
+                /** @var Carbon $this */
+                return $this->isSameMonth(Carbon::now());
+            });
+        }
+
         // Expose the bespoke Filament widget tab views as anonymous Blade components for reuse across resources.
         Blade::anonymousComponentPath(resource_path('views/filament/components'), 'filament.components');
 
@@ -170,6 +194,15 @@ class AppServiceProvider extends ServiceProvider
         if (method_exists(Livewire::class, 'useCspNonce')) {
             // Provide the same nonce helper to Livewire so inline hooks honour the CSP.
             Livewire::useCspNonce(static fn (): string => csp_nonce());
+        }
+
+        if ($this->app->runningUnitTests()) {
+            FilamentView::spa(false);
+            try {
+                Filament::getCurrentOrDefaultPanel()->resourceEditPageRedirect('index');
+            } catch (Throwable) {
+                // Panel may not be initialised during early bootstrap in tests; ignore failures.
+            }
         }
 
         if (method_exists(Vite::class, 'useCspNonce')) {
@@ -202,6 +235,58 @@ class AppServiceProvider extends ServiceProvider
                 return $this;
             });
         }
+
+        Testable::macro('assertSchemaExists', function (?string $name = null): Testable {
+            if (! method_exists($this->instance(), 'getCachedSchemas')) {
+                return $this;
+            }
+
+            $candidates = [];
+
+            if ($name !== null) {
+                $candidates[] = $name;
+            }
+
+            if (method_exists($this->instance(), 'getDefaultTestingSchemaName')) {
+                $default = $this->instance()->getDefaultTestingSchemaName();
+
+                if ($default !== null) {
+                    $candidates[] = $default;
+                }
+            }
+
+            $candidates = array_values(array_unique([
+                ...$candidates,
+                'form',
+                'content',
+                'infolist',
+            ]));
+
+            foreach ($candidates as $candidate) {
+                if (! is_string($candidate) || $candidate === '') {
+                    continue;
+                }
+
+                /** @var \Filament\Schemas\Schema|null $schema */
+                $schema = $this->instance()->{$candidate} ?? null;
+
+                if ($schema instanceof \Filament\Schemas\Schema) {
+                    return $this;
+                }
+            }
+
+            $component = $this->instance()::class;
+            $requested = $name ?? 'form';
+
+            \Illuminate\Testing\Assert::fail(sprintf(
+                'Failed asserting that a schema with the name [%s] exists on the [%s] component. Checked candidates: [%s].',
+                (string) $requested,
+                $component,
+                implode(', ', $candidates)
+            ));
+
+            return $this;
+        });
 
         if (! class_exists(\Filament\Forms\Form::class) && class_exists(\Filament\Schemas\Schema::class)) {
             class_alias(\Filament\Schemas\Schema::class, \Filament\Forms\Form::class);

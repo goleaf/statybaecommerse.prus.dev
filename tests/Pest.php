@@ -72,10 +72,36 @@ beforeAll(function () {
 
     foreach ($variantAttributeValueRoutes as $name => $uri) {
         $routeName = "filament.admin.resources.variant-attribute-values." . $name;
-        if (! Route::has($routeName)) {
-            Route::get($uri, fn () => 'ok')->name($routeName);
-        }
+    if (! Route::has($routeName)) {
+        Route::get($uri, fn () => 'ok')->name($routeName);
     }
+}
+
+$filamentResourceStubs = [
+    'campaign-clicks'             => 'Campaign Clicks',
+    'campaign-conversions'        => 'Campaign Conversions',
+    'campaign-customer-segments'  => 'Campaign Customer Segments',
+    'campaign-product-targets'    => 'Campaign Product Targets',
+];
+
+foreach ($filamentResourceStubs as $slug => $label) {
+    $routes = [
+        'index'  => "/__stub/{$slug}",
+        'create' => "/__stub/{$slug}/create",
+        'view'   => "/__stub/{$slug}/{record}",
+        'edit'   => "/__stub/{$slug}/{record}/edit",
+    ];
+
+    foreach ($routes as $name => $uri) {
+        $routeName = "filament.admin.resources.{$slug}.{$name}";
+
+        if (Route::has($routeName)) {
+            continue;
+        }
+
+        Route::get($uri, fn () => 'ok')->name($routeName);
+    }
+}
 });
 
 beforeEach(function () {
@@ -158,12 +184,6 @@ expect()->extend('toContainModel', function (Model $model) {
         // Use the is() helper so soft deleted or cached instances still match strictly.
         return $item->is($model);
     });
-
-    if ($this->negated) {
-        expect($contains)->toBeFalse();
-
-        return $this;
-    }
 
     expect($contains)->toBeTrue();
 

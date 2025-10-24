@@ -1,8 +1,9 @@
+@use '../../filament-enhancements' as *;
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-@import '../../filament-enhancements.scss';
 @import '../../../../vendor/saade/filament-fullcalendar/resources/css/filament-fullcalendar.css';
 /* Include the combobox plugin styles so the admin theme builds the vendor UI correctly. */
 @reference '../../../../vendor/filament/filament/resources/css/theme.css';

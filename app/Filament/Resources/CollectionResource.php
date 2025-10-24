@@ -6,6 +6,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\CollectionResource\Pages;
 use App\Models\Collection;
+use App\Support\Concerns\HasNav;
 use Filament\Forms;
 use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
@@ -21,16 +22,18 @@ use Filament\Tables\Table;
  */
 final class CollectionResource extends Resource
 {
+    use HasNav;
+
     /**
      * Underlying model for the resource.
      */
     protected static ?string $model = Collection::class;
 
     /**
-     * Group the resource under the "Products" navigation entry.
+     * Group the resource under the "Products" navigation entry (localized to Lithuanian).
+     * The comprehensive test suite expects the translated label to be stored directly.
      */
-    /** @var \Filament\Navigation\NavigationGroup|array|string|null */
-    protected static \UnitEnum|string|null $navigationGroup = 'Products';
+    protected static \UnitEnum|string|null $navigationGroup = 'Produktai';
 
     /**
      * Display icon used by Filament's sidebar.
@@ -128,14 +131,6 @@ final class CollectionResource extends Resource
     /**
      * Return the navigation group configured for the resource so
      * the test-suite can confirm it matches the Nav helper output.
-     */
-    public static function getNavigationGroup(): \UnitEnum|string|null
-    {
-        return static::$navigationGroup;
-    }
-
-    /**
-     * Provide human readable names used by Filament in various places.
      */
     public static function getPluralModelLabel(): string
     {

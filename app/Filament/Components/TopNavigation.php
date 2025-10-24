@@ -31,10 +31,6 @@ class TopNavigation extends Widget
     {
         $groups = [];
 
-        $user = Auth::user();
-        $isAdminUser = ($user?->is_admin ?? false)
-            || ($user?->hasAnyRole(['admin', 'Admin']) ?? false);
-
         foreach (NavigationGroup::ordered() as $group) {
             // Only include groups that the current user is allowed to see.
             if (! $this->canAccessGroup($group)) {
@@ -49,8 +45,8 @@ class TopNavigation extends Widget
                 'color'       => $group->color(),
                 'priority'    => $group->priority(),
                 'is_core'     => $group->isCore(),
-                // Expose whether the section is admin-only for the current viewer.
-                'is_admin_only'       => $group->isAdminOnly() && ! $isAdminUser,
+                // Expose whether the section is admin-only regardless of the current viewer.
+                'is_admin_only'       => $group->isAdminOnly(),
                 'is_public'           => $group->isPublic(),
                 'requires_permission' => $group->requiresPermission(),
                 'permission'          => $group->getPermission(),

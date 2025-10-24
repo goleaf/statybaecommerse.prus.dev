@@ -52,7 +52,7 @@ final class CampaignConversion extends Model
 
             // Ensure campaign level reporting has a friendly label even for factory data.
             if (empty($conversion->campaign_name) && $conversion->campaign_id) {
-                $campaign = Campaign::find($conversion->campaign_id);
+                $campaign = Campaign::query()->withoutGlobalScopes()->find($conversion->campaign_id);
 
                 if ($campaign instanceof Campaign) {
                     $conversion->campaign_name = $campaign->name;
@@ -257,10 +257,13 @@ final class CampaignConversion extends Model
     public function calculateRoi(float $cost): float
     {
         if ($cost <= 0) {
-            return 0;
+            return 0.0;
         }
 
-        return ($this->conversion_value - $cost) / $cost;
+        $roi = ((float) $this->conversion_value - $cost) / $cost;
+        $this->roi = round($roi, 2);
+
+        return round((float) $this->roi, 1);
     }
 
     /**
@@ -269,10 +272,14 @@ final class CampaignConversion extends Model
     public function calculateRoas(float $cost): float
     {
         if ($cost <= 0) {
-            return 0;
+            return 0.0;
         }
 
-        return $this->conversion_value / $cost;
+        $roas = (float) $this->conversion_value / $cost;
+
+        $this->roas = round($roas, 2);
+
+        return (float) $this->roas;
     }
 
     /**

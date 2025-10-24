@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 it('returns 404 for invalid encoded path', function (): void {
-    $response = $this->getSignedRoute('media.secure-download', ['encodedPath' => '!!invalid!!']);
+    $response = getSignedRoute('media.secure-download', ['encodedPath' => '!!invalid!!']);
     $response->assertStatus(404);
 });
 
@@ -14,7 +14,7 @@ it('serves file inline with correct headers', function (): void {
 
     $encoded = \App\Support\Storage\SecureStorage::encodePath($path);
 
-    $response = $this->getSignedRoute('media.secure-download', ['encodedPath' => $encoded]);
+    $response = getSignedRoute('media.secure-download', ['encodedPath' => $encoded]);
 
     $response->assertOk();
     $response->assertHeader('X-Content-Type-Options', 'nosniff');

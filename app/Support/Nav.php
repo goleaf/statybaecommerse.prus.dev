@@ -70,10 +70,22 @@ final class Nav
      */
     private static function resourceClasses(): array
     {
-        // Avoid autoloading all resources during tests to prevent unrelated
-        // class load errors from interfering with isolated feature tests.
+        // Allow tests to opt-out of automatic resource discovery when they
+        // explicitly request a limited set of resources via configuration.
         if (app()->environment('testing')) {
-            return [];
+            $shouldDiscover = (bool) config('filament.testing.autodiscover_resources', true);
+
+            if (! $shouldDiscover) {
+                /** @var array<class-string<Resource>> $configured */
+                $configured = array_values(array_filter(
+                    (array) config('filament.testing.resources', []),
+                    static fn (mixed $resource): bool => is_string($resource)
+                        && class_exists($resource)
+                        && is_subclass_of($resource, Resource::class),
+                ));
+
+                return $configured;
+            }
         }
 
         $resourcePath = app_path('Filament/Resources');

@@ -64,6 +64,13 @@ final class Category extends Model implements HasMedia
     use Searchable;
     use SoftDeletes;
 
+    public const SCOPE_COLUMN_HINTS = [
+        'is_active'    => true,
+        'is_visible'   => true,
+        'is_enabled'   => true,
+        'status'       => false,
+    ];
+
     protected $fillable = ['name', 'slug', 'description', 'short_description', 'parent_id', 'sort_order', 'is_visible', 'is_enabled', 'is_active', 'is_featured', 'color', 'seo_title', 'seo_description', 'show_in_menu', 'product_limit'];
 
     protected $casts = ['is_visible' => 'boolean', 'is_enabled' => 'boolean', 'is_active' => 'boolean', 'is_featured' => 'boolean', 'show_in_menu' => 'boolean', 'sort_order' => 'integer', 'product_limit' => 'integer'];

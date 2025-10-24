@@ -136,7 +136,7 @@ final class AdminSeeder extends Seeder
     {
         $this->logInfo('👤 Creating admin user...');
 
-        return User::firstOrCreate(
+        return User::updateOrCreate(
             ['email' => 'admin@example.com'],
             [
                 'name'              => 'Admin User',
@@ -164,8 +164,8 @@ final class AdminSeeder extends Seeder
 
         $createdZones = [];
         foreach ($zones as $zone) {
-            // firstOrCreate keeps the seeder idempotent when rerun by the test suite.
-            $createdZones[] = Zone::firstOrCreate(
+            // updateOrCreate keeps the seeder idempotent when rerun by the test suite.
+            $createdZones[] = Zone::updateOrCreate(
                 ['code' => $zone['code']],
                 $zone
             );
@@ -255,7 +255,7 @@ final class AdminSeeder extends Seeder
 
         $createdCountries = [];
         foreach ($countries as $country) {
-            $createdCountries[] = Country::firstOrCreate(
+            $createdCountries[] = Country::updateOrCreate(
                 ['cca2' => $country['cca2']],
                 $country
             );
@@ -280,7 +280,7 @@ final class AdminSeeder extends Seeder
 
         $createdCities = [];
         foreach ($cities as $city) {
-            $createdCities[] = City::firstOrCreate(
+            $createdCities[] = City::updateOrCreate(
                 ['name' => $city['name'], 'country_id' => $city['country_id']],
                 $city
             );
@@ -297,14 +297,14 @@ final class AdminSeeder extends Seeder
         $this->logInfo('💰 Creating currencies...');
 
         $currencies = [
-            ['name' => ['lt' => 'Euro', 'en' => 'Euro'], 'code' => 'EUR', 'symbol' => '€', 'exchange_rate' => 1.0, 'is_default' => true, 'is_enabled' => true, 'decimal_places' => 2],
-            ['name' => ['lt' => 'US Dollar', 'en' => 'US Dollar'], 'code' => 'USD', 'symbol' => '$', 'exchange_rate' => 0.85, 'is_default' => false, 'is_enabled' => true, 'decimal_places' => 2],
-            ['name' => ['lt' => 'British Pound', 'en' => 'British Pound'], 'code' => 'GBP', 'symbol' => '£', 'exchange_rate' => 1.15, 'is_default' => false, 'is_enabled' => true, 'decimal_places' => 2],
+            ['name' => $this->encodeTranslations(['lt' => 'Euro', 'en' => 'Euro']), 'code' => 'EUR', 'symbol' => '€', 'exchange_rate' => 1.0, 'is_default' => true, 'is_enabled' => true, 'decimal_places' => 2],
+            ['name' => $this->encodeTranslations(['lt' => 'US Dollar', 'en' => 'US Dollar']), 'code' => 'USD', 'symbol' => '$', 'exchange_rate' => 0.85, 'is_default' => false, 'is_enabled' => true, 'decimal_places' => 2],
+            ['name' => $this->encodeTranslations(['lt' => 'British Pound', 'en' => 'British Pound']), 'code' => 'GBP', 'symbol' => '£', 'exchange_rate' => 1.15, 'is_default' => false, 'is_enabled' => true, 'decimal_places' => 2],
         ];
 
         $createdCurrencies = [];
         foreach ($currencies as $currency) {
-            $createdCurrencies[] = Currency::firstOrCreate(
+            $createdCurrencies[] = Currency::updateOrCreate(
                 ['code' => $currency['code']],
                 $currency
             );
@@ -329,7 +329,7 @@ final class AdminSeeder extends Seeder
 
         $createdGroups = [];
         foreach ($groups as $group) {
-            $createdGroups[] = CustomerGroup::firstOrCreate(
+            $createdGroups[] = CustomerGroup::updateOrCreate(
                 ['code' => $group['code']],
                 $group
             );
@@ -376,7 +376,7 @@ final class AdminSeeder extends Seeder
 
         $createdCategories = [];
         foreach ($categories as $category) {
-            $createdCategory = Category::firstOrCreate(
+            $createdCategory = Category::updateOrCreate(
                 ['slug' => $category['slug']],
                 $category
             );
@@ -451,7 +451,7 @@ final class AdminSeeder extends Seeder
 
         $createdProducts = [];
         foreach ($products as $index => $product) {
-            $createdProduct = Product::firstOrCreate(
+            $createdProduct = Product::updateOrCreate(
                 ['sku' => $product['sku']],
                 $product
             );
@@ -486,7 +486,7 @@ final class AdminSeeder extends Seeder
 
         foreach ($products as $product) {
             foreach ($variantDefinitions as $definition) {
-                $variant = ProductVariant::firstOrCreate(
+                $variant = ProductVariant::updateOrCreate(
                     ['product_id' => $product->id, 'sku' => $product->sku . '-' . $definition['suffix']],
                     [
                         'product_id' => $product->id,
@@ -519,7 +519,7 @@ final class AdminSeeder extends Seeder
 
         foreach ($products as $product) {
             foreach ($locations as $location) {
-                Inventory::firstOrCreate(
+                Inventory::updateOrCreate(
                     ['product_id' => $product->id, 'location_id' => $location->id],
                     [
                         'product_id'  => $product->id,
@@ -576,7 +576,7 @@ final class AdminSeeder extends Seeder
 
         $createdAddresses = [];
         foreach ($addresses as $address) {
-            $createdAddresses[] = Address::firstOrCreate(
+            $createdAddresses[] = Address::updateOrCreate(
                 [
                     'user_id'        => $address['user_id'],
                     'type'           => $address['type'],
@@ -653,7 +653,7 @@ final class AdminSeeder extends Seeder
             foreach ($selectedVariants as $position => $variant) {
                 $quantity = $position + 1; // Simple incremental quantity keeps totals predictable.
 
-                OrderItem::firstOrCreate(
+                OrderItem::updateOrCreate(
                     [
                         'order_id'           => $order->id,
                         'product_variant_id' => $variant->id,
@@ -681,7 +681,7 @@ final class AdminSeeder extends Seeder
         $this->logInfo('🚚 Creating order shipping...');
 
         foreach ($orders as $order) {
-            OrderShipping::firstOrCreate(
+            OrderShipping::updateOrCreate(
                 ['order_id' => $order->id],
                 [
                     'order_id'        => $order->id,
@@ -706,7 +706,7 @@ final class AdminSeeder extends Seeder
 
         foreach ($orders as $order) {
             /** @var Order $order */
-            Document::firstOrCreate(
+            Document::updateOrCreate(
                 [
                     'documentable_type' => Order::class,
                     'documentable_id'   => $order->id,
@@ -735,7 +735,7 @@ final class AdminSeeder extends Seeder
         ];
 
         foreach ($codes as $code) {
-            DiscountCode::firstOrCreate(
+            DiscountCode::updateOrCreate(
                 ['code' => $code['code']],
                 $code
             );
@@ -780,7 +780,7 @@ final class AdminSeeder extends Seeder
         ];
 
         foreach ($sliders as $slider) {
-            Slider::firstOrCreate(
+            Slider::updateOrCreate(
                 ['title' => $slider['title']],
                 $slider
             );
@@ -819,7 +819,7 @@ final class AdminSeeder extends Seeder
         ];
 
         foreach ($blocks as $block) {
-            RecommendationBlock::firstOrCreate(
+            RecommendationBlock::updateOrCreate(
                 ['title' => $block['title']],
                 $block
             );
@@ -856,7 +856,7 @@ final class AdminSeeder extends Seeder
         ];
 
         foreach ($seoData as $seo) {
-            $record = SeoData::firstOrCreate(
+            $record = SeoData::updateOrCreate(
                 [
                     'seoable_type' => $seo['seoable_type'],
                     'seoable_id'   => $seo['seoable_id'],
@@ -889,7 +889,7 @@ final class AdminSeeder extends Seeder
         ];
 
         foreach ($emails as $email) {
-            Subscriber::firstOrCreate(
+            Subscriber::updateOrCreate(
                 ['email' => $email],
                 [
                     'email'         => $email,
@@ -905,7 +905,7 @@ final class AdminSeeder extends Seeder
     {
         $this->logInfo('🎁 Creating referral rewards...');
 
-        ReferralReward::firstOrCreate(
+        ReferralReward::updateOrCreate(
             ['user_id' => $admin->id],
             [
                 'user_id'       => $admin->id,
@@ -927,7 +927,7 @@ final class AdminSeeder extends Seeder
         $this->logInfo('📈 Creating product history...');
 
         foreach ($products as $product) {
-            ProductHistory::firstOrCreate(
+            ProductHistory::updateOrCreate(
                 [
                     'product_id' => $product->id,
                     'action'     => 'created',
@@ -975,7 +975,7 @@ final class AdminSeeder extends Seeder
 
         $createdLocations = [];
         foreach ($locations as $location) {
-            $createdLocations[] = Location::firstOrCreate(
+            $createdLocations[] = Location::updateOrCreate(
                 ['name' => $location['name']],
                 $location
             );
@@ -1070,6 +1070,11 @@ final class AdminSeeder extends Seeder
             ->unique()
             ->values()
             ->all();
+    }
+
+    private function encodeTranslations(array $translations): string
+    {
+        return json_encode($translations, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
     }
 
     /**

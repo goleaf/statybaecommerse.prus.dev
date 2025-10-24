@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\UserOwnedScope;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Auth\Factory as AuthFactory;
@@ -104,7 +105,9 @@ final class AnalyticsEvent extends Model
      */
     public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class)
+            ->withoutGlobalScopes([ActiveScope::class])
+            ->withTrashed();
     }
 
     /**

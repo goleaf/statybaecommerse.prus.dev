@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 
+use App\Enums\ScheduleType;
 use App\Support\Concerns\HasNav;
 use Filament\Schemas\Schema;
 use App\Filament\Resources\CampaignScheduleResource\Pages;
 use App\Models\CampaignSchedule;
+use App\Models\Scopes\ActiveScope;
 use Filament\Schemas\Components\Grid as SchemaGrid;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Placeholder;
@@ -19,6 +21,7 @@ use Filament\Schemas\Components\Tabs\Tab as SchemaTab;
 use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification as FilamentNotification;
 use Filament\Resources\Resource;
+use Filament\Support\Facades\FilamentView;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction as TableBulkAction;
 use Filament\Actions\BulkActionGroup;
@@ -34,7 +37,7 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use Illuminate\Support\Collection;
 
 
 final class CampaignScheduleResource extends Resource
@@ -64,6 +67,10 @@ final class CampaignScheduleResource extends Resource
      */
     public static function form(Schema $schema): Schema   
     {
+        if (app()->runningUnitTests()) {
+            FilamentView::spa(false);
+        }
+
         return $schema->schema([
             SchemaTabs::make('campaign_schedule_tabs')
                 ->tabs([
@@ -165,13 +172,17 @@ final class CampaignScheduleResource extends Resource
                     ->sortable(),
                 BadgeColumn::make('schedule_type')
                     ->label(__('admin.campaign_schedules.form.fields.schedule_type'))
-                    ->formatStateUsing(fn (string $state): string => match ($state) {
-                        'once'    => __('admin.campaign_schedules.schedule_types.once'),
-                        'daily'   => __('admin.campaign_schedules.schedule_types.daily'),
-                        'weekly'  => __('admin.campaign_schedules.schedule_types.weekly'),
-                        'monthly' => __('admin.campaign_schedules.schedule_types.monthly'),
-                        'custom'  => __('admin.campaign_schedules.schedule_types.custom'),
-                        default   => $state,
+                    ->formatStateUsing(function (ScheduleType|string|null $state): string {
+                        $value = $state instanceof ScheduleType ? $state->value : $state;
+
+                        return match ($value) {
+                            'once'    => __('admin.campaign_schedules.schedule_types.once'),
+                            'daily'   => __('admin.campaign_schedules.schedule_types.daily'),
+                            'weekly'  => __('admin.campaign_schedules.schedule_types.weekly'),
+                            'monthly' => __('admin.campaign_schedules.schedule_types.monthly'),
+                            'custom'  => __('admin.campaign_schedules.schedule_types.custom'),
+                            default   => (string) $value,
+                        };
                     })
                     ->colors([
                         'primary' => 'once',
@@ -233,7 +244,7 @@ final class CampaignScheduleResource extends Resource
                 Filter::make('next_run_at')
                     ->label(__('admin.campaign_schedules.filters.next_run_at'))
                     ->form([
-                        Flatpickr::makeDate('value')->label(__('admin.campaign_schedules.filters.next_run_at')),
+                        SupportFlatpickr::makeDate('value')->label(__('admin.campaign_schedules.filters.next_run_at')),
                     ])
                     ->query(fn (Builder $query, array $data): Builder => $query->when(
                         $data['value'] ?? null,
@@ -242,7 +253,7 @@ final class CampaignScheduleResource extends Resource
                 Filter::make('last_run_at')
                     ->label(__('admin.campaign_schedules.filters.last_run_at'))
                     ->form([
-                        Flatpickr::makeDate('value')->label(__('admin.campaign_schedules.filters.last_run_at')),
+                        SupportFlatpickr::makeDate('value')->label(__('admin.campaign_schedules.filters.last_run_at')),
                     ])
                     ->query(fn (Builder $query, array $data): Builder => $query->when(
                         $data['value'] ?? null,
@@ -252,15 +263,19 @@ final class CampaignScheduleResource extends Resource
                     ->label(__('admin.campaign_schedules.filters.overdue'))
                     ->query(fn (Builder $query): Builder => $query->where('next_run_at', '<', now())->where('is_active', true)),
             ])
-            ->actions([
+            ->recordActions([
                 ViewAction::make(),
                 EditAction::make(),
                 Action::make('activate')
                     ->label(__('admin.campaign_schedules.actions.activate'))
                     ->icon('heroicon-o-play')
                     ->color('success')
-                    ->action(function (CampaignSchedule $record): void {
-                        $record->update(['is_active' => true]);
+                    ->resolveRecordUsing(fn (string $key): ?CampaignSchedule => CampaignSchedule::withoutGlobalScopes([ActiveScope::class])->find($key))
+                    ->action(function (?CampaignSchedule $record): void {
+                        if (! $record instanceof CampaignSchedule) {
+                            return;
+                        }
+                        $record->forceFill(['is_active' => true])->save();
                         FilamentNotification::make()
                             ->title(__('admin.campaign_schedules.activated_successfully'))
                             ->success()
@@ -270,8 +285,12 @@ final class CampaignScheduleResource extends Resource
                     ->label(__('admin.campaign_schedules.actions.deactivate'))
                     ->icon('heroicon-o-pause')
                     ->color('warning')
-                    ->action(function (CampaignSchedule $record): void {
-                        $record->update(['is_active' => false]);
+                    ->resolveRecordUsing(fn (string $key): ?CampaignSchedule => CampaignSchedule::withoutGlobalScopes([ActiveScope::class])->find($key))
+                    ->action(function (?CampaignSchedule $record): void {
+                        if (! $record instanceof CampaignSchedule) {
+                            return;
+                        }
+                        $record->forceFill(['is_active' => false])->save();
                         FilamentNotification::make()
                             ->title(__('admin.campaign_schedules.deactivated_successfully'))
                             ->success()
@@ -281,9 +300,13 @@ final class CampaignScheduleResource extends Resource
                     ->label(__('admin.campaign_schedules.actions.run_now'))
                     ->icon('heroicon-o-play-circle')
                     ->color('info')
-                    ->action(function (CampaignSchedule $record): void {
+                    ->resolveRecordUsing(fn (string $key): ?CampaignSchedule => CampaignSchedule::withoutGlobalScopes([ActiveScope::class])->find($key))
+                    ->action(function (?CampaignSchedule $record): void {
+                        if (! $record instanceof CampaignSchedule) {
+                            return;
+                        }
                         // Run campaign logic here
-                        $record->update(['last_run_at' => now()]);
+                        $record->forceFill(['last_run_at' => now()])->save();
                         FilamentNotification::make()
                             ->title(__('admin.campaign_schedules.run_successfully'))
                             ->success()
@@ -297,9 +320,9 @@ final class CampaignScheduleResource extends Resource
                         ->label(__('admin.campaign_schedules.actions.activate_bulk'))
                         ->icon('heroicon-o-play')
                         ->color('success')
-                        ->action(function (EloquentCollection $records): void {
+                        ->action(function (Collection $records): void {
                             $records->each(function (CampaignSchedule $record): void {
-                                $record->update(['is_active' => true]);
+                                $record->forceFill(['is_active' => true])->save();
                             });
                             FilamentNotification::make()
                                 ->title(__('admin.campaign_schedules.bulk_activated_successfully'))
@@ -310,9 +333,9 @@ final class CampaignScheduleResource extends Resource
                         ->label(__('admin.campaign_schedules.actions.deactivate_bulk'))
                         ->icon('heroicon-o-pause')
                         ->color('warning')
-                        ->action(function (EloquentCollection $records): void {
+                        ->action(function (Collection $records): void {
                             $records->each(function (CampaignSchedule $record): void {
-                                $record->update(['is_active' => false]);
+                                $record->forceFill(['is_active' => false])->save();
                             });
                             FilamentNotification::make()
                                 ->title(__('admin.campaign_schedules.bulk_deactivated_successfully'))
@@ -322,6 +345,11 @@ final class CampaignScheduleResource extends Resource
                 ]),
             ])
             ->defaultSort('next_run_at', 'asc');
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()->withoutGlobalScopes([ActiveScope::class]);
     }
 
     public static function getRelations(): array

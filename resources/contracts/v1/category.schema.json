@@ -17,6 +17,15 @@
             "type": "object",
             "additionalProperties": false,
             "properties": {
+                "category": {
+                    "$ref": "#/$defs/category"
+                },
+                "categories": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/$defs/category"
+                    }
+                },
                 "item": {
                     "$ref": "#/$defs/category"
                 },
@@ -28,6 +37,12 @@
                 }
             },
             "anyOf": [
+                {
+                    "required": ["category"]
+                },
+                {
+                    "required": ["categories"]
+                },
                 {
                     "required": ["item"]
                 },

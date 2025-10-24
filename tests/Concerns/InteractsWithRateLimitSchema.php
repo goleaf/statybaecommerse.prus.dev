@@ -9,6 +9,7 @@ use Illuminate\Routing\Middleware\ThrottleRequests;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Schema;
 use ReflectionProperty;
+use Tests\Support\TestingDatabase;
 
 trait InteractsWithRateLimitSchema
 {
@@ -172,6 +173,11 @@ trait InteractsWithRateLimitSchema
         Schema::dropIfExists('users');
         Schema::dropIfExists('activity_log');
         Schema::enableForeignKeyConstraints();
+
+        // Restore the shared testing database schema so subsequent tests that rely on the
+        // RefreshDatabase transaction harness operate against the full migration set.
+        TestingDatabase::teardown();
+        TestingDatabase::migrate();
     }
 
     protected function clearRateLimiterKeys(string $limiter, string ...$keys): void

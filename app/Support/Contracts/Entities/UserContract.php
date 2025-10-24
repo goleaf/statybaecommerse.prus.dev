@@ -26,9 +26,9 @@ final class UserContract
 
     public static function forUser(User $user, array $meta = []): array
     {
-        return self::envelope([
-            'item' => self::mapUser($user),
-        ], $meta);
+        $userPayload = self::mapUser($user);
+
+        return self::envelope($userPayload, $meta);
     }
 
     private static function mapUser(User $user): array
@@ -44,11 +44,12 @@ final class UserContract
             $relationsToLoad[] = 'orders';
         }
 
-        if (
-            Schema::hasTable('user_wishlists')
+        $hasWishlistTables = Schema::hasTable('user_wishlists')
             && Schema::hasColumn('user_wishlists', 'product_id')
             && Schema::hasTable('products')
-        ) {
+            && Schema::hasTable('wishlist_items');
+
+        if ($hasWishlistTables) {
             $relationsToLoad[] = 'wishlist';
         }
 
@@ -57,26 +58,9 @@ final class UserContract
         }
         $safeAttributes = $user->toApiSafeArray();
 
-        $wishlistItems = $user->wishlists
-            ->flatMap(static function ($wishlist) {
-                return $wishlist->items->map(static function ($item) use ($wishlist) {
-                    return [
-                        'wishlist_id'   => $wishlist->getKey(),
-                        'wishlist_name' => (string) $wishlist->name,
-                        'product'       => $item->product ? [
-                            'id'   => $item->product->getKey(),
-                            'name' => (string) $item->product->name,
-                            'slug' => (string) $item->product->slug,
-                        ] : null,
-                        'variant_id' => $item->variant_id,
-                        'quantity'   => $item->quantity,
-                        'notes'      => $item->notes,
-                        'added_at'   => $item->created_at?->toISOString(),
-                    ];
-                });
-            })
-            ->values()
-            ->all();
+        if ($hasWishlistTables) {
+            $user->loadMissing(['wishlists.items.product']);
+        }
 
         return [
             'id'         => $user->getKey(),
@@ -119,7 +103,7 @@ final class UserContract
                     return Arr::except($order->toArray(), ['user_id']);
                 })->all()
                 : [],
-            'wishlist' => $user->relationLoaded('wishlist')
+            'wishlist' => $hasWishlistTables && $user->relationLoaded('wishlist')
                 ? $user->wishlist->map(static function ($product) {
                     return Arr::except($product->toArray(), ['pivot']);
                 })->all()

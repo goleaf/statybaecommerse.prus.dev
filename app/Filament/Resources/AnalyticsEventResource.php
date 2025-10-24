@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Enums\NavigationGroup;
 use App\Filament\Resources\AnalyticsEventResource\Pages;
 use App\Models\AnalyticsEvent;
 use App\Models\User;
 use App\Support\Concerns\HasNav;
+use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 // Align the bulk action group import with the core Actions namespace introduced in Filament v4.
@@ -42,6 +44,13 @@ final class AnalyticsEventResource extends Resource
     protected static ?string $model = AnalyticsEvent::class;
 
     protected static ?int $navigationSort = 1;
+
+    /**
+     * Mirror the Filament base definitions so navigation metadata remains discoverable via the Nav registry.
+     */
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar-square';
+
+    protected static \UnitEnum|string|null $navigationGroup = NavigationGroup::Analytics->value;
 
     /**
      * Handle getPluralModelLabel functionality with proper error handling.

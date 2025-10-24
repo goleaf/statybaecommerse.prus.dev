@@ -22,8 +22,8 @@ final class CustomerGroupTest extends TestCase
         ]);
 
         $this->assertDatabaseHas('customer_groups', [
-            'name' => json_encode(['lt' => 'VIP Customers']),
-            'description' => json_encode(['lt' => 'High-value customers with special privileges']),
+            'name' => 'VIP Customers',
+            'description' => 'High-value customers with special privileges',
             'is_enabled' => true,
         ]);
     }
@@ -38,7 +38,8 @@ final class CustomerGroupTest extends TestCase
         ]);
 
         $this->assertIsBool($customerGroup->is_enabled);
-        $this->assertIsString($customerGroup->discount_percentage); // decimal:2 cast returns string
+        $this->assertIsFloat($customerGroup->discount_percentage);
+        $this->assertSame(15.5, $customerGroup->discount_percentage);
         $this->assertIsArray($customerGroup->conditions);
         $this->assertInstanceOf(\Carbon\Carbon::class, $customerGroup->created_at);
     }
@@ -96,7 +97,7 @@ final class CustomerGroupTest extends TestCase
             'discount_percentage' => 10.00,
         ]);
 
-        $this->assertEquals('10.00', $customerGroup->discount_percentage);
+        $this->assertSame(10.0, $customerGroup->discount_percentage);
     }
 
     // Note: Many tests were removed because they referenced database columns that don't exist

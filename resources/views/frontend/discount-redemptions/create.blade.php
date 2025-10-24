@@ -170,7 +170,7 @@
                             <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">
                                 {{ __('If you\'re having trouble redeeming your code, please contact our support team.') }}
                             </p>
-                            <a href="{{ route('frontend.contact') }}"
+                            <a href="{{ route('frontend.contact.index') }}"
                                class="inline-flex items-center text-sm text-blue-600 dark:text-blue-400 hover:underline">
                                 {{ __('Contact Support') }}
                                 <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -185,4 +185,3 @@
         </div>
     </div>
 @endsection
-

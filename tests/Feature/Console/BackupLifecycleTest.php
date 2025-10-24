@@ -56,13 +56,10 @@ final class BackupLifecycleTest extends TestCase
             User::factory()->count(2)->create();
             Product::factory()->count(3)->create();
 
-            /** @var PendingCommand $prepare */
-            $prepare = $this->artisan('backup:prepare', [
+            $this->artisan('backup:prepare', [
                 '--connection' => 'sqlite',
                 '--storage-path' => $backupRoot,
-            ]);
-
-            $prepare->assertExitCode(0);
+            ])->assertExitCode(0);
 
             $directories = collect(File::directories($backupRoot))->sort()->values();
             $this->assertNotEmpty($directories);
@@ -81,14 +78,11 @@ final class BackupLifecycleTest extends TestCase
             $this->assertSame(2, $metadata['counts']['users'] ?? null);
             $this->assertSame(3, $metadata['counts']['products'] ?? null);
 
-            /** @var PendingCommand $verify */
-            $verify = $this->artisan('backup:verify', [
+            $this->artisan('backup:verify', [
                 '--storage-path' => $backupRoot,
                 '--working-path' => $verifyWorkingPath,
                 '--connection' => 'backup-verify-test',
-            ]);
-
-            $verify->assertExitCode(0);
+            ])->assertExitCode(0);
             $this->assertFileExists($verifyDatabasePath);
         } finally {
             File::deleteDirectory($backupRoot);

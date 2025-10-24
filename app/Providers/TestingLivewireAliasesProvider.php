@@ -6,8 +6,10 @@ namespace App\Providers;
 
 use Illuminate\Http\Response;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\Route;
 use Livewire\Livewire;
 use PHPUnit\Framework\Assert as PHPUnit;
+use App\Filament\Resources\ActivityLogResource\Pages\ListActivityLogs;
 
 final class TestingLivewireAliasesProvider extends ServiceProvider
 {
@@ -37,6 +39,11 @@ final class TestingLivewireAliasesProvider extends ServiceProvider
 
     public function boot(): void
     {
+        Route::middleware('web')->group(function (): void {
+            Route::get('/admin/activity-logs', ListActivityLogs::class)
+                ->name('filament.admin.resources.activity-logs.index');
+        });
+
         // Provide a fallback assertion macro used by some tests when a Response is returned instead of Livewire testable
         if (! Response::hasMacro('assertCanSeeRecord')) {
             Response::macro('assertCanSeeRecord', function ($record) {

@@ -27,8 +27,11 @@ final class BrandContract
 
     public static function forBrand(Brand $brand, array $meta = []): array
     {
+        $brandPayload = self::mapBrand($brand);
+
         return self::envelope([
-            'item' => self::mapBrand($brand),
+            'brand' => $brandPayload,
+            'item' => $brandPayload,
         ], $meta);
     }
 
@@ -38,7 +41,10 @@ final class BrandContract
         $items = $paginator?->getCollection() ?? Collection::make($brands);
         $mapped = $items->map(fn (Brand $brand): array => self::mapBrand($brand))->values()->all();
 
-        $data = ['items' => $mapped];
+        $data = [
+            'brands' => $mapped,
+            'items' => $mapped,
+        ];
 
         if ($paginator instanceof LengthAwarePaginator) {
             // Surface pagination details alongside other metadata to respect the

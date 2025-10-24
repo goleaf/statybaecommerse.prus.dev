@@ -6,6 +6,7 @@ namespace Database\Factories;
 
 use App\Models\Brand;
 use App\Models\Product;
+use Database\Factories\Concerns\SupportsSequenceIndices;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
@@ -15,6 +16,7 @@ use Illuminate\Support\Str;
  */
 class ProductFactory extends Factory
 {
+    use SupportsSequenceIndices;
     protected $model = Product::class;
 
     private const PRESET_PRODUCTS = [
@@ -122,6 +124,7 @@ class ProductFactory extends Factory
             // Default products should satisfy the published/visible scopes used by the
             // API layer so contract tests can rely on generated fixtures without
             // additional state tweaks.
+            'is_active'       => true,
             'is_visible'      => true,
             'is_enabled'      => true,
             'is_featured'     => false,
@@ -319,5 +322,10 @@ class ProductFactory extends Factory
         }
 
         return $attributes;
+    }
+
+    public function sequence(...$sequence)
+    {
+        return parent::sequence(...$this->normaliseSequenceDefinitions($sequence));
     }
 }

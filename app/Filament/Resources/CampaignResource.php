@@ -316,12 +316,9 @@ final class CampaignResource extends Resource
                 SelectFilter::make('channel_id')
                     ->relationship('channel', 'name'),
                 Filter::make('created_at')
+                    ->label(self::label('campaigns.fields.created_at', 'Created at'))
                     ->form([
-                        SupportFlatpickr::makeRange('range')
-                            ->label(self::label('campaigns.fields.created_at', 'Created at'))
-
-                            ->format('Y-m-d')
-                            ->displayFormat('Y-m-d'),
+                        SupportFlatpickr::makeRange('range', displayFormat: 'Y-m-d', format: 'Y-m-d'),
                     ])
                     ->query(fn (Builder $query, array $data): Builder => DateRangeFilter::apply(
                         $query,

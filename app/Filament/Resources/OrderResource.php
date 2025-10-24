@@ -22,6 +22,9 @@ use App\Support\Search\CustomerSearch;
 use App\Support\Search\PartnerSearch;
 use App\Support\Search\SearchableComponentHelper;
 use App\Support\Seo\LocaleUrlGenerator;
+use App\Services\Export\ExportColumn;
+use App\Services\Export\ExportFormat;
+use App\Services\Export\ExportService;
 use Awcodes\BadgeableColumn\Components\Badge;
 use Awcodes\BadgeableColumn\Components\BadgeableColumn;
 use BackedEnum;
@@ -41,12 +44,13 @@ use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Set;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Support\Enums\MaxWidth;
+use Filament\Support\Enums\Width;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ViewColumn;
 use Filament\Tables\Filters\Filter;
@@ -832,12 +836,9 @@ final class OrderResource extends Resource implements DefinesExportColumns
                 ValueRangeFilter::make('items_count')
                     ->label(__('orders.fields.items_count')),
                 Filter::make('created_at')
+                    ->label(__('orders.created_at'))
                     ->form([
-                        SupportFlatpickr::makeRange('range')
-                            ->label(__('orders.created_at'))
-
-                            ->format('Y-m-d')
-                            ->displayFormat('Y-m-d'),
+                        SupportFlatpickr::makeRange('range', displayFormat: 'Y-m-d', format: 'Y-m-d'),
                     ])
                     ->query(fn (Builder $query, array $data): Builder => DateRangeFilter::apply(
                         $query,
@@ -846,7 +847,7 @@ final class OrderResource extends Resource implements DefinesExportColumns
                     )),
                 TrashedFilter::make(),
             ])
-            ->filtersFormWidth(MaxWidth::Large)
+            ->filtersFormWidth(Width::Large)
             ->headerActions([
                 ExportAction::make('export')
                     ->label(__('Export'))
@@ -1067,12 +1068,12 @@ final class OrderResource extends Resource implements DefinesExportColumns
     public static function availableExportColumns(): array
     {
         return [
-            'number' => new ExportColumn('number', __('orders.number'), fn (Order $order): string => (string) $order->number),
-            'status' => new ExportColumn('status', __('orders.status'), fn (Order $order): string => $order->status instanceof BackedEnum ? $order->status->value : (string) $order->status),
-            'payment_status' => new ExportColumn('payment_status', __('orders.payment_status'), fn (Order $order): string => $order->payment_status instanceof BackedEnum ? $order->payment_status->value : (string) $order->payment_status),
-            'total' => new ExportColumn('total', __('orders.total'), fn (Order $order): string => (string) $order->total),
-            'customer' => new ExportColumn('customer', __('orders.customer'), fn (Order $order): string => (string) ($order->user?->name ?? '')),
-            'created_at' => new ExportColumn('created_at', __('orders.created_at'), fn (Order $order): string => optional($order->created_at)->toDateTimeString() ?? ''),
+            'number' => new ExportColumn('number', self::translate('orders.number', 'Number'), resolver: fn (Order $order): string => (string) $order->number),
+            'status' => new ExportColumn('status', self::translate('orders.status', 'Status'), resolver: fn (Order $order): string => $order->status instanceof BackedEnum ? $order->status->value : (string) $order->status),
+            'payment_status' => new ExportColumn('payment_status', self::translate('orders.payment_status', 'Payment Status'), resolver: fn (Order $order): string => $order->payment_status instanceof BackedEnum ? $order->payment_status->value : (string) $order->payment_status),
+            'total' => new ExportColumn('total', self::translate('orders.total', 'Total'), resolver: fn (Order $order): string => (string) $order->total),
+            'customer' => new ExportColumn('customer', self::translate('orders.customer', 'Customer'), resolver: fn (Order $order): string => (string) ($order->user?->name ?? '')),
+            'created_at' => new ExportColumn('created_at', self::translate('orders.created_at', 'Created At'), resolver: fn (Order $order): string => optional($order->created_at)->toDateTimeString() ?? ''),
         ];
     }
 
@@ -1082,6 +1083,13 @@ final class OrderResource extends Resource implements DefinesExportColumns
     private static function exportColumnOptions(): array
     {
         return array_map(static fn (ExportColumn $column): string => $column->label, self::availableExportColumns());
+    }
+
+    private static function translate(string $key, string $fallback): string
+    {
+        $value = __($key);
+
+        return is_string($value) && $value !== $key ? $value : $fallback;
     }
 
     /**

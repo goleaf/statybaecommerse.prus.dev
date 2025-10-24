@@ -13,9 +13,10 @@ use App\Models\User;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Validation\Rule;
-use Illuminate\View\View;
 
 final class ProfileController extends Controller
 {
@@ -27,30 +28,38 @@ final class ProfileController extends Controller
 
     public function index(Request $request): View
     {
-        return view('frontend.profile.index', [
-            'user' => $request->user()->load('addresses'),
+        $user = $this->resolveUser($request);
+
+        return view('profile.index', [
+            'user' => $user,
+            'addresses' => $user->addresses()->latest()->get(),
         ]);
     }
 
     public function edit(Request $request): View
     {
-        return view('frontend.profile.edit', [
-            'user' => $request->user(),
+        $user = $this->resolveUser($request);
+
+        return view('profile.edit', [
+            'user' => $user,
+            'countries' => $this->resolveCountries(),
+            'customer' => $this->resolveCustomerForUser($user),
         ]);
     }
 
     public function update(Request $request): RedirectResponse
     {
-        $user = $request->user();
+        $user = $this->resolveUser($request);
+        $originalEmail = $user->email;
 
-        $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->getKey())],
-            'password' => ['nullable', 'confirmed', 'min:8'],
-        ]);
+        $validated = $request->validate($this->profileRules($user));
 
-        $user->name = $validated['name'];
+        $user->first_name = $validated['first_name'];
+        $user->last_name = $validated['last_name'];
+        $user->name = trim(sprintf('%s %s', $validated['first_name'], $validated['last_name']));
         $user->email = $validated['email'];
+        $user->phone = $validated['phone'] ?? null;
+        $user->phone_number = $validated['phone'] ?? null;
 
         if (! empty($validated['password'])) {
             $user->password = Hash::make($validated['password']);
@@ -58,22 +67,28 @@ final class ProfileController extends Controller
 
         $user->save();
 
+        $this->updateCustomerRecord($user, $validated, $originalEmail);
+
         return redirect()->route('frontend.profile.index')->with('status', 'profile-updated');
     }
 
     public function addresses(Request $request): View
     {
-        return view('frontend.profile.addresses', [
-            'addresses' => $request->user()->addresses()->latest()->get(),
+        $user = $this->resolveUser($request);
+
+        return view('profile.addresses', [
+            'user' => $user,
+            'addresses' => $user->addresses()->latest()->get(),
             'types' => AddressType::cases(),
         ]);
     }
 
     public function storeAddress(Request $request): RedirectResponse
     {
+        $user = $this->resolveUser($request);
         $validated = $this->validateAddress($request);
 
-        $address = $request->user()->addresses()->create($validated);
+        $address = $user->addresses()->create($validated);
 
         if ($address->is_default) {
             $this->ensureSingleDefault($request, $address);
@@ -84,6 +99,9 @@ final class ProfileController extends Controller
 
     public function updateAddress(Request $request, Address $address): RedirectResponse
     {
+        $user = $this->resolveUser($request);
+        $this->ensureAddressOwner($user->getKey(), $address);
+
         $validated = $this->validateAddress($request, $address);
 
         $address->update($validated);
@@ -95,8 +113,11 @@ final class ProfileController extends Controller
         return redirect()->route('frontend.profile.addresses')->with('status', 'address-updated');
     }
 
-    public function deleteAddress(Address $address): RedirectResponse
+    public function deleteAddress(Request $request, Address $address): RedirectResponse
     {
+        $user = $this->resolveUser($request);
+        $this->ensureAddressOwner($user->getKey(), $address);
+
         $address->delete();
 
         return redirect()->route('frontend.profile.addresses')->with('status', 'address-deleted');
@@ -104,7 +125,7 @@ final class ProfileController extends Controller
 
     private function validateAddress(Request $request, ?Address $address = null): array
     {
-        $validated = $request->validate([
+        $rules = [
             'type' => ['required', Rule::in(array_map(fn (AddressType $type) => $type->value, AddressType::cases()))],
             'first_name' => ['required', 'string', 'max:120'],
             'last_name' => ['required', 'string', 'max:120'],
@@ -191,26 +212,22 @@ final class ProfileController extends Controller
             'city_id' => $validated['city_id'] ?? null,
         ]);
 
-        $validated['is_default'] = (bool) ($validated['is_default'] ?? false);
-        $validated['is_billing'] = (bool) ($validated['is_billing'] ?? false);
-        $validated['is_shipping'] = (bool) ($validated['is_shipping'] ?? false);
+        $customer->is_default = (bool) ($validated['is_default'] ?? $customer->is_default ?? false);
+        $customer->is_billing = (bool) ($validated['is_billing'] ?? $customer->is_billing ?? false);
+        $customer->is_shipping = (bool) ($validated['is_shipping'] ?? $customer->is_shipping ?? false);
 
-        return $validated;
+        $customer->save();
     }
 
     private function ensureSingleDefault(Request $request, Address $address): void
     {
-        $rules = ['nullable', 'integer'];
+        $user = $this->resolveUser($request);
 
-        if ($this->countriesTableExists()) {
-            $rules[] = Rule::exists('countries', 'id');
-        }
-
-        return $rules;
+        $this->synchroniseAddressFlags($user, $address);
     }
 
     /**
-     * @return array<int, string|Exists>
+     * @return array<int, string|Rule>
      */
     private function cityRule(): array
     {
@@ -223,6 +240,20 @@ final class ProfileController extends Controller
         return $rules;
     }
 
+    /**
+     * @return array<int, string|Rule>
+     */
+    private function countryRule(): array
+    {
+        $rules = ['nullable', 'integer'];
+
+        if ($this->countriesTableExists()) {
+            $rules[] = Rule::exists('countries', 'id');
+        }
+
+        return $rules;
+    }
+
     private function resolveCountries(): Collection
     {
         if (! $this->countriesTableExists()) {
@@ -230,6 +261,35 @@ final class ProfileController extends Controller
         }
 
         return Country::query()->orderBy('name')->get(['id', 'name', 'cca2']);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function profileRules(User $user): array
+    {
+        return [
+            'first_name' => ['required', 'string', 'max:120'],
+            'last_name' => ['required', 'string', 'max:120'],
+            'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->getKey())],
+            'phone' => ['nullable', 'string', 'max:50'],
+            'address' => ['nullable', 'string', 'max:255'],
+            'postal_code' => ['nullable', 'string', 'max:32'],
+            'country_id' => $this->countryRule(),
+            'city_id' => $this->cityRule(),
+            'password' => ['nullable', 'confirmed', 'min:8'],
+        ];
+    }
+
+    private function resolveUser(Request $request): User
+    {
+        $user = $request->user();
+
+        if (! $user instanceof User) {
+            abort(403);
+        }
+
+        return $user;
     }
 
     private function customersTableExists(): bool

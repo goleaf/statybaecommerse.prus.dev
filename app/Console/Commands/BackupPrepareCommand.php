@@ -148,6 +148,19 @@ final class BackupPrepareCommand extends Command
             throw new RuntimeException(sprintf('SQLite database [%s] does not exist.', $databasePath));
         }
 
+        $connectionInstance = DB::connection($connection);
+
+        try {
+            if ($connectionInstance->getDriverName() === 'sqlite') {
+                $pdo = $connectionInstance->getPdo();
+                $pdo->exec('PRAGMA wal_checkpoint(TRUNCATE);');
+            }
+        } catch (Throwable $exception) {
+            throw new RuntimeException('Unable to checkpoint sqlite database prior to backup.', 0, $exception);
+        } finally {
+            $connectionInstance->disconnect();
+        }
+
         $targetPath = $backupPath . DIRECTORY_SEPARATOR . 'database.sqlite';
 
         File::copy($databasePath, $targetPath);
@@ -297,4 +310,3 @@ final class BackupPrepareCommand extends Command
         return $this->laravel ?? app();
     }
 }
-

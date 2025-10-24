@@ -119,35 +119,23 @@ final class ComprehensiveMultilanguageSeeder extends Seeder
         $this->command->info('💰 Seeding currencies with translations...');
 
         $currenciesData = [
-            ['code' => 'EUR', 'symbol' => '€', 'exchange_rate' => 1.0, 'is_default' => true, 'translations' => ['lt' => 'Euras', 'en' => 'Euro']],
-            ['code' => 'USD', 'symbol' => '$', 'exchange_rate' => 1.08, 'is_default' => false, 'translations' => ['lt' => 'JAV doleris', 'en' => 'US Dollar']],
-            ['code' => 'GBP', 'symbol' => '£', 'exchange_rate' => 0.85, 'is_default' => false, 'translations' => ['lt' => 'Didžiosios Britanijos svaras', 'en' => 'British Pound']],
+            ['code' => 'EUR', 'symbol' => '€', 'exchange_rate' => 1.0, 'is_default' => true, 'name' => 'Euro'],
+            ['code' => 'USD', 'symbol' => '$', 'exchange_rate' => 1.08, 'is_default' => false, 'name' => 'US Dollar'],
+            ['code' => 'GBP', 'symbol' => '£', 'exchange_rate' => 0.85, 'is_default' => false, 'name' => 'British Pound'],
         ];
 
         foreach ($currenciesData as $data) {
-            Currency::factory()
-                ->hasTranslations(2, function (array $attributes, Currency $currency) use ($data) {
-                    static $localeIndex = 0;
-                    $locales = ['lt', 'en'];
-                    $locale = $locales[$localeIndex % 2];
-                    $localeIndex++;
-
-                    return [
-                        'locale' => $locale,
-                        'name' => $data['translations'][$locale],
-                    ];
-                })
-                ->create([
-                    'code' => $data['code'],
-                    'symbol' => $data['symbol'],
-                    'name' => $data['translations']['en'],
-                    'exchange_rate' => $data['exchange_rate'],
-                    'is_default' => $data['is_default'],
-                    'is_enabled' => true,
-                ]);
+            Currency::factory()->create([
+                'code' => $data['code'],
+                'symbol' => $data['symbol'],
+                'name' => $data['name'],
+                'exchange_rate' => $data['exchange_rate'],
+                'is_default' => $data['is_default'],
+                'is_enabled' => true,
+            ]);
         }
 
-        $this->command->info('   ✅ Created '.count($currenciesData).' currencies with translations');
+        $this->command->info('   ✅ Created '.count($currenciesData).' currencies');
     }
 
     private function seedLocationsWithTranslations(): void

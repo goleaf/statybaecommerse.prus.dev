@@ -96,6 +96,12 @@ final class AuditDatabaseIndexesCommand extends Command
             return $duplicates === [] && $suggestions === [] ? self::SUCCESS : self::FAILURE;
         }
 
+        if ($duplicates === [] && $suggestions === []) {
+            $this->components->info('No duplicate indexes found and all recommended composites are present.');
+
+            return self::SUCCESS;
+        }
+
         if ($duplicates === []) {
             $this->components->info('No duplicate indexes found.');
         } else {
@@ -141,49 +147,16 @@ final class AuditDatabaseIndexesCommand extends Command
                         'indexes' => [$name],
                     ];
                 }
+            }
 
-                $columns = $index->getColumns();
-
-                if (! is_array($columns) || $columns === []) {
-                    continue;
+            foreach ($signatures as $candidate) {
+                if (count($candidate['indexes']) > 1) {
+                    $duplicates[] = $candidate;
                 }
-
-                $columnNames = [];
-
-                foreach ($columns as $column) {
-                    if (! is_string($column) || $column === '') {
-                        continue;
-                    }
-
-                    $columnNames[] = $column;
-                }
-
-                if ($columnNames === []) {
-                    continue;
-                }
-
-                $name = $index->getName();
-
-                if (! is_string($name) || $name === '') {
-                    continue;
-                }
-
-                $uniqueFlag = $index->isUnique();
-
-                if (! is_bool($uniqueFlag)) {
-                    continue;
-                }
-
-                $indexes[] = [
-                    'table'   => $tableName,
-                    'name'    => $name,
-                    'columns' => $columnNames,
-                    'unique'  => $uniqueFlag,
-                ];
             }
         }
 
-        return $indexes;
+        return $duplicates;
     }
 
     /**
@@ -445,10 +418,6 @@ final class AuditDatabaseIndexesCommand extends Command
         $suggestions = [];
 
         foreach ($this->commerceIndexRecommendations() as $table => $recommendations) {
-            if (! isset($snapshot[$table]) && ! $this->tableExists($connection, $table)) {
-                continue;
-            }
-
             /** @var array<string, array{columns:list<string>, unique:bool}> $existing */
             $existing = $snapshot[$table] ?? [];
 

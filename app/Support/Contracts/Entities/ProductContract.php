@@ -27,8 +27,11 @@ final class ProductContract
 
     public static function forProduct(Product $product, array $meta = []): array
     {
+        $productPayload = self::mapProduct($product);
+
         return self::envelope([
-            'item' => self::mapProduct($product),
+            'product' => $productPayload,
+            'item' => $productPayload,
         ], $meta);
     }
 
@@ -37,8 +40,14 @@ final class ProductContract
         $paginator = $products instanceof LengthAwarePaginator ? $products : null;
         $items = $paginator?->getCollection() ?? Collection::make($products);
 
+        $mapped = $items
+            ->map(fn (Product $product): array => self::mapProduct($product))
+            ->values()
+            ->all();
+
         $data = [
-            'items' => $items->map(fn (Product $product): array => self::mapProduct($product))->values()->all(),
+            'products' => $mapped,
+            'items' => $mapped,
         ];
 
         if ($paginator instanceof LengthAwarePaginator) {

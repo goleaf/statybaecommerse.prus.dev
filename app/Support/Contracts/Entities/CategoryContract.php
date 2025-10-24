@@ -27,8 +27,11 @@ final class CategoryContract
 
     public static function forCategory(Category $category, array $meta = []): array
     {
+        $categoryPayload = self::mapCategory($category);
+
         return self::envelope([
-            'item' => self::mapCategory($category),
+            'category' => $categoryPayload,
+            'item' => $categoryPayload,
         ], $meta);
     }
 
@@ -38,7 +41,10 @@ final class CategoryContract
         $items = $paginator?->getCollection() ?? Collection::make($categories);
         $mapped = $items->map(fn (Category $category): array => self::mapCategory($category))->values()->all();
 
-        $data = ['items' => $mapped];
+        $data = [
+            'categories' => $mapped,
+            'items' => $mapped,
+        ];
 
         if ($paginator instanceof LengthAwarePaginator) {
             $data['pagination'] = [

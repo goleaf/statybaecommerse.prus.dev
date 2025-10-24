@@ -41,9 +41,14 @@ return new class extends Migration
                 $table->string('name');
                 $table->string('slug')->unique();
                 $table->text('description')->nullable();
+                $table->text('short_description')->nullable();
                 $table->unsignedBigInteger('parent_id')->nullable();
                 $table->integer('sort_order')->default(0);
                 $table->boolean('is_visible')->default(true);
+                $table->boolean('is_active')->default(true);
+                $table->boolean('is_enabled')->default(true);
+                $table->boolean('is_featured')->default(false);
+                $table->string('color', 7)->nullable();
                 $table->string('seo_title')->nullable();
                 $table->text('seo_description')->nullable();
                 $table->timestamps();

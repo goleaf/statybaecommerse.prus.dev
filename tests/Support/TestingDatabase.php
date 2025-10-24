@@ -60,23 +60,17 @@ final class TestingDatabase
      */
     public static function path(): string
     {
-        if (self::$databasePath !== null) {
+        $token = self::resolveParallelToken();
+
+        if (self::$databasePath !== null && self::$parallelToken === $token) {
             return self::$databasePath;
         }
 
-        $token = $_SERVER['TEST_TOKEN']
-            ?? $_ENV['TEST_TOKEN']
-            ?? getenv('TEST_TOKEN')
-            ?? null;
+        self::$parallelToken = $token;
 
-        if (is_string($token) && $token !== '') {
-            self::$parallelToken = $token;
-            // Normalise the token for filesystem usage so worker-specific databases remain predictable.
-            $database = sprintf('testing_parallel_%s.sqlite', preg_replace('/[^A-Za-z0-9_-]/', '', $token));
-        } else {
-            self::$parallelToken = null;
-            $database = 'testing_cli_' . Str::random(12) . '.sqlite';
-        }
+        $database = is_string($token)
+            ? sprintf('testing_parallel_%s.sqlite', $token)
+            : 'testing_cli_' . Str::random(12) . '.sqlite';
 
         $directory = self::resolveDatabaseDirectory();
 
@@ -101,6 +95,25 @@ final class TestingDatabase
         }
 
         return $basePath . '/database/testing/databases';
+    }
+
+    /**
+     * Normalise the parallel testing token for filesystem usage.
+     */
+    private static function resolveParallelToken(): ?string
+    {
+        $token = $_SERVER['TEST_TOKEN']
+            ?? $_ENV['TEST_TOKEN']
+            ?? getenv('TEST_TOKEN')
+            ?? null;
+
+        if (! is_string($token) || $token === '') {
+            return null;
+        }
+
+        $normalised = preg_replace('/[^A-Za-z0-9_-]/', '', $token);
+
+        return $normalised === '' ? null : $normalised;
     }
 
     /**
@@ -596,6 +609,40 @@ final class TestingDatabase
                 $table->decimal('conversion_rate', 5, 4)->default(0);
                 $table->timestamps();
                 $table->unique(['product_id', 'variant_id', 'date_bucket'], 'variant_analytics_product_variant_bucket_unique');
+            });
+        }
+
+        if (! $schema->hasTable('user_preferences')) {
+            $schema->create('user_preferences', function (Blueprint $table): void {
+                $table->id();
+                $table->unsignedBigInteger('user_id');
+                $table->string('preference_type');
+                $table->string('preference_key');
+                $table->decimal('preference_score', 8, 6)->default(0);
+                $table->json('metadata')->nullable();
+                $table->timestamp('last_updated')->nullable();
+                $table->timestamps();
+
+                $table->unique(['user_id', 'preference_type', 'preference_key'], 'user_preferences_user_type_key_unique');
+                $table->index(['user_id', 'preference_type', 'preference_score'], 'user_preferences_score_idx');
+            });
+        }
+
+        if (! $schema->hasTable('user_product_interactions')) {
+            $schema->create('user_product_interactions', function (Blueprint $table): void {
+                $table->id();
+                $table->unsignedBigInteger('user_id');
+                $table->unsignedBigInteger('product_id');
+                $table->string('interaction_type');
+                $table->decimal('rating', 3, 2)->nullable();
+                $table->integer('count')->default(1);
+                $table->timestamp('first_interaction');
+                $table->timestamp('last_interaction');
+                $table->timestamps();
+
+                $table->unique(['user_id', 'product_id', 'interaction_type'], 'user_product_interactions_unique');
+                $table->index(['user_id', 'interaction_type', 'last_interaction'], 'user_product_interactions_last_idx');
+                $table->index(['product_id', 'interaction_type', 'count'], 'user_product_interactions_product_idx');
             });
         }
 

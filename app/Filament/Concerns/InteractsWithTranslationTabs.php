@@ -47,6 +47,94 @@ trait InteractsWithTranslationTabs
         return config('app.locale', 'en');
     }
 
+    public function getDefaultTestingSchemaName(): ?string
+    {
+        $name = parent::getDefaultTestingSchemaName();
+
+        return $name ?? 'form';
+    }
+
+    protected function beforeValidate(): void
+    {
+        if (! property_exists($this, 'data') || ! is_array($this->data)) {
+            return;
+        }
+
+        $fields = $this->getTranslatableFields();
+
+        if ($fields === []) {
+            return;
+        }
+
+        $locales = $this->getAvailableLocales();
+        $defaultLocale = $this->getDefaultLocale();
+        $record = property_exists($this, 'record') ? $this->record ?? null : null;
+        $recordTranslations = [];
+
+        if ($record instanceof Model && method_exists($record, 'translations')) {
+            if ($record->relationLoaded('translations')) {
+                $recordTranslations = $record->getRelation('translations')
+                    ->groupBy('locale')
+                    ->map(static fn ($group) => $group->first());
+            } else {
+                $recordTranslations = $record->translations()
+                    ->get()
+                    ->groupBy('locale')
+                    ->map(static fn ($group) => $group->first());
+            }
+        }
+
+        foreach ($fields as $field) {
+            if (! array_key_exists($field, $this->data)) {
+                continue;
+            }
+
+            $state = $this->data[$field] ?? null;
+
+            if (is_array($state)) {
+                $defaultValue = $state[$defaultLocale] ?? ($state[array_key_first($state)] ?? null);
+
+                foreach ($locales as $locale) {
+                    if (! array_key_exists($locale, $state) || blank($state[$locale])) {
+                        $state[$locale] = $defaultValue;
+                    }
+                }
+
+                $this->data[$field] = $state;
+
+                continue;
+            }
+
+            $fallback = $state;
+
+            if ($fallback === null && $record instanceof Model && $record->getAttribute($field) !== null) {
+                $fallback = $record->getAttribute($field);
+            }
+
+            $resolved = [];
+
+            foreach ($locales as $locale) {
+                $translation = $recordTranslations[$locale][$field] ?? null;
+
+                if ($translation !== null) {
+                    $resolved[$locale] = $translation;
+
+                    continue;
+                }
+
+                if ($locale === $defaultLocale) {
+                    $resolved[$locale] = $fallback;
+
+                    continue;
+                }
+
+                $resolved[$locale] = $fallback;
+            }
+
+            $this->data[$field] = $resolved;
+        }
+    }
+
     /**
      * @return array{0: array<string, mixed>, 1: array<string, array<string, mixed>>}
      */
@@ -64,13 +152,20 @@ trait InteractsWithTranslationTabs
         $locales = $this->getAvailableLocales();
         $translations = [];
 
+        $defaultLocale = $this->getDefaultLocale();
+
         foreach ($fields as $field) {
             $fieldValue = $data[$field] ?? null;
-            unset($data[$field]);
 
             if (! is_array($fieldValue)) {
+                if (filled($fieldValue)) {
+                    $translations[$defaultLocale][$field] = $fieldValue;
+                }
+
                 continue;
             }
+
+            unset($data[$field]);
 
             foreach ($fieldValue as $locale => $value) {
                 if (! in_array($locale, $locales, true)) {

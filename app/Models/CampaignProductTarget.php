@@ -61,6 +61,7 @@ final class CampaignProductTarget extends Model
             'sort_order' => 'integer',
             'is_active' => 'boolean',
             'is_featured' => 'boolean',
+            'conditions' => 'array',
         ];
     }
 

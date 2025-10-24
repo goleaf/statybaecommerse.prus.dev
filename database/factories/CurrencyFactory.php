@@ -16,7 +16,7 @@ final class CurrencyFactory extends Factory
 
     private const PRESET_CURRENCIES = [
         'eur' => [
-            'name' => ['en' => 'Euro', 'lt' => 'Euras'],
+            'name' => 'Euro',
             'code' => 'EUR',
             'symbol' => '€',
             'exchange_rate' => 1.0,
@@ -24,21 +24,21 @@ final class CurrencyFactory extends Factory
             'is_default' => true,
         ],
         'usd' => [
-            'name' => ['en' => 'US Dollar', 'lt' => 'JAV doleris'],
+            'name' => 'US Dollar',
             'code' => 'USD',
             'symbol' => '$',
             'exchange_rate' => 1.10,
             'decimal_places' => 2,
         ],
         'gbp' => [
-            'name' => ['en' => 'British Pound Sterling', 'lt' => 'Svaras sterlingų'],
+            'name' => 'British Pound Sterling',
             'code' => 'GBP',
             'symbol' => '£',
             'exchange_rate' => 0.85,
             'decimal_places' => 2,
         ],
         'sek' => [
-            'name' => ['en' => 'Swedish Krona', 'lt' => 'Švedijos krona'],
+            'name' => 'Swedish Krona',
             'code' => 'SEK',
             'symbol' => 'kr',
             'exchange_rate' => 10.50,
@@ -49,10 +49,7 @@ final class CurrencyFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => [
-                'en' => $this->faker->currencyCode().' Currency',
-                'lt' => 'Valiuta '.$this->faker->word(),
-            ],
+            'name' => $this->faker->currencyCode().' Currency',
             'code' => strtoupper($this->faker->lexify('???')),
             'symbol' => $this->faker->randomElement(['€', '$', '£', '¥', '₿']),
             'exchange_rate' => $this->faker->randomFloat(4, 0.2, 2.5),
@@ -62,6 +59,7 @@ final class CurrencyFactory extends Factory
             'is_default' => false,
             'sort_order' => $this->faker->numberBetween(0, 100),
             'auto_update_rate' => false,
+            'description' => $this->faker->sentence(),
         ];
     }
 

@@ -39,6 +39,7 @@ final class InvalidateCategoryCache
             Cache::forget(CacheKeys::homeCategoryTree($locale));
             Cache::forget(CacheKeys::homeCatalogueCategories($locale));
             Cache::forget(CacheKeys::navigationCategories(8, $locale));
+            Cache::forget(CacheKeys::categoryNavigationTree().':'.$locale);
 
             if (CacheTagHelper::supportsTags()) {
                 $categoryLocaleTags = CacheTagHelper::merge(
@@ -49,6 +50,7 @@ final class InvalidateCategoryCache
                 Cache::tags($categoryLocaleTags)->forget(CacheKeys::homeCategoryTree($locale));
                 Cache::tags($categoryLocaleTags)->forget(CacheKeys::homeCatalogueCategories($locale));
                 Cache::tags($categoryLocaleTags)->forget(CacheKeys::navigationCategories(8, $locale));
+                Cache::tags($categoryLocaleTags)->forget(CacheKeys::categoryNavigationTree());
             }
         }
 

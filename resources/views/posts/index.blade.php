@@ -10,7 +10,7 @@
             <div class="text-center mb-12">
                 <h1 class="text-4xl font-bold text-gray-900 mb-4">{{ __('posts.title') }}</h1>
                 <p class="text-xl text-gray-600 max-w-3xl mx-auto">
-                    {{ __('posts.index.description', 'Discover the latest news and updates from our blog.') }}
+                    {{ __('posts.index.description') }}
                 </p>
             </div>
 
@@ -35,7 +35,7 @@
                         <input type="text"
                                name="q"
                                value="{{ request('q') }}"
-                               placeholder="{{ __('posts.search.placeholder', 'Search posts...') }}"
+                               placeholder="{{ __('posts.search.placeholder') }}"
                                class="w-full px-4 py-3 pl-10 pr-4 text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                         <div class="absolute inset-y-0 left-0 flex items-center pl-3">
                             <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -144,13 +144,12 @@
                               d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
                         </path>
                     </svg>
-                    <h3 class="mt-2 text-sm font-medium text-gray-900">{{ __('posts.no_posts.title', 'No posts found') }}
+                    <h3 class="mt-2 text-sm font-medium text-gray-900">{{ __('posts.no_posts.title') }}
                     </h3>
                     <p class="mt-1 text-sm text-gray-500">
-                        {{ __('posts.no_posts.description', 'There are no posts available at the moment.') }}</p>
+                        {{ __('posts.no_posts.description') }}</p>
                 </div>
             @endif
         </div>
     </div>
 @endsection
-

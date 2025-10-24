@@ -76,9 +76,13 @@ final class SalesByMonthChartTest extends TestCase
 
     private function ensureWidgetTables(): void
     {
+        Schema::disableForeignKeyConstraints();
+
         Schema::dropIfExists('activity_log');
         Schema::dropIfExists('order_items');
         Schema::dropIfExists('orders');
+
+        Schema::enableForeignKeyConstraints();
 
         Schema::create('orders', function (Blueprint $table): void {
             $table->id();

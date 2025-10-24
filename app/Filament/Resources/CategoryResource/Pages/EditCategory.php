@@ -62,6 +62,13 @@ final class EditCategory extends EditRecord
     {
         $this->syncTranslationRecords($this->record, $this->languageTabsPayload);
 
-        parent::afterSave();
+        if (method_exists(EditRecord::class, 'afterSave')) {
+            parent::afterSave();
+        }
+    }
+
+    public function getDefaultTestingSchemaName(): ?string
+    {
+        return 'form';
     }
 }

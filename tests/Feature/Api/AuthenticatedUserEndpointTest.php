@@ -47,7 +47,7 @@ final class AuthenticatedUserEndpointTest extends TestCase
         $response->assertOk()
             ->assertJsonPath('contract', 'user')
             ->assertJsonPath('version', 'v1')
-            ->assertJsonPath('data.item.id', $user->getKey());
+            ->assertJsonPath('data.id', $user->getKey());
     }
 
     public function test_endpoint_is_rate_limited(): void

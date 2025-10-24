@@ -200,9 +200,10 @@ final class ApiKey extends Model
      */
     public function resolvedScopes(): array
     {
-        return Collection::make(
-            Arr::wrap($this->scopes ?? $this->permissions ?? [])
-        )
+        $scopes = Arr::wrap($this->scopes ?? []);
+        $permissions = Arr::wrap($this->permissions ?? []);
+
+        return Collection::make(array_merge($scopes, $permissions))
             ->filter(static fn ($scope): bool => is_string($scope) && $scope !== '')
             ->unique()
             ->values()

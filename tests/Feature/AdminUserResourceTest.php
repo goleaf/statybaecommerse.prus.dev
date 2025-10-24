@@ -9,10 +9,11 @@ use App\Filament\Resources\AdminUserResource\Pages\EditAdminUser;
 use App\Filament\Resources\AdminUserResource\Pages\ListAdminUsers;
 use App\Filament\Resources\AdminUserResource\Pages\ViewAdminUser;
 use App\Models\AdminUser;
-use Hash;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Hash;
 use Livewire\Livewire;
 use Tests\TestCase;
 
@@ -20,18 +21,43 @@ final class AdminUserResourceTest extends TestCase
 {
     use RefreshDatabase;
 
+    private ?string $previousAuthGuard = null;
+
+    private ?string $previousFilamentGuard = null;
+
+    private AdminUser $adminUser;
+
     protected function setUp(): void
     {
         parent::setUp();
 
         // Resolve the full Filament admin panel so resource schemas are booted during tests.
         $this->resolveAdminPanel();
+
+        $this->previousAuthGuard = Config::get('auth.defaults.guard');
+        $this->previousFilamentGuard = Config::get('filament.auth.guard');
+
         Config::set('auth.defaults.guard', 'admin');
+        Config::set('filament.auth.guard', 'admin');
+        Auth::setDefaultDriver('admin');
+        Auth::shouldUse('admin');
 
         // Create a test admin user for authentication
         $this->adminUser = AdminUser::factory()->create([
             'email' => 'admin@example.com',
         ]);
+    }
+
+    protected function tearDown(): void
+    {
+        $guard = $this->previousAuthGuard ?? 'web';
+        Config::set('auth.defaults.guard', $guard);
+        Auth::shouldUse($guard);
+        Auth::setDefaultDriver($guard);
+
+        Config::set('filament.auth.guard', $this->previousFilamentGuard);
+
+        parent::tearDown();
     }
 
     public function test_can_list_admin_users(): void

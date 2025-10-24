@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Frontend;
 use App\Http\Controllers\Controller;
 use App\Models\Coupon;
 use App\Models\Discount;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
@@ -34,48 +35,102 @@ final class DiscountController extends Controller
         return view('frontend.discounts.coupons', compact('coupons'));
     }
 
-    public function applyCoupon(\App\Http\Requests\ApplyCouponRequest $request): RedirectResponse
+    public function applyCoupon(\App\Http\Requests\ApplyCouponRequest $request): RedirectResponse|JsonResponse
     {
         $validated = $request->validated();
+        $expectsJson = $request->expectsJson();
 
         $cart = Session::get('cart', []);
-        if (empty($cart)) {
+        $subtotal = isset($validated['cart']['subtotal'])
+            ? (float) $validated['cart']['subtotal']
+            : $this->buildCartSummary()['subtotal'];
+
+        if (! $expectsJson && empty($cart)) {
             return redirect()->route('frontend.cart.index')->withErrors([
                 'cart' => __('Add items to your cart before applying a coupon.'),
             ]);
         }
 
-        $coupon = Coupon::query()->valid()->byCode($validated['code'])->first();
+        $normalizedCode = strtoupper($validated['code']);
+        $coupon = Coupon::query()
+            ->valid()
+            ->whereRaw('upper(code) = ?', [$normalizedCode])
+            ->first();
 
         if (! $coupon) {
+            Session::forget('checkout.coupon');
+
+            if ($expectsJson) {
+                return response()->json([
+                    'success' => false,
+                    'message' => __('The provided coupon code is not valid.'),
+                ], 422);
+            }
+
             return redirect()->back()->withErrors([
                 'code' => __('The provided coupon code is not valid.'),
             ]);
         }
 
-        $summary = $this->buildCartSummary();
+        $minimumAmount = $coupon->minimum_amount !== null ? (float) $coupon->minimum_amount : null;
 
-        if ($coupon->minimum_amount && $summary['subtotal'] < $coupon->minimum_amount) {
+        if ($minimumAmount !== null && $subtotal < $minimumAmount) {
+            Session::forget('checkout.coupon');
+
+            if ($expectsJson) {
+                return response()->json([
+                    'success' => false,
+                    'message' => __('This coupon requires a minimum order amount of :amount.', [
+                        'amount' => app_money_format($minimumAmount),
+                    ]),
+                ], 422);
+            }
+
             return redirect()->back()->withErrors([
                 'code' => __('This coupon requires a minimum order amount of :amount.', ['amount' => app_money_format($coupon->minimum_amount ?? 0)]),
             ]);
         }
 
-        $discountAmount = $this->calculateDiscount($coupon, $summary['subtotal']);
+        $discountAmount = $this->calculateDiscount($coupon, $subtotal);
 
         Session::put('cart_discount', $discountAmount);
         Session::put('applied_coupon', [
             'id' => $coupon->getKey(),
             'code' => $coupon->code,
         ]);
+        Session::put('checkout.coupon', [
+            'id' => $coupon->getKey(),
+            'code' => $coupon->code,
+            'discount_amount' => $discountAmount,
+        ]);
+
+        if ($expectsJson) {
+            return response()->json([
+                'success' => true,
+                'coupon' => [
+                    'id' => $coupon->getKey(),
+                    'code' => $coupon->code,
+                    'type' => $coupon->type,
+                    'value' => (float) $coupon->value,
+                ],
+                'discount_amount' => $discountAmount,
+            ]);
+        }
 
         return redirect()->route('frontend.cart.index')->with('status', 'coupon-applied');
     }
 
-    public function removeCoupon(): RedirectResponse
+    public function removeCoupon(Request $request): RedirectResponse|JsonResponse
     {
         Session::forget('cart_discount');
         Session::forget('applied_coupon');
+        Session::forget('checkout.coupon');
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+            ]);
+        }
 
         return redirect()->route('frontend.cart.index')->with('status', 'coupon-removed');
     }

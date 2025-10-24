@@ -5,11 +5,13 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
+use App\Models\CartItem;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\UserWishlist;
 use App\Models\WishlistItem;
 use App\Services\Cart\CartService;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -68,13 +70,27 @@ final class ApiController extends Controller
 
     public function getCartCount(Request $request): JsonResponse
     {
-        $userId = $request->user()?->getAuthIdentifier();
-        $sessionId = $request->session()->getId();
+        $userIdentifier = $request->user()?->getAuthIdentifier();
+        $userId = $userIdentifier !== null ? (int) $userIdentifier : null;
+        $sessionId = (string) $request->session()->getId();
 
-        $count = $this->cartService->getCount(
-            $userId !== null ? (int) $userId : null,
-            $sessionId
-        );
+        if ($userId !== null) {
+            $databaseCount = CartItem::withoutGlobalScopes()
+                ->where(static function (Builder $query) use ($userId, $sessionId): void {
+                    $query->where('user_id', $userId);
+
+                    if ($sessionId !== '') {
+                        $query->orWhere('session_id', $sessionId);
+                    }
+                })
+                ->sum('quantity');
+
+            if ($databaseCount > 0) {
+                return response()->json(['count' => (int) $databaseCount]);
+            }
+        }
+
+        $count = $this->cartService->getCount(null, $sessionId);
 
         return response()->json(['count' => $count]);
     }
@@ -109,9 +125,10 @@ final class ApiController extends Controller
             return response()->json(['error' => 'Product not found'], 404);
         }
 
+        $userId = (int) $user->getAuthIdentifier();
         $variantId = $request->has('variant_id') ? (int) $request->integer('variant_id') : null;
 
-        $wishlist = $this->resolveDefaultWishlist((int) $user->getAuthIdentifier());
+        $wishlist = $this->resolveDefaultWishlist($userId);
 
         $wishlistItemQuery = $wishlist->items()
             ->where('product_id', $productId)
@@ -131,7 +148,9 @@ final class ApiController extends Controller
             $added = true;
         }
 
-        $count = $wishlist->items()->count();
+        $count = WishlistItem::query()
+            ->forUser($userId)
+            ->count();
 
         return response()->json([
             'added' => $added,
@@ -155,7 +174,7 @@ final class ApiController extends Controller
             ->whereIn('id', $orderedIds)
             ->get(['id', 'name', 'slug', 'price'])
             ->sortBy(static function (Product $product) use ($orderedIds): int {
-                $position = array_search($product->getKey(), $orderedIds, true);
+                $position = array_search((int) $product->getKey(), $orderedIds, true);
 
                 return $position === false ? PHP_INT_MAX : $position;
             })

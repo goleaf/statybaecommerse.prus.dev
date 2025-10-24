@@ -244,11 +244,11 @@ final class CategoryResourceTest extends TestCase
     {
         Livewire::test(\App\Filament\Resources\CategoryResource\Pages\CreateCategory::class)
             ->fillForm([
-                'name' => '',  // Required field
+                'name' => '',  // Required field for default locale
                 'slug' => 'invalid slug!',  // Invalid format
             ])
             ->call('create')
-            ->assertHasFormErrors(['name', 'slug']);
+            ->assertHasFormErrors(['name.lt', 'slug.lt']);
     }
 
     public function test_category_slug_auto_generation(): void
@@ -257,7 +257,7 @@ final class CategoryResourceTest extends TestCase
             ->fillForm([
                 'name' => 'Test Category Name',
             ])
-            ->assertFormSet('slug', 'test-category-name');
+            ->assertFormSet(['slug.lt' => 'test-category-name']);
     }
 
     public function test_category_parent_relationship(): void

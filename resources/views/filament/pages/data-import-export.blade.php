@@ -1,5 +1,3 @@
-@php(/** @var \App\Filament\Pages\DataImportExport $this */ null)
-
 <x-filament::page>
     <div class="space-y-6">
         {{ $this->form }}
@@ -128,6 +126,5 @@
         </x-filament::card>
     </div>
 </x-filament-panels::page>
-
 
 

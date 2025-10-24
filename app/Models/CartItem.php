@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Builders\CartItemBuilder;
 use App\Models\Scopes\UserOwnedScope;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -47,6 +48,11 @@ final class CartItem extends Model
             $item->price ??= $unitPrice;
             $item->total_price ??= max(0, ($unitPrice * $quantity) - $discount);
         });
+    }
+
+    public function newEloquentBuilder($query): CartItemBuilder
+    {
+        return new CartItemBuilder($query);
     }
 
     /**

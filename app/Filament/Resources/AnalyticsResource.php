@@ -36,7 +36,7 @@ final class AnalyticsResource extends Resource
     /**
      * Keep the union aligned with the Filament base so enum-backed groups resolve correctly.
      */
-    protected static \UnitEnum|string|null $navigationGroup = NavigationGroup::Analytics;
+    protected static \UnitEnum|string|null $navigationGroup = NavigationGroup::Analytics->value;
 
     public static function getNavigationLabel(): string
     {
@@ -184,10 +184,7 @@ final class AnalyticsResource extends Resource
                 Filter::make('created_at')
                     ->label(__('analytics.order_date_range'))
                     ->form([
-                        SupportFlatpickr::makeRange('range')
-                            ->label(__('analytics.from_date'))
-                            ->format('Y-m-d')
-                            ->displayFormat('Y-m-d'),
+                        SupportFlatpickr::makeRange('range', displayFormat: 'Y-m-d', format: 'Y-m-d'),
                     ])
                     ->indicateUsing(static fn (array $data): ?string => isset($data['range']['start'], $data['range']['end'])
                         ? __('analytics.order_date_range') . ': ' . $data['range']['start'] . ' → ' . $data['range']['end']

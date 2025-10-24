@@ -548,7 +548,7 @@ final class SystemSetting extends Model implements HasMedia
      */
     public function validateValue($value): bool
     {
-        $rules = $this->getValidationRulesArray();
+        $rules = $this->getValidationRulesForForm();
         if (empty($rules)) {
             return true;
         }
@@ -564,7 +564,7 @@ final class SystemSetting extends Model implements HasMedia
      */
     public function getValidationErrors($value): array
     {
-        $rules = $this->getValidationRulesArray();
+        $rules = $this->getValidationRulesForForm();
         if (empty($rules)) {
             return [];
         }
@@ -658,7 +658,7 @@ final class SystemSetting extends Model implements HasMedia
      */
     public function getActiveDependencies()
     {
-        return $this->dependencies()->active()->with('dependsOnSettingRelation')->get();
+        return $this->dependencies()->active()->with('dependsOnSetting')->get();
     }
 
     /**

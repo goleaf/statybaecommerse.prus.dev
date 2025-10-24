@@ -202,11 +202,7 @@ final class VariantStockHistoryResource extends Resource
                 Filter::make('created_at')
                     ->label(__('admin.variant_stock_histories.filters.created_at'))
                     ->form([
-                        SupportFlatpickr::makeRange('range')
-                            ->label(__('admin.variant_stock_histories.filters.created_at'))
-
-                            ->format('Y-m-d')
-                            ->displayFormat('Y-m-d'),
+                        SupportFlatpickr::makeRange('range', displayFormat: 'Y-m-d', format: 'Y-m-d'),
                     ])
                     ->query(fn (Builder $query, array $data): Builder => DateRangeFilter::apply(
                         $query,

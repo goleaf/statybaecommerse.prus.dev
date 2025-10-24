@@ -21,7 +21,7 @@ it('feature: can create a customer group with legacy fields only', function () {
 
     expect($customerGroup->name)->toBe('VIP Customers');
     expect($customerGroup->code)->toBe('VIP');
-    expect($customerGroup->discount_percentage)->toBe('15.00');
+    expect($customerGroup->discount_percentage)->toBe(15.0);
     expect($customerGroup->is_enabled)->toBeTrue();
 });
 
@@ -39,7 +39,7 @@ it('feature: can update customer group legacy fields', function () {
         'is_enabled' => false,
     ]);
 
-    expect($customerGroup->fresh()->discount_percentage)->toBe('10.00');
+    expect($customerGroup->fresh()->discount_percentage)->toBe(10.0);
     expect($customerGroup->fresh()->is_enabled)->toBeFalse();
 });
 

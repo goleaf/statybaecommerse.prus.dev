@@ -56,7 +56,7 @@
                                               d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
                                         </path>
                                     </svg>
-                                    {{ $post->views_count }} {{ __('posts.views', 'views') }}
+                                    {{ $post->views_count }} {{ __('posts.views') }}
                                 </span>
                             </div>
 
@@ -88,7 +88,7 @@
                     <!-- Tags -->
                     @if ($post->getTranslatedTags())
                         <div class="mb-8">
-                            <h3 class="text-lg font-semibold text-gray-900 mb-3">{{ __('posts.tags', 'Tags') }}</h3>
+                            <h3 class="text-lg font-semibold text-gray-900 mb-3">{{ __('posts.tags') }}</h3>
                             <div class="flex flex-wrap gap-2">
                                 @foreach (explode(',', $post->getTranslatedTags()) as $tag)
                                     <span
@@ -110,7 +110,7 @@
                                           d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z">
                                     </path>
                                 </svg>
-                                {{ __('posts.like', 'Like') }}
+                                {{ __('posts.like') }}
                             </button>
 
                             <button
@@ -120,12 +120,12 @@
                                           d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z">
                                     </path>
                                 </svg>
-                                {{ __('posts.share', 'Share') }}
+                                {{ __('posts.share') }}
                             </button>
                         </div>
 
                         <div class="text-sm text-gray-500">
-                            {{ __('posts.last_updated', 'Last updated') }}: {{ $post->updated_at->format('d/m/Y H:i') }}
+                            {{ __('posts.last_updated') }}: {{ $post->updated_at->format('d/m/Y H:i') }}
                         </div>
                     </div>
                 </div>
@@ -134,7 +134,7 @@
             <!-- Gallery -->
             @if ($post->getMedia('gallery')->count() > 0)
                 <div class="mt-12">
-                    <h2 class="text-2xl font-bold text-gray-900 mb-6">{{ __('posts.gallery', 'Gallery') }}</h2>
+                    <h2 class="text-2xl font-bold text-gray-900 mb-6">{{ __('posts.gallery') }}</h2>
                     <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                         @foreach ($post->getMedia('gallery') as $image)
                             <div class="aspect-square">
@@ -151,7 +151,7 @@
             <!-- Related Posts -->
             @if ($relatedPosts->count() > 0)
                 <div class="mt-12">
-                    <h2 class="text-2xl font-bold text-gray-900 mb-6">{{ __('posts.related_posts', 'Related Posts') }}</h2>
+                    <h2 class="text-2xl font-bold text-gray-900 mb-6">{{ __('posts.related_posts') }}</h2>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                         @foreach ($relatedPosts as $relatedPost)
                             <article
@@ -174,7 +174,7 @@
 
                                     <div class="flex items-center justify-between text-sm text-gray-500">
                                         <span>{{ $relatedPost->published_at?->format('d/m/Y') }}</span>
-                                        <span>{{ $relatedPost->views_count }} {{ __('posts.views', 'views') }}</span>
+                                        <span>{{ $relatedPost->views_count }} {{ __('posts.views') }}</span>
                                     </div>
                                 </div>
                             </article>
@@ -225,4 +225,3 @@
         });
     </script>
 @endsection
-

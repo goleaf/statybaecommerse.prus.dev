@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Enums\ScheduleType;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -37,6 +38,7 @@ final class CampaignSchedule extends Model
             'schedule_config' => 'array',
             'next_run_at' => 'datetime',
             'last_run_at' => 'datetime',
+            'schedule_type' => ScheduleType::class,
             'is_active' => 'boolean',
         ];
     }

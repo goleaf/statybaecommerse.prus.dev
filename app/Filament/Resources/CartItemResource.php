@@ -14,20 +14,20 @@ use App\Support\Filament\SearchableInputHelper;
 use App\Support\Search\ProductSearch;
 use BackedEnum;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
+use Filament\Forms;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Textarea;
+use Filament\Notifications\Notification;
+use Filament\Resources\Resource;
+use Filament\Schemas\Components\Grid as SchemaGrid;
+use Filament\Schemas\Components\Section as SchemaSection;
+use Filament\Schemas\Schema;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Forms;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Form;
-use Filament\Notifications\Notification;
-use Filament\Resources\Resource;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
@@ -66,12 +66,12 @@ final class CartItemResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form->schema([
-            Section::make(__('cart_items.basic_information'))
+        return $schema->schema([
+            SchemaSection::make(__('cart_items.basic_information'))
                 ->schema([
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             Select::make('user_id')
                                 ->label(__('cart_items.user'))
@@ -169,7 +169,7 @@ final class CartItemResource extends Resource
                         ->readOnly()
                         ->dehydrated(false)
                         ->maxLength(255),
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->schema([
                             TextInput::make('quantity')
                                 ->label(__('cart_items.quantity'))
@@ -198,9 +198,9 @@ final class CartItemResource extends Resource
                         ->rows(3)
                         ->maxLength(1000),
                 ]),
-            Section::make(__('cart_items.pricing'))
+            SchemaSection::make(__('cart_items.pricing'))
                 ->schema([
-                    Grid::make(3)
+                    SchemaGrid::make(3)
                         ->schema([
                             TextInput::make('unit_price')
                                 ->label(__('cart_items.unit_price'))
@@ -235,7 +235,7 @@ final class CartItemResource extends Resource
                                 ->dehydrated(),
                         ]),
                 ]),
-            Section::make(__('cart_items.additional_info'))
+            SchemaSection::make(__('cart_items.additional_info'))
                 ->schema([
                     Forms\Components\KeyValue::make('attributes')
                         ->label(__('cart_items.attributes'))
@@ -256,7 +256,7 @@ final class CartItemResource extends Resource
     /**
      * Configure the Filament table with columns, filters, and actions.
      */
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         // Configure the table definition for the streamlined Filament v4 return type.
         return $table

@@ -229,6 +229,7 @@ final class CacheInvalidator
             Cache::forget('nav:main_categories:'.$locale);
             Cache::forget('nav:featured_brands:'.$locale);
             Cache::forget('nav:featured_collections:'.$locale);
+            Cache::forget(CacheKeys::categoryNavigationTree().':'.$locale);
         }
 
         foreach ([6, 10] as $limit) {
@@ -249,6 +250,7 @@ final class CacheInvalidator
             Cache::forget("category_nav_tree:{$locale}");
             Cache::forget("mobile_category_tree:{$locale}");
             Cache::forget('nav:main_categories:'.$locale);
+            Cache::forget(CacheKeys::categoryNavigationTree().':'.$locale);
         }
 
         Cache::forget(CacheKeys::categoryNavigationTree());

@@ -17,6 +17,15 @@
             "type": "object",
             "additionalProperties": false,
             "properties": {
+                "product": {
+                    "$ref": "#/$defs/product"
+                },
+                "products": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/$defs/product"
+                    }
+                },
                 "item": {
                     "$ref": "#/$defs/product"
                 },
@@ -51,6 +60,12 @@
                 }
             },
             "anyOf": [
+                {
+                    "required": ["product"]
+                },
+                {
+                    "required": ["products"]
+                },
                 {
                     "required": ["item"]
                 },
