@@ -28,9 +28,10 @@ return [
     // Document Status
     'statuses' => [
         'draft' => 'Draft',
+        'generated' => 'Generated',
+        'sent' => 'Sent',
         'published' => 'Published',
         'archived' => 'Archived',
-        'pending' => 'Pending Review',
     ],
 
     // Document Format

@@ -35,7 +35,7 @@ Route::middleware('auth')->group(function (): void {
         ->name('filament.admin.resources.variant-combinations.edit');
 
     Route::get('/admin/news-image-resources', function (Request $request) {
-        $forwarded = RequestFacade::create('/admin/news-images', 'GET', $request->query());
+        $forwarded = Request::create('/admin/news-images', 'GET', $request->query());
 
         return app()->handle($forwarded);
     });
