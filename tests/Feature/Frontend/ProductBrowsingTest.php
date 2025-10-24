@@ -70,7 +70,6 @@ final class ProductBrowsingTest extends TestCase
 
         $this->get(route('frontend.products.index', ['category' => $categoryA->slug]))
             ->assertOk()
-            ->dump()
             ->assertSeeText($productA->name)
             ->assertDontSeeText($productB->name);
 
