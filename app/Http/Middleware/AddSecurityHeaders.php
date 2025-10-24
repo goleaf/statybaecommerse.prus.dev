@@ -1,11 +1,8 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Http\Middleware;
 
 use App\Support\Security\CspNonce;
-use Closure;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\Request;
@@ -15,10 +12,13 @@ use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use Closure;
 
 final class AddSecurityHeaders
 {
-    public function __construct(private readonly ConfigRepository $config) {}
+    public function __construct(
+        private readonly ConfigRepository $config
+    ) {}
 
     public function handle(Request $request, Closure $next): Response
     {
@@ -28,7 +28,7 @@ final class AddSecurityHeaders
         /** @var Response $response */
         $response = $next($request);
 
-        if (! $this->config->get('security.headers.enabled', true)) {
+        if (!$this->config->get('security.headers.enabled', true)) {
             return $response;
         }
 
@@ -65,12 +65,12 @@ final class AddSecurityHeaders
     private function applyStaticHeaders(Response $response): void
     {
         $headers = $this->config->get('security.headers.values', []);
-        if (! is_array($headers)) {
+        if (!is_array($headers)) {
             return;
         }
 
         foreach ($headers as $header => $value) {
-            if (! is_string($header) || $header === '' || strcasecmp($header, 'Permissions-Policy') === 0 || strcasecmp($header, 'Strict-Transport-Security') === 0) {
+            if (!is_string($header) || $header === '' || strcasecmp($header, 'Permissions-Policy') === 0 || strcasecmp($header, 'Strict-Transport-Security') === 0) {
                 continue;
             }
 
@@ -88,14 +88,14 @@ final class AddSecurityHeaders
     private function applyPermissionsPolicy(Response $response): void
     {
         $policies = $this->config->get('security.headers.permissions_policy', []);
-        if (! is_array($policies) || $policies === []) {
+        if (!is_array($policies) || $policies === []) {
             return;
         }
 
         $compiled = [];
 
         foreach ($policies as $feature => $values) {
-            if (! is_string($feature) || $feature === '') {
+            if (!is_string($feature) || $feature === '') {
                 continue;
             }
 
@@ -117,7 +117,7 @@ final class AddSecurityHeaders
     private function applyStrictTransportSecurity(Response $response): void
     {
         $config = $this->config->get('security.headers.hsts', []);
-        if (! is_array($config) || empty($config['enabled'])) {
+        if (!is_array($config) || empty($config['enabled'])) {
             return;
         }
 
@@ -128,11 +128,11 @@ final class AddSecurityHeaders
 
         $parts = ["max-age={$maxAge}"];
 
-        if (! empty($config['include_subdomains'])) {
+        if (!empty($config['include_subdomains'])) {
             $parts[] = 'includeSubDomains';
         }
 
-        if (! empty($config['preload'])) {
+        if (!empty($config['preload'])) {
             $parts[] = 'preload';
         }
 
@@ -142,7 +142,7 @@ final class AddSecurityHeaders
     private function applyContentSecurityPolicy(Response $response, ?CspNonce $nonce): void
     {
         $directives = $this->config->get('security.headers.content_security_policy.directives', []);
-        if (! is_array($directives) || $directives === []) {
+        if (!is_array($directives) || $directives === []) {
             return;
         }
 
@@ -151,7 +151,7 @@ final class AddSecurityHeaders
         $compiled = [];
 
         foreach ($directives as $directive => $values) {
-            if (! is_string($directive) || $directive === '') {
+            if (!is_string($directive) || $directive === '') {
                 continue;
             }
 
@@ -187,12 +187,12 @@ final class AddSecurityHeaders
         }
 
         $contentType = $response->headers->get('Content-Type');
-        if (! is_string($contentType) || ! Str::contains(Str::lower($contentType), 'text/html')) {
+        if (!is_string($contentType) || !Str::contains(Str::lower($contentType), 'text/html')) {
             return;
         }
 
         $content = $response->getContent();
-        if (! is_string($content) || $content === '') {
+        if (!is_string($content) || $content === '') {
             return;
         }
 
@@ -205,29 +205,73 @@ final class AddSecurityHeaders
         }
 
         $nonceValue = $nonce?->value();
-        if (! is_string($nonceValue) || $nonceValue === '') {
+        if (!is_string($nonceValue) || $nonceValue === '') {
             return;
         }
 
-        // Inject nonces into inline scripts and styles so they satisfy strict CSP directives.
-        $scriptPattern = '/<script(?![^>]*\\bsrc=)(?![^>]*\\bnonce=)([^>]*)>/i';
-        $stylePattern = '/<style(?![^>]*\\bnonce=)([^>]*)>/i';
-
-        $updated = preg_replace($scriptPattern, '<script$1 nonce="' . $nonceValue . '">', $content);
-        if ($updated === null) {
-            return;
-        }
-
-        $updated = preg_replace($stylePattern, '<style$1 nonce="' . $nonceValue . '">', $updated);
-        if ($updated === null) {
-            return;
-        }
-
-        $response->setContent($updated);
+        $response->setContent($this->injectNonceIntoHtml($content, $nonceValue));
 
         if ($shouldRestoreOriginal && $response instanceof HttpResponse) {
             $response->original = $originalContent;
         }
+    }
+
+    private function injectNonceIntoHtml(string $html, string $nonce): string
+    {
+        if ($html === '') {
+            return $html;
+        }
+
+        $tokens = token_get_all('<?php ' . $html);
+        $result = '';
+        $depth = 0;
+
+        foreach ($tokens as $token) {
+            if (is_array($token)) {
+                [$id, $text] = $token;
+
+                if ($id === T_INLINE_HTML) {
+                    $result .= $this->injectNonceIntoInlineHtml($text, $nonce);
+                    continue;
+                }
+
+                $result .= $text;
+
+                continue;
+            }
+
+            $symbol = $token;
+
+            if ($symbol === '{') {
+                $depth++;
+            } elseif ($symbol === '}') {
+                $depth = max(0, $depth - 1);
+            }
+
+            $result .= $symbol;
+        }
+
+        return str_replace('<?php ', '', $result);
+    }
+
+    private function injectNonceIntoInlineHtml(string $html, string $nonce): string
+    {
+        if ($html === '') {
+            return $html;
+        }
+
+        $patterns = [
+            '/(<script\b[^>]*)(?<!nonce=)(>)/i',
+            '/(<style\b[^>]*)(?<!nonce=)(>)/i',
+        ];
+
+        $replacement = static fn(array $matches): string => $matches[1] . ' nonce="' . e($nonce) . '"' . $matches[2];
+
+        foreach ($patterns as $pattern) {
+            $html = preg_replace_callback($pattern, $replacement, $html) ?? $html;
+        }
+
+        return $html;
     }
 
     private function normalisePermissionSources(mixed $values): ?string
@@ -240,14 +284,14 @@ final class AddSecurityHeaders
             return '()';
         }
 
-        if (! is_array($values)) {
+        if (!is_array($values)) {
             return null;
         }
 
         $sources = [];
 
         foreach ($values as $value) {
-            if (! is_string($value)) {
+            if (!is_string($value)) {
                 continue;
             }
 
@@ -280,7 +324,7 @@ final class AddSecurityHeaders
             return [];
         }
 
-        if (! is_array($values)) {
+        if (!is_array($values)) {
             return null;
         }
 
@@ -289,7 +333,7 @@ final class AddSecurityHeaders
         $hadNoncePlaceholder = false;
 
         foreach ($values as $value) {
-            if (! is_string($value)) {
+            if (!is_string($value)) {
                 continue;
             }
 

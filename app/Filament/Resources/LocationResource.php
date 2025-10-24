@@ -94,7 +94,7 @@ final class LocationResource extends Resource
                                 ->searchable()
                                 ->preload()
                                 ->live(onBlur: true)
-                                ->afterStateUpdated(function (?string $state, Forms\Set $set): void {
+                                ->afterStateUpdated(function (?string $state, Forms\Set $set, Forms\Get $get): void {
                                     if (! $state) {
                                         $set('country_id', null);
                                         $set('city_id', null);
@@ -109,8 +109,21 @@ final class LocationResource extends Resource
                                         $set('country_id', $country->getKey());
                                     }
 
-                                    $set('city_id', null);
-                                    $set('city_code', null);
+                                    $currentCityId = $get('city_id');
+
+                                    if ($currentCityId) {
+                                        $city = City::withoutGlobalScopes()->find($currentCityId);
+
+                                        if (! $city || ($city->country && ($city->country->cca2 ?? $city->country->code) !== $state)) {
+                                            $set('city_id', null);
+                                            $set('city_code', null);
+                                        } else {
+                                            $set('city_code', $city->code);
+                                        }
+                                    } else {
+                                        $set('city_id', null);
+                                        $set('city_code', null);
+                                    }
                                 })
                                 ->afterStateHydrated(function (?string $state, Forms\Set $set, Forms\Get $get): void {
                                     if (! $state) {
@@ -127,10 +140,23 @@ final class LocationResource extends Resource
                                     $currentCityId = $get('city_id');
                                     if ($currentCityId) {
                                         $city = City::withoutGlobalScopes()->find($currentCityId);
-                                        if (! $city || ($city->country && ($city->country->cca2 ?? $city->country->code) !== $state)) {
+                                        if (! $city) {
                                             $set('city_id', null);
                                             $set('city_code', null);
+
+                                            return;
                                         }
+
+                                        if ($city->country) {
+                                            $cityCountryCode = $city->country->cca2 ?? $city->country->code;
+
+                                            if ($cityCountryCode !== $state) {
+                                                $set('country_code', $cityCountryCode);
+                                                $set('country_id', $city->country->getKey());
+                                            }
+                                        }
+
+                                        $set('city_code', $city->code);
                                     }
                                 }),
                             Select::make('city_id')

@@ -364,7 +364,7 @@ final class NewsCommentResourceTest extends TestCase
         $news = News::factory()->create();
         $parentComment = NewsComment::factory()->create(['news_id' => $news->id]);
 
-        $component = Livewire::test(\App\Filament\Resources\NewsCommentResource\Pages\CreateNewsComment::class)
+        Livewire::test(\App\Filament\Resources\NewsCommentResource\Pages\CreateNewsComment::class)
             ->fillForm([
                 'news_id' => $news->id,
                 'parent_id' => $parentComment->id,
@@ -373,11 +373,9 @@ final class NewsCommentResourceTest extends TestCase
                 'news_id' => $news->id,
                 'parent_id' => $parentComment->id,
             ])
-            ->fillForm([
-                'author_name' => 'Child Author',
-                'author_email' => 'child@example.com',
-                'content' => 'This is a reply',
-            ])
+            ->set('data.author_name', 'Child Author')
+            ->set('data.author_email', 'child@example.com')
+            ->set('data.content', 'This is a reply')
             ->call('create')
             ->assertHasNoFormErrors();
 

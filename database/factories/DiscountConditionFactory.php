@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Database\Factories;
 
@@ -39,7 +37,7 @@ final class DiscountConditionFactory extends Factory
             'operator' => $operator,
             'value' => $this->generateValueForType($type),
             'position' => $this->faker->numberBetween(0, 10),
-            'is_active' => $this->faker->boolean(80), // 80% chance of being active
+            'is_active' => $this->faker->boolean(80),  // 80% chance of being active
             'priority' => $this->faker->numberBetween(0, 10),
             'metadata' => $metadata === null ? null : (array) $metadata,
         ];
@@ -64,7 +62,7 @@ final class DiscountConditionFactory extends Factory
      */
     public function active(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'is_active' => true,
         ]);
     }
@@ -74,7 +72,7 @@ final class DiscountConditionFactory extends Factory
      */
     public function inactive(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'is_active' => false,
         ]);
     }
@@ -84,7 +82,7 @@ final class DiscountConditionFactory extends Factory
      */
     public function highPriority(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'priority' => $this->faker->numberBetween(6, 10),
         ]);
     }
@@ -94,7 +92,7 @@ final class DiscountConditionFactory extends Factory
      */
     public function lowPriority(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'priority' => $this->faker->numberBetween(0, 5),
         ]);
     }
@@ -104,7 +102,7 @@ final class DiscountConditionFactory extends Factory
      */
     public function cartTotal(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'type' => 'cart_total',
             'operator' => $this->faker->randomElement(['greater_than', 'less_than', 'equals_to']),
             'value' => $this->faker->numberBetween(10, 500),
@@ -116,7 +114,7 @@ final class DiscountConditionFactory extends Factory
      */
     public function product(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'type' => 'product',
             'operator' => $this->faker->randomElement(['equals_to', 'contains', 'starts_with']),
             'value' => $this->faker->word(),
@@ -128,7 +126,7 @@ final class DiscountConditionFactory extends Factory
      */
     public function category(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'type' => 'category',
             'operator' => $this->faker->randomElement(['equals_to', 'contains', 'in_array']),
             'value' => $this->faker->randomElements(['electronics', 'clothing', 'books', 'home'], 2),

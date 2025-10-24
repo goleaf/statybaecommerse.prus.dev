@@ -76,6 +76,13 @@ return [
             'description' => 'Description',
             'help_text' => 'Help Text',
             'help_text_help' => 'Additional context displayed in the admin interface',
+            'locales' => [
+                'lt' => 'Lithuanian',
+                'en' => 'English',
+                'de' => 'German',
+                'fr' => 'French',
+                'es' => 'Spanish',
+            ],
         ],
     ],
     'user_product_interactions' => [
