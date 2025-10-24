@@ -27,6 +27,12 @@ final class DiscountConditionFactory extends Factory
         $operators = array_keys(DiscountCondition::getOperatorsForType($type));
         $operator = $this->faker->randomElement($operators);
 
+        $metadata = $this->faker->optional(0.3)->randomElements([
+            'test' => 'data',
+            'category' => 'electronics',
+            'brand' => 'test_brand',
+        ]);
+
         return [
             'discount_id' => Discount::factory(),
             'type' => $type,
@@ -35,11 +41,7 @@ final class DiscountConditionFactory extends Factory
             'position' => $this->faker->numberBetween(0, 10),
             'is_active' => $this->faker->boolean(80), // 80% chance of being active
             'priority' => $this->faker->numberBetween(0, 10),
-            'metadata' => $this->faker->optional(0.3)->randomElements([
-                'test' => 'data',
-                'category' => 'electronics',
-                'brand' => 'test_brand',
-            ]),
+            'metadata' => $metadata === null ? null : (array) $metadata,
         ];
     }
 

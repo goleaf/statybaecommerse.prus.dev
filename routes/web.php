@@ -5,10 +5,11 @@ declare(strict_types=1);
 use App\Http\Controllers\Api\V1\HealthController;
 use App\Http\Controllers\ApiDocsController;
 use App\Http\Controllers\LocaleController;
+use App\Http\Controllers\MailPreviewController;
 use App\Http\Controllers\NewsCommentController;
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\SecureMediaDownloadController;
-use App\Http\Controllers\MailPreviewController;
+use App\Http\Controllers\TestResultsController;
 use App\Models\Discount;
 use Illuminate\Support\Facades\Route;
 
@@ -43,7 +44,7 @@ Route::middleware(['web'])->group(function () {
     Route::get('/variant-showcase', App\Livewire\ProductVariantShowcase::class)->name('variant-showcase');
 
     // Sequential test status dashboard
-    Route::get('/test-results', App\Livewire\TestResultsDashboard::class)->name('test-results');
+    Route::get('/test-results', [TestResultsController::class, '__invoke'])->name('test-results');
 
     Route::prefix('news')->name('news.')->group(function (): void {
         Route::get('/', [NewsController::class, 'index'])->name('index');

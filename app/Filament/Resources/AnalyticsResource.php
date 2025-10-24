@@ -4,16 +4,13 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use App\Enums\NavigationGroup;
 use App\Filament\Resources\AnalyticsResource\Pages;
 use App\Models\Order;
 use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
 use App\Support\Filament\Filters\DateRangeFilter;
-use BackedEnum;
-use Filament\Schemas\Schema;
-use Filament\Resources\Resource;
 use Filament\Actions\ViewAction;
+use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\Summarizers\Average;
 use Filament\Tables\Columns\Summarizers\Count;
 use Filament\Tables\Columns\Summarizers\Sum;
@@ -24,19 +21,12 @@ use Filament\Tables\Grouping\Group;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable as SpatieTranslatableResource;
+
 final class AnalyticsResource extends Resource
 {
-    use SpatieTranslatableResource; // Align translation support with other resources.
+    use SpatieTranslatableResource;  // Align translation support with other resources.
 
-    /**
-     * Mirror the Filament base class union so icon definitions support both enum-backed and string identifiers.
-     */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar-square';
-
-    /**
-     * Keep the union aligned with the Filament base so enum-backed groups resolve correctly.
-     */
-    protected static \UnitEnum|string|null $navigationGroup = NavigationGroup::Analytics->value;
+    // Use base Resource properties for navigation icon/group to avoid type conflicts in PHP.
 
     public static function getNavigationLabel(): string
     {
@@ -66,17 +56,17 @@ final class AnalyticsResource extends Resource
         return $count > 0 ? (string) $count : null;
     }
 
-    public static function getNavigationBadgeColor(): string|array|null
+    public static function getNavigationBadgeColor(): string
     {
         return 'warning';
     }
 
-    public static function form(Schema $schema): Schema   
+    public static function form(Schema $schema): Schema
     {
         return $schema;
     }
 
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         // Configure the table definition for the streamlined Filament v4 return type.
         return $table

@@ -6,6 +6,7 @@ namespace Database\Factories;
 
 use App\Models\Campaign;
 use App\Models\CampaignCustomerSegment;
+use App\Models\CustomerGroup;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -21,32 +22,25 @@ final class CampaignCustomerSegmentFactory extends Factory
         $segmentType = fake()->randomElement($segmentTypes);
 
         return [
-            'campaign_id' => Campaign::factory(),
-            'customer_group_id' => function () {
-                $existingGroups = \App\Models\CustomerGroup::query()->get();
-                if ($existingGroups->isNotEmpty()) {
-                    return $existingGroups->random()->id;
-                }
-
-                return \App\Models\CustomerGroup::factory();
-            },
-            'segment_type' => $segmentType,
-            'segment_criteria' => $this->generateSegmentCriteria($segmentType),
-            'targeting_tags' => $this->generateTargetingTags($segmentType),
+            'campaign_id'       => Campaign::factory(),
+            'customer_group_id' => CustomerGroup::factory(),
+            'segment_type'      => $segmentType,
+            'segment_criteria'  => $this->generateSegmentCriteria($segmentType),
+            'targeting_tags'    => $this->generateTargetingTags($segmentType),
             'custom_conditions' => $this->generateCustomConditions($segmentType),
             'track_performance' => fake()->boolean(80),
-            'auto_optimize' => fake()->boolean(30),
-            'is_active' => true,
-            'sort_order' => fake()->numberBetween(1, 100),
+            'auto_optimize'     => fake()->boolean(30),
+            'is_active'         => true,
+            'sort_order'        => fake()->numberBetween(1, 100),
         ];
     }
 
     public function demographic(): static
     {
         return $this->state(fn (array $attributes) => [
-            'segment_type' => 'demographic',
-            'segment_criteria' => $this->generateDemographicCriteria(),
-            'targeting_tags' => ['age_group', 'gender', 'income_level', 'education'],
+            'segment_type'      => 'demographic',
+            'segment_criteria'  => $this->generateDemographicCriteria(),
+            'targeting_tags'    => ['age_group', 'gender', 'income_level', 'education'],
             'custom_conditions' => fake()->randomElement([
                 'Age between 18-65 and income above average',
                 'University education or higher',
@@ -59,9 +53,9 @@ final class CampaignCustomerSegmentFactory extends Factory
     public function behavioral(): static
     {
         return $this->state(fn (array $attributes) => [
-            'segment_type' => 'behavioral',
-            'segment_criteria' => $this->generateBehavioralCriteria(),
-            'targeting_tags' => ['purchase_frequency', 'loyalty_level', 'browsing_behavior'],
+            'segment_type'      => 'behavioral',
+            'segment_criteria'  => $this->generateBehavioralCriteria(),
+            'targeting_tags'    => ['purchase_frequency', 'loyalty_level', 'browsing_behavior'],
             'custom_conditions' => fake()->randomElement([
                 'Purchase frequency > 2 per month',
                 'Cart abandonment rate < 20%',
@@ -74,9 +68,9 @@ final class CampaignCustomerSegmentFactory extends Factory
     public function geographic(): static
     {
         return $this->state(fn (array $attributes) => [
-            'segment_type' => 'geographic',
-            'segment_criteria' => $this->generateGeographicCriteria(),
-            'targeting_tags' => ['country', 'region', 'city', 'timezone'],
+            'segment_type'      => 'geographic',
+            'segment_criteria'  => $this->generateGeographicCriteria(),
+            'targeting_tags'    => ['country', 'region', 'city', 'timezone'],
             'custom_conditions' => fake()->randomElement([
                 'Located in major metropolitan areas',
                 'Shipping zone: EU countries only',
@@ -89,9 +83,9 @@ final class CampaignCustomerSegmentFactory extends Factory
     public function psychographic(): static
     {
         return $this->state(fn (array $attributes) => [
-            'segment_type' => 'psychographic',
-            'segment_criteria' => $this->generatePsychographicCriteria(),
-            'targeting_tags' => ['lifestyle', 'interests', 'values', 'personality'],
+            'segment_type'      => 'psychographic',
+            'segment_criteria'  => $this->generatePsychographicCriteria(),
+            'targeting_tags'    => ['lifestyle', 'interests', 'values', 'personality'],
             'custom_conditions' => fake()->randomElement([
                 'High interest in technology and innovation',
                 'Environmentally conscious lifestyle',
@@ -119,43 +113,43 @@ final class CampaignCustomerSegmentFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'track_performance' => true,
-            'auto_optimize' => true,
-            'is_active' => true,
+            'auto_optimize'     => true,
+            'is_active'         => true,
         ]);
     }
 
     private function generateSegmentCriteria(string $segmentType): array
     {
         return match ($segmentType) {
-            'demographic' => $this->generateDemographicCriteria(),
-            'behavioral' => $this->generateBehavioralCriteria(),
-            'geographic' => $this->generateGeographicCriteria(),
+            'demographic'   => $this->generateDemographicCriteria(),
+            'behavioral'    => $this->generateBehavioralCriteria(),
+            'geographic'    => $this->generateGeographicCriteria(),
             'psychographic' => $this->generatePsychographicCriteria(),
-            default => ['custom' => 'generic_segment'],
+            default         => ['custom' => 'generic_segment'],
         };
     }
 
     private function generateDemographicCriteria(): array
     {
         return [
-            'age_range' => fake()->randomElement(['18-25', '26-35', '36-50', '51-65', '65+']),
-            'gender' => fake()->randomElement(['male', 'female', 'other']),
+            'age_range'    => fake()->randomElement(['18-25', '26-35', '36-50', '51-65', '65+']),
+            'gender'       => fake()->randomElement(['male', 'female', 'other']),
             'income_level' => fake()->randomElement(['low', 'medium', 'high', 'very_high']),
-            'education' => fake()->randomElement(['high_school', 'bachelor', 'master', 'phd']),
-            'occupation' => fake()->jobTitle(),
-            'location' => fake()->city(),
+            'education'    => fake()->randomElement(['high_school', 'bachelor', 'master', 'phd']),
+            'occupation'   => fake()->jobTitle(),
+            'location'     => fake()->city(),
         ];
     }
 
     private function generateBehavioralCriteria(): array
     {
         return [
-            'purchase_frequency' => fake()->randomElement(['low', 'medium', 'high', 'very_high']),
-            'loyalty_level' => fake()->randomElement(['new', 'regular', 'loyal', 'vip']),
-            'browsing_behavior' => fake()->randomElement(['casual', 'frequent', 'intensive']),
-            'cart_abandonment' => fake()->randomElement(['low', 'medium', 'high']),
-            'last_purchase_days' => fake()->numberBetween(1, 365),
-            'total_orders' => fake()->numberBetween(1, 100),
+            'purchase_frequency'  => fake()->randomElement(['low', 'medium', 'high', 'very_high']),
+            'loyalty_level'       => fake()->randomElement(['new', 'regular', 'loyal', 'vip']),
+            'browsing_behavior'   => fake()->randomElement(['casual', 'frequent', 'intensive']),
+            'cart_abandonment'    => fake()->randomElement(['low', 'medium', 'high']),
+            'last_purchase_days'  => fake()->numberBetween(1, 365),
+            'total_orders'        => fake()->numberBetween(1, 100),
             'average_order_value' => fake()->randomFloat(2, 10, 500),
         ];
     }
@@ -163,9 +157,9 @@ final class CampaignCustomerSegmentFactory extends Factory
     private function generateGeographicCriteria(): array
     {
         return [
-            'country' => fake()->randomElement(['Lithuania', 'Latvia', 'Estonia', 'Poland', 'Germany']),
-            'region' => fake()->randomElement(['Vilnius', 'Kaunas', 'Klaipėda', 'Šiauliai', 'Panevėžys']),
-            'city' => fake()->city(),
+            'country'  => fake()->randomElement(['Lithuania', 'Latvia', 'Estonia', 'Poland', 'Germany']),
+            'region'   => fake()->randomElement(['Vilnius', 'Kaunas', 'Klaipėda', 'Šiauliai', 'Panevėžys']),
+            'city'     => fake()->city(),
             'timezone' => fake()->randomElement(['GMT+2', 'GMT+3']),
             'language' => fake()->randomElement(['lt', 'en', 'ru', 'de']),
             'currency' => 'EUR',
@@ -194,20 +188,20 @@ final class CampaignCustomerSegmentFactory extends Factory
                 'price',
                 'convenience',
             ], fake()->numberBetween(1, 3)),
-            'personality' => fake()->randomElement(['adventurous', 'conservative', 'social', 'independent']),
+            'personality'         => fake()->randomElement(['adventurous', 'conservative', 'social', 'independent']),
             'shopping_preference' => fake()->randomElement(['online', 'offline', 'mixed']),
-            'social_media_usage' => fake()->randomElement(['high', 'medium', 'low']),
+            'social_media_usage'  => fake()->randomElement(['high', 'medium', 'low']),
         ];
     }
 
     private function generateTargetingTags(string $segmentType): array
     {
         $baseTags = match ($segmentType) {
-            'demographic' => ['age_group', 'gender', 'income', 'education'],
-            'behavioral' => ['frequent_buyers', 'loyal_customers', 'high_value'],
-            'geographic' => ['location', 'region', 'timezone'],
+            'demographic'   => ['age_group', 'gender', 'income', 'education'],
+            'behavioral'    => ['frequent_buyers', 'loyal_customers', 'high_value'],
+            'geographic'    => ['location', 'region', 'timezone'],
             'psychographic' => ['lifestyle', 'interests', 'values'],
-            default => ['general'],
+            default         => ['general'],
         };
 
         return array_merge($baseTags, [

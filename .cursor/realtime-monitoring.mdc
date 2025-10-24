@@ -51,7 +51,6 @@ vendor/bin/rector process {currentFile} --ansi --no-progress-bar
 ### Filament v4:
 - `Schema` → `Form` в сигнатурах методов
 - `$schema` → `$form` в теле методов
-- `navigationIcon` → добавление docblock
 
 ### Laravel:
 - `return` → добавление типов возвращаемых значений

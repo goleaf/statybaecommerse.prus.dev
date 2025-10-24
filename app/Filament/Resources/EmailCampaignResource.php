@@ -4,28 +4,28 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use App\Support\Concerns\HasNav;
-use Filament\Schemas\Schema;
 use App\Filament\Resources\EmailCampaignResource\Pages;
 use App\Models\EmailCampaign;
+use App\Support\Concerns\HasNav;
 use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
 use BackedEnum;
-use Filament\Schemas\Components\Grid as SchemaGrid;
-use Filament\Schemas\Components\Section as SchemaSection;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
-use Filament\Resources\Resource;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
+use Filament\Resources\Resource;
+use Filament\Schemas\Components\Grid as SchemaGrid;
+use Filament\Schemas\Components\Section as SchemaSection;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use UnitEnum;
 
 final class EmailCampaignResource extends Resource
 {
@@ -35,10 +35,9 @@ final class EmailCampaignResource extends Resource
 
     protected static ?int $navigationSort = 4;
 
-    /**
-     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
-     */
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-envelope';
+
+    protected static UnitEnum|string|null $navigationGroup = 'Campaigns';
 
     public static function getNavigationLabel(): string
     {
@@ -55,7 +54,7 @@ final class EmailCampaignResource extends Resource
         return __('admin.email_campaigns.model_label');
     }
 
-    public static function form(Schema $schema): Schema   
+    public static function form(Schema $schema): Schema
     {
         return $schema->schema([
             SchemaSection::make(__('admin.email_campaigns.basic_information'))
@@ -103,7 +102,7 @@ final class EmailCampaignResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         // Configure the table definition for the streamlined Filament v4 return type.
         return $table

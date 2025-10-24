@@ -9,6 +9,8 @@ use App\Filament\Resources\VariantCombinationResource\Pages\ViewVariantCombinati
 use App\Http\Controllers\Admin\CampaignConversionController;
 use App\Http\Controllers\Admin\LocationController as AdminLocationController;
 use App\Models\Inventory;
+use App\Models\NewsImage;
+use App\Support\Storage\SecureStorage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Validator;
@@ -33,7 +35,7 @@ Route::middleware('auth')->group(function (): void {
         ->name('filament.admin.resources.variant-combinations.edit');
 
     Route::get('/admin/news-image-resources', function (Request $request) {
-        $forwarded = Request::create('/admin/news-images', 'GET', $request->query());
+        $forwarded = RequestFacade::create('/admin/news-images', 'GET', $request->query());
 
         return app()->handle($forwarded);
     });

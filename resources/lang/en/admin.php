@@ -65,6 +65,18 @@ return [
         'is_not_empty' => 'Is Not Empty',
         'is_true' => 'Is True',
         'is_false' => 'Is False',
+        'normal_setting_translations' => [
+            'navigation_label' => 'Standard Setting Translations',
+            'plural_model_label' => 'Standard Setting Translations',
+            'model_label' => 'Standard Setting Translation',
+            'basic_information' => 'Basic Information',
+            'enhanced_setting' => 'Setting',
+            'locale' => 'Locale',
+            'display_name' => 'Display Name',
+            'description' => 'Description',
+            'help_text' => 'Help Text',
+            'help_text_help' => 'Additional context displayed in the admin interface',
+        ],
     ],
     'user_product_interactions' => [
         'navigation_label' => 'User Product Interactions',

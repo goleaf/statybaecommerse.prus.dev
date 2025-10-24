@@ -4,257 +4,255 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use App\Filament\Resources\NewsResource\Pages\EditNews;
+use App\Filament\Resources\NewsResource\RelationManagers\CommentsRelationManager;
 use App\Models\News;
 use App\Models\NewsComment;
 use App\Models\User;
+use Filament\Actions\Testing\TestAction;
+use Filament\Tables\Testing\TestBulkAction;
+use Filament\Tables\Testing\TestFilter;
+use Filament\Tables\Testing\TestSearch;
+use Filament\Testing\Livewire\Concerns\InteractsWithForms;
+use Filament\Testing\Livewire\Concerns\InteractsWithTable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
+use Pest\Laravel\actingAs;
+use Livewire\Livewire;
+use Filament\Facades\Filament;
 
-final class NewsCommentRelationManagerTest extends TestCase
-{
-    use RefreshDatabase;
+use function Pest\Livewire\livewire;
+use function PHPUnit\Framework\assertCount;
 
-    protected function setUp(): void
-    {
-        parent::setUp();
+beforeEach(function (): void {
+    Filament::setCurrentPanel('admin');
 
-        $this->actingAs(User::factory()->create([
-            'email' => 'admin@example.com',
-            'is_admin' => true,
-        ]));
-    }
+    $this->adminUser = User::factory()->create([
+        'email' => 'admin@example.com',
+        'is_admin' => true,
+    ]);
 
-    public function test_can_list_news_comments(): void
-    {
-        $news = News::factory()->create();
-        NewsComment::factory()->count(3)->create(['news_id' => $news->id]);
+    actingAs($this->adminUser);
 
-        $this
-            ->get("/admin/news/{$news->id}/edit")
-            ->assertOk()
-            ->assertSee('Comments');
-    }
+    $this->news = News::factory()->create([
+        'title' => 'Test News',
+    ]);
+});
 
-    public function test_can_create_news_comment(): void
-    {
-        $news = News::factory()->create();
+it('displays comments table with existing records', function (): void {
+    $comments = NewsComment::factory()->count(3)->create([
+        'news_id' => $this->news->id,
+    ]);
 
-        $commentData = [
-            'author_name' => 'Test Commenter',
-            'author_email' => 'commenter@example.com',
-            'content' => 'This is a test comment.',
+    livewire(CommentsRelationManager::class, [
+        'ownerRecord' => $this->news,
+        'pageClass' => EditNews::class,
+    ])
+        ->assertCanSeeTableRecords($comments)
+        ->assertTableColumnState('content', $comments->first(), fn (?string $state) => $state !== null);
+});
+
+it('creates a comment through the relation manager', function (): void {
+    $component = livewire(CommentsRelationManager::class, [
+        'ownerRecord' => $this->news,
+        'pageClass' => EditNews::class,
+    ]);
+
+    $component
+        ->callTableAction('create', data: [
+            'author_name' => 'Jonas Jonaitis',
+            'author_email' => 'jonas@example.lt',
+            'content' => 'Puikus straipsnis apie technologijas.',
             'is_approved' => true,
             'is_visible' => true,
-        ];
+        ])
+        ->assertHasNoTableActionErrors();
 
-        $this
-            ->post("/admin/news/{$news->id}/comments", $commentData)
-            ->assertRedirect();
+    expect(NewsComment::query()->where('news_id', $this->news->id)->exists())->toBeTrue();
+});
 
-        $this->assertDatabaseHas('news_comments', [
-            'news_id' => $news->id,
-            'author_name' => 'Test Commenter',
-            'author_email' => 'commenter@example.com',
-            'content' => 'This is a test comment.',
-            'is_approved' => true,
-            'is_visible' => true,
-        ]);
-    }
+it('edits an existing comment', function (): void {
+    $comment = NewsComment::factory()->create([
+        'news_id' => $this->news->id,
+        'author_name' => 'Pradinis Autorius',
+    ]);
 
-    public function test_can_edit_news_comment(): void
-    {
-        $news = News::factory()->create();
-        $comment = NewsComment::factory()->create([
-            'news_id' => $news->id,
-            'author_name' => 'Original Author',
-        ]);
-
-        $updateData = [
-            'author_name' => 'Updated Author',
-            'is_approved' => true,
-        ];
-
-        $this
-            ->put("/admin/news/{$news->id}/comments/{$comment->id}", $updateData)
-            ->assertRedirect();
-
-        $this->assertDatabaseHas('news_comments', [
-            'id' => $comment->id,
-            'author_name' => 'Updated Author',
-            'is_approved' => true,
-        ]);
-    }
-
-    public function test_can_delete_news_comment(): void
-    {
-        $news = News::factory()->create();
-        $comment = NewsComment::factory()->create(['news_id' => $news->id]);
-
-        $this
-            ->delete("/admin/news/{$news->id}/comments/{$comment->id}")
-            ->assertRedirect();
-
-        $this->assertDatabaseMissing('news_comments', [
-            'id' => $comment->id,
-        ]);
-    }
-
-    public function test_can_create_nested_comment(): void
-    {
-        $news = News::factory()->create();
-        $parentComment = NewsComment::factory()->create([
-            'news_id' => $news->id,
-        ]);
-
-        $replyData = [
-            'author_name' => 'Reply Author',
-            'author_email' => 'reply@example.com',
-            'content' => 'This is a reply to the parent comment.',
-            'parent_id' => $parentComment->id,
-            'is_approved' => true,
-            'is_visible' => true,
-        ];
-
-        $this
-            ->post("/admin/news/{$news->id}/comments", $replyData)
-            ->assertRedirect();
-
-        $this->assertDatabaseHas('news_comments', [
-            'news_id' => $news->id,
-            'parent_id' => $parentComment->id,
-            'author_name' => 'Reply Author',
-            'content' => 'This is a reply to the parent comment.',
-        ]);
-    }
-
-    public function test_can_filter_comments_by_approval_status(): void
-    {
-        $news = News::factory()->create();
-        NewsComment::factory()->create([
-            'news_id' => $news->id,
-            'is_approved' => true,
-        ]);
-        NewsComment::factory()->create([
-            'news_id' => $news->id,
-            'is_approved' => false,
-        ]);
-
-        $response = $this->get("/admin/news/{$news->id}/edit?tableFilters[is_approved][value]=1");
-
-        $response->assertOk();
-    }
-
-    public function test_can_filter_comments_by_visibility(): void
-    {
-        $news = News::factory()->create();
-        NewsComment::factory()->create([
-            'news_id' => $news->id,
-            'is_visible' => true,
-        ]);
-        NewsComment::factory()->create([
-            'news_id' => $news->id,
+    livewire(CommentsRelationManager::class, [
+        'ownerRecord' => $this->news,
+        'pageClass' => EditNews::class,
+    ])
+        ->callTableAction('edit', $comment, [
+            'author_name' => 'Atnaujintas Autorius',
+            'content' => 'Atnaujintas komentaras',
             'is_visible' => false,
+        ])
+        ->assertHasNoTableActionErrors();
+
+    expect($comment->fresh())
+        ->author_name->toBe('Atnaujintas Autorius')
+        ->content->toBe('Atnaujintas komentaras')
+        ->is_visible->toBeFalse();
+});
+
+it('deletes a comment via table action', function (): void {
+    $comment = NewsComment::factory()->create([
+        'news_id' => $this->news->id,
+    ]);
+
+    livewire(CommentsRelationManager::class, [
+        'ownerRecord' => $this->news,
+        'pageClass' => EditNews::class,
+    ])
+        ->callTableAction('delete', $comment)
+        ->assertHasNoTableActionErrors();
+
+    expect(NewsComment::query()->whereKey($comment->getKey())->exists())->toBeFalse();
+});
+
+it('creates nested replies', function (): void {
+    $parent = NewsComment::factory()->create([
+        'news_id' => $this->news->id,
+    ]);
+
+    livewire(CommentsRelationManager::class, [
+        'ownerRecord' => $this->news,
+        'pageClass' => EditNews::class,
+    ])
+        ->callTableAction('create', data: [
+            'author_name' => 'Atsakymo Autorius',
+            'author_email' => 'atsakymas@example.lt',
+            'content' => 'Tai atsakymas į komentarą.',
+            'parent_id' => $parent->id,
+        ])
+        ->assertHasNoTableActionErrors();
+
+    $reply = NewsComment::query()
+        ->where('parent_id', $parent->id)
+        ->where('news_id', $this->news->id)
+        ->first();
+
+    expect($reply)->not->toBeNull();
+});
+
+it('filters by approval and visibility', function (): void {
+    $approved = NewsComment::factory()->create([
+        'news_id' => $this->news->id,
+        'is_approved' => true,
+        'is_visible' => true,
+    ]);
+
+    $pending = NewsComment::factory()->create([
+        'news_id' => $this->news->id,
+        'is_approved' => false,
+        'is_visible' => false,
+    ]);
+
+    $component = livewire(CommentsRelationManager::class, [
+        'ownerRecord' => $this->news,
+        'pageClass' => EditNews::class,
+    ]);
+
+    $component
+        ->filterTable('is_approved', 'true')
+        ->assertCanSeeTableRecords([$approved])
+        ->assertCanNotSeeTableRecords([$pending]);
+
+    $component
+        ->filterTable('is_visible', 'true')
+        ->assertCanSeeTableRecords([$approved])
+        ->assertCanNotSeeTableRecords([$pending]);
+});
+
+it('searches by author and content', function (): void {
+    $matching = NewsComment::factory()->create([
+        'news_id' => $this->news->id,
+        'author_name' => 'Technologijų Guru',
+        'content' => 'Technologijų pažanga yra nuostabi.',
+    ]);
+
+    $other = NewsComment::factory()->create([
+        'news_id' => $this->news->id,
+        'author_name' => 'Sporto Fanatikas',
+        'content' => 'Šis komentaras apie sportą.',
+    ]);
+
+    livewire(CommentsRelationManager::class, [
+        'ownerRecord' => $this->news,
+        'pageClass' => EditNews::class,
+    ])
+        ->searchTable('technologijų')
+        ->assertCanSeeTableRecords([$matching])
+        ->assertCanNotSeeTableRecords([$other]);
+});
+
+it('toggles approval status via custom action', function (): void {
+    $comment = NewsComment::factory()->create([
+        'news_id' => $this->news->id,
+        'is_approved' => false,
+    ]);
+
+    livewire(CommentsRelationManager::class, [
+        'ownerRecord' => $this->news,
+        'pageClass' => EditNews::class,
+    ])
+        ->callTableAction('toggle_approval', $comment)
+        ->assertHasNoTableActionErrors();
+
+    expect($comment->fresh()->is_approved)->toBeTrue();
+});
+
+it('bulk approves and disapproves comments', function (): void {
+    $records = NewsComment::factory()->count(3)->create([
+        'news_id' => $this->news->id,
+        'is_approved' => false,
+    ]);
+
+    $component = livewire(CommentsRelationManager::class, [
+        'ownerRecord' => $this->news,
+        'pageClass' => EditNews::class,
+    ]);
+
+    $component
+        ->callTableBulkAction('approve', $records)
+        ->assertHasNoTableActionErrors();
+
+    expect($records->fresh()->every(fn (NewsComment $comment): bool => $comment->is_approved))->toBeTrue();
+
+    $component
+        ->callTableBulkAction('disapprove', $records)
+        ->assertHasNoTableActionErrors();
+
+    expect($records->fresh()->every(fn (NewsComment $comment): bool => $comment->is_approved === false))->toBeTrue();
+});
+
+it('validates required fields when creating a comment', function (): void {
+    livewire(CommentsRelationManager::class, [
+        'ownerRecord' => $this->news,
+        'pageClass' => EditNews::class,
+    ])
+        ->callTableAction('create', data: [
+            'author_name' => null,
+            'author_email' => 'neteisingas-el',
+            'content' => null,
+        ])
+        ->assertHasTableActionErrors([
+            'author_name' => ['validation.required'],
+            'author_email' => ['validation.email'],
+            'content' => ['validation.required'],
         ]);
+});
 
-        $response = $this->get("/admin/news/{$news->id}/edit?tableFilters[is_visible][value]=1");
-
-        $response->assertOk();
-    }
-
-    public function test_comment_validation_requires_author_name(): void
-    {
-        $news = News::factory()->create();
-
-        $commentData = [
-            'author_email' => 'commenter@example.com',
-            'content' => 'This is a test comment.',
-            'is_approved' => true,
-            'is_visible' => true,
-        ];
-
-        $response = $this->post("/admin/news/{$news->id}/comments", $commentData);
-        $response->assertSessionHasErrors('author_name');
-    }
-
-    public function test_comment_validation_requires_author_email(): void
-    {
-        $news = News::factory()->create();
-
-        $commentData = [
-            'author_name' => 'Test Commenter',
-            'content' => 'This is a test comment.',
-            'is_approved' => true,
-            'is_visible' => true,
-        ];
-
-        $response = $this->post("/admin/news/{$news->id}/comments", $commentData);
-        $response->assertSessionHasErrors('author_email');
-    }
-
-    public function test_comment_validation_requires_content(): void
-    {
-        $news = News::factory()->create();
-
-        $commentData = [
-            'author_name' => 'Test Commenter',
-            'author_email' => 'commenter@example.com',
-            'is_approved' => true,
-            'is_visible' => true,
-        ];
-
-        $response = $this->post("/admin/news/{$news->id}/comments", $commentData);
-        $response->assertSessionHasErrors('content');
-    }
-
-    public function test_comment_validation_author_email_must_be_valid(): void
-    {
-        $news = News::factory()->create();
-
-        $commentData = [
-            'author_name' => 'Test Commenter',
-            'author_email' => 'invalid-email',
-            'content' => 'This is a test comment.',
-            'is_approved' => true,
-            'is_visible' => true,
-        ];
-
-        $response = $this->post("/admin/news/{$news->id}/comments", $commentData);
-        $response->assertSessionHasErrors('author_email');
-    }
-
-    public function test_can_search_comments_by_content(): void
-    {
-        $news = News::factory()->create();
-        NewsComment::factory()->create([
-            'news_id' => $news->id,
-            'content' => 'Great article about technology!',
+it('validates parent selection for nested replies', function (): void {
+    livewire(CommentsRelationManager::class, [
+        'ownerRecord' => $this->news,
+        'pageClass' => EditNews::class,
+    ])
+        ->callTableAction('create', data: [
+            'author_name' => 'Komentatorius',
+            'author_email' => 'komentatorius@example.lt',
+            'content' => 'Sveiki!',
+            'parent_id' => 999999,
+        ])
+        ->assertHasTableActionErrors([
+            'parent_id' => ['validation.exists'],
         ]);
-        NewsComment::factory()->create([
-            'news_id' => $news->id,
-            'content' => 'This article is about sports.',
-        ]);
-
-        $response = $this->get("/admin/news/{$news->id}/edit?search=technology");
-
-        $response->assertOk();
-    }
-
-    public function test_can_search_comments_by_author_name(): void
-    {
-        $news = News::factory()->create();
-        NewsComment::factory()->create([
-            'news_id' => $news->id,
-            'author_name' => 'John Doe',
-            'content' => 'Test comment',
-        ]);
-        NewsComment::factory()->create([
-            'news_id' => $news->id,
-            'author_name' => 'Jane Smith',
-            'content' => 'Another comment',
-        ]);
-
-        $response = $this->get("/admin/news/{$news->id}/edit?search=John");
-
-        $response->assertOk();
-    }
-}
+});

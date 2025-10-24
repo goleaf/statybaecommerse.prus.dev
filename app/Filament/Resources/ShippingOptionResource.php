@@ -11,7 +11,6 @@ use Filament\Schemas\Schema;
 use App\Filament\Resources\ShippingOptionResource\Pages;
 use App\Models\ShippingOption;
 use App\Support\Forms\MatrixFactory;
-use BackedEnum;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -43,11 +42,6 @@ final class ShippingOptionResource extends Resource
 {
     use HasNav;
 
-    public static function getNavigationIcon(): BackedEnum|string|null
-    {
-        return 'heroicon-o-truck';
-    }
-
     protected static ?string $model = ShippingOption::class;
 
     protected static ?int $navigationSort = 3;
@@ -69,7 +63,7 @@ final class ShippingOptionResource extends Resource
         return __('admin.shipping_options.model_label');
     }
 
-    public static function form(Schema $schema): Schema   
+    public static function form(Schema $schema): Schema
     {
         return $schema
             ->schema([
@@ -219,7 +213,7 @@ final class ShippingOptionResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         // Configure the table definition for the streamlined Filament v4 return type.
         return $table

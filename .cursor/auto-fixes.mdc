@@ -70,15 +70,6 @@ return $schema->schema([...]);
 return $form->schema([...]);
 ```
 
-### Исправление navigationIcon:
-```php
-// До
-protected static ?string $navigationIcon = 'heroicon-o-users';
-
-// После
-/** @var string|\BackedEnum|null */
-protected static $navigationIcon = 'heroicon-o-users';
-```
 
 ## LARAVEL
 

@@ -39,6 +39,7 @@ final class ShippingOption extends Model
         'currency_code',
         'country_id',
         'city_id',
+        'zone_id',
         'is_enabled',
         'is_default',
         'sort_order',
@@ -122,9 +123,9 @@ final class ShippingOption extends Model
     /**
      * Handle scopeEnabled functionality with proper error handling.
      *
-     * @param  Builder<self> $query
-     * @return Builder<self>
+     * @param  Builder<self>           $query
      * @param  Builder<ShippingOption> $query
+     * @return Builder<self>
      * @return Builder<ShippingOption>
      */
     public function scopeEnabled(Builder $query): Builder
@@ -135,9 +136,9 @@ final class ShippingOption extends Model
     /**
      * Handle scopeDefault functionality with proper error handling.
      *
-     * @param  Builder<self> $query
-     * @return Builder<self>
+     * @param  Builder<self>           $query
      * @param  Builder<ShippingOption> $query
+     * @return Builder<self>
      * @return Builder<ShippingOption>
      */
     public function scopeDefault(Builder $query): Builder
@@ -148,9 +149,9 @@ final class ShippingOption extends Model
     /**
      * Handle scopeByCarrier functionality with proper error handling.
      *
-     * @param  Builder<self> $query
-     * @return Builder<self>
+     * @param  Builder<self>           $query
      * @param  Builder<ShippingOption> $query
+     * @return Builder<self>
      * @return Builder<ShippingOption>
      */
     public function scopeByCarrier(Builder $query, string $carrier): Builder
@@ -180,12 +181,20 @@ final class ShippingOption extends Model
         return $query->where('city_id', $cityId);
     }
 
+    public function zone(): BelongsTo
+    {
+        /** @var BelongsTo<Zone, ShippingOption> $relation */
+        $relation = $this->belongsTo(Zone::class);
+
+        return $relation;
+    }
+
     /**
      * Handle scopeOrdered functionality with proper error handling.
      *
-     * @param  Builder<self> $query
-     * @return Builder<self>
+     * @param  Builder<self>           $query
      * @param  Builder<ShippingOption> $query
+     * @return Builder<self>
      * @return Builder<ShippingOption>
      */
     public function scopeOrdered(Builder $query): Builder

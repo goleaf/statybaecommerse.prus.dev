@@ -12,16 +12,7 @@ always use mcp
 - update git with this prompt changesd files. write in commit message what was changed and do not put in commit any another files what is not in git, after end of prompt, after end of work with prompt, update git, make commit and push and write what was updated in every file. and write summary of changes in work of prompt, in commit attach not all not commited files, but only files what was modified in this work prompt. dont do it. make 
 
 
----
 
-description: Filament v4 — normalize Resource signatures (form/table), drop conflicting App\Filament\Resources\Schema import, and standardize \$navigationIcon typing to prevent signature/type errors.
-globs:
-
-* "composer.json"
-* "app/Filament/\*\*/\*.php"
-  alwaysApply: true
-
----
 
 # Scope
 
@@ -60,17 +51,6 @@ globs:
      ```php
      public static function table(Table $table): Table
      ```
-
-4. **\$navigationIcon property (compatible with v4)**
-
-   * Standardize to **untyped** property with a docblock:
-
-     ```php
-     /** @var string|\BackedEnum|null */
-     protected static $navigationIcon = 'heroicon-o-document-text';
-     ```
-   * If any typed declaration exists (e.g., `protected static ?string $navigationIcon` or a union), **remove the type** and keep the existing value.
-   * Do not introduce enum values unless the project already uses them.
 
 5. **Ban conflicting local class names**
 
@@ -131,29 +111,3 @@ globs:
     public static function table(Table $table): Table
     ```
 
-* **Standardize `$navigationIcon`**
-
-  * Find (typed property):
-
-    * `protected\s+static\s+[^$]*\s+\$navigationIcon\s*=\s*([^;]+);`
-  * Replace with:
-
-    ```
-    /** @var string|\BackedEnum|null */
-    protected static $navigationIcon = \1;
-    ```
-  * If a docblock already exists for `$navigationIcon`, keep the most permissive docblock (`string|\BackedEnum|null`).
-
-# Guardrails
-
-* Do not modify other properties or methods unrelated to `form`, `table`, or `$navigationIcon`.
-* Do not alter `namespace` declarations.
-* Do not remove legitimate business logic inside method bodies—only adjust variable names if needed (`$form` → `$schema`).
-
-# Quick Self-Check (after edits)
-
-* `public static function form(Schema $schema): Schema` present and compiles.
-* `public static function table(Table $table): Table` present and compiles.
-* No `use App\Filament\Resources\Schema;` remains.
-* `$navigationIcon` is untyped with `/** @var string|\BackedEnum|null */` docblock.
-* File passes `php -l`.

@@ -1,34 +1,31 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use BackedEnum;
-use Filament\Schemas\Schema;
 use App\Filament\Resources\SystemSettingCategoryTranslationResource\Pages;
 use App\Models\SystemSettingCategory;
 use App\Models\SystemSettingCategoryTranslation;
-use Exception;
-use Filament\Schemas\Components\Grid as SchemaGrid;
-use Filament\Schemas\Components\Section as SchemaSection;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\TextInput;
-use Filament\Notifications\Notification;
-use Filament\Resources\Resource;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
+use Filament\Notifications\Notification;
+use Filament\Resources\Resource;
+use Filament\Schemas\Components\Grid as SchemaGrid;
+use Filament\Schemas\Components\Section as SchemaSection;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Exception;
+use BackedEnum;
 use UnitEnum;
 
 final class SystemSettingCategoryTranslationResource extends Resource
@@ -36,14 +33,14 @@ final class SystemSettingCategoryTranslationResource extends Resource
     protected static ?string $model = \App\Models\SystemSettingCategoryTranslation::class;
 
     /**
-     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
+     * @var BackedEnum|string|null
      */
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-language';
 
     /**
-     * @var string|\UnitEnum|null Navigation group assignment stored without a typed property to avoid enum collisions.
+     * @var UnitEnum|string|null
      */
-    protected static \UnitEnum|string|null $navigationGroup = 'Settings';
+    protected static UnitEnum|string|null $navigationGroup = 'Settings';
 
     protected static bool $shouldRegisterNavigation = false;
 
@@ -62,7 +59,7 @@ final class SystemSettingCategoryTranslationResource extends Resource
         return __('admin.system_setting_category_translations.model_label');
     }
 
-    public static function form(Schema $schema): Schema   
+    public static function form(Schema $schema): Schema
     {
         return $schema->schema([
             SchemaSection::make(__('admin.system_setting_category_translations.basic_information'))
@@ -106,7 +103,7 @@ final class SystemSettingCategoryTranslationResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         // Configure the table definition for the streamlined Filament v4 return type.
         return $table
@@ -119,8 +116,8 @@ final class SystemSettingCategoryTranslationResource extends Resource
                 TextColumn::make('locale')
                     ->label(__('admin.system_setting_category_translations.locale'))
                     ->badge()
-                    ->color(fn (SystemSettingCategoryTranslation $record): string => $record->locale_badge_color)
-                    ->formatStateUsing(fn (string $state): string => SystemSettingCategoryTranslation::getAvailableLocales()[$state] ?? $state),
+                    ->color(fn(SystemSettingCategoryTranslation $record): string => $record->locale_badge_color)
+                    ->formatStateUsing(fn(string $state): string => SystemSettingCategoryTranslation::getAvailableLocales()[$state] ?? $state),
                 TextColumn::make('name')
                     ->label(__('admin.system_setting_category_translations.name'))
                     ->searchable()
@@ -142,19 +139,19 @@ final class SystemSettingCategoryTranslationResource extends Resource
                 TextColumn::make('completeness')
                     ->label(__('admin.system_setting_category_translations.completeness'))
                     ->badge()
-                    ->color(fn (int $state): string => match (true) {
+                    ->color(fn(int $state): string => match (true) {
                         $state >= 90 => 'success',
                         $state >= 70 => 'warning',
                         $state >= 50 => 'info',
-                        default      => 'danger',
+                        default => 'danger',
                     })
-                    ->formatStateUsing(fn (int $state): string => $state . '%')
+                    ->formatStateUsing(fn(int $state): string => $state . '%')
                     ->toggleable(),
                 TextColumn::make('quality_score')
                     ->label(__('admin.system_setting_category_translations.quality_score'))
                     ->badge()
-                    ->color(fn (SystemSettingCategoryTranslation $record): string => $record->quality_badge_color)
-                    ->formatStateUsing(fn (int $state): string => $state . '/100')
+                    ->color(fn(SystemSettingCategoryTranslation $record): string => $record->quality_badge_color)
+                    ->formatStateUsing(fn(int $state): string => $state . '/100')
                     ->toggleable(),
                 TextColumn::make('created_at')
                     ->label(__('admin.common.created_at'))
@@ -174,12 +171,12 @@ final class SystemSettingCategoryTranslationResource extends Resource
                 SelectFilter::make('completeness')
                     ->label(__('admin.system_setting_category_translations.completeness'))
                     ->options([
-                        'complete'   => __('admin.system_setting_category_translations.complete'),
+                        'complete' => __('admin.system_setting_category_translations.complete'),
                         'incomplete' => __('admin.system_setting_category_translations.incomplete'),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
                         return match ($data['value'] ?? null) {
-                            'complete'   => $query->whereNotNull('name')->whereNotNull('description'),
+                            'complete' => $query->whereNotNull('name')->whereNotNull('description'),
                             'incomplete' => $query->where(function ($q): void {
                                 $q->whereNull('name')->orWhereNull('description');
                             }),
@@ -189,9 +186,9 @@ final class SystemSettingCategoryTranslationResource extends Resource
                 SelectFilter::make('quality')
                     ->label(__('admin.system_setting_category_translations.quality'))
                     ->options([
-                        'high'   => __('admin.system_setting_category_translations.high_quality'),
+                        'high' => __('admin.system_setting_category_translations.high_quality'),
                         'medium' => __('admin.system_setting_category_translations.medium_quality'),
-                        'low'    => __('admin.system_setting_category_translations.low_quality'),
+                        'low' => __('admin.system_setting_category_translations.low_quality'),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
                         return match ($data['value'] ?? null) {
@@ -315,17 +312,17 @@ final class SystemSettingCategoryTranslationResource extends Resource
     {
         if (app()->environment('testing')) {
             return [
-                'index'  => Pages\ListSystemSettingCategoryTranslations::route('/'),
+                'index' => Pages\ListSystemSettingCategoryTranslations::route('/'),
                 'create' => Pages\CreateSystemSettingCategoryTranslation::route('/create'),
                 // Omit view/edit to avoid route conflicts with test stubs
             ];
         }
 
         return [
-            'index'  => Pages\ListSystemSettingCategoryTranslations::route('/'),
+            'index' => Pages\ListSystemSettingCategoryTranslations::route('/'),
             'create' => Pages\CreateSystemSettingCategoryTranslation::route('/create'),
-            'view'   => Pages\ViewSystemSettingCategoryTranslation::route('/{record}'),
-            'edit'   => Pages\EditSystemSettingCategoryTranslation::route('/{record}/edit'),
+            'view' => Pages\ViewSystemSettingCategoryTranslation::route('/{record}'),
+            'edit' => Pages\EditSystemSettingCategoryTranslation::route('/{record}/edit'),
         ];
     }
 }

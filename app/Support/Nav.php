@@ -10,6 +10,7 @@ use BackedEnum;
 use Filament\Resources\Resource;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Str;
+use ParseError;
 use ReflectionClass;
 use ReflectionException;
 use Throwable;
@@ -64,6 +65,13 @@ final class Nav
     private static array $groupMetaCache = [];
 
     /**
+     * Recursion guards to prevent infinite loops when resources delegate back to Nav.
+     *
+     * @var array<string, bool>
+     */
+    private static array $resolving = [];
+
+    /**
      * Discover all first-party Filament resource classes under the application namespace.
      *
      * @return array<int, class-string<\Filament\Resources\Resource>>
@@ -76,12 +84,12 @@ final class Nav
             $shouldDiscover = (bool) config('filament.testing.autodiscover_resources', true);
 
             if (! $shouldDiscover) {
-                /** @var array<class-string<Resource>> $configured */
+                /** @var array<class-string<resource>> $configured */
                 $configured = array_values(array_filter(
                     (array) config('filament.testing.resources', []),
-                    static fn (mixed $resource): bool => is_string($resource)
-                        && class_exists($resource)
-                        && is_subclass_of($resource, Resource::class),
+                    static fn (mixed $resource): bool => is_string($resource) &&
+                        class_exists($resource) &&
+                        is_subclass_of($resource, Resource::class),
                 ));
 
                 return $configured;
@@ -104,7 +112,7 @@ final class Nav
                 if (class_exists($class) && is_subclass_of($class, Resource::class)) {
                     $classes[] = $class;
                 }
-            } catch (\ParseError $exception) {
+            } catch (ParseError $exception) {
                 // Skip resources that cannot be parsed so storefront pages remain accessible during tests.
                 continue;
             }
@@ -207,14 +215,20 @@ final class Nav
     private static function getRawGroupValue(string $resource): mixed
     {
         if (! self::resourceUsesNavTrait($resource) && method_exists($resource, 'getNavigationGroup')) {
-            try {
-                $group = $resource::getNavigationGroup();
+            $key = 'group:' . $resource;
+            if (! isset(self::$resolving[$key])) {
+                self::$resolving[$key] = true;
+                try {
+                    $group = $resource::getNavigationGroup();
 
-                if ($group !== null) {
-                    return $group;
+                    if ($group !== null) {
+                        return $group;
+                    }
+                } catch (Throwable) {
+                    // Intentionally swallow exceptions so a misbehaving resource does not break discovery.
+                } finally {
+                    unset(self::$resolving[$key]);
                 }
-            } catch (Throwable) {
-                // Intentionally swallow exceptions so a misbehaving resource does not break discovery.
             }
         }
 
@@ -229,14 +243,20 @@ final class Nav
     private static function resolveIcon(string $resource): BackedEnum|Htmlable|string|null
     {
         if (! self::resourceUsesNavTrait($resource) && method_exists($resource, 'getNavigationIcon')) {
-            try {
-                $icon = $resource::getNavigationIcon();
+            $key = 'icon:' . $resource;
+            if (! isset(self::$resolving[$key])) {
+                self::$resolving[$key] = true;
+                try {
+                    $icon = $resource::getNavigationIcon();
 
-                if ($icon !== null) {
-                    return $icon;
+                    if ($icon !== null) {
+                        return $icon;
+                    }
+                } catch (Throwable) {
+                    // Ignore and fall back to the static property if present.
+                } finally {
+                    unset(self::$resolving[$key]);
                 }
-            } catch (Throwable) {
-                // Ignore and fall back to the static property if present.
             }
         }
 
@@ -251,14 +271,20 @@ final class Nav
     private static function resolveSort(string $resource): ?int
     {
         if (! self::resourceUsesNavTrait($resource) && method_exists($resource, 'getNavigationSort')) {
-            try {
-                $sort = $resource::getNavigationSort();
+            $key = 'sort:' . $resource;
+            if (! isset(self::$resolving[$key])) {
+                self::$resolving[$key] = true;
+                try {
+                    $sort = $resource::getNavigationSort();
 
-                if ($sort !== null) {
-                    return $sort;
+                    if ($sort !== null) {
+                        return $sort;
+                    }
+                } catch (Throwable) {
+                    // Ignore and look for a property below.
+                } finally {
+                    unset(self::$resolving[$key]);
                 }
-            } catch (Throwable) {
-                // Ignore and look for a property below.
             }
         }
 

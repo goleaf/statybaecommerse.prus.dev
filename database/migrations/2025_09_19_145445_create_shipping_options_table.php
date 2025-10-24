@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -20,7 +22,9 @@ return new class extends Migration
             $table->string('service_type');
             $table->decimal('price', 10, 2);
             $table->string('currency_code', 3)->default('EUR');
-            $table->unsignedBigInteger('zone_id');
+            $table->foreignId('zone_id')->constrained('zones')->cascadeOnDelete();
+            $table->foreignId('country_id')->nullable()->constrained('countries')->nullOnDelete();
+            $table->foreignId('city_id')->nullable()->constrained('cities')->nullOnDelete();
             $table->boolean('is_enabled')->default(true);
             $table->boolean('is_default')->default(false);
             $table->integer('sort_order')->default(0);
@@ -34,7 +38,6 @@ return new class extends Migration
             $table->json('shipping_matrix')->nullable();
             $table->timestamps();
 
-            $table->foreign('zone_id')->references('id')->on('zones')->onDelete('cascade');
             $table->index(['zone_id', 'is_enabled']);
             $table->index(['is_default', 'is_enabled']);
         });

@@ -12,8 +12,8 @@ use Tests\TestCase;
 
 final class NewsCategoryTest extends TestCase
 {
-    use RefreshDatabase;
     use InteractsWithFilamentPivotTables;
+    use RefreshDatabase;
 
     protected function afterRefreshingDatabase(): void
     {
@@ -26,17 +26,17 @@ final class NewsCategoryTest extends TestCase
         $category = NewsCategory::factory()->create([
             'is_visible' => true,
             'sort_order' => 1,
-            'color' => '#ff0000',
-            'icon' => 'heroicon-o-rectangle-stack',
+            'color'      => '#ff0000',
+            'icon'       => 'heroicon-o-rectangle-stack',
         ]);
 
         // Assert
         $this->assertDatabaseHas('news_categories', [
-            'id' => $category->id,
+            'id'         => $category->id,
             'is_visible' => true,
             'sort_order' => 1,
-            'color' => '#ff0000',
-            'icon' => 'heroicon-o-rectangle-stack',
+            'color'      => '#ff0000',
+            'icon'       => 'heroicon-o-rectangle-stack',
         ]);
     }
 
@@ -138,11 +138,14 @@ final class NewsCategoryTest extends TestCase
     {
         // Arrange
         $data = [
-            'is_visible' => true,
-            'parent_id' => null,
-            'sort_order' => 1,
-            'color' => '#ff0000',
-            'icon' => 'heroicon-o-rectangle-stack',
+            'name'        => 'Test Category',
+            'slug'        => 'test-category',
+            'description' => 'Test description',
+            'is_visible'  => true,
+            'parent_id'   => null,
+            'sort_order'  => 1,
+            'color'       => '#ff0000',
+            'icon'        => 'heroicon-o-rectangle-stack',
         ];
 
         // Act

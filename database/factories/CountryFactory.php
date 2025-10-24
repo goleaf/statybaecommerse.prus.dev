@@ -19,12 +19,14 @@ final class CountryFactory extends Factory
         $regions = ['Europe', 'Asia', 'Africa', 'North America', 'South America', 'Oceania', 'Antarctica'];
         $currencies = ['EUR', 'USD', 'GBP', 'JPY', 'CHF', 'CAD', 'AUD', 'CNY', 'RUB', 'INR'];
 
+        $uniqueIndex = $this->faker->unique()->numberBetween(100, 999);
+
         return [
             'name' => $this->faker->country(),
             'name_official' => $this->faker->optional(0.7)->country(),
             'description' => $this->faker->optional(0.6)->paragraph(),
-            'cca2' => $this->faker->unique()->countryCode(),
-            'cca3' => $this->faker->unique()->countryISOAlpha3(),
+            'cca2' => sprintf('T%02d', $uniqueIndex % 100),
+            'cca3' => sprintf('T%03d', $uniqueIndex),
             'ccn3' => $this->faker->optional(0.8)->numerify('###'),
             'code' => $this->faker->optional(0.5)->lexify('???'),
             'iso_code' => $this->faker->optional(0.5)->lexify('???'),

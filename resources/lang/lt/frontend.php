@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 return [
     'navigation' => [
@@ -223,6 +221,87 @@ return [
         'usage_step_3' => 'Spustelėkite bet kurį rezultatą, kad pereitumėte prie jo',
         'usage_step_4' => 'Naudokite "Peržiūrėti visus rezultatus" pilnai paieškos puslapiui',
         'go_to_search_page' => 'Eiti į pilną paieškos puslapį',
+    ],
+    'test_results' => [
+        'title' => 'Testų rezultatai',
+        'duration_seconds' => ':value s',
+        'meta' => [
+            'heading' => 'Testų vykdymo suvestinė',
+            'description' => 'Rezultatai saugomi faile :path ir atnaujinami realiu laiku vykdant komandą.',
+            'status' => [
+                'label' => 'Būsena',
+                'running' => 'Vykdoma',
+                'idle' => 'Neaktyvu',
+            ],
+            'updated_at' => 'Paskutinį kartą atnaujinta',
+            'title' => 'Vykdymo informacija',
+            'current_test' => 'Dabartinis testas',
+            'no_current_test' => 'Nėra aktyvaus testo',
+            'current_position' => 'Progresas',
+            'completed_total' => 'Užbaigti testai',
+            'created_at' => 'Sukurta',
+            'started_at' => 'Pradžia',
+            'completed_at' => 'Pabaiga',
+        ],
+        'summary' => [
+            'success_rate' => 'Sėkmės rodiklis',
+            'completed' => ':completed iš :total',
+            'total' => 'Iš viso',
+        ],
+        'progress' => [
+            'title' => 'Bendra eiga',
+        ],
+        'status' => [
+            'passed' => 'Sėkmingi',
+            'failed' => 'Nesėkmingi',
+            'running' => 'Vykdomi',
+            'pending' => 'Laukiantys',
+            'legend' => [
+                'title' => 'Būsenų legenda',
+                'descriptions' => [
+                    'passed' => 'Testas sėkmingai įvykdytas be klaidų.',
+                    'failed' => 'Testas baigėsi klaida ir reikalauja dėmesio.',
+                    'running' => 'Testas šiuo metu vykdomas.',
+                    'pending' => 'Testas dar nebuvo vykdytas šios sesijos metu.',
+                ],
+            ],
+        ],
+        'empty' => [
+            'title' => 'Rezultatų dar nėra',
+            'description' => 'Paleiskite komandą, kad pradėtumėte suvestį ir stebėtumėte testų eigą realiu laiku.',
+        ],
+        'table' => [
+            'title' => 'Išsamūs testų duomenys',
+            'total_rows' => 'Iš viso eilučių: :count',
+            'headers' => [
+                'identifier' => 'Identifikatorius',
+                'hash' => 'Maiša',
+                'groups' => 'Grupės',
+                'status' => 'Būsena',
+                'duration' => 'Trukmė',
+                'actions' => 'Veiksmai',
+            ],
+            'columns' => [
+                'ran_at_unknown' => 'Laikas nežinomas',
+                'no_groups' => 'Nėra grupių',
+                'unknown_duration' => 'Nežinoma',
+            ],
+            'actions' => [
+                'view_details' => 'Peržiūrėti detales',
+            ],
+            'details' => [
+                'output' => 'Konsolės išvestis',
+                'empty_output' => 'Išvesties nėra.',
+                'error' => 'Klaidos išvestis',
+                'empty_error' => 'Klaidos neužfiksuotos.',
+            ],
+        ],
+        'failed' => [
+            'title' => 'Nepavykę testai',
+            'count' => 'Nepavykę: :count',
+            'label' => 'Nepavykęs testas',
+            'none' => 'Nepavykusių testų nėra.',
+        ],
     ],
     'forms' => [
         'required' => 'Šis laukas yra privalomas',

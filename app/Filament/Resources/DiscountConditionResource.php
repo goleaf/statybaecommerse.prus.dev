@@ -12,6 +12,7 @@ use App\Filament\Resources\DiscountConditionResource\Widgets\DiscountConditionTa
 use App\Models\DiscountCondition;
 use App\Models\Scopes\ActiveScope;
 use BackedEnum;
+use UnitEnum;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
@@ -53,14 +54,19 @@ final class DiscountConditionResource extends Resource
      */
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-adjustments-horizontal';
 
-    public static function getNavigationGroup(): \UnitEnum|string|null
+    /**
+     * @var UnitEnum|string|null
+     */
+    protected static UnitEnum|string|null $navigationGroup = null;
+
+    public static function getNavigationGroup(): UnitEnum|string
     {
-        return 'Discounts';
+        return __('discount_conditions.navigation_group');
     }
 
     public static function getNavigationLabel(): string
     {
-        return __('discount_conditions.title');
+        return __('discount_conditions.navigation_label');
     }
 
     public static function getPluralModelLabel(): string
@@ -73,7 +79,7 @@ final class DiscountConditionResource extends Resource
         return __('discount_conditions.single');
     }
 
-    public static function form(Schema $schema): Schema   
+    public static function form(Schema $schema): Schema
     {
         return $schema
             ->schema([
@@ -90,6 +96,7 @@ final class DiscountConditionResource extends Resource
                                             ->searchable()
                                             ->preload()
                                             ->required(),
+                                        TextInput::make('position')
                                         TextInput::make('position')
                                             ->label(__('discount_conditions.position'))
                                             ->numeric()
@@ -117,8 +124,8 @@ final class DiscountConditionResource extends Resource
                                             ->required()
                                             ->live(),
                                         Select::make('operator')
-                                            ->label(__('discount_conditions.operator'))
-                                            ->options(static fn (Get $get): array => DiscountCondition::getOperatorsForType($get('type') ?? ''))
+                                        ->label(__('discount_conditions.operator'))
+                                        ->options(static fn (Get $get): array => DiscountCondition::getOperatorsForType($get('type') ?? ''))
                                             ->required()
                                             ->live(),
                                         Textarea::make('value')
@@ -176,7 +183,7 @@ final class DiscountConditionResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         // Configure the table definition for the streamlined Filament v4 return type.
         return $table
@@ -301,7 +308,7 @@ final class DiscountConditionResource extends Resource
             ->defaultSort('priority', 'asc');
     }
 
-    public static function infolist(Schema $schema): Schema   
+    public static function infolist(Schema $schema): Schema
     {
         // Provide the infolist schema using the Filament v4 return type.
         return $schema

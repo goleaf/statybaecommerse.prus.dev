@@ -43,6 +43,7 @@ use Throwable;
 
 final class ReportResource extends Resource
 {
+
     public static function getNavigationGroup(): string
     {
         return __('navigation.groups.analytics');
@@ -88,12 +89,10 @@ final class ReportResource extends Resource
                     ->schema([
                         TextInput::make('name')
                             ->label(__('reports.fields.name'))
-                            ->translateLabel()
-                            ->translatable()
                             ->required()
                             ->maxLength(255)
                             ->live()
-                            ->afterStateUpdated(fn ($state, callable $set) => $set('slug', Str::slug($state))),
+                            ->afterStateUpdated(fn (string $state, callable $set) => $set('slug', Str::slug($state))),
                         TextInput::make('slug')
                             ->label(__('reports.fields.slug'))
                             ->required()
@@ -131,16 +130,12 @@ final class ReportResource extends Resource
                     ->schema([
                         Textarea::make('description')
                             ->label(__('reports.fields.description'))
-                            ->translateLabel()
-                            ->translatable()
                             ->maxLength(65535)
                             ->nullable()
                             ->rows(3)
                             ->columnSpanFull(),
                         Textarea::make('content')
                             ->label(__('reports.fields.content'))
-                            ->translateLabel()
-                            ->translatable()
                             ->maxLength(65535)
                             ->nullable()
                             ->rows(5)
@@ -373,8 +368,7 @@ final class ReportResource extends Resource
 
                         $notification->send();
                     }),
-                DeleteAction::make()
-                    ->using(fn (Report $record): bool => (bool) $record->forceDelete()),
+                DeleteAction::make(),
                 Action::make('generate')
                     ->label(__('reports.actions.generate'))
                     ->icon('heroicon-o-arrow-down-tray')

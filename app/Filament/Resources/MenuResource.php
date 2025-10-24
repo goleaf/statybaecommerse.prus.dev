@@ -1,25 +1,12 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use App\Support\Concerns\HasNav;
-use Filament\Schemas\Schema;
-use App\Filament\Resources\MenuResource\Pages;
 use App\Filament\Resources\MenuResource\RelationManagers\MenuItemsRelationManager;
-use App\Models\Menu;
+use App\Filament\Resources\MenuResource\Pages;
 use App\Models\Scopes\ActiveScope;
-use BackedEnum;
-use Filament\Schemas\Components\Grid as SchemaGrid;
-use Filament\Schemas\Components\Section as SchemaSection;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
-use Filament\Notifications\Notification;
-use Filament\Resources\Resource;
+use App\Models\Menu;
+use App\Support\Concerns\HasNav;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
@@ -27,6 +14,15 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
+use Filament\Notifications\Notification;
+use Filament\Resources\Resource;
+use Filament\Schemas\Components\Grid as SchemaGrid;
+use Filament\Schemas\Components\Section as SchemaSection;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -34,6 +30,7 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use BackedEnum;
 
 final class MenuResource extends Resource
 {
@@ -68,14 +65,14 @@ final class MenuResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Schema $schema): Schema   
+    public static function form(Schema $schema): Schema
     {
         // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
         $locationOptions = [
-            'header'  => __('menus.locations.header'),
-            'footer'  => __('menus.locations.footer'),
+            'header' => __('menus.locations.header'),
+            'footer' => __('menus.locations.footer'),
             'sidebar' => __('menus.locations.sidebar'),
-            'mobile'  => __('menus.locations.mobile'),
+            'mobile' => __('menus.locations.mobile'),
         ];
 
         return $schema->schema([
@@ -117,7 +114,7 @@ final class MenuResource extends Resource
     /**
      * Configure the Filament table with columns, filters, and actions.
      */
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         // Configure the table definition for the streamlined Filament v4 return type.
         return $table
@@ -135,12 +132,12 @@ final class MenuResource extends Resource
                 TextColumn::make('location')
                     ->label(__('menus.location'))
                     ->badge()
-                    ->formatStateUsing(static fn (?string $state): ?string => match ($state) {
-                        'header'  => __('menus.locations.header'),
-                        'footer'  => __('menus.locations.footer'),
+                    ->formatStateUsing(static fn(?string $state): ?string => match ($state) {
+                        'header' => __('menus.locations.header'),
+                        'footer' => __('menus.locations.footer'),
                         'sidebar' => __('menus.locations.sidebar'),
-                        'mobile'  => __('menus.locations.mobile'),
-                        default   => $state,
+                        'mobile' => __('menus.locations.mobile'),
+                        default => $state,
                     })
                     ->sortable(),
                 TextColumn::make('description')
@@ -174,10 +171,10 @@ final class MenuResource extends Resource
                     ->label(__('menus.location'))
                     ->multiple()
                     ->options([
-                        'header'  => __('menus.locations.header'),
-                        'footer'  => __('menus.locations.footer'),
+                        'header' => __('menus.locations.header'),
+                        'footer' => __('menus.locations.footer'),
                         'sidebar' => __('menus.locations.sidebar'),
-                        'mobile'  => __('menus.locations.mobile'),
+                        'mobile' => __('menus.locations.mobile'),
                     ]),
             ])
             ->actions([
@@ -185,18 +182,17 @@ final class MenuResource extends Resource
                 EditAction::make(),
                 DeleteAction::make(),
                 Action::make('toggle_active')
-                    ->label(fn (Menu $record): string => $record->is_active ? __('menus.deactivate') : __('menus.activate'))
-                    ->icon(fn (Menu $record): string => $record->is_active ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
-                    ->color(fn (Menu $record): string => $record->is_active ? 'warning' : 'success')
+                    ->label(fn(Menu $record): string => $record->is_active ? __('menus.deactivate') : __('menus.activate'))
+                    ->icon(fn(Menu $record): string => $record->is_active ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
+                    ->color(fn(Menu $record): string => $record->is_active ? 'warning' : 'success')
                     ->requiresConfirmation()
                     ->action(function (Menu $record): void {
                         // Flip the active flag before Filament resolves the success notification payload.
-                        $record->update(['is_active' => ! $record->is_active]);
+                        $record->update(['is_active' => !$record->is_active]);
                     })
-                    ->successNotificationTitle(static fn (Menu $record): string => $record->is_active
+                    ->successNotificationTitle(static fn(Menu $record): string => $record->is_active
                         ? __('menus.activated_successfully')
-                        : __('menus.deactivated_successfully')
-                    ),
+                        : __('menus.deactivated_successfully')),
                 Action::make('duplicate')
                     ->label(__('menus.duplicate'))
                     ->icon('heroicon-o-document-duplicate')
@@ -208,6 +204,7 @@ final class MenuResource extends Resource
                         $duplicate = $record->replicate([
                             'created_at',
                             'updated_at',
+                            'items_count',
                         ]);
 
                         $duplicate->name = sprintf('%s (Copy)', $record->name);
@@ -269,10 +266,10 @@ final class MenuResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index'  => Pages\ListMenus::route('/'),
+            'index' => Pages\ListMenus::route('/'),
             'create' => Pages\CreateMenu::route('/create'),
-            'view'   => Pages\ViewMenu::route('/{record}'),
-            'edit'   => Pages\EditMenu::route('/{record}/edit'),
+            'view' => Pages\ViewMenu::route('/{record}'),
+            'edit' => Pages\EditMenu::route('/{record}/edit'),
         ];
     }
 

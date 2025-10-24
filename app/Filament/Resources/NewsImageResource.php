@@ -25,8 +25,8 @@ use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Tabs;
-use Filament\Forms\Components\Tabs\Tab;
+use Filament\Forms\Components\Tabs as SchemaTabs;
+use Filament\Forms\Components\Tabs\Tab as SchemaTab;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
@@ -83,7 +83,7 @@ final class NewsImageResource extends Resource
                         SchemaTab::make(__('admin.news_images.basic_information'))
                             ->icon('heroicon-o-photo')
                             ->schema([
-                                SchemaSection::make(__('admin.news_images.basic_information'))
+                        Section::make(__('admin.news_images.basic_information'))
                                     ->description(__('admin.news_images.basic_information_description'))
                                     ->schema([
                                         Select::make('news_id')
@@ -202,7 +202,7 @@ final class NewsImageResource extends Resource
                                                     ]);
                                                 }
                                             }),
-                                        SchemaGrid::make(2)
+                                        Grid::make(2)
                                             ->schema([
                                                 TextInput::make('alt_text')
                                                     ->label(__('admin.news_images.alt_text'))
@@ -221,7 +221,7 @@ final class NewsImageResource extends Resource
                                             ->columnSpanFull()
                                             ->maxLength(500)
                                             ->helperText(__('admin.news_images.caption_help')),
-                                        SchemaGrid::make(3)
+                                        Grid::make(3)
                                             ->schema([
                                                 Toggle::make('is_featured')
                                                     ->label(__('admin.news_images.is_featured'))
@@ -241,10 +241,10 @@ final class NewsImageResource extends Resource
                         SchemaTab::make(__('admin.news_images.technical_details'))
                             ->icon('heroicon-o-cog-6-tooth')
                             ->schema([
-                                SchemaSection::make(__('admin.news_images.technical_details'))
+                                Section::make(__('admin.news_images.technical_details'))
                                     ->description(__('admin.news_images.technical_details_description'))
                                     ->schema([
-                                        SchemaGrid::make(2)
+                                        Grid::make(2)
                                             ->schema([
                                                 TextInput::make('dimensions.width')
                                                     ->label(__('admin.news_images.width'))
@@ -282,7 +282,7 @@ final class NewsImageResource extends Resource
                         SchemaTab::make(__('admin.news_images.seo_metadata'))
                             ->icon('heroicon-o-magnifying-glass')
                             ->schema([
-                                SchemaSection::make(__('admin.news_images.seo_metadata'))
+                                Section::make(__('admin.news_images.seo_metadata'))
                                     ->description(__('admin.news_images.seo_metadata_description'))
                                     ->schema([
                                         TextInput::make('alt_text')

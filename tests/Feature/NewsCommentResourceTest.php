@@ -6,6 +6,7 @@ namespace Tests\Feature;
 
 use App\Models\News;
 use App\Models\NewsComment;
+use App\Models\Translations\NewsTranslation;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
@@ -14,6 +15,8 @@ use Tests\TestCase;
 final class NewsCommentResourceTest extends TestCase
 {
     use RefreshDatabase;
+
+    private const SUPPORTED_LOCALES = ['lt', 'en'];
 
     protected function setUp(): void
     {
@@ -30,7 +33,7 @@ final class NewsCommentResourceTest extends TestCase
     public function test_can_list_news_comments(): void
     {
         // Arrange
-        $news = News::factory()->create();
+        $news = $this->createTranslatedNews();
         $comments = NewsComment::factory()->count(3)->create(['news_id' => $news->id]);
 
         // Act & Assert
@@ -41,7 +44,7 @@ final class NewsCommentResourceTest extends TestCase
     public function test_can_create_news_comment(): void
     {
         // Arrange
-        $news = News::factory()->create();
+        $news = $this->createTranslatedNews();
         $commentData = [
             'news_id' => $news->id,
             'author_name' => 'John Doe',
@@ -71,7 +74,7 @@ final class NewsCommentResourceTest extends TestCase
     public function test_can_edit_news_comment(): void
     {
         // Arrange
-        $news = News::factory()->create();
+        $news = $this->createTranslatedNews();
         $comment = NewsComment::factory()->create([
             'news_id' => $news->id,
             'author_name' => 'Original Author',
@@ -104,7 +107,7 @@ final class NewsCommentResourceTest extends TestCase
     public function test_can_delete_news_comment(): void
     {
         // Arrange
-        $news = News::factory()->create();
+        $news = $this->createTranslatedNews();
         $comment = NewsComment::factory()->create(['news_id' => $news->id]);
 
         // Act
@@ -138,8 +141,8 @@ final class NewsCommentResourceTest extends TestCase
     public function test_can_filter_comments_by_news(): void
     {
         // Arrange
-        $news1 = News::factory()->create();
-        $news2 = News::factory()->create();
+        $news1 = $this->createTranslatedNews();
+        $news2 = $this->createTranslatedNews();
         $comment1 = NewsComment::factory()->create(['news_id' => $news1->id]);
         $comment2 = NewsComment::factory()->create(['news_id' => $news2->id]);
 
@@ -153,7 +156,7 @@ final class NewsCommentResourceTest extends TestCase
     public function test_can_filter_comments_by_approval_status(): void
     {
         // Arrange
-        $news = News::factory()->create();
+        $news = $this->createTranslatedNews();
         $approvedComment = NewsComment::factory()->create([
             'news_id' => $news->id,
             'is_approved' => true,
@@ -173,7 +176,7 @@ final class NewsCommentResourceTest extends TestCase
     public function test_can_filter_comments_by_visibility(): void
     {
         // Arrange
-        $news = News::factory()->create();
+        $news = $this->createTranslatedNews();
         $visibleComment = NewsComment::factory()->create([
             'news_id' => $news->id,
             'is_visible' => true,
@@ -193,7 +196,7 @@ final class NewsCommentResourceTest extends TestCase
     public function test_can_bulk_approve_comments(): void
     {
         // Arrange
-        $news = News::factory()->create();
+        $news = $this->createTranslatedNews();
         $comments = NewsComment::factory()->count(3)->create([
             'news_id' => $news->id,
             'is_approved' => false,
@@ -215,7 +218,7 @@ final class NewsCommentResourceTest extends TestCase
     public function test_can_bulk_disapprove_comments(): void
     {
         // Arrange
-        $news = News::factory()->create();
+        $news = $this->createTranslatedNews();
         $comments = NewsComment::factory()->count(3)->create([
             'news_id' => $news->id,
             'is_approved' => true,
@@ -250,7 +253,7 @@ final class NewsCommentResourceTest extends TestCase
     public function test_comment_validation_requires_author_name(): void
     {
         // Arrange
-        $news = News::factory()->create();
+        $news = $this->createTranslatedNews();
 
         // Act & Assert
         Livewire::test(\App\Filament\Resources\NewsCommentResource\Pages\CreateNewsComment::class)
@@ -266,7 +269,7 @@ final class NewsCommentResourceTest extends TestCase
     public function test_comment_validation_requires_author_email(): void
     {
         // Arrange
-        $news = News::factory()->create();
+        $news = $this->createTranslatedNews();
 
         // Act & Assert
         Livewire::test(\App\Filament\Resources\NewsCommentResource\Pages\CreateNewsComment::class)
@@ -282,7 +285,7 @@ final class NewsCommentResourceTest extends TestCase
     public function test_comment_validation_requires_content(): void
     {
         // Arrange
-        $news = News::factory()->create();
+        $news = $this->createTranslatedNews();
 
         // Act & Assert
         Livewire::test(\App\Filament\Resources\NewsCommentResource\Pages\CreateNewsComment::class)
@@ -298,7 +301,7 @@ final class NewsCommentResourceTest extends TestCase
     public function test_comment_validation_requires_valid_email(): void
     {
         // Arrange
-        $news = News::factory()->create();
+        $news = $this->createTranslatedNews();
 
         // Act & Assert
         Livewire::test(\App\Filament\Resources\NewsCommentResource\Pages\CreateNewsComment::class)
@@ -361,17 +364,20 @@ final class NewsCommentResourceTest extends TestCase
         $news = News::factory()->create();
         $parentComment = NewsComment::factory()->create(['news_id' => $news->id]);
 
-        $childCommentData = [
-            'news_id' => $news->id,
-            'parent_id' => $parentComment->id,
-            'author_name' => 'Child Author',
-            'author_email' => 'child@example.com',
-            'content' => 'This is a reply',
-        ];
-
-        // Act
-        Livewire::test(\App\Filament\Resources\NewsCommentResource\Pages\CreateNewsComment::class)
-            ->fillForm($childCommentData)
+        $component = Livewire::test(\App\Filament\Resources\NewsCommentResource\Pages\CreateNewsComment::class)
+            ->fillForm([
+                'news_id' => $news->id,
+                'parent_id' => $parentComment->id,
+            ])
+            ->assertFormSet([
+                'news_id' => $news->id,
+                'parent_id' => $parentComment->id,
+            ])
+            ->fillForm([
+                'author_name' => 'Child Author',
+                'author_email' => 'child@example.com',
+                'content' => 'This is a reply',
+            ])
             ->call('create')
             ->assertHasNoFormErrors();
 
@@ -382,5 +388,19 @@ final class NewsCommentResourceTest extends TestCase
             'author_name' => 'Child Author',
             'content' => 'This is a reply',
         ]);
+    }
+
+    private function createTranslatedNews(): News
+    {
+        $news = News::factory()->create();
+
+        foreach (self::SUPPORTED_LOCALES as $locale) {
+            NewsTranslation::factory()->create([
+                'news_id' => $news->id,
+                'locale' => $locale,
+            ]);
+        }
+
+        return $news;
     }
 }
