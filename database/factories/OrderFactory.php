@@ -7,7 +7,7 @@ namespace Database\Factories;
 use App\Models\Channel;
 use App\Models\Order;
 use App\Models\User;
-use App\Models\Zone;
+use App\Models\Country;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Schema;
 
@@ -35,7 +35,7 @@ class OrderFactory extends Factory
             'number' => 'ORD-'.strtoupper($this->faker->unique()->bothify('######')),
             'user_id' => null,
             'channel_id' => null,
-            'zone_id' => null,
+            'country_id' => null,
             'partner_id' => null,
             'status' => $this->faker->randomElement(['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'completed']),
             'payment_status' => $this->faker->randomElement(['pending', 'paid', 'failed', 'refunded', 'partially_refunded']),
@@ -205,15 +205,15 @@ class OrderFactory extends Factory
                     $order->setRelation('channel', Channel::factory()->make());
                 }
 
-                if ($order->zone_id === null && ! $order->relationLoaded('zone')) {
-                    $order->setRelation('zone', Zone::factory()->make());
+                if ($order->country_id === null && ! $order->relationLoaded('country')) {
+                    $order->setRelation('country', Country::factory()->make());
                 }
             })
             ->afterCreating(function (Order $order): void {
                 $dirty = false;
                 $userTable = (new User())->getTable();
                 $channelTable = (new Channel())->getTable();
-                $zoneTable = (new Zone())->getTable();
+                $countryTable = (new Country())->getTable();
 
                 if ($order->user_id === null && Schema::hasTable($userTable)) {
                     $order->user()->associate(User::factory()->create());
@@ -225,8 +225,8 @@ class OrderFactory extends Factory
                     $dirty = true;
                 }
 
-                if ($order->zone_id === null && Schema::hasTable($zoneTable)) {
-                    $order->zone()->associate(Zone::factory()->create());
+                if ($order->country_id === null && Schema::hasTable($countryTable)) {
+                    $order->country()->associate(Country::factory()->create());
                     $dirty = true;
                 }
 

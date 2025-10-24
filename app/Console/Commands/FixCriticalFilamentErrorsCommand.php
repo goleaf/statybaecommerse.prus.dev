@@ -28,7 +28,6 @@ final class FixCriticalFilamentErrorsCommand extends Command
             'PriceResource',
             'ReferralResource',
             'ReferralRewardResource',
-            'ZoneResource',
             'ReviewResource',
             'SystemSettingsResource',
             'ProductVariantResource',
