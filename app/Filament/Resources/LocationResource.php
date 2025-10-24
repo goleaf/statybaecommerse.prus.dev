@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 
+use App\Filament\Resources\LocationResource\Pages;
 use App\Models\City;
 use App\Models\Country;
 use App\Support\Concerns\HasNav;
@@ -93,10 +94,11 @@ final class LocationResource extends Resource
                                 ->searchable()
                                 ->preload()
                                 ->live(onBlur: true)
-                                ->afterStateUpdated(function ($state, Forms\Set $set): void {
+                                ->afterStateUpdated(function (?string $state, Forms\Set $set): void {
                                     if (! $state) {
                                         $set('country_id', null);
                                         $set('city_id', null);
+                                        $set('city_code', null);
 
                                         return;
                                     }
@@ -110,7 +112,7 @@ final class LocationResource extends Resource
                                     $set('city_id', null);
                                     $set('city_code', null);
                                 })
-                                ->afterStateHydrated(function (?string $state, Forms\Set $set): void {
+                                ->afterStateHydrated(function (?string $state, Forms\Set $set, Forms\Get $get): void {
                                     if (! $state) {
                                         $set('country_id', null);
 
@@ -120,6 +122,15 @@ final class LocationResource extends Resource
                                     $country = Country::withoutGlobalScopes()->where('cca2', $state)->first();
                                     if ($country) {
                                         $set('country_id', $country->getKey());
+                                    }
+
+                                    $currentCityId = $get('city_id');
+                                    if ($currentCityId) {
+                                        $city = City::withoutGlobalScopes()->find($currentCityId);
+                                        if (! $city || ($city->country && ($city->country->cca2 ?? $city->country->code) !== $state)) {
+                                            $set('city_id', null);
+                                            $set('city_code', null);
+                                        }
                                     }
                                 }),
                             Select::make('city_id')

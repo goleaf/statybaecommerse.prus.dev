@@ -10,8 +10,7 @@ use App\Filament\Resources\NormalSettingTranslationResource\Pages;
 use App\Models\NormalSetting;
 use App\Models\NormalSettingTranslation;
 use BackedEnum;
-use Filament\Schemas\Schema;
-use Filament\Forms\Components\Grid;
+use Filament\Actions;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -19,10 +18,17 @@ use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid as SchemaGrid;
 use Filament\Schemas\Components\Section as SchemaSection;
+use Filament\Schemas\Schema;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Support\Arr;
 use UnitEnum;
 
 /**
@@ -74,44 +80,38 @@ final class NormalSettingTranslationResource extends Resource
     {
         return $schema
             ->schema([
-                SchemaSection::make(__('admin.normal_setting_translations.basic_information'))
+                SchemaSection::make(__('admin.system_settings.normal_setting_translations.basic_information'))
                     ->schema([
                         SchemaGrid::make(2)
                             ->schema([
                                 Select::make('enhanced_setting_id')
-                                    ->label(__('admin.normal_setting_translations.enhanced_setting'))
+                                    ->label(__('admin.system_settings.normal_setting_translations.enhanced_setting'))
                                     ->options(fn (): array => NormalSetting::query()->pluck('key', 'id')->all())
                                     ->required()
                                     ->searchable(),
 
                                 Select::make('locale')
-                                    ->label(__('admin.normal_setting_translations.locale'))
-                                    ->options([
-                                        'en' => 'English',
-                                        'lt' => 'Lithuanian',
-                                        'de' => 'German',
-                                        'fr' => 'French',
-                                        'es' => 'Spanish',
-                                    ])
+                                    ->label(__('admin.system_settings.normal_setting_translations.locale'))
+                                    ->options(self::getLocaleOptions())
                                     ->required()
                                     ->native(false),
                             ]),
 
                         TextInput::make('display_name')
-                            ->label(__('admin.normal_setting_translations.display_name'))
+                            ->label(__('admin.system_settings.normal_setting_translations.display_name'))
                             ->required()
                             ->maxLength(255),
 
                         Textarea::make('description')
-                            ->label(__('admin.normal_setting_translations.description'))
+                            ->label(__('admin.system_settings.normal_setting_translations.description'))
                             ->maxLength(1000)
                             ->rows(3),
 
                         Textarea::make('help_text')
-                            ->label(__('admin.normal_setting_translations.help_text'))
+                            ->label(__('admin.system_settings.normal_setting_translations.help_text'))
                             ->maxLength(1000)
                             ->rows(3)
-                            ->helperText(__('admin.normal_setting_translations.help_text_help')),
+                            ->helperText(__('admin.system_settings.normal_setting_translations.help_text_help')),
                     ]),
             ]);
     }
@@ -122,13 +122,13 @@ final class NormalSettingTranslationResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('enhancedSetting.key')
-                    ->label(__('admin.normal_setting_translations.enhanced_setting'))
+                    ->label(__('admin.system_settings.normal_setting_translations.enhanced_setting'))
                     ->searchable()
                     ->sortable()
                     ->copyable(),
 
                 TextColumn::make('locale')
-                    ->label(__('admin.normal_setting_translations.locale'))
+                    ->label(__('admin.system_settings.normal_setting_translations.locale'))
                     ->badge()
                     ->color(fn (?string $state): string => match ($state) {
                         'en' => 'success',
@@ -137,22 +137,23 @@ final class NormalSettingTranslationResource extends Resource
                         'fr' => 'danger',
                         'es' => 'primary',
                         default => 'gray',
-                    }),
+                    })
+                    ->formatStateUsing(fn (?string $state): ?string => Arr::get(self::getLocaleOptions(), $state, $state)),
 
                 TextColumn::make('display_name')
-                    ->label(__('admin.normal_setting_translations.display_name'))
+                    ->label(__('admin.system_settings.normal_setting_translations.display_name'))
                     ->searchable()
                     ->sortable()
                     ->limit(50)
                     ->tooltip(fn (TextColumn $column): ?string => filled($state = $column->getState()) && mb_strlen((string) $state) > 50 ? (string) $state : null),
 
                 TextColumn::make('description')
-                    ->label(__('admin.normal_setting_translations.description'))
+                    ->label(__('admin.system_settings.normal_setting_translations.description'))
                     ->limit(50)
                     ->tooltip(fn (TextColumn $column): ?string => filled($state = $column->getState()) && mb_strlen((string) $state) > 50 ? (string) $state : null),
 
                 TextColumn::make('help_text')
-                    ->label(__('admin.normal_setting_translations.help_text'))
+                    ->label(__('admin.system_settings.normal_setting_translations.help_text'))
                     ->limit(50)
                     ->tooltip(fn (TextColumn $column): ?string => filled($state = $column->getState()) && mb_strlen((string) $state) > 50 ? (string) $state : null),
 
@@ -164,19 +165,13 @@ final class NormalSettingTranslationResource extends Resource
             ])
             ->filters([
                 SelectFilter::make('enhanced_setting_id')
-                    ->label(__('admin.normal_setting_translations.enhanced_setting'))
+                    ->label(__('admin.system_settings.normal_setting_translations.enhanced_setting'))
                     ->options(fn (): array => NormalSetting::query()->pluck('key', 'id')->all())
                     ->searchable(),
 
                 SelectFilter::make('locale')
-                    ->label(__('admin.normal_setting_translations.locale'))
-                    ->options([
-                        'en' => 'English',
-                        'lt' => 'Lithuanian',
-                        'de' => 'German',
-                        'fr' => 'French',
-                        'es' => 'Spanish',
-                    ]),
+                    ->label(__('admin.system_settings.normal_setting_translations.locale'))
+                    ->options(self::getLocaleOptions()),
             ])
             ->actions([
                 ViewAction::make(),
@@ -206,5 +201,12 @@ final class NormalSettingTranslationResource extends Resource
             'view'   => Pages\ViewNormalSettingTranslation::route('/{record}'),
             'edit'   => Pages\EditNormalSettingTranslation::route('/{record}/edit'),
         ];
+    }
+
+    private static function getLocaleOptions(): array
+    {
+        $options = trans('admin.system_settings.normal_setting_translations.locales');
+
+        return is_array($options) ? $options : [];
     }
 }

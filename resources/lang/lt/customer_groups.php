@@ -8,7 +8,7 @@ return [
     'permissions' => 'Leidimai',
     'settings' => 'Nustatymai',
     'name' => 'Grupės pavadinimas',
-    'code' => 'Identifikatorius',
+    'code' => 'Grupės kodas',
     'description' => 'Aprašymas',
     'discount_percentage' => 'Nuolaidos procentas (%)',
     'discount_fixed' => 'Fiksuota nuolaida (€)',
