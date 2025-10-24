@@ -12,10 +12,9 @@ return new class extends Migration
     {
         Schema::create('currencies', function (Blueprint $table): void {
             $table->id();
-            // Translatable attributes are stored as JSON to support multilingual names and descriptions.
-            $table->json('name');
-            $table->json('description')->nullable();
-            $table->string('code', 3)->unique();
+            $table->string('name');
+            $table->text('description')->nullable();
+            $table->string('code', 5)->unique();
             // Allow ISO style references such as "USD-840" without truncation while staying compact for indexes.
             $table->string('iso_code', 10)->nullable()->unique();
             $table->string('symbol', 10)->nullable();

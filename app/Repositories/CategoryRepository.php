@@ -73,4 +73,38 @@ final class CategoryRepository
 
         return Cache::remember($key, $expiresAt, $callback);
     }
+
+    public function getVisibleTree(?string $locale = null): Collection
+    {
+        $resolvedLocale = $locale ?? app()->getLocale();
+        $supportsTags = CacheTagHelper::supportsTags();
+        $cacheKey = CacheKeys::categoryNavigationTree();
+
+        if (! $supportsTags) {
+            $cacheKey .= ':'.$resolvedLocale;
+        }
+
+        $callback = static function () use ($resolvedLocale): Collection {
+            return Category::query()
+                ->topLevelVisible()
+                ->withLocale($resolvedLocale)
+                ->withCount('products')
+                ->with([
+                    'children' => static fn ($query) => $query
+                        ->visible()
+                        ->ordered()
+                        ->withLocale($resolvedLocale)
+                        ->withCount('products'),
+                ])
+                ->ordered()
+                ->get();
+        };
+
+        $tags = CacheTagHelper::merge(
+            CacheTagHelper::categories(),
+            CacheTagHelper::locale($resolvedLocale)
+        );
+
+        return $this->remember($cacheKey, CacheKeys::TTL_FIVE_MINUTES, $callback, $supportsTags ? $tags : []);
+    }
 }

@@ -25,7 +25,9 @@ final class ProductContractPresenter
         );
 
         return self::envelope(
-            ['items' => $items],
+            [
+                'items' => $items,
+            ],
             [
                 'query' => $output->getQuery(),
                 'total' => $output->getTotal(),
@@ -62,8 +64,11 @@ final class ProductContractPresenter
 
     public static function fromDetails(ProductDetailsDto $output): array
     {
+        $product = self::mapSummary($output->getSummary());
+
         return self::envelope([
-            'item' => self::mapSummary($output->getSummary()),
+            'product' => $product,
+            'item' => $product,
         ]);
     }
 

@@ -51,6 +51,7 @@ return [
         'resources' => [
             App\Filament\Resources\SystemSettingResource::class,
             App\Filament\Resources\CustomerManagementResource::class,
+            App\Filament\Resources\AddressResource::class,
         ],
         'pages' => [
             App\Filament\Pages\Dashboard::class,

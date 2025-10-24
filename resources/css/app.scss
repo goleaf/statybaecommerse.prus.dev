@@ -12,6 +12,12 @@
 @use 'sass:meta';
 @use 'sass:selector';
 
+// Load variable font families via @fontsource to ensure Vite resolves assets at build time.
+@include meta.load-css('@fontsource-variable/inter/index.css');
+@include meta.load-css('@fontsource-variable/space-grotesk/index.css');
+@include meta.load-css('@fontsource-variable/figtree/index.css');
+@include meta.load-css('@fontsource-variable/instrument-sans/index.css');
+
 // 2. SCSS VARIABLES & MIXINS
 // =============================================================================
 
@@ -1987,41 +1993,7 @@ $transition-slow: 0.5s ease;
 
 // 4. FONT LOADING OPTIMIZATION
 // =============================================================================
-@font-face {
-  font-family: 'Inter';
-  font-style: normal;
-  font-weight: 100 900;
-  font-display: swap;
-  src: url('../fonts/inter-var.woff2') format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-
-@font-face {
-  font-family: 'Space Grotesk';
-  font-style: normal;
-  font-weight: 300 700;
-  font-display: swap;
-  src: url('../fonts/space-grotesk-var.woff2') format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-
-@font-face {
-  font-family: 'Figtree';
-  font-style: normal;
-  font-weight: 300 900;
-  font-display: swap;
-  src: url('../fonts/figtree-var.woff2') format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-
-@font-face {
-  font-family: 'Instrument Sans';
-  font-style: normal;
-  font-weight: 400 700;
-  font-display: swap;
-  src: url('../fonts/instrument-sans-var.woff2') format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
+// Variable font faces are provided by @fontsource-variable packages (see meta.load-css calls above).
 
 // 5. OPTIMIZED COMPONENT STYLES WITH MIXINS
 // =============================================================================

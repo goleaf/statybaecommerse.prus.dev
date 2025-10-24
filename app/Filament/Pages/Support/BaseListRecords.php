@@ -27,6 +27,11 @@ abstract class BaseListRecords extends ListRecords
         return $this->applyToggleableTableLayout($table);
     }
 
+    protected function authorizeAccess(): void
+    {
+        abort_unless(static::getResource()::canViewAny(), 403);
+    }
+
     /**
      * Bridge legacy Livewire test helpers that still call the `create` method directly.
      */

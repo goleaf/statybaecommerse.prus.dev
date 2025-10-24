@@ -7,7 +7,6 @@ namespace App\Support\Search;
 use App\Models\Product;
 use DefStudio\SearchableInput\DTO\SearchResult;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Schema;
 
 final class ProductSearch
@@ -73,25 +72,94 @@ final class ProductSearch
         $search = trim($term);
 
         $builder = Product::query()
-            ->withoutGlobalScope(SoftDeletingScope::class)
-            ->select(['id', 'sku', 'barcode', 'name', 'price'])
-            ->when($search !== '', function (Builder $builder) use ($search): void {
-                $builder->where(function (Builder $query) use ($search): void {
-                    $query
-                        ->where('sku', 'like', "%{$search}%")
-                        ->orWhere('barcode', 'like', "%{$search}%")
-                        ->orWhere('name->lt', 'like', "%{$search}%")
-                        ->orWhere('name->en', 'like', "%{$search}%");
-                });
-            })
-            ->orderByDesc('updated_at');
+            ->withoutGlobalScopes()
+            ->select(['id', 'sku', 'barcode', 'name', 'price', 'updated_at']);
 
-        if (Schema::hasColumn($builder->getModel()->getTable(), 'deleted_at')) {
+        self::applyAvailabilityFilters($builder);
+
+        if ($search !== '') {
+            $builder->where(function (Builder $query) use ($search): void {
+                $like = "%{$search}%";
+
+                $query
+                    ->where('sku', 'like', $like)
+                    ->orWhere('barcode', 'like', $like);
+
+                self::applyNameSearchConstraint($query, $search);
+            });
+        }
+
+        $builder->orderByDesc('updated_at');
+
+        $table = $builder->getModel()->getTable();
+
+        if (Schema::hasColumn($table, 'deleted_at')) {
             // Respect soft delete semantics when the column exists so storefront queries stay aligned with production data.
-            $builder->whereNull('deleted_at');
+            $builder->whereNull("{$table}.deleted_at");
         }
 
         return $builder;
+    }
+
+    private static function applyAvailabilityFilters(Builder $builder): void
+    {
+        $table = $builder->getModel()->getTable();
+
+        if (Schema::hasColumn($table, 'is_active')) {
+            $builder->where("{$table}.is_active", true);
+        }
+
+        if (Schema::hasColumn($table, 'is_visible')) {
+            $builder->where("{$table}.is_visible", true);
+        }
+
+        if (Schema::hasColumn($table, 'is_enabled')) {
+            $builder->where("{$table}.is_enabled", true);
+        }
+
+        if (Schema::hasColumn($table, 'status')) {
+            $builder->where("{$table}.status", 'published');
+        }
+
+        if (Schema::hasColumn($table, 'published_at')) {
+            $builder
+                ->whereNotNull("{$table}.published_at")
+                ->where("{$table}.published_at", '<=', now());
+        }
+    }
+
+    private static function applyNameSearchConstraint(Builder $query, string $search): void
+    {
+        $like = "%{$search}%";
+        $driver = $query->getConnection()->getDriverName();
+        $table = $query->getModel()->getTable();
+        $column = "{$table}.name";
+
+        if (in_array($driver, ['mysql', 'mariadb'], true)) {
+            $query
+                ->orWhereRaw("JSON_UNQUOTE(JSON_EXTRACT({$column}, '$.en')) LIKE ?", [$like])
+                ->orWhereRaw("JSON_UNQUOTE(JSON_EXTRACT({$column}, '$.lt')) LIKE ?", [$like]);
+
+            return;
+        }
+
+        if ($driver === 'pgsql') {
+            $query
+                ->orWhereRaw("({$column}->>'en') ILIKE ?", [$like])
+                ->orWhereRaw("({$column}->>'lt') ILIKE ?", [$like]);
+
+            return;
+        }
+
+        if ($driver === 'sqlite') {
+            $query
+                ->orWhereRaw("json_extract({$column}, '$.en') LIKE ?", [$like])
+                ->orWhereRaw("json_extract({$column}, '$.lt') LIKE ?", [$like]);
+
+            return;
+        }
+
+        $query->orWhere($column, 'like', $like);
     }
 
     private static function formatLabel(Product $product): string

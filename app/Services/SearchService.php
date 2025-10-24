@@ -38,15 +38,16 @@ final class SearchService
             ? $query
             : $this->legacyQueryData((string) $query, $limit);
         $originalQuery = $queryData->query();
-        $normalizedQuery = $this->sanitizeQueryString($originalQuery);
+        $sanitised = $this->sanitizeQueryString($originalQuery);
+        $normalizedQuery = $sanitised['query'];
 
-        if ($normalizedQuery === '') {
+        if ($sanitised['blocked'] || $normalizedQuery === '') {
             return $isAggregated
-                ? $this->emptyAggregatedPayload($queryData, $originalQuery)
+                ? $this->blockedAggregatedPayload($queryData, $originalQuery)
                 : [];
         }
 
-        if ($normalizedQuery !== $originalQuery) {
+        if ($sanitised['modified']) {
             $queryData = SearchQueryData::fromArray([
                 'query'    => $normalizedQuery,
                 'page'     => $queryData->page(),
@@ -92,12 +93,13 @@ final class SearchService
         ];
 
         $groupedResults = $this->groupResultsByType($pageResults, $bucketCounts);
-        $returnedCount = $isAggregated
-            ? array_sum(array_map(static fn (array $bucket): int => count($bucket['items']), $groupedResults))
-            : count($pageResults);
+        $returnedCount = count($pageResults);
+        $dataPayload = $isAggregated
+            ? $this->mergeFlatResults($groupedResults, $pageResults)
+            : $pageResults;
 
         $payload = [
-            'data' => $isAggregated ? $groupedResults : $pageResults,
+            'data' => $dataPayload,
             'meta' => [
                 'query' => $originalQuery,
                 'page' => $queryData->page(),
@@ -228,6 +230,34 @@ final class SearchService
         return config('search.driver') === 'scout' && config('search.scout.enabled');
     }
 
+    private function blockedAggregatedPayload(SearchQueryData $queryData, ?string $originalQuery = null): array
+    {
+        $bucketCounts = [
+            'product' => 0,
+            'category' => 0,
+            'brand' => 0,
+        ];
+
+        return [
+            'data' => [],
+            'meta' => [
+                'query' => $originalQuery ?? $queryData->query(),
+                'page' => $queryData->page(),
+                'per_page' => $queryData->perPage(),
+                'max_per_page' => SearchQueryData::MAX_PER_PAGE,
+                'total_results' => 0,
+                'returned' => 0,
+                'has_more' => false,
+                'took_ms' => 0,
+                'types' => $queryData->types(),
+                'cached' => false,
+                'blocked' => true,
+            ],
+            'buckets' => $bucketCounts,
+            'aggregations' => $this->groupResultsByType([], $bucketCounts),
+        ];
+    }
+
     /**
      * Build the standard aggregated payload for the suspicious query branch.
      */
@@ -257,6 +287,21 @@ final class SearchService
             ],
             'buckets' => $bucketCounts,
         ];
+    }
+
+    private function mergeFlatResults(array $groupedResults, array $pageResults): array
+    {
+        if ($pageResults === []) {
+            return $groupedResults;
+        }
+
+        $merged = $groupedResults;
+
+        foreach (array_values($pageResults) as $index => $result) {
+            $merged[(string) $index] = $result;
+        }
+
+        return $merged;
     }
 
     /**
@@ -317,13 +362,89 @@ final class SearchService
         ];
     }
 
-    private function sanitizeQueryString(string $query): string
+    /**
+     * @return array{query:string, blocked:bool, modified:bool}
+     */
+    private function sanitizeQueryString(string $query): array
     {
-        $cleaned = preg_replace('/(--|\\/\\*|\\*\\/)/', ' ', $query);
-        $cleaned = preg_replace('/[\'";=#]/', ' ', $cleaned ?? '');
-        $cleaned = preg_replace('/[^\\p{L}\\p{N}\\s]/u', ' ', $cleaned ?? '');
-        $cleaned = preg_replace('/\\s+/u', ' ', $cleaned ?? '');
+        $original = trim($query);
 
-        return trim($cleaned ?? '');
+        if ($original === '') {
+            return [
+                'query' => '',
+                'blocked' => false,
+                'modified' => false,
+            ];
+        }
+
+        $normalized = str_replace(["\r", "\n", "\t"], ' ', $original);
+
+        $blocked = false;
+        $modified = false;
+
+        $normalized = preg_replace('/(--|\\/\\*|\\*\\/)/', ' ', $normalized ?? '', -1, $commentCount);
+        if (($commentCount ?? 0) > 0) {
+            $modified = true;
+        }
+
+        $normalized = str_replace([';', '"', '`'], ' ', $normalized ?? '');
+
+        $tokens = preg_split('/\\s+/', $normalized ?? '', -1, PREG_SPLIT_NO_EMPTY);
+        $safeTokens = [];
+
+        $reservedKeywords = ['select', 'insert', 'update', 'delete', 'drop', 'union', 'where', 'from', 'join'];
+        $logicalOperators = ['or', 'and'];
+
+        foreach ($tokens as $token) {
+            $stripped = trim($token, " \t\n\r\0\x0B\"'");
+
+            if ($stripped === '') {
+                $modified = true;
+                continue;
+            }
+
+            $lower = mb_strtolower($stripped, 'UTF-8');
+
+            if (str_contains($stripped, '%') || str_contains($stripped, '_')) {
+                $blocked = true;
+                $modified = true;
+                continue;
+            }
+
+            if (preg_match('/[=<>]/', $stripped) === 1) {
+                $modified = true;
+                continue;
+            }
+
+            if (in_array($lower, $reservedKeywords, true)) {
+                $blocked = true;
+                $modified = true;
+                continue;
+            }
+
+            if (in_array($lower, $logicalOperators, true)) {
+                $modified = true;
+                continue;
+            }
+
+            if (preg_match('/^[\\p{L}\\p{N}\\-\\+\\/]+$/u', $stripped) !== 1) {
+                $modified = true;
+                continue;
+            }
+
+            $safeTokens[] = $stripped;
+        }
+
+        $cleaned = implode(' ', $safeTokens);
+
+        if ($cleaned === '') {
+            $blocked = true;
+        }
+
+        return [
+            'query' => $cleaned,
+            'blocked' => $blocked,
+            'modified' => $modified || $cleaned !== $original,
+        ];
     }
 }

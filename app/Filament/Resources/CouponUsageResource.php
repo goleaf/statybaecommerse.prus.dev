@@ -12,10 +12,13 @@ use Filament\Schemas\Schema;
 use App\Filament\Resources\CouponUsageResource\Pages;
 use App\Models\Coupon;
 use App\Models\CouponUsage;
+use App\Models\User;
 use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
 use App\Support\Search\CouponSearch;
 use App\Support\Search\CustomerSearch;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
+use Filament\Infolists\Components\KeyValueEntry;
+use Filament\Infolists\Components\TextEntry;
 // Alias schema grid to match Filament v4 schema-based layouts in the resource.
 use Filament\Schemas\Components\Grid as SchemaGrid;
 use Filament\Forms\Components\KeyValue;
@@ -45,6 +48,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Number;
 
 final class CouponUsageResource extends Resource
 {
@@ -199,6 +203,54 @@ final class CouponUsageResource extends Resource
                                 ])->columns(2),
                         ]),
                 ])->columnSpanFull(),
+        ]);
+    }
+
+    public static function infolist(Schema $schema): Schema   
+    {
+        return $schema->schema([
+            SchemaSection::make(__('admin.coupon_usages.form.sections.basic_information'))
+                ->schema([
+                    TextEntry::make('coupon.code')
+                        ->label(__('admin.coupon_usages.form.fields.coupon'))
+                        ->placeholder('-'),
+                    TextEntry::make('user.name')
+                        ->label(__('admin.coupon_usages.form.fields.user'))
+                        ->placeholder('-'),
+                    TextEntry::make('order_id')
+                        ->label(__('admin.coupon_usages.form.fields.order'))
+                        ->formatStateUsing(static fn ($state): string => $state ? "Order #{$state}" : '-'),
+                    TextEntry::make('discount_amount')
+                        ->label(__('admin.coupon_usages.form.fields.discount_amount'))
+                        ->formatStateUsing(static function ($state): string {
+                            if ($state === null || $state === '') {
+                                return number_format(0, 2, '.', '');
+                            }
+
+                            return number_format((float) $state, 2, '.', '');
+                        }),
+                    TextEntry::make('used_at')
+                        ->label(__('admin.coupon_usages.form.fields.used_at'))
+                        ->dateTime()
+                        ->placeholder('-'),
+                ])
+                ->columns(2),
+            SchemaSection::make(__('admin.coupon_usages.form.sections.usage_details'))
+                ->schema([
+                    KeyValueEntry::make('metadata')
+                        ->label(__('admin.coupon_usages.form.fields.metadata'))
+                        ->placeholder('-')
+                        ->columnSpanFull(),
+                    TextEntry::make('created_at')
+                        ->label(__('admin.coupon_usages.form.fields.created_at'))
+                        ->dateTime()
+                        ->placeholder('-'),
+                    TextEntry::make('updated_at')
+                        ->label(__('admin.coupon_usages.form.fields.updated_at'))
+                        ->dateTime()
+                        ->placeholder('-'),
+                ])
+                ->columns(2),
         ]);
     }
 

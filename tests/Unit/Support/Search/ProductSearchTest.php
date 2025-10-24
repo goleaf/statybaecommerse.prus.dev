@@ -4,44 +4,21 @@ declare(strict_types=1);
 
 use App\Models\Product;
 use App\Support\Search\ProductSearch;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Foundation\Testing\RefreshDatabaseState;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Schema;
 
-uses()->group('searchable-input');
-
-beforeEach(function (): void {
-    RefreshDatabaseState::$migrated = true;
-
-    Schema::withoutForeignKeyConstraints(static function (): void {
-        Schema::dropIfExists('products');
-    });
-
-    Schema::create('products', function (Blueprint $table): void {
-        $table->id();
-        $table->string('sku')->nullable();
-        $table->string('barcode')->nullable();
-        $table->json('name')->nullable();
-        $table->decimal('price', 10, 2)->nullable();
-        $table->boolean('is_active')->default(true);
-        $table->boolean('is_visible')->default(true);
-        $table->string('status')->nullable();
-        $table->timestamp('published_at')->nullable();
-        $table->timestamps();
-    });
-});
+uses(RefreshDatabase::class)->group('searchable-input');
 
 it('unit: returns formatted product labels for free text search', function (): void {
-    $product = Product::unguarded(fn () => Product::create([
+    $product = Product::factory()->create([
         'sku'          => 'TEST-SKU',
         'name'         => ['en' => 'Makita Hammer', 'lt' => 'Makita Plaktukas'],
-        'is_active'    => true,
         'is_visible'   => true,
+        'is_enabled'   => true,
         'status'       => 'published',
         'published_at' => Carbon::now()->subDay(),
         'updated_at'   => Carbon::now(),
-    ]));
+    ]);
 
     $results = ProductSearch::byFreeText('Makita');
 
@@ -52,16 +29,16 @@ it('unit: returns formatted product labels for free text search', function (): v
 });
 
 it('unit: returns search result metadata for product lookups', function (): void {
-    $product = Product::unguarded(fn () => Product::create([
+    $product = Product::factory()->create([
         'sku'          => 'META-001',
         'price'        => 19.99,
         'name'         => ['en' => 'Bosch Drill', 'lt' => 'Bosch Gręžtuvas'],
-        'is_active'    => true,
         'is_visible'   => true,
+        'is_enabled'   => true,
         'status'       => 'published',
         'published_at' => Carbon::now()->subDay(),
         'updated_at'   => Carbon::now(),
-    ]));
+    ]);
 
     $results = ProductSearch::complex('Bosch');
 

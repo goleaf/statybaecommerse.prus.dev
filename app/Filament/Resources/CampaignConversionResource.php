@@ -11,10 +11,14 @@ use App\Models\CampaignConversion;
 use App\Models\User;
 use BackedEnum;
 use Filament\Forms;
+use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Infolists\Components\Grid as InfolistGrid;
+use Filament\Infolists\Components\Section as InfolistSection;
+use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid as SchemaGrid;
 use Filament\Schemas\Components\Section as SchemaSection;
@@ -412,7 +416,7 @@ final class CampaignConversionResource extends Resource
             'index'  => Pages\ListCampaignConversions::route('/'),
             'create' => Pages\CreateCampaignConversion::route('/create'),
             'edit'   => Pages\EditCampaignConversion::route('/{record}/edit'),
-            'view'   => Pages\ViewCampaignConversion::route('/{record}'),
+            'view'   => Pages\ViewCampaignConversion::route('/view/{record}'),
         ];
     }
 }

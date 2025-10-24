@@ -42,6 +42,8 @@ final class PartnerApiAuthenticate
         $apiKey->forceFill(['last_used_at' => now()])->save();
 
         $request->attributes->set('partner_api_key', $apiKey);
+        $request->attributes->set('partner_api_pipeline', 'legacy');
+        $request->attributes->set('partner_api_abilities', $apiKey->resolvedScopes());
 
         return $next($request);
     }

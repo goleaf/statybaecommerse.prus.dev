@@ -11,8 +11,14 @@ use App\Models\OrderItem;
 use App\Models\OrderShipping;
 use App\Models\Product;
 use App\Models\User;
+use App\Support\Contracts\Entities\BrandContract;
+use App\Support\Contracts\Entities\CategoryContract;
+use App\Support\Contracts\Entities\OrderContract;
+use App\Support\Contracts\Entities\ProductContract;
+use App\Support\Contracts\Entities\UserContract;
 use App\Support\Contracts\SimpleJsonSchemaValidator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 use function collect;
 
@@ -42,15 +48,17 @@ final class ContractValidationTest extends TestCase
         $response = $this->getJson('/api/products/search?q='.urlencode(substr($product->name, 0, 4)));
 
         $response->assertOk();
-        $contractProducts = $response->json('data.products');
-        $this->assertNotEmpty($contractProducts);
-        $payload = collect($contractProducts)->firstWhere('id', $product->id);
-        $this->assertNotNull($payload, 'Product payload not found in response.');
-        $this->assertSame([], $this->validator->validate('product', $payload));
+        $payload = $response->json();
+        $this->assertSame([], $this->validator->validate($payload, ProductContract::schemaPath()));
+
+        $items = $payload['data']['items'] ?? [];
+        $this->assertNotEmpty($items);
+        $productPayload = collect($items)->firstWhere('id', $product->id);
+        $this->assertNotNull($productPayload, 'Product payload not found in response.');
 
         $invalid = $payload;
-        unset($invalid['sku']);
-        $this->assertNotEmpty($this->validator->validate('product', $invalid));
+        unset($invalid['data']['items'][0]['sku']);
+        $this->assertNotEmpty($this->validator->validate($invalid, ProductContract::schemaPath()));
     }
 
     public function test_category_tree_response_matches_contract(): void
@@ -60,14 +68,15 @@ final class ContractValidationTest extends TestCase
 
         $response = $this->getJson('/api/categories/tree');
         $response->assertOk();
-        $categories = $response->json('data.categories');
+        $payload = $response->json();
+        $this->assertSame([], $this->validator->validate($payload, CategoryContract::schemaPath()));
+
+        $categories = $payload['data']['items'] ?? [];
         $this->assertNotEmpty($categories);
-        $payload = $categories[0];
-        $this->assertSame([], $this->validator->validate('category', $payload));
 
         $invalid = $payload;
-        $invalid['order'] = 'first';
-        $this->assertNotEmpty($this->validator->validate('category', $invalid));
+        $invalid['data']['items'][0]['order'] = 'first';
+        $this->assertNotEmpty($this->validator->validate($invalid, CategoryContract::schemaPath()));
     }
 
     public function test_brand_show_response_matches_contract(): void
@@ -76,12 +85,12 @@ final class ContractValidationTest extends TestCase
 
         $response = $this->getJson('/api/brands/'.$brand->slug);
         $response->assertOk();
-        $payload = $response->json('data.brand');
-        $this->assertSame([], $this->validator->validate('brand', $payload));
+        $payload = $response->json();
+        $this->assertSame([], $this->validator->validate($payload, BrandContract::schemaPath()));
 
         $invalid = $payload;
-        $invalid['url'] = 123;
-        $this->assertNotEmpty($this->validator->validate('brand', $invalid));
+        $invalid['data']['item']['website'] = 123;
+        $this->assertNotEmpty($this->validator->validate($invalid, BrandContract::schemaPath()));
     }
 
     public function test_order_show_response_matches_contract(): void
@@ -108,14 +117,14 @@ final class ContractValidationTest extends TestCase
         ]);
 
         $this->actingAs($user);
-        $response = $this->getJson('/api/orders/'.$order->getKey());
+        $response = $this->getJson('/api/orders/'.$order->number);
         $response->assertOk();
-        $payload = $response->json('data.order');
-        $this->assertSame([], $this->validator->validate('order', $payload));
+        $payload = $response->json();
+        $this->assertSame([], $this->validator->validate($payload, OrderContract::schemaPath()));
 
         $invalid = $payload;
-        $invalid['items'][0]['quantity'] = 'two';
-        $this->assertNotEmpty($this->validator->validate('order', $invalid));
+        $invalid['data']['order']['items'][0]['quantity'] = 'two';
+        $this->assertNotEmpty($this->validator->validate($invalid, OrderContract::schemaPath()));
     }
 
     public function test_user_profile_response_matches_contract(): void
@@ -125,14 +134,14 @@ final class ContractValidationTest extends TestCase
             'last_name' => 'Meistras',
         ]);
 
-        $this->actingAs($user);
-        $response = $this->getJson('/api/user/profile');
+        Sanctum::actingAs($user, ['profile.read']);
+        $response = $this->getJson('/api/v1/user');
         $response->assertOk();
-        $payload = $response->json('data');
-        $this->assertSame([], $this->validator->validate('user', $payload));
+        $payload = $response->json();
+        $this->assertSame([], $this->validator->validate($payload, UserContract::schemaPath()));
 
         $invalid = $payload;
-        $invalid['email'] = 'not-an-email';
-        $this->assertNotEmpty($this->validator->validate('user', $invalid));
+        $invalid['data']['item']['contact']['email'] = 'not-an-email';
+        $this->assertNotEmpty($this->validator->validate($invalid, UserContract::schemaPath()));
     }
 }

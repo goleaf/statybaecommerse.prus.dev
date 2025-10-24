@@ -11,6 +11,8 @@ trait InteractsWithRateLimitSchema
 {
     protected function migrateRateLimitSchema(): void
     {
+        Schema::disableForeignKeyConstraints();
+
         Schema::dropIfExists('exports');
         Schema::dropIfExists('users');
         Schema::dropIfExists('addresses');
@@ -121,10 +123,14 @@ trait InteractsWithRateLimitSchema
             $table->unsignedBigInteger('model_id');
             $table->primary(['role_id', 'model_id', 'model_type']);
         });
+
+        Schema::enableForeignKeyConstraints();
     }
 
     protected function resetRateLimitSchema(): void
     {
+        Schema::disableForeignKeyConstraints();
+
         Schema::dropIfExists('user_wishlists');
         Schema::dropIfExists('products');
         Schema::dropIfExists('orders');
@@ -135,5 +141,7 @@ trait InteractsWithRateLimitSchema
         Schema::dropIfExists('reviews');
         Schema::dropIfExists('model_has_roles');
         Schema::dropIfExists('roles');
+
+        Schema::enableForeignKeyConstraints();
     }
 }

@@ -522,6 +522,7 @@ Route::prefix('api')->group(function (): void {
     Route::get('/brands', [App\Http\Controllers\Api\BrandController::class, 'index'])->name('api.brands.index');
     Route::get('/brands/{brand:slug}', [App\Http\Controllers\Api\BrandController::class, 'show'])->name('api.brands.show');
     Route::middleware('auth')->get('/orders/{order:number}', [App\Http\Controllers\Api\OrderController::class, 'show'])->name('api.orders.show');
+    Route::middleware('auth')->get('/user/profile', [App\Http\Controllers\Api\UserProfileController::class, '__invoke'])->name('api.user.profile');
 });
 
 // Public utility endpoints

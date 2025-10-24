@@ -17,6 +17,38 @@ use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 final class ApiServiceProvider extends ServiceProvider
 {
+    /**
+     * @var array<string, mixed>
+     */
+    private array $configBaselines = [];
+
+    /**
+     * @param  \Illuminate\Contracts\Foundation\Application  $app
+     */
+    public function __construct($app)
+    {
+        parent::__construct($app);
+
+        $this->seedConfigBaselines([
+            'api.rate_limits.read',
+            'security.rate_limiting.api.read',
+            'api.rate_limits.write',
+            'security.rate_limiting.api.write',
+            'api.rate_limits.autocomplete',
+            'security.rate_limiting.api.autocomplete',
+            'api.rate_limits.profile',
+            'security.rate_limiting.api.profile',
+            'api.rate_limits.exports',
+            'security.rate_limiting.api.exports',
+            'api.rate_limits.frontend.checkout',
+            'security.rate_limiting.frontend.checkout',
+            'api.rate_limits.defaults.minute',
+            'security.rate_limiting.defaults.minute',
+            'api.rate_limits.default',
+            'security.rate_limiting.api.default',
+        ]);
+    }
+
     public function boot(): void
     {
         RateLimiter::for('api.default', function (Request $request): array {
@@ -115,7 +147,7 @@ final class ApiServiceProvider extends ServiceProvider
      */
     private function readRateLimitConfig(): array
     {
-        $config = config('security.rate_limiting.api.read');
+        $config = $this->configValue('api.rate_limits.read', 'security.rate_limiting.api.read');
 
         return $this->normalizeRateLimitConfig($config, $this->defaultRateLimitConfig());
     }
@@ -125,7 +157,7 @@ final class ApiServiceProvider extends ServiceProvider
      */
     private function writeRateLimitConfig(): array
     {
-        $config = config('security.rate_limiting.api.write');
+        $config = $this->configValue('api.rate_limits.write', 'security.rate_limiting.api.write');
 
         return $this->normalizeRateLimitConfig($config, $this->defaultRateLimitConfig());
     }
@@ -240,7 +272,11 @@ final class ApiServiceProvider extends ServiceProvider
      */
     private function notificationRateLimitConfig(string $type): array
     {
-        $config = data_get(config('security.rate_limiting.api.notifications'), $type);
+        $config = data_get(config('api.rate_limits.notifications'), $type);
+
+        if ($config === null) {
+            $config = data_get(config('security.rate_limiting.api.notifications'), $type);
+        }
 
         return $this->normalizeRateLimitConfig($config, $this->defaultRateLimitConfig());
     }
@@ -250,7 +286,7 @@ final class ApiServiceProvider extends ServiceProvider
      */
     private function autocompleteRateLimitConfig(): array
     {
-        $config = config('security.rate_limiting.api.autocomplete');
+        $config = $this->configValue('api.rate_limits.autocomplete', 'security.rate_limiting.api.autocomplete');
 
         return $this->normalizeRateLimitConfig($config, [
             'per_user' => 30,
@@ -263,7 +299,7 @@ final class ApiServiceProvider extends ServiceProvider
      */
     private function profileRateLimitConfig(): array
     {
-        $config = config('security.rate_limiting.api.profile');
+        $config = $this->configValue('api.rate_limits.profile', 'security.rate_limiting.api.profile');
 
         return $this->normalizeRateLimitConfig($config, $this->readRateLimitConfig());
     }
@@ -273,7 +309,7 @@ final class ApiServiceProvider extends ServiceProvider
      */
     private function exportRateLimitConfig(): array
     {
-        $config = config('security.rate_limiting.api.exports');
+        $config = $this->configValue('api.rate_limits.exports', 'security.rate_limiting.api.exports');
 
         return $this->normalizeRateLimitConfig($config, $this->defaultRateLimitConfig());
     }
@@ -283,7 +319,7 @@ final class ApiServiceProvider extends ServiceProvider
      */
     private function checkoutRateLimitConfig(): array
     {
-        $config = config('security.rate_limiting.frontend.checkout');
+        $config = $this->configValue('api.rate_limits.frontend.checkout', 'security.rate_limiting.frontend.checkout');
 
         return $this->normalizeRateLimitConfig($config, [
             'per_user' => 10,
@@ -296,8 +332,9 @@ final class ApiServiceProvider extends ServiceProvider
      */
     private function defaultRateLimitConfig(): array
     {
-        $baseline = max(1, (int) config('security.rate_limiting.defaults.minute', 60));
-        $config = config('security.rate_limiting.api.default');
+        $baselineConfig = $this->configValue('api.rate_limits.defaults.minute', 'security.rate_limiting.defaults.minute', 60);
+        $baseline = max(1, (int) $baselineConfig);
+        $config = $this->configValue('api.rate_limits.default', 'security.rate_limiting.api.default');
 
         if (! is_array($config)) {
             $value = $this->normalizeLimitValue($config, $baseline);
@@ -340,6 +377,51 @@ final class ApiServiceProvider extends ServiceProvider
                 ? $this->normalizeLimitValue($config['per_ip'], $fallback['per_ip'])
                 : $fallback['per_ip'],
         ];
+    }
+
+    /**
+     * Seed baseline configuration values so runtime overrides can be detected reliably.
+     *
+     * @param  array<int, string>  $keys
+     */
+    private function seedConfigBaselines(array $keys): void
+    {
+        foreach ($keys as $key) {
+            if (! array_key_exists($key, $this->configBaselines)) {
+                $this->configBaselines[$key] = config($key);
+            }
+        }
+    }
+
+    private function configValue(string $primary, string $legacy, mixed $default = null): mixed
+    {
+        $primaryValue = config($primary);
+        $legacyValue = config($legacy);
+
+        if (! array_key_exists($primary, $this->configBaselines)) {
+            $this->configBaselines[$primary] = $primaryValue;
+        }
+
+        if (! array_key_exists($legacy, $this->configBaselines)) {
+            $this->configBaselines[$legacy] = $legacyValue;
+        }
+
+        $primaryChanged = $primaryValue !== $this->configBaselines[$primary];
+        $legacyChanged = $legacyValue !== $this->configBaselines[$legacy];
+
+        if ($primaryChanged && ! $legacyChanged) {
+            return $primaryValue;
+        }
+
+        if ($legacyChanged && ! $primaryChanged) {
+            return $legacyValue;
+        }
+
+        if ($primaryChanged && $legacyChanged) {
+            return $primaryValue;
+        }
+
+        return $primaryValue ?? $legacyValue ?? $default;
     }
 
     private function normalizeLimitValue(mixed $value, ?int $fallback): ?int
@@ -504,7 +586,8 @@ final class ApiServiceProvider extends ServiceProvider
     {
         $response = response()
             ->json([
-                'error' => [
+                'status' => SymfonyResponse::HTTP_TOO_MANY_REQUESTS,
+                'error'  => [
                     'code'    => 'rate_limit_exceeded',
                     'message' => __('Too many requests.'),
                 ],

@@ -13,6 +13,8 @@ final class CategorySeeder extends Seeder
 {
     private LocalImageGeneratorService $imageGenerator;
 
+    private const DEFAULT_SUPPORTED_LOCALES = ['lt', 'en', 'ru', 'de'];
+
     public function __construct()
     {
         $this->imageGenerator = new LocalImageGeneratorService;
@@ -945,6 +947,8 @@ final class CategorySeeder extends Seeder
 
     private function supportedLocales(): array
     {
+        $defaultLocales = collect(self::DEFAULT_SUPPORTED_LOCALES);
+
         // Gather locale configuration from every canonical source, allowing the seeder to remain resilient even when
         // projects customise their localisation settings or leave certain keys unset.
         $configuredSources = [
@@ -973,10 +977,14 @@ final class CategorySeeder extends Seeder
             ->values();
 
         if ($locales->isEmpty()) {
-            $locales = collect(['lt', 'en', 'ru', 'de']);
+            return $defaultLocales->all();
         }
 
-        return $locales->all();
+        return $defaultLocales
+            ->merge($locales->intersect($defaultLocales))
+            ->unique()
+            ->values()
+            ->all();
     }
 
     private function translateLike(string $text, string $locale): string

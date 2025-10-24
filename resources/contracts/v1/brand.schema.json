@@ -17,6 +17,15 @@
             "type": "object",
             "additionalProperties": false,
             "properties": {
+                "brand": {
+                    "$ref": "#/$defs/brand"
+                },
+                "brands": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/$defs/brand"
+                    }
+                },
                 "item": {
                     "$ref": "#/$defs/brand"
                 },
@@ -28,6 +37,12 @@
                 }
             },
             "anyOf": [
+                {
+                    "required": ["brand"]
+                },
+                {
+                    "required": ["brands"]
+                },
                 {
                     "required": ["item"]
                 },

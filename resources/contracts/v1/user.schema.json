@@ -14,14 +14,31 @@
             "pattern": "^v1(\\.\\d+)?$"
         },
         "data": {
-            "type": "object",
-            "additionalProperties": false,
-            "properties": {
-                "item": {
+            "anyOf": [
+                {
                     "$ref": "#/$defs/user"
+                },
+                {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                        "user": {
+                            "$ref": "#/$defs/user"
+                        },
+                        "item": {
+                            "$ref": "#/$defs/user"
+                        }
+                    },
+                    "anyOf": [
+                        {
+                            "required": ["user"]
+                        },
+                        {
+                            "required": ["item"]
+                        }
+                    ]
                 }
-            },
-            "required": ["item"]
+            ]
         },
         "meta": {
             "type": "object",

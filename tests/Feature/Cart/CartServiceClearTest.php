@@ -3,11 +3,13 @@
 declare(strict_types=1);
 
 use App\Models\CartItem;
+use App\Models\User;
 use App\Services\Cart\CartService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 it('clears both primary and fallback session carts and cached/session state', function (): void {
-    $userId = 123;
+    $user = User::factory()->create();
+    $userId = $user->id;
     $primary = 'sess-primary-abc';
     $fallback = 'sess-fallback-xyz';
 
@@ -35,7 +37,8 @@ it('clears both primary and fallback session carts and cached/session state', fu
 });
 
 it('uses stored fallback session id when explicit fallback not provided', function (): void {
-    $userId = 321;
+    $user = User::factory()->create();
+    $userId = $user->id;
     $primary = 'sess-alpha';
     $storedFallback = 'sess-beta';
 

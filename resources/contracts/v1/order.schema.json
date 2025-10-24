@@ -17,6 +17,15 @@
             "type": "object",
             "additionalProperties": false,
             "properties": {
+                "order": {
+                    "$ref": "#/$defs/order"
+                },
+                "orders": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/$defs/order"
+                    }
+                },
                 "item": {
                     "$ref": "#/$defs/order"
                 },
@@ -28,6 +37,12 @@
                 }
             },
             "anyOf": [
+                {
+                    "required": ["order"]
+                },
+                {
+                    "required": ["orders"]
+                },
                 {
                     "required": ["item"]
                 },

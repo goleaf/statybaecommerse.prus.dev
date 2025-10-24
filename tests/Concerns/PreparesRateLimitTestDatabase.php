@@ -60,6 +60,8 @@ trait PreparesRateLimitTestDatabase
             'users',
         ];
 
+        Schema::disableForeignKeyConstraints();
+
         foreach ($tablesToDrop as $table) {
             Schema::dropIfExists($table);
         }
@@ -197,5 +199,7 @@ trait PreparesRateLimitTestDatabase
             $table->unsignedBigInteger($modelKey);
             $table->index([$modelKey, 'model_type'], 'model_has_permissions_model_id_model_type_index');
         });
+
+        Schema::enableForeignKeyConstraints();
     }
 }

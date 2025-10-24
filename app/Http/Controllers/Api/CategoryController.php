@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Category;
+use App\Repositories\CategoryRepository;
 use App\Support\Contracts\Entities\CategoryContract;
 use App\Support\ListQuery\ListQueryDefinition;
 use App\Support\ListQuery\ListQueryValidator;
@@ -98,8 +99,8 @@ final class CategoryController extends Controller
         $category->load(['children', 'parent']);
         $payload = CategoryContract::forCategory($category);
 
-        return $this->handleContentNegotiation($request, $data);
-}
+        return $this->respondWithContract($request, $payload);
+    }
 
     private function categoryListDefinition(): ListQueryDefinition
     {

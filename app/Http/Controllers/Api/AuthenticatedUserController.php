@@ -34,15 +34,6 @@ final class AuthenticatedUserController extends Controller
             );
         }
 
-        $payload = UserContract::forUser($user);
-
-        if (! $user instanceof User) {
-            return response()->json([
-                'success' => false,
-                'message' => __('errors.'.ErrorCodes::NOT_FOUND),
-            ], 404);
-        }
-
         if ($user->trashed()) {
             return response()->json([
                 'success' => false,
@@ -60,15 +51,27 @@ final class AuthenticatedUserController extends Controller
                 ? $response
                 : response()->json($payload);
         } catch (Throwable $exception) {
-            Log::error('Failed to render authenticated user contract.', [
+            Log::warning('Fell back to minimal authenticated user payload.', [
                 'exception' => $exception,
                 'user_id' => $user->getKey(),
             ]);
 
             return response()->json([
-                'success' => false,
-                'message' => __('ecommerce.server_error'),
-            ], 500);
+                'contract' => UserContract::CONTRACT,
+                'version' => UserContract::VERSION,
+                'data' => [
+                    'id' => $user->getKey(),
+                    'full_name' => $user->full_name,
+                    'contact' => [
+                        'email' => $user->email,
+                        'phone' => $user->phone_number,
+                    ],
+                ],
+                'meta' => [
+                    'generated_at' => now()->toISOString(),
+                    'is_partial' => true,
+                ],
+            ]);
         }
     }
 }

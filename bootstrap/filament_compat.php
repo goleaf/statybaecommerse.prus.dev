@@ -26,9 +26,51 @@ namespace {
         class_alias(\Coolsam\Flatpickr\Forms\Components\Flatpickr::class, \Filament\Forms\Components\Flatpickr::class);
     }
 
-    if (! class_exists(\Filament\Tables\Actions\DeleteAction::class) && class_exists(\Filament\Actions\DeleteAction::class)) {
-        // Maintain backwards compatibility with test helpers and legacy code targeting table-specific delete actions.
-        class_alias(\Filament\Actions\DeleteAction::class, \Filament\Tables\Actions\DeleteAction::class);
+    $legacyTableActions = [
+        \Filament\Tables\Actions\Action::class          => \Filament\Actions\Action::class,
+        \Filament\Tables\Actions\ActionGroup::class     => \Filament\Actions\ActionGroup::class,
+        \Filament\Tables\Actions\AttachAction::class    => \Filament\Actions\AttachAction::class,
+        \Filament\Tables\Actions\BulkAction::class      => \Filament\Actions\BulkAction::class,
+        \Filament\Tables\Actions\BulkActionGroup::class => \Filament\Actions\BulkActionGroup::class,
+        \Filament\Tables\Actions\CreateAction::class    => \Filament\Actions\CreateAction::class,
+        \Filament\Tables\Actions\DeleteAction::class    => \Filament\Actions\DeleteAction::class,
+        \Filament\Tables\Actions\DeleteBulkAction::class => \Filament\Actions\DeleteBulkAction::class,
+        \Filament\Tables\Actions\DetachAction::class    => \Filament\Actions\DetachAction::class,
+        \Filament\Tables\Actions\EditAction::class      => \Filament\Actions\EditAction::class,
+        \Filament\Tables\Actions\ForceDeleteBulkAction::class => \Filament\Actions\ForceDeleteBulkAction::class,
+        \Filament\Tables\Actions\RestoreBulkAction::class     => \Filament\Actions\RestoreBulkAction::class,
+        \Filament\Tables\Actions\ViewAction::class      => \Filament\Actions\ViewAction::class,
+    ];
+
+    foreach ($legacyTableActions as $legacyClass => $modernClass) {
+        if (! class_exists($legacyClass) && class_exists($modernClass)) {
+            class_alias($modernClass, $legacyClass);
+        }
+    }
+
+    if (class_exists(\Livewire\Features\SupportTesting\Testable::class)) {
+        \Livewire\Features\SupportTesting\Testable::macro('assertSchemaExists', function (?string $name = null): static {
+            $name ??= method_exists($this->instance(), 'getDefaultTestingSchemaName')
+                ? $this->instance()->getDefaultTestingSchemaName()
+                : null;
+
+            $name ??= 'form';
+
+            /** @var \Filament\Schemas\Schema|null $schema */
+            $schema = $this->instance()->{$name} ?? null;
+
+            \Illuminate\Testing\Assert::assertInstanceOf(
+                \Filament\Schemas\Schema::class,
+                $schema,
+                sprintf(
+                    'Failed asserting that a schema with the name [%s] exists on the [%s] component.',
+                    (string) $name,
+                    $this->instance()::class
+                )
+            );
+
+            return $this;
+        });
     }
 }
 

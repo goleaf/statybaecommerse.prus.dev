@@ -4,33 +4,50 @@ declare(strict_types=1);
 
 namespace App\Support\Contracts;
 
+use App\Support\Contracts\Entities\BrandContract;
+use App\Support\Contracts\Entities\CategoryContract;
+use App\Support\Contracts\Entities\OrderContract;
+use App\Support\Contracts\Entities\ProductContract;
+use App\Support\Contracts\Entities\UserContract;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use InvalidArgumentException;
 
 final class SimpleJsonSchemaValidator
 {
+    /**
+     * @var array<string, array<string, mixed>>
+     */
+    private array $schemaCache = [];
+
     public function __construct(private readonly Filesystem $filesystem) {}
 
     /**
-     * Validate the given payload against the JSON schema located at the provided path.
+     * Validate the given payload.
      *
+     * Usage scenarios:
+     * - validate($payload, $schemaPath) to validate against a full schema file.
+     * - validate($contract, $payload) to validate an entity payload against the schema's $defs entry.
+     *
+     * @param  array<string, mixed>|list<mixed>|string  $payloadOrContract
+     * @param  array<string, mixed>|list<mixed>|string|null  $schemaOrPayload
      * @return array<int, string> Validation error messages. Empty when the payload is valid.
      */
-    public function validate(array $payload, string $schemaPath): array
+    public function validate(mixed $payloadOrContract, mixed $schemaOrPayload = null): array
     {
-        if (! $this->filesystem->exists($schemaPath)) {
-            return [sprintf('Schema file [%s] could not be located.', $schemaPath)];
+        if (is_string($payloadOrContract) && is_array($schemaOrPayload)) {
+            return $this->validateContractPayload($payloadOrContract, $schemaOrPayload);
         }
 
-        $contents = $this->filesystem->get($schemaPath);
-        $schema = safe_json_decode_array($contents);
-
-        if (! is_array($schema)) {
-            return [sprintf('Schema file [%s] does not contain a valid JSON object.', $schemaPath)];
+        if (is_array($payloadOrContract) && is_string($schemaOrPayload)) {
+            return $this->validateSchemaPathPayload($payloadOrContract, $schemaOrPayload);
         }
 
-        return $this->validateAgainstSchema($payload, $schema, '$', $schema);
+        throw new InvalidArgumentException(
+            'SimpleJsonSchemaValidator::validate expects either (array $payload, string $schemaPath) '
+            .'or (string $contract, array $payload).',
+        );
     }
 
     /**
@@ -212,6 +229,106 @@ final class SimpleJsonSchemaValidator
             'email' => filter_var($value, FILTER_VALIDATE_EMAIL) ? [] : [sprintf('%s must be a valid email address.', $path)],
             'date-time' => strtotime($value) !== false ? [] : [sprintf('%s must be a valid date-time string.', $path)],
             default => [],
+        };
+    }
+
+    /**
+     * Validate a payload using the schema located at the provided path.
+     *
+     * @param  array<string, mixed>|list<mixed>  $payload
+     * @return array<int, string>
+     */
+    private function validateSchemaPathPayload(array $payload, string $schemaPath): array
+    {
+        $schemaResult = $this->loadSchema($schemaPath);
+        if ($schemaResult['errors'] !== []) {
+            return $schemaResult['errors'];
+        }
+
+        /** @var array<string, mixed> $schema */
+        $schema = $schemaResult['schema'];
+
+        return $this->validateAgainstSchema($payload, $schema, '$', $schema);
+    }
+
+    /**
+     * Validate a payload against a contract definition stored under the schema's $defs section.
+     *
+     * @param  array<string, mixed>|list<mixed>  $payload
+     * @return array<int, string>
+     */
+    private function validateContractPayload(string $contract, array $payload): array
+    {
+        $schemaPath = $this->schemaPathForContract($contract);
+
+        if ($schemaPath === null) {
+            return [sprintf('Schema for contract [%s] is not registered.', $contract)];
+        }
+
+        $schemaResult = $this->loadSchema($schemaPath);
+        if ($schemaResult['errors'] !== []) {
+            return $schemaResult['errors'];
+        }
+
+        /** @var array<string, mixed> $schema */
+        $schema = $schemaResult['schema'];
+
+        $definitionKey = $this->definitionKeyForContract($contract);
+        $definition = $schema['$defs'][$definitionKey] ?? null;
+
+        if (! is_array($definition)) {
+            return [sprintf('Schema for contract [%s] is missing the [%s] definition.', $contract, $definitionKey)];
+        }
+
+        return $this->validateAgainstSchema($payload, $definition, '$', $schema);
+    }
+
+    /**
+     * @return array{schema: array<string, mixed>|null, errors: array<int, string>}
+     */
+    private function loadSchema(string $schemaPath): array
+    {
+        if (array_key_exists($schemaPath, $this->schemaCache)) {
+            return ['schema' => $this->schemaCache[$schemaPath], 'errors' => []];
+        }
+
+        if (! $this->filesystem->exists($schemaPath)) {
+            return ['schema' => null, 'errors' => [sprintf('Schema file [%s] could not be located.', $schemaPath)]];
+        }
+
+        $contents = $this->filesystem->get($schemaPath);
+        $decoded = json_decode($contents, true);
+
+        if (json_last_error() !== JSON_ERROR_NONE || ! is_array($decoded)) {
+            return ['schema' => null, 'errors' => [sprintf('Schema file [%s] does not contain a valid JSON object.', $schemaPath)]];
+        }
+
+        $this->schemaCache[$schemaPath] = $decoded;
+
+        return ['schema' => $decoded, 'errors' => []];
+    }
+
+    private function schemaPathForContract(string $contract): ?string
+    {
+        return match (strtolower($contract)) {
+            ProductContract::CONTRACT => ProductContract::schemaPath(),
+            CategoryContract::CONTRACT => CategoryContract::schemaPath(),
+            BrandContract::CONTRACT => BrandContract::schemaPath(),
+            OrderContract::CONTRACT => OrderContract::schemaPath(),
+            UserContract::CONTRACT => UserContract::schemaPath(),
+            default => null,
+        };
+    }
+
+    private function definitionKeyForContract(string $contract): string
+    {
+        return match (strtolower($contract)) {
+            ProductContract::CONTRACT => 'product',
+            CategoryContract::CONTRACT => 'category',
+            BrandContract::CONTRACT => 'brand',
+            OrderContract::CONTRACT => 'order',
+            UserContract::CONTRACT => 'user',
+            default => $contract,
         };
     }
 }

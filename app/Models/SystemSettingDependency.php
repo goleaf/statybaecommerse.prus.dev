@@ -27,6 +27,20 @@ final class SystemSettingDependency extends Model
 {
     use HasFactory;
 
+    protected static function booted(): void
+    {
+        static::resolveRelationUsing('dependsOnSetting', fn (self $model): BelongsTo => $model->dependsOnSettingRelation());
+    }
+
+    public function __call($method, $parameters)
+    {
+        if ($method === 'dependsOnSetting' && $parameters !== []) {
+            return $this->newQuery()->$method(...$parameters);
+        }
+
+        return parent::__call($method, $parameters);
+    }
+
     protected $fillable = [
         'setting_id',
         'depends_on_setting_id',
@@ -50,15 +64,7 @@ final class SystemSettingDependency extends Model
     }
 
     /**
-     * Direct relation to the dependency source setting.
-     */
-    public function dependsOn(): BelongsTo
-    {
-        return $this->belongsTo(SystemSetting::class, 'depends_on_setting_id');
-    }
-
-    /**
-     * Relation used for eager loading and attribute access without clashing with scopes.
+     * Relation to the source setting this dependency listens to.
      */
     public function dependsOnSettingRelation(): BelongsTo
     {
@@ -66,11 +72,17 @@ final class SystemSettingDependency extends Model
     }
 
     /**
-     * Accessor to expose the dependsOnSetting relation under the expected property name.
+     * Accessor exposing the relation under the expected attribute name.
      */
     public function getDependsOnSettingAttribute(): ?SystemSetting
     {
         return $this->getRelationValue('dependsOnSettingRelation');
+    }
+
+    /** @deprecated Use dependsOnSettingRelation() or the dependsOnSetting attribute instead. */
+    public function dependsOn(): BelongsTo
+    {
+        return $this->dependsOnSettingRelation();
     }
 
     /**
@@ -185,7 +197,7 @@ final class SystemSettingDependency extends Model
                         ->where('key', 'like', "%{$search}%")
                         ->orWhere('name', 'like', "%{$search}%");
                 })
-                ->orWhereHas('dependsOnSettingRelation', function ($q) use ($search): void {
+                ->orWhereHas('dependsOnSetting', function ($q) use ($search): void {
                     $q
                         ->where('key', 'like', "%{$search}%")
                         ->orWhere('name', 'like', "%{$search}%");
@@ -238,10 +250,10 @@ final class SystemSettingDependency extends Model
      */
     public function isConditionMet(): bool
     {
-        if (! $this->dependsOn) {
+        if (! $this->dependsOnSetting) {
             return false;
         }
-        $dependencyValue = $this->dependsOn->value;
+        $dependencyValue = $this->dependsOnSetting->value;
         $operator = strtolower(trim((string) ($this->condition ?? '')));
         $expectedValue = $this->condition_value;
 

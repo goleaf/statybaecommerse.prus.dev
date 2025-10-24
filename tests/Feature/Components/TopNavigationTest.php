@@ -83,7 +83,7 @@ it('feature: includes admin-only groups for admin users', function (): void {
     $groups = collect($viewData['navigationGroups']);
     $adminOnlyGroups = $groups->filter(fn ($group) => $group['is_admin_only']);
 
-    expect($adminOnlyGroups)->toHaveCount(0);
+    expect($adminOnlyGroups)->toHaveCount(NavigationGroup::adminOnly()->count());
 });
 
 it('feature: respects user permissions for permission-required groups', function (): void {

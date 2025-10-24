@@ -19,7 +19,7 @@ final class SystemSettingTranslationFactory extends Factory
     {
         return [
             'system_setting_id' => SystemSetting::factory(),
-            'locale' => $this->faker->unique()->randomElement(['en', 'lt', 'de', 'fr', 'es', 'pl', 'ru']),
+            'locale' => $this->faker->randomElement(['en', 'lt', 'de', 'fr', 'es', 'pl', 'ru']),
             'name' => $this->faker->sentence(3),
             'description' => $this->faker->paragraph(2),
             'help_text' => $this->faker->paragraph(1),

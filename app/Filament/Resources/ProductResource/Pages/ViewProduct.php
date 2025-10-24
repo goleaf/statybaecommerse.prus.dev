@@ -18,7 +18,7 @@ use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Infolist;
 use Filament\Resources\Pages\ViewRecord;
 use Icetalker\FilamentTableRepeatableEntry\Infolists\Components\TableRepeatableEntry;
-use LaraZeus\ListGroup\Entries\ListItem;
+use LaraZeus\ListGroup\Item\ListItem;
 use LaraZeus\ListGroup\Infolists\ListEntry;
 
 final class ViewProduct extends ViewRecord
@@ -117,7 +117,7 @@ final class ViewProduct extends ViewRecord
                         })
                         ->all();
                 }),
-            SchemaSection::make(__('ecommerce.variants'))
+            Section::make(__('ecommerce.variants'))
                 ->schema([
                     TableRepeatableEntry::make('variants')
                         ->label(__('ecommerce.variants'))

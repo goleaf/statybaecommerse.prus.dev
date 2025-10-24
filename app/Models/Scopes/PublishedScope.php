@@ -22,17 +22,54 @@ use Illuminate\Database\Eloquent\Scope;
 final class PublishedScope implements Scope
 {
     /**
-     * Handle apply functionality with proper error handling.
+     * Cache schema lookups to avoid repeated information_schema round-trips.
+     *
+     * @var array<string, array<string, bool>>
      */
+    private static array $columnPresence = [];
+
     public function apply(Builder $builder, Model $model): void
     {
-        // Check if the model has a published_at column
-        if ($model->getConnection()->getSchemaBuilder()->hasColumn($model->getTable(), 'published_at')) {
+        if (defined($model::class.'::SCOPE_COLUMN_HINTS')) {
+            $hints = $model::SCOPE_COLUMN_HINTS;
+
+            if ($hints['published_at'] ?? false) {
+                $builder->whereNotNull('published_at')->where('published_at', '<=', now());
+            }
+
+            if ($hints['status'] ?? false) {
+                $builder->where('status', 'published');
+            }
+
+            return;
+        }
+
+        $connection = $model->getConnection();
+        $table = $model->getTable();
+        $cacheKey = sprintf('%s::%s', $connection->getName() ?: 'default', $table);
+
+        if (! array_key_exists($cacheKey, self::$columnPresence)) {
+            try {
+                $schema = $connection->getSchemaBuilder();
+                self::$columnPresence[$cacheKey] = [
+                    'published_at' => $schema->hasColumn($table, 'published_at'),
+                    'status'       => $schema->hasColumn($table, 'status'),
+                ];
+            } catch (\Throwable) {
+                self::$columnPresence[$cacheKey] = [
+                    'published_at' => false,
+                    'status'       => false,
+                ];
+            }
+        }
+
+        $columns = self::$columnPresence[$cacheKey];
+
+        if ($columns['published_at']) {
             $builder->whereNotNull('published_at')->where('published_at', '<=', now());
         }
 
-        // If model has a status column, ensure published status
-        if ($model->getConnection()->getSchemaBuilder()->hasColumn($model->getTable(), 'status')) {
+        if ($columns['status']) {
             $builder->where('status', 'published');
         }
     }

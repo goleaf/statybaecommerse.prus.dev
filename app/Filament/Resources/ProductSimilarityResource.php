@@ -38,9 +38,7 @@ final class ProductSimilarityResource extends Resource
 
     public static function getNavigationGroup(): \UnitEnum|string|null
     {
-        $group = NavigationGroup::Products;
-
-        return $group->label();
+        return NavigationGroup::Products->value;
     }
 
     public static function getNavigationLabel(): string

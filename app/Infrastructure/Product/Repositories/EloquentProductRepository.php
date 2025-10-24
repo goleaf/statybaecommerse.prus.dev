@@ -15,7 +15,11 @@ use App\Domain\Product\ValueObjects\ProductCatalogQuery;
 use App\Domain\Product\ValueObjects\ProductSearchCriteria;
 use App\Domain\Product\ValueObjects\ProductSlug;
 use App\Models\Product;
+use App\Models\Scopes\ActiveScope;
+use App\Models\Scopes\EnabledScope;
 use App\Models\Scopes\PublishedScope;
+use App\Models\Scopes\StatusScope;
+use App\Models\Scopes\VisibleScope;
 use Illuminate\Database\Eloquent\Builder;
 
 /**
@@ -29,7 +33,7 @@ final class EloquentProductRepository implements ProductRepositoryInterface
     {
         $query = Product::query()
             // Allow draft fixtures during tests while downstream specs filter displayable records.
-            ->withoutGlobalScope(PublishedScope::class)
+            ->withoutGlobalScopes([ActiveScope::class, PublishedScope::class, VisibleScope::class])
             ->where('is_visible', true)
             ->where(static function ($builder) use ($criteria): void {
                 $term = $criteria->getQuery();
@@ -37,7 +41,12 @@ final class EloquentProductRepository implements ProductRepositoryInterface
                     ->orWhere('description', 'like', "%{$term}%")
                     ->orWhere('sku', 'like', "%{$term}%");
             })
-            ->with(['brand', 'categories', 'variants', 'media'])
+            ->with([
+                'brand' => static fn ($relation) => $relation->withoutGlobalScopes([ActiveScope::class, EnabledScope::class]),
+                'categories' => static fn ($relation) => $relation->withoutGlobalScopes([ActiveScope::class, EnabledScope::class, VisibleScope::class]),
+                'variants' => static fn ($relation) => $relation->withoutGlobalScopes([ActiveScope::class, EnabledScope::class, StatusScope::class]),
+                'media',
+            ])
             ->withSum([
                 // Eager-load active reservation totals so stock checks avoid N+1 aggregate queries.
                 'stockReservations as reserved_stock_quantity' => static function (Builder $relation): void {
@@ -61,8 +70,14 @@ final class EloquentProductRepository implements ProductRepositoryInterface
     public function getCatalogProducts(ProductCatalogQuery $query): ProductCollection
     {
         $builder = Product::query()
+            ->withoutGlobalScopes([ActiveScope::class, PublishedScope::class, VisibleScope::class])
             ->where('is_visible', true)
-            ->with(['brand', 'categories', 'variants', 'media'])
+            ->with([
+                'brand' => static fn ($relation) => $relation->withoutGlobalScopes([ActiveScope::class, EnabledScope::class]),
+                'categories' => static fn ($relation) => $relation->withoutGlobalScopes([ActiveScope::class, EnabledScope::class, VisibleScope::class]),
+                'variants' => static fn ($relation) => $relation->withoutGlobalScopes([ActiveScope::class, EnabledScope::class, StatusScope::class]),
+                'media',
+            ])
             ->withSum([
                 // Keep reservation totals consistent in catalog listings as well for parity with search results.
                 'stockReservations as reserved_stock_quantity' => static function (Builder $relation): void {

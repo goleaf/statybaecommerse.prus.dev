@@ -272,12 +272,9 @@ final class UserBehaviorResource extends Resource
                         null  => fn (Builder $query): Builder => $query,
                     ]),
                 Filter::make('created_at')
+                    ->label(__('admin.user_behaviors.created_at'))
                     ->form([
-                        SupportFlatpickr::makeRange('range')
-                            ->label(__('admin.user_behaviors.created_at'))
-
-                            ->format('Y-m-d')
-                            ->displayFormat('Y-m-d'),
+                        SupportFlatpickr::makeRange('range', displayFormat: 'Y-m-d', format: 'Y-m-d'),
                     ])
                     ->query(fn (Builder $query, array $data): Builder => DateRangeFilter::apply(
                         $query,

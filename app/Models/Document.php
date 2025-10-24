@@ -33,9 +33,8 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  *
  * @mixin \Eloquent
  */
-#[ObservedBy([AttributionObserver::class])]
+#[ObservedBy(AttributionObserver::class)]
 #[ScopedBy([StatusScope::class])]
-#[ObservedBy([AttributionObserver::class])]
 final class Document extends Model
 {
     /** @use HasFactory<\Database\Factories\DocumentFactory> */

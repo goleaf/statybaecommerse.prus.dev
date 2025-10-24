@@ -27,30 +27,30 @@ abstract class RateLimitTestCase extends FeatureTestCase
 
     protected function clearRateLimit(User $user, string $suffix = '', string $limiter = 'api.default'): void
     {
-        RateLimiter::clear($this->hashedKey($limiter, $this->rateLimitKeyForUser($user, $suffix)));
-        RateLimiter::clear($this->hashedKey($limiter, $this->rateLimitKeyForIp($suffix)));
-        RateLimiter::clear($this->hashedKey($limiter, $this->rateLimitKeyForLoopbackIpv6($suffix)));
+        RateLimiter::clear($this->hashedKey($limiter, $this->rateLimitKeyForUser($user, $suffix, $limiter)));
+        RateLimiter::clear($this->hashedKey($limiter, $this->rateLimitKeyForIp($suffix, $limiter)));
+        RateLimiter::clear($this->hashedKey($limiter, $this->rateLimitKeyForLoopbackIpv6($suffix, $limiter)));
     }
 
-    protected function rateLimitKeyForUser(User $user, string $suffix = ''): string
+    protected function rateLimitKeyForUser(User $user, string $suffix = '', ?string $bucket = null): string
     {
-        $baseKey = 'user:'.$user->getAuthIdentifier();
+        $keySuffix = $suffix !== '' ? $suffix : ($bucket ?? 'api.default');
 
-        return $suffix === '' ? $baseKey : $baseKey.'|'.$suffix;
+        return sprintf('user:%s|%s', $user->getAuthIdentifier(), $keySuffix);
     }
 
-    protected function rateLimitKeyForIp(string $suffix = ''): string
+    protected function rateLimitKeyForIp(string $suffix = '', ?string $bucket = null): string
     {
-        $baseKey = 'ip:127.0.0.1';
+        $keySuffix = $suffix !== '' ? $suffix : ($bucket ?? 'api.default');
 
-        return $suffix === '' ? $baseKey : $baseKey.'|'.$suffix;
+        return sprintf('ip:127.0.0.1|%s', $keySuffix);
     }
 
     protected function saturateRateLimit(User $user, string $suffix = '', string $limiter = 'api.default'): void
     {
-        $userKey = $this->hashedKey($limiter, $this->rateLimitKeyForUser($user, $suffix));
-        $ipKey = $this->hashedKey($limiter, $this->rateLimitKeyForIp($suffix));
-        $fallbackIpKey = $this->hashedKey($limiter, $this->rateLimitKeyForLoopbackIpv6($suffix));
+        $userKey = $this->hashedKey($limiter, $this->rateLimitKeyForUser($user, $suffix, $limiter));
+        $ipKey = $this->hashedKey($limiter, $this->rateLimitKeyForIp($suffix, $limiter));
+        $fallbackIpKey = $this->hashedKey($limiter, $this->rateLimitKeyForLoopbackIpv6($suffix, $limiter));
 
         RateLimiter::hit($userKey);
         RateLimiter::hit($userKey);
@@ -65,10 +65,10 @@ abstract class RateLimitTestCase extends FeatureTestCase
         return md5($limiter.$key);
     }
 
-    private function rateLimitKeyForLoopbackIpv6(string $suffix = ''): string
+    private function rateLimitKeyForLoopbackIpv6(string $suffix = '', ?string $bucket = null): string
     {
-        $baseKey = 'ip:::1';
+        $keySuffix = $suffix !== '' ? $suffix : ($bucket ?? 'api.default');
 
-        return $suffix === '' ? $baseKey : $baseKey.'|'.$suffix;
+        return sprintf('ip:::1|%s', $keySuffix);
     }
 }

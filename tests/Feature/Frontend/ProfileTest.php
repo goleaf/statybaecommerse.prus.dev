@@ -34,6 +34,8 @@ final class ProfileTest extends TestCase
 
     public function test_edit_page_handles_missing_countries_table(): void
     {
+        $user = User::factory()->create();
+
         Schema::shouldReceive('hasTable')
             ->with('countries')
             ->andReturnFalse();
@@ -41,8 +43,6 @@ final class ProfileTest extends TestCase
         Schema::shouldReceive('hasTable')
             ->withArgs(static fn (string $table): bool => $table !== 'countries')
             ->andReturnTrue();
-
-            $response = $this->actingAs($user)->get(route('frontend.profile.edit'));
 
         $response = $this->actingAs($user)->get(route('frontend.profile.edit'));
 
@@ -163,6 +163,8 @@ final class ProfileTest extends TestCase
 
     public function test_user_can_create_address_when_lookup_tables_are_missing(): void
     {
+        $user = User::factory()->create();
+
         Schema::shouldReceive('hasTable')
             ->with('countries')
             ->andReturnFalse();
@@ -175,19 +177,17 @@ final class ProfileTest extends TestCase
             ->withArgs(static fn (string $table): bool => ! in_array($table, ['countries', 'cities'], true))
             ->andReturnTrue();
 
-            $payload = [
-                'type' => AddressType::SHIPPING->value,
-                'first_name' => 'Jonas',
-                'last_name' => 'Jonaitis',
-                'address_line_1' => 'Gedimino pr. 1',
-                'city' => 'Vilnius',
-                'postal_code' => '01103',
-                'country_code' => 'LT',
-            ];
+        $payload = [
+            'type' => AddressType::SHIPPING->value,
+            'first_name' => 'Jonas',
+            'last_name' => 'Jonaitis',
+            'address_line_1' => 'Gedimino pr. 1',
+            'city' => 'Vilnius',
+            'postal_code' => '01103',
+            'country_code' => 'LT',
+        ];
 
-            $response = $this->actingAs($user)->post(route('frontend.profile.store-address'), $payload);
-
-            $response->assertRedirect(route('frontend.profile.addresses'));
+        $response = $this->actingAs($user)->post(route('frontend.profile.store-address'), $payload);
 
         $response->assertRedirect(route('frontend.profile.addresses'));
 

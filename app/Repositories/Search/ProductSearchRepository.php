@@ -118,32 +118,38 @@ SQL;
             ? $attributes['brand_name']
             : null;
 
-        $shortDescription = $attributes['short_description'] ?? null;
-        $fullDescription = $attributes['description'] ?? null;
-        $translatedDescription = $attributes['translated_description'] ?? null;
-        $description = is_string($shortDescription) && $shortDescription !== ''
-            ? $shortDescription
-            : (is_string($fullDescription) && $fullDescription !== ''
-                ? $fullDescription
-                : (is_string($translatedDescription) && $translatedDescription !== '' ? $translatedDescription : null));
+        $shortDescription = $this->resolveTextValue($attributes['short_description'] ?? null);
+        $fullDescription = $this->resolveTextValue($attributes['description'] ?? null);
+        $translatedDescription = $this->resolveTextValue($attributes['translated_description'] ?? null);
+        $description = $shortDescription ?? $fullDescription ?? $translatedDescription;
 
-        $title = isset($attributes['name']) && is_string($attributes['name']) ? $attributes['name'] : '';
-        $slug = isset($attributes['slug']) && is_string($attributes['slug']) ? $attributes['slug'] : '';
+        $resolvedName = $this->resolveTextValue($attributes['translated_name'] ?? null)
+            ?? $this->resolveTextValue($attributes['name'] ?? null)
+            ?? '';
+        $resolvedSlug = $this->resolveTextValue($attributes['slug'] ?? null) ?? '';
         $salesCount = $attributes['sales_count'] ?? 0;
         $reviewsCount = $attributes['reviews_count'] ?? 0;
         $averageRating = $attributes['average_rating'] ?? 0.0;
+        $sku = $this->resolveTextValue($attributes['sku'] ?? null) ?? '';
 
         return [
             'id'              => is_numeric($attributes['id'] ?? null) ? (int) $attributes['id'] : 0,
             'type'            => 'product',
-            'title'           => $title,
+            'title'           => $resolvedName,
             'subtitle'        => $subtitle,
             'description'     => $description,
             'price'           => $price,
             'formatted_price' => Number::currency($price, 'EUR', app()->getLocale()),
             'image'           => null,
-            'url'             => route('products.show', $slug),
-            'relevance_score' => $this->calculateRelevanceScore($attributes, $queryData->query()),
+            'url'             => $resolvedSlug !== '' ? route('products.show', $resolvedSlug) : null,
+            'relevance_score' => $this->calculateRelevanceScore(
+                $resolvedName,
+                $sku,
+                $fullDescription,
+                $translatedDescription,
+                (bool) ($attributes['is_featured'] ?? false),
+                $queryData->query()
+            ),
             'sales_count'     => is_numeric($salesCount) ? (int) $salesCount : 0,
             'reviews_count'   => is_numeric($reviewsCount) ? (int) $reviewsCount : 0,
             'average_rating'  => is_numeric($averageRating) ? (float) $averageRating : 0.0,
@@ -151,45 +157,34 @@ SQL;
         ];
     }
 
-    /**
-     * @param array<string, mixed> $attributes
-     */
-    private function calculateRelevanceScore(array $attributes, string $query): int
+    private function calculateRelevanceScore(string $name, string $sku, ?string $description, ?string $translatedDescription, bool $isFeatured, string $query): int
     {
         $score = 0;
         $normalizedQuery = Str::lower($query);
-        $name = isset($attributes['name']) && is_string($attributes['name'])
-            ? Str::lower($attributes['name'])
-            : '';
-        $sku = isset($attributes['sku']) && is_string($attributes['sku'])
-            ? Str::lower($attributes['sku'])
-            : '';
-        $description = isset($attributes['description']) && is_string($attributes['description'])
-            ? Str::lower($attributes['description'])
-            : '';
-        $translatedDescription = isset($attributes['translated_description']) && is_string($attributes['translated_description'])
-            ? Str::lower($attributes['translated_description'])
-            : '';
+        $lowerName = Str::lower($name);
+        $lowerSku = Str::lower($sku);
+        $lowerDescription = is_string($description) ? Str::lower($description) : '';
+        $lowerTranslatedDescription = is_string($translatedDescription) ? Str::lower($translatedDescription) : '';
 
-        if ($name === $normalizedQuery) {
+        if ($lowerName === $normalizedQuery) {
             $score += 100;
-        } elseif (str_contains($name, $normalizedQuery)) {
+        } elseif (str_contains($lowerName, $normalizedQuery)) {
             $score += 50;
         }
 
-        if ($sku !== '' && str_contains($sku, $normalizedQuery)) {
+        if ($lowerSku !== '' && str_contains($lowerSku, $normalizedQuery)) {
             $score += 40;
         }
 
-        if ($description !== '' && str_contains($description, $normalizedQuery)) {
+        if ($lowerDescription !== '' && str_contains($lowerDescription, $normalizedQuery)) {
             $score += 20;
         }
 
-        if ($translatedDescription !== '' && str_contains($translatedDescription, $normalizedQuery)) {
+        if ($lowerTranslatedDescription !== '' && str_contains($lowerTranslatedDescription, $normalizedQuery)) {
             $score += 10;
         }
 
-        if ((bool) ($attributes['is_featured'] ?? false)) {
+        if ($isFeatured) {
             $score += 10;
         }
 
@@ -221,5 +216,74 @@ SQL;
         ];
 
         return implode("\n", $selects);
+    }
+
+    private function resolveTextValue(mixed $value): ?string
+    {
+        if ($value === null) {
+            return null;
+        }
+
+        if (is_string($value)) {
+            $trimmed = trim($value);
+            if ($trimmed === '') {
+                return null;
+            }
+
+            $decoded = json_decode($trimmed, true);
+            if (json_last_error() === JSON_ERROR_NONE) {
+                if (is_string($decoded) && $decoded !== '') {
+                    return $this->stripWrappingQuotes($decoded);
+                }
+
+                if (is_array($decoded)) {
+                    return $this->extractLocalizedValue($decoded);
+                }
+            }
+
+            return $this->stripWrappingQuotes($trimmed);
+        }
+
+        if (is_array($value)) {
+            return $this->extractLocalizedValue($value);
+        }
+
+        return null;
+    }
+
+    /**
+     * @param array<mixed> $values
+     */
+    private function extractLocalizedValue(array $values): ?string
+    {
+        $locale = app()->getLocale();
+        $fallback = config('app.fallback_locale');
+
+        foreach ([$locale, $fallback] as $preferredLocale) {
+            if ($preferredLocale !== null && isset($values[$preferredLocale]) && is_string($values[$preferredLocale])) {
+                $candidate = $this->stripWrappingQuotes($values[$preferredLocale]);
+
+                if ($candidate !== '') {
+                    return $candidate;
+                }
+            }
+        }
+
+        foreach ($values as $value) {
+            if (is_string($value)) {
+                $candidate = $this->stripWrappingQuotes($value);
+
+                if ($candidate !== '') {
+                    return $candidate;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private function stripWrappingQuotes(string $value): string
+    {
+        return trim($value, " \t\n\r\0\x0B\"'");
     }
 }

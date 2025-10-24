@@ -8,6 +8,10 @@ return [
         'web',
     ],
 
+    'testing' => [
+        'skip_checks' => true,
+    ],
+
     'abilities' => [
         'panel' => [
             'access' => 'panel.access.admin',

@@ -90,6 +90,7 @@ final class ActiveScope implements Scope
     {
         return match ($model::class) {
             \App\Models\Order::class => [],
+            \App\Models\Referral::class => ['pending', 'active', 'completed', 'expired', 'cancelled'],
             default                  => ['active'],
         };
     }
@@ -103,6 +104,20 @@ final class ActiveScope implements Scope
     {
         $connection = $model->getConnection();
         $cacheKey = $this->buildMetadataCacheKey($connection, $model->getTable());
+
+        if (defined($model::class.'::SCOPE_COLUMN_HINTS')) {
+            $hints = $model::SCOPE_COLUMN_HINTS;
+
+            return self::$tableMetadataCache[$cacheKey] = [
+                'exists'  => true,
+                'columns' => [
+                    'is_active'  => (bool) ($hints['is_active'] ?? false),
+                    'is_visible' => (bool) ($hints['is_visible'] ?? false),
+                    'is_enabled' => (bool) ($hints['is_enabled'] ?? false),
+                    'status'     => (bool) ($hints['status'] ?? false),
+                ],
+            ];
+        }
 
         if (! array_key_exists($cacheKey, self::$tableMetadataCache)) {
             self::$tableMetadataCache[$cacheKey] = $this->introspectTable($connection, $model->getTable());

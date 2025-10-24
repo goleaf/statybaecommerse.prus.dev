@@ -22,12 +22,39 @@ use Illuminate\Database\Eloquent\Scope;
 final class EnabledScope implements Scope
 {
     /**
-     * Handle apply functionality with proper error handling.
+     * Cache column existence lookups to avoid repeated schema introspection during hot paths.
+     *
+     * @var array<string, bool>
      */
+    private static array $columnPresence = [];
+
     public function apply(Builder $builder, Model $model): void
     {
-        // Check if the model has an is_enabled column
-        if ($model->getConnection()->getSchemaBuilder()->hasColumn($model->getTable(), 'is_enabled')) {
+        if (defined($model::class.'::SCOPE_COLUMN_HINTS')) {
+            $hints = $model::SCOPE_COLUMN_HINTS;
+
+            if (! ($hints['is_enabled'] ?? false)) {
+                return;
+            }
+
+            $builder->where('is_enabled', true);
+
+            return;
+        }
+
+        $connection = $model->getConnection();
+        $table = $model->getTable();
+        $cacheKey = sprintf('%s::%s', $connection->getName() ?: 'default', $table);
+
+        if (! array_key_exists($cacheKey, self::$columnPresence)) {
+            try {
+                self::$columnPresence[$cacheKey] = $connection->getSchemaBuilder()->hasColumn($table, 'is_enabled');
+            } catch (\Throwable) {
+                self::$columnPresence[$cacheKey] = false;
+            }
+        }
+
+        if (self::$columnPresence[$cacheKey]) {
             $builder->where('is_enabled', true);
         }
     }

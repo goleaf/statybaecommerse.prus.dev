@@ -43,6 +43,7 @@ final class EnsurePartnerApiKey
 
         $request->attributes->set('partner_api_key', $apiKey);
         $request->attributes->set('partner_api_abilities', $abilities);
+        $request->attributes->set('partner_api_pipeline', 'modern');
 
         if ($normalizedScopes !== []) {
             $request->attributes->set('partner_api_required_scopes', $normalizedScopes);

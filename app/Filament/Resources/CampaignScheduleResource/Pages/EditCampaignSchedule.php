@@ -19,4 +19,13 @@ class EditCampaignSchedule extends EditRecord
             Actions\DeleteAction::make(),
         ];
     }
+
+    public function save(bool $shouldRedirect = true, bool $shouldSendSavedNotification = true): void
+    {
+        parent::save(false, $shouldSendSavedNotification);
+
+        if ($shouldRedirect) {
+            $this->redirect($this->getResource()::getUrl('index'), navigate: false);
+        }
+    }
 }

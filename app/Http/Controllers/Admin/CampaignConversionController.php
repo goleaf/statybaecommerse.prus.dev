@@ -56,11 +56,12 @@ final class CampaignConversionController extends Controller
     /**
      * Show the details for a single conversion.
      */
-    public function show(CampaignConversion $campaignConversion): Response
+    public function show(int $campaignConversion): Response
     {
-        $campaignConversion->loadMissing(['campaign', 'customer']);
+        $conversion = $this->findConversion($campaignConversion);
+        $conversion->loadMissing(['campaign', 'customer']);
 
-        return $this->htmlResponse('Campaign Conversion Detail', Collection::make([$campaignConversion]));
+        return $this->htmlResponse('Campaign Conversion Detail', Collection::make([$conversion]));
     }
 
     /**
@@ -84,7 +85,7 @@ final class CampaignConversionController extends Controller
             'custom_attributes' => ['nullable', 'array'],
         ]);
 
-        $campaign = Campaign::find($validated['campaign_id']);
+        $campaign = Campaign::query()->withoutGlobalScopes()->find($validated['campaign_id']);
         $validated['campaign_name'] = $campaign?->name;
 
         $conversion = CampaignConversion::create($validated);
@@ -95,7 +96,7 @@ final class CampaignConversionController extends Controller
     /**
      * Update an existing conversion.
      */
-    public function update(Request $request, CampaignConversion $campaignConversion): RedirectResponse
+    public function update(Request $request, int $campaignConversion): RedirectResponse
     {
         $validated = $request->validate([
             'campaign_id' => ['sometimes', 'integer', 'exists:discount_campaigns,id'],
@@ -114,23 +115,26 @@ final class CampaignConversionController extends Controller
             'custom_attributes' => ['sometimes', 'array'],
         ]);
 
+        $conversion = $this->findConversion($campaignConversion);
+
         if (array_key_exists('campaign_id', $validated)) {
-            $campaign = Campaign::find($validated['campaign_id']);
+            $campaign = Campaign::query()->withoutGlobalScopes()->find($validated['campaign_id']);
             $validated['campaign_name'] = $campaign?->name;
         }
 
-        $campaignConversion->fill($validated);
-        $campaignConversion->save();
+        $conversion->fill($validated);
+        $conversion->save();
 
-        return redirect()->route('admin.campaign-conversions.show', $campaignConversion);
+        return redirect()->route('admin.campaign-conversions.show', $conversion);
     }
 
     /**
      * Remove a conversion.
      */
-    public function destroy(CampaignConversion $campaignConversion): RedirectResponse
+    public function destroy(int $campaignConversion): RedirectResponse
     {
-        $campaignConversion->delete();
+        $conversion = $this->findConversion($campaignConversion);
+        $conversion->delete();
 
         return redirect()->route('admin.campaign-conversions.index');
     }
@@ -138,9 +142,10 @@ final class CampaignConversionController extends Controller
     /**
      * Mark a single conversion as verified.
      */
-    public function verify(CampaignConversion $campaignConversion): RedirectResponse
+    public function verify(int $campaignConversion): RedirectResponse
     {
-        $campaignConversion->forceFill(['is_verified' => true])->save();
+        $conversion = $this->findConversion($campaignConversion);
+        $conversion->forceFill(['is_verified' => true])->save();
 
         return redirect()->route('admin.campaign-conversions.index');
     }
@@ -148,9 +153,10 @@ final class CampaignConversionController extends Controller
     /**
      * Remove the verified flag from a conversion.
      */
-    public function unverify(CampaignConversion $campaignConversion): RedirectResponse
+    public function unverify(int $campaignConversion): RedirectResponse
     {
-        $campaignConversion->forceFill(['is_verified' => false])->save();
+        $conversion = $this->findConversion($campaignConversion);
+        $conversion->forceFill(['is_verified' => false])->save();
 
         return redirect()->route('admin.campaign-conversions.index');
     }
@@ -158,9 +164,10 @@ final class CampaignConversionController extends Controller
     /**
      * Mark a conversion as attributed.
      */
-    public function attribute(CampaignConversion $campaignConversion): RedirectResponse
+    public function attribute(int $campaignConversion): RedirectResponse
     {
-        $campaignConversion->forceFill(['is_attributed' => true])->save();
+        $conversion = $this->findConversion($campaignConversion);
+        $conversion->forceFill(['is_attributed' => true])->save();
 
         return redirect()->route('admin.campaign-conversions.index');
     }
@@ -168,9 +175,10 @@ final class CampaignConversionController extends Controller
     /**
      * Remove the attributed flag from a conversion.
      */
-    public function unattribute(CampaignConversion $campaignConversion): RedirectResponse
+    public function unattribute(int $campaignConversion): RedirectResponse
     {
-        $campaignConversion->forceFill(['is_attributed' => false])->save();
+        $conversion = $this->findConversion($campaignConversion);
+        $conversion->forceFill(['is_attributed' => false])->save();
 
         return redirect()->route('admin.campaign-conversions.index');
     }
@@ -362,6 +370,16 @@ final class CampaignConversionController extends Controller
         ]);
 
         return array_values(array_unique(array_map('intval', $validated['ids'])));
+    }
+
+    /**
+     * Resolve a conversion without relying on implicit route model binding.
+     */
+    private function findConversion(int|string $conversionId): CampaignConversion
+    {
+        return CampaignConversion::query()
+            ->withoutGlobalScopes()
+            ->findOrFail((int) $conversionId);
     }
 
     /**

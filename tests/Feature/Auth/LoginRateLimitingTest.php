@@ -81,10 +81,20 @@ final class LoginRateLimitingTest extends TestCase
 
         Notification::assertSentTo($user, ResetPassword::class);
 
-        Livewire::test('pages.auth.forgot-password')
-            ->set('email', $user->email)
-            ->call('sendPasswordResetLink')
-            ->assertHasErrors(['email']);
+        $rateLimitedAttempt = Livewire::test('pages.auth.forgot-password')
+            ->set('email', $user->email);
+
+        $thrown = null;
+
+        try {
+            $rateLimitedAttempt->call('sendPasswordResetLink');
+        } catch (\Illuminate\Validation\ValidationException $exception) {
+            $thrown = $exception;
+        }
+
+        $this->assertInstanceOf(\Illuminate\Validation\ValidationException::class, $thrown);
+        $this->assertIsArray($thrown->errors());
+        $this->assertArrayHasKey('email', $thrown->errors());
 
         $key = Str::transliterate('password-reset|'.Str::lower($user->email).'|127.0.0.1');
 

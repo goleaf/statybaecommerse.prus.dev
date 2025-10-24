@@ -8,33 +8,45 @@ return new class extends Migration
 {
     public function up(): void
     {
-        // SQLite in the test environment can intermittently throw disk I/O errors
-        // when altering large tables. Since these columns are irrelevant for the
-        // current feature tests, skip this migration during test runs.
-        if (app()->environment('testing') && config('database.default') === 'sqlite') {
-            return;
-        }
-
         Schema::table('referrals', function (Blueprint $table) {
-            $table->json('title')->nullable()->after('user_agent');
-            $table->json('description')->nullable()->after('title');
-            $table->json('terms_conditions')->nullable()->after('description');
-            $table->json('benefits_description')->nullable()->after('terms_conditions');
-            $table->json('how_it_works')->nullable()->after('benefits_description');
-            $table->json('seo_title')->nullable()->after('how_it_works');
-            $table->json('seo_description')->nullable()->after('seo_title');
-            $table->json('seo_keywords')->nullable()->after('seo_description');
+            if (! Schema::hasColumn('referrals', 'title')) {
+                $table->json('title')->nullable()->after('user_agent');
+            }
+
+            if (! Schema::hasColumn('referrals', 'description')) {
+                $table->json('description')->nullable()->after('title');
+            }
+
+            if (! Schema::hasColumn('referrals', 'terms_conditions')) {
+                $table->json('terms_conditions')->nullable()->after('description');
+            }
+
+            if (! Schema::hasColumn('referrals', 'benefits_description')) {
+                $table->json('benefits_description')->nullable()->after('terms_conditions');
+            }
+
+            if (! Schema::hasColumn('referrals', 'how_it_works')) {
+                $table->json('how_it_works')->nullable()->after('benefits_description');
+            }
+
+            if (! Schema::hasColumn('referrals', 'seo_title')) {
+                $table->json('seo_title')->nullable()->after('how_it_works');
+            }
+
+            if (! Schema::hasColumn('referrals', 'seo_description')) {
+                $table->json('seo_description')->nullable()->after('seo_title');
+            }
+
+            if (! Schema::hasColumn('referrals', 'seo_keywords')) {
+                $table->json('seo_keywords')->nullable()->after('seo_description');
+            }
         });
     }
 
     public function down(): void
     {
-        if (app()->environment('testing') && config('database.default') === 'sqlite') {
-            return;
-        }
-
         Schema::table('referrals', function (Blueprint $table) {
-            $table->dropColumn([
+            $columns = [
                 'title',
                 'description',
                 'terms_conditions',
@@ -43,7 +55,13 @@ return new class extends Migration
                 'seo_title',
                 'seo_description',
                 'seo_keywords',
-            ]);
+            ];
+
+            $drop = array_filter($columns, fn (string $column) => Schema::hasColumn('referrals', $column));
+
+            if ($drop !== []) {
+                $table->dropColumn($drop);
+            }
         });
     }
 };

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Database\Factories;
 
 use App\Models\Category;
+use Database\Factories\Concerns\SupportsSequenceIndices;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
@@ -14,7 +15,17 @@ use Illuminate\Support\Str;
  */
 class CategoryFactory extends Factory
 {
+    use SupportsSequenceIndices;
+
     protected $model = Category::class;
+
+    /**
+     * Track generated slugs per process so factories avoid collisions before
+     * the models are persisted to the database.
+     *
+     * @var array<int, string>
+     */
+    private static array $generatedSlugs = [];
 
     private const PRESET_CATEGORIES = [
         'tools' => [
@@ -91,7 +102,7 @@ class CategoryFactory extends Factory
         $baseSlug = Str::slug($name);
         $slug = $this->generateUniqueSlug($baseSlug);
 
-        return [
+        return $this->guardForMissingColumns([
             'name' => $name,
             // Ensure slug collisions from deterministic category names do not break SQLite tests.
             'slug'            => $slug,
@@ -99,9 +110,34 @@ class CategoryFactory extends Factory
             'parent_id'       => null, // Will be set by seeder for subcategories
             'sort_order'      => $this->faker->numberBetween(0, 100),
             'is_visible'      => true,
+            'is_active'       => true,
+            'is_enabled'      => true,
             'seo_title'       => $name . ' - Profesionalūs sprendimai statybininkams',
             'seo_description' => 'Platus ' . strtolower($name) . ' asortimentas geriausiomis kainomis. Greitas pristatymas visoje Lietuvoje.',
-        ];
+        ]);
+    }
+
+    /**
+     * Strip attributes that are unavailable on lightweight category tables used in isolated tests.
+     *
+     * @param  array<string, mixed>  $attributes
+     * @return array<string, mixed>
+     */
+    private function guardForMissingColumns(array $attributes): array
+    {
+        $table = (new Category())->getTable();
+
+        if (! Schema::hasTable($table)) {
+            return $attributes;
+        }
+
+        foreach (array_keys($attributes) as $column) {
+            if (! Schema::hasColumn($table, $column)) {
+                unset($attributes[$column]);
+            }
+        }
+
+        return $attributes;
     }
 
     /**
@@ -116,10 +152,15 @@ class CategoryFactory extends Factory
         $slug = $baseSlug;
         $counter = 1;
 
-        while (Category::where('slug', $slug)->exists()) {
+        while (
+            in_array($slug, self::$generatedSlugs, true)
+            || Category::withoutGlobalScopes()->where('slug', $slug)->exists()
+        ) {
             $slug = $baseSlug . '-' . $counter;
             $counter++;
         }
+
+        self::$generatedSlugs[] = $slug;
 
         return $slug;
     }
@@ -178,10 +219,15 @@ class CategoryFactory extends Factory
     {
         $preset = self::PRESET_CATEGORIES[$key] ?? [];
 
-        return array_merge([
+        return $this->guardForMissingColumns(array_merge([
             'parent_id'  => null,
             'sort_order' => 0,
             'is_visible' => true,
-        ], $preset);
+        ], $preset));
+    }
+
+    public function sequence(...$sequence)
+    {
+        return parent::sequence(...$this->normaliseSequenceDefinitions($sequence));
     }
 }

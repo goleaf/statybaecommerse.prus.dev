@@ -4,11 +4,14 @@ namespace Tests\Feature\Api\Concerns;
 
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Tests\Support\TestingDatabase;
 
 trait UsesApiRateLimitSchema
 {
     protected function setUpRateLimitSchema(): void
     {
+        Schema::disableForeignKeyConstraints();
+
         Schema::dropIfExists('activity_log');
         Schema::dropIfExists('cart_items');
         Schema::dropIfExists('user_wishlists');
@@ -55,6 +58,7 @@ trait UsesApiRateLimitSchema
             $table->string('city')->nullable();
             $table->string('country_code', 2)->nullable();
             $table->string('postal_code')->nullable();
+            $table->softDeletes();
             $table->timestamps();
         });
 
@@ -72,6 +76,11 @@ trait UsesApiRateLimitSchema
         Schema::create('products', function (Blueprint $table): void {
             $table->bigIncrements('id');
             $table->string('name')->nullable();
+            $table->boolean('is_enabled')->default(true);
+            $table->boolean('is_visible')->default(true);
+            $table->string('status')->default('published');
+            $table->timestamp('published_at')->nullable();
+            $table->softDeletes();
             $table->timestamps();
         });
 
@@ -79,6 +88,9 @@ trait UsesApiRateLimitSchema
             $table->bigIncrements('id');
             $table->unsignedBigInteger('user_id');
             $table->unsignedBigInteger('product_id');
+            $table->string('name')->default('Default Wishlist');
+            $table->boolean('is_default')->default(true);
+            $table->softDeletes();
             $table->timestamps();
         });
 
@@ -129,10 +141,14 @@ trait UsesApiRateLimitSchema
             $table->json('properties')->nullable();
             $table->timestamps();
         });
+
+        Schema::enableForeignKeyConstraints();
     }
 
     protected function tearDownRateLimitSchema(): void
     {
+        Schema::disableForeignKeyConstraints();
+
         Schema::dropIfExists('activity_log');
         Schema::dropIfExists('cart_items');
         Schema::dropIfExists('user_wishlists');
@@ -143,5 +159,12 @@ trait UsesApiRateLimitSchema
         Schema::dropIfExists('roles');
         Schema::dropIfExists('exports');
         Schema::dropIfExists('users');
+
+        Schema::enableForeignKeyConstraints();
+
+        // Reset the shared testing database so other suites that expect the canonical
+        // migration set (bootstrapped via RefreshDatabase) are not left without core tables.
+        TestingDatabase::teardown();
+        TestingDatabase::migrate();
     }
 }

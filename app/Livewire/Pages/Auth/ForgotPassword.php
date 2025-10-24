@@ -45,7 +45,9 @@ final class ForgotPassword extends Component
         $monitor = app(SuspiciousIpMonitor::class);
         $decaySeconds = $this->decaySeconds();
 
-        $this->ensureIsNotRateLimited($captchaManager, $monitor);
+        if (! $this->ensureIsNotRateLimited($captchaManager, $monitor)) {
+            return;
+        }
 
         try {
             if ($captchaManager->shouldChallenge($this->throttleKey(), 'auth.password_reset')) {
@@ -71,7 +73,7 @@ final class ForgotPassword extends Component
             $attempts = $this->recordRateLimitAttempt($monitor, $decaySeconds);
 
             if ($attempts > $this->maxAttempts()) {
-                $this->throwRateLimitException($captchaManager, $monitor, primeTimer: false);
+                $this->handleRateLimitViolation($captchaManager, $monitor, primeTimer: false);
             }
 
             throw $exception;
@@ -80,7 +82,9 @@ final class ForgotPassword extends Component
         $attempts = $this->recordRateLimitAttempt($monitor, $decaySeconds);
 
         if ($attempts > $this->maxAttempts()) {
-            $this->throwRateLimitException($captchaManager, $monitor, primeTimer: false);
+            $this->handleRateLimitViolation($captchaManager, $monitor, primeTimer: false);
+
+            return;
         }
 
         $broker = Password::broker();
@@ -123,7 +127,7 @@ final class ForgotPassword extends Component
         return view('livewire.pages.auth.forgot-password');
     }
 
-    private function ensureIsNotRateLimited(CaptchaManager $captchaManager, SuspiciousIpMonitor $monitor): void
+    private function ensureIsNotRateLimited(CaptchaManager $captchaManager, SuspiciousIpMonitor $monitor): bool
     {
         $throttleKey = $this->throttleKey();
         $maxAttempts = $this->maxAttempts();
@@ -133,17 +137,19 @@ final class ForgotPassword extends Component
             || RateLimiter::attempts($throttleKey) >= $maxAttempts;
 
         if (! $tooManyAttempts && ! $hasReachedThreshold) {
-            return;
+            return true;
         }
 
-        $this->throwRateLimitException($captchaManager, $monitor, primeTimer: ! $tooManyAttempts);
+        $this->handleRateLimitViolation($captchaManager, $monitor, primeTimer: ! $tooManyAttempts);
+
+        return false;
     }
 
-    private function throwRateLimitException(
+    private function handleRateLimitViolation(
         CaptchaManager $captchaManager,
         SuspiciousIpMonitor $monitor,
         bool $primeTimer
-    ): never {
+    ): void {
         if ($primeTimer) {
             RateLimiter::hit($this->throttleKey(), $this->decaySeconds());
         }
@@ -165,11 +171,19 @@ final class ForgotPassword extends Component
             $seconds = $this->decaySeconds();
         }
 
+        $message = trans('auth.throttle', [
+            'seconds' => $seconds,
+            'minutes' => (int) ceil($seconds / 60),
+        ]);
+
+        $this->addError('email', $message);
+
+        if (! $this->shouldThrowRateLimitException()) {
+            return;
+        }
+
         $exception = ValidationException::withMessages([
-            'email' => trans('auth.throttle', [
-                'seconds' => $seconds,
-                'minutes' => (int) ceil($seconds / 60),
-            ]),
+            'email' => $message,
         ]);
 
         $exception->status = 429;
@@ -227,21 +241,37 @@ final class ForgotPassword extends Component
 
     private function maxAttempts(): int
     {
-        $configured = config('security.rate_limiting.password_reset.max_attempts');
+        $candidates = [];
 
-        if ($configured === null) {
-            $configured = data_get(config('security.rate_limiting.auth.password_reset'), 'max_attempts');
+        $global = config('security.rate_limiting.password_reset.max_attempts');
+        if (is_numeric($global)) {
+            $value = (int) $global;
+            if ($value > 0) {
+                $candidates[] = $value;
+            }
         }
 
-        return max(1, (int) ($configured ?? 5));
+        $auth = config('security.rate_limiting.auth.password_reset.max_attempts');
+        if (is_numeric($auth)) {
+            $value = (int) $auth;
+            if ($value > 0) {
+                $candidates[] = $value;
+            }
+        }
+
+        if ($candidates === []) {
+            return 5;
+        }
+
+        return max(1, min($candidates));
     }
 
     private function decaySeconds(): int
     {
-        $configured = config('security.rate_limiting.password_reset.decay_seconds');
+        $configured = config('security.rate_limiting.auth.password_reset.decay_seconds');
 
         if ($configured === null) {
-            $configured = data_get(config('security.rate_limiting.auth.password_reset'), 'decay_seconds');
+            $configured = config('security.rate_limiting.password_reset.decay_seconds');
         }
 
         return max(1, (int) ($configured ?? 300));
@@ -277,7 +307,10 @@ final class ForgotPassword extends Component
             return 0;
         }
 
-        if (! $this->rateLimiterUsesEphemeralStore() && RateLimiter::attempts($throttleKey) === 0) {
+        $limiterAttempts = RateLimiter::attempts($throttleKey);
+        $limiterAvailableIn = RateLimiter::availableIn($throttleKey);
+
+        if ($limiterAttempts === 0 && $limiterAvailableIn === 0) {
             $store->forget($this->attemptCacheKey($throttleKey));
 
             return 0;
@@ -342,5 +375,10 @@ final class ForgotPassword extends Component
         $driver = config("cache.stores.{$defaultStore}.driver");
 
         return in_array($driver, ['array', 'null'], true);
+    }
+
+    private function shouldThrowRateLimitException(): bool
+    {
+        return true;
     }
 }

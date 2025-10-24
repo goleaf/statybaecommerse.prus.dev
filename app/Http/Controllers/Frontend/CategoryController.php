@@ -6,15 +6,18 @@ namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
 use App\Models\Category;
-use App\Support\Frontend\DataProviders\CategoryCatalogueDataProvider;
 use App\Support\Frontend\DataProviders\ProductCatalogueDataProvider;
+use App\Support\Frontend\DataProviders\CategoryCatalogueDataProvider;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 
 final class CategoryController extends Controller
 {
-    public function __construct(private readonly CategoryCatalogueDataProvider $dataProvider) {}
+    public function __construct(
+        private readonly CategoryCatalogueDataProvider $categoryData,
+        private readonly ProductCatalogueDataProvider $productData,
+    ) {}
 
     public function index(Request $request): View
     {

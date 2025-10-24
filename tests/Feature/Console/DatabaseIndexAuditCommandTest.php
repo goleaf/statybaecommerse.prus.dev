@@ -51,6 +51,15 @@ final class DatabaseIndexAuditCommandTest extends TestCase
             $table->timestamps();
         });
 
+        Schema::connection($connection)->create('cart_items', static function (Blueprint $table): void {
+            $table->id();
+            $table->unsignedBigInteger('cart_id');
+            $table->unsignedBigInteger('product_id');
+            $table->unsignedBigInteger('user_id')->nullable();
+            $table->string('session_id')->nullable();
+            $table->timestamps();
+        });
+
         Schema::connection($connection)->create('products', static function (Blueprint $table): void {
             $table->id();
             $table->unsignedBigInteger('category_id');
@@ -88,12 +97,16 @@ final class DatabaseIndexAuditCommandTest extends TestCase
         Schema::connection($connection)->table('orders', static function (Blueprint $table): void {
             // Add the composite indexes the audit expects for analytics and CRM flows.
             $table->index(['status', 'created_at'], 'index_orders_status_created_at');
-            $table->index(['customer_id', 'created_at'], 'index_orders_customer_created_at');
+            $table->index(['customer_id', 'status'], 'index_orders_customer_status');
         });
 
         Schema::connection($connection)->table('order_items', static function (Blueprint $table): void {
             // Ensure order to product lookups lean on a composite index.
             $table->index(['order_id', 'product_id'], 'order_items_order_product_idx');
+        });
+
+        Schema::connection($connection)->table('cart_items', static function (Blueprint $table): void {
+            $table->index(['cart_id', 'product_id'], 'cart_items_cart_product_idx');
         });
 
         Schema::connection($connection)->table('products', static function (Blueprint $table): void {

@@ -8,11 +8,12 @@ use App\Support\Storage\SecureStorage;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Illuminate\Support\Facades\Storage;
 
 final class SecureMediaDownloadController extends Controller
 {
-    public function __invoke(Request $request, string $encodedPath): Response
+    public function __invoke(Request $request, string $encodedPath): Response|StreamedResponse
     {
         $path = SecureStorage::decodePath($encodedPath);
         abort_if($path === null, 404);

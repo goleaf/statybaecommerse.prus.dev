@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
 use Filament\Schemas\Schema;
 use App\Filament\Resources\CurrencyResource\Pages;
 use App\Models\Currency;
@@ -19,6 +18,9 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Infolists\Components\IconEntry;
+use Filament\Infolists\Components\TextEntry;
+use Filament\Infolists\Infolist;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -27,12 +29,9 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Collection;
-use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable as SpatieTranslatableResource;
 
 final class CurrencyResource extends Resource
 {
-    use SpatieTranslatableResource; // Enable locale-aware management for Spatie translatable attributes.
-
     protected static ?string $model = Currency::class;
 
     /**
@@ -52,6 +51,53 @@ final class CurrencyResource extends Resource
     }
 
     /**
+     * Configure read-only view for currency details.
+     */
+    public static function infolist(Infolist $infolist): Infolist
+    {
+        return $infolist->schema([
+            TextEntry::make('name')
+                ->label(__('currencies.name')),
+            TextEntry::make('code')
+                ->label(__('currencies.code')),
+            TextEntry::make('symbol')
+                ->label(__('currencies.symbol')),
+            TextEntry::make('iso_code')
+                ->label(__('currencies.iso_code'))
+                ->placeholder('—'),
+            TextEntry::make('exchange_rate')
+                ->label(__('currencies.exchange_rate'))
+                ->numeric(decimalPlaces: 6),
+            TextEntry::make('base_currency')
+                ->label(__('currencies.base_currency')),
+            TextEntry::make('decimal_places')
+                ->label(__('currencies.decimal_places')),
+            TextEntry::make('symbol_position')
+                ->label(__('currencies.symbol_position'))
+                ->formatStateUsing(fn (?string $state): string => $state ? __("currencies.positions.{$state}") : '—'),
+            TextEntry::make('thousands_separator')
+                ->label(__('currencies.thousands_separator')),
+            TextEntry::make('decimal_separator')
+                ->label(__('currencies.decimal_separator')),
+            IconEntry::make('is_active')
+                ->label(__('currencies.is_active'))
+                ->boolean(),
+            IconEntry::make('is_default')
+                ->label(__('currencies.is_default'))
+                ->boolean(),
+            IconEntry::make('auto_update_rate')
+                ->label(__('currencies.auto_update_rate'))
+                ->boolean(),
+            TextEntry::make('sort_order')
+                ->label(__('currencies.sort_order')),
+            TextEntry::make('description')
+                ->label(__('currencies.description'))
+                ->columnSpanFull()
+                ->placeholder('—'),
+        ]);
+    }
+
+    /**
      * Configure the Filament form schema with fields and validation.
      */
     public static function form(Schema $schema): Schema   
@@ -67,7 +113,7 @@ final class CurrencyResource extends Resource
                                 ->maxLength(255),
                             TextInput::make('code')
                                 ->label(__('currencies.code'))
-                                ->maxLength(3)
+                                ->maxLength(5)
                                 ->unique(ignoreRecord: true)
                                 ->rules(['alpha'])
                                 ->helperText(__('currencies.code_help')),

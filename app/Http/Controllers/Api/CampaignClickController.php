@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreCampaignClickRequest;
 use App\Http\Requests\UpdateCampaignClickRequest;
+use App\Http\Resources\CampaignClickCollection;
 use App\Http\Resources\CampaignClickResource;
 use App\Models\CampaignClick;
 use App\Support\ListQuery\ListQueryDefinition;

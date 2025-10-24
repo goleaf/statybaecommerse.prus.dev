@@ -119,17 +119,19 @@ final class AdminPanelProvider extends PanelProvider
         $plugins[] = FilamentNordThemePlugin::make();
         $plugins[] = ResizedColumnPlugin::make()->preserveOnDB();
 
+        $configuredGuard = config('filament.auth.guard');
+        $defaultGuard = app()->environment('testing') ? 'web' : 'admin';
+        $guard = is_string($configuredGuard) && $configuredGuard !== ''
+            ? $configuredGuard
+            : $defaultGuard;
+
         return $panel
             ->default()
             ->id('admin')
             ->path('admin')
             ->login()
             ->profile()
-            ->when(
-                app()->environment('testing'),
-                fn (Panel $p) => $p->authGuard('web'),
-                fn (Panel $p) => $p->authGuard('admin'),
-            )
+            ->authGuard($guard)
             ->authPasswordBroker('admin_users')
             ->brandName(__('admin.brand_name'))
             ->brandLogo(fn (): string => asset('images/logo-admin.svg'))
@@ -152,6 +154,7 @@ final class AdminPanelProvider extends PanelProvider
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,
                 StartSession::class,
+                \App\Http\Middleware\ResolveFilamentGuard::class,
                 AuthenticateSession::class,
                 ShareErrorsFromSession::class,
                 \App\Http\Middleware\SetFilamentLocale::class,
@@ -161,6 +164,7 @@ final class AdminPanelProvider extends PanelProvider
                 DispatchServingFilamentEvent::class,
             ])
             ->authMiddleware([
+                \App\Http\Middleware\ResolveFilamentGuard::class,
                 Authenticate::class,
             ])
             // Disable database notifications polling to prevent auto-refresh on the main page

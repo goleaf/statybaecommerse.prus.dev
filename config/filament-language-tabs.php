@@ -18,7 +18,6 @@ $defaultLocales = array_values(array_unique($defaultLocales));
 
 $requiredLocales = array_filter([
     config('app.locale'),
-    config('app.fallback_locale'),
 ]);
 
 if ($requiredLocales === []) {

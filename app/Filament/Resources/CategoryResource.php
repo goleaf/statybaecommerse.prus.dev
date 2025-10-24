@@ -18,16 +18,16 @@ use App\Support\Concerns\HasNav;
 use BackedEnum;
 use Filament\Forms\Components\ColorPicker;
 use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Forms\Set;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Grid as SchemaGrid;
+use Filament\Schemas\Components\Section as SchemaSection;
+use Filament\Schemas\Schema;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Actions\BulkActionGroup;
@@ -118,10 +118,10 @@ final class CategoryResource extends Resource
         return __('categories.single');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form->schema([
-            Section::make(__('categories.basic_information'))
+        return $schema->components([
+            SchemaSection::make(__('categories.basic_information'))
                 ->components([
                     LanguageTabs::make([
                         TextInput::make('name')
@@ -129,10 +129,15 @@ final class CategoryResource extends Resource
                             ->required()
                             ->maxLength(255)
                             // Keep the slug synchronised with the initial name while creating new categories for faster authoring.
-                            ->live(onBlur: true)
+                            ->live(debounce: 500)
                             ->afterStateUpdated(function (string $operation, ?string $state, Set $set): void {
                                 if ($operation === 'create') {
-                                    $set('slug', Str::slug((string) $state));
+                                    $slug = Str::slug((string) $state);
+                                    $defaultLocale = config('app.locale', 'lt');
+
+                                    $set('slug', $slug);
+                                    $set("slug.{$defaultLocale}", $slug);
+                                    $set("slug_{$defaultLocale}", $slug);
                                 }
                             }),
                         TextInput::make('slug')
@@ -145,7 +150,12 @@ final class CategoryResource extends Resource
                             ->live(onBlur: true)
                             ->afterStateUpdated(function (?string $state, Set $set): void {
                                 // Normalise user edits so the slug never diverges from the expected format.
-                                $set('slug', Str::slug((string) $state));
+                                $slug = Str::slug((string) $state);
+                                $defaultLocale = config('app.locale', 'lt');
+
+                                $set('slug', $slug);
+                                $set("slug.{$defaultLocale}", $slug);
+                                $set("slug_{$defaultLocale}", $slug);
                             }),
                         Textarea::make('description')
                             ->label(__('categories.description'))
@@ -167,7 +177,7 @@ final class CategoryResource extends Resource
                                 ->maxLength(255),
                         ]),
                 ]),
-            Section::make(__('categories.media'))
+            SchemaSection::make(__('categories.media'))
                 ->components([
                     FileUpload::make('image')
                         ->label(__('categories.image'))
@@ -190,12 +200,13 @@ final class CategoryResource extends Resource
                         ->directory('categories/banners')
                         ->visibility('private'),
                 ]),
-            Section::make(__('categories.appearance'))
+            SchemaSection::make(__('categories.appearance'))
                 ->components([
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->components([
                             ColorPicker::make('color')
                                 ->label(__('categories.color'))
+                                ->nullable()
                                 ->hex(),
                             TextInput::make('sort_order')
                                 ->label(__('categories.sort_order'))
@@ -204,7 +215,7 @@ final class CategoryResource extends Resource
                                 ->minValue(0),
                         ]),
                 ]),
-            Section::make(__('categories.seo'))
+            SchemaSection::make(__('categories.seo'))
                 ->components([
                     LanguageTabs::make([
                         TextInput::make('seo_title')
@@ -216,9 +227,9 @@ final class CategoryResource extends Resource
                             ->maxLength(500),
                     ]),
                 ]),
-            Section::make(__('categories.settings'))
+            SchemaSection::make(__('categories.settings'))
                 ->components([
-                    Grid::make(2)
+                    SchemaGrid::make(2)
                         ->components([
                             Toggle::make('is_active')
                                 ->label(__('categories.is_active'))
@@ -414,13 +425,40 @@ final class CategoryResource extends Resource
             return $query;
         }
 
-        $normalised = filter_var($value, FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE);
+        $normalised = self::normaliseBooleanFilterValue($value);
 
-        if (! is_bool($normalised)) {
+        if ($normalised === null) {
             return $query;
         }
 
         return $query->where($query->qualifyColumn($column), $normalised);
+    }
+
+    private static function normaliseBooleanFilterValue(mixed $value): ?bool
+    {
+        if (is_bool($value)) {
+            return $value;
+        }
+
+        if (is_int($value)) {
+            return match ($value) {
+                1 => true,
+                0 => false,
+                default => null,
+            };
+        }
+
+        if (is_string($value)) {
+            $normalised = strtolower(trim($value));
+
+            return match ($normalised) {
+                '1', 'true', 'yes', 'on'   => true,
+                '0', 'false', 'no', 'off' => false,
+                default                   => null,
+            };
+        }
+
+        return null;
     }
 
     public static function getRelations(): array

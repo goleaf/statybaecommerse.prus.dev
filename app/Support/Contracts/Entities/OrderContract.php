@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Support\Contracts\Entities;
 
+use App\Data\Pricing\PriceBreakdown;
 use App\Models\Order;
+use App\Services\Pricing\PriceConfiguration;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 
@@ -26,16 +28,23 @@ final class OrderContract
 
     public static function forOrder(Order $order, array $meta = []): array
     {
+        $orderPayload = self::mapOrder($order);
+
         return self::envelope([
-            'item' => self::mapOrder($order),
+            'order' => $orderPayload,
+            'item' => $orderPayload,
         ], $meta);
     }
 
     public static function forCollection(iterable $orders, array $meta = []): array
     {
-        $items = Collection::make($orders)->map(fn (Order $order): array => self::mapOrder($order))->values()->all();
+        $items = Collection::make($orders)
+            ->map(fn (Order $order): array => self::mapOrder($order))
+            ->values()
+            ->all();
 
         return self::envelope([
+            'orders' => $items,
             'items' => $items,
         ], $meta + ['total' => count($items)]);
     }
@@ -44,12 +53,18 @@ final class OrderContract
     {
         $order->loadMissing(['items']);
 
+        $configuration = app(PriceConfiguration::class);
+        $breakdown = PriceBreakdown::fromOrder($order, $configuration);
+
+        $status = $order->status;
+        $paymentStatus = $order->payment_status;
+
         return [
             'id'     => $order->getKey(),
             'number' => (string) $order->number,
             'status' => [
-                'state'         => (string) $order->status,
-                'payment_state' => $order->payment_status,
+                'state'         => $status instanceof \BackedEnum ? $status->value : (string) $status,
+                'payment_state' => $paymentStatus instanceof \BackedEnum ? $paymentStatus->value : $paymentStatus,
             ],
             'totals' => $breakdown->toContractTotals(),
             'items'  => $order->items->map(static fn ($item): array => [
@@ -64,7 +79,7 @@ final class OrderContract
             'shipping_address' => is_array($order->shipping_address) ? $order->shipping_address : [],
             'placed_at'        => $order->created_at?->toISOString(),
             'links'            => [
-                'self' => route('frontend.orders.show', $order->number),
+                'self' => route('api.orders.show', ['order' => $order->number]),
             ],
         ];
     }

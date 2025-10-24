@@ -148,12 +148,9 @@ final class ProductComparisonResource extends Resource
                     ->searchable()
                     ->preload(),
                 Filter::make('created_at')
+                    ->label(__('product_comparisons.created_at'))
                     ->form([
-                        SupportFlatpickr::makeRange('range')
-                            ->label(__('product_comparisons.created_at'))
-
-                            ->format('Y-m-d')
-                            ->displayFormat('Y-m-d'),
+                        SupportFlatpickr::makeRange('range', displayFormat: 'Y-m-d', format: 'Y-m-d'),
                     ])
                     ->query(fn (Builder $query, array $data): Builder => DateRangeFilter::apply(
                         $query,

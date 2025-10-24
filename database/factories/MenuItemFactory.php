@@ -6,6 +6,7 @@ namespace Database\Factories;
 
 use App\Models\Menu;
 use App\Models\MenuItem;
+use Database\Factories\Concerns\SupportsSequenceIndices;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -13,6 +14,8 @@ use Illuminate\Database\Eloquent\Factories\Factory;
  */
 final class MenuItemFactory extends Factory
 {
+    use SupportsSequenceIndices;
+
     protected $model = MenuItem::class;
 
     /**
@@ -96,5 +99,10 @@ final class MenuItemFactory extends Factory
             'route_name' => null,
             'route_params' => null,
         ]);
+    }
+
+    public function sequence(...$sequence)
+    {
+        return parent::sequence(...$this->normaliseSequenceDefinitions($sequence));
     }
 }

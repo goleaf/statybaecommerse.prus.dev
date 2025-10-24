@@ -15,6 +15,9 @@ use App\Filament\Resources\ProductResource\RelationManagers\ReviewsRelationManag
 use App\Filament\Resources\ProductResource\RelationManagers\VariantsRelationManager;
 use App\Filament\Widgets\InlineCharts\ProductSalesSparkline;
 use App\Models\Product;
+use App\Models\Scopes\ActiveScope;
+use App\Models\Scopes\PublishedScope;
+use App\Models\Scopes\VisibleScope;
 use App\Support\Authorization\AuthorizationMatrix;
 use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
 use App\Support\Filament\Schemas\TestingSchemaHost;
@@ -939,6 +942,18 @@ final class ProductResource extends Resource implements DefinesExportColumns
             ->withAvg([
                 'reviews as approved_reviews_avg_rating' => fn (Builder $query): Builder => $query->where('is_approved', true),
             ], 'rating');
+    }
+
+    /**
+     * @return Builder<Product>
+     */
+    public static function getRecordRouteBindingEloquentQuery(): Builder
+    {
+        return static::getModel()::query()->withoutGlobalScopes([
+            ActiveScope::class,
+            PublishedScope::class,
+            VisibleScope::class,
+        ]);
     }
 
     /**

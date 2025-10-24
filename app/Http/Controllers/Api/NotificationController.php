@@ -16,12 +16,16 @@ use App\Http\Requests\Api\NotificationSearchRequest;
 use App\Http\Requests\Api\NotificationShowRequest;
 use App\Http\Requests\Api\NotificationStatsRequest;
 use App\Models\Notification;
+use App\Models\User;
 use App\Services\NotificationService;
 use App\Support\ApiErrorResponse;
 use App\Support\ErrorCodes;
+use Illuminate\Auth\AuthenticationException;
+use App\Support\RequestContext;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
+use InvalidArgumentException;
 
 final class NotificationController extends Controller
 {
@@ -31,8 +35,13 @@ final class NotificationController extends Controller
     {
         $user = Auth::user();
         $input = $request->validated();
-        $filters = NotificationFilterData::fromArray($input);
-        $pagination = NotificationPaginationData::fromArray($input);
+
+        try {
+            $filters = NotificationFilterData::fromArray($input);
+            $pagination = NotificationPaginationData::fromArray($input);
+        } catch (InvalidArgumentException $exception) {
+            return $this->invalidQueryResponse($request, $exception);
+        }
 
         $page = $this->notificationService->getUserNotifications($user, $filters, $pagination);
 
@@ -149,8 +158,13 @@ final class NotificationController extends Controller
     {
         $user = Auth::user();
         $input = $request->validated();
-        $pagination = NotificationPaginationData::fromArray($input);
-        $search = NotificationSearchParametersData::fromArray($input);
+
+        try {
+            $pagination = NotificationPaginationData::fromArray($input);
+            $search = NotificationSearchParametersData::fromArray($input);
+        } catch (InvalidArgumentException $exception) {
+            return $this->invalidQueryResponse($request, $exception);
+        }
 
         $page = $this->notificationService->searchNotifications($user, $search, $pagination);
 
@@ -160,6 +174,75 @@ final class NotificationController extends Controller
             'meta'    => $page->meta(),
             'links'   => $page->links(),
         ]);
+    }
+
+    private function invalidQueryResponse(ApiRequest $request, InvalidArgumentException $exception): JsonResponse
+    {
+        return $this->validationErrorResponse(
+            $request,
+            $this->mapInvalidArgumentToErrors($exception),
+        );
+    }
+
+    /**
+     * @param array<string, array<int, string>> $errors
+     */
+    private function validationErrorResponse(ApiRequest $request, array $errors): JsonResponse
+    {
+        $violations = collect($errors)
+            ->map(static function (array $messages, string $field): array {
+                $localizedMessages = array_values($messages);
+
+                return [
+                    'field'    => $field,
+                    'messages' => $localizedMessages,
+                    'reason'   => $localizedMessages[0] ?? 'Invalid value.',
+                ];
+            })
+            ->values()
+            ->all();
+
+        $locale = RequestContext::resolveLocale($request);
+        $detail = $violations[0]['messages'][0] ?? (ErrorCodes::message(ErrorCodes::VALIDATION_FAILED, $locale) ?? __('The given data was invalid.'));
+
+        $response = ApiErrorResponse::problem(
+            request: $request,
+            errorCode: ErrorCodes::VALIDATION_FAILED,
+            detail: $detail,
+            status: 422,
+            title: ApiErrorResponse::titleFor(ErrorCodes::VALIDATION_FAILED, $locale),
+            context: ['violations' => $violations],
+            locale: $locale,
+        );
+
+        $payload = $response->getData(true);
+        $payload['message'] = $detail;
+        $payload['errors'] = $errors;
+
+        $response->setData($payload);
+
+        return $response;
+    }
+
+    /**
+     * @return array<string, array<int, string>>
+     */
+    private function mapInvalidArgumentToErrors(InvalidArgumentException $exception): array
+    {
+        $message = $exception->getMessage();
+
+        $field = match (true) {
+            str_contains($message, 'Per page') => 'per_page',
+            str_contains($message, 'Page') => 'page',
+            str_contains($message, 'Sort direction') => 'direction',
+            str_contains($message, 'Sort field') => 'sort',
+            str_contains($message, 'Notification type') => 'type',
+            str_contains($message, 'Read filter') => 'read',
+            str_contains($message, 'Search term') => 'q',
+            default => 'query',
+        };
+
+        return [$field => [$message]];
     }
 
     private function notFoundResponse(): JsonResponse
@@ -172,5 +255,16 @@ final class NotificationController extends Controller
             status: 404,
             title: ApiErrorResponse::titleFor(ErrorCodes::NOT_FOUND),
         );
+    }
+
+    private function requireUser(ApiRequest $request): User
+    {
+        $user = $request->user();
+
+        if (! $user instanceof User) {
+            throw new AuthenticationException('Authentication required.');
+        }
+
+        return $user;
     }
 }

@@ -17,6 +17,15 @@ final class VariantAnalyticsFactory extends Factory
 {
     protected $model = VariantAnalytics::class;
 
+    /**
+     * Simple sequence counter so generated rows always receive a unique day.
+     *
+     * Keeping this factory deterministic avoids tripping the unique database
+     * constraint on (product_id, variant_id, date_bucket) when the same variant
+     * is reused across multiple rows in tests.
+     */
+    private static int $daySequence = 0;
+
     public function definition(): array
     {
         $views = fake()->numberBetween(10, 1000);
@@ -24,7 +33,7 @@ final class VariantAnalyticsFactory extends Factory
         $addToCart = fake()->numberBetween(1, $clicks);
         $purchases = fake()->numberBetween(1, $addToCart);
 
-        $bucketDate = Carbon::parse(fake()->dateTimeBetween('-30 days', 'now'))->startOfDay();
+        $bucketDate = Carbon::today()->subDays(self::$daySequence++);
         $productFactory = Product::factory();
 
         return [
@@ -67,16 +76,26 @@ final class VariantAnalyticsFactory extends Factory
 
     public function recent(): static
     {
-        return $this->state(fn (array $attributes) => [
-            'date' => fake()->dateTimeBetween('-7 days', 'now')->format('Y-m-d'),
-        ]);
+        return $this->state(function (array $attributes) {
+            $date = Carbon::parse(fake()->dateTimeBetween('-7 days', 'now'))->toDateString();
+
+            return [
+                'date' => $date,
+                'date_bucket' => sprintf('%s:%s', VariantAnalytics::BUCKET_DAILY, $date),
+            ];
+        });
     }
 
     public function historical(): static
     {
-        return $this->state(fn (array $attributes) => [
-            'date' => fake()->dateTimeBetween('-1 year', '-30 days')->format('Y-m-d'),
-        ]);
+        return $this->state(function (array $attributes) {
+            $date = Carbon::parse(fake()->dateTimeBetween('-1 year', '-30 days'))->toDateString();
+
+            return [
+                'date' => $date,
+                'date_bucket' => sprintf('%s:%s', VariantAnalytics::BUCKET_DAILY, $date),
+            ];
+        });
     }
 
     public function withVariant(ProductVariant $variant): static

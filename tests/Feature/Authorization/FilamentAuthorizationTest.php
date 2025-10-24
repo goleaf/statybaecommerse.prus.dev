@@ -16,8 +16,13 @@ use Spatie\Permission\PermissionRegistrar;
 uses(RefreshDatabase::class);
 
 beforeEach(function (): void {
+    config()->set('authorization.testing.skip_checks', false);
     app(PermissionRegistrar::class)->forgetCachedPermissions();
     $this->resolveAdminPanel();
+});
+
+afterEach(function (): void {
+    config()->set('authorization.testing.skip_checks', true);
 });
 
 function createUserWithRole(string $role): User

@@ -101,6 +101,8 @@ final class GeneralStatsOverviewTest extends TestCase
 
     private function ensureWidgetTables(): void
     {
+        Schema::disableForeignKeyConstraints();
+
         Schema::dropIfExists('activity_log');
         Schema::dropIfExists('order_items');
         Schema::dropIfExists('orders');
@@ -108,6 +110,8 @@ final class GeneralStatsOverviewTest extends TestCase
         Schema::dropIfExists('analytics_events');
         Schema::dropIfExists('subscribers');
         Schema::dropIfExists('users');
+
+        Schema::enableForeignKeyConstraints();
 
         Schema::create('users', function (Blueprint $table): void {
             $table->id();

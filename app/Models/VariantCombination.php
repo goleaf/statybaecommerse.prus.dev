@@ -6,6 +6,7 @@ namespace App\Models;
 
 use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\EnabledScope;
+use App\Models\Scopes\VisibleScope;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -54,6 +55,16 @@ final class VariantCombination extends Model
     {
         // Always compute the deterministic hash before storing the model to the database.
         static::saving(static function (VariantCombination $combination): void {
+            if (! is_array($combination->attribute_combinations)) {
+                $combination->attribute_combinations = $combination->attribute_combinations === null
+                    ? []
+                    : (array) $combination->attribute_combinations;
+            }
+
+            if (is_array($combination->attribute_combinations)) {
+                $combination->attribute_combinations = self::normaliseCombination($combination->attribute_combinations);
+            }
+
             $combination->combination_hash = $combination->generateDeterministicHash();
         });
 
@@ -129,15 +140,18 @@ final class VariantCombination extends Model
      */
     public function getIsValidCombinationAttribute(): bool
     {
-        if (! $this->attribute_combinations || ! $this->product) {
+        if (! is_array($this->attribute_combinations) || $this->attribute_combinations === [] || ! $this->product) {
             return false;
         }
 
         // Check if all attributes exist for this product
-        $productAttributes = $this->product->attributes()->pluck('name', 'id')->toArray();
+        $productAttributes = $this->product
+            ->attributes()
+            ->pluck('name')
+            ->all();
 
         foreach ($this->attribute_combinations as $attributeName => $value) {
-            if (! in_array($attributeName, $productAttributes)) {
+            if (! in_array($attributeName, $productAttributes, true)) {
                 return false;
             }
         }
@@ -194,7 +208,13 @@ final class VariantCombination extends Model
      */
     public static function generateCombinations(Product $product): array
     {
-        $attributes = $product->attributes()->with('values')->get();
+        $attributes = $product
+            ->attributes()
+            ->withoutGlobalScopes([ActiveScope::class, EnabledScope::class, VisibleScope::class])
+            ->with([
+                'values' => static fn ($query) => $query->withoutGlobalScopes([ActiveScope::class, EnabledScope::class]),
+            ])
+            ->get();
         $combinations = [];
 
         if ($attributes->isEmpty()) {
@@ -438,11 +458,42 @@ final class VariantCombination extends Model
      */
     public static function cachedForProduct(int $productId): EloquentCollection
     {
-        if (! array_key_exists($productId, self::$hydratedCache)) {
+        $shouldRefresh = ! array_key_exists($productId, self::$hydratedCache);
+
+        if (! $shouldRefresh) {
+            $cached = self::$hydratedCache[$productId];
+
+            if (! $cached instanceof EloquentCollection) {
+                $shouldRefresh = true;
+            } elseif ($cached->isNotEmpty()) {
+                $model = $cached->first();
+
+                if (! $model instanceof self) {
+                    $shouldRefresh = true;
+                } else {
+                    $keyName = $model->getKeyName();
+                    $cachedIds = $cached->modelKeys();
+
+                    $existingCount = self::query()
+                        ->withoutGlobalScopes()
+                        ->where('product_id', $productId)
+                        ->whereIn($keyName, $cachedIds)
+                        ->count();
+
+                    // If the cached records no longer exist (e.g. after RefreshDatabase migrations),
+                    // ensure the cache slice is rebuilt from the fresh database state.
+                    if ($existingCount !== count($cachedIds)) {
+                        $shouldRefresh = true;
+                    }
+                }
+            }
+        }
+
+        if ($shouldRefresh) {
             self::refreshCombinationCacheForProduct($productId);
         }
 
-        return self::$hydratedCache[$productId];
+        return self::$hydratedCache[$productId] ?? new EloquentCollection();
     }
 
     /**

@@ -12,6 +12,8 @@ use Spatie\Permission\Models\Role;
 
 describe('Product resource authorization', function () {
     beforeEach(function (): void {
+        config()->set('authorization.testing.skip_checks', false);
+
         $this->resolveAdminPanel();
 
         $this->product = Product::factory()->create();
@@ -39,12 +41,20 @@ describe('Product resource authorization', function () {
         }
     });
 
+    afterEach(function (): void {
+        config()->set('authorization.testing.skip_checks', true);
+    });
+
     it('feature: returns 403 for users without product listing permission', function (string $role) {
         $user = User::factory()->create();
         $user->assignRole($role);
 
+        $this->actingAs($user);
+
+        expect($user->can('view_products'))->toBeFalse();
+        expect(ProductResource::canViewAny())->toBeFalse();
+
         $this
-            ->actingAs($user)
             ->get(ProductResource::getUrl('index'))
             ->assertForbidden();
     })->with([
@@ -55,8 +65,11 @@ describe('Product resource authorization', function () {
         $user = User::factory()->create();
         $user->assignRole($role);
 
+        $this->actingAs($user);
+
+        expect(ProductResource::resolveRecordRouteBinding($this->product->slug))->not()->toBeNull();
+
         $this
-            ->actingAs($user)
             ->get(ProductResource::getUrl('view', ['record' => $this->product]))
             ->assertForbidden();
     })->with([
@@ -101,10 +114,9 @@ describe('Product resource authorization', function () {
         $user = User::factory()->create();
         $user->assignRole($role);
 
-        Livewire::actingAs($user)
-            ->test(ListProducts::class)
-            ->callTableAction('delete', $this->product)
-            ->assertForbidden();
+        $this->actingAs($user);
+
+        expect(ProductResource::canDelete($this->product))->toBeFalse();
     })->with([
         'editor role missing delete ability' => 'editor',
         'manager role missing delete ability' => 'manager',

@@ -78,7 +78,15 @@ final class Product extends Model implements HasMedia, TranslatableRecord
     use InteractsWithMedia;
     use LogsActivity;
 
-    protected $fillable = ['name', 'slug', 'description', 'short_description', 'sku', 'barcode', 'price', 'compare_price', 'cost_price', 'sale_price', 'manage_stock', 'track_stock', 'allow_backorder', 'stock_quantity', 'low_stock_threshold', 'weight', 'length', 'width', 'height', 'is_visible', 'is_featured', 'is_requestable', 'requests_count', 'minimum_quantity', 'hide_add_to_cart', 'request_message', 'published_at', 'seo_title', 'seo_description', 'brand_id', 'status', 'type', 'video_url', 'metadata', 'variant_attribute_matrix', 'sort_order', 'tax_class', 'shipping_class', 'download_limit', 'download_expiry', 'external_url', 'button_text'];
+    public const SCOPE_COLUMN_HINTS = [
+        'is_active'    => false,
+        'is_visible'   => true,
+        'is_enabled'   => true,
+        'status'       => true,
+        'published_at' => true,
+    ];
+
+    protected $fillable = ['name', 'slug', 'description', 'short_description', 'sku', 'barcode', 'price', 'compare_price', 'cost_price', 'sale_price', 'manage_stock', 'track_stock', 'allow_backorder', 'stock_quantity', 'low_stock_threshold', 'weight', 'length', 'width', 'height', 'is_active', 'is_visible', 'is_enabled', 'is_featured', 'is_requestable', 'requests_count', 'minimum_quantity', 'hide_add_to_cart', 'request_message', 'published_at', 'seo_title', 'seo_description', 'brand_id', 'status', 'type', 'video_url', 'metadata', 'variant_attribute_matrix', 'sort_order', 'tax_class', 'shipping_class', 'download_limit', 'download_expiry', 'external_url', 'button_text'];
 
     protected $casts = [
         // Persist translated names as JSON so array payloads from search fixtures serialize correctly.
@@ -91,7 +99,9 @@ final class Product extends Model implements HasMedia, TranslatableRecord
         'length'              => 'decimal:2',
         'width'               => 'decimal:2',
         'height'              => 'decimal:2',
+        'is_active'           => 'boolean',
         'is_visible'          => 'boolean',
+        'is_enabled'          => 'boolean',
         'is_featured'         => 'boolean',
         'is_requestable'      => 'boolean',
         'hide_add_to_cart'    => 'boolean',

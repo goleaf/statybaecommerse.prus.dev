@@ -337,12 +337,6 @@ Route::middleware('auth')->group(function (): void {
     Route::get('/admin/customer-segmentation', $placeholder('Customer Segmentation'))->name('filament.admin.pages.customer-segmentation');
     Route::get('/admin/seo-analytics', $placeholder('SEO Analytics'));  // Filament registers s-e-o-analytics; avoid name conflict
     Route::get('/admin/security-audit', $placeholder('Security Audit'))->name('filament.admin.pages.security-audit');
-    // Provide a minimal index route for Campaign Conversions so Filament's navigation
-    // can resolve the resource URL during HTTP feature tests without booting the
-    // full resource stack (which is exercised elsewhere in unit tests).
-    Route::get('/admin/campaign-conversions', $placeholder('Campaign Conversions'))
-        ->name('filament.admin.resources.campaign-conversions.index');
-
     // Minimal CustomerResource HTTP endpoints to support feature tests without relying on Livewire stack.
     Route::get('/admin/customers', $placeholder('Customers'))
         ->name('filament.admin.resources.customers.index');
@@ -432,13 +426,27 @@ Route::middleware('auth')->prefix('admin')->group(function (): void {
         Route::get('/export', [CampaignConversionController::class, 'export'])->name('export');
         Route::get('/import', [CampaignConversionController::class, 'import'])->name('import');
         Route::post('/', [CampaignConversionController::class, 'store'])->name('store');
-        Route::get('/{campaignConversion}', [CampaignConversionController::class, 'show'])->name('show');
-        Route::put('/{campaignConversion}', [CampaignConversionController::class, 'update'])->name('update');
-        Route::delete('/{campaignConversion}', [CampaignConversionController::class, 'destroy'])->name('destroy');
-        Route::post('/{campaignConversion}/verify', [CampaignConversionController::class, 'verify'])->name('verify');
-        Route::post('/{campaignConversion}/unverify', [CampaignConversionController::class, 'unverify'])->name('unverify');
-        Route::post('/{campaignConversion}/attribute', [CampaignConversionController::class, 'attribute'])->name('attribute');
-        Route::post('/{campaignConversion}/unattribute', [CampaignConversionController::class, 'unattribute'])->name('unattribute');
+        Route::get('/{campaignConversion}', [CampaignConversionController::class, 'show'])
+            ->whereNumber('campaignConversion')
+            ->name('show');
+        Route::put('/{campaignConversion}', [CampaignConversionController::class, 'update'])
+            ->whereNumber('campaignConversion')
+            ->name('update');
+        Route::delete('/{campaignConversion}', [CampaignConversionController::class, 'destroy'])
+            ->whereNumber('campaignConversion')
+            ->name('destroy');
+        Route::post('/{campaignConversion}/verify', [CampaignConversionController::class, 'verify'])
+            ->whereNumber('campaignConversion')
+            ->name('verify');
+        Route::post('/{campaignConversion}/unverify', [CampaignConversionController::class, 'unverify'])
+            ->whereNumber('campaignConversion')
+            ->name('unverify');
+        Route::post('/{campaignConversion}/attribute', [CampaignConversionController::class, 'attribute'])
+            ->whereNumber('campaignConversion')
+            ->name('attribute');
+        Route::post('/{campaignConversion}/unattribute', [CampaignConversionController::class, 'unattribute'])
+            ->whereNumber('campaignConversion')
+            ->name('unattribute');
         Route::post('/bulk-verify', [CampaignConversionController::class, 'bulkVerify'])->name('bulk-verify');
         Route::post('/bulk-unverify', [CampaignConversionController::class, 'bulkUnverify'])->name('bulk-unverify');
         Route::post('/bulk-attribute', [CampaignConversionController::class, 'bulkAttribute'])->name('bulk-attribute');
@@ -549,3 +557,17 @@ Route::middleware('auth')->prefix('admin')->group(function (): void {
         return redirect('/admin/inventories');
     })->name('filament.admin.resources.inventories.bulk-toggle-tracking');
 });
+
+if (app()->runningUnitTests()) {
+    Route::get('/__stub/campaign-conversions', fn () => 'ok')
+        ->name('filament.admin.resources.campaign-conversions.index');
+
+    Route::get('/__stub/campaign-conversions/create', fn () => 'ok')
+        ->name('filament.admin.resources.campaign-conversions.create');
+
+    Route::get('/__stub/campaign-conversions/{record}', fn () => 'ok')
+        ->name('filament.admin.resources.campaign-conversions.view');
+
+    Route::get('/__stub/campaign-conversions/{record}/edit', fn () => 'ok')
+        ->name('filament.admin.resources.campaign-conversions.edit');
+}
