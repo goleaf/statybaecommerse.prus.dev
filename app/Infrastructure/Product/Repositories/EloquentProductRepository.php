@@ -24,6 +24,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Schema;
 use JsonException;
+use App\Support\Media\ProductImageUrlResolver;
 
 /**
  * Eloquent-backed repository for domain product read models.
@@ -48,7 +49,7 @@ final class EloquentProductRepository implements ProductRepositoryInterface
                 'brand' => static fn ($relation) => $relation->withoutGlobalScopes([ActiveScope::class, EnabledScope::class]),
                 'categories' => static fn ($relation) => $relation->withoutGlobalScopes([ActiveScope::class, EnabledScope::class, VisibleScope::class]),
                 'variants' => static fn ($relation) => $relation->withoutGlobalScopes([ActiveScope::class, EnabledScope::class, StatusScope::class]),
-                'media',
+                'images' => static fn ($relation) => $relation->orderBy('sort_order'),
             ])
             ->withSum([
                 // Eager-load active reservation totals so stock checks avoid N+1 aggregate queries.
@@ -81,7 +82,7 @@ final class EloquentProductRepository implements ProductRepositoryInterface
                 'brand' => static fn ($relation) => $relation->withoutGlobalScopes([ActiveScope::class, EnabledScope::class]),
                 'categories' => static fn ($relation) => $relation->withoutGlobalScopes([ActiveScope::class, EnabledScope::class, VisibleScope::class]),
                 'variants' => static fn ($relation) => $relation->withoutGlobalScopes([ActiveScope::class, EnabledScope::class, StatusScope::class]),
-                'media',
+                'images' => static fn ($relation) => $relation->orderBy('sort_order'),
             ])
             ->withSum([
                 // Keep reservation totals consistent in catalog listings as well for parity with search results.
@@ -124,7 +125,12 @@ final class EloquentProductRepository implements ProductRepositoryInterface
         $builder = Product::query()
             ->withoutGlobalScopes([SoftDeletingScope::class])
             ->where('slug', $slug->getValue())
-            ->with(['brand', 'categories', 'variants', 'media'])
+            ->with([
+                'brand',
+                'categories',
+                'variants',
+                'images' => static fn ($relation) => $relation->orderBy('sort_order'),
+            ])
             ->withSum([
                 // Ensure detail views reuse the same eager-loaded reservation aggregates.
                 'stockReservations as reserved_stock_quantity' => static function (Builder $relation): void {
@@ -150,12 +156,16 @@ final class EloquentProductRepository implements ProductRepositoryInterface
         $shortDescription = $this->resolveTranslatableString($product, 'short_description');
 
         $images = new ProductImageCollection(
-            $product->getMedia('images')
-                ->map(static fn ($media) => new ProductImage(
-                    $media->getUrl(),
-                    $media->getUrl('thumb'),
-                    $media->getCustomProperty('alt', null),
-                ))
+            $product->images
+                ->map(function (\App\Models\ProductImage $image) use ($name): ProductImage {
+                    $url = ProductImageUrlResolver::resolve($image->path);
+
+                    return new ProductImage(
+                        $url ?? '',
+                        $url,
+                        $image->alt_text ?? $name,
+                    );
+                })
                 ->values()
                 ->all()
         );
