@@ -426,6 +426,24 @@ final class DiscountResource extends Resource
         return $newDiscount;
     }
 
+    public static function getTypeOptions(): array
+    {
+        return collect(self::TYPE_OPTIONS)
+            ->mapWithKeys(fn (string $label, string $value): array => [
+                $value => self::translateWithFallback("discounts.types.{$value}", $label),
+            ])
+            ->all();
+    }
+
+    public static function getStatusOptions(): array
+    {
+        return collect(self::STATUS_OPTIONS)
+            ->mapWithKeys(fn (string $label, string $value): array => [
+                $value => self::translateWithFallback("discounts.statuses.{$value}", $label),
+            ])
+            ->all();
+    }
+
     private static function getTypeLabel(?string $type): string
     {
         if (! $type) {

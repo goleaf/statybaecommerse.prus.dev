@@ -69,6 +69,7 @@ final class ProductSeriesTest extends TestCase
             $table->unsignedBigInteger('channel_id')->nullable();
             $table->unsignedBigInteger('zone_id')->nullable();
             $table->unsignedBigInteger('partner_id')->nullable();
+            $table->unsignedBigInteger('country_id')->nullable();
             $table->string('status')->default('completed');
             $table->string('payment_status')->nullable();
             $table->string('payment_method')->nullable();

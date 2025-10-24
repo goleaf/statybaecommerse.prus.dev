@@ -43,6 +43,8 @@ Type: Complex System
 - [ ] Filament import duplication resolved (in progress)
 - [ ] UserProductInteractions resource delegating handled (in progress)
 - [ ] Filament navigationGroup type fatal error remediation (2025-10-22 — in progress)
+- [ ] Resolve project:test Artisan command discovery failure, ensure runnable Pest coverage, and document bilingual outputs (2025-10-24)
+- [ ] Introduce dedicated headerless layout page with bespoke Tailwind design and bilingual content parity, plus regression coverage (2025-10-24)
 
 ## Completed Implementation (95%)
 

@@ -9,6 +9,7 @@ use App\Support\Contracts\ContractPathResolver;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Route;
 
 final class CategoryContract
 {
@@ -82,7 +83,7 @@ final class CategoryContract
                 'name' => (string) $child->name,
                 'description' => $child->description,
                 'links' => [
-                    'self' => route('categories.show', $child->slug),
+                    'self' => self::categoryLink((string) $child->slug),
                 ],
                 'parent' => null,
                 'children' => [],
@@ -90,9 +91,18 @@ final class CategoryContract
             ])->all(),
             'product_count' => $category->products_count ?? null,
             'links' => [
-                'self' => route('categories.show', $category->slug),
+                'self' => self::categoryLink((string) $category->slug),
             ],
         ];
+    }
+
+    private static function categoryLink(string $slug): string
+    {
+        if (Route::has('categories.show')) {
+            return route('categories.show', $slug);
+        }
+
+        return url('/categories/'.$slug);
     }
 
     private static function envelope(array $data, array $meta = []): array

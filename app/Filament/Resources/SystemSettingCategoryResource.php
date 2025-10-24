@@ -32,6 +32,7 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid as SchemaGrid;
 use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Schemas\Components\Utilities\Get as SchemaGet;
+use Filament\Schemas\Components\Utilities\Set as SchemaSet;
 use Filament\Tables\Columns\ColorColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -113,7 +114,7 @@ final class SystemSettingCategoryResource extends Resource
                                     ->required()
                                     ->maxLength(255)
                                     ->live()
-                                    ->afterStateUpdated(static function (?string $state, Set $set): void {
+                                    ->afterStateUpdated(static function (?string $state, SchemaSet $set): void {
                                         // Keep the slug synchronized when administrators edit the name.
                                         if ($state === null || $state === '') {
                                             return;
@@ -124,11 +125,11 @@ final class SystemSettingCategoryResource extends Resource
                                     ->helperText(__('system_setting_categories.name_help')),
                                 TextInput::make('slug')
                                     ->label(__('system_setting_categories.slug'))
-                                    ->rules(static fn (Get $get): array => [empty($get('name')) ? 'required' : 'nullable'])
+                                    ->rules(static fn (SchemaGet $get): array => [empty($get('name')) ? 'required' : 'nullable'])
                                     ->unique(SystemSettingCategory::class, 'slug', ignoreRecord: true)
                                     // Allow empty slug; it will be generated from name on submit
                                     ->maxLength(255)
-                                    ->dehydrateStateUsing(static function (?string $state, Get $get): string {
+                                    ->dehydrateStateUsing(static function (?string $state, SchemaGet $get): string {
                                         // Fall back to a generated slug whenever the administrator leaves it blank.
                                         return $state !== null && $state !== ''
                                             ? $state

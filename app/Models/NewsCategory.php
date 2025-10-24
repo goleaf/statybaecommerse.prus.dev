@@ -37,7 +37,16 @@ final class NewsCategory extends Model
 
     protected $table = 'news_categories';
 
-    protected $fillable = ['is_visible', 'parent_id', 'sort_order', 'color', 'icon'];
+    protected $fillable = [
+        'name',
+        'slug',
+        'description',
+        'is_visible',
+        'parent_id',
+        'sort_order',
+        'color',
+        'icon',
+    ];
 
     /**
      * Handle casts functionality with proper error handling.
@@ -95,6 +104,42 @@ final class NewsCategory extends Model
     public function scopeOrdered(Builder $query): Builder
     {
         return $query->orderBy('sort_order')->orderBy('id');
+    }
+
+    /**
+     * Resolve route bindings for both slug and numeric identifiers.
+     *
+     * @param  mixed       $value
+     * @param  string|null $field
+     */
+    public function resolveRouteBinding($value, $field = null)
+    {
+        $field ??= $this->getRouteKeyName();
+
+        $query = $this->newQuery();
+
+        if (is_numeric($value)) {
+            return $query->whereKey($value)->firstOrFail();
+        }
+
+        if ($field === 'slug' && is_string($value)) {
+            $locale = app()->getLocale();
+            $fallback = config('app.fallback_locale', 'en');
+
+            return $query
+                ->where($field, $value)
+                ->orWhereHas('translations', static function (Builder $builder) use ($value, $locale): void {
+                    $builder->where('locale', $locale)->where('slug', $value);
+                })
+                ->when($fallback !== $locale, static function (Builder $builder) use ($value, $fallback): void {
+                    $builder->orWhereHas('translations', static function (Builder $builder) use ($value, $fallback): void {
+                        $builder->where('locale', $fallback)->where('slug', $value);
+                    });
+                })
+                ->firstOrFail();
+        }
+
+        return parent::resolveRouteBinding($value, $field);
     }
 
     /**

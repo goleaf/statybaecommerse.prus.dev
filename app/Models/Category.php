@@ -20,6 +20,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Route;
 use Laravel\Scout\Searchable;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
@@ -362,7 +363,28 @@ final class Category extends Model implements HasMedia
      */
     public function getCanonicalUrlAttribute(): string
     {
-        return route('categories.show', $this->slug);
+        $parameter = $this->slug ?: $this->getKey();
+
+        if ($parameter === null) {
+            return url('/');
+        }
+
+        if (Route::has('categories.show')) {
+            return route('categories.show', $parameter);
+        }
+
+        if (Route::has('frontend.categories.show')) {
+            return route('frontend.categories.show', ['category' => $parameter]);
+        }
+
+        if (Route::has('localized.categories.show')) {
+            return route('localized.categories.show', [
+                'locale' => app()->getLocale(),
+                'category' => $parameter,
+            ]);
+        }
+
+        return url('/categories/' . $parameter);
     }
 
     /**

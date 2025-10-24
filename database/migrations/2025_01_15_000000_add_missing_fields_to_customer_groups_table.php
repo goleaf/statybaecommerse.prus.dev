@@ -50,6 +50,9 @@ return new class extends Migration
             if (! Schema::hasColumn('customer_groups', 'type')) {
                 $table->enum('type', ['regular', 'vip', 'wholesale', 'retail', 'corporate'])->default('regular')->after('sort_order');
             }
+            if (! Schema::hasColumn('customer_groups', 'metadata')) {
+                $table->json('metadata')->nullable()->after('type');
+            }
         });
     }
 
@@ -73,6 +76,7 @@ return new class extends Migration
                 'is_default',
                 'sort_order',
                 'type',
+                'metadata',
             ]);
         });
     }

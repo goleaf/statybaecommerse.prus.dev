@@ -3,9 +3,9 @@
 declare(strict_types=1);
 
 namespace App\Filament\Resources\NewsCategories;
+
+use App\Enums\NavigationGroup;
 use App\Support\Concerns\HasNav;
-
-
 use Filament\Schemas\Schema;
 use App\Filament\Resources\NewsCategories\Pages\CreateNewsCategory;
 use App\Filament\Resources\NewsCategories\Pages\EditNewsCategory;

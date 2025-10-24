@@ -21,8 +21,8 @@ use App\Models\Scopes\PublishedScope;
 use App\Models\Scopes\StatusScope;
 use App\Models\Scopes\VisibleScope;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Illuminate\Support\Facades\Schema;
 use JsonException;
 use App\Support\Media\ProductImageUrlResolver;
 
@@ -49,7 +49,9 @@ final class EloquentProductRepository implements ProductRepositoryInterface
                 'brand' => static fn ($relation) => $relation->withoutGlobalScopes([ActiveScope::class, EnabledScope::class]),
                 'categories' => static fn ($relation) => $relation->withoutGlobalScopes([ActiveScope::class, EnabledScope::class, VisibleScope::class]),
                 'variants' => static fn ($relation) => $relation->withoutGlobalScopes([ActiveScope::class, EnabledScope::class, StatusScope::class]),
-                'images' => static fn ($relation) => $relation->orderBy('sort_order'),
+                'images' => static fn ($relation) => $relation
+                    ->withoutGlobalScopes([ActiveScope::class])
+                    ->orderBy('sort_order'),
             ])
             ->withSum([
                 // Eager-load active reservation totals so stock checks avoid N+1 aggregate queries.
@@ -82,7 +84,9 @@ final class EloquentProductRepository implements ProductRepositoryInterface
                 'brand' => static fn ($relation) => $relation->withoutGlobalScopes([ActiveScope::class, EnabledScope::class]),
                 'categories' => static fn ($relation) => $relation->withoutGlobalScopes([ActiveScope::class, EnabledScope::class, VisibleScope::class]),
                 'variants' => static fn ($relation) => $relation->withoutGlobalScopes([ActiveScope::class, EnabledScope::class, StatusScope::class]),
-                'images' => static fn ($relation) => $relation->orderBy('sort_order'),
+                'images' => static fn ($relation) => $relation
+                    ->withoutGlobalScopes([ActiveScope::class])
+                    ->orderBy('sort_order'),
             ])
             ->withSum([
                 // Keep reservation totals consistent in catalog listings as well for parity with search results.
@@ -129,7 +133,9 @@ final class EloquentProductRepository implements ProductRepositoryInterface
                 'brand',
                 'categories',
                 'variants',
-                'images' => static fn ($relation) => $relation->orderBy('sort_order'),
+                'images' => static fn ($relation) => $relation
+                    ->withoutGlobalScopes([ActiveScope::class])
+                    ->orderBy('sort_order'),
             ])
             ->withSum([
                 // Ensure detail views reuse the same eager-loaded reservation aggregates.
@@ -285,10 +291,15 @@ final class EloquentProductRepository implements ProductRepositoryInterface
 
     private function applySoftDeleteConstraint(Builder $builder): void
     {
-        $table = $builder->getModel()->getTable();
+        $model = $builder->getModel();
 
-        if (Schema::hasColumn($table, 'deleted_at')) {
-            $builder->whereNull("{$table}.deleted_at");
+        if (! in_array(SoftDeletes::class, class_uses_recursive($model::class), true)) {
+            return;
         }
+
+        $column = $model->getDeletedAtColumn();
+        $table = $model->getTable();
+
+        $builder->whereNull("{$table}.{$column}");
     }
 }

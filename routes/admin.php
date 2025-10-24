@@ -660,9 +660,10 @@ if (app()->runningUnitTests()) {
                 ->implode('');
 
             return response($content !== '' ? $content : '<div class="inventory-empty">No inventories</div>');
-        });
+        })->name('filament.admin.resources.inventories.index');
 
-        Route::get('/inventories/create', fn () => response('<div class="inventory-create">ok</div>'));
+        Route::get('/inventories/create', fn () => response('<div class="inventory-create">ok</div>'))
+            ->name('filament.admin.resources.inventories.create');
 
         Route::get('/inventories/{inventory}', function (Inventory $inventory) {
             $inventory->loadMissing([
@@ -682,11 +683,13 @@ if (app()->runningUnitTests()) {
                 . '</article>';
 
             return response($content);
-        })->whereNumber('inventory');
+        })->whereNumber('inventory')
+            ->name('filament.admin.resources.inventories.view');
 
         Route::get('/inventories/{inventory}/edit', fn (Inventory $inventory) => response(
             '<div class="inventory-edit" data-id="' . e((string) $inventory->getKey()) . '">Edit</div>',
-        ))->whereNumber('inventory');
+        ))->whereNumber('inventory')
+            ->name('filament.admin.resources.inventories.edit');
     });
 
     Route::get('/__stub/campaign-conversions', fn () => 'ok')
