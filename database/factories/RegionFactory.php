@@ -6,7 +6,6 @@ namespace Database\Factories;
 
 use App\Models\Country;
 use App\Models\Region;
-use App\Models\Zone;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -24,7 +23,6 @@ final class RegionFactory extends Factory
             'slug' => $this->faker->unique()->slug(2),
             'description' => $this->faker->optional(0.8)->paragraph(),
             'country_id' => Country::factory(),
-            'zone_id' => $this->faker->optional(0.6)->randomElement([Zone::factory(), null]),
             'parent_id' => $this->faker->optional(0.3)->randomElement([Region::factory(), null]),
             'level' => $this->faker->numberBetween(0, 5),
             'is_enabled' => $this->faker->boolean(85),
@@ -76,12 +74,6 @@ final class RegionFactory extends Factory
         ]);
     }
 
-    public function withZone(?Zone $zone = null): static
-    {
-        return $this->state(fn (array $attributes) => [
-            'zone_id' => $zone?->id ?? Zone::factory(),
-        ]);
-    }
 
     public function withCode(string $code): static
     {

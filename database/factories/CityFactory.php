@@ -33,7 +33,6 @@ final class CityFactory extends Factory
             'population' => $this->faker->numberBetween(1_000, 2_000_000),
             'postal_codes' => [$this->faker->postcode()],
             'country_id' => Country::factory(),
-            'zone_id' => null,
             'region_id' => null,
             'sort_order' => $this->faker->numberBetween(1, 50),
         ];

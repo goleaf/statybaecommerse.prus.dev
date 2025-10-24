@@ -6,6 +6,7 @@ namespace App\Filament\Resources;
 
 
 use App\Support\Concerns\HasNav;
+use App\Models\City;
 use Filament\Schemas\Schema;
 use App\Filament\Resources\ShippingOptionResource\Pages;
 use App\Models\ShippingOption;
@@ -91,13 +92,23 @@ final class ShippingOptionResource extends Resource
                                 TextInput::make('carrier_name')
                                     ->label(__('admin.shipping_options.carrier_name'))
                                     ->maxLength(255),
-                                // Allow shipping options to be attached to a geographic zone for targeted availability.
-                                Select::make('zone_id')
-                                    ->label(__('admin.shipping_options.zone'))
-                                    ->relationship('zone', 'name')
+                                // Allow shipping options to be attached to a country and optionally a specific city for availability.
+                                Select::make('country_id')
+                                    ->label(__('admin.shipping_options.country'))
+                                    ->relationship('country', 'name')
+                                    ->required()
                                     ->preload()
                                     ->searchable()
-                                    ->helperText(__('admin.shipping_options.zone_help')),
+                                    ->reactive()
+                                    ->afterStateUpdated(fn (callable $set) => $set('city_id', null))
+                                    ->helperText(__('admin.shipping_options.country_help')),
+                                Select::make('city_id')
+                                    ->label(__('admin.shipping_options.city'))
+                                    ->options(fn (Get $get): array => $get('country_id') ? City::query()->where('country_id', $get('country_id'))->orderBy('name')->pluck('name', 'id')->all() : [])
+                                    ->searchable()
+                                    ->preload()
+                                    ->disabled(fn (Get $get): bool => blank($get('country_id')))
+                                    ->helperText(__('admin.shipping_options.city_help')),
                                 Select::make('service_type')
                                     ->label(__('admin.shipping_options.service_type'))
                                     ->options([
@@ -239,11 +250,17 @@ final class ShippingOptionResource extends Resource
                             : Number::currency((float) $state, $record->currency_code ?? 'EUR', app()->getLocale())
                     )
                     ->sortable(),
-                // Surface the assigned zone so operators can audit coverage quickly.
-                TextColumn::make('zone.name')
-                    ->label(__('admin.shipping_options.zone'))
+                // Surface the assigned country so operators can audit coverage quickly.
+                TextColumn::make('country.name')
+                    ->label(__('admin.shipping_options.country'))
+                    ->sortable()
+                    ->searchable()
+                    ->toggleable(),
+                TextColumn::make('city.name')
+                    ->label(__('admin.shipping_options.city'))
                     ->badge()
                     ->sortable()
+                    ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('estimated_days_min')
                     ->label(__('admin.shipping_options.estimated_days'))
@@ -285,10 +302,13 @@ final class ShippingOptionResource extends Resource
                         'overnight' => __('admin.shipping_options.service_types.overnight'),
                         'economy'   => __('admin.shipping_options.service_types.economy'),
                     ]),
-                // Filter by zone to narrow down shipping options for a specific market.
-                SelectFilter::make('zone_id')
-                    ->label(__('admin.shipping_options.zone'))
-                    ->relationship('zone', 'name'),
+                // Filter by country and city to narrow down shipping options for a specific market.
+                SelectFilter::make('country_id')
+                    ->label(__('admin.shipping_options.country'))
+                    ->relationship('country', 'name'),
+                SelectFilter::make('city_id')
+                    ->label(__('admin.shipping_options.city'))
+                    ->options(fn (): array => City::query()->orderBy('name')->pluck('name', 'id')->all()),
                 ValueRangeFilter::make('price')
                     ->label(__('admin.shipping_options.price'))
                     ->currency()

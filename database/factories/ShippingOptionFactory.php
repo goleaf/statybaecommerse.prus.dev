@@ -2,6 +2,8 @@
 
 namespace Database\Factories;
 
+use App\Models\City;
+use App\Models\Country;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -20,6 +22,7 @@ class ShippingOptionFactory extends Factory
         $services = ['Standard', 'Express', 'Overnight', 'Economy', 'Priority'];
         $carrier = fake()->randomElement($carriers);
         $service = fake()->randomElement($services);
+        $country = Country::factory();
 
         return [
             'name' => $carrier.' '.$service,
@@ -29,7 +32,8 @@ class ShippingOptionFactory extends Factory
             'service_type' => $service,
             'price' => fake()->randomFloat(2, 5, 50),
             'currency_code' => 'EUR',
-            'zone_id' => \App\Models\Zone::factory(),
+            'country_id' => $country,
+            'city_id' => City::factory()->for($country),
             'is_enabled' => true,
             'is_default' => false,
             'sort_order' => fake()->numberBetween(0, 100),

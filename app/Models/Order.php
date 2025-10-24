@@ -207,11 +207,12 @@ final class Order extends Model
     }
 
     /**
-     * Zone relation.
+     * Provide convenient access to the country associated with the order.
      */
-    public function zone(): BelongsTo
+    public function country(): BelongsTo
     {
-        return $this->belongsTo(Zone::class);
+        // Orders rely on the shipping country for reporting and fulfilment routing.
+        return $this->belongsTo(Country::class);
     }
 
     /**
