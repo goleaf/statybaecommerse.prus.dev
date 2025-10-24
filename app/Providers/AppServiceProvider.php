@@ -209,22 +209,6 @@ class AppServiceProvider extends ServiceProvider
             } catch (Throwable) {
                 // Panel may not be initialised during early bootstrap in tests; ignore failures.
             }
-
-            $this->app->booted(function (): void {
-                if (Route::has('frontend.api.products.search')) {
-                    return;
-                }
-
-                Route::middleware('web')
-                    ->prefix('api')
-                    ->name('frontend.api.')
-                    ->group(static function (): void {
-                        Route::get(
-                            '/products/search',
-                            [\App\Http\Controllers\Frontend\ApiController::class, 'searchProducts']
-                        )->name('products.search');
-                    });
-            });
         }
 
         if (method_exists(Vite::class, 'useCspNonce')) {

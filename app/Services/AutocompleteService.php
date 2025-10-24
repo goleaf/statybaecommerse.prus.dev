@@ -249,21 +249,29 @@ final class AutocompleteService
 
     /**
      * @param  array<string, mixed>  $filters
-     * @return array{brand_id: int|null, category_id: int|null}
+     * @return array{brand_id: int|null, category_id: int|null, search_term: string|null}
      */
     private function normaliseProductContext(array $filters): array
     {
         $brand = $filters['brand'] ?? $filters['brand_id'] ?? null;
         $category = $filters['category'] ?? $filters['category_id'] ?? null;
+        $search = $filters['q'] ?? $filters['search'] ?? null;
+        $searchTerm = null;
+
+        if (is_string($search)) {
+            $trimmed = trim($search);
+            $searchTerm = $trimmed !== '' ? $trimmed : null;
+        }
 
         return [
             'brand_id' => $this->resolveBrandIdentifier($brand),
             'category_id' => $this->resolveCategoryIdentifier($category),
+            'search_term' => $searchTerm,
         ];
     }
 
     /**
-     * @param  array{brand_id: int|null, category_id: int|null}  $context
+     * @param  array{brand_id: int|null, category_id: int|null, search_term: string|null}  $context
      */
     private function popularSuggestionsCacheKey(int $limit, array $context): string
     {
@@ -277,7 +285,7 @@ final class AutocompleteService
     }
 
     /**
-     * @param  array{brand_id: int|null, category_id: int|null}  $context
+     * @param  array{brand_id: int|null, category_id: int|null, search_term: string|null}  $context
      */
     private function applyProductContextFilters(Builder $query, array $context): void
     {
@@ -288,6 +296,17 @@ final class AutocompleteService
         if ($context['category_id'] !== null) {
             $query->whereHas('categories', static function (Builder $builder) use ($context): void {
                 $builder->where('categories.id', $context['category_id']);
+            });
+        }
+
+        if ($context['search_term'] !== null) {
+            $search = $this->prepareSearchTerm($context['search_term']);
+
+            $query->where(static function (Builder $builder) use ($search): void {
+                $builder
+                    ->where('name', 'like', $search)
+                    ->orWhere('sku', 'like', $search)
+                    ->orWhere('description', 'like', $search);
             });
         }
     }

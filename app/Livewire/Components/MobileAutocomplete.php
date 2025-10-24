@@ -189,7 +189,7 @@ final class MobileAutocomplete extends Component
     private function sanitizeFilters(array $filters): array
     {
         return collect($filters)
-            ->only(['category', 'category_id', 'brand', 'brand_id'])
+            ->only(['category', 'category_id', 'brand', 'brand_id', 'q', 'search'])
             ->filter(static fn ($value) => is_scalar($value) && $value !== '' && $value !== null)
             ->map(static fn ($value) => is_string($value) ? trim($value) : $value)
             ->all();

@@ -137,7 +137,6 @@ Route::middleware(['web'])->group(function () {
 
     // API Routes for AJAX
     Route::prefix('api')->name('frontend.api.')->group(function () {
-        Route::get('/products/search', [App\Http\Controllers\Frontend\ApiController::class, 'searchProducts'])->name('products.search');
         Route::get('/categories/tree', [App\Http\Controllers\Frontend\ApiController::class, 'getCategoryTree'])->name('categories.tree');
         Route::get('/cart/count', [App\Http\Controllers\Frontend\ApiController::class, 'getCartCount'])->name('cart.count');
         Route::get('/wishlist/count', [App\Http\Controllers\Frontend\ApiController::class, 'getWishlistCount'])->name('wishlist.count');
