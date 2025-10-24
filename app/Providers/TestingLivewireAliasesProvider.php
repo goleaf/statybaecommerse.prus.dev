@@ -40,7 +40,10 @@ final class TestingLivewireAliasesProvider extends ServiceProvider
 
     public function boot(): void
     {
-        app()->prependMiddleware(TestingLegalResourceStub::class);
+        $kernel = app(\Illuminate\Contracts\Http\Kernel::class);
+        if (method_exists($kernel, 'prependMiddleware')) {
+            $kernel->prependMiddleware(TestingLegalResourceStub::class);
+        }
 
         Route::middleware('web')->group(function (): void {
             Route::get('/admin/activity-logs', ListActivityLogs::class)
