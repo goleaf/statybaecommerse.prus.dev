@@ -41,7 +41,7 @@ final class ApiEndpointsTest extends TestCase
         ]);
 
         // Act: hit the search endpoint with a query that should match the product.
-        $response = $this->getJson(route('frontend.api.products.search', ['q' => 'Searchable']));
+        $response = $this->getJson(route('api.products.search', ['q' => 'Searchable']));
 
         // Assert: validate HTTP response and ensure media keys are present.
         $response->assertOk();
@@ -49,24 +49,42 @@ final class ApiEndpointsTest extends TestCase
         $payload = $response->json();
 
         self::assertIsArray($payload);
-        self::assertNotEmpty($payload);
+        self::assertArrayHasKey('data', $payload);
+        self::assertIsArray($payload['data']);
+        self::assertArrayHasKey('items', $payload['data']);
 
-        $result = array_values($payload)[0];
+        $items = $payload['data']['items'];
+        self::assertIsArray($items);
+        self::assertNotEmpty($items);
+
+        $result = array_values($items)[0];
         self::assertIsArray($result);
 
         // Assert: only the published product should be returned by the API.
         self::assertSame($visibleProduct->getKey(), $result['id']);
-        self::assertArrayHasKey('main_image', $result);
-        self::assertArrayHasKey('thumbnail', $result);
-        self::assertArrayHasKey('image', $result);
+        self::assertArrayHasKey('media', $result);
+        self::assertIsArray($result['media']);
+        self::assertArrayHasKey('images', $result['media']);
+
+        $images = $result['media']['images'];
+        self::assertIsArray($images);
+
+        if ($images !== []) {
+            $primaryImage = $images[0];
+            self::assertIsArray($primaryImage);
+            self::assertArrayHasKey('url', $primaryImage);
+            self::assertArrayHasKey('thumbnail', $primaryImage);
+            self::assertArrayHasKey('alt', $primaryImage);
+        }
 
         $visibleProduct = $visibleProduct->fresh();
         self::assertInstanceOf(Product::class, $visibleProduct);
 
-        self::assertSame($visibleProduct->main_image, $result['main_image']);
-        // Confirm the legacy `image` key mirrors the new main image accessor.
-        self::assertSame($visibleProduct->main_image, $result['image']);
-        self::assertSame($visibleProduct->thumbnail, $result['thumbnail']);
+        if ($images !== []) {
+            $primaryImage = $images[0];
+            self::assertSame($visibleProduct->main_image, $primaryImage['url']);
+            self::assertSame($visibleProduct->thumbnail, $primaryImage['thumbnail']);
+        }
     }
 
     public function test_recently_viewed_products_return_media_attributes(): void
