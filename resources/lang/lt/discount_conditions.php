@@ -82,4 +82,3 @@ return [
         'current' => 'Dabar galiojančios',
     ],
 ];
-

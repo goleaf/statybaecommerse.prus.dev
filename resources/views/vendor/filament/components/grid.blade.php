@@ -18,7 +18,7 @@
         '2xl' => $twoXl,
     ];
 
-    $classes = ['fi-grid', 'grid', 'gap-6'];
+    $classes = ['fi-grid', 'grid'];
 
     foreach ($columns as $breakpoint => $count) {
         if (empty($count)) {

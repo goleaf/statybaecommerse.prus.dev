@@ -9,21 +9,20 @@ use App\Filament\Resources\NewsResource\RelationManagers\CommentsRelationManager
 use App\Models\News;
 use App\Models\NewsComment;
 use App\Models\User;
-use Filament\Actions\Testing\TestAction;
-use Filament\Tables\Testing\TestBulkAction;
-use Filament\Tables\Testing\TestFilter;
-use Filament\Tables\Testing\TestSearch;
-use Filament\Testing\Livewire\Concerns\InteractsWithForms;
-use Filament\Testing\Livewire\Concerns\InteractsWithTable;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Pest\Laravel\actingAs;
-use Livewire\Livewire;
 use Filament\Facades\Filament;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Livewire\Livewire;
+use Pest\Laravel\actingAs;
 
 use function Pest\Livewire\livewire;
 use function PHPUnit\Framework\assertCount;
 
 beforeEach(function (): void {
+    config()->set('filament.testing.autodiscover_resources', false);
+    config()->set('filament.testing.resources', [
+        \App\Filament\Resources\NewsResource::class,
+    ]);
+
     Filament::setCurrentPanel('admin');
 
     $this->adminUser = User::factory()->create([
@@ -43,7 +42,7 @@ it('displays comments table with existing records', function (): void {
         'news_id' => $this->news->id,
     ]);
 
-    livewire(CommentsRelationManager::class, [
+    Livewire::test(CommentsRelationManager::class, [
         'ownerRecord' => $this->news,
         'pageClass' => EditNews::class,
     ])
@@ -52,7 +51,7 @@ it('displays comments table with existing records', function (): void {
 });
 
 it('creates a comment through the relation manager', function (): void {
-    $component = livewire(CommentsRelationManager::class, [
+    $component = Livewire::test(CommentsRelationManager::class, [
         'ownerRecord' => $this->news,
         'pageClass' => EditNews::class,
     ]);
@@ -76,7 +75,7 @@ it('edits an existing comment', function (): void {
         'author_name' => 'Pradinis Autorius',
     ]);
 
-    livewire(CommentsRelationManager::class, [
+    Livewire::test(CommentsRelationManager::class, [
         'ownerRecord' => $this->news,
         'pageClass' => EditNews::class,
     ])
@@ -98,7 +97,7 @@ it('deletes a comment via table action', function (): void {
         'news_id' => $this->news->id,
     ]);
 
-    livewire(CommentsRelationManager::class, [
+    Livewire::test(CommentsRelationManager::class, [
         'ownerRecord' => $this->news,
         'pageClass' => EditNews::class,
     ])
@@ -113,7 +112,7 @@ it('creates nested replies', function (): void {
         'news_id' => $this->news->id,
     ]);
 
-    livewire(CommentsRelationManager::class, [
+    Livewire::test(CommentsRelationManager::class, [
         'ownerRecord' => $this->news,
         'pageClass' => EditNews::class,
     ])
@@ -146,7 +145,7 @@ it('filters by approval and visibility', function (): void {
         'is_visible' => false,
     ]);
 
-    $component = livewire(CommentsRelationManager::class, [
+    $component = Livewire::test(CommentsRelationManager::class, [
         'ownerRecord' => $this->news,
         'pageClass' => EditNews::class,
     ]);
@@ -175,7 +174,7 @@ it('searches by author and content', function (): void {
         'content' => 'Šis komentaras apie sportą.',
     ]);
 
-    livewire(CommentsRelationManager::class, [
+    Livewire::test(CommentsRelationManager::class, [
         'ownerRecord' => $this->news,
         'pageClass' => EditNews::class,
     ])
@@ -190,7 +189,7 @@ it('toggles approval status via custom action', function (): void {
         'is_approved' => false,
     ]);
 
-    livewire(CommentsRelationManager::class, [
+    Livewire::test(CommentsRelationManager::class, [
         'ownerRecord' => $this->news,
         'pageClass' => EditNews::class,
     ])
@@ -206,7 +205,7 @@ it('bulk approves and disapproves comments', function (): void {
         'is_approved' => false,
     ]);
 
-    $component = livewire(CommentsRelationManager::class, [
+    $component = Livewire::test(CommentsRelationManager::class, [
         'ownerRecord' => $this->news,
         'pageClass' => EditNews::class,
     ]);
@@ -215,17 +214,21 @@ it('bulk approves and disapproves comments', function (): void {
         ->callTableBulkAction('approve', $records)
         ->assertHasNoTableActionErrors();
 
-    expect($records->fresh()->every(fn (NewsComment $comment): bool => $comment->is_approved))->toBeTrue();
+    $records->each(fn (NewsComment $comment) => $comment->refresh());
+
+    expect($records->every(fn (NewsComment $comment): bool => $comment->is_approved))->toBeTrue();
 
     $component
         ->callTableBulkAction('disapprove', $records)
         ->assertHasNoTableActionErrors();
 
-    expect($records->fresh()->every(fn (NewsComment $comment): bool => $comment->is_approved === false))->toBeTrue();
+    $records->each(fn (NewsComment $comment) => $comment->refresh());
+
+    expect($records->every(fn (NewsComment $comment): bool => $comment->is_approved === false))->toBeTrue();
 });
 
 it('validates required fields when creating a comment', function (): void {
-    livewire(CommentsRelationManager::class, [
+    Livewire::test(CommentsRelationManager::class, [
         'ownerRecord' => $this->news,
         'pageClass' => EditNews::class,
     ])
@@ -242,7 +245,7 @@ it('validates required fields when creating a comment', function (): void {
 });
 
 it('validates parent selection for nested replies', function (): void {
-    livewire(CommentsRelationManager::class, [
+    Livewire::test(CommentsRelationManager::class, [
         'ownerRecord' => $this->news,
         'pageClass' => EditNews::class,
     ])
