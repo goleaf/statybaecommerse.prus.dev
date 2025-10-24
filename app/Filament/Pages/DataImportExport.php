@@ -10,9 +10,10 @@ use App\Services\ImportExport\ProviderRegistry;
 use App\Support\Storage\SecureStorage;
 use Filament\Actions\Action;
 use Filament\Forms;
-use Filament\Forms\Components\Fieldset;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
+use Filament\Schemas\Components\Fieldset;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
+use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Illuminate\Support\Facades\Storage;
 
@@ -81,7 +82,10 @@ final class DataImportExport extends Page
                 ->action(function (): void {
                     $provider = ProviderRegistry::get($this->provider ?? 'xml');
                     if (! $provider) {
-                        $this->notify('danger', __('translations.provider_not_found'));
+                        Notification::make()
+                            ->title(__('translations.provider_not_found'))
+                            ->danger()
+                            ->send();
 
                         return;
                     }
@@ -90,13 +94,19 @@ final class DataImportExport extends Page
                         $path = $path[0] ?? null;
                     }
                     if (! $path) {
-                        $this->notify('danger', __('translations.file_missing'));
+                        Notification::make()
+                            ->title(__('translations.file_missing'))
+                            ->danger()
+                            ->send();
 
                         return;
                     }
                     $abs = Storage::disk(SecureStorage::disk())->path($path);
                     $res = $provider->import($abs, ['only' => $this->only ?? 'all', 'download_images' => (bool) $this->downloadImages]);
-                    $this->notify('success', __('translations.import_finished'));
+                    Notification::make()
+                        ->title(__('translations.import_finished'))
+                        ->success()
+                        ->send();
                     $this->dispatch('imported', created: $res['categories']['created'] + $res['products']['created']);
                 }),
             Action::make('export')
@@ -104,7 +114,10 @@ final class DataImportExport extends Page
                 ->action(function (): void {
                     $provider = ProviderRegistry::get($this->provider ?? 'xml');
                     if (! $provider) {
-                        $this->notify('danger', __('translations.provider_not_found'));
+                        Notification::make()
+                            ->title(__('translations.provider_not_found'))
+                            ->danger()
+                            ->send();
 
                         return;
                     }
@@ -113,7 +126,10 @@ final class DataImportExport extends Page
                         Storage::disk(SecureStorage::disk())->path($targetPath),
                         ['only' => $this->only ?? 'all']
                     );
-                    $this->notify('success', __('translations.export_finished'));
+                    Notification::make()
+                        ->title(__('translations.export_finished'))
+                        ->success()
+                        ->send();
                 }),
         ];
     }

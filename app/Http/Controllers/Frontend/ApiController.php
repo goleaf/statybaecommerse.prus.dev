@@ -172,7 +172,7 @@ final class ApiController extends Controller
         // Recently viewed should honour session ordering even for unpublished catalog entries during tests.
         $products = Product::withoutGlobalScopes()
             ->whereIn('id', $orderedIds)
-            ->get(['id', 'name', 'slug', 'price'])
+            ->get(['id', 'name', 'slug', 'price', 'is_visible', 'status', 'published_at'])
             ->sortBy(static function (Product $product) use ($orderedIds): int {
                 $position = array_search((int) $product->getKey(), $orderedIds, true);
 

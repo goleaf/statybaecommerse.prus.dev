@@ -22,7 +22,6 @@ return new class extends Migration
                 $table->boolean('is_tracked')->default(true);
                 $table->timestamps();
 
-                $table->unique(['product_id', 'location_id'], 'inventory_unique_per_location');
                 $table->index(['product_id']);
                 $table->index(['location_id']);
                 $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
@@ -42,7 +41,6 @@ return new class extends Migration
                 $table->boolean('is_tracked')->default(true);
                 $table->timestamps();
 
-                $table->unique(['variant_id', 'location_id'], 'variant_inventory_unique_per_location');
                 $table->index(['location_id']);
             });
         }

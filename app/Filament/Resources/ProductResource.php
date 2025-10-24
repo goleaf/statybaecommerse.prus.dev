@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 
+use App\Data\ExportRequestData;
 use App\Filament\Resources\ProductResource\Pages;
 use App\Filament\Resources\ProductResource\RelationManagers\AttributesRelationManager;
 use App\Filament\Resources\ProductResource\RelationManagers\CategoriesRelationManager;
@@ -23,12 +24,14 @@ use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
 use App\Support\Filament\Schemas\TestingSchemaHost;
 use App\Support\Forms\MatrixFactory;
 use App\Support\Seo\LocaleUrlGenerator;
-use App\Filament\Forms\Components\Quantity;
 use Awcodes\BadgeableColumn\Components\Badge;
 use Awcodes\BadgeableColumn\Components\BadgeableColumn;
 use BackedEnum;
+use App\Filament\Forms\Components\Quantity;
 use App\Services\Export\ExportColumn;
 use App\Services\Export\Contracts\DefinesExportColumns;
+use App\Services\Export\Exporters\ProductExport;
+use App\Services\Export\ExportService;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkAction;
@@ -39,7 +42,6 @@ use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\KeyValue;
-use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\Textarea;
@@ -65,11 +67,11 @@ use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Route;
 use LaraZeus\InlineChart\Tables\Columns\InlineChart;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 use Pixelpeter\FilamentLanguageTabs\Forms\Components\LanguageTabs;
 use pxlrbt\FilamentExcel\Actions\Tables\ExportAction;
-use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
 use pxlrbt\FilamentExcel\Columns\Column;
 use pxlrbt\FilamentExcel\Exports\ExcelExport;
 use Tapp\FilamentValueRangeFilter\Filters\ValueRangeFilter;
@@ -170,8 +172,7 @@ final class ProductResource extends Resource implements DefinesExportColumns
             ->directory('products')
             ->disk('public')
             ->visibility('public')
-            ->reorderable()
-            ->appendFiles();
+            ->reorderable();
 
         if (method_exists($imagesUpload, 'relationship')) {
             $imagesUpload->relationship('images', 'path');
@@ -194,48 +195,14 @@ final class ProductResource extends Resource implements DefinesExportColumns
                                                 ->label(__('products.fields.slug'))
                                                 ->required()
                                                 ->maxLength(255),
-                                            RichEditor::make('description')
+                                            Textarea::make('description')
                                                 ->label(__('products.fields.description'))
-                                                ->toolbarButtons([
-                                                    'bold',
-                                                    'italic',
-                                                    'underline',
-                                                    'strike',
-                                                    'link',
-                                                    'bulletList',
-                                                    'orderedList',
-                                                    'grid',
-                                                    'gridDelete',
-                                                    'textColor',
-                                                ])
-                                                ->textColors([
-                                                    'primary' => '#1d4ed8',
-                                                    'emerald' => '#047857',
-                                                    'amber'   => '#f59e0b',
-                                                    'slate'   => '#475569',
-                                                ]),
+                                                ->rows(6),
                                             Textarea::make('short_description')
                                                 ->label(__('products.fields.short_description'))
                                                 ->rows(3)
                                                 ->maxLength(500),
                                         ]),
-                                        SchemaGrid::make(2)
-                                            ->schema([
-                                                TextInput::make('name')
-                                                    ->label(__('products.fields.name'))
-                                                    ->required()
-                                                    ->maxLength(255)
-                                                    ->live()
-                                                    ->afterStateUpdated(fn ($state, callable $set) => $set('slug', Str::slug($state))),
-                                                TextInput::make('slug')
-                                                    ->label(__('products.fields.slug'))
-                                                    ->required()
-                                                    ->unique(ignoreRecord: true)
-                                                    ->maxLength(255),
-                                                TextInput::make('barcode')
-                                                    ->label(__('products.fields.barcode'))
-                                                    ->maxLength(255),
-                                            ]),
                                         TextInput::make('sku')
                                             ->label(__('products.fields.sku'))
                                             ->required()
@@ -244,30 +211,6 @@ final class ProductResource extends Resource implements DefinesExportColumns
                                         TextInput::make('barcode')
                                             ->label(__('products.fields.barcode'))
                                             ->maxLength(255),
-                                        RichEditor::make('description')
-                                            ->label(__('products.fields.description'))
-                                            ->toolbarButtons([
-                                                'bold',
-                                                'italic',
-                                                'underline',
-                                                'strike',
-                                                'link',
-                                                'bulletList',
-                                                'orderedList',
-                                                'grid',
-                                                'gridDelete',
-                                                'textColor',
-                                            ])
-                                            ->textColors([
-                                                'primary' => '#1d4ed8',
-                                                'emerald' => '#047857',
-                                                'amber'   => '#f59e0b',
-                                                'slate'   => '#475569',
-                                            ]),
-                                        Textarea::make('short_description')
-                                            ->label(__('products.fields.short_description'))
-                                            ->rows(3)
-                                            ->maxLength(500),
                                     ]),
                                 SchemaSection::make('Pricing & Inventory')
                                     ->components([
@@ -532,13 +475,25 @@ final class ProductResource extends Resource implements DefinesExportColumns
                                     return null;
                                 }
 
-                                $url = $localeUrlGenerator->localizedRoute(
-                                    'localized.products.show',
-                                    ['product' => $slug],
-                                    $locale,
-                                ) ?? route('products.show', ['product' => $slug]);
+                                $localizedUrl = rescue(
+                                    fn () => $localeUrlGenerator->localizedRoute(
+                                        'localized.products.show',
+                                        ['product' => $slug],
+                                        $locale,
+                                    ),
+                                    null,
+                                    report: false,
+                                );
 
-                                if (! $url) {
+                                $defaultUrl = null;
+
+                                if ($localizedUrl === null && Route::has('products.show')) {
+                                    $defaultUrl = route('products.show', ['product' => $slug]);
+                                }
+
+                                $url = $localizedUrl ?? $defaultUrl;
+
+                                if ($url === null) {
                                     return null;
                                 }
 
@@ -716,11 +671,69 @@ final class ProductResource extends Resource implements DefinesExportColumns
             ])
             ->bulkActions([
                 BulkActionGroup::make([
-                    ExportBulkAction::make()
+                    BulkAction::make('export_selected')
                         ->label(__('Export selected'))
                         ->icon('heroicon-o-arrow-down-tray')
                         ->color('success')
-                        ->exports(self::getExportPresets())
+                        ->form([
+                            Select::make('format')
+                                ->label(__('Export format'))
+                                ->options([
+                                    'csv'  => 'CSV',
+                                    'xlsx' => 'Excel (.xlsx)',
+                                    'pdf'  => 'PDF',
+                                ])
+                                ->default('xlsx')
+                                ->required(),
+                            Select::make('columns')
+                                ->label(__('Export columns'))
+                                ->options(self::exportColumnOptions())
+                                ->multiple()
+                                ->required()
+                                ->preload(),
+                        ])
+                        ->action(function (Collection $records, array $data): void {
+                            $availableColumns = array_keys(self::availableExportColumns());
+                            $selectedColumns = array_values(array_filter(
+                                (array) ($data['columns'] ?? []),
+                                static fn ($column): bool => in_array($column, $availableColumns, true),
+                            ));
+
+                            if ($selectedColumns === []) {
+                                throw \Illuminate\Validation\ValidationException::withMessages([
+                                    'columns' => [__('Select at least one column to export.')],
+                                ]);
+                            }
+
+                            $format = strtolower((string) ($data['format'] ?? 'xlsx'));
+
+                            if (! in_array($format, ['csv', 'xlsx', 'pdf'], true)) {
+                                throw \Illuminate\Validation\ValidationException::withMessages([
+                                    'format' => [__('Unsupported export format.')],
+                                ]);
+                            }
+
+                            $productExport = app(ProductExport::class);
+                            $exportService = app(ExportService::class);
+
+                            $request = new ExportRequestData(
+                                name: $productExport->name(),
+                                exportable: ProductExport::class,
+                                format: $format,
+                                columns: $selectedColumns,
+                                filters: [],
+                                recordIds: $records->modelKeys(),
+                                userId: auth()->id()
+                            );
+
+                            $exportService->queue($request);
+
+                            Notification::make()
+                                ->title(__('Export queued'))
+                                ->body(__('We will notify you when the export is ready.'))
+                                ->success()
+                                ->send();
+                        })
                         ->visible(fn () => AuthorizationMatrix::check('products', 'viewAny')),
                     BulkAction::make('publish')
                         ->label(__('products.actions.publish'))
@@ -980,6 +993,16 @@ final class ProductResource extends Resource implements DefinesExportColumns
                 ])
                 ->queue(),
         ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private static function exportColumnOptions(): array
+    {
+        return collect(self::availableExportColumns())
+            ->mapWithKeys(fn (ExportColumn $column): array => [$column->key => $column->label])
+            ->all();
     }
 
     public static function getRelations(): array

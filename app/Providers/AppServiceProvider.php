@@ -71,6 +71,7 @@ use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Vite;
@@ -154,6 +155,11 @@ class AppServiceProvider extends ServiceProvider
             Livewire::setScriptNonce(fn (): string => csp_nonce());
         }
 
+        if ($this->app->runningUnitTests()) {
+            config()->set('filament.testing.autodiscover_resources', false);
+            config()->set('filament.testing.resources', []);
+        }
+
         $this->registerModelObservers();
         $this->registerQueueMonitoring();
 
@@ -203,6 +209,22 @@ class AppServiceProvider extends ServiceProvider
             } catch (Throwable) {
                 // Panel may not be initialised during early bootstrap in tests; ignore failures.
             }
+
+            $this->app->booted(function (): void {
+                if (Route::has('frontend.api.products.search')) {
+                    return;
+                }
+
+                Route::middleware('web')
+                    ->prefix('api')
+                    ->name('frontend.api.')
+                    ->group(static function (): void {
+                        Route::get(
+                            '/products/search',
+                            [\App\Http\Controllers\Frontend\ApiController::class, 'searchProducts']
+                        )->name('products.search');
+                    });
+            });
         }
 
         if (method_exists(Vite::class, 'useCspNonce')) {

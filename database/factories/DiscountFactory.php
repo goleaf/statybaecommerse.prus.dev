@@ -22,7 +22,7 @@ final class DiscountFactory extends Factory
             'is_active'   => true,
             'is_enabled'  => true,
             // Setting a baseline status ensures admin forms load with a valid value.
-            'status'         => 'draft',
+            'status'         => 'active',
             'starts_at'      => now()->subDays(1),
             'ends_at'        => now()->addDays(30),
             'usage_limit'    => fake()->numberBetween(10, 100),

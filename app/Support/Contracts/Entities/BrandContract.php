@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Support\Contracts\Entities;
 
 use App\Models\Brand;
+use App\Support\Contracts\ContractPathResolver;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
@@ -17,12 +18,12 @@ final class BrandContract
 
     public static function schemaPath(): string
     {
-        return resource_path('contracts/v1/brand.schema.json');
+        return ContractPathResolver::schema('brand.schema.json');
     }
 
     public static function examplePath(): string
     {
-        return resource_path('contracts/v1/examples/brand.json');
+        return ContractPathResolver::example('brand.json');
     }
 
     public static function forBrand(Brand $brand, array $meta = []): array

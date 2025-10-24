@@ -76,7 +76,7 @@ final class Inventory extends Model
      */
     public function scopeLowStock($query)
     {
-        return $query->whereRaw('quantity <= threshold');
+        return $query->whereRaw('(quantity - reserved) > 0 AND (quantity - reserved) <= threshold');
     }
 
     /**
@@ -97,7 +97,14 @@ final class Inventory extends Model
      */
     public function isLowStock(): bool
     {
-        return $this->quantity <= $this->threshold;
+        $available = $this->available_quantity;
+        $threshold = (int) $this->threshold;
+
+        if ($available <= 0) {
+            return false;
+        }
+
+        return $threshold > 0 && $available <= $threshold;
     }
 
     /**

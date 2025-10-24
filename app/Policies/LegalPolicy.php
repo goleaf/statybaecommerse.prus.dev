@@ -44,6 +44,14 @@ final class LegalPolicy
 
     private function hasPermission(User|AdminUser $user, string $permission): bool
     {
+        if (method_exists($user, 'getAttribute') && (bool) $user->getAttribute('is_admin')) {
+            return true;
+        }
+
+        if (isset($user->is_admin) && (bool) $user->is_admin) {
+            return true;
+        }
+
         if (! method_exists($user, 'can')) {
             return false;
         }

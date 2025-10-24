@@ -6,6 +6,7 @@ namespace App\Support\Search;
 
 use App\Models\Product;
 use App\Models\ProductVariant;
+use App\Support\Filament\SearchableComponentHelper;
 use DefStudio\SearchableInput\DTO\SearchResult;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Illuminate\Database\Eloquent\Builder;
@@ -19,150 +20,104 @@ final class ProductVariantSearch
     public static function results(string $term, int $limit = 15): array
     {
         /** @var EloquentCollection<int, ProductVariant> $variants */
-        $variants = ProductVariant::query()
-            ->select(['id', 'product_id', 'name', 'sku', 'price'])
-            ->with(['product:id,name,sku'])
-            ->when(trim($term) !== '', function (Builder $builder) use ($term): void {
-                $builder->where(function (Builder $query) use ($term): void {
-                    $query
-                        ->where('name', 'like', "%{$term}%")
-                        ->orWhere('sku', 'like', "%{$term}%")
-                        ->orWhereHas('product', function (Builder $productQuery) use ($term): void {
-                            $productQuery
-                                ->where('name', 'like', "%{$term}%")
-                                ->orWhere('sku', 'like', "%{$term}%");
-                        });
-                });
-            })
-            ->orderByDesc('updated_at')
+        $variants = self::baseQuery($term)
             ->limit($limit)
             ->get();
 
         return $variants
-            ->map(static function (ProductVariant $variant): SearchResult {
-                /** @var int|string|null $identifier */
-                $identifier = $variant->getKey();
-
-                /** @var string|null $rawName */
-                $rawName = $variant->getAttribute('name');
-                /** @var string|null $rawSku */
-                $rawSku = $variant->getAttribute('sku');
-                /** @var float|int|string|null $rawPrice */
-                $rawPrice = $variant->getAttribute('price');
-
-                $name = $rawName ?? '';
-                $sku = $rawSku ?? '';
-                $price = is_numeric($rawPrice) ? (float) $rawPrice : 0.0;
-
-                $product = $variant->getRelationValue('product');
-                $productName = $product instanceof Product ? self::resolveName($product->getAttribute('name')) : '';
-                $productSku = $product instanceof Product ? (string) ($product->getAttribute('sku') ?? '') : '';
-
-                $labelFragments = array_filter([
-                    $sku !== '' ? $sku : null,
-                    $name !== '' ? $name : null,
-                    $productName !== '' ? __('orders.lookups.variant_product', ['product' => $productName]) : null,
-                ]);
-
-                $label = trim(implode(' • ', $labelFragments));
-
-                $result = SearchResult::make((string) ($identifier ?? ''), $label !== '' ? $label : __('orders.lookups.variant_unknown'));
-
-                // Bundle both the variant details and parent product context into the payload.
-                return SearchResultPayload::normalise($result, [
-                    'variant_id'   => $variant->getKey(),
-                    'sku'          => $sku,
-                    'name'         => $name,
-                    'price'        => $price,
-                    'product_id'   => $variant->getAttribute('product_id'),
-                    'product_sku'  => $productSku,
-                    'product_name' => $productName,
-                ]);
-            })
+            ->map(static fn (ProductVariant $variant): SearchResult => self::toResult($variant))
             ->all();
     }
 
     public static function label(ProductVariant $variant): string
     {
+        $sku = self::stringValue($variant->getAttribute('sku'));
+        $name = self::stringValue($variant->getAttribute('name'));
         $product = $variant->getRelationValue('product');
+        $productName = $product instanceof Product ? self::resolveProductName($product) : '';
 
-        $productName = $product instanceof Product
-            ? self::resolveProductName($product)
-            : '';
+        $skuPart = $sku !== '' ? sprintf('[%s]', $sku) : '[—]';
+        $variantPart = $name !== '' ? $name : __('products.labels.unnamed_variant');
 
-        /** @var string|null $rawVariantName */
-        $rawVariantName = $variant->getAttribute('name');
-        /** @var string|null $rawSku */
-        $rawSku = $variant->getAttribute('sku');
-
-        $variantName = $rawVariantName ?? '';
-        $sku = $rawSku ?? '—';
-
-        return trim(sprintf('[%s] %s — %s', $sku !== '' ? $sku : '—', $productName, $variantName));
+        return trim(sprintf('%s %s%s', $skuPart, $productName !== '' ? "{$productName} — " : '', $variantPart));
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public static function payload(ProductVariant $variant): array
     {
         $product = $variant->getRelationValue('product');
 
-        $productName = $product instanceof Product
-            ? self::resolveProductName($product)
-            : '';
-
-        /** @var float|int|string|null $rawPrice */
-        $rawPrice = $variant->getAttribute('price');
-        $price = is_numeric($rawPrice) ? (float) $rawPrice : 0.0;
-
         return [
             'variant_id'   => $variant->getKey(),
             'product_id'   => $variant->getAttribute('product_id'),
-            'sku'          => (string) ($variant->getAttribute('sku') ?? ''),
-            'name'         => (string) ($variant->getAttribute('name') ?? ''),
-            'product_name' => $productName,
-            'price'        => $price,
+            'sku'          => self::stringValue($variant->getAttribute('sku')),
+            'name'         => self::stringValue($variant->getAttribute('name')),
+            'price'        => self::numericValue($variant->getAttribute('price')),
+            'product_sku'  => $product instanceof Product ? self::stringValue($product->getAttribute('sku')) : '',
+            'product_name' => $product instanceof Product ? self::resolveProductName($product) : '',
         ];
     }
 
     public static function hydrateComponent(SearchableInput $component, ?int $state): void
     {
-        if ($state === null) {
-            SearchableComponentHelper::forget($component);
+        SearchableComponentHelper::hydrate(
+            $component,
+            $state,
+            static function (int $identifier): ?ProductVariant {
+                return ProductVariant::query()
+                    ->select(['id', 'product_id', 'sku', 'name', 'price'])
+                    ->with(['product:id,sku,name'])
+                    ->find($identifier);
+            },
+            static function (ProductVariant $variant): array {
+                $result = self::toResult($variant);
+                $payload = SearchResultPayload::hydrate($result)['payload'];
 
-            return;
-        }
-
-        $variant = ProductVariant::query()
-            ->select(['id', 'product_id', 'sku', 'name', 'price'])
-            ->with(['product:id,sku,name'])
-            ->find($state);
-
-        if (! $variant instanceof ProductVariant) {
-            return;
-        }
-
-        SearchableComponentHelper::apply($component, self::toResult($variant));
+                return [
+                    'value'   => $result->value(),
+                    'label'   => $result->label(),
+                    'payload' => $payload,
+                ];
+            },
+        );
     }
 
-    /**
-     * @return Builder<ProductVariant>
-     */
-    private static function query(string $term): Builder
+    private static function baseQuery(string $term): Builder
     {
-        $variant = ProductVariant::query()
-            ->select(['id', 'product_id', 'name', 'sku', 'price'])
+        $search = trim($term);
+
+        return ProductVariant::query()
+            ->select(['id', 'product_id', 'name', 'sku', 'price', 'updated_at'])
             ->with(['product:id,name,sku'])
-            ->find($variantId);
+            ->when($search !== '', static function (Builder $builder) use ($search): void {
+                $builder->where(static function (Builder $query) use ($search): void {
+                    $like = "%{$search}%";
 
-        if (! $variant instanceof ProductVariant) {
-            return null;
-        }
+                    $query
+                        ->where('name', 'like', $like)
+                        ->orWhere('sku', 'like', $like)
+                        ->orWhereHas('product', static function (Builder $productQuery) use ($like): void {
+                            $productQuery
+                                ->where('name', 'like', $like)
+                                ->orWhere('sku', 'like', $like);
+                        });
+                });
+            })
+            ->orderByDesc('updated_at');
+    }
 
-        return self::payload($variant);
+    private static function toResult(ProductVariant $variant): SearchResult
+    {
+        $identifier = (string) ($variant->getKey() ?? '');
+        $result = SearchResult::make($identifier, self::label($variant));
+
+        return SearchResultPayload::normalise($result, self::payload($variant));
     }
 
     private static function resolveProductName(Product $product): string
     {
-        /** @var string|null $rawName */
         $rawName = $product->getAttribute('name');
 
         if (is_array($rawName)) {
@@ -175,45 +130,13 @@ final class ProductVariantSearch
         return is_string($rawName) ? $rawName : '';
     }
 
-    private static function toResult(ProductVariant $variant): SearchResult
+    private static function numericValue(mixed $value): float
     {
-        /** @var int|string|null $identifier */
-        $identifier = $variant->getKey();
+        return is_numeric($value) ? (float) $value : 0.0;
+    }
 
-        /** @var string|null $rawName */
-        $rawName = $variant->getAttribute('name');
-        /** @var string|null $rawSku */
-        $rawSku = $variant->getAttribute('sku');
-        /** @var float|int|string|null $rawPrice */
-        $rawPrice = $variant->getAttribute('price');
-
-        $name = $rawName ?? '';
-        $sku = $rawSku ?? '';
-        $price = is_numeric($rawPrice) ? (float) $rawPrice : 0.0;
-
-        $product = $variant->getRelationValue('product');
-        $productName = $product instanceof Product ? self::resolveName($product->getAttribute('name')) : '';
-        $productSku = $product instanceof Product ? (string) ($product->getAttribute('sku') ?? '') : '';
-
-        $labelFragments = array_filter([
-            $sku !== '' ? $sku : null,
-            $name !== '' ? $name : null,
-            $productName !== '' ? __('orders.lookups.variant_product', ['product' => $productName]) : null,
-        ]);
-
-        $label = trim(implode(' • ', $labelFragments));
-
-        $result = SearchResult::make((string) ($identifier ?? ''), $label !== '' ? $label : __('orders.lookups.variant_unknown'));
-
-        $result
-            ->withData('variant_id', $variant->getKey())
-            ->withData('sku', $sku)
-            ->withData('name', $name)
-            ->withData('price', $price)
-            ->withData('product_id', $variant->getAttribute('product_id'))
-            ->withData('product_sku', $productSku)
-            ->withData('product_name', $productName);
-
-        return $result;
+    private static function stringValue(mixed $value): string
+    {
+        return is_string($value) ? $value : '';
     }
 }

@@ -124,6 +124,7 @@ final class HomepageCatalogueDataProvider
             'latestProducts' => $latestProducts,
             'popularCategories' => $popularCategories,
             'topBrands' => $topBrands,
+            'popularBrands' => $topBrands,
         ];
     }
 }

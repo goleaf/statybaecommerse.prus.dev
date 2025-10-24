@@ -28,10 +28,12 @@ final class HealthController extends Controller
     private function respond(array $payload): JsonResponse
     {
         $statusCode = $payload['status'] === 'ok' ? 200 : 503;
+        $locale = app()->getLocale();
 
         return response()
             ->json($payload, $statusCode)
             ->header('Cache-Control', 'no-store, max-age=0')
-            ->header('Pragma', 'no-cache');
+            ->header('Pragma', 'no-cache')
+            ->header('Content-Language', $locale);
     }
 }

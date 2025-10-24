@@ -99,7 +99,6 @@ return new class extends Migration
                 $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
                 $table->foreign('location_id')->references('id')->on('locations')->onDelete('cascade');
 
-                $table->unique(['product_id', 'location_id']);
                 $table->index(['location_id', 'is_tracked']);
             });
         }

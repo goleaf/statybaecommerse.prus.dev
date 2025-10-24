@@ -7,6 +7,7 @@ namespace App\Support\Contracts\Entities;
 use App\Data\Pricing\PriceBreakdown;
 use App\Models\Order;
 use App\Services\Pricing\PriceConfiguration;
+use App\Support\Contracts\ContractPathResolver;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 
@@ -18,12 +19,12 @@ final class OrderContract
 
     public static function schemaPath(): string
     {
-        return resource_path('contracts/v1/order.schema.json');
+        return ContractPathResolver::schema('order.schema.json');
     }
 
     public static function examplePath(): string
     {
-        return resource_path('contracts/v1/examples/order.json');
+        return ContractPathResolver::example('order.json');
     }
 
     public static function forOrder(Order $order, array $meta = []): array

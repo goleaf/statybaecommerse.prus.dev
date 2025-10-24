@@ -9,7 +9,7 @@
             <div class="space-y-4">
                 <nav class="text-sm text-gray-500" aria-label="Breadcrumb">
                     <ol class="flex flex-wrap items-center gap-2">
-                        <li><a href="{{ route('frontend.home') }}" class="text-blue-600 hover:text-blue-700">{{ __('frontend.navigation.home') }}</a></li>
+                        <li><a href="{{ route('home') }}" class="text-blue-600 hover:text-blue-700">{{ __('frontend.navigation.home') }}</a></li>
                         <li>/</li>
                         <li><a href="{{ route('frontend.categories.index') }}" class="text-blue-600 hover:text-blue-700">{{ __('Categories') }}</a></li>
                         <li>/</li>

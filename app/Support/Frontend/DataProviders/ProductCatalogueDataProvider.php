@@ -7,6 +7,7 @@ namespace App\Support\Frontend\DataProviders;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\Scopes\PublishedScope;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
@@ -157,8 +158,12 @@ final class ProductCatalogueDataProvider
     private function baseQuery(): Builder
     {
         return Product::query()
+            ->withoutGlobalScope(PublishedScope::class)
             ->with(['brand'])
-            ->published();
+            ->where('is_visible', true)
+            ->whereIn('status', ['active', 'published'])
+            ->whereNotNull('published_at')
+            ->where('published_at', '<=', now());
     }
 
     private function applyCommonFilters(Builder $query, array $filters): void
@@ -174,13 +179,13 @@ final class ProductCatalogueDataProvider
             $this->applyFilterShortcut($query, $filter);
         }
 
-        if ($brandId = $filters['brand'] ?? $filters['brand_id'] ?? null) {
+        if (null !== ($brandId = $this->resolveBrandIdentifier($filters['brand'] ?? $filters['brand_id'] ?? null))) {
             $query->where('brand_id', $brandId);
         }
 
-        if ($categoryId = $filters['category'] ?? $filters['category_id'] ?? null) {
+        if (null !== ($categoryId = $this->resolveCategoryIdentifier($filters['category'] ?? $filters['category_id'] ?? null))) {
             $query->whereHas('categories', function (Builder $builder) use ($categoryId): void {
-                $builder->where('category_id', $categoryId);
+                $builder->where('categories.id', $categoryId);
             });
         }
 
@@ -222,6 +227,78 @@ final class ProductCatalogueDataProvider
         $perPage = (int) ($filters['per_page'] ?? 12);
 
         return $query->paginate($perPage > 0 ? $perPage : 12)->withQueryString();
+    }
+
+    private function resolveBrandIdentifier(mixed $brand): ?int
+    {
+        if ($brand instanceof Brand) {
+            return $brand->getKey();
+        }
+
+        if ($brand === null || $brand === '') {
+            return null;
+        }
+
+        if (is_int($brand)) {
+            return $brand;
+        }
+
+        if (is_string($brand) && ctype_digit($brand)) {
+            return (int) $brand;
+        }
+
+        if (is_scalar($brand)) {
+            $slug = (string) $brand;
+
+            $brandId = Brand::query()
+                ->where(static function (Builder $builder) use ($slug): void {
+                    $builder->where('slug', $slug)
+                        ->orWhereHas('translations', static function (Builder $translationQuery) use ($slug): void {
+                            $translationQuery->where('slug', $slug);
+                        });
+                })
+                ->value('id');
+
+            return $brandId !== null ? (int) $brandId : null;
+        }
+
+        return null;
+    }
+
+    private function resolveCategoryIdentifier(mixed $category): ?int
+    {
+        if ($category instanceof Category) {
+            return $category->getKey();
+        }
+
+        if ($category === null || $category === '') {
+            return null;
+        }
+
+        if (is_int($category)) {
+            return $category;
+        }
+
+        if (is_string($category) && ctype_digit($category)) {
+            return (int) $category;
+        }
+
+        if (is_scalar($category)) {
+            $slug = (string) $category;
+
+            $categoryId = Category::query()
+                ->where(static function (Builder $builder) use ($slug): void {
+                    $builder->where('slug', $slug)
+                        ->orWhereHas('translations', static function (Builder $translationQuery) use ($slug): void {
+                            $translationQuery->where('slug', $slug);
+                        });
+                })
+                ->value('id');
+
+            return $categoryId !== null ? (int) $categoryId : null;
+        }
+
+        return null;
     }
 
     public function categoryHighlights(int $limit = 6): Collection

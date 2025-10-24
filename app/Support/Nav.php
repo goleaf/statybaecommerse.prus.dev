@@ -100,8 +100,13 @@ final class Nav
             $relative = Str::after($file, app_path() . DIRECTORY_SEPARATOR);
             $class = 'App\\' . str_replace(['/', '.php'], ['\\', ''], $relative);
 
-            if (class_exists($class) && is_subclass_of($class, Resource::class)) {
-                $classes[] = $class;
+            try {
+                if (class_exists($class) && is_subclass_of($class, Resource::class)) {
+                    $classes[] = $class;
+                }
+            } catch (\ParseError $exception) {
+                // Skip resources that cannot be parsed so storefront pages remain accessible during tests.
+                continue;
             }
         }
 

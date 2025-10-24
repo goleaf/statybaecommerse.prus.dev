@@ -10,9 +10,10 @@ use App\Models\Address;
 use App\Models\Country;
 use App\Models\Customer;
 use App\Models\User;
-use Illuminate\Contracts\View\View;
+use App\Support\Database\TableAvailability;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Schema;
@@ -20,27 +21,26 @@ use Illuminate\Validation\Rule;
 
 final class ProfileController extends Controller
 {
-    private ?bool $customersTableExists = null;
-
-    private ?bool $countriesTableExists = null;
-
-    private ?bool $citiesTableExists = null;
-
-    public function index(Request $request): View
+    public function __construct(private readonly TableAvailability $tables)
     {
-        $user = $this->resolveUser($request);
+    }
 
-        return view('profile.index', [
+    public function index(Request $request): Response
+    {
+        $user = $this->resolveUser($request)->load('addresses');
+
+        return response()->view('frontend.profile.index', [
             'user' => $user,
-            'addresses' => $user->addresses()->latest()->get(),
+            'addresses' => $user->addresses,
+            'customer' => $this->resolveCustomerForUser($user),
         ]);
     }
 
-    public function edit(Request $request): View
+    public function edit(Request $request): Response
     {
         $user = $this->resolveUser($request);
 
-        return view('profile.edit', [
+        return response()->view('frontend.profile.edit', [
             'user' => $user,
             'countries' => $this->resolveCountries(),
             'customer' => $this->resolveCustomerForUser($user),
@@ -54,14 +54,17 @@ final class ProfileController extends Controller
 
         $validated = $request->validate($this->profileRules($user));
 
-        $user->first_name = $validated['first_name'];
-        $user->last_name = $validated['last_name'];
-        $user->name = trim(sprintf('%s %s', $validated['first_name'], $validated['last_name']));
+        $user->name = $validated['name'];
+
+        [$derivedFirstName, $derivedLastName] = $this->splitName($validated['name']);
+
+        $user->first_name = $validated['first_name'] ?? $derivedFirstName;
+        $user->last_name = $validated['last_name'] ?? $derivedLastName;
         $user->email = $validated['email'];
         $user->phone = $validated['phone'] ?? null;
         $user->phone_number = $validated['phone'] ?? null;
 
-        if (! empty($validated['password'])) {
+        if (! empty($validated['password'] ?? null)) {
             $user->password = Hash::make($validated['password']);
         }
 
@@ -72,14 +75,16 @@ final class ProfileController extends Controller
         return redirect()->route('frontend.profile.index')->with('status', 'profile-updated');
     }
 
-    public function addresses(Request $request): View
+    public function addresses(Request $request): Response
     {
         $user = $this->resolveUser($request);
 
-        return view('profile.addresses', [
+        return response()->view('frontend.profile.addresses', [
             'user' => $user,
             'addresses' => $user->addresses()->latest()->get(),
             'types' => AddressType::cases(),
+            'addressTypes' => AddressType::options(),
+            'countries' => $this->resolveCountries(),
         ]);
     }
 
@@ -91,7 +96,7 @@ final class ProfileController extends Controller
         $address = $user->addresses()->create($validated);
 
         if ($address->is_default) {
-            $this->ensureSingleDefault($request, $address);
+            $this->ensureSingleDefault($user, $address);
         }
 
         return redirect()->route('frontend.profile.addresses')->with('status', 'address-created');
@@ -107,7 +112,7 @@ final class ProfileController extends Controller
         $address->update($validated);
 
         if ($address->is_default) {
-            $this->ensureSingleDefault($request, $address);
+            $this->ensureSingleDefault($user, $address);
         }
 
         return redirect()->route('frontend.profile.addresses')->with('status', 'address-updated');
@@ -118,7 +123,7 @@ final class ProfileController extends Controller
         $user = $this->resolveUser($request);
         $this->ensureAddressOwner($user->getKey(), $address);
 
-        $address->delete();
+        $address->forceDelete();
 
         return redirect()->route('frontend.profile.addresses')->with('status', 'address-deleted');
     }
@@ -126,7 +131,7 @@ final class ProfileController extends Controller
     private function validateAddress(Request $request, ?Address $address = null): array
     {
         $rules = [
-            'type' => ['required', Rule::in(array_map(fn (AddressType $type) => $type->value, AddressType::cases()))],
+            'type' => ['required', Rule::in(array_map(static fn (AddressType $type) => $type->value, AddressType::cases()))],
             'first_name' => ['required', 'string', 'max:120'],
             'last_name' => ['required', 'string', 'max:120'],
             'address_line_1' => ['required', 'string', 'max:255'],
@@ -172,6 +177,11 @@ final class ProfileController extends Controller
         }
     }
 
+    private function ensureSingleDefault(User $user, Address $address): void
+    {
+        $this->synchroniseAddressFlags($user, $address);
+    }
+
     private function ensureAddressOwner(int $userId, Address $address): void
     {
         if ($address->user_id !== $userId) {
@@ -202,7 +212,13 @@ final class ProfileController extends Controller
             $customer = Customer::query()->firstOrNew(['email' => $validated['email']]);
         }
 
-        $customer->fill([
+        $columns = Schema::hasTable($customer->getTable())
+            ? Schema::getColumnListing($customer->getTable())
+            : [];
+
+        $columnLookup = array_flip($columns);
+
+        $customer->fill(array_intersect_key([
             'name' => $user->name,
             'email' => $validated['email'],
             'phone' => $validated['phone'] ?? null,
@@ -210,20 +226,15 @@ final class ProfileController extends Controller
             'postal_code' => $validated['postal_code'] ?? null,
             'country_id' => $validated['country_id'] ?? null,
             'city_id' => $validated['city_id'] ?? null,
-        ]);
+        ], $columnLookup));
 
-        $customer->is_default = (bool) ($validated['is_default'] ?? $customer->is_default ?? false);
-        $customer->is_billing = (bool) ($validated['is_billing'] ?? $customer->is_billing ?? false);
-        $customer->is_shipping = (bool) ($validated['is_shipping'] ?? $customer->is_shipping ?? false);
+        foreach (['is_default', 'is_billing', 'is_shipping'] as $flag) {
+            if (isset($columnLookup[$flag])) {
+                $customer->{$flag} = (bool) ($validated[$flag] ?? $customer->{$flag} ?? false);
+            }
+        }
 
         $customer->save();
-    }
-
-    private function ensureSingleDefault(Request $request, Address $address): void
-    {
-        $user = $this->resolveUser($request);
-
-        $this->synchroniseAddressFlags($user, $address);
     }
 
     /**
@@ -269,8 +280,9 @@ final class ProfileController extends Controller
     private function profileRules(User $user): array
     {
         return [
-            'first_name' => ['required', 'string', 'max:120'],
-            'last_name' => ['required', 'string', 'max:120'],
+            'name' => ['required', 'string', 'max:255'],
+            'first_name' => ['sometimes', 'nullable', 'string', 'max:120'],
+            'last_name' => ['sometimes', 'nullable', 'string', 'max:120'],
             'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->getKey())],
             'phone' => ['nullable', 'string', 'max:50'],
             'address' => ['nullable', 'string', 'max:255'],
@@ -294,28 +306,30 @@ final class ProfileController extends Controller
 
     private function customersTableExists(): bool
     {
-        if ($this->customersTableExists === null) {
-            $this->customersTableExists = Schema::hasTable('customers');
-        }
-
-        return $this->customersTableExists;
+        return $this->tables->has('customers');
     }
 
     private function countriesTableExists(): bool
     {
-        if ($this->countriesTableExists === null) {
-            $this->countriesTableExists = Schema::hasTable('countries');
-        }
-
-        return $this->countriesTableExists;
+        return $this->tables->has('countries');
     }
 
     private function citiesTableExists(): bool
     {
-        if ($this->citiesTableExists === null) {
-            $this->citiesTableExists = Schema::hasTable('cities');
-        }
+        return $this->tables->has('cities');
+    }
 
-        return $this->citiesTableExists;
+    /**
+     * @return array{0: string, 1: string|null}
+     */
+    private function splitName(string $name): array
+    {
+        $parts = preg_split('/\s+/u', trim($name), 2, PREG_SPLIT_NO_EMPTY) ?: [];
+
+        $firstName = $parts[0] ?? $name;
+        $lastName = $parts[1] ?? null;
+
+        return [$firstName, $lastName];
     }
 }
+

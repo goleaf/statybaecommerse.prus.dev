@@ -11,7 +11,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 
-final class ProcessExport implements ShouldQueue
+class ProcessExport implements ShouldQueue
 {
     use Dispatchable;
     use InteractsWithQueue;

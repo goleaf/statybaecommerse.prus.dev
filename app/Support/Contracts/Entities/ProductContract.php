@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Support\Contracts\Entities;
 
 use App\Models\Product;
+use App\Support\Contracts\ContractPathResolver;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
@@ -17,12 +18,12 @@ final class ProductContract
 
     public static function schemaPath(): string
     {
-        return resource_path('contracts/v1/product.schema.json');
+        return ContractPathResolver::schema('product.schema.json');
     }
 
     public static function examplePath(): string
     {
-        return resource_path('contracts/v1/examples/product.json');
+        return ContractPathResolver::example('product.json');
     }
 
     public static function forProduct(Product $product, array $meta = []): array

@@ -33,7 +33,7 @@ final class CartController extends Controller
     {
         $validated = $request->validated();
 
-        $product = Product::query()->findOrFail($validated['product_id']);
+        $product = Product::withoutGlobalScopes()->findOrFail($validated['product_id']);
 
         $cart = $this->getCart();
         $key = (string) $product->getKey();
@@ -109,6 +109,7 @@ final class CartController extends Controller
         ]);
 
         $cart = $this->getCart();
+        logger()->info('cart.update', ['payload' => $payload, 'cart_before' => $cart]);
 
         $items = $payload['items'] ?? [['product_id' => $payload['product_id'], 'quantity' => $payload['quantity']]];
 
@@ -122,6 +123,7 @@ final class CartController extends Controller
         }
 
         $this->saveCart($cart);
+        logger()->info('cart.update.after', ['cart_after' => $cart]);
 
         return redirect()->route('frontend.cart.index')->with('status', 'cart-updated');
     }

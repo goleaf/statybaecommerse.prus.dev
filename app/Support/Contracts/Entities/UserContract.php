@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Support\Contracts\Entities;
 
 use App\Models\User;
+use App\Support\Contracts\ContractPathResolver;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Schema;
 
@@ -16,12 +17,12 @@ final class UserContract
 
     public static function schemaPath(): string
     {
-        return resource_path('contracts/v1/user.schema.json');
+        return ContractPathResolver::schema('user.schema.json');
     }
 
     public static function examplePath(): string
     {
-        return resource_path('contracts/v1/examples/user.json');
+        return ContractPathResolver::example('user.json');
     }
 
     public static function forUser(User $user, array $meta = []): array

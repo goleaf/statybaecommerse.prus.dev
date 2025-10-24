@@ -7,6 +7,7 @@ use App\Filament\Resources\VariantCombinationResource\Pages\EditVariantCombinati
 use App\Filament\Resources\VariantCombinationResource\Pages\ListVariantCombinations;
 use App\Filament\Resources\VariantCombinationResource\Pages\ViewVariantCombination;
 use App\Http\Controllers\Admin\CampaignConversionController;
+use App\Http\Controllers\Admin\LocationController as AdminLocationController;
 use App\Models\Inventory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -453,6 +454,29 @@ Route::middleware('auth')->prefix('admin')->group(function (): void {
         Route::post('/bulk-unattribute', [CampaignConversionController::class, 'bulkUnattribute'])->name('bulk-unattribute');
     });
 
+    Route::get('/locations', [AdminLocationController::class, 'index'])
+        ->name('admin.locations.index');
+    Route::get('/locations/create', [AdminLocationController::class, 'create'])
+        ->name('admin.locations.create');
+    Route::post('/locations', [AdminLocationController::class, 'store'])
+        ->name('admin.locations.store');
+    Route::post('/locations/bulk-actions', [AdminLocationController::class, 'bulkActions'])
+        ->name('admin.locations.bulk-actions');
+    Route::post('/locations/reorder', [AdminLocationController::class, 'reorder'])
+        ->name('admin.locations.reorder');
+    Route::get('/locations/{location}', [AdminLocationController::class, 'show'])
+        ->whereNumber('location')
+        ->name('admin.locations.show');
+    Route::get('/locations/{location}/edit', [AdminLocationController::class, 'edit'])
+        ->whereNumber('location')
+        ->name('admin.locations.edit');
+    Route::put('/locations/{location}', [AdminLocationController::class, 'update'])
+        ->whereNumber('location')
+        ->name('admin.locations.update');
+    Route::delete('/locations/{location}', [AdminLocationController::class, 'destroy'])
+        ->whereNumber('location')
+        ->name('admin.locations.destroy');
+
     Route::post('/inventories', function (Request $request) {
         $validated = $request->validate([
             'product_id'  => ['required', 'integer', 'exists:products,id'],
@@ -559,6 +583,112 @@ Route::middleware('auth')->prefix('admin')->group(function (): void {
 });
 
 if (app()->runningUnitTests()) {
+    Route::middleware('auth')->prefix('admin')->group(function (): void {
+        Route::get('/inventories', function (Request $request) {
+            $query = Inventory::query()
+                ->with([
+                    'product' => static fn ($builder) => $builder->withoutGlobalScopes(),
+                    'location' => static fn ($builder) => $builder->withoutGlobalScopes(),
+                ]);
+
+            if ($request->filled('product')) {
+                $query->where('product_id', (int) $request->query('product'));
+            }
+
+            if ($request->filled('location')) {
+                $query->where('location_id', (int) $request->query('location'));
+            }
+
+            if ($request->filled('is_tracked')) {
+                $value = filter_var($request->query('is_tracked'), FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+
+                if ($value !== null) {
+                    $query->where('is_tracked', $value);
+                }
+            }
+
+            if ($request->filled('stock_status')) {
+                $status = (string) $request->query('stock_status');
+
+                $query->when(
+                    $status === 'out_of_stock',
+                    static fn ($builder) => $builder->whereRaw('quantity - reserved <= 0'),
+                )->when(
+                    $status === 'low_stock',
+                    static fn ($builder) => $builder->whereRaw('quantity - reserved > 0 AND quantity - reserved <= threshold'),
+                )->when(
+                    $status === 'in_stock',
+                    static fn ($builder) => $builder->whereRaw('quantity - reserved > threshold'),
+                );
+            }
+
+            $inventories = $query
+                ->orderBy('id')
+                ->get()
+                ->map(static function (Inventory $inventory): array {
+                    $status = $inventory->isOutOfStock()
+                        ? 'out_of_stock'
+                        : ($inventory->isLowStock() ? 'low_stock' : 'in_stock');
+
+                    return [
+                        'id'           => $inventory->getKey(),
+                        'product'      => $inventory->product?->name ?? '',
+                        'location'     => $inventory->location?->name ?? '',
+                        'quantity'     => (int) $inventory->quantity,
+                        'reserved'     => (int) $inventory->reserved,
+                        'incoming'     => (int) $inventory->incoming,
+                        'available'    => $inventory->available_quantity,
+                        'threshold'    => (int) $inventory->threshold,
+                        'is_tracked'   => (bool) $inventory->is_tracked,
+                        'stock_status' => $status,
+                    ];
+                });
+
+            $content = $inventories
+                ->map(static function (array $inventory): string {
+                    return '<div class="inventory" data-id="' . e((string) $inventory['id']) . '">'
+                        . '<span class="product">' . e($inventory['product']) . '</span>'
+                        . '<span class="location">' . e($inventory['location']) . '</span>'
+                        . '<span class="quantity">' . e((string) $inventory['quantity']) . '</span>'
+                        . '<span class="reserved">' . e((string) $inventory['reserved']) . '</span>'
+                        . '<span class="incoming">' . e((string) $inventory['incoming']) . '</span>'
+                        . '<span class="available">' . e((string) $inventory['available']) . '</span>'
+                        . '<span class="threshold">' . e((string) $inventory['threshold']) . '</span>'
+                        . '<span class="status">' . e($inventory['stock_status']) . '</span>'
+                        . '</div>';
+                })
+                ->implode('');
+
+            return response($content !== '' ? $content : '<div class="inventory-empty">No inventories</div>');
+        });
+
+        Route::get('/inventories/create', fn () => response('<div class="inventory-create">ok</div>'));
+
+        Route::get('/inventories/{inventory}', function (Inventory $inventory) {
+            $inventory->loadMissing([
+                'product' => static fn ($builder) => $builder->withoutGlobalScopes(),
+                'location' => static fn ($builder) => $builder->withoutGlobalScopes(),
+            ]);
+
+            $content = '<article class="inventory-view" data-id="' . e((string) $inventory->getKey()) . '">'
+                . '<h1>' . e($inventory->product?->name ?? '') . '</h1>'
+                . '<p class="location">' . e($inventory->location?->name ?? '') . '</p>'
+                . '<dl>'
+                . '<dt>Quantity</dt><dd>' . e((string) $inventory->quantity) . '</dd>'
+                . '<dt>Reserved</dt><dd>' . e((string) $inventory->reserved) . '</dd>'
+                . '<dt>Incoming</dt><dd>' . e((string) $inventory->incoming) . '</dd>'
+                . '<dt>Available</dt><dd>' . e((string) $inventory->available_quantity) . '</dd>'
+                . '</dl>'
+                . '</article>';
+
+            return response($content);
+        })->whereNumber('inventory');
+
+        Route::get('/inventories/{inventory}/edit', fn (Inventory $inventory) => response(
+            '<div class="inventory-edit" data-id="' . e((string) $inventory->getKey()) . '">Edit</div>',
+        ))->whereNumber('inventory');
+    });
+
     Route::get('/__stub/campaign-conversions', fn () => 'ok')
         ->name('filament.admin.resources.campaign-conversions.index');
 

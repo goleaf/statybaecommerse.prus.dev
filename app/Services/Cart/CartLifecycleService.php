@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services\Cart;
 
+use App\Enums\PaymentStatus;
 use App\Models\CartItem;
 use Illuminate\Contracts\Session\Session;
 use Illuminate\Database\Eloquent\Builder;
@@ -25,7 +26,7 @@ final class CartLifecycleService
     /**
      * Clear cart state after a successful checkout.
      */
-    public function clearAfterCheckout(?int $userId, ?string $sessionId, ?string $paymentStatus = null): void
+    public function clearAfterCheckout(?int $userId, ?string $sessionId, PaymentStatus|string|null $paymentStatus = null): void
     {
         if ($this->shouldRetainForPartialPayment($paymentStatus)) {
             return;
@@ -42,13 +43,15 @@ final class CartLifecycleService
         $this->clearTargets($userId, $sessionId);
     }
 
-    private function shouldRetainForPartialPayment(?string $paymentStatus): bool
+    private function shouldRetainForPartialPayment(PaymentStatus|string|null $paymentStatus): bool
     {
         if ($paymentStatus === null) {
             return false;
         }
 
-        return in_array(strtolower($paymentStatus), [
+        $value = $paymentStatus instanceof PaymentStatus ? $paymentStatus->value : $paymentStatus;
+
+        return in_array(strtolower($value), [
             'partial',
             'partially_paid',
             'partially_authorized',

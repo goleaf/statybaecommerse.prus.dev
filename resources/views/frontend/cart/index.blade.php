@@ -10,6 +10,7 @@
                             <div>
                                 <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100">{{ $item['name'] }}</h2>
                                 <p class="text-sm text-gray-500 dark:text-gray-400">{{ __('Unit price: :price', ['price' => app_money_format($item['price'])]) }}</p>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">{{ __('Quantity: :quantity', ['quantity' => $item['quantity']]) }}</p>
                             </div>
                             <div class="flex items-center justify-end gap-3 text-sm text-gray-600 dark:text-gray-300">
                                 <dt>{{ __('Tax') }}:</dt>
@@ -29,15 +30,15 @@
                                 <dt>{{ __('Total') }}:</dt>
                                 <dd>{{ $summary['formatted_total'] }}</dd>
                             </div>
-                        </dl>
-                    </div>
+                        </div>
+                    @endforeach
 
-                    <div class="flex flex-col gap-3 sm:flex-row sm:justify-end">
+                    <div class="flex flex-col gap-3 sm:flex-row sm:justify-end pt-4">
                         <a href="{{ route('frontend.checkout.index') }}"
                            class="inline-flex items-center justify-center rounded-lg bg-green-600 px-5 py-3 text-center text-white shadow hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500">
                             {{ __('Proceed to checkout') }}
                         </a>
-                        <a href="{{ route('products.index', ['locale' => app()->getLocale()]) ?? '/products' }}"
+                        <a href="{{ route('frontend.products.index', ['locale' => app()->getLocale()]) ?? '/products' }}"
                            class="inline-flex items-center justify-center rounded-lg border border-gray-300 px-5 py-3 text-center text-gray-700 hover:border-blue-500 hover:text-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">
                             {{ __('Continue shopping') }}
                         </a>

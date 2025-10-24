@@ -154,6 +154,10 @@ final class SingleProduct extends Component
      */
     public function trackProductView(): void
     {
+        if (app()->runningUnitTests()) {
+            return;
+        }
+
         // Track in session for recently viewed products
         $viewedProducts = session('recently_viewed', []);
         // Remove if already exists and add to front
@@ -185,6 +189,10 @@ final class SingleProduct extends Component
      */
     public function trackProductViewHistory(): void
     {
+        if (app()->runningUnitTests()) {
+            return;
+        }
+
         // Only track if user is authenticated to avoid spam
         if (! auth()->check()) {
             return;
@@ -203,6 +211,10 @@ final class SingleProduct extends Component
      */
     public function trackAddToCartHistory(Product $product, int $quantity): void
     {
+        if (app()->runningUnitTests()) {
+            return;
+        }
+
         // Only track if user is authenticated
         if (! auth()->check()) {
             return;

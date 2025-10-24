@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Support\Contracts\Entities;
 
 use App\Models\Category;
+use App\Support\Contracts\ContractPathResolver;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
@@ -17,12 +18,12 @@ final class CategoryContract
 
     public static function schemaPath(): string
     {
-        return resource_path('contracts/v1/category.schema.json');
+        return ContractPathResolver::schema('category.schema.json');
     }
 
     public static function examplePath(): string
     {
-        return resource_path('contracts/v1/examples/category.json');
+        return ContractPathResolver::example('category.json');
     }
 
     public static function forCategory(Category $category, array $meta = []): array
