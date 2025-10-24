@@ -594,6 +594,20 @@ final class TestingDatabase
             });
         }
 
+        if (! $schema->hasTable('variant_combinations')) {
+            $schema->create('variant_combinations', function (Blueprint $table): void {
+                $table->id();
+                $table->foreignId('product_id')->constrained('products')->cascadeOnDelete();
+                $table->json('attribute_combinations')->nullable();
+                $table->string('combination_hash')->index();
+                $table->boolean('is_available')->default(true);
+                $table->timestamps();
+                $table->softDeletes();
+
+                $table->unique(['product_id', 'combination_hash'], 'variant_combinations_product_hash_unique');
+            });
+        }
+
         if (! $schema->hasTable('variant_analytics')) {
             $schema->create('variant_analytics', function (Blueprint $table): void {
                 $table->id();
@@ -609,6 +623,26 @@ final class TestingDatabase
                 $table->decimal('conversion_rate', 5, 4)->default(0);
                 $table->timestamps();
                 $table->unique(['product_id', 'variant_id', 'date_bucket'], 'variant_analytics_product_variant_bucket_unique');
+            });
+        }
+
+        if (! $schema->hasTable('variant_images')) {
+            $schema->create('variant_images', function (Blueprint $table): void {
+                $table->id();
+                $table->foreignId('variant_id')->constrained('product_variants')->cascadeOnDelete();
+                $table->string('image_path')->nullable();
+                $table->string('alt_text')->nullable();
+                $table->text('description')->nullable();
+                $table->integer('sort_order')->default(0);
+                $table->boolean('is_primary')->default(false);
+                $table->boolean('is_active')->default(true);
+                $table->unsignedBigInteger('file_size')->nullable();
+                $table->json('dimensions')->nullable();
+                $table->timestamps();
+                $table->softDeletes();
+
+                $table->index(['variant_id', 'sort_order'], 'variant_images_variant_sort_index');
+                $table->index(['variant_id', 'is_primary'], 'variant_images_primary_index');
             });
         }
 
@@ -643,6 +677,61 @@ final class TestingDatabase
                 $table->unique(['user_id', 'product_id', 'interaction_type'], 'user_product_interactions_unique');
                 $table->index(['user_id', 'interaction_type', 'last_interaction'], 'user_product_interactions_last_idx');
                 $table->index(['product_id', 'interaction_type', 'count'], 'user_product_interactions_product_idx');
+            });
+        }
+
+        if (! $schema->hasTable('orders')) {
+            $schema->create('orders', function (Blueprint $table): void {
+                $table->id();
+                $table->string('number')->unique();
+                $table->unsignedBigInteger('user_id')->nullable();
+                $table->unsignedBigInteger('channel_id')->nullable();
+                $table->unsignedBigInteger('zone_id')->nullable();
+                $table->unsignedBigInteger('partner_id')->nullable();
+                $table->unsignedBigInteger('shipping_option_id')->nullable();
+                $table->unsignedBigInteger('coupon_id')->nullable();
+                $table->string('status')->default('pending');
+                $table->string('payment_status')->default('pending');
+                $table->string('payment_method')->nullable();
+                $table->string('payment_reference')->nullable();
+                $table->decimal('subtotal', 12, 2)->default(0);
+                $table->decimal('tax_amount', 12, 2)->default(0);
+                $table->decimal('shipping_amount', 12, 2)->default(0);
+                $table->decimal('discount_amount', 12, 2)->default(0);
+                $table->decimal('total', 12, 2)->default(0);
+                $table->string('currency', 3)->default('EUR');
+                $table->json('billing_address')->nullable();
+                $table->json('shipping_address')->nullable();
+                $table->json('transactions')->nullable();
+                $table->text('notes')->nullable();
+                $table->timestamp('shipped_at')->nullable();
+                $table->timestamp('delivered_at')->nullable();
+                $table->timestamps();
+                $table->softDeletes();
+
+                $table->index(['status', 'created_at'], 'orders_status_created_idx');
+                $table->index(['payment_status', 'created_at'], 'orders_payment_status_created_idx');
+            });
+        }
+
+        if (! $schema->hasTable('order_items')) {
+            $schema->create('order_items', function (Blueprint $table): void {
+                $table->id();
+                $table->foreignId('order_id')->constrained('orders')->cascadeOnDelete();
+                $table->foreignId('product_id')->nullable()->constrained('products')->nullOnDelete();
+                $table->foreignId('product_variant_id')->nullable()->constrained('product_variants')->nullOnDelete();
+                $table->string('name')->nullable();
+                $table->string('sku')->nullable();
+                $table->unsignedInteger('quantity')->default(1);
+                $table->decimal('unit_price', 12, 2)->default(0);
+                $table->decimal('price', 12, 2)->default(0);
+                $table->decimal('total', 12, 2)->default(0);
+                $table->decimal('discount_amount', 12, 2)->nullable();
+                $table->string('status')->nullable();
+                $table->text('notes')->nullable();
+                $table->timestamps();
+
+                $table->index(['order_id', 'product_id'], 'order_items_order_product_idx');
             });
         }
 
