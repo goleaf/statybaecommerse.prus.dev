@@ -5,13 +5,12 @@ declare(strict_types=1);
 namespace Tests\Unit\PHP;
 
 use ArrayObject;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 final class NullSafetyTest extends TestCase
 {
-    /**
-     * @dataProvider countSafetyProvider
-     */
+    #[DataProvider('countSafetyProvider')]
     public function test_count_safety(mixed $value, int $expected): void
     {
         $actual = is_countable($value) ? count($value) : 0;
@@ -34,9 +33,7 @@ final class NullSafetyTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider strposProvider
-     */
+    #[DataProvider('strposProvider')]
     public function test_strpos_haystack_cast(mixed $haystack, string $needle, int|false $expected): void
     {
         $actual = strpos((string) $haystack, $needle);
@@ -56,9 +53,7 @@ final class NullSafetyTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider explodeProvider
-     */
+    #[DataProvider('explodeProvider')]
     public function test_explode_string_cast(string $delimiter, mixed $value, array $expected): void
     {
         $actual = explode($delimiter, (string) $value);
@@ -77,9 +72,7 @@ final class NullSafetyTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider jsonDecodeArrayProvider
-     */
+    #[DataProvider('jsonDecodeArrayProvider')]
     public function test_safe_json_decode_array(mixed $value, array $expected): void
     {
         $actual = safe_json_decode_array($value);
@@ -101,4 +94,3 @@ final class NullSafetyTest extends TestCase
         ];
     }
 }
-

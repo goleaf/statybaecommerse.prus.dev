@@ -17,11 +17,6 @@
             <parameter name="minCoverage" value="70"/>
         </bootstrap>
     </extensions>
-    <coverage>
-        <report>
-            <clover outputFile="storage/app/coverage/clover.xml"/>
-        </report>
-    </coverage>
     <testsuites>
         <testsuite name="Unit">
             <directory suffix="Test.php">tests/Unit</directory>

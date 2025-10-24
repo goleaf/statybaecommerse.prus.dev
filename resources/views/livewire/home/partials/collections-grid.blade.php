@@ -12,7 +12,7 @@
                     default => 'from-slate-600/70 via-slate-700/70 to-slate-800/70',
                 };
             @endphp
-            <a href="{{ route('collections.show', $collection) }}"
+            <a href="{{ route('frontend.collections.show', $collection) }}"
                class="group relative flex w-80 min-w-[20rem] max-w-xs snap-start flex-col overflow-hidden rounded-3xl border border-white/10 bg-white/5 shadow">
                 <div class="relative h-56 w-full overflow-hidden">
                     @if ($image)

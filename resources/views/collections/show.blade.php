@@ -17,7 +17,7 @@
             <li>
                 <div class="flex items-center">
                     <i class="fas fa-chevron-right text-gray-400 mx-1"></i>
-                    <a href="{{ route('collections.index') }}" class="ml-1 text-sm font-medium text-gray-700 hover:text-blue-600 md:ml-2 dark:text-gray-400 dark:hover:text-white">
+                    <a href="{{ route('frontend.collections.index') }}" class="ml-1 text-sm font-medium text-gray-700 hover:text-blue-600 md:ml-2 dark:text-gray-400 dark:hover:text-white">
                         {{ __('collections.title') }}
                     </a>
                 </div>
@@ -214,7 +214,7 @@
                                     </p>
                                 </div>
                                 
-                                <a href="{{ route('collections.show', $relatedCollection) }}" 
+                                <a href="{{ route('frontend.collections.show', $relatedCollection) }}" 
                                    class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
                                     <i class="fas fa-arrow-right"></i>
                                 </a>

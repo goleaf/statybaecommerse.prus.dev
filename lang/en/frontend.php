@@ -378,6 +378,7 @@ return [
         'required' => 'Required',
         'last_updated' => 'Last updated',
         'document_unavailable' => 'This document is currently unavailable. Please contact us for assistance.',
+        'document_under_review' => 'This document is currently under review. Please check back soon.',
         'terms_of_service' => 'Terms & Conditions',
         'privacy_policy' => 'Privacy Policy',
         'cookie_policy' => 'Cookie Policy',

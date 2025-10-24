@@ -64,7 +64,7 @@ final class BrandController extends Controller
         $seoTitle = $brand->getTranslatedSeoTitle() ?: $brand->getTranslatedName().' - '.config('app.name');
         $seoDescription = $brand->getTranslatedSeoDescription() ?: $brand->getTranslatedDescription();
 
-        return view('brands.show', [
+        return view('frontend.brands.show', [
             'brand' => $brand,
             'products' => $products,
             'seoTitle' => $seoTitle,

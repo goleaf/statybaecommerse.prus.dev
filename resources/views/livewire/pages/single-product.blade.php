@@ -27,15 +27,15 @@
             <x-breadcrumbs :items="[
                 [
                     'label' => __('frontend.navigation.products'),
-                    'url' => route('products.index', ['locale' => app()->getLocale()]),
+                    'url' => route('localized.products.index', ['locale' => app()->getLocale()]),
                 ],
                 [
                     'label' => $product->brand?->trans('name') ?? $product->brand?->name,
                     'url' =>
-                        $product->brand && function_exists('route') && Route::has('brands.show')
-                            ? route('brands.show', [
+                        $product->brand && function_exists('route') && Route::has('localized.brands.show')
+                            ? route('localized.brands.show', [
                                 'locale' => app()->getLocale(),
-                                'brand' => $product->brand->trans('slug') ?? $product->brand->slug,
+                                'slug' => $product->brand->trans('slug') ?? $product->brand->slug,
                             ])
                             : null,
                 ],
@@ -60,8 +60,8 @@
                 $reservedQuantity = $inventorySnapshot['reserved'] ?? $product->reservedQuantity();
                 $shortDescription = $product->trans('short_description') ?? $product->short_description;
                 $recentHistories = $this->recentHistories;
-                $contactUrl = Route::has('contact')
-                    ? route('contact', ['locale' => app()->getLocale()])
+                $contactUrl = Route::has('frontend.contact.index')
+                    ? route('frontend.contact.index')
                     : 'mailto:' . (config('mail.from.address') ?? 'info@example.com');
                 $activeStockStatus = $stockStatus ?? 'out_of_stock';
                 $activeStockMessage = $stockMessage ?? '';
@@ -548,7 +548,7 @@
             </div>
 
             <div class="text-center">
-                <a href="{{ route('products.index', ['locale' => app()->getLocale()]) }}"
+                <a href="{{ route('localized.products.index', ['locale' => app()->getLocale()]) }}"
                    class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-5 py-2 text-sm font-medium text-slate-600 hover:border-slate-300 hover:text-slate-900">
                     <x-heroicon-o-arrow-left class="h-4 w-4" />
                     {{ __('frontend.buttons.back_to_products') }}

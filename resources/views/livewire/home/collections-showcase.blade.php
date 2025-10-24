@@ -5,8 +5,8 @@
 
     <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
         @php
-            $collectionsIndexUrl = \Illuminate\Support\Facades\Route::has('collections.index')
-                ? route('collections.index')
+            $collectionsIndexUrl = \Illuminate\Support\Facades\Route::has('frontend.collections.index')
+                ? route('frontend.collections.index')
                 : url('/collections');
         @endphp
 

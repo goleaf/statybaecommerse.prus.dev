@@ -22,7 +22,7 @@ final class BrandController extends Controller
     {
         $data = $this->brandData->index($request->all());
 
-        return view('brands.index', array_merge($data, [
+        return view('frontend.brands.index', array_merge($data, [
             'highlightedBrands' => $this->productData->brandHighlights(12),
             'featuredProducts' => $this->productData->featured(4),
         ]));
@@ -30,6 +30,6 @@ final class BrandController extends Controller
 
     public function show(Brand $brand, Request $request): View
     {
-        return view('brands.show', $this->brandData->show($brand, $request->all()));
+        return view('frontend.brands.show', $this->brandData->show($brand, $request->all()));
     }
 }

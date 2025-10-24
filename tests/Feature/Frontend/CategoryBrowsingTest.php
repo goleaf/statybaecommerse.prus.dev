@@ -23,7 +23,7 @@ final class CategoryBrowsingTest extends TestCase
         $response = $this->get(route('frontend.categories.index'));
 
         $response->assertOk()
-            ->assertViewIs('categories.index')
+            ->assertViewIs('frontend.categories.index')
             ->assertViewHas('categories', function ($categories) use ($visibleCategory, $hiddenCategory) {
                 return $categories->contains('id', $visibleCategory->id)
                     && ! $categories->contains('id', $hiddenCategory->id);
@@ -45,7 +45,7 @@ final class CategoryBrowsingTest extends TestCase
         $response = $this->get(route('frontend.categories.show', $category));
 
         $response->assertOk()
-            ->assertViewIs('categories.show')
+            ->assertViewIs('frontend.categories.show')
             ->assertViewHas('products', function ($paginator) use ($product) {
                 return $paginator->contains('id', $product->id);
             });
@@ -69,7 +69,7 @@ final class CategoryBrowsingTest extends TestCase
         $response = $this->get(route('frontend.categories.show', $category));
 
         $response->assertOk()
-            ->assertViewIs('categories.show')
+            ->assertViewIs('frontend.categories.show')
             ->assertViewHas('products', function ($paginator) {
                 return $paginator->total() === 0;
             });

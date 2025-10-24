@@ -126,8 +126,14 @@ final class FrontendApiControllerTest extends TestCase
         $response->assertOk()
             ->assertJson(fn (AssertableJson $json) => $json
                 ->count(2)
-                ->first(fn (AssertableJson $item) => $item->where('id', $secondProduct->getKey()))
-                ->where('1.id', $firstProduct->getKey())
+                ->first(fn (AssertableJson $item) => $item
+                    ->where('id', $secondProduct->getKey())
+                    ->etc()
+                )
+                ->has('1', fn (AssertableJson $item) => $item
+                    ->where('id', $firstProduct->getKey())
+                    ->etc()
+                )
             );
     }
 }

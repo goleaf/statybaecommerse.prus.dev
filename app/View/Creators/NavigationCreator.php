@@ -67,6 +67,8 @@ final class NavigationCreator
             'products.show',
             'categories.show',
             'brands.show',
+            'frontend.brands.index',
+            'frontend.brands.show',
         ];
 
         return in_array($viewName, $navigationViews) ||

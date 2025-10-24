@@ -682,6 +682,7 @@ return [
         'required' => 'Privalomas',
         'last_updated' => 'Paskutinį kartą atnaujinta',
         'document_unavailable' => 'Šis dokumentas šiuo metu nepasiekiamas. Dėl pagalbos susisiekite su mumis.',
+        'document_under_review' => 'Šis dokumentas šiuo metu peržiūrimas. Patikrinkite vėliau.',
         'terms_of_service' => 'Naudojimo sąlygos',
         'privacy_policy' => 'Privatumo politika',
         'cookie_policy' => 'Slapukų politika',

@@ -45,6 +45,12 @@ return [
     'price'            => 'Price',
     'name'             => 'Name',
     'showing'          => 'Showing',
+    // Cookie consent banner
+    'cookie_prompt_label'       => 'Cookie consent banner',
+    'cookie_prompt_title'       => 'We value your privacy',
+    'cookie_prompt_description' => 'We use cookies to personalize content and analyze our traffic. Learn more in our',
+    'cookie_prompt_reject'      => 'Reject non-essential cookies',
+    'cookie_prompt_accept'      => 'Accept all cookies',
     // Address Types
     'address_type_shipping'             => 'Shipping Address',
     'address_type_billing'              => 'Billing Address',
