@@ -10,7 +10,6 @@ use App\Models\Address;
 use App\Models\City;
 use App\Models\Country;
 use App\Models\User;
-use App\Support\Concerns\HasNav;
 use App\Support\Filament\SearchableInputHelper;
 use App\Support\Search\AddressSearch;
 use App\Support\Search\CustomerSearch;
@@ -18,7 +17,9 @@ use BackedEnum;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
+use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\Select;
@@ -31,10 +32,8 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid as SchemaGrid;
 use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Schemas\Schema;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\QueryBuilder;
 use Filament\Tables\Filters\QueryBuilder\Constraints\DateConstraint;
@@ -43,28 +42,16 @@ use Filament\Tables\Filters\QueryBuilder\Constraints\TextConstraint;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable as SpatieTranslatableResource;
 
-/**
- * AddressResource
- *
- * Filament v4 resource for Address management in the admin panel.
- * Provides comprehensive CRUD operations with advanced filtering, relations, and multilingual support.
- */
 final class AddressResource extends Resource
 {
-    use SpatieTranslatableResource; // Enable locale-aware management for Spatie translatable attributes.
+    use SpatieTranslatableResource;
 
-    protected static ?string $model = Address::class;
-
-    protected static ?int $navigationSort = 3;
-
-    /**
-     * Explicit navigation icon keeps the Address menu visually distinct.
-     */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-map-pin';
+    // Use base class navigation metadata to avoid import/type conflicts.
 
     /**
      * Get navigation label
@@ -72,14 +59,6 @@ final class AddressResource extends Resource
     public static function getNavigationLabel(): string
     {
         return __('admin.navigation.addresses');
-    }
-
-    /**
-     * Get navigation group
-     */
-    public static function getNavigationGroup(): string|\UnitEnum|null
-    {
-        return 'Orders';
     }
 
     /**
@@ -96,6 +75,14 @@ final class AddressResource extends Resource
     public static function getPluralModelLabel(): string
     {
         return __('admin.models.addresses');
+    }
+
+    /**
+     * Get navigation icon
+     */
+    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
+    {
+        return 'heroicon-o-map-pin';
     }
 
     /**
@@ -473,7 +460,7 @@ final class AddressResource extends Resource
                             ->success()
                             ->send();
                     })
-                    ->visible(fn (Address $record) => ! $record->is_default),
+                    ->visible(fn (Address $record): bool => ! $record->is_default),
                 Action::make('duplicate')
                     ->label(__('translations.duplicate'))
                     ->icon('heroicon-o-document-duplicate')
@@ -488,9 +475,9 @@ final class AddressResource extends Resource
                             ->send();
                     }),
                 Action::make('toggle_active')
-                    ->label(fn (Address $record) => $record->is_active ? __('translations.deactivate') : __('translations.activate'))
-                    ->icon(fn (Address $record) => $record->is_active ? 'heroicon-o-x-circle' : 'heroicon-o-check-circle')
-                    ->color(fn (Address $record) => $record->is_active ? 'danger' : 'success')
+                    ->label(fn (Address $record): string|array|null => $record->is_active ? __('translations.deactivate') : __('translations.activate'))
+                    ->icon(fn (Address $record): string => $record->is_active ? 'heroicon-o-x-circle' : 'heroicon-o-check-circle')
+                    ->color(fn (Address $record): string => $record->is_active ? 'danger' : 'success')
                     ->action(function (Address $record): void {
                         $record->update(['is_active' => ! $record->is_active]);
                         Notification::make()
@@ -616,7 +603,7 @@ final class AddressResource extends Resource
     /**
      * Get navigation badge color
      */
-    public static function getNavigationBadgeColor(): string|array|null
+    public static function getNavigationBadgeColor(): string
     {
         $count = self::getModel()::count();
         $activeCount = self::getModel()::where('is_active', true)->count();

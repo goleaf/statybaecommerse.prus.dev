@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Tests\Support;
 
@@ -74,8 +72,8 @@ final class TestingDatabase
 
         $directory = self::resolveDatabaseDirectory();
 
-        if (! is_dir($directory)) {
-            mkdir($directory, 0o755, true);
+        if (!is_dir($directory)) {
+            mkdir($directory, 0755, true);
         }
 
         self::$databasePath = rtrim($directory, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $database;
@@ -107,7 +105,7 @@ final class TestingDatabase
             ?? getenv('TEST_TOKEN')
             ?? null;
 
-        if (! is_string($token) || $token === '') {
+        if (!is_string($token) || $token === '') {
             return null;
         }
 
@@ -125,15 +123,15 @@ final class TestingDatabase
         $databasePath = self::path();
         $directory = dirname($databasePath);
 
-        if (! is_dir($directory)) {
-            mkdir($directory, 0o755, true);
+        if (!is_dir($directory)) {
+            mkdir($directory, 0755, true);
         }
 
-        if (! file_exists($databasePath)) {
+        if (!file_exists($databasePath)) {
             touch($databasePath);
         }
 
-        @chmod($databasePath, 0o666);
+        @chmod($databasePath, 0666);
     }
 
     /**
@@ -154,13 +152,13 @@ final class TestingDatabase
         Config::set('database.connections.sqlite.prefix', '');
         Config::set('telescope.storage.database.connection', 'sqlite');
         Config::set('database.connections.testing', [
-            'driver'                  => 'sqlite',
-            'database'                => $databasePath,
-            'prefix'                  => '',
+            'driver' => 'sqlite',
+            'database' => $databasePath,
+            'prefix' => '',
             'foreign_key_constraints' => true,
-            'journal_mode'            => null,
-            'synchronous'             => null,
-            'busy_timeout'            => 60000,
+            'journal_mode' => null,
+            'synchronous' => null,
+            'busy_timeout' => 60000,
         ]);
         // Force Telescope to use the same SQLite connection so its migrations run without reaching for MySQL.
         Config::set('telescope.storage.database.connection', 'sqlite');
@@ -200,7 +198,7 @@ final class TestingDatabase
             Config::set('telescope.storage.database.connection', 'sqlite');
             // Keep environment variables aligned with the active database path so
             // nested Artisan commands resolve the same connection.
-            putenv('DB_DATABASE='.$databasePath);
+            putenv('DB_DATABASE=' . $databasePath);
             $_ENV['DB_DATABASE'] = $databasePath;
             $_SERVER['DB_DATABASE'] = $databasePath;
 
@@ -216,6 +214,7 @@ final class TestingDatabase
 
                 if ($canRetry) {
                     self::rotateSqliteDatabase();
+
                     continue;
                 }
 
@@ -225,18 +224,18 @@ final class TestingDatabase
             try {
                 Artisan::call('migrate:fresh', [
                     '--database' => 'sqlite',
-                    '--force'    => true,
+                    '--force' => true,
                 ]);
 
                 if (is_dir(base_path('tests/database/migrations'))) {
                     Artisan::call('migrate', [
                         '--database' => 'sqlite',
-                        '--path'     => 'tests/database/migrations',
-                        '--force'    => true,
+                        '--path' => 'tests/database/migrations',
+                        '--force' => true,
                     ]);
                 }
 
-                if (! Schema::connection('sqlite')->hasTable('users')) {
+                if (!Schema::connection('sqlite')->hasTable('users')) {
                     self::provisionFallbackSchema();
                 }
 
@@ -252,6 +251,7 @@ final class TestingDatabase
 
                 if ($canRetry) {
                     self::rotateSqliteDatabase();
+
                     continue;
                 }
 
@@ -306,10 +306,10 @@ final class TestingDatabase
     {
         $message = strtolower($throwable->getMessage());
 
-        return str_contains($message, 'disk i/o')
-            || str_contains($message, 'database disk image is malformed')
-            || str_contains($message, 'attempt to write a readonly database')
-            || str_contains($message, 'database is locked');
+        return str_contains($message, 'disk i/o') ||
+            str_contains($message, 'database disk image is malformed') ||
+            str_contains($message, 'attempt to write a readonly database') ||
+            str_contains($message, 'database is locked');
     }
 
     private static function rotateSqliteDatabase(): void
@@ -322,8 +322,8 @@ final class TestingDatabase
 
         $directory = $basePath . '/database';
 
-        if (! is_dir($directory)) {
-            mkdir($directory, 0o755, true);
+        if (!is_dir($directory)) {
+            mkdir($directory, 0755, true);
         }
 
         self::$databasePath = $directory . '/testing_cli_' . Str::random(12) . '.sqlite';
@@ -374,21 +374,21 @@ final class TestingDatabase
             try {
                 Artisan::call('migrate:fresh', [
                     '--database' => 'sqlite',
-                    '--force'    => true,
+                    '--force' => true,
                 ]);
 
                 if (is_dir(base_path('tests/database/migrations'))) {
                     Artisan::call('migrate', [
                         '--database' => 'sqlite',
-                        '--path'     => 'tests/database/migrations',
-                        '--force'    => true,
+                        '--path' => 'tests/database/migrations',
+                        '--force' => true,
                     ]);
                 }
             } catch (\Throwable $exception) {
                 // Swallow migration exceptions so the manual schema fallback can run.
             }
 
-            if (! Schema::connection('sqlite')->hasTable('users')) {
+            if (!Schema::connection('sqlite')->hasTable('users')) {
                 self::provisionFallbackSchema();
             }
 
@@ -412,7 +412,58 @@ final class TestingDatabase
         $connection = config('database.default', 'sqlite');
         $schema = Schema::connection($connection);
 
-        if (! $schema->hasTable('users')) {
+        if (!$schema->hasTable('shipping_options')) {
+            $schema->create('shipping_options', function (Blueprint $table): void {
+                $table->id();
+                $table->string('name');
+                $table->string('slug')->unique();
+                $table->string('description')->nullable();
+                $table->string('carrier_name')->nullable();
+                $table->string('service_type')->nullable();
+                $table->decimal('price', 12, 2)->nullable();
+                $table->string('currency_code', 3)->default('EUR');
+                $table->foreignId('country_id')->nullable()->constrained('countries')->nullOnDelete();
+                $table->foreignId('city_id')->nullable()->constrained('cities')->nullOnDelete();
+                $table->foreignId('zone_id')->nullable()->constrained('zones')->nullOnDelete();
+                $table->boolean('is_enabled')->default(true);
+                $table->boolean('is_default')->default(false);
+                $table->integer('sort_order')->default(0);
+                $table->integer('min_weight')->nullable();
+                $table->integer('max_weight')->nullable();
+                $table->decimal('min_order_amount', 12, 2)->nullable();
+                $table->decimal('max_order_amount', 12, 2)->nullable();
+                $table->integer('estimated_days_min')->nullable();
+                $table->integer('estimated_days_max')->nullable();
+                $table->json('metadata')->nullable();
+                $table->json('shipping_matrix')->nullable();
+                $table->timestamps();
+                $table->softDeletes();
+
+                $table->index(['is_enabled', 'sort_order']);
+            });
+        }
+
+        if (! $schema->hasTable('customers')) {
+            $schema->create('customers', function (Blueprint $table): void {
+                $table->id();
+                $table->string('name');
+                $table->string('email')->nullable();
+                $table->string('phone')->nullable();
+                $table->string('address')->nullable();
+                $table->string('postal_code')->nullable();
+                $table->foreignId('country_id')->nullable()->constrained('countries')->nullOnDelete();
+                $table->foreignId('city_id')->nullable()->constrained('cities')->nullOnDelete();
+                $table->foreignId('company_id')->nullable()->constrained('companies')->nullOnDelete();
+                $table->boolean('is_active')->default(true);
+                $table->json('metadata')->nullable();
+                $table->timestamps();
+                $table->softDeletes();
+
+                $table->index(['is_active']);
+            });
+        }
+
+        if (!$schema->hasTable('users')) {
             $schema->create('users', function (Blueprint $table): void {
                 $table->id();
                 $table->string('name')->nullable();
@@ -427,7 +478,7 @@ final class TestingDatabase
             });
         }
 
-        if (! $schema->hasTable('system_setting_categories')) {
+        if (!$schema->hasTable('system_setting_categories')) {
             $schema->create('system_setting_categories', function (Blueprint $table): void {
                 $table->id();
                 $table->string('name');
@@ -446,7 +497,7 @@ final class TestingDatabase
             });
         }
 
-        if (! $schema->hasTable('system_settings')) {
+        if (!$schema->hasTable('system_settings')) {
             $schema->create('system_settings', function (Blueprint $table): void {
                 $table->id();
                 $table->unsignedBigInteger('category_id')->nullable();
@@ -495,7 +546,7 @@ final class TestingDatabase
             });
         }
 
-        if (! $schema->hasTable('system_setting_dependencies')) {
+        if (!$schema->hasTable('system_setting_dependencies')) {
             $schema->create('system_setting_dependencies', function (Blueprint $table): void {
                 $table->id();
                 $table->unsignedBigInteger('setting_id');
@@ -510,7 +561,7 @@ final class TestingDatabase
             });
         }
 
-        if (! $schema->hasTable('activity_log')) {
+        if (!$schema->hasTable('activity_log')) {
             $schema->create('activity_log', function (Blueprint $table): void {
                 $table->id();
                 $table->string('log_name')->nullable();
@@ -537,7 +588,7 @@ final class TestingDatabase
             });
         }
 
-        if (! $schema->hasTable('cart_items')) {
+        if (!$schema->hasTable('cart_items')) {
             $schema->create('cart_items', function (Blueprint $table): void {
                 $table->id();
                 $table->string('session_id')->nullable()->index();
@@ -552,7 +603,7 @@ final class TestingDatabase
             });
         }
 
-        if (! $schema->hasTable('products')) {
+        if (!$schema->hasTable('products')) {
             $schema->create('products', function (Blueprint $table): void {
                 $table->id();
                 $table->string('type')->default('simple');
@@ -579,7 +630,7 @@ final class TestingDatabase
             });
         }
 
-        if (! $schema->hasTable('product_variants')) {
+        if (!$schema->hasTable('product_variants')) {
             $schema->create('product_variants', function (Blueprint $table): void {
                 $table->id();
                 $table->foreignId('product_id')->constrained('products')->cascadeOnDelete();
@@ -594,7 +645,7 @@ final class TestingDatabase
             });
         }
 
-        if (! $schema->hasTable('variant_combinations')) {
+        if (!$schema->hasTable('variant_combinations')) {
             $schema->create('variant_combinations', function (Blueprint $table): void {
                 $table->id();
                 $table->foreignId('product_id')->constrained('products')->cascadeOnDelete();
@@ -608,7 +659,7 @@ final class TestingDatabase
             });
         }
 
-        if (! $schema->hasTable('variant_analytics')) {
+        if (!$schema->hasTable('variant_analytics')) {
             $schema->create('variant_analytics', function (Blueprint $table): void {
                 $table->id();
                 $table->foreignId('product_id')->constrained('products')->cascadeOnDelete();
@@ -626,7 +677,7 @@ final class TestingDatabase
             });
         }
 
-        if (! $schema->hasTable('variant_images')) {
+        if (!$schema->hasTable('variant_images')) {
             $schema->create('variant_images', function (Blueprint $table): void {
                 $table->id();
                 $table->foreignId('variant_id')->constrained('product_variants')->cascadeOnDelete();
@@ -646,7 +697,7 @@ final class TestingDatabase
             });
         }
 
-        if (! $schema->hasTable('user_preferences')) {
+        if (!$schema->hasTable('user_preferences')) {
             $schema->create('user_preferences', function (Blueprint $table): void {
                 $table->id();
                 $table->unsignedBigInteger('user_id');
@@ -662,7 +713,7 @@ final class TestingDatabase
             });
         }
 
-        if (! $schema->hasTable('user_product_interactions')) {
+        if (!$schema->hasTable('user_product_interactions')) {
             $schema->create('user_product_interactions', function (Blueprint $table): void {
                 $table->id();
                 $table->unsignedBigInteger('user_id');
@@ -680,16 +731,17 @@ final class TestingDatabase
             });
         }
 
-        if (! $schema->hasTable('orders')) {
+        if (!$schema->hasTable('orders')) {
             $schema->create('orders', function (Blueprint $table): void {
                 $table->id();
                 $table->string('number')->unique();
-                $table->unsignedBigInteger('user_id')->nullable();
-                $table->unsignedBigInteger('channel_id')->nullable();
-                $table->unsignedBigInteger('zone_id')->nullable();
-                $table->unsignedBigInteger('partner_id')->nullable();
-                $table->unsignedBigInteger('shipping_option_id')->nullable();
-                $table->unsignedBigInteger('coupon_id')->nullable();
+                $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
+                $table->foreignId('customer_id')->nullable()->constrained('customers')->nullOnDelete();
+                $table->foreignId('channel_id')->nullable()->constrained('channels')->nullOnDelete();
+                $table->foreignId('zone_id')->nullable()->constrained('zones')->nullOnDelete();
+                $table->foreignId('partner_id')->nullable()->constrained('partners')->nullOnDelete();
+                $table->foreignId('shipping_option_id')->nullable()->constrained('shipping_options')->nullOnDelete();
+                $table->foreignId('coupon_id')->nullable()->constrained('coupons')->nullOnDelete();
                 $table->string('status')->default('pending');
                 $table->string('payment_status')->default('pending');
                 $table->string('payment_method')->nullable();
@@ -714,7 +766,7 @@ final class TestingDatabase
             });
         }
 
-        if (! $schema->hasTable('order_items')) {
+        if (!$schema->hasTable('order_items')) {
             $schema->create('order_items', function (Blueprint $table): void {
                 $table->id();
                 $table->foreignId('order_id')->constrained('orders')->cascadeOnDelete();
@@ -735,7 +787,7 @@ final class TestingDatabase
             });
         }
 
-        if (! $schema->hasTable('system_setting_categories')) {
+        if (!$schema->hasTable('system_setting_categories')) {
             $schema->create('system_setting_categories', function (Blueprint $table): void {
                 $table->id();
                 $table->string('name');
@@ -763,7 +815,7 @@ final class TestingDatabase
             });
         }
 
-        if (! $schema->hasTable('system_settings')) {
+        if (!$schema->hasTable('system_settings')) {
             $schema->create('system_settings', function (Blueprint $table): void {
                 $table->id();
                 $table->unsignedBigInteger('category_id')->nullable();
@@ -813,7 +865,7 @@ final class TestingDatabase
             });
         }
 
-        if (! $schema->hasTable('system_setting_translations')) {
+        if (!$schema->hasTable('system_setting_translations')) {
             $schema->create('system_setting_translations', function (Blueprint $table): void {
                 $table->id();
                 $table->foreignId('system_setting_id')->constrained('system_settings')->cascadeOnDelete();

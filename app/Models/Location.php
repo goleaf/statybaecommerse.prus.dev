@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\City;
+use App\Models\Country;
 use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\EnabledScope;
 use App\Models\Translations\LocationTranslation;
@@ -65,6 +67,11 @@ final class Location extends Model
     public function country(): BelongsTo
     {
         return $this->belongsTo(Country::class, 'country_code', 'cca2');
+    }
+
+    public function city(): BelongsTo
+    {
+        return $this->belongsTo(City::class);
     }
 
     /**

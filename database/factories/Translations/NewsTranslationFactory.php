@@ -16,10 +16,13 @@ final class NewsTranslationFactory extends Factory
 
     public function definition(): array
     {
-        $title = fake()->sentence(3);
+        $locale = fake()->randomElement(['lt', 'en']);
+        $title = $locale === 'lt'
+            ? fake('lt_LT')->sentence(3)
+            : fake('en_US')->sentence(3);
 
         return [
-            'locale' => fake()->randomElement(['lt', 'en']),
+            'locale' => $locale,
             'title' => $title,
             'slug' => str($title)->slug()->toString(),
             'summary' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',

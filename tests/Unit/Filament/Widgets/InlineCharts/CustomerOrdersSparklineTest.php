@@ -24,7 +24,9 @@ final class CustomerOrdersSparklineTest extends TestCase
     {
         CarbonImmutable::setTestNow(CarbonImmutable::create(2024, 6, 15, 12));
 
-        $customer = Customer::factory()->create();
+        $customer = Customer::factory()->create([
+            'email' => 'customer@example.com',
+        ]);
 
         $firstDay = CarbonImmutable::now()->subDays(2)->startOfDay();
         $secondDay = CarbonImmutable::now()->subDay()->startOfDay();

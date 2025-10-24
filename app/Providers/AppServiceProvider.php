@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Providers;
 
 use App\Console\Commands\ProfiledSeedCommand;
-use App\Database\Connectors\GracefulSQLiteConnector;
 use App\Contracts\DocumentServiceContract;
 use App\Contracts\HealthReporter as HealthReporterContract;
+use App\Database\Connectors\GracefulSQLiteConnector;
 use App\Domain\Product\Repositories\ProductRepositoryInterface;
 use App\Filament\Components\LiveNotificationFeed;
 use App\Infrastructure\Product\Repositories\EloquentProductRepository;
@@ -25,8 +25,8 @@ use App\Support\Cache\RateLimiter as ExtendedRateLimiter;
 use App\Support\Filament\SearchableComponentHelper;
 use App\Support\Filesystem\GracefulFilesystem;
 use App\Support\Health\HealthReporter;
-use App\Support\Livewire\Hooks\PropagateValidationExceptionHook;
 use App\Support\Html\HtmlSanitizer;
+use App\Support\Livewire\Hooks\PropagateValidationExceptionHook;
 use App\Support\Security\CspNonce;
 use App\Support\Storage\SecureStorage;
 use App\Support\Tracing\Trace;
@@ -51,11 +51,11 @@ use Filament\Tables\Testing\TestsRecords;
 use Filament\Tables\Testing\TestsSummaries;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Auth\Notifications\VerifyEmail;
+use Illuminate\Cache\RateLimiter as BaseRateLimiter;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Filesystem\Filesystem;
-use Illuminate\Cache\RateLimiter as BaseRateLimiter;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response as HttpResponse;
@@ -71,7 +71,6 @@ use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\RateLimiter;
-use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Vite;
@@ -219,7 +218,7 @@ class AppServiceProvider extends ServiceProvider
         Blade::anonymousComponentNamespace(
             resource_path('views/filament/components'),
             'filament'
-        ); // Expose custom Filament Blade components for anonymous <x-filament::*> usage.
+        );  // Expose custom Filament Blade components for anonymous <x-filament::*> usage.
 
         if (! Testable::hasMacro('assertCanSeeFormData')) {
             Testable::macro('assertCanSeeFormData', function (array $data): Testable {
@@ -401,8 +400,8 @@ class AppServiceProvider extends ServiceProvider
             }
 
             $signature = $apiKey instanceof ApiKey
-                ? 'partner-api:'.$apiKey->getKey()
-                : 'partner-api:anonymous:'.sha1($request->header('X-Api-Key', '').'|'.$request->ip());
+                ? 'partner-api:' . $apiKey->getKey()
+                : 'partner-api:anonymous:' . sha1($request->header('X-Api-Key', '') . '|' . $request->ip());
 
             $limit = $apiKey instanceof ApiKey
                 ? $apiKey->toRateLimit()

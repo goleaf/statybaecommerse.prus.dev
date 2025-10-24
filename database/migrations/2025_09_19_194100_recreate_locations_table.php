@@ -33,6 +33,8 @@ return new class extends Migration
             $table->string('state')->nullable();
             $table->string('postal_code')->nullable();
             $table->string('country_code', 2)->nullable();
+            $table->foreignId('country_id')->nullable()->constrained('countries')->nullOnDelete();
+            $table->foreignId('city_id')->nullable()->constrained('cities')->nullOnDelete();
             $table->string('phone')->nullable();
             $table->string('email')->nullable();
             $table->decimal('latitude', 10, 8)->nullable();
@@ -48,6 +50,7 @@ return new class extends Migration
             $table->index(['is_enabled', 'is_default']);
             $table->index(['type', 'is_enabled']);
             $table->index(['country_code', 'city']);
+            $table->index(['country_id', 'city_id']);
             $table->index('sort_order');
         });
         try {

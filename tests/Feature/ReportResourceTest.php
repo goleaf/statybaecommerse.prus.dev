@@ -6,6 +6,7 @@ namespace Tests\Feature;
 
 use App\Models\Report;
 use App\Models\User;
+use Filament\Notifications\Notification as FilamentNotification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Tests\TestCase;
@@ -34,14 +35,25 @@ class ReportResourceTest extends TestCase
 
     public function test_can_create_report(): void
     {
+        FilamentNotification::fake();
+
         Livewire::test(\App\Filament\Resources\ReportResource\Pages\CreateReport::class)
             ->fillForm([
-                'name' => 'Test Report',
+                'name' => [
+                    'lt' => 'Test Report LT',
+                    'en' => 'Test Report EN',
+                ],
                 'slug' => 'test-report',
                 'type' => 'sales',
                 'category' => 'sales',
-                'description' => 'Test Description',
-                'content' => 'Test Content',
+                'description' => [
+                    'lt' => 'Test Description LT',
+                    'en' => 'Test Description EN',
+                ],
+                'content' => [
+                    'lt' => 'Test Content LT',
+                    'en' => 'Test Content EN',
+                ],
                 'is_active' => true,
                 'is_public' => false,
                 'is_scheduled' => false,
@@ -50,16 +62,22 @@ class ReportResourceTest extends TestCase
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('reports', [
-            'name' => 'Test Report',
             'slug' => 'test-report',
             'type' => 'sales',
             'category' => 'sales',
-            'description' => 'Test Description',
-            'content' => 'Test Content',
             'is_active' => true,
             'is_public' => false,
             'is_scheduled' => false,
         ]);
+
+        $createdReport = Report::query()->where('slug', 'test-report')->firstOrFail();
+
+        expect($createdReport->getTranslation('name', 'lt'))->toBe('Test Report LT');
+        expect($createdReport->getTranslation('name', 'en'))->toBe('Test Report EN');
+        expect($createdReport->getTranslation('description', 'lt'))->toBe('Test Description LT');
+        expect($createdReport->getTranslation('description', 'en'))->toBe('Test Description EN');
+        expect($createdReport->getTranslation('content', 'lt'))->toBe('Test Content LT');
+        expect($createdReport->getTranslation('content', 'en'))->toBe('Test Content EN');
     }
 
     public function test_can_edit_report(): void
@@ -164,6 +182,8 @@ class ReportResourceTest extends TestCase
 
     public function test_can_generate_report_action(): void
     {
+        FilamentNotification::fake();
+
         $report = Report::factory()->create();
 
         Livewire::test(\App\Filament\Resources\ReportResource\Pages\ListReports::class)
@@ -176,6 +196,8 @@ class ReportResourceTest extends TestCase
 
     public function test_can_bulk_generate_reports(): void
     {
+        FilamentNotification::fake();
+
         $reports = Report::factory()->count(3)->create();
 
         Livewire::test(\App\Filament\Resources\ReportResource\Pages\ListReports::class)
@@ -190,6 +212,8 @@ class ReportResourceTest extends TestCase
 
     public function test_can_bulk_activate_reports(): void
     {
+        FilamentNotification::fake();
+
         $reports = Report::factory()->count(3)->create(['is_active' => false]);
 
         Livewire::test(\App\Filament\Resources\ReportResource\Pages\ListReports::class)
@@ -204,6 +228,8 @@ class ReportResourceTest extends TestCase
 
     public function test_can_bulk_deactivate_reports(): void
     {
+        FilamentNotification::fake();
+
         $reports = Report::factory()->count(3)->create(['is_active' => true]);
 
         Livewire::test(\App\Filament\Resources\ReportResource\Pages\ListReports::class)
@@ -218,8 +244,8 @@ class ReportResourceTest extends TestCase
 
     public function test_can_search_reports(): void
     {
-        $report1 = Report::factory()->create(['name' => 'Sales Report']);
-        $report2 = Report::factory()->create(['name' => 'Inventory Report']);
+        $report1 = Report::factory()->create(['name' => ['lt' => 'Pardavimų ataskaita', 'en' => 'Sales Report']]);
+        $report2 = Report::factory()->create(['name' => ['lt' => 'Atsargų ataskaita', 'en' => 'Inventory Report']]);
 
         Livewire::test(\App\Filament\Resources\ReportResource\Pages\ListReports::class)
             ->searchTable('Sales')

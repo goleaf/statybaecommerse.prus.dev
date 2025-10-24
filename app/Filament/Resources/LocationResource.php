@@ -5,16 +5,17 @@ declare(strict_types=1);
 namespace App\Filament\Resources;
 
 
+use App\Models\City;
+use App\Models\Country;
 use App\Support\Concerns\HasNav;
-use Filament\Schemas\Schema;
-use App\Filament\Resources\LocationResource\Pages;
-use App\Models\Location;
+use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
@@ -25,6 +26,7 @@ use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid as SchemaGrid;
 use Filament\Schemas\Components\Section as SchemaSection;
+use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -33,7 +35,6 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
 
 final class LocationResource extends Resource
 {
@@ -86,26 +87,40 @@ final class LocationResource extends Resource
                 ->components([
                     SchemaGrid::make(2)
                         ->components([
-                            Select::make('country_id')
-                                ->label(__('locations.fields.country'))
-                                ->relationship('country', 'name')
+                            Select::make('country_code')
+                                ->label(__('locations.fields.country_code'))
+                                ->options(fn () => Country::withoutGlobalScopes()->orderBy('name')->pluck('name', 'cca2')->toArray())
                                 ->searchable()
                                 ->preload()
-                                ->live()
+                                ->live(onBlur: true)
                                 ->afterStateUpdated(function ($state, Forms\Set $set): void {
-                                    if ($state) {
-                                        $country = Country::find($state);
-                                        if ($country) {
-                                            $set('country_code', $country->code);
-                                        }
-                                    }
+                                    if (! $state) {
+                                        $set('country_id', null);
+                                        $set('city_id', null);
 
-                                    $country = Country::find($state);
-                                    if ($country === null) {
                                         return;
                                     }
 
-                                    $set('country_code', $country->code);
+                                    $country = Country::withoutGlobalScopes()->where('cca2', $state)->first();
+
+                                    if ($country) {
+                                        $set('country_id', $country->getKey());
+                                    }
+
+                                    $set('city_id', null);
+                                    $set('city_code', null);
+                                })
+                                ->afterStateHydrated(function (?string $state, Forms\Set $set): void {
+                                    if (! $state) {
+                                        $set('country_id', null);
+
+                                        return;
+                                    }
+
+                                    $country = Country::withoutGlobalScopes()->where('cca2', $state)->first();
+                                    if ($country) {
+                                        $set('country_id', $country->getKey());
+                                    }
                                 }),
                             Select::make('city_id')
                                 ->label(__('locations.fields.city'))
@@ -114,24 +129,44 @@ final class LocationResource extends Resource
                                 ->preload()
                                 ->live()
                                 ->afterStateUpdated(function ($state, Forms\Set $set): void {
-                                    if ($state) {
-                                        $city = City::find($state);
-                                        if ($city) {
-                                            $set('city_code', $city->code);
-                                        }
+                                    if (! $state) {
+                                        $set('city_code', null);
+
+                                        return;
                                     }
 
-                                    $city = City::find($state);
+                                    $city = City::withoutGlobalScopes()->find($state);
                                     if ($city === null) {
+                                        $set('city_code', null);
+
                                         return;
                                     }
 
                                     $set('city_code', $city->code);
+
+                                    if ($city->country) {
+                                        $set('country_code', $city->country->cca2 ?? $city->country->code);
+                                        $set('country_id', $city->country->getKey());
+                                    }
+                                })
+                                ->afterStateHydrated(function ($state, Forms\Set $set): void {
+                                    if (! $state) {
+                                        $set('city_code', null);
+
+                                        return;
+                                    }
+
+                                    $city = City::withoutGlobalScopes()->find($state);
+                                    if ($city) {
+                                        $set('city_code', $city->code);
+
+                                        if ($city->country) {
+                                            $set('country_code', $city->country->cca2 ?? $city->country->code);
+                                            $set('country_id', $city->country->getKey());
+                                        }
+                                    }
                                 }),
-                            TextInput::make('country_code')
-                                ->label(__('locations.fields.country_code'))
-                                ->maxLength(3)
-                                ->disabled(),
+                            Hidden::make('country_id'),
                             TextInput::make('city_code')
                                 ->label(__('locations.fields.city_code'))
                                 ->maxLength(10)

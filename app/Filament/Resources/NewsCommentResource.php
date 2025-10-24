@@ -4,23 +4,15 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use App\Support\Concerns\HasNav;
-use Filament\Schemas\Schema;
 use App\Filament\Resources\NewsCommentResource\Pages;
+use App\Models\News;
 use App\Models\NewsComment;
 use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\ApprovedScope;
 use App\Models\Scopes\VisibleScope;
+use App\Models\Scopes\PublishedScope;
+use App\Support\Concerns\HasNav;
 use BackedEnum;
-use Filament\Schemas\Components\Grid as SchemaGrid;
-use Filament\Schemas\Components\Section as SchemaSection;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
-use Filament\Forms\Get;
-use Filament\Resources\Resource;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
@@ -28,6 +20,15 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
+use Filament\Forms\Get;
+use Filament\Resources\Resource;
+use Filament\Schemas\Components\Grid as SchemaGrid;
+use Filament\Schemas\Components\Section as SchemaSection;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -41,12 +42,14 @@ final class NewsCommentResource extends Resource
 {
     use HasNav;
 
+    protected static ?string $model = NewsComment::class;
+
     /**
      * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
      */
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-chat-bubble-left-ellipsis';
 
-    public static function getNavigationGroup(): \UnitEnum|string|null
+    public static function getNavigationGroup(): UnitEnum|string|null
     {
         return 'Content';
     }
@@ -68,7 +71,7 @@ final class NewsCommentResource extends Resource
         return __('admin.news_comments.model_label');
     }
 
-    public static function form(Schema $schema): Schema   
+    public static function form(Schema $schema): Schema
     {
         return $schema->schema([
             SchemaSection::make(__('admin.news_comments.basic_information'))
@@ -78,15 +81,9 @@ final class NewsCommentResource extends Resource
                         ->schema([
                             Select::make('news_id')
                                 ->label(__('admin.news_comments.news'))
-                                ->relationship(
-                                    name: 'news',
-                                    titleAttribute: 'title',
-                                    modifyQueryUsing: fn (Builder $query): Builder => $query->withoutGlobalScopes([
-                                        ActiveScope::class,
-                                        ApprovedScope::class,
-                                        VisibleScope::class,
-                                    ])
-                                )
+                                ->options(fn (): array => self::getNewsOptions())
+                                ->getSearchResultsUsing(fn (string $search): array => self::getNewsOptions($search))
+                                ->getOptionLabelUsing(fn (?int $value): ?string => self::resolveNewsOptionLabel($value))
                                 ->required()
                                 ->searchable()
                                 ->preload()
@@ -100,20 +97,16 @@ final class NewsCommentResource extends Resource
                                         return [];
                                     }
 
-                                    $query = NewsComment::query()
+                                    return NewsComment::query()
                                         ->withoutGlobalScopes([
                                             ActiveScope::class,
                                             ApprovedScope::class,
                                             VisibleScope::class,
                                         ])
                                         ->where('news_id', $newsId)
-                                        ->orderBy('created_at');
-
-                                    if ($record?->exists) {
-                                        $query->whereKeyNot($record->getKey());
-                                    }
-
-                                    return $query->pluck('author_name', 'id')->all();
+                                        ->orderBy('created_at')
+                                        ->pluck('author_name', 'id')
+                                        ->all();
                                 })
                                 ->searchable()
                                 ->preload()
@@ -149,7 +142,7 @@ final class NewsCommentResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         // Configure the table definition for the streamlined Filament v4 return type.
         return $table
@@ -211,15 +204,7 @@ final class NewsCommentResource extends Resource
             ->filters([
                 SelectFilter::make('news_id')
                     ->label(__('admin.news_comments.news'))
-                    ->relationship(
-                        'news',
-                        'title',
-                        modifyQueryUsing: fn (Builder $query): Builder => $query->withoutGlobalScopes([
-                            ActiveScope::class,
-                            ApprovedScope::class,
-                            VisibleScope::class,
-                        ])
-                    )
+                    ->options(fn (): array => self::getNewsOptions())
                     ->searchable()
                     ->preload(),
                 TernaryFilter::make('is_approved')
@@ -312,5 +297,46 @@ final class NewsCommentResource extends Resource
             'view'   => Pages\ViewNewsComment::route('/{record}'),
             'edit'   => Pages\EditNewsComment::route('/{record}/edit'),
         ];
+    }
+
+    private static function getNewsOptions(?string $search = null, int $limit = 50): array
+    {
+        $query = self::newsQuery()
+            ->latest('published_at')
+            ->limit($limit);
+
+        if ($search !== null && $search !== '') {
+            $query->where(function (Builder $builder) use ($search): void {
+                $builder->whereHas('translations', function (Builder $translationQuery) use ($search): void {
+                    $translationQuery->where('title', 'like', "%{$search}%");
+                });
+            });
+        }
+
+        return $query
+            ->get()
+            ->mapWithKeys(fn (News $news): array => [$news->getKey() => $news->title])
+            ->all();
+    }
+
+    private static function resolveNewsOptionLabel(?int $value): ?string
+    {
+        if ($value === null) {
+            return null;
+        }
+
+        return self::newsQuery()->find($value)?->title;
+    }
+
+    private static function newsQuery(): Builder
+    {
+        return News::query()
+            ->withoutGlobalScopes([
+                ActiveScope::class,
+                ApprovedScope::class,
+                VisibleScope::class,
+                PublishedScope::class,
+            ])
+            ->with('translations');
     }
 }

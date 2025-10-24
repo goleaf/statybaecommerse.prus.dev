@@ -834,7 +834,6 @@ This codebase delivers a production‑grade, Filament‑powered e‑commerce pla
 ### Filament v4
 - Architecture
   - Keep heavy logic in services; resources focus on forms/tables/actions
-  - Use navigation groups/enums for consistent grouping (`App\Enums\NavigationGroup`)
   - Prefer typed closures and early returns; avoid deep nesting in resource configs
 - Tables
   - Tune `searchDebounce('750ms')` to reduce query load on large datasets

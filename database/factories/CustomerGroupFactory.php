@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Database\Factories;
 
@@ -47,6 +45,20 @@ final class CustomerGroupFactory extends Factory
             ];
         }
 
+        if (isset($attributes['name']) && is_string($attributes['name'])) {
+            $attributes['name'] = [
+                'lt' => $attributes['name'],
+                'en' => $attributes['name'],
+            ];
+        }
+
+        if (isset($attributes['description']) && is_string($attributes['description'])) {
+            $attributes['description'] = [
+                'lt' => $attributes['description'],
+                'en' => $attributes['description'],
+            ];
+        }
+
         return $attributes;
     }
 
@@ -55,8 +67,8 @@ final class CustomerGroupFactory extends Factory
      */
     public function active(): static
     {
-        return $this->state(fn (array $attributes) => [
-            'is_active'  => true,
+        return $this->state(fn(array $attributes) => [
+            'is_active' => true,
             'is_enabled' => true,
         ]);
     }
@@ -66,8 +78,8 @@ final class CustomerGroupFactory extends Factory
      */
     public function inactive(): static
     {
-        return $this->state(fn (array $attributes) => [
-            'is_active'  => false,
+        return $this->state(fn(array $attributes) => [
+            'is_active' => false,
             'is_enabled' => false,
         ]);
     }
@@ -77,9 +89,9 @@ final class CustomerGroupFactory extends Factory
      */
     public function default(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'is_default' => true,
-            'is_active'  => true,
+            'is_active' => true,
             'is_enabled' => true,
         ]);
     }

@@ -1,9 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Factories;
 
 use App\Models\City;
 use App\Models\Country;
+use App\Models\Zone;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -22,29 +25,31 @@ class ShippingOptionFactory extends Factory
         $services = ['Standard', 'Express', 'Overnight', 'Economy', 'Priority'];
         $carrier = fake()->randomElement($carriers);
         $service = fake()->randomElement($services);
+        $zone = Zone::factory();
         $country = Country::factory();
 
         return [
-            'name' => $carrier.' '.$service,
-            'slug' => fake()->unique()->slug(2),
-            'description' => fake()->sentence(),
-            'carrier_name' => $carrier,
-            'service_type' => $service,
-            'price' => fake()->randomFloat(2, 5, 50),
-            'currency_code' => 'EUR',
-            'country_id' => $country,
-            'city_id' => City::factory()->for($country),
-            'is_enabled' => true,
-            'is_default' => false,
-            'sort_order' => fake()->numberBetween(0, 100),
-            'min_weight' => fake()->optional(0.3)->numberBetween(0, 5),
-            'max_weight' => fake()->optional(0.3)->numberBetween(10, 100),
-            'min_order_amount' => fake()->optional(0.2)->randomFloat(2, 0, 50),
-            'max_order_amount' => fake()->optional(0.2)->randomFloat(2, 100, 1000),
+            'name'               => $carrier . ' ' . $service,
+            'slug'               => fake()->unique()->slug(2),
+            'description'        => fake()->sentence(),
+            'carrier_name'       => $carrier,
+            'service_type'       => $service,
+            'price'              => fake()->randomFloat(2, 5, 50),
+            'currency_code'      => 'EUR',
+            'country_id'         => $country,
+            'city_id'            => City::factory()->for($country),
+            'zone_id'            => $zone,
+            'is_enabled'         => true,
+            'is_default'         => false,
+            'sort_order'         => fake()->numberBetween(0, 100),
+            'min_weight'         => fake()->optional(0.3)->numberBetween(0, 5),
+            'max_weight'         => fake()->optional(0.3)->numberBetween(10, 100),
+            'min_order_amount'   => fake()->optional(0.2)->randomFloat(2, 0, 50),
+            'max_order_amount'   => fake()->optional(0.2)->randomFloat(2, 100, 1000),
             'estimated_days_min' => fake()->numberBetween(1, 3),
             'estimated_days_max' => fake()->numberBetween(3, 7),
-            'metadata' => null,
-            'shipping_matrix' => [],
+            'metadata'           => null,
+            'shipping_matrix'    => [],
         ];
     }
 
@@ -73,8 +78,8 @@ class ShippingOptionFactory extends Factory
     public function free(): static
     {
         return $this->state(fn (array $attributes) => [
-            'price' => 0,
-            'name' => 'Free Shipping',
+            'price'        => 0,
+            'name'         => 'Free Shipping',
             'carrier_name' => 'Standard',
             'service_type' => 'Free',
         ]);

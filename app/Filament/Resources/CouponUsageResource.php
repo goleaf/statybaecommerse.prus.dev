@@ -4,34 +4,33 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use App\Support\Concerns\HasNav;
-// Import shared helper to keep searchable inputs consistent with repository conventions.
-use App\Support\Filament\SearchableInputHelper;
-use Filament\Schemas\Schema;
 use App\Filament\Resources\CouponUsageResource\Pages;
+// Import shared helper to keep searchable inputs consistent with repository conventions.
 use App\Models\Coupon;
 use App\Models\CouponUsage;
 use App\Models\User;
+use App\Support\Concerns\HasNav;
 use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
+use App\Support\Filament\SearchableInputHelper;
 use App\Support\Search\CouponSearch;
 use App\Support\Search\CustomerSearch;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
-use Filament\Infolists\Components\KeyValueEntry;
-use Filament\Infolists\Components\TextEntry;
-// Alias schema grid to match Filament v4 schema-based layouts in the resource.
-use Filament\Schemas\Components\Grid as SchemaGrid;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Placeholder;
-use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Forms\Components\Select;
-use Filament\Schemas\Components\Tabs as SchemaTabs;
-use Filament\Schemas\Components\Tabs\Tab as SchemaTab;
+// Alias schema grid to match Filament v4 schema-based layouts in the resource.
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Set;
+use Filament\Infolists\Components\KeyValueEntry;
+use Filament\Infolists\Components\TextEntry;
 use Filament\Notifications\Notification as FilamentNotification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Grid as SchemaGrid;
+use Filament\Schemas\Components\Section as SchemaSection;
+use Filament\Schemas\Components\Tabs as SchemaTabs;
+use Filament\Schemas\Components\Tabs\Tab as SchemaTab;
+use Filament\Schemas\Schema;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Actions\BulkActionGroup;
@@ -66,7 +65,7 @@ final class CouponUsageResource extends Resource
         return __('admin.coupon_usages.single');
     }
 
-    public static function form(Schema $schema): Schema   
+    public static function form(Schema $schema): Schema
     {
         return $schema->components([
             SchemaTabs::make('coupon_usage_tabs')
@@ -206,7 +205,7 @@ final class CouponUsageResource extends Resource
         ]);
     }
 
-    public static function infolist(Schema $schema): Schema   
+    public static function infolist(Schema $schema): Schema
     {
         return $schema->schema([
             SchemaSection::make(__('admin.coupon_usages.form.sections.basic_information'))
@@ -254,7 +253,7 @@ final class CouponUsageResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         // Configure the table definition for the streamlined Filament v4 return type.
         return $table

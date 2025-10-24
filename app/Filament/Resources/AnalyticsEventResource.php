@@ -4,25 +4,18 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Enums\NavigationGroup;
 use App\Filament\Resources\AnalyticsEventResource\Pages;
 use App\Models\AnalyticsEvent;
 use App\Models\User;
 use App\Support\Concerns\HasNav;
-use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
-// Align the bulk action group import with the core Actions namespace introduced in Filament v4.
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
-// Use the action-level delete bulk action to stay consistent with the updated Filament contracts.
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\KeyValue;
-use Filament\Schemas\Schema;
-use Filament\Schemas\Components\Grid as SchemaGrid;
-use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -30,6 +23,9 @@ use Filament\Forms\Components\Toggle;
 use Filament\Forms\Set;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Grid as SchemaGrid;
+use Filament\Schemas\Components\Section as SchemaSection;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -45,12 +41,7 @@ final class AnalyticsEventResource extends Resource
 
     protected static ?int $navigationSort = 1;
 
-    /**
-     * Mirror the Filament base definitions so navigation metadata remains discoverable via the Nav registry.
-     */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar-square';
-
-    protected static \UnitEnum|string|null $navigationGroup = NavigationGroup::Analytics->value;
+    // Rely on base Resource navigation metadata to avoid type/import conflicts.
 
     /**
      * Handle getPluralModelLabel functionality with proper error handling.

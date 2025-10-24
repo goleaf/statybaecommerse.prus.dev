@@ -4,29 +4,28 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Enums\NavigationGroup as AppNavigationGroup;
 use App\Filament\Resources\ActivityLogResource\Pages;
 use App\Models\ActivityLog;
 use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
 use App\Support\Filament\Filters\DateRangeFilter;
+use App\Support\Nav;
 use BackedEnum;
 use Filament\Actions\Action;
-use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use UnitEnum;
 
 final class ActivityLogResource extends Resource
 {
     protected static ?string $model = ActivityLog::class;
-    /**
-     * Use the explicit union type required by Filament v4 so the resource remains compatible with the
-     * framework's typed base property while still documenting the accepted icon formats.
-     */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-document-text';
 
     protected static ?int $navigationSort = 9;
 
@@ -38,9 +37,16 @@ final class ActivityLogResource extends Resource
 
     protected static ?string $pluralModelLabel = null;
 
-    public static function getNavigationGroup(): string
+    protected static BackedEnum|string|null $navigationIcon = null;
+
+    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
     {
-        return __('navigation.groups.system');
+        return Nav::iconForResource(self::class) ?? self::$navigationIcon;
+    }
+
+    public static function getNavigationGroup(): UnitEnum|string|null
+    {
+        return Nav::groupForResource(self::class) ?? AppNavigationGroup::System;
     }
 
     public static function getNavigationLabel(): string
@@ -63,12 +69,8 @@ final class ActivityLogResource extends Resource
         return $schema->schema([]);
     }
 
-    /**
-     * Configure the table that lists activity log records along with filters and actions.
-     */
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
-        // Configure the table definition for the streamlined Filament v4 return type.
         return $table
             ->columns([
                 TextColumn::make('id')
@@ -87,7 +89,7 @@ final class ActivityLogResource extends Resource
                     ->sortable(),
                 TextColumn::make('subject_type')
                     ->label(__('Subject Type'))
-                    ->formatStateUsing(fn ($state) => class_basename((string) $state))
+                    ->formatStateUsing(fn ($state): string => class_basename((string) $state))
                     ->sortable(),
                 TextColumn::make('event')
                     ->label(__('Event'))
@@ -105,7 +107,7 @@ final class ActivityLogResource extends Resource
                     ->label(__('Subject Type'))
                     ->options(fn (): array => self::getDistinctFilterOptions('subject_type')),
                 Filter::make('created_at')
-                    ->label(__('Created At')) // Make the filter caption explicit for the table header chips.
+                    ->label(__('Created At'))
                     ->form([
                         SupportFlatpickr::makeRange('range', withTime: false, displayFormat: 'Y-m-d', format: 'Y-m-d'),
                     ])
@@ -118,9 +120,9 @@ final class ActivityLogResource extends Resource
             ->actions([
                 Action::make('view_details')
                     ->label(__('View details'))
-                    ->modalHeading(fn(ActivityLog $record) => (string) ($record->description ?? __('Activity details')))
-                    ->modalSubheading(fn(ActivityLog $record) => (string) ($record->causer?->name ?? __('System')))
-                    ->modalContent(fn(ActivityLog $record) => view(
+                    ->modalHeading(fn (ActivityLog $record): string => (string) ($record->description ?? __('Activity details')))
+                    ->modalSubheading(fn (ActivityLog $record): string => (string) ($record->causer?->name ?? __('System')))
+                    ->modalContent(fn (ActivityLog $record): \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View => view(
                         'filament.resources.activity-log-resource.components.activity-details',
                         ['activity' => $record->loadMissing('causer', 'subject')]
                     ))
@@ -129,11 +131,6 @@ final class ActivityLogResource extends Resource
             ->defaultSort('created_at', 'desc');
     }
 
-    /**
-     * Resolve distinct column values so select filters populate with real activity log data.
-     *
-     * @return array<string, string>
-     */
     protected static function getDistinctFilterOptions(string $column): array
     {
         $values = ActivityLog::query()
@@ -142,7 +139,7 @@ final class ActivityLogResource extends Resource
             ->whereNotNull($column)
             ->orderBy($column)
             ->pluck($column)
-            ->filter(static fn ($value) => $value !== '');
+            ->filter(static fn ($value): bool => $value !== '');
 
         if ($column === 'subject_type') {
             return $values
