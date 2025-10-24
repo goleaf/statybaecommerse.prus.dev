@@ -49,7 +49,7 @@ final class CampaignFactory extends Factory
 
                 return \App\Models\Channel::factory();
             },
-            'zone_id'   => null,
+            'country_id'   => null,
             'status'    => 'active',
             'metadata'  => [
                 'source' => $this->faker->randomElement(['manual', 'automated', 'imported']),
