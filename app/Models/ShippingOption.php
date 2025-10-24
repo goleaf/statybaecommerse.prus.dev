@@ -37,7 +37,8 @@ final class ShippingOption extends Model
         'service_type',
         'price',
         'currency_code',
-        'zone_id',
+        'country_id',
+        'city_id',
         'is_enabled',
         'is_default',
         'sort_order',
@@ -49,7 +50,6 @@ final class ShippingOption extends Model
         'estimated_days_max',
         'metadata',
         'shipping_matrix',
-        'zone_id',
     ];
 
     protected function casts(): array
@@ -88,26 +88,37 @@ final class ShippingOption extends Model
     }
 
     /**
-     * Provide direct access to the owning zone relationship.
+     * Provide direct access to the owning country relationship.
      *
-     * @return BelongsTo<Zone, static>
+     * @return BelongsTo<Country, static>
      *
-     * @phpstan-return BelongsTo<Zone, ShippingOption>
+     * @phpstan-return BelongsTo<Country, ShippingOption>
      */
-    public function zone(): BelongsTo
+    public function country(): BelongsTo
     {
         // Expose the relation used across factories, seeds, and API resources.
-        /** @var BelongsTo<Zone, ShippingOption> $relation */
-        $relation = $this->belongsTo(Zone::class);
+        /** @var BelongsTo<Country, ShippingOption> $relation */
+        $relation = $this->belongsTo(Country::class);
 
         return $relation;
     }
 
     /**
-     * Handle zone functionality with proper error handling.
+     * Provide direct access to the optional city relationship used for granular availability rules.
      *
-     * @phpstan-return BelongsTo<Zone, ShippingOption>
+     * @return BelongsTo<City, static>
+     *
+     * @phpstan-return BelongsTo<City, ShippingOption>
      */
+    public function city(): BelongsTo
+    {
+        // Enable downstream forms to reactively bind the chosen city when present.
+        /** @var BelongsTo<City, ShippingOption> $relation */
+        $relation = $this->belongsTo(City::class);
+
+        return $relation;
+    }
+
     /**
      * Handle scopeEnabled functionality with proper error handling.
      *
@@ -147,20 +158,28 @@ final class ShippingOption extends Model
         return $query->where('carrier_name', $carrier);
     }
 
-    public function scopeByZone(Builder $query, int|string $zoneId): Builder
-    {
-        return $query->where('zone_id', $zoneId);
-    }
-
     /**
-     * Scope shipping options by zone while tolerating null filters.
-     */
-    /**
-     * Handle scopeByZone functionality with proper error handling.
+     * Filter shipping options by the owning country identifier.
      *
      * @param  Builder<self> $query
      * @return Builder<self>
      */
+    public function scopeByCountry(Builder $query, int|string $countryId): Builder
+    {
+        return $query->where('country_id', $countryId);
+    }
+
+    /**
+     * Filter shipping options by the optional city identifier whenever needed.
+     *
+     * @param  Builder<self> $query
+     * @return Builder<self>
+     */
+    public function scopeByCity(Builder $query, int|string $cityId): Builder
+    {
+        return $query->where('city_id', $cityId);
+    }
+
     /**
      * Handle scopeOrdered functionality with proper error handling.
      *
