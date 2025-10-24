@@ -78,6 +78,13 @@ return [
             'description' => 'Aprašymas',
             'help_text' => 'Pagalbos tekstas',
             'help_text_help' => 'Papildoma informacija, rodoma administravimo sąsajoje',
+            'locales' => [
+                'lt' => 'Lietuvių',
+                'en' => 'Anglų',
+                'de' => 'Vokiečių',
+                'fr' => 'Prancūzų',
+                'es' => 'Ispanų',
+            ],
         ],
     ],
     'user_product_interactions' => [

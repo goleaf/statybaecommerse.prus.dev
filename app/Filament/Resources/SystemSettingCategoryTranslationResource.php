@@ -33,14 +33,14 @@ final class SystemSettingCategoryTranslationResource extends Resource
     protected static ?string $model = \App\Models\SystemSettingCategoryTranslation::class;
 
     /**
-     * @var UnitEnum|string|null
+     * @var BackedEnum|string|null
      */
-    protected static $navigationIcon = 'heroicon-o-language';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-language';
 
     /**
      * @var UnitEnum|string|null
      */
-    protected static $navigationGroup = 'Settings';
+    protected static UnitEnum|string|null $navigationGroup = 'Settings';
 
     protected static bool $shouldRegisterNavigation = false;
 
