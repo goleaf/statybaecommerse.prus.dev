@@ -248,6 +248,123 @@ final class AutocompleteService
     }
 
     /**
+     * @param  array<string, mixed>  $filters
+     * @return array{brand_id: int|null, category_id: int|null}
+     */
+    private function normaliseProductContext(array $filters): array
+    {
+        $brand = $filters['brand'] ?? $filters['brand_id'] ?? null;
+        $category = $filters['category'] ?? $filters['category_id'] ?? null;
+
+        return [
+            'brand_id' => $this->resolveBrandIdentifier($brand),
+            'category_id' => $this->resolveCategoryIdentifier($category),
+        ];
+    }
+
+    /**
+     * @param  array{brand_id: int|null, category_id: int|null}  $context
+     */
+    private function popularSuggestionsCacheKey(int $limit, array $context): string
+    {
+        $serialised = json_encode($context);
+
+        return sprintf(
+            'autocomplete:popular:%d:%s',
+            $limit,
+            $serialised !== false ? md5($serialised) : md5('context-null')
+        );
+    }
+
+    /**
+     * @param  array{brand_id: int|null, category_id: int|null}  $context
+     */
+    private function applyProductContextFilters(Builder $query, array $context): void
+    {
+        if ($context['brand_id'] !== null) {
+            $query->where('brand_id', $context['brand_id']);
+        }
+
+        if ($context['category_id'] !== null) {
+            $query->whereHas('categories', static function (Builder $builder) use ($context): void {
+                $builder->where('categories.id', $context['category_id']);
+            });
+        }
+    }
+
+    private function resolveBrandIdentifier(mixed $brand): ?int
+    {
+        if ($brand instanceof Brand) {
+            return $brand->getKey();
+        }
+
+        if ($brand === null || $brand === '') {
+            return null;
+        }
+
+        if (is_int($brand)) {
+            return $brand;
+        }
+
+        if (is_string($brand) && ctype_digit($brand)) {
+            return (int) $brand;
+        }
+
+        if (is_scalar($brand)) {
+            $slug = (string) $brand;
+
+            $brandId = Brand::query()
+                ->where(static function (Builder $builder) use ($slug): void {
+                    $builder->where('slug', $slug)
+                        ->orWhereHas('translations', static function (Builder $translationQuery) use ($slug): void {
+                            $translationQuery->where('slug', $slug);
+                        });
+                })
+                ->value('id');
+
+            return $brandId !== null ? (int) $brandId : null;
+        }
+
+        return null;
+    }
+
+    private function resolveCategoryIdentifier(mixed $category): ?int
+    {
+        if ($category instanceof Category) {
+            return $category->getKey();
+        }
+
+        if ($category === null || $category === '') {
+            return null;
+        }
+
+        if (is_int($category)) {
+            return $category;
+        }
+
+        if (is_string($category) && ctype_digit($category)) {
+            return (int) $category;
+        }
+
+        if (is_scalar($category)) {
+            $slug = (string) $category;
+
+            $categoryId = Category::query()
+                ->where(static function (Builder $builder) use ($slug): void {
+                    $builder->where('slug', $slug)
+                        ->orWhereHas('translations', static function (Builder $translationQuery) use ($slug): void {
+                            $translationQuery->where('slug', $slug);
+                        });
+                })
+                ->value('id');
+
+            return $categoryId !== null ? (int) $categoryId : null;
+        }
+
+        return null;
+    }
+
+    /**
      * Recently searched terms are scoped per user (or guest).
      *
      * @return array<int, array<string, mixed>>
