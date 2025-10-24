@@ -1,17 +1,17 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Models;
 
 use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\EnabledScope;
 use App\Models\Scopes\VisibleScope;
+use Database\Factories\VariantCombinationFactory;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
-use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
@@ -19,21 +19,30 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  *
  * Eloquent model representing the VariantCombination entity for managing variant combinations.
  *
- * @property mixed $table
- * @property mixed $fillable
- * @property mixed $casts
- * @property mixed $appends
+ * @property int                             $id
+ * @property int                             $product_id
+ * @property array<string, mixed>            $attribute_combinations
+ * @property string                          $combination_hash
+ * @property bool                            $is_available
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @property-read string $formatted_combinations
+ * @property-read bool $is_valid_combination
  *
  * @method static \Illuminate\Database\Eloquent\Builder|VariantCombination newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|VariantCombination newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|VariantCombination query()
+ * @method static VariantCombinationFactory                                factory($count = null, $state = [])
  *
  * @mixin \Eloquent
  */
 #[ScopedBy([ActiveScope::class, EnabledScope::class])]
 final class VariantCombination extends Model
 {
-    use HasFactory, SoftDeletes;
+    /** @use HasFactory<VariantCombinationFactory> */
+    use HasFactory;
+    use SoftDeletes;
 
     protected $table = 'variant_combinations';
 
@@ -54,22 +63,22 @@ final class VariantCombination extends Model
     protected static function booted(): void
     {
         // Always compute the deterministic hash before storing the model to the database.
-        static::saving(static function (VariantCombination $combination): void {
-            if (! is_array($combination->attribute_combinations)) {
-                $combination->attribute_combinations = $combination->attribute_combinations === null
-                    ? []
-                    : (array) $combination->attribute_combinations;
+        self::saving(static function (VariantCombination $combination): void {
+            /** @var array<string, mixed>|null $combinations */
+            $combinations = $combination->attribute_combinations;
+
+            if (!is_array($combinations)) {
+                $combinations = [];
             }
 
-            if (is_array($combination->attribute_combinations)) {
-                $combination->attribute_combinations = self::normaliseCombination($combination->attribute_combinations);
-            }
+            $normalized = self::normaliseCombination($combinations);
+            $combination->setAttribute('attribute_combinations', $normalized);
 
             $combination->combination_hash = $combination->generateDeterministicHash();
         });
 
         // Ensure retrieved models are cached for strict, model-aware comparisons in tests.
-        static::retrieved(static function (VariantCombination $combination): void {
+        self::retrieved(static function (VariantCombination $combination): void {
             $combination->storeInCache();
         });
 
@@ -78,9 +87,9 @@ final class VariantCombination extends Model
             $combination->refreshCache();
         };
 
-        static::saved($flushCallback);
-        static::deleted($flushCallback);
-        static::restored($flushCallback);
+        self::saved($flushCallback);
+        self::deleted($flushCallback);
+        self::restored($flushCallback);
     }
 
     protected function casts(): array
@@ -99,6 +108,8 @@ final class VariantCombination extends Model
 
     /**
      * Handle product functionality with proper error handling.
+     *
+     * @return BelongsTo<Product, $this>
      */
     public function product(): BelongsTo
     {
@@ -110,13 +121,15 @@ final class VariantCombination extends Model
      */
     public function getFormattedCombinationsAttribute(): string
     {
-        if (! $this->attribute_combinations) {
+        $combinations = $this->attribute_combinations;
+
+        if ($combinations === []) {
             return 'No combinations';
         }
 
         $formatted = [];
-        foreach ($this->attribute_combinations as $attribute => $value) {
-            $formatted[] = ucfirst($attribute).': '.$value;
+        foreach ($combinations as $attribute => $value) {
+            $formatted[] = ucfirst((string) $attribute) . ': ' . (is_scalar($value) ? (string) $value : 'N/A');
         }
 
         return implode(', ', $formatted);
@@ -127,7 +140,7 @@ final class VariantCombination extends Model
      */
     public function getCombinationHashAttribute(): string
     {
-        if (! $this->attribute_combinations) {
+        if (!$this->attribute_combinations) {
             // Reuse the deterministic fallback so that attribute-less payloads remain consistent across requests.
             return $this->deterministicFallbackHash();
         }
@@ -140,18 +153,30 @@ final class VariantCombination extends Model
      */
     public function getIsValidCombinationAttribute(): bool
     {
-        if (! is_array($this->attribute_combinations) || $this->attribute_combinations === [] || ! $this->product) {
+        $combinations = $this->attribute_combinations;
+
+        if ($combinations === []) {
+            return false;
+        }
+
+        if (!$this->relationLoaded('product') && !$this->product_id) {
+            return false;
+        }
+
+        $product = $this->relationLoaded('product') ? $this->product : Product::find($this->product_id);
+
+        if (!$product) {
             return false;
         }
 
         // Check if all attributes exist for this product
-        $productAttributes = $this->product
+        $productAttributes = $product
             ->attributes()
             ->pluck('name')
             ->all();
 
-        foreach ($this->attribute_combinations as $attributeName => $value) {
-            if (! in_array($attributeName, $productAttributes, true)) {
+        foreach ($combinations as $attributeName => $value) {
+            if (!in_array($attributeName, $productAttributes, true)) {
                 return false;
             }
         }
@@ -162,9 +187,10 @@ final class VariantCombination extends Model
     /**
      * Handle scopeAvailable functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param  Builder<self> $query
+     * @return Builder<self>
      */
-    public function scopeAvailable($query)
+    public function scopeAvailable(Builder $query): Builder
     {
         return $query->where('is_available', true);
     }
@@ -172,9 +198,10 @@ final class VariantCombination extends Model
     /**
      * Handle scopeByProduct functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param  Builder<self> $query
+     * @return Builder<self>
      */
-    public function scopeByProduct($query, int $productId)
+    public function scopeByProduct(Builder $query, int $productId): Builder
     {
         return $query->where('product_id', $productId);
     }
@@ -182,22 +209,25 @@ final class VariantCombination extends Model
     /**
      * Handle scopeByAttributeValue functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param  Builder<self> $query
+     * @return Builder<self>
      */
-    public function scopeByAttributeValue($query, string $attribute, string $value)
+    public function scopeByAttributeValue(Builder $query, string $attribute, string $value): Builder
     {
-        return $query->whereJsonContains('attribute_combinations->'.$attribute, $value);
+        return $query->whereJsonContains('attribute_combinations->' . $attribute, $value);
     }
 
     /**
      * Handle scopeByCombination functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param  Builder<self>        $query
+     * @param  array<string, mixed> $combinations
+     * @return Builder<self>
      */
-    public function scopeByCombination($query, array $combinations)
+    public function scopeByCombination(Builder $query, array $combinations): Builder
     {
         foreach ($combinations as $attribute => $value) {
-            $query->whereJsonContains('attribute_combinations->'.$attribute, $value);
+            $query->whereJsonContains('attribute_combinations->' . $attribute, $value);
         }
 
         return $query;
@@ -205,51 +235,71 @@ final class VariantCombination extends Model
 
     /**
      * Generate all possible combinations for a product.
+     *
+     * @return array<int, array<string, mixed>>
      */
     public static function generateCombinations(Product $product): array
     {
-        $attributes = $product
-            ->attributes()
+        $attributesQuery = $product->attributes();
+
+        /** @var \Illuminate\Database\Eloquent\Collection<int, Attribute> $attributes */
+        $attributes = $attributesQuery
             ->withoutGlobalScopes([ActiveScope::class, EnabledScope::class, VisibleScope::class])
             ->with([
-                'values' => static fn ($query) => $query->withoutGlobalScopes([ActiveScope::class, EnabledScope::class]),
+                /** @phpstan-ignore-next-line Method call on mixed type - query builder method chaining */
+                'values' => static fn($query) => $query->withoutGlobalScopes([ActiveScope::class, EnabledScope::class]),
             ])
             ->get();
         $combinations = [];
 
         if ($attributes->isEmpty()) {
             // Fall back to existing variant attribute payloads before yielding a deterministic fallback combination.
-            $variantCombinations = $product->variants()
+            $variantCombinations = $product
+                ->variants()
                 ->with('attributes.attribute')
                 ->get()
-                ->map(static function (ProductVariant $variant): array {
-                    return $variant->getVariantAttributes();
+                ->map(static function ($variant) {
+                    if ($variant instanceof ProductVariant) {
+                        return $variant->getVariantAttributes();
+                    }
+
+                    return [];
                 })
-                ->filter(static fn (array $combination): bool => $combination !== [])
-                ->map(static fn (array $combination): array => self::normaliseCombination($combination))
+                ->filter(static fn($combination) => $combination !== [])
+                /** @phpstan-ignore-next-line Type narrowing issue */
+                ->map(static fn($combination) => is_array($combination) ? self::normaliseCombination($combination) : [])
                 ->unique()
                 ->values()
                 ->all();
 
             if ($variantCombinations !== []) {
+                /** @var array<int, array<string, mixed>> $variantCombinations */
                 return $variantCombinations;
             }
 
             return [self::fallbackCombination($product)];
         }
 
+        /** @var array<string, array<int, string>> $attributeValues */
         $attributeValues = [];
         foreach ($attributes as $attribute) {
-            $attributeValues[$attribute->name] = $attribute->values->pluck('value')->toArray();
+            $attributeName = $attribute->name;
+            /** @var array<int, string> $values */
+            $values = $attribute->values->pluck('value')->toArray();
+            $attributeValues[$attributeName] = $values;
         }
 
         $combinations = self::generateCombinationsRecursive($attributeValues);
 
-        return array_map(static fn (array $combination): array => self::normaliseCombination($combination), $combinations);
+        return array_map(static fn(array $combination): array => self::normaliseCombination($combination), $combinations);
     }
 
     /**
      * Generate combinations recursively.
+     *
+     * @param  array<string, array<int, string>> $attributeValues
+     * @param  array<string, mixed>              $currentCombination
+     * @return array<int, array<string, mixed>>
      */
     private static function generateCombinationsRecursive(array $attributeValues, array $currentCombination = [], int $depth = 0): array
     {
@@ -284,7 +334,7 @@ final class VariantCombination extends Model
 
         foreach ($combinations as $combination) {
             $normalisedCombination = self::normaliseCombination($combination);
-            $hash = self::deterministicHashFor($normalisedCombination, $product->getKey());
+            $hash = self::deterministicHashFor($normalisedCombination, $product->id);
 
             $record = self::withTrashed()->updateOrCreate(
                 [
@@ -307,51 +357,63 @@ final class VariantCombination extends Model
 
     /**
      * Find variant by combination.
+     *
+     * @param array<string, mixed> $combination
      */
     public static function findVariantByCombination(Product $product, array $combination): ?ProductVariant
     {
         $combination = self::normaliseCombination($combination);
-        $hash = self::deterministicHashFor($combination, $product->getKey());
+        $hash = self::deterministicHashFor($combination, $product->id);
 
         $variantCombination = self::where('product_id', $product->id)
             ->where('combination_hash', $hash)
             ->first();
 
-        if (! $variantCombination) {
+        if (!$variantCombination) {
             return null;
         }
 
         // Find the actual variant that matches this combination
-        return $product->variants()
-            ->whereHas('attributes', function ($query) use ($combination) {
+        /** @var ProductVariant|null $variant */
+        $variant = $product
+            ->variants()
+            ->whereHas('attributes', function (Builder $query) use ($combination): void {
                 foreach ($combination as $attributeName => $value) {
-                    $query->whereHas('attribute', function ($subQuery) use ($attributeName) {
+                    $query->whereHas('attribute', function (Builder $subQuery) use ($attributeName): void {
                         $subQuery->where('name', $attributeName);
                     })->where('value', $value);
                 }
             })
             ->first();
+
+        return $variant;
     }
 
     /**
      * Get available combinations for a product.
+     *
+     * @return array<int, array<string, mixed>>
      */
     public static function getAvailableCombinations(Product $product): array
     {
-        return self::where('product_id', $product->id)
+        /** @var array<int, array<string, mixed>> $result */
+        $result = self::where('product_id', $product->id)
             ->where('is_available', true)
-            ->get()
             ->pluck('attribute_combinations')
             ->toArray();
+
+        return $result;
     }
 
     /**
      * Check if a combination is available.
+     *
+     * @param array<string, mixed> $combination
      */
     public static function isCombinationAvailable(Product $product, array $combination): bool
     {
         $combination = self::normaliseCombination($combination);
-        $hash = self::deterministicHashFor($combination, $product->getKey());
+        $hash = self::deterministicHashFor($combination, $product->id);
 
         return self::where('product_id', $product->id)
             ->where('combination_hash', $hash)
@@ -361,6 +423,9 @@ final class VariantCombination extends Model
 
     /**
      * Normalise a combination array before hashing.
+     *
+     * @param  array<string, mixed> $combination
+     * @return array<string, mixed>
      */
     private static function normaliseCombination(array $combination): array
     {
@@ -371,16 +436,20 @@ final class VariantCombination extends Model
 
     /**
      * Provide a deterministic fallback payload for attribute-less combinations.
+     *
+     * @return array<string, string>
      */
     private static function fallbackCombination(Product $product): array
     {
         return [
-            '__fallback' => 'product-'.self::resolveProductKey($product->getKey()),
+            '__fallback' => 'product-' . self::resolveProductKey($product->id),
         ];
     }
 
     /**
      * Calculate a deterministic hash for a combination and product pairing.
+     *
+     * @param array<string, mixed> $combination
      */
     private static function deterministicHashFor(array $combination, int|string|null $productKey): string
     {
@@ -396,11 +465,13 @@ final class VariantCombination extends Model
      */
     private function generateDeterministicHash(): string
     {
-        if (! is_array($this->attribute_combinations) || $this->attribute_combinations === []) {
+        $combinations = $this->attribute_combinations;
+
+        if ($combinations === []) {
             return $this->deterministicFallbackHash();
         }
 
-        $normalised = self::normaliseCombination($this->attribute_combinations);
+        $normalised = self::normaliseCombination($combinations);
 
         return self::deterministicHashFor($normalised, $this->product_id);
     }
@@ -410,7 +481,7 @@ final class VariantCombination extends Model
      */
     private function deterministicFallbackHash(): string
     {
-        return hash('sha256', 'fallback:'.self::resolveProductKey($this->product_id));
+        return hash('sha256', 'fallback:' . self::resolveProductKey($this->product_id));
     }
 
     /**
@@ -426,12 +497,12 @@ final class VariantCombination extends Model
      */
     private function storeInCache(): void
     {
-        if (! $this->product_id) {
+        if (!$this->product_id) {
             return;
         }
 
         $productId = (int) $this->product_id;
-        $collection = self::$hydratedCache[$productId] ?? new EloquentCollection();
+        $collection = self::$hydratedCache[$productId] ?? new EloquentCollection;
 
         if ($collection->firstWhere($this->getKeyName(), $this->getKey())) {
             return;
@@ -446,7 +517,7 @@ final class VariantCombination extends Model
      */
     private function refreshCache(): void
     {
-        if (! $this->product_id) {
+        if (!$this->product_id) {
             return;
         }
 
@@ -455,36 +526,31 @@ final class VariantCombination extends Model
 
     /**
      * Retrieve cached combinations for a product, hydrating when unavailable.
+     *
+     * @return EloquentCollection<int, self>
      */
     public static function cachedForProduct(int $productId): EloquentCollection
     {
-        $shouldRefresh = ! array_key_exists($productId, self::$hydratedCache);
+        $shouldRefresh = !array_key_exists($productId, self::$hydratedCache);
 
-        if (! $shouldRefresh) {
+        if (!$shouldRefresh) {
             $cached = self::$hydratedCache[$productId];
 
-            if (! $cached instanceof EloquentCollection) {
-                $shouldRefresh = true;
-            } elseif ($cached->isNotEmpty()) {
+            if ($cached->isNotEmpty()) {
                 $model = $cached->first();
+                $keyName = $model->getKeyName();
+                $cachedIds = $cached->modelKeys();
 
-                if (! $model instanceof self) {
+                $existingCount = self::query()
+                    ->withoutGlobalScopes()
+                    ->where('product_id', $productId)
+                    ->whereIn($keyName, $cachedIds)
+                    ->count();
+
+                // If the cached records no longer exist (e.g. after RefreshDatabase migrations),
+                // ensure the cache slice is rebuilt from the fresh database state.
+                if ($existingCount !== count($cachedIds)) {
                     $shouldRefresh = true;
-                } else {
-                    $keyName = $model->getKeyName();
-                    $cachedIds = $cached->modelKeys();
-
-                    $existingCount = self::query()
-                        ->withoutGlobalScopes()
-                        ->where('product_id', $productId)
-                        ->whereIn($keyName, $cachedIds)
-                        ->count();
-
-                    // If the cached records no longer exist (e.g. after RefreshDatabase migrations),
-                    // ensure the cache slice is rebuilt from the fresh database state.
-                    if ($existingCount !== count($cachedIds)) {
-                        $shouldRefresh = true;
-                    }
                 }
             }
         }
@@ -493,7 +559,7 @@ final class VariantCombination extends Model
             self::refreshCombinationCacheForProduct($productId);
         }
 
-        return self::$hydratedCache[$productId] ?? new EloquentCollection();
+        return self::$hydratedCache[$productId] ?? new EloquentCollection;
     }
 
     /**

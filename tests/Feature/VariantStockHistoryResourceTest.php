@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Tests\Feature;
 
@@ -207,10 +205,9 @@ class VariantStockHistoryResourceTest extends TestCase
 
     public function test_quantity_change_is_calculated_correctly(): void
     {
-        $stockHistory = VariantStockHistory::factory()->create([
-            'old_quantity' => 10,
-            'new_quantity' => 15,
-        ]);
+        $stockHistory = VariantStockHistory::factory()
+            ->withQuantities(10, 15)
+            ->create();
 
         $this->assertEquals(5, $stockHistory->quantity_change);
     }

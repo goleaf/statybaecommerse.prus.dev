@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Tests\Feature;
 
@@ -82,7 +80,7 @@ final class NewsCategoryResourceTest extends TestCase
 
         // Act
         Livewire::test(\App\Filament\Resources\NewsCategoryResource\Pages\EditNewsCategory::class, [
-            'record' => $category->getRouteKey(),
+            'record' => $category->slug,
         ])
             ->fillForm($updatedData)
             ->call('save')
@@ -185,7 +183,7 @@ final class NewsCategoryResourceTest extends TestCase
                 'name' => 'Test Category',
             ])
             ->call('create')
-            ->assertHasFormErrors(['slug']);
+            ->assertHasFormErrors(['slug' => 'required']);
     }
 
     public function test_category_slug_must_be_unique(): void
@@ -214,9 +212,24 @@ final class NewsCategoryResourceTest extends TestCase
             'icon' => 'heroicon-o-tag',
         ]);
 
+        $category->translations()->createMany([
+            [
+                'locale' => 'lt',
+                'name' => 'Test Category',
+                'slug' => 'test-category-lt',
+                'description' => 'Test description',
+            ],
+            [
+                'locale' => 'en',
+                'name' => 'Test Category',
+                'slug' => 'test-category-en',
+                'description' => 'Test description',
+            ],
+        ]);
+
         // Act & Assert
         Livewire::test(\App\Filament\Resources\NewsCategoryResource\Pages\ViewNewsCategory::class, [
-            'record' => $category->getRouteKey(),
+            'record' => $category->slug,
         ])
             ->assertFormSet([
                 'name' => 'Test Category',

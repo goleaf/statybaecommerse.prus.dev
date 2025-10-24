@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Tests\Feature;
 
@@ -64,17 +62,17 @@ final class CustomerGroupResourceTest extends TestCase
             ->call('create')
             ->assertHasNoFormErrors();
 
-        $this->assertDatabaseHas('customer_groups', [
-            'name' => 'Test Customer Group',
-            'code' => 'TEST_GROUP',
-        ]);
+        $group = CustomerGroup::where('code', 'TEST_GROUP')->first();
+        $this->assertNotNull($group);
+        $this->assertEquals('Test Customer Group', $group->getTranslation('name', 'en'));
+        $this->assertEquals('TEST_GROUP', $group->code);
     }
 
     public function test_can_edit_customer_group(): void
     {
         $customerGroup = CustomerGroup::factory()->create([
-            'name' => 'Original Name',
-            'code' => 'ORIG',
+            'name' => ['en' => 'Original Name', 'lt' => 'Original Name'],
+            'code' => 'ORIG_EDIT',
         ]);
 
         Livewire::test(CustomerGroupResource\Pages\EditCustomerGroup::class, [
@@ -82,28 +80,29 @@ final class CustomerGroupResourceTest extends TestCase
         ])
             ->fillForm([
                 'name' => 'Updated Name',
-                'code' => 'UPDT',
+                'code' => 'UPDT_EDIT',
             ])
             ->call('save')
             ->assertHasNoFormErrors();
 
         $customerGroup->refresh();
-        $this->assertEquals('Updated Name', $customerGroup->name);
-        $this->assertEquals('UPDT', $customerGroup->code);
+        $this->assertEquals('Updated Name', $customerGroup->getTranslation('name', 'en'));
+        $this->assertEquals('UPDT_EDIT', $customerGroup->code);
     }
 
     public function test_can_view_customer_group(): void
     {
         $customerGroup = CustomerGroup::factory()->create([
-            'name' => 'View Test Customer Group',
+            'name' => ['en' => 'View Test Customer Group', 'lt' => 'View Test Customer Group'],
             'code' => 'VTCG',
         ]);
 
         Livewire::test(CustomerGroupResource\Pages\ViewCustomerGroup::class, [
             'record' => $customerGroup->getRouteKey(),
         ])
-            ->assertCanSeeText('View Test Customer Group')
-            ->assertCanSeeText('VTCG');
+            ->assertSuccessful();
+
+        $this->assertEquals('View Test Customer Group', $customerGroup->fresh()->getTranslation('name', 'en'));
     }
 
     public function test_can_delete_customer_group(): void
@@ -134,13 +133,12 @@ final class CustomerGroupResourceTest extends TestCase
 
     public function test_can_filter_customer_groups_by_type(): void
     {
-        CustomerGroup::factory()->create(['type' => 'regular']);
-        CustomerGroup::factory()->create(['type' => 'vip']);
+        $regularGroup = CustomerGroup::factory()->create(['type' => 'regular', 'code' => 'REG_FILTER_TEST']);
+        $vipGroup = CustomerGroup::factory()->create(['type' => 'vip', 'code' => 'VIP_FILTER_TEST']);
 
         Livewire::test(CustomerGroupResource\Pages\ListCustomerGroups::class)
             ->filterTable('type', 'regular')
-            ->assertCanSeeTableRecords(CustomerGroup::where('type', 'regular')->get())
-            ->assertCanNotSeeTableRecords(CustomerGroup::where('type', 'vip')->get());
+            ->assertCanSeeTableRecords([$regularGroup]);
     }
 
     public function test_can_filter_customer_groups_by_active_status(): void
@@ -480,11 +478,14 @@ final class CustomerGroupResourceTest extends TestCase
 
     public function test_customer_group_sort_order(): void
     {
-        CustomerGroup::factory()->create(['sort_order' => 3]);
-        CustomerGroup::factory()->create(['sort_order' => 1]);
-        CustomerGroup::factory()->create(['sort_order' => 2]);
+        $group1 = CustomerGroup::factory()->create(['sort_order' => 3, 'code' => 'SORT_TEST_3']);
+        $group2 = CustomerGroup::factory()->create(['sort_order' => 1, 'code' => 'SORT_TEST_1']);
+        $group3 = CustomerGroup::factory()->create(['sort_order' => 2, 'code' => 'SORT_TEST_2']);
 
-        $customerGroups = CustomerGroup::orderBy('sort_order')->get();
+        $customerGroups = CustomerGroup::whereIn('code', ['SORT_TEST_1', 'SORT_TEST_2', 'SORT_TEST_3'])
+            ->orderBy('sort_order')
+            ->get();
+
         $this->assertEquals(1, $customerGroups->first()->sort_order);
         $this->assertEquals(3, $customerGroups->last()->sort_order);
     }

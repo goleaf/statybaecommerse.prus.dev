@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Tests\Feature\Filament\NewsCategories;
 
@@ -8,7 +6,6 @@ use App\Filament\Resources\NewsCategories\Pages\CreateNewsCategory;
 use App\Filament\Resources\NewsCategories\Pages\EditNewsCategory;
 use App\Filament\Resources\NewsCategories\Pages\ListNewsCategories;
 use App\Models\NewsCategory;
-use App\Models\Translations\NewsCategoryTranslation;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
@@ -23,7 +20,7 @@ final class NewsCategoryResourceTest extends TestCase
         parent::setUp();
 
         $admin = User::factory()->create([
-            'email'    => 'admin@example.com',
+            'email' => 'admin@example.com',
             'is_admin' => true,
         ]);
 
@@ -71,14 +68,14 @@ final class NewsCategoryResourceTest extends TestCase
         ]);
 
         Livewire::test(EditNewsCategory::class, [
-            'record' => $category->getKey(),
+            'record' => $category->slug,
         ])
             ->fillForm([
                 'is_visible' => false,
-                'parent_id'  => $hiddenParent->getKey(),
+                'parent_id' => $hiddenParent->slug,
                 'sort_order' => 10,
-                'color'      => '#123456',
-                'icon'       => 'heroicon-o-newspaper',
+                'color' => '#123456',
+                'icon' => 'heroicon-o-newspaper',
             ])
             ->call('save')
             ->assertHasNoFormErrors();
@@ -96,12 +93,19 @@ final class NewsCategoryResourceTest extends TestCase
     {
         $category = NewsCategory::factory()->create($attributes);
 
-        NewsCategoryTranslation::factory()->lithuanian()->create([
-            'news_category_id' => $category->getKey(),
-        ]);
-
-        NewsCategoryTranslation::factory()->english()->create([
-            'news_category_id' => $category->getKey(),
+        $category->translations()->createMany([
+            [
+                'locale' => 'lt',
+                'name' => 'Paslėpta kategorija',
+                'slug' => "paslepta-kategorija-{$category->slug}",
+                'description' => 'Kategorija lietuvių kalba',
+            ],
+            [
+                'locale' => 'en',
+                'name' => 'Hidden Category',
+                'slug' => "hidden-category-{$category->slug}",
+                'description' => 'Category in English',
+            ],
         ]);
 
         return $category->fresh();

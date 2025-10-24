@@ -1,43 +1,59 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 
 /**
  * SystemSettingDependency
  *
  * Eloquent model representing the SystemSettingDependency entity with comprehensive relationships, scopes, and business logic for the e-commerce system.
  *
- * @property mixed $fillable
- * @property mixed $casts
+ * @property int                             $id
+ * @property int                             $setting_id
+ * @property int                             $depends_on_setting_id
+ * @property string|null                     $condition
+ * @property string|null                     $condition_value
+ * @property bool                            $is_active
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read SystemSetting $setting
+ * @property-read SystemSetting $dependsOnSetting
  *
- * @method static \Illuminate\Database\Eloquent\Builder|SystemSettingDependency newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|SystemSettingDependency newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|SystemSettingDependency query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static> newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static> newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<static> query()
+ * @method static \Illuminate\Database\Eloquent\Builder<static> active()
+ * @method static \Illuminate\Database\Eloquent\Builder<static> inactive()
+ * @method static \Illuminate\Database\Eloquent\Builder<static> forSetting(int|string $settingId)
+ * @method static \Illuminate\Database\Eloquent\Builder<static> dependsOnSetting(int|string $settingId)
  *
  * @mixin \Eloquent
  */
 final class SystemSettingDependency extends Model
 {
+    /** @use HasFactory<\Database\Factories\SystemSettingDependencyFactory> */
     use HasFactory;
 
     protected static function booted(): void
     {
-        static::resolveRelationUsing(
+        self::resolveRelationUsing(
             'dependsOnSetting',
-            static fn (self $model): BelongsTo => $model->dependsOnSettingRelation()
+            static fn(self $model): BelongsTo => $model->dependsOnSettingRelation()
         );
     }
 
-    public function __call($method, $parameters)
+    /**
+     * @param mixed $method
+     * @param mixed $parameters
+     */
+    public function __call($method, $parameters): mixed
     {
         if ($method === 'dependsOnSetting' && $parameters !== []) {
+            /** @phpstan-ignore-next-line Dynamic scope method call */
             return $this->newQuery()->$method(...$parameters);
         }
 
@@ -58,17 +74,27 @@ final class SystemSettingDependency extends Model
         'is_active' => 'boolean',
     ];
 
+    /**
+     * @return BelongsTo<SystemSetting, $this>
+     */
     public function setting(): BelongsTo
     {
         return $this->belongsTo(SystemSetting::class, 'setting_id');
     }
 
-    /** @deprecated Use the dependsOnSetting relation instead. */
+    /**
+     * @deprecated Use the dependsOnSetting relation instead.
+     *
+     * @return BelongsTo<SystemSetting, $this>
+     */
     public function dependsOn(): BelongsTo
     {
         return $this->dependsOnSettingRelation();
     }
 
+    /**
+     * @return BelongsTo<SystemSetting, $this>
+     */
     public function dependsOnSettingRelation(): BelongsTo
     {
         return $this->belongsTo(SystemSetting::class, 'depends_on_setting_id');
@@ -76,13 +102,14 @@ final class SystemSettingDependency extends Model
 
     public function getDependsOnSettingAttribute(): ?SystemSetting
     {
-        return $this->getRelationValue('dependsOnSettingRelation');
+        $relation = $this->getRelationValue('dependsOnSettingRelation');
+
+        return $relation instanceof SystemSetting ? $relation : null;
     }
 
     /**
-     * Handle scopeActive functionality with proper error handling.
-     *
-     * @param mixed $query
+     * @param  Builder<static> $query
+     * @return Builder<static>
      */
     public function scopeActive(Builder $query): Builder
     {
@@ -90,9 +117,8 @@ final class SystemSettingDependency extends Model
     }
 
     /**
-     * Handle scopeInactive functionality with proper error handling.
-     *
-     * @param mixed $query
+     * @param  Builder<static> $query
+     * @return Builder<static>
      */
     public function scopeInactive(Builder $query): Builder
     {
@@ -100,10 +126,8 @@ final class SystemSettingDependency extends Model
     }
 
     /**
-     * Handle scopeForSetting functionality with proper error handling.
-     *
-     * @param mixed $query
-     * @param mixed $settingId
+     * @param  Builder<static> $query
+     * @return Builder<static>
      */
     public function scopeForSetting(Builder $query, int|string $settingId): Builder
     {
@@ -111,19 +135,21 @@ final class SystemSettingDependency extends Model
     }
 
     /**
-     * Handle scopeDependsOnSetting functionality with proper error handling.
-     *
-     * @param mixed $query
-     * @param mixed $settingId
+     * @param  Builder<static> $query
+     * @return Builder<static>
      */
     public function scopeDependsOnSetting(Builder $query, int|string $settingId): Builder
     {
         return $query->where('depends_on_setting_id', $settingId);
     }
 
+    /**
+     * @param  Builder<static> $query
+     * @return Builder<static>
+     */
     public function scopeWithCondition(Builder $query, string $condition): Builder
     {
-        $like = '%'.$condition.'%';
+        $like = '%' . $condition . '%';
 
         return $query->where(function (Builder $builder) use ($like): void {
             $builder
@@ -132,6 +158,10 @@ final class SystemSettingDependency extends Model
         });
     }
 
+    /**
+     * @param  Builder<static> $query
+     * @return Builder<static>
+     */
     public function scopeByCondition(Builder $query, string $operator): Builder
     {
         $normalizedOperator = strtolower($operator);
@@ -144,11 +174,8 @@ final class SystemSettingDependency extends Model
     }
 
     /**
-     * Handle scopeCreatedBetween functionality with proper error handling.
-     *
-     * @param mixed $query
-     * @param mixed $from
-     * @param mixed $to
+     * @param  Builder<static> $query
+     * @return Builder<static>
      */
     public function scopeCreatedBetween(Builder $query, mixed $from, mixed $to): Builder
     {
@@ -156,17 +183,18 @@ final class SystemSettingDependency extends Model
     }
 
     /**
-     * Handle scopeUpdatedBetween functionality with proper error handling.
-     *
-     * @param mixed $query
-     * @param mixed $from
-     * @param mixed $to
+     * @param  Builder<static> $query
+     * @return Builder<static>
      */
     public function scopeUpdatedBetween(Builder $query, mixed $from, mixed $to): Builder
     {
         return $query->whereBetween('updated_at', [$from, $to]);
     }
 
+    /**
+     * @param  Builder<static> $query
+     * @return Builder<static>
+     */
     public function scopeSearch(Builder $query, string $search): Builder
     {
         $search = trim($search);
@@ -175,7 +203,7 @@ final class SystemSettingDependency extends Model
             return $query;
         }
 
-        $like = '%'.$search.'%';
+        $like = '%' . $search . '%';
 
         return $query->where(function (Builder $builder) use ($like): void {
             $builder
@@ -186,6 +214,7 @@ final class SystemSettingDependency extends Model
                         ->where('key', 'like', $like)
                         ->orWhere('name', 'like', $like);
                 })
+                /** @phpstan-ignore larastan.relationExistence */
                 ->orWhereHas('dependsOnSetting', function (Builder $relation) use ($like): void {
                     $relation
                         ->where('key', 'like', $like)
@@ -194,21 +223,37 @@ final class SystemSettingDependency extends Model
         });
     }
 
+    /**
+     * @param  Builder<static> $query
+     * @return Builder<static>
+     */
     public function scopeOrderByCreatedAt(Builder $query, string $direction = 'desc'): Builder
     {
         return $query->orderBy('created_at', $direction);
     }
 
+    /**
+     * @param  Builder<static> $query
+     * @return Builder<static>
+     */
     public function scopeOrderByUpdatedAt(Builder $query, string $direction = 'desc'): Builder
     {
         return $query->orderBy('updated_at', $direction);
     }
 
+    /**
+     * @param  Builder<static> $query
+     * @return Builder<static>
+     */
     public function scopeOrderByCondition(Builder $query, string $direction = 'desc'): Builder
     {
         return $query->orderBy('condition', $direction);
     }
 
+    /**
+     * @param  Builder<static> $query
+     * @return Builder<static>
+     */
     public function scopeOrderByActiveStatus(Builder $query, string $direction = 'desc'): Builder
     {
         return $query->orderBy('is_active', $direction);
@@ -218,12 +263,13 @@ final class SystemSettingDependency extends Model
     {
         $dependsOnSetting = $this->getRelationValue('dependsOnSettingRelation');
 
-        if (! $dependsOnSetting) {
+        if (!$dependsOnSetting instanceof SystemSetting) {
             return false;
         }
 
+        /** @phpstan-ignore-next-line SystemSetting model has dynamic value property */
         $dependencyValue = $dependsOnSetting->value;
-        $operator = strtolower(trim((string) ($this->condition ?? '')));
+        $operator = strtolower(trim($this->condition ?? ''));
         $expectedValue = $this->condition_value;
 
         if ($operator === '') {
@@ -246,7 +292,7 @@ final class SystemSettingDependency extends Model
             'not_in',
         ];
 
-        if (in_array($operator, $operatorsRequiringValue, true) && ($expectedValue === null || (is_string($expectedValue) && trim($expectedValue) === ''))) {
+        if (in_array($operator, $operatorsRequiringValue, true) && ($expectedValue === null || trim($expectedValue) === '')) {
             return false;
         }
 
@@ -261,11 +307,11 @@ final class SystemSettingDependency extends Model
             'less_than' => $this->compareValues($normalizedValue, $normalizedExpected) === -1,
             'less_or_equals' => $this->compareValues($normalizedValue, $normalizedExpected) <= 0,
             'contains' => is_string($normalizedValue) && is_string($normalizedExpected) && str_contains($normalizedValue, $normalizedExpected),
-            'not_contains' => is_string($normalizedValue) && is_string($normalizedExpected) && ! str_contains($normalizedValue, $normalizedExpected),
+            'not_contains' => is_string($normalizedValue) && is_string($normalizedExpected) && !str_contains($normalizedValue, $normalizedExpected),
             'starts_with' => is_string($normalizedValue) && is_string($normalizedExpected) && str_starts_with($normalizedValue, $normalizedExpected),
             'ends_with' => is_string($normalizedValue) && is_string($normalizedExpected) && str_ends_with($normalizedValue, $normalizedExpected),
             'in' => $this->isInList($normalizedValue, $normalizedExpected),
-            'not_in' => ! $this->isInList($normalizedValue, $normalizedExpected),
+            'not_in' => !$this->isInList($normalizedValue, $normalizedExpected),
             'is_empty' => blank($normalizedValue),
             'is_not_empty' => filled($normalizedValue),
             'is_true' => $this->toBoolean($normalizedValue) === true,
@@ -287,6 +333,7 @@ final class SystemSettingDependency extends Model
             return $actual <=> $expected;
         }
 
+        /** @phpstan-ignore-next-line Safe type casting for comparison */
         return strcmp((string) $actual, (string) $expected);
     }
 
@@ -305,15 +352,15 @@ final class SystemSettingDependency extends Model
             if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
                 $expected = $decoded;
             } else {
-                $expected = array_map('trim', array_filter(explode(',', $expected), static fn ($item): bool => $item !== ''));
+                $expected = array_map('trim', array_filter(explode(',', $expected), static fn($item): bool => $item !== ''));
             }
         }
 
-        if (! is_array($expected)) {
+        if (!is_array($expected)) {
             return false;
         }
 
-        return in_array($actual, $expected, ! is_string($actual));
+        return in_array($actual, $expected, !is_string($actual));
     }
 
     /**

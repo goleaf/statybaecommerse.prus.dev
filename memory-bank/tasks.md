@@ -925,3 +925,14 @@ UserProductInteractionResource is now fully functional with maximum Filament v4 
 - [ ] Audit and remediate `LocationResourceTest` regression blocking Filament location management flows; align resource schema/table signatures, translations, and model helpers before rerunning targeted Pest suite. // added 2025-10-24
 - [ ] Restore `RecommendationBlockResource` suite parity so that all table CRUD, filters, bulk operations, toggles, validation, and relational actions pass in LT/EN with Filament v4 schema/table compliance. // added 2025-10-24
 - [ ] Resolve `RecommendationCacheResource` test regressions ensuring form/table compliance, translations, filters, and model helpers satisfy RecommendationCacheResourceTest scenarios with LT/EN parity. // added 2025-10-24
+### 2025-10-24 – Customer Model Audit
+- [ ] Analyze `App\\Models\\Customer` for strict typing, casts, relationships, and translation compliance
+- [ ] Implement required model refactors with multilingual alignment and service-pattern consistency
+- [ ] Create or update dedicated Pest unit tests for Customer model behaviors
+- [ ] Run targeted Pest suite for Customer model and document outcomes
+
+### 2025-10-24 – Address Model Audit
+- [ ] Review `App\\Models\\Address` for relationship correctness, attribute configuration, casts, and translation handling
+- [ ] Refine validation rule exports and utility helpers for billing/shipping defaults
+- [ ] Ensure Lithuanian/English translations cover surfaced messages or labels tied to Address logic
+- [ ] Create or update comprehensive Pest coverage for Address model behaviors and run targeted suites

@@ -19,7 +19,7 @@ class LocationResourceTest extends TestCase
         parent::setUp();
 
         $this->actingAs(User::factory()->create([
-            'email' => 'admin@example.com',
+            'email'    => 'admin@example.com',
             'is_admin' => true,
         ]));
     }
@@ -28,10 +28,10 @@ class LocationResourceTest extends TestCase
     {
         $country = Country::factory()->create(['name' => 'Lithuania']);
         $location = Location::factory()->create([
-            'name' => 'Vilnius Store',
-            'code' => 'VIL001',
+            'name'         => 'Vilnius Store',
+            'code'         => 'VIL001',
             'country_code' => $country->cca2,
-            'is_enabled' => true,
+            'is_enabled'   => true,
         ]);
 
         $this
@@ -51,39 +51,39 @@ class LocationResourceTest extends TestCase
             ->assertOk();
 
         $this->post('/admin/locations', [
-            'name' => 'Kaunas Warehouse',
-            'code' => 'KAU001',
-            'description' => 'Main warehouse in Kaunas',
-            'country_code' => $country->cca2,
+            'name'           => 'Kaunas Warehouse',
+            'code'           => 'KAU001',
+            'description'    => 'Main warehouse in Kaunas',
+            'country_code'   => $country->cca2,
             'address_line_1' => 'Gedimino g. 1',
-            'city' => 'Kaunas',
-            'postal_code' => '44275',
-            'phone' => '+370 37 123456',
-            'email' => 'kaunas@example.com',
-            'type' => 'warehouse',
-            'latitude' => 54.8985,
-            'longitude' => 23.9036,
-            'is_enabled' => true,
-            'is_default' => false,
-            'sort_order' => 1,
+            'city'           => 'Kaunas',
+            'postal_code'    => '44275',
+            'phone'          => '+370 37 123456',
+            'email'          => 'kaunas@example.com',
+            'type'           => 'warehouse',
+            'latitude'       => 54.8985,
+            'longitude'      => 23.9036,
+            'is_enabled'     => true,
+            'is_default'     => false,
+            'sort_order'     => 1,
         ])->assertRedirect();
 
         $this->assertDatabaseHas('locations', [
-            'name' => 'Kaunas Warehouse',
-            'code' => 'KAU001',
-            'description' => 'Main warehouse in Kaunas',
-            'country_code' => $country->cca2,
+            'name'           => 'Kaunas Warehouse',
+            'code'           => 'KAU001',
+            'description'    => 'Main warehouse in Kaunas',
+            'country_code'   => $country->cca2,
             'address_line_1' => 'Gedimino g. 1',
-            'city' => 'Kaunas',
-            'postal_code' => '44275',
-            'phone' => '+370 37 123456',
-            'email' => 'kaunas@example.com',
-            'type' => 'warehouse',
-            'latitude' => 54.8985,
-            'longitude' => 23.9036,
-            'is_enabled' => true,
-            'is_default' => false,
-            'sort_order' => 1,
+            'city'           => 'Kaunas',
+            'postal_code'    => '44275',
+            'phone'          => '+370 37 123456',
+            'email'          => 'kaunas@example.com',
+            'type'           => 'warehouse',
+            'latitude'       => 54.8985,
+            'longitude'      => 23.9036,
+            'is_enabled'     => true,
+            'is_default'     => false,
+            'sort_order'     => 1,
         ]);
     }
 
@@ -91,7 +91,7 @@ class LocationResourceTest extends TestCase
     {
         $country = Country::factory()->create();
         $location = Location::factory()->create([
-            'name' => 'Riga Office',
+            'name'         => 'Riga Office',
             'country_code' => $country->cca2,
         ]);
 
@@ -105,7 +105,7 @@ class LocationResourceTest extends TestCase
     {
         $country = Country::factory()->create();
         $location = Location::factory()->create([
-            'name' => 'Tallinn Store',
+            'name'         => 'Tallinn Store',
             'country_code' => $country->cca2,
         ]);
 
@@ -114,39 +114,39 @@ class LocationResourceTest extends TestCase
             ->assertOk();
 
         $this->put("/admin/locations/{$location->id}", [
-            'name' => 'Tallinn Main Store',
-            'code' => 'TAL001',
-            'description' => 'Updated description',
-            'country_code' => $country->cca2,
+            'name'           => 'Tallinn Main Store',
+            'code'           => 'TAL001',
+            'description'    => 'Updated description',
+            'country_code'   => $country->cca2,
             'address_line_1' => 'Narva mnt. 1',
-            'city' => 'Tallinn',
-            'postal_code' => '10117',
-            'phone' => '+372 6 123456',
-            'email' => 'tallinn@example.com',
-            'type' => 'store',
-            'latitude' => 59.437,
-            'longitude' => 24.7536,
-            'is_enabled' => false,
-            'is_default' => true,
-            'sort_order' => 2,
+            'city'           => 'Tallinn',
+            'postal_code'    => '10117',
+            'phone'          => '+372 6 123456',
+            'email'          => 'tallinn@example.com',
+            'type'           => 'store',
+            'latitude'       => 59.437,
+            'longitude'      => 24.7536,
+            'is_enabled'     => false,
+            'is_default'     => true,
+            'sort_order'     => 2,
         ])->assertRedirect();
 
         $this->assertDatabaseHas('locations', [
-            'id' => $location->id,
-            'name' => 'Tallinn Main Store',
-            'code' => 'TAL001',
-            'description' => 'Updated description',
+            'id'             => $location->id,
+            'name'           => 'Tallinn Main Store',
+            'code'           => 'TAL001',
+            'description'    => 'Updated description',
             'address_line_1' => 'Narva mnt. 1',
-            'city' => 'Tallinn',
-            'postal_code' => '10117',
-            'phone' => '+372 6 123456',
-            'email' => 'tallinn@example.com',
-            'type' => 'store',
-            'latitude' => 59.437,
-            'longitude' => 24.7536,
-            'is_enabled' => false,
-            'is_default' => true,
-            'sort_order' => 2,
+            'city'           => 'Tallinn',
+            'postal_code'    => '10117',
+            'phone'          => '+372 6 123456',
+            'email'          => 'tallinn@example.com',
+            'type'           => 'store',
+            'latitude'       => 59.437,
+            'longitude'      => 24.7536,
+            'is_enabled'     => false,
+            'is_default'     => true,
+            'sort_order'     => 2,
         ]);
     }
 
@@ -172,17 +172,17 @@ class LocationResourceTest extends TestCase
         $country2 = Country::factory()->create(['name' => 'Latvia']);
 
         Location::factory()->create([
-            'name' => 'Vilnius Store',
+            'name'         => 'Vilnius Store',
             'country_code' => $country1->cca2,
         ]);
 
         Location::factory()->create([
-            'name' => 'Riga Store',
+            'name'         => 'Riga Store',
             'country_code' => $country2->cca2,
         ]);
 
         $this
-            ->get('/admin/locations?country_id='.$country1->id)
+            ->get('/admin/locations?country_id=' . $country1->id)
             ->assertOk()
             ->assertSee('Vilnius Store')
             ->assertDontSee('Riga Store');
@@ -193,14 +193,14 @@ class LocationResourceTest extends TestCase
         $country = Country::factory()->create();
 
         Location::factory()->create([
-            'name' => 'Warehouse',
-            'type' => 'warehouse',
+            'name'         => 'Warehouse',
+            'type'         => 'warehouse',
             'country_code' => $country->cca2,
         ]);
 
         Location::factory()->create([
-            'name' => 'Store',
-            'type' => 'store',
+            'name'         => 'Store',
+            'type'         => 'store',
             'country_code' => $country->cca2,
         ]);
 
@@ -216,14 +216,14 @@ class LocationResourceTest extends TestCase
         $country = Country::factory()->create();
 
         Location::factory()->create([
-            'name' => 'Enabled Location',
-            'is_enabled' => true,
+            'name'         => 'Enabled Location',
+            'is_enabled'   => true,
             'country_code' => $country->cca2,
         ]);
 
         Location::factory()->create([
-            'name' => 'Disabled Location',
-            'is_enabled' => false,
+            'name'         => 'Disabled Location',
+            'is_enabled'   => false,
             'country_code' => $country->cca2,
         ]);
 
@@ -239,14 +239,14 @@ class LocationResourceTest extends TestCase
         $country = Country::factory()->create();
 
         Location::factory()->create([
-            'name' => 'Default Location',
-            'is_default' => true,
+            'name'         => 'Default Location',
+            'is_default'   => true,
             'country_code' => $country->cca2,
         ]);
 
         Location::factory()->create([
-            'name' => 'Non-default Location',
-            'is_default' => false,
+            'name'         => 'Non-default Location',
+            'is_default'   => false,
             'country_code' => $country->cca2,
         ]);
 
@@ -262,16 +262,16 @@ class LocationResourceTest extends TestCase
         $country = Country::factory()->create();
 
         Location::factory()->create([
-            'name' => 'With Coordinates',
-            'latitude' => 54.8985,
-            'longitude' => 23.9036,
+            'name'         => 'With Coordinates',
+            'latitude'     => 54.8985,
+            'longitude'    => 23.9036,
             'country_code' => $country->cca2,
         ]);
 
         Location::factory()->create([
-            'name' => 'Without Coordinates',
-            'latitude' => null,
-            'longitude' => null,
+            'name'         => 'Without Coordinates',
+            'latitude'     => null,
+            'longitude'    => null,
             'country_code' => $country->cca2,
         ]);
 
@@ -287,7 +287,7 @@ class LocationResourceTest extends TestCase
         $country = Country::factory()->create();
 
         Location::factory()->create([
-            'name' => 'With Hours',
+            'name'          => 'With Hours',
             'opening_hours' => [
                 ['day' => 'monday', 'open_time' => '09:00', 'close_time' => '18:00', 'is_closed' => false],
             ],
@@ -295,9 +295,9 @@ class LocationResourceTest extends TestCase
         ]);
 
         Location::factory()->create([
-            'name' => 'Without Hours',
+            'name'          => 'Without Hours',
             'opening_hours' => null,
-            'country_code' => $country->cca2,
+            'country_code'  => $country->cca2,
         ]);
 
         $this
@@ -313,10 +313,10 @@ class LocationResourceTest extends TestCase
         $location = Location::factory()->create([
             'address_line_1' => 'Gedimino g. 1',
             'address_line_2' => 'Apt. 5',
-            'city' => 'Vilnius',
-            'state' => 'Vilnius County',
-            'postal_code' => '01103',
-            'country_code' => $country->cca2,
+            'city'           => 'Vilnius',
+            'state'          => 'Vilnius County',
+            'postal_code'    => '01103',
+            'country_code'   => $country->cca2,
         ]);
 
         $expected = 'Gedimino g. 1, Apt. 5, Vilnius, Vilnius County, 01103';
@@ -327,8 +327,8 @@ class LocationResourceTest extends TestCase
     {
         $country = Country::factory()->create();
         $location = Location::factory()->create([
-            'latitude' => 54.8985,
-            'longitude' => 23.9036,
+            'latitude'     => 54.8985,
+            'longitude'    => 23.9036,
             'country_code' => $country->cca2,
         ]);
 
@@ -339,8 +339,8 @@ class LocationResourceTest extends TestCase
     {
         $country = Country::factory()->create();
         $location = Location::factory()->create([
-            'latitude' => 54.8985,
-            'longitude' => 23.9036,
+            'latitude'     => 54.8985,
+            'longitude'    => 23.9036,
             'country_code' => $country->cca2,
         ]);
 
@@ -353,17 +353,17 @@ class LocationResourceTest extends TestCase
         $country = Country::factory()->create();
 
         $warehouse = Location::factory()->create([
-            'type' => 'warehouse',
+            'type'         => 'warehouse',
             'country_code' => $country->cca2,
         ]);
 
         $store = Location::factory()->create([
-            'type' => 'store',
+            'type'         => 'store',
             'country_code' => $country->cca2,
         ]);
 
         $office = Location::factory()->create([
-            'type' => 'office',
+            'type'         => 'office',
             'country_code' => $country->cca2,
         ]);
 
@@ -385,14 +385,14 @@ class LocationResourceTest extends TestCase
         $country = Country::factory()->create();
 
         $withCoords = Location::factory()->create([
-            'latitude' => 54.8985,
-            'longitude' => 23.9036,
+            'latitude'     => 54.8985,
+            'longitude'    => 23.9036,
             'country_code' => $country->cca2,
         ]);
 
         $withoutCoords = Location::factory()->create([
-            'latitude' => null,
-            'longitude' => null,
+            'latitude'     => null,
+            'longitude'    => null,
             'country_code' => $country->cca2,
         ]);
 
@@ -413,7 +413,7 @@ class LocationResourceTest extends TestCase
 
         $withoutHours = Location::factory()->create([
             'opening_hours' => null,
-            'country_code' => $country->cca2,
+            'country_code'  => $country->cca2,
         ]);
 
         $this->assertTrue($withHours->hasOpeningHours());
@@ -462,9 +462,9 @@ class LocationResourceTest extends TestCase
     {
         $country = Country::factory()->create();
         $location = Location::factory()->create([
-            'type' => 'warehouse',
-            'latitude' => 54.8985,
-            'longitude' => 23.9036,
+            'type'          => 'warehouse',
+            'latitude'      => 54.8985,
+            'longitude'     => 23.9036,
             'opening_hours' => [
                 ['day' => 'monday', 'open_time' => '09:00', 'close_time' => '18:00', 'is_closed' => false],
             ],
@@ -484,9 +484,9 @@ class LocationResourceTest extends TestCase
     {
         $country = Country::factory()->create();
         $location = Location::factory()->create([
-            'name' => 'Test Location',
-            'description' => 'Test Description',
-            'type' => 'store',
+            'name'         => 'Test Location',
+            'description'  => 'Test Description',
+            'type'         => 'store',
             'country_code' => $country->cca2,
         ]);
 

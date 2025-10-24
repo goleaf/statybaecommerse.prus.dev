@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Database\Factories;
 
@@ -11,13 +9,14 @@ use Illuminate\Support\Facades\Schema;
 class AttributeFactory extends Factory
 {
     protected $model = \App\Models\Attribute::class;
+
     private static bool $schemaEnsured = false;
 
     public function definition(): array
     {
         self::ensureSchema();
 
-        $label = $this->faker->randomElement(['Color', 'Size', 'Material', 'Fit', 'Length', 'Style']).' '.$this->faker->unique()->numerify('###');
+        $label = $this->faker->randomElement(['Color', 'Size', 'Material', 'Fit', 'Length', 'Style']) . ' ' . $this->faker->unique()->numerify('###');
         $types = ['text', 'number', 'boolean', 'select', 'multiselect', 'color', 'date', 'textarea', 'file', 'image'];
         $groupNames = ['basic_info', 'technical_specs', 'appearance', 'dimensions', 'materials', 'features', 'compatibility', 'warranty', 'shipping', 'seo'];
 
@@ -73,7 +72,7 @@ class AttributeFactory extends Factory
 
         $schema = Schema::connection(config('database.default', 'sqlite'));
 
-        if (! $schema->hasTable('attributes')) {
+        if (!$schema->hasTable('attributes')) {
             $schema->create('attributes', static function (Blueprint $table): void {
                 $table->id();
                 $table->string('name');
@@ -105,7 +104,7 @@ class AttributeFactory extends Factory
             });
         }
 
-        if (! $schema->hasTable('attribute_values')) {
+        if (!$schema->hasTable('attribute_values')) {
             $schema->create('attribute_values', static function (Blueprint $table): void {
                 $table->id();
                 $table->unsignedBigInteger('attribute_id');
@@ -125,7 +124,7 @@ class AttributeFactory extends Factory
             });
         }
 
-        if (! $schema->hasTable('product_attributes')) {
+        if (!$schema->hasTable('product_attributes')) {
             $schema->create('product_attributes', static function (Blueprint $table): void {
                 $table->id();
                 $table->unsignedBigInteger('product_id');
@@ -140,5 +139,243 @@ class AttributeFactory extends Factory
         }
 
         self::$schemaEnsured = true;
+    }
+
+    /**
+     * Indicate that the attribute is required.
+     */
+    public function required(): static
+    {
+        return $this->state(fn(array $attributes) => [
+            'is_required' => true,
+        ]);
+    }
+
+    /**
+     * Indicate that the attribute is optional.
+     */
+    public function optional(): static
+    {
+        return $this->state(fn(array $attributes) => [
+            'is_required' => false,
+        ]);
+    }
+
+    /**
+     * Indicate that the attribute is filterable.
+     */
+    public function filterable(): static
+    {
+        return $this->state(fn(array $attributes) => [
+            'is_filterable' => true,
+        ]);
+    }
+
+    /**
+     * Indicate that the attribute is searchable.
+     */
+    public function searchable(): static
+    {
+        return $this->state(fn(array $attributes) => [
+            'is_searchable' => true,
+        ]);
+    }
+
+    /**
+     * Indicate that the attribute is sortable.
+     */
+    public function sortable(): static
+    {
+        return $this->state(fn(array $attributes) => [
+            'is_sortable' => true,
+        ]);
+    }
+
+    /**
+     * Indicate that the attribute is visible.
+     */
+    public function visible(): static
+    {
+        return $this->state(fn(array $attributes) => [
+            'is_visible' => true,
+        ]);
+    }
+
+    /**
+     * Indicate that the attribute is hidden.
+     */
+    public function hidden(): static
+    {
+        return $this->state(fn(array $attributes) => [
+            'is_visible' => false,
+        ]);
+    }
+
+    /**
+     * Indicate that the attribute is editable.
+     */
+    public function editable(): static
+    {
+        return $this->state(fn(array $attributes) => [
+            'is_editable' => true,
+        ]);
+    }
+
+    /**
+     * Indicate that the attribute is readonly.
+     */
+    public function readonly(): static
+    {
+        return $this->state(fn(array $attributes) => [
+            'is_editable' => false,
+        ]);
+    }
+
+    /**
+     * Indicate that the attribute is enabled.
+     */
+    public function enabled(): static
+    {
+        return $this->state(fn(array $attributes) => [
+            'is_enabled' => true,
+            'is_active' => true,
+        ]);
+    }
+
+    /**
+     * Indicate that the attribute is disabled.
+     */
+    public function disabled(): static
+    {
+        return $this->state(fn(array $attributes) => [
+            'is_enabled' => false,
+            'is_active' => false,
+        ]);
+    }
+
+    /**
+     * Create a text type attribute.
+     */
+    public function text(): static
+    {
+        return $this->state(fn(array $attributes) => [
+            'type' => 'text',
+        ]);
+    }
+
+    /**
+     * Create a number type attribute.
+     */
+    public function number(): static
+    {
+        return $this->state(fn(array $attributes) => [
+            'type' => 'number',
+            'min_value' => 0,
+            'max_value' => 100,
+            'step_value' => 1,
+        ]);
+    }
+
+    /**
+     * Create a boolean type attribute.
+     */
+    public function boolean(): static
+    {
+        return $this->state(fn(array $attributes) => [
+            'type' => 'boolean',
+            'default_value' => 'false',
+        ]);
+    }
+
+    /**
+     * Create a select type attribute.
+     */
+    public function select(): static
+    {
+        return $this->state(fn(array $attributes) => [
+            'type' => 'select',
+        ]);
+    }
+
+    /**
+     * Create a multiselect type attribute.
+     */
+    public function multiselect(): static
+    {
+        return $this->state(fn(array $attributes) => [
+            'type' => 'multiselect',
+        ]);
+    }
+
+    /**
+     * Create a color type attribute.
+     */
+    public function color(): static
+    {
+        return $this->state(fn(array $attributes) => [
+            'type' => 'color',
+            'default_value' => '#000000',
+        ]);
+    }
+
+    /**
+     * Create a date type attribute.
+     */
+    public function date(): static
+    {
+        return $this->state(fn(array $attributes) => [
+            'type' => 'date',
+        ]);
+    }
+
+    /**
+     * Create a textarea type attribute.
+     */
+    public function textarea(): static
+    {
+        return $this->state(fn(array $attributes) => [
+            'type' => 'textarea',
+            'max_length' => 1000,
+        ]);
+    }
+
+    /**
+     * Create a file type attribute.
+     */
+    public function file(): static
+    {
+        return $this->state(fn(array $attributes) => [
+            'type' => 'file',
+        ]);
+    }
+
+    /**
+     * Create an image type attribute.
+     */
+    public function image(): static
+    {
+        return $this->state(fn(array $attributes) => [
+            'type' => 'image',
+        ]);
+    }
+
+    /**
+     * Set a specific group name.
+     */
+    public function inGroup(string $groupName): static
+    {
+        return $this->state(fn(array $attributes) => [
+            'group_name' => $groupName,
+        ]);
+    }
+
+    /**
+     * Set a specific category.
+     */
+    public function forCategory(int $categoryId): static
+    {
+        return $this->state(fn(array $attributes) => [
+            'category_id' => $categoryId,
+        ]);
     }
 }

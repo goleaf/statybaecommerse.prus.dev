@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
@@ -187,9 +185,11 @@ final class CustomerGroupResource extends Resource
                         return $query->when($value !== null, function (Builder $innerQuery) use ($value): Builder {
                             $state = self::resolveBooleanFilterValue($value);
 
-                            return $state === null
-                                ? $innerQuery
-                                : $innerQuery->where('is_active', $state);
+                            if ($state === null) {
+                                return $innerQuery->withoutGlobalScopes();
+                            }
+
+                            return $innerQuery->withoutGlobalScopes()->where('is_active', $state);
                         });
                     }),
                 SelectFilter::make('is_default')
@@ -198,36 +198,51 @@ final class CustomerGroupResource extends Resource
                         '1' => __('customer_groups.default_only'),
                         '0' => __('customer_groups.non_default_only'),
                     ])
-                    ->query(fn (Builder $query, $value): Builder => $query->when(
-                        self::resolveBooleanFilterValue($value) !== null,
-                        fn (Builder $q) => $q->where('is_default', self::resolveBooleanFilterValue($value))
-                    )),
+                    ->query(function (Builder $query, $value): Builder {
+                        $state = self::resolveBooleanFilterValue($value);
+
+                        if ($state === null) {
+                            return $query;
+                        }
+
+                        return $query->withoutGlobalScopes()->where('is_default', $state);
+                    }),
                 SelectFilter::make('has_special_pricing')
                     ->label(__('customer_groups.has_special_pricing'))
                     ->options([
                         '1' => __('customer_groups.only_special_pricing'),
                         '0' => __('customer_groups.all_groups'),
                     ])
-                    ->query(fn (Builder $query, $value): Builder => $query->when(
-                        self::resolveBooleanFilterValue($value) !== null,
-                        fn (Builder $q) => $q->where('has_special_pricing', self::resolveBooleanFilterValue($value))
-                    )),
+                    ->query(function (Builder $query, $value): Builder {
+                        $state = self::resolveBooleanFilterValue($value);
+
+                        if ($state === null) {
+                            return $query;
+                        }
+
+                        return $query->withoutGlobalScopes()->where('has_special_pricing', $state);
+                    }),
                 SelectFilter::make('has_volume_discounts')
                     ->label(__('customer_groups.has_volume_discounts'))
                     ->options([
                         '1' => __('customer_groups.only_volume_discounts'),
                         '0' => __('customer_groups.all_groups'),
                     ])
-                    ->query(fn (Builder $query, $value): Builder => $query->when(
-                        self::resolveBooleanFilterValue($value) !== null,
-                        fn (Builder $q) => $q->where('has_volume_discounts', self::resolveBooleanFilterValue($value))
-                    )),
+                    ->query(function (Builder $query, $value): Builder {
+                        $state = self::resolveBooleanFilterValue($value);
+
+                        if ($state === null) {
+                            return $query;
+                        }
+
+                        return $query->withoutGlobalScopes()->where('has_volume_discounts', $state);
+                    }),
                 SelectFilter::make('type')
                     ->label(__('customer_groups.type'))
                     ->options(self::typeOptions())
-                    ->query(fn (Builder $query, $value): Builder => $query->when(
+                    ->query(fn(Builder $query, $value): Builder => $query->when(
                         filled($value),
-                        fn (Builder $q) => $q->where('type', $value)
+                        fn(Builder $q) => $q->where('type', $value)
                     )),
             ])
             ->actions([
@@ -242,10 +257,15 @@ final class CustomerGroupResource extends Resource
 
                         return __('customer_groups.activate');
                     })
-                    ->icon(fn (?CustomerGroup $record): string => $record?->is_active ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
-                    ->color(fn (?CustomerGroup $record): string => $record?->is_active ? 'warning' : 'success')
-                    ->action(function (CustomerGroup $record): void {
-                        $record->update(['is_active' => ! $record->is_active]);
+                    ->icon(fn(?CustomerGroup $record): string => $record?->is_active ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
+                    ->color(fn(?CustomerGroup $record): string => $record?->is_active ? 'warning' : 'success')
+                    ->visible(fn(?CustomerGroup $record): bool => $record !== null)
+                    ->action(function (?CustomerGroup $record): void {
+                        if (!$record instanceof CustomerGroup) {
+                            return;
+                        }
+
+                        $record->update(['is_active' => !$record->is_active]);
 
                         Notification::make()
                             ->title($record->is_active ? __('customer_groups.activated_successfully') : __('customer_groups.deactivated_successfully'))
@@ -257,7 +277,7 @@ final class CustomerGroupResource extends Resource
                     ->label(__('customer_groups.set_default'))
                     ->icon('heroicon-o-star')
                     ->color('primary')
-                    ->visible(fn (?CustomerGroup $record): bool => $record?->is_default === false)
+                    ->visible(fn(?CustomerGroup $record): bool => $record?->is_default === false)
                     ->action(function (CustomerGroup $record): void {
                         CustomerGroup::query()
                             ->whereKeyNot($record->getKey())
@@ -265,7 +285,7 @@ final class CustomerGroupResource extends Resource
 
                         $record->update([
                             'is_default' => true,
-                            'is_active'  => true,
+                            'is_active' => true,
                         ]);
 
                         Notification::make()
@@ -273,7 +293,7 @@ final class CustomerGroupResource extends Resource
                             ->success()
                             ->send();
                     })
-                    ->visible(fn (?CustomerGroup $record): bool => $record instanceof CustomerGroup)
+                    ->visible(fn(?CustomerGroup $record): bool => $record instanceof CustomerGroup)
                     ->requiresConfirmation(),
             ])
             ->bulkActions([
@@ -284,16 +304,11 @@ final class CustomerGroupResource extends Resource
                         ->icon('heroicon-o-eye')
                         ->color('success')
                         ->action(function (Collection $records): void {
-                            $ids = $records->pluck('id')->filter()->all();
-
-                            if ($ids === []) {
-                                return;
-                            }
-
-                            CustomerGroup::query()
-                                ->whereKey($ids)
-                                ->get()
-                                ->each(fn (CustomerGroup $group): bool => $group->update(['is_active' => true]));
+                            $records
+                                ->filter(fn(?CustomerGroup $group): bool => $group instanceof CustomerGroup)
+                                ->each(static function (CustomerGroup $group): void {
+                                    $group->update(['is_active' => true]);
+                                });
 
                             Notification::make()
                                 ->title(__('customer_groups.bulk_activated_success'))
@@ -306,16 +321,11 @@ final class CustomerGroupResource extends Resource
                         ->icon('heroicon-o-eye-slash')
                         ->color('warning')
                         ->action(function (Collection $records): void {
-                            $ids = $records->pluck('id')->filter()->all();
-
-                            if ($ids === []) {
-                                return;
-                            }
-
-                            CustomerGroup::query()
-                                ->whereKey($ids)
-                                ->get()
-                                ->each(fn (CustomerGroup $group): bool => $group->update(['is_active' => false]));
+                            $records
+                                ->filter(fn(?CustomerGroup $group): bool => $group instanceof CustomerGroup)
+                                ->each(static function (CustomerGroup $group): void {
+                                    $group->update(['is_active' => false]);
+                                });
 
                             Notification::make()
                                 ->title(__('customer_groups.bulk_deactivated_success'))
@@ -335,10 +345,10 @@ final class CustomerGroupResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index'  => Pages\ListCustomerGroups::route('/'),
+            'index' => Pages\ListCustomerGroups::route('/'),
             'create' => Pages\CreateCustomerGroup::route('/create'),
-            'view'   => Pages\ViewCustomerGroup::route('/{record}'),
-            'edit'   => Pages\EditCustomerGroup::route('/{record}/edit'),
+            'view' => Pages\ViewCustomerGroup::route('/{record}'),
+            'edit' => Pages\EditCustomerGroup::route('/{record}/edit'),
         ];
     }
 
@@ -348,10 +358,10 @@ final class CustomerGroupResource extends Resource
     private static function typeOptions(): array
     {
         return [
-            'regular'   => __('customer_groups.type_regular'),
-            'vip'       => __('customer_groups.type_vip'),
+            'regular' => __('customer_groups.type_regular'),
+            'vip' => __('customer_groups.type_vip'),
             'wholesale' => __('customer_groups.type_wholesale'),
-            'retail'    => __('customer_groups.type_retail'),
+            'retail' => __('customer_groups.type_retail'),
             'corporate' => __('customer_groups.type_corporate'),
         ];
     }
@@ -389,5 +399,24 @@ final class CustomerGroupResource extends Resource
         }
 
         return null;
+    }
+
+    public static function mutateLocalizedAttributes(array $data): array
+    {
+        $normalized = $data;
+
+        foreach (['name', 'description'] as $attribute) {
+            if (!array_key_exists($attribute, $normalized)) {
+                continue;
+            }
+
+            $value = $normalized[$attribute];
+
+            if (is_array($value)) {
+                $normalized[$attribute] = json_encode($value, JSON_THROW_ON_ERROR);
+            }
+        }
+
+        return $normalized;
     }
 }

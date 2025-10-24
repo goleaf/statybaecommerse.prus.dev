@@ -35,8 +35,8 @@ final class UserPreferenceModelTest extends TestCase
     {
         $userPreference = UserPreference::factory()->create([
             'preference_score' => '0.85',
-            'metadata' => ['source' => 'test'],
-            'last_updated' => '2024-01-01 12:00:00',
+            'metadata'         => ['source' => 'test'],
+            'last_updated'     => '2024-01-01 12:00:00',
         ]);
 
         $this->assertIsFloat($userPreference->preference_score);
@@ -134,15 +134,15 @@ final class UserPreferenceModelTest extends TestCase
     public function test_user_preference_can_store_complex_metadata(): void
     {
         $complexMetadata = [
-            'source' => 'purchase_history',
-            'frequency' => 'high',
+            'source'              => 'purchase_history',
+            'frequency'           => 'high',
             'category_preference' => 'electronics',
-            'nested_data' => [
-                'subcategory' => 'smartphones',
+            'nested_data'         => [
+                'subcategory'      => 'smartphones',
                 'brand_preference' => 'apple',
             ],
             'timestamps' => [
-                'first_seen' => now()->toISOString(),
+                'first_seen'   => now()->toISOString(),
                 'last_updated' => now()->toISOString(),
             ],
         ];
