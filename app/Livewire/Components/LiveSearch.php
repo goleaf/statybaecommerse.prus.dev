@@ -54,11 +54,15 @@ final class LiveSearch extends Component
 
     public bool $enablePopularSearches = true;
 
+    public array $filters = [];
+
     /**
      * Initialize the Livewire component with parameters.
      */
-    public function mount(): void
+    public function mount(array $filters = []): void
     {
+        $this->filters = $this->sanitizeFilters($filters);
+
         if ($this->enableSuggestions) {
             $this->loadSuggestions();
         }
@@ -107,7 +111,7 @@ final class LiveSearch extends Component
             $suggestions = array_merge($suggestions, $recent);
         }
         if ($this->enablePopularSearches) {
-            $popular = $autocompleteService->getPopularSuggestions(7);
+            $popular = $autocompleteService->getPopularSuggestions(7, $this->filters);
             $suggestions = array_merge($suggestions, $popular);
         }
         $this->suggestions = array_slice($suggestions, 0, 10);
@@ -191,5 +195,18 @@ final class LiveSearch extends Component
     public function render(): View
     {
         return view('livewire.components.live-search');
+    }
+
+    /**
+     * @param  array<string, mixed>  $filters
+     * @return array<string, mixed>
+     */
+    private function sanitizeFilters(array $filters): array
+    {
+        return collect($filters)
+            ->only(['category', 'category_id', 'brand', 'brand_id'])
+            ->filter(static fn ($value) => is_scalar($value) && $value !== '' && $value !== null)
+            ->map(static fn ($value) => is_string($value) ? trim($value) : $value)
+            ->all();
     }
 }

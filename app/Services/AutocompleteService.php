@@ -216,17 +216,23 @@ final class AutocompleteService
      *
      * @return array<int, array<string, mixed>>
      */
-    public function getPopularSuggestions(int $limit = 10): array
+    public function getPopularSuggestions(int $limit = 10, array $filters = []): array
     {
         $limit = $this->normalizeLimit($limit);
+        $context = $this->normaliseProductContext($filters);
+        $cacheKey = $this->popularSuggestionsCacheKey($limit, $context);
 
         return Cache::remember(
-            'autocomplete:popular:'.$limit,
+            $cacheKey,
             900,
-            function () use ($limit): array {
-                return Product::query()
+            function () use ($limit, $context): array {
+                $query = Product::query()
                     ->where('is_visible', true)
-                    ->orderByDesc('created_at')
+                    ->orderByDesc('created_at');
+
+                $this->applyProductContextFilters($query, $context);
+
+                return $query
                     ->limit($limit)
                     ->get()
                     ->map(fn (Product $product) => [
@@ -234,6 +240,7 @@ final class AutocompleteService
                         'id' => $product->id,
                         'title' => $product->name,
                         'url' => $this->productUrl($product),
+                        'is_popular' => true,
                     ])
                     ->all();
             }

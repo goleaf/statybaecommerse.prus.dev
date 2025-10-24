@@ -61,7 +61,7 @@ final class CatalogueBrowsingTest extends TestCase
             'topCategories',
             'highlightedBrands',
         ]);
-        $response->assertSeeText($product->name);
+        $response->assertSeeText($product->name, false);
     }
 
     public function test_product_listing_filters_featured_products(): void
@@ -157,7 +157,7 @@ final class CatalogueBrowsingTest extends TestCase
         });
         $response->assertSeeText('Discover professional tools for every job');
         foreach ($visibleProducts as $product) {
-            $response->assertSeeText($product->name);
+            $response->assertSeeText($product->name, false);
         }
     }
 
@@ -225,7 +225,7 @@ final class CatalogueBrowsingTest extends TestCase
                 && ! $ids->contains($otherProduct->id)
                 && ! $ids->contains($hiddenProduct->id);
         });
-        $response->assertSeeText($categoryProduct->name);
+        $response->assertSeeText($categoryProduct->name, false);
     }
 
     public function test_brand_page_surfaces_products_and_categories(): void
@@ -297,6 +297,6 @@ final class CatalogueBrowsingTest extends TestCase
                 && ! $ids->contains($otherProduct->id)
                 && ! $ids->contains($hiddenProduct->id);
         });
-        $response->assertSeeText($brandProduct->name);
+        $response->assertSeeText($brandProduct->name, false);
     }
 }
