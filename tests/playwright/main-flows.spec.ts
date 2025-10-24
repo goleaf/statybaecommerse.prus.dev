@@ -48,7 +48,14 @@ test.describe('Storefront happy path', () => {
     });
     expect(searchResponse.ok(), `Product search failed${baseURL ? ` for ${baseURL}` : ''}`).toBeTruthy();
 
-    const matches = (await searchResponse.json()) as Array<{ id: number; name: string }>;
+    const payload = await searchResponse.json() as unknown;
+    const items = Array.isArray(payload)
+      ? payload
+      : (payload && typeof payload === 'object' && 'data' in payload && payload.data && typeof payload.data === 'object' && 'items' in payload.data
+        ? (payload.data as { items?: unknown }).items
+        : []);
+
+    const matches = Array.isArray(items) ? items as Array<{ id: number; name: string }> : [];
     const matchingProduct = matches.find((item) => item.name === productTitle)
       ?? matches.find((item) => item.name.includes(FEATURED_PRODUCT_NAME))
       ?? matches[0];
