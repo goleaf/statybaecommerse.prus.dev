@@ -17,7 +17,7 @@ trait BuildsProductCatalogueQuery
     {
         return Product::query()
             ->where('is_visible', true)
-            ->where('status', 'published')
+            ->whereIn('status', ['published', 'active'])
             ->whereNotNull('published_at')
             ->where('published_at', '<=', now())
             ->with([

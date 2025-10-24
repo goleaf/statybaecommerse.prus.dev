@@ -342,7 +342,29 @@ final class I18nAuditCommand extends Command
             }
         }
 
+        $supportedConfig = config('app.supported_locales', []);
+        $supportedLocales = collect();
+
+        if (is_array($supportedConfig)) {
+            $supportedLocales = collect($supportedConfig)->filter(static fn ($locale): bool => is_string($locale) && $locale !== '')->map(static fn (string $locale): string => trim($locale));
+        } elseif (is_string($supportedConfig)) {
+            $supportedLocales = collect(explode(',', $supportedConfig))
+                ->map(static fn (string $locale): string => trim($locale))
+                ->filter(static fn (string $locale): bool => $locale !== '');
+        }
+
+        $fallbackLocale = config('app.fallback_locale');
+        if (is_string($fallbackLocale) && $fallbackLocale !== '') {
+            $supportedLocales = $supportedLocales->push($fallbackLocale);
+        }
+
+        if ($supportedLocales->isNotEmpty()) {
+            $supportedLocales = $supportedLocales->unique()->values();
+            $locales = $locales
+                ->filter(static fn (string $locale): bool => $supportedLocales->contains($locale))
+                ->values();
+        }
+
         return $locales->unique()->sort()->values();
     }
 }
-

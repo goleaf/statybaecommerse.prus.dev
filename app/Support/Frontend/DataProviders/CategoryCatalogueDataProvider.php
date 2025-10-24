@@ -6,6 +6,7 @@ namespace App\Support\Frontend\DataProviders;
 
 use App\Models\Brand;
 use App\Models\Category;
+use App\Support\Frontend\DataProviders\Concerns\BuildsProductCatalogueQuery;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 

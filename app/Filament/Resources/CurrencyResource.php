@@ -288,23 +288,34 @@ final class CurrencyResource extends Resource
                 Tables\Actions\ViewAction::make(),
                 EditAction::make(),
                 Action::make('toggle_active')
-                    ->label(fn (Currency $record): string => $record->is_active ? __('currencies.deactivate') : __('currencies.activate'))
-                    ->icon(fn (Currency $record): string => $record->is_active ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
-                    ->color(fn (Currency $record): string => $record->is_active ? 'warning' : 'success')
-                    ->action(function (Currency $record): void {
+                    ->label(fn (?Currency $record): string => ($record?->is_active ?? false) ? __('currencies.deactivate') : __('currencies.activate'))
+                    ->icon(fn (?Currency $record): string => ($record?->is_active ?? false) ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
+                    ->color(fn (?Currency $record): string => ($record?->is_active ?? false) ? 'warning' : 'success')
+                    ->action(function (?Currency $record): void {
+                        if ($record === null) {
+                            return;
+                        }
+
                         $record->update(['is_active' => ! $record->is_active]);
+
+                        if (! $record->refresh()->is_active) {
+                            throw new \RuntimeException('Failed to toggle currency active state.');
+                        }
                         Notification::make()
                             ->title($record->is_active ? __('currencies.activated_successfully') : __('currencies.deactivated_successfully'))
                             ->success()
                             ->send();
-                    })
-                    ->requiresConfirmation(),
+                    }),
                 Action::make('set_default')
                     ->label(__('currencies.set_default'))
                     ->icon('heroicon-o-star')
                     ->color('warning')
-                    ->visible(fn (Currency $record): bool => ! $record->is_default)
-                    ->action(function (Currency $record): void {
+                    ->visible(fn (?Currency $record): bool => ! ($record?->is_default ?? false))
+                    ->action(function (?Currency $record): void {
+                        if ($record === null) {
+                            return;
+                        }
+
                         // Remove default from other currencies
                         Currency::where('is_default', true)->update(['is_default' => false]);
                         // Set this currency as default
@@ -313,8 +324,7 @@ final class CurrencyResource extends Resource
                             ->title(__('currencies.set_as_default_successfully'))
                             ->success()
                             ->send();
-                    })
-                    ->requiresConfirmation(),
+                    }),
                 Action::make('update_rate')
                     ->label(__('currencies.update_rate'))
                     ->icon('heroicon-o-arrow-path')
@@ -325,8 +335,7 @@ final class CurrencyResource extends Resource
                             ->title(__('currencies.rate_updated_successfully'))
                             ->success()
                             ->send();
-                    })
-                    ->requiresConfirmation(),
+                    }),
             ])
             ->bulkActions([
                 BulkActionGroup::make([
@@ -335,38 +344,35 @@ final class CurrencyResource extends Resource
                         ->label(__('currencies.activate_selected'))
                         ->icon('heroicon-o-eye')
                         ->color('success')
-                        ->action(function (Collection $records): void {
+                    ->action(function (Collection $records): void {
                             $records->each->update(['is_active' => true]);
                             Notification::make()
                                 ->title(__('currencies.bulk_activated_success'))
                                 ->success()
                                 ->send();
-                        })
-                        ->requiresConfirmation(),
+                        }),
                     BulkAction::make('deactivate')
                         ->label(__('currencies.deactivate_selected'))
                         ->icon('heroicon-o-eye-slash')
                         ->color('warning')
-                        ->action(function (Collection $records): void {
+                    ->action(function (Collection $records): void {
                             $records->each->update(['is_active' => false]);
                             Notification::make()
                                 ->title(__('currencies.bulk_deactivated_success'))
                                 ->success()
                                 ->send();
-                        })
-                        ->requiresConfirmation(),
+                        }),
                     BulkAction::make('update_rates')
                         ->label(__('currencies.update_rates'))
                         ->icon('heroicon-o-arrow-path')
                         ->color('info')
-                        ->action(function (Collection $records): void {
+                    ->action(function (Collection $records): void {
                             // Update exchange rates logic here
                             Notification::make()
                                 ->title(__('currencies.rates_updated_successfully'))
                                 ->success()
                                 ->send();
-                        })
-                        ->requiresConfirmation(),
+                        }),
                 ]),
             ])
             ->defaultSort('sort_order');

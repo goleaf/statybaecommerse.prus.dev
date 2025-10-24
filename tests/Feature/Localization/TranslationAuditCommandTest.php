@@ -9,9 +9,10 @@ it('feature: passes the translation audit', function (): void {
     $exitCode = Artisan::call('i18n:audit');
     $output = Artisan::output();
 
-    expect($exitCode)
-        ->withFailMessage("Translation audit failed:\n".$output)
-        ->toBe(Command::SUCCESS);
+    expect($exitCode)->toBe(
+        Command::SUCCESS,
+        "Translation audit failed:\n".$output
+    );
 
     expect($output)->toContain('All locales are consistent');
 });

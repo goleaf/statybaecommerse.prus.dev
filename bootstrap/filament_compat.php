@@ -83,6 +83,14 @@ namespace Filament\Forms\Components {
         class_alias(\Filament\Schemas\Components\Grid::class, Grid::class);
     }
 
+    if (! class_exists(SchemaSection::class) && class_exists(Section::class)) {
+        class_alias(Section::class, SchemaSection::class);
+    }
+
+    if (! class_exists(SchemaGrid::class) && class_exists(Grid::class)) {
+        class_alias(Grid::class, SchemaGrid::class);
+    }
+
     if (! class_exists(Combobox::class) && class_exists(\App\Support\FilamentCompat\Combobox::class)) {
         class_alias(\App\Support\FilamentCompat\Combobox::class, Combobox::class);
     }

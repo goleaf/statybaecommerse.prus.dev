@@ -51,6 +51,8 @@ $app = Application::configure(basePath: dirname(__DIR__))
         health: '/up',
         then: function (): void {
             Route::middleware('web')
+                ->group(base_path('routes/frontend.php'));
+            Route::middleware('web')
                 ->group(base_path('routes/system-settings.php'));
             // Load admin routes
             Route::middleware('web')

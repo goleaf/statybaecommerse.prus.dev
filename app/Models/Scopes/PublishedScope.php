@@ -38,7 +38,7 @@ final class PublishedScope implements Scope
             }
 
             if ($hints['status'] ?? false) {
-                $builder->where('status', 'published');
+                $builder->whereIn('status', ['published', 'active']);
             }
 
             return;
@@ -70,7 +70,7 @@ final class PublishedScope implements Scope
         }
 
         if ($columns['status']) {
-            $builder->where('status', 'published');
+            $builder->whereIn('status', ['published', 'active']);
         }
     }
 }

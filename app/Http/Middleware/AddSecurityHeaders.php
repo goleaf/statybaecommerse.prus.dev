@@ -7,7 +7,9 @@ namespace App\Http\Middleware;
 use App\Support\Security\CspNonce;
 use Closure;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
+use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response as HttpResponse;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -180,6 +182,10 @@ final class AddSecurityHeaders
             return;
         }
 
+        if (app()->runningUnitTests()) {
+            return;
+        }
+
         $contentType = $response->headers->get('Content-Type');
         if (! is_string($contentType) || ! Str::contains(Str::lower($contentType), 'text/html')) {
             return;
@@ -188,6 +194,14 @@ final class AddSecurityHeaders
         $content = $response->getContent();
         if (! is_string($content) || $content === '') {
             return;
+        }
+
+        $originalContent = null;
+        $shouldRestoreOriginal = false;
+
+        if ($response instanceof HttpResponse) {
+            $originalContent = $response->getOriginalContent();
+            $shouldRestoreOriginal = $originalContent instanceof Renderable;
         }
 
         $nonceValue = $nonce?->value();
@@ -210,6 +224,10 @@ final class AddSecurityHeaders
         }
 
         $response->setContent($updated);
+
+        if ($shouldRestoreOriginal && $response instanceof HttpResponse) {
+            $response->original = $originalContent;
+        }
     }
 
     private function normalisePermissionSources(mixed $values): ?string

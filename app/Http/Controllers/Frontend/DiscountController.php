@@ -10,6 +10,7 @@ use App\Models\Discount;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Session;
 use Illuminate\View\View;
 
@@ -117,7 +118,7 @@ final class DiscountController extends Controller
             ]);
         }
 
-        return redirect()->route('frontend.cart.index')->with('status', 'coupon-applied');
+        return $this->redirectToCart()->with('status', 'coupon-applied');
     }
 
     public function removeCoupon(Request $request): RedirectResponse|JsonResponse
@@ -132,7 +133,7 @@ final class DiscountController extends Controller
             ]);
         }
 
-        return redirect()->route('frontend.cart.index')->with('status', 'coupon-removed');
+        return $this->redirectToCart()->with('status', 'coupon-removed');
     }
 
     private function calculateDiscount(Coupon $coupon, float $subtotal): float
@@ -178,5 +179,14 @@ final class DiscountController extends Controller
             'discount' => round($discount, 2),
             'total' => round(max($total, 0), 2),
         ];
+    }
+
+    private function redirectToCart(): RedirectResponse
+    {
+        if (! Route::has('frontend.cart.index')) {
+            Route::getRoutes()->refreshNameLookups();
+        }
+
+        return redirect()->route('frontend.cart.index');
     }
 }

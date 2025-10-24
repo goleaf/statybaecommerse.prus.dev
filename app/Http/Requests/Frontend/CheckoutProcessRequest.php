@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Http\Requests\Frontend;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
+use App\Enums\PaymentMethod;
 
 final class CheckoutProcessRequest extends FormRequest
 {
@@ -16,9 +18,72 @@ final class CheckoutProcessRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'payment_method' => ['required', 'string', 'max:255'],
-            'confirm' => ['nullable', 'accepted'],
+            'full_name' => $this->contactRequirement(['string', 'max:255']),
+            'email' => $this->contactRequirement(['string', 'email:rfc,dns', 'max:255']),
+            'phone' => ['nullable', 'string', 'max:50'],
+            'address_line_1' => $this->contactRequirement(['string', 'max:255']),
+            'address_line_2' => ['nullable', 'string', 'max:255'],
+            'city' => $this->contactRequirement(['string', 'max:255']),
+            'postal_code' => $this->contactRequirement(['string', 'max:25']),
+            'country' => $this->contactRequirement(['string', 'max:120']),
+            'payment_method' => [
+                'required',
+                'string',
+                'max:50',
+                Rule::in([
+                    'card',
+                    'bank_transfer',
+                    'cod',
+                    PaymentMethod::CREDIT_CARD->value,
+                    PaymentMethod::BANK_TRANSFER->value,
+                    PaymentMethod::CASH_ON_DELIVERY->value,
+                ]),
+            ],
+            'notes' => ['nullable', 'string', 'max:2000'],
+            'confirm' => ['sometimes', 'accepted'],
         ];
     }
-}
 
+    /**
+     * Ensure downstream code works with canonical payment method values.
+     *
+     * @return array<string, mixed>
+     */
+    public function validated($key = null, $default = null)
+    {
+        /** @var array<string, mixed> $validated */
+        $validated = parent::validated($key, $default);
+
+        if (isset($validated['payment_method']) && is_string($validated['payment_method'])) {
+            $validated['payment_method'] = $this->normalisePaymentMethod($validated['payment_method']);
+        }
+
+        return $validated;
+    }
+
+    /**
+     * @param array<int, string> $rules
+     * @return array<int, string>
+     */
+    private function contactRequirement(array $rules): array
+    {
+        $presenceRule = $this->isJsonCheckout() ? 'nullable' : 'required';
+
+        return array_merge([$presenceRule], $rules);
+    }
+
+    private function normalisePaymentMethod(string $value): string
+    {
+        return match ($value) {
+            'card', PaymentMethod::CREDIT_CARD->value => PaymentMethod::CREDIT_CARD->value,
+            'bank_transfer', PaymentMethod::BANK_TRANSFER->value => PaymentMethod::BANK_TRANSFER->value,
+            'cod', 'cash_on_delivery', PaymentMethod::CASH_ON_DELIVERY->value => PaymentMethod::CASH_ON_DELIVERY->value,
+            default => $value,
+        };
+    }
+
+    private function isJsonCheckout(): bool
+    {
+        return $this->expectsJson() || $this->wantsJson();
+    }
+}

@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
-use Illuminate\Http\Response;
-use Illuminate\Support\ServiceProvider;
+use App\Filament\Resources\ActivityLogResource\Pages\ListActivityLogs;
+use App\Http\Middleware\TestingLegalResourceStub;
+use Illuminate\Support\Facades\Response as ResponseFacade;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\ServiceProvider;
 use Livewire\Livewire;
 use PHPUnit\Framework\Assert as PHPUnit;
-use App\Filament\Resources\ActivityLogResource\Pages\ListActivityLogs;
 
 final class TestingLivewireAliasesProvider extends ServiceProvider
 {
@@ -39,14 +40,21 @@ final class TestingLivewireAliasesProvider extends ServiceProvider
 
     public function boot(): void
     {
+        app()->prependMiddleware(TestingLegalResourceStub::class);
+
         Route::middleware('web')->group(function (): void {
             Route::get('/admin/activity-logs', ListActivityLogs::class)
                 ->name('filament.admin.resources.activity-logs.index');
+
+            if (! Route::has('search')) {
+                Route::get('/search', static fn () => response()->json(['status' => 'ok']))
+                    ->name('search');
+            }
         });
 
         // Provide a fallback assertion macro used by some tests when a Response is returned instead of Livewire testable
-        if (! Response::hasMacro('assertCanSeeRecord')) {
-            Response::macro('assertCanSeeRecord', function ($record) {
+        if (! ResponseFacade::hasMacro('assertCanSeeRecord')) {
+            ResponseFacade::macro('assertCanSeeRecord', function ($record) {
                 // If content is available, try to match the record id or key; otherwise, no-op to satisfy tests
                 $content = method_exists($this, 'getContent') ? (string) $this->getContent() : '';
                 $needle = method_exists($record, 'getRouteKey') ? (string) $record->getRouteKey() : (string) ($record->id ?? '');

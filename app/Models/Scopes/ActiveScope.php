@@ -91,6 +91,7 @@ final class ActiveScope implements Scope
         return match ($model::class) {
             \App\Models\Order::class => [],
             \App\Models\Referral::class => ['pending', 'active', 'completed', 'expired', 'cancelled'],
+            \App\Models\DiscountRedemption::class => ['pending', 'redeemed', 'expired', 'cancelled'],
             default                  => ['active'],
         };
     }

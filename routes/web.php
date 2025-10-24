@@ -8,6 +8,7 @@ use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\NewsCommentController;
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\SecureMediaDownloadController;
+use App\Http\Controllers\MailPreviewController;
 use App\Models\Discount;
 use Illuminate\Support\Facades\Route;
 

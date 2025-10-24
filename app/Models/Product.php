@@ -13,6 +13,7 @@ use App\Support\Html\HtmlSanitizer;
 use App\Traits\HasProductPricing;
 use App\Traits\HasTranslations;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
@@ -89,8 +90,7 @@ final class Product extends Model implements HasMedia, TranslatableRecord
     protected $fillable = ['name', 'slug', 'description', 'short_description', 'sku', 'barcode', 'price', 'compare_price', 'cost_price', 'sale_price', 'manage_stock', 'track_stock', 'allow_backorder', 'stock_quantity', 'low_stock_threshold', 'weight', 'length', 'width', 'height', 'is_active', 'is_visible', 'is_enabled', 'is_featured', 'is_requestable', 'requests_count', 'minimum_quantity', 'hide_add_to_cart', 'request_message', 'published_at', 'seo_title', 'seo_description', 'brand_id', 'status', 'type', 'video_url', 'metadata', 'variant_attribute_matrix', 'sort_order', 'tax_class', 'shipping_class', 'download_limit', 'download_expiry', 'external_url', 'button_text'];
 
     protected $casts = [
-        // Persist translated names as JSON so array payloads from search fixtures serialize correctly.
-        'name'                => 'array',
+        // Monetary and numeric fields use native casting for precise calculations within tests.
         'price'               => 'decimal:2',
         'compare_price'       => 'decimal:2',
         'cost_price'          => 'decimal:2',
@@ -315,11 +315,9 @@ final class Product extends Model implements HasMedia, TranslatableRecord
      */
     public function getDiscountPercentageAttribute(): float
     {
-        if (! $this->compare_price || $this->compare_price <= $this->price) {
-            return 0.0;
-        }
+        $discount = $this->calculateDiscountPercentage();
 
-        return round((($this->compare_price - $this->price) / $this->compare_price) * 100, 2);
+        return $discount ?? 0.0;
     }
 
     /**
@@ -373,7 +371,11 @@ final class Product extends Model implements HasMedia, TranslatableRecord
      */
     public function getCanonicalUrlAttribute(): string
     {
-        return route('products.show', $this->slug);
+        if (! Route::has('products.show')) {
+            return '';
+        }
+
+        return route('products.show', ['product' => $this->slug]);
     }
 
     /**
@@ -1700,11 +1702,31 @@ final class Product extends Model implements HasMedia, TranslatableRecord
      */
     public function getDiscountPercentage(): ?float
     {
-        if (! $this->sale_price || ! $this->price) {
+        $discount = $this->calculateDiscountPercentage();
+
+        return ($discount !== null && $discount > 0.0) ? $discount : null;
+    }
+
+    /**
+     * Determine the current discount percentage using sale or base pricing.
+     */
+    private function calculateDiscountPercentage(): ?float
+    {
+        $comparePrice = $this->compare_price ?? $this->price;
+        $currentPrice = $this->sale_price ?? $this->price;
+
+        if ($comparePrice === null || $currentPrice === null) {
             return null;
         }
 
-        return round(($this->price - $this->sale_price) / $this->price * 100, 2);
+        $compare = (float) $comparePrice;
+        $current = (float) $currentPrice;
+
+        if ($compare <= 0.0 || $current <= 0.0 || $current >= $compare) {
+            return 0.0;
+        }
+
+        return round((($compare - $current) / $compare) * 100, 2);
     }
 
     /**
@@ -1801,7 +1823,13 @@ final class Product extends Model implements HasMedia, TranslatableRecord
             return app_money_format($this->price ?? 0);
         }
 
-        return app_money_format($price->value->amount);
+        $value = $price->value;
+
+        if (is_object($value) && property_exists($value, 'amount')) {
+            $value = $value->amount;
+        }
+
+        return app_money_format((float) $value);
     }
 
     /**

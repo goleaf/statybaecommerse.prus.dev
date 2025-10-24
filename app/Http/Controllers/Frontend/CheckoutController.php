@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
+use App\Enums\PaymentMethod;
 use App\Models\CartItem;
 use App\Models\Order;
 use App\Models\OrderItem;
@@ -83,17 +84,28 @@ final class CheckoutController extends Controller
                 $request,
                 __('errors.messages.checkout_empty'),
                 422,
-                'frontend.cart.index'
+                'frontend.cart.index',
+                'cart'
             );
         }
 
         $validated = $request->validated();
+        $paymentMethod = PaymentMethod::tryFrom($validated['payment_method'] ?? '') ?? PaymentMethod::CREDIT_CARD;
+        $contactAddress = array_filter([
+            'full_name' => $validated['full_name'] ?? null,
+            'email' => $validated['email'] ?? null,
+            'phone' => $validated['phone'] ?? null,
+            'address_line_1' => $validated['address_line_1'] ?? null,
+            'address_line_2' => $validated['address_line_2'] ?? null,
+            'city' => $validated['city'] ?? null,
+            'postal_code' => $validated['postal_code'] ?? null,
+            'country' => $validated['country'] ?? null,
+        ], static fn ($value) => $value !== null && $value !== '');
+        $subtotal = (float) $items->sum(fn (CartItem $item) => $item->calculateSubtotal());
+        $breakdown = app(PriceCalculator::class)->breakdown($subtotal);
 
         try {
-            $order = DB::transaction(function () use ($items, $request, $validated) {
-                $subtotal = (float) $items->sum(fn (CartItem $item) => $item->calculateSubtotal());
-                $breakdown = app(PriceCalculator::class)->breakdown($subtotal);
-
+            $order = DB::transaction(function () use ($items, $request, $validated, $paymentMethod, $breakdown, $contactAddress) {
                 /** @var Order $order */
                 $order = Order::query()->create([
                     'number'            => Str::upper(Str::random(10)),
@@ -105,11 +117,12 @@ final class CheckoutController extends Controller
                     'discount_amount'   => $breakdown->discount,
                     'total'             => $breakdown->total,
                     'currency'          => $breakdown->currency,
-                    'billing_address'   => [],
-                    'shipping_address'  => [],
+                    'billing_address'   => $contactAddress,
+                    'shipping_address'  => $contactAddress,
                     'payment_status'    => 'paid',
-                    'payment_method'    => $validated['payment_method'],
+                    'payment_method'    => $paymentMethod->value,
                     'payment_reference' => (string) Str::uuid(),
+                    'notes'             => $validated['notes'] ?? null,
                 ]);
 
                 foreach ($items as $item) {
@@ -162,6 +175,10 @@ final class CheckoutController extends Controller
                 'success' => true,
                 'message' => __('ecommerce.order_placed_successfully'),
                 'order_id' => $order->getKey(),
+                'order' => [
+                    'id' => $order->getKey(),
+                    'number' => $order->number,
+                ],
             ], 201);
         }
 
@@ -202,7 +219,7 @@ final class CheckoutController extends Controller
         $sessionId = (string) $request->session()->getId();
         $userId = $request->user()?->getAuthIdentifier();
 
-        return CartItem::query()
+        $items = CartItem::query()
             ->where(function ($query) use ($sessionId, $userId): void {
                 $hasCondition = false;
 
@@ -227,6 +244,36 @@ final class CheckoutController extends Controller
             })
             ->orderBy('created_at')
             ->get();
+        if ($items->isNotEmpty()) {
+            return $items;
+        }
+
+        $sessionCart = $request->session()->get('cart', []);
+        if (! is_array($sessionCart) || $sessionCart === []) {
+            return collect();
+        }
+
+        return collect($sessionCart)
+            ->filter(static fn ($item): bool => is_array($item) && isset($item['product_id']))
+            ->map(static function (array $item): CartItem {
+                $price = isset($item['price']) ? (float) $item['price'] : (float) ($item['unit_price'] ?? 0.0);
+                $quantity = (int) ($item['quantity'] ?? 0);
+
+                return CartItem::make([
+                    'product_id' => (int) $item['product_id'],
+                    'product_variant_id' => isset($item['product_variant_id']) ? (int) $item['product_variant_id'] : null,
+                    'quantity' => $quantity > 0 ? $quantity : 1,
+                    'price' => $price,
+                    'unit_price' => $price,
+                    'product_snapshot' => [
+                        'name' => $item['name'] ?? null,
+                        'sku' => $item['sku'] ?? null,
+                        'image' => $item['image'] ?? null,
+                    ],
+                    'notes' => $item['notes'] ?? null,
+                ]);
+            })
+            ->values();
     }
 
     /**
@@ -241,18 +288,25 @@ final class CheckoutController extends Controller
         return ['item_count' => (int) $items->sum('quantity')] + $breakdown->toSummary();
     }
 
-    private function respondError(Request $request, string $message, int $status, ?string $redirectRoute = null): RedirectResponse|JsonResponse
+    private function respondError(Request $request, string $message, int $status, ?string $redirectRoute = null, ?string $errorKey = null): RedirectResponse|JsonResponse
     {
         if ($request->wantsJson()) {
             return response()->json([
                 'success' => false,
                 'message' => $message,
+                'errors' => $errorKey !== null ? [$errorKey => [$message]] : [],
             ], $status);
         }
 
         $flashKey = $status >= 500 ? 'error' : ($status === 429 ? 'warning' : 'error');
 
-        return redirect()->route($redirectRoute ?? 'frontend.checkout.index')->with($flashKey, $message);
+        $response = redirect()->route($redirectRoute ?? 'frontend.checkout.index');
+
+        if ($errorKey !== null) {
+            $response = $response->withErrors([$errorKey => $message]);
+        }
+
+        return $response->with($flashKey, $message);
     }
 
     private function checkoutThrottleKey(Request $request): string

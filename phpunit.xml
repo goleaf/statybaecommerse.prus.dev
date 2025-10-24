@@ -56,6 +56,7 @@
         <env name="ACTIVITY_LOGGER_ENABLED" value="false"/>
         <env name="PULSE_ENABLED" value="false"/>
         <env name="TELESCOPE_ENABLED" value="false"/>
+        <env name="LARAVEL_PARALLEL_TESTING_WITHOUT_DATABASES" value="1"/>
         <env name="SKIP_FILAMENT_BOOT" value="1"/>
         <env name="NIGHTWATCH_ENABLED" value="false"/>
         <!-- Avoid SQLite write-contention across processes -->

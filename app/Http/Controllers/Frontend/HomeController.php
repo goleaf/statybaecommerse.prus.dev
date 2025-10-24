@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
-use App\Support\Frontend\DataProviders\HomePageDataProvider;
+use App\Support\Frontend\DataProviders\HomepageCatalogueDataProvider;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 

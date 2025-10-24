@@ -114,7 +114,9 @@
         ],
         [
             'label' => __('Shop Products'),
-            'url' => route('products.index', ['locale' => $locale]) ?? url('/products'),
+            'url' => Route::has('frontend.products.index')
+                ? route('frontend.products.index', ['locale' => $locale])
+                : url('/products'),
             'icon' => 'products',
         ],
         [
@@ -124,7 +126,9 @@
         ],
         [
             'label' => __('View Cart'),
-            'url' => route('cart.index', ['locale' => $locale]) ?? url('/cart'),
+            'url' => Route::has('frontend.cart.index')
+                ? route('frontend.cart.index')
+                : url('/cart'),
             'icon' => 'cart',
         ],
     ],

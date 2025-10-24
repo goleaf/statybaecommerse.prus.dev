@@ -4,6 +4,12 @@
     </div>
 
     <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+        @php
+            $collectionsIndexUrl = \Illuminate\Support\Facades\Route::has('collections.index')
+                ? route('collections.index')
+                : url('/collections');
+        @endphp
+
         <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
             <div class="space-y-4 max-w-2xl">
                 <span
@@ -18,7 +24,7 @@
                     {{ __('home.collections_description') }}
                 </p>
             </div>
-            <a href="{{ route('collections.index') }}"
+            <a href="{{ $collectionsIndexUrl }}"
                class="inline-flex items-center gap-2 self-start rounded-full border border-gray-300 bg-gray-50 px-5 py-2.5 text-sm font-semibold text-gray-700 transition hover:bg-gray-100">
                 {{ __('home.all_collections') }}
                 <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">

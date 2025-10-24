@@ -17,8 +17,8 @@
             <!-- Filters -->
             <div class="mb-8">
                 <div class="flex flex-wrap gap-4 justify-center">
-                    <a href="{{ route('posts.index') }}"
-                       class="px-6 py-2 rounded-full {{ request()->routeIs('posts.index') && !request()->featured ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300' }}">
+                    <a href="{{ route('frontend.posts.index') }}"
+                       class="px-6 py-2 rounded-full {{ request()->routeIs('frontend.posts.index') && !request()->featured ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300' }}">
                         {{ __('posts.filters.all_posts') }}
                     </a>
                     <a href="{{ route('posts.featured') }}"
@@ -80,7 +80,7 @@
                                 </div>
 
                                 <h2 class="text-xl font-semibold text-gray-900 mb-3 line-clamp-2">
-                                    <a href="{{ route('posts.show', $post) }}"
+                                    <a href="{{ route('frontend.posts.show', $post) }}"
                                        class="hover:text-blue-600 transition-colors">
                                         {{ $post->getTranslatedTitle() }}
                                     </a>

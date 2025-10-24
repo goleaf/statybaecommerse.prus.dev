@@ -14,8 +14,18 @@
         ->values();
     $contactCta = is_array($contactCta ?? null) ? $contactCta : null;
     $locale = app()->getLocale();
-    $homeRoute = route('localized.home', ['locale' => $locale]) ?? url('/');
-    $searchRoute = route('search', ['locale' => $locale]) ?? '/search';
+    $homeRoute = \Illuminate\Support\Facades\Route::has('localized.home')
+        ? route('localized.home', ['locale' => $locale])
+        : (\Illuminate\Support\Facades\Route::has('home')
+            ? route('home')
+            : url('/'));
+    $searchRoute = \Illuminate\Support\Facades\Route::has('localized.search')
+        ? route('localized.search', ['locale' => $locale])
+        : (\Illuminate\Support\Facades\Route::has('frontend.search.index')
+            ? route('frontend.search.index')
+            : (\Illuminate\Support\Facades\Route::has('search')
+                ? route('search')
+                : url('/search')));
     $correlationHeaderConfig = config('app.correlation_header', 'X-Correlation-ID');
     $correlationHeader = is_string($correlationHeaderConfig) && $correlationHeaderConfig !== ''
         ? $correlationHeaderConfig

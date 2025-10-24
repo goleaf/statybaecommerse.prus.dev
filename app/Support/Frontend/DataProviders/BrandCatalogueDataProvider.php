@@ -6,6 +6,7 @@ namespace App\Support\Frontend\DataProviders;
 
 use App\Models\Brand;
 use App\Models\Category;
+use App\Support\Frontend\DataProviders\Concerns\BuildsProductCatalogueQuery;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 
@@ -15,21 +16,30 @@ final class BrandCatalogueDataProvider
 
     public function __construct(private readonly ProductCatalogueDataProvider $products) {}
 
-    public function index(): array
+    public function index(array $filters = []): array
     {
-        $brands = Brand::query()
+        $search = trim((string) ($filters['q'] ?? $filters['search'] ?? ''));
+
+        $brandsQuery = Brand::query()
+            ->where('is_visible', true)
             ->withCount([
-                'products as visible_products_count' => static function (Builder $query): void {
-                    $query->where('is_visible', true)
-                        ->whereNotNull('published_at')
-                        ->where('published_at', '<=', now());
+                'products as published_products_count' => static function (Builder $query): void {
+                    $query->published();
                 },
             ])
-            ->orderBy('name')
-            ->get();
+            ->when($search !== '', static function (Builder $query) use ($search): void {
+                $query->where('name', 'like', "%{$search}%");
+            })
+            ->orderByDesc('published_products_count')
+            ->orderBy('name');
+
+        $brands = $brandsQuery
+            ->paginate(24)
+            ->withQueryString();
 
         return [
             'brands' => $brands,
+            'search' => $search,
         ];
     }
 
@@ -37,7 +47,12 @@ final class BrandCatalogueDataProvider
     {
         $brand->loadCount(['products' => fn (Builder $query) => $query->published()]);
 
+        $filtersWithBrand = $filters;
+        $filtersWithBrand['brand'] = $brand->getKey();
+
         $products = $this->products->getProductsForBrand($brand, $filters);
+
+        $availableCategories = $this->resolveBrandCategories($brand);
 
         return [
             'brand' => $brand,
@@ -46,7 +61,9 @@ final class BrandCatalogueDataProvider
             'availableFilters' => $this->products->filterOptions(),
             'activeSort' => $this->products->resolveSortKey($filters['sort'] ?? null),
             'activeFilter' => $filters['filter'] ?? null,
-            'relatedCategories' => $this->resolveBrandCategories($brand),
+            'availableCategories' => $availableCategories,
+            'relatedCategories' => $availableCategories,
+            'filters' => $filtersWithBrand,
         ];
     }
 

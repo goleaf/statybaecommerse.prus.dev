@@ -9,6 +9,10 @@ use BackedEnum;
 use Filament\Schemas\Schema;
 use App\Filament\Resources\VariantInventoryResource\Pages;
 use App\Models\Location;
+use App\Models\Scopes\ActiveScope;
+use App\Models\Scopes\EnabledScope;
+use App\Models\Scopes\StatusScope;
+use App\Models\Scopes\TrackedScope;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Models\VariantInventory;
@@ -560,21 +564,30 @@ final class VariantInventoryResource extends Resource
                         $record = $livewire->getMountedTableActionRecord();
                         $quantity = (int) ($data['quantity'] ?? 0);
                         $type = $data['adjustment_type'] ?? 'add';
+                        \Log::info('adjust_stock action triggered', [
+                            'record_class' => get_class($record),
+                            'record_id' => $record->getKey(),
+                            'type' => $type,
+                            'quantity' => $quantity,
+                        ]);
 
                         switch ($type) {
                             case 'add':
-                                $record->addStock($quantity);
+                                $result = $record->addStock($quantity);
+                                \Log::info('addStock result', ['result' => $result]);
                                 break;
                             case 'subtract':
-                                $record->removeStock($quantity);
+                                $result = $record->removeStock($quantity);
+                                \Log::info('removeStock result', ['result' => $result]);
                                 break;
                             case 'set':
                                 $record->stock = $quantity;
-                                $record->updateAvailableStock();
+                                $result = $record->updateAvailableStock();
+                                \Log::info('setStock result', ['result' => $result]);
                                 break;
                         }
 
-                        $record->save();
+                        $record->refresh();
                         Notification::make()
                             ->title(__('admin.variant_inventory.stock_adjusted_successfully'))
                             ->success()
@@ -648,7 +661,7 @@ final class VariantInventoryResource extends Resource
                                         $record->updateAvailableStock();
                                         break;
                                 }
-                                $record->save();
+                                $record->refresh();
                                 $count++;
                             }
                             Notification::make()
@@ -723,5 +736,16 @@ final class VariantInventoryResource extends Resource
             'view'   => Pages\ViewVariantInventory::route('/{record}'),
             'edit'   => Pages\EditVariantInventory::route('/{record}/edit'),
         ];
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->withoutGlobalScopes([
+                ActiveScope::class,
+                EnabledScope::class,
+                TrackedScope::class,
+                StatusScope::class,
+            ]);
     }
 }

@@ -62,6 +62,7 @@ if (! function_exists('csp_nonce')) {
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\HtmlString;
+use Illuminate\Support\Str;
 
 if (! function_exists('current_currency')) {
     function current_currency(): string
@@ -167,10 +168,47 @@ if (! function_exists('format_money')) {
             // Fall back to intl formatter below
         }
 
-        // Fallback: use intl NumberFormatter
-        $formatter = new \NumberFormatter($locale, \NumberFormatter::CURRENCY);
+        // Fallback: use intl NumberFormatter when the extension is available
+        if (class_exists(\NumberFormatter::class)) {
+            try {
+                $formatter = new \NumberFormatter($locale, \NumberFormatter::CURRENCY);
+                $formatted = $formatter->formatCurrency((float) $amount, $currency);
+                if ($formatted !== false) {
+                    return $formatted;
+                }
+            } catch (\Throwable $e) {
+                // Silently fall back to manual formatting when NumberFormatter fails
+            }
+        }
 
-        return $formatter->formatCurrency((float) $amount, $currency) ?: (string) $amount;
+        // Final fallback: basic formatting that respects common locale decimal separators
+        $normalizedLocale = Str::of($locale)->lower()->replace(['@', '_'], '-')->value();
+        $primaryLocale = explode('-', $normalizedLocale)[0] ?? $normalizedLocale;
+        $dotDecimalLocales = [
+            'en',
+            'zh',
+            'ja',
+            'ko',
+            'th',
+            'my',
+            'id',
+            'ms',
+            'vi',
+            'bn',
+        ];
+
+        $useDotDecimal = in_array($primaryLocale, $dotDecimalLocales, true);
+        $decimalSeparator = $useDotDecimal ? '.' : ',';
+        $thousandsSeparator = $useDotDecimal ? ',' : ' ';
+        $formattedAmount = number_format((float) $amount, 2, $decimalSeparator, $thousandsSeparator);
+
+        if (! is_string($currency) || $currency === '') {
+            return $formattedAmount;
+        }
+
+        return $useDotDecimal
+            ? $currency . ' ' . $formattedAmount
+            : $formattedAmount . ' ' . $currency;
     }
 }
 
