@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Models;
 
@@ -12,11 +10,11 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Casts\Attribute as EloquentAttribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -24,7 +22,81 @@ use JsonException;
 use Stringable;
 
 /**
- * Attribute domain model responsible for product metadata.
+ * Attribute Model
+ *
+ * Represents product attributes/metadata with comprehensive validation, translation, and relationship management.
+ * Attributes can be text, number, select, multiselect, boolean, date, color, file, image, or textarea types.
+ *
+ * @property int                 $id
+ * @property string              $name
+ * @property string              $slug
+ * @property string              $type
+ * @property string|null         $description
+ * @property array|string|null   $validation_rules
+ * @property string|null         $default_value
+ * @property bool                $is_required
+ * @property bool                $is_filterable
+ * @property bool                $is_searchable
+ * @property bool                $is_visible
+ * @property bool                $is_editable
+ * @property bool                $is_sortable
+ * @property int                 $sort_order
+ * @property bool                $is_enabled
+ * @property bool                $is_active
+ * @property int|null            $category_id
+ * @property string|null         $group_name
+ * @property string|null         $icon
+ * @property string|null         $color
+ * @property int|null            $min_length
+ * @property int|null            $max_length
+ * @property float|null          $min_value
+ * @property float|null          $max_value
+ * @property float|null          $step_value
+ * @property string|null         $placeholder
+ * @property string|null         $help_text
+ * @property array|null          $meta_data
+ * @property \Carbon\Carbon      $created_at
+ * @property \Carbon\Carbon      $updated_at
+ * @property \Carbon\Carbon|null $deleted_at
+ * @property-read string                                                                $formatted_type
+ * @property-read array                                                                 $validation_rules_array
+ * @property-read array                                                                 $meta_data_array
+ * @property-read string                                                                $display_name
+ * @property-read string                                                                $formatted_description
+ * @property-read string                                                                $type_icon
+ * @property-read string                                                                $type_color
+ * @property-read string                                                                $status_badge
+ * @property-read string                                                                $status_color
+ * @property-read string                                                                $status_label
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, AttributeValue>        $values
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, AttributeValue>        $enabledValues
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, AttributeValue>        $requiredValues
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Product>               $products
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, ProductVariant>        $variants
+ * @property-read Category|null                                                         $category
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, ProductAttributeValue> $productAttributeValues
+ *
+ * @method static \Illuminate\Database\Eloquent\Builder|Attribute enabled()
+ * @method static \Illuminate\Database\Eloquent\Builder|Attribute disabled()
+ * @method static \Illuminate\Database\Eloquent\Builder|Attribute filterable()
+ * @method static \Illuminate\Database\Eloquent\Builder|Attribute searchable()
+ * @method static \Illuminate\Database\Eloquent\Builder|Attribute required()
+ * @method static \Illuminate\Database\Eloquent\Builder|Attribute optional()
+ * @method static \Illuminate\Database\Eloquent\Builder|Attribute ordered()
+ * @method static \Illuminate\Database\Eloquent\Builder|Attribute visible()
+ * @method static \Illuminate\Database\Eloquent\Builder|Attribute editable()
+ * @method static \Illuminate\Database\Eloquent\Builder|Attribute sortable()
+ * @method static \Illuminate\Database\Eloquent\Builder|Attribute byType(string $type)
+ * @method static \Illuminate\Database\Eloquent\Builder|Attribute byCategory(int $categoryId)
+ * @method static \Illuminate\Database\Eloquent\Builder|Attribute byGroup(string $groupName)
+ * @method static \Illuminate\Database\Eloquent\Builder|Attribute withValues()
+ * @method static \Illuminate\Database\Eloquent\Builder|Attribute withEnabledValues()
+ * @method static \Illuminate\Database\Eloquent\Builder|Attribute withTranslations(?string $locale = null)
+ * @method static \Illuminate\Database\Eloquent\Builder|Attribute newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Attribute newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Attribute query()
+ *
+ * @mixin \Eloquent
  */
 #[ScopedBy([ActiveScope::class, EnabledScope::class, VisibleScope::class])]
 final class Attribute extends Model
@@ -60,7 +132,7 @@ final class Attribute extends Model
     protected function validationRules(): EloquentAttribute
     {
         return EloquentAttribute::make(
-            get: static function ($value): array|string|null {
+            get: static function ($value): array | string | null {
                 if ($value === null) {
                     return null;
                 }
@@ -69,7 +141,7 @@ final class Attribute extends Model
                     return $value;
                 }
 
-                if (! is_string($value)) {
+                if (!is_string($value)) {
                     return $value;
                 }
 
@@ -112,7 +184,7 @@ final class Attribute extends Model
             return json_encode($value, JSON_THROW_ON_ERROR);
         } catch (JsonException) {
             // Developers occasionally persist rule objects; casting to strings maintains compatibility.
-            return json_encode(array_map(static fn ($rule): string => (string) $rule, $value), JSON_THROW_ON_ERROR);
+            return json_encode(array_map(static fn($rule): string => (string) $rule, $value), JSON_THROW_ON_ERROR);
         }
     }
 
@@ -183,6 +255,16 @@ final class Attribute extends Model
     }
 
     /**
+     * Scope to get only disabled attributes.
+     *
+     * @param mixed $query
+     */
+    public function scopeDisabled($query)
+    {
+        return $query->where('is_enabled', false);
+    }
+
+    /**
      * Handle scopeFilterable functionality with proper error handling.
      *
      * @param mixed $query
@@ -210,6 +292,16 @@ final class Attribute extends Model
     public function scopeRequired($query)
     {
         return $query->where('is_required', true);
+    }
+
+    /**
+     * Scope to get only optional (not required) attributes.
+     *
+     * @param mixed $query
+     */
+    public function scopeOptional($query)
+    {
+        return $query->where('is_required', false);
     }
 
     /**
@@ -310,17 +402,17 @@ final class Attribute extends Model
     public function getFormattedTypeAttribute(): string
     {
         return match ($this->type) {
-            'boolean'     => 'Boolean',
-            'color'       => 'Color',
-            'date'        => 'Date',
-            'file'        => 'File',
-            'image'       => 'Image',
+            'boolean' => 'Boolean',
+            'color' => 'Color',
+            'date' => 'Date',
+            'file' => 'File',
+            'image' => 'Image',
             'multiselect' => 'Multi Select',
-            'number'      => 'Number',
-            'select'      => 'Select',
-            'text'        => 'Text',
-            'textarea'    => 'Textarea',
-            default       => ucfirst($this->type),
+            'number' => 'Number',
+            'select' => 'Select',
+            'text' => 'Text',
+            'textarea' => 'Textarea',
+            default => ucfirst($this->type),
         };
     }
 
@@ -432,16 +524,16 @@ final class Attribute extends Model
     {
         return match ($this->type) {
             'boolean' => false,
-            'color'   => '#000000',
-            'date'    => null,
+            'color' => '#000000',
+            'date' => null,
             'file',
-            'image'       => null,
+            'image' => null,
             'multiselect' => [],
-            'number'      => 0,
-            'select'      => null,
+            'number' => 0,
+            'select' => null,
             'text',
             'textarea' => '',
-            default    => null,
+            default => null,
         };
     }
 
@@ -493,17 +585,17 @@ final class Attribute extends Model
     public function getTypeIconAttribute(): string
     {
         return match ($this->type) {
-            'boolean'     => 'heroicon-o-check-circle',
-            'color'       => 'heroicon-o-swatch',
-            'date'        => 'heroicon-o-calendar',
-            'file'        => 'heroicon-o-paper-clip',
-            'image'       => 'heroicon-o-photo',
+            'boolean' => 'heroicon-o-check-circle',
+            'color' => 'heroicon-o-swatch',
+            'date' => 'heroicon-o-calendar',
+            'file' => 'heroicon-o-paper-clip',
+            'image' => 'heroicon-o-photo',
             'multiselect' => 'heroicon-o-squares-2x2',
-            'number'      => 'heroicon-o-calculator',
-            'select'      => 'heroicon-o-list-bullet',
-            'text'        => 'heroicon-o-document-text',
-            'textarea'    => 'heroicon-o-document',
-            default       => 'heroicon-o-adjustments-horizontal',
+            'number' => 'heroicon-o-calculator',
+            'select' => 'heroicon-o-list-bullet',
+            'text' => 'heroicon-o-document-text',
+            'textarea' => 'heroicon-o-document',
+            default => 'heroicon-o-adjustments-horizontal',
         };
     }
 
@@ -513,17 +605,17 @@ final class Attribute extends Model
     public function getTypeColorAttribute(): string
     {
         return match ($this->type) {
-            'text'        => 'gray',
-            'number'      => 'blue',
-            'boolean'     => 'green',
-            'select'      => 'yellow',
+            'text' => 'gray',
+            'number' => 'blue',
+            'boolean' => 'green',
+            'select' => 'yellow',
             'multiselect' => 'orange',
-            'color'       => 'purple',
-            'date'        => 'red',
-            'textarea'    => 'indigo',
-            'file'        => 'pink',
-            'image'       => 'rose',
-            default       => 'gray',
+            'color' => 'purple',
+            'date' => 'red',
+            'textarea' => 'indigo',
+            'file' => 'pink',
+            'image' => 'rose',
+            default => 'gray',
         };
     }
 
@@ -537,7 +629,7 @@ final class Attribute extends Model
             $rules[] = 'required';
         }
         $extra = $this->getValidationRulesArrayAttribute();
-        if (! empty($extra)) {
+        if (!empty($extra)) {
             $rules = array_merge($rules, $extra);
         }
 
@@ -626,7 +718,7 @@ final class Attribute extends Model
      */
     public function getStatusBadgeAttribute(): string
     {
-        if (! $this->is_enabled) {
+        if (!$this->is_enabled) {
             return 'disabled';
         }
         if ($this->is_required) {
@@ -645,11 +737,11 @@ final class Attribute extends Model
     public function getStatusColorAttribute(): string
     {
         return match ($this->status_badge) {
-            'disabled'   => 'gray',
-            'required'   => 'red',
+            'disabled' => 'gray',
+            'required' => 'red',
             'filterable' => 'blue',
-            'standard'   => 'green',
-            default      => 'gray',
+            'standard' => 'green',
+            default => 'gray',
         };
     }
 
@@ -659,11 +751,11 @@ final class Attribute extends Model
     public function getStatusLabelAttribute(): string
     {
         return match ($this->status_badge) {
-            'disabled'   => __('attributes.disabled'),
-            'required'   => __('attributes.required'),
+            'disabled' => __('attributes.disabled'),
+            'required' => __('attributes.required'),
             'filterable' => __('attributes.filterable'),
-            'standard'   => __('attributes.standard'),
-            default      => __('attributes.unknown'),
+            'standard' => __('attributes.standard'),
+            default => __('attributes.unknown'),
         };
     }
 

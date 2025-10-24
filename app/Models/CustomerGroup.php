@@ -1,30 +1,66 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Models;
 
 use Database\Factories\CustomerGroupFactory;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Spatie\Translatable\HasTranslations;
 
 /**
- * CustomerGroup
+ * CustomerGroup Model
  *
- * Eloquent model representing the CustomerGroup entity with comprehensive relationships, scopes, and business logic for the e-commerce system.
+ * Represents a customer segmentation group with discount rules, permissions, and access control.
+ * Groups can be assigned to users/customers to provide special pricing, catalog access, and ordering capabilities.
  *
- * @property mixed                     $table
- * @property array<int, string>        $translatable
- * @property mixed                     $fillable
+ * @property int                       $id
+ * @property string                    $name
+ * @property string                    $slug
+ * @property string|null               $code
+ * @property string|null               $color
+ * @property string|null               $icon
+ * @property string|null               $description
+ * @property float|null                $discount_percentage
+ * @property string|null               $discount_fixed
+ * @property bool                      $has_special_pricing
+ * @property bool                      $has_volume_discounts
+ * @property bool                      $can_view_prices
+ * @property bool                      $can_place_orders
+ * @property bool                      $can_view_catalog
+ * @property bool                      $can_use_coupons
+ * @property bool                      $is_enabled
+ * @property bool                      $is_active
+ * @property bool                      $is_default
+ * @property int                       $sort_order
+ * @property string                    $type
  * @property array<string, mixed>|null $metadata
+ * @property array<string, mixed>|null $conditions
+ * @property string|null               $payment_terms
+ * @property string|null               $minimum_order_amount
+ * @property string|null               $credit_limit
+ * @property \Carbon\Carbon            $created_at
+ * @property \Carbon\Carbon            $updated_at
+ * @property \Carbon\Carbon|null       $deleted_at
+ * @property-read int                                                               $users_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, User>              $users
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, User>              $customers
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, Discount>          $discounts
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, PriceList>         $priceLists
  *
+ * @method static Builder|CustomerGroup active()
+ * @method static Builder|CustomerGroup inactive()
+ * @method static Builder|CustomerGroup enabled()
+ * @method static Builder|CustomerGroup disabled()
+ * @method static Builder|CustomerGroup withDiscount()
+ * @method static Builder|CustomerGroup withSpecialPricing()
+ * @method static Builder|CustomerGroup byType(string $type)
+ * @method static Builder|CustomerGroup default()
+ * @method static Builder|CustomerGroup orderByPriority()
  * @method static Builder|CustomerGroup newModelQuery()
  * @method static Builder|CustomerGroup newQuery()
  * @method static Builder|CustomerGroup query()
@@ -35,7 +71,6 @@ final class CustomerGroup extends Model
 {
     /** @use HasFactory<CustomerGroupFactory> */
     use HasFactory;
-
     use HasTranslations {
         getTranslations as getTranslationsFromTrait;
     }
@@ -47,49 +82,6 @@ final class CustomerGroup extends Model
      * @var array<int, string>
      */
     public array $translatable = ['name', 'description'];
-
-    protected static function booted(): void
-    {
-        // Generate a slug automatically so legacy factories and direct model usage can
-        // create customer groups without explicitly specifying one.
-        self::creating(function (CustomerGroup $group): void {
-            if (! $group->slug) {
-                /** @var array<string, string>|string|null $rawName */
-                $rawName = $group->getAttribute('name');
-
-                $resolvedName = is_array($rawName)
-                    ? (string) (Arr::first($rawName) ?? '')
-                    : (string) ($rawName ?? '');
-
-                if ($resolvedName === '') {
-                    $code = $group->getAttribute('code');
-
-                    if (is_string($code) && $code !== '') {
-                        $resolvedName = $code;
-                    }
-                }
-
-                $group->slug = Str::slug($resolvedName) ?: Str::random(8);
-            }
-        });
-
-        self::saving(function (CustomerGroup $group): void {
-            foreach (['name', 'description'] as $attribute) {
-                $raw = $group->getAttributes()[$attribute] ?? null;
-
-                if (! is_string($raw)) {
-                    continue;
-                }
-
-                $decoded = json_decode($raw, true);
-
-                if (json_last_error() === JSON_ERROR_NONE && is_array($decoded) && count($decoded) === 1) {
-                    $collapsedValue = Arr::first($decoded, default: '');
-                    $group->attributes[$attribute] = is_scalar($collapsedValue) ? (string) $collapsedValue : '';
-                }
-            }
-        });
-    }
 
     /**
      * Whitelist both the legacy segmentation flags and the modern management fields.
@@ -125,22 +117,33 @@ final class CustomerGroup extends Model
     /**
      * Bootstrap the model and ensure the slug column is automatically maintained.
      */
-    protected static function boot(): void
+    protected static function booted(): void
     {
-        parent::boot();
-
-        self::creating(static function (CustomerGroup $customerGroup): void {
-            // Derive the slug from the code or name so the database constraint is always satisfied.
-            $slug = $customerGroup->getAttribute('slug');
-            $customerGroup->setAttribute('slug', $slug ?? self::generateSlug($customerGroup));
+        // Generate a slug automatically when creating a record
+        self::creating(static function (CustomerGroup $group): void {
+            if (!$group->slug) {
+                $group->slug = self::generateSlug($group);
+            }
         });
 
-        self::updating(static function (CustomerGroup $customerGroup): void {
-            // Refresh the slug when relevant attributes change while respecting manually provided values.
-            $slug = $customerGroup->getAttribute('slug');
+        // Update slug when name or code changes
+        self::updating(static function (CustomerGroup $group): void {
+            if ($group->isDirty(['name', 'code']) && empty($group->slug)) {
+                $group->slug = self::generateSlug($group);
+            }
+        });
 
-            if ($customerGroup->isDirty(['name', 'code']) && empty($slug)) {
-                $customerGroup->setAttribute('slug', self::generateSlug($customerGroup));
+        // Ensure translatable fields are properly stored
+        self::saving(static function (CustomerGroup $group): void {
+            foreach ($group->translatable as $attribute) {
+                $value = $group->getAttribute($attribute);
+
+                if (is_array($value)) {
+                    continue;
+                }
+
+                $group->setTranslation($attribute, 'lt', $value);
+                $group->setTranslation($attribute, 'en', $value);
             }
         });
     }
@@ -170,20 +173,22 @@ final class CustomerGroup extends Model
     protected function casts(): array
     {
         return [
-            'discount_fixed'       => 'decimal:2',
-            'has_special_pricing'  => 'boolean',
+            'discount_fixed' => 'decimal:2',
+            'minimum_order_amount' => 'decimal:2',
+            'credit_limit' => 'decimal:2',
+            'has_special_pricing' => 'boolean',
             'has_volume_discounts' => 'boolean',
-            'can_view_prices'      => 'boolean',
-            'can_place_orders'     => 'boolean',
-            'can_view_catalog'     => 'boolean',
-            'can_use_coupons'      => 'boolean',
-            'is_enabled'           => 'boolean',
-            'is_active'            => 'boolean',
-            'is_default'           => 'boolean',
-            'sort_order'           => 'integer',
-            'metadata'             => 'array',
-            'conditions'           => 'array',
-            'deleted_at'           => 'datetime',
+            'can_view_prices' => 'boolean',
+            'can_place_orders' => 'boolean',
+            'can_view_catalog' => 'boolean',
+            'can_use_coupons' => 'boolean',
+            'is_enabled' => 'boolean',
+            'is_active' => 'boolean',
+            'is_default' => 'boolean',
+            'sort_order' => 'integer',
+            'metadata' => 'array',
+            'conditions' => 'array',
+            'deleted_at' => 'datetime',
         ];
     }
 
@@ -201,7 +206,7 @@ final class CustomerGroup extends Model
                     return null;
                 }
 
-                if (! is_numeric($value)) {
+                if (!is_numeric($value)) {
                     // Bail out gracefully when the persisted value is not numeric to avoid type juggling bugs.
                     return null;
                 }
@@ -213,7 +218,7 @@ final class CustomerGroup extends Model
                     return null;
                 }
 
-                if (! is_numeric($value)) {
+                if (!is_numeric($value)) {
                     return null;
                 }
 
@@ -222,9 +227,8 @@ final class CustomerGroup extends Model
         );
     }
 
-    /**
-     * Handle users functionality with proper error handling.
-     */
+    /** Handle users functionality with proper error handling. */
+
     /**
      * @return BelongsToMany<User, self>
      */
@@ -280,6 +284,7 @@ final class CustomerGroup extends Model
      *
      * @param mixed $query
      */
+
     /**
      * @param  Builder<CustomerGroup> $query
      * @return Builder<CustomerGroup>
@@ -294,6 +299,7 @@ final class CustomerGroup extends Model
      *
      * @param mixed $query
      */
+
     /**
      * @param  Builder<CustomerGroup> $query
      * @return Builder<CustomerGroup>
@@ -301,6 +307,83 @@ final class CustomerGroup extends Model
     public function scopeWithDiscount(Builder $query): Builder
     {
         return $query->where('discount_percentage', '>', 0);
+    }
+
+    /**
+     * Scope to get only inactive groups.
+     *
+     * @param  Builder<CustomerGroup> $query
+     * @return Builder<CustomerGroup>
+     */
+    public function scopeInactive(Builder $query): Builder
+    {
+        return $query->where('is_enabled', false)->where('is_active', false);
+    }
+
+    /**
+     * Scope to get only active groups (both is_enabled and is_active).
+     *
+     * @param  Builder<CustomerGroup> $query
+     * @return Builder<CustomerGroup>
+     */
+    public function scopeActive(Builder $query): Builder
+    {
+        return $query->where('is_enabled', true)->where('is_active', true);
+    }
+
+    /**
+     * Scope to get only disabled groups.
+     *
+     * @param  Builder<CustomerGroup> $query
+     * @return Builder<CustomerGroup>
+     */
+    public function scopeDisabled(Builder $query): Builder
+    {
+        return $query->where('is_enabled', false);
+    }
+
+    /**
+     * Scope to get groups with special pricing enabled.
+     *
+     * @param  Builder<CustomerGroup> $query
+     * @return Builder<CustomerGroup>
+     */
+    public function scopeWithSpecialPricing(Builder $query): Builder
+    {
+        return $query->where('has_special_pricing', true);
+    }
+
+    /**
+     * Scope to filter by group type.
+     *
+     * @param  Builder<CustomerGroup> $query
+     * @return Builder<CustomerGroup>
+     */
+    public function scopeByType(Builder $query, string $type): Builder
+    {
+        return $query->where('type', $type);
+    }
+
+    /**
+     * Scope to get only default groups.
+     *
+     * @param  Builder<CustomerGroup> $query
+     * @return Builder<CustomerGroup>
+     */
+    public function scopeDefault(Builder $query): Builder
+    {
+        return $query->where('is_default', true);
+    }
+
+    /**
+     * Scope to order by sort_order ascending.
+     *
+     * @param  Builder<CustomerGroup> $query
+     * @return Builder<CustomerGroup>
+     */
+    public function scopeOrderByPriority(Builder $query): Builder
+    {
+        return $query->orderBy('sort_order', 'asc');
     }
 
     /**
@@ -318,7 +401,7 @@ final class CustomerGroup extends Model
     {
         $rawDiscount = $this->getAttribute('discount_percentage');
 
-        if (! is_numeric($rawDiscount)) {
+        if (!is_numeric($rawDiscount)) {
             // Treat missing or malformed discounts as zero so downstream logic stays predictable.
             return false;
         }
@@ -461,5 +544,107 @@ final class CustomerGroup extends Model
         }
 
         return (bool) $value;
+    }
+
+    /**
+     * Check if the group has any discount (percentage or fixed).
+     */
+    public function hasAnyDiscount(): bool
+    {
+        return $this->hasDiscountRate() || $this->hasFixedDiscount();
+    }
+
+    /**
+     * Check if the group has a fixed discount.
+     */
+    public function hasFixedDiscount(): bool
+    {
+        $rawFixed = $this->getAttribute('discount_fixed');
+
+        if (!is_numeric($rawFixed)) {
+            return false;
+        }
+
+        return (float) $rawFixed > 0;
+    }
+
+    /**
+     * Check if the group allows catalog viewing.
+     */
+    public function canViewCatalog(): bool
+    {
+        return (bool) $this->getAttribute('can_view_catalog');
+    }
+
+    /**
+     * Check if the group allows price viewing.
+     */
+    public function canViewPrices(): bool
+    {
+        return (bool) $this->getAttribute('can_view_prices');
+    }
+
+    /**
+     * Check if the group allows placing orders.
+     */
+    public function canPlaceOrders(): bool
+    {
+        return (bool) $this->getAttribute('can_place_orders');
+    }
+
+    /**
+     * Check if the group can use coupons.
+     */
+    public function canUseCoupons(): bool
+    {
+        return (bool) $this->getAttribute('can_use_coupons');
+    }
+
+    /**
+     * Check if this is the default group.
+     */
+    public function isDefault(): bool
+    {
+        return (bool) $this->getAttribute('is_default');
+    }
+
+    /**
+     * Get total discount (considering both percentage and fixed).
+     */
+    public function getTotalDiscountForAmount(float $amount): float
+    {
+        $discount = 0.0;
+
+        if ($this->hasDiscountRate()) {
+            $percentage = $this->getAttribute('discount_percentage');
+            if (is_numeric($percentage)) {
+                $discount += ($amount * ((float) $percentage) / 100);
+            }
+        }
+
+        if ($this->hasFixedDiscount()) {
+            $fixed = $this->getAttribute('discount_fixed');
+            if (is_numeric($fixed)) {
+                $discount += (float) $fixed;
+            }
+        }
+
+        return $discount;
+    }
+
+    /**
+     * Check if the group has volume discounts enabled.
+     */
+    public function hasVolumeDiscounts(): bool
+    {
+        return (bool) $this->getAttribute('has_volume_discounts');
+    }
+
+    /**
+     * Check if the group has special pricing enabled.
+     */
+    public function hasSpecialPricing(): bool
+    {
+        return (bool) $this->getAttribute('has_special_pricing');
     }
 }

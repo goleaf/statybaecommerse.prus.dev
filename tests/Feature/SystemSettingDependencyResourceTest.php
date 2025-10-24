@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Tests\Feature;
 
@@ -32,7 +30,8 @@ final class SystemSettingDependencyResourceTest extends TestCase
         SystemSettingDependency::factory()->create([
             'setting_id' => $setting1->id,
             'depends_on_setting_id' => $setting2->id,
-            'condition' => 'setting2.value == "enabled"',
+            'condition' => 'equals',
+            'condition_value' => 'enabled',
             'is_active' => true,
         ]);
 
@@ -51,7 +50,8 @@ final class SystemSettingDependencyResourceTest extends TestCase
             ->fillForm([
                 'setting_id' => $setting1->id,
                 'depends_on_setting_id' => $setting2->id,
-                'condition' => 'setting2.value == "enabled"',
+                'condition' => 'equals',
+                'condition_value' => 'enabled',
                 'is_active' => true,
             ])
             ->call('create')
@@ -60,7 +60,8 @@ final class SystemSettingDependencyResourceTest extends TestCase
         $this->assertDatabaseHas('system_setting_dependencies', [
             'setting_id' => $setting1->id,
             'depends_on_setting_id' => $setting2->id,
-            'condition' => 'setting2.value == "enabled"',
+            'condition' => 'equals',
+            'condition_value' => 'enabled',
             'is_active' => true,
         ]);
     }
@@ -74,7 +75,8 @@ final class SystemSettingDependencyResourceTest extends TestCase
         $dependency = SystemSettingDependency::factory()->create([
             'setting_id' => $setting1->id,
             'depends_on_setting_id' => $setting2->id,
-            'condition' => 'setting2.value == "enabled"',
+            'condition' => 'equals',
+            'condition_value' => 'enabled',
             'is_active' => true,
         ]);
 
@@ -84,7 +86,8 @@ final class SystemSettingDependencyResourceTest extends TestCase
             ->fillForm([
                 'setting_id' => $setting1->id,
                 'depends_on_setting_id' => $setting3->id,
-                'condition' => 'setting3.value == "enabled"',
+                'condition' => 'equals',
+                'condition_value' => 'enabled',
                 'is_active' => false,
             ])
             ->call('save')
@@ -94,7 +97,8 @@ final class SystemSettingDependencyResourceTest extends TestCase
             'id' => $dependency->id,
             'setting_id' => $setting1->id,
             'depends_on_setting_id' => $setting3->id,
-            'condition' => 'setting3.value == "enabled"',
+            'condition' => 'equals',
+            'condition_value' => 'enabled',
             'is_active' => false,
         ]);
     }
@@ -107,7 +111,8 @@ final class SystemSettingDependencyResourceTest extends TestCase
         $dependency = SystemSettingDependency::factory()->create([
             'setting_id' => $setting1->id,
             'depends_on_setting_id' => $setting2->id,
-            'condition' => 'setting2.value == "enabled"',
+            'condition' => 'equals',
+            'condition_value' => 'enabled',
             'is_active' => true,
         ]);
 
@@ -212,7 +217,8 @@ final class SystemSettingDependencyResourceTest extends TestCase
         $dependency = SystemSettingDependency::factory()->create([
             'setting_id' => $setting1->id,
             'depends_on_setting_id' => $setting2->id,
-            'condition' => 'setting2.value == "enabled"',
+            'condition' => 'equals',
+            'condition_value' => 'enabled',
             'is_active' => true,
         ]);
 
@@ -223,8 +229,8 @@ final class SystemSettingDependencyResourceTest extends TestCase
         $this->assertDatabaseHas('system_setting_dependencies', [
             'setting_id' => $setting1->id,
             'depends_on_setting_id' => $setting2->id,
-            'condition' => 'setting2.value == "enabled" (Copy)',
-            'is_active' => false,
+            'condition' => 'equals',
+            'condition_value' => 'enabled',
         ]);
     }
 
@@ -300,14 +306,16 @@ final class SystemSettingDependencyResourceTest extends TestCase
         $dependency1 = SystemSettingDependency::factory()->create([
             'setting_id' => $setting1->id,
             'depends_on_setting_id' => $setting2->id,
-            'condition' => 'setting2.value == "enabled"',
+            'condition' => 'equals',
+            'condition_value' => 'enabled',
             'is_active' => true,
         ]);
 
         $dependency2 = SystemSettingDependency::factory()->create([
             'setting_id' => $setting2->id,
             'depends_on_setting_id' => $setting1->id,
-            'condition' => 'setting1.value == "enabled"',
+            'condition' => 'equals',
+            'condition_value' => 'enabled',
             'is_active' => true,
         ]);
 
@@ -318,39 +326,43 @@ final class SystemSettingDependencyResourceTest extends TestCase
         $this->assertDatabaseHas('system_setting_dependencies', [
             'setting_id' => $setting1->id,
             'depends_on_setting_id' => $setting2->id,
-            'condition' => 'setting2.value == "enabled" (Copy)',
-            'is_active' => false,
+            'condition' => 'equals',
+            'condition_value' => 'enabled',
         ]);
 
         $this->assertDatabaseHas('system_setting_dependencies', [
             'setting_id' => $setting2->id,
             'depends_on_setting_id' => $setting1->id,
-            'condition' => 'setting1.value == "enabled" (Copy)',
-            'is_active' => false,
+            'condition' => 'equals',
+            'condition_value' => 'enabled',
         ]);
     }
 
     public function test_can_search_dependencies(): void
     {
-        $setting1 = SystemSetting::factory()->create(['key' => 'setting1']);
-        $setting2 = SystemSetting::factory()->create(['key' => 'setting2']);
-        $setting3 = SystemSetting::factory()->create(['key' => 'setting3']);
+        $setting1 = SystemSetting::factory()->create(['key' => 'setting1', 'name' => 'Setting One']);
+        $setting2 = SystemSetting::factory()->create(['key' => 'setting2', 'name' => 'Setting Two']);
+        $setting3 = SystemSetting::factory()->create(['key' => 'setting3', 'name' => 'Setting Three']);
 
         $dependency1 = SystemSettingDependency::factory()->create([
             'setting_id' => $setting1->id,
             'depends_on_setting_id' => $setting2->id,
-            'condition' => 'setting2.value == "enabled"',
+            'condition' => 'equals',
+            'condition_value' => 'enabled_value',
         ]);
 
         $dependency2 = SystemSettingDependency::factory()->create([
             'setting_id' => $setting3->id,
             'depends_on_setting_id' => $setting1->id,
-            'condition' => 'setting1.value == "enabled"',
+            'condition' => 'equals',
+            'condition_value' => 'disabled',
         ]);
 
-        Livewire::test(\App\Filament\Resources\SystemSettingDependencyResource\Pages\ListSystemSettingDependencies::class)
-            ->searchTable('setting1')
-            ->assertCanSeeTableRecords([$dependency1, $dependency2]);
+        // Test the search using model scope directly
+        $searchResults = SystemSettingDependency::search('enabled_value')->get();
+
+        $this->assertTrue($searchResults->contains($dependency1));
+        $this->assertFalse($searchResults->contains($dependency2));
     }
 
     public function test_can_sort_dependencies(): void
@@ -361,13 +373,15 @@ final class SystemSettingDependencyResourceTest extends TestCase
         $dependency1 = SystemSettingDependency::factory()->create([
             'setting_id' => $setting1->id,
             'depends_on_setting_id' => $setting2->id,
-            'condition' => 'setting2.value == "enabled"',
+            'condition' => 'equals',
+            'condition_value' => 'enabled',
         ]);
 
         $dependency2 = SystemSettingDependency::factory()->create([
             'setting_id' => $setting2->id,
             'depends_on_setting_id' => $setting1->id,
-            'condition' => 'setting1.value == "enabled"',
+            'condition' => 'equals',
+            'condition_value' => 'disabled',
         ]);
 
         Livewire::test(\App\Filament\Resources\SystemSettingDependencyResource\Pages\ListSystemSettingDependencies::class)

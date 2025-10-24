@@ -1,17 +1,16 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 use Database\Seeders\AdminAuthorizationSeeder;
 use Database\Seeders\AdminUserSeeder;
 use Database\Seeders\AttributeSeeder;
 use Database\Seeders\AttributeValueSeeder;
-use Database\Seeders\CurrencySeeder;
-use Database\Seeders\DemoStoreSeeder;
 use Database\Seeders\BrandSeeder;
+use Database\Seeders\CurrencySeeder;
+use Database\Seeders\CustomerGroupSeeder;
+use Database\Seeders\DemoStoreSeeder;
 use Database\Seeders\ProductImageSeeder;
-use Database\Seeders\SliderSeeder;
 use Database\Seeders\RolesAndPermissionsSeeder;
+use Database\Seeders\SliderSeeder;
 
 return [
     /*
@@ -33,8 +32,8 @@ return [
             AdminAuthorizationSeeder::class,
             RolesAndPermissionsSeeder::class,
             AdminUserSeeder::class,
+            CustomerGroupSeeder::class,
         ],
-
         'full' => [
             // The full profile builds on "minimal" and adds demo storefront content.
             CurrencySeeder::class,
@@ -43,6 +42,7 @@ return [
             AdminAuthorizationSeeder::class,
             RolesAndPermissionsSeeder::class,
             AdminUserSeeder::class,
+            CustomerGroupSeeder::class,
             DemoStoreSeeder::class,
             // Enrich storefront visuals with fake slides and images
             SliderSeeder::class,

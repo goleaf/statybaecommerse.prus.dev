@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Tests\Unit;
 
@@ -267,7 +265,7 @@ final class OrderItemTest extends TestCase
             'order_id' => $this->order->id,
             'product_id' => $this->product->id,
             'product_variant_id' => $this->variant->id,
-            'name' => $this->product->name.' - '.$this->variant->name,
+            'name' => $this->product->name . ' - ' . $this->variant->name,
         ]);
 
         $this->assertStringContainsString($this->product->name, $orderItem->name);
@@ -324,5 +322,214 @@ final class OrderItemTest extends TestCase
 
         $this->assertEquals(25.0, $orderItem->unit_price);
         $this->assertEquals(50.0, $orderItem->total);
+    }
+
+    public function test_order_item_auto_sets_name_from_product(): void
+    {
+        $orderItem = OrderItem::factory()->create([
+            'order_id' => $this->order->id,
+            'product_id' => $this->product->id,
+            'name' => null,
+        ]);
+
+        $this->assertEquals($this->product->name, $orderItem->name);
+    }
+
+    public function test_order_item_auto_sets_name_from_product_and_variant(): void
+    {
+        $orderItem = OrderItem::factory()->create([
+            'order_id' => $this->order->id,
+            'product_id' => $this->product->id,
+            'product_variant_id' => $this->variant->id,
+            'name' => null,
+        ]);
+
+        $expectedName = $this->product->name . ' - ' . $this->variant->name;
+        $this->assertEquals($expectedName, $orderItem->name);
+    }
+
+    public function test_order_item_auto_sets_sku_from_product(): void
+    {
+        $orderItem = OrderItem::factory()->create([
+            'order_id' => $this->order->id,
+            'product_id' => $this->product->id,
+            'sku' => null,
+        ]);
+
+        $this->assertEquals($this->product->sku, $orderItem->sku);
+    }
+
+    public function test_order_item_auto_sets_sku_from_variant(): void
+    {
+        $orderItem = OrderItem::factory()->create([
+            'order_id' => $this->order->id,
+            'product_id' => $this->product->id,
+            'product_variant_id' => $this->variant->id,
+            'sku' => null,
+        ]);
+
+        $this->assertEquals($this->variant->sku, $orderItem->sku);
+    }
+
+    public function test_order_item_calculates_total_with_discount_on_creation(): void
+    {
+        $orderItem = new OrderItem([
+            'order_id' => $this->order->id,
+            'product_id' => $this->product->id,
+            'name' => 'Test Item',
+            'quantity' => 5,
+            'unit_price' => 20.0,
+            'discount_amount' => 10.0,
+        ]);
+
+        $orderItem->save();
+
+        $expectedTotal = (20.0 * 5) - 10.0;
+        $this->assertEquals($expectedTotal, $orderItem->total);
+        $this->assertEquals(90.0, $orderItem->total);
+    }
+
+    public function test_order_item_recalculates_total_when_discount_changes(): void
+    {
+        $orderItem = OrderItem::factory()->create([
+            'order_id' => $this->order->id,
+            'product_id' => $this->product->id,
+            'quantity' => 4,
+            'unit_price' => 25.0,
+            'discount_amount' => 0,
+            'total' => 100.0,
+        ]);
+
+        $orderItem->update(['discount_amount' => 20.0]);
+
+        $this->assertEquals(80.0, $orderItem->fresh()->total);
+    }
+
+    public function test_order_item_handles_large_discount(): void
+    {
+        $orderItem = new OrderItem([
+            'order_id' => $this->order->id,
+            'product_id' => $this->product->id,
+            'name' => 'Test Item',
+            'quantity' => 2,
+            'unit_price' => 30.0,
+            'discount_amount' => 70.0,
+        ]);
+
+        $orderItem->save();
+
+        $expectedTotal = (30.0 * 2) - 70.0;
+        $this->assertEquals($expectedTotal, $orderItem->total);
+        $this->assertEquals(-10.0, $orderItem->total);
+    }
+
+    public function test_order_item_discount_amount_defaults_to_zero(): void
+    {
+        $orderItem = new OrderItem([
+            'order_id' => $this->order->id,
+            'product_id' => $this->product->id,
+            'name' => 'Test Item',
+            'quantity' => 3,
+            'unit_price' => 15.0,
+        ]);
+
+        $orderItem->save();
+
+        $this->assertEquals(45.0, $orderItem->total);
+    }
+
+    public function test_order_item_preserves_manually_set_total(): void
+    {
+        $orderItem = OrderItem::factory()->create([
+            'order_id' => $this->order->id,
+            'product_id' => $this->product->id,
+            'quantity' => 3,
+            'unit_price' => 20.0,
+            'total' => 55.0,
+        ]);
+
+        $this->assertEquals(55.0, $orderItem->total);
+    }
+
+    public function test_order_item_updates_total_when_quantity_changes(): void
+    {
+        $orderItem = OrderItem::factory()->create([
+            'order_id' => $this->order->id,
+            'product_id' => $this->product->id,
+            'quantity' => 2,
+            'unit_price' => 25.0,
+            'total' => 50.0,
+        ]);
+
+        $orderItem->update(['quantity' => 5]);
+
+        $this->assertEquals(125.0, $orderItem->fresh()->total);
+    }
+
+    public function test_order_item_status_has_default(): void
+    {
+        $orderItem = OrderItem::factory()->create([
+            'order_id' => $this->order->id,
+            'product_id' => $this->product->id,
+        ]);
+
+        // Status defaults to 'pending' in factory
+        $this->assertEquals('pending', $orderItem->status);
+    }
+
+    public function test_order_item_can_have_status(): void
+    {
+        $orderItem = OrderItem::factory()->create([
+            'order_id' => $this->order->id,
+            'product_id' => $this->product->id,
+            'status' => 'pending',
+        ]);
+
+        $this->assertEquals('pending', $orderItem->status);
+    }
+
+    public function test_order_item_eager_loads_relationships(): void
+    {
+        $orderItem = OrderItem::factory()->create([
+            'order_id' => $this->order->id,
+            'product_id' => $this->product->id,
+            'product_variant_id' => $this->variant->id,
+        ]);
+
+        $loadedItem = OrderItem::with(['order', 'product', 'productVariant'])->find($orderItem->id);
+
+        $this->assertTrue($loadedItem->relationLoaded('order'));
+        $this->assertTrue($loadedItem->relationLoaded('product'));
+        $this->assertTrue($loadedItem->relationLoaded('productVariant'));
+    }
+
+    public function test_order_item_discount_amount_cast_to_float(): void
+    {
+        $orderItem = OrderItem::factory()->create([
+            'order_id' => $this->order->id,
+            'product_id' => $this->product->id,
+            'discount_amount' => '15.50',
+        ]);
+
+        $this->assertIsFloat($orderItem->discount_amount);
+        $this->assertEquals(15.5, $orderItem->discount_amount);
+    }
+
+    public function test_order_item_complex_discount_calculation(): void
+    {
+        $orderItem = new OrderItem([
+            'order_id' => $this->order->id,
+            'product_id' => $this->product->id,
+            'name' => 'Test Item',
+            'quantity' => 10,
+            'unit_price' => 99.99,
+            'discount_amount' => 249.99,
+        ]);
+
+        $orderItem->save();
+
+        $expectedTotal = (99.99 * 10) - 249.99;
+        $this->assertEquals($expectedTotal, $orderItem->total);
+        $this->assertEquals(749.91, $orderItem->total);
     }
 }

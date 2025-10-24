@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 use App\Filament\Resources\CustomerGroupResource\Pages\ListCustomerGroups;
 use App\Models\CustomerGroup;
@@ -39,12 +37,11 @@ it('feature: can create a new customer group with basic fields', function () {
         ->call('create')
         ->assertHasNoFormErrors();
 
-    $this->assertDatabaseHas('customer_groups', [
-        'name' => 'VIP Customers',
-        'code' => 'VIP',
-        'description' => 'High-value customers',
-        'discount_percentage' => 15,
-        'is_active' => true,
-        'is_default' => false,
-    ]);
+    $group = CustomerGroup::where('code', 'VIP')->first();
+    expect($group)->not->toBeNull();
+    expect($group->getTranslation('name', 'en'))->toBe('VIP Customers');
+    expect($group->getTranslation('description', 'en'))->toBe('High-value customers');
+    expect($group->discount_percentage)->toBe(15.0);
+    expect($group->is_active)->toBeTrue();
+    expect($group->is_default)->toBeFalse();
 });

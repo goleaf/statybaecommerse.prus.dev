@@ -1,12 +1,8 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Filament\Resources\OrderResource\RelationManagers;
 
-
 use App\Filament\RelationManagers\Support\BaseRelationManager;
-use Filament\Schemas\Schema;
 use App\Models\OrderShipping;
 use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
 use Filament\Actions\Action;
@@ -21,6 +17,7 @@ use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
 use Filament\Schemas\Components\Grid as SchemaGrid;
 use Filament\Schemas\Components\Section as SchemaSection;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -53,7 +50,7 @@ final class OrderShippingRelationManager extends BaseRelationManager
     /**
      * Configure the form schema for order shipping.
      */
-    public function form(Schema $schema): Schema   
+    public function form(Schema $schema): Schema
     {
         return $schema
             ->schema([
@@ -66,10 +63,10 @@ final class OrderShippingRelationManager extends BaseRelationManager
                                 Select::make('shipping_method')
                                     ->label(__('orders.fields.shipping_method'))
                                     ->options([
-                                        'standard'      => __('orders.shipping_methods.standard'),
-                                        'express'       => __('orders.shipping_methods.express'),
-                                        'overnight'     => __('orders.shipping_methods.overnight'),
-                                        'pickup'        => __('orders.shipping_methods.pickup'),
+                                        'standard' => __('orders.shipping_methods.standard'),
+                                        'express' => __('orders.shipping_methods.express'),
+                                        'overnight' => __('orders.shipping_methods.overnight'),
+                                        'pickup' => __('orders.shipping_methods.pickup'),
                                         'international' => __('orders.shipping_methods.international'),
                                     ])
                                     ->required(),
@@ -159,14 +156,14 @@ final class OrderShippingRelationManager extends BaseRelationManager
     /**
      * Configure the table for order shipping.
      */
-    public function table(Table $table): Table   
+    public function table(Table $table): Table
     {
         // Configure the relation manager table to satisfy Filament v4's return type requirements.
         return $table
             ->columns([
                 TextColumn::make('shipping_method')
                     ->label(__('orders.fields.shipping_method'))
-                    ->formatStateUsing(fn (?string $state): string => $state ? __("orders.shipping_methods.{$state}") : '-')
+                    ->formatStateUsing(fn(?string $state): string => $state ? __("orders.shipping_methods.{$state}") : '-')
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('tracking_number')
@@ -185,14 +182,14 @@ final class OrderShippingRelationManager extends BaseRelationManager
                 BadgeColumn::make('status')
                     ->label(__('orders.fields.status'))
                     ->colors([
-                        'warning'   => 'pending',
-                        'primary'   => 'processing',
-                        'info'      => 'shipped',
-                        'success'   => 'delivered',
-                        'danger'    => 'cancelled',
+                        'warning' => 'pending',
+                        'primary' => 'processing',
+                        'info' => 'shipped',
+                        'success' => 'delivered',
+                        'danger' => 'cancelled',
                         'secondary' => 'returned',
                     ])
-                    ->formatStateUsing(fn (?string $state): string => $state ? __("orders.shipping_statuses.{$state}") : '-'),
+                    ->formatStateUsing(fn(?string $state): string => $state ? __("orders.shipping_statuses.{$state}") : '-'),
                 IconColumn::make('is_delivered')
                     ->label(__('orders.fields.is_delivered'))
                     ->boolean()
@@ -220,41 +217,32 @@ final class OrderShippingRelationManager extends BaseRelationManager
                 SelectFilter::make('shipping_method')
                     ->label(__('orders.fields.shipping_method'))
                     ->options([
-                        'standard'      => __('orders.shipping_methods.standard'),
-                        'express'       => __('orders.shipping_methods.express'),
-                        'overnight'     => __('orders.shipping_methods.overnight'),
-                        'pickup'        => __('orders.shipping_methods.pickup'),
+                        'standard' => __('orders.shipping_methods.standard'),
+                        'express' => __('orders.shipping_methods.express'),
+                        'overnight' => __('orders.shipping_methods.overnight'),
+                        'pickup' => __('orders.shipping_methods.pickup'),
                         'international' => __('orders.shipping_methods.international'),
                     ])
                     ->multiple(),
                 SelectFilter::make('status')
                     ->label(__('orders.fields.status'))
                     ->options([
-                        'pending'    => __('orders.shipping_statuses.pending'),
+                        'pending' => __('orders.shipping_statuses.pending'),
                         'processing' => __('orders.shipping_statuses.processing'),
-                        'shipped'    => __('orders.shipping_statuses.shipped'),
-                        'delivered'  => __('orders.shipping_statuses.delivered'),
-                        'cancelled'  => __('orders.shipping_statuses.cancelled'),
-                        'returned'   => __('orders.shipping_statuses.returned'),
+                        'shipped' => __('orders.shipping_statuses.shipped'),
+                        'delivered' => __('orders.shipping_statuses.delivered'),
+                        'cancelled' => __('orders.shipping_statuses.cancelled'),
+                        'returned' => __('orders.shipping_statuses.returned'),
                     ])
                     ->multiple(),
                 TernaryFilter::make('is_delivered')
                     ->label(__('orders.fields.is_delivered'))
                     ->queries(
-                        true: fn (Builder $query) => $query->where('is_delivered', true),
-                        false: fn (Builder $query) => $query->where('is_delivered', false),
+                        true: fn(Builder $query) => $query->where('is_delivered', true),
+                        false: fn(Builder $query) => $query->where('is_delivered', false),
                     ),
             ])
             ->headerActions([
-                RelationManagerRepeaterAction::make()
-                    ->label('Quick edit ' . $this->getPluralModelLabel())
-                    ->icon('heroicon-m-pencil-square')
-                    ->modalHeading('Edit ' . $this->getPluralModelLabel())
-                    ->modalWidth('5xl')
-                    ->configureRepeater(function (Repeater $repeater): Repeater {
-                        // Provide a quick-edit modal for managing records inline.
-                        return $repeater->schema($this->getQuickEditSchema());
-                    }),
                 \Filament\Actions\CreateAction::make()
                     ->label(__('orders.add_shipping'))
                     ->icon('heroicon-o-plus')
@@ -263,10 +251,10 @@ final class OrderShippingRelationManager extends BaseRelationManager
                         Select::make('shipping_method')
                             ->label(__('orders.fields.shipping_method'))
                             ->options([
-                                'standard'      => __('orders.shipping_methods.standard'),
-                                'express'       => __('orders.shipping_methods.express'),
-                                'overnight'     => __('orders.shipping_methods.overnight'),
-                                'pickup'        => __('orders.shipping_methods.pickup'),
+                                'standard' => __('orders.shipping_methods.standard'),
+                                'express' => __('orders.shipping_methods.express'),
+                                'overnight' => __('orders.shipping_methods.overnight'),
+                                'pickup' => __('orders.shipping_methods.pickup'),
                                 'international' => __('orders.shipping_methods.international'),
                             ])
                             ->required(),
@@ -300,7 +288,7 @@ final class OrderShippingRelationManager extends BaseRelationManager
                     ->using(function (array $data) {
                         $owner = $this->getOwnerRecord();
                         // Ensure totals consistency if not provided
-                        if (! isset($data['total_cost'])) {
+                        if (!isset($data['total_cost'])) {
                             $data['total_cost'] = (float) ($data['base_cost'] ?? 0) + (float) ($data['insurance_cost'] ?? 0);
                         }
 
@@ -322,11 +310,11 @@ final class OrderShippingRelationManager extends BaseRelationManager
                         $record->update([
                             'shipping_method' => $data['shipping_method'] ?? ($record->shipping_method ?? 'express'),
                             'tracking_number' => $data['tracking_number'] ?? $record->tracking_number,
-                            'carrier'         => $data['carrier'] ?? ($record->carrier ?? 'DHL'),
-                            'service_type'    => $data['service_type'] ?? ($record->service_type ?? 'Express'),
-                            'base_cost'       => $data['base_cost'] ?? ($record->base_cost ?? 0),
-                            'insurance_cost'  => $data['insurance_cost'] ?? ($record->insurance_cost ?? 0),
-                            'total_cost'      => $data['total_cost'] ?? ($record->base_cost + ($record->insurance_cost ?? 0)),
+                            'carrier' => $data['carrier'] ?? ($record->carrier ?? 'DHL'),
+                            'service_type' => $data['service_type'] ?? ($record->service_type ?? 'Express'),
+                            'base_cost' => $data['base_cost'] ?? ($record->base_cost ?? 0),
+                            'insurance_cost' => $data['insurance_cost'] ?? ($record->insurance_cost ?? 0),
+                            'total_cost' => $data['total_cost'] ?? ($record->base_cost + ($record->insurance_cost ?? 0)),
                         ]);
                     }),
             ])
@@ -339,15 +327,15 @@ final class OrderShippingRelationManager extends BaseRelationManager
                     ->label(__('orders.mark_shipped'))
                     ->icon('heroicon-o-truck')
                     ->color('info')
-                    ->visible(fn (OrderShipping $record): bool => $record->status !== 'shipped')
-                    ->action(function (OrderShipping $record): void {
-                        \Illuminate\Support\Facades\DB::table('order_shippings')
-                            ->where('id', $record->getKey())
-                            ->update([
-                                'status'     => 'shipped',
-                                'shipped_at' => now(),
-                                'updated_at' => now(),
-                            ]);
+                    ->action(function (?OrderShipping $record): void {
+                        if (!$record instanceof OrderShipping) {
+                            return;
+                        }
+
+                        $record->update([
+                            'status' => 'shipped',
+                            'shipped_at' => now(),
+                        ]);
 
                         Notification::make()
                             ->title(__('orders.shipped_successfully'))
@@ -358,16 +346,16 @@ final class OrderShippingRelationManager extends BaseRelationManager
                     ->label(__('orders.mark_delivered'))
                     ->icon('heroicon-o-check-circle')
                     ->color('success')
-                    ->visible(fn (OrderShipping $record): bool => $record->status !== 'delivered')
-                    ->action(function (OrderShipping $record): void {
-                        \Illuminate\Support\Facades\DB::table('order_shippings')
-                            ->where('id', $record->getKey())
-                            ->update([
-                                'status'       => 'delivered',
-                                'is_delivered' => true,
-                                'delivered_at' => now(),
-                                'updated_at'   => now(),
-                            ]);
+                    ->action(function (?OrderShipping $record): void {
+                        if (!$record instanceof OrderShipping) {
+                            return;
+                        }
+
+                        $record->update([
+                            'status' => 'delivered',
+                            'is_delivered' => true,
+                            'delivered_at' => now(),
+                        ]);
 
                         Notification::make()
                             ->title(__('orders.delivered_successfully'))
@@ -378,9 +366,9 @@ final class OrderShippingRelationManager extends BaseRelationManager
                     ->label(__('orders.track_package'))
                     ->icon('heroicon-o-magnifying-glass')
                     ->color('gray')
-                    ->url(fn (OrderShipping $record): string => $record->tracking_url ?? '#')
+                    ->url(fn(OrderShipping $record): string => $record->tracking_url ?? '#')
                     ->openUrlInNewTab()
-                    ->visible(fn (OrderShipping $record): bool => ! empty($record->tracking_number)),
+                    ->visible(fn(OrderShipping $record): bool => !empty($record->tracking_number)),
             ])
             ->bulkActions([
                 BulkActionGroup::make([
@@ -390,17 +378,14 @@ final class OrderShippingRelationManager extends BaseRelationManager
                         ->icon('heroicon-o-truck')
                         ->color('info')
                         ->action(function (Collection $records): void {
-                            foreach ($records as $rec) {
-                                if ($rec instanceof OrderShipping) {
-                                    \Illuminate\Support\Facades\DB::table('order_shippings')
-                                        ->where('id', $rec->getKey())
-                                        ->update([
-                                            'status'     => 'shipped',
-                                            'shipped_at' => now(),
-                                            'updated_at' => now(),
-                                        ]);
-                                }
-                            }
+                            $records
+                                ->filter(fn($rec) => $rec instanceof OrderShipping)
+                                ->each(function (OrderShipping $rec): void {
+                                    $rec->update([
+                                        'status' => 'shipped',
+                                        'shipped_at' => now(),
+                                    ]);
+                                });
 
                             Notification::make()
                                 ->title(__('orders.bulk_shipped_success'))
@@ -412,11 +397,15 @@ final class OrderShippingRelationManager extends BaseRelationManager
                         ->icon('heroicon-o-check-circle')
                         ->color('success')
                         ->action(function (Collection $records): void {
-                            $records->each->update([
-                                'status'       => 'delivered',
-                                'is_delivered' => true,
-                                'delivered_at' => now(),
-                            ]);
+                            $records
+                                ->filter(fn($rec) => $rec instanceof OrderShipping)
+                                ->each(function (OrderShipping $rec): void {
+                                    $rec->update([
+                                        'status' => 'delivered',
+                                        'is_delivered' => true,
+                                        'delivered_at' => now(),
+                                    ]);
+                                });
 
                             Notification::make()
                                 ->title(__('orders.bulk_delivered_success'))

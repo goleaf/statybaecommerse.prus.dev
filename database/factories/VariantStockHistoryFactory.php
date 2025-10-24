@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Database\Factories;
 
@@ -26,9 +24,9 @@ class VariantStockHistoryFactory extends Factory
         $oldQuantity = $this->faker->numberBetween(0, 100);
         $quantityChange = match ($changeType) {
             'increase' => $this->faker->numberBetween(1, 20),
-            'decrease' => -$this->faker->numberBetween(1, min(10, $oldQuantity)),
+            'decrease' => -$this->faker->numberBetween(1, min(10, max(1, $oldQuantity))),
             'adjustment' => $this->faker->numberBetween(-5, 10),
-            'reserve' => -$this->faker->numberBetween(1, min(5, $oldQuantity)),
+            'reserve' => -$this->faker->numberBetween(1, min(5, max(1, $oldQuantity))),
             'unreserve' => $this->faker->numberBetween(1, 10),
             default => 0,
         };
@@ -38,7 +36,7 @@ class VariantStockHistoryFactory extends Factory
             'variant_id' => ProductVariant::factory(),
             'old_quantity' => $oldQuantity,
             'new_quantity' => $newQuantity,
-            'quantity_change' => $quantityChange,
+            'quantity_change' => $quantityChange,  // Use calculated change from match expression
             'change_type' => $changeType,
             'change_reason' => $this->faker->randomElement($changeReasons),
             'changed_by' => User::factory(),
@@ -47,43 +45,96 @@ class VariantStockHistoryFactory extends Factory
         ];
     }
 
+    /**
+     * State for setting both old_quantity and new_quantity explicitly.
+     * This will ensure quantity_change is properly calculated.
+     */
+    public function withQuantities(int $oldQuantity, int $newQuantity): static
+    {
+        return $this->state(fn(array $attributes) => [
+            'old_quantity' => $oldQuantity,
+            'new_quantity' => $newQuantity,
+            'quantity_change' => $newQuantity - $oldQuantity,
+        ]);
+    }
+
     public function increase(): static
     {
-        return $this->state(fn (array $attributes) => [
-            'change_type' => 'increase',
-            'quantity_change' => $this->faker->numberBetween(1, 20),
-        ]);
+        return $this->state(function (array $attributes) {
+            $quantityChange = $this->faker->numberBetween(1, 20);
+            $oldQuantity = $attributes['old_quantity'] ?? $this->faker->numberBetween(0, 100);
+            $newQuantity = $oldQuantity + $quantityChange;
+
+            return [
+                'change_type' => 'increase',
+                'old_quantity' => $oldQuantity,
+                'new_quantity' => $newQuantity,
+                'quantity_change' => $quantityChange,
+            ];
+        });
     }
 
     public function decrease(): static
     {
-        return $this->state(fn (array $attributes) => [
-            'change_type' => 'decrease',
-            'quantity_change' => -$this->faker->numberBetween(1, 10),
-        ]);
+        return $this->state(function (array $attributes) {
+            $oldQuantity = $attributes['old_quantity'] ?? $this->faker->numberBetween(10, 100);
+            $quantityChange = -$this->faker->numberBetween(1, min(10, $oldQuantity));
+            $newQuantity = max(0, $oldQuantity + $quantityChange);
+
+            return [
+                'change_type' => 'decrease',
+                'old_quantity' => $oldQuantity,
+                'new_quantity' => $newQuantity,
+                'quantity_change' => $quantityChange,
+            ];
+        });
     }
 
     public function adjustment(): static
     {
-        return $this->state(fn (array $attributes) => [
-            'change_type' => 'adjustment',
-            'quantity_change' => $this->faker->numberBetween(-5, 10),
-        ]);
+        return $this->state(function (array $attributes) {
+            $oldQuantity = $attributes['old_quantity'] ?? $this->faker->numberBetween(0, 100);
+            $quantityChange = $this->faker->numberBetween(-5, 10);
+            $newQuantity = max(0, $oldQuantity + $quantityChange);
+
+            return [
+                'change_type' => 'adjustment',
+                'old_quantity' => $oldQuantity,
+                'new_quantity' => $newQuantity,
+                'quantity_change' => $quantityChange,
+            ];
+        });
     }
 
     public function reserve(): static
     {
-        return $this->state(fn (array $attributes) => [
-            'change_type' => 'reserve',
-            'quantity_change' => -$this->faker->numberBetween(1, 5),
-        ]);
+        return $this->state(function (array $attributes) {
+            $oldQuantity = $attributes['old_quantity'] ?? $this->faker->numberBetween(10, 100);
+            $quantityChange = -$this->faker->numberBetween(1, min(5, $oldQuantity));
+            $newQuantity = max(0, $oldQuantity + $quantityChange);
+
+            return [
+                'change_type' => 'reserve',
+                'old_quantity' => $oldQuantity,
+                'new_quantity' => $newQuantity,
+                'quantity_change' => $quantityChange,
+            ];
+        });
     }
 
     public function unreserve(): static
     {
-        return $this->state(fn (array $attributes) => [
-            'change_type' => 'unreserve',
-            'quantity_change' => $this->faker->numberBetween(1, 10),
-        ]);
+        return $this->state(function (array $attributes) {
+            $quantityChange = $this->faker->numberBetween(1, 10);
+            $oldQuantity = $attributes['old_quantity'] ?? $this->faker->numberBetween(0, 100);
+            $newQuantity = $oldQuantity + $quantityChange;
+
+            return [
+                'change_type' => 'unreserve',
+                'old_quantity' => $oldQuantity,
+                'new_quantity' => $newQuantity,
+                'quantity_change' => $quantityChange,
+            ];
+        });
     }
 }

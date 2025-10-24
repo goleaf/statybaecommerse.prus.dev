@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Tests\Unit;
 
@@ -20,7 +18,7 @@ final class ReferralCampaignTest extends TestCase
             'is_active' => true,
             'start_date' => now(),
             'end_date' => now()->addDays(30),
-            'reward_amount' => 10.00,
+            'reward_amount' => 10.0,
             'reward_type' => 'fixed',
             'max_referrals_per_user' => 5,
             'max_total_referrals' => 100,
@@ -30,7 +28,7 @@ final class ReferralCampaignTest extends TestCase
         $this->assertEquals('Test Referral Campaign', $campaign->name);
         $this->assertEquals('Test description', $campaign->description);
         $this->assertTrue($campaign->is_active);
-        $this->assertEquals(10.00, $campaign->reward_amount);
+        $this->assertEquals(10.0, $campaign->reward_amount);
         $this->assertEquals('fixed', $campaign->reward_type);
         $this->assertEquals(5, $campaign->max_referrals_per_user);
         $this->assertEquals(100, $campaign->max_total_referrals);
@@ -108,18 +106,26 @@ final class ReferralCampaignTest extends TestCase
 
     public function test_referral_campaign_scopes(): void
     {
-        $activeCampaign = ReferralCampaign::factory()->create(['is_active' => true]);
+        $activeCampaign = ReferralCampaign::factory()->create([
+            'is_active' => true,
+            'start_date' => now()->subDay(),
+            'end_date' => now()->addMonth(),
+        ]);
         $inactiveCampaign = ReferralCampaign::factory()->create(['is_active' => false]);
 
-        // Test active scope
-        $activeCampaigns = ReferralCampaign::active()->get();
+        // Test active scope (need to use withoutGlobalScopes since ActiveScope is already applied globally)
+        $activeCampaigns = ReferralCampaign::withoutGlobalScopes()->active()->get();
         $this->assertTrue($activeCampaigns->contains($activeCampaign));
         $this->assertFalse($activeCampaigns->contains($inactiveCampaign));
     }
 
     public function test_referral_campaign_is_active_method(): void
     {
-        $activeCampaign = ReferralCampaign::factory()->create(['is_active' => true]);
+        $activeCampaign = ReferralCampaign::factory()->create([
+            'is_active' => true,
+            'start_date' => now()->subDay(),
+            'end_date' => now()->addMonth(),
+        ]);
         $inactiveCampaign = ReferralCampaign::factory()->create(['is_active' => false]);
 
         $this->assertTrue($activeCampaign->isActive());

@@ -1,14 +1,13 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Models;
 
 use App\Models\Scopes\UserOwnedScope;
+use Database\Factories\OrderItemFactory;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
 /**
@@ -16,18 +15,33 @@ use Illuminate\Support\Str;
  *
  * Eloquent model representing the OrderItem entity with comprehensive relationships, scopes, and business logic for the e-commerce system.
  *
- * @property mixed $table
- * @property mixed $fillable
+ * @property int                             $id
+ * @property int                             $order_id
+ * @property int                             $product_id
+ * @property int|null                        $product_variant_id
+ * @property string                          $name
+ * @property string|null                     $sku
+ * @property int                             $quantity
+ * @property float                           $unit_price
+ * @property float|null                      $price
+ * @property float                           $total
+ * @property float|null                      $discount_amount
+ * @property string|null                     $status
+ * @property string|null                     $notes
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
  *
  * @method static \Illuminate\Database\Eloquent\Builder|OrderItem newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|OrderItem newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|OrderItem query()
+ * @method static OrderItemFactory                                factory($count = null, $state = [])
  *
  * @mixin \Eloquent
  */
 #[ScopedBy([UserOwnedScope::class])]
 final class OrderItem extends Model
 {
+    /** @use HasFactory<OrderItemFactory> */
     use HasFactory;
 
     protected $table = 'order_items';
@@ -50,6 +64,8 @@ final class OrderItem extends Model
 
     /**
      * Handle order functionality with proper error handling.
+     *
+     * @return BelongsTo<Order, $this>
      */
     public function order(): BelongsTo
     {
@@ -58,6 +74,8 @@ final class OrderItem extends Model
 
     /**
      * Handle product functionality with proper error handling.
+     *
+     * @return BelongsTo<Product, $this>
      */
     public function product(): BelongsTo
     {
@@ -66,6 +84,8 @@ final class OrderItem extends Model
 
     /**
      * Handle productVariant functionality with proper error handling.
+     *
+     * @return BelongsTo<ProductVariant, $this>
      */
     public function productVariant(): BelongsTo
     {
@@ -78,7 +98,7 @@ final class OrderItem extends Model
     protected static function boot(): void
     {
         parent::boot();
-        self::creating(function (OrderItem $orderItem) {
+        self::creating(function (OrderItem $orderItem): void {
             $product = null;
             $variant = null;
 
@@ -94,34 +114,38 @@ final class OrderItem extends Model
                     : ProductVariant::query()->find($orderItem->product_variant_id);
             }
 
-            if ($orderItem->name === null && $product) {
-                $orderItem->name = $variant
-                    ? Str::of($product->name)->append(' - ', $variant->name)->toString()
-                    : $product->name;
+            if (!isset($orderItem->name) && $product !== null) {
+                if ($variant !== null && isset($variant->name)) {
+                    $productName = $product->name ?? '';
+                    $variantName = $variant->name ?? '';
+                    $orderItem->name = Str::of($productName)->append(' - ', $variantName)->toString();
+                } else {
+                    $orderItem->name = $product->name ?? '';
+                }
             }
 
-            if ($orderItem->sku === null) {
-                if ($variant && $variant->sku !== null) {
+            if (!isset($orderItem->sku)) {
+                if ($variant !== null && isset($variant->sku)) {
                     $orderItem->sku = $variant->sku;
-                } elseif ($product && $product->sku !== null) {
+                } elseif ($product !== null && isset($product->sku)) {
                     $orderItem->sku = $product->sku;
                 }
             }
 
-            if (isset($orderItem->price) && $orderItem->unit_price === null) {
+            if (isset($orderItem->price) && !isset($orderItem->unit_price)) {
                 $orderItem->unit_price = $orderItem->price;
             }
             $discount = (float) ($orderItem->discount_amount ?? 0);
-            if ($orderItem->total === null) {
+            if (!isset($orderItem->total)) {
                 $orderItem->total = ($orderItem->unit_price * $orderItem->quantity) - $discount;
             }
         });
-        self::updating(function (OrderItem $orderItem) {
-            if ($orderItem->isDirty(['unit_price', 'quantity', 'discount_amount']) && ! $orderItem->isDirty('total')) {
+        self::updating(function (OrderItem $orderItem): void {
+            if ($orderItem->isDirty(['unit_price', 'quantity', 'discount_amount']) && !$orderItem->isDirty('total')) {
                 $discount = (float) ($orderItem->discount_amount ?? 0);
                 $orderItem->total = ($orderItem->unit_price * $orderItem->quantity) - $discount;
             }
-            if ($orderItem->isDirty('price') && ! $orderItem->isDirty('unit_price')) {
+            if ($orderItem->isDirty('price') && !$orderItem->isDirty('unit_price') && $orderItem->price !== null) {
                 $orderItem->unit_price = $orderItem->price;
             }
         });

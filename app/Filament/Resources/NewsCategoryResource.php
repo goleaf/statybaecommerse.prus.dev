@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
@@ -8,23 +6,21 @@ use App\Enums\NavigationGroup;
 use App\Filament\Resources\NewsCategoryResource\Pages;
 use App\Models\NewsCategory;
 use App\Support\Concerns\HasNav;
-use BackedEnum;
 use Filament\Forms\Components\ColorPicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Infolists;
 use Filament\Infolists\Components\IconEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Schemas\Schema;
+use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Actions\EditAction;
-use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\ColorColumn;
 use Filament\Tables\Columns\IconColumn;
@@ -35,6 +31,8 @@ use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
+use BackedEnum;
+use UnitEnum;
 
 final class NewsCategoryResource extends Resource
 {
@@ -42,14 +40,14 @@ final class NewsCategoryResource extends Resource
 
     protected static ?string $model = NewsCategory::class;
 
-    protected static ?string $recordRouteKeyName = 'id';
+    protected static ?string $recordRouteKeyName = 'slug';
 
     public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
     {
         return 'heroicon-o-tag';
     }
 
-    public static function getNavigationGroup(): \UnitEnum|string|null
+    public static function getNavigationGroup(): UnitEnum|string|null
     {
         // Leverage the enum label to keep the group consistent across locales.
         return NavigationGroup::Content->label();
@@ -61,7 +59,7 @@ final class NewsCategoryResource extends Resource
 
     protected static ?string $pluralModelLabel = 'News Categories';
 
-    public static function form(Schema $schema): Schema   
+    public static function form(Schema $schema): Schema
     {
         return $schema->schema([
             SchemaSection::make(__('news_categories.sections.category_information'))
@@ -71,7 +69,7 @@ final class NewsCategoryResource extends Resource
                         ->required()
                         ->maxLength(255)
                         ->live()
-                        ->afterStateUpdated(fn ($state, callable $set) => $set('slug', Str::slug($state)))
+                        ->afterStateUpdated(fn($state, callable $set) => $set('slug', Str::slug($state)))
                         ->placeholder(__('news_categories.fields.name'))
                         ->helperText(__('news_categories.fields.name') . ' ' . __('for all languages')),
                     TextInput::make('slug')
@@ -93,7 +91,7 @@ final class NewsCategoryResource extends Resource
                 ->schema([
                     Select::make('parent_id')
                         ->label(__('news_categories.fields.parent_id'))
-                        ->relationship('parent', 'name')
+                        ->options(fn() => NewsCategory::query()->pluck('name', 'id'))
                         ->searchable()
                         ->preload()
                         ->placeholder(__('Select parent category'))
@@ -113,21 +111,21 @@ final class NewsCategoryResource extends Resource
                     Select::make('icon')
                         ->label(__('news_categories.fields.icon'))
                         ->options([
-                            'heroicon-o-tag'                => 'Tag',
-                            'heroicon-o-document-text'      => 'Document',
-                            'heroicon-o-newspaper'          => 'Newspaper',
-                            'heroicon-o-folder'             => 'Folder',
-                            'heroicon-o-rectangle-stack'    => 'Stack',
-                            'heroicon-o-squares-2x2'        => 'Grid',
-                            'heroicon-o-bookmark'           => 'Bookmark',
-                            'heroicon-o-star'               => 'Star',
-                            'heroicon-o-fire'               => 'Fire',
-                            'heroicon-o-bolt'               => 'Bolt',
-                            'heroicon-o-light-bulb'         => 'Light Bulb',
-                            'heroicon-o-cog'                => 'Settings',
+                            'heroicon-o-tag' => 'Tag',
+                            'heroicon-o-document-text' => 'Document',
+                            'heroicon-o-newspaper' => 'Newspaper',
+                            'heroicon-o-folder' => 'Folder',
+                            'heroicon-o-rectangle-stack' => 'Stack',
+                            'heroicon-o-squares-2x2' => 'Grid',
+                            'heroicon-o-bookmark' => 'Bookmark',
+                            'heroicon-o-star' => 'Star',
+                            'heroicon-o-fire' => 'Fire',
+                            'heroicon-o-bolt' => 'Bolt',
+                            'heroicon-o-light-bulb' => 'Light Bulb',
+                            'heroicon-o-cog' => 'Settings',
                             'heroicon-o-wrench-screwdriver' => 'Tools',
-                            'heroicon-o-building-office'    => 'Building',
-                            'heroicon-o-home'               => 'Home',
+                            'heroicon-o-building-office' => 'Building',
+                            'heroicon-o-home' => 'Home',
                         ])
                         ->searchable()
                         ->preload()
@@ -146,7 +144,7 @@ final class NewsCategoryResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         // Configure the table definition for the streamlined Filament v4 return type.
         return $table
@@ -231,27 +229,27 @@ final class NewsCategoryResource extends Resource
                 SelectFilter::make('has_news')
                     ->label(__('Has News'))
                     ->options([
-                        'with_news'    => __('With News'),
+                        'with_news' => __('With News'),
                         'without_news' => __('Without News'),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
                         return match ($data['value']) {
-                            'with_news'    => $query->has('news'),
+                            'with_news' => $query->has('news'),
                             'without_news' => $query->doesntHave('news'),
-                            default        => $query,
+                            default => $query,
                         };
                     }),
                 SelectFilter::make('has_children')
                     ->label(__('Has Children'))
                     ->options([
-                        'with_children'    => __('With Children'),
+                        'with_children' => __('With Children'),
                         'without_children' => __('Without Children'),
                     ])
                     ->query(function (Builder $query, array $data): Builder {
                         return match ($data['value']) {
-                            'with_children'    => $query->has('children'),
+                            'with_children' => $query->has('children'),
                             'without_children' => $query->doesntHave('children'),
-                            default            => $query,
+                            default => $query,
                         };
                     }),
             ])
@@ -291,7 +289,7 @@ final class NewsCategoryResource extends Resource
             ->paginationPageOptions([10, 25, 50, 100]);
     }
 
-    public static function infolist(Schema $schema): Schema   
+    public static function infolist(Schema $schema): Schema
     {
         // Provide the infolist schema using the Filament v4 return type.
         return $schema
@@ -329,7 +327,7 @@ final class NewsCategoryResource extends Resource
                             ->color('primary'),
                         TextEntry::make('color')
                             ->label(__('news_categories.fields.color'))
-                            ->color(fn ($state) => $state)
+                            ->color(fn($state) => $state)
                             ->copyable()
                             ->badge(),
                         TextEntry::make('icon')
@@ -386,10 +384,10 @@ final class NewsCategoryResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index'  => Pages\ListNewsCategories::route('/'),
+            'index' => Pages\ListNewsCategories::route('/'),
             'create' => Pages\CreateNewsCategory::route('/create'),
-            'view'   => Pages\ViewNewsCategory::route('/{record}'),
-            'edit'   => Pages\EditNewsCategory::route('/{record}/edit'),
+            'view' => Pages\ViewNewsCategory::route('/{record}'),
+            'edit' => Pages\EditNewsCategory::route('/{record}/edit'),
         ];
     }
 }

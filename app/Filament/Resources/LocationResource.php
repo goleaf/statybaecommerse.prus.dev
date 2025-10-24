@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
 use App\Filament\Resources\LocationResource\Pages;
 use App\Models\City;
 use App\Models\Country;
@@ -62,7 +61,7 @@ final class LocationResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Schema $schema): Schema   
+    public static function form(Schema $schema): Schema
     {
         return $schema->schema([
             SchemaSection::make(__('locations.basic_information'))
@@ -343,7 +342,7 @@ final class LocationResource extends Resource
     /**
      * Configure the Filament table with columns, filters, and actions.
      */
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         // Configure the table definition for the streamlined Filament v4 return type.
         return $table

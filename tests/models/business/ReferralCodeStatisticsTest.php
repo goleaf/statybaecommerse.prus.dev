@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Tests\Unit;
 
@@ -24,7 +22,7 @@ final class ReferralCodeStatisticsTest extends TestCase
             'total_clicks' => 50,
             'total_signups' => 25,
             'total_conversions' => 10,
-            'total_revenue' => 500.00,
+            'total_revenue' => 500.0,
             'metadata' => ['source' => 'email', 'campaign' => 'winter_sale'],
         ]);
 
@@ -35,7 +33,7 @@ final class ReferralCodeStatisticsTest extends TestCase
         $this->assertEquals(50, $statistics->total_clicks);
         $this->assertEquals(25, $statistics->total_signups);
         $this->assertEquals(10, $statistics->total_conversions);
-        $this->assertEquals(500.00, $statistics->total_revenue);
+        $this->assertEquals(500.0, $statistics->total_revenue);
         $this->assertIsArray($statistics->metadata);
         $this->assertEquals('email', $statistics->metadata['source']);
         $this->assertEquals('winter_sale', $statistics->metadata['campaign']);
@@ -71,18 +69,22 @@ final class ReferralCodeStatisticsTest extends TestCase
         ]);
 
         $this->assertInstanceOf(\Carbon\Carbon::class, $statistics->date);
-        $this->assertIsFloat($statistics->total_revenue);
-        $this->assertEquals(250.75, $statistics->total_revenue);
+        // decimal:2 cast returns string in Laravel 12
+        $this->assertIsString($statistics->total_revenue);
+        $this->assertEquals('250.75', $statistics->total_revenue);
         $this->assertIsArray($statistics->metadata);
     }
 
     public function test_referral_code_statistics_belongs_to_referral_code(): void
     {
-        $referralCode = ReferralCode::factory()->create();
+        $referralCode = ReferralCode::factory()->create(['is_active' => true]);
         $statistics = ReferralCodeStatistics::factory()->create(['referral_code_id' => $referralCode->id]);
 
-        $this->assertInstanceOf(ReferralCode::class, $statistics->referralCode);
-        $this->assertEquals($referralCode->id, $statistics->referralCode->id);
+        // Reload the relationship without global scopes
+        $relatedCode = $statistics->referralCode()->withoutGlobalScopes()->first();
+
+        $this->assertInstanceOf(ReferralCode::class, $relatedCode);
+        $this->assertEquals($referralCode->id, $relatedCode->id);
     }
 
     public function test_referral_code_statistics_scope_by_date_range(): void
@@ -165,8 +167,8 @@ final class ReferralCodeStatisticsTest extends TestCase
 
     public function test_referral_code_statistics_scope_with_revenue(): void
     {
-        $withRevenue = ReferralCodeStatistics::factory()->create(['total_revenue' => 100.00]);
-        $withoutRevenue = ReferralCodeStatistics::factory()->create(['total_revenue' => 0.00]);
+        $withRevenue = ReferralCodeStatistics::factory()->create(['total_revenue' => 100.0]);
+        $withoutRevenue = ReferralCodeStatistics::factory()->create(['total_revenue' => 0.0]);
 
         $revenueStats = ReferralCodeStatistics::withRevenue()->get();
         $this->assertTrue($revenueStats->contains($withRevenue));
@@ -177,12 +179,12 @@ final class ReferralCodeStatisticsTest extends TestCase
     {
         $highPerforming = ReferralCodeStatistics::factory()->create([
             'total_conversions' => 10,
-            'total_revenue' => 500.00,
+            'total_revenue' => 500.0,
         ]);
 
         $lowPerforming = ReferralCodeStatistics::factory()->create([
             'total_conversions' => 1,
-            'total_revenue' => 50.00,
+            'total_revenue' => 50.0,
         ]);
 
         $highPerformingStats = ReferralCodeStatistics::highPerforming()->get();
@@ -254,7 +256,7 @@ final class ReferralCodeStatisticsTest extends TestCase
     {
         $statistics = ReferralCodeStatistics::factory()->create([
             'total_conversions' => 10,
-            'total_revenue' => 500.00,
+            'total_revenue' => 500.0,
         ]);
 
         $this->assertEquals(50.0, $statistics->getAverageRevenuePerConversion());
@@ -264,7 +266,7 @@ final class ReferralCodeStatisticsTest extends TestCase
     {
         $statistics = ReferralCodeStatistics::factory()->create([
             'total_conversions' => 0,
-            'total_revenue' => 0.00,
+            'total_revenue' => 0.0,
         ]);
 
         $this->assertEquals(0.0, $statistics->getAverageRevenuePerConversion());
@@ -287,6 +289,7 @@ final class ReferralCodeStatisticsTest extends TestCase
         $this->assertIsInt($statistics->total_clicks);
         $this->assertIsInt($statistics->total_signups);
         $this->assertIsInt($statistics->total_conversions);
-        $this->assertIsFloat($statistics->total_revenue);
+        // decimal:2 cast returns string in Laravel 12
+        $this->assertIsString($statistics->total_revenue);
     }
 }

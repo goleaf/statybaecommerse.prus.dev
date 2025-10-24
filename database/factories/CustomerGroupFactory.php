@@ -45,14 +45,14 @@ final class CustomerGroupFactory extends Factory
             ];
         }
 
-        if (isset($attributes['name']) && is_string($attributes['name'])) {
+        if (is_string($attributes['name'])) {
             $attributes['name'] = [
                 'lt' => $attributes['name'],
                 'en' => $attributes['name'],
             ];
         }
 
-        if (isset($attributes['description']) && is_string($attributes['description'])) {
+        if (is_string($attributes['description'])) {
             $attributes['description'] = [
                 'lt' => $attributes['description'],
                 'en' => $attributes['description'],
@@ -93,6 +93,116 @@ final class CustomerGroupFactory extends Factory
             'is_default' => true,
             'is_active' => true,
             'is_enabled' => true,
+        ]);
+    }
+
+    /**
+     * Indicate that the customer group has special pricing.
+     */
+    public function withSpecialPricing(): static
+    {
+        return $this->state(fn(array $attributes) => [
+            'has_special_pricing' => true,
+            'discount_percentage' => $this->faker->randomFloat(2, 5, 25),
+        ]);
+    }
+
+    /**
+     * Indicate that the customer group has volume discounts.
+     */
+    public function withVolumeDiscounts(): static
+    {
+        return $this->state(fn(array $attributes) => [
+            'has_volume_discounts' => true,
+        ]);
+    }
+
+    /**
+     * Indicate that the customer group has a fixed discount.
+     */
+    public function withFixedDiscount(float $amount = 10.0): static
+    {
+        return $this->state(fn(array $attributes) => [
+            'discount_fixed' => $amount,
+        ]);
+    }
+
+    /**
+     * Indicate that the customer group has a percentage discount.
+     */
+    public function withPercentageDiscount(float $percentage = 15.0): static
+    {
+        return $this->state(fn(array $attributes) => [
+            'discount_percentage' => $percentage,
+        ]);
+    }
+
+    /**
+     * Indicate specific group type.
+     */
+    public function ofType(string $type): static
+    {
+        return $this->state(fn(array $attributes) => [
+            'type' => $type,
+        ]);
+    }
+
+    /**
+     * Indicate VIP group.
+     */
+    public function vip(): static
+    {
+        return $this->state(fn(array $attributes) => [
+            'type' => 'vip',
+            'has_special_pricing' => true,
+            'discount_percentage' => $this->faker->randomFloat(2, 15, 30),
+            'has_volume_discounts' => true,
+        ]);
+    }
+
+    /**
+     * Indicate wholesale group.
+     */
+    public function wholesale(): static
+    {
+        return $this->state(fn(array $attributes) => [
+            'type' => 'wholesale',
+            'has_special_pricing' => true,
+            'discount_percentage' => $this->faker->randomFloat(2, 20, 40),
+            'minimum_order_amount' => $this->faker->randomFloat(2, 500, 2000),
+        ]);
+    }
+
+    /**
+     * Indicate corporate group.
+     */
+    public function corporate(): static
+    {
+        return $this->state(fn(array $attributes) => [
+            'type' => 'corporate',
+            'has_special_pricing' => true,
+            'payment_terms' => 'net_30',
+            'credit_limit' => $this->faker->randomFloat(2, 5000, 50000),
+        ]);
+    }
+
+    /**
+     * Indicate the group cannot view prices.
+     */
+    public function withoutPriceAccess(): static
+    {
+        return $this->state(fn(array $attributes) => [
+            'can_view_prices' => false,
+        ]);
+    }
+
+    /**
+     * Indicate the group cannot place orders.
+     */
+    public function withoutOrderAccess(): static
+    {
+        return $this->state(fn(array $attributes) => [
+            'can_place_orders' => false,
         ]);
     }
 }

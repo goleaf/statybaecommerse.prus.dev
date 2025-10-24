@@ -1,6 +1,4 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Tests\Feature;
 
@@ -215,10 +213,10 @@ class UserWishlistResourceTest extends TestCase
             ->callTableBulkAction('delete', [$this->wishlist, $anotherWishlist])
             ->assertHasNoTableBulkActionErrors();
 
-        $this->assertDatabaseMissing('user_wishlists', [
+        $this->assertSoftDeleted('user_wishlists', [
             'id' => $this->wishlist->id,
         ]);
-        $this->assertDatabaseMissing('user_wishlists', [
+        $this->assertSoftDeleted('user_wishlists', [
             'id' => $anotherWishlist->id,
         ]);
     }

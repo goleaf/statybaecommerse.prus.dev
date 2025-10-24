@@ -1,11 +1,9 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace Tests\Unit;
 
-use App\Models\Legal;
 use App\Models\Translations\LegalTranslation;
+use App\Models\Legal;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -69,10 +67,10 @@ class LegalTest extends TestCase
 
     public function test_legal_scope_enabled(): void
     {
-        $enabledLegal = Legal::factory()->enabled()->create();
-        $disabledLegal = Legal::factory()->disabled()->create();
+        $enabledLegal = Legal::factory()->enabled()->published()->create();
+        $disabledLegal = Legal::factory()->disabled()->published()->create();
 
-        $enabledLegals = Legal::enabled()->get();
+        $enabledLegals = Legal::withoutGlobalScope(\App\Models\Scopes\EnabledScope::class)->enabled()->get();
 
         $this->assertTrue($enabledLegals->contains($enabledLegal));
         $this->assertFalse($enabledLegals->contains($disabledLegal));
@@ -80,8 +78,8 @@ class LegalTest extends TestCase
 
     public function test_legal_scope_required(): void
     {
-        $requiredLegal = Legal::factory()->required()->create();
-        $optionalLegal = Legal::factory()->create(['is_required' => false]);
+        $requiredLegal = Legal::factory()->required()->enabled()->published()->create();
+        $optionalLegal = Legal::factory()->enabled()->published()->create(['is_required' => false]);
 
         $requiredLegals = Legal::required()->get();
 
@@ -91,8 +89,8 @@ class LegalTest extends TestCase
 
     public function test_legal_scope_by_type(): void
     {
-        $privacyPolicy = Legal::factory()->privacyPolicy()->create();
-        $termsOfUse = Legal::factory()->termsOfUse()->create();
+        $privacyPolicy = Legal::factory()->privacyPolicy()->enabled()->published()->create();
+        $termsOfUse = Legal::factory()->termsOfUse()->enabled()->published()->create();
 
         $privacyPolicies = Legal::byType('privacy_policy')->get();
 
@@ -113,9 +111,9 @@ class LegalTest extends TestCase
 
     public function test_legal_scope_ordered(): void
     {
-        $legal1 = Legal::factory()->create(['sort_order' => 2]);
-        $legal2 = Legal::factory()->create(['sort_order' => 1]);
-        $legal3 = Legal::factory()->create(['sort_order' => 3]);
+        $legal1 = Legal::factory()->enabled()->published()->create(['sort_order' => 2]);
+        $legal2 = Legal::factory()->enabled()->published()->create(['sort_order' => 1]);
+        $legal3 = Legal::factory()->enabled()->published()->create(['sort_order' => 3]);
 
         $orderedLegals = Legal::ordered()->get();
 
