@@ -913,12 +913,14 @@ UserProductInteractionResource is now fully functional with maximum Filament v4 
 - Align CollectionResource with Filament v4 conventions: Tables action namespace usage, schema layout cleanup, slug safety, and resilient sort order handling. // added 2025-10-22
 - [ ] Diagnose and fix `NewsCommentResource` Filament suite regressions so that `Tests\\Feature\\NewsCommentResourceTest` passes all scenarios (listing, CRUD, filters, bulk actions, validation, nested comment creation) with bilingual translations restored.
 - [ ] Resolve comprehensive `NewsImageResource` regressions causing `Tests\\Feature\\NewsImageResourceTest` to fail across listing, CRUD, filters, bulk actions, validation, and persistence behaviors with full LT/EN translation coverage.
+- [ ] Restore `DiscountConditionResource` parity: update translations, normalize schema/table signatures, and ensure model factory and sync helpers support tests through bilingual coverage. // added 2025-10-24
 
 ### 2025-10-24 – Test Failure Remediation
 - [ ] Execute `php artisan test` to capture the first failing case and document the error trace.
 - [ ] Triage the failure, implement code and translation fixes, and update/author matching Pest coverage.
 - [ ] Re-run the impacted test suite until it passes, then record results for bilingual release notes.
 - [ ] Resolve `CustomerGroup` model/resource regressions causing comprehensive Filament and feature test failures; normalize form/table signatures, ensure schema/table imports, and restore translations + validations for both LT/EN locales.
+- [ ] Investigate `DiscountConditionResourceTest` failures covering list, CRUD, filters, bulk actions, status toggles, validation, and relationship syncing; implement LT/EN translations and rerun targeted Pest suites. // added 2025-10-24
 - [ ] Investigate `MenuResourceTest` suite failures (listing, creation, editing, deletion, filters, bulk actions) and restore full coverage with bilingual translations and Filament v4 schema/table compliance. // added 2025-10-24
 - [ ] Audit and remediate `LocationResourceTest` regression blocking Filament location management flows; align resource schema/table signatures, translations, and model helpers before rerunning targeted Pest suite. // added 2025-10-24
 - [ ] Restore `RecommendationBlockResource` suite parity so that all table CRUD, filters, bulk operations, toggles, validation, and relational actions pass in LT/EN with Filament v4 schema/table compliance. // added 2025-10-24

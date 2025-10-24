@@ -244,8 +244,18 @@ class ReportResourceTest extends TestCase
 
     public function test_can_search_reports(): void
     {
-        $report1 = Report::factory()->create(['name' => ['lt' => 'Pardavimų ataskaita', 'en' => 'Sales Report']]);
-        $report2 = Report::factory()->create(['name' => ['lt' => 'Atsargų ataskaita', 'en' => 'Inventory Report']]);
+        $report1 = Report::factory()->create([
+            'name' => [
+                'lt' => 'Pardavimų ataskaita',
+                'en' => 'Sales Report',
+            ],
+        ]);
+        $report2 = Report::factory()->create([
+            'name' => [
+                'lt' => 'Atsargų ataskaita',
+                'en' => 'Inventory Report',
+            ],
+        ]);
 
         Livewire::test(\App\Filament\Resources\ReportResource\Pages\ListReports::class)
             ->searchTable('Sales')
