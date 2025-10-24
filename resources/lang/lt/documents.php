@@ -28,9 +28,10 @@ return [
     // Document Status
     'statuses' => [
         'draft' => 'Juodraštis',
+        'generated' => 'Sugeneruotas',
+        'sent' => 'Išsiųstas',
         'published' => 'Publikuotas',
         'archived' => 'Archyvuotas',
-        'pending' => 'Laukia peržiūros',
     ],
 
     // Document Format

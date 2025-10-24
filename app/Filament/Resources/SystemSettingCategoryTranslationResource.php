@@ -26,7 +26,6 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Exception;
 use BackedEnum;
-use UnitEnum;
 
 final class SystemSettingCategoryTranslationResource extends Resource
 {
@@ -35,12 +34,8 @@ final class SystemSettingCategoryTranslationResource extends Resource
     /**
      * @var UnitEnum|string|null
      */
-    protected static UnitEnum|string|null $navigationIcon = 'heroicon-o-language';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-language';
 
-    /**
-     * @var UnitEnum|string|null
-     */
-    protected static UnitEnum|string|null $navigationGroup = 'Settings';
 
     protected static bool $shouldRegisterNavigation = false;
 
