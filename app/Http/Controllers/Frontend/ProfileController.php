@@ -29,7 +29,7 @@ final class ProfileController extends Controller
     {
         $user = $this->resolveUser($request)->load('addresses');
 
-        return response()->view('frontend.profile.index', [
+        return response()->view('profile.index', [
             'user' => $user,
             'addresses' => $user->addresses,
             'customer' => $this->resolveCustomerForUser($user),
@@ -40,7 +40,7 @@ final class ProfileController extends Controller
     {
         $user = $this->resolveUser($request);
 
-        return response()->view('frontend.profile.edit', [
+        return response()->view('profile.edit', [
             'user' => $user,
             'countries' => $this->resolveCountries(),
             'customer' => $this->resolveCustomerForUser($user),
@@ -99,7 +99,7 @@ final class ProfileController extends Controller
     {
         $user = $this->resolveUser($request);
 
-        return response()->view('frontend.profile.addresses', [
+        return response()->view('profile.addresses', [
             'user' => $user,
             'addresses' => $user->addresses()->latest()->get(),
             'types' => AddressType::cases(),
@@ -143,7 +143,7 @@ final class ProfileController extends Controller
         $user = $this->resolveUser($request);
         $this->ensureAddressOwner($user->getKey(), $address);
 
-        $address->forceDelete();
+        $address->delete();
 
         return redirect()->route('frontend.profile.addresses')->with('status', 'address-deleted');
     }

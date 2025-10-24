@@ -46,7 +46,7 @@
                         </div>
                     </div>
                 </div>
-            </header>
+            </div>
 
             <section class="mt-10 space-y-8">
                 <div class="flex flex-col gap-4 rounded-3xl border border-gray-200 bg-white p-6 sm:flex-row sm:items-center sm:justify-between">
@@ -79,7 +79,7 @@
                     </form>
                 </div>
 
-                @include('frontend.products.partials.product-grid', ['products' => $products, 'emptyMessage' => __('No products have been published for this brand yet.')])
+                @include('frontend.products.partials.product-grid', ['products' => $products, 'emptyMessage' => __('No products found for this brand yet.')])
             </section>
 
             <section class="mt-12 rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">

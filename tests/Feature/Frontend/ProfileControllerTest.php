@@ -21,7 +21,7 @@ final class ProfileControllerTest extends TestCase
         $response = $this->actingAs($user)->get(route('frontend.profile.index'));
 
         $response->assertOk();
-        $response->assertViewIs('frontend.profile.index');
+        $response->assertViewIs('profile.index');
         $response->assertSee($user->name);
     }
 
@@ -125,6 +125,6 @@ final class ProfileControllerTest extends TestCase
         $response = $this->actingAs($user)->delete(route('frontend.profile.delete-address', $address));
 
         $response->assertRedirect(route('frontend.profile.addresses'));
-        $this->assertDatabaseMissing('addresses', ['id' => $address->id]);
+        $this->assertSoftDeleted('addresses', ['id' => $address->id]);
     }
 }
