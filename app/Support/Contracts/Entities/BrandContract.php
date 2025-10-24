@@ -9,6 +9,7 @@ use App\Support\Contracts\ContractPathResolver;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Route;
 
 final class BrandContract
 {
@@ -75,9 +76,18 @@ final class BrandContract
             'website'        => $brand->website ? (string) $brand->website : null,
             'products_count' => $brand->products_count ?? null,
             'links'          => [
-                'self' => route('brands.show', $brand->slug),
+                'self' => self::brandLink((string) $brand->slug),
             ],
         ];
+    }
+
+    private static function brandLink(string $slug): string
+    {
+        if (Route::has('brands.show')) {
+            return route('brands.show', $slug);
+        }
+
+        return url('/brands/'.$slug);
     }
 
     private static function envelope(array $data, array $meta = []): array

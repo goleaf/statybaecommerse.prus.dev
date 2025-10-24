@@ -6,12 +6,18 @@ namespace App\Services\Export;
 
 use App\Data\ExportRequestData;
 use App\Enums\ExportStatus;
-use App\Jobs\ProcessExport;
+use App\Enums\ExportType;
+use App\Jobs\ProcessExportJob;
 use App\Models\Export;
+use App\Models\User;
 use App\Notifications\ExportCompletedNotification;
 use App\Notifications\ExportFailedNotification;
+use App\Notifications\ExportReadyNotification;
 use App\Services\Export\Contracts\Exportable;
 use App\Services\Export\Contracts\ExportWriter;
+use App\Services\Export\Exporters\OrderExport;
+use App\Services\Export\Exporters\ProductExport;
+use App\Services\Export\Exporters\UserExport;
 use App\Services\Export\Writers\CsvExportWriter;
 use App\Services\Export\Writers\PdfExportWriter;
 use App\Services\Export\Writers\XlsxExportWriter;
@@ -21,10 +27,10 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use InvalidArgumentException;
 use Throwable;
 
 final class ExportService
@@ -48,131 +54,139 @@ final class ExportService
             $config = [];
         }
 
-        $configuredDisk = $config['disk'] ?? config('filesystems.default', 'public');
-        $this->disk = $disk ?? (is_string($configuredDisk) ? $configuredDisk : 'public');
+        $configuredDisk = $config['disk'] ?? config('filesystems.default', 'local');
+        $this->disk = $disk ?? (is_string($configuredDisk) ? $configuredDisk : 'local');
         $this->chunkSize = $this->resolveInteger($config['chunk_size'] ?? null, 250);
         $this->downloadUrlTtl = $this->resolveInteger($config['download_url_ttl'] ?? null, 60);
-        $formats = $config['formats'] ?? [];
 
-        if (is_array($formats)) {
-            foreach ($formats as $key => $writer) {
-                if (! is_string($key) || ! is_string($writer) || ! is_subclass_of($writer, ExportWriter::class)) {
-                    continue;
-                }
+        $this->writerMap = [
+            'csv' => CsvExportWriter::class,
+            'xlsx' => XlsxExportWriter::class,
+            'pdf' => PdfExportWriter::class,
+        ];
 
-                $this->writerMap[Str::lower($key)] = $writer;
+        foreach (($config['formats'] ?? []) as $key => $writer) {
+            if (! is_string($key) || ! is_string($writer) || ! is_subclass_of($writer, ExportWriter::class)) {
+                continue;
             }
+
+            $this->writerMap[Str::lower($key)] = $writer;
         }
     }
 
     public function queue(ExportRequestData $data): Export
     {
-        $payload = $data->toPayload();
-        $exportable = $this->resolveExportable($payload['exportable']);
+        $exportable = $this->resolveExportableFromRequest($data);
 
-        /** @var array<int, string> $requestedColumns */
-        $requestedColumns = $payload['columns'];
-        $columns = $this->resolveColumns($exportable, $requestedColumns);
-
-        $export = Export::query()->create([
-            'name' => $payload['name'] ?: $exportable->name(),
-            'format' => $payload['format'],
-            'status' => ExportStatus::Queued,
-            'exportable_type' => $payload['exportable'],
-            'columns' => array_keys($columns),
-            'exportable_options' => [
-                'record_ids' => $payload['record_ids'],
-                'filters' => $payload['filters'],
-                'meta' => $payload['meta'],
-            ],
-            'artifact_disk' => $this->disk,
-            'requested_by' => $payload['user_id'],
-        ]);
-
-        $exportId = $export->getKey();
-
-        if (! is_int($exportId)) {
-            throw new \UnexpectedValueException('Export primary key must be an integer.');
-        }
-
-        Bus::dispatch(new ProcessExport($exportId));
-
-        return $export;
+        return $this->queueExportable($exportable, $data);
     }
 
-    public function process(int $exportId): void
+    public function queueExport(ExportRequestData $data, User $user): Export
     {
-        $export = Export::query()->findOrFail($exportId);
+        $data->userId ??= $user->getKey();
+        $exportable = $this->resolveExportableFromRequest($data);
 
-        if ($export->status === ExportStatus::Completed) {
-            return;
+        return $this->queueExportable($exportable, $data, $user);
+    }
+
+    public function process(Export|int $export): Export
+    {
+        $model = $this->resolveExportModel($export);
+
+        if ($model->status === ExportStatus::Completed) {
+            return $model;
         }
 
-        $export->forceFill([
+        $model->forceFill([
             'status' => ExportStatus::Processing,
             'processed_rows' => 0,
             'failure_reason' => null,
             'failed_at' => null,
         ])->save();
 
-        try {
-            $exportable = $this->resolveExportable($export->exportable_type);
-            /** @var array<int, string> $columnKeys */
-            $columnKeys = $export->columns ?? [];
-            $columns = $this->resolveColumns($exportable, $columnKeys);
-            $query = $this->buildQuery($exportable, $export->exportable_options ?? []);
-            $writer = $this->makeWriter($export->format);
-            $headers = Collection::make($columns)->map(fn (ExportColumn $column) => $column->label)->values()->all();
-            $path = $this->artifactPath($export);
+        $disk = $model->artifact_disk ?? $this->disk;
+        $path = null;
 
-            $writer->open($export->artifact_disk ?? $this->disk, $path, $headers);
+        try {
+            $exportable = $this->resolveExportable($model->exportable_type);
+            $columns = $this->resolveColumns($exportable, $model->columns ?? []);
+            $query = $this->buildQuery($exportable, $model->exportable_options ?? []);
+            $writer = $this->makeWriter($model->format);
+            $headers = Collection::make($columns)
+                ->map(static fn (ExportColumn $column): string => $column->label)
+                ->values()
+                ->all();
+
+            $path = $this->artifactPath($model);
+
+            $writer->open($disk, $path, $headers);
 
             $total = 0;
             $query->chunkById($this->chunkSize, function (Collection $chunk) use (&$total, $writer, $exportable, $columns): void {
-                /** @var Model $model */
-                foreach ($chunk as $model) {
-                    $writer->append($exportable->map($model, $columns));
+                /** @var Model $record */
+                foreach ($chunk as $record) {
+                    $writer->append($exportable->map($record, $columns));
                     $total++;
                 }
             });
 
             $writer->close();
 
-            $export->forceFill([
+            $model->forceFill([
                 'status' => ExportStatus::Completed,
                 'artifact_path' => $path,
-                'artifact_filename' => $this->buildFileName($exportable, $export),
+                'artifact_filename' => $this->buildFileName($exportable, $model),
                 'completed_at' => now(),
                 'total_rows' => $total,
                 'processed_rows' => $total,
             ])->save();
 
-            if ($export->requestedBy) {
-                $export->requestedBy->notify(new ExportReadyNotification(
-                    $export,
-                    ExportUrlGenerator::temporarySignedDownloadUrl($export),
-                ));
-            }
+            $this->notifySuccess($model);
         } catch (Throwable $exception) {
             Log::error('Export failed', [
-                'export_id' => $export->getKey(),
+                'export_id' => $model->getKey(),
                 'exception' => $exception,
             ]);
 
-            $export->forceFill([
+            $model->forceFill([
                 'status' => ExportStatus::Failed,
                 'failed_at' => now(),
                 'failure_reason' => $exception->getMessage(),
             ])->save();
 
-            if ($export->requestedBy) {
-                $export->requestedBy->notify(new ExportFailedNotification($export));
-            }
+            $this->notifyFailure($model);
 
-            if ($path ?? null) {
-                Storage::disk($export->artifact_disk ?? $this->disk)->delete($path);
+            if ($path !== null) {
+                Storage::disk($disk)->delete($path);
             }
         }
+
+        return $model;
+    }
+
+    private function queueExportable(Exportable $exportable, ExportRequestData $data, ?User $user = null): Export
+    {
+        $columns = $this->resolveColumns($exportable, $data->requestedColumns());
+        $options = [
+            'record_ids' => $data->recordIdentifiers(),
+            'filters' => $data->filters,
+            'meta' => $data->metadata(),
+        ];
+
+        $export = Export::query()->create([
+            'name' => $data->name ?: $exportable->name(),
+            'format' => $data->normalizedFormat(),
+            'status' => ExportStatus::Queued,
+            'exportable_type' => $exportable::class,
+            'columns' => array_keys($columns),
+            'exportable_options' => $options,
+            'artifact_disk' => $this->disk,
+            'requested_by' => $user?->getKey() ?? $data->userId,
+        ]);
+
+        ProcessExportJob::dispatch($export->getKey());
+
+        return $export;
     }
 
     /**
@@ -273,5 +287,60 @@ final class ExportService
         }
 
         return $default;
+    }
+
+    private function resolveExportModel(Export|int $export): Export
+    {
+        if ($export instanceof Export) {
+            return $export->fresh() ?? $export;
+        }
+
+        return Export::query()->findOrFail($export);
+    }
+
+    private function resolveExportableFromRequest(ExportRequestData $data): Exportable
+    {
+        if (is_string($data->exportable) && $data->exportable !== '') {
+            return $this->resolveExportable($data->exportable);
+        }
+
+        $entity = $data->entityEnum();
+
+        if ($entity === null) {
+            throw new InvalidArgumentException('Exportable class or entity must be provided.');
+        }
+
+        return match ($entity) {
+            ExportType::ORDERS => $this->resolveExportable(OrderExport::class),
+            ExportType::PRODUCTS => $this->resolveExportable(ProductExport::class),
+            ExportType::USERS => $this->resolveExportable(UserExport::class),
+        };
+    }
+
+    private function notifySuccess(Export $export): void
+    {
+        $export->loadMissing('requestedBy');
+        $user = $export->requestedBy;
+
+        if (! $user instanceof User) {
+            return;
+        }
+
+        $url = ExportUrlGenerator::temporarySignedDownloadUrl($export, $this->downloadUrlTtl);
+
+        $user->notify(new ExportCompletedNotification($export, $url));
+        $user->notify(new ExportReadyNotification($export, $url, $this->downloadUrlTtl));
+    }
+
+    private function notifyFailure(Export $export): void
+    {
+        $export->loadMissing('requestedBy');
+        $user = $export->requestedBy;
+
+        if (! $user instanceof User) {
+            return;
+        }
+
+        $user->notify(new ExportFailedNotification($export));
     }
 }

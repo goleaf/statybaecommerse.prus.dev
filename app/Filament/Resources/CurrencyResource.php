@@ -11,6 +11,7 @@ use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Schemas\Components\Grid as SchemaGrid;
 use Filament\Schemas\Components\Section as SchemaSection;
@@ -29,6 +30,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Validation\Rule;
 
 final class CurrencyResource extends Resource
 {
@@ -114,8 +116,18 @@ final class CurrencyResource extends Resource
                             TextInput::make('code')
                                 ->label(__('currencies.code'))
                                 ->maxLength(5)
-                                ->unique(ignoreRecord: true)
-                                ->rules(['alpha'])
+                                ->rules(static function (TextInput $component): array {
+                                    $uniqueRule = Rule::unique(Currency::class, 'code')
+                                        ->whereNull('deleted_at');
+
+                                    $record = $component->getRecord();
+
+                                    if ($record !== null && $record->exists) {
+                                        $uniqueRule->ignore($record);
+                                    }
+
+                                    return ['alpha', $uniqueRule];
+                                })
                                 ->helperText(__('currencies.code_help')),
                         ]),
                     SchemaGrid::make(2)
@@ -287,6 +299,7 @@ final class CurrencyResource extends Resource
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 EditAction::make(),
+                DeleteAction::make(),
                 Action::make('toggle_active')
                     ->label(fn (?Currency $record): string => ($record?->is_active ?? false) ? __('currencies.deactivate') : __('currencies.activate'))
                     ->icon(fn (?Currency $record): string => ($record?->is_active ?? false) ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
@@ -296,11 +309,11 @@ final class CurrencyResource extends Resource
                             return;
                         }
 
-                        $record->update(['is_active' => ! $record->is_active]);
+                        $newIsActive = ! $record->is_active;
 
-                        if (! $record->refresh()->is_active) {
-                            throw new \RuntimeException('Failed to toggle currency active state.');
-                        }
+                        Currency::whereKey($record)->update(['is_active' => $newIsActive]);
+                        $record->refresh();
+
                         Notification::make()
                             ->title($record->is_active ? __('currencies.activated_successfully') : __('currencies.deactivated_successfully'))
                             ->success()
@@ -344,8 +357,17 @@ final class CurrencyResource extends Resource
                         ->label(__('currencies.activate_selected'))
                         ->icon('heroicon-o-eye')
                         ->color('success')
-                    ->action(function (Collection $records): void {
-                            $records->each->update(['is_active' => true]);
+                        ->action(function (Collection $records): void {
+                            $recordIds = $records->modelKeys();
+                            if ($recordIds === []) {
+                                return;
+                            }
+
+                            Currency::whereKey($recordIds)->update(['is_active' => true]);
+                            $records->each(function (Currency $record): void {
+                                $record->refresh();
+                            });
+
                             Notification::make()
                                 ->title(__('currencies.bulk_activated_success'))
                                 ->success()
@@ -355,8 +377,17 @@ final class CurrencyResource extends Resource
                         ->label(__('currencies.deactivate_selected'))
                         ->icon('heroicon-o-eye-slash')
                         ->color('warning')
-                    ->action(function (Collection $records): void {
-                            $records->each->update(['is_active' => false]);
+                        ->action(function (Collection $records): void {
+                            $recordIds = $records->modelKeys();
+                            if ($recordIds === []) {
+                                return;
+                            }
+
+                            Currency::whereKey($recordIds)->update(['is_active' => false]);
+                            $records->each(function (Currency $record): void {
+                                $record->refresh();
+                            });
+
                             Notification::make()
                                 ->title(__('currencies.bulk_deactivated_success'))
                                 ->success()

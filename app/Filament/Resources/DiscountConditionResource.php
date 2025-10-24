@@ -31,6 +31,7 @@ use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid as InfolistGrid;
 use Filament\Schemas\Components\Section as InfolistSection;
+use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Schemas\Components\Tabs as SchemaTabs;
 use Filament\Schemas\Components\Tabs\Tab as SchemaTab;
 use Filament\Schemas\Schema;

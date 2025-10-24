@@ -50,6 +50,40 @@ class ImportProducts extends Command
     protected ?string $pivotCategoryProduct = null;
 
     /**
+     * Optional tables used to materialise variants and attribute options.
+     */
+    protected ?string $productVariantsTable = null;
+
+    protected ?string $attributesTable = null;
+
+    protected ?string $attributeValuesTable = null;
+
+    protected ?string $productAttributesTable = null;
+
+    protected ?string $productVariantAttributesTable = null;
+
+    /**
+     * Local caches so repeated lookups do not hammer the database.
+     *
+     * @var array<string, string>
+     */
+    protected array $categoryCache = [];
+
+    /**
+     * Cache attribute identifiers keyed by their slug for fast reuse.
+     *
+     * @var array<string, string>
+     */
+    protected array $attributeCache = [];
+
+    /**
+     * Cache attribute value identifiers keyed by attribute slug + value slug.
+     *
+     * @var array<string, string>
+     */
+    protected array $attributeValueCache = [];
+
+    /**
      * Execute the console command.
      */
     public function handle(): int
@@ -140,6 +174,9 @@ class ImportProducts extends Command
         $updated = 0;
         $skipped = 0;
         $errors = 0;
+        $variantCreated = 0;
+        $variantUpdated = 0;
+        $variantSkipped = 0;
 
         // Iterate each data row, skipping empty ones and logging errors per row.
         $rowCount = count($rows);
@@ -170,12 +207,23 @@ class ImportProducts extends Command
 
             try {
                 $result = $this->upsertProductFromItem($item, $delimiter, $vat);
-                if ($result === 'created') {
+                $status = $result['status'] ?? 'skipped';
+                $variantStatus = $result['variant_status'] ?? null;
+
+                if ($status === 'created') {
                     $created++;
-                } elseif ($result === 'updated') {
+                } elseif ($status === 'updated') {
                     $updated++;
                 } else {
                     $skipped++;
+                }
+
+                if ($variantStatus === 'created') {
+                    $variantCreated++;
+                } elseif ($variantStatus === 'updated') {
+                    $variantUpdated++;
+                } elseif ($variantStatus === 'skipped' || $variantStatus === null) {
+                    $variantSkipped++;
                 }
             } catch (Throwable $e) {
                 $errors++;
@@ -190,7 +238,18 @@ class ImportProducts extends Command
 
         $progress->finish();
         $this->newLine(2);
-        $this->table(['Created', 'Updated', 'Skipped', 'Errors'], [[(string) $created, (string) $updated, (string) $skipped, (string) $errors]]);
+        $this->table(
+            ['Created', 'Updated', 'Skipped', 'Errors', 'Variants +', 'Variants ~', 'Variants ·'],
+            [[
+                (string) $created,
+                (string) $updated,
+                (string) $skipped,
+                (string) $errors,
+                (string) $variantCreated,
+                (string) $variantUpdated,
+                (string) $variantSkipped,
+            ]]
+        );
 
         return $errors > 0 ? self::FAILURE : self::SUCCESS;
     }
@@ -223,6 +282,26 @@ class ImportProducts extends Command
 
         if (Schema::hasTable('manufacturers')) {
             $this->manufacturersTable = 'manufacturers';
+        }
+
+        if (Schema::hasTable('product_variants')) {
+            $this->productVariantsTable = 'product_variants';
+        }
+
+        if (Schema::hasTable('attributes')) {
+            $this->attributesTable = 'attributes';
+        }
+
+        if (Schema::hasTable('attribute_values')) {
+            $this->attributeValuesTable = 'attribute_values';
+        }
+
+        if (Schema::hasTable('product_attributes')) {
+            $this->productAttributesTable = 'product_attributes';
+        }
+
+        if (Schema::hasTable('product_variant_attributes')) {
+            $this->productVariantAttributesTable = 'product_variant_attributes';
         }
     }
 
@@ -415,49 +494,36 @@ class ImportProducts extends Command
     }
 
     /**
-     * Insert or update a product row derived from the spreadsheet entry.
+     * Collect extended item attributes (colour, size, etc.) into a consistent structure.
      *
-     * @param array<string, mixed> $item
+     * @param  array<string, mixed> $item
+     * @return array<string, mixed>
      */
-    protected function upsertProductFromItem(array $item, string $delimiter, float $vat): string
+    protected function collectItemAttributes(array $item): array
     {
-        $productsTable = $this->productsTable;
-        /** @var array<int, string> $columns */
-        $columns = Schema::getColumnListing($productsTable);
-        $now = Carbon::now();
+        $rawSku = $this->nullableStringValue($item['sku'] ?? null);
 
-        $name = $this->normalizeStringValue($item['name'] ?? null);
-        $desc = $this->normalizeStringValue($item['description'] ?? null);
-        $manufacturerName = $this->nullableStringValue($item['manufacturer'] ?? null);
+        $attributes = [
+            'ean'          => $this->nullableStringValue($item['ean'] ?? null),
+            'source_sku'   => $rawSku,
+            'sku'          => $rawSku,
+            'dimensions'   => $this->nullableStringValue($item['dimensions'] ?? null),
+            'color'        => $this->nullableStringValue($item['color'] ?? null),
+            'size'         => $this->nullableStringValue($item['size'] ?? null),
+            'weight'       => $this->nullableStringValue($item['weight'] ?? null),
+            'material'     => $this->nullableStringValue($item['material'] ?? null),
+            'pack_qty'     => $this->nullableStringValue($item['pack_qty'] ?? null),
+            'pkg_length'   => $this->nullableStringValue($item['pkg_length'] ?? null),
+            'pkg_width'    => $this->nullableStringValue($item['pkg_width'] ?? null),
+            'pkg_height'   => $this->nullableStringValue($item['pkg_height'] ?? null),
+            'product_url'  => $this->nullableStringValue($item['product_url'] ?? null),
+            'catalog_urls' => $this->nullableStringValue($item['catalog_urls'] ?? null),
+        ];
 
-        // Resolve category hierarchy and ensure related records exist.
-        $categoryPath = $this->extractCategoryPath($item, $delimiter);
-        $categoryId = null;
-        if ($this->categoriesTable !== null && $categoryPath !== null) {
-            $categoryId = $this->ensureCategoryPath($categoryPath, $delimiter);
-        }
-
-        // Handle brand/manufacturer inference.
-        $brandId = null;
-        if ($manufacturerName !== null) {
-            $brandId = $this->ensureBrandOrManufacturer($manufacturerName);
-        }
-
-        // Collect attributes used for metadata or uniqueness.
         $knownKeys = [
             'image',
             'name',
             'description',
-            'pack_qty',
-            'dimensions',
-            'color',
-            'size',
-            'weight',
-            'material',
-            'pkg_length',
-            'pkg_width',
-            'pkg_height',
-            'product_url',
             'price_ex_vat',
             'manufacturer',
             'category_path',
@@ -465,46 +531,95 @@ class ImportProducts extends Command
             'category3',
             'category4',
             'category5',
-            'catalog_urls',
-            'ean',
-            'sku',
-        ];
-
-        $attributes = [
-            'ean'          => $this->nullableStringValue($item['ean'] ?? null),
-            'sku'          => $this->nullableStringValue($item['sku'] ?? null),
-            'dimensions'   => $item['dimensions'] ?? null,
-            'color'        => $item['color'] ?? null,
-            'size'         => $item['size'] ?? null,
-            'pack_qty'     => $item['pack_qty'] ?? null,
-            'material'     => $item['material'] ?? null,
-            'pkg_length'   => $item['pkg_length'] ?? null,
-            'pkg_width'    => $item['pkg_width'] ?? null,
-            'pkg_height'   => $item['pkg_height'] ?? null,
-            'product_url'  => $item['product_url'] ?? null,
-            'catalog_urls' => $item['catalog_urls'] ?? null,
+            'kaina be pvm',
         ];
 
         foreach ($item as $key => $value) {
-            if (! in_array($key, $knownKeys, true) && $value !== null && $value !== '') {
-                $attributes[$key] = $value;
+            if (in_array($key, $knownKeys, true)) {
+                continue;
+            }
+
+            if (! array_key_exists($key, $attributes)) {
+                $attributes[$key] = $this->nullableStringValue($value);
             }
         }
 
-        // Build a slug using meaningful attributes to help deduplicate similar entries.
-        $uniqueKeyParts = [$name];
-        foreach (['dimensions', 'color', 'size', 'pack_qty'] as $attributeKey) {
-            $attributeValue = $this->normalizeStringValue($attributes[$attributeKey] ?? null);
-            if ($attributeValue !== '') {
-                $uniqueKeyParts[] = $attributeValue;
-            }
+        return $attributes;
+    }
+
+    /**
+     * Insert or update a product row derived from the spreadsheet entry and hydrate variants.
+     *
+     * @param  array<string, mixed> $item
+     * @return array{status:string, product_id:?string, variant_status:?string, variant_id:?string}
+     */
+    protected function upsertProductFromItem(array $item, string $delimiter, float $vat): array
+    {
+        $productsTable = $this->productsTable;
+        /** @var array<int, string> $columns */
+        $columns = Schema::getColumnListing($productsTable);
+        $now = Carbon::now();
+
+        // Normalise common fields up front so downstream helpers work with clean data.
+        $name = $this->normalizeStringValue($item['name'] ?? null);
+        $desc = $this->normalizeStringValue($item['description'] ?? null);
+        $manufacturerName = $this->nullableStringValue($item['manufacturer'] ?? null);
+
+        // Build or locate category entries before the product so pivoting succeeds.
+        $categoryPath = $this->extractCategoryPath($item, $delimiter);
+        $categoryId = $categoryPath !== null ? $this->ensureCategoryPath($categoryPath, $delimiter) : null;
+
+        $brandId = null;
+        if ($manufacturerName !== null) {
+            $brandId = $this->ensureBrandOrManufacturer($manufacturerName);
         }
 
-        $slug = Str::slug(implode(' ', array_filter($uniqueKeyParts, static fn (string $part): bool => $part !== '')));
+        // Gather extended attributes (colour, size, custom columns) into a single bag.
+        $attributes = $this->collectItemAttributes($item);
 
-        // Parse price and convert VAT-inclusive value when supported by the schema.
         $priceEx = $this->toFloat($item['price_ex_vat'] ?? null);
 
+        $pkName = $this->primaryKeyOf($productsTable) ?? 'id';
+        $providedSku = $this->normalizeSku($attributes['sku'] ?? null);
+        $existing = null;
+
+        if ($providedSku !== null && in_array('sku', $columns, true)) {
+            $existing = DB::table($productsTable)->where('sku', $providedSku)->first();
+        }
+
+        $existingId = null;
+        if ($existing !== null) {
+            $existingId = $existing->{$pkName} ?? null;
+        }
+
+        // Generate a slug that honours database limits while staying deterministic.
+        $slug = null;
+        if (in_array('slug', $columns, true)) {
+            if ($existing !== null && isset($existing->slug) && $existing->slug !== null) {
+                $slug = (string) $existing->slug;
+            } else {
+                $slugBase = $this->buildProductSlugBase($name, $manufacturerName);
+                $slug = $this->generateUniqueSlug($productsTable, $slugBase, $existingId !== null ? (string) $existingId : null);
+            }
+        }
+
+        // Resolve a SKU that satisfies unique constraints regardless of sheet quality.
+        $sku = null;
+        if (in_array('sku', $columns, true)) {
+            $sku = $this->resolveSkuForTable(
+                $productsTable,
+                $providedSku,
+                $name,
+                $attributes,
+                $existingId !== null ? (string) $existingId : null
+            );
+
+            if ($sku !== null) {
+                $attributes['sku'] = $sku;
+            }
+        }
+
+        // Assemble the payload, guarding each assignment with schema checks.
         $payload = [];
         $this->putIfColumnExists($payload, $columns, 'name', $name);
         $this->putIfColumnExists($payload, $columns, 'slug', $slug);
@@ -549,32 +664,36 @@ class ImportProducts extends Command
             );
         }
 
+        if ($sku !== null) {
+            $payload['sku'] = $sku;
+        }
+
         if (in_array('updated_at', $columns, true)) {
             $payload['updated_at'] = $now;
         }
 
-        // Choose the most reliable unique field, preferring SKU.
         $uniqueField = null;
-        $skuFromSheet = $attributes['sku'] ?? null;
-        if (in_array('sku', $columns, true) && is_string($skuFromSheet) && $skuFromSheet !== '') {
+        if (in_array('sku', $columns, true) && $sku !== null) {
             $uniqueField = 'sku';
-            $payload['sku'] = $skuFromSheet;
-        } elseif (in_array('sku', $columns, true)) {
-            $generatedSkuBase = preg_replace('/[^A-Za-z0-9]+/', '', $slug) ?? '';
-            $payload['sku'] = strtoupper(substr($generatedSkuBase, 0, 48));
-            $uniqueField = 'sku';
-        } elseif (in_array('slug', $columns, true)) {
+        } elseif (in_array('slug', $columns, true) && $slug !== null) {
             $uniqueField = 'slug';
-        } elseif (in_array('name', $columns, true)) {
+        } elseif (in_array('name', $columns, true) && $name !== '') {
             $uniqueField = 'name';
         } else {
             throw new RuntimeException("Could not determine unique field for upsert in table '{$productsTable}'.");
         }
 
-        // Perform the upsert using the detected primary key.
-        $existing = DB::table($productsTable)->where($uniqueField, $payload[$uniqueField])->first();
+        $uniqueValue = $payload[$uniqueField] ?? null;
+        if (! is_string($uniqueValue) || $uniqueValue === '') {
+            throw new RuntimeException("Resolved unique field '{$uniqueField}' is empty for '{$productsTable}'.");
+        }
+
+        $existing = DB::table($productsTable)->where($uniqueField, $uniqueValue)->first();
         if ($existing !== null) {
-            $pkName = $this->primaryKeyOf($productsTable) ?? 'id';
+            $existingId = $existing->{$pkName} ?? null;
+        }
+
+        if ($existing !== null) {
             DB::table($productsTable)->where($pkName, $existing->{$pkName})->update($payload);
             $id = $existing->{$pkName} ?? null;
             $action = 'updated';
@@ -583,25 +702,40 @@ class ImportProducts extends Command
                 $payload['created_at'] = $now;
             }
 
-            // insertGetId might not return ULID/UUID, so fall back to select-after-insert.
-            $primaryKey = $this->primaryKeyOf($productsTable) ?? 'id';
-            $inserted = DB::table($productsTable)->insertGetId($payload, $primaryKey);
+            $inserted = DB::table($productsTable)->insertGetId($payload, $pkName);
             if (! $inserted) {
                 DB::table($productsTable)->insert($payload);
-                $row = DB::table($productsTable)->where($uniqueField, $payload[$uniqueField])->first();
-                $inserted = $row->{$primaryKey} ?? null;
+                $row = DB::table($productsTable)->where($uniqueField, $uniqueValue)->first();
+                $inserted = $row->{$pkName} ?? null;
             }
 
             $id = $inserted;
             $action = 'created';
         }
 
-        // Attach the pivot relationship when both identifiers exist.
         if ($id !== null && $categoryId !== null && $this->pivotCategoryProduct !== null && (is_string($id) || is_int($id))) {
             $this->ensurePivot((string) $id, $categoryId);
         }
 
-        return $action;
+        $variantOutcome = null;
+        if ($id !== null && (is_string($id) || is_int($id))) {
+            $variantOutcome = $this->syncVariantData(
+                (string) $id,
+                $name,
+                $attributes,
+                $item,
+                $priceEx,
+                $vat,
+                $sku
+            );
+        }
+
+        return [
+            'status' => $action,
+            'product_id' => is_string($id) || is_int($id) ? (string) $id : null,
+            'variant_status' => $variantOutcome['status'] ?? null,
+            'variant_id' => $variantOutcome['variant_id'] ?? null,
+        ];
     }
 
     /**
@@ -630,11 +764,7 @@ class ImportProducts extends Command
      */
     protected function ensureCategoryPath(string $path, string $delimiter = '/'): ?string
     {
-        if ($this->categoriesTable === null) {
-            return null;
-        }
-
-        if ($path === '') {
+        if ($this->categoriesTable === null || $path === '') {
             return null;
         }
 
@@ -646,80 +776,94 @@ class ImportProducts extends Command
             static fn (string $segment): string => trim($segment),
             explode($delimiter, $path)
         )));
+
         if ($segments === []) {
             return null;
         }
 
+        $table = $this->categoriesTable;
+        $pk = $this->primaryKeyOf($table) ?? 'id';
         $parentId = null;
+        $traversed = [];
+
         foreach ($segments as $segment) {
-            $slug = Str::slug($segment);
-
-            $query = DB::table($this->categoriesTable)
-                ->when(
-                    $parentId,
-                    fn (Builder $builder): Builder => $builder->where('parent_id', $parentId),
-                    fn (Builder $builder): Builder => $builder->whereNull('parent_id')
-                )
-                ->where(function (Builder $builder) use ($slug, $segment): void {
-                    $builder->where('slug', $slug);
-
-                    if ($this->categoriesTable !== null && Schema::hasColumn($this->categoriesTable, 'name')) {
-                        $builder->orWhere('name', $segment);
-                    }
-                });
-
-            $existing = $query->first();
-            if ($existing !== null) {
-                $pk = $this->primaryKeyOf($this->categoriesTable) ?? 'id';
-                $parentId = $existing->{$pk} ?? null;
-
+            if ($segment === '') {
                 continue;
             }
 
+            $traversed[] = mb_strtolower($segment, 'UTF-8');
+            $cacheKey = implode('>', $traversed);
+
+            if (isset($this->categoryCache[$cacheKey])) {
+                $parentId = $this->categoryCache[$cacheKey];
+                continue;
+            }
+
+            // Attempt to reuse an existing slug or matching name under the same parent.
+            $slugCandidate = Str::slug($segment);
+            $existing = null;
+
+            if ($slugCandidate !== '') {
+                $existing = DB::table($table)->where('slug', $slugCandidate)->first();
+            }
+
+            if ($existing === null) {
+                $query = DB::table($table)
+                    ->when(
+                        $parentId,
+                        static fn (Builder $builder, string $id): Builder => $builder->where('parent_id', $id),
+                        static fn (Builder $builder): Builder => $builder->whereNull('parent_id')
+                    );
+
+                if (Schema::hasColumn($table, 'name')) {
+                    $query->where('name', $segment);
+                }
+
+                $existing = $query->first();
+            }
+
+            if ($existing !== null) {
+                $resolvedId = $existing->{$pk} ?? null;
+                if ($resolvedId !== null) {
+                    $parentId = (string) $resolvedId;
+                    $this->categoryCache[$cacheKey] = (string) $parentId;
+
+                    continue;
+                }
+            }
+
+            $slug = $this->generateUniqueSlug($table, $segment);
+
             $insert = ['slug' => $slug];
-            if (Schema::hasColumn($this->categoriesTable, 'name')) {
+            if (Schema::hasColumn($table, 'name')) {
                 $insert['name'] = $segment;
             }
-
-            if (Schema::hasColumn($this->categoriesTable, 'parent_id')) {
+            if (Schema::hasColumn($table, 'parent_id')) {
                 $insert['parent_id'] = $parentId;
             }
-
-            if (Schema::hasColumn($this->categoriesTable, 'created_at')) {
+            if (Schema::hasColumn($table, 'created_at')) {
                 $insert['created_at'] = Carbon::now();
             }
-
-            if (Schema::hasColumn($this->categoriesTable, 'updated_at')) {
+            if (Schema::hasColumn($table, 'updated_at')) {
                 $insert['updated_at'] = Carbon::now();
             }
 
-            $pk = $this->primaryKeyOf($this->categoriesTable) ?? 'id';
-            $newId = DB::table($this->categoriesTable)->insertGetId($insert, $pk);
+            $newId = DB::table($table)->insertGetId($insert, $pk);
             if (! $newId) {
-                DB::table($this->categoriesTable)->insert($insert);
-                $row = DB::table($this->categoriesTable)
-                    ->when(
-                        $parentId,
-                        fn (Builder $builder): Builder => $builder->where('parent_id', $parentId),
-                        fn (Builder $builder): Builder => $builder->whereNull('parent_id')
-                    )
-                    ->where('slug', $slug)
-                    ->first();
+                DB::table($table)->insert($insert);
+                $row = DB::table($table)->where('slug', $slug)->first();
                 $newId = $row->{$pk} ?? null;
             }
 
-            $parentId = $newId;
+            if ($newId === null) {
+                return null;
+            }
+
+            $parentId = (string) $newId;
+            $this->categoryCache[$cacheKey] = $parentId;
         }
 
-        if ($parentId === null) {
-            return null;
-        }
-
-        if (is_string($parentId) || is_int($parentId)) {
-            return (string) $parentId;
-        }
-
-        return null;
+        return $parentId;
     }
 
     /**
@@ -818,6 +962,668 @@ class ImportProducts extends Command
         }
 
         return null;
+    }
+
+    /**
+     * Create or update product variant records for the imported row.
+     *
+     * @param  array<string, mixed> $attributes
+     * @param  array<string, mixed> $item
+     * @return array{status:string, variant_id:?string}
+     */
+    protected function syncVariantData(
+        string $productId,
+        string $productName,
+        array $attributes,
+        array $item,
+        ?float $priceEx,
+        float $vat,
+        ?string $productSku
+    ): array {
+        if ($this->productVariantsTable === null) {
+            return ['status' => 'skipped', 'variant_id' => null];
+        }
+
+        $table = $this->productVariantsTable;
+        /** @var array<int, string> $columns */
+        $columns = Schema::getColumnListing($table);
+
+        if (! in_array('product_id', $columns, true) || ! in_array('sku', $columns, true)) {
+            return ['status' => 'skipped', 'variant_id' => null];
+        }
+
+        $variantOptions = $this->extractVariantOptions($attributes, $item);
+        $variantName = $this->buildVariantName($productName, $variantOptions);
+
+        $providedVariantSku = $this->normalizeSku($item['variant_sku'] ?? null);
+        $variantSkuSeed = $this->resolveVariantSkuSeed($productSku, $variantOptions, $productName, $attributes, $providedVariantSku);
+
+        $pk = $this->primaryKeyOf($table) ?? 'id';
+        $existing = DB::table($table)->where('sku', $variantSkuSeed)->first();
+        if ($existing === null && in_array('variant_combination_hash', $columns, true)) {
+            $hashSeed = $this->buildVariantCombinationHash($productId, $variantOptions, $variantSkuSeed);
+            $existing = DB::table($table)
+                ->where('product_id', $productId)
+                ->where('variant_combination_hash', $hashSeed)
+                ->first();
+        }
+
+        $ignoreId = null;
+        if ($existing !== null) {
+            $existingId = $existing->{$pk} ?? null;
+            if ($existingId !== null) {
+                $ignoreId = (string) $existingId;
+            }
+
+            if (isset($existing->sku)) {
+                $variantSkuSeed = (string) $existing->sku;
+            }
+        }
+
+        $variantSku = $this->ensureUniqueColumnValue($table, 'sku', $variantSkuSeed, $ignoreId, 64);
+        $variantHash = $this->buildVariantCombinationHash($productId, $variantOptions, $variantSku);
+
+        $variantPayload = [];
+        $this->putIfColumnExists($variantPayload, $columns, 'product_id', $productId);
+        $this->putIfColumnExists($variantPayload, $columns, 'name', $variantName);
+        $this->putIfColumnExists($variantPayload, $columns, 'sku', $variantSku);
+        $this->putIfColumnExists($variantPayload, $columns, 'barcode', $attributes['ean'] ?? null);
+        $this->putIfColumnExists($variantPayload, $columns, 'price', $priceEx ?? 0.0);
+        $this->putIfColumnExists($variantPayload, $columns, 'cost_price', $priceEx);
+        $this->putIfColumnExists($variantPayload, $columns, 'weight', $this->toFloat($attributes['weight'] ?? null));
+
+        if (in_array('price_incl_vat', $columns, true)) {
+            $this->putIfColumnExists(
+                $variantPayload,
+                $columns,
+                'price_incl_vat',
+                $priceEx !== null ? round($priceEx * (1 + $vat / 100), 2) : null
+            );
+        }
+
+        if (in_array('attributes', $columns, true)) {
+            $variantPayload['attributes'] = json_encode($variantOptions, JSON_UNESCAPED_UNICODE);
+        }
+
+        if (in_array('variant_attribute_matrix', $columns, true)) {
+            $variantPayload['variant_attribute_matrix'] = json_encode(['options' => $variantOptions], JSON_UNESCAPED_UNICODE);
+        }
+
+        if (in_array('variant_combination_hash', $columns, true)) {
+            $variantPayload['variant_combination_hash'] = $variantHash;
+        }
+
+        if (in_array('is_enabled', $columns, true)) {
+            $variantPayload['is_enabled'] = true;
+        }
+
+        if (in_array('track_inventory', $columns, true)) {
+            $variantPayload['track_inventory'] = false;
+        }
+
+        if (in_array('is_default', $columns, true)) {
+            $isFirstVariant = DB::table($table)->where('product_id', $productId)->count() === 0;
+            $variantPayload['is_default'] = $existing !== null ? (bool) ($existing->is_default ?? false) : $isFirstVariant;
+        }
+
+        if (in_array('updated_at', $columns, true)) {
+            $variantPayload['updated_at'] = Carbon::now();
+        }
+
+        $variantId = null;
+        $status = 'skipped';
+
+        if ($existing !== null) {
+            DB::table($table)->where($pk, $existing->{$pk})->update($variantPayload);
+            $variantId = $existing->{$pk} ?? null;
+            $status = 'updated';
+        } else {
+            if (in_array('created_at', $columns, true)) {
+                $variantPayload['created_at'] = Carbon::now();
+            }
+
+            $inserted = DB::table($table)->insertGetId($variantPayload, $pk);
+            if (! $inserted) {
+                DB::table($table)->insert($variantPayload);
+                $row = DB::table($table)->where('sku', $variantSku)->first();
+                $inserted = $row->{$pk} ?? null;
+            }
+
+            $variantId = $inserted;
+            $status = 'created';
+        }
+
+        if ($variantId !== null) {
+            $variantId = (string) $variantId;
+            $this->syncAttributeAssignments($productId, $variantId, $variantOptions);
+        }
+
+        return [
+            'status' => $status,
+            'variant_id' => $variantId,
+        ];
+    }
+
+    /**
+     * Extract meaningful variant options from product attributes and raw columns.
+     *
+     * @param  array<string, mixed> $attributes
+     * @param  array<string, mixed> $item
+     * @return array<string, string>
+     */
+    protected function extractVariantOptions(array $attributes, array $item): array
+    {
+        $reserved = ['ean', 'sku', 'source_sku', 'product_url', 'catalog_urls', 'manufacturer', 'category_path', 'category2', 'category3', 'category4', 'category5', 'variant_sku'];
+        $preferred = ['color', 'size', 'dimensions', 'weight', 'material', 'pack_qty', 'pkg_length', 'pkg_width', 'pkg_height'];
+
+        $options = [];
+        foreach ($preferred as $key) {
+            $value = $this->nullableStringValue($attributes[$key] ?? null);
+            if ($value !== null) {
+                $options[$key] = $value;
+            }
+        }
+
+        foreach ($attributes as $key => $value) {
+            if (isset($options[$key])) {
+                continue;
+            }
+
+            if (in_array($key, $reserved, true)) {
+                continue;
+            }
+
+            $normalized = $this->nullableStringValue($value);
+            if ($normalized !== null) {
+                $options[$key] = $normalized;
+            }
+        }
+
+        return $options;
+    }
+
+    /**
+     * Build a human friendly variant name by appending formatted option labels.
+     *
+     * @param array<string, string> $variantOptions
+     */
+    protected function buildVariantName(string $productName, array $variantOptions): string
+    {
+        if ($variantOptions === []) {
+            return $productName;
+        }
+
+        $parts = [];
+        foreach ($variantOptions as $key => $value) {
+            $parts[] = $this->humanizeVariantKey($key) . ': ' . $value;
+        }
+
+        return trim($productName . ' - ' . implode(', ', $parts));
+    }
+
+    /**
+     * Generate a deterministic variant SKU seed taking the product SKU and options into account.
+     *
+     * @param array<string, mixed> $attributes
+     * @param array<string, string> $variantOptions
+     */
+    protected function resolveVariantSkuSeed(
+        ?string $productSku,
+        array $variantOptions,
+        string $productName,
+        array $attributes,
+        ?string $providedVariantSku
+    ): string {
+        $candidate = $providedVariantSku;
+        if ($candidate === null) {
+            $candidate = $this->normalizeSku($attributes['source_sku'] ?? null);
+        }
+
+        if ($candidate === null && $productSku !== null) {
+            $candidate = $productSku;
+        }
+
+        if ($candidate === null) {
+            $candidate = $this->generateSkuSeed($productName, $variantOptions) ?? strtoupper(substr(hash('sha1', $productName), 0, 16));
+        }
+
+        if ($variantOptions !== []) {
+            $suffix = strtoupper(substr(hash('crc32b', json_encode($variantOptions, JSON_UNESCAPED_UNICODE)), 0, 6));
+            $candidate = rtrim(substr($candidate, 0, max(1, 48 - 7)), '-') . '-' . $suffix;
+        }
+
+        return substr($candidate, 0, 64);
+    }
+
+    /**
+     * Create a stable hash representing the variant option combination.
+     *
+     * @param array<string, string> $variantOptions
+     */
+    protected function buildVariantCombinationHash(string $productId, array $variantOptions, string $sku): string
+    {
+        return hash('sha1', json_encode([
+            'product_id' => $productId,
+            'sku'        => $sku,
+            'options'    => $variantOptions,
+        ], JSON_UNESCAPED_UNICODE));
+    }
+
+    /**
+     * Synchronise attribute definitions and pivot relationships for the variant.
+     *
+     * @param array<string, string> $variantOptions
+     */
+    protected function syncAttributeAssignments(string $productId, string $variantId, array $variantOptions): void
+    {
+        if ($variantOptions === []) {
+            return;
+        }
+
+        foreach ($variantOptions as $key => $value) {
+            $label = $this->humanizeVariantKey($key);
+            $attributeSlug = Str::slug($label);
+            if ($attributeSlug === '') {
+                $attributeSlug = Str::slug('option-' . substr(hash('sha1', $key), 0, 8));
+            }
+
+            $attributeId = $this->ensureAttributeExists($attributeSlug, $label);
+            if ($attributeId === null) {
+                continue;
+            }
+
+            $valueId = $this->ensureAttributeValueExists($attributeSlug, $attributeId, $value);
+            if ($valueId === null) {
+                continue;
+            }
+
+            $this->syncProductAttributePivot($productId, $attributeId, $valueId);
+            $this->syncVariantAttributePivot($variantId, $attributeId, $valueId);
+        }
+    }
+
+    /**
+     * Ensure the attribute definition exists and return its identifier.
+     */
+    protected function ensureAttributeExists(string $slug, string $name): ?string
+    {
+        if ($this->attributesTable === null) {
+            return null;
+        }
+
+        if (isset($this->attributeCache[$slug])) {
+            return $this->attributeCache[$slug];
+        }
+
+        $table = $this->attributesTable;
+        $pk = $this->primaryKeyOf($table) ?? 'id';
+        $existing = DB::table($table)->where('slug', $slug)->first();
+        if ($existing !== null) {
+            $id = $existing->{$pk} ?? null;
+            if ($id !== null) {
+                $this->attributeCache[$slug] = (string) $id;
+
+                return (string) $id;
+            }
+        }
+
+        $insert = ['slug' => $slug];
+        if (Schema::hasColumn($table, 'name')) {
+            $insert['name'] = $name;
+        }
+        if (Schema::hasColumn($table, 'type')) {
+            $insert['type'] = 'select';
+        }
+        if (Schema::hasColumn($table, 'is_enabled')) {
+            $insert['is_enabled'] = true;
+        }
+        if (Schema::hasColumn($table, 'is_filterable')) {
+            $insert['is_filterable'] = true;
+        }
+        if (Schema::hasColumn($table, 'created_at')) {
+            $insert['created_at'] = Carbon::now();
+        }
+        if (Schema::hasColumn($table, 'updated_at')) {
+            $insert['updated_at'] = Carbon::now();
+        }
+
+        $id = DB::table($table)->insertGetId($insert, $pk);
+        if (! $id) {
+            DB::table($table)->insert($insert);
+            $row = DB::table($table)->where('slug', $slug)->first();
+            $id = $row->{$pk} ?? null;
+        }
+
+        if ($id === null) {
+            return null;
+        }
+
+        $this->attributeCache[$slug] = (string) $id;
+
+        return (string) $id;
+    }
+
+    /**
+     * Ensure the attribute value exists and return its identifier.
+     */
+    protected function ensureAttributeValueExists(string $attributeSlug, string $attributeId, string $value): ?string
+    {
+        if ($this->attributeValuesTable === null) {
+            return null;
+        }
+
+        $valueSlug = Str::slug($value);
+        if ($valueSlug === '') {
+            $valueSlug = Str::slug(substr($value, 0, 32)) ?: strtolower(substr(hash('sha1', $value), 0, 12));
+        }
+
+        $cacheKey = $attributeSlug . '|' . $valueSlug;
+        if (isset($this->attributeValueCache[$cacheKey])) {
+            return $this->attributeValueCache[$cacheKey];
+        }
+
+        $table = $this->attributeValuesTable;
+        $pk = $this->primaryKeyOf($table) ?? 'id';
+        $existing = DB::table($table)
+            ->where('attribute_id', $attributeId)
+            ->where('slug', $valueSlug)
+            ->first();
+
+        if ($existing !== null) {
+            $id = $existing->{$pk} ?? null;
+            if ($id !== null) {
+                $this->attributeValueCache[$cacheKey] = (string) $id;
+
+                return (string) $id;
+            }
+        }
+
+        $insert = [
+            'attribute_id' => $attributeId,
+            'slug'         => $valueSlug,
+        ];
+
+        if (Schema::hasColumn($table, 'value')) {
+            $insert['value'] = $value;
+        }
+        if (Schema::hasColumn($table, 'is_enabled')) {
+            $insert['is_enabled'] = true;
+        }
+        if (Schema::hasColumn($table, 'created_at')) {
+            $insert['created_at'] = Carbon::now();
+        }
+        if (Schema::hasColumn($table, 'updated_at')) {
+            $insert['updated_at'] = Carbon::now();
+        }
+
+        $id = DB::table($table)->insertGetId($insert, $pk);
+        if (! $id) {
+            DB::table($table)->insert($insert);
+            $row = DB::table($table)
+                ->where('attribute_id', $attributeId)
+                ->where('slug', $valueSlug)
+                ->first();
+            $id = $row->{$pk} ?? null;
+        }
+
+        if ($id === null) {
+            return null;
+        }
+
+        $this->attributeValueCache[$cacheKey] = (string) $id;
+
+        return (string) $id;
+    }
+
+    /**
+     * Attach the product_attributes pivot if necessary.
+     */
+    protected function syncProductAttributePivot(string $productId, string $attributeId, string $attributeValueId): void
+    {
+        if ($this->productAttributesTable === null) {
+            return;
+        }
+
+        $table = $this->productAttributesTable;
+        $query = DB::table($table)
+            ->where('product_id', $productId)
+            ->where('attribute_id', $attributeId);
+
+        if ($query->exists()) {
+            if (Schema::hasColumn($table, 'attribute_value_id')) {
+                $payload = ['attribute_value_id' => $attributeValueId];
+                if (Schema::hasColumn($table, 'updated_at')) {
+                    $payload['updated_at'] = Carbon::now();
+                }
+                $query->update($payload);
+            }
+
+            return;
+        }
+
+        $payload = [
+            'product_id'   => $productId,
+            'attribute_id' => $attributeId,
+        ];
+
+        if (Schema::hasColumn($table, 'attribute_value_id')) {
+            $payload['attribute_value_id'] = $attributeValueId;
+        }
+        if (Schema::hasColumn($table, 'created_at')) {
+            $payload['created_at'] = Carbon::now();
+        }
+        if (Schema::hasColumn($table, 'updated_at')) {
+            $payload['updated_at'] = Carbon::now();
+        }
+
+        DB::table($table)->insert($payload);
+    }
+
+    /**
+     * Attach the product_variant_attributes pivot if necessary.
+     */
+    protected function syncVariantAttributePivot(string $variantId, string $attributeId, string $attributeValueId): void
+    {
+        if ($this->productVariantAttributesTable === null) {
+            return;
+        }
+
+        $table = $this->productVariantAttributesTable;
+        $query = DB::table($table)
+            ->where('variant_id', $variantId)
+            ->where('attribute_id', $attributeId);
+
+        if ($query->exists()) {
+            $payload = ['attribute_value_id' => $attributeValueId];
+            if (Schema::hasColumn($table, 'updated_at')) {
+                $payload['updated_at'] = Carbon::now();
+            }
+            $query->update($payload);
+
+            return;
+        }
+
+        $payload = [
+            'variant_id'         => $variantId,
+            'attribute_id'       => $attributeId,
+            'attribute_value_id' => $attributeValueId,
+        ];
+
+        if (Schema::hasColumn($table, 'created_at')) {
+            $payload['created_at'] = Carbon::now();
+        }
+        if (Schema::hasColumn($table, 'updated_at')) {
+            $payload['updated_at'] = Carbon::now();
+        }
+
+        DB::table($table)->insert($payload);
+    }
+
+    /**
+     * Convert a variant key into a human readable label.
+     */
+    protected function humanizeVariantKey(string $key): string
+    {
+        $normalized = preg_replace('/[\-_]+/', ' ', $key) ?? $key;
+        $normalized = preg_replace('/\s+/', ' ', $normalized) ?? $normalized;
+
+        return ucwords(trim($normalized));
+    }
+
+    /**
+     * Build a deterministic slug seed combining the product name and manufacturer.
+     */
+    protected function buildProductSlugBase(string $name, ?string $manufacturerName): string
+    {
+        $parts = array_filter([
+            $name,
+            $manufacturerName,
+        ], static fn (?string $part): bool => $part !== null && trim($part) !== '');
+
+        $base = trim(implode(' ', $parts));
+
+        return $base !== '' ? $base : 'product';
+    }
+
+    /**
+     * Generate a globally unique slug within the provided table, respecting column limits.
+     */
+    protected function generateUniqueSlug(string $table, string $base, ?string $ignoreId = null, int $maxLength = 191): string
+    {
+        $initial = Str::slug($base);
+        if ($initial === '') {
+            $initial = Str::slug('item-' . substr(hash('sha1', $base), 0, 12));
+        }
+
+        $slug = $this->truncateSlug($initial, $maxLength);
+        $candidate = $slug;
+        $suffix = 1;
+        $pk = $this->primaryKeyOf($table) ?? 'id';
+
+        while (
+            DB::table($table)
+                ->where('slug', $candidate)
+                ->when($ignoreId, static fn (Builder $query, string $id): Builder => $query->where($pk, '!=', $id))
+                ->exists()
+        ) {
+            $suffixString = '-' . $suffix++;
+            $candidate = $this->truncateSlug($slug, $maxLength - strlen($suffixString)) . $suffixString;
+        }
+
+        return $candidate;
+    }
+
+    /**
+     * Trim a slug to the desired length without leaving dangling separators.
+     */
+    protected function truncateSlug(string $slug, int $maxLength): string
+    {
+        if (strlen($slug) <= $maxLength) {
+            return $slug;
+        }
+
+        $trimmed = substr($slug, 0, $maxLength);
+
+        return rtrim($trimmed, '-_');
+    }
+
+    /**
+     * Normalise SKU strings, stripping unsupported characters and enforcing length.
+     */
+    protected function normalizeSku(mixed $value): ?string
+    {
+        $stringValue = $this->nullableStringValue($value);
+        if ($stringValue === null) {
+            return null;
+        }
+
+        $ascii = Str::upper(Str::ascii($stringValue));
+        $sanitised = preg_replace('/[^A-Z0-9-]+/', '', $ascii) ?? '';
+        $sanitised = trim($sanitised, '-');
+
+        if ($sanitised === '') {
+            return null;
+        }
+
+        return substr($sanitised, 0, 64);
+    }
+
+    /**
+     * Resolve a SKU for the products table, falling back to generated seeds when needed.
+     *
+     * @param array<string, mixed> $attributes
+     */
+    protected function resolveSkuForTable(string $table, ?string $providedSku, string $name, array $attributes, ?string $ignoreId): ?string
+    {
+        $candidate = $providedSku;
+        if ($candidate === null || $candidate === '') {
+            $seed = $this->generateSkuSeed($name, $attributes);
+            if ($seed === null) {
+                return null;
+            }
+
+            $candidate = $seed;
+        }
+
+        return $this->ensureUniqueColumnValue($table, 'sku', $candidate, $ignoreId, 64);
+    }
+
+    /**
+     * Build a deterministic SKU seed using the product name and high-signal attributes.
+     *
+     * @param array<string, mixed> $attributes
+     */
+    protected function generateSkuSeed(string $name, array $attributes): ?string
+    {
+        $base = preg_replace('/[^A-Z0-9]+/', '', Str::upper(Str::ascii($name))) ?? '';
+        $base = substr($base, 0, 24);
+
+        $descriptorParts = [];
+        foreach (['color', 'size', 'pack_qty', 'material'] as $key) {
+            $value = $this->nullableStringValue($attributes[$key] ?? null);
+            if ($value !== null) {
+                $descriptorParts[] = preg_replace('/[^A-Z0-9]+/', '', Str::upper(Str::ascii($value))) ?? '';
+            }
+        }
+
+        $descriptorParts = array_filter($descriptorParts, static fn (string $part): bool => $part !== '');
+
+        $candidate = $base;
+        if ($descriptorParts !== []) {
+            $candidate = trim($base . '-' . implode('-', $descriptorParts), '-');
+        }
+
+        if ($candidate === '') {
+            return strtoupper(substr(hash('sha1', $name . json_encode($attributes, JSON_UNESCAPED_UNICODE)), 0, 16));
+        }
+
+        return substr($candidate, 0, 64);
+    }
+
+    /**
+     * Ensure a given column value is unique within the specified table.
+     */
+    protected function ensureUniqueColumnValue(string $table, string $column, string $candidate, ?string $ignoreId, int $maxLength): string
+    {
+        $value = substr($candidate, 0, $maxLength);
+        if ($value === '') {
+            $value = strtoupper(substr(hash('sha1', $candidate . $table . $column), 0, $maxLength));
+        }
+
+        $pk = $this->primaryKeyOf($table) ?? 'id';
+        $suffix = 1;
+
+        while (
+            DB::table($table)
+                ->where($column, $value)
+                ->when($ignoreId, static fn (Builder $query, string $id): Builder => $query->where($pk, '!=', $id))
+                ->exists()
+        ) {
+            $suffixString = '-' . $suffix++;
+            $value = substr($candidate, 0, max(1, $maxLength - strlen($suffixString))) . $suffixString;
+        }
+
+        return $value;
     }
 
     /**

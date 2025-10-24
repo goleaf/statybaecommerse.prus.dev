@@ -6,6 +6,7 @@ namespace Database\Factories;
 
 use App\Models\NewsCategory;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\NewsCategory>
@@ -16,7 +17,12 @@ final class NewsCategoryFactory extends Factory
 
     public function definition(): array
     {
+        $name = $this->faker->unique()->words(3, true);
+
         return [
+            'name'        => $name,
+            'slug'        => Str::slug($name),
+            'description' => $this->faker->optional()->sentence(12),
             // Default visibility to true so global scopes such as ActiveScope do not
             // unexpectedly hide categories during tests or seed generation flows.
             'is_visible' => true,

@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Support\Concerns\HasNav;
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\NewsCategoryResource\Pages;
 use App\Models\NewsCategory;
+use App\Support\Concerns\HasNav;
 use BackedEnum;
 use Filament\Forms\Components\ColorPicker;
 use Filament\Forms\Components\Select;
@@ -24,6 +24,7 @@ use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\Action;
 use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\ColorColumn;
 use Filament\Tables\Columns\IconColumn;
@@ -33,12 +34,15 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Str;
 
 final class NewsCategoryResource extends Resource
 {
     use HasNav;
 
     protected static ?string $model = NewsCategory::class;
+
+    protected static ?string $recordRouteKeyName = 'id';
 
     public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
     {
@@ -252,6 +256,21 @@ final class NewsCategoryResource extends Resource
                     }),
             ])
             ->actions([
+                Action::make('reorder')
+                    ->label(__('Reorder'))
+                    ->icon('heroicon-o-arrows-up-down')
+                    ->requiresConfirmation()
+                    ->modalHeading(__('Reorder Category'))
+                    ->form([
+                        TextInput::make('order')
+                            ->label(__('news_categories.fields.sort_order'))
+                            ->numeric()
+                            ->required()
+                            ->minValue(0),
+                    ])
+                    ->action(static function (NewsCategory $record, array $data): void {
+                        $record->update(['sort_order' => (int) ($data['order'] ?? $record->sort_order)]);
+                    }),
                 ViewAction::make()
                     ->color('info'),
                 EditAction::make()

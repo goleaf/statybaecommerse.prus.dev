@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Exceptions;
 
+use App\Exceptions\Domain\DomainException;
+use App\Services\TranslationService;
 use App\Support\ApiErrorResponse;
 use App\Support\ErrorCodes;
 use App\Support\RequestContext;
@@ -100,6 +102,21 @@ class Handler extends ExceptionHandler
         // Only customize API responses; defer to the framework for web views.
         if ($request instanceof Request && RequestContext::isApiRequest($request)) {
             $locale = RequestContext::resolveLocale($request);
+
+            if ($e instanceof DomainException) {
+                $errorCode = $e->errorCode()->value;
+                $detail = TranslationService::get($e->translationKey(), $e->context(), $locale);
+
+                return ApiErrorResponse::problem(
+                    request: $request,
+                    errorCode: $errorCode,
+                    detail: $detail,
+                    status: $e->status(),
+                    title: ApiErrorResponse::titleFor($errorCode, $locale),
+                    context: $e->context(),
+                    locale: $locale,
+                );
+            }
 
             if ($e instanceof ValidationException) {
                 $violations = collect($e->errors())

@@ -27,8 +27,8 @@ final class ListDiscountConditions extends BaseListRecords
     public function getWidgetTabs(): array
     {
         return [
-            'all'    => SchemaTab::make(__('discount_conditions.tabs.all')),
-            'active' => SchemaTab::make(__('discount_conditions.tabs.active'))
+            'all'    => WidgetTab::make(__('discount_conditions.tabs.all')),
+            'active' => WidgetTab::make(__('discount_conditions.tabs.active'))
                 ->modifyQueryUsing(fn (Builder $query) => $query->where('is_active', true))
                 ->value(fn () => $this->getResource()::getEloquentQuery()->where('is_active', true)->count()),
             'minimum_amount' => WidgetTab::make(__('discount_conditions.tabs.minimum_amount'))

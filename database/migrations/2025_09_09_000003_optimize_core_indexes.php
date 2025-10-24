@@ -5,65 +5,55 @@ declare(strict_types=1);
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
 
 return new class extends Migration
 {
     public function up(): void
     {
-        // SQLite-only safe index creations (project uses SQLite)
+        $this->ensureIndexes('product_translations', [
+            ['columns' => ['product_id'], 'name' => 'product_translations_product_idx'],
+            ['columns' => ['locale'], 'name' => 'product_translations_locale_idx'],
+            ['columns' => ['product_id', 'locale'], 'name' => 'product_translations_unique', 'unique' => true],
+        ]);
 
-        // product_translations
-        if (Schema::hasTable('product_translations')) {
-            $this->createIndex('CREATE INDEX IF NOT EXISTS product_translations_product_idx ON product_translations (product_id)');
-            $this->createIndex('CREATE INDEX IF NOT EXISTS product_translations_locale_idx ON product_translations (locale)');
-            $this->createIndex('CREATE UNIQUE INDEX IF NOT EXISTS product_translations_unique ON product_translations (product_id, locale)');
-        }
+        $this->ensureIndexes('product_attributes', [
+            ['columns' => ['product_id'], 'name' => 'product_attributes_product_idx'],
+            ['columns' => ['attribute_id'], 'name' => 'product_attributes_attribute_idx'],
+            ['columns' => ['attribute_value_id'], 'name' => 'product_attributes_value_idx'],
+        ]);
 
-        // product_attributes
-        if (Schema::hasTable('product_attributes')) {
-            $this->createIndex('CREATE INDEX IF NOT EXISTS product_attributes_product_idx ON product_attributes (product_id)');
-            $this->createIndex('CREATE INDEX IF NOT EXISTS product_attributes_attribute_idx ON product_attributes (attribute_id)');
-            $this->createIndex('CREATE INDEX IF NOT EXISTS product_attributes_value_idx ON product_attributes (attribute_value_id)');
-        }
+        $this->ensureIndexes('product_categories', [
+            ['columns' => ['product_id'], 'name' => 'product_categories_product_idx'],
+            ['columns' => ['category_id'], 'name' => 'product_categories_category_idx'],
+        ]);
 
-        // product_categories
-        if (Schema::hasTable('product_categories')) {
-            $this->createIndex('CREATE INDEX IF NOT EXISTS product_categories_product_idx ON product_categories (product_id)');
-            $this->createIndex('CREATE INDEX IF NOT EXISTS product_categories_category_idx ON product_categories (category_id)');
-        }
+        $this->ensureIndexes('product_collections', [
+            ['columns' => ['product_id'], 'name' => 'product_collections_product_idx'],
+            ['columns' => ['collection_id'], 'name' => 'product_collections_collection_idx'],
+        ]);
 
-        // product_collections
-        if (Schema::hasTable('product_collections')) {
-            $this->createIndex('CREATE INDEX IF NOT EXISTS product_collections_product_idx ON product_collections (product_id)');
-            $this->createIndex('CREATE INDEX IF NOT EXISTS product_collections_collection_idx ON product_collections (collection_id)');
-        }
+        $this->ensureIndexes('order_items', [
+            ['columns' => ['order_id'], 'name' => 'order_items_order_idx'],
+            ['columns' => ['product_id'], 'name' => 'order_items_product_idx'],
+        ]);
 
-        // order_items
-        if (Schema::hasTable('order_items')) {
-            $this->createIndex('CREATE INDEX IF NOT EXISTS order_items_order_idx ON order_items (order_id)');
-            $this->createIndex('CREATE INDEX IF NOT EXISTS order_items_product_idx ON order_items (product_id)');
-        }
+        $this->ensureIndexes('prices', [
+            ['columns' => ['currency_id'], 'name' => 'prices_currency_idx'],
+            ['columns' => ['priceable_type', 'priceable_id'], 'name' => 'prices_priceable_idx'],
+        ]);
 
-        // prices (if exists)
-        if (Schema::hasTable('prices')) {
-            $this->createIndex('CREATE INDEX IF NOT EXISTS prices_currency_idx ON prices (currency_id)');
-            $this->createIndex('CREATE INDEX IF NOT EXISTS prices_priceable_idx ON prices (priceable_type, priceable_id)');
-        }
+        $this->ensureIndexes('documents', [
+            ['columns' => ['documentable_type', 'documentable_id'], 'name' => 'documents_documentable_idx'],
+        ]);
 
-        // documents (if exists)
-        if (Schema::hasTable('documents')) {
-            $this->createIndex('CREATE INDEX IF NOT EXISTS documents_documentable_idx ON documents (documentable_type, documentable_id)');
-        }
+        $this->ensureIndexes('reviews', [
+            ['columns' => ['created_at'], 'name' => 'reviews_created_idx'],
+        ]);
 
-        // reviews (additional)
-        if (Schema::hasTable('reviews')) {
-            $this->createIndex('CREATE INDEX IF NOT EXISTS reviews_created_idx ON reviews (created_at)');
-        }
-
-        // users
-        if (Schema::hasTable('users')) {
-            $this->createIndex('CREATE INDEX IF NOT EXISTS users_email_verified_idx ON users (email_verified_at)');
-        }
+        $this->ensureIndexes('users', [
+            ['columns' => ['email_verified_at'], 'name' => 'users_email_verified_idx'],
+        ]);
     }
 
     public function down(): void
@@ -71,11 +61,59 @@ return new class extends Migration
         // Non-destructive on purpose
     }
 
-    private function createIndex(string $sql): void
+    /**
+     * @param  array<int, array{columns: array<int, string>, name: string, unique?: bool}>  $indexes
+     */
+    private function ensureIndexes(string $table, array $indexes): void
     {
-        try {
-            DB::statement($sql);
-        } catch (\Throwable $e) {  /* ignore */
+        if (! Schema::hasTable($table) || $indexes === []) {
+            return;
         }
+
+        foreach ($indexes as $index) {
+            $columns = $index['columns'];
+            $name = $index['name'];
+            $unique = $index['unique'] ?? false;
+
+            if ($this->indexExists($table, $name)) {
+                continue;
+            }
+
+            Schema::table($table, function (Blueprint $table) use ($columns, $name, $unique): void {
+                if ($unique) {
+                    $table->unique($columns, $name);
+                } else {
+                    $table->index($columns, $name);
+                }
+            });
+        }
+    }
+
+    private function indexExists(string $table, string $index): bool
+    {
+        $connection = Schema::getConnection();
+        $driver = $connection->getDriverName();
+
+        if ($driver === 'sqlite') {
+            $result = DB::select("PRAGMA index_list('{$table}')");
+
+            foreach ($result as $row) {
+                $name = $row->name ?? ($row['name'] ?? null);
+
+                if ($name === $index) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        if ($driver === 'mysql') {
+            $result = DB::select("SHOW INDEX FROM `{$table}` WHERE Key_name = ?", [$index]);
+
+            return ! empty($result);
+        }
+
+        return false;
     }
 };

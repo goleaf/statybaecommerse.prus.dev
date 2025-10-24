@@ -147,11 +147,16 @@ final class BackupVerifyCommand extends Command
 
     private function findLatestBackupDirectory(string $storageRoot): ?string
     {
-        if (! File::exists($storageRoot)) {
+        $normalizedRoot = rtrim($storageRoot, DIRECTORY_SEPARATOR);
+
+        if (! File::exists($normalizedRoot)) {
             return null;
         }
 
-        $directories = array_filter(File::directories($storageRoot), static fn ($path): bool => is_string($path));
+        $directories = array_filter(
+            File::directories($normalizedRoot),
+            static fn ($path): bool => is_string($path) && dirname($path) === $normalizedRoot
+        );
 
         if ($directories === []) {
             return null;

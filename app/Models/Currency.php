@@ -450,7 +450,9 @@ final class Currency extends Model
         $formattedAmount = number_format($amount, $decimalPlaces, $decimalSeparator, $thousandsSeparator);
 
         if ($this->symbol) {
-            return $this->symbol_position === 'before'
+            $symbolPosition = $this->symbol_position ?? 'before';
+
+            return $symbolPosition === 'before'
                 ? sprintf('%s %s', $this->symbol, $formattedAmount)
                 : sprintf('%s %s', $formattedAmount, $this->symbol);
         }

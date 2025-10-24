@@ -28,6 +28,7 @@ use App\Models\Slider;
 use App\Models\Subscriber;
 use App\Models\User;
 use App\Models\Zone;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -52,69 +53,71 @@ final class AdminSeeder extends Seeder
         DB::beginTransaction();
 
         try {
-            // Create admin user and supporting fixtures in a deterministic order
-            // so the accompanying feature tests can make exact assertions.
-            $admin = $this->createAdminUser();
+            Model::withoutEvents(function (): void {
+                // Create admin user and supporting fixtures in a deterministic order
+                // so the accompanying feature tests can make exact assertions.
+                $admin = $this->createAdminUser();
 
-            // Create geographic scaffolding that powers address and logistics flows.
-            $this->createZones();
-            $countries = $this->createCountries();
-            $cities = $this->createCities($countries);
+                // Create geographic scaffolding that powers address and logistics flows.
+                $this->createZones();
+                $countries = $this->createCountries();
+                $cities = $this->createCities($countries);
 
-            // Create currencies
-            $currencies = $this->createCurrencies();
+                // Create currencies
+                $currencies = $this->createCurrencies();
 
-            // Create customer groups
-            $customerGroups = $this->createCustomerGroups();
+                // Create customer groups
+                $customerGroups = $this->createCustomerGroups();
 
-            // Create categories
-            $categories = $this->createCategories();
+                // Create categories
+                $categories = $this->createCategories();
 
-            // Create products and variants
-            $products = $this->createProducts($categories);
-            $variants = $this->createProductVariants($products);
+                // Create products and variants
+                $products = $this->createProducts($categories);
+                $variants = $this->createProductVariants($products);
 
-            // Create locations first
-            $locations = $this->createLocations();
+                // Create locations first
+                $locations = $this->createLocations();
 
-            // Create stock records
-            $this->createStockRecords($products, $locations);
+                // Create stock records
+                $this->createStockRecords($products, $locations);
 
-            // Create addresses
-            $addresses = $this->createAddresses($admin);
+                // Create addresses
+                $addresses = $this->createAddresses($admin);
 
-            // Create orders and order items
-            $orders = $this->createOrders($admin);
-            $this->createOrderItems($orders, $variants);
+                // Create orders and order items
+                $orders = $this->createOrders($admin);
+                $this->createOrderItems($orders, $variants);
 
-            // Create order shipping
-            $this->createOrderShipping($orders);
+                // Create order shipping
+                $this->createOrderShipping($orders);
 
-            // Create documents
-            // $this->createDocuments($orders); // Temporarily disabled - requires document_template_id
+                // Create documents
+                // $this->createDocuments($orders); // Temporarily disabled - requires document_template_id
 
-            // Create discount codes
-            // $this->createDiscountCodes(); // Temporarily disabled - table doesn't exist
+                // Create discount codes
+                // $this->createDiscountCodes(); // Temporarily disabled - table doesn't exist
 
-            // Create sliders
-            $this->createSliders();
+                // Create sliders
+                $this->createSliders();
 
-            // Create recommendation blocks
-            $this->createRecommendationBlocks();
+                // Create recommendation blocks
+                $this->createRecommendationBlocks();
 
-            // Create SEO data
-            $this->createSeoData();
+                // Create SEO data
+                $this->createSeoData();
 
-            // Create subscribers
-            $this->createSubscribers();
+                // Create subscribers
+                $this->createSubscribers();
 
-            // Create referral rewards
-            // $this->createReferralRewards($admin); // Temporarily disabled - requires referral_id
+                // Create referral rewards
+                // $this->createReferralRewards($admin); // Temporarily disabled - requires referral_id
 
-            // Create product history
-            $this->createProductHistory($products, $admin);
+                // Create product history
+                $this->createProductHistory($products, $admin);
 
-            // Locations already created above
+                // Locations already created above
+            });
 
             // Commit to make sure all fixture data becomes visible together when
             // every seeding step has succeeded.

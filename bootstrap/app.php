@@ -103,49 +103,32 @@ $app = Application::configure(basePath: dirname(__DIR__))
         $resolveCorrelationHeader = static fn (): string => RequestContext::correlationHeader();
 
         $exceptions->render(function (DomainException $exception, Request $request) {
+            if (! RequestContext::isApiRequest($request) && ! $request->expectsJson() && ! $request->wantsJson()) {
+                return null;
+            }
+
             $locale = RequestContext::resolveLocale($request);
-            $traceId = RequestContext::resolveTraceId($request);
-            $correlationHeader = RequestContext::correlationHeader();
-
-            $message = TranslationService::get($exception->translationKey(), $exception->context(), $locale);
-
-            Log::withContext([
-                'trace_id'       => $traceId,
-                'correlation_id' => $traceId,
-                'locale'         => $locale,
-                'error_code'     => $exception->errorCode(),
-                'request_path'   => $request->path(),
-                'request_method' => $request->method(),
-            ]);
+            $detail = TranslationService::get($exception->translationKey(), $exception->context(), $locale);
+            $errorCode = $exception->errorCode()->value;
 
             Log::warning('Domain exception rendered.', [
                 'exception'       => $exception::class,
                 'status'          => $exception->status(),
                 'translation_key' => $exception->translationKey(),
                 'context'         => $exception->context(),
+                'locale'          => $locale,
+                'trace_id'        => RequestContext::resolveTraceId($request),
             ]);
 
-            $payload = [
-                'error' => [
-                    'code'    => $exception->errorCode(),
-                    'message' => $message,
-                    'locale'  => $locale,
-                ],
-                'meta' => [
-                    'trace_id'       => $traceId,
-                    'correlation_id' => $traceId,
-                    'timestamp'      => now()->toIso8601String(),
-                ],
-            ];
-
-            if ($exception->context() !== []) {
-                $payload['error']['context'] = $exception->context();
-            }
-
-            return response()
-                ->json($payload, $exception->status())
-                ->header($correlationHeader, $traceId)
-                ->header('Content-Language', $locale);
+            return ApiErrorResponse::problem(
+                request: $request,
+                errorCode: $errorCode,
+                detail: $detail,
+                status: $exception->status(),
+                title: ApiErrorResponse::titleFor($errorCode, $locale),
+                context: $exception->context(),
+                locale: $locale,
+            );
         });
 
         $exceptions->render(function (ValidationException $exception, Request $request) {

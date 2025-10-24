@@ -263,7 +263,7 @@ final class CampaignConversion extends Model
         $roi = ((float) $this->conversion_value - $cost) / $cost;
         $this->roi = round($roi, 2);
 
-        return round((float) $this->roi, 1);
+        return (float) $this->roi;
     }
 
     /**

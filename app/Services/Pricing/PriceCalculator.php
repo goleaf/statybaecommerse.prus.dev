@@ -52,4 +52,11 @@ final class PriceCalculator
 
         return max(0.0, $rate);
     }
+
+    public function formatAmount(float $amount): string
+    {
+        $rounded = $this->configuration->round($amount);
+
+        return app_money_format($rounded, $this->configuration->currency());
+    }
 }

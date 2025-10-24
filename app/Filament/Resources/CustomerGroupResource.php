@@ -9,6 +9,7 @@ use App\Models\CustomerGroup;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
@@ -91,6 +92,55 @@ final class CustomerGroupResource extends Resource
                         ->rows(3)
                         ->columnSpanFull(),
                 ]),
+            SchemaSection::make(__('customer_groups.pricing_settings'))
+                ->schema([
+                    SchemaGrid::make(2)
+                        ->schema([
+                            TextInput::make('discount_percentage')
+                                // Surface the legacy percentage field so simple create flows remain backwards compatible.
+                                ->label(__('price_lists.discount_percentage'))
+                                ->numeric()
+                                ->minValue(0)
+                                ->maxValue(100)
+                                ->step(0.01)
+                                ->default(0),
+                            TextInput::make('discount_fixed')
+                                ->label(__('customer_groups.discount_fixed'))
+                                ->helperText(__('customer_groups.discount_fixed_help'))
+                                ->numeric()
+                                ->minValue(0)
+                                ->step(0.01)
+                                ->default(0)
+                                ->rules(['numeric', 'min:0']),
+                        ]),
+                    SchemaGrid::make(2)
+                        ->schema([
+                            Toggle::make('has_special_pricing')
+                                ->label(__('customer_groups.has_special_pricing'))
+                                ->default(false),
+                            Toggle::make('has_volume_discounts')
+                                ->label(__('customer_groups.has_volume_discounts'))
+                                ->default(false),
+                        ]),
+                ]),
+            SchemaSection::make(__('customer_groups.permissions'))
+                ->schema([
+                    SchemaGrid::make(2)
+                        ->schema([
+                            Toggle::make('can_view_prices')
+                                ->label(__('customer_groups.can_view_prices'))
+                                ->default(true),
+                            Toggle::make('can_place_orders')
+                                ->label(__('customer_groups.can_place_orders'))
+                                ->default(true),
+                            Toggle::make('can_view_catalog')
+                                ->label(__('customer_groups.can_view_catalog'))
+                                ->default(true),
+                            Toggle::make('can_use_coupons')
+                                ->label(__('customer_groups.can_use_coupons'))
+                                ->default(true),
+                        ]),
+                ]),
             SchemaSection::make(__('customer_groups.settings'))
                 ->schema([
                     SchemaGrid::make(2)
@@ -102,14 +152,6 @@ final class CustomerGroupResource extends Resource
                                 ->label(__('customer_groups.is_default'))
                                 ->default(false),
                         ]),
-                    TextInput::make('discount_percentage')
-                        // Surface the legacy percentage field so simple create flows remain backwards compatible.
-                        ->label(__('price_lists.discount_percentage'))
-                        ->numeric()
-                        ->minValue(0)
-                        ->maxValue(100)
-                        ->step(0.01)
-                        ->default(0),
                     SchemaGrid::make(2)
                         ->schema([
                             Select::make('type')
@@ -161,23 +203,71 @@ final class CustomerGroupResource extends Resource
                     ])
                     ->query(function (Builder $query, $value): Builder {
                         return $query->when($value !== null, function (Builder $innerQuery) use ($value): Builder {
-                            $state = filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+                            $state = self::resolveBooleanFilterValue($value);
 
-                            if ($state === null) {
-                                $state = (bool) $value;
-                            }
-
-                            return $innerQuery->where('is_active', $state);
+                            return $state === null
+                                ? $innerQuery
+                                : $innerQuery->where('is_active', $state);
                         });
                     }),
+                SelectFilter::make('is_default')
+                    ->label(__('customer_groups.is_default'))
+                    ->options([
+                        1 => __('customer_groups.set_default'),
+                        0 => __('customer_groups.deactivate'),
+                    ])
+                    ->query(fn (Builder $query, $value): Builder => $query->when(
+                        self::resolveBooleanFilterValue($value) !== null,
+                        fn (Builder $q) => $q->where('is_default', self::resolveBooleanFilterValue($value))
+                    )),
+                SelectFilter::make('has_special_pricing')
+                    ->label(__('customer_groups.has_special_pricing'))
+                    ->options([
+                        1 => __('customer_groups.has_special_pricing'),
+                        0 => __('customer_groups.all_groups'),
+                    ])
+                    ->query(fn (Builder $query, $value): Builder => $query->when(
+                        self::resolveBooleanFilterValue($value) !== null,
+                        fn (Builder $q) => $q->where('has_special_pricing', self::resolveBooleanFilterValue($value))
+                    )),
+                SelectFilter::make('has_volume_discounts')
+                    ->label(__('customer_groups.has_volume_discounts'))
+                    ->options([
+                        1 => __('customer_groups.has_volume_discounts'),
+                        0 => __('customer_groups.all_groups'),
+                    ])
+                    ->query(fn (Builder $query, $value): Builder => $query->when(
+                        self::resolveBooleanFilterValue($value) !== null,
+                        fn (Builder $q) => $q->where('has_volume_discounts', self::resolveBooleanFilterValue($value))
+                    )),
+                SelectFilter::make('type')
+                    ->label(__('customer_groups.type'))
+                    ->options([
+                        'regular'   => 'Regular',
+                        'vip'       => 'VIP',
+                        'wholesale' => 'Wholesale',
+                        'retail'    => 'Retail',
+                        'corporate' => 'Corporate',
+                    ])
+                    ->query(fn (Builder $query, $value): Builder => $query->when(
+                        filled($value),
+                        fn (Builder $q) => $q->where('type', $value)
+                    )),
             ])
             ->actions([
                 ViewAction::make(),
                 EditAction::make(),
+                DeleteAction::make(),
                 Action::make('toggle_active')
-                    ->label(fn (CustomerGroup $record): string => $record->is_active ? __('customer_groups.deactivate') : __('customer_groups.activate'))
-                    ->icon(fn (CustomerGroup $record): string => $record->is_active ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
-                    ->color(fn (CustomerGroup $record): string => $record->is_active ? 'warning' : 'success')
+                    ->label(function (?CustomerGroup $record): string {
+                        if ($record?->is_active) {
+                            return __('customer_groups.deactivate');
+                        }
+
+                        return __('customer_groups.activate');
+                    })
+                    ->icon(fn (?CustomerGroup $record): string => $record?->is_active ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
+                    ->color(fn (?CustomerGroup $record): string => $record?->is_active ? 'warning' : 'success')
                     ->action(function (CustomerGroup $record): void {
                         $record->update(['is_active' => ! $record->is_active]);
 
@@ -186,6 +276,28 @@ final class CustomerGroupResource extends Resource
                             ->success()
                             ->send();
                     })
+                    ->requiresConfirmation(),
+                Action::make('set_default')
+                    ->label(__('customer_groups.set_default'))
+                    ->icon('heroicon-o-star')
+                    ->color('primary')
+                    ->visible(fn (?CustomerGroup $record): bool => $record?->is_default === false)
+                    ->action(function (CustomerGroup $record): void {
+                        CustomerGroup::query()
+                            ->whereKeyNot($record->getKey())
+                            ->update(['is_default' => false]);
+
+                        $record->update([
+                            'is_default' => true,
+                            'is_active'  => true,
+                        ]);
+
+                        Notification::make()
+                            ->title(__('customer_groups.set_as_default_successfully'))
+                            ->success()
+                            ->send();
+                    })
+                    ->visible(fn (?CustomerGroup $record): bool => $record instanceof CustomerGroup)
                     ->requiresConfirmation(),
             ])
             ->bulkActions([
@@ -196,7 +308,16 @@ final class CustomerGroupResource extends Resource
                         ->icon('heroicon-o-eye')
                         ->color('success')
                         ->action(function (Collection $records): void {
-                            $records->each->update(['is_active' => true]);
+                            $ids = $records->pluck('id')->filter()->all();
+
+                            if ($ids === []) {
+                                return;
+                            }
+
+                            CustomerGroup::query()
+                                ->whereKey($ids)
+                                ->get()
+                                ->each(fn (CustomerGroup $group): bool => $group->update(['is_active' => true]));
 
                             Notification::make()
                                 ->title(__('customer_groups.bulk_activated_success'))
@@ -209,7 +330,16 @@ final class CustomerGroupResource extends Resource
                         ->icon('heroicon-o-eye-slash')
                         ->color('warning')
                         ->action(function (Collection $records): void {
-                            $records->each->update(['is_active' => false]);
+                            $ids = $records->pluck('id')->filter()->all();
+
+                            if ($ids === []) {
+                                return;
+                            }
+
+                            CustomerGroup::query()
+                                ->whereKey($ids)
+                                ->get()
+                                ->each(fn (CustomerGroup $group): bool => $group->update(['is_active' => false]));
 
                             Notification::make()
                                 ->title(__('customer_groups.bulk_deactivated_success'))
@@ -234,5 +364,40 @@ final class CustomerGroupResource extends Resource
             'view'   => Pages\ViewCustomerGroup::route('/{record}'),
             'edit'   => Pages\EditCustomerGroup::route('/{record}/edit'),
         ];
+    }
+
+    private static function resolveBooleanFilterValue(mixed $value): ?bool
+    {
+        if ($value === null || $value === '') {
+            return null;
+        }
+
+        if (is_bool($value)) {
+            return $value;
+        }
+
+        $filtered = filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+
+        if ($filtered !== null) {
+            return $filtered;
+        }
+
+        if (is_numeric($value)) {
+            return (bool) $value;
+        }
+
+        if (is_string($value)) {
+            $normalized = strtolower($value);
+
+            if (in_array($normalized, ['yes', 'true', '1', 'on'], true)) {
+                return true;
+            }
+
+            if (in_array($normalized, ['no', 'false', '0', 'off'], true)) {
+                return false;
+            }
+        }
+
+        return null;
     }
 }
