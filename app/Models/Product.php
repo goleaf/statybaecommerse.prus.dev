@@ -12,11 +12,10 @@ use App\Observers\ProductObserver;
 use App\Support\Html\HtmlSanitizer;
 use App\Traits\HasProductPricing;
 use App\Traits\HasTranslations;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Storage;
+use DateTimeInterface;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -27,35 +26,37 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Storage;
+use JsonException;
 use Laravel\Scout\Searchable;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
-use JsonException;
 
 /**
  * Product
  *
  * Eloquent model representing the Product entity with comprehensive relationships, scopes, and business logic for the e-commerce system.
  *
- * @property mixed  $fillable
- * @property mixed  $casts
- * @property mixed  $appends
- * @property mixed  $table
- * @property string $translationModel
- * @property array $translatable
- * @property int $id
- * @property string $name
- * @property string|null $slug
- * @property string|null $short_description
- * @property string|null $description
- * @property string|null $sku
- * @property float|string|null $price
- * @property bool $is_featured
- * @property bool $is_visible
+ * @property mixed                           $fillable
+ * @property mixed                           $casts
+ * @property mixed                           $appends
+ * @property mixed                           $table
+ * @property string                          $translationModel
+ * @property array                           $translatable
+ * @property int                             $id
+ * @property string                          $name
+ * @property string|null                     $slug
+ * @property string|null                     $short_description
+ * @property string|null                     $description
+ * @property string|null                     $sku
+ * @property float|string|null               $price
+ * @property bool                            $is_featured
+ * @property bool                            $is_visible
  * @property \Illuminate\Support\Carbon|null $published_at
  * @property-read Brand|null $brand
  * @property-read string|null $thumbnail
@@ -168,7 +169,7 @@ final class Product extends Model implements HasMedia, TranslatableRecord
     /**
      * Normalize translatable attributes to JSON when arrays are assigned.
      *
-     * @param  mixed  $value
+     * @param mixed $value
      */
     public function setAttribute($key, $value)
     {
@@ -184,7 +185,7 @@ final class Product extends Model implements HasMedia, TranslatableRecord
     /**
      * Encode the provided translations while filtering empty payloads.
      *
-     * @param  array<string|int, mixed>  $value
+     * @param array<string|int, mixed> $value
      */
     private function serialiseTranslatableAttribute(array $value): string
     {
@@ -535,7 +536,7 @@ final class Product extends Model implements HasMedia, TranslatableRecord
 
     public function reserveStock(
         int $quantity,
-        ?\DateTimeInterface $expiresAt = null,
+        ?DateTimeInterface $expiresAt = null,
         array $meta = [],
         ?string $referenceType = null,
         ?string $referenceId = null
@@ -559,13 +560,13 @@ final class Product extends Model implements HasMedia, TranslatableRecord
             }
 
             return $product->stockReservations()->create([
-                'quantity' => $quantity,
-                'status' => StockReservation::STATUS_RESERVED,
-                'reserved_at' => now(),
-                'expires_at' => $expiresAt,
-                'meta' => $meta ?: null,
+                'quantity'       => $quantity,
+                'status'         => StockReservation::STATUS_RESERVED,
+                'reserved_at'    => now(),
+                'expires_at'     => $expiresAt,
+                'meta'           => $meta ?: null,
                 'reference_type' => $referenceType,
-                'reference_id' => $referenceId,
+                'reference_id'   => $referenceId,
             ]);
         });
 
@@ -1063,6 +1064,17 @@ final class Product extends Model implements HasMedia, TranslatableRecord
         return $query->where('is_visible', true);
     }
 
+    /**
+     * Handle scopeOrderedByName functionality with proper error handling.
+     */
+    public function scopeOrderedByName(Builder $query, string $direction = 'asc'): Builder
+    {
+        // Normalise the direction to guarantee deterministic ordering without exposing raw input.
+        $direction = strtolower($direction) === 'desc' ? 'desc' : 'asc';
+
+        return $query->orderBy('name', $direction);
+    }
+
     public function scopeReadyForCatalog(Builder $query): Builder
     {
         return $query
@@ -1414,7 +1426,7 @@ final class Product extends Model implements HasMedia, TranslatableRecord
         if (empty($images)) {
             return ['src' => null, 'srcset' => '', 'sizes' => '', 'alt' => $this->name];
         }
-        $srcset = [$images['xs'] ?? null ? $images['xs'].' 150w' : null, $images['sm'] ?? null ? $images['sm'].' 300w' : null, $images['md'] ?? null ? $images['md'].' 500w' : null, $images['lg'] ?? null ? $images['lg'].' 800w' : null, $images['xl'] ?? null ? $images['xl'].' 1200w' : null];
+        $srcset = [$images['xs'] ?? null ? $images['xs'] . ' 150w' : null, $images['sm'] ?? null ? $images['sm'] . ' 300w' : null, $images['md'] ?? null ? $images['md'] . ' 500w' : null, $images['lg'] ?? null ? $images['lg'] . ' 800w' : null, $images['xl'] ?? null ? $images['xl'] . ' 1200w' : null];
         $sizeKey = $defaultSize ?? 'md';
 
         return ['src' => $images[$sizeKey] ?? $images['md'], 'srcset' => implode(', ', array_filter($srcset)), 'sizes' => '(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 300px', 'alt' => __('translations.product_image_alt', ['name' => $this->name, 'number' => 1])];
