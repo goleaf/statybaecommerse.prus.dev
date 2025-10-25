@@ -7,7 +7,9 @@ namespace App\Http\Middleware;
 use App\Services\CodeStyleService;
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Log;
+use Symfony\Component\HttpFoundation\Response;
 
 final class CodeStyleMiddleware
 {
@@ -15,11 +17,14 @@ final class CodeStyleMiddleware
         private readonly CodeStyleService $codeStyleService
     ) {}
 
-    public function handle(Request $request, Closure $next)
+    public function handle(Request $request, Closure $next): Response
     {
         // Only apply in development environment
         if (! app()->environment('local', 'testing')) {
-            return $next($request);
+            /** @var Response $response */
+            $response = $next($request);
+
+            return $response;
         }
 
         // Check if this is a file upload or modification request
@@ -27,7 +32,10 @@ final class CodeStyleMiddleware
             $this->validateUploadedFiles($request);
         }
 
-        return $next($request);
+        /** @var Response $response */
+        $response = $next($request);
+
+        return $response;
     }
 
     private function isFileModificationRequest(Request $request): bool
@@ -62,14 +70,14 @@ final class CodeStyleMiddleware
         }
     }
 
-    private function validateSingleFile($file): void
+    private function validateSingleFile(UploadedFile $file): void
     {
         if (! $file->isValid() || ! str_ends_with($file->getClientOriginalName(), '.php')) {
             return;
         }
 
-        $content = file_get_contents($file->getPathname());
-        $violations = $this->codeStyleService->validateFile($file->getClientOriginalName());
+        // Analyse the temporary upload path so the validation service can read the file contents.
+        $violations = $this->codeStyleService->validateFile($file->getPathname());
 
         if (! empty($violations)) {
             Log::warning('Code style violations detected in uploaded file', [
