@@ -6,6 +6,7 @@ namespace App\Models;
 
 use App\Models\Scopes\ActiveScope;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -31,14 +32,37 @@ final class CollectionRule extends Model
 
     protected $table = 'collection_rules';
 
-    protected $fillable = ['collection_id', 'field', 'operator', 'value', 'position'];
+    protected $fillable = ['collection_id', 'field', 'operator', 'value', 'position', 'is_active'];
 
     /**
      * Handle casts functionality with proper error handling.
      */
     protected function casts(): array
     {
-        return ['position' => 'integer'];
+        // Ensure ordering and activation flags are always typed consistently.
+        return ['position' => 'integer', 'is_active' => 'boolean'];
+    }
+
+    /**
+     * Automatically assign defaults whenever a collection rule is persisted.
+     */
+    protected static function booted(): void
+    {
+        self::creating(function (CollectionRule $rule): void {
+            // Guarantee that soft-deactivated rules still persist with an explicit boolean flag.
+            if ($rule->is_active === null) {
+                $rule->is_active = true;
+            }
+
+            // When no position is provided we append the rule to the end of the collection stack.
+            if ($rule->position === null && $rule->collection_id !== null) {
+                $nextPosition = (int) static::withoutGlobalScopes()
+                    ->where('collection_id', $rule->collection_id)
+                    ->max('position');
+
+                $rule->position = $nextPosition + 1;
+            }
+        });
     }
 
     /**
@@ -47,5 +71,32 @@ final class CollectionRule extends Model
     public function collection(): BelongsTo
     {
         return $this->belongsTo(Collection::class);
+    }
+
+    /**
+     * Handle scopeOrdered functionality with proper error handling.
+     */
+    public function scopeOrdered(Builder $query): Builder
+    {
+        // Keep ordering deterministic so storefront renders rules predictably.
+        return $query->orderBy('position');
+    }
+
+    /**
+     * Handle scopeActive functionality with proper error handling.
+     */
+    public function scopeActive(Builder $query): Builder
+    {
+        // Provide an opt-in scope for diagnostics that disable the global ActiveScope.
+        return $query->where('is_active', true);
+    }
+
+    /**
+     * Handle scopeForCollection functionality with proper error handling.
+     */
+    public function scopeForCollection(Builder $query, int $collectionId): Builder
+    {
+        // Filter rules for a specific collection without leaking cross-collection data.
+        return $query->where('collection_id', $collectionId);
     }
 }
