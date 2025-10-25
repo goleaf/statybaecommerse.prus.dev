@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Carbon;
 
 /**
  * EmailCampaign
@@ -31,30 +32,100 @@ final class EmailCampaign extends Model
 {
     use HasFactory;
 
+    /**
+     * Provide explicit hints for the shared ActiveScope helper so schema
+     * introspection is avoided during tests that rely on in-memory SQLite.
+     */
+    public const SCOPE_COLUMN_HINTS = [
+        'is_active' => true,
+        'status'    => true,
+    ];
+
+    /**
+     * Enumerate the supported lifecycle statuses that the factory and
+     * application logic expect to work with.
+     */
+    public const STATUS_DRAFT = 'draft';
+
+    public const STATUS_SCHEDULED = 'scheduled';
+
+    public const STATUS_SENDING = 'sending';
+
+    public const STATUS_SENT = 'sent';
+
+    public const STATUS_PAUSED = 'paused';
+
+    public const STATUS_CANCELLED = 'cancelled';
+
+    /**
+     * Collate status values for quick validation and testing.
+     */
+    public const STATUSES = [
+        self::STATUS_DRAFT,
+        self::STATUS_SCHEDULED,
+        self::STATUS_SENDING,
+        self::STATUS_SENT,
+        self::STATUS_PAUSED,
+        self::STATUS_CANCELLED,
+    ];
+
+    /** @var array<int, string> */
     protected $fillable = [
         'name',
         'description',
         'subject',
         'content',
+        'html_content',
         'from_email',
         'from_name',
         'reply_to',
         'scheduled_at',
         'sent_at',
+        'completed_at',
         'is_active',
         'status',
         'template_id',
         'created_by',
         'settings',
         'metadata',
+        'target_audience',
+        'total_recipients',
+        'sent_count',
+        'delivered_count',
+        'opened_count',
+        'clicked_count',
+        'unsubscribed_count',
     ];
 
+    /** @var array<string, string> */
     protected $casts = [
         'scheduled_at' => 'datetime',
         'sent_at' => 'datetime',
+        'completed_at' => 'datetime',
         'is_active' => 'boolean',
+        'total_recipients' => 'integer',
+        'sent_count' => 'integer',
+        'delivered_count' => 'integer',
+        'opened_count' => 'integer',
+        'clicked_count' => 'integer',
+        'unsubscribed_count' => 'integer',
+        'target_audience' => 'array',
         'settings' => 'array',
         'metadata' => 'array',
+    ];
+
+    /**
+     * Ensure sensible defaults so aggregate helpers stay predictable.
+     */
+    protected $attributes = [
+        'status' => self::STATUS_DRAFT,
+        'is_active' => true,
+        'total_recipients' => 0,
+        'sent_count' => 0,
+        'delivered_count' => 0,
+        'opened_count' => 0,
+        'clicked_count' => 0,
+        'unsubscribed_count' => 0,
     ];
 
     /**
@@ -94,7 +165,7 @@ final class EmailCampaign extends Model
      */
     public function scopeScheduled(Builder $query): Builder
     {
-        return $query->where('status', 'scheduled');
+        return $query->where('status', self::STATUS_SCHEDULED);
     }
 
     /**
@@ -102,7 +173,25 @@ final class EmailCampaign extends Model
      */
     public function scopeSent(Builder $query): Builder
     {
-        return $query->where('status', 'sent');
+        return $query->where('status', self::STATUS_SENT);
+    }
+
+    /**
+     * Handle scopeOrderedByName functionality with proper error handling.
+     */
+    public function scopeOrderedByName(Builder $query, string $direction = 'asc'): Builder
+    {
+        return $query->orderBy('name', $direction);
+    }
+
+    /**
+     * Handle scopeWithStatus functionality with proper error handling.
+     */
+    public function scopeWithStatus(Builder $query, string|array $statuses): Builder
+    {
+        $statusList = (array) $statuses;
+
+        return $query->whereIn('status', $statusList);
     }
 
     /**
@@ -110,7 +199,7 @@ final class EmailCampaign extends Model
      */
     public function isScheduled(): bool
     {
-        return $this->status === 'scheduled';
+        return $this->status === self::STATUS_SCHEDULED;
     }
 
     /**
@@ -118,7 +207,7 @@ final class EmailCampaign extends Model
      */
     public function isSent(): bool
     {
-        return $this->status === 'sent';
+        return $this->status === self::STATUS_SENT;
     }
 
     /**
@@ -127,8 +216,8 @@ final class EmailCampaign extends Model
     public function canBeSent(): bool
     {
         return $this->is_active &&
-               $this->status === 'scheduled' &&
-               $this->scheduled_at &&
+               $this->status === self::STATUS_SCHEDULED &&
+               $this->scheduled_at instanceof Carbon &&
                $this->scheduled_at->isPast();
     }
 }
