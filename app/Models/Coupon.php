@@ -6,6 +6,7 @@ namespace App\Models;
 
 use App\Models\Scopes\ActiveScope;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -21,15 +22,16 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property mixed $fillable
  * @property mixed $casts
  *
- * @method static \Illuminate\Database\Eloquent\Builder|Coupon newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|Coupon newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|Coupon query()
+ * @method static \Illuminate\Database\Eloquent\Builder<Coupon> newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<Coupon> newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder<Coupon> query()
  *
  * @mixin \Eloquent
  */
 #[ScopedBy([ActiveScope::class])]
 final class Coupon extends Model
 {
+    /** @use HasFactory<\Database\Factories\CouponFactory> */
     use HasFactory, SoftDeletes;
 
     protected $fillable = ['code', 'name', 'description', 'type', 'value', 'minimum_amount', 'maximum_discount', 'usage_limit', 'usage_limit_per_user', 'used_count', 'is_active', 'is_public', 'is_auto_apply', 'is_stackable', 'is_first_time_only', 'customer_group_id', 'starts_at', 'expires_at', 'applicable_products', 'applicable_categories'];
@@ -40,40 +42,66 @@ final class Coupon extends Model
 
     /**
      * Handle products functionality with proper error handling.
+     *
+     * @return BelongsToMany<Product, Coupon>
      */
     public function products(): BelongsToMany
     {
-        return $this->belongsToMany(Product::class, 'coupon_products');
+        /** @var BelongsToMany<Product, Coupon> $relation */
+        $relation = $this->belongsToMany(Product::class, 'coupon_products');
+
+        return $relation;
     }
 
     /**
      * Handle categories functionality with proper error handling.
+     *
+     * @return BelongsToMany<Category, Coupon>
      */
     public function categories(): BelongsToMany
     {
-        return $this->belongsToMany(Category::class, 'coupon_categories');
+        /** @var BelongsToMany<Category, Coupon> $relation */
+        $relation = $this->belongsToMany(Category::class, 'coupon_categories');
+
+        return $relation;
     }
 
+    /**
+     * @return BelongsTo<CustomerGroup, Coupon>
+     */
     public function customerGroup(): BelongsTo
     {
         // Provide access to the owning customer group so filters and forms can reference it safely.
-        return $this->belongsTo(CustomerGroup::class);
+        /** @var BelongsTo<CustomerGroup, Coupon> $relation */
+        $relation = $this->belongsTo(CustomerGroup::class);
+
+        return $relation;
     }
 
     /**
      * Handle orders functionality with proper error handling.
+     *
+     * @return HasMany<Order, Coupon>
      */
     public function orders(): HasMany
     {
-        return $this->hasMany(Order::class);
+        /** @var HasMany<Order, Coupon> $relation */
+        $relation = $this->hasMany(Order::class);
+
+        return $relation;
     }
 
     /**
      * Handle usages functionality with proper error handling.
+     *
+     * @return HasMany<CouponUsage, Coupon>
      */
     public function usages(): HasMany
     {
-        return $this->hasMany(CouponUsage::class);
+        /** @var HasMany<CouponUsage, Coupon> $relation */
+        $relation = $this->hasMany(CouponUsage::class);
+
+        return $relation;
     }
 
     // Scopes
@@ -81,57 +109,88 @@ final class Coupon extends Model
     /**
      * Handle scopeActive functionality with proper error handling.
      *
-     * @param mixed $query
+     * @param  Builder<Coupon> $query
+     * @return Builder<Coupon>
      */
-    public function scopeActive($query)
+    public function scopeActive(Builder $query): Builder
     {
+        // Ensure we only surface coupons explicitly marked as active in the database.
         return $query->where('is_active', true);
     }
 
     /**
      * Handle scopeValid functionality with proper error handling.
      *
-     * @param mixed $query
+     * @param  Builder<Coupon> $query
+     * @return Builder<Coupon>
      */
-    public function scopeValid($query)
+    public function scopeValid(Builder $query): Builder
     {
-        return $query->where('is_active', true)->where(function ($q) {
-            $q->whereNull('starts_at')->orWhere('starts_at', '<=', now());
-        })->where(function ($q) {
-            $q->whereNull('expires_at')->orWhere('expires_at', '>', now());
-        })->where(function ($q) {
-            $q->whereNull('usage_limit')->orWhereRaw('used_count < usage_limit');
-        });
+        // Capture the current moment once so multiple comparisons use a consistent timestamp.
+        $now = now();
+
+        return $query
+            ->where('is_active', true)
+            ->where(static function (Builder $builder) use ($now): void {
+                // Allow coupons without a start date or ones that have already started.
+                $builder->whereNull('starts_at')->orWhere('starts_at', '<=', $now);
+            })
+            ->where(static function (Builder $builder) use ($now): void {
+                // Ensure the coupon is either timeless or still before its expiration boundary.
+                $builder->whereNull('expires_at')->orWhere('expires_at', '>', $now);
+            })
+            ->where(static function (Builder $builder): void {
+                // Prevent coupons that have exhausted their usage limit from being considered valid.
+                $builder->whereNull('usage_limit')->orWhereColumn('used_count', '<', 'usage_limit');
+            });
     }
 
     /**
      * Handle scopeExpired functionality with proper error handling.
      *
-     * @param mixed $query
+     * @param  Builder<Coupon> $query
+     * @return Builder<Coupon>
      */
-    public function scopeExpired($query)
+    public function scopeExpired(Builder $query): Builder
     {
+        // Quickly locate coupons whose expiration timestamp has already passed.
         return $query->where('expires_at', '<', now());
     }
 
     /**
      * Handle scopeByType functionality with proper error handling.
      *
-     * @param mixed $query
+     * @param  Builder<Coupon> $query
+     * @return Builder<Coupon>
      */
-    public function scopeByType($query, string $type)
+    public function scopeByType(Builder $query, string $type): Builder
     {
+        // Provide an expressive shortcut for filtering coupons by discount type.
         return $query->where('type', $type);
     }
 
     /**
      * Handle scopeByCode functionality with proper error handling.
      *
-     * @param mixed $query
+     * @param  Builder<Coupon> $query
+     * @return Builder<Coupon>
      */
-    public function scopeByCode($query, string $code)
+    public function scopeByCode(Builder $query, string $code): Builder
     {
+        // Locate a coupon by its public code value without repeating column names elsewhere.
         return $query->where('code', $code);
+    }
+
+    /**
+     * Provide a deterministic alphabetical ordering helper for data tables and APIs.
+     *
+     * @param  Builder<Coupon> $query
+     * @return Builder<Coupon>
+     */
+    public function scopeOrderedByName(Builder $query): Builder
+    {
+        // Qualify the column to avoid ambiguity when the query joins additional tables.
+        return $query->orderBy($query->qualifyColumn('name'));
     }
 
     /**
@@ -194,22 +253,31 @@ final class Coupon extends Model
         if (! $this->canBeUsed($orderTotal)) {
             return 0;
         }
-        if ($this->type === 'percentage') {
-            return $orderTotal * $this->value / 100;
+        // Determine the raw discount value based on the configured coupon type.
+        $discount = $this->type === 'percentage'
+            ? $orderTotal * ((float) $this->value) / 100
+            : (float) $this->value;
+
+        // Respect any configured maximum discount to prevent over-application.
+        if ($this->maximum_discount !== null) {
+            $discount = min($discount, (float) $this->maximum_discount);
         }
 
-        return (float) min($this->value, $orderTotal);
+        // Guard against scenarios where a fixed discount exceeds the current order total.
+        return (float) min($discount, $orderTotal);
     }
 
     /**
      * Compute the remaining usage count without persisting a dedicated column.
      */
-    public function getRemainingUsesAttribute(): int
+    public function getRemainingUsesAttribute(): ?int
     {
         if ($this->usage_limit === null) {
-            return max(0, (int) ($this->usage_limit ?? 0));
+            // Mirror the behaviour of DiscountCode by signalling unlimited usage with null.
+            return null;
         }
 
+        // Clamp the remaining uses at zero so negative values are never exposed.
         return max(0, (int) ($this->usage_limit - $this->used_count));
     }
 }
