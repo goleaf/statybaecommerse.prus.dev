@@ -6,13 +6,16 @@ namespace App\Models;
 
 use App\Models\Scopes\DateRangeScope;
 use App\Models\Scopes\EnabledScope;
+use App\Models\Translations\PriceTranslation;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Collection;
 
 /**
  * Price
@@ -39,69 +42,102 @@ final class Price extends Model
 
     /**
      * Handle casts functionality with proper error handling.
+     *
+     * @return array<string, string>
      */
     protected function casts(): array
     {
-        return ['amount' => 'decimal:4', 'compare_amount' => 'decimal:4', 'cost_amount' => 'decimal:4', 'starts_at' => 'datetime', 'ends_at' => 'datetime', 'is_enabled' => 'boolean', 'metadata' => 'array'];
+        // Guarantee that all monetary values preserve precision while dates remain Carbon instances.
+        return [
+            'amount' => 'decimal:4',
+            'compare_amount' => 'decimal:4',
+            'cost_amount' => 'decimal:4',
+            'starts_at' => 'datetime',
+            'ends_at' => 'datetime',
+            'is_enabled' => 'boolean',
+            'metadata' => 'array',
+        ];
     }
 
     /**
      * Handle priceable functionality with proper error handling.
+     *
+     * @return MorphTo<Model, self>
      */
     public function priceable(): MorphTo
     {
+        // Delegate to Laravel's morphTo helper to support products, variants, and other priceable entities.
         return $this->morphTo();
     }
 
     /**
      * Handle currency functionality with proper error handling.
+     *
+     * @return BelongsTo<Currency, self>
      */
     public function currency(): BelongsTo
     {
+        // Connect each price to the currency record responsible for formatting and exchange rate handling.
         return $this->belongsTo(Currency::class);
     }
 
     /**
      * Handle translations functionality with proper error handling.
+     *
+     * @return HasMany<PriceTranslation>
      */
     public function translations(): HasMany
     {
-        return $this->hasMany(\App\Models\Translations\PriceTranslation::class);
+        // Expose localized labels and descriptions for back-office and storefront rendering.
+        return $this->hasMany(PriceTranslation::class);
     }
 
     /**
      * Handle scopeEnabled functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param  Builder<self>  $query
+     * @return Builder<self>
      */
-    public function scopeEnabled($query)
+    public function scopeEnabled(Builder $query): Builder
     {
+        // Filter to prices explicitly flagged as enabled.
         return $query->where('is_enabled', true);
     }
 
     /**
      * Handle scopeActive functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param  Builder<self>  $query
+     * @return Builder<self>
      */
-    public function scopeActive($query)
+    public function scopeActive(Builder $query): Builder
     {
-        return $query->where('is_enabled', true)->where(function ($q) {
-            $q->whereNull('starts_at')->orWhere('starts_at', '<=', now());
-        })->where(function ($q) {
-            $q->whereNull('ends_at')->orWhere('ends_at', '>=', now());
-        });
+        // Keep the comparison moment consistent across the query evaluation.
+        $now = now();
+
+        return $query
+            ->where('is_enabled', true)
+            ->where(static function (Builder $builder) use ($now): void {
+                // Allow records that have already started or do not have a start constraint.
+                $builder->whereNull('starts_at')->orWhere('starts_at', '<=', $now);
+            })
+            ->where(static function (Builder $builder) use ($now): void {
+                // Allow records that have not yet ended or do not have an end constraint.
+                $builder->whereNull('ends_at')->orWhere('ends_at', '>=', $now);
+            });
     }
 
     /**
      * Handle scopeForCurrency functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param  Builder<self>  $query
+     * @return Builder<self>
      */
-    public function scopeForCurrency($query, string $currencyCode)
+    public function scopeForCurrency(Builder $query, string $currencyCode): Builder
     {
-        return $query->whereHas('currency', function ($q) use ($currencyCode) {
-            $q->where('code', $currencyCode);
+        // Limit the result set to a specific ISO currency code.
+        return $query->whereHas('currency', static function (Builder $builder) use ($currencyCode): void {
+            $builder->where('code', $currencyCode);
         });
     }
 
@@ -143,7 +179,8 @@ final class Price extends Model
     public function getTranslatedName(?string $locale = null): ?string
     {
         $locale = $locale ?: app()->getLocale();
-        $translation = $this->translations()->where('locale', $locale)->first();
+        // Resolve the translation while preferring already-loaded relationships to avoid additional queries.
+        $translation = $this->resolveTranslation($locale);
 
         return $translation?->name;
     }
@@ -154,9 +191,28 @@ final class Price extends Model
     public function getTranslatedDescription(?string $locale = null): ?string
     {
         $locale = $locale ?: app()->getLocale();
-        $translation = $this->translations()->where('locale', $locale)->first();
+        // Resolve the translation while preferring already-loaded relationships to avoid additional queries.
+        $translation = $this->resolveTranslation($locale);
 
         return $translation?->description;
+    }
+
+    /**
+     * Resolve the translation for the requested locale with minimal query overhead.
+     */
+    private function resolveTranslation(?string $locale = null): ?PriceTranslation
+    {
+        // Default to the application locale when none is provided explicitly.
+        $localeToUse = $locale ?: app()->getLocale();
+
+        if ($this->relationLoaded('translations')) {
+            /** @var Collection<int, PriceTranslation> $translations */
+            $translations = $this->getRelation('translations');
+
+            return $translations->firstWhere('locale', $localeToUse);
+        }
+
+        return $this->translations()->where('locale', $localeToUse)->first();
     }
 
     /**
