@@ -4,12 +4,11 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use App\Models\City;
-use App\Models\Country;
 use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\EnabledScope;
 use App\Models\Translations\LocationTranslation;
 use App\Traits\HasTranslations;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -43,14 +42,46 @@ final class Location extends Model
 
     protected $table = 'locations';
 
-    protected $fillable = ['name', 'slug', 'description', 'code', 'address_line_1', 'address_line_2', 'city', 'state', 'postal_code', 'country_code', 'phone', 'email', 'is_enabled', 'is_default', 'type', 'latitude', 'longitude', 'opening_hours', 'contact_info', 'sort_order'];
+    /**
+     * @var array<int, string>
+     */
+    protected $fillable = [
+        'name',
+        'slug',
+        'description',
+        'code',
+        'address_line_1',
+        'address_line_2',
+        'city',
+        'state',
+        'postal_code',
+        'country_code',
+        'phone',
+        'email',
+        'is_enabled',
+        'is_default',
+        'type',
+        'latitude',
+        'longitude',
+        'opening_hours',
+        'contact_info',
+        'sort_order',
+    ];
 
     /**
      * Handle casts functionality with proper error handling.
      */
     protected function casts(): array
     {
-        return ['is_enabled' => 'boolean', 'is_default' => 'boolean', 'latitude' => 'float', 'longitude' => 'float', 'opening_hours' => 'array', 'contact_info' => 'array', 'sort_order' => 'integer'];
+        return [
+            'is_enabled' => 'boolean',
+            'is_default' => 'boolean',
+            'latitude' => 'float',
+            'longitude' => 'float',
+            'opening_hours' => 'array',
+            'contact_info' => 'array',
+            'sort_order' => 'integer',
+        ];
     }
 
     /**
@@ -92,32 +123,38 @@ final class Location extends Model
 
     /**
      * Handle scopeEnabled functionality with proper error handling.
-     *
-     * @param  mixed  $query
      */
-    public function scopeEnabled($query)
+    public function scopeEnabled(Builder $query): Builder
     {
+        // Filter the dataset so only locations flagged as enabled remain in scope.
         return $query->where('is_enabled', true);
     }
 
     /**
      * Handle scopeDefault functionality with proper error handling.
-     *
-     * @param  mixed  $query
      */
-    public function scopeDefault($query)
+    public function scopeDefault(Builder $query): Builder
     {
+        // Narrow the query down to locations marked as the default option.
         return $query->where('is_default', true);
     }
 
     /**
      * Handle scopeByType functionality with proper error handling.
-     *
-     * @param  mixed  $query
      */
-    public function scopeByType($query, string $type)
+    public function scopeByType(Builder $query, string $type): Builder
     {
+        // Target specific location types (warehouse, store, etc.) when fetching data.
         return $query->where('type', $type);
+    }
+
+    /**
+     * Scope a query to consistently order locations by their human-readable name.
+     */
+    public function scopeOrderedByName(Builder $query): Builder
+    {
+        // Perform a case-insensitive alphabetical ordering so back-office lists remain predictable.
+        return $query->orderByRaw('LOWER(name) asc');
     }
 
     /**
@@ -337,16 +374,17 @@ final class Location extends Model
     // Scope for translated locations
     /**
      * Handle scopeWithTranslations functionality with proper error handling.
-     *
-     * @param  mixed  $query
      */
-    public function scopeWithTranslations($query, ?string $locale = null)
+    public function scopeWithTranslations(Builder $query, ?string $locale = null): Builder
     {
         $locale = $locale ?: app()->getLocale();
 
-        return $query->with(['translations' => function ($q) use ($locale) {
-            $q->where('locale', $locale);
-        }]);
+        return $query->with([
+            'translations' => static function (Builder $relationQuery) use ($locale): void {
+                // Ensure only the requested locale is eager loaded to keep payloads lean.
+                $relationQuery->where('locale', $locale);
+            },
+        ]);
     }
 
     // Get all available locales for this location
