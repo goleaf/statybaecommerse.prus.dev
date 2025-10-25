@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\OrdersByName;
 use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\DateRangeScope;
 use Database\Factories\PriceListItemFactory;
@@ -26,6 +27,7 @@ use Spatie\Translatable\HasTranslations;
  * @property int|null                          $variant_id
  * @property float|null                        $net_amount
  * @property float|null                        $compare_amount
+ * @property float|null                        $price
  * @property array<string, string>|string|null $name
  * @property array<string, string>|string|null $description
  * @property array<string, string>|string|null $notes
@@ -61,6 +63,8 @@ final class PriceListItem extends Model
 
     use HasTranslations;
 
+    use OrdersByName;
+
     /**
      * @var string|null
      */
@@ -73,6 +77,7 @@ final class PriceListItem extends Model
         'price_list_id',
         'product_id',
         'variant_id',
+        'price',
         'net_amount',
         'compare_amount',
         'name',
@@ -99,6 +104,7 @@ final class PriceListItem extends Model
     {
         // Cast the numeric and date attributes to ensure consistent data when retrieved from persistence.
         return [
+            'price'          => 'decimal:2',
             'net_amount'     => 'decimal:4',
             'compare_amount' => 'decimal:4',
             'is_active'      => 'boolean',
@@ -364,23 +370,30 @@ final class PriceListItem extends Model
     }
 
     /**
-     * Handle scopeOrderedByName functionality with proper error handling.
+     * Direct the shared OrdersByName scope to the translated name payload by default.
+     *
+     * @var string
      */
+    protected string $nameColumn = 'name';
+
     /**
-     * @param  Builder<self> $query
-     * @return Builder<self>
+     * Provide a price alias so administrative forms using a `price` field stay compatible.
      */
-    public function scopeOrderedByName(Builder $query, string $direction = 'asc'): Builder
+    public function getPriceAttribute(): ?float
     {
-        // Determine the locale-aware JSON path for translations and sort by the lower-cased value for consistency.
-        $locale = app()->getLocale();
-        $sanitizedDirection = Str::lower($direction) === 'desc' ? 'desc' : 'asc';
+        // Re-use the stored net_amount value to avoid drifting representations between aliases.
+        $netAmount = $this->getAttribute('net_amount');
 
-        $jsonPath = sprintf('$."%s"', $locale);
+        return $netAmount !== null ? round((float) $netAmount, 2) : null;
+    }
 
-        return $query->orderByRaw(
-            sprintf('LOWER(COALESCE(json_extract(name, "%s"), name)) %s', $jsonPath, $sanitizedDirection)
-        );
+    /**
+     * Mutate the synthetic price attribute back into the persisted net_amount column.
+     */
+    public function setPriceAttribute(float|int|string|null $value): void
+    {
+        // Allow numeric strings from form submissions and coerce them into the expected storage column.
+        $this->attributes['net_amount'] = $value !== null ? (float) $value : null;
     }
 
     // Translation methods
