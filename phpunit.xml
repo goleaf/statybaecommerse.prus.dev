@@ -25,6 +25,9 @@
             <directory suffix="Test.php">tests/Feature</directory>
             <directory suffix="Test.php">tests/Admin</directory>
         </testsuite>
+        <testsuite name="Models">
+            <directory suffix="Test.php">tests/Models</directory>
+        </testsuite>
         <testsuite name="Performance">
             <directory suffix="Test.php">tests/Performance</directory>
         </testsuite>
