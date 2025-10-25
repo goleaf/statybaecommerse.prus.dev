@@ -20,19 +20,18 @@ class UserProductInteractionsTable
                     ->searchable(),
                 TextColumn::make('product.name')
                     ->searchable(),
-                TextColumn::make('interaction_type')
+                TextColumn::make('event')
+                    ->label(__('admin.user_product_interactions.event'))
                     ->searchable(),
+                TextColumn::make('occurred_at')
+                    ->label(__('admin.user_product_interactions.occurred_at'))
+                    ->dateTime()
+                    ->sortable(),
                 TextColumn::make('rating')
                     ->numeric()
                     ->sortable(),
                 TextColumn::make('count')
                     ->numeric()
-                    ->sortable(),
-                TextColumn::make('first_interaction')
-                    ->dateTime()
-                    ->sortable(),
-                TextColumn::make('last_interaction')
-                    ->dateTime()
                     ->sortable(),
                 TextColumn::make('created_at')
                     ->dateTime()
