@@ -101,7 +101,10 @@ final class Legal extends Model
      */
     public function scopePublished(Builder $query): Builder
     {
-        return $query->where('published_at', '<=', now());
+        // Ensure the record has an explicit publish timestamp before checking the cutoff time.
+        return $query
+            ->whereNotNull('published_at')
+            ->where('published_at', '<=', now());
     }
 
     /**
@@ -219,7 +222,14 @@ final class Legal extends Model
     public function getAvailableLocales(): array
     {
         /** @var array<int, string> $locales */
-        $locales = $this->translations()->pluck('locale')->toArray();
+        $locales = $this->translations()
+            ->pluck('locale')
+            // Remove empty or null locales to avoid noise in the consumer APIs.
+            ->filter(static fn (?string $locale): bool => is_string($locale) && $locale !== '')
+            // Deduplicate locales in case of eager-loaded relations with duplicates.
+            ->unique()
+            ->values()
+            ->all();
 
         return $locales;
     }
