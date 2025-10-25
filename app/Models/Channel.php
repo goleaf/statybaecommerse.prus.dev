@@ -148,7 +148,7 @@ final class Channel extends Model
      */
     public function scopeOrderedByName(Builder $query): Builder
     {
-        // Delegate to the query builder to keep the ordering logic consistent across consumers.
+        // Using a simple ascending order keeps the scope database agnostic and easy to reason about.
         return $query->orderBy('name');
     }
 }
