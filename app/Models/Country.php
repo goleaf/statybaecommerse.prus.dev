@@ -238,6 +238,17 @@ final class Country extends Model
         return $query->where('currency_code', $currencyCode);
     }
 
+    /**
+     * Ensure countries can be retrieved in a predictable alphabetical order.
+     *
+     * @param mixed $query
+     */
+    public function scopeOrderedByName($query)
+    {
+        // Using LOWER keeps the sort stable regardless of the database collation settings.
+        return $query->orderByRaw('LOWER(name) asc')->orderBy('name');
+    }
+
     // Helper methods
 
     /**
