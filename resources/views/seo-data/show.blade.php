@@ -77,15 +77,15 @@
                         @endif
                     </div>
 
-                    @if($seoData->keywords)
+                    @if(! empty($seoData->keywords))
                         <div>
                             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                 {{ __('seo_data.keywords') }}
                             </label>
                             <div class="flex flex-wrap gap-2">
-                                @foreach(explode(',', $seoData->keywords) as $keyword)
+                                @foreach($seoData->keywords as $keyword)
                                     <span class="inline-flex items-center px-3 py-1 rounded-full text-sm bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
-                                        {{ trim($keyword) }}
+                                        {{ $keyword }}
                                     </span>
                                 @endforeach
                             </div>

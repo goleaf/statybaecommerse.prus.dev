@@ -54,7 +54,11 @@ final class SharedComponentServiceProvider extends ServiceProvider
                 echo '<title>' . App\Support\Helpers\SharedHelpers::getSeoTitle(\$seoData['title'] ?? '') . '</title>';
                 echo '<meta name=\"description\" content=\"' . App\Support\Helpers\SharedHelpers::getSeoDescription(\$seoData['description'] ?? '') . '\">';
                 if (isset(\$seoData['keywords'])) {
-                    echo '<meta name=\"keywords\" content=\"' . \$seoData['keywords'] . '\">';
+                    \$keywords = \$seoData['keywords'];
+                    if (is_array(\$keywords)) {
+                        \$keywords = implode(', ', array_filter(array_map(static fn ($keyword) => trim((string) $keyword), \$keywords)));
+                    }
+                    echo '<meta name=\"keywords\" content=\"' . e(\$keywords) . '\">';
                 }
             ?>";
         });

@@ -59,7 +59,7 @@ class SeoDataResourceTest extends TestCase
             'locale' => 'lt',
             'title' => 'Test Product SEO Title',
             'description' => 'Test product SEO description for better search engine optimization',
-            'keywords' => 'test, product, seo',
+            'keywords' => json_encode(['test', 'product', 'seo']),
             'canonical_url' => 'https://example.com/products/test-product',
             'no_index' => false,
             'no_follow' => false,
@@ -91,7 +91,7 @@ class SeoDataResourceTest extends TestCase
             'locale' => 'en',
             'title' => 'Test Category SEO Title',
             'description' => 'Test category SEO description for better search engine optimization',
-            'keywords' => 'test, category, seo',
+            'keywords' => json_encode(['test', 'category', 'seo']),
             'canonical_url' => 'https://example.com/categories/test-category',
             'no_index' => false,
             'no_follow' => false,
@@ -123,7 +123,7 @@ class SeoDataResourceTest extends TestCase
             'locale' => 'lt',
             'title' => 'Test Brand SEO Title',
             'description' => 'Test brand SEO description for better search engine optimization',
-            'keywords' => 'test, brand, seo',
+            'keywords' => json_encode(['test', 'brand', 'seo']),
             'canonical_url' => 'https://example.com/brands/test-brand',
             'no_index' => false,
             'no_follow' => false,
@@ -149,7 +149,7 @@ class SeoDataResourceTest extends TestCase
 
         $this->assertEquals('Updated SEO Title', $seoData->title);
         $this->assertEquals('Updated SEO description for better search engine optimization', $seoData->description);
-        $this->assertEquals('updated, seo, keywords', $seoData->keywords);
+        $this->assertSame(['updated', 'seo', 'keywords'], $seoData->keywords);
     }
 
     public function test_can_view_seo_data(): void
