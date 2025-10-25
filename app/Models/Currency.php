@@ -169,6 +169,15 @@ final class Currency extends Model
         return $query->where('is_active', true);
     }
 
+    /**
+     * Scope currencies ordered alphabetically by their human readable name.
+     */
+    public function scopeOrderedByName(Builder $query): Builder
+    {
+        // Ordering by the `name` column keeps the back office listing predictable for administrators.
+        return $query->orderBy('name');
+    }
+
     // Accessors
 
     /**

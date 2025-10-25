@@ -7,6 +7,7 @@ namespace App\Models;
 use App\Enums\AddressType;
 use App\Models\Scopes\UserOwnedScope;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -166,70 +167,77 @@ final class Address extends Model
     /**
      * Handle scopeDefault functionality with proper error handling.
      *
-     * @param mixed $query
+     * @param Builder $query
      */
-    public function scopeDefault($query)
+    public function scopeDefault(Builder $query): Builder
     {
+        // Limit the selection to addresses explicitly marked as default for a user.
         return $query->where('is_default', true);
     }
 
     /**
      * Handle scopeByType functionality with proper error handling.
      *
-     * @param mixed $query
+     * @param Builder $query
      */
-    public function scopeByType($query, string $type)
+    public function scopeByType(Builder $query, string $type): Builder
     {
+        // Filter addresses by the provided type (billing, shipping, etc.).
         return $query->where('type', $type);
     }
 
     /**
      * Handle scopeBilling functionality with proper error handling.
      *
-     * @param mixed $query
+     * @param Builder $query
      */
-    public function scopeBilling($query)
+    public function scopeBilling(Builder $query): Builder
     {
+        // Restrict the query to addresses flagged as billing.
         return $query->where('is_billing', true);
     }
 
     /**
      * Handle scopeShipping functionality with proper error handling.
      *
-     * @param mixed $query
+     * @param Builder $query
      */
-    public function scopeShipping($query)
+    public function scopeShipping(Builder $query): Builder
     {
+        // Restrict the query to addresses flagged as shipping.
         return $query->where('is_shipping', true);
     }
 
     /**
      * Handle scopeActive functionality with proper error handling.
      *
-     * @param mixed $query
+     * @param Builder $query
      */
-    public function scopeActive($query)
+    public function scopeActive(Builder $query): Builder
     {
+        // Filter the query to addresses that are marked as active.
         return $query->where('is_active', true);
     }
 
     /**
      * Handle scopeForUser functionality with proper error handling.
      *
-     * @param mixed $query
+     * @param Builder $query
      */
-    public function scopeForUser($query, int $userId)
+    public function scopeForUser(Builder $query, int $userId): Builder
     {
+        // Narrow the query to a specific user identifier.
         return $query->where('user_id', $userId);
     }
 
     /**
      * Handle scopeByCountry functionality with proper error handling.
      *
-     * @param mixed $query
+     * @param Builder $query
      */
-    public function scopeByCountry($query, string $countryCode)
+    public function scopeByCountry(Builder $query, string $countryCode): Builder
     {
+        // Limit the query by ISO country code.
         return $query->where('country_code', $countryCode);
     }
 
@@ -238,8 +246,9 @@ final class Address extends Model
      *
      * @param mixed $query
      */
-    public function scopeByCity($query, string $city)
+    public function scopeByCity(Builder $query, string $city): Builder
     {
+        // Perform a fuzzy city search so partial matches are returned.
         return $query->where('city', 'like', "%{$city}%");
     }
 
@@ -248,9 +257,19 @@ final class Address extends Model
      *
      * @param mixed $query
      */
-    public function scopeByPostalCode($query, string $postalCode)
+    public function scopeByPostalCode(Builder $query, string $postalCode): Builder
     {
+        // Perform a fuzzy postal code search for partial query support.
         return $query->where('postal_code', 'like', "%{$postalCode}%");
+    }
+
+    /**
+     * Provide a reusable ordering scope for alphabetic listings by customer name.
+     */
+    public function scopeOrderedByName(Builder $query): Builder
+    {
+        // Order by first and last name columns to offer predictable directory views.
+        return $query->orderBy('first_name')->orderBy('last_name');
     }
 
     /**

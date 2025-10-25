@@ -7,6 +7,7 @@ namespace App\Models;
 use App\Models\Scopes\ActiveScope;
 use App\Traits\HasTranslations;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -98,41 +99,48 @@ final class Customer extends Model
 
     /**
      * Handle scopeActive functionality with proper error handling.
-     *
-     * @param  mixed  $query
      */
-    public function scopeActive($query)
+    public function scopeActive(Builder $query): Builder
     {
+        // Filter customers that are flagged as active for downstream usage.
         return $query->where('is_active', true);
     }
 
     /**
      * Handle scopeByCity functionality with proper error handling.
-     *
-     * @param  mixed  $query
      */
-    public function scopeByCity($query, int $cityId)
+    public function scopeByCity(Builder $query, int $cityId): Builder
     {
+        // Restrict the query to customers that belong to the provided city identifier.
         return $query->where('city_id', $cityId);
     }
 
     /**
      * Handle scopeByCountry functionality with proper error handling.
-     *
-     * @param  mixed  $query
      */
-    public function scopeByCountry($query, int $countryId)
+    public function scopeByCountry(Builder $query, int $countryId): Builder
     {
+        // Restrict the query to customers that belong to the provided country identifier.
         return $query->where('country_id', $countryId);
     }
 
     /**
      * Handle scopeByCompany functionality with proper error handling.
-     *
-     * @param  mixed  $query
      */
-    public function scopeByCompany($query, int $companyId)
+    public function scopeByCompany(Builder $query, int $companyId): Builder
     {
+        // Restrict the query to customers that belong to the provided company identifier.
         return $query->where('company_id', $companyId);
+    }
+
+    /**
+     * Provide a standard way to order customers alphabetically by name.
+     */
+    public function scopeOrderedByName(Builder $query, string $direction = 'asc'): Builder
+    {
+        // Normalise direction input to prevent unexpected SQL direction values.
+        $direction = strtolower($direction) === 'desc' ? 'desc' : 'asc';
+
+        return $query->orderBy('name', $direction);
     }
 }

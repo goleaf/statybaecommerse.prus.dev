@@ -9,6 +9,7 @@ use App\Support\Authorization\AuthorizationMatrix;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -31,7 +32,10 @@ use Spatie\Permission\Traits\HasRoles;
 #[ScopedBy([ActiveScope::class])]
 final class AdminUser extends Authenticatable implements FilamentUser
 {
-    use HasFactory, HasRoles, Notifiable;
+    /** @use HasFactory<\Database\Factories\AdminUserFactory> */
+    use HasFactory;
+    use HasRoles;
+    use Notifiable;
 
     /**
      * Guard name for Spatie permissions (separate admin guard).
@@ -55,10 +59,44 @@ final class AdminUser extends Authenticatable implements FilamentUser
     }
 
     /**
+     * Handle scopeOrderedByName functionality with proper error handling.
+     */
+    public function scopeOrderedByName(Builder $query): Builder
+    {
+        // Always normalize the casing before sorting so administrators appear deterministically.
+        return $query->orderByRaw('LOWER(name) ASC, name ASC');
+    }
+
+    /**
      * Handle canAccessPanel functionality with proper error handling.
      */
     public function canAccessPanel(Panel $panel): bool
     {
         return AuthorizationMatrix::check('panel', 'access', $this);
+    }
+
+    /**
+     * Determine whether the administrator has already confirmed their email address.
+     */
+    public function hasVerifiedEmail(): bool
+    {
+        // A non-null timestamp indicates that the verification handshake already completed.
+        return $this->email_verified_at !== null;
+    }
+
+    /**
+     * Stamp the verification timestamp while skipping redundant writes during bulk actions.
+     */
+    public function markEmailAsVerified(): bool
+    {
+        // Avoid touching the database if the verification flag was already persisted earlier.
+        if ($this->hasVerifiedEmail()) {
+            return false;
+        }
+
+        // Force fill bypasses mass-assignment checks so table actions can reuse the helper safely.
+        return $this->forceFill([
+            'email_verified_at' => now(),
+        ])->save();
     }
 }

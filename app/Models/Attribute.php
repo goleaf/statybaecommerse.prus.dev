@@ -8,6 +8,7 @@ use App\Models\Scopes\VisibleScope;
 use App\Traits\HasTranslations;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute as EloquentAttribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -312,6 +313,17 @@ final class Attribute extends Model
     public function scopeOrdered($query)
     {
         return $query->orderBy('sort_order');
+    }
+
+    /**
+     * Scope to order attributes alphabetically by their name column.
+     *
+     * @param Builder $query The current query builder instance for chaining.
+     */
+    public function scopeOrderedByName(Builder $query): Builder
+    {
+        // Order by the raw name column to keep deterministic alphabetical ordering.
+        return $query->orderBy('name');
     }
 
     /**

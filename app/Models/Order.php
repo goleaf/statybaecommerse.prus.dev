@@ -28,18 +28,20 @@ use Schema;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Translatable\HasTranslations;
+use Throwable;
+use ValueError;
 
 /**
  * Order
  *
  * Eloquent model representing the Order entity with comprehensive relationships, scopes, and business logic for the e-commerce system.
  *
- * @property array $translatable
+ * @property array      $translatable
  * @property array|null $transactions
  * @property array|null $billing_address
  * @property array|null $shipping_address
- * @property mixed $fillable
- * @property mixed $appends
+ * @property mixed      $fillable
+ * @property mixed      $appends
  *
  * @method static \Illuminate\Database\Eloquent\Builder|Order newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Order newQuery()
@@ -67,19 +69,19 @@ final class Order extends Model
     protected function casts(): array
     {
         return [
-            'status' => OrderStatus::class,
-            'payment_status' => PaymentStatus::class,
-            'payment_method' => PaymentMethod::class,
-            'subtotal' => 'decimal:2',
-            'tax_amount' => 'decimal:2',
-            'shipping_amount' => 'decimal:2',
-            'discount_amount' => 'decimal:2',
-            'total' => 'decimal:2',
-            'billing_address' => 'array',
+            'status'           => OrderStatus::class,
+            'payment_status'   => PaymentStatus::class,
+            'payment_method'   => PaymentMethod::class,
+            'subtotal'         => 'decimal:2',
+            'tax_amount'       => 'decimal:2',
+            'shipping_amount'  => 'decimal:2',
+            'discount_amount'  => 'decimal:2',
+            'total'            => 'decimal:2',
+            'billing_address'  => 'array',
             'shipping_address' => 'array',
-            'transactions' => 'array',
-            'shipped_at' => 'datetime',
-            'delivered_at' => 'datetime',
+            'transactions'     => 'array',
+            'shipped_at'       => 'datetime',
+            'delivered_at'     => 'datetime',
         ];
     }
 
@@ -102,7 +104,7 @@ final class Order extends Model
      */
     public function getActivitylogOptions(): LogOptions
     {
-        return LogOptions::defaults()->logOnly(['number', 'status', 'total', 'notes', 'tracking_number', 'fulfillment_status'])->logOnlyDirty()->dontSubmitEmptyLogs()->setDescriptionForEvent(fn (string $eventName) => "Order {$eventName}")->useLogName('order');
+        return LogOptions::defaults()->logOnly(['number', 'status', 'total', 'notes', 'tracking_number', 'fulfillment_status'])->logOnlyDirty()->dontSubmitEmptyLogs()->setDescriptionForEvent(fn (string $eventName): string => "Order {$eventName}")->useLogName('order');
     }
 
     /**
@@ -283,12 +285,12 @@ final class Order extends Model
      */
     public function scopeCreatedBetween(Builder $query, CarbonInterface|DateTimeInterface|string $start, CarbonInterface|DateTimeInterface|string $end): Builder
     {
-        [$startAt, $endAt] = self::normalizeRange($start, $end);
-        $column = $this->qualifyCreatedAtColumn();
+        [$startAt, $endAt] = $this->normalizeRange($start, $end);
+        $this->qualifyCreatedAtColumn();
 
         // Hint the planner towards the standalone created_at index before applying the
         // date range constraint so SQLite/MySQL avoid falling back to composite scans.
-        self::enforceCreatedAtIndex($query);
+        $this->enforceCreatedAtIndex($query);
 
         return $query->whereBetween($query->qualifyColumn('created_at'), [$startAt, $endAt]);
     }
@@ -301,7 +303,7 @@ final class Order extends Model
     {
         // Ensure partial window scans also leverage the dedicated created_at index for
         // analytics roll-ups and dashboard aggregations.
-        self::enforceCreatedAtIndex($query);
+        $this->enforceCreatedAtIndex($query);
 
         return $query->where($query->qualifyColumn('created_at'), '>=', self::toImmutableCarbon($start));
     }
@@ -314,7 +316,7 @@ final class Order extends Model
     {
         // Apply the same index hint when only an upper bound is provided so sequential
         // scans remain fast even under heavy data volumes.
-        self::enforceCreatedAtIndex($query);
+        $this->enforceCreatedAtIndex($query);
 
         return $query->where($query->qualifyColumn('created_at'), '<=', self::toImmutableCarbon($end));
     }
@@ -325,13 +327,13 @@ final class Order extends Model
      */
     public function scopeCreatedOn(Builder $query, CarbonInterface|DateTimeInterface|string $date): Builder
     {
-        [$startOfDay, $endOfDay] = self::normalizeDayRange($date);
+        [$startOfDay, $endOfDay] = $this->normalizeDayRange($date);
 
         // Keep day-level analytics aligned with the created_at index to avoid table
         // scans whenever widgets drill into a single date bucket.
-        self::enforceCreatedAtIndex($query);
+        $this->enforceCreatedAtIndex($query);
 
-        return $query->whereBetween($query->qualifyColumn('created_at'), [$day->copy()->startOfDay(), $day->copy()->endOfDay()]);
+        return $query->whereBetween($query->qualifyColumn('created_at'), [$startOfDay, $endOfDay]);
     }
 
     public function scopeCreatedToday(Builder $query): Builder
@@ -360,6 +362,17 @@ final class Order extends Model
         return $this->scopeCreatedBetween($query, $month->copy()->startOfMonth(), $month->copy()->endOfMonth());
     }
 
+    /**
+     * Order the query by the human-readable order number to keep listings predictable.
+     */
+    public function scopeOrderedByName(Builder $query, string $direction = 'asc'): Builder
+    {
+        // Normalise the direction flag so the query builder never receives unexpected input.
+        $direction = strtolower($direction) === 'desc' ? 'desc' : 'asc';
+
+        return $query->orderBy($query->qualifyColumn('number'), $direction);
+    }
+
     // Consider orders that have been paid (preferred) or are in a paid-like lifecycle state
 
     /**
@@ -379,6 +392,7 @@ final class Order extends Model
         // Also include lifecycle statuses that imply payment captured
         return $query->orWhereIn('status', ['processing', 'confirmed', 'shipped', 'delivered', 'completed']);
     }
+
     public function scopeCreatedOnDate(Builder $query, CarbonInterface $date): Builder
     {
         $day = $date->toImmutable();
@@ -412,7 +426,7 @@ final class Order extends Model
 
         try {
             $enum = OrderStatus::from((string) $status);
-        } catch (\ValueError) {
+        } catch (ValueError) {
             return false;
         }
 
@@ -432,7 +446,7 @@ final class Order extends Model
 
         try {
             $enum = OrderStatus::from((string) $status);
-        } catch (\ValueError) {
+        } catch (ValueError) {
             return false;
         }
 
@@ -452,7 +466,7 @@ final class Order extends Model
 
         try {
             $enum = OrderStatus::from((string) $status);
-        } catch (\ValueError) {
+        } catch (ValueError) {
             return false;
         }
 
@@ -493,13 +507,13 @@ final class Order extends Model
                 ?? CarbonImmutable::parse($value->format('Y-m-d H:i:s.u'), $value->getTimezone());
         }
 
-        return CarbonImmutable::parse((string) $value);
+        return CarbonImmutable::parse($value);
     }
 
     /**
      * @return array{0: CarbonImmutable, 1: CarbonImmutable}
      */
-    private static function normalizeRange(CarbonInterface|DateTimeInterface|string $start, CarbonInterface|DateTimeInterface|string $end): array
+    private function normalizeRange(CarbonInterface|DateTimeInterface|string $start, CarbonInterface|DateTimeInterface|string $end): array
     {
         $startAt = self::toImmutableCarbon($start)->startOfSecond();
         $endAt = self::toImmutableCarbon($end)->endOfSecond();
@@ -512,12 +526,25 @@ final class Order extends Model
     }
 
     /**
+     * Resolve the start and end of a given day while remaining timezone aware for analytics scopes.
+     *
+     * @return array{0: CarbonImmutable, 1: CarbonImmutable}
+     */
+    private function normalizeDayRange(CarbonInterface|DateTimeInterface|string $date): array
+    {
+        // Convert the incoming value into an immutable carbon instance for consistent manipulation.
+        $day = self::toImmutableCarbon($date);
+
+        return [$day->startOfDay(), $day->endOfDay()];
+    }
+
+    /**
      * Apply a portable index hint so different database drivers consistently favour the
      * dedicated orders_created_at_index during analytics queries.
      */
-    private static function enforceCreatedAtIndex(Builder $query): void
+    private function enforceCreatedAtIndex(Builder $query): void
     {
-        if (! self::createdAtIndexExists($query)) {
+        if (! $this->createdAtIndexExists($query)) {
             return;
         }
 
@@ -565,7 +592,7 @@ final class Order extends Model
     /**
      * Determine if the created_at index is present for the current connection and table.
      */
-    private static function createdAtIndexExists(Builder $query): bool
+    private function createdAtIndexExists(Builder $query): bool
     {
         $model = $query->getModel();
         $table = $model->getTable();
@@ -584,7 +611,7 @@ final class Order extends Model
 
         try {
             $schema = Schema::connection($connectionName);
-        } catch (\Throwable) {
+        } catch (Throwable) {
             return self::$createdAtIndexAvailable[$cacheKey] = false;
         }
 

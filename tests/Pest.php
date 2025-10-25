@@ -9,8 +9,10 @@ use Spatie\Permission\Models\Role;
 use Spatie\Permission\PermissionRegistrar;
 use Tests\Support\TestingDatabase;
 
+<<<<<<< HEAD
 uses(Tests\TestCase::class)->in('Feature', 'Unit', 'admin', 'frontend', 'Performance');
-
+// Register the base TestCase for dedicated model quality suites introduced under tests/Models.
+uses(Tests\TestCase::class)->in('Models');
 
 beforeAll(function () {
     $testingDatabasePath = TestingDatabase::path();
@@ -45,13 +47,13 @@ beforeAll(function () {
     if (! file_exists($manifestPath)) {
         file_put_contents($manifestPath, json_encode([
             'resources/css/app.scss' => [
-                'file' => 'css/app.css',
-                'src' => 'resources/css/app.scss',
+                'file'    => 'css/app.css',
+                'src'     => 'resources/css/app.scss',
                 'isEntry' => true,
             ],
             'resources/js/app.js' => [
-                'file' => 'js/app.js',
-                'src' => 'resources/js/app.js',
+                'file'    => 'js/app.js',
+                'src'     => 'resources/js/app.js',
                 'isEntry' => true,
             ],
         ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
@@ -71,37 +73,37 @@ beforeAll(function () {
     ];
 
     foreach ($variantAttributeValueRoutes as $name => $uri) {
-        $routeName = "filament.admin.resources.variant-attribute-values." . $name;
-    if (! Route::has($routeName)) {
-        Route::get($uri, fn () => 'ok')->name($routeName);
+        $routeName = 'filament.admin.resources.variant-attribute-values.' . $name;
+        if (! Route::has($routeName)) {
+            Route::get($uri, fn () => 'ok')->name($routeName);
+        }
     }
-}
 
-$filamentResourceStubs = [
-    'campaign-clicks'             => 'Campaign Clicks',
-    'campaign-conversions'        => 'Campaign Conversions',
-    'campaign-customer-segments'  => 'Campaign Customer Segments',
-    'campaign-product-targets'    => 'Campaign Product Targets',
-];
-
-foreach ($filamentResourceStubs as $slug => $label) {
-    $routes = [
-        'index'  => "/__stub/{$slug}",
-        'create' => "/__stub/{$slug}/create",
-        'view'   => "/__stub/{$slug}/{record}",
-        'edit'   => "/__stub/{$slug}/{record}/edit",
+    $filamentResourceStubs = [
+        'campaign-clicks'            => 'Campaign Clicks',
+        'campaign-conversions'       => 'Campaign Conversions',
+        'campaign-customer-segments' => 'Campaign Customer Segments',
+        'campaign-product-targets'   => 'Campaign Product Targets',
     ];
 
-    foreach ($routes as $name => $uri) {
-        $routeName = "filament.admin.resources.{$slug}.{$name}";
+    foreach ($filamentResourceStubs as $slug => $label) {
+        $routes = [
+            'index'  => "/__stub/{$slug}",
+            'create' => "/__stub/{$slug}/create",
+            'view'   => "/__stub/{$slug}/{record}",
+            'edit'   => "/__stub/{$slug}/{record}/edit",
+        ];
 
-        if (Route::has($routeName)) {
-            continue;
+        foreach ($routes as $name => $uri) {
+            $routeName = "filament.admin.resources.{$slug}.{$name}";
+
+            if (Route::has($routeName)) {
+                continue;
+            }
+
+            Route::get($uri, fn () => 'ok')->name($routeName);
         }
-
-        Route::get($uri, fn () => 'ok')->name($routeName);
     }
-}
 });
 
 beforeEach(function () {

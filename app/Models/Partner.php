@@ -6,7 +6,9 @@ namespace App\Models;
 
 use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\EnabledScope;
+use Database\Factories\PartnerFactory;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -29,13 +31,26 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @method static \Illuminate\Database\Eloquent\Builder|Partner newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Partner query()
  *
+ * @property bool                      $is_enabled
+ * @property float|null                $discount_rate
+ * @property float|null                $commission_rate
+ * @property array<string, mixed>|null $metadata
+ * @property-read \App\Models\PartnerTier|null $tier
+ * @property-read float $effective_discount_rate
+ *
  * @mixin \Eloquent
+ */
+/**
+ * @use HasFactory<PartnerFactory>
  */
 #[ScopedBy([ActiveScope::class, EnabledScope::class])]
 final class Partner extends Model implements HasMedia
 {
-    use HasFactory, SoftDeletes;
+    /** @use HasFactory<PartnerFactory> */
+    use HasFactory;
+
     use InteractsWithMedia;
+    use SoftDeletes;
 
     protected $table = 'partners';
 
@@ -51,6 +66,8 @@ final class Partner extends Model implements HasMedia
 
     /**
      * Handle tier functionality with proper error handling.
+     *
+     * @return BelongsTo<PartnerTier, $this>
      */
     public function tier(): BelongsTo
     {
@@ -59,6 +76,8 @@ final class Partner extends Model implements HasMedia
 
     /**
      * Handle users functionality with proper error handling.
+     *
+     * @return BelongsToMany<User, $this>
      */
     public function users(): BelongsToMany
     {
@@ -67,6 +86,8 @@ final class Partner extends Model implements HasMedia
 
     /**
      * Handle priceLists functionality with proper error handling.
+     *
+     * @return BelongsToMany<PriceList, $this>
      */
     public function priceLists(): BelongsToMany
     {
@@ -75,6 +96,8 @@ final class Partner extends Model implements HasMedia
 
     /**
      * Handle orders functionality with proper error handling.
+     *
+     * @return HasMany<Order, $this>
      */
     public function orders(): HasMany
     {
@@ -83,12 +106,19 @@ final class Partner extends Model implements HasMedia
 
     /**
      * Handle variantInventories functionality with proper error handling.
+     *
+     * @return HasMany<VariantInventory, $this>
      */
     public function variantInventories(): HasMany
     {
         return $this->hasMany(VariantInventory::class, 'supplier_id');
     }
 
+    /**
+     * Handle apiKeys functionality with proper error handling.
+     *
+     * @return HasMany<ApiKey, $this>
+     */
     public function apiKeys(): HasMany
     {
         return $this->hasMany(ApiKey::class);
@@ -97,21 +127,37 @@ final class Partner extends Model implements HasMedia
     /**
      * Handle scopeEnabled functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param  Builder<static> $query
+     * @return Builder<static>
      */
-    public function scopeEnabled($query)
+    public function scopeEnabled(Builder $query): Builder
     {
+        // Constrain the query to only include partners that are currently enabled.
         return $query->where('is_enabled', true);
     }
 
     /**
      * Handle scopeByTier functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param  Builder<static> $query
+     * @return Builder<static>
      */
-    public function scopeByTier($query, int $tierId)
+    public function scopeByTier(Builder $query, int $tierId): Builder
     {
+        // Limit the query to partners assigned to the specified tier identifier.
         return $query->where('tier_id', $tierId);
+    }
+
+    /**
+     * Handle scopeOrderedByName functionality with proper error handling.
+     *
+     * @param  Builder<static> $query
+     * @return Builder<static>
+     */
+    public function scopeOrderedByName(Builder $query): Builder
+    {
+        // Apply an ascending sort on the partner name to ensure predictable listings.
+        return $query->orderBy('name');
     }
 
     /**
@@ -119,7 +165,22 @@ final class Partner extends Model implements HasMedia
      */
     public function getEffectiveDiscountRateAttribute(): float
     {
-        return $this->discount_rate ?: $this->tier->discount_rate ?? 0;
+        // Prefer the partner-specific discount when available and fall back to the related tier rate.
+        $ownRate = $this->getAttribute('discount_rate');
+        if (is_numeric($ownRate)) {
+            return (float) $ownRate;
+        }
+
+        $tier = $this->getRelationValue('tier');
+        if ($tier instanceof PartnerTier) {
+            $tierRate = $tier->getAttribute('discount_rate');
+
+            if (is_numeric($tierRate)) {
+                return (float) $tierRate;
+            }
+        }
+
+        return 0.0;
     }
 
     /**

@@ -41,7 +41,10 @@ final class OrderShipping extends Model
     protected $fillable = [
         'order_id',
         'carrier_name',
+        'shipping_method',
+        'carrier',
         'service',
+        'service_type',
         'tracking_number',
         'tracking_url',
         'shipped_at',
@@ -54,6 +57,10 @@ final class OrderShipping extends Model
         'insurance_cost',
         'total_cost',
         'metadata',
+        'status',
+        'is_delivered',
+        'delivery_notes',
+        'notes',
     ];
 
     /**
@@ -123,6 +130,20 @@ final class OrderShipping extends Model
     public function scopeByCarrier(Builder $query, string $carrier): Builder
     {
         return $query->where('carrier_name', $carrier);
+    }
+
+    /**
+     * Handle scopeOrderedByName functionality with proper error handling.
+     *
+     * @param  Builder<OrderShipping> $query
+     * @return Builder<OrderShipping>
+     */
+    public function scopeOrderedByName(Builder $query): Builder
+    {
+        // Order shipping records by carrier name to provide consistent listings in admin tables.
+        return $query
+            ->orderBy('carrier_name')
+            ->orderBy('carrier');
     }
 
     /**

@@ -137,8 +137,18 @@ final class Channel extends Model
      */
     public function scopeOrdered(Builder $query): Builder
     {
+        // Ensure we keep a predictable ordering by the explicit sort position first and fall back to name ordering.
         return $query
             ->orderBy('sort_order')
-            ->orderBy('name');
+            ->orderedByName();
+    }
+
+    /**
+     * Order channels alphabetically so dropdowns remain stable.
+     */
+    public function scopeOrderedByName(Builder $query): Builder
+    {
+        // Using a simple ascending order keeps the scope database agnostic and easy to reason about.
+        return $query->orderBy('name');
     }
 }

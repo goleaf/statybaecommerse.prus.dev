@@ -188,6 +188,17 @@ final class City extends Model
     }
 
     /**
+     * Handle scopeOrderedByName functionality with proper error handling.
+     *
+     * @param mixed $query
+     */
+    public function scopeOrderedByName($query)
+    {
+        // Order results alphabetically to support predictable dropdowns and listings.
+        return $query->orderBy('name');
+    }
+
+    /**
      * Handle scopeDefault functionality with proper error handling.
      *
      * @param mixed $query

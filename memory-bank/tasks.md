@@ -181,6 +181,11 @@ Type: Complex System
 ## Remaining Critical Tasks
 
 ### 🔥 P0 - Critical Issues (Week 1)
+0. **Consolidate outstanding PR branches into `main` (2025-10-25 — active)**
+   - [ ] Sequentially merge remaining `codex/*` branches, resolving conflicts inline
+   - [ ] Run `php artisan test` after each merge batch to validate builds
+   - [ ] Delete merged branches locally/remotely and prune stale references
+   - [ ] Capture merge notes for bilingual release documentation
 1. **Admin Access Resolution** ✅ COMPLETED
    - [x] Fix Filament panel login redirect issues
    - [x] Verify admin dashboard accessibility

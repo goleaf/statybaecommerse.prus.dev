@@ -1,8 +1,7 @@
-# Filament v4 Normalization — 2025-10-24
+# October 25, 2025 — PR Merge & Cleanup
 
-1. Inventory Filament resources and relation managers requiring `Schema`/`Table` signature updates. *(in progress)*
-2. Batch-update imports and method signatures (`form`, `table`) with `$schema` renames. *(pending)*
-3. Normalize `$navigationGroup` docblocks and ensure `use UnitEnum;` where needed. *(pending)*
-4. Re-run targeted Pest suites for touched resources and document translation impacts. *(pending)*
-5. Restore `DiscountCondition` Filament resource coverage (translations, schema/table compliance, factory sync helpers) and verify Pest suite passes. *(pending)*
+1. Sequentially merge remaining `codex/*` PR branches into `main`, resolving conflicts. *(in progress)*
+2. After each merge batch, run `php artisan test` to validate builds. *(pending)*
+3. Delete merged branches locally (`git branch -d`) and remotely (`git push origin --delete`). *(pending)*
+4. Update bilingual release notes summarizing merged branches, conflicts, and validations. *(pending)*
 

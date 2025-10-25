@@ -8,9 +8,10 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Notifications\DatabaseNotification;
+use Illuminate\Support\Str;
 
 /**
  * Notification
@@ -23,6 +24,19 @@ use Illuminate\Notifications\DatabaseNotification;
  * @property mixed $keyType
  * @property mixed $incrementing
  *
+ * @phpstan-property array<string, string> $casts
+ *
+ * @property-read bool $is_read
+ * @property-read bool $is_urgent
+ * @property-read string|null $notification_type
+ * @property-read string $formatted_created_at
+ * @property-read string|null $formatted_read_at
+ * @property-read string|null $title
+ * @property-read string|null $message
+ * @property-read string|null $color
+ * @property-read array<int, string> $tags
+ * @property-read string|null $attachment
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|Notification newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Notification newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Notification query()
@@ -31,12 +45,81 @@ use Illuminate\Notifications\DatabaseNotification;
  */
 final class Notification extends DatabaseNotification
 {
+    /**
+     * @use \Illuminate\Database\Eloquent\Factories\HasFactory<\Database\Factories\NotificationFactory>
+     */
     use HasFactory;
 
+    /**
+     * Map normalized notification types to consistent color keywords.
+     *
+     * @var array<string, string>
+     */
+    private const TYPE_COLOR_MAP = [
+        'order'      => 'blue',
+        'product'    => 'green',
+        'user'       => 'purple',
+        'system'     => 'orange',
+        'payment'    => 'yellow',
+        'shipping'   => 'indigo',
+        'review'     => 'pink',
+        'promotion'  => 'red',
+        'newsletter' => 'cyan',
+        'support'    => 'gray',
+    ];
+
+    /**
+     * Map normalized notification types to icon identifiers consumed by the UI.
+     *
+     * @var array<string, string>
+     */
+    private const TYPE_ICON_MAP = [
+        'order'      => 'heroicon-o-shopping-cart',
+        'product'    => 'heroicon-o-cube',
+        'user'       => 'heroicon-o-user',
+        'system'     => 'heroicon-o-cog-6-tooth',
+        'payment'    => 'heroicon-o-credit-card',
+        'shipping'   => 'heroicon-o-truck',
+        'review'     => 'heroicon-o-star',
+        'promotion'  => 'heroicon-o-gift',
+        'newsletter' => 'heroicon-o-envelope',
+        'support'    => 'heroicon-o-lifebuoy',
+    ];
+
+    /**
+     * The canonical list of types inspected when producing aggregate statistics.
+     *
+     * @var string[]
+     */
+    private const TYPE_STAT_KEYS = [
+        'order',
+        'product',
+        'user',
+        'system',
+        'payment',
+        'shipping',
+        'review',
+        'promotion',
+        'newsletter',
+        'support',
+    ];
+
+    /**
+     * @var list<string>
+     */
     protected $fillable = ['type', 'notifiable_type', 'notifiable_id', 'user_id', 'data', 'read_at'];
 
+    /**
+     * Catalog of attribute casts applied to persisted payload columns.
+     *
+     * @var array<string, string>
+     */
+    // @phpstan-ignore-next-line We intentionally specialize the inherited cast definitions for better IDE hints.
     protected $casts = ['data' => 'array', 'read_at' => 'datetime', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
 
+    /**
+     * @var list<string>
+     */
     protected $appends = ['is_read', 'is_urgent', 'notification_type', 'formatted_created_at', 'formatted_read_at'];
 
     protected $keyType = 'string';
@@ -51,7 +134,8 @@ final class Notification extends DatabaseNotification
         parent::boot();
         self::creating(function (Notification $notification): void {
             if (! $notification->id) {
-                $notification->id = (string) \Illuminate\Support\Str::uuid();
+                // Ensure every notification carries a UUID primary key for cross-service traceability.
+                $notification->id = (string) Str::uuid();
             }
             if ($notification->notifiable_type === User::class && ! $notification->user_id) {
                 $notification->user_id = $notification->notifiable_id;
@@ -61,24 +145,26 @@ final class Notification extends DatabaseNotification
 
     // Relationships
     /**
-     * Handle notifiable functionality with proper error handling.
-     */
-    public function notifiable(): MorphTo
-    {
-        return $this->morphTo();
-    }
-
-    /**
      * Handle user functionality with proper error handling.
+     */
+    /**
+     * @return BelongsTo<User, DatabaseNotification>
      */
     public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'notifiable_id')->where('notifiable_type', User::class);
+        /** @var BelongsTo<User, DatabaseNotification> $relation */
+        $relation = $this->belongsTo(User::class, 'notifiable_id')->where('notifiable_type', User::class);
+
+        return $relation;
     }
 
     // Scopes
     /**
      * Handle scopeRead functionality with proper error handling.
+     */
+    /**
+     * @param  Builder<self> $query
+     * @return Builder<self>
      */
     public function scopeRead(Builder $query): Builder
     {
@@ -88,6 +174,10 @@ final class Notification extends DatabaseNotification
     /**
      * Handle scopeUnread functionality with proper error handling.
      */
+    /**
+     * @param  Builder<self> $query
+     * @return Builder<self>
+     */
     public function scopeUnread(Builder $query): Builder
     {
         return $query->whereNull('read_at');
@@ -95,6 +185,10 @@ final class Notification extends DatabaseNotification
 
     /**
      * Handle scopeUrgent functionality with proper error handling.
+     */
+    /**
+     * @param  Builder<self> $query
+     * @return Builder<self>
      */
     public function scopeUrgent(Builder $query): Builder
     {
@@ -104,23 +198,44 @@ final class Notification extends DatabaseNotification
     /**
      * Handle scopeNormal functionality with proper error handling.
      */
+    /**
+     * @param  Builder<self> $query
+     * @return Builder<self>
+     */
     public function scopeNormal(Builder $query): Builder
     {
-        return $query->where(function ($q) {
-            $q->whereJsonDoesntContain('data->urgent', true)->orWhereNull('data->urgent');
+        return $query->where(function (Builder $builder): void {
+            // Match notifications that explicitly declare non-urgent status or never set the flag.
+            $builder
+                ->whereJsonDoesntContain('data->urgent', true)
+                ->orWhereNull('data->urgent');
         });
     }
 
     /**
      * Handle scopeByType functionality with proper error handling.
      */
+    /**
+     * @param  Builder<self> $query
+     * @return Builder<self>
+     */
     public function scopeByType(Builder $query, string $type): Builder
     {
-        return $query->whereJsonContains('data->type', $type);
+        return $query->where(function (Builder $builder) use ($type): void {
+            // Honor explicit metadata stored within the payload JSON.
+            $builder->whereJsonContains('data->notification_type', $type)
+                ->orWhereJsonContains('data->type', $type)
+                // Fallback to the notification class name to support legacy payloads.
+                ->orWhere('type', 'like', sprintf('%%%sNotification', Str::studly($type)));
+        });
     }
 
     /**
      * Handle scopeByNotificationType functionality with proper error handling.
+     */
+    /**
+     * @param  Builder<self> $query
+     * @return Builder<self>
      */
     public function scopeByNotificationType(Builder $query, string $notificationType): Builder
     {
@@ -130,6 +245,10 @@ final class Notification extends DatabaseNotification
     /**
      * Handle scopeForUser functionality with proper error handling.
      */
+    /**
+     * @param  Builder<self> $query
+     * @return Builder<self>
+     */
     public function scopeForUser(Builder $query, int $userId): Builder
     {
         return $query->where('notifiable_id', $userId)->where('notifiable_type', User::class);
@@ -137,6 +256,10 @@ final class Notification extends DatabaseNotification
 
     /**
      * Handle scopeRecent functionality with proper error handling.
+     */
+    /**
+     * @param  Builder<self> $query
+     * @return Builder<self>
      */
     public function scopeRecent(Builder $query, int $days = 7): Builder
     {
@@ -146,6 +269,10 @@ final class Notification extends DatabaseNotification
     /**
      * Handle scopeOld functionality with proper error handling.
      */
+    /**
+     * @param  Builder<self> $query
+     * @return Builder<self>
+     */
     public function scopeOld(Builder $query, int $days = 30): Builder
     {
         return $query->where('created_at', '<', now()->subDays($days));
@@ -154,17 +281,27 @@ final class Notification extends DatabaseNotification
     /**
      * Handle scopeWithTags functionality with proper error handling.
      */
+    /**
+     * @param  Builder<self>      $query
+     * @param  array<int, string> $tags
+     * @return Builder<self>
+     */
     public function scopeWithTags(Builder $query, array $tags): Builder
     {
-        return $query->where(function ($q) use ($tags) {
+        return $query->where(function (Builder $builder) use ($tags): void {
+            // Build an or-chain to match notifications containing any of the requested tags.
             foreach ($tags as $tag) {
-                $q->orWhereJsonContains('data->tags', $tag);
+                $builder->orWhereJsonContains('data->tags', $tag);
             }
         });
     }
 
     /**
      * Handle scopeByDateRange functionality with proper error handling.
+     */
+    /**
+     * @param  Builder<self> $query
+     * @return Builder<self>
      */
     public function scopeByDateRange(Builder $query, Carbon $from, Carbon $to): Builder
     {
@@ -175,37 +312,80 @@ final class Notification extends DatabaseNotification
     /**
      * Handle isRead functionality with proper error handling.
      */
+    /**
+     * @return Attribute<bool, never>
+     */
     protected function isRead(): Attribute
     {
-        return Attribute::make(get: fn (): bool => ! is_null($this->read_at));
+        return Attribute::make(get: fn (): bool => $this->read_at !== null);
     }
 
     /**
      * Handle isUrgent functionality with proper error handling.
      */
+    /**
+     * @return Attribute<bool, never>
+     */
     protected function isUrgent(): Attribute
     {
-        return Attribute::make(get: fn (): bool => $this->data['urgent'] ?? false);
+        return Attribute::make(get: fn (): bool => (bool) ($this->data['urgent'] ?? false));
     }
 
     /**
      * Handle notificationType functionality with proper error handling.
      */
+    /**
+     * @return Attribute<?string, never>
+     */
     protected function notificationType(): Attribute
     {
-        return Attribute::make(get: fn (): ?string => $this->data['type'] ?? null);
+        return Attribute::make(get: function (): ?string {
+            // Prefer explicit metadata while tolerating historical payload key variations.
+            $type = $this->data['notification_type'] ?? null;
+
+            if (is_string($type) && $type !== '') {
+                return strtolower($type);
+            }
+
+            $fallbackType = $this->data['type'] ?? null;
+
+            if (is_string($fallbackType) && $fallbackType !== '') {
+                $normalized = strtolower($fallbackType);
+                if (array_key_exists($normalized, self::TYPE_COLOR_MAP)) {
+                    return $normalized;
+                }
+            }
+
+            $typeColumn = $this->getAttribute('type');
+
+            if (! is_string($typeColumn) || $typeColumn === '') {
+                return null;
+            }
+
+            // Derive a normalized slug from the notification class name when the payload lacks context.
+            return Str::of(class_basename($typeColumn))
+                ->replaceLast('Notification', '')
+                ->lower()
+                ->value();
+        });
     }
 
     /**
      * Handle formattedCreatedAt functionality with proper error handling.
      */
+    /**
+     * @return Attribute<string, never>
+     */
     protected function formattedCreatedAt(): Attribute
     {
-        return Attribute::make(get: fn (): string => $this->created_at->format('d/m/Y H:i'));
+        return Attribute::make(get: fn (): string => ($this->created_at ?? now())->format('d/m/Y H:i'));
     }
 
     /**
      * Handle formattedReadAt functionality with proper error handling.
+     */
+    /**
+     * @return Attribute<?string, never>
      */
     protected function formattedReadAt(): Attribute
     {
@@ -215,41 +395,83 @@ final class Notification extends DatabaseNotification
     /**
      * Handle title functionality with proper error handling.
      */
+    /**
+     * @return Attribute<?string, never>
+     */
     protected function title(): Attribute
     {
-        return Attribute::make(get: fn (): ?string => $this->data['title'] ?? null);
+        return Attribute::make(get: function (): ?string {
+            $value = $this->data['title'] ?? null;
+
+            return is_string($value) ? $value : null;
+        });
     }
 
     /**
      * Handle message functionality with proper error handling.
      */
+    /**
+     * @return Attribute<?string, never>
+     */
     protected function message(): Attribute
     {
-        return Attribute::make(get: fn (): ?string => $this->data['message'] ?? null);
+        return Attribute::make(get: function (): ?string {
+            $value = $this->data['message'] ?? null;
+
+            return is_string($value) ? $value : null;
+        });
     }
 
     /**
      * Handle color functionality with proper error handling.
      */
+    /**
+     * @return Attribute<?string, never>
+     */
     protected function color(): Attribute
     {
-        return Attribute::make(get: fn (): ?string => $this->data['color'] ?? null);
+        return Attribute::make(get: function (): ?string {
+            $value = $this->data['color'] ?? null;
+
+            return is_string($value) ? $value : null;
+        });
     }
 
     /**
      * Handle tags functionality with proper error handling.
      */
+    /**
+     * @return Attribute<array<int, string>, never>
+     */
     protected function tags(): Attribute
     {
-        return Attribute::make(get: fn (): array => $this->data['tags'] ?? []);
+        return Attribute::make(get: function (): array {
+            $tags = $this->data['tags'] ?? [];
+
+            if (! is_array($tags)) {
+                return [];
+            }
+
+            $stringTags = array_filter($tags, static fn ($tag): bool => is_string($tag));
+
+            /** @var array<int, string> $stringTags */
+            return array_values($stringTags);
+        });
     }
 
     /**
      * Handle attachment functionality with proper error handling.
      */
+    /**
+     * @return Attribute<?string, never>
+     */
     protected function attachment(): Attribute
     {
-        return Attribute::make(get: fn (): ?string => $this->data['attachment'] ?? null);
+        return Attribute::make(get: function (): ?string {
+            $value = $this->data['attachment'] ?? null;
+
+            return is_string($value) ? $value : null;
+        });
     }
 
     // Methods
@@ -295,19 +517,8 @@ final class Notification extends DatabaseNotification
      */
     public function getNotificationTypeColor(): string
     {
-        return match ($this->notification_type) {
-            'order' => 'blue',
-            'product' => 'green',
-            'user' => 'purple',
-            'system' => 'orange',
-            'payment' => 'yellow',
-            'shipping' => 'indigo',
-            'review' => 'pink',
-            'promotion' => 'red',
-            'newsletter' => 'cyan',
-            'support' => 'gray',
-            default => 'gray',
-        };
+        // Defer to the curated map while maintaining a safe fallback.
+        return self::TYPE_COLOR_MAP[$this->notification_type] ?? 'gray';
     }
 
     /**
@@ -315,19 +526,8 @@ final class Notification extends DatabaseNotification
      */
     public function getNotificationTypeIcon(): string
     {
-        return match ($this->notification_type) {
-            'order' => 'heroicon-o-shopping-cart',
-            'product' => 'heroicon-o-cube',
-            'user' => 'heroicon-o-user',
-            'system' => 'heroicon-o-cog-6-tooth',
-            'payment' => 'heroicon-o-credit-card',
-            'shipping' => 'heroicon-o-truck',
-            'review' => 'heroicon-o-star',
-            'promotion' => 'heroicon-o-gift',
-            'newsletter' => 'heroicon-o-envelope',
-            'support' => 'heroicon-o-lifebuoy',
-            default => 'heroicon-o-bell',
-        };
+        // Resolve the icon alias expected by Filament dashboards or fall back to the generic bell glyph.
+        return self::TYPE_ICON_MAP[$this->notification_type] ?? 'heroicon-o-bell';
     }
 
     /**
@@ -335,7 +535,7 @@ final class Notification extends DatabaseNotification
      */
     public function getTimeAgo(): string
     {
-        return $this->created_at->diffForHumans();
+        return $this->created_at?->diffForHumans() ?? '';
     }
 
     /**
@@ -351,7 +551,9 @@ final class Notification extends DatabaseNotification
      */
     public function isOld(int $days = 30): bool
     {
-        return $this->created_at->lt(now()->subDays($days));
+        $createdAt = $this->created_at;
+
+        return $createdAt !== null && $createdAt->lt(now()->subDays($days));
     }
 
     /**
@@ -359,7 +561,9 @@ final class Notification extends DatabaseNotification
      */
     public function isRecent(int $days = 7): bool
     {
-        return $this->created_at->gte(now()->subDays($days));
+        $createdAt = $this->created_at;
+
+        return $createdAt !== null && $createdAt->gte(now()->subDays($days));
     }
 
     /**
@@ -429,20 +633,35 @@ final class Notification extends DatabaseNotification
     /**
      * Handle getStats functionality with proper error handling.
      */
+    /**
+     * @return array<string, int>
+     */
     public static function getStats(): array
     {
-        return ['total' => self::count(), 'unread' => self::unread()->count(), 'read' => self::read()->count(), 'urgent' => self::urgent()->count(), 'today' => self::whereDate('created_at', today())->count(), 'this_week' => self::whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()])->count(), 'this_month' => self::whereMonth('created_at', now()->month)->count()];
+        return [
+            'total'      => self::query()->count(),
+            'unread'     => self::query()->unread()->count(),
+            'read'       => self::query()->read()->count(),
+            'urgent'     => self::query()->urgent()->count(),
+            'today'      => self::query()->whereDate('created_at', today())->count(),
+            'this_week'  => self::query()->whereBetween('created_at', [now()->startOfWeek(), now()->endOfWeek()])->count(),
+            'this_month' => self::query()->whereMonth('created_at', now()->month)->count(),
+        ];
     }
 
     /**
      * Handle getTypeStats functionality with proper error handling.
      */
+    /**
+     * @return array<string, int>
+     */
     public static function getTypeStats(): array
     {
-        $types = ['order', 'product', 'user', 'system', 'payment', 'shipping', 'review', 'promotion', 'newsletter', 'support'];
         $stats = [];
-        foreach ($types as $type) {
-            $stats[$type] = self::byType($type)->count();
+
+        // Iterate over the canonical set so reporting remains stable even when no records exist for a type.
+        foreach (self::TYPE_STAT_KEYS as $type) {
+            $stats[$type] = self::query()->byType($type)->count();
         }
 
         return $stats;
@@ -453,7 +672,10 @@ final class Notification extends DatabaseNotification
      */
     public static function cleanupOld(int $days = 30): int
     {
-        return self::old($days)->delete();
+        $deleted = self::query()->old($days)->delete();
+        /** @var int $deleted */
+
+        return $deleted;
     }
 
     /**
@@ -461,7 +683,10 @@ final class Notification extends DatabaseNotification
      */
     public static function markAllAsReadForUser(int $userId): int
     {
-        return self::forUser($userId)->unread()->update(['read_at' => now()]);
+        $updated = self::query()->forUser($userId)->unread()->update(['read_at' => now()]);
+        /** @var int $updated */
+
+        return $updated;
     }
 
     /**
@@ -469,6 +694,9 @@ final class Notification extends DatabaseNotification
      */
     public static function markAllAsUnreadForUser(int $userId): int
     {
-        return self::forUser($userId)->read()->update(['read_at' => null]);
+        $updated = self::query()->forUser($userId)->read()->update(['read_at' => null]);
+        /** @var int $updated */
+
+        return $updated;
     }
 }
