@@ -79,6 +79,19 @@ describe('Currency Model', function () {
         expect($result->is_default)->toBeTrue();
     });
 
+    it('can scope currencies ordered by name', function () {
+        // Arrange the currencies with intentionally shuffled names.
+        Currency::factory()->create(['name' => 'Zulu', 'code' => 'ZUL']);
+        Currency::factory()->create(['name' => 'Alpha', 'code' => 'ALP']);
+        Currency::factory()->create(['name' => 'Mike', 'code' => 'MIK']);
+
+        // Act by retrieving the ordered collection using the dedicated scope.
+        $orderedNames = Currency::orderedByName()->pluck('name')->all();
+
+        // Assert the names are sorted alphabetically to guide admin expectations.
+        expect($orderedNames)->toBe(['Alpha', 'Mike', 'Zulu']);
+    });
+
     it('has formatted symbol attribute', function () {
         $currency = Currency::factory()->create(['symbol' => '$']);
         expect($currency->formatted_symbol)->toBe('$');
