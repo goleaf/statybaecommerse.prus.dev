@@ -77,4 +77,16 @@ final class Menu extends Model
             'allItems' => static fn($itemQuery) => $itemQuery->visible()->ordered(),
         ]);
     }
+
+    /**
+     * Scope the query to order menus alphabetically by their display name.
+     *
+     * Including this helper keeps ordering behaviour consistent across the
+     * application whenever menus need to be rendered in a predictable list.
+     */
+    public function scopeOrderedByName(Builder $query): Builder
+    {
+        // Always order by the "name" column to keep menu listings readable.
+        return $query->orderBy('name');
+    }
 }
