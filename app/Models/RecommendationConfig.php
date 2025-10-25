@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\OrdersByName;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -26,10 +28,17 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 final class RecommendationConfig extends Model
 {
     use HasFactory;
+    use OrdersByName;
 
-    protected $fillable = ['name', 'type', 'config', 'is_active', 'is_default', 'priority', 'sort_order', 'filters', 'max_results', 'min_score', 'decay_factor', 'description', 'cache_ttl', 'enable_caching', 'enable_analytics', 'batch_size', 'timeout_seconds', 'conditions', 'notes', 'metadata'];
+    /**
+     * Keep alphabetical ordering based on the name attribute so dropdowns and
+     * relation pickers remain predictable throughout the UI.
+     */
+    protected string $nameColumn = 'name';
 
-    protected $casts = ['config' => 'array', 'filters' => 'array', 'conditions' => 'array', 'metadata' => 'array', 'is_active' => 'boolean', 'enable_caching' => 'boolean', 'enable_analytics' => 'boolean', 'priority' => 'integer', 'max_results' => 'integer', 'min_score' => 'decimal:6', 'cache_ttl' => 'integer', 'batch_size' => 'integer', 'timeout_seconds' => 'integer'];
+    protected $fillable = ['name', 'type', 'config', 'is_active', 'is_default', 'priority', 'sort_order', 'filters', 'max_results', 'min_score', 'decay_factor', 'description', 'cache_ttl', 'enable_caching', 'enable_analytics', 'batch_size', 'timeout_seconds', 'conditions', 'notes', 'metadata', 'meta'];
+
+    protected $casts = ['config' => 'array', 'filters' => 'array', 'conditions' => 'array', 'metadata' => 'array', 'meta' => 'array', 'is_active' => 'boolean', 'enable_caching' => 'boolean', 'enable_analytics' => 'boolean', 'priority' => 'integer', 'max_results' => 'integer', 'min_score' => 'decimal:6', 'cache_ttl' => 'integer', 'batch_size' => 'integer', 'timeout_seconds' => 'integer'];
 
     /**
      * Handle analytics functionality with proper error handling.
@@ -52,9 +61,9 @@ final class RecommendationConfig extends Model
     /**
      * Handle scopeActive functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
-    public function scopeActive($query)
+    public function scopeActive(Builder $query): Builder
     {
         return $query->where('is_active', true);
     }
@@ -62,7 +71,7 @@ final class RecommendationConfig extends Model
     /**
      * Handle scopeByType functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeByType($query, string $type)
     {
@@ -72,7 +81,7 @@ final class RecommendationConfig extends Model
     /**
      * Handle scopeOrderedByPriority functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeOrderedByPriority($query)
     {
@@ -87,12 +96,12 @@ final class RecommendationConfig extends Model
         return match ($this->type) {
             'content_based' => \App\Services\Recommendations\ContentBasedRecommendation::class,
             'collaborative' => \App\Services\Recommendations\CollaborativeFilteringRecommendation::class,
-            'hybrid' => \App\Services\Recommendations\HybridRecommendation::class,
-            'popularity' => \App\Services\Recommendations\PopularityRecommendation::class,
-            'trending' => \App\Services\Recommendations\TrendingRecommendation::class,
-            'cross_sell' => \App\Services\Recommendations\CrossSellRecommendation::class,
-            'up_sell' => \App\Services\Recommendations\UpSellRecommendation::class,
-            default => \App\Services\Recommendations\ContentBasedRecommendation::class,
+            'hybrid'        => \App\Services\Recommendations\HybridRecommendation::class,
+            'popularity'    => \App\Services\Recommendations\PopularityRecommendation::class,
+            'trending'      => \App\Services\Recommendations\TrendingRecommendation::class,
+            'cross_sell'    => \App\Services\Recommendations\CrossSellRecommendation::class,
+            'up_sell'       => \App\Services\Recommendations\UpSellRecommendation::class,
+            default         => \App\Services\Recommendations\ContentBasedRecommendation::class,
         };
     }
 }

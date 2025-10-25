@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\OrdersByName;
 use App\Models\Scopes\ActiveScope;
 use App\Models\Translations\DiscountConditionTranslation;
 use App\Traits\HasTranslations;
@@ -33,7 +34,17 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 #[ScopedBy([ActiveScope::class])]
 final class DiscountCondition extends Model
 {
-    use HasFactory, HasTranslations;
+    use HasFactory;
+    use HasTranslations;
+    use OrdersByName {
+        scopeOrderedByName as scopeOrderedByNameFromTrait;
+    }
+
+    /**
+     * Default the alphabetical ordering to the type column when translations
+     * are unavailable, ensuring the shared trait remains functional.
+     */
+    protected string $nameColumn = 'type';
 
     protected string $translationModel = DiscountConditionTranslation::class;
 
@@ -42,7 +53,7 @@ final class DiscountCondition extends Model
     /**
      * @var array<int, string>
      */
-    protected $fillable = ['discount_id', 'type', 'operator', 'value', 'position', 'is_active', 'priority', 'metadata'];
+    protected $fillable = ['discount_id', 'type', 'operator', 'value', 'position', 'is_active', 'priority', 'metadata', 'meta'];
 
     /**
      * @var array<string, string>
@@ -58,6 +69,7 @@ final class DiscountCondition extends Model
         'priority' => 'integer',
         // Persist auxiliary context without manual decoding.
         'metadata' => 'array',
+        'meta'     => 'array',
     ];
 
     /**
@@ -177,8 +189,6 @@ final class DiscountCondition extends Model
 
     /**
      * Handle matches functionality with proper error handling.
-     *
-     * @param mixed $testValue
      */
     public function matches(mixed $testValue): bool
     {

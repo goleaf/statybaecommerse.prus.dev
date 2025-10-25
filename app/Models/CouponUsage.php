@@ -57,6 +57,7 @@ final class CouponUsage extends Model
         'discount_amount',
         'used_at',
         'metadata',
+        'meta',
     ];
 
     /**
@@ -66,6 +67,7 @@ final class CouponUsage extends Model
         'discount_amount' => 'decimal:2',
         'used_at'         => 'datetime',
         'metadata'        => 'array',
+        'meta'            => 'array',
     ];
 
     /**

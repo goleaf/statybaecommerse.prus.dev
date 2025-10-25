@@ -65,6 +65,7 @@ final class EmailCampaignRecipientFactory extends Factory
                 ], $this->faker->numberBetween(1, 3)),
                 'utm_source' => $this->faker->randomElement(['newsletter', 'promotion', 'holiday-campaign']),
             ],
+            'meta'            => [],
             'scheduled_at'    => $scheduledAt,
             'sent_at'         => $sentAt,
             'delivered_at'    => $deliveredAt,

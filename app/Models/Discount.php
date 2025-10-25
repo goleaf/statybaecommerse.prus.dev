@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\OrdersByName;
 use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\EnabledScope;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
@@ -32,11 +33,19 @@ use Illuminate\Support\Str;
 #[ScopedBy([ActiveScope::class, EnabledScope::class])]
 final class Discount extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory;
+    use OrdersByName;
+    use SoftDeletes;
+
+    /**
+     * Declare the sortable column so the shared OrdersByName trait knows which
+     * attribute to reference when applying alphabetical ordering within scopes.
+     */
+    protected string $nameColumn = 'name';
 
     protected $table = 'discounts';
 
-    protected $fillable = ['name', 'slug', 'description', 'type', 'value', 'is_active', 'is_enabled', 'starts_at', 'ends_at', 'usage_limit', 'usage_count', 'minimum_amount', 'maximum_amount', 'status', 'scope', 'stacking_policy', 'metadata', 'priority', 'exclusive', 'applies_to_shipping', 'free_shipping', 'first_order_only', 'per_customer_limit', 'per_code_limit', 'per_day_limit', 'channel_restrictions', 'currency_restrictions', 'weekday_mask', 'time_window'];
+    protected $fillable = ['name', 'slug', 'description', 'type', 'value', 'is_active', 'is_enabled', 'starts_at', 'ends_at', 'usage_limit', 'usage_count', 'minimum_amount', 'maximum_amount', 'status', 'scope', 'stacking_policy', 'metadata', 'meta', 'priority', 'exclusive', 'applies_to_shipping', 'free_shipping', 'first_order_only', 'per_customer_limit', 'per_code_limit', 'per_day_limit', 'channel_restrictions', 'currency_restrictions', 'weekday_mask', 'time_window'];
 
     /**
      * Wire up lifecycle hooks so we can safely derive slugs when a record is created or renamed.
@@ -63,7 +72,7 @@ final class Discount extends Model
      */
     protected function casts(): array
     {
-        return ['value' => 'float', 'minimum_amount' => 'decimal:2', 'maximum_amount' => 'decimal:2', 'starts_at' => 'datetime', 'ends_at' => 'datetime', 'is_active' => 'boolean', 'is_enabled' => 'boolean', 'scope' => 'array', 'metadata' => 'array', 'exclusive' => 'boolean', 'applies_to_shipping' => 'boolean', 'free_shipping' => 'boolean', 'first_order_only' => 'boolean', 'channel_restrictions' => 'array', 'currency_restrictions' => 'array', 'time_window' => 'array', 'usage_limit' => 'integer', 'usage_count' => 'integer', 'per_customer_limit' => 'integer', 'per_code_limit' => 'integer', 'per_day_limit' => 'integer', 'priority' => 'integer'];
+        return ['value' => 'float', 'minimum_amount' => 'decimal:2', 'maximum_amount' => 'decimal:2', 'starts_at' => 'datetime', 'ends_at' => 'datetime', 'is_active' => 'boolean', 'is_enabled' => 'boolean', 'scope' => 'array', 'metadata' => 'array', 'meta' => 'array', 'exclusive' => 'boolean', 'applies_to_shipping' => 'boolean', 'free_shipping' => 'boolean', 'first_order_only' => 'boolean', 'channel_restrictions' => 'array', 'currency_restrictions' => 'array', 'time_window' => 'array', 'usage_limit' => 'integer', 'usage_count' => 'integer', 'per_customer_limit' => 'integer', 'per_code_limit' => 'integer', 'per_day_limit' => 'integer', 'priority' => 'integer'];
     }
 
     /**
@@ -75,6 +84,19 @@ final class Discount extends Model
             $q->whereNull('starts_at')->orWhere('starts_at', '<=', now());
         })->where(function ($q) {
             $q->whereNull('ends_at')->orWhere('ends_at', '>=', now());
+        });
+    }
+
+    /**
+     * Allow quick fuzzy searching by name so UIs can power autocomplete inputs
+     * without needing to duplicate the `like` clause logic elsewhere.
+     */
+    public function scopeSearch(Builder $query, string $term): Builder
+    {
+        $term = trim($term);
+
+        return $query->when($term !== '', static function (Builder $builder) use ($term): void {
+            $builder->where('name', 'like', "%{$term}%");
         });
     }
 

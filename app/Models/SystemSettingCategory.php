@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\OrdersByName;
 use App\Models\Scopes\ActiveScope;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -19,6 +21,7 @@ use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Sluggable\HasSlug;
 use Spatie\Sluggable\SlugOptions;
+use Throwable;
 
 /**
  * SystemSettingCategory
@@ -37,15 +40,25 @@ use Spatie\Sluggable\SlugOptions;
 #[ScopedBy([ActiveScope::class])]
 final class SystemSettingCategory extends Model
 {
-    use HasFactory, HasSlug, LogsActivity, SoftDeletes;
+    use HasFactory;
+    use HasSlug;
+    use LogsActivity;
+    use OrdersByName;
+    use SoftDeletes;
 
-    protected $fillable = ['name', 'slug', 'description', 'icon', 'color', 'sort_order', 'is_active', 'parent_id'];
+    /**
+     * Configure alphabetical ordering to rely on the translated name column so
+     * nested category pickers remain sorted intuitively.
+     */
+    protected string $nameColumn = 'name';
 
-    protected $casts = ['is_active' => 'boolean', 'sort_order' => 'integer', 'parent_id' => 'integer'];
+    protected $fillable = ['name', 'slug', 'description', 'icon', 'color', 'sort_order', 'is_active', 'parent_id', 'meta'];
+
+    protected $casts = ['is_active' => 'boolean', 'sort_order' => 'integer', 'parent_id' => 'integer', 'meta' => 'array'];
 
     protected static function booted(): void
     {
-        static::updated(function (self $category): void {
+        self::updated(function (self $category): void {
             $connectionName = $category->getConnectionName() ?? config('database.default');
 
             if (! is_string($connectionName)) {
@@ -58,7 +71,7 @@ final class SystemSettingCategory extends Model
 
             try {
                 $schema = Schema::connection($connectionName);
-            } catch (\Throwable) {
+            } catch (Throwable) {
                 return;
             }
 
@@ -84,24 +97,24 @@ final class SystemSettingCategory extends Model
             try {
                 $properties = json_encode([
                     'attributes' => $attributes,
-                    'old' => $original,
+                    'old'        => $original,
                 ], JSON_THROW_ON_ERROR);
             } catch (JsonException) {
                 $properties = json_encode([
                     'attributes' => $attributes,
-                    'old' => $original,
+                    'old'        => $original,
                 ]) ?: null;
             }
 
             DB::connection($connectionName)->table('activity_log')->insert([
-                'log_name' => 'system_setting_categories',
-                'description' => 'System Setting Category updated',
+                'log_name'     => 'system_setting_categories',
+                'description'  => 'System Setting Category updated',
                 'subject_type' => self::class,
-                'subject_id' => $category->getKey(),
-                'event' => 'updated',
-                'properties' => $properties,
-                'created_at' => now(),
-                'updated_at' => now(),
+                'subject_id'   => $category->getKey(),
+                'event'        => 'updated',
+                'properties'   => $properties,
+                'created_at'   => now(),
+                'updated_at'   => now(),
             ]);
         });
     }
@@ -157,9 +170,9 @@ final class SystemSettingCategory extends Model
     /**
      * Handle scopeActive functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
-    public function scopeActive($query)
+    public function scopeActive(Builder $query): Builder
     {
         return $query->where('is_active', true);
     }
@@ -167,9 +180,9 @@ final class SystemSettingCategory extends Model
     /**
      * Handle scopeOrdered functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
-    public function scopeOrdered($query)
+    public function scopeOrdered(Builder $query): Builder
     {
         return $query->orderBy('sort_order')->orderBy('name');
     }
@@ -177,9 +190,9 @@ final class SystemSettingCategory extends Model
     /**
      * Handle scopeRoot functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
-    public function scopeRoot($query)
+    public function scopeRoot(Builder $query): Builder
     {
         return $query->whereNull('parent_id');
     }
@@ -187,9 +200,9 @@ final class SystemSettingCategory extends Model
     /**
      * Handle scopeWithSettings functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
-    public function scopeWithSettings($query)
+    public function scopeWithSettings(Builder $query): Builder
     {
         return $query->with(['settings' => function ($q) {
             $q->active()->ordered();
@@ -248,13 +261,13 @@ final class SystemSettingCategory extends Model
     public function getColorClass(): string
     {
         return match ($this->color) {
-            'primary' => 'text-primary-600',
+            'primary'   => 'text-primary-600',
             'secondary' => 'text-secondary-600',
-            'success' => 'text-success-600',
-            'warning' => 'text-warning-600',
-            'danger' => 'text-danger-600',
-            'info' => 'text-info-600',
-            default => 'text-gray-600',
+            'success'   => 'text-success-600',
+            'warning'   => 'text-warning-600',
+            'danger'    => 'text-danger-600',
+            'info'      => 'text-info-600',
+            default     => 'text-gray-600',
         };
     }
 
@@ -264,13 +277,13 @@ final class SystemSettingCategory extends Model
     public function getBadgeColorClass(): string
     {
         return match ($this->color) {
-            'primary' => 'bg-primary-100 text-primary-800',
+            'primary'   => 'bg-primary-100 text-primary-800',
             'secondary' => 'bg-secondary-100 text-secondary-800',
-            'success' => 'bg-success-100 text-success-800',
-            'warning' => 'bg-warning-100 text-warning-800',
-            'danger' => 'bg-danger-100 text-danger-800',
-            'info' => 'bg-info-100 text-info-800',
-            default => 'bg-gray-100 text-gray-800',
+            'success'   => 'bg-success-100 text-success-800',
+            'warning'   => 'bg-warning-100 text-warning-800',
+            'danger'    => 'bg-danger-100 text-danger-800',
+            'info'      => 'bg-info-100 text-info-800',
+            default     => 'bg-gray-100 text-gray-800',
         };
     }
 
@@ -408,15 +421,15 @@ final class SystemSettingCategory extends Model
     public function getTreeStructure(): array
     {
         return [
-            'id' => $this->id,
-            'name' => $this->getTranslatedName(),
-            'slug' => $this->slug,
-            'description' => $this->getTranslatedDescription(),
-            'icon' => $this->getIconClass(),
-            'color' => $this->color,
-            'settings_count' => $this->getSettingsCount(),
+            'id'                    => $this->id,
+            'name'                  => $this->getTranslatedName(),
+            'slug'                  => $this->slug,
+            'description'           => $this->getTranslatedDescription(),
+            'icon'                  => $this->getIconClass(),
+            'color'                 => $this->color,
+            'settings_count'        => $this->getSettingsCount(),
             'public_settings_count' => $this->getPublicSettingsCount(),
-            'children' => $this->getChildren()
+            'children'              => $this->getChildren()
                 ->map
                 ->getTreeStructure()
                 ->values()
