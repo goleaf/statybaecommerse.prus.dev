@@ -139,6 +139,16 @@ final class PriceList extends Model
     }
 
     /**
+     * Handle scopeOrderedByName functionality with proper error handling.
+     *
+     * @param  mixed  $query
+     */
+    public function scopeOrderedByName($query, string $direction = 'asc')
+    {
+        return $query->orderBy('name', $direction);
+    }
+
+    /**
      * Handle scopeByCurrency functionality with proper error handling.
      *
      * @param  mixed  $query
