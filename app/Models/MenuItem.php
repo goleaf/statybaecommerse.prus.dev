@@ -82,4 +82,13 @@ final class MenuItem extends Model
     {
         return $query->orderBy('sort_order');
     }
+
+    /**
+     * Ensure menu items are consistently sorted by their human readable label.
+     */
+    public function scopeOrderedByName(Builder $query): Builder
+    {
+        // Order by the label column so navigation entries appear alphabetically.
+        return $query->orderBy('label');
+    }
 }
