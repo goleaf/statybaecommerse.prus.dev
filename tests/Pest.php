@@ -9,7 +9,7 @@ use Spatie\Permission\Models\Role;
 use Spatie\Permission\PermissionRegistrar;
 use Tests\Support\TestingDatabase;
 
-uses(Tests\TestCase::class)->in('Feature', 'Unit', 'admin', 'frontend', 'Performance');
+uses(Tests\TestCase::class)->in('Feature', 'Unit', 'admin', 'frontend', 'Performance', 'Models');
 
 
 beforeAll(function () {
