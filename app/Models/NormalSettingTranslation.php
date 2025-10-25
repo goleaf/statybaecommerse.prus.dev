@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Database\Factories\NormalSettingTranslationFactory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -24,6 +26,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 final class NormalSettingTranslation extends Model
 {
+    /** @use HasFactory<NormalSettingTranslationFactory> */
     use HasFactory;
 
     protected $table = 'enhanced_settings_translations';
@@ -32,9 +35,27 @@ final class NormalSettingTranslation extends Model
 
     /**
      * Handle enhancedSetting functionality with proper error handling.
+     *
+     * @return BelongsTo<NormalSetting, NormalSettingTranslation>
      */
     public function enhancedSetting(): BelongsTo
     {
-        return $this->belongsTo(NormalSetting::class, 'enhanced_setting_id');
+        /** @var BelongsTo<NormalSetting, NormalSettingTranslation> $relation */
+        $relation = $this->belongsTo(NormalSetting::class, 'enhanced_setting_id');
+
+        // Return the hydrated belongsTo relation instance for fluent chaining.
+        return $relation;
+    }
+
+    /**
+     * Scope the query to always order translations by the user-facing display name.
+     *
+     * @param  Builder<NormalSettingTranslation> $query
+     * @return Builder<NormalSettingTranslation>
+     */
+    public function scopeOrderedByName(Builder $query): Builder
+    {
+        // Sorting by display_name keeps listings predictable for administrators and storefront consumers.
+        return $query->orderBy('display_name');
     }
 }
