@@ -1,7 +1,10 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\OrdersByName;
 use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\ApprovedScope;
 use App\Observers\UserObserver;
@@ -25,12 +28,12 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Arr;
+use JsonException;
 use Laravel\Sanctum\HasApiTokens;
-use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Permission\Traits\HasRoles;
 use Spatie\Translatable\HasTranslations;
-use JsonException;
 
 /**
  * User
@@ -53,7 +56,7 @@ use JsonException;
 final class User extends Authenticatable implements FilamentUser, HasLocalePreferenceContract
 {
     use HasApiTokens;  // Allow issuing API tokens for Sanctum-protected endpoints.
-    use HasFactory, HasRoles, HasSafeSerialization, HasTranslations, LogsActivity, Notifiable, SoftDeletes;
+    use HasFactory, HasRoles, HasSafeSerialization, HasTranslations, LogsActivity, Notifiable, OrdersByName, SoftDeletes;
 
     /**
      * Handle booted functionality with proper error handling.
@@ -65,7 +68,7 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
             if (empty($user->name) && $computedName !== '') {
                 $user->name = $computedName;
             }
-            if (empty($user->name) && !empty($user->email)) {
+            if (empty($user->name) && ! empty($user->email)) {
                 $user->name = (string) $user->email;
             }
         });
@@ -95,7 +98,7 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
     protected function preferredCurrency(): Attribute
     {
         return Attribute::make(
-            get: fn() => data_get($this->preferences, 'preferred_currency'),
+            get: fn () => data_get($this->preferences, 'preferred_currency'),
             set: function (?string $value): array {
                 $preferences = $this->preferences ?? [];
 
@@ -159,7 +162,7 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
     protected function newsletterSubscription(): Attribute
     {
         return Attribute::make(
-            get: fn() => (bool) data_get($this->notification_preferences, 'newsletter_subscription', false),
+            get: fn () => (bool) data_get($this->notification_preferences, 'newsletter_subscription', false),
             set: function (?bool $value): array {
                 $preferences = $this->notification_preferences ?? [];
 
@@ -217,7 +220,7 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
     protected function smsNotifications(): Attribute
     {
         return Attribute::make(
-            get: fn() => (bool) data_get($this->notification_preferences, 'sms_notifications', false),
+            get: fn () => (bool) data_get($this->notification_preferences, 'sms_notifications', false),
             set: function (?bool $value): array {
                 $preferences = $this->notification_preferences ?? [];
 
@@ -270,11 +273,11 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
     protected function rolesLabel(): Attribute
     {
         return Attribute::make(get: function (): string {
-            $roles = Arr::from($this->roles()->pluck('name')->filter(fn($value) => is_string($value) && $value !== '')->values());
+            $roles = Arr::from($this->roles()->pluck('name')->filter(fn ($value) => is_string($value) && $value !== '')->values());
             if (count($roles) === 0) {
                 return 'N/A';
             }
-            $labels = array_map(fn($item) => ucwords((string) $item), $roles);
+            $labels = array_map(fn ($item) => ucwords((string) $item), $roles);
 
             return implode(', ', $labels);
         });
@@ -285,7 +288,7 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
      */
     public function getActivitylogOptions(): LogOptions
     {
-        return LogOptions::defaults()->logOnly(['name', 'email', 'is_active', 'last_login_at', 'preferred_locale', 'first_name', 'last_name', 'phone_number', 'is_admin', 'accepts_marketing', 'two_factor_enabled', 'company', 'position', 'website'])->logOnlyDirty()->dontSubmitEmptyLogs()->setDescriptionForEvent(fn(string $eventName) => "User {$eventName}")->useLogName('user');
+        return LogOptions::defaults()->logOnly(['name', 'email', 'is_active', 'last_login_at', 'preferred_locale', 'first_name', 'last_name', 'phone_number', 'is_admin', 'accepts_marketing', 'two_factor_enabled', 'company', 'position', 'website'])->logOnlyDirty()->dontSubmitEmptyLogs()->setDescriptionForEvent(fn (string $eventName) => "User {$eventName}")->useLogName('user');
     }
 
     /**
@@ -1007,7 +1010,7 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
      */
     public function isEmailVerified(): bool
     {
-        return !is_null($this->email_verified_at);
+        return ! is_null($this->email_verified_at);
     }
 
     /**
@@ -1015,7 +1018,7 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
      */
     public function isPhoneVerified(): bool
     {
-        return !is_null($this->phone_verified_at);
+        return ! is_null($this->phone_verified_at);
     }
 
     /**
@@ -1023,7 +1026,7 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
      */
     public function hasTwoFactor(): bool
     {
-        return $this->two_factor_enabled && !is_null($this->two_factor_confirmed_at);
+        return $this->two_factor_enabled && ! is_null($this->two_factor_confirmed_at);
     }
 
     /**
@@ -1031,7 +1034,7 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
      */
     public function isOnTrial(): bool
     {
-        return !is_null($this->trial_ends_at) && $this->trial_ends_at->isFuture();
+        return ! is_null($this->trial_ends_at) && $this->trial_ends_at->isFuture();
     }
 
     /**
@@ -1039,7 +1042,7 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
      */
     public function hasActiveSubscription(): bool
     {
-        return !is_null($this->subscription_status) && !in_array($this->subscription_status, ['cancelled', 'expired']);
+        return ! is_null($this->subscription_status) && ! in_array($this->subscription_status, ['cancelled', 'expired']);
     }
 
     /**
@@ -1048,7 +1051,7 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
     public function getSubscriptionStatusColorAttribute(): string
     {
         return match ($this->subscription_status) {
-            'active' => 'success',
+            'active'   => 'success',
             'trialing' => 'info',
             'past_due' => 'warning',
             'cancelled', 'expired' => 'danger',
@@ -1061,7 +1064,7 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
      */
     public function getStatusColorAttribute(): string
     {
-        if (!$this->is_active) {
+        if (! $this->is_active) {
             return 'danger';
         }
         if ($this->is_admin) {
@@ -1076,7 +1079,7 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
      */
     public function getStatusTextAttribute(): string
     {
-        if (!$this->is_active) {
+        if (! $this->is_active) {
             return __('admin.user_status.inactive');
         }
         if ($this->is_admin) {
@@ -1091,7 +1094,7 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
      */
     public function getAgeAttribute(): ?int
     {
-        if (!$this->birth_date && !$this->date_of_birth) {
+        if (! $this->birth_date && ! $this->date_of_birth) {
             return null;
         }
         $birthDate = $this->birth_date ?? $this->date_of_birth;
@@ -1105,10 +1108,10 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
     public function getGenderTextAttribute(): ?string
     {
         return match ($this->gender) {
-            'male' => __('admin.gender.male'),
+            'male'   => __('admin.gender.male'),
             'female' => __('admin.gender.female'),
-            'other' => __('admin.gender.other'),
-            default => null,
+            'other'  => __('admin.gender.other'),
+            default  => null,
         };
     }
 
@@ -1118,8 +1121,8 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
     public function getLocaleTextAttribute(): string
     {
         return match ($this->preferred_locale) {
-            'en' => __('admin.locales.english'),
-            'lt' => __('admin.locales.lithuanian'),
+            'en'    => __('admin.locales.english'),
+            'lt'    => __('admin.locales.lithuanian'),
             default => $this->preferred_locale,
         };
     }

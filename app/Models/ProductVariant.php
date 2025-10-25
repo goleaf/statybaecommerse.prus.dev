@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Contracts\TranslatableRecord;
+use App\Models\Concerns\OrdersByName;
 use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\EnabledScope;
 use App\Models\Scopes\StatusScope;
@@ -50,6 +51,7 @@ final class ProductVariant extends Model implements HasMedia, TranslatableRecord
     use HasProductPricing;
     use HasTranslations;
     use InteractsWithMedia;
+    use OrdersByName;
     use SoftDeletes;
 
     protected $table = 'product_variants';
@@ -83,32 +85,32 @@ final class ProductVariant extends Model implements HasMedia, TranslatableRecord
     protected function casts(): array
     {
         return [
-            'price' => 'decimal:4',
-            'compare_price' => 'decimal:4',
-            'cost_price' => 'decimal:4',
-            'wholesale_price' => 'decimal:4',
-            'member_price' => 'decimal:4',
-            'promotional_price' => 'decimal:4',
-            'weight' => 'decimal:2',
-            'stock_quantity' => 'integer',
-            'reserved_quantity' => 'integer',
-            'available_quantity' => 'integer',
-            'sold_quantity' => 'integer',
-            'track_inventory' => 'boolean',
-            'is_default' => 'boolean',
-            'is_enabled' => 'boolean',
-            'is_on_sale' => 'boolean',
-            'is_featured' => 'boolean',
-            'is_new' => 'boolean',
-            'is_bestseller' => 'boolean',
-            'sale_start_date' => 'datetime',
-            'sale_end_date' => 'datetime',
-            'views_count' => 'integer',
-            'clicks_count' => 'integer',
-            'conversion_rate' => 'decimal:4',
-            'attributes' => 'array',
+            'price'                    => 'decimal:4',
+            'compare_price'            => 'decimal:4',
+            'cost_price'               => 'decimal:4',
+            'wholesale_price'          => 'decimal:4',
+            'member_price'             => 'decimal:4',
+            'promotional_price'        => 'decimal:4',
+            'weight'                   => 'decimal:2',
+            'stock_quantity'           => 'integer',
+            'reserved_quantity'        => 'integer',
+            'available_quantity'       => 'integer',
+            'sold_quantity'            => 'integer',
+            'track_inventory'          => 'boolean',
+            'is_default'               => 'boolean',
+            'is_enabled'               => 'boolean',
+            'is_on_sale'               => 'boolean',
+            'is_featured'              => 'boolean',
+            'is_new'                   => 'boolean',
+            'is_bestseller'            => 'boolean',
+            'sale_start_date'          => 'datetime',
+            'sale_end_date'            => 'datetime',
+            'views_count'              => 'integer',
+            'clicks_count'             => 'integer',
+            'conversion_rate'          => 'decimal:4',
+            'attributes'               => 'array',
             'variant_attribute_matrix' => 'array',
-            'variant_metadata' => 'array',
+            'variant_metadata'         => 'array',
         ];
     }
 
@@ -245,7 +247,7 @@ final class ProductVariant extends Model implements HasMedia, TranslatableRecord
     /**
      * Handle scopeEnabled functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeEnabled($query)
     {
@@ -255,7 +257,7 @@ final class ProductVariant extends Model implements HasMedia, TranslatableRecord
     /**
      * Handle scopeInStock functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeInStock($query)
     {
@@ -265,7 +267,7 @@ final class ProductVariant extends Model implements HasMedia, TranslatableRecord
     /**
      * Handle scopeByStatus functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeByStatus($query, string $status)
     {
@@ -277,7 +279,7 @@ final class ProductVariant extends Model implements HasMedia, TranslatableRecord
      */
     public function getDisplayNameAttribute(): string
     {
-        return $this->name ?: $this->product->name.' - '.$this->sku;
+        return $this->name ?: $this->product->name . ' - ' . $this->sku;
     }
 
     /**
@@ -364,7 +366,7 @@ final class ProductVariant extends Model implements HasMedia, TranslatableRecord
         }
 
         if ($this->size) {
-            return $this->size.($this->size_unit ? ' '.$this->size_unit : '');
+            return $this->size . ($this->size_unit ? ' ' . $this->size_unit : '');
         }
 
         return '';
@@ -376,7 +378,7 @@ final class ProductVariant extends Model implements HasMedia, TranslatableRecord
     public function getVariantSkuAttribute(): string
     {
         if ($this->variant_sku_suffix) {
-            return $this->sku.'-'.$this->variant_sku_suffix;
+            return $this->sku . '-' . $this->variant_sku_suffix;
         }
 
         return $this->sku;
@@ -431,7 +433,7 @@ final class ProductVariant extends Model implements HasMedia, TranslatableRecord
     /**
      * Handle scopeBySize functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeBySize($query, string $size)
     {
@@ -441,7 +443,7 @@ final class ProductVariant extends Model implements HasMedia, TranslatableRecord
     /**
      * Handle scopeByVariantType functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeByVariantType($query, string $type)
     {
@@ -451,7 +453,7 @@ final class ProductVariant extends Model implements HasMedia, TranslatableRecord
     /**
      * Handle scopeDefaultVariant functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeDefaultVariant($query)
     {
@@ -461,7 +463,7 @@ final class ProductVariant extends Model implements HasMedia, TranslatableRecord
     /**
      * Handle scopeLowStock functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeLowStock($query)
     {
@@ -472,7 +474,7 @@ final class ProductVariant extends Model implements HasMedia, TranslatableRecord
     /**
      * Handle scopeOutOfStock functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeOutOfStock($query)
     {
@@ -480,15 +482,8 @@ final class ProductVariant extends Model implements HasMedia, TranslatableRecord
             ->where('quantity', '<=', 0);
     }
 
-    /**
-     * Handle scopeOrderedByName functionality with proper error handling.
-     *
-     * @param  mixed  $query
-     */
-    public function scopeOrderedByName($query, string $direction = 'asc')
-    {
-        return $query->orderBy('name', $direction);
-    }
+    // orderedByName scope provided by OrdersByName trait which now ensures a
+    // sanitised ordering direction for every consumer of this model.
 
     /**
      * Set as default variant for the product.
@@ -531,9 +526,9 @@ final class ProductVariant extends Model implements HasMedia, TranslatableRecord
         if (! empty($attributes)) {
             $attributeStrings = [];
             foreach ($attributes as $key => $value) {
-                $attributeStrings[] = ucfirst($key).': '.$value;
+                $attributeStrings[] = ucfirst($key) . ': ' . $value;
             }
-            $name .= ' ('.implode(', ', $attributeStrings).')';
+            $name .= ' (' . implode(', ', $attributeStrings) . ')';
         }
 
         return $name;
@@ -577,8 +572,8 @@ final class ProductVariant extends Model implements HasMedia, TranslatableRecord
 
         if (! filled($translated)) {
             $translated = match ($locale) {
-                'lt' => $this->variant_name_lt,
-                'en' => $this->variant_name_en,
+                'lt'    => $this->variant_name_lt,
+                'en'    => $this->variant_name_en,
                 default => null,
             };
         }
@@ -601,8 +596,8 @@ final class ProductVariant extends Model implements HasMedia, TranslatableRecord
 
         if (! filled($translated)) {
             $translated = match ($locale) {
-                'lt' => $this->description_lt,
-                'en' => $this->description_en,
+                'lt'    => $this->description_lt,
+                'en'    => $this->description_en,
                 default => null,
             };
         }
@@ -621,8 +616,8 @@ final class ProductVariant extends Model implements HasMedia, TranslatableRecord
 
         if (! filled($translated)) {
             $translated = match ($locale) {
-                'lt' => $this->seo_title_lt,
-                'en' => $this->seo_title_en,
+                'lt'    => $this->seo_title_lt,
+                'en'    => $this->seo_title_en,
                 default => null,
             };
         }
@@ -641,8 +636,8 @@ final class ProductVariant extends Model implements HasMedia, TranslatableRecord
 
         if (! filled($translated)) {
             $translated = match ($locale) {
-                'lt' => $this->seo_description_lt,
-                'en' => $this->seo_description_en,
+                'lt'    => $this->seo_description_lt,
+                'en'    => $this->seo_description_en,
                 default => null,
             };
         }
@@ -703,8 +698,8 @@ final class ProductVariant extends Model implements HasMedia, TranslatableRecord
     {
         return match ($customerType) {
             'wholesale' => $this->wholesale_price ?: $this->price,
-            'member' => $this->member_price ?: $this->price,
-            default => $this->getCurrentPrice(),
+            'member'    => $this->member_price ?: $this->price,
+            default     => $this->getCurrentPrice(),
         };
     }
 

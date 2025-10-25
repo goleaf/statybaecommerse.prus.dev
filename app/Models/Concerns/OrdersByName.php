@@ -17,24 +17,37 @@ use Illuminate\Database\Eloquent\Model;
 trait OrdersByName
 {
     /**
-     * Determine the column used for ordering operations.
+     * Provide a default column name that consuming models may override when
+     * their sortable attribute does not match the conventional "name" field.
+     */
+    protected string $nameColumn = 'name';
+
+    /**
+     * Determine the column used for ordering operations while remaining
+     * tolerant of legacy models that expose an overriding property dynamically.
      */
     protected function getNameColumn(): string
     {
-        /** @phpstan-ignore-next-line function.alreadyNarrowedType */
-        return property_exists($this, 'nameColumn') ? $this->nameColumn : 'name';
+        // Fall back to the trait-level property whenever the concrete model
+        // does not declare a custom $nameColumn configuration explicitly.
+        return property_exists($this, 'nameColumn') ? (string) $this->nameColumn : $this->nameColumn;
     }
 
     /**
-     * Scope to order records by the configured name column ascending.
+     * Scope to order records by the configured name column while guarding the
+     * direction parameter to protect against unexpected SQL injections.
      *
      * @template TModel of Model
      *
      * @param  Builder<TModel> $query
      * @return Builder<TModel>
      */
-    public function scopeOrderedByName(Builder $query): Builder
+    public function scopeOrderedByName(Builder $query, string $direction = 'asc'): Builder
     {
-        return $query->orderBy($this->getNameColumn());
+        // Normalise the direction argument so callers cannot influence the
+        // generated SQL beyond toggling ascending or descending order.
+        $direction = strtolower($direction) === 'desc' ? 'desc' : 'asc';
+
+        return $query->orderBy($this->getNameColumn(), $direction);
     }
 }
