@@ -158,6 +158,10 @@ class CampaignConversionTest extends TestCase
         $this->assertEquals(1, CampaignConversion::byMedium('cpc')->count());
         $this->assertEquals(1, CampaignConversion::byMedium('social')->count());
 
+        // Test orderedByName scope keeps predictable alphabetical order for reporting grids.
+        $orderedNames = CampaignConversion::query()->orderedByName()->pluck('campaign_name')->all();
+        $this->assertEquals($orderedNames, collect($orderedNames)->sort()->values()->all());
+
         // Test highValue scope
         $this->assertEquals(1, CampaignConversion::highValue(100)->count());
         $this->assertEquals(2, CampaignConversion::highValue(30)->count());
