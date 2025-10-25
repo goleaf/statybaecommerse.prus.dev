@@ -256,6 +256,18 @@ final class Discount extends Model
     }
 
     /**
+     * Order the query alphabetically by the discount name while defending against invalid directions.
+     */
+    public function scopeOrderedByName(Builder $query, string $direction = 'asc'): Builder
+    {
+        // Guard against unexpected direction values to keep the query predictable and safe.
+        $direction = strtolower($direction) === 'desc' ? 'desc' : 'asc';
+
+        // Apply the ordering so API responses and UI dropdowns remain sorted consistently for shoppers.
+        return $query->orderBy('name', $direction);
+    }
+
+    /**
      * Handle scopeByPriority functionality with proper error handling.
      */
     public function scopeByPriority(Builder $query, string $direction = 'asc'): Builder
