@@ -284,6 +284,15 @@ final class CampaignConversion extends Model
     }
 
     /**
+     * Handle scopeOrderedByName functionality with proper error handling.
+     */
+    public function scopeOrderedByName(Builder $query): Builder
+    {
+        // Always order by the stored campaign_name so marketing tables remain predictable.
+        return $query->orderBy('campaign_name');
+    }
+
+    /**
      * Handle scopeHighValue functionality with proper error handling.
      */
     public function scopeHighValue(Builder $query, float $minValue = 100): Builder
