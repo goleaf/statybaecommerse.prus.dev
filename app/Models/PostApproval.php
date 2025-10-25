@@ -20,10 +20,12 @@ final class PostApproval extends Model
 {
     use HasFactory;
 
+    // Guarded attributes are explicitly enumerated to avoid accidental mass-assignment.
     protected $fillable = ['post_id', 'user_id', 'decision', 'notes', 'decided_at'];
 
     protected function casts(): array
     {
+        // Ensure native PHP types are returned for common attributes when hydrating the model.
         return [
             'post_id' => 'integer',
             'user_id' => 'integer',
@@ -31,13 +33,21 @@ final class PostApproval extends Model
         ];
     }
 
+    /**
+     * @return BelongsTo<Post, PostApproval>
+     */
     public function post(): BelongsTo
     {
+        // The approval belongs to the marketing post it moderates.
         return $this->belongsTo(Post::class);
     }
 
+    /**
+     * @return BelongsTo<User, PostApproval>
+     */
     public function user(): BelongsTo
     {
+        // Track the moderator that recorded the decision.
         return $this->belongsTo(User::class);
     }
 }
