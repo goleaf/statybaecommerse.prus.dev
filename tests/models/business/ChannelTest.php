@@ -95,6 +95,22 @@ class ChannelTest extends TestCase
         $this->assertEquals($channel3->id, $orderedChannels->last()->id);
     }
 
+    public function test_channel_scope_ordered_by_name(): void
+    {
+        $channelA = Channel::factory()->create(['name' => 'Zeta Channel']);
+        $channelB = Channel::factory()->create(['name' => 'Alpha Channel']);
+        $channelC = Channel::factory()->create(['name' => 'Beta Channel']);
+
+        // The orderedByName scope should deliver records alphabetically, regardless of creation order.
+        $orderedChannels = Channel::orderedByName()->get();
+
+        $this->assertEquals([
+            $channelB->id,
+            $channelC->id,
+            $channelA->id,
+        ], $orderedChannels->pluck('id')->all());
+    }
+
     public function test_channel_can_have_products(): void
     {
         $channel = Channel::factory()->create();

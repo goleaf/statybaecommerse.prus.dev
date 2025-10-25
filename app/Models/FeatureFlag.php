@@ -66,7 +66,7 @@ final class FeatureFlag extends Model
         if ($this->rollout_percentage) {
             $percentage = $this->rollout_percentage['percentage'] ?? 100;
             if ($percentage < 100) {
-                $hash = hash('sha256', $this->key.($user?->id ?? session()->getId()));
+                $hash = hash('sha256', $this->key . ($user?->id ?? session()->getId()));
                 $userPercentile = hexdec(substr($hash, 0, 8)) / 0xFFFFFFFF * 100;
                 if ($userPercentile > $percentage) {
                     return false;
@@ -132,7 +132,7 @@ final class FeatureFlag extends Model
     /**
      * Handle scopeActive functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeActive($query)
     {
@@ -142,7 +142,7 @@ final class FeatureFlag extends Model
     /**
      * Handle scopeEnabled functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeEnabled($query)
     {
@@ -152,7 +152,7 @@ final class FeatureFlag extends Model
     /**
      * Handle scopeDisabled functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeDisabled($query)
     {
@@ -162,7 +162,7 @@ final class FeatureFlag extends Model
     /**
      * Handle scopeGlobal functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeGlobal($query)
     {
@@ -172,7 +172,7 @@ final class FeatureFlag extends Model
     /**
      * Handle scopeByKey functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeByKey($query, string $key)
     {
@@ -182,11 +182,22 @@ final class FeatureFlag extends Model
     /**
      * Handle scopeEnvironment functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeEnvironment($query, string $environment)
     {
         return $query->where('environment', $environment);
+    }
+
+    /**
+     * Handle scopeOrderedByName functionality with proper error handling.
+     *
+     * @param mixed $query
+     */
+    public function scopeOrderedByName($query)
+    {
+        // Order feature flags alphabetically by their human readable name for deterministic listings.
+        return $query->orderBy('name');
     }
 
     /**

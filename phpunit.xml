@@ -22,6 +22,10 @@
             <directory suffix="Test.php">tests/Unit</directory>
             <directory suffix="Test.php">tests/Models</directory>
         </testsuite>
+        <!-- Include dedicated model tests to ensure coverage for Eloquent scopes and helpers. -->
+        <testsuite name="Models">
+            <directory suffix="Test.php">tests/Models</directory>
+        </testsuite>
         <testsuite name="Feature">
             <directory suffix="Test.php">tests/Feature</directory>
             <directory suffix="Test.php">tests/Admin</directory>

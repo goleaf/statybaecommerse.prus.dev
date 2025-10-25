@@ -1,14 +1,17 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models;
 
 use App\Traits\HasTranslations;
+use Database\Factories\NewsCategoryFactory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
 /**
@@ -28,7 +31,9 @@ use Illuminate\Support\Str;
  */
 final class NewsCategory extends Model
 {
+    /** @use HasFactory<NewsCategoryFactory> */
     use HasFactory;
+
     use HasTranslations;
 
     protected $table = 'news_categories';
@@ -54,12 +59,14 @@ final class NewsCategory extends Model
 
     protected static function booted(): void
     {
-        static::saving(static function (self $category): void {
-            if (!empty($category->slug)) {
+        self::saving(static function (self $category): void {
+            if (! empty($category->slug)) {
                 return;
             }
 
-            $category->slug = Str::slug($category->getAttribute('name'));
+            // Retrieve the name attribute, falling back to an empty string when unavailable for predictable slugs.
+            $name = $category->getAttribute('name');
+            $category->slug = Str::slug(is_string($name) ? $name : '');
         });
     }
 
@@ -67,26 +74,41 @@ final class NewsCategory extends Model
 
     /**
      * Handle parent category functionality with proper error handling.
+     *
+     * @return BelongsTo<NewsCategory, NewsCategory>
      */
     public function parent(): BelongsTo
     {
-        return $this->belongsTo(NewsCategory::class, 'parent_id');
+        /** @var BelongsTo<NewsCategory, NewsCategory> $relation */
+        $relation = $this->belongsTo(NewsCategory::class, 'parent_id');
+
+        return $relation;
     }
 
     /**
      * Handle children categories functionality with proper error handling.
+     *
+     * @return HasMany<NewsCategory, NewsCategory>
      */
     public function children(): HasMany
     {
-        return $this->hasMany(NewsCategory::class, 'parent_id');
+        /** @var HasMany<NewsCategory, NewsCategory> $relation */
+        $relation = $this->hasMany(NewsCategory::class, 'parent_id');
+
+        return $relation;
     }
 
     /**
      * Handle news functionality with proper error handling.
+     *
+     * @return BelongsToMany<News, NewsCategory, \Illuminate\Database\Eloquent\Relations\Pivot, 'pivot'>
      */
     public function news(): BelongsToMany
     {
-        return $this->belongsToMany(News::class, 'news_category_pivot', 'news_category_id', 'news_id')->withTimestamps();
+        /** @var BelongsToMany<News, NewsCategory, \Illuminate\Database\Eloquent\Relations\Pivot, 'pivot'> $relation */
+        $relation = $this->belongsToMany(News::class, 'news_category_pivot', 'news_category_id', 'news_id')->withTimestamps();
+
+        return $relation;
     }
 
     /**
@@ -99,6 +121,9 @@ final class NewsCategory extends Model
 
     /**
      * Handle scopeVisible functionality with proper error handling.
+     *
+     * @param  Builder<self> $query
+     * @return Builder<self>
      */
     public function scopeVisible(Builder $query): Builder
     {
@@ -107,10 +132,25 @@ final class NewsCategory extends Model
 
     /**
      * Handle scopeOrdered functionality with proper error handling.
+     *
+     * @param  Builder<self> $query
+     * @return Builder<self>
      */
     public function scopeOrdered(Builder $query): Builder
     {
         return $query->orderBy('sort_order')->orderBy('id');
+    }
+
+    /**
+     * Provide a reusable alphabetical ordering scope to keep UI listings predictable.
+     *
+     * @param  Builder<self> $query
+     * @return Builder<self>
+     */
+    public function scopeOrderedByName(Builder $query): Builder
+    {
+        // Sort by the base name column so both translated and non-translated contexts remain stable.
+        return $query->orderBy('name');
     }
 
     /**
@@ -149,7 +189,10 @@ final class NewsCategory extends Model
      */
     public function getSlugAttribute(): string
     {
-        return $this->getTranslation('slug', app()->getLocale());
+        // Retrieve the localized slug and default to an empty string when the translation is missing.
+        $value = $this->getTranslation('slug', app()->getLocale());
+
+        return is_string($value) ? $value : '';
     }
 
     /**
@@ -157,7 +200,10 @@ final class NewsCategory extends Model
      */
     public function getNameAttribute(): string
     {
-        return $this->getTranslation('name', app()->getLocale());
+        // Ensure downstream consumers always receive a string representation of the translated name.
+        $value = $this->getTranslation('name', app()->getLocale());
+
+        return is_string($value) ? $value : '';
     }
 
     /**
@@ -165,6 +211,9 @@ final class NewsCategory extends Model
      */
     public function getDescriptionAttribute(): ?string
     {
-        return $this->getTranslation('description', app()->getLocale());
+        // Normalize the translated description into a nullable string for consistent usage patterns.
+        $value = $this->getTranslation('description', app()->getLocale());
+
+        return is_string($value) ? $value : null;
     }
 }

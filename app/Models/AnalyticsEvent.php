@@ -15,7 +15,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Throwable;
 
 /**
  * AnalyticsEvent
@@ -87,7 +89,7 @@ final class AnalyticsEvent extends Model
     ];
 
     protected $casts = [
-        'user_id'         => 'integer',
+        'user_id'          => 'integer',
         'properties'       => 'array',
         'event_data'       => 'array',
         'is_important'     => 'boolean',
@@ -189,6 +191,15 @@ final class AnalyticsEvent extends Model
     public function scopeByBrowser(Builder $query, string $browser): Builder
     {
         return self::withoutOwnershipScope($query)->where('browser', $browser);
+    }
+
+    /**
+     * Handle scopeOrderedByName functionality with proper error handling.
+     */
+    public function scopeOrderedByName(Builder $query): Builder
+    {
+        // Sort using a lower-cased projection so analytics appear consistently regardless of database collation rules.
+        return self::withoutOwnershipScope($query)->orderByRaw('event_name IS NULL, LOWER(event_name) ASC, event_name ASC');
     }
 
     /**
@@ -346,7 +357,7 @@ final class AnalyticsEvent extends Model
 
     private static function ownershiplessQuery(): Builder
     {
-        return static::query()->withoutGlobalScopes([UserOwnedScope::class]);
+        return self::query()->withoutGlobalScopes([UserOwnedScope::class]);
     }
 
     // Static methods
@@ -437,7 +448,7 @@ final class AnalyticsEvent extends Model
             ->orderBy('date', 'desc')
             ->limit(30)
             ->pluck('revenue', 'date')
-            ->map(fn ($revenue) => (float) $revenue)
+            ->map(fn ($revenue): float => (float) $revenue)
             ->toArray();
     }
 
@@ -467,24 +478,17 @@ final class AnalyticsEvent extends Model
         // Resolve the current HTTP request in a defensive way so console-driven
         // contexts (for example PHPUnit or artisan commands) can still capture
         // analytics records without encountering missing request bindings.
-        $request = app()->bound('request') ? request() : null;
+        $request = self::resolveCurrentRequest();
 
         // Ensure a stable session identifier even when the session manager is
         // unavailable by falling back to a deterministic UUID for analytics
         // correlation inside non-HTTP execution paths.
-        $sessionId = null;
-        if (app()->bound('session')) {
-            $sessionStore = session();
-            if (method_exists($sessionStore, 'getId')) {
-                $sessionId = $sessionStore->getId();
-            }
-        }
-        $sessionId ??= (string) Str::uuid();
+        $sessionId = self::resolveSessionIdentifier() ?? (string) Str::uuid();
 
         $eventData = [
             'event_type' => $eventType,
             'session_id' => $sessionId,
-            'user_id'    => auth()->id(),
+            'user_id'    => self::resolveAuthenticatedUserId(),
             'url'        => $request?->fullUrl(),
             'referrer'   => $request?->headers->get('referer'),
             'ip_address' => $request?->ip(),
@@ -497,19 +501,18 @@ final class AnalyticsEvent extends Model
         if (isset($data['properties'])) {
             $eventData['properties'] = $data['properties'];
             unset($data['properties']);
-        } else {
+        } elseif ($data !== []) {
             // Treat the data array as properties if it's not empty
-            if (! empty($data)) {
-                $eventData['properties'] = $data;
-                $data = [];  // Clear data so it doesn't get merged again
-            }
+            $eventData['properties'] = $data;
+            $data = [];
+            // Clear data so it doesn't get merged again
         }
 
         // Merge remaining data
         $eventData = array_merge($eventData, $data);
 
         if ($trackable && is_object($trackable)) {
-            $eventData['trackable_type'] = get_class($trackable);
+            $eventData['trackable_type'] = $trackable::class;
             $eventData['trackable_id'] = $trackable->id;
         } elseif ($trackable && is_string($trackable)) {
             // If trackable is a string (like URL), use it as URL
@@ -517,5 +520,95 @@ final class AnalyticsEvent extends Model
         }
 
         return self::create($eventData);
+    }
+
+    /**
+     * Resolve the current HTTP request instance in a container-safe manner.
+     */
+    private static function resolveCurrentRequest(): ?Request
+    {
+        // Pull the bound request from the container when available to avoid coupling to the global helper during tests.
+        $container = Container::getInstance();
+
+        if ($container === null || ! $container->bound('request')) {
+            return null;
+        }
+
+        $request = $container->make('request');
+
+        return $request instanceof Request ? $request : null;
+    }
+
+    /**
+     * Resolve the active session identifier, gracefully handling missing session drivers.
+     */
+    private static function resolveSessionIdentifier(): ?string
+    {
+        // Ask the container for the session store when it exists so console contexts do not raise runtime errors.
+        $container = Container::getInstance();
+
+        if ($container === null || ! $container->bound('session')) {
+            return null;
+        }
+
+        $session = $container->make('session');
+
+        if ($session instanceof SessionContract) {
+            try {
+                return $session->getId();
+            } catch (Throwable) {
+                // When the session backend cannot provide an identifier just fall back to null.
+                return null;
+            }
+        }
+
+        if (is_object($session) && method_exists($session, 'getId')) {
+            try {
+                return (string) $session->getId();
+            } catch (Throwable) {
+                return null;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Resolve the authenticated user identifier without assuming a particular guard implementation.
+     */
+    private static function resolveAuthenticatedUserId(): ?int
+    {
+        // Leverage the container binding first which keeps the logic compatible with customised guard stacks.
+        $container = Container::getInstance();
+
+        if ($container !== null && $container->bound('auth')) {
+            $authFactory = $container->make('auth');
+
+            if ($authFactory instanceof AuthFactory) {
+                try {
+                    $guard = $authFactory->guard();
+
+                    if ($guard !== null && method_exists($guard, 'id')) {
+                        $identifier = $guard->id();
+
+                        return $identifier === null ? null : (int) $identifier;
+                    }
+                } catch (Throwable) {
+                    // Ignore guard resolution failures and fall through to the helper-based fallback.
+                }
+            }
+        }
+
+        if (function_exists('auth')) {
+            try {
+                $id = auth()->id();
+
+                return $id === null ? null : (int) $id;
+            } catch (Throwable) {
+                return null;
+            }
+        }
+
+        return null;
     }
 }

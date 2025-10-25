@@ -6,20 +6,28 @@ namespace App\Models;
 
 use App\Models\Scopes\ActiveScope;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Stringable;
 
 /**
- * NotificationTemplate
+ * @property string $name
+ * @property string $slug
+ * @property string $type
+ * @property string $event
+ * @property array<string, string>|null $subject
+ * @property array<string, string>|null $content
+ * @property array<int, string>|null $variables
+ * @property bool $is_active
  *
- * Eloquent model representing the NotificationTemplate entity with comprehensive relationships, scopes, and business logic for the e-commerce system.
- *
- * @property mixed $fillable
- * @property mixed $casts
- *
- * @method static \Illuminate\Database\Eloquent\Builder|NotificationTemplate newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|NotificationTemplate newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|NotificationTemplate query()
+ * @method static Builder|NotificationTemplate active()
+ * @method static Builder|NotificationTemplate byEvent(string $event)
+ * @method static Builder|NotificationTemplate byType(string $type)
+ * @method static Builder|NotificationTemplate orderedByName()
+ * @method static Builder|NotificationTemplate newModelQuery()
+ * @method static Builder|NotificationTemplate newQuery()
+ * @method static Builder|NotificationTemplate query()
  *
  * @mixin \Eloquent
  */
@@ -28,18 +36,43 @@ final class NotificationTemplate extends Model
 {
     use HasFactory;
 
+    /**
+     * @var array<int, string>
+     */
     protected $fillable = ['name', 'slug', 'type', 'event', 'subject', 'content', 'variables', 'is_active'];
 
-    protected $casts = ['is_active' => 'boolean'];
+    /**
+     * @var array<string, string>
+     */
+    protected $casts = [
+        'subject' => 'array',
+        'content' => 'array',
+        'variables' => 'array',
+        'is_active' => 'boolean',
+    ];
 
     /**
      * Handle getLocalizedSubject functionality with proper error handling.
      */
     public function getLocalizedSubject(?string $locale = null): ?string
     {
-        $locale = $locale ?? app()->getLocale();
+        // Resolve the preferred locale by falling back to the application default when needed.
+        $locale = $locale !== null && $locale !== '' ? $locale : app()->getLocale();
 
-        return $this->subject[$locale] ?? $this->subject[config('app.fallback_locale')] ?? null;
+        $subjects = is_array($this->subject) ? $this->subject : [];
+
+        $candidates = array_values(array_filter([
+            $locale,
+            config('app.fallback_locale'),
+        ], static fn (?string $candidate): bool => is_string($candidate) && $candidate !== ''));
+
+        foreach ($candidates as $candidate) {
+            if (array_key_exists($candidate, $subjects) && is_string($subjects[$candidate]) && $subjects[$candidate] !== '') {
+                return $subjects[$candidate];
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -47,9 +80,23 @@ final class NotificationTemplate extends Model
      */
     public function getLocalizedContent(?string $locale = null): ?string
     {
-        $locale = $locale ?? app()->getLocale();
+        // Resolve the preferred locale by falling back to the application default when needed.
+        $locale = $locale !== null && $locale !== '' ? $locale : app()->getLocale();
 
-        return $this->content[$locale] ?? $this->content[config('app.fallback_locale')] ?? null;
+        $content = is_array($this->content) ? $this->content : [];
+
+        $candidates = array_values(array_filter([
+            $locale,
+            config('app.fallback_locale'),
+        ], static fn (?string $candidate): bool => is_string($candidate) && $candidate !== ''));
+
+        foreach ($candidates as $candidate) {
+            if (array_key_exists($candidate, $content) && is_string($content[$candidate]) && $content[$candidate] !== '') {
+                return $content[$candidate];
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -77,8 +124,15 @@ final class NotificationTemplate extends Model
      */
     private function replaceVariables(string $template, array $variables): string
     {
+        // Iterate through the provided replacements, ensuring we only process string keys.
         foreach ($variables as $key => $value) {
-            $template = str_replace("{{$key}}", (string) $value, $template);
+            if (! is_string($key) || $key === '') {
+                continue;
+            }
+
+            $replacement = $value instanceof Stringable ? (string) $value : (is_scalar($value) ? (string) $value : '');
+
+            $template = str_replace("{{$key}}", $replacement, $template);
         }
 
         return $template;
@@ -89,7 +143,39 @@ final class NotificationTemplate extends Model
      */
     public function getAvailableVariables(): array
     {
-        return $this->variables ?? [];
+        $rawVariables = $this->variables;
+
+        if ($rawVariables === null) {
+            return [];
+        }
+
+        $candidates = [];
+
+        if (is_string($rawVariables)) {
+            $candidates = explode(',', $rawVariables);
+        }
+
+        if (is_array($rawVariables)) {
+            $candidates = $rawVariables;
+        }
+
+        $normalized = [];
+
+        foreach ($candidates as $candidate) {
+            if ($candidate instanceof Stringable) {
+                $normalized[] = trim((string) $candidate);
+
+                continue;
+            }
+
+            if (is_scalar($candidate)) {
+                $normalized[] = trim((string) $candidate);
+            }
+        }
+
+        $normalized = array_values(array_filter($normalized, static fn (string $value): bool => $value !== ''));
+
+        return array_values(array_unique($normalized));
     }
 
     /**
@@ -97,7 +183,11 @@ final class NotificationTemplate extends Model
      */
     public static function getByEvent(string $event): ?self
     {
-        return self::where('event', $event)->where('is_active', true)->first();
+        // Prefer fluent query builders to keep the intent of the lookup explicit.
+        return self::query()
+            ->where('event', $event)
+            ->where('is_active', true)
+            ->first();
     }
 
     /**
@@ -105,8 +195,9 @@ final class NotificationTemplate extends Model
      *
      * @param  mixed  $query
      */
-    public function scopeActive($query)
+    public function scopeActive(Builder $query): Builder
     {
+        // Limit the query to templates that are currently enabled for delivery.
         return $query->where('is_active', true);
     }
 
@@ -115,8 +206,9 @@ final class NotificationTemplate extends Model
      *
      * @param  mixed  $query
      */
-    public function scopeByType($query, string $type)
+    public function scopeByType(Builder $query, string $type): Builder
     {
+        // Filter templates by the delivery channel, such as email or SMS.
         return $query->where('type', $type);
     }
 
@@ -125,8 +217,18 @@ final class NotificationTemplate extends Model
      *
      * @param  mixed  $query
      */
-    public function scopeByEvent($query, string $event)
+    public function scopeByEvent(Builder $query, string $event): Builder
     {
+        // Narrow down templates by the domain event that triggers them.
         return $query->where('event', $event);
+    }
+
+    /**
+     * Provide a consistent alphabetical ordering when listing templates.
+     */
+    public function scopeOrderedByName(Builder $query): Builder
+    {
+        // Order the records to keep dropdowns and management tables predictable.
+        return $query->orderBy('name');
     }
 }

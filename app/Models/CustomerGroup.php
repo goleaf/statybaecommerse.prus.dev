@@ -61,6 +61,7 @@ use Spatie\Translatable\HasTranslations;
  * @method static Builder|CustomerGroup byType(string $type)
  * @method static Builder|CustomerGroup default()
  * @method static Builder|CustomerGroup orderByPriority()
+ * @method static Builder|CustomerGroup orderedByName(?string $locale = null)
  * @method static Builder|CustomerGroup newModelQuery()
  * @method static Builder|CustomerGroup newQuery()
  * @method static Builder|CustomerGroup query()
@@ -384,6 +385,29 @@ final class CustomerGroup extends Model
     public function scopeOrderByPriority(Builder $query): Builder
     {
         return $query->orderBy('sort_order', 'asc');
+    }
+
+    /**
+     * Order customer groups alphabetically for deterministic dropdowns and reports.
+     *
+     * @param  Builder<CustomerGroup>  $query
+     * @return Builder<CustomerGroup>
+     */
+    public function scopeOrderedByName(Builder $query, ?string $locale = null): Builder
+    {
+        // Fall back to the current application locale so translated JSON columns can be queried safely.
+        $resolvedLocale = $locale ?? app()->getLocale();
+
+        // Strip any unexpected characters from the locale to avoid malformed JSON path fragments.
+        $resolvedLocale = preg_replace('/[^A-Za-z0-9_]/', '_', (string) $resolvedLocale);
+
+        // Guarantee a sensible default even when the sanitised locale becomes empty after filtering.
+        $resolvedLocale = $resolvedLocale !== '' ? $resolvedLocale : 'en';
+
+        // Use JSON path ordering to support Spatie translatable columns while preserving a stable tie-breaker.
+        return $query
+            ->orderBy("name->{$resolvedLocale}")
+            ->orderBy('id');
     }
 
     /**

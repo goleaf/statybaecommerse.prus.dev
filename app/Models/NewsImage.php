@@ -67,6 +67,18 @@ final class NewsImage extends Model
     }
 
     /**
+     * Handle scopeOrderedByName functionality with proper error handling.
+     *
+     * Ordering by caption keeps the listing predictable for administrators
+     * who browse image records alphabetically, while falling back to the id
+     * provides deterministic ordering for identical captions.
+     */
+    public function scopeOrderedByName(Builder $query): Builder
+    {
+        return $query->orderBy('caption')->orderBy('id');
+    }
+
+    /**
      * Handle getUrlAttribute functionality with proper error handling.
      */
     public function getUrlAttribute(): string
