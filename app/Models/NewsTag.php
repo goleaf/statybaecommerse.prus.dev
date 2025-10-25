@@ -76,6 +76,15 @@ final class NewsTag extends Model
     }
 
     /**
+     * Scope the query to order tags alphabetically by their name column for predictable listings.
+     */
+    public function scopeOrderedByName(Builder $query): Builder
+    {
+        // Order tags by the persisted "name" column to keep alphabetical ordering consistent across locales.
+        return $query->orderBy('name');
+    }
+
+    /**
      * Handle getRouteKeyName functionality with proper error handling.
      */
     public function getRouteKeyName(): string
