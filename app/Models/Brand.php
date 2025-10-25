@@ -590,6 +590,18 @@ final class Brand extends Model implements HasMedia, TranslatableRecord
     }
 
     /**
+     * Provide a reusable way to order brands by their name field.
+     */
+    public function scopeOrderedByName(Builder $query, string $direction = 'asc'): Builder
+    {
+        // Sanitize the provided direction so only ASC or DESC are allowed.
+        $direction = strtolower($direction) === 'desc' ? 'desc' : 'asc';
+
+        // Return the modified query builder ordered by the human friendly brand name.
+        return $query->orderBy('name', $direction);
+    }
+
+    /**
      * Handle scopeWithoutMedia functionality with proper error handling.
      *
      * @param mixed $query
