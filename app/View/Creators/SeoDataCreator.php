@@ -36,7 +36,9 @@ final class SeoDataCreator
             'seo' => $seoData,
             'metaTitle' => $seoData['title'],
             'metaDescription' => $seoData['description'],
-            'metaKeywords' => $seoData['keywords'],
+            'metaKeywords' => is_array($seoData['keywords'])
+                ? implode(', ', array_filter(array_map(static fn ($keyword): string => trim((string) $keyword), $seoData['keywords'])))
+                : (string) $seoData['keywords'],
             'canonicalUrl' => $seoData['canonical_url'],
             'ogTitle' => $seoData['og_title'],
             'ogDescription' => $seoData['og_description'],

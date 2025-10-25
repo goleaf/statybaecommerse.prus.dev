@@ -104,13 +104,13 @@
                         </p>
                     @endif
 
-                    @if($seo->keywords)
+                    @if(! empty($seo->keywords))
                         <div class="mb-4">
                             <p class="text-xs text-gray-500 dark:text-gray-400 mb-1">{{ __('seo_data.keywords') }}:</p>
                             <div class="flex flex-wrap gap-1">
-                                @foreach(explode(',', $seo->keywords) as $keyword)
+                                @foreach($seo->keywords as $keyword)
                                     <span class="inline-flex items-center px-2 py-1 rounded text-xs bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300">
-                                        {{ trim($keyword) }}
+                                        {{ $keyword }}
                                     </span>
                                 @endforeach
                             </div>
