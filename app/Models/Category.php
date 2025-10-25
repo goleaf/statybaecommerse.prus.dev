@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use App\Contracts\TranslatableRecord;
 use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\EnabledScope;
 use App\Models\Scopes\VisibleScope;
@@ -31,19 +30,19 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  *
  * Eloquent model representing the Category entity with comprehensive relationships, scopes, and business logic for the e-commerce system.
  *
- * @property mixed  $fillable
- * @property mixed  $casts
- * @property mixed  $appends
- * @property bool   $is_active
- * @property bool   $is_visible
- * @property bool   $is_featured
- * @property bool   $is_enabled
- * @property string $translationModel
- * @property int $id
- * @property string $name
+ * @property mixed       $fillable
+ * @property mixed       $casts
+ * @property mixed       $appends
+ * @property bool        $is_active
+ * @property bool        $is_visible
+ * @property bool        $is_featured
+ * @property bool        $is_enabled
+ * @property string      $translationModel
+ * @property int         $id
+ * @property string      $name
  * @property string|null $slug
  * @property string|null $description
- * @property bool $is_visible
+ * @property bool        $is_visible
  * @property-read int|null $products_count
  * @property-read int|null $children_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, Category> $children
@@ -56,7 +55,6 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  */
 #[ObservedBy([CategoryObserver::class])]
 #[ScopedBy([ActiveScope::class, EnabledScope::class, VisibleScope::class])]
-#[ObservedBy([CategoryObserver::class])]
 final class Category extends Model implements HasMedia
 {
     use HasFactory;
@@ -66,10 +64,10 @@ final class Category extends Model implements HasMedia
     use SoftDeletes;
 
     public const SCOPE_COLUMN_HINTS = [
-        'is_active'    => true,
-        'is_visible'   => true,
-        'is_enabled'   => true,
-        'status'       => false,
+        'is_active'  => true,
+        'is_visible' => true,
+        'is_enabled' => true,
+        'status'     => false,
     ];
 
     protected $fillable = ['name', 'slug', 'description', 'short_description', 'parent_id', 'sort_order', 'is_visible', 'is_enabled', 'is_active', 'is_featured', 'color', 'seo_title', 'seo_description', 'show_in_menu', 'product_limit'];
@@ -114,16 +112,16 @@ final class Category extends Model implements HasMedia
         $locale = app()->getLocale();
 
         return [
-            'id' => $this->getKey(),
-            'type' => 'category',
-            'name' => $this->name,
-            'slug' => $this->slug,
-            'description' => $this->description,
-            'translated_name' => $this->trans('name', $locale),
+            'id'                     => $this->getKey(),
+            'type'                   => 'category',
+            'name'                   => $this->name,
+            'slug'                   => $this->slug,
+            'description'            => $this->description,
+            'translated_name'        => $this->trans('name', $locale),
             'translated_description' => $this->trans('description', $locale),
-            'products_count' => (int) ($this->products_count ?? 0),
-            'children_count' => (int) ($this->children_count ?? 0),
-            'is_visible' => (bool) $this->is_visible,
+            'products_count'         => (int) ($this->products_count ?? 0),
+            'children_count'         => (int) ($this->children_count ?? 0),
+            'is_visible'             => (bool) $this->is_visible,
         ];
     }
 
@@ -235,6 +233,15 @@ final class Category extends Model implements HasMedia
     }
 
     /**
+     * Scope a query to order categories alphabetically by their name column.
+     */
+    public function scopeOrderedByName(Builder $query): Builder
+    {
+        // Enforce name-based ordering for areas where alphabetical navigation is required.
+        return $query->orderBy('name');
+    }
+
+    /**
      * Handle scopeWithProductCounts functionality with proper error handling.
      *
      * @param mixed $query
@@ -337,7 +344,7 @@ final class Category extends Model implements HasMedia
     {
         $name = $this->trans('name', app()->getLocale());
         if ($this->parent) {
-            return $this->parent->getFullNameAttribute().' > '.$name;
+            return $this->parent->getFullNameAttribute() . ' > ' . $name;
         }
 
         return $name;
@@ -379,7 +386,7 @@ final class Category extends Model implements HasMedia
 
         if (Route::has('localized.categories.show')) {
             return route('localized.categories.show', [
-                'locale' => app()->getLocale(),
+                'locale'   => app()->getLocale(),
                 'category' => $parameter,
             ]);
         }
@@ -519,8 +526,6 @@ final class Category extends Model implements HasMedia
 
     /**
      * Handle getOrCreateTranslation functionality with proper error handling.
-     *
-     * @return App\Models\Translations\CategoryTranslation
      */
     public function getOrCreateTranslation(string $locale): \App\Models\Translations\CategoryTranslation
     {
@@ -743,7 +748,7 @@ final class Category extends Model implements HasMedia
     /**
      * Handle getImageUrl functionality with proper error handling.
      */
-    public function getImageUrl(?string $size = null): ?string
+    public function getImageUrl(?string $size = null): string
     {
         if (! $size) {
             return $this->getFirstMediaUrl('images');
@@ -755,7 +760,7 @@ final class Category extends Model implements HasMedia
     /**
      * Handle getBannerUrl functionality with proper error handling.
      */
-    public function getBannerUrl(?string $size = null): ?string
+    public function getBannerUrl(?string $size = null): string
     {
         if (! $size) {
             return $this->getFirstMediaUrl('banner');
