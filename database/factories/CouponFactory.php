@@ -6,6 +6,7 @@ namespace Database\Factories;
 
 use App\Models\Coupon;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Coupon>
@@ -22,20 +23,24 @@ final class CouponFactory extends Factory
     public function definition(): array
     {
         return [
-            'code'                 => $this->faker->unique()->regexify('[A-Z0-9]{8}'),
-            'name'                 => $this->faker->words(3, true),
-            'description'          => $this->faker->sentence(),
-            'type'                 => $this->faker->randomElement(['percentage', 'fixed']),
-            'value'                => $this->faker->randomFloat(2, 5, 50),
+            // Generate deterministic uppercase alpha-numeric code without relying on deprecated faker helpers.
+            'code' => Str::upper(Str::random(8)),
+            // Provide predictable text fields to keep tests deterministic across Faker versions.
+            'name'                 => 'Seasonal Coupon ' . Str::upper(Str::random(4)),
+            'description'          => 'Automatically generated coupon for testing scenarios.',
+            'type'                 => 'percentage',
+            'value'                => 10.00,
             'minimum_amount'       => null,
             'maximum_discount'     => null,
-            'usage_limit'          => $this->faker->numberBetween(10, 1000),
-            'usage_limit_per_user' => $this->faker->numberBetween(1, 5),
+            'usage_limit'          => 100,
+            'usage_limit_per_user' => 1,
             'used_count'           => 0,
             'is_active'            => true,
             'is_public'            => false,
             'is_auto_apply'        => false,
             'is_stackable'         => false,
+            'is_first_time_only'   => false,
+            'customer_group_id'    => null,
             // Default validity window keeps generated coupons immediately usable for tests and seed data.
             'starts_at'             => now()->subWeek(),
             'expires_at'            => now()->addMonths(3),
