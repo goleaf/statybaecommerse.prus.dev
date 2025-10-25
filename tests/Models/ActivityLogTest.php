@@ -2,42 +2,101 @@
 
 declare(strict_types=1);
 
+namespace Tests\Models;
+
 use App\Models\ActivityLog;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Collection;
 use Tests\TestCase;
 
-uses(TestCase::class, RefreshDatabase::class);
+final class ActivityLogTest extends TestCase
+{
+    use RefreshDatabase;
 
-test('activity log factory creates records', function (): void {
-    // Arrange & Act: persist a freshly generated activity log for the assertion.
-    ActivityLog::factory()->create();
+    public function test_activity_log_factory_creates_records(): void
+    {
+        ActivityLog::factory()->create();
 
-    // Assert: ensure at least one row exists in the table.
-    expect(ActivityLog::count())->toBe(1);
-});
+        $this->assertSame(1, ActivityLog::count());
+    }
 
-test('orderedByName scope sorts by log name ascending', function (): void {
-    // Arrange: create two logs in reverse alphabetical order.
-    $user = User::factory()->create();
-    ActivityLog::factory()->for($user, 'user')->create(['log_name' => 'Zulu']);
-    ActivityLog::factory()->for($user, 'user')->create(['log_name' => 'Alpha']);
+    public function test_ordered_by_name_scope_sorts_by_log_name_ascending(): void
+    {
+        $user = User::factory()->create();
+        ActivityLog::factory()->for($user, 'user')->create(['log_name' => 'Zulu']);
+        ActivityLog::factory()->for($user, 'user')->create(['log_name' => 'Alpha']);
 
-    // Act: fetch ordered results using the dedicated scope.
-    $ordered = ActivityLog::orderedByName()->pluck('log_name')->all();
+        $ordered = ActivityLog::orderedByName()->pluck('log_name');
 
-    // Assert: the names should be returned alphabetically.
-    expect($ordered)->toBe(['Alpha', 'Zulu']);
-});
+        $this->assertInstanceOf(Collection::class, $ordered);
+        $this->assertSame(['Alpha', 'Zulu'], $ordered->all());
+    }
 
-test('relations expose expected relation objects', function (): void {
-    // Arrange: obtain a model instance without touching the database.
-    $model = new ActivityLog;
+    public function test_relations_expose_expected_relation_objects(): void
+    {
+        $model = new ActivityLog();
 
-    // Assert: ensure relationship methods return the proper relation types.
-    expect($model->user())->toBeInstanceOf(BelongsTo::class);
-    expect($model->subject())->toBeInstanceOf(MorphTo::class);
-    expect($model->causer())->toBeInstanceOf(MorphTo::class);
-});
+        $this->assertInstanceOf(BelongsTo::class, $model->user());
+        $this->assertInstanceOf(MorphTo::class, $model->subject());
+        $this->assertInstanceOf(MorphTo::class, $model->causer());
+    }
+
+    public function test_fillable_attributes_are_defined(): void
+    {
+        $model = new ActivityLog();
+
+        $this->assertEqualsCanonicalizing([
+            'log_name',
+            'description',
+            'event',
+            'subject_type',
+            'subject_id',
+            'causer_type',
+            'causer_id',
+            'properties',
+            'batch_uuid',
+            'ip_address',
+            'user_agent',
+            'device_type',
+            'browser',
+            'os',
+            'country',
+            'is_important',
+            'is_system',
+            'severity',
+            'category',
+            'notes',
+        ], $model->getFillable());
+    }
+
+    public function test_casts_are_configured(): void
+    {
+        $model = new ActivityLog();
+
+        foreach ([
+            'properties' => 'array',
+            'is_important' => 'boolean',
+            'is_system' => 'boolean',
+            'created_at' => 'datetime',
+            'updated_at' => 'datetime',
+        ] as $attribute => $cast) {
+            $this->assertArrayHasKey($attribute, $model->getCasts());
+            $this->assertSame($cast, $model->getCasts()[$attribute]);
+        }
+    }
+
+    public function test_user_relationship_returns_belongs_to(): void
+    {
+        $user = User::factory()->create();
+        $log = ActivityLog::factory()->create([
+            'causer_id' => $user->id,
+        ]);
+
+        $this->assertInstanceOf(BelongsTo::class, $log->user());
+        $this->assertTrue($log->user->is($user));
+    }
+}
+

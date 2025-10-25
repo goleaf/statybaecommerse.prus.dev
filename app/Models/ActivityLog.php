@@ -6,6 +6,7 @@ namespace App\Models;
 
 use App\Models\Concerns\OrdersByName;
 use Database\Factories\ActivityLogFactory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -34,7 +35,6 @@ final class ActivityLog extends Model
 {
     /** @phpstan-ignore-next-line missingType.generics */
     use HasFactory;
-
     use OrdersByName;
 
     /**
@@ -126,5 +126,14 @@ final class ActivityLog extends Model
         $relation = $this->morphTo();
 
         return $relation;
+    }
+
+    /**
+     * Scope a query to order activity logs by their human readable name.
+     */
+    public function scopeOrderedByName(Builder $query): Builder
+    {
+        // Order by the log_name column to provide deterministic results in listings.
+        return $query->orderBy('log_name');
     }
 }
