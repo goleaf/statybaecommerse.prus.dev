@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -84,5 +85,14 @@ final class ActivityLog extends Model
     public function causer(): MorphTo
     {
         return $this->morphTo();
+    }
+
+    /**
+     * Scope a query to order activity logs by their human readable name.
+     */
+    public function scopeOrderedByName(Builder $query): Builder
+    {
+        // Order by the log_name column to provide deterministic results in listings.
+        return $query->orderBy('log_name');
     }
 }
