@@ -6,7 +6,9 @@ namespace App\Models;
 
 use App\Models\Scopes\StatusScope;
 use App\Models\Scopes\UserOwnedScope;
+use Database\Factories\ProductRequestFactory;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -32,12 +34,51 @@ use Spatie\Activitylog\Traits\LogsActivity;
 #[ScopedBy([UserOwnedScope::class, StatusScope::class])]
 final class ProductRequest extends Model
 {
-    use HasFactory, LogsActivity, SoftDeletes;
+    /** @use HasFactory<ProductRequestFactory> */
+    use HasFactory;
 
-    protected $fillable = ['product_id', 'user_id', 'name', 'email', 'phone', 'message', 'requested_quantity', 'status', 'admin_notes', 'responded_at', 'responded_by'];
+    use LogsActivity;
+    use SoftDeletes;
 
-    protected $casts = ['requested_quantity' => 'integer', 'responded_at' => 'datetime'];
+    /**
+     * Centralised status constants to avoid string duplication throughout the model logic.
+     */
+    public const STATUS_PENDING = 'pending';
 
+    public const STATUS_IN_PROGRESS = 'in_progress';
+
+    public const STATUS_COMPLETED = 'completed';
+
+    public const STATUS_CANCELLED = 'cancelled';
+
+    /**
+     * The attributes that are mass assignable in order to protect against accidental overrides.
+     */
+    protected $fillable = [
+        'product_id',
+        'user_id',
+        'name',
+        'email',
+        'phone',
+        'message',
+        'requested_quantity',
+        'status',
+        'admin_notes',
+        'responded_at',
+        'responded_by',
+    ];
+
+    /**
+     * Attribute casting rules keep frequently accessed fields strongly typed.
+     */
+    protected $casts = [
+        'requested_quantity' => 'integer',
+        'responded_at'       => 'datetime',
+    ];
+
+    /**
+     * Explicitly declare the backing table to avoid accidental renaming issues.
+     */
     protected $table = 'product_requests';
 
     /**
@@ -45,91 +86,134 @@ final class ProductRequest extends Model
      */
     public function getActivitylogOptions(): LogOptions
     {
-        return LogOptions::defaults()->logOnly(['status', 'admin_notes', 'responded_at', 'responded_by'])->logOnlyDirty()->dontSubmitEmptyLogs()->setDescriptionForEvent(fn (string $eventName) => "Product Request {$eventName}")->useLogName('product_request');
+        return LogOptions::defaults()->logOnly(['status', 'admin_notes', 'responded_at', 'responded_by'])->logOnlyDirty()->dontSubmitEmptyLogs()->setDescriptionForEvent(fn (string $eventName): string => "Product Request {$eventName}")->useLogName('product_request');
     }
 
     /**
      * Handle product functionality with proper error handling.
+     *
+     * @return BelongsTo<Product, ProductRequest>
      */
     public function product(): BelongsTo
     {
-        return $this->belongsTo(Product::class, 'product_id');
+        /** @var BelongsTo<Product, ProductRequest> $relation */
+        $relation = $this->belongsTo(Product::class, 'product_id');
+
+        return $relation;
     }
 
     /**
      * Handle user functionality with proper error handling.
+     *
+     * @return BelongsTo<User, ProductRequest>
      */
     public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'user_id');
+        /** @var BelongsTo<User, ProductRequest> $relation */
+        $relation = $this->belongsTo(User::class, 'user_id');
+
+        return $relation;
     }
 
     /**
      * Handle respondedBy functionality with proper error handling.
+     *
+     * @return BelongsTo<User, ProductRequest>
      */
     public function respondedBy(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'responded_by');
+        /** @var BelongsTo<User, ProductRequest> $relation */
+        $relation = $this->belongsTo(User::class, 'responded_by');
+
+        return $relation;
     }
 
     /**
      * Handle scopePending functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param  Builder<ProductRequest> $query
+     * @return Builder<ProductRequest>
      */
-    public function scopePending($query)
+    public function scopePending(Builder $query): Builder
     {
-        return $query->where('status', 'pending');
+        // Limit results to records that are awaiting a response.
+        return $query->where('status', self::STATUS_PENDING);
     }
 
     /**
      * Handle scopeInProgress functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param  Builder<ProductRequest> $query
+     * @return Builder<ProductRequest>
      */
-    public function scopeInProgress($query)
+    public function scopeInProgress(Builder $query): Builder
     {
-        return $query->where('status', 'in_progress');
+        // Limit results to records currently being handled by the support team.
+        return $query->where('status', self::STATUS_IN_PROGRESS);
     }
 
     /**
      * Handle scopeCompleted functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param  Builder<ProductRequest> $query
+     * @return Builder<ProductRequest>
      */
-    public function scopeCompleted($query)
+    public function scopeCompleted(Builder $query): Builder
     {
-        return $query->where('status', 'completed');
+        // Limit results to requests that have already been fulfilled.
+        return $query->where('status', self::STATUS_COMPLETED);
     }
 
     /**
      * Handle scopeCancelled functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param  Builder<ProductRequest> $query
+     * @return Builder<ProductRequest>
      */
-    public function scopeCancelled($query)
+    public function scopeCancelled(Builder $query): Builder
     {
-        return $query->where('status', 'cancelled');
+        // Limit results to requests that were intentionally stopped.
+        return $query
+            ->withoutGlobalScope(StatusScope::class)
+            ->where('status', self::STATUS_CANCELLED);
     }
 
     /**
      * Handle scopeByProduct functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param  Builder<ProductRequest> $query
+     * @return Builder<ProductRequest>
      */
-    public function scopeByProduct($query, int $productId)
+    public function scopeByProduct(Builder $query, int $productId): Builder
     {
+        // Filter by the related product to inspect a specific catalogue item.
         return $query->where('product_id', $productId);
     }
 
     /**
      * Handle scopeByUser functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param  Builder<ProductRequest> $query
+     * @return Builder<ProductRequest>
      */
-    public function scopeByUser($query, int $userId)
+    public function scopeByUser(Builder $query, int $userId): Builder
     {
+        // Filter by the originating customer to analyse their outstanding requests.
         return $query->where('user_id', $userId);
+    }
+
+    /**
+     * Apply a consistent alphabetical ordering when displaying lists of requests by name.
+     *
+     * @param  Builder<ProductRequest> $query
+     * @return Builder<ProductRequest>
+     */
+    public function scopeOrderedByName(Builder $query, string $direction = 'asc'): Builder
+    {
+        // Guard against invalid direction values by normalising the input before applying it.
+        $safeDirection = strtolower($direction) === 'desc' ? 'desc' : 'asc';
+
+        return $query->orderBy($query->qualifyColumn('name'), $safeDirection);
     }
 
     /**
@@ -137,7 +221,7 @@ final class ProductRequest extends Model
      */
     public function isPending(): bool
     {
-        return $this->status === 'pending';
+        return $this->status === self::STATUS_PENDING;
     }
 
     /**
@@ -145,7 +229,7 @@ final class ProductRequest extends Model
      */
     public function isInProgress(): bool
     {
-        return $this->status === 'in_progress';
+        return $this->status === self::STATUS_IN_PROGRESS;
     }
 
     /**
@@ -153,7 +237,7 @@ final class ProductRequest extends Model
      */
     public function isCompleted(): bool
     {
-        return $this->status === 'completed';
+        return $this->status === self::STATUS_COMPLETED;
     }
 
     /**
@@ -161,7 +245,7 @@ final class ProductRequest extends Model
      */
     public function isCancelled(): bool
     {
-        return $this->status === 'cancelled';
+        return $this->status === self::STATUS_CANCELLED;
     }
 
     /**
@@ -169,7 +253,11 @@ final class ProductRequest extends Model
      */
     public function markAsInProgress(?int $respondedBy = null): void
     {
-        $this->update(['status' => 'in_progress', 'responded_at' => now(), 'responded_by' => $respondedBy]);
+        $this->update([
+            'status'       => self::STATUS_IN_PROGRESS,
+            'responded_at' => now(),
+            'responded_by' => $respondedBy,
+        ]);
     }
 
     /**
@@ -177,7 +265,12 @@ final class ProductRequest extends Model
      */
     public function markAsCompleted(?int $respondedBy = null, ?string $adminNotes = null): void
     {
-        $this->update(['status' => 'completed', 'responded_at' => now(), 'responded_by' => $respondedBy, 'admin_notes' => $adminNotes]);
+        $this->update([
+            'status'       => self::STATUS_COMPLETED,
+            'responded_at' => now(),
+            'responded_by' => $respondedBy,
+            'admin_notes'  => $adminNotes,
+        ]);
     }
 
     /**
@@ -185,7 +278,12 @@ final class ProductRequest extends Model
      */
     public function markAsCancelled(?int $respondedBy = null, ?string $adminNotes = null): void
     {
-        $this->update(['status' => 'cancelled', 'responded_at' => now(), 'responded_by' => $respondedBy, 'admin_notes' => $adminNotes]);
+        $this->update([
+            'status'       => self::STATUS_CANCELLED,
+            'responded_at' => now(),
+            'responded_by' => $respondedBy,
+            'admin_notes'  => $adminNotes,
+        ]);
     }
 
     /**
@@ -193,13 +291,18 @@ final class ProductRequest extends Model
      */
     public function getStatusLabelAttribute(): string
     {
-        return match ($this->status) {
-            'pending' => __('translations.status_pending'),
-            'in_progress' => __('translations.status_in_progress'),
-            'completed' => __('translations.status_completed'),
-            'cancelled' => __('translations.status_cancelled'),
-            default => __('translations.status_unknown'),
-        };
+        $labels = [
+            self::STATUS_PENDING     => __('translations.status_pending'),
+            self::STATUS_IN_PROGRESS => __('translations.status_in_progress'),
+            self::STATUS_COMPLETED   => __('translations.status_completed'),
+            self::STATUS_CANCELLED   => __('translations.status_cancelled'),
+        ];
+
+        if (! array_key_exists($this->status, $labels)) {
+            return __('translations.status_unknown');
+        }
+
+        return $labels[$this->status];
     }
 
     /**
@@ -207,12 +310,17 @@ final class ProductRequest extends Model
      */
     public function getStatusColorAttribute(): string
     {
-        return match ($this->status) {
-            'pending' => 'warning',
-            'in_progress' => 'info',
-            'completed' => 'success',
-            'cancelled' => 'danger',
-            default => 'secondary',
-        };
+        $colors = [
+            self::STATUS_PENDING     => 'warning',
+            self::STATUS_IN_PROGRESS => 'info',
+            self::STATUS_COMPLETED   => 'success',
+            self::STATUS_CANCELLED   => 'danger',
+        ];
+
+        if (! array_key_exists($this->status, $colors)) {
+            return 'secondary';
+        }
+
+        return $colors[$this->status];
     }
 }
