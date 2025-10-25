@@ -7,6 +7,7 @@ namespace App\Models;
 use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\EnabledScope;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -53,21 +54,26 @@ final class PartnerTier extends Model
 
     /**
      * Handle scopeEnabled functionality with proper error handling.
-     *
-     * @param  mixed  $query
      */
-    public function scopeEnabled($query)
+    public function scopeEnabled(Builder $query): Builder
     {
         return $query->where('is_enabled', true);
     }
 
     /**
      * Handle scopeByDiscountRate functionality with proper error handling.
-     *
-     * @param  mixed  $query
      */
-    public function scopeByDiscountRate($query, float $rate)
+    public function scopeByDiscountRate(Builder $query, float $rate): Builder
     {
         return $query->where('discount_rate', $rate);
+    }
+
+    /**
+     * Handle scopeOrderedByName functionality with proper error handling.
+     */
+    public function scopeOrderedByName(Builder $query): Builder
+    {
+        // Sort partner tiers alphabetically to provide predictable presentation layers.
+        return $query->orderBy('name');
     }
 }
