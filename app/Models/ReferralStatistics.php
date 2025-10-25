@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use DB;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -29,14 +30,14 @@ final class ReferralStatistics extends Model
 
     protected $table = 'referral_statistics';
 
-    protected $fillable = ['user_id', 'date', 'total_referrals', 'completed_referrals', 'pending_referrals', 'total_rewards_earned', 'total_discounts_given', 'metadata'];
+    protected $fillable = ['user_id', 'date', 'total_referrals', 'completed_referrals', 'pending_referrals', 'total_rewards_earned', 'total_discounts_given', 'metadata', 'meta'];
 
     /**
      * Handle casts functionality with proper error handling.
      */
     protected function casts(): array
     {
-        return ['date' => 'date', 'total_referrals' => 'integer', 'completed_referrals' => 'integer', 'pending_referrals' => 'integer', 'total_rewards_earned' => 'decimal:2', 'total_discounts_given' => 'decimal:2', 'metadata' => 'array'];
+        return ['date' => 'date', 'total_referrals' => 'integer', 'completed_referrals' => 'integer', 'pending_referrals' => 'integer', 'total_rewards_earned' => 'decimal:2', 'total_discounts_given' => 'decimal:2', 'metadata' => 'array', 'meta' => 'array'];
     }
 
     /**
@@ -68,7 +69,7 @@ final class ReferralStatistics extends Model
      */
     public static function getOrCreateForUserAndDate(int $userId, string $date): self
     {
-        return \DB::transaction(function () use ($userId, $date) {
+        return DB::transaction(function () use ($userId, $date) {
             $existing = self::where('user_id', $userId)->where('date', $date)->lockForUpdate()->first();
             if ($existing) {
                 return $existing;

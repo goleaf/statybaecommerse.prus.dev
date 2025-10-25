@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\OrdersByName;
 // use App\Models\Scopes\ActiveScope;
 // use App\Models\Scopes\EnabledScope;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
@@ -29,6 +30,14 @@ final class ShippingOption extends Model
     /** @use HasFactory<\Database\Factories\ShippingOptionFactory> */
     use HasFactory;
 
+    use OrdersByName;
+
+    /**
+     * Prefer the human-readable name column for alphabetical ordering so admin
+     * lists and storefront controls stay predictable.
+     */
+    protected string $nameColumn = 'name';
+
     protected $fillable = [
         'name',
         'slug',
@@ -50,6 +59,7 @@ final class ShippingOption extends Model
         'estimated_days_min',
         'estimated_days_max',
         'metadata',
+        'meta',
         'shipping_matrix',
     ];
 
@@ -67,6 +77,7 @@ final class ShippingOption extends Model
             'estimated_days_max' => 'integer',
             'sort_order'         => 'integer',
             'metadata'           => 'array',
+            'meta'               => 'array',
             'shipping_matrix'    => 'array',
         ];
     }

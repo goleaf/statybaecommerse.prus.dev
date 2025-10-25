@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Tests\Models;
 
@@ -15,7 +17,7 @@ final class RecommendationBlockTest extends TestCase
     public function test_fillable_configuration_and_casts(): void
     {
         // Instantiate the model to inspect its configuration arrays.
-        $model = new RecommendationBlock();
+        $model = new RecommendationBlock;
 
         // Confirm mass-assignable fields map to the expected recommendation block attributes.
         self::assertSame([
@@ -33,30 +35,32 @@ final class RecommendationBlockTest extends TestCase
             'config_ids',
             'cache_duration',
             'display_settings',
+            'meta',
         ], $model->getFillable());
 
         // Validate boolean, integer, and array casting for runtime safety.
         self::assertSame([
-            'config_ids' => 'array',
-            'is_active' => 'boolean',
-            'is_default' => 'boolean',
-            'show_title' => 'boolean',
+            'config_ids'       => 'array',
+            'is_active'        => 'boolean',
+            'is_default'       => 'boolean',
+            'show_title'       => 'boolean',
             'show_description' => 'boolean',
-            'max_products' => 'integer',
-            'sort_order' => 'integer',
-            'cache_duration' => 'integer',
+            'max_products'     => 'integer',
+            'sort_order'       => 'integer',
+            'cache_duration'   => 'integer',
             'display_settings' => 'array',
+            'meta'             => 'array',
         ], $model->getCasts());
     }
 
     public function test_relationships_resolve_expected_relation_types(): void
     {
         // Ensure each relationship accessor returns the proper eloquent relation instance.
-        $model = new RecommendationBlock();
+        $model = new RecommendationBlock;
 
         self::assertInstanceOf(BelongsToMany::class, $model->products());
         self::assertInstanceOf(HasMany::class, $model->analytics());
-        self::assertInstanceOf(HasMany::class, $model->cache());
+        self::assertInstanceOf(HasMany::class, $model->caches());
     }
 
     public function test_scopes_apply_expected_constraints(): void

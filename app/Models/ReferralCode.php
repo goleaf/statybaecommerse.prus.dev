@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\OrdersByName;
 use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\DateRangeScope;
 use App\Models\Scopes\UserOwnedScope;
@@ -34,9 +35,18 @@ use Spatie\Translatable\HasTranslations;
 #[ScopedBy([ActiveScope::class, DateRangeScope::class, UserOwnedScope::class])]
 final class ReferralCode extends Model
 {
-    use HasFactory, HasTranslations, LogsActivity;
+    use HasFactory;
+    use HasTranslations;
+    use LogsActivity;
+    use OrdersByName;
 
-    protected $fillable = ['user_id', 'code', 'is_active', 'expires_at', 'metadata', 'title', 'description', 'usage_limit', 'usage_count', 'reward_amount', 'reward_type', 'conditions', 'campaign_id', 'source', 'tags'];
+    /**
+     * Allow alphabetical ordering to rely on the code string so admin filters
+     * and API endpoints can quickly locate individual referral codes.
+     */
+    protected string $nameColumn = 'code';
+
+    protected $fillable = ['user_id', 'code', 'is_active', 'expires_at', 'metadata', 'meta', 'title', 'description', 'usage_limit', 'usage_count', 'reward_amount', 'reward_type', 'conditions', 'campaign_id', 'source', 'tags'];
 
     public array $translatable = ['title', 'description'];
 
@@ -45,7 +55,7 @@ final class ReferralCode extends Model
      */
     protected function casts(): array
     {
-        return ['is_active' => 'boolean', 'expires_at' => 'datetime', 'metadata' => 'array', 'usage_limit' => 'integer', 'usage_count' => 'integer', 'reward_amount' => 'decimal:2', 'conditions' => 'array', 'tags' => 'array'];
+        return ['is_active' => 'boolean', 'expires_at' => 'datetime', 'metadata' => 'array', 'meta' => 'array', 'usage_limit' => 'integer', 'usage_count' => 'integer', 'reward_amount' => 'decimal:2', 'conditions' => 'array', 'tags' => 'array'];
     }
 
     /**
@@ -165,6 +175,31 @@ final class ReferralCode extends Model
     }
 
     /**
+     * Narrow the selection to a specific referral code string, allowing fluent
+     * chains like ReferralCode::withCode('ABC123')->first().
+     */
+    public function scopeWithCode(Builder $query, string $code): Builder
+    {
+        return $query->where('code', $code);
+    }
+
+    /**
+     * Provide a helper to select only codes that are currently available for
+     * redemption by checking both the active flag and usage limits.
+     */
+    public function scopeAvailable(Builder $query): Builder
+    {
+        return $query
+            ->where('is_active', true)
+            ->where(static function (Builder $builder): void {
+                $builder->whereNull('usage_limit')->orWhereColumn('usage_count', '<', 'usage_limit');
+            })
+            ->where(static function (Builder $builder): void {
+                $builder->whereNull('expires_at')->orWhere('expires_at', '>', now());
+            });
+    }
+
+    /**
      * Handle isValid functionality with proper error handling.
      */
     public function isValid(): bool
@@ -247,7 +282,7 @@ final class ReferralCode extends Model
      */
     public function getReferralUrlAttribute(): string
     {
-        return url('/register?ref='.$this->code);
+        return url('/register?ref=' . $this->code);
     }
 
     /**
@@ -285,7 +320,7 @@ final class ReferralCode extends Model
             return null;
         }
 
-        return number_format($this->reward_amount, 2).' EUR';
+        return number_format($this->reward_amount, 2) . ' EUR';
     }
 
     /**
@@ -319,15 +354,15 @@ final class ReferralCode extends Model
         $contextValue = $context[$field];
 
         return match ($operator) {
-            '=' => $contextValue == $value,
-            '!=' => $contextValue != $value,
-            '>' => $contextValue > $value,
-            '>=' => $contextValue >= $value,
-            '<' => $contextValue < $value,
-            '<=' => $contextValue <= $value,
-            'in' => in_array($contextValue, (array) $value),
+            '='      => $contextValue == $value,
+            '!='     => $contextValue != $value,
+            '>'      => $contextValue > $value,
+            '>='     => $contextValue >= $value,
+            '<'      => $contextValue < $value,
+            '<='     => $contextValue <= $value,
+            'in'     => in_array($contextValue, (array) $value),
             'not_in' => ! in_array($contextValue, (array) $value),
-            default => false,
+            default  => false,
         };
     }
 
