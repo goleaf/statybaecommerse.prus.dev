@@ -7,7 +7,9 @@ namespace App\Models;
 use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\EnabledScope;
 use App\Traits\HasTranslations;
+use Database\Factories\AttributeValueFactory;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute as EloquentAttribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -17,14 +19,15 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use JsonSerializable;
 
 /**
  * AttributeValue
  *
  * Eloquent model representing the AttributeValue entity with comprehensive relationships, scopes, and business logic for the e-commerce system.
  *
- * @property mixed $table
- * @property mixed $fillable
+ * @property mixed  $table
+ * @property mixed  $fillable
  * @property string $translationModel
  *
  * @method static \Illuminate\Database\Eloquent\Builder|AttributeValue newModelQuery()
@@ -32,10 +35,13 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
  * @method static \Illuminate\Database\Eloquent\Builder|AttributeValue query()
  *
  * @mixin \Eloquent
+ *
+ * @phpstan-use \Illuminate\Database\Eloquent\Factories\HasFactory<AttributeValueFactory>
  */
 #[ScopedBy([ActiveScope::class, EnabledScope::class])]
 final class AttributeValue extends Model
 {
+    /** @phpstan-ignore-next-line */
     use HasFactory, HasTranslations, SoftDeletes;
 
     protected $table = 'attribute_values';
@@ -66,12 +72,12 @@ final class AttributeValue extends Model
     protected function casts(): array
     {
         return [
-            'sort_order' => 'integer',
-            'is_enabled' => 'boolean',
-            'is_active' => 'boolean',
-            'is_default' => 'boolean',
+            'sort_order'    => 'integer',
+            'is_enabled'    => 'boolean',
+            'is_active'     => 'boolean',
+            'is_default'    => 'boolean',
             'is_searchable' => 'boolean',
-            'metadata' => 'array',
+            'metadata'      => 'array',
         ];
     }
 
@@ -79,6 +85,8 @@ final class AttributeValue extends Model
 
     /**
      * Handle attribute functionality with proper error handling.
+     *
+     * @return BelongsTo<Attribute, $this>
      */
     public function attribute(): BelongsTo
     {
@@ -87,6 +95,8 @@ final class AttributeValue extends Model
 
     /**
      * Handle products functionality with proper error handling.
+     *
+     * @return BelongsToMany<Product, $this>
      */
     public function products(): BelongsToMany
     {
@@ -95,6 +105,8 @@ final class AttributeValue extends Model
 
     /**
      * Handle variants functionality with proper error handling.
+     *
+     * @return BelongsToMany<ProductVariant, $this>
      */
     public function variants(): BelongsToMany
     {
@@ -103,6 +115,8 @@ final class AttributeValue extends Model
 
     /**
      * Handle valueable functionality with proper error handling.
+     *
+     * @return MorphTo<Model, $this>
      */
     public function valueable(): MorphTo
     {
@@ -112,90 +126,123 @@ final class AttributeValue extends Model
     /**
      * Handle scopeEnabled functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param  Builder<AttributeValue> $query
+     * @return Builder<AttributeValue>
      */
-    public function scopeEnabled($query)
+    public function scopeEnabled(Builder $query): Builder
     {
+        // Limit the query to records explicitly flagged as enabled for storefront visibility.
         return $query->where('is_enabled', true);
     }
 
     /**
      * Handle scopeOrdered functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param  Builder<AttributeValue> $query
+     * @return Builder<AttributeValue>
      */
-    public function scopeOrdered($query)
+    public function scopeOrdered(Builder $query): Builder
     {
+        // Keep attribute values sorted according to the configured manual sort order column.
         return $query->orderBy('sort_order');
+    }
+
+    /**
+     * Handle scopeOrderedByName functionality with proper error handling.
+     *
+     * @param  Builder<AttributeValue> $query
+     * @return Builder<AttributeValue>
+     */
+    public function scopeOrderedByName(Builder $query): Builder
+    {
+        // Prefer the human friendly display value and gracefully fall back to the raw value field.
+        return $query
+            ->orderByRaw("COALESCE(NULLIF(display_value, ''), value)")
+            ->orderBy('display_value')
+            ->orderBy('value');
     }
 
     /**
      * Handle scopeForAttribute functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param  Builder<AttributeValue> $query
+     * @return Builder<AttributeValue>
      */
-    public function scopeForAttribute($query, int $attributeId)
+    public function scopeForAttribute(Builder $query, int $attributeId): Builder
     {
+        // Filter records by the owning attribute identifier for quick relationship lookups.
         return $query->where('attribute_id', $attributeId);
     }
 
     /**
      * Handle scopeByAttribute functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param  Builder<AttributeValue> $query
+     * @return Builder<AttributeValue>
      */
-    public function scopeByAttribute($query, int $attributeId)
+    public function scopeByAttribute(Builder $query, int $attributeId): Builder
     {
+        // Provide an alias scope for Attribute::values() style queries that need explicit filtering.
         return $query->where('attribute_id', $attributeId);
     }
 
     /**
      * Handle scopeByValue functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param  Builder<AttributeValue> $query
+     * @return Builder<AttributeValue>
      */
-    public function scopeByValue($query, string $value)
+    public function scopeByValue(Builder $query, string $value): Builder
     {
+        // Match records exactly on the stored value column to support deterministic lookups.
         return $query->where('value', $value);
     }
 
     /**
      * Handle scopeByDisplayValue functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param  Builder<AttributeValue> $query
+     * @return Builder<AttributeValue>
      */
-    public function scopeByDisplayValue($query, string $displayValue)
+    public function scopeByDisplayValue(Builder $query, string $displayValue): Builder
     {
+        // Allow callers to query by the localized display label that surfaces in the UI.
         return $query->where('display_value', $displayValue);
     }
 
     /**
      * Handle scopeByHexColor functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param  Builder<AttributeValue> $query
+     * @return Builder<AttributeValue>
      */
-    public function scopeByHexColor($query, string $hexColor)
+    public function scopeByHexColor(Builder $query, string $hexColor): Builder
     {
+        // Support color pickers by filtering on the stored hex value when available.
         return $query->where('hex_color', $hexColor);
     }
 
     /**
      * Handle scopeByImage functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param  Builder<AttributeValue> $query
+     * @return Builder<AttributeValue>
      */
-    public function scopeByImage($query, string $image)
+    public function scopeByImage(Builder $query, string $image): Builder
     {
+        // Enable retrieval of values with an associated media image reference.
         return $query->where('image', $image);
     }
 
     /**
      * Handle scopeActive functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param  Builder<AttributeValue> $query
+     * @return Builder<AttributeValue>
      */
-    public function scopeActive($query)
+    public function scopeActive(Builder $query): Builder
     {
+        // Restrict the query to items marked as active to honour merchandising rules.
         return $query->where('is_active', true);
     }
 
@@ -208,14 +255,15 @@ final class AttributeValue extends Model
         // Reload the model without the storefront-only scopes so records that
         // were just deactivated or disabled can still be rehydrated in tests
         // and Filament callbacks.
-        $fresh = static::withoutGlobalScopes([
+        $fresh = self::withoutGlobalScopes([
             ActiveScope::class,
             EnabledScope::class,
             SoftDeletingScope::class,
-        ])->find($this->getKey());
+        ])->whereKey($this->getKey())->first();
 
         if ($fresh === null) {
-            throw (new ModelNotFoundException())->setModel(static::class, [$this->getKey()]);
+            // Bubble up the missing model scenario with a standard not-found exception for consistency.
+            throw (new ModelNotFoundException)->setModel(self::class);
         }
 
         $this->setRawAttributes($fresh->getAttributes(), true);
@@ -225,9 +273,19 @@ final class AttributeValue extends Model
         return $this;
     }
 
+    /**
+     * Handle metadata accessor functionality with proper error handling.
+     *
+     * @return EloquentAttribute<array<array-key, mixed>, array<array-key, mixed>|null>
+     */
     protected function metadata(): EloquentAttribute
     {
         return EloquentAttribute::make(
+            /**
+             * Normalise persisted metadata into an array payload for consumers.
+             *
+             * @return array<array-key, mixed>
+             */
             get: static function ($value): array {
                 if (is_array($value)) {
                     return $value;
@@ -237,7 +295,7 @@ final class AttributeValue extends Model
                     return safe_json_decode_array($value);
                 }
 
-                if ($value instanceof \JsonSerializable) {
+                if ($value instanceof JsonSerializable) {
                     $encoded = $value->jsonSerialize();
 
                     return is_array($encoded) ? $encoded : [];
@@ -245,6 +303,12 @@ final class AttributeValue extends Model
 
                 return $value ? (array) $value : [];
             },
+            /**
+             * Serialise incoming metadata into a format suitable for persistence.
+             *
+             * @param  array<array-key, mixed>|JsonSerializable|string|null $value
+             * @return array<array-key, mixed>|null
+             */
             set: static function ($value): ?array {
                 if ($value === null) {
                     return null;
@@ -256,7 +320,7 @@ final class AttributeValue extends Model
                     return $decoded !== [] ? $decoded : null;
                 }
 
-                if ($value instanceof \JsonSerializable) {
+                if ($value instanceof JsonSerializable) {
                     $encoded = $value->jsonSerialize();
 
                     return is_array($encoded) ? $encoded : null;
