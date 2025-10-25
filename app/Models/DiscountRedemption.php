@@ -7,49 +7,75 @@ namespace App\Models;
 use App\Models\Scopes\StatusScope;
 use App\Models\Scopes\UserOwnedScope;
 use App\Traits\HasTranslations;
+use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Carbon;
 
 /**
- * DiscountRedemption
- *
- * Eloquent model representing the DiscountRedemption entity with comprehensive relationships, scopes, and business logic for the e-commerce system.
- *
- * @property mixed $table
- * @property mixed $fillable
- * @property string $translationModel
- *
- * @method static \Illuminate\Database\Eloquent\Builder|DiscountRedemption newModelQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|DiscountRedemption newQuery()
- * @method static \Illuminate\Database\Eloquent\Builder|DiscountRedemption query()
- *
- * @mixin \Eloquent
+ * DiscountRedemption encapsulates the lifecycle of a redeemed discount code and the
+ * relationships it maintains with discounts, codes, orders, and users.
  */
 #[ScopedBy([UserOwnedScope::class, StatusScope::class])]
 final class DiscountRedemption extends Model
 {
-    use HasFactory, HasTranslations, SoftDeletes;
-
-    protected $table = 'discount_redemptions';
-
-    protected $fillable = ['discount_id', 'code_id', 'order_id', 'user_id', 'amount_saved', 'currency_code', 'redeemed_at', 'metadata', 'status', 'notes', 'ip_address', 'user_agent', 'created_by', 'updated_by', 'created_by_name', 'updated_by_name'];
+    use HasFactory;
+    use HasTranslations;
+    use SoftDeletes;
 
     /**
-     * Handle casts functionality with proper error handling.
+     * @var string Explicitly define the backing table so refactors remain safe.
      */
-    protected function casts(): array
-    {
-        return ['amount_saved' => 'decimal:2', 'redeemed_at' => 'datetime', 'metadata' => 'array', 'created_at' => 'datetime', 'updated_at' => 'datetime', 'deleted_at' => 'datetime'];
-    }
+    protected $table = 'discount_redemptions';
 
+    /**
+     * @var array<int, string> Mass-assignment whitelist for safe data hydration.
+     */
+    protected $fillable = [
+        'discount_id',
+        'code_id',
+        'order_id',
+        'user_id',
+        'amount_saved',
+        'currency_code',
+        'redeemed_at',
+        'metadata',
+        'status',
+        'notes',
+        'ip_address',
+        'user_agent',
+        'created_by',
+        'updated_by',
+        'created_by_name',
+        'updated_by_name',
+    ];
+
+    /**
+     * @var class-string Link the HasTranslations trait with the translation model.
+     */
     protected string $translationModel = \App\Models\Translations\DiscountRedemptionTranslation::class;
 
     /**
-     * Handle discount functionality with proper error handling.
+     * Cast persisted attributes to keep business logic predictable.
+     */
+    protected function casts(): array
+    {
+        return [
+            'amount_saved' => 'decimal:2',
+            'redeemed_at'  => 'datetime',
+            'metadata'     => 'array',
+            'created_at'   => 'datetime',
+            'updated_at'   => 'datetime',
+            'deleted_at'   => 'datetime',
+        ];
+    }
+
+    /**
+     * Discount relationship enabling quick access to promotion metadata.
      */
     public function discount(): BelongsTo
     {
@@ -57,7 +83,7 @@ final class DiscountRedemption extends Model
     }
 
     /**
-     * Handle code functionality with proper error handling.
+     * Discount code relationship for tracking the redeemed code details.
      */
     public function code(): BelongsTo
     {
@@ -65,7 +91,7 @@ final class DiscountRedemption extends Model
     }
 
     /**
-     * Handle user functionality with proper error handling.
+     * User relationship tying the redemption back to a customer account.
      */
     public function user(): BelongsTo
     {
@@ -73,7 +99,7 @@ final class DiscountRedemption extends Model
     }
 
     /**
-     * Handle order functionality with proper error handling.
+     * Order relationship linking the redemption to the completed purchase.
      */
     public function order(): BelongsTo
     {
@@ -81,7 +107,7 @@ final class DiscountRedemption extends Model
     }
 
     /**
-     * Handle creator functionality with proper error handling.
+     * Creator relationship for audit trails when admins create redemptions.
      */
     public function creator(): BelongsTo
     {
@@ -89,7 +115,7 @@ final class DiscountRedemption extends Model
     }
 
     /**
-     * Handle updater functionality with proper error handling.
+     * Updater relationship for audit trails when admins modify redemptions.
      */
     public function updater(): BelongsTo
     {
@@ -97,72 +123,65 @@ final class DiscountRedemption extends Model
     }
 
     /**
-     * Handle scopeForDiscount functionality with proper error handling.
-     *
-     * @param  mixed  $query
-     * @param  mixed  $discountId
+     * Scope helper narrowing results to a specific discount identifier.
      */
-    public function scopeForDiscount($query, $discountId)
+    public function scopeForDiscount(Builder $query, int|string $discountId): Builder
     {
         return $query->where('discount_id', $discountId);
     }
 
     /**
-     * Handle scopeForUser functionality with proper error handling.
-     *
-     * @param  mixed  $query
-     * @param  mixed  $userId
+     * Scope helper returning redemptions owned by the provided user identifier.
      */
-    public function scopeForUser($query, $userId)
+    public function scopeForUser(Builder $query, int|string $userId): Builder
     {
         return $query->where('user_id', $userId);
     }
 
     /**
-     * Handle scopeForOrder functionality with proper error handling.
-     *
-     * @param  mixed  $query
-     * @param  mixed  $orderId
+     * Scope helper limiting results to a specific order identifier.
      */
-    public function scopeForOrder($query, $orderId)
+    public function scopeForOrder(Builder $query, int|string $orderId): Builder
     {
         return $query->where('order_id', $orderId);
     }
 
     /**
-     * Handle scopeWithinDateRange functionality with proper error handling.
-     *
-     * @param  mixed  $query
-     * @param  mixed  $startDate
-     * @param  mixed  $endDate
+     * Scope helper constraining the redemption date to the supplied range.
      */
-    public function scopeWithinDateRange($query, $startDate, $endDate)
-    {
-        return $query->whereBetween('redeemed_at', [$startDate, $endDate]);
+    public function scopeWithinDateRange(
+        Builder $query,
+        CarbonInterface|string $startDate,
+        CarbonInterface|string $endDate,
+    ): Builder {
+        $start = $startDate instanceof CarbonInterface ? $startDate : Carbon::parse($startDate);
+        $end = $endDate instanceof CarbonInterface ? $endDate : Carbon::parse($endDate);
+
+        return $query->whereBetween('redeemed_at', [$start, $end]);
     }
 
     /**
-     * Handle getTotalSavedForDiscount functionality with proper error handling.
-     *
-     * @param  mixed  $discountId
+     * Aggregate helper summarising total savings for a discount across all redemptions.
      */
-    public static function getTotalSavedForDiscount($discountId): float
+    public static function getTotalSavedForDiscount(int|string $discountId): float
     {
-        return self::where('discount_id', $discountId)->sum('amount_saved');
+        return (float) self::query()
+            ->where('discount_id', $discountId)
+            ->sum('amount_saved');
     }
 
     /**
-     * Handle getTotalSavedForUser functionality with proper error handling.
-     *
-     * @param  mixed  $userId
+     * Aggregate helper summarising total savings attributed to a specific user.
      */
-    public static function getTotalSavedForUser($userId): float
+    public static function getTotalSavedForUser(int|string $userId): float
     {
-        return self::where('user_id', $userId)->sum('amount_saved');
+        return (float) self::query()
+            ->where('user_id', $userId)
+            ->sum('amount_saved');
     }
 
     /**
-     * Handle scopeByStatus functionality with proper error handling.
+     * Scope helper to retrieve redemptions by status keyword.
      */
     public function scopeByStatus(Builder $query, string $status): Builder
     {
@@ -170,7 +189,7 @@ final class DiscountRedemption extends Model
     }
 
     /**
-     * Handle scopeForCurrency functionality with proper error handling.
+     * Scope helper to limit redemptions to a specific currency code.
      */
     public function scopeForCurrency(Builder $query, string $currencyCode): Builder
     {
@@ -178,15 +197,15 @@ final class DiscountRedemption extends Model
     }
 
     /**
-     * Handle scopeRecent functionality with proper error handling.
+     * Scope helper returning redemptions from the most recent rolling window.
      */
     public function scopeRecent(Builder $query, int $days = 30): Builder
     {
-        return $query->where('redeemed_at', '>=', now()->subDays($days));
+        return $query->where('redeemed_at', '>=', Carbon::now()->subDays($days));
     }
 
     /**
-     * Handle scopeAboveAmount functionality with proper error handling.
+     * Scope helper selecting redemptions with an amount above the provided threshold.
      */
     public function scopeAboveAmount(Builder $query, float $amount): Builder
     {
@@ -194,7 +213,7 @@ final class DiscountRedemption extends Model
     }
 
     /**
-     * Handle scopeBelowAmount functionality with proper error handling.
+     * Scope helper selecting redemptions with an amount below the provided threshold.
      */
     public function scopeBelowAmount(Builder $query, float $amount): Builder
     {
@@ -202,64 +221,67 @@ final class DiscountRedemption extends Model
     }
 
     /**
-     * Handle getTotalRedemptionsForDiscount functionality with proper error handling.
+     * Aggregate helper counting redemptions for a given discount identifier.
      */
     public static function getTotalRedemptionsForDiscount(int $discountId): int
     {
-        return self::where('discount_id', $discountId)->count();
+        return self::query()->where('discount_id', $discountId)->count();
     }
 
     /**
-     * Handle getTotalRedemptionsForUser functionality with proper error handling.
+     * Aggregate helper counting redemptions for a given user identifier.
      */
     public static function getTotalRedemptionsForUser(int $userId): int
     {
-        return self::where('user_id', $userId)->count();
+        return self::query()->where('user_id', $userId)->count();
     }
 
     /**
-     * Handle getAverageSavedForDiscount functionality with proper error handling.
+     * Aggregate helper calculating the average saving amount for a discount.
      */
     public static function getAverageSavedForDiscount(int $discountId): float
     {
-        return self::where('discount_id', $discountId)->avg('amount_saved') ?? 0.0;
+        return (float) (self::query()->where('discount_id', $discountId)->avg('amount_saved') ?? 0.0);
     }
 
     /**
-     * Handle getAverageSavedForUser functionality with proper error handling.
+     * Aggregate helper calculating the average saving amount for a user.
      */
     public static function getAverageSavedForUser(int $userId): float
     {
-        return self::where('user_id', $userId)->avg('amount_saved') ?? 0.0;
+        return (float) (self::query()->where('user_id', $userId)->avg('amount_saved') ?? 0.0);
     }
 
     /**
-     * Handle isRecent functionality with proper error handling.
+     * Convenience helper to determine if the redemption happened within the last day.
      */
     public function isRecent(): bool
     {
-        return $this->redeemed_at && $this->redeemed_at->isAfter(now()->subDay());
+        return $this->redeemed_at instanceof CarbonInterface
+            && $this->redeemed_at->isAfter(Carbon::now()->subDay());
     }
 
     /**
-     * Handle getFormattedAmountSavedAttribute functionality with proper error handling.
+     * Presenter helper returning the amount saved in a user-friendly format.
      */
     public function getFormattedAmountSavedAttribute(): string
     {
-        return number_format($this->amount_saved, 2).' '.($this->currency_code ?? 'EUR');
+        $currency = $this->currency_code ?? 'EUR';
+
+        return number_format((float) $this->amount_saved, 2) . ' ' . $currency;
     }
 
     /**
-     * Handle getStatusColorAttribute functionality with proper error handling.
+     * Presenter helper providing a colour hint for UI badges based on status.
      */
     public function getStatusColorAttribute(): string
     {
         return match ($this->status) {
             'completed' => 'success',
-            'pending' => 'warning',
+            'pending'   => 'warning',
             'cancelled' => 'danger',
-            'refunded' => 'info',
-            default => 'secondary',
+            'refunded'  => 'info',
+            default     => 'secondary',
         };
     }
 }
