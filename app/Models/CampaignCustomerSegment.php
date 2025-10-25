@@ -6,7 +6,7 @@ namespace App\Models;
 
 use Database\Factories\CampaignCustomerSegmentFactory;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Factories\Sequence;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -26,6 +26,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  */
 final class CampaignCustomerSegment extends Model
 {
+    use HasFactory;
     use SoftDeletes;
 
     protected $fillable = [
@@ -42,35 +43,12 @@ final class CampaignCustomerSegment extends Model
     ];
 
     /**
-     * Create a new factory instance for this model with optional count and state configuration.
-     *
-     * @param int|null                                                                                       $count
-     * @param array<string, mixed>|callable(array<string, mixed>, Model|null): array<string, mixed>|Sequence $state
+     * Provide factory resolution through HasFactory for clean test and seeder generation.
      */
-    public static function factory($count = null, $state = []): CampaignCustomerSegmentFactory
+    protected static function newFactory(): CampaignCustomerSegmentFactory
     {
-        /** @var CampaignCustomerSegmentFactory $factory */
-        $factory = CampaignCustomerSegmentFactory::new();
-
-        if ($count !== null) {
-            // Mirror the HasFactory trait behaviour by applying the requested record count when provided.
-            $factory = $factory->count($count);
-        }
-
-        if ($state instanceof Sequence) {
-            // Leverage dedicated sequence support when the caller passes a Sequence instance just like the original trait.
-            $factory = $factory->sequence($state);
-        } elseif (is_array($state) && $state !== []) {
-            /** @var array<string, mixed> $state */
-            // Allow callers to seed the factory with initial state arrays or sequences, matching Laravel's default pattern.
-            $factory = $factory->state($state);
-        } elseif (is_callable($state)) {
-            /** @var callable(array<string, mixed>, Model|null): array<string, mixed> $state */
-            // Preserve callable state resolvers that compute attributes at runtime, mirroring Laravel's factory defaults.
-            $factory = $factory->state($state);
-        }
-
-        return $factory;
+        // Returning the typed factory keeps the Laravel convention while remaining explicit for static analysers.
+        return CampaignCustomerSegmentFactory::new();
     }
 
     /**
@@ -81,6 +59,7 @@ final class CampaignCustomerSegment extends Model
         return [
             'segment_criteria'  => 'array',
             'targeting_tags'    => 'array',
+            'custom_conditions' => 'array',
             'track_performance' => 'boolean',
             'auto_optimize'     => 'boolean',
             'is_active'         => 'boolean',
@@ -184,7 +163,9 @@ final class CampaignCustomerSegment extends Model
      */
     public function scopeOrdered(Builder $query, string $direction = 'asc'): Builder
     {
-        // Allowing direction overrides preserves backwards compatibility while giving callers flexibility when listing segments.
-        return $query->orderBy('sort_order', $direction);
+        // Guard against invalid direction input to avoid malformed SQL while still allowing asc/desc toggles.
+        $sanitisedDirection = strtolower($direction) === 'desc' ? 'desc' : 'asc';
+
+        return $query->orderBy('sort_order', $sanitisedDirection);
     }
 }
