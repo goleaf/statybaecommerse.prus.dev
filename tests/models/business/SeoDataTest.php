@@ -19,14 +19,14 @@ class SeoDataTest extends TestCase
         $seoData = SeoData::factory()->create([
             'title' => 'Test Page Title',
             'description' => 'Test page description for SEO',
-            'keywords' => 'test, page, seo',
+            'keywords' => ['test', 'page', 'seo'],
             'canonical_url' => 'https://example.com/test-page',
         ]);
 
         $this->assertDatabaseHas('seo_data', [
             'title' => 'Test Page Title',
             'description' => 'Test page description for SEO',
-            'keywords' => 'test, page, seo',
+            'keywords' => json_encode(['test', 'page', 'seo']),
             'canonical_url' => 'https://example.com/test-page',
         ]);
     }
@@ -43,6 +43,7 @@ class SeoDataTest extends TestCase
 
         $this->assertIsBool($seoData->no_index);
         $this->assertIsBool($seoData->no_follow);
+        $this->assertIsArray($seoData->keywords);
         $this->assertIsArray($seoData->meta_tags);
         $this->assertIsArray($seoData->structured_data);
         $this->assertInstanceOf(\Carbon\Carbon::class, $seoData->created_at);
@@ -59,6 +60,8 @@ class SeoDataTest extends TestCase
         $this->assertContains('title', $fillable);
         $this->assertContains('description', $fillable);
         $this->assertContains('keywords', $fillable);
+        $this->assertContains('slug', $fillable);
+        $this->assertContains('meta', $fillable);
         $this->assertContains('canonical_url', $fillable);
         $this->assertContains('meta_tags', $fillable);
         $this->assertContains('structured_data', $fillable);
@@ -169,7 +172,7 @@ class SeoDataTest extends TestCase
     public function test_seo_data_keywords_count_attribute(): void
     {
         $seoData = SeoData::factory()->create([
-            'keywords' => 'keyword1, keyword2, keyword3',
+            'keywords' => ['keyword1', 'keyword2', 'keyword3'],
         ]);
 
         $this->assertEquals(3, $seoData->keywords_count);
@@ -210,7 +213,7 @@ class SeoDataTest extends TestCase
         $seoData = SeoData::factory()->create([
             'title' => 'This is a perfectly optimized title for SEO',
             'description' => 'This is a perfectly optimized description for SEO that is between 120 and 160 characters long and provides good information.',
-            'keywords' => 'keyword1, keyword2, keyword3, keyword4, keyword5',
+            'keywords' => ['keyword1', 'keyword2', 'keyword3', 'keyword4', 'keyword5'],
             'canonical_url' => 'https://example.com/page',
             'structured_data' => ['@context' => 'https://schema.org'],
         ]);
@@ -238,7 +241,7 @@ class SeoDataTest extends TestCase
         $seoData = SeoData::factory()->create([
             'title' => 'This is a perfectly optimized title for SEO',
             'description' => 'This is a perfectly optimized description for SEO that is between 120 and 160 characters long and provides good information.',
-            'keywords' => 'keyword1, keyword2, keyword3, keyword4, keyword5',
+            'keywords' => ['keyword1', 'keyword2', 'keyword3', 'keyword4', 'keyword5'],
             'canonical_url' => 'https://example.com/page',
             'structured_data' => ['@context' => 'https://schema.org'],
         ]);
@@ -284,7 +287,7 @@ class SeoDataTest extends TestCase
         $seoData = SeoData::factory()->create([
             'title' => 'Test Page Title',
             'description' => 'Test page description',
-            'keywords' => 'test, page, seo',
+            'keywords' => ['test', 'page', 'seo'],
             'canonical_url' => 'https://example.com/test-page',
             'no_index' => true,
             'no_follow' => false,
