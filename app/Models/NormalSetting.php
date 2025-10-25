@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Database\Factories\NormalSettingFactory;
 use Exception;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\DeadlockException;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -20,24 +22,50 @@ use JsonSerializable;
  *
  * Eloquent model representing the NormalSetting entity with comprehensive relationships, scopes, and business logic for the e-commerce system.
  *
- * @property mixed $table
- * @property mixed $fillable
- * @property mixed $casts
+ * @property string|null             $table
+ * @property list<string>            $fillable
+ * @property array<string, string>   $casts
+ * @property string|null             $group
+ * @property string                  $key
+ * @property string|null             $locale
+ * @property mixed                   $value
+ * @property string                  $type
+ * @property string|null             $description
+ * @property bool                    $is_public
+ * @property bool                    $is_encrypted
+ * @property bool                    $is_active
+ * @property array<int, string>|null $validation_rules
+ * @property int                     $sort_order
  *
+ * @method static NormalSettingFactory                                factory()
  * @method static \Illuminate\Database\Eloquent\Builder|NormalSetting newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|NormalSetting newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|NormalSetting query()
+ *
+ * @use HasFactory<\Database\Factories\NormalSettingFactory>
+ *
+ * @phpstan-use HasFactory<\Database\Factories\NormalSettingFactory>
  *
  * @mixin \Eloquent
  */
 final class NormalSetting extends Model
 {
+    /** @phpstan-ignore-next-line We rely on Laravel's built-in HasFactory trait despite its unbounded generic signature. */
     use HasFactory;
 
+    /**
+     * @var string|null
+     */
     protected $table = 'enhanced_settings';
 
+    /**
+     * @var list<string> Populates the assignable attributes for mass-assignment.
+     */
     protected $fillable = ['group', 'key', 'locale', 'value', 'type', 'description', 'is_public', 'is_encrypted', 'is_active', 'validation_rules', 'sort_order'];
 
+    /**
+     * @var array<string, string> Cast map that keeps primitive types predictable when hydrating the model.
+     */
     protected $casts = ['is_public' => 'boolean', 'is_encrypted' => 'boolean', 'is_active' => 'boolean', 'sort_order' => 'integer', 'validation_rules' => 'json'];
 
     public const TYPE_STRING = 'string';
@@ -62,22 +90,35 @@ final class NormalSetting extends Model
     ];
 
     /**
+     * Provide a strongly typed factory hook for static analysis consumers.
+     */
+    protected static function newFactory(): NormalSettingFactory
+    {
+        return NormalSettingFactory::new();
+    }
+
+    /**
      * Handle value functionality with proper error handling.
+     *
+     * @return Attribute<mixed, mixed>
      */
     protected function value(): Attribute
     {
         return Attribute::make(get: function ($value) {
-            if ($this->attributes['is_encrypted'] ?? false) {
-                if ($value && $value !== 'null') {
-                    try {
-                        $decrypted = decrypt($value);
-                        if (in_array($this->attributes['type'] ?? '', ['json', 'array']) && is_string($decrypted)) {
-                            return safe_json_decode_array($decrypted);
-                        }
+            // Quickly short-circuit when the encrypted value is not a string to satisfy strict analysers.
+            if (($this->attributes['is_encrypted'] ?? false) && $value !== null) {
+                if (! is_string($value)) {
+                    return $value;
+                }
 
-                        return $decrypted;
-                    } catch (Exception $e) {
+                try {
+                    $decrypted = decrypt($value);
+                    if (in_array($this->attributes['type'] ?? '', ['json', 'array']) && is_string($decrypted)) {
+                        return safe_json_decode_array($decrypted);
                     }
+
+                    return $decrypted;
+                } catch (Exception) {
                 }
             }
             if (in_array($this->attributes['type'] ?? '', [self::TYPE_JSON, self::TYPE_ARRAY], true)) {
@@ -89,12 +130,17 @@ final class NormalSetting extends Model
             }
 
             if (($this->attributes['type'] ?? '') === self::TYPE_INTEGER) {
-                return $value === null ? null : (int) $value;
+                if ($value === null) {
+                    return null;
+                }
+
+                return is_numeric($value) ? (int) $value : $value;
             }
 
             return $value;
         }, set: function ($value) {
-            if (($this->attributes['type'] ?? '') === self::TYPE_INTEGER && $value !== null) {
+            // Safeguard by ensuring the provided value is numeric before casting to int.
+            if (($this->attributes['type'] ?? '') === self::TYPE_INTEGER && $value !== null && is_numeric($value)) {
                 $value = (int) $value;
             }
 
@@ -118,7 +164,7 @@ final class NormalSetting extends Model
             if (($this->attributes['is_encrypted'] ?? false) && $value !== null) {
                 try {
                     return encrypt($value);
-                } catch (Exception $e) {
+                } catch (Exception) {
                     return $value;
                 }
             }
@@ -129,6 +175,8 @@ final class NormalSetting extends Model
 
     /**
      * Handle validationRules functionality with proper error handling.
+     *
+     * @return Attribute<array<int, string>, array<int, string>|string|null>
      */
     protected function validationRules(): Attribute
     {
@@ -151,70 +199,66 @@ final class NormalSetting extends Model
     }
 
     /**
-     * Handle scopeByGroup functionality with proper error handling.
-     *
-     * @param mixed $query
+     * @param  Builder<self> $query
+     * @return Builder<self>
      */
-    public function scopeByGroup($query, string $group)
+    public function scopeByGroup(Builder $query, string $group): Builder
     {
         return $query->where('group', $group);
     }
 
     /**
-     * Handle scopePublic functionality with proper error handling.
-     *
-     * @param mixed $query
+     * @param  Builder<self> $query
+     * @return Builder<self>
      */
-    public function scopePublic($query)
+    public function scopePublic(Builder $query): Builder
     {
         return $query->where('is_public', true);
     }
 
     /**
-     * Scope query to only include active settings.
-     *
-     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @param  Builder<self> $query
+     * @return Builder<self>
      */
-    public function scopeActive($query)
+    public function scopeActive(Builder $query): Builder
     {
         return $query->where('is_active', true);
     }
 
     /**
-     * Handle scopeOrdered functionality with proper error handling.
-     *
-     * @param mixed $query
+     * @param  Builder<self> $query
+     * @return Builder<self>
      */
-    public function scopeOrdered($query)
+    public function scopeOrdered(Builder $query): Builder
     {
         return $query->orderBy('group')->orderBy('sort_order')->orderBy('key');
     }
 
     /**
      * Handle getValue functionality with proper error handling.
-     *
-     * @param mixed $default
      */
-    public static function getValue(string $key, $default = null, ?string $locale = null)
+    public static function getValue(string $key, mixed $default = null, ?string $locale = null): mixed
     {
-        $query = self::where('key', $key);
+        $query = self::query()->where('key', $key);
 
         if (self::localeColumnExists()) {
-            $locale = $locale ?? app()->getLocale();
+            $locale ??= app()->getLocale();
             $query->where('locale', $locale);
         }
 
         $setting = $query->first();
 
-        return $setting ? $setting->value : $default;
+        if ($setting !== null) {
+            return $setting->value;
+        }
+
+        return $default;
     }
 
     /**
      * Handle setValue functionality with proper error handling.
-     *
-     * @param mixed $value
      */
-    public static function setValue(string $key, $value, string $group = 'general', ?string $locale = null): void
+    public static function setValue(string $key, mixed $value, string $group = 'general', ?string $locale = null): void
     {
         $type = self::inferTypeFromValue($value);
         $supportsLocale = self::localeColumnExists();
@@ -251,7 +295,7 @@ final class NormalSetting extends Model
         }
     }
 
-    private static function inferTypeFromValue($value): string
+    private static function inferTypeFromValue(mixed $value): string
     {
         if (is_bool($value)) {
             return self::TYPE_BOOLEAN;
@@ -280,7 +324,7 @@ final class NormalSetting extends Model
         return self::TYPE_STRING;
     }
 
-    private static function normalizeValueForStorage($value, string $type)
+    private static function normalizeValueForStorage(mixed $value, string $type): mixed
     {
         if ($type === self::TYPE_ARRAY) {
             if ($value instanceof Arrayable) {
@@ -315,7 +359,7 @@ final class NormalSetting extends Model
         }
 
         if ($type === self::TYPE_INTEGER) {
-            return $value === null ? null : (int) $value;
+            return $value === null ? null : (is_numeric($value) ? (int) $value : $value);
         }
 
         if ($type === self::TYPE_BOOLEAN) {
@@ -331,7 +375,7 @@ final class NormalSetting extends Model
             return true;
         }
 
-        $message = strtolower((string) $exception->getMessage());
+        $message = strtolower($exception->getMessage());
 
         return str_contains($message, 'database is locked')
             || str_contains($message, 'database table is locked')
@@ -341,17 +385,25 @@ final class NormalSetting extends Model
     /**
      * Handle translations functionality with proper error handling.
      */
+    /**
+     * @return HasMany<NormalSettingTranslation>
+     *
+     * @phpstan-return HasMany<NormalSettingTranslation, NormalSetting>
+     */
     public function translations(): HasMany
     {
-        return $this->hasMany(NormalSettingTranslation::class);
+        /** @var HasMany<NormalSettingTranslation, NormalSetting> $relation */
+        $relation = $this->hasMany(NormalSettingTranslation::class, 'enhanced_setting_id');
+
+        return $relation;
     }
 
     /**
      * Handle translation functionality with proper error handling.
      */
-    public function translation(?string $locale = null)
+    public function translation(?string $locale = null): ?NormalSettingTranslation
     {
-        $locale = $locale ?? app()->getLocale();
+        $locale ??= app()->getLocale();
 
         return $this->translations()->where('locale', $locale)->first();
     }
@@ -363,17 +415,25 @@ final class NormalSetting extends Model
     {
         $translation = $this->translation($locale);
 
-        return $translation?->description ?? $this->description;
+        if ($translation instanceof \App\Models\NormalSettingTranslation) {
+            return $translation->description;
+        }
+
+        return $this->description;
     }
 
     /**
      * Handle getDisplayName functionality with proper error handling.
      */
-    public function getDisplayName(?string $locale = null): ?string
+    public function getDisplayName(?string $locale = null): string
     {
         $translation = $this->translation($locale);
 
-        return $translation?->display_name ?? $this->key;
+        if ($translation instanceof \App\Models\NormalSettingTranslation && $translation->display_name !== null) {
+            return $translation->display_name;
+        }
+
+        return $this->key;
     }
 
     /**
@@ -387,17 +447,16 @@ final class NormalSetting extends Model
     }
 
     /**
-     * Handle scopeForLocale functionality with proper error handling.
-     *
-     * @param mixed $query
+     * @param  Builder<self> $query
+     * @return Builder<self>
      */
-    public function scopeForLocale($query, ?string $locale = null)
+    public function scopeForLocale(Builder $query, ?string $locale = null): Builder
     {
         if (! self::localeColumnExists()) {
             return $query;
         }
 
-        $locale = $locale ?? app()->getLocale();
+        $locale ??= app()->getLocale();
 
         return $query->where('locale', $locale);
     }
@@ -407,12 +466,12 @@ final class NormalSetting extends Model
      */
     protected static function booted(): void
     {
-        self::creating(function (self $setting) {
+        self::creating(function (self $setting): void {
             if ($setting->is_encrypted && $setting->value !== null) {
                 $setting->attributes['value'] = encrypt($setting->value);
             }
         });
-        self::updating(function (self $setting) {
+        self::updating(function (self $setting): void {
             if ($setting->is_encrypted && $setting->isDirty('value') && $setting->value !== null) {
                 $setting->attributes['value'] = encrypt($setting->value);
             }
@@ -422,7 +481,7 @@ final class NormalSetting extends Model
     private static function localeColumnExists(): bool
     {
         try {
-            return Schema::hasColumn((new self())->getTable(), 'locale');
+            return Schema::hasColumn((new self)->getTable(), 'locale');
         } catch (Exception) {
             return false;
         }
