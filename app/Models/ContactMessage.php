@@ -4,24 +4,31 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\OrdersByName;
+use Database\Factories\ContactMessageFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * @property int $id
- * @property string $name
- * @property string $email
- * @property string $subject
+ * @property int         $id
+ * @property string      $name
+ * @property string      $email
+ * @property string      $subject
  * @property string|null $phone
  * @property string|null $order_number
- * @property string $message
+ * @property string      $message
  * @property string|null $ip_address
  * @property string|null $user_agent
+ *
+ * @method static Builder<self> orderedByName(string $direction = 'asc')
  */
 final class ContactMessage extends Model
 {
+    /** @use HasFactory<ContactMessageFactory> */
     use HasFactory;
+
+    use OrdersByName;
 
     protected $fillable = [
         'name',
@@ -40,15 +47,18 @@ final class ContactMessage extends Model
     ];
 
     /**
-     * Scope a query to order contact messages alphabetically by the contact name.
-     *
-     * @param Builder<ContactMessage> $query The current query builder instance.
-     *
-     * @return Builder<ContactMessage> The modified builder ordered by the name column.
+     * Point the shared OrdersByName scope at the subject column for predictable sorting.
      */
-    public function scopeOrderedByName(Builder $query): Builder
+    protected function getNameColumn(): string
     {
-        // Sorting by name ensures consistent presentation in administrative listings.
-        return $query->orderBy('name');
+        return 'subject';
+    }
+
+    /**
+     * Provide the factory resolution for Laravel's model factory helpers.
+     */
+    protected static function newFactory(): ContactMessageFactory
+    {
+        return ContactMessageFactory::new();
     }
 }
