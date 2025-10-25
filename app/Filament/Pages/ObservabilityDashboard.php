@@ -5,13 +5,18 @@ declare(strict_types=1);
 namespace App\Filament\Pages;
 
 use App\Support\Monitoring\ApplicationMetrics;
-use BackedEnum;
 use Filament\Pages\Page;
 use UnitEnum;
 
 final class ObservabilityDashboard extends Page
 {
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar';
+    /**
+     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations while surfacing
+     * the accepted union type for static analyzers.
+     *
+     * @var string|\BackedEnum|null
+     */
+    protected static $navigationIcon = 'heroicon-o-chart-bar';
 
     protected static \UnitEnum|string|null $navigationGroup = 'System';
 

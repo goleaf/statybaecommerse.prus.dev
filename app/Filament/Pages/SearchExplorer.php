@@ -6,15 +6,19 @@ namespace App\Filament\Pages;
 
 use App\Data\SearchQueryData;
 use App\Services\SearchService;
+use BackedEnum;
 use Filament\Pages\Page;
 use UnitEnum;
 
 final class SearchExplorer extends Page
 {
     /**
-     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
+     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations while keeping
+     * the union types expressed through PHPDoc for clarity and tooling support.
+     *
+     * @var string|\BackedEnum|null
      */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-magnifying-glass-circle';
+    protected static $navigationIcon = 'heroicon-o-magnifying-glass-circle';
 
     public static function getNavigationGroup(): BackedEnum|string|null
     {

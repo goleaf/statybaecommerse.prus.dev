@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Pages;
 
-
+use BackedEnum;
 use Filament\Schemas\Schema;
 use App\Services\Shared\ComponentPerformanceService;
 use Filament\Actions\Action;
@@ -20,9 +20,12 @@ use Throwable;
 final class CacheMaintenance extends Page
 {
     /**
-     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
+     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations while
+     * documenting the accepted union type for downstream tooling.
+     *
+     * @var string|\BackedEnum|null
      */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-server-stack';
+    protected static $navigationIcon = 'heroicon-o-server-stack';
 
     public static function getNavigationGroup(): BackedEnum|string|null
     {
@@ -84,7 +87,7 @@ final class CacheMaintenance extends Page
     public function form(Schema $schema): Schema   
     {
         // Configure the Filament resource form schema using the v4 Schema API.
-        // Embrace the Filament v4 return contract so downstream tooling can rely on a `Form` instance.
+        // Embrace the Filament v4 return contract so downstream tooling can rely on a `Schema` instance for hydration.
         return $schema
             ->schema([
                 Section::make('Targeted Cache Operations')

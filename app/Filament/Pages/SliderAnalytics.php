@@ -15,7 +15,6 @@ use Filament\Pages\Dashboard\Concerns\HasFiltersAction;
 use Filament\Widgets\Concerns\InteractsWithPageFilters;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
-use BackedEnum;
 
 class SliderAnalytics extends BaseDashboard
 {
@@ -23,9 +22,12 @@ class SliderAnalytics extends BaseDashboard
     use InteractsWithPageFilters;
 
     /**
-     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
+     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations while documenting
+     * the accepted union via PHPDoc to satisfy Filament's static analysis guidance.
+     *
+     * @var string|\BackedEnum|null
      */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar';
+    protected static $navigationIcon = 'heroicon-o-chart-bar';
 
     protected static ?int $navigationSort = 3;
 
