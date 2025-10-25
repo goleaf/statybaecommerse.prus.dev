@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\OrdersByName;
+use Database\Factories\ActivityLogFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -22,12 +24,31 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  * @method static \Illuminate\Database\Eloquent\Builder|ActivityLog newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|ActivityLog newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|ActivityLog query()
+ * @method static \Database\Factories\ActivityLogFactory            factory($count = null, $state = [])
  *
  * @mixin \Eloquent
+ *
+ * @phpstan-use HasFactory<\Database\Factories\ActivityLogFactory>
  */
 final class ActivityLog extends Model
 {
+    /** @phpstan-ignore-next-line missingType.generics */
     use HasFactory;
+
+    use OrdersByName;
+
+    /**
+     * Column leveraged by the OrdersByName scope.
+     */
+    protected string $nameColumn = 'log_name';
+
+    /**
+     * Provide the explicitly typed factory for phpstan and IDEs.
+     */
+    protected static function newFactory(): ActivityLogFactory
+    {
+        return ActivityLogFactory::new();
+    }
 
     protected $table = 'activity_log';
 
@@ -55,34 +76,55 @@ final class ActivityLog extends Model
     ];
 
     protected $casts = [
-        'properties' => 'array',
+        'properties'   => 'array',
         'is_important' => 'boolean',
-        'is_system' => 'boolean',
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime',
+        'is_system'    => 'boolean',
+        'created_at'   => 'datetime',
+        'updated_at'   => 'datetime',
     ];
 
     /**
      * Get the user that performed the activity.
+     *
+     * @return BelongsTo<User, self>
+     *
+     * @phpstan-return BelongsTo<User, ActivityLog>
      */
     public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'causer_id');
+        /** @var BelongsTo<User, ActivityLog> $relation */
+        $relation = $this->belongsTo(User::class, 'causer_id');
+
+        return $relation;
     }
 
     /**
      * Get the subject of the activity.
+     *
+     * @return MorphTo<Model, self>
+     *
+     * @phpstan-return MorphTo<Model, ActivityLog>
      */
     public function subject(): MorphTo
     {
-        return $this->morphTo();
+        /** @var MorphTo<Model, ActivityLog> $relation */
+        $relation = $this->morphTo();
+
+        return $relation;
     }
 
     /**
      * Get the causer of the activity.
+     *
+     * @return MorphTo<Model, self>
+     *
+     * @phpstan-return MorphTo<Model, ActivityLog>
      */
     public function causer(): MorphTo
     {
-        return $this->morphTo();
+        /** @var MorphTo<Model, ActivityLog> $relation */
+        $relation = $this->morphTo();
+
+        return $relation;
     }
 }
