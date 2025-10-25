@@ -4,17 +4,22 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use JsonException;
 
 /**
  * @property array<string, array{previous:mixed,current:mixed}>|null $diff
  */
 final class AuditTrail extends Model
 {
+    // Enable Laravel's factory helpers for this model to simplify seeding and testing.
+    use HasFactory;
+
     protected $fillable = [
         'auditable_type',
         'auditable_id',
@@ -52,6 +57,9 @@ final class AuditTrail extends Model
         return $relation;
     }
 
+    /**
+     * Build a human-readable label for the auditable record reference.
+     */
     public function getAuditableLabelAttribute(): string
     {
         $type = class_basename($this->auditable_type ?? '');
@@ -59,6 +67,9 @@ final class AuditTrail extends Model
         return trim(sprintf('%s #%s', $type, $this->auditable_id));
     }
 
+    /**
+     * Resolve a displayable identifier for the actor, falling back to a localized string.
+     */
     public function getActorDisplayNameAttribute(): string
     {
         if ($this->actor) {
@@ -85,6 +96,11 @@ final class AuditTrail extends Model
         return implode(', ', array_keys($diff));
     }
 
+    /**
+     * Render the diff payload as a pretty-printed JSON string for logs or diagnostics.
+     *
+     * @throws JsonException
+     */
     public function getDiffPrettyAttribute(): string
     {
         return json_encode($this->diff, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR);
@@ -124,6 +140,8 @@ final class AuditTrail extends Model
 
     /**
      * @param  array<string, array{previous:mixed,current:mixed}>  $diff
+     *
+     * @throws JsonException
      */
     public static function record(Model $auditable, array $diff, string $event, ?string $reason = null): void
     {
@@ -135,6 +153,7 @@ final class AuditTrail extends Model
 
         $requestId = self::resolveRequestId();
 
+        // Persist the diff snapshot alongside actor and correlation identifiers for traceability.
         self::query()->create([
             'auditable_type' => $auditable->getMorphClass(),
             'auditable_id' => $auditable->getKey(),
