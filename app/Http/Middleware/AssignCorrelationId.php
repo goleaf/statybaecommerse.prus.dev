@@ -41,6 +41,7 @@ final class AssignCorrelationId
         ]);
 
         try {
+            /** @var Response $response */
             $response = $next($request);
         } catch (\Throwable $throwable) {
             $this->logContext->setUserId($request->user()?->getAuthIdentifier());

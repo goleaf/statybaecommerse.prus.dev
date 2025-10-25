@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Http\Middleware;
 
@@ -9,10 +11,10 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response as HttpResponse;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Str;
+use Closure;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
-use Closure;
 
 final class AddSecurityHeaders
 {
@@ -28,7 +30,7 @@ final class AddSecurityHeaders
         /** @var Response $response */
         $response = $next($request);
 
-        if (!$this->config->get('security.headers.enabled', true)) {
+        if (! $this->config->get('security.headers.enabled', true)) {
             return $response;
         }
 
@@ -65,12 +67,12 @@ final class AddSecurityHeaders
     private function applyStaticHeaders(Response $response): void
     {
         $headers = $this->config->get('security.headers.values', []);
-        if (!is_array($headers)) {
+        if (! is_array($headers)) {
             return;
         }
 
         foreach ($headers as $header => $value) {
-            if (!is_string($header) || $header === '' || strcasecmp($header, 'Permissions-Policy') === 0 || strcasecmp($header, 'Strict-Transport-Security') === 0) {
+            if (! is_string($header) || $header === '' || strcasecmp($header, 'Permissions-Policy') === 0 || strcasecmp($header, 'Strict-Transport-Security') === 0) {
                 continue;
             }
 
@@ -88,14 +90,14 @@ final class AddSecurityHeaders
     private function applyPermissionsPolicy(Response $response): void
     {
         $policies = $this->config->get('security.headers.permissions_policy', []);
-        if (!is_array($policies) || $policies === []) {
+        if (! is_array($policies) || $policies === []) {
             return;
         }
 
         $compiled = [];
 
         foreach ($policies as $feature => $values) {
-            if (!is_string($feature) || $feature === '') {
+            if (! is_string($feature) || $feature === '') {
                 continue;
             }
 
@@ -117,7 +119,7 @@ final class AddSecurityHeaders
     private function applyStrictTransportSecurity(Response $response): void
     {
         $config = $this->config->get('security.headers.hsts', []);
-        if (!is_array($config) || empty($config['enabled'])) {
+        if (! is_array($config) || empty($config['enabled'])) {
             return;
         }
 
@@ -128,11 +130,11 @@ final class AddSecurityHeaders
 
         $parts = ["max-age={$maxAge}"];
 
-        if (!empty($config['include_subdomains'])) {
+        if (! empty($config['include_subdomains'])) {
             $parts[] = 'includeSubDomains';
         }
 
-        if (!empty($config['preload'])) {
+        if (! empty($config['preload'])) {
             $parts[] = 'preload';
         }
 
@@ -142,7 +144,7 @@ final class AddSecurityHeaders
     private function applyContentSecurityPolicy(Response $response, ?CspNonce $nonce): void
     {
         $directives = $this->config->get('security.headers.content_security_policy.directives', []);
-        if (!is_array($directives) || $directives === []) {
+        if (! is_array($directives) || $directives === []) {
             return;
         }
 
@@ -151,7 +153,7 @@ final class AddSecurityHeaders
         $compiled = [];
 
         foreach ($directives as $directive => $values) {
-            if (!is_string($directive) || $directive === '') {
+            if (! is_string($directive) || $directive === '') {
                 continue;
             }
 
@@ -187,12 +189,12 @@ final class AddSecurityHeaders
         }
 
         $contentType = $response->headers->get('Content-Type');
-        if (!is_string($contentType) || !Str::contains(Str::lower($contentType), 'text/html')) {
+        if (! is_string($contentType) || ! Str::contains(Str::lower($contentType), 'text/html')) {
             return;
         }
 
         $content = $response->getContent();
-        if (!is_string($content) || $content === '') {
+        if (! is_string($content) || $content === '') {
             return;
         }
 
@@ -205,7 +207,7 @@ final class AddSecurityHeaders
         }
 
         $nonceValue = $nonce?->value();
-        if (!is_string($nonceValue) || $nonceValue === '') {
+        if (! is_string($nonceValue) || $nonceValue === '') {
             return;
         }
 
@@ -284,14 +286,14 @@ final class AddSecurityHeaders
             return '()';
         }
 
-        if (!is_array($values)) {
+        if (! is_array($values)) {
             return null;
         }
 
         $sources = [];
 
         foreach ($values as $value) {
-            if (!is_string($value)) {
+            if (! is_string($value)) {
                 continue;
             }
 
@@ -324,7 +326,7 @@ final class AddSecurityHeaders
             return [];
         }
 
-        if (!is_array($values)) {
+        if (! is_array($values)) {
             return null;
         }
 
@@ -333,7 +335,7 @@ final class AddSecurityHeaders
         $hadNoncePlaceholder = false;
 
         foreach ($values as $value) {
-            if (!is_string($value)) {
+            if (! is_string($value)) {
                 continue;
             }
 

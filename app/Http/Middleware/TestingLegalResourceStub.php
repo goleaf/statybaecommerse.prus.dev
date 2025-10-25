@@ -14,17 +14,32 @@ use Illuminate\Http\Response;
  */
 final class TestingLegalResourceStub
 {
-    public function handle(Request $request, Closure $next)
+    public function handle(Request $request, Closure $next): Response
     {
         if (! app()->runningUnitTests()) {
-            return $next($request);
+            /** @var Response $response */
+            $response = $next($request);
+
+            return $response;
         }
 
         if (! str_starts_with($request->path(), 'admin/legals')) {
-            return $next($request);
+            /** @var Response $response */
+            $response = $next($request);
+
+            return $response;
         }
 
-        return $this->handleLegalRequest($request) ?? $next($request);
+        $intercepted = $this->handleLegalRequest($request);
+
+        if ($intercepted instanceof Response) {
+            return $intercepted;
+        }
+
+        /** @var Response $response */
+        $response = $next($request);
+
+        return $response;
     }
 
     private function handleLegalRequest(Request $request): ?Response
