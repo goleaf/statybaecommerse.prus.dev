@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\OrdersByName;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -14,6 +15,16 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
 final class Slider extends Model implements HasMedia
 {
     use HasFactory, InteractsWithMedia;
+
+    /**
+     * Provide alphabetical ordering using the localized title column via the shared trait.
+     */
+    use OrdersByName;
+
+    /**
+     * Target the title column for alphabetical ordering since sliders do not expose a plain name field.
+     */
+    protected string $nameColumn = 'title';
 
     protected $fillable = [
         'title',
@@ -29,8 +40,8 @@ final class Slider extends Model implements HasMedia
     ];
 
     protected $casts = [
-        'is_active' => 'boolean',
-        'settings' => 'array',
+        'is_active'  => 'boolean',
+        'settings'   => 'array',
         'sort_order' => 'integer',
     ];
 

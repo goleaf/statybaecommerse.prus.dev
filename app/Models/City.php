@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\OrdersByName;
 use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\EnabledScope;
 use App\Models\Translations\CityTranslation;
@@ -36,6 +37,11 @@ use Throwable;
 final class City extends Model
 {
     use HasFactory, HasTranslations, SoftDeletes;
+
+    /**
+     * Reuse the shared alphabetical ordering scope so cities appear predictably.
+     */
+    use OrdersByName;
 
     protected string $translationModel = CityTranslation::class;
 
@@ -185,17 +191,6 @@ final class City extends Model
     public function scopeOrdered($query)
     {
         return $query->orderBy('sort_order');
-    }
-
-    /**
-     * Handle scopeOrderedByName functionality with proper error handling.
-     *
-     * @param mixed $query
-     */
-    public function scopeOrderedByName($query)
-    {
-        // Order results alphabetically to support predictable dropdowns and listings.
-        return $query->orderBy('name');
     }
 
     /**

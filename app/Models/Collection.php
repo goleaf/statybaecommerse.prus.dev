@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Contracts\TranslatableRecord;
+use App\Models\Concerns\OrdersByName;
 use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\VisibleScope;
 use App\Observers\CollectionObserver;
@@ -46,6 +47,11 @@ final class Collection extends Model implements HasMedia, TranslatableRecord
     use HasFactory, SoftDeletes;
     use HasTranslations;
     use InteractsWithMedia;
+
+    /**
+     * Enable alphabetical ordering for collection listings throughout the application.
+     */
+    use OrdersByName;
 
     protected $table = 'collections';
 
@@ -156,17 +162,6 @@ final class Collection extends Model implements HasMedia, TranslatableRecord
     public function scopeOrdered($query)
     {
         return $query->orderBy('sort_order');
-    }
-
-    /**
-     * Handle scopeOrderedByName functionality with proper error handling.
-     *
-     * @param mixed $query
-     */
-    public function scopeOrderedByName($query)
-    {
-        // Order collections alphabetically by their name field to simplify UI listings.
-        return $query->orderBy('name');
     }
 
     /**

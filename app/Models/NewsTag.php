@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\OrdersByName;
 use App\Models\Scopes\ActiveScope;
 use App\Traits\HasTranslations;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
@@ -17,8 +18,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  *
  * Eloquent model representing the NewsTag entity with comprehensive relationships, scopes, and business logic for the e-commerce system.
  *
- * @property mixed $table
- * @property mixed $fillable
+ * @property mixed  $table
+ * @property mixed  $fillable
  * @property string $translationModel
  *
  * @method static \Illuminate\Database\Eloquent\Builder|NewsTag newModelQuery()
@@ -33,6 +34,11 @@ final class NewsTag extends Model
     use HasFactory;
     use HasTranslations;
 
+    /**
+     * Share the alphabetical ordering helper so tag selectors remain sorted.
+     */
+    use OrdersByName;
+
     protected $table = 'news_tags';
 
     protected $fillable = ['name', 'slug', 'description', 'is_visible', 'is_active', 'color', 'sort_order'];
@@ -44,7 +50,7 @@ final class NewsTag extends Model
     {
         return [
             'is_visible' => 'boolean',
-            'is_active' => 'boolean',
+            'is_active'  => 'boolean',
             'sort_order' => 'integer',
         ];
     }
@@ -73,15 +79,6 @@ final class NewsTag extends Model
     public function scopeVisible(Builder $query): Builder
     {
         return $query->where('is_visible', true);
-    }
-
-    /**
-     * Scope the query to order tags alphabetically by their name column for predictable listings.
-     */
-    public function scopeOrderedByName(Builder $query): Builder
-    {
-        // Order tags by the persisted "name" column to keep alphabetical ordering consistent across locales.
-        return $query->orderBy('name');
     }
 
     /**

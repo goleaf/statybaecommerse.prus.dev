@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\OrdersByName;
 use Database\Factories\CompanyFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -30,6 +31,11 @@ final class Company extends Model
 {
     use HasFactory;
 
+    /**
+     * Reuse the shared alphabetical ordering scope for consistent company dropdowns.
+     */
+    use OrdersByName;
+
     // Avoid global active scoping so administrative tooling can view and mutate inactive records during testing.
 
     protected $fillable = [
@@ -47,7 +53,7 @@ final class Company extends Model
 
     // Attribute casting configuration ensures metadata remains structured and the active flag is always boolean.
     protected $casts = [
-        'metadata' => 'array',
+        'metadata'  => 'array',
         'is_active' => 'boolean',
     ];
     // Relationships
@@ -95,18 +101,6 @@ final class Company extends Model
     public function scopeBySize(Builder $query, string $size): Builder
     {
         return $query->where('size', $size);
-    }
-
-    /**
-     * Handle scopeOrderedByName functionality with proper error handling.
-     *
-     * @param  Builder<Company> $query
-     * @return Builder<Company>
-     */
-    public function scopeOrderedByName(Builder $query): Builder
-    {
-        // Sort companies alphabetically to provide predictable listings for UI and reports.
-        return $query->orderBy('name');
     }
 
     // Accessors

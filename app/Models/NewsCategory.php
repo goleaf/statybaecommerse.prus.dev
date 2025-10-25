@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\OrdersByName;
 use App\Traits\HasTranslations;
 use Database\Factories\NewsCategoryFactory;
 use Illuminate\Database\Eloquent\Builder;
@@ -35,6 +36,11 @@ final class NewsCategory extends Model
     use HasFactory;
 
     use HasTranslations;
+
+    /**
+     * Share the alphabetical ordering scope so category pickers remain predictable.
+     */
+    use OrdersByName;
 
     protected $table = 'news_categories';
 
@@ -139,18 +145,6 @@ final class NewsCategory extends Model
     public function scopeOrdered(Builder $query): Builder
     {
         return $query->orderBy('sort_order')->orderBy('id');
-    }
-
-    /**
-     * Provide a reusable alphabetical ordering scope to keep UI listings predictable.
-     *
-     * @param  Builder<self> $query
-     * @return Builder<self>
-     */
-    public function scopeOrderedByName(Builder $query): Builder
-    {
-        // Sort by the base name column so both translated and non-translated contexts remain stable.
-        return $query->orderBy('name');
     }
 
     /**

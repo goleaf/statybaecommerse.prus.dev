@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\OrdersByName;
 use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\EnabledScope;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
@@ -31,6 +32,11 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 final class PartnerTier extends Model
 {
     use HasFactory, SoftDeletes;
+
+    /**
+     * Allow alphabetical ordering reuse through the shared OrdersByName concern.
+     */
+    use OrdersByName;
 
     protected $table = 'partner_tiers';
 
@@ -66,14 +72,5 @@ final class PartnerTier extends Model
     public function scopeByDiscountRate(Builder $query, float $rate): Builder
     {
         return $query->where('discount_rate', $rate);
-    }
-
-    /**
-     * Handle scopeOrderedByName functionality with proper error handling.
-     */
-    public function scopeOrderedByName(Builder $query): Builder
-    {
-        // Sort partner tiers alphabetically to provide predictable presentation layers.
-        return $query->orderBy('name');
     }
 }

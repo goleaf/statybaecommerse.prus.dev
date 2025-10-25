@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\OrdersByName;
 use App\Models\Scopes\ActiveScope;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Builder;
@@ -29,6 +30,16 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 final class CollectionRule extends Model
 {
     use HasFactory;
+
+    /**
+     * Allow quick alphabetical ordering by the rule field when presenting rule lists.
+     */
+    use OrdersByName;
+
+    /**
+     * Target the field column for alphabetical ordering because there is no dedicated name column.
+     */
+    protected string $nameColumn = 'field';
 
     protected $table = 'collection_rules';
 

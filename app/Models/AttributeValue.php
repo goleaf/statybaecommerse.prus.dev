@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\OrdersByName;
 use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\EnabledScope;
 use App\Traits\HasTranslations;
@@ -43,6 +44,16 @@ final class AttributeValue extends Model
 {
     /** @phpstan-ignore-next-line */
     use HasFactory, HasTranslations, SoftDeletes;
+
+    /**
+     * Provide the shared alphabetical ordering scope based on the value column.
+     */
+    use OrdersByName;
+
+    /**
+     * Sort attribute values by their human readable value field when using the OrdersByName concern.
+     */
+    protected string $nameColumn = 'value';
 
     protected $table = 'attribute_values';
 
@@ -145,21 +156,6 @@ final class AttributeValue extends Model
     {
         // Keep attribute values sorted according to the configured manual sort order column.
         return $query->orderBy('sort_order');
-    }
-
-    /**
-     * Handle scopeOrderedByName functionality with proper error handling.
-     *
-     * @param  Builder<AttributeValue> $query
-     * @return Builder<AttributeValue>
-     */
-    public function scopeOrderedByName(Builder $query): Builder
-    {
-        // Prefer the human friendly display value and gracefully fall back to the raw value field.
-        return $query
-            ->orderByRaw("COALESCE(NULLIF(display_value, ''), value)")
-            ->orderBy('display_value')
-            ->orderBy('value');
     }
 
     /**

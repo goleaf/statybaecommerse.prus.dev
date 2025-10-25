@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\OrdersByName;
 use App\Models\Scopes\ActiveScope;
 use App\Support\Authorization\AuthorizationMatrix;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -34,8 +34,14 @@ final class AdminUser extends Authenticatable implements FilamentUser
 {
     /** @use HasFactory<\Database\Factories\AdminUserFactory> */
     use HasFactory;
+
     use HasRoles;
     use Notifiable;
+
+    /**
+     * Share the alphabetical ordering scope with other models so admin lists stay consistent.
+     */
+    use OrdersByName;
 
     /**
      * Guard name for Spatie permissions (separate admin guard).
@@ -56,15 +62,6 @@ final class AdminUser extends Authenticatable implements FilamentUser
     protected function casts(): array
     {
         return ['email_verified_at' => 'datetime', 'password' => 'hashed'];
-    }
-
-    /**
-     * Handle scopeOrderedByName functionality with proper error handling.
-     */
-    public function scopeOrderedByName(Builder $query): Builder
-    {
-        // Always normalize the casing before sorting so administrators appear deterministically.
-        return $query->orderByRaw('LOWER(name) ASC, name ASC');
     }
 
     /**

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\OrdersByName;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -25,6 +26,16 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 final class CampaignConversionTranslation extends Model
 {
     use HasFactory;
+
+    /**
+     * Allow translation listings to fall back to alphabetical ordering by notes when available.
+     */
+    use OrdersByName;
+
+    /**
+     * Order translation rows by their notes column because a dedicated title field is not present.
+     */
+    protected string $nameColumn = 'notes';
 
     /**
      * Explicitly define the table to keep the translation namespace flexible.

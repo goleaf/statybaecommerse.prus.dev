@@ -27,7 +27,11 @@ trait OrdersByName
         if (property_exists($this, 'nameColumn')) {
             // Casting to string ensures defensive safety even when the host
             // model accidentally exposes the property as a different scalar.
-            return (string) $this->nameColumn;
+            $column = (string) $this->nameColumn;
+
+            // Guarantee a non-empty column name even if the host accidentally
+            // clears the property, keeping the scope resilient to misconfiguration.
+            return $column !== '' ? $column : 'name';
         }
 
         // Provide a sensible default so models can opt-in without redeclaring

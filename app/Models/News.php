@@ -6,6 +6,7 @@ namespace App\Models;
 
 use App\Contracts\TranslatableRecord;
 use App\Enums\ModerationState;
+use App\Models\Concerns\OrdersByName;
 use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\PublishedScope;
 use App\Models\Scopes\VisibleScope;
@@ -45,7 +46,18 @@ final class News extends Model implements TranslatableRecord
     use HasFactory;
     use HasTranslations;
     use LogsActivity;
+
+    /**
+     * Allow alphabetical ordering helpers to reuse the shared OrdersByName scope.
+     */
+    use OrdersByName;
+
     use SoftDeletes;
+
+    /**
+     * Sort news entries by the author_name column when leveraging the reusable trait.
+     */
+    protected string $nameColumn = 'author_name';
 
     protected $table = 'news';
 
@@ -216,18 +228,6 @@ final class News extends Model implements TranslatableRecord
     public function scopeFeatured(Builder $query): Builder
     {
         return $query->where('is_featured', true);
-    }
-
-    /**
-     * Provide a deterministic alphabetical ordering using the author name field when available.
-     */
-    public function scopeOrderedByName(Builder $query): Builder
-    {
-        // Order null author names last for consistent pagination while keeping creation order as a tiebreaker.
-        return $query
-            ->orderByRaw('author_name IS NULL')
-            ->orderBy('author_name')
-            ->orderBy('id');
     }
 
     /**

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\OrdersByName;
 use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\EnabledScope;
 use Database\Factories\PartnerFactory;
@@ -50,6 +51,12 @@ final class Partner extends Model implements HasMedia
     use HasFactory;
 
     use InteractsWithMedia;
+
+    /**
+     * Surface the shared alphabetical ordering scope for partner listings.
+     */
+    use OrdersByName;
+
     use SoftDeletes;
 
     protected $table = 'partners';
@@ -146,18 +153,6 @@ final class Partner extends Model implements HasMedia
     {
         // Limit the query to partners assigned to the specified tier identifier.
         return $query->where('tier_id', $tierId);
-    }
-
-    /**
-     * Handle scopeOrderedByName functionality with proper error handling.
-     *
-     * @param  Builder<static> $query
-     * @return Builder<static>
-     */
-    public function scopeOrderedByName(Builder $query): Builder
-    {
-        // Apply an ascending sort on the partner name to ensure predictable listings.
-        return $query->orderBy('name');
     }
 
     /**

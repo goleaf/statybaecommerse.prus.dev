@@ -9,10 +9,7 @@ use Spatie\Permission\Models\Role;
 use Spatie\Permission\PermissionRegistrar;
 use Tests\Support\TestingDatabase;
 
-<<<<<<< HEAD
 uses(Tests\TestCase::class)->in('Feature', 'Unit', 'admin', 'frontend', 'Performance');
-// Register the base TestCase for dedicated model quality suites introduced under tests/Models.
-uses(Tests\TestCase::class)->in('Models');
 
 beforeAll(function () {
     $testingDatabasePath = TestingDatabase::path();

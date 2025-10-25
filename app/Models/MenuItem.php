@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\OrdersByName;
 use App\Models\Scopes\VisibleScope;
 use App\Observers\MenuItemObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
@@ -26,13 +27,23 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @method static \Illuminate\Database\Eloquent\Builder|MenuItem query()
  *
  * @mixin \Eloquent
-*/
+ */
 #[ObservedBy([MenuItemObserver::class])]
 #[ScopedBy([VisibleScope::class])]
 #[ObservedBy([MenuItemObserver::class])]
 final class MenuItem extends Model
 {
     use HasFactory;
+
+    /**
+     * Adopt the shared alphabetical ordering scope targeting the label column.
+     */
+    use OrdersByName;
+
+    /**
+     * Instruct the trait to sort by the label attribute rather than the default name column.
+     */
+    protected string $nameColumn = 'label';
 
     protected $fillable = ['menu_id', 'parent_id', 'label', 'url', 'route_name', 'route_params', 'icon', 'sort_order', 'is_visible'];
 
@@ -81,14 +92,5 @@ final class MenuItem extends Model
     public function scopeOrdered(Builder $query): Builder
     {
         return $query->orderBy('sort_order');
-    }
-
-    /**
-     * Ensure menu items are consistently sorted by their human readable label.
-     */
-    public function scopeOrderedByName(Builder $query): Builder
-    {
-        // Order by the label column so navigation entries appear alphabetically.
-        return $query->orderBy('label');
     }
 }
