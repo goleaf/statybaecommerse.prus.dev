@@ -18,6 +18,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\DB;
@@ -477,6 +478,16 @@ final class ProductVariant extends Model implements HasMedia, TranslatableRecord
     {
         return $query->where('track_inventory', true)
             ->where('quantity', '<=', 0);
+    }
+
+    /**
+     * Handle scopeOrderedByName functionality with proper error handling.
+     *
+     * @param  mixed  $query
+     */
+    public function scopeOrderedByName($query, string $direction = 'asc')
+    {
+        return $query->orderBy('name', $direction);
     }
 
     /**
