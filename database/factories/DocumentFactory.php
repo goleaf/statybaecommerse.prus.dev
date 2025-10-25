@@ -19,9 +19,25 @@ final class DocumentFactory extends Factory
 
     public function definition(): array
     {
+        $format = $this->faker->randomElement([
+            Document::FORMAT_PDF,
+            Document::FORMAT_HTML,
+            Document::FORMAT_DOCX,
+        ]);
+
+        $status = $this->faker->randomElement([
+            Document::STATUS_DRAFT,
+            Document::STATUS_GENERATED,
+            Document::STATUS_PUBLISHED,
+            Document::STATUS_ARCHIVED,
+        ]);
+
         return [
-            'document_template_id' => DocumentTemplate::factory(),
-            'title' => $this->faker->sentence(3),
+            'document_template_id' => DocumentTemplate::factory(), // Keep relational integrity with a valid template.
+            'title' => $this->faker->sentence(3), // Human-readable heading rendered in the UI.
+            'name' => $this->faker->words(3, true), // Friendly alias for search dropdowns.
+            'type' => $this->faker->randomElement(['invoice', 'receipt', 'contract', 'report']), // Document classification for analytics.
+            'version' => sprintf('v%s.%s', $this->faker->randomDigitNotNull(), $this->faker->randomDigit()), // Semantic version tag for auditing.
             'content' => $this->faker->randomHtml(),
             'variables' => [
                 'ORDER_NUMBER' => $this->faker->unique()->numerify('ORD-#####'),
@@ -31,14 +47,27 @@ final class DocumentFactory extends Factory
                 'COMPANY_NAME' => config('app.name'),
                 'COMPANY_ADDRESS' => $this->faker->address(),
             ],
-            'status' => $this->faker->randomElement(['draft', 'generated', 'sent', 'archived']),
-            'format' => $this->faker->randomElement(['pdf', 'html', 'docx']),
-            'file_path' => $this->faker->optional(0.7)->filePath(),
-            'documentable_type' => Order::class,
+            'status' => $status, // Persist a lifecycle state recognised by the model helpers.
+            'format' => $format, // Ensure mime metadata tracks the selected renderer.
+            'file_path' => $format === Document::FORMAT_HTML ? null : 'documents/'.$this->faker->uuid().'.'.$format, // Skip file storage for inline HTML.
+            'file_size' => $format === Document::FORMAT_HTML ? null : $this->faker->numberBetween(10_000, 5_000_000), // Approximate payload size in bytes.
+            'mime_type' => match ($format) {
+                Document::FORMAT_PDF => 'application/pdf',
+                Document::FORMAT_HTML => 'text/html',
+                Document::FORMAT_DOCX => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                default => 'application/octet-stream',
+            },
+            'is_public' => $this->faker->boolean(30), // Randomise whether the link is shareable without auth.
+            'is_downloadable' => $format !== Document::FORMAT_HTML, // Inline HTML stays view-only by default.
+            'access_password' => $this->faker->optional(0.25)->password(), // Allow modelling of protected documents.
+            'documentable_type' => Order::class, // Default polymorphic relation to orders.
             'documentable_id' => Order::factory(),
             'created_by' => User::factory(),
             'updated_by' => User::factory(),
             'generated_at' => $this->faker->optional(0.8)->dateTimeBetween('-1 month', 'now'),
+            'expires_at' => $this->faker->optional(0.3)->dateTimeBetween('+1 week', '+1 year'), // Allow testing of expiring access policies.
+            'description' => $this->faker->sentence(12), // Provide marketing copy for admin listings.
+            'notes' => $this->faker->optional()->paragraph(), // Internal notes for staff coordination.
         ];
     }
 
@@ -48,7 +77,7 @@ final class DocumentFactory extends Factory
     public function draft(): static
     {
         return $this->state(fn (array $attributes) => [
-            'status' => 'draft',
+            'status' => Document::STATUS_DRAFT,
             'file_path' => null,
             'generated_at' => null,
         ]);
@@ -60,7 +89,8 @@ final class DocumentFactory extends Factory
     public function generated(): static
     {
         return $this->state(fn (array $attributes) => [
-            'status' => 'generated',
+            'status' => Document::STATUS_GENERATED,
+            'format' => Document::FORMAT_PDF,
             'file_path' => 'documents/'.$this->faker->uuid().'.pdf',
             'generated_at' => $this->faker->dateTimeBetween('-1 week', 'now'),
         ]);
@@ -73,6 +103,7 @@ final class DocumentFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'status' => 'sent',
+            'format' => Document::FORMAT_PDF,
             'file_path' => 'documents/'.$this->faker->uuid().'.pdf',
             'generated_at' => $this->faker->dateTimeBetween('-1 month', '-1 week'),
         ]);
@@ -139,7 +170,7 @@ final class DocumentFactory extends Factory
     public function pdf(): static
     {
         return $this->state(fn (array $attributes) => [
-            'format' => 'pdf',
+            'format' => Document::FORMAT_PDF,
             'file_path' => 'documents/'.$this->faker->uuid().'.pdf',
         ]);
     }
@@ -150,7 +181,7 @@ final class DocumentFactory extends Factory
     public function html(): static
     {
         return $this->state(fn (array $attributes) => [
-            'format' => 'html',
+            'format' => Document::FORMAT_HTML,
             'file_path' => null,  // HTML documents are usually not stored as files
         ]);
     }
