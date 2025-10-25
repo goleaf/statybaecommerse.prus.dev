@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\OrdersByName;
 use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\DateRangeScope;
 use Database\Factories\PriceListItemFactory;
@@ -60,6 +61,7 @@ final class PriceListItem extends Model
     use HasFactory;
 
     use HasTranslations;
+    use OrdersByName;
 
     /**
      * @var string|null
@@ -361,26 +363,6 @@ final class PriceListItem extends Model
     public function scopeWithDiscount(Builder $query): Builder
     {
         return $query->whereNotNull('compare_amount')->whereColumn('compare_amount', '>', 'net_amount');
-    }
-
-    /**
-     * Handle scopeOrderedByName functionality with proper error handling.
-     */
-    /**
-     * @param  Builder<self> $query
-     * @return Builder<self>
-     */
-    public function scopeOrderedByName(Builder $query, string $direction = 'asc'): Builder
-    {
-        // Determine the locale-aware JSON path for translations and sort by the lower-cased value for consistency.
-        $locale = app()->getLocale();
-        $sanitizedDirection = Str::lower($direction) === 'desc' ? 'desc' : 'asc';
-
-        $jsonPath = sprintf('$."%s"', $locale);
-
-        return $query->orderByRaw(
-            sprintf('LOWER(COALESCE(json_extract(name, "%s"), name)) %s', $jsonPath, $sanitizedDirection)
-        );
     }
 
     // Translation methods

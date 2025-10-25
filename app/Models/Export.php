@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Enums\ExportStatus;
+use App\Models\Concerns\OrdersByName;
 use Database\Factories\ExportFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -65,6 +66,8 @@ final class Export extends Model
 {
     /** @use HasFactory<ExportFactory> */
     use HasFactory;
+
+    use OrdersByName;
 
     protected $fillable = [
         'uuid',
