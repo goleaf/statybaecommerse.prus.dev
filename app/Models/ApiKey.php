@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -309,5 +310,17 @@ final class ApiKey extends Model
         $relation = $this->belongsTo(User::class);
 
         return $relation;
+    }
+
+    /**
+     * Scope a query to order API keys alphabetically by their display name.
+     *
+     * @param  Builder<ApiKey>  $query
+     * @return Builder<ApiKey>
+     */
+    public function scopeOrderedByName(Builder $query): Builder
+    {
+        // Use a simple ascending order to present API keys in predictable order.
+        return $query->orderBy('name');
     }
 }
