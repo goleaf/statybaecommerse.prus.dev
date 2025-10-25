@@ -8,6 +8,7 @@ use App\Models\Scopes\ActiveScope;
 use App\Models\Translations\DiscountConditionTranslation;
 use App\Traits\HasTranslations;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -38,15 +39,26 @@ final class DiscountCondition extends Model
 
     protected $table = 'discount_conditions';
 
+    /**
+     * @var array<int, string>
+     */
     protected $fillable = ['discount_id', 'type', 'operator', 'value', 'position', 'is_active', 'priority', 'metadata'];
 
     /**
-     * Handle casts functionality with proper error handling.
+     * @var array<string, string>
      */
-    protected function casts(): array
-    {
-        return ['value' => 'array', 'position' => 'integer', 'is_active' => 'boolean', 'priority' => 'integer', 'metadata' => 'array'];
-    }
+    protected $casts = [
+        // Store the condition payload consistently for evaluation routines.
+        'value' => 'array',
+        // Maintain predictable ordering for visual builders.
+        'position' => 'integer',
+        // Make conditional toggling intuitive within queries.
+        'is_active' => 'boolean',
+        // Ensure prioritisation can leverage numeric comparisons.
+        'priority' => 'integer',
+        // Persist auxiliary context without manual decoding.
+        'metadata' => 'array',
+    ];
 
     /**
      * Handle discount functionality with proper error handling.
@@ -87,8 +99,9 @@ final class DiscountCondition extends Model
      *
      * @param mixed $query
      */
-    public function scopeActive($query)
+    public function scopeActive(Builder $query): Builder
     {
+        // Keep the intent explicit: only return active conditions for downstream matching.
         return $query->where('is_active', true);
     }
 
@@ -97,8 +110,9 @@ final class DiscountCondition extends Model
      *
      * @param mixed $query
      */
-    public function scopeByType($query, string $type)
+    public function scopeByType(Builder $query, string $type): Builder
     {
+        // Allow filtering the scope to a concrete discriminator.
         return $query->where('type', $type);
     }
 
@@ -107,8 +121,9 @@ final class DiscountCondition extends Model
      *
      * @param mixed $query
      */
-    public function scopeByOperator($query, string $operator)
+    public function scopeByOperator(Builder $query, string $operator): Builder
     {
+        // Let callers target specific comparison semantics.
         return $query->where('operator', $operator);
     }
 
@@ -117,9 +132,31 @@ final class DiscountCondition extends Model
      *
      * @param mixed $query
      */
-    public function scopeByPriority($query, string $direction = 'asc')
+    public function scopeByPriority(Builder $query, string $direction = 'asc'): Builder
     {
+        // Provide a predictable ordering for UI displays and rule evaluation.
         return $query->orderBy('priority', $direction);
+    }
+
+    /**
+     * Handle scopeOrderedByName functionality with proper error handling.
+     */
+    public function scopeOrderedByName(Builder $query, string $direction = 'asc'): Builder
+    {
+        // Resolve the active locale so the ordering mirrors the visible language.
+        $locale = app()->getLocale();
+
+        // Order through a subquery to avoid repeated joins in chained builders.
+        return $query
+            ->orderBy(
+                DiscountConditionTranslation::query()
+                    ->select('name')
+                    ->whereColumn('discount_condition_translations.discount_condition_id', 'discount_conditions.id')
+                    ->where('locale', $locale)
+                    ->limit(1),
+                $direction
+            )
+            ->orderBy('discount_conditions.id');
     }
 
     /**
@@ -143,7 +180,7 @@ final class DiscountCondition extends Model
      *
      * @param mixed $testValue
      */
-    public function matches($testValue): bool
+    public function matches(mixed $testValue): bool
     {
         if (! $this->is_active) {
             return false;
