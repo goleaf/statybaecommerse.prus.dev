@@ -1,14 +1,16 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models;
 
 use App\Enums\ExportStatus;
 use Database\Factories\ExportFactory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Str;
 
 /**
@@ -92,14 +94,14 @@ final class Export extends Model
     protected function casts(): array
     {
         return [
-            'columns' => 'array',
+            'columns'            => 'array',
             'exportable_options' => 'array',
-            'total_rows' => 'integer',
-            'processed_rows' => 'integer',
-            'requested_at' => 'datetime',
-            'completed_at' => 'datetime',
-            'failed_at' => 'datetime',
-            'status' => ExportStatus::class,
+            'total_rows'         => 'integer',
+            'processed_rows'     => 'integer',
+            'requested_at'       => 'datetime',
+            'completed_at'       => 'datetime',
+            'failed_at'          => 'datetime',
+            'status'             => ExportStatus::class,
         ];
     }
 
@@ -109,11 +111,11 @@ final class Export extends Model
     protected static function booted(): void
     {
         self::creating(function (self $export): void {
-            if (!$export->getAttribute('uuid')) {
+            if (! $export->getAttribute('uuid')) {
                 $export->setAttribute('uuid', (string) Str::uuid());
             }
 
-            if (!$export->getAttribute('requested_at')) {
+            if (! $export->getAttribute('requested_at')) {
                 $export->setAttribute('requested_at', now());
             }
 
@@ -217,6 +219,18 @@ final class Export extends Model
     }
 
     /**
+     * Scope a query to order exports alphabetically by name.
+     *
+     * @param  Builder<self> $query
+     * @return Builder<self>
+     */
+    public function scopeOrderedByName(Builder $query): Builder
+    {
+        // Sorting by the "name" column keeps listings predictable for users.
+        return $query->orderBy('name');
+    }
+
+    /**
      * Scope a query to filter exports by exportable type.
      *
      * @param  Builder<self> $query
@@ -235,7 +249,7 @@ final class Export extends Model
     protected function fileExtension(): Attribute
     {
         return Attribute::make(
-            get: fn(): string => $this->format
+            get: fn (): string => $this->format
         );
     }
 
@@ -261,7 +275,7 @@ final class Export extends Model
     protected function isCompleted(): Attribute
     {
         return Attribute::make(
-            get: fn(): bool => $this->status === ExportStatus::Completed
+            get: fn (): bool => $this->status === ExportStatus::Completed
         );
     }
 
@@ -271,7 +285,7 @@ final class Export extends Model
     protected function isFailed(): Attribute
     {
         return Attribute::make(
-            get: fn(): bool => $this->status === ExportStatus::Failed
+            get: fn (): bool => $this->status === ExportStatus::Failed
         );
     }
 
@@ -281,7 +295,7 @@ final class Export extends Model
     protected function isProcessing(): Attribute
     {
         return Attribute::make(
-            get: fn(): bool => $this->status === ExportStatus::Processing
+            get: fn (): bool => $this->status === ExportStatus::Processing
         );
     }
 
@@ -291,7 +305,7 @@ final class Export extends Model
     protected function isDownloadable(): Attribute
     {
         return Attribute::make(
-            get: fn(): bool => $this->status === ExportStatus::Completed &&
+            get: fn (): bool => $this->status === ExportStatus::Completed &&
                 $this->artifact_path !== null &&
                 $this->artifact_filename !== null
         );
@@ -315,11 +329,11 @@ final class Export extends Model
     public function markAsCompleted(string $artifactPath, string $artifactFilename, ?string $artifactDisk = null): bool
     {
         return $this->update([
-            'status' => ExportStatus::Completed,
-            'completed_at' => now(),
-            'artifact_path' => $artifactPath,
+            'status'            => ExportStatus::Completed,
+            'completed_at'      => now(),
+            'artifact_path'     => $artifactPath,
             'artifact_filename' => $artifactFilename,
-            'artifact_disk' => $artifactDisk ?? $this->artifact_disk,
+            'artifact_disk'     => $artifactDisk ?? $this->artifact_disk,
         ]);
     }
 
@@ -329,8 +343,8 @@ final class Export extends Model
     public function markAsFailed(string $reason): bool
     {
         return $this->update([
-            'status' => ExportStatus::Failed,
-            'failed_at' => now(),
+            'status'         => ExportStatus::Failed,
+            'failed_at'      => now(),
             'failure_reason' => $reason,
         ]);
     }
