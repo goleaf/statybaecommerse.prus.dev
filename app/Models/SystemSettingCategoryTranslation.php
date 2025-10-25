@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\OrdersByName;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -15,11 +16,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  *
  * Eloquent model representing the SystemSettingCategoryTranslation entity with comprehensive relationships, scopes, and business logic for the e-commerce system.
  *
- * @property int $id
- * @property int $system_setting_category_id
- * @property string $locale
- * @property string $name
- * @property string|null $description
+ * @property int            $id
+ * @property int            $system_setting_category_id
+ * @property string         $locale
+ * @property string         $name
+ * @property string|null    $description
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
  * @property-read SystemSettingCategory $systemSettingCategory
@@ -40,20 +41,29 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 final class SystemSettingCategoryTranslation extends Model
 {
     use HasFactory;
+    use OrdersByName;
+
+    /**
+     * Order translations by the name attribute so UI selectors remain
+     * alphabetised across locales.
+     */
+    protected string $nameColumn = 'name';
 
     protected $fillable = [
         'system_setting_category_id',
         'locale',
         'name',
         'description',
+        'meta',
     ];
 
     protected function casts(): array
     {
         return [
             'system_setting_category_id' => 'integer',
-            'created_at' => 'datetime',
-            'updated_at' => 'datetime',
+            'created_at'                 => 'datetime',
+            'updated_at'                 => 'datetime',
+            'meta'                       => 'array',
         ];
     }
 
@@ -151,11 +161,11 @@ final class SystemSettingCategoryTranslation extends Model
     public function getLocaleBadgeColorAttribute(): string
     {
         return match ($this->locale) {
-            'en' => 'success',
-            'lt' => 'info',
-            'de' => 'warning',
-            'fr' => 'danger',
-            'es' => 'primary',
+            'en'    => 'success',
+            'lt'    => 'info',
+            'de'    => 'warning',
+            'fr'    => 'danger',
+            'es'    => 'primary',
             default => 'gray',
         };
     }
@@ -192,7 +202,7 @@ final class SystemSettingCategoryTranslation extends Model
      */
     public function getTruncatedNameAttribute(): string
     {
-        return strlen($this->name) > 50 ? substr($this->name, 0, 47).'...' : $this->name;
+        return strlen($this->name) > 50 ? substr($this->name, 0, 47) . '...' : $this->name;
     }
 
     /**
@@ -204,7 +214,7 @@ final class SystemSettingCategoryTranslation extends Model
             return null;
         }
 
-        return strlen($this->description) > 50 ? substr($this->description, 0, 47).'...' : $this->description;
+        return strlen($this->description) > 50 ? substr($this->description, 0, 47) . '...' : $this->description;
     }
 
     /**
@@ -216,11 +226,11 @@ final class SystemSettingCategoryTranslation extends Model
         $totalLocales = count(self::getAvailableLocales());
 
         $stats = [
-            'total_locales' => $totalLocales,
-            'translated_locales' => $translations->count(),
-            'completion_percentage' => (int) round(($translations->count() / $totalLocales) * 100),
-            'missing_locales' => [],
-            'complete_translations' => $translations->filter(fn ($t) => $t->isComplete())->count(),
+            'total_locales'           => $totalLocales,
+            'translated_locales'      => $translations->count(),
+            'completion_percentage'   => (int) round(($translations->count() / $totalLocales) * 100),
+            'missing_locales'         => [],
+            'complete_translations'   => $translations->filter(fn ($t) => $t->isComplete())->count(),
             'incomplete_translations' => $translations->filter(fn ($t) => ! $t->isComplete())->count(),
         ];
 
@@ -260,11 +270,11 @@ final class SystemSettingCategoryTranslation extends Model
         return self::updateOrCreate(
             [
                 'system_setting_category_id' => $categoryId,
-                'locale' => $locale,
+                'locale'                     => $locale,
             ],
             array_merge($data, [
                 'system_setting_category_id' => $categoryId,
-                'locale' => $locale,
+                'locale'                     => $locale,
             ])
         );
     }
@@ -290,9 +300,9 @@ final class SystemSettingCategoryTranslation extends Model
     {
         return self::create([
             'system_setting_category_id' => $this->system_setting_category_id,
-            'locale' => $newLocale,
-            'name' => $this->name,
-            'description' => $this->description,
+            'locale'                     => $newLocale,
+            'name'                       => $this->name,
+            'description'                => $this->description,
         ]);
     }
 
@@ -331,7 +341,7 @@ final class SystemSettingCategoryTranslation extends Model
             $this->quality_score >= 90 => 'success',
             $this->quality_score >= 70 => 'warning',
             $this->quality_score >= 50 => 'info',
-            default => 'danger',
+            default                    => 'danger',
         };
     }
 }

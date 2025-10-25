@@ -26,9 +26,9 @@ final class SystemSettingHistory extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['system_setting_id', 'old_value', 'new_value', 'changed_by', 'change_reason', 'ip_address', 'user_agent'];
+    protected $fillable = ['system_setting_id', 'old_value', 'new_value', 'changed_by', 'change_reason', 'ip_address', 'user_agent', 'meta'];
 
-    protected $casts = ['old_value' => 'string', 'new_value' => 'string', 'changed_by' => 'integer'];
+    protected $casts = ['old_value' => 'string', 'new_value' => 'string', 'changed_by' => 'integer', 'meta' => 'array'];
 
     /**
      * Handle systemSetting functionality with proper error handling.
@@ -65,7 +65,7 @@ final class SystemSettingHistory extends Model
     /**
      * Handle formatValue functionality with proper error handling.
      *
-     * @param  mixed  $value
+     * @param mixed $value
      */
     private function formatValue($value): string
     {

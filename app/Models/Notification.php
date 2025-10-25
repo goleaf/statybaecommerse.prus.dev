@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\OrdersByName;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -49,6 +50,14 @@ final class Notification extends DatabaseNotification
      * @use \Illuminate\Database\Eloquent\Factories\HasFactory<\Database\Factories\NotificationFactory>
      */
     use HasFactory;
+
+    use OrdersByName;
+
+    /**
+     * Default alphabetical ordering to the notification type when generating
+     * listings, ensuring predictable grouping for support teams.
+     */
+    protected string $nameColumn = 'type';
 
     /**
      * Map normalized notification types to consistent color keywords.
@@ -107,7 +116,7 @@ final class Notification extends DatabaseNotification
     /**
      * @var list<string>
      */
-    protected $fillable = ['type', 'notifiable_type', 'notifiable_id', 'user_id', 'data', 'read_at'];
+    protected $fillable = ['type', 'notifiable_type', 'notifiable_id', 'user_id', 'data', 'meta', 'read_at'];
 
     /**
      * Catalog of attribute casts applied to persisted payload columns.
@@ -115,7 +124,7 @@ final class Notification extends DatabaseNotification
      * @var array<string, string>
      */
     // @phpstan-ignore-next-line We intentionally specialize the inherited cast definitions for better IDE hints.
-    protected $casts = ['data' => 'array', 'read_at' => 'datetime', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
+    protected $casts = ['data' => 'array', 'meta' => 'array', 'read_at' => 'datetime', 'created_at' => 'datetime', 'updated_at' => 'datetime'];
 
     /**
      * @var list<string>

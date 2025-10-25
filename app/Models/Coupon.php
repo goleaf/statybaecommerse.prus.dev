@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\OrdersByName;
 use App\Models\Scopes\ActiveScope;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Builder;
@@ -32,11 +33,20 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 final class Coupon extends Model
 {
     /** @use HasFactory<\Database\Factories\CouponFactory> */
-    use HasFactory, SoftDeletes;
+    use HasFactory;
 
-    protected $fillable = ['code', 'name', 'description', 'type', 'value', 'minimum_amount', 'maximum_discount', 'usage_limit', 'usage_limit_per_user', 'used_count', 'is_active', 'is_public', 'is_auto_apply', 'is_stackable', 'is_first_time_only', 'customer_group_id', 'starts_at', 'expires_at', 'applicable_products', 'applicable_categories'];
+    use OrdersByName;
+    use SoftDeletes;
 
-    protected $casts = ['value' => 'decimal:2', 'minimum_amount' => 'decimal:2', 'maximum_discount' => 'decimal:2', 'usage_limit' => 'integer', 'usage_limit_per_user' => 'integer', 'used_count' => 'integer', 'is_active' => 'boolean', 'is_public' => 'boolean', 'is_auto_apply' => 'boolean', 'is_stackable' => 'boolean', 'is_first_time_only' => 'boolean', 'customer_group_id' => 'integer', 'starts_at' => 'datetime', 'expires_at' => 'datetime', 'applicable_products' => 'array', 'applicable_categories' => 'array'];
+    /**
+     * Ensure alphabetical ordering defaults to the human-readable name column
+     * so the shared OrdersByName trait applies consistent query clauses.
+     */
+    protected string $nameColumn = 'name';
+
+    protected $fillable = ['code', 'name', 'description', 'type', 'value', 'minimum_amount', 'maximum_discount', 'usage_limit', 'usage_limit_per_user', 'used_count', 'is_active', 'is_public', 'is_auto_apply', 'is_stackable', 'is_first_time_only', 'customer_group_id', 'starts_at', 'expires_at', 'applicable_products', 'applicable_categories', 'meta'];
+
+    protected $casts = ['value' => 'decimal:2', 'minimum_amount' => 'decimal:2', 'maximum_discount' => 'decimal:2', 'usage_limit' => 'integer', 'usage_limit_per_user' => 'integer', 'used_count' => 'integer', 'is_active' => 'boolean', 'is_public' => 'boolean', 'is_auto_apply' => 'boolean', 'is_stackable' => 'boolean', 'is_first_time_only' => 'boolean', 'customer_group_id' => 'integer', 'starts_at' => 'datetime', 'expires_at' => 'datetime', 'applicable_products' => 'array', 'applicable_categories' => 'array', 'meta' => 'array'];
 
     // Relationships
 
@@ -179,18 +189,6 @@ final class Coupon extends Model
     {
         // Locate a coupon by its public code value without repeating column names elsewhere.
         return $query->where('code', $code);
-    }
-
-    /**
-     * Provide a deterministic alphabetical ordering helper for data tables and APIs.
-     *
-     * @param  Builder<Coupon> $query
-     * @return Builder<Coupon>
-     */
-    public function scopeOrderedByName(Builder $query): Builder
-    {
-        // Qualify the column to avoid ambiguity when the query joins additional tables.
-        return $query->orderBy($query->qualifyColumn('name'));
     }
 
     /**

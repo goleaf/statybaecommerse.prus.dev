@@ -45,6 +45,7 @@ it('exposes expected fillable attributes', function (): void {
         'name',
         'status',
         'metadata',
+        'meta',
         'scheduled_at',
         'sent_at',
         'delivered_at',
@@ -75,6 +76,7 @@ it('defines the expected attribute casts', function (): void {
     // Assert: validate we keep serialization and mutation behaviour untouched.
     expect($casts)->toMatchArray([
         'metadata'          => 'array',
+        'meta'              => 'array',
         'scheduled_at'      => 'datetime',
         'sent_at'           => 'datetime',
         'delivered_at'      => 'datetime',

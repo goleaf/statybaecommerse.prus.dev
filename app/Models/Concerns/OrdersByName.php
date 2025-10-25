@@ -17,20 +17,22 @@ use Illuminate\Database\Eloquent\Model;
 trait OrdersByName
 {
     /**
-     * Provide a default column name that consuming models may override when
-     * their sortable attribute does not match the conventional "name" field.
-     */
-    protected string $nameColumn = 'name';
-
-    /**
      * Determine the column used for ordering operations while remaining
      * tolerant of legacy models that expose an overriding property dynamically.
      */
     protected function getNameColumn(): string
     {
-        // Fall back to the trait-level property whenever the concrete model
+        // Fall back to the default column name whenever the concrete model
         // does not declare a custom $nameColumn configuration explicitly.
-        return property_exists($this, 'nameColumn') ? (string) $this->nameColumn : $this->nameColumn;
+        if (property_exists($this, 'nameColumn')) {
+            // Casting to string ensures defensive safety even when the host
+            // model accidentally exposes the property as a different scalar.
+            return (string) $this->nameColumn;
+        }
+
+        // Provide a sensible default so models can opt-in without redeclaring
+        // anything—this keeps legacy models working out of the box.
+        return 'name';
     }
 
     /**

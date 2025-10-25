@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\OrdersByName;
 use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\DateRangeScope;
 use App\Models\Scopes\StatusScope;
@@ -34,7 +35,15 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 #[ScopedBy([ActiveScope::class, DateRangeScope::class, StatusScope::class])]
 final class DiscountCode extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory;
+    use OrdersByName;
+    use SoftDeletes;
+
+    /**
+     * Expose the target column for alphabetical ordering so shared helpers can
+     * consistently sort discount codes by their public string value.
+     */
+    protected string $nameColumn = 'code';
 
     protected $table = 'discount_codes';
 
@@ -64,6 +73,7 @@ final class DiscountCode extends Model
         'customer_group_id',
         'status',
         'metadata',
+        'meta',
         'created_by',
         'updated_by',
         'created_by_name',
@@ -92,6 +102,7 @@ final class DiscountCode extends Model
             'minimum_amount'       => 'decimal:2',
             'maximum_discount'     => 'decimal:2',
             'metadata'             => 'array',
+            'meta'                 => 'array',
         ];
     }
 
@@ -159,6 +170,46 @@ final class DiscountCode extends Model
     public function users(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'discount_redemptions', 'code_id', 'user_id');
+    }
+
+    /**
+     * Quickly limit the query to codes that are currently valid based on the
+     * expiration and activation metadata persisted alongside the record.
+     */
+    public function scopeValid(Builder $query): Builder
+    {
+        $now = now();
+
+        return $query
+            ->where('is_active', true)
+            ->where(static function (Builder $builder) use ($now): void {
+                $builder->whereNull('starts_at')->orWhere('starts_at', '<=', $now);
+            })
+            ->where(static function (Builder $builder) use ($now): void {
+                $builder->whereNull('expires_at')->orWhere('expires_at', '>=', $now);
+            });
+    }
+
+    /**
+     * Provide a dedicated helper to isolate non-expired codes for UI dropdowns
+     * while keeping business logic readable at the call site.
+     */
+    public function scopeNotExpired(Builder $query): Builder
+    {
+        $now = now();
+
+        return $query->where(static function (Builder $builder) use ($now): void {
+            $builder->whereNull('expires_at')->orWhere('expires_at', '>=', $now);
+        });
+    }
+
+    /**
+     * Resolve a code by its public identifier without repeating column names
+     * throughout services and controllers, reducing potential typos.
+     */
+    public function scopeWithCode(Builder $query, string $code): Builder
+    {
+        return $query->where('code', $code);
     }
 
     /**

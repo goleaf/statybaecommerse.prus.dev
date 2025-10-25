@@ -26,14 +26,14 @@ final class ReferralCodeUsageLog extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['referral_code_id', 'user_id', 'ip_address', 'user_agent', 'referrer', 'metadata'];
+    protected $fillable = ['referral_code_id', 'user_id', 'ip_address', 'user_agent', 'referrer', 'metadata', 'meta'];
 
     /**
      * Handle casts functionality with proper error handling.
      */
     protected function casts(): array
     {
-        return ['metadata' => 'array'];
+        return ['metadata' => 'array', 'meta' => 'array'];
     }
 
     /**

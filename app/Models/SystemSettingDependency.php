@@ -1,11 +1,14 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use App\Models\Concerns\OrdersByName;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * SystemSettingDependency
@@ -38,11 +41,19 @@ final class SystemSettingDependency extends Model
     /** @use HasFactory<\Database\Factories\SystemSettingDependencyFactory> */
     use HasFactory;
 
+    use OrdersByName;
+
+    /**
+     * Sort dependencies by their condition column so diagnostic tables remain
+     * predictable even when filtering by dependent key values.
+     */
+    protected string $nameColumn = 'condition';
+
     protected static function booted(): void
     {
         self::resolveRelationUsing(
             'dependsOnSetting',
-            static fn(self $model): BelongsTo => $model->dependsOnSettingRelation()
+            static fn (self $model): BelongsTo => $model->dependsOnSettingRelation()
         );
     }
 
@@ -66,12 +77,14 @@ final class SystemSettingDependency extends Model
         'condition',
         'condition_value',
         'is_active',
+        'meta',
     ];
 
     protected $casts = [
-        'condition' => 'string',
+        'condition'       => 'string',
         'condition_value' => 'string',
-        'is_active' => 'boolean',
+        'is_active'       => 'boolean',
+        'meta'            => 'array',
     ];
 
     /**
@@ -263,7 +276,7 @@ final class SystemSettingDependency extends Model
     {
         $dependsOnSetting = $this->getRelationValue('dependsOnSettingRelation');
 
-        if (!$dependsOnSetting instanceof SystemSetting) {
+        if (! $dependsOnSetting instanceof SystemSetting) {
             return false;
         }
 
@@ -300,23 +313,23 @@ final class SystemSettingDependency extends Model
         $normalizedExpected = is_string($expectedValue) ? trim($expectedValue) : $expectedValue;
 
         return match ($operator) {
-            'equals' => $this->compareValues($normalizedValue, $normalizedExpected) === 0,
-            'not_equals' => $this->compareValues($normalizedValue, $normalizedExpected) !== 0,
-            'greater_than' => $this->compareValues($normalizedValue, $normalizedExpected) === 1,
+            'equals'            => $this->compareValues($normalizedValue, $normalizedExpected) === 0,
+            'not_equals'        => $this->compareValues($normalizedValue, $normalizedExpected) !== 0,
+            'greater_than'      => $this->compareValues($normalizedValue, $normalizedExpected) === 1,
             'greater_or_equals' => $this->compareValues($normalizedValue, $normalizedExpected) >= 0,
-            'less_than' => $this->compareValues($normalizedValue, $normalizedExpected) === -1,
-            'less_or_equals' => $this->compareValues($normalizedValue, $normalizedExpected) <= 0,
-            'contains' => is_string($normalizedValue) && is_string($normalizedExpected) && str_contains($normalizedValue, $normalizedExpected),
-            'not_contains' => is_string($normalizedValue) && is_string($normalizedExpected) && !str_contains($normalizedValue, $normalizedExpected),
-            'starts_with' => is_string($normalizedValue) && is_string($normalizedExpected) && str_starts_with($normalizedValue, $normalizedExpected),
-            'ends_with' => is_string($normalizedValue) && is_string($normalizedExpected) && str_ends_with($normalizedValue, $normalizedExpected),
-            'in' => $this->isInList($normalizedValue, $normalizedExpected),
-            'not_in' => !$this->isInList($normalizedValue, $normalizedExpected),
-            'is_empty' => blank($normalizedValue),
-            'is_not_empty' => filled($normalizedValue),
-            'is_true' => $this->toBoolean($normalizedValue) === true,
-            'is_false' => $this->toBoolean($normalizedValue) === false,
-            default => false,
+            'less_than'         => $this->compareValues($normalizedValue, $normalizedExpected) === -1,
+            'less_or_equals'    => $this->compareValues($normalizedValue, $normalizedExpected) <= 0,
+            'contains'          => is_string($normalizedValue) && is_string($normalizedExpected) && str_contains($normalizedValue, $normalizedExpected),
+            'not_contains'      => is_string($normalizedValue) && is_string($normalizedExpected) && ! str_contains($normalizedValue, $normalizedExpected),
+            'starts_with'       => is_string($normalizedValue) && is_string($normalizedExpected) && str_starts_with($normalizedValue, $normalizedExpected),
+            'ends_with'         => is_string($normalizedValue) && is_string($normalizedExpected) && str_ends_with($normalizedValue, $normalizedExpected),
+            'in'                => $this->isInList($normalizedValue, $normalizedExpected),
+            'not_in'            => ! $this->isInList($normalizedValue, $normalizedExpected),
+            'is_empty'          => blank($normalizedValue),
+            'is_not_empty'      => filled($normalizedValue),
+            'is_true'           => $this->toBoolean($normalizedValue) === true,
+            'is_false'          => $this->toBoolean($normalizedValue) === false,
+            default             => false,
         };
     }
 
@@ -352,15 +365,15 @@ final class SystemSettingDependency extends Model
             if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
                 $expected = $decoded;
             } else {
-                $expected = array_map('trim', array_filter(explode(',', $expected), static fn($item): bool => $item !== ''));
+                $expected = array_map('trim', array_filter(explode(',', $expected), static fn ($item): bool => $item !== ''));
             }
         }
 
-        if (!is_array($expected)) {
+        if (! is_array($expected)) {
             return false;
         }
 
-        return in_array($actual, $expected, !is_string($actual));
+        return in_array($actual, $expected, ! is_string($actual));
     }
 
     /**

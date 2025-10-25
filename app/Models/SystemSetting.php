@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\OrdersByName;
 use App\Models\Scopes\ActiveScope;
+use Exception;
 use Illuminate\Cache\TaggableStore;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -36,11 +39,21 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
 #[ScopedBy([ActiveScope::class])]
 final class SystemSetting extends Model implements HasMedia
 {
-    use HasFactory, InteractsWithMedia, LogsActivity, SoftDeletes;
+    use HasFactory;
+    use InteractsWithMedia;
+    use LogsActivity;
+    use OrdersByName;
+    use SoftDeletes;
 
-    protected $fillable = ['category_id', 'key', 'name', 'value', 'type', 'group', 'category', 'unit', 'description', 'help_text', 'is_public', 'is_required', 'is_encrypted', 'is_readonly', 'validation_rules', 'options', 'default_value', 'sort_order', 'is_active', 'updated_by', 'placeholder', 'tooltip', 'metadata', 'validation_message', 'is_cacheable', 'cache_ttl', 'cache_key', 'environment', 'tags', 'version', 'access_count', 'last_accessed_at'];
+    /**
+     * Use the key column for alphabetical ordering so system settings remain
+     * predictable when displayed in configuration tables.
+     */
+    protected string $nameColumn = 'key';
 
-    protected $casts = ['is_public' => 'boolean', 'is_required' => 'boolean', 'is_encrypted' => 'boolean', 'is_readonly' => 'boolean', 'is_active' => 'boolean', 'is_cacheable' => 'boolean', 'validation_rules' => 'json', 'options' => 'json', 'metadata' => 'json', 'tags' => 'json', 'sort_order' => 'integer', 'cache_ttl' => 'integer', 'access_count' => 'integer', 'last_accessed_at' => 'datetime'];
+    protected $fillable = ['category_id', 'key', 'name', 'value', 'type', 'group', 'category', 'unit', 'description', 'help_text', 'is_public', 'is_required', 'is_encrypted', 'is_readonly', 'validation_rules', 'options', 'default_value', 'sort_order', 'is_active', 'updated_by', 'placeholder', 'tooltip', 'metadata', 'meta', 'validation_message', 'is_cacheable', 'cache_ttl', 'cache_key', 'environment', 'tags', 'version', 'access_count', 'last_accessed_at'];
+
+    protected $casts = ['is_public' => 'boolean', 'is_required' => 'boolean', 'is_encrypted' => 'boolean', 'is_readonly' => 'boolean', 'is_active' => 'boolean', 'is_cacheable' => 'boolean', 'validation_rules' => 'json', 'options' => 'json', 'metadata' => 'json', 'meta' => 'json', 'tags' => 'json', 'sort_order' => 'integer', 'cache_ttl' => 'integer', 'access_count' => 'integer', 'last_accessed_at' => 'datetime'];
 
     /**
      * Handle value functionality with proper error handling.
@@ -52,7 +65,7 @@ final class SystemSetting extends Model implements HasMedia
                 if ($this->is_encrypted && $value) {
                     try {
                         $value = decrypt($value);
-                    } catch (\Exception $e) {
+                    } catch (Exception $e) {
                         // If decryption fails, return the original value.
                     }
                 }
@@ -66,9 +79,9 @@ final class SystemSetting extends Model implements HasMedia
                         FILTER_NULL_ON_FAILURE
                     ) ?? (bool) json_decode($value ?? 'false'),
                     'integer' => is_null($value) ? null : (int) $value,
-                    'float' => is_null($value) ? null : (float) $value,
+                    'float'   => is_null($value) ? null : (float) $value,
                     'array', 'json' => safe_json_decode_array($value ?: '[]'),
-                    'file' => $this->getFirstMediaUrl('files'),
+                    'file'  => $this->getFirstMediaUrl('files'),
                     'image' => $this->getFirstMediaUrl('images'),
                     default => $value,
                 };
@@ -90,7 +103,7 @@ final class SystemSetting extends Model implements HasMedia
                 FILTER_NULL_ON_FAILURE
             ) ?? (bool) $value),
             'integer' => is_null($value) ? null : (string) (int) $value,
-            'float' => is_null($value) ? null : (string) (float) $value,
+            'float'   => is_null($value) ? null : (string) (float) $value,
             'array', 'json' => json_encode($value ?? []),
             default => is_null($value) ? null : (string) $value,
         };
@@ -201,9 +214,9 @@ final class SystemSetting extends Model implements HasMedia
     /**
      * Handle scopeByGroup functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
-    public function scopeByGroup($query, string $group)
+    public function scopeByGroup(Builder $query, string $group): Builder
     {
         return $query->where('group', $group);
     }
@@ -211,9 +224,9 @@ final class SystemSetting extends Model implements HasMedia
     /**
      * Handle scopeByCategory functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param Builder<SystemSetting> $query
      */
-    public function scopeByCategory($query, string $category)
+    public function scopeByCategory(Builder $query, string $category): Builder
     {
         return $query->whereHas('category', function ($q) use ($category) {
             $q->where('slug', $category);
@@ -223,9 +236,9 @@ final class SystemSetting extends Model implements HasMedia
     /**
      * Handle scopePublic functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
-    public function scopePublic($query)
+    public function scopePublic(Builder $query): Builder
     {
         return $query->where('is_public', true);
     }
@@ -233,9 +246,9 @@ final class SystemSetting extends Model implements HasMedia
     /**
      * Handle scopeActive functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
-    public function scopeActive($query)
+    public function scopeActive(Builder $query): Builder
     {
         return $query->where('is_active', true);
     }
@@ -243,9 +256,9 @@ final class SystemSetting extends Model implements HasMedia
     /**
      * Handle scopeOrdered functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
-    public function scopeOrdered($query)
+    public function scopeOrdered(Builder $query): Builder
     {
         return $query->orderBy('sort_order')->orderBy('name');
     }
@@ -253,9 +266,9 @@ final class SystemSetting extends Model implements HasMedia
     /**
      * Handle scopeSearchable functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
-    public function scopeSearchable($query, string $search)
+    public function scopeSearchable(Builder $query, string $search): Builder
     {
         return $query->where(function ($q) use ($search) {
             $q->where('key', 'like', "%{$search}%")->orWhere('name', 'like', "%{$search}%")->orWhere('description', 'like', "%{$search}%");
@@ -263,9 +276,27 @@ final class SystemSetting extends Model implements HasMedia
     }
 
     /**
+     * Provide a scope shortcut for retrieving a specific setting by key while
+     * keeping chained queries readable.
+     */
+    public function scopeWithKey(Builder $query, string $key): Builder
+    {
+        return $query->where('key', $key);
+    }
+
+    /**
+     * Filter settings by their owning category identifier for simplified admin
+     * widgets that allow selecting related configuration items.
+     */
+    public function scopeInCategory(Builder $query, int $categoryId): Builder
+    {
+        return $query->where('category_id', $categoryId);
+    }
+
+    /**
      * Handle getValue functionality with proper error handling.
      *
-     * @param  mixed  $default
+     * @param mixed $default
      */
     public static function getValue(string $key, $default = null)
     {
@@ -277,18 +308,18 @@ final class SystemSetting extends Model implements HasMedia
     /**
      * Handle setValue functionality with proper error handling.
      *
-     * @param  mixed  $value
+     * @param mixed $value
      */
     public static function setValue(string $key, $value, array $options = []): void
     {
         $defaults = [
-            'type'        => 'string',
-            'group'       => 'general',
-            'is_public'   => false,
-            'is_required' => false,
-            'is_encrypted'=> false,
-            'is_readonly' => false,
-            'is_active'   => true,
+            'type'         => 'string',
+            'group'        => 'general',
+            'is_public'    => false,
+            'is_required'  => false,
+            'is_encrypted' => false,
+            'is_readonly'  => false,
+            'is_active'    => true,
         ];
         $data = array_merge($defaults, $options, [
             'key'        => $key,
@@ -302,7 +333,7 @@ final class SystemSetting extends Model implements HasMedia
     /**
      * Handle getPublic functionality with proper error handling.
      *
-     * @param  mixed  $default
+     * @param mixed $default
      */
     public static function getPublic(string $key, $default = null)
     {
@@ -433,7 +464,7 @@ final class SystemSetting extends Model implements HasMedia
             'boolean' => $this->value ? __('admin.yes') : __('admin.no'),
             'array', 'json' => json_encode($this->value, JSON_PRETTY_PRINT),
             'file', 'image' => $this->value ? basename($this->value) : __('admin.not_set'),
-            'color' => $this->value ? '<span style="background-color: '.$this->value.'; width: 20px; height: 20px; display: inline-block; border-radius: 3px;"></span> '.$this->value : __('admin.not_set'),
+            'color' => $this->value ? '<span style="background-color: ' . $this->value . '; width: 20px; height: 20px; display: inline-block; border-radius: 3px;"></span> ' . $this->value : __('admin.not_set'),
             default => (string) $this->value,
         };
     }
@@ -445,13 +476,13 @@ final class SystemSetting extends Model implements HasMedia
     {
         return match ($this->type) {
             'string', 'text' => 'heroicon-o-document-text',
-            'number' => 'heroicon-o-calculator',
+            'number'  => 'heroicon-o-calculator',
             'boolean' => 'heroicon-o-check-circle',
             'array', 'json' => 'heroicon-o-code-bracket',
-            'file' => 'heroicon-o-document',
-            'image' => 'heroicon-o-photo',
+            'file'   => 'heroicon-o-document',
+            'image'  => 'heroicon-o-photo',
             'select' => 'heroicon-o-list-bullet',
-            'color' => 'heroicon-o-swatch',
+            'color'  => 'heroicon-o-swatch',
             'date', 'datetime' => 'heroicon-o-calendar-days',
             default => 'heroicon-o-cog-6-tooth',
         };
@@ -464,12 +495,12 @@ final class SystemSetting extends Model implements HasMedia
     {
         return match ($this->type) {
             'string', 'text' => 'gray',
-            'number' => 'blue',
+            'number'  => 'blue',
             'boolean' => 'green',
             'array', 'json' => 'purple',
             'file', 'image' => 'orange',
             'select' => 'indigo',
-            'color' => 'pink',
+            'color'  => 'pink',
             'date', 'datetime' => 'yellow',
             default => 'gray',
         };
@@ -544,7 +575,7 @@ final class SystemSetting extends Model implements HasMedia
     /**
      * Handle validateValue functionality with proper error handling.
      *
-     * @param  mixed  $value
+     * @param mixed $value
      */
     public function validateValue($value): bool
     {
@@ -560,7 +591,7 @@ final class SystemSetting extends Model implements HasMedia
     /**
      * Handle getValidationErrors functionality with proper error handling.
      *
-     * @param  mixed  $value
+     * @param mixed $value
      */
     public function getValidationErrors($value): array
     {
@@ -578,7 +609,7 @@ final class SystemSetting extends Model implements HasMedia
      */
     public function getCacheKey(): string
     {
-        return 'system_setting_'.$this->key;
+        return 'system_setting_' . $this->key;
     }
 
     /**
@@ -586,7 +617,7 @@ final class SystemSetting extends Model implements HasMedia
      */
     public function getCacheTags(): array
     {
-        return ['system_settings', 'system_setting_'.$this->id, 'group_'.$this->group];
+        return ['system_settings', 'system_setting_' . $this->id, 'group_' . $this->group];
     }
 
     /**
