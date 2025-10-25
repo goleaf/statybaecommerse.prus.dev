@@ -71,7 +71,8 @@ trait ManagesNewsTranslationTabs
                 ->where('locale', $locale)
                 ->where('slug', $slug);
 
-            if ($ignoreNewsId) {
+            // Respect the optional ignore identifier even when it is falsy (e.g. zero) by using a strict null check.
+            if ($ignoreNewsId !== null) {
                 $query->where('news_id', '!=', $ignoreNewsId);
             }
 
