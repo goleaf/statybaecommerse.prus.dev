@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 final class EmailCampaignRecipient extends Model
 {
+    /** @use HasFactory<\Database\Factories\EmailCampaignRecipientFactory> */
     use HasFactory;
 
     protected $fillable = [
@@ -68,8 +70,29 @@ final class EmailCampaignRecipient extends Model
         'is_unsubscribed'   => false,
     ];
 
+    /**
+     * Define the relationship to the owning email campaign instance.
+     *
+     * @return BelongsTo<EmailCampaign, self>
+     */
     public function campaign(): BelongsTo
     {
-        return $this->belongsTo(EmailCampaign::class, 'email_campaign_id');
+        /** @var BelongsTo<EmailCampaign, self> $relation */
+        $relation = $this->belongsTo(EmailCampaign::class, 'email_campaign_id');
+
+        // Return the cached relationship instance to keep type information precise for static analysis.
+        return $relation;
+    }
+
+    /**
+     * Scope a query to order email campaign recipients alphabetically by their name.
+     *
+     * @param  Builder<EmailCampaignRecipient> $query
+     * @return Builder<EmailCampaignRecipient>
+     */
+    public function scopeOrderedByName(Builder $query): Builder
+    {
+        // Order recipients by the name column in ascending order for predictable listings.
+        return $query->orderBy('name');
     }
 }
