@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\OrdersByName;
 use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\EnabledScope;
 use App\Models\Scopes\StatusScope;
 use App\Models\Scopes\TrackedScope;
+use DateTimeInterface;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -36,7 +38,15 @@ use Illuminate\Support\Facades\DB;
 #[ScopedBy([ActiveScope::class, EnabledScope::class, TrackedScope::class, StatusScope::class])]
 final class VariantInventory extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, OrdersByName, SoftDeletes;
+
+    /**
+     * Default column leveraged by the reusable orderedByName scope.
+     */
+    protected function getNameColumn(): string
+    {
+        return 'warehouse_code';
+    }
 
     protected $table = 'variant_inventories';
 
@@ -66,11 +76,11 @@ final class VariantInventory extends Model
     protected function casts(): array
     {
         return [
-            'stock' => 'integer',
-            'reserved' => 'integer',
-            'available' => 'integer',
-            'reorder_point' => 'integer',
-            'reorder_quantity' => 'integer',
+            'stock'             => 'integer',
+            'reserved'          => 'integer',
+            'available'         => 'integer',
+            'reorder_point'     => 'integer',
+            'reorder_quantity'  => 'integer',
             'last_restocked_at' => 'datetime',
         ];
     }
@@ -188,16 +198,16 @@ final class VariantInventory extends Model
     {
         return match ($this->stock_status) {
             'out_of_stock' => 'Out of Stock',
-            'low_stock' => 'Low Stock',
-            'in_stock' => 'In Stock',
-            default => 'Unknown',
+            'low_stock'    => 'Low Stock',
+            'in_stock'     => 'In Stock',
+            default        => 'Unknown',
         };
     }
 
     /**
      * Handle scopeInStock functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeInStock($query)
     {
@@ -207,7 +217,7 @@ final class VariantInventory extends Model
     /**
      * Handle scopeLowStock functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeLowStock($query)
     {
@@ -217,7 +227,7 @@ final class VariantInventory extends Model
     /**
      * Handle scopeOutOfStock functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeOutOfStock($query)
     {
@@ -227,7 +237,7 @@ final class VariantInventory extends Model
     /**
      * Handle scopeNeedsReorder functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeNeedsReorder($query)
     {
@@ -237,7 +247,7 @@ final class VariantInventory extends Model
     /**
      * Handle scopeByWarehouse functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeByWarehouse($query, string $warehouseCode)
     {
@@ -247,9 +257,9 @@ final class VariantInventory extends Model
     /**
      * @return Builder<self>
      */
-    private static function newUnlockedQuery(): Builder
+    private function newUnlockedQuery(): Builder
     {
-        return static::query()->withoutGlobalScopes([
+        return self::query()->withoutGlobalScopes([
             ActiveScope::class,
             EnabledScope::class,
             TrackedScope::class,
@@ -262,7 +272,7 @@ final class VariantInventory extends Model
      */
     public function reserveStock(
         int $quantity,
-        ?\DateTimeInterface $expiresAt = null,
+        ?DateTimeInterface $expiresAt = null,
         array $meta = [],
         ?string $referenceType = null,
         ?string $referenceId = null
@@ -271,8 +281,8 @@ final class VariantInventory extends Model
             return false;
         }
 
-        $reserved = DB::transaction(function () use ($quantity) {
-            $inventory = self::newUnlockedQuery()
+        $reserved = DB::transaction(function () use ($quantity): bool {
+            $inventory = $this->newUnlockedQuery()
                 ->whereKey($this->getKey())
                 ->lockForUpdate()
                 ->first();
@@ -317,8 +327,8 @@ final class VariantInventory extends Model
             return false;
         }
 
-        $released = DB::transaction(function () use ($quantity) {
-            $inventory = self::newUnlockedQuery()
+        $released = DB::transaction(function () use ($quantity): bool {
+            $inventory = $this->newUnlockedQuery()
                 ->whereKey($this->getKey())
                 ->lockForUpdate()
                 ->first();
@@ -361,8 +371,8 @@ final class VariantInventory extends Model
             return false;
         }
 
-        $added = DB::transaction(function () use ($quantity) {
-            $inventory = self::newUnlockedQuery()
+        $added = DB::transaction(function () use ($quantity): bool {
+            $inventory = $this->newUnlockedQuery()
                 ->whereKey($this->getKey())
                 ->lockForUpdate()
                 ->first();
@@ -403,8 +413,8 @@ final class VariantInventory extends Model
             return false;
         }
 
-        $removed = DB::transaction(function () use ($quantity) {
-            $inventory = self::newUnlockedQuery()
+        $removed = DB::transaction(function () use ($quantity): bool {
+            $inventory = $this->newUnlockedQuery()
                 ->whereKey($this->getKey())
                 ->lockForUpdate()
                 ->first();
@@ -473,9 +483,9 @@ final class VariantInventory extends Model
     {
         return match ($this->stock_status) {
             'out_of_stock' => 'danger',
-            'low_stock' => 'warning',
-            'in_stock' => 'success',
-            default => 'secondary',
+            'low_stock'    => 'warning',
+            'in_stock'     => 'success',
+            default        => 'secondary',
         };
     }
 
@@ -486,9 +496,9 @@ final class VariantInventory extends Model
     {
         return match ($this->stock_status) {
             'out_of_stock' => 'Out of Stock',
-            'low_stock' => 'Low Stock',
-            'in_stock' => 'In Stock',
-            default => 'Unknown',
+            'low_stock'    => 'Low Stock',
+            'in_stock'     => 'In Stock',
+            default        => 'Unknown',
         };
     }
 }

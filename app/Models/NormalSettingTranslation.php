@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\OrdersByName;
 use Database\Factories\NormalSettingTranslationFactory;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -29,6 +29,16 @@ final class NormalSettingTranslation extends Model
     /** @use HasFactory<NormalSettingTranslationFactory> */
     use HasFactory;
 
+    use OrdersByName; // Expose the shared orderedByName scope for translation listings.
+
+    /**
+     * Order translations by the user-facing display_name for consistency across panels.
+     */
+    protected function getNameColumn(): string
+    {
+        return 'display_name';
+    }
+
     protected $table = 'enhanced_settings_translations';
 
     protected $fillable = ['enhanced_setting_id', 'locale', 'description', 'display_name', 'help_text'];
@@ -45,17 +55,5 @@ final class NormalSettingTranslation extends Model
 
         // Return the hydrated belongsTo relation instance for fluent chaining.
         return $relation;
-    }
-
-    /**
-     * Scope the query to always order translations by the user-facing display name.
-     *
-     * @param  Builder<NormalSettingTranslation> $query
-     * @return Builder<NormalSettingTranslation>
-     */
-    public function scopeOrderedByName(Builder $query): Builder
-    {
-        // Sorting by display_name keeps listings predictable for administrators and storefront consumers.
-        return $query->orderBy('display_name');
     }
 }

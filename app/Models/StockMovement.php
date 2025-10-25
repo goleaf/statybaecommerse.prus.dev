@@ -6,6 +6,7 @@ namespace App\Models;
 
 use App\Models\Scopes\UserOwnedScope;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -42,7 +43,9 @@ final class StockMovement extends Model
     }
 
     /**
-     * Handle variantInventory functionality with proper error handling.
+     * Provide access to the owning inventory record for this movement.
+     *
+     * @return BelongsTo<VariantInventory, self>
      */
     public function variantInventory(): BelongsTo
     {
@@ -50,7 +53,9 @@ final class StockMovement extends Model
     }
 
     /**
-     * Handle user functionality with proper error handling.
+     * Resolve the user responsible for the stock adjustment when available.
+     *
+     * @return BelongsTo<User, self>
      */
     public function user(): BelongsTo
     {
@@ -58,51 +63,41 @@ final class StockMovement extends Model
     }
 
     /**
-     * Handle scopeInbound functionality with proper error handling.
-     *
-     * @param  mixed  $query
+     * Scope helper that narrows the query to inbound movements only.
      */
-    public function scopeInbound($query)
+    public function scopeInbound(Builder $query): Builder
     {
         return $query->where('type', 'in');
     }
 
     /**
-     * Handle scopeOutbound functionality with proper error handling.
-     *
-     * @param  mixed  $query
+     * Scope helper that narrows the query to outbound movements only.
      */
-    public function scopeOutbound($query)
+    public function scopeOutbound(Builder $query): Builder
     {
         return $query->where('type', 'out');
     }
 
     /**
-     * Handle scopeByReason functionality with proper error handling.
-     *
-     * @param  mixed  $query
+     * Scope helper for retrieving movements filtered by their reason string.
      */
-    public function scopeByReason($query, string $reason)
+    public function scopeByReason(Builder $query, string $reason): Builder
     {
         return $query->where('reason', $reason);
     }
 
     /**
-     * Handle scopeByUser functionality with proper error handling.
-     *
-     * @param  mixed  $query
+     * Scope helper for retrieving movements attributed to a specific user.
      */
-    public function scopeByUser($query, int $userId)
+    public function scopeByUser(Builder $query, int $userId): Builder
     {
         return $query->where('user_id', $userId);
     }
 
     /**
-     * Handle scopeRecent functionality with proper error handling.
-     *
-     * @param  mixed  $query
+     * Scope helper for restricting results to movements within a recent window.
      */
-    public function scopeRecent($query, int $days = 30)
+    public function scopeRecent(Builder $query, int $days = 30): Builder
     {
         return $query->where('moved_at', '>=', now()->subDays($days));
     }
@@ -113,8 +108,8 @@ final class StockMovement extends Model
     public function getTypeLabelAttribute(): string
     {
         return match ($this->type) {
-            'in' => __('inventory.stock_in'),
-            'out' => __('inventory.stock_out'),
+            'in'    => __('inventory.stock_in'),
+            'out'   => __('inventory.stock_out'),
             default => __('inventory.unknown'),
         };
     }
@@ -125,15 +120,15 @@ final class StockMovement extends Model
     public function getReasonLabelAttribute(): string
     {
         return match ($this->reason) {
-            'sale' => __('inventory.reason_sale'),
-            'return' => __('inventory.reason_return'),
-            'adjustment' => __('inventory.reason_adjustment'),
+            'sale'              => __('inventory.reason_sale'),
+            'return'            => __('inventory.reason_return'),
+            'adjustment'        => __('inventory.reason_adjustment'),
             'manual_adjustment' => __('inventory.reason_manual_adjustment'),
-            'restock' => __('inventory.reason_restock'),
-            'damage' => __('inventory.reason_damage'),
-            'theft' => __('inventory.reason_theft'),
-            'transfer' => __('inventory.reason_transfer'),
-            default => $this->reason,
+            'restock'           => __('inventory.reason_restock'),
+            'damage'            => __('inventory.reason_damage'),
+            'theft'             => __('inventory.reason_theft'),
+            'transfer'          => __('inventory.reason_transfer'),
+            default             => $this->reason,
         };
     }
 }

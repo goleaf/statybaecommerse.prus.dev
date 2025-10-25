@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\OrdersByName;
 use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\DateRangeScope;
 use App\Models\Scopes\UserOwnedScope;
@@ -34,7 +35,15 @@ use Spatie\Translatable\HasTranslations;
 #[ScopedBy([ActiveScope::class, DateRangeScope::class, UserOwnedScope::class])]
 final class ReferralCode extends Model
 {
-    use HasFactory, HasTranslations, LogsActivity;
+    use HasFactory, HasTranslations, LogsActivity, OrdersByName;
+
+    /**
+     * Order referral codes by their public identifier when using the shared scope.
+     */
+    protected function getNameColumn(): string
+    {
+        return 'code';
+    }
 
     protected $fillable = ['user_id', 'code', 'is_active', 'expires_at', 'metadata', 'title', 'description', 'usage_limit', 'usage_count', 'reward_amount', 'reward_type', 'conditions', 'campaign_id', 'source', 'tags'];
 
@@ -109,7 +118,7 @@ final class ReferralCode extends Model
      */
     public function scopeActive(Builder $query): Builder
     {
-        return $query->where('is_active', true)->where(function ($q) {
+        return $query->where('is_active', true)->where(function ($q): void {
             $q->whereNull('expires_at')->orWhere('expires_at', '>', now());
         });
     }
@@ -119,7 +128,7 @@ final class ReferralCode extends Model
      */
     public function scopeExpired(Builder $query): Builder
     {
-        return $query->where('is_active', false)->orWhere(function ($q) {
+        return $query->where('is_active', false)->orWhere(function ($q): void {
             $q->whereNotNull('expires_at')->where('expires_at', '<=', now());
         });
     }
@@ -175,11 +184,8 @@ final class ReferralCode extends Model
         if ($this->expires_at && $this->expires_at->isPast()) {
             return false;
         }
-        if ($this->usage_limit && $this->usage_count >= $this->usage_limit) {
-            return false;
-        }
 
-        return true;
+        return ! ($this->usage_limit && $this->usage_count >= $this->usage_limit);
     }
 
     /**
@@ -247,7 +253,7 @@ final class ReferralCode extends Model
      */
     public function getReferralUrlAttribute(): string
     {
-        return url('/register?ref='.$this->code);
+        return url('/register?ref=' . $this->code);
     }
 
     /**
@@ -285,7 +291,7 @@ final class ReferralCode extends Model
             return null;
         }
 
-        return number_format($this->reward_amount, 2).' EUR';
+        return number_format($this->reward_amount, 2) . ' EUR';
     }
 
     /**
@@ -319,15 +325,15 @@ final class ReferralCode extends Model
         $contextValue = $context[$field];
 
         return match ($operator) {
-            '=' => $contextValue == $value,
-            '!=' => $contextValue != $value,
-            '>' => $contextValue > $value,
-            '>=' => $contextValue >= $value,
-            '<' => $contextValue < $value,
-            '<=' => $contextValue <= $value,
-            'in' => in_array($contextValue, (array) $value),
+            '='      => $contextValue == $value,
+            '!='     => $contextValue != $value,
+            '>'      => $contextValue > $value,
+            '>='     => $contextValue >= $value,
+            '<'      => $contextValue < $value,
+            '<='     => $contextValue <= $value,
+            'in'     => in_array($contextValue, (array) $value),
             'not_in' => ! in_array($contextValue, (array) $value),
-            default => false,
+            default  => false,
         };
     }
 

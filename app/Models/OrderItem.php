@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\OrdersByName;
 use App\Models\Scopes\UserOwnedScope;
 use Database\Factories\OrderItemFactory;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -47,21 +47,11 @@ final class OrderItem extends Model
     /** @use HasFactory<OrderItemFactory> */
     use HasFactory;
 
+    use OrdersByName; // Reuse the shared ordering scope for predictable listings.
+
     protected $table = 'order_items';
 
     protected $fillable = ['order_id', 'product_id', 'product_variant_id', 'name', 'sku', 'quantity', 'unit_price', 'price', 'total', 'notes', 'discount_amount', 'status'];
-
-    /**
-     * Scope the query to always order items by their display name.
-     *
-     * @param  Builder<self> $query
-     * @return Builder<self>
-     */
-    public function scopeOrderedByName(Builder $query): Builder
-    {
-        // Ensures consistent alphabetical ordering when presenting order line items.
-        return $query->orderBy('name');
-    }
 
     /**
      * Handle casts functionality with proper error handling.

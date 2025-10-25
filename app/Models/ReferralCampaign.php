@@ -1,16 +1,19 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\OrdersByName;
 use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\DateRangeScope;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Spatie\Activitylog\Traits\LogsActivity;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Translatable\HasTranslations;
 
 /**
@@ -48,7 +51,7 @@ use Spatie\Translatable\HasTranslations;
 final class ReferralCampaign extends Model
 {
     /** @use HasFactory<\Database\Factories\ReferralCampaignFactory> */
-    use HasFactory, HasTranslations, LogsActivity;
+    use HasFactory, HasTranslations, LogsActivity, OrdersByName;
 
     protected $fillable = ['name', 'description', 'is_active', 'start_date', 'end_date', 'reward_amount', 'reward_type', 'max_referrals_per_user', 'max_total_referrals', 'conditions', 'metadata'];
 
@@ -99,17 +102,14 @@ final class ReferralCampaign extends Model
      */
     public function isActive(): bool
     {
-        if (!$this->is_active) {
+        if (! $this->is_active) {
             return false;
         }
         if ($this->start_date && $this->start_date->isFuture()) {
             return false;
         }
-        if ($this->end_date && $this->end_date->isPast()) {
-            return false;
-        }
 
-        return true;
+        return ! ($this->end_date && $this->end_date->isPast());
     }
 
     /**
@@ -149,7 +149,7 @@ final class ReferralCampaign extends Model
      */
     public function canAcceptReferrals(): bool
     {
-        if (!$this->isRunning()) {
+        if (! $this->isRunning()) {
             return false;
         }
 
