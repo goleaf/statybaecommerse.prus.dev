@@ -136,9 +136,8 @@ trait InteractsWithTranslationTabs
     }
 
     /**
-     * @return array{0: array<string, mixed>, 1: array<string, array<string, mixed>>}
-     */
-    /**
+     * Normalize the submitted form payload by separating the translated values from scalar data.
+     *
      * @param  array<string, mixed>                                                   $data
      * @return array{0: array<string, mixed>, 1: array<string, array<string, mixed>>}
      */
@@ -167,11 +166,27 @@ trait InteractsWithTranslationTabs
 
             unset($data[$field]);
 
+            // Detect whether the default locale was supplied explicitly to avoid overwriting intentional blanks.
+            $defaultLocaleProvided = array_key_exists($defaultLocale, $fieldValue);
+
+            // Capture the first filled translation value to reuse for the default locale when it is missing entirely.
+            $firstFilledLocaleValue = null;
+
             foreach ($fieldValue as $locale => $value) {
                 if (! in_array($locale, $locales, true)) {
                     continue;
                 }
+
+                if ($firstFilledLocaleValue === null && filled($value)) {
+                    $firstFilledLocaleValue = $value;
+                }
+
                 $translations[$locale][$field] = $value;
+            }
+
+            // Fall back to the first populated locale value so the default column remains populated for downstream consumers.
+            if (! $defaultLocaleProvided && $firstFilledLocaleValue !== null) {
+                $translations[$defaultLocale][$field] = $firstFilledLocaleValue;
             }
         }
 
@@ -179,11 +194,8 @@ trait InteractsWithTranslationTabs
     }
 
     /**
-     * @param  array<string, mixed>                $data
-     * @param  array<string, array<string, mixed>> $translations
-     * @return array<string, mixed>
-     */
-    /**
+     * Hydrate the base data array with the default locale values so Filament validations stay aligned.
+     *
      * @param  array<string, mixed>                $data
      * @param  array<string, array<string, mixed>> $translations
      * @return array<string, mixed>
@@ -201,10 +213,8 @@ trait InteractsWithTranslationTabs
     }
 
     /**
-     * @param  array<string, mixed> $data
-     * @return array<string, mixed>
-     */
-    /**
+     * Expand the hydrated record with locale-indexed state so each tab renders the persisted values.
+     *
      * @param  TranslatableRecord&Model $record
      * @param  array<string, mixed>     $data
      * @return array<string, mixed>
@@ -239,9 +249,8 @@ trait InteractsWithTranslationTabs
     }
 
     /**
-     * @param array<string, array<string, mixed>> $translations
-     */
-    /**
+     * Persist each locale payload to the translation relation while keeping the root model in sync.
+     *
      * @param TranslatableRecord&Model            $record
      * @param array<string, array<string, mixed>> $translations
      */
