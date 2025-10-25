@@ -27,10 +27,19 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 #[ScopedBy([ActiveScope::class])]
 final class CampaignView extends Model
 {
+    /**
+     * @use HasFactory<\Database\Factories\CampaignViewFactory>
+     */
     use HasFactory;
 
+    /**
+     * Disable automatic timestamp management because the table stores custom view tracking dates.
+     */
     public $timestamps = false;
 
+    /**
+     * @var list<string> Columns that can be mass-assigned when recording campaign views.
+     */
     protected $fillable = ['campaign_id', 'session_id', 'ip_address', 'user_agent', 'referer', 'customer_id', 'viewed_at'];
 
     /**
@@ -43,17 +52,31 @@ final class CampaignView extends Model
 
     /**
      * Handle campaign functionality with proper error handling.
+     *
+     * @return BelongsTo<Campaign, CampaignView>
+     *
+     * @phpstan-return BelongsTo<Campaign, CampaignView>
      */
     public function campaign(): BelongsTo
     {
-        return $this->belongsTo(Campaign::class);
+        /** @var BelongsTo<Campaign, CampaignView> $relationship */
+        $relationship = $this->belongsTo(Campaign::class);
+
+        return $relationship;
     }
 
     /**
      * Handle customer functionality with proper error handling.
+     *
+     * @return BelongsTo<User, CampaignView>
+     *
+     * @phpstan-return BelongsTo<User, CampaignView>
      */
     public function customer(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'customer_id');
+        /** @var BelongsTo<User, CampaignView> $relationship */
+        $relationship = $this->belongsTo(User::class, 'customer_id');
+
+        return $relationship;
     }
 }
