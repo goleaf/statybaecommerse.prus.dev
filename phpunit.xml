@@ -21,6 +21,10 @@
         <testsuite name="Unit">
             <directory suffix="Test.php">tests/Unit</directory>
         </testsuite>
+        <testsuite name="Models">
+            <!-- Dedicated suite for model quality assurance tests living under tests/Models. -->
+            <directory suffix="Test.php">tests/Models</directory>
+        </testsuite>
         <testsuite name="Feature">
             <directory suffix="Test.php">tests/Feature</directory>
             <directory suffix="Test.php">tests/Admin</directory>
