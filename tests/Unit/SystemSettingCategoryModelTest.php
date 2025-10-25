@@ -16,23 +16,23 @@ class SystemSettingCategoryModelTest extends TestCase
     public function test_can_create_system_setting_category(): void
     {
         $category = SystemSettingCategory::factory()->create([
-            'name' => 'Test Category',
-            'slug' => 'test-category',
+            'name'        => 'Test Category',
+            'slug'        => 'test-category',
             'description' => 'Test description',
-            'icon' => 'heroicon-o-cog',
-            'color' => '#FF0000',
-            'sort_order' => 1,
-            'is_active' => true,
+            'icon'        => 'heroicon-o-cog',
+            'color'       => '#FF0000',
+            'sort_order'  => 1,
+            'is_active'   => true,
         ]);
 
         $this->assertDatabaseHas('system_setting_categories', [
-            'name' => 'Test Category',
-            'slug' => 'test-category',
+            'name'        => 'Test Category',
+            'slug'        => 'test-category',
             'description' => 'Test description',
-            'icon' => 'heroicon-o-cog',
-            'color' => '#FF0000',
-            'sort_order' => 1,
-            'is_active' => true,
+            'icon'        => 'heroicon-o-cog',
+            'color'       => '#FF0000',
+            'sort_order'  => 1,
+            'is_active'   => true,
         ]);
 
         $this->assertEquals('Test Category', $category->name);
@@ -56,6 +56,7 @@ class SystemSettingCategoryModelTest extends TestCase
             'sort_order',
             'is_active',
             'parent_id',
+            'meta',
         ];
 
         $this->assertEquals($expectedFillable, $category->getFillable());
@@ -65,7 +66,7 @@ class SystemSettingCategoryModelTest extends TestCase
     {
         $parent = SystemSettingCategory::factory()->create();
         $category = SystemSettingCategory::factory()->create([
-            'is_active' => '1',
+            'is_active'  => '1',
             'sort_order' => '5',
             // Provide a string parent reference to exercise cast behaviour while
             // avoiding foreign key violations under SQLite.
@@ -85,7 +86,7 @@ class SystemSettingCategoryModelTest extends TestCase
         $parentCategory = SystemSettingCategory::factory()->create(['name' => 'Parent Category']);
         $childCategory = SystemSettingCategory::factory()->create([
             'parent_id' => $parentCategory->id,
-            'name' => 'Child Category',
+            'name'      => 'Child Category',
         ]);
 
         $this->assertInstanceOf(SystemSettingCategory::class, $childCategory->parent);
@@ -98,11 +99,11 @@ class SystemSettingCategoryModelTest extends TestCase
         $parentCategory = SystemSettingCategory::factory()->create(['name' => 'Parent Category']);
         $child1 = SystemSettingCategory::factory()->create([
             'parent_id' => $parentCategory->id,
-            'name' => 'Child 1',
+            'name'      => 'Child 1',
         ]);
         $child2 = SystemSettingCategory::factory()->create([
             'parent_id' => $parentCategory->id,
-            'name' => 'Child 2',
+            'name'      => 'Child 2',
         ]);
 
         $children = $parentCategory->children;
@@ -116,9 +117,9 @@ class SystemSettingCategoryModelTest extends TestCase
         $category = SystemSettingCategory::factory()->create(['name' => 'Test Category']);
         $translation = SystemSettingCategoryTranslation::factory()->create([
             'system_setting_category_id' => $category->id,
-            'locale' => 'en',
-            'name' => 'Test Category EN',
-            'description' => 'Test description EN',
+            'locale'                     => 'en',
+            'name'                       => 'Test Category EN',
+            'description'                => 'Test description EN',
         ]);
 
         $translations = $category->translations;
@@ -172,8 +173,8 @@ class SystemSettingCategoryModelTest extends TestCase
         // Test with translation
         SystemSettingCategoryTranslation::factory()->create([
             'system_setting_category_id' => $category->id,
-            'locale' => 'en',
-            'name' => 'English Name',
+            'locale'                     => 'en',
+            'name'                       => 'English Name',
         ]);
 
         $this->assertEquals('English Name', $category->getTranslatedName('en'));
@@ -191,8 +192,8 @@ class SystemSettingCategoryModelTest extends TestCase
         // Test with translation
         SystemSettingCategoryTranslation::factory()->create([
             'system_setting_category_id' => $category->id,
-            'locale' => 'en',
-            'description' => 'English Description',
+            'locale'                     => 'en',
+            'description'                => 'English Description',
         ]);
 
         $this->assertEquals('English Description', $category->getTranslatedDescription('en'));

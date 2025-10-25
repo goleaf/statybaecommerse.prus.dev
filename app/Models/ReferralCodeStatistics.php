@@ -1,13 +1,15 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models;
 
 use Database\Factories\ReferralCodeStatisticsFactory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * ReferralCodeStatistics
@@ -62,6 +64,7 @@ final class ReferralCodeStatistics extends Model
         'total_conversions',
         'total_revenue',
         'metadata',
+        'meta',
     ];
 
     /**
@@ -72,13 +75,14 @@ final class ReferralCodeStatistics extends Model
     protected function casts(): array
     {
         return [
-            'date' => 'date',
-            'total_views' => 'integer',
-            'total_clicks' => 'integer',
-            'total_signups' => 'integer',
+            'date'              => 'date',
+            'total_views'       => 'integer',
+            'total_clicks'      => 'integer',
+            'total_signups'     => 'integer',
             'total_conversions' => 'integer',
-            'total_revenue' => 'decimal:2',
-            'metadata' => 'array',
+            'total_revenue'     => 'decimal:2',
+            'metadata'          => 'array',
+            'meta'              => 'array',
         ];
     }
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\OrdersByName;
 use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\StatusScope;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
@@ -34,9 +35,18 @@ use Spatie\Translatable\HasTranslations;
 #[ScopedBy([ActiveScope::class, StatusScope::class])]
 final class Referral extends Model
 {
-    use HasFactory, HasTranslations, SoftDeletes;
+    use HasFactory;
+    use HasTranslations;
+    use OrdersByName;
+    use SoftDeletes;
 
-    protected $fillable = ['referrer_id', 'referred_id', 'referral_code', 'status', 'completed_at', 'expires_at', 'metadata', 'source', 'campaign', 'utm_source', 'utm_medium', 'utm_campaign', 'ip_address', 'user_agent', 'title', 'description', 'terms_conditions', 'benefits_description', 'how_it_works', 'seo_title', 'seo_description', 'seo_keywords'];
+    /**
+     * Sort referral listings by their translated title to keep marketing teams
+     * aligned with the way campaigns are presented in the UI.
+     */
+    protected string $nameColumn = 'title';
+
+    protected $fillable = ['referrer_id', 'referred_id', 'referral_code', 'status', 'completed_at', 'expires_at', 'metadata', 'meta', 'source', 'campaign', 'utm_source', 'utm_medium', 'utm_campaign', 'ip_address', 'user_agent', 'title', 'description', 'terms_conditions', 'benefits_description', 'how_it_works', 'seo_title', 'seo_description', 'seo_keywords'];
 
     public array $translatable = ['title', 'description', 'terms_conditions', 'benefits_description', 'how_it_works', 'seo_title', 'seo_description', 'seo_keywords'];
 
@@ -45,7 +55,7 @@ final class Referral extends Model
      */
     protected function casts(): array
     {
-        return ['completed_at' => 'datetime', 'expires_at' => 'datetime', 'metadata' => 'array', 'seo_keywords' => 'array'];
+        return ['completed_at' => 'datetime', 'expires_at' => 'datetime', 'metadata' => 'array', 'meta' => 'array', 'seo_keywords' => 'array'];
     }
 
     /**
@@ -120,6 +130,15 @@ final class Referral extends Model
         return $query->where('status', 'pending')->where(function ($q) {
             $q->whereNull('expires_at')->orWhere('expires_at', '>', now());
         });
+    }
+
+    /**
+     * Allow filtering by the campaign identifier stored alongside the referral
+     * to keep analytics dashboards and exports expressive.
+     */
+    public function scopeForCampaign(Builder $query, string $campaign): Builder
+    {
+        return $query->where('campaign', $campaign);
     }
 
     /**

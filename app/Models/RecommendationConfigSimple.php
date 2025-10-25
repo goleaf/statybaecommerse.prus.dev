@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\OrdersByName;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -17,6 +19,13 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 final class RecommendationConfigSimple extends Model
 {
     use HasFactory;
+    use OrdersByName;
+
+    /**
+     * Default alphabetical ordering to the human-readable name so admin forms
+     * remain intuitive when referencing these simplified configurations.
+     */
+    protected string $nameColumn = 'name';
 
     protected $fillable = [
         'name',
@@ -39,24 +48,26 @@ final class RecommendationConfigSimple extends Model
         'is_default',
         'sort_order',
         'notes',
+        'meta',
     ];
 
     protected $casts = [
         'exclude_out_of_stock' => 'boolean',
-        'exclude_inactive' => 'boolean',
-        'is_active' => 'boolean',
-        'is_default' => 'boolean',
-        'min_score' => 'decimal:6',
-        'decay_factor' => 'decimal:6',
-        'price_weight' => 'decimal:6',
-        'rating_weight' => 'decimal:6',
-        'popularity_weight' => 'decimal:6',
-        'recency_weight' => 'decimal:6',
-        'category_weight' => 'decimal:6',
-        'custom_weight' => 'decimal:6',
-        'max_results' => 'integer',
-        'cache_duration' => 'integer',
-        'sort_order' => 'integer',
+        'exclude_inactive'     => 'boolean',
+        'is_active'            => 'boolean',
+        'is_default'           => 'boolean',
+        'min_score'            => 'decimal:6',
+        'decay_factor'         => 'decimal:6',
+        'price_weight'         => 'decimal:6',
+        'rating_weight'        => 'decimal:6',
+        'popularity_weight'    => 'decimal:6',
+        'recency_weight'       => 'decimal:6',
+        'category_weight'      => 'decimal:6',
+        'custom_weight'        => 'decimal:6',
+        'max_results'          => 'integer',
+        'cache_duration'       => 'integer',
+        'sort_order'           => 'integer',
+        'meta'                 => 'array',
     ];
 
     /**
@@ -86,7 +97,7 @@ final class RecommendationConfigSimple extends Model
     /**
      * Scope for active configs
      */
-    public function scopeActive($query)
+    public function scopeActive(Builder $query): Builder
     {
         return $query->where('is_active', true);
     }
@@ -94,7 +105,7 @@ final class RecommendationConfigSimple extends Model
     /**
      * Scope for default config
      */
-    public function scopeDefault($query)
+    public function scopeDefault(Builder $query): Builder
     {
         return $query->where('is_default', true);
     }
@@ -102,7 +113,7 @@ final class RecommendationConfigSimple extends Model
     /**
      * Scope by algorithm type
      */
-    public function scopeByAlgorithmType($query, string $algorithmType)
+    public function scopeByAlgorithmType(Builder $query, string $algorithmType): Builder
     {
         return $query->where('algorithm_type', $algorithmType);
     }
@@ -110,7 +121,7 @@ final class RecommendationConfigSimple extends Model
     /**
      * Scope ordered by sort order
      */
-    public function scopeOrdered($query)
+    public function scopeOrdered(Builder $query): Builder
     {
         return $query->orderBy('sort_order')->orderBy('name');
     }

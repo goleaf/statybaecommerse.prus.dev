@@ -19,18 +19,18 @@ final class SystemSettingTranslationTest extends TestCase
 
         $translation = SystemSettingTranslation::create([
             'system_setting_id' => $systemSetting->id,
-            'locale' => 'en',
-            'name' => 'Test Translation',
-            'description' => 'Test Description',
-            'help_text' => 'Test Help Text',
+            'locale'            => 'en',
+            'name'              => 'Test Translation',
+            'description'       => 'Test Description',
+            'help_text'         => 'Test Help Text',
         ]);
 
         $this->assertDatabaseHas('system_setting_translations', [
             'system_setting_id' => $systemSetting->id,
-            'locale' => 'en',
-            'name' => 'Test Translation',
-            'description' => 'Test Description',
-            'help_text' => 'Test Help Text',
+            'locale'            => 'en',
+            'name'              => 'Test Translation',
+            'description'       => 'Test Description',
+            'help_text'         => 'Test Help Text',
         ]);
     }
 
@@ -55,6 +55,7 @@ final class SystemSettingTranslationTest extends TestCase
             'name',
             'description',
             'help_text',
+            'meta',
         ];
 
         $this->assertEquals($expectedFillable, $translation->getFillable());
@@ -65,7 +66,7 @@ final class SystemSettingTranslationTest extends TestCase
         $systemSetting = SystemSetting::factory()->create();
         $originalTranslation = SystemSettingTranslation::factory()->create([
             'system_setting_id' => $systemSetting->id,
-            'name' => 'Original Name',
+            'name'              => 'Original Name',
         ]);
 
         $replicatedTranslation = $originalTranslation->replicate();
@@ -74,12 +75,12 @@ final class SystemSettingTranslationTest extends TestCase
 
         $this->assertDatabaseHas('system_setting_translations', [
             'system_setting_id' => $systemSetting->id,
-            'name' => 'Replicated Name',
+            'name'              => 'Replicated Name',
         ]);
 
         $this->assertDatabaseHas('system_setting_translations', [
             'system_setting_id' => $systemSetting->id,
-            'name' => 'Original Name',
+            'name'              => 'Original Name',
         ]);
     }
 
@@ -108,7 +109,7 @@ final class SystemSettingTranslationTest extends TestCase
         $translation->restore();
 
         $this->assertDatabaseHas('system_setting_translations', [
-            'id' => $translation->id,
+            'id'         => $translation->id,
             'deleted_at' => null,
         ]);
     }
@@ -133,12 +134,12 @@ final class SystemSettingTranslationTest extends TestCase
 
         SystemSettingTranslation::factory()->create([
             'system_setting_id' => $systemSetting->id,
-            'locale' => 'en',
+            'locale'            => 'en',
         ]);
 
         SystemSettingTranslation::factory()->create([
             'system_setting_id' => $systemSetting->id,
-            'locale' => 'lt',
+            'locale'            => 'lt',
         ]);
 
         $englishTranslations = SystemSettingTranslation::where('locale', 'en')->get();
@@ -174,14 +175,14 @@ final class SystemSettingTranslationTest extends TestCase
 
         $englishTranslation = SystemSettingTranslation::factory()->create([
             'system_setting_id' => $systemSetting->id,
-            'locale' => 'en',
-            'name' => 'English Name',
+            'locale'            => 'en',
+            'name'              => 'English Name',
         ]);
 
         $lithuanianTranslation = SystemSettingTranslation::factory()->create([
             'system_setting_id' => $systemSetting->id,
-            'locale' => 'lt',
-            'name' => 'Lithuanian Name',
+            'locale'            => 'lt',
+            'name'              => 'Lithuanian Name',
         ]);
 
         $foundEnglish = SystemSettingTranslation::where('system_setting_id', $systemSetting->id)
@@ -215,12 +216,12 @@ final class SystemSettingTranslationTest extends TestCase
 
         SystemSettingTranslation::factory()->count(2)->create([
             'system_setting_id' => $systemSetting->id,
-            'locale' => 'en',
+            'locale'            => 'en',
         ]);
 
         SystemSettingTranslation::factory()->count(3)->create([
             'system_setting_id' => $systemSetting->id,
-            'locale' => 'lt',
+            'locale'            => 'lt',
         ]);
 
         $englishCount = SystemSettingTranslation::where('locale', 'en')->count();
