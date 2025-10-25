@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -37,4 +38,17 @@ final class ContactMessage extends Model
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
+
+    /**
+     * Scope a query to order contact messages alphabetically by the contact name.
+     *
+     * @param Builder<ContactMessage> $query The current query builder instance.
+     *
+     * @return Builder<ContactMessage> The modified builder ordered by the name column.
+     */
+    public function scopeOrderedByName(Builder $query): Builder
+    {
+        // Sorting by name ensures consistent presentation in administrative listings.
+        return $query->orderBy('name');
+    }
 }
