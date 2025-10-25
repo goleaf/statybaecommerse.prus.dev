@@ -219,6 +219,18 @@ final class News extends Model implements TranslatableRecord
     }
 
     /**
+     * Provide a deterministic alphabetical ordering using the author name field when available.
+     */
+    public function scopeOrderedByName(Builder $query): Builder
+    {
+        // Order null author names last for consistent pagination while keeping creation order as a tiebreaker.
+        return $query
+            ->orderByRaw('author_name IS NULL')
+            ->orderBy('author_name')
+            ->orderBy('id');
+    }
+
+    /**
      * Handle scopeByCategory functionality with proper error handling.
      */
     public function scopeByCategory(Builder $query, int $categoryId): Builder
