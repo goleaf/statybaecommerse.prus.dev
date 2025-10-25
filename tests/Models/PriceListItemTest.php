@@ -27,6 +27,7 @@ final class PriceListItemTest extends TestCase
             'price_list_id',
             'product_id',
             'variant_id',
+            'price',
             'net_amount',
             'compare_amount',
             'name',
@@ -44,6 +45,7 @@ final class PriceListItemTest extends TestCase
         // Validate that the casts provide the necessary type coercion for numeric and temporal fields.
         $casts = $model->getCasts();
         $expectedCasts = [
+            'price'          => 'decimal:2',
             'net_amount'     => 'decimal:4',
             'compare_amount' => 'decimal:4',
             'is_active'      => 'boolean',
@@ -117,6 +119,7 @@ final class PriceListItemTest extends TestCase
         self::assertSame(20, $item->discount_percentage);
         self::assertSame(80.0, $item->effective_price);
         self::assertSame(20.0, $item->savings_amount);
+        self::assertSame(80.0, $item->price);
 
         // Quantity validation should honour the configured thresholds.
         self::assertTrue($item->isValidForQuantity(3));
@@ -154,13 +157,13 @@ final class PriceListItemTest extends TestCase
         $byPriority = PriceListItem::query()->byPriority('desc');
         self::assertStringContainsString('order by "priority" desc', $byPriority->toSql());
 
-        // Scope: orderedByName asc should reference the locale-aware JSON extraction snippet.
+        // Scope: orderedByName asc should rely on the shared trait's sanitised ordering clause.
         $orderedAsc = PriceListItem::query()->orderedByName();
-        self::assertStringContainsString('LOWER(COALESCE(json_extract(name, "$."en""), name)) asc', $orderedAsc->toSql());
+        self::assertStringContainsString('order by "name" asc', $orderedAsc->toSql());
 
-        // Scope: orderedByName desc should invert the ordering direction.
+        // Scope: orderedByName desc should invert the ordering direction while retaining sanitisation.
         $orderedDesc = PriceListItem::query()->orderedByName('desc');
-        self::assertStringContainsString('LOWER(COALESCE(json_extract(name, "$."en""), name)) desc', $orderedDesc->toSql());
+        self::assertStringContainsString('order by "name" desc', $orderedDesc->toSql());
 
         // Scope: forProduct and forVariant should add simple equality constraints.
         $forProduct = PriceListItem::query()->forProduct(7);
