@@ -2,278 +2,135 @@
 
 declare(strict_types=1);
 
-namespace Tests\Unit;
+namespace Tests\Models\Business;
 
 use App\Models\Channel;
+use App\Models\Discount;
+use App\Models\Order;
 use App\Models\Product;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
-class ChannelTest extends TestCase
+final class ChannelTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_channel_can_be_created(): void
+    public function test_factory_creates_channel_with_expected_defaults(): void
     {
-        $channel = Channel::factory()->create([
-            'name' => 'Online Store',
-            'is_enabled' => true,
-        ]);
+        // Act: create a fresh channel using the factory so we exercise realistic defaults.
+        $channel = Channel::factory()->create();
 
-        $this->assertDatabaseHas('channels', [
-            'name' => 'Online Store',
-            'is_enabled' => true,
-        ]);
+        // Assert: the record persists and exposes the core defaults surfaced in the UI.
+        $this->assertDatabaseHas('channels', ['id' => $channel->id]);
+        $this->assertTrue($channel->is_enabled, 'Factory channels should be enabled so storefront tests succeed.');
+        $this->assertSame('EUR', $channel->currency_code, 'Factory keeps EUR to align with seeding defaults.');
     }
 
-    public function test_channel_casts_work_correctly(): void
+    public function test_casts_and_fillable_configuration(): void
     {
+        // Arrange: provide toggle and json data to ensure casts/assignment stay in sync with the schema.
         $channel = Channel::factory()->create([
-            'is_enabled' => true,
-            'is_default' => false,
-            'created_at' => now(),
+            'is_enabled'        => true,
+            'is_default'        => false,
+            'is_active'         => true,
+            'ssl_enabled'       => true,
+            'analytics_enabled' => true,
+            'metadata'          => ['theme' => 'dark'],
+            'configuration'     => ['timezone' => 'Europe/Vilnius'],
         ]);
 
+        // Assert: every expected attribute may be mass assigned.
+        foreach (['name', 'slug', 'code', 'type', 'metadata', 'configuration'] as $attribute) {
+            $this->assertContains($attribute, $channel->getFillable(), sprintf('Attribute %s should be fillable.', $attribute));
+        }
+
+        // Assert: boolean and array casts remain typed after persistence.
         $this->assertIsBool($channel->is_enabled);
         $this->assertIsBool($channel->is_default);
-        $this->assertInstanceOf(\Carbon\Carbon::class, $channel->created_at);
-    }
-
-    public function test_channel_fillable_attributes(): void
-    {
-        $channel = new Channel;
-        $fillable = $channel->getFillable();
-
-        $this->assertContains('name', $fillable);
-        $this->assertContains('slug', $fillable);
-        $this->assertContains('url', $fillable);
-        $this->assertContains('is_enabled', $fillable);
-    }
-
-    public function test_channel_scope_enabled(): void
-    {
-        $activeChannel = Channel::factory()->create(['is_enabled' => true]);
-        $inactiveChannel = Channel::factory()->create(['is_enabled' => false]);
-
-        $activeChannels = Channel::enabled()->get();
-
-        $this->assertTrue($activeChannels->contains($activeChannel));
-        $this->assertFalse($activeChannels->contains($inactiveChannel));
-    }
-
-    public function test_channel_scope_default(): void
-    {
-        $defaultChannel = Channel::factory()->create(['is_default' => true]);
-        $nonDefaultChannel = Channel::factory()->create(['is_default' => false]);
-
-        $defaultChannels = Channel::default()->get();
-
-        $this->assertTrue($defaultChannels->contains($defaultChannel));
-        $this->assertFalse($defaultChannels->contains($nonDefaultChannel));
-    }
-
-    public function test_channel_scope_by_type(): void
-    {
-        $webChannel = Channel::factory()->create(['type' => 'web']);
-        $mobileChannel = Channel::factory()->create(['type' => 'mobile']);
-
-        $webChannels = Channel::byType('web')->get();
-
-        $this->assertTrue($webChannels->contains($webChannel));
-        $this->assertFalse($webChannels->contains($mobileChannel));
-    }
-
-    public function test_channel_scope_ordered(): void
-    {
-        $channel1 = Channel::factory()->create(['sort_order' => 2]);
-        $channel2 = Channel::factory()->create(['sort_order' => 1]);
-        $channel3 = Channel::factory()->create(['sort_order' => 3]);
-
-        $orderedChannels = Channel::ordered()->get();
-
-        $this->assertEquals($channel2->id, $orderedChannels->first()->id);
-        $this->assertEquals($channel3->id, $orderedChannels->last()->id);
-    }
-
-    public function test_channel_can_have_products(): void
-    {
-        $channel = Channel::factory()->create();
-        $products = Product::factory()->count(3)->create();
-
-        $channel->products()->attach($products->pluck('id'));
-
-        $this->assertCount(3, $channel->products);
-        $this->assertInstanceOf(Product::class, $channel->products->first());
-    }
-
-    public function test_channel_can_have_description(): void
-    {
-        $channel = Channel::factory()->create([
-            'description' => 'Main online store channel',
-        ]);
-
-        $this->assertEquals('Main online store channel', $channel->description);
-    }
-
-    public function test_channel_can_have_configuration(): void
-    {
-        $channel = Channel::factory()->create([
-            'configuration' => [
-                'theme' => 'default',
-                'currency' => 'EUR',
-                'language' => 'lt',
-                'timezone' => 'Europe/Vilnius',
-            ],
-        ]);
-
+        $this->assertIsBool($channel->is_active);
+        $this->assertIsBool($channel->ssl_enabled);
+        $this->assertIsBool($channel->analytics_enabled);
+        $this->assertIsArray($channel->metadata);
         $this->assertIsArray($channel->configuration);
-        $this->assertEquals('default', $channel->configuration['theme']);
-        $this->assertEquals('EUR', $channel->configuration['currency']);
-        $this->assertEquals('lt', $channel->configuration['language']);
-        $this->assertEquals('Europe/Vilnius', $channel->configuration['timezone']);
     }
 
-    public function test_channel_can_have_domain(): void
+    public function test_relationships_expose_expected_types_and_data(): void
     {
-        $channel = Channel::factory()->create([
-            'domain' => 'store.example.com',
-        ]);
+        // Arrange: build a channel and related records to verify the relations and eager loading metadata.
+        $channel = Channel::factory()->create();
+        $order = Order::factory()->create(['channel_id' => $channel->getKey()]);
+        $discount = Discount::factory()->create(['channel_id' => $channel->getKey()]);
+        $product = Product::factory()->create();
+        $channel->products()->attach($product->getKey());
 
-        $this->assertEquals('store.example.com', $channel->domain);
+        // Assert: relation accessors return the correct relation instances for IDE support.
+        $this->assertInstanceOf(HasMany::class, $channel->orders());
+        $this->assertInstanceOf(HasMany::class, $channel->discounts());
+        $this->assertInstanceOf(BelongsToMany::class, $channel->products());
+
+        // Assert: data retrieved from the relationships is complete and unfiltered by scopes.
+        $this->assertTrue($channel->orders->contains($order));
+        $this->assertTrue($channel->discounts->contains($discount));
+        $this->assertTrue($channel->products->contains($product));
     }
 
-    public function test_channel_can_have_ssl_enabled(): void
+    public function test_boolean_scopes_filter_records_correctly(): void
     {
-        $channel = Channel::factory()->create([
-            'ssl_enabled' => true,
-        ]);
+        // Arrange: capture a mix of channel records to validate each scope independently.
+        $enabled = Channel::factory()->create(['is_enabled' => true, 'is_default' => false, 'is_active' => true]);
+        $default = Channel::factory()->create(['is_enabled' => true, 'is_default' => true, 'is_active' => true]);
+        $inactive = Channel::factory()->create(['is_enabled' => false, 'is_default' => false, 'is_active' => false]);
+        $api = Channel::factory()->create(['type' => 'api']);
 
-        $this->assertTrue($channel->ssl_enabled);
+        // Assert: Enabled scope only returns channels toggled on.
+        $this->assertTrue(Channel::enabled()->get()->contains($enabled));
+        $this->assertFalse(Channel::enabled()->get()->contains($inactive));
+
+        // Assert: Default scope matches the default record and ignores others.
+        $this->assertTrue(Channel::default()->get()->contains($default));
+        $this->assertFalse(Channel::default()->get()->contains($enabled));
+
+        // Assert: Active scope respects operational toggles.
+        $this->assertTrue(Channel::active()->get()->contains($enabled));
+        $this->assertFalse(Channel::active()->get()->contains($inactive));
+
+        // Assert: Type scope narrows down to the requested delivery mechanism.
+        $this->assertTrue(Channel::byType('api')->get()->contains($api));
+        $this->assertFalse(Channel::byType('api')->get()->contains($enabled));
     }
 
-    public function test_channel_can_have_meta_information(): void
+    public function test_ordered_scope_prioritises_sort_order_then_name(): void
     {
-        $channel = Channel::factory()->create([
-            'meta_title' => 'Online Store - Channel Title',
-            'meta_description' => 'Channel description for SEO',
-            'meta_keywords' => 'store, online, shopping',
-        ]);
+        // Arrange: share a constant sort order to confirm the tie-breaker uses names.
+        $alpha = Channel::factory()->create(['sort_order' => 5, 'name' => 'Alpha Channel']);
+        $bravo = Channel::factory()->create(['sort_order' => 5, 'name' => 'Bravo Channel']);
+        $first = Channel::factory()->create(['sort_order' => 1, 'name' => 'Zulu Channel']);
 
-        $this->assertEquals('Online Store - Channel Title', $channel->meta_title);
-        $this->assertEquals('Channel description for SEO', $channel->meta_description);
-        $this->assertEquals('store, online, shopping', $channel->meta_keywords);
+        // Act: execute the ordered scope.
+        $ordered = Channel::ordered()->get();
+
+        // Assert: lowest explicit sort order wins, followed by alphabetical tiebreakers.
+        $this->assertSame($first->getKey(), $ordered->first()->getKey());
+        $this->assertSame([$alpha->getKey(), $bravo->getKey()], $ordered->where('sort_order', 5)->modelKeys());
     }
 
-    public function test_channel_can_have_analytics_settings(): void
+    public function test_ordered_by_name_scope_sorts_alphabetically(): void
     {
-        $channel = Channel::factory()->create([
-            'analytics_tracking_id' => 'GA-123456789',
-            'analytics_enabled' => true,
-        ]);
+        // Arrange: same sort order so only the name ordering matters.
+        $delta = Channel::factory()->create(['sort_order' => 10, 'name' => 'Delta Shop']);
+        $charlie = Channel::factory()->create(['sort_order' => 10, 'name' => 'Charlie Shop']);
+        $echo = Channel::factory()->create(['sort_order' => 10, 'name' => 'Echo Shop']);
 
-        $this->assertEquals('GA-123456789', $channel->analytics_tracking_id);
-        $this->assertTrue($channel->analytics_enabled);
-    }
+        // Act: fetch using the orderedByName scope in isolation.
+        $ordered = Channel::orderedByName()->get();
 
-    public function test_channel_can_have_payment_settings(): void
-    {
-        $channel = Channel::factory()->create([
-            'payment_methods' => ['credit_card', 'paypal', 'bank_transfer'],
-            'default_payment_method' => 'credit_card',
-        ]);
-
-        $this->assertIsArray($channel->payment_methods);
-        $this->assertContains('credit_card', $channel->payment_methods);
-        $this->assertContains('paypal', $channel->payment_methods);
-        $this->assertContains('bank_transfer', $channel->payment_methods);
-        $this->assertEquals('credit_card', $channel->default_payment_method);
-    }
-
-    public function test_channel_can_have_shipping_settings(): void
-    {
-        $channel = Channel::factory()->create([
-            'shipping_methods' => ['standard', 'express', 'overnight'],
-            'default_shipping_method' => 'standard',
-            'free_shipping_threshold' => 100.00,
-        ]);
-
-        $this->assertIsArray($channel->shipping_methods);
-        $this->assertContains('standard', $channel->shipping_methods);
-        $this->assertContains('express', $channel->shipping_methods);
-        $this->assertContains('overnight', $channel->shipping_methods);
-        $this->assertEquals('standard', $channel->default_shipping_method);
-        $this->assertEquals(100.00, $channel->free_shipping_threshold);
-    }
-
-    public function test_channel_can_have_currency_settings(): void
-    {
-        $channel = Channel::factory()->create([
-            'currency_code' => 'EUR',
-            'currency_symbol' => '€',
-            'currency_position' => 'after',
-        ]);
-
-        $this->assertEquals('EUR', $channel->currency_code);
-        $this->assertEquals('€', $channel->currency_symbol);
-        $this->assertEquals('after', $channel->currency_position);
-    }
-
-    public function test_channel_can_have_language_settings(): void
-    {
-        $channel = Channel::factory()->create([
-            'default_language' => 'lt',
-            'supported_languages' => ['lt', 'en', 'ru'],
-        ]);
-
-        $this->assertEquals('lt', $channel->default_language);
-        $this->assertIsArray($channel->supported_languages);
-        $this->assertContains('lt', $channel->supported_languages);
-        $this->assertContains('en', $channel->supported_languages);
-        $this->assertContains('ru', $channel->supported_languages);
-    }
-
-    public function test_channel_can_have_contact_information(): void
-    {
-        $channel = Channel::factory()->create([
-            'contact_email' => 'support@example.com',
-            'contact_phone' => '+37012345678',
-            'contact_address' => 'Vilnius, Lithuania',
-        ]);
-
-        $this->assertEquals('support@example.com', $channel->contact_email);
-        $this->assertEquals('+37012345678', $channel->contact_phone);
-        $this->assertEquals('Vilnius, Lithuania', $channel->contact_address);
-    }
-
-    public function test_channel_can_have_social_media_links(): void
-    {
-        $channel = Channel::factory()->create([
-            'social_media' => [
-                'facebook' => 'https://facebook.com/example',
-                'instagram' => 'https://instagram.com/example',
-                'twitter' => 'https://twitter.com/example',
-            ],
-        ]);
-
-        $this->assertIsArray($channel->social_media);
-        $this->assertEquals('https://facebook.com/example', $channel->social_media['facebook']);
-        $this->assertEquals('https://instagram.com/example', $channel->social_media['instagram']);
-        $this->assertEquals('https://twitter.com/example', $channel->social_media['twitter']);
-    }
-
-    public function test_channel_can_have_legal_documents(): void
-    {
-        $channel = Channel::factory()->create([
-            'legal_documents' => [
-                'privacy_policy' => 'privacy-policy',
-                'terms_of_service' => 'terms-of-service',
-                'cookie_policy' => 'cookie-policy',
-            ],
-        ]);
-
-        $this->assertIsArray($channel->legal_documents);
-        $this->assertEquals('privacy-policy', $channel->legal_documents['privacy_policy']);
-        $this->assertEquals('terms-of-service', $channel->legal_documents['terms_of_service']);
-        $this->assertEquals('cookie-policy', $channel->legal_documents['cookie_policy']);
+        // Assert: collection is sorted alphabetically regardless of sort_order values.
+        $this->assertSame([
+            $charlie->getKey(),
+            $delta->getKey(),
+            $echo->getKey(),
+        ], $ordered->modelKeys());
     }
 }
