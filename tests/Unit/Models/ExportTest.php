@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Tests\Unit\Models;
 
@@ -17,11 +19,11 @@ final class ExportTest extends TestCase
         $user = User::factory()->create();
 
         $export = Export::factory()->create([
-            'name' => 'Test Export',
-            'format' => 'csv',
-            'status' => ExportStatus::Queued,
+            'name'            => 'Test Export',
+            'format'          => 'csv',
+            'status'          => ExportStatus::Queued,
             'exportable_type' => 'Product',
-            'requested_by' => $user->id,
+            'requested_by'    => $user->id,
         ]);
 
         expect($export)
@@ -65,7 +67,7 @@ final class ExportTest extends TestCase
     public function test_export_automatically_sets_default_counter_values(): void
     {
         $export = Export::factory()->create([
-            'total_rows' => null,
+            'total_rows'     => null,
             'processed_rows' => null,
         ]);
 
@@ -149,7 +151,7 @@ final class ExportTest extends TestCase
 
         expect($queued)
             ->toHaveCount(2)
-            ->and($queued->every(fn($export) => $export->status === ExportStatus::Queued))
+            ->and($queued->every(fn ($export) => $export->status === ExportStatus::Queued))
             ->toBeTrue();
     }
 
@@ -163,7 +165,7 @@ final class ExportTest extends TestCase
 
         expect($processing)
             ->toHaveCount(3)
-            ->and($processing->every(fn($export) => $export->status === ExportStatus::Processing))
+            ->and($processing->every(fn ($export) => $export->status === ExportStatus::Processing))
             ->toBeTrue();
     }
 
@@ -177,7 +179,7 @@ final class ExportTest extends TestCase
 
         expect($completed)
             ->toHaveCount(4)
-            ->and($completed->every(fn($export) => $export->status === ExportStatus::Completed))
+            ->and($completed->every(fn ($export) => $export->status === ExportStatus::Completed))
             ->toBeTrue();
     }
 
@@ -190,7 +192,7 @@ final class ExportTest extends TestCase
 
         expect($failed)
             ->toHaveCount(2)
-            ->and($failed->every(fn($export) => $export->status === ExportStatus::Failed))
+            ->and($failed->every(fn ($export) => $export->status === ExportStatus::Failed))
             ->toBeTrue();
     }
 
@@ -206,7 +208,7 @@ final class ExportTest extends TestCase
 
         expect($user1Exports)
             ->toHaveCount(3)
-            ->and($user1Exports->every(fn($export) => $export->requested_by === $user1->id))
+            ->and($user1Exports->every(fn ($export) => $export->requested_by === $user1->id))
             ->toBeTrue();
     }
 
@@ -234,8 +236,22 @@ final class ExportTest extends TestCase
 
         expect($productExports)
             ->toHaveCount(2)
-            ->and($productExports->every(fn($export) => $export->exportable_type === 'Product'))
+            ->and($productExports->every(fn ($export) => $export->exportable_type === 'Product'))
             ->toBeTrue();
+    }
+
+    public function test_scope_ordered_by_name_sorts_exports_alphabetically(): void
+    {
+        // Arrange exports with intentionally mixed order names.
+        $alpha = Export::factory()->create(['name' => 'Alpha Export', 'requested_at' => now()->subDay()]);
+        $gamma = Export::factory()->create(['name' => 'Gamma Export', 'requested_at' => now()->subHours(2)]);
+        $beta = Export::factory()->create(['name' => 'Beta Export', 'requested_at' => now()]);
+
+        // Act by applying the new scope and collecting identifiers.
+        $ordered = Export::orderedByName()->pluck('id')->all();
+
+        // Assert that ordering follows alphabetical expectations.
+        expect($ordered)->toBe([$alpha->id, $beta->id, $gamma->id]);
     }
 
     public function test_file_extension_accessor_returns_format(): void
@@ -248,7 +264,7 @@ final class ExportTest extends TestCase
     public function test_progress_percentage_accessor_calculates_correctly(): void
     {
         $export = Export::factory()->create([
-            'total_rows' => 1000,
+            'total_rows'     => 1000,
             'processed_rows' => 750,
         ]);
 
@@ -258,7 +274,7 @@ final class ExportTest extends TestCase
     public function test_progress_percentage_accessor_returns_zero_when_total_rows_is_zero(): void
     {
         $export = Export::factory()->create([
-            'total_rows' => 0,
+            'total_rows'     => 0,
             'processed_rows' => 0,
         ]);
 
@@ -317,8 +333,8 @@ final class ExportTest extends TestCase
     public function test_is_downloadable_accessor_returns_false_when_not_completed(): void
     {
         $export = Export::factory()->create([
-            'status' => ExportStatus::Processing,
-            'artifact_path' => 'exports/test.csv',
+            'status'            => ExportStatus::Processing,
+            'artifact_path'     => 'exports/test.csv',
             'artifact_filename' => 'test.csv',
         ]);
 
@@ -328,8 +344,8 @@ final class ExportTest extends TestCase
     public function test_is_downloadable_accessor_returns_false_when_completed_without_artifact(): void
     {
         $export = Export::factory()->create([
-            'status' => ExportStatus::Completed,
-            'artifact_path' => null,
+            'status'            => ExportStatus::Completed,
+            'artifact_path'     => null,
             'artifact_filename' => null,
         ]);
 
@@ -398,7 +414,7 @@ final class ExportTest extends TestCase
     public function test_update_progress_updates_processed_rows(): void
     {
         $export = Export::factory()->processing()->create([
-            'total_rows' => 1000,
+            'total_rows'     => 1000,
             'processed_rows' => 0,
         ]);
 
@@ -413,7 +429,7 @@ final class ExportTest extends TestCase
     public function test_update_progress_can_update_both_processed_and_total_rows(): void
     {
         $export = Export::factory()->processing()->create([
-            'total_rows' => 1000,
+            'total_rows'     => 1000,
             'processed_rows' => 0,
         ]);
 
