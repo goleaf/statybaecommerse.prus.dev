@@ -45,7 +45,11 @@ final class Company extends Model
         'metadata',
     ];
 
-    protected $casts = ['metadata' => 'array', 'is_active' => 'boolean'];
+    // Attribute casting configuration ensures metadata remains structured and the active flag is always boolean.
+    protected $casts = [
+        'metadata' => 'array',
+        'is_active' => 'boolean',
+    ];
     // Relationships
 
     /**
@@ -93,6 +97,18 @@ final class Company extends Model
         return $query->where('size', $size);
     }
 
+    /**
+     * Handle scopeOrderedByName functionality with proper error handling.
+     *
+     * @param  Builder<Company> $query
+     * @return Builder<Company>
+     */
+    public function scopeOrderedByName(Builder $query): Builder
+    {
+        // Sort companies alphabetically to provide predictable listings for UI and reports.
+        return $query->orderBy('name');
+    }
+
     // Accessors
 
     /**
@@ -108,6 +124,7 @@ final class Company extends Model
      */
     public function getActiveSubscriberCountAttribute(): int
     {
-        return $this->subscribers()->where('is_active', true)->count();
+        // Rely on the subscriber status column to avoid querying a non-existent boolean flag.
+        return $this->subscribers()->where('status', 'active')->count();
     }
 }
