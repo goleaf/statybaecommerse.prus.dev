@@ -285,6 +285,15 @@ final class Campaign extends Model
     }
 
     /**
+     * Handle scopeOrderedByName functionality with proper error handling.
+     */
+    public function scopeOrderedByName(Builder $query): Builder
+    {
+        // Ensure campaigns are retrieved in a predictable alphabetical order by their name.
+        return $query->orderBy('name');
+    }
+
+    /**
      * Handle scopeForChannel functionality with proper error handling.
      */
     public function scopeForChannel(Builder $query, int $channelId): Builder
