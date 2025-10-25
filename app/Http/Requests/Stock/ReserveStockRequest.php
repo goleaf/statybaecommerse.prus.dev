@@ -13,12 +13,11 @@ final class ReserveStockRequest extends FormRequest
 
     protected function prepareForValidation(): void
     {
-        $stockId = (int) ($this->route('stock') ?? 0);
+        // Resolve the inventory instance from either implicit model binding or a raw identifier.
+        $inventory = $this->resolveInventoryFromRoute();
 
-        if ($stockId > 0) {
-            $inventory = VariantInventory::find($stockId);
-            $this->maxAvailable = (int) ($inventory?->available_stock ?? 0);
-        }
+        // Cache the available stock count for later validation without additional queries.
+        $this->maxAvailable = (int) ($inventory?->available_stock ?? 0);
     }
 
     public function authorize(): bool
@@ -32,6 +31,26 @@ final class ReserveStockRequest extends FormRequest
             'quantity' => ['required', 'integer', 'min:1', 'max:' . $this->maxAvailable],
             'notes' => ['nullable', 'string', 'max:1000'],
         ];
+    }
+
+    /**
+     * @return VariantInventory|null Resolve the bound inventory even if only an ID was provided.
+     */
+    private function resolveInventoryFromRoute(): ?VariantInventory
+    {
+        $stock = $this->route('stock');
+
+        // If the router already provided a model instance we can use it directly.
+        if ($stock instanceof VariantInventory) {
+            return $stock;
+        }
+
+        // Guard against non-numeric values before attempting a lookup.
+        if (! is_numeric($stock)) {
+            return null;
+        }
+
+        return VariantInventory::find((int) $stock);
     }
 }
 
