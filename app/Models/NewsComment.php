@@ -106,6 +106,15 @@ final class NewsComment extends Model
     }
 
     /**
+     * Handle scopeOrderedByName functionality with proper error handling.
+     */
+    public function scopeOrderedByName(Builder $query): Builder
+    {
+        // Order the query results by the author name to provide consistent sorting for listings.
+        return $query->orderBy('author_name');
+    }
+
+    /**
      * Handle isReply functionality with proper error handling.
      */
     public function isReply(): bool
