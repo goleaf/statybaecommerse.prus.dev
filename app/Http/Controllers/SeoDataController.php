@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Models\SeoData;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -20,28 +21,51 @@ final class SeoDataController extends Controller
      */
     public function index(Request $request): View
     {
-        $query = SeoData::with('seoable')->orderBy('created_at', 'desc');
-        // Filter by locale
-        if ($request->has('locale') && $request->locale) {
-            $query->where('locale', $request->locale);
+        $query = SeoData::query()
+            ->with('seoable')
+            ->orderBy('created_at', 'desc');
+
+        // Filter by locale when an explicit locale has been provided.
+        $locale = $request->input('locale');
+        if (is_string($locale) && $locale !== '') {
+            $query->where('locale', $locale);
         }
-        // Filter by type
-        if ($request->has('type') && $request->type) {
-            $query->where('seoable_type', $request->type);
+
+        // Filter by the polymorphic type when supplied by the caller.
+        $typeFilter = $request->input('type');
+        if (is_string($typeFilter) && $typeFilter !== '') {
+            $query->where('seoable_type', $typeFilter);
         }
-        // Search in title and description
-        if ($request->has('search') && $request->search) {
-            $search = $request->search;
-            $query->where(function ($q) use ($search) {
-                $q->where('title', 'like', "%{$search}%")->orWhere('description', 'like', "%{$search}%")->orWhere('keywords', 'like', "%{$search}%");
+
+        // Search in title, description, and keywords using a grouped LIKE query.
+        $search = $request->input('search');
+        if (is_string($search) && $search !== '') {
+            $like = '%'.$search.'%';
+            $query->where(function (Builder $builder) use ($like): void {
+                $builder
+                    ->where('title', 'like', $like)
+                    ->orWhere('description', 'like', $like)
+                    ->orWhere('keywords', 'like', $like);
             });
         }
-        $seoData = $query->get()->skipWhile(function ($seoData) {
-            // Skip SEO data that is not properly configured for display
-            return empty($seoData->title) || empty($seoData->description) || empty($seoData->locale) || empty($seoData->seoable_type) || ! $seoData->seoable;
-        })->paginate(20);
 
-        return view('seo-data.index', compact('seoData'));
+        // Ensure we only display records that have the essential SEO metadata present.
+        $query->whereHas('seoable')
+            ->whereNotNull('title')
+            ->whereNotNull('description')
+            ->whereNotNull('locale')
+            ->whereNotNull('seoable_type')
+            ->where('title', '<>', '')
+            ->where('description', '<>', '')
+            ->where('locale', '<>', '')
+            ->where('seoable_type', '<>', '');
+
+        $seoData = $query->paginate(20)->withQueryString();
+
+        /** @var view-string $view */
+        $view = 'seo-data.index';
+
+        return view($view, compact('seoData'));
     }
 
     /**
@@ -59,24 +83,44 @@ final class SeoDataController extends Controller
      */
     public function byType(string $type, Request $request): View
     {
-        $query = SeoData::with('seoable')->where('seoable_type', $type)->orderBy('created_at', 'desc');
-        // Filter by locale
-        if ($request->has('locale') && $request->locale) {
-            $query->where('locale', $request->locale);
+        $query = SeoData::query()
+            ->with('seoable')
+            ->where('seoable_type', $type)
+            ->orderBy('created_at', 'desc');
+
+        // Apply locale filtering only when the caller provides the value.
+        $locale = $request->input('locale');
+        if (is_string($locale) && $locale !== '') {
+            $query->where('locale', $locale);
         }
-        // Search in title and description
-        if ($request->has('search') && $request->search) {
-            $search = $request->search;
-            $query->where(function ($q) use ($search) {
-                $q->where('title', 'like', "%{$search}%")->orWhere('description', 'like', "%{$search}%")->orWhere('keywords', 'like', "%{$search}%");
+
+        // Apply the text search filter in a dedicated grouped condition.
+        $search = $request->input('search');
+        if (is_string($search) && $search !== '') {
+            $like = '%'.$search.'%';
+            $query->where(function (Builder $builder) use ($like): void {
+                $builder
+                    ->where('title', 'like', $like)
+                    ->orWhere('description', 'like', $like)
+                    ->orWhere('keywords', 'like', $like);
             });
         }
-        $seoData = $query->get()->skipWhile(function ($seoData) {
-            // Skip SEO data that is not properly configured for display
-            return empty($seoData->title) || empty($seoData->description) || empty($seoData->locale) || empty($seoData->seoable_type) || ! $seoData->seoable;
-        })->paginate(20);
 
-        return view('seo-data.by-type', compact('seoData', 'type'));
+        // Guard against returning incomplete SEO payloads and enforce existing relations.
+        $query->whereHas('seoable')
+            ->whereNotNull('title')
+            ->whereNotNull('description')
+            ->whereNotNull('locale')
+            ->where('title', '<>', '')
+            ->where('description', '<>', '')
+            ->where('locale', '<>', '');
+
+        $seoData = $query->paginate(20)->withQueryString();
+
+        /** @var view-string $view */
+        $view = 'seo-data.by-type';
+
+        return view($view, compact('seoData', 'type'));
     }
 
     /**
