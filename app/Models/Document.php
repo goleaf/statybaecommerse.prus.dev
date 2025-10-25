@@ -23,6 +23,9 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  *
  * @property mixed $fillable
  * @property mixed $casts
+ * @property bool  $is_public
+ * @property bool  $is_downloadable
+ * @property string|null $name
  *
  * @phpstan-use HasFactory<\Database\Factories\DocumentFactory>
  *
@@ -37,6 +40,26 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 #[ScopedBy([StatusScope::class])]
 final class Document extends Model
 {
+    /**
+     * Status constants keep business logic decoupled from raw string literals.
+     */
+    public const STATUS_DRAFT = 'draft';
+
+    public const STATUS_GENERATED = 'generated';
+
+    public const STATUS_PUBLISHED = 'published';
+
+    public const STATUS_ARCHIVED = 'archived';
+
+    /**
+     * Format constants help downstream services reason about file handling.
+     */
+    public const FORMAT_PDF = 'pdf';
+
+    public const FORMAT_HTML = 'html';
+
+    public const FORMAT_DOCX = 'docx';
+
     /** @use HasFactory<\Database\Factories\DocumentFactory> */
     use HasFactory;
 
@@ -72,8 +95,18 @@ final class Document extends Model
         'expires_at'      => 'datetime',
         'is_public'       => 'bool',
         'is_downloadable' => 'bool',
+        'file_size'       => 'int',
         'created_by'      => 'int',
         'updated_by'      => 'int',
+    ];
+
+    /**
+     * @var array<string, mixed>
+     */
+    protected $attributes = [
+        // Keep boolean flags predictable for newly instantiated models.
+        'is_public' => false,
+        'is_downloadable' => true,
     ];
 
     protected $with = ['creator', 'updater'];
@@ -155,7 +188,8 @@ final class Document extends Model
      */
     public function isGenerated(): bool
     {
-        return $this->status === 'generated' || $this->status === 'published';
+        // Consider published documents generated to support download workflows.
+        return in_array($this->status, [self::STATUS_GENERATED, self::STATUS_PUBLISHED], true);
     }
 
     /**
@@ -179,7 +213,8 @@ final class Document extends Model
      */
     public function isPdf(): bool
     {
-        return $this->format === 'pdf';
+        // Map directly to the constant to avoid typos in conditional checks.
+        return $this->format === self::FORMAT_PDF;
     }
 
     /**
@@ -187,7 +222,7 @@ final class Document extends Model
      */
     public function isDraft(): bool
     {
-        return $this->status === 'draft';
+        return $this->status === self::STATUS_DRAFT;
     }
 
     /**
@@ -195,7 +230,7 @@ final class Document extends Model
      */
     public function isPublished(): bool
     {
-        return $this->status === 'published';
+        return $this->status === self::STATUS_PUBLISHED;
     }
 
     /**
@@ -203,7 +238,23 @@ final class Document extends Model
      */
     public function isArchived(): bool
     {
-        return $this->status === 'archived';
+        return $this->status === self::STATUS_ARCHIVED;
+    }
+
+    /**
+     * Quickly check whether the document can be shared without authentication.
+     */
+    public function isPublic(): bool
+    {
+        return $this->is_public;
+    }
+
+    /**
+     * Determine if the generated asset should be downloadable from the UI.
+     */
+    public function isDownloadable(): bool
+    {
+        return $this->is_downloadable;
     }
 
     /**
@@ -248,6 +299,21 @@ final class Document extends Model
     public function scopeOfFormat(Builder $query, string $format): Builder
     {
         return $query->where('format', $format);
+    }
+
+    /**
+     * Order records alphabetically using the friendly name (with a title fallback).
+     *
+     * @param  Builder<Document> $query
+     * @return Builder<Document>
+     */
+    public function scopeOrderedByName(Builder $query): Builder
+    {
+        return $query
+            // Prefer the custom name when present but gracefully fall back to the title.
+            ->orderByRaw("COALESCE(NULLIF(name, ''), title) ASC")
+            // A deterministic second sort keeps pagination stable across inserts.
+            ->orderBy($this->qualifyColumn($this->getKeyName()));
     }
 
     /**
