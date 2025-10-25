@@ -159,6 +159,17 @@ final class Collection extends Model implements HasMedia, TranslatableRecord
     }
 
     /**
+     * Handle scopeOrderedByName functionality with proper error handling.
+     *
+     * @param mixed $query
+     */
+    public function scopeOrderedByName($query)
+    {
+        // Order collections alphabetically by their name field to simplify UI listings.
+        return $query->orderBy('name');
+    }
+
+    /**
      * Handle scopeActive functionality with proper error handling.
      *
      * @param mixed $query
