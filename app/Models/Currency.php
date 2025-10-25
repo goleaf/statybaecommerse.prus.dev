@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\OrdersByName;
 use App\Models\Translations\CurrencyTranslation;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -25,12 +26,15 @@ use InvalidArgumentException;
  * @method static \Illuminate\Database\Eloquent\Builder|Currency newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Currency newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Currency query()
+ * @method static Builder<self>                                  orderedByName(string $direction = 'asc')
  *
  * @mixin \Eloquent
  */
 final class Currency extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory;
+    use OrdersByName;
+    use SoftDeletes;
 
     protected $table = 'currencies';
 
@@ -64,7 +68,7 @@ final class Currency extends Model
 
     protected static function booted(): void
     {
-        static::saved(function (self $currency): void {
+        self::saved(function (self $currency): void {
             $currency->persistPendingTranslations();
         });
     }
@@ -75,12 +79,12 @@ final class Currency extends Model
     protected function casts(): array
     {
         return [
-            'exchange_rate' => 'float',
-            'decimal_places' => 'integer',
-            'sort_order' => 'integer',
-            'is_active' => 'boolean',
-            'is_default' => 'boolean',
-            'is_enabled' => 'boolean',
+            'exchange_rate'    => 'float',
+            'decimal_places'   => 'integer',
+            'sort_order'       => 'integer',
+            'is_active'        => 'boolean',
+            'is_default'       => 'boolean',
+            'is_enabled'       => 'boolean',
             'auto_update_rate' => 'boolean',
         ];
     }
@@ -108,7 +112,8 @@ final class Currency extends Model
      */
     public function orders(): HasMany
     {
-        return $this->hasMany(Order::class);
+        // Orders persist the three-letter currency code instead of a foreign key, so link the relationship accordingly.
+        return $this->hasMany(Order::class, 'currency', 'code');
     }
 
     /**
@@ -170,13 +175,14 @@ final class Currency extends Model
     }
 
     /**
-     * Scope currencies ordered alphabetically by their human readable name.
+     * Direct the shared OrdersByName trait to use the ISO code column for ordering.
      */
-    public function scopeOrderedByName(Builder $query): Builder
+    protected function getNameColumn(): string
     {
-        // Ordering by the `name` column keeps the back office listing predictable for administrators.
-        return $query->orderBy('name');
+        return 'code';
     }
+
+    // Alphabetical ordering is provided by the shared OrdersByName scope targeting the ISO code.
 
     // Accessors
 
