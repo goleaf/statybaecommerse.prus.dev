@@ -58,7 +58,7 @@ final class SeoDataResourceTest extends TestCase
             'locale' => 'lt',
             'title' => 'Test SEO Title',
             'description' => 'Test SEO description for the page',
-            'keywords' => 'test, seo, keywords',
+            'keywords' => json_encode(['test', 'seo', 'keywords']),
             'canonical_url' => 'https://example.com/test-page',
             'no_index' => false,
             'no_follow' => false,

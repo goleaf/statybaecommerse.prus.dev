@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\OrdersByName;
 use App\Models\Scopes\ActiveScope;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -30,13 +32,45 @@ use Spatie\Translatable\HasTranslations;
 #[ScopedBy([ActiveScope::class])]
 final class SeoData extends Model
 {
-    use HasFactory, HasTranslations, SoftDeletes;
+    use HasFactory, HasTranslations, OrdersByName, SoftDeletes;
 
-    protected $fillable = ['seoable_type', 'seoable_id', 'locale', 'title', 'description', 'keywords', 'canonical_url', 'meta_tags', 'structured_data', 'no_index', 'no_follow'];
+    /**
+     * Column leveraged by the shared OrdersByName scope for alphabetical sorting.
+     */
+    protected string $nameColumn = 'title';
 
-    protected $casts = ['meta_tags' => 'array', 'structured_data' => 'array', 'no_index' => 'boolean', 'no_follow' => 'boolean'];
+    /**
+     * @var array<int, string>
+     */
+    protected $fillable = [
+        'seoable_type',
+        'seoable_id',
+        'title',
+        'description',
+        'keywords',
+        'slug',
+        'meta',
+        'locale',
+        'canonical_url',
+        'meta_tags',
+        'structured_data',
+        'no_index',
+        'no_follow',
+    ];
 
-    public array $translatable = ['title', 'description', 'keywords'];
+    /**
+     * @var array<string, string>
+     */
+    protected $casts = [
+        'keywords' => 'array',
+        'meta' => 'array',
+        'meta_tags' => 'array',
+        'structured_data' => 'array',
+        'no_index' => 'boolean',
+        'no_follow' => 'boolean',
+    ];
+
+    public array $translatable = ['title', 'description'];
 
     protected static function booted(): void
     {
@@ -56,11 +90,16 @@ final class SeoData extends Model
             }
 
             // Ensure translatable fields are stored as translations for current locale
-            foreach (['title', 'description', 'keywords'] as $attr) {
+            foreach (['title', 'description'] as $attr) {
                 $value = $model->getAttribute($attr);
                 if (is_string($value)) {
                     $model->setTranslation($attr, $model->locale ?? app()->getLocale() ?? 'lt', $value);
                 }
+            }
+
+            // Normalise keyword payloads so they persist as JSON arrays for casting.
+            if (array_key_exists('keywords', $model->attributes)) {
+                $model->keywords = $model->attributes['keywords'];
             }
 
             // Allow detached records (not morphing to another model)
@@ -71,6 +110,105 @@ final class SeoData extends Model
                 $model->seoable_id = null;
             }
         });
+    }
+
+    /**
+     * Normalise the keywords attribute so callers always receive a trimmed array.
+     */
+    protected function keywords(): Attribute
+    {
+        return Attribute::make(
+            get: fn (mixed $value): array => $this->normalizeKeywordsValue($value),
+            set: fn (mixed $value): array => ['keywords' => $this->normalizeKeywordsValue($value)],
+        );
+    }
+
+    /**
+     * Provide a convenient alias for the legacy meta_tags column expected by the new API.
+     */
+    protected function meta(): Attribute
+    {
+        return Attribute::make(
+            get: fn (mixed $value, array $attributes): array => $this->normalizeMetaValue($value ?? ($attributes['meta_tags'] ?? null)),
+            set: fn (mixed $value): array => ['meta_tags' => $this->normalizeMetaValue($value)],
+        );
+    }
+
+    /**
+     * Provide a defensive slug attribute without persisting an unavailable column.
+     */
+    protected function slug(): Attribute
+    {
+        return Attribute::make(
+            get: fn (mixed $value): ?string => is_string($value) ? $value : null,
+            set: fn (mixed $value): array => [],
+        );
+    }
+
+    /**
+     * Reduce the keyword payload to a human-readable string for display or meta tags.
+     */
+    public function keywordsAsString(string $separator = ', '): string
+    {
+        return implode($separator, $this->keywords);
+    }
+
+    /**
+     * Normalise raw keyword payloads into a trimmed list of strings.
+     *
+     * @return array<int, string>
+     */
+    private function normalizeKeywordsValue(mixed $value): array
+    {
+        if ($value instanceof \Stringable) {
+            $value = (string) $value;
+        }
+
+        if (is_array($value)) {
+            return array_values(array_filter(
+                array_map(static fn ($item): string => trim((string) $item), $value),
+                static fn ($item): bool => $item !== ''
+            ));
+        }
+
+        if (is_string($value) && $value !== '') {
+            $decoded = json_decode($value, true);
+            if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+                return $this->normalizeKeywordsValue($decoded);
+            }
+
+            return $this->normalizeKeywordsValue(explode(',', $value));
+        }
+
+        return [];
+    }
+
+    /**
+     * Cast assorted meta representations into an array for consistent downstream handling.
+     *
+     * @return array<string, mixed>
+     */
+    private function normalizeMetaValue(mixed $value): array
+    {
+        if ($value instanceof \JsonSerializable) {
+            $value = $value->jsonSerialize();
+        }
+
+        if (is_string($value) && $value !== '') {
+            $decoded = json_decode($value, true);
+
+            if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+                return $decoded;
+            }
+
+            return [];
+        }
+
+        if (is_array($value)) {
+            return $value;
+        }
+
+        return [];
     }
 
     /**
@@ -191,8 +329,9 @@ final class SeoData extends Model
             $html .= '<meta name="description" content="'.e($this->description).'">'.PHP_EOL;
             $html .= '<meta property="og:description" content="'.e($this->description).'">'.PHP_EOL;
         }
-        if ($this->keywords) {
-            $html .= '<meta name="keywords" content="'.e($this->keywords).'">'.PHP_EOL;
+        $keywordsString = $this->keywordsAsString();
+        if ($keywordsString !== '') {
+            $html .= '<meta name="keywords" content="'.e($keywordsString).'">'.PHP_EOL;
         }
         if ($this->canonical_url) {
             $html .= '<link rel="canonical" href="'.e($this->canonical_url).'">'.PHP_EOL;
@@ -298,11 +437,11 @@ final class SeoData extends Model
      */
     public function getKeywordsCountAttribute(): int
     {
-        if (! $this->keywords) {
+        if ($this->keywords === []) {
             return 0;
         }
 
-        return count(array_filter(explode(',', $this->keywords)));
+        return count($this->keywords);
     }
 
     /**
@@ -350,7 +489,7 @@ final class SeoData extends Model
             }
         }
         // Keywords score (15 points max)
-        if ($this->keywords) {
+        if ($this->keywords !== []) {
             $score += 10;
             // Has keywords
             if ($this->keywords_count >= 3 && $this->keywords_count <= 10) {
