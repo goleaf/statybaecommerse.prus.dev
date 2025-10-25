@@ -719,16 +719,19 @@ final class TestingDatabase
                 $table->id();
                 $table->unsignedBigInteger('user_id');
                 $table->unsignedBigInteger('product_id');
-                $table->string('interaction_type');
+                $table->string('event');
                 $table->decimal('rating', 3, 2)->nullable();
                 $table->integer('count')->default(1);
                 $table->timestamp('first_interaction');
                 $table->timestamp('last_interaction');
+                $table->foreignId('product_variant_id')->nullable()->constrained('product_variants')->nullOnDelete();
+                $table->json('meta')->nullable();
+                $table->timestamp('occurred_at')->nullable();
                 $table->timestamps();
 
-                $table->unique(['user_id', 'product_id', 'interaction_type'], 'user_product_interactions_unique');
-                $table->index(['user_id', 'interaction_type', 'last_interaction'], 'user_product_interactions_last_idx');
-                $table->index(['product_id', 'interaction_type', 'count'], 'user_product_interactions_product_idx');
+                $table->unique(['user_id', 'product_id', 'event'], 'user_product_interactions_unique');
+                $table->index(['user_id', 'event', 'last_interaction'], 'user_product_interactions_last_idx');
+                $table->index(['product_id', 'event', 'count'], 'user_product_interactions_product_idx');
             });
         }
 
