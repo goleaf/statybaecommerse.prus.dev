@@ -224,4 +224,16 @@ final class DocumentTemplate extends Model
     {
         return $query->where('category', $category);
     }
+
+    /**
+     * Scope a query to order templates alphabetically by their human readable name.
+     *
+     * @param  Builder<DocumentTemplate> $query
+     * @return Builder<DocumentTemplate>
+     */
+    public function scopeOrderedByName(Builder $query): Builder
+    {
+        // Order by the user-facing "name" column so dropdowns remain predictable.
+        return $query->orderBy('name');
+    }
 }
