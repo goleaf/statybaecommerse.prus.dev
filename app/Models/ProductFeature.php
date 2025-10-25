@@ -6,6 +6,7 @@ namespace App\Models;
 
 use App\Models\Scopes\ActiveScope;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -29,16 +30,23 @@ final class ProductFeature extends Model
 {
     use HasFactory;
 
+    /**
+     * @var array<int, string>
+     */
     protected $fillable = ['product_id', 'feature_type', 'feature_key', 'feature_value', 'weight', 'is_active'];
 
+    /**
+     * @var array<string, string>
+     */
     protected $casts = [
         'feature_value' => 'string',
-        'weight' => 'decimal:4',
-        'is_active' => 'boolean',
+        'weight'        => 'decimal:4',
+        'is_active'     => 'boolean',
     ];
 
     /**
-     * Handle product functionality with proper error handling.
+     * Provide the relationship definition for the owning product so feature queries
+     * can eagerly load the parent record when needed.
      */
     public function product(): BelongsTo
     {
@@ -46,42 +54,44 @@ final class ProductFeature extends Model
     }
 
     /**
-     * Handle scopeByType functionality with proper error handling.
-     *
-     * @param  mixed  $query
+     * Scope features by their declared type (e.g. specification, benefit).
      */
-    public function scopeByType($query, string $type)
+    public function scopeByType(Builder $query, string $type): Builder
     {
         return $query->where('feature_type', $type);
     }
 
     /**
-     * Handle scopeByFeature functionality with proper error handling.
-     *
-     * @param  mixed  $query
+     * Scope features by their semantic key, such as "color" or "weight".
      */
-    public function scopeByFeature($query, string $featureKey)
+    public function scopeByFeature(Builder $query, string $featureKey): Builder
     {
         return $query->where('feature_key', $featureKey);
     }
 
     /**
-     * Handle scopeWithMinValue functionality with proper error handling.
-     *
-     * @param  mixed  $query
+     * Restrict the query to features whose numeric value exceeds a threshold.
      */
-    public function scopeWithMinValue($query, float $minValue)
+    public function scopeWithMinValue(Builder $query, float $minValue): Builder
     {
         return $query->where('feature_value', '>=', $minValue);
     }
 
     /**
-     * Handle scopeOrderedByValue functionality with proper error handling.
-     *
-     * @param  mixed  $query
+     * Order features by their stored value in descending order to surface the most
+     * relevant or heavily weighted entries first.
      */
-    public function scopeOrderedByValue($query)
+    public function scopeOrderedByValue(Builder $query): Builder
     {
         return $query->orderByDesc('feature_value');
+    }
+
+    /**
+     * Order features alphabetically by their key name which functions as a
+     * human-friendly identifier in management interfaces.
+     */
+    public function scopeOrderedByName(Builder $query): Builder
+    {
+        return $query->orderBy('feature_key');
     }
 }
