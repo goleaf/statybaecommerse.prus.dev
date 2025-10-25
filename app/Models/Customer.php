@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\OrdersByName;
 use App\Models\Scopes\ActiveScope;
 use App\Traits\HasTranslations;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
@@ -22,7 +23,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 #[ScopedBy([ActiveScope::class])]
 final class Customer extends Model
 {
-    use HasFactory, HasTranslations, SoftDeletes;
+    use HasFactory, HasTranslations, OrdersByName, SoftDeletes;
 
     protected $table = 'customers';
 
@@ -43,7 +44,7 @@ final class Customer extends Model
     {
         return [
             'is_active' => 'boolean',
-            'metadata' => 'array',
+            'metadata'  => 'array',
         ];
     }
 
@@ -133,14 +134,6 @@ final class Customer extends Model
         return $query->where('company_id', $companyId);
     }
 
-    /**
-     * Provide a standard way to order customers alphabetically by name.
-     */
-    public function scopeOrderedByName(Builder $query, string $direction = 'asc'): Builder
-    {
-        // Normalise direction input to prevent unexpected SQL direction values.
-        $direction = strtolower($direction) === 'desc' ? 'desc' : 'asc';
-
-        return $query->orderBy('name', $direction);
-    }
+    // The orderedByName scope is now supplied by the shared OrdersByName trait
+    // so that every consumer benefits from the consistent direction guarding.
 }
