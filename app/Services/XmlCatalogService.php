@@ -477,11 +477,14 @@ final class XmlCatalogService
                     }
 
                     if ($storedPath !== '') {
+                        $fallback = $alt !== '' ? $alt : ($payload['name'] ?? $product->name ?? '');
+
                         ProductImage::query()->create([
                             'product_id' => $product->id,
                             'path' => $storedPath,
-                            'alt_text' => $alt !== '' ? $alt : ($payload['name'] ?? $product->name ?? ''),
-                            'sort_order' => $index,
+                            'title' => $fallback,
+                            'alt' => $fallback,
+                            'position' => $index,
                         ]);
                         $index++;
                     }

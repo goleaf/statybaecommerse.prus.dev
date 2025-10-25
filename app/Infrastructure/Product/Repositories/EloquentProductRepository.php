@@ -51,7 +51,7 @@ final class EloquentProductRepository implements ProductRepositoryInterface
                 'variants' => static fn ($relation) => $relation->withoutGlobalScopes([ActiveScope::class, EnabledScope::class, StatusScope::class]),
                 'images' => static fn ($relation) => $relation
                     ->withoutGlobalScopes([ActiveScope::class])
-                    ->orderBy('sort_order'),
+                ->orderBy('position'),
             ])
             ->withSum([
                 // Eager-load active reservation totals so stock checks avoid N+1 aggregate queries.
@@ -86,7 +86,7 @@ final class EloquentProductRepository implements ProductRepositoryInterface
                 'variants' => static fn ($relation) => $relation->withoutGlobalScopes([ActiveScope::class, EnabledScope::class, StatusScope::class]),
                 'images' => static fn ($relation) => $relation
                     ->withoutGlobalScopes([ActiveScope::class])
-                    ->orderBy('sort_order'),
+                ->orderBy('position'),
             ])
             ->withSum([
                 // Keep reservation totals consistent in catalog listings as well for parity with search results.
@@ -135,7 +135,7 @@ final class EloquentProductRepository implements ProductRepositoryInterface
                 'variants',
                 'images' => static fn ($relation) => $relation
                     ->withoutGlobalScopes([ActiveScope::class])
-                    ->orderBy('sort_order'),
+                ->orderBy('position'),
             ])
             ->withSum([
                 // Ensure detail views reuse the same eager-loaded reservation aggregates.
@@ -169,7 +169,7 @@ final class EloquentProductRepository implements ProductRepositoryInterface
                     return new ProductImage(
                         $url ?? '',
                         $url,
-                        $image->alt_text ?? $name,
+                        $image->alt ?? $name,
                     );
                 })
                 ->values()

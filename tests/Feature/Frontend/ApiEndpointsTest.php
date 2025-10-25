@@ -28,8 +28,8 @@ final class ApiEndpointsTest extends TestCase
         ProductImage::factory()
             ->for($visibleProduct)
             ->create([
-                'path'       => 'product-images/test-search-product.jpg',
-                'sort_order' => 0,
+                'path' => 'product-images/test-search-product.jpg',
+                'position' => 0,
             ]);
 
         // Arrange: ensure drafts never leak into the storefront endpoint.
@@ -99,8 +99,8 @@ final class ApiEndpointsTest extends TestCase
         ProductImage::factory()
             ->for($firstProduct)
             ->create([
-                'path'       => 'product-images/first-viewed.jpg',
-                'sort_order' => 0,
+                'path' => 'product-images/first-viewed.jpg',
+                'position' => 0,
             ]);
 
         $secondProduct = Product::factory()
@@ -112,8 +112,8 @@ final class ApiEndpointsTest extends TestCase
         ProductImage::factory()
             ->for($secondProduct)
             ->create([
-                'path'       => 'product-images/second-viewed.jpg',
-                'sort_order' => 0,
+                'path' => 'product-images/second-viewed.jpg',
+                'position' => 0,
             ]);
 
         // Act: emulate a session history where the second product was viewed last.

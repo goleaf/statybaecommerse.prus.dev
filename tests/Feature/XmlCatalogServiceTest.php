@@ -19,7 +19,13 @@ it('feature: exports and imports categories and products with translations and i
     $p = Product::query()->create(['name' => 'Telefonas', 'slug' => 'telefonas', 'sku' => 'T-1', 'price' => 9.99, 'is_visible' => true]);
     $p->categories()->attach($cat->id);
     $p->updateTranslation('en', ['name' => 'Phone']);
-    ProductImage::query()->create(['product_id' => $p->id, 'path' => 'images/sample.jpg', 'alt_text' => 'Sample', 'sort_order' => 1]);
+    ProductImage::query()->create([
+        'product_id' => $p->id,
+        'path' => 'images/sample.jpg',
+        'title' => 'Sample',
+        'alt' => 'Sample',
+        'position' => 1,
+    ]);
 
     $service = app(XmlCatalogService::class);
     $tmp = base_path('storage/testing-catalog.xml');

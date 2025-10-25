@@ -143,7 +143,7 @@ final class ProductImageGallery extends Component
     {
         $variant = $this->product
             ->variants()
-            ->with(['images' => fn ($query) => $query->orderBy('sort_order')])
+            ->with(['images' => fn ($query) => $query->orderBy('position')])
             ->find($variantId);
 
         if (! $variant) {
@@ -151,7 +151,7 @@ final class ProductImageGallery extends Component
         }
 
         $images = $variant->images
-            ->sortBy('sort_order')
+            ->sortBy('position')
             ->values()
             ->map(function (VariantImage $image) use ($variant) {
                 $full = $image->image_url;

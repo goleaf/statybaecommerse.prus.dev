@@ -756,7 +756,7 @@ final class Product extends Model implements HasMedia, TranslatableRecord
      */
     public function images(): HasMany
     {
-        return $this->hasMany(ProductImage::class)->orderBy('sort_order');
+        return $this->hasMany(ProductImage::class)->orderBy('position');
     }
 
     /**
@@ -780,7 +780,7 @@ final class Product extends Model implements HasMedia, TranslatableRecord
      */
     public function primaryImage(): HasOne
     {
-        return $this->images()->one()->ofMany('sort_order', 'min');
+        return $this->images()->one()->ofMany('position', 'min');
     }
 
     /**
@@ -1380,10 +1380,20 @@ final class Product extends Model implements HasMedia, TranslatableRecord
      */
     public function getGalleryImages(): array
     {
-        return $this->images()->orderBy('sort_order')->get()->map(function (ProductImage $img) {
+        return $this->images()->orderBy('position')->get()->map(function (ProductImage $img) {
             $url = $this->resolvePublicUrl($img->path);
 
-            return ['original' => $url, 'xl' => $url, 'lg' => $url, 'md' => $url, 'sm' => $url, 'xs' => $url, 'alt' => $img->alt_text ?: $this->name, 'title' => $this->name, 'generated' => true];
+            return [
+                'original' => $url,
+                'xl' => $url,
+                'lg' => $url,
+                'md' => $url,
+                'sm' => $url,
+                'xs' => $url,
+                'alt' => $img->alt ?? $this->name,
+                'title' => $img->title ?? $this->name,
+                'generated' => true,
+            ];
         })->toArray();
     }
 
@@ -1400,7 +1410,7 @@ final class Product extends Model implements HasMedia, TranslatableRecord
      */
     public function getAllImageSizes(): array
     {
-        $img = $this->images()->orderBy('sort_order')->first();
+        $img = $this->images()->orderBy('position')->first();
         if (! $img) {
             return [];
         }

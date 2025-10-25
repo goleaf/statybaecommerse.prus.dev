@@ -34,7 +34,7 @@ final class ImagesRelationManager extends BaseRelationManager
                     ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
                     ->directory('products/images')
                     ->visibility('private'),
-                Forms\Components\TextInput::make('alt_text')
+                Forms\Components\TextInput::make('alt')
                     ->label(__('products.images.alt_text'))
                     ->maxLength(255)
                     ->helperText(__('products.images.alt_text_help')),
@@ -62,7 +62,7 @@ final class ImagesRelationManager extends BaseRelationManager
                 Forms\Components\Toggle::make('is_active')
                     ->label(__('products.images.is_active'))
                     ->default(true),
-                Forms\Components\TextInput::make('sort_order')
+                Forms\Components\TextInput::make('position')
                     ->label(__('products.images.sort_order'))
                     ->numeric()
                     ->default(0)
@@ -74,13 +74,13 @@ final class ImagesRelationManager extends BaseRelationManager
     {
         // Configure the relation manager table to satisfy Filament v4's return type requirements.
         return $table
-            ->recordTitleAttribute('alt_text')
+            ->recordTitleAttribute('title')
             ->columns([
                 Tables\Columns\ImageColumn::make('image')
                     ->label(__('products.images.image'))
                     ->size(60)
                     ->square(),
-                Tables\Columns\TextColumn::make('alt_text')
+                Tables\Columns\TextColumn::make('alt')
                     ->label(__('products.images.alt_text'))
                     ->searchable()
                     ->sortable()
@@ -111,7 +111,7 @@ final class ImagesRelationManager extends BaseRelationManager
                     ->label(__('products.images.is_active'))
                     ->boolean()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('sort_order')
+                Tables\Columns\TextColumn::make('position')
                     ->label(__('products.images.sort_order'))
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
@@ -165,7 +165,7 @@ final class ImagesRelationManager extends BaseRelationManager
                                     ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
                                     ->directory('products/images')
                                     ->visibility('private'),
-                                Forms\Components\TextInput::make('alt_text')
+                                Forms\Components\TextInput::make('alt')
                                     ->label(__('products.images.alt_text'))
                                     ->maxLength(255),
                                 Forms\Components\TextInput::make('title')
@@ -190,7 +190,7 @@ final class ImagesRelationManager extends BaseRelationManager
                                     ->label(__('products.images.is_primary')),
                                 Forms\Components\Toggle::make('is_active')
                                     ->label(__('products.images.is_active')),
-                                Forms\Components\TextInput::make('sort_order')
+                                Forms\Components\TextInput::make('position')
                                     ->label(__('products.images.sort_order'))
                                     ->numeric()
                                     ->minValue(0),
@@ -207,6 +207,6 @@ final class ImagesRelationManager extends BaseRelationManager
                     DeleteBulkAction::make(),
                 ]),
             ])
-            ->defaultSort('sort_order');
+            ->defaultSort('position');
     }
 }

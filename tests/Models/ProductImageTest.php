@@ -23,21 +23,24 @@ final class ProductImageTest extends TestCase
         // Validate the fillable attributes to prevent accidental mass-assignment vulnerabilities.
         self::assertSame([
             'product_id',
+            'product_variant_id',
+            'title',
+            'alt',
             'path',
-            'alt_text',
-            'sort_order',
-            'is_active',
+            'position',
+            'meta',
         ], $model->getFillable());
 
         // Ensure the casts map the important attributes to strong native types.
         self::assertSame([
-            'product_id' => 'integer',
-            'sort_order' => 'integer',
-            'is_active' => 'boolean',
+            'product_id' => 'int',
+            'product_variant_id' => 'int',
+            'position' => 'int',
+            'meta' => 'array',
         ], $model->getCasts());
 
-        // Check that images default to the active state when the attribute is not provided.
-        self::assertTrue((bool) $model->getAttribute('is_active'));
+        // Confirm JSON metadata defaults to an empty array for predictable downstream usage.
+        self::assertSame([], $model->getAttribute('meta'));
     }
 
     public function test_product_relationship_returns_parent_model(): void
@@ -112,14 +115,12 @@ final class ProductImageTest extends TestCase
         $product = Product::factory()->create();
         $otherProduct = Product::factory()->create();
 
-        // Seed images with a mix of activity states and sort orders for the scope tests.
-        $first = ProductImage::factory()->for($product, 'product')->create(['sort_order' => 1]);
-        $second = ProductImage::factory()->for($product, 'product')->create(['sort_order' => 5]);
-        ProductImage::factory()->for($product, 'product')->create([
-            'is_active' => false,
-            'sort_order' => 2,
-        ]);
-        ProductImage::factory()->for($otherProduct, 'product')->create(['sort_order' => 0]);
+        // Seed images with a mix of activity states and positions for the scope tests.
+        $first = ProductImage::factory()->for($product, 'product')->create(['position' => 1]);
+        $second = ProductImage::factory()->for($product, 'product')->create(['position' => 5]);
+        $inactive = ProductImage::factory()->for($product, 'product')->create(['position' => 2]);
+        $inactive->forceFill(['is_active' => false])->save();
+        ProductImage::factory()->for($otherProduct, 'product')->create(['position' => 0]);
 
         // Chain the custom scopes and ensure we only receive the active images for the target product.
         $scopedIds = ProductImage::query()
@@ -129,7 +130,7 @@ final class ProductImageTest extends TestCase
             ->pluck('id')
             ->all();
 
-        // Confirm that the ordered scope respects the sort_order and id fallback for deterministic ordering.
+        // Confirm that the ordered scope respects the position and id fallback for deterministic ordering.
         self::assertSame([$first->getKey(), $second->getKey()], $scopedIds);
     }
 
@@ -137,8 +138,8 @@ final class ProductImageTest extends TestCase
     {
         // Create a product and populate multiple images with known ordering.
         $product = Product::factory()->create();
-        $first = ProductImage::factory()->for($product, 'product')->create(['sort_order' => 1]);
-        ProductImage::factory()->for($product, 'product')->create(['sort_order' => 3]);
+        $first = ProductImage::factory()->for($product, 'product')->create(['position' => 1]);
+        ProductImage::factory()->for($product, 'product')->create(['position' => 3]);
 
         // Execute the primary scope which should return only the leading image in the ordered list.
         $primaryId = ProductImage::query()
@@ -155,17 +156,17 @@ final class ProductImageTest extends TestCase
         // Create a product to share between the test fixtures.
         $product = Product::factory()->create();
 
-        // Seed an image that leads the ordering despite not having a zero sort order.
-        $leading = ProductImage::factory()->for($product, 'product')->create(['sort_order' => 2]);
-        ProductImage::factory()->for($product, 'product')->create(['sort_order' => 5]);
+        // Seed an image that leads the ordering despite not having a zero position.
+        $leading = ProductImage::factory()->for($product, 'product')->create(['position' => 2]);
+        ProductImage::factory()->for($product, 'product')->create(['position' => 5]);
 
-        // Persist another image with an explicit zero sort order to test the short-circuit branch.
-        $zeroSort = ProductImage::factory()->for($product, 'product')->create(['sort_order' => 0]);
+        // Persist another image with an explicit zero position to test the short-circuit branch.
+        $zeroSort = ProductImage::factory()->for($product, 'product')->create(['position' => 0]);
 
         // The leading image should evaluate as primary because it appears first in the ordered scope.
         self::assertTrue($leading->fresh()->isPrimary());
 
-        // The zero sort order image should also report as primary even without considering ordering queries.
+        // The zero position image should also report as primary even without considering ordering queries.
         self::assertTrue($zeroSort->fresh()->isPrimary());
     }
 
@@ -175,16 +176,16 @@ final class ProductImageTest extends TestCase
         $product = Product::factory()->create(['name' => 'Granite Tile']);
 
         // Create an image that contains explicit alt text so the accessor should surface the stored value.
-        $withAlt = ProductImage::factory()->for($product, 'product')->create(['alt_text' => 'Custom alt text']);
+        $withAlt = ProductImage::factory()->for($product, 'product')->create(['alt' => 'Custom alt text']);
         self::assertSame('Custom alt text', $withAlt->getAltTextOrDefault());
 
         // Create an image without alt text but ensure the relation is loaded for the product-specific fallback.
-        $withoutAlt = ProductImage::factory()->for($product, 'product')->create(['alt_text' => null]);
+        $withoutAlt = ProductImage::factory()->for($product, 'product')->create(['alt' => null]);
         $withoutAlt->setRelation('product', $product);
         self::assertSame('Granite Tile image', $withoutAlt->getAltTextOrDefault());
 
         // Evaluate the generic fallback when no alt text or relation data is available.
-        $standalone = ProductImage::factory()->make(['alt_text' => null]);
+        $standalone = ProductImage::factory()->make(['alt' => null]);
         self::assertSame('Product image', $standalone->getAltTextOrDefault());
     }
 }

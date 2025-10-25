@@ -25,8 +25,12 @@ final class ProductImageFactory extends Factory
         return [
             'product_id' => Product::factory(),
             'path' => 'product-images/'.$this->faker->uuid().'.jpg',
-            'alt_text' => $this->faker->sentence(3),
-            'sort_order' => $this->faker->numberBetween(0, 10),
+            'title' => $this->faker->sentence(3),
+            'alt' => $this->faker->sentence(3),
+            'position' => $this->faker->numberBetween(0, 10),
+            'meta' => [
+                'breakpoints' => ['lg' => '1024w', 'sm' => '512w'],
+            ],
         ];
     }
 
@@ -37,8 +41,9 @@ final class ProductImageFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'path' => 'product-images/main-'.$this->faker->uuid().'.jpg',
-            'alt_text' => 'Main product image',
-            'sort_order' => 1,
+            'title' => 'Main product image',
+            'alt' => 'Main product image',
+            'position' => 1,
         ]);
     }
 
@@ -49,8 +54,9 @@ final class ProductImageFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'path' => 'product-images/gallery-'.$this->faker->uuid().'.jpg',
-            'alt_text' => 'Gallery image',
-            'sort_order' => $this->faker->numberBetween(2, 5),
+            'title' => 'Gallery image',
+            'alt' => 'Gallery image',
+            'position' => $this->faker->numberBetween(2, 5),
         ]);
     }
 
@@ -61,8 +67,9 @@ final class ProductImageFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'path' => 'product-images/lifestyle-'.$this->faker->uuid().'.jpg',
-            'alt_text' => 'Lifestyle image',
-            'sort_order' => $this->faker->numberBetween(6, 8),
+            'title' => 'Lifestyle image',
+            'alt' => 'Lifestyle image',
+            'position' => $this->faker->numberBetween(6, 8),
         ]);
     }
 
@@ -73,8 +80,9 @@ final class ProductImageFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'path' => 'product-images/technical-'.$this->faker->uuid().'.jpg',
-            'alt_text' => 'Technical specification image',
-            'sort_order' => $this->faker->numberBetween(9, 10),
+            'title' => 'Technical specification image',
+            'alt' => 'Technical specification image',
+            'position' => $this->faker->numberBetween(9, 10),
         ]);
     }
 
@@ -85,8 +93,9 @@ final class ProductImageFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'path' => 'product-images/thumb-'.$this->faker->uuid().'.jpg',
-            'alt_text' => 'Thumbnail image',
-            'sort_order' => 0,
+            'title' => 'Thumbnail image',
+            'alt' => 'Thumbnail image',
+            'position' => 0,
         ]);
     }
 
@@ -97,8 +106,9 @@ final class ProductImageFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'path' => 'product-images/high-res-'.$this->faker->uuid().'.jpg',
-            'alt_text' => 'High resolution image',
-            'sort_order' => $this->faker->numberBetween(1, 3),
+            'title' => 'High resolution image',
+            'alt' => 'High resolution image',
+            'position' => $this->faker->numberBetween(1, 3),
         ]);
     }
 
@@ -108,7 +118,7 @@ final class ProductImageFactory extends Factory
     public function withoutAltText(): static
     {
         return $this->state(fn (array $attributes) => [
-            'alt_text' => null,
+            'alt' => null,
         ]);
     }
 
@@ -118,7 +128,7 @@ final class ProductImageFactory extends Factory
     public function withLongAltText(): static
     {
         return $this->state(fn (array $attributes) => [
-            'alt_text' => $this->faker->paragraph(2),
+            'alt' => $this->faker->paragraph(2),
         ]);
     }
 
@@ -128,7 +138,7 @@ final class ProductImageFactory extends Factory
     public function withShortAltText(): static
     {
         return $this->state(fn (array $attributes) => [
-            'alt_text' => $this->faker->word(),
+            'alt' => $this->faker->word(),
         ]);
     }
 
@@ -166,7 +176,7 @@ final class ProductImageFactory extends Factory
     public function withSortOrder(int $sortOrder): static
     {
         return $this->state(fn (array $attributes) => [
-            'sort_order' => $sortOrder,
+            'position' => $sortOrder,
         ]);
     }
 
@@ -186,7 +196,7 @@ final class ProductImageFactory extends Factory
     public function withAltText(string $altText): static
     {
         return $this->state(fn (array $attributes) => [
-            'alt_text' => $altText,
+            'alt' => $altText,
         ]);
     }
 
@@ -241,7 +251,8 @@ final class ProductImageFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'path' => 'product-images/'.$this->faker->uuid()."_{$width}x{$height}.jpg",
-            'alt_text' => "Product image {$width}x{$height}",
+            'title' => "Product image {$width}x{$height}",
+            'alt' => "Product image {$width}x{$height}",
         ]);
     }
 
@@ -254,7 +265,8 @@ final class ProductImageFactory extends Factory
 
         return $this->state(fn (array $attributes) => [
             'path' => "product-images/{$categorySlug}/".$this->faker->uuid().'.jpg',
-            'alt_text' => "{$category} product image",
+            'title' => "{$category} product image",
+            'alt' => "{$category} product image",
         ]);
     }
 }

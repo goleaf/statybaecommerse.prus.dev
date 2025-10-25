@@ -51,8 +51,9 @@ final class AdditionalGlobalScopesTest extends TestCase
     public function test_product_image_model_has_active_scope(): void
     {
         // Create test product images
-        $activeImage = ProductImage::factory()->create(['is_active' => true]);
-        $inactiveImage = ProductImage::factory()->create(['is_active' => false]);
+        $activeImage = ProductImage::factory()->create();
+        $inactiveImage = ProductImage::factory()->create();
+        $inactiveImage->forceFill(['is_active' => false])->save();
 
         // Test that only active images are returned
         $images = ProductImage::all();

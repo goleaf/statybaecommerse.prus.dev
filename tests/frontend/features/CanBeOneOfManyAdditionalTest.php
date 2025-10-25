@@ -49,15 +49,15 @@ final class CanBeOneOfManyAdditionalTest extends TestCase
     {
         $product = Product::factory()->create();
 
-        // Create multiple images with different sort orders
+        // Create multiple images with different positions
         $primaryImage = ProductImage::factory()->create([
             'product_id' => $product->id,
-            'sort_order' => 1,
+            'position' => 1,
         ]);
 
         $secondaryImage = ProductImage::factory()->create([
             'product_id' => $product->id,
-            'sort_order' => 2,
+            'position' => 2,
         ]);
 
         // Refresh the product to clear any cached relationships

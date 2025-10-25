@@ -50,13 +50,19 @@ final class ProductImageResource extends Resource
                     ->visibility('public')
                     ->dehydrateStateUsing(static fn (?string $state): ?string => $state ? 'storage/' . ltrim($state, '/') : null)
                     ->formatStateUsing(static fn (?string $state): ?string => $state && str_starts_with($state, 'storage/') ? substr($state, strlen('storage/')) : $state),
-                Forms\Components\TextInput::make('alt_text')
+                Forms\Components\TextInput::make('title')
+                    ->label('Title')
+                    ->maxLength(255)
+                    ->helperText('Short heading displayed alongside the image in galleries.'),
+                Forms\Components\TextInput::make('alt')
                     ->label('Alt Text')
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('sort_order')
-                    ->label('Sort Order')
+                    ->maxLength(255)
+                    ->helperText('Accessible description announced by screen readers.'),
+                Forms\Components\TextInput::make('position')
+                    ->label('Position')
                     ->numeric()
-                    ->default(0),
+                    ->default(0)
+                    ->helperText('Lower numbers appear first in galleries.'),
             ]);
     }
 
@@ -71,10 +77,16 @@ final class ProductImageResource extends Resource
                 Tables\Columns\TextColumn::make('product.name')
                     ->label('Product')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('alt_text')
+                Tables\Columns\TextColumn::make('title')
+                    ->label('Title')
                     ->limit(30)
                     ->searchable(),
-                Tables\Columns\TextColumn::make('sort_order'),
+                Tables\Columns\TextColumn::make('alt')
+                    ->label('Alt Text')
+                    ->limit(30)
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('position')
+                    ->label('Position'),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -93,7 +105,7 @@ final class ProductImageResource extends Resource
                     DeleteBulkAction::make(),
                 ]),
             ])
-            ->defaultSort('sort_order');
+            ->defaultSort('position');
     }
 
     public static function getRelations(): array
