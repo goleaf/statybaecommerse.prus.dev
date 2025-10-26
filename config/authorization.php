@@ -67,6 +67,11 @@ return [
             'create'  => 'product_histories.create',
             'export'  => 'product_histories.export',
         ],
+        // Gatekeeping for discount rule management and diagnostic helpers.
+        'discount_conditions' => [
+            'viewAny' => 'discount_conditions.viewAny',
+            'view'    => 'discount_conditions.view',
+        ],
     ],
 
     'roles' => [
@@ -81,6 +86,7 @@ return [
             'roles.viewAny', 'roles.view', 'roles.create', 'roles.update', 'roles.delete',
             'audit_logs.viewAny',
             'product_histories.viewAny', 'product_histories.view', 'product_histories.create', 'product_histories.export',
+            'discount_conditions.viewAny', 'discount_conditions.view',
         ],
         'administrator' => [
             'panel.access.admin',
@@ -92,6 +98,7 @@ return [
             'roles.viewAny', 'roles.view', 'roles.create', 'roles.update', 'roles.delete',
             'audit_logs.viewAny',
             'product_histories.viewAny', 'product_histories.view', 'product_histories.create', 'product_histories.export',
+            'discount_conditions.viewAny', 'discount_conditions.view',
         ],
         'manager' => [
             'panel.access.admin',
@@ -100,12 +107,14 @@ return [
             'brands.viewAny', 'brands.view', 'brands.update',
             'orders.viewAny', 'orders.view', 'orders.update',
             'users.viewAny', 'users.view',
+            'discount_conditions.viewAny', 'discount_conditions.view',
         ],
         'editor' => [
             'panel.access.admin',
             'view_products', 'edit_products',
             'categories.viewAny', 'categories.view', 'categories.update',
             'brands.viewAny', 'brands.view', 'brands.update',
+            'discount_conditions.viewAny', 'discount_conditions.view',
         ],
         'support' => [
             'panel.access.admin',
@@ -118,6 +127,7 @@ return [
             'categories.viewAny', 'categories.view',
             'brands.viewAny', 'brands.view',
             'orders.viewAny', 'orders.view',
+            'discount_conditions.viewAny', 'discount_conditions.view',
         ],
         'user' => [],
     ],

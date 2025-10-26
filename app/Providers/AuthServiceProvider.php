@@ -11,8 +11,10 @@ use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Country;
 use App\Models\Customer;
+use App\Models\DiscountCondition;
 use App\Models\Export;
 use App\Models\Legal;
+use App\Models\Notification;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\ProductHistory;
@@ -28,6 +30,7 @@ use App\Policies\BrandPolicy;
 use App\Policies\CategoryPolicy;
 use App\Policies\CountryPolicy;
 use App\Policies\CustomerPolicy;
+use App\Policies\DiscountConditionPolicy;
 use App\Policies\ExportPolicy;
 use App\Policies\LegalPolicy;
 use App\Policies\NotificationPolicy;
@@ -52,24 +55,25 @@ final class AuthServiceProvider extends ServiceProvider
      * @var array<class-string, class-string>
      */
     protected $policies = [
-        Address::class        => AddressPolicy::class,
-        AuditLog::class       => AuditLogPolicy::class,
-        Brand::class          => BrandPolicy::class,
-        Category::class       => CategoryPolicy::class,
-        Country::class        => CountryPolicy::class,
-        Customer::class       => CustomerPolicy::class,
-        Export::class         => ExportPolicy::class,
-        Legal::class          => LegalPolicy::class,
-        Notification::class   => NotificationPolicy::class,
-        Order::class          => OrderPolicy::class,
-        Product::class        => ProductPolicy::class,
-        ProductHistory::class => ProductHistoryPolicy::class,
-        ProductRequest::class => ProductRequestPolicy::class,
-        Referral::class       => ReferralPolicy::class,
-        ReferralCode::class   => ReferralCodePolicy::class,
-        Role::class           => RolePolicy::class,
-        SystemSetting::class  => SystemSettingPolicy::class,
-        User::class           => UserPolicy::class,
+        Address::class           => AddressPolicy::class,
+        AuditLog::class          => AuditLogPolicy::class,
+        Brand::class             => BrandPolicy::class,
+        Category::class          => CategoryPolicy::class,
+        Country::class           => CountryPolicy::class,
+        Customer::class          => CustomerPolicy::class,
+        DiscountCondition::class => DiscountConditionPolicy::class,
+        Export::class            => ExportPolicy::class,
+        Legal::class             => LegalPolicy::class,
+        Notification::class      => NotificationPolicy::class,
+        Order::class             => OrderPolicy::class,
+        Product::class           => ProductPolicy::class,
+        ProductHistory::class    => ProductHistoryPolicy::class,
+        ProductRequest::class    => ProductRequestPolicy::class,
+        Referral::class          => ReferralPolicy::class,
+        ReferralCode::class      => ReferralCodePolicy::class,
+        Role::class              => RolePolicy::class,
+        SystemSetting::class     => SystemSettingPolicy::class,
+        User::class              => UserPolicy::class,
     ];
 
     /**
@@ -80,7 +84,7 @@ final class AuthServiceProvider extends ServiceProvider
         $this->registerPolicies();
 
         // Allow privileged admin roles to bypass granular authorization checks
-        Gate::before(function ($user, ?string $ability = null) {
+        Gate::before(function ($user, ?string $ability = null): ?true {
             if (! $user instanceof AdminUser) {
                 return null;
             }
@@ -99,11 +103,11 @@ final class AuthServiceProvider extends ServiceProvider
                 return true;
             }
 
-            if ($user === null) {
+            if (!$user instanceof \Illuminate\Contracts\Auth\Authenticatable) {
                 return false;
             }
 
-            return isset($user->is_admin) ? (bool) $user->is_admin : false;
+            return property_exists($user, 'is_admin') && $user->is_admin !== null && (bool) $user->is_admin;
         });
 
         $permissions = (array) config('dashboard.permissions');

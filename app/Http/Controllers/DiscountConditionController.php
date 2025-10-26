@@ -4,10 +4,15 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\DiscountConditionIndexRequest;
+use App\Http\Requests\DiscountConditionOperatorsRequest;
+use App\Http\Resources\DiscountConditionCollection;
+use App\Http\Resources\DiscountConditionOperatorCollection;
+use App\Http\Resources\DiscountConditionTestResource;
 use App\Models\Discount;
 use App\Models\DiscountCondition;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
 use OpenApi\Attributes as OA;
 
@@ -22,31 +27,77 @@ final class DiscountConditionController extends Controller
     /**
      * Display a listing of the resource with pagination and filtering.
      */
-    public function index(Request $request): View
+    public function index(DiscountConditionIndexRequest $request): View
     {
-        $query = DiscountCondition::with(['discount', 'translations'])->active()->byPriority('desc');
-        // Apply filters
-        if ($request->filled('type')) {
-            $query->byType($request->get('type'));
+        Gate::authorize('viewAny', DiscountCondition::class);
+
+        /** @var array<string, mixed> $filters */
+        $filters = $request->validated();
+
+        // Warm up the query with eager loading to avoid N+1 lookups when rendering the table.
+        $query = DiscountCondition::query()
+            ->with(['discount', 'translations'])
+            ->active();
+
+        $typeFilter = $filters['type'] ?? null;
+        if (is_string($typeFilter) && $typeFilter !== '') {
+            // Allow narrowing by discriminator type.
+            $query->byType($typeFilter);
         }
-        if ($request->filled('discount_id')) {
-            $query->where('discount_id', $request->get('discount_id'));
+
+        if (array_key_exists('discount_id', $filters)) {
+            $discountId = $filters['discount_id'];
+
+            // Allow targeting a single discount when auditing its rules.
+            if (is_int($discountId) || (is_string($discountId) && $discountId !== '')) {
+                $query->where('discount_id', (int) $discountId);
+            }
         }
-        if ($request->filled('operator')) {
-            $query->byOperator($request->get('operator'));
+
+        $operatorFilter = $filters['operator'] ?? null;
+        if (is_string($operatorFilter) && $operatorFilter !== '') {
+            // Allow filtering by comparison operator for diagnostic purposes.
+            $query->byOperator($operatorFilter);
         }
+
+        $sort = $filters['sort'] ?? 'priority';
+        if (! is_string($sort) || $sort === '') {
+            $sort = 'priority';
+        }
+
+        $direction = $filters['direction'] ?? 'desc';
+        if (! is_string($direction) || $direction === '') {
+            $direction = 'desc';
+        }
+
+        if ($sort === 'priority') {
+            // Retain the historical default priority ordering.
+            $query->orderBy('priority', $direction);
+        } else {
+            // Provide deterministic secondary ordering to ensure stable pagination.
+            $query->orderBy($sort, $direction)->orderBy('id');
+        }
+
+        $perPageInput = $filters['per_page'] ?? null;
+        $perPage = 20;
+
+        if (is_int($perPageInput)) {
+            // Trust integer values coming from the validated payload.
+            $perPage = max(1, $perPageInput);
+        } elseif (is_string($perPageInput) && $perPageInput !== '') {
+            // Normalise numeric strings into integers for the paginator.
+            $perPage = max(1, (int) $perPageInput);
+        }
+
         $conditions = $query
-            // Filter out discount conditions that are missing the key attributes required for the index view.
-            ->whereNotNull('type')
-            ->whereNotNull('discount_id')
-            ->whereNotNull('operator')
-            ->whereHas('discount')
-            ->paginate(20);
-        $discounts = Discount::active()->get();
+            ->paginate($perPage)
+            ->appends($filters);
+
+        $discounts = Discount::query()->active()->orderBy('name')->get();
         $types = DiscountCondition::getTypes();
         $operators = DiscountCondition::getOperators();
 
-        return view('discount-conditions.index', compact('conditions', 'discounts', 'types', 'operators'));
+        return view('discount-conditions.index', ['conditions' => $conditions, 'discounts' => $discounts, 'types' => $types, 'operators' => $operators]);
     }
 
     /**
@@ -54,9 +105,12 @@ final class DiscountConditionController extends Controller
      */
     public function show(DiscountCondition $discountCondition): View
     {
-        $discountCondition->load(['discount', 'translations']);
+        Gate::authorize('view', $discountCondition);
 
-        return view('discount-conditions.show', compact('discountCondition'));
+        // Ensure relationships are loaded for the detailed view without incurring N+1 queries.
+        $discountCondition->loadMissing(['discount', 'translations']);
+
+        return view('discount-conditions.show', ['discountCondition' => $discountCondition]);
     }
 
     #[OA\Post(
@@ -65,13 +119,13 @@ final class DiscountConditionController extends Controller
         description: 'Evaluate a discount condition against a provided test value to determine whether it matches and is valid.',
         tags: ['Discount Conditions'],
         parameters: [
-            new OA\Parameter(name: 'discountCondition', in: 'path', required: true, description: 'Discount condition identifier.', schema: new OA\Schema(type: 'integer', format: 'int64')),
+            new OA\Parameter(name: 'discountCondition', description: 'Discount condition identifier.', in: 'path', required: true, schema: new OA\Schema(type: 'integer', format: 'int64')),
         ],
         requestBody: new OA\RequestBody(
             required: true,
-            content: new OA\JsonContent(type: 'object', required: ['test_value'], properties: [
+            content: new OA\JsonContent(required: ['test_value'], properties: [
                 new OA\Property(property: 'test_value', type: 'string'),
-            ])
+            ], type: 'object')
         ),
         responses: [
             new OA\Response(response: 200, description: 'Condition test results.', content: new OA\JsonContent(ref: '#/components/schemas/DiscountConditionTestResponse')),
@@ -95,29 +149,39 @@ final class DiscountConditionController extends Controller
             ),
         ],
         requestBody: new OA\RequestBody(
-            required: true,
             description: 'Value to test against the condition.',
+            required: true,
             content: new OA\JsonContent(
-                type: 'object',
                 required: ['test_value'],
                 properties: [
                     new OA\Property(property: 'test_value', type: 'string'),
                 ],
+                type: 'object',
             ),
         ),
         responses: [
-            new OA\Response(response: 200, ref: '#/components/responses/DiscountConditionTest'),
-            new OA\Response(response: 422, ref: '#/components/responses/ValidationError'),
+            new OA\Response(ref: '#/components/responses/DiscountConditionTest', response: 200),
+            new OA\Response(ref: '#/components/responses/ValidationError', response: 422),
         ]
     )]
     public function test(\App\Http\Requests\DiscountConditionTestRequest $request, DiscountCondition $discountCondition): JsonResponse
     {
+        Gate::authorize('view', $discountCondition);
+
         $validated = $request->validated();
         $value = $validated['test_value'];
         $matches = $discountCondition->matches($value);
         $isValid = $discountCondition->isValidForContext([$discountCondition->type => $value]);
 
-        return response()->json(['matches' => $matches, 'is_valid' => $isValid, 'condition_description' => $discountCondition->human_readable_condition, 'message' => $matches ? __('discount_conditions.messages.condition_matches') : __('discount_conditions.messages.condition_does_not_match')]);
+        // Delegate the JSON structure to an API resource so formatting stays consistent.
+        return DiscountConditionTestResource::make([
+            'matches'               => $matches,
+            'is_valid'              => $isValid,
+            'condition_description' => $discountCondition->human_readable_condition,
+            'message'               => $matches
+                ? __('discount_conditions.messages.condition_matches')
+                : __('discount_conditions.messages.condition_does_not_match'),
+        ])->toResponse($request);
     }
 
     #[OA\Get(
@@ -125,7 +189,7 @@ final class DiscountConditionController extends Controller
         summary: 'List conditions for a discount',
         tags: ['Discount Conditions'],
         parameters: [
-            new OA\Parameter(name: 'discount', in: 'path', required: true, description: 'Discount identifier.', schema: new OA\Schema(type: 'integer', format: 'int64')),
+            new OA\Parameter(name: 'discount', description: 'Discount identifier.', in: 'path', required: true, schema: new OA\Schema(type: 'integer', format: 'int64')),
         ],
         responses: [
             new OA\Response(response: 200, description: 'Discount conditions.', content: new OA\JsonContent(ref: '#/components/schemas/DiscountConditionCollection')),
@@ -148,16 +212,22 @@ final class DiscountConditionController extends Controller
             ),
         ],
         responses: [
-            new OA\Response(response: 200, ref: '#/components/responses/DiscountConditions'),
+            new OA\Response(ref: '#/components/responses/DiscountConditions', response: 200),
         ]
     )]
     public function forDiscount(Discount $discount): JsonResponse
     {
-        $conditions = $discount->conditions()->active()->byPriority('desc')->with('translations')->get();
+        Gate::authorize('viewAny', DiscountCondition::class);
 
-        return response()->json(['conditions' => $conditions->map(function ($condition) {
-            return ['id' => $condition->id, 'type' => $condition->type, 'type_label' => $condition->getTypeLabel(), 'operator' => $condition->operator, 'operator_label' => $condition->getOperatorLabel(), 'value' => $condition->value, 'priority' => $condition->priority, 'position' => $condition->position, 'description' => $condition->human_readable_condition, 'name' => $condition->translated_name];
-        })]);
+        $conditions = DiscountCondition::query()
+            ->where('discount_id', $discount->getKey())
+            ->active()
+            ->byPriority('desc')
+            ->with('translations')
+            ->get();
+
+        // Reuse the resource collection so the JSON payload stays consistent across endpoints.
+        return DiscountConditionCollection::make($conditions)->response();
     }
 
     #[OA\Get(
@@ -165,7 +235,7 @@ final class DiscountConditionController extends Controller
         summary: 'List operators for a discount condition type',
         tags: ['Discount Conditions'],
         parameters: [
-            new OA\QueryParameter(name: 'type', in: 'query', description: 'Discount condition type key.', schema: new OA\Schema(type: 'string')),
+            new OA\QueryParameter(name: 'type', description: 'Discount condition type key.', in: 'query', schema: new OA\Schema(type: 'string')),
         ],
         responses: [
             new OA\Response(response: 200, description: 'Available operators.', content: new OA\JsonContent(ref: '#/components/schemas/DiscountConditionOperatorsResponse')),
@@ -188,18 +258,34 @@ final class DiscountConditionController extends Controller
             ),
         ],
         responses: [
-            new OA\Response(response: 200, ref: '#/components/responses/DiscountConditionOperators'),
+            new OA\Response(ref: '#/components/responses/DiscountConditionOperators', response: 200),
         ]
     )]
-    public function operatorsForType(Request $request): JsonResponse
+    public function operatorsForType(DiscountConditionOperatorsRequest $request): JsonResponse
     {
-        $type = $request->get('type');
-        if (! $type) {
-            return response()->json(['operators' => []]);
-        }
-        $operators = DiscountCondition::getOperatorsForType($type);
+        Gate::authorize('viewAny', DiscountCondition::class);
 
-        return response()->json(['operators' => $operators]);
+        /** @var array<string, mixed> $validated */
+        $validated = $request->validated();
+        $type = $validated['type'] ?? null;
+
+        if (! is_string($type) || $type === '') {
+            // When the discriminator is absent, expose the global operator mapping.
+            $operators = DiscountCondition::getOperators();
+        } else {
+            // Hand back the subset relevant to the requested discriminator.
+            $operators = DiscountCondition::getOperatorsForType($type);
+        }
+
+        // Convert the associative list into a simple key/label structure for UI clients.
+        $operatorCollection = collect($operators)
+            ->map(static fn (mixed $label, int|string $key): array => [
+                'key'   => is_int($key) ? (string) $key : $key,
+                'label' => is_string($label) ? $label : (is_scalar($label) ? strval($label) : ''),
+            ])
+            ->values();
+
+        return DiscountConditionOperatorCollection::make($operatorCollection)->response();
     }
 
     #[OA\Get(
@@ -219,7 +305,7 @@ final class DiscountConditionController extends Controller
         summary: 'Summarize discount condition usage metrics.',
         tags: ['Discount Conditions'],
         responses: [
-            new OA\Response(response: 200, ref: '#/components/responses/DiscountConditionStatistics'),
+            new OA\Response(ref: '#/components/responses/DiscountConditionStatistics', response: 200),
         ]
     )]
     public function statistics(): JsonResponse
