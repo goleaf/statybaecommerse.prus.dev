@@ -8,6 +8,16 @@
         <div class="mb-8">
             <h1 class="text-3xl font-bold text-gray-900 mb-4">{{ __('reviews_reviews') }}</h1>
             <p class="text-gray-600">{{ __('reviews_index_description') }}</p>
+
+            @guest
+                {{-- Highlight the login pathway so guests understand how to contribute reviews. --}}
+                <div class="mt-4 rounded-lg border border-blue-200 bg-blue-50 p-4 text-sm text-blue-700">
+                    {{ __('translations.login_to_review') }}
+                    <a href="{{ route('login') }}" class="font-semibold underline decoration-blue-500">
+                        {{ __('auth.login') }}
+                    </a>
+                </div>
+            @endguest
         </div>
 
         @if($reviews->count() > 0)

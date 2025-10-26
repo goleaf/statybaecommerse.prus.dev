@@ -150,37 +150,20 @@ final class ReviewController extends Controller
         }
 
         $userId = (int) Auth::id();
-        $metadata = $this->normaliseMetadata($review);
-        $likedByRaw = $metadata['liked_by'] ?? [];
-        if (! is_array($likedByRaw)) {
-            $likedByRaw = [];
-        }
-        // Normalise the "liked_by" metadata into an integer array to avoid duplicate or malformed entries.
-        $likedBy = [];
-        foreach ($likedByRaw as $value) {
-            if (! is_int($value) && ! is_string($value) && ! is_float($value)) {
-                continue;
-            }
+        $interaction = $this->syncInteractionMetadata($review, 'liked_by', $userId);
 
-            $likedBy[] = (int) $value;
-        }
-        $likedBy = array_values(array_unique($likedBy));
-
-        if (in_array($userId, $likedBy, true)) {
+        if ($interaction['already']) {
             return response()->json([
                 'message'        => __('You have already marked this review as helpful.'),
-                'helpful_count'  => (int) ($review->helpful_count ?? count($likedBy)),
+                'helpful_count'  => (int) ($review->helpful_count ?? $interaction['total']),
                 'reported_count' => (int) ($review->reported_count ?? 0),
             ]);
         }
 
-        $likedBy[] = $userId;
-        $likedBy = array_values(array_unique($likedBy));
-        $metadata['liked_by'] = $likedBy;
-
-        DB::transaction(function () use ($review, $metadata, $likedBy): void {
-            $review->setAttribute('metadata', $metadata);
-            $review->setAttribute('helpful_count', count($likedBy));
+        DB::transaction(function () use ($review, $interaction): void {
+            // Persist the de-duplicated metadata list so repeated clicks stay idempotent.
+            $review->setAttribute('metadata', $interaction['metadata']);
+            $review->setAttribute('helpful_count', $interaction['total']);
             $review->save();
         });
 
@@ -188,7 +171,7 @@ final class ReviewController extends Controller
 
         return response()->json([
             'message'        => __('Thanks for your feedback!'),
-            'helpful_count'  => (int) ($review->helpful_count ?? count($likedBy)),
+            'helpful_count'  => (int) ($review->helpful_count ?? $interaction['total']),
             'reported_count' => (int) ($review->reported_count ?? 0),
         ]);
     }
@@ -205,46 +188,25 @@ final class ReviewController extends Controller
         $validated = $request->validated();
 
         $userId = (int) Auth::id();
-        $metadata = $this->normaliseMetadata($review);
-        $reportedByRaw = $metadata['reported_by'] ?? [];
-        if (! is_array($reportedByRaw)) {
-            $reportedByRaw = [];
-        }
-        // Normalise the "reported_by" metadata into an integer array for consistent counting.
-        $reportedBy = [];
-        foreach ($reportedByRaw as $value) {
-            if (! is_int($value) && ! is_string($value) && ! is_float($value)) {
-                continue;
-            }
+        $interaction = $this->syncInteractionMetadata(
+            review: $review,
+            interactionKey: 'reported_by',
+            userId: $userId,
+            options: ['reasonKey' => 'reported_reasons', 'reason' => $validated['reason'] ?? null],
+        );
 
-            $reportedBy[] = (int) $value;
-        }
-        $reportedBy = array_values(array_unique($reportedBy));
-
-        if (in_array($userId, $reportedBy, true)) {
+        if ($interaction['already']) {
             return response()->json([
                 'message'        => __('You have already reported this review.'),
                 'helpful_count'  => (int) ($review->helpful_count ?? 0),
-                'reported_count' => (int) ($review->reported_count ?? count($reportedBy)),
+                'reported_count' => (int) ($review->reported_count ?? $interaction['total']),
             ]);
         }
 
-        $reportedBy[] = $userId;
-        $reportedBy = array_values(array_unique($reportedBy));
-        $metadata['reported_by'] = $reportedBy;
-
-        if (($validated['reason'] ?? null) !== null && $validated['reason'] !== '') {
-            $reasons = $metadata['reported_reasons'] ?? [];
-            if (! is_array($reasons)) {
-                $reasons = [];
-            }
-            $reasons[(string) $userId] = $validated['reason'];
-            $metadata['reported_reasons'] = $reasons;
-        }
-
-        DB::transaction(function () use ($review, $metadata, $reportedBy): void {
-            $review->setAttribute('metadata', $metadata);
-            $review->setAttribute('reported_count', count($reportedBy));
+        DB::transaction(function () use ($review, $interaction): void {
+            // Persist the interaction metadata alongside the running report tally.
+            $review->setAttribute('metadata', $interaction['metadata']);
+            $review->setAttribute('reported_count', $interaction['total']);
             $review->save();
         });
 
@@ -253,7 +215,7 @@ final class ReviewController extends Controller
         return response()->json([
             'message'        => __('Thanks for letting us know.'),
             'helpful_count'  => (int) ($review->helpful_count ?? 0),
-            'reported_count' => (int) ($review->reported_count ?? count($reportedBy)),
+            'reported_count' => (int) ($review->reported_count ?? $interaction['total']),
         ]);
     }
 
@@ -277,6 +239,65 @@ final class ReviewController extends Controller
         $decoded = json_decode($metadata, true);
 
         return is_array($decoded) ? (array) $decoded : [];
+    }
+
+    /**
+     * Ensure helpful/report feedback arrays remain unique and optionally capture a reason payload.
+     *
+     * @param array{reasonKey?: string, reason?: string}|null $options
+     *
+     * @return array{metadata: array<int|string, mixed>, already: bool, total: int}
+     */
+    private function syncInteractionMetadata(Review $review, string $interactionKey, int $userId, ?array $options = null): array
+    {
+        $metadata = $this->normaliseMetadata($review);
+
+        $rawList = $metadata[$interactionKey] ?? [];
+        if (! is_array($rawList)) {
+            $rawList = [];
+        }
+
+        // Convert the stored metadata into a strict list of unique user identifiers.
+        $userIds = [];
+        foreach ($rawList as $value) {
+            if (is_int($value) || is_float($value) || is_string($value)) {
+                $userIds[] = (int) $value;
+            }
+        }
+        $userIds = array_values(array_unique($userIds));
+
+        $alreadyParticipated = in_array($userId, $userIds, true);
+        if ($alreadyParticipated) {
+            return [
+                'metadata' => $metadata,
+                'already'  => true,
+                'total'    => count($userIds),
+            ];
+        }
+
+        $userIds[] = $userId;
+        $metadata[$interactionKey] = array_values(array_unique($userIds));
+
+        if ($options !== null) {
+            $reasonKey = $options['reasonKey'] ?? null;
+            $reason = $options['reason'] ?? null;
+            if ($reasonKey !== null && $reason !== null && $reason !== '') {
+                $existingReasons = $metadata[$reasonKey] ?? [];
+                if (! is_array($existingReasons)) {
+                    $existingReasons = [];
+                }
+
+                // Persist the latest reason per user so moderators can review context quickly.
+                $existingReasons[(string) $userId] = $reason;
+                $metadata[$reasonKey] = $existingReasons;
+            }
+        }
+
+        return [
+            'metadata' => $metadata,
+            'already'  => false,
+            'total'    => count($metadata[$interactionKey]),
+        ];
     }
 
     /**
