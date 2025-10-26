@@ -353,9 +353,9 @@ final class SeoDataResource extends Resource
                 Filter::make('high_seo_score')
                     ->label(__('seo_data.filters.high_seo_score'))
                     ->query(fn (Builder $query): Builder => $query->whereRaw('
-                        (CASE 
+                        (CASE
                             WHEN title IS NOT NULL THEN 20 ELSE 0 END +
-                         CASE 
+                         CASE
                             WHEN LENGTH(title) BETWEEN 30 AND 60 THEN 20 ELSE 0 END +
                          CASE 
                             WHEN description IS NOT NULL THEN 15 ELSE 0 END +
