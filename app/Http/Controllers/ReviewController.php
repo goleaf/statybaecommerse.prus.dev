@@ -8,6 +8,7 @@ use App\Data\ReviewData;
 use App\Http\Requests\ReportReviewRequest;
 use App\Models\Product;
 use App\Models\Review;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -28,10 +29,16 @@ final class ReviewController extends Controller
      */
     public function index(Request $request): View
     {
-        $reviews = Review::with(['user', 'product'])->where('is_approved', true)->latest()->get()->skipWhile(function ($review) {
-            // Skip reviews that are not properly configured for display
-            return empty($review->title) || empty($review->comment) || ! $review->is_approved || $review->rating <= 0;
-        })->paginate(20);
+        $reviews = Review::query()
+            ->with(['user', 'product'])
+            ->where('is_approved', true)
+            ->where(function (Builder $query): void {
+                // Ensure that only reviews with visible titles and content reach the paginator
+                $query->whereNotNull('title')->where('title', '!=', '')->whereNotNull('content')->where('content', '!=', '');
+            })
+            ->where('rating', '>', 0)
+            ->latest()
+            ->paginate(20);
 
         return view('reviews.index', compact('reviews'));
     }
@@ -206,10 +213,16 @@ final class ReviewController extends Controller
      */
     public function productReviews(Product $product): View
     {
-        $reviews = $product->reviews()->with('user')->where('is_approved', true)->latest()->get()->skipWhile(function ($review) {
-            // Skip reviews that are not properly configured for display
-            return empty($review->title) || empty($review->comment) || ! $review->is_approved || $review->rating <= 0;
-        })->paginate(10);
+        $reviews = $product->reviews()
+            ->with('user')
+            ->where('is_approved', true)
+            ->where(function (Builder $query): void {
+                // Enforce the same visibility rules used on the index so storefront pagination never crashes
+                $query->whereNotNull('title')->where('title', '!=', '')->whereNotNull('content')->where('content', '!=', '');
+            })
+            ->where('rating', '>', 0)
+            ->latest()
+            ->paginate(10);
         $ratingStats = ['average' => $product->reviews()->where('is_approved', true)->avg('rating') ?? 0, 'count' => $product->reviews()->where('is_approved', true)->count(), 'distribution' => $product->reviews()->where('is_approved', true)->selectRaw('rating, COUNT(*) as count')->groupBy('rating')->orderBy('rating')->pluck('count', 'rating')->toArray()];
 
         return view('reviews.product', compact('product', 'reviews', 'ratingStats'));
