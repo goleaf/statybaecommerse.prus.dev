@@ -314,6 +314,20 @@ final class ApiKey extends Model
     }
 
     /**
+     * Provide convenient access to the partner that owns this credential.
+     *
+     * @return BelongsTo<Partner, ApiKey>
+     */
+    public function partner(): BelongsTo
+    {
+        // Expose the inverse relationship so partner-scoped queries remain expressive.
+        /** @var BelongsTo<Partner, ApiKey> $relation */
+        $relation = $this->belongsTo(Partner::class);
+
+        return $relation;
+    }
+
+    /**
      * Scope a query to order API keys alphabetically by their display name.
      *
      * @param  Builder<ApiKey> $query
