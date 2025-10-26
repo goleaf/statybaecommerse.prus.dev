@@ -94,3 +94,37 @@ it('normalizes uppercase email input before storing the user record', function (
     expect($user)->not->toBeNull();
     expect($user->email)->toBe('upper@example.com');
 });
+
+it('validates individual fields during real-time input updates', function (): void {
+    // Arrange: bootstrap the Livewire component without submitting the full form payload.
+    $component = Livewire::test(Register::class);
+
+    // Act & Assert: ensure an empty first name immediately surfaces the required validation message.
+    $component->set('registrationForm.first_name', '')
+        ->assertHasErrors(['registrationForm.first_name' => ['required']]);
+
+    // Reset the first name to a valid value so subsequent assertions are not polluted by earlier errors.
+    $component->set('registrationForm.first_name', 'Taylor')
+        ->assertHasNoErrors(['registrationForm.first_name']);
+
+    // Act & Assert: confirm invalid email syntax is caught before the form is submitted.
+    $component->set('registrationForm.email', 'invalid-email')
+        ->assertHasErrors(['registrationForm.email' => ['email']]);
+
+    // Normalize the email again to ensure later password checks are isolated to their field only.
+    $component->set('registrationForm.email', 'valid@example.com')
+        ->assertHasNoErrors(['registrationForm.email']);
+
+    // Act & Assert: verify the default password rule set still enforces minimum length requirements inline.
+    $component->set('registrationForm.password', 'short')
+        ->assertHasErrors(['registrationForm.password' => ['min']]);
+
+    // Provide a compliant password so the confirmation rule can run without conflicting errors.
+    $component->set('registrationForm.password', 'Password123!')
+        ->assertHasNoErrors(['registrationForm.password']);
+
+    // Act & Assert: make sure the confirmation field must be populated even during live validation cycles.
+    $component->set('registrationForm.password_confirmation', 'temporary')
+        ->set('registrationForm.password_confirmation', '')
+        ->assertHasErrors(['registrationForm.password_confirmation' => ['required']]);
+});
