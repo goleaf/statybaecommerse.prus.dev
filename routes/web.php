@@ -969,7 +969,7 @@ Route::middleware('auth')->group(function (): void {
 Route::middleware('auth')->group(function (): void {
     Route::put('/admin/{locale}/legal/{id}/translations/{lang}', [LegalTranslationController::class, 'update'])
         ->name('admin.legal.translations.save');
-    Route::put('/admin/{locale}/brands/{id}/translations/{lang}', fn () => back())
+    Route::put('/admin/{locale}/brands/{id}/translations/{lang}', [BrandTranslationController::class, 'update'])
         ->name('admin.brands.translations.save');
     Route::put('/admin/{locale}/categories/{id}/translations/{lang}', fn () => back())
         ->name('admin.categories.translations.save');
