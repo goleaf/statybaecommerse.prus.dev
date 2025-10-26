@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api\Partner;
 
+use App\Enums\OrderStatus;
+use App\Enums\PaymentStatus;
 use App\Models\ApiKey;
 use App\Models\Order;
 use App\Models\Partner;
@@ -15,6 +17,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Validation\Rule;
 use Symfony\Component\HttpFoundation\Response;
 
 final class OrdersIndexController
@@ -84,8 +87,8 @@ final class OrdersIndexController
              * } $validated
              */
             $validated = Validator::make($request->query(), [
-                'status'         => ['sometimes', 'string'],
-                'payment_status' => ['sometimes', 'string'],
+                'status'         => ['sometimes', 'string', Rule::in(OrderStatus::values())],
+                'payment_status' => ['sometimes', 'string', Rule::in($this->allowedPaymentStatuses())],
                 'since'          => ['sometimes', 'date'],
                 'until'          => ['sometimes', 'date'],
                 'per_page'       => ['sometimes', 'integer', 'between:1,100'],
@@ -118,14 +121,18 @@ final class OrdersIndexController
             ->where('partner_id', $partner->getKey())
             ->orderByDesc('created_at');
 
-        if (isset($validated['status'])) {
-            // Apply lifecycle status filtering when requested.
-            $query->where('status', $validated['status']);
+        $statusFilter = $this->normaliseOrderStatus($validated['status'] ?? null);
+
+        if ($statusFilter instanceof OrderStatus) {
+            // Apply lifecycle status filtering when requested using the enum to guarantee valid values.
+            $query->where('status', $statusFilter->value);
         }
 
-        if (isset($validated['payment_status'])) {
+        $paymentFilter = $this->normalisePaymentStatus($validated['payment_status'] ?? null);
+
+        if ($paymentFilter instanceof PaymentStatus) {
             // Allow partners to narrow down by payment status for reconciliation workflows.
-            $query->where('payment_status', $validated['payment_status']);
+            $query->where('payment_status', $paymentFilter->value);
         }
 
         if ($since instanceof \Carbon\CarbonImmutable) {
@@ -166,13 +173,49 @@ final class OrdersIndexController
                 'last_page'    => $paginator->lastPage(),
             ],
             'filters' => Arr::whereNotNull([
-                'status'         => $validated['status'] ?? null,
-                'payment_status' => $validated['payment_status'] ?? null,
+                'status'         => $statusFilter?->value,
+                'payment_status' => $paymentFilter?->value,
                 'since'          => $since?->toIso8601String(),
                 'until'          => $until?->toIso8601String(),
             ]),
         ]);
 
         return response()->json($payload);
+    }
+
+    /**
+     * Normalise the requested order status filter against the enum.
+     */
+    private function normaliseOrderStatus(?string $status): ?OrderStatus
+    {
+        if ($status === null || $status === '') {
+            return null;
+        }
+
+        return OrderStatus::tryFrom($status);
+    }
+
+    /**
+     * Normalise the requested payment status filter against the enum.
+     */
+    private function normalisePaymentStatus(?string $status): ?PaymentStatus
+    {
+        if ($status === null || $status === '') {
+            return null;
+        }
+
+        return PaymentStatus::tryFrom($status);
+    }
+
+    /**
+     * Provide the list of allowed payment status filters for validator rules.
+     *
+     * @return array<int, string>
+     */
+    private function allowedPaymentStatuses(): array
+    {
+        return collect(PaymentStatus::cases())
+            ->map(static fn (PaymentStatus $status): string => $status->value)
+            ->toArray();
     }
 }

@@ -85,6 +85,7 @@ return [
         'delivered'  => 'Delivered',
         'cancelled'  => 'Cancelled',
         'refunded'   => 'Refunded',
+        'returned'   => 'Returned',
     ],
     'statuses' => [
         'pending'    => 'Pending',
@@ -93,6 +94,7 @@ return [
         'delivered'  => 'Delivered',
         'cancelled'  => 'Cancelled',
         'refunded'   => 'Refunded',
+        'returned'   => 'Returned',
     ],
     // Item statuses
     'item_statuses' => [
@@ -103,16 +105,24 @@ return [
     ],
     // Payment statuses
     'payment_status' => [
-        'pending'  => 'Pending',
-        'paid'     => 'Paid',
-        'failed'   => 'Failed',
-        'refunded' => 'Refunded',
+        'pending'            => 'Pending',
+        'authorized'         => 'Authorized',
+        'captured'           => 'Captured',
+        'settled'            => 'Settled',
+        'paid'               => 'Paid',
+        'failed'             => 'Failed',
+        'refunded'           => 'Refunded',
+        'partially_refunded' => 'Partially refunded',
     ],
     'payment_statuses' => [
-        'pending'  => 'Pending',
-        'paid'     => 'Paid',
-        'failed'   => 'Failed',
-        'refunded' => 'Refunded',
+        'pending'            => 'Pending',
+        'authorized'         => 'Authorized',
+        'captured'           => 'Captured',
+        'settled'            => 'Settled',
+        'paid'               => 'Paid',
+        'failed'             => 'Failed',
+        'refunded'           => 'Refunded',
+        'partially_refunded' => 'Partially refunded',
     ],
     // Payment methods
     'payment_methods' => [
