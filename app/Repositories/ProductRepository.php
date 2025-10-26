@@ -6,33 +6,52 @@ namespace App\Repositories;
 
 use App\Models\Product;
 use App\Support\Cache\CacheKeys;
+use App\Support\Cache\CacheTagHelper;
 use App\Support\Cache\TagAwareCache;
+use Illuminate\Support\Collection;
 
 final class ProductRepository
 {
-    private const SEARCH_CACHE_TTL_MINUTES = 5;
-
-    private const SHOW_CACHE_TTL_MINUTES = 5;
-
-    public function __construct(private readonly CacheRepository $cache)
+    /**
+     * Cache the total product count for dashboard widgets while allowing raw
+     * connection checks used by maintenance commands.
+     */
+    public function count(?string $connection = null): int
     {
         $defaultConnection = config('database.default');
 
+        // Skip cache when the caller explicitly targets a non-default connection.
         if ($connection !== null && $connection !== $defaultConnection) {
             return Product::on($connection)->newQuery()->count();
         }
 
-        return TagAwareCache::remember(
+        $tags = CacheTagHelper::merge(
+            CacheTagHelper::products(),
+            CacheTagHelper::dashboards(),
+            [CacheKeys::productAggregateTag(), CacheKeys::dashboardTag()],
+        );
+
+        return $this->remember(
             CacheKeys::productTotalCount(),
-            now()->addSeconds(CacheKeys::TTL_MINUTE),
+            CacheKeys::TTL_MINUTE,
             static fn (): int => Product::query()->count(),
-            [CacheKeys::productAggregateTag(), CacheKeys::dashboardTag()]
+            $tags,
         );
     }
 
+    /**
+     * Count published, visible products for storefront statistics.
+     */
     public function visibleCount(): int
     {
-        return $this->rememberWithTags(
+        $tags = CacheTagHelper::merge(
+            CacheTagHelper::products(),
+            [CacheKeys::productAggregateTag()],
+            [CacheKeys::homeTag()],
+            [CacheKeys::navigationTag()],
+        );
+
+        return $this->remember(
             CacheKeys::productVisibleCount(),
             CacheKeys::TTL_MINUTE,
             static fn (): int => Product::query()
@@ -41,73 +60,121 @@ final class ProductRepository
                 ->whereNotNull('published_at')
                 ->where('published_at', '<=', now())
                 ->count(),
-            [CacheKeys::productAggregateTag(), CacheKeys::homeTag()],
+            $tags,
         );
     }
 
+    /**
+     * Retrieve featured products while caching the list with catalogue tags.
+     *
+     * @return Collection<int, Product>
+     */
     public function featured(int $limit = 8): Collection
     {
-        return $this->rememberWithTags(
+        $limit = max(1, $limit);
+
+        $tags = CacheTagHelper::merge(
+            CacheTagHelper::products(),
+            CacheTagHelper::categories(),
+            CacheTagHelper::brands(),
+            [CacheKeys::productAggregateTag()],
+            [CacheKeys::homeTag()],
+            [CacheKeys::navigationTag()],
+        );
+
+        return $this->remember(
             CacheKeys::productFeaturedList($limit),
             CacheKeys::TTL_MINUTE,
-            static fn (): Collection => Product::query()
-                ->withoutGlobalScopes()
-                ->where('is_visible', true)
-                ->where('is_featured', true)
-                ->whereNotNull('published_at')
-                ->where('published_at', '<=', now())
-                ->latest('published_at')
-                ->limit($limit)
-                ->get(),
-            [CacheKeys::productAggregateTag(), CacheKeys::homeTag(), CacheKeys::navigationTag()],
+            static function () use ($limit): Collection {
+                return Product::query()
+                    ->withoutGlobalScopes()
+                    ->where('is_visible', true)
+                    ->where('is_featured', true)
+                    ->whereNotNull('published_at')
+                    ->where('published_at', '<=', now())
+                    ->latest('published_at')
+                    ->limit($limit)
+                    ->get();
+            },
+            $tags,
         );
     }
 
+    /**
+     * Retrieve the most recent products for carousels and storefront blocks.
+     *
+     * @return Collection<int, Product>
+     */
     public function latest(int $limit = 8): Collection
     {
-        return $this->rememberWithTags(
+        $limit = max(1, $limit);
+
+        $tags = CacheTagHelper::merge(
+            CacheTagHelper::products(),
+            CacheTagHelper::categories(),
+            CacheTagHelper::brands(),
+            [CacheKeys::productAggregateTag()],
+            [CacheKeys::homeTag()],
+            [CacheKeys::navigationTag()],
+        );
+
+        return $this->remember(
             CacheKeys::productLatestList($limit),
             CacheKeys::TTL_MINUTE,
-            static fn (): Collection => Product::query()
-                ->withoutGlobalScopes()
-                ->where('is_visible', true)
-                ->whereNotNull('published_at')
-                ->where('published_at', '<=', now())
-                ->latest('created_at')
-                ->limit($limit)
-                ->get(),
-            [CacheKeys::productAggregateTag(), CacheKeys::homeTag()],
+            static function () use ($limit): Collection {
+                return Product::query()
+                    ->withoutGlobalScopes()
+                    ->where('is_visible', true)
+                    ->whereNotNull('published_at')
+                    ->where('published_at', '<=', now())
+                    ->latest('created_at')
+                    ->limit($limit)
+                    ->get();
+            },
+            $tags,
         );
     }
 
+    /**
+     * Resolve a published product by id while ensuring cache invalidation via tags.
+     */
     public function findPublishedById(int $productId): ?Product
     {
-        $cacheKey = CacheKeys::productTag($productId);
-
-        return $this->rememberWithTags(
-            $cacheKey,
-            CacheKeys::TTL_MINUTE,
-            static fn () => Product::query()
-                ->withoutGlobalScopes()
-                ->whereKey($productId)
-                ->where('is_visible', true)
-                ->whereNotNull('published_at')
-                ->where('published_at', '<=', now())
-                ->first(),
+        $tags = CacheTagHelper::merge(
+            CacheTagHelper::products(),
             [CacheKeys::productAggregateTag()],
+            [CacheKeys::homeTag()],
+            [CacheKeys::navigationTag()],
+            [CacheKeys::productTag($productId)],
+        );
+
+        return $this->remember(
+            CacheKeys::productTag($productId),
+            CacheKeys::TTL_MINUTE,
+            static function () use ($productId): ?Product {
+                return Product::query()
+                    ->withoutGlobalScopes()
+                    ->whereKey($productId)
+                    ->where('is_visible', true)
+                    ->whereNotNull('published_at')
+                    ->where('published_at', '<=', now())
+                    ->first();
+            },
+            $tags,
         );
     }
 
-    private function rememberWithTags(string $key, int $ttlSeconds, callable $callback, array $tags = []): mixed
+    /**
+     * Centralised cache helper so repository queries share the same TTL logic.
+     *
+     * @template TValue
+     * @param callable(): TValue $callback
+     * @param array<int, string> $tags
+     * @return TValue
+     */
+    private function remember(string $key, int $ttlSeconds, callable $callback, array $tags = [])
     {
-        $expiresAt = now()->addSeconds($ttlSeconds);
-
-        if (Cache::supportsTags()) {
-            $normalizedTags = array_values(array_unique($tags));
-
-            return Cache::tags($normalizedTags)->remember($key, $expiresAt, $callback);
-        }
-
-        return Cache::remember($key, $expiresAt, $callback);
+        // Leverage the tag-aware helper so tagged stores and array stores behave consistently.
+        return TagAwareCache::remember($key, now()->addSeconds($ttlSeconds), $callback, $tags);
     }
 }
