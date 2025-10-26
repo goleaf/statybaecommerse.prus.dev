@@ -4,6 +4,9 @@
     $navigationGroups = NavigationGroup::ordered();
     $user = auth()->user();
     $isAdmin = $user?->is_admin ?? false;
+    $notificationStreamUrl = $user?->getAuthIdentifier()
+        ? route('api.notifications.stream', ['user' => $user->getAuthIdentifier()])
+        : null;
 
     if (!function_exists('canAccessGroup')) {
         function canAccessGroup($group)
@@ -249,10 +252,23 @@
                 </div>
 
                 <!-- Notifications -->
-                <button class="relative p-2 text-gray-400 hover:text-gray-500">
-                    <x-heroicon-o-bell class="h-5 w-5" />
-                    <span class="absolute -top-1 -right-1 h-3 w-3 bg-red-500 rounded-full"></span>
-                </button>
+                <div
+                    @if($notificationStreamUrl)
+                        data-notification-stream-url="{{ $notificationStreamUrl }}"
+                    @endif
+                    class="relative"
+                >
+                    <button
+                            type="button"
+                            aria-label="{{ __('Notifications') }}"
+                            class="relative p-2 text-gray-400 hover:text-gray-500"
+                    >
+                        <x-heroicon-o-bell class="h-5 w-5" />
+                        @if($notificationStreamUrl)
+                            <span class="absolute -top-1 -right-1 h-3 w-3 bg-red-500 rounded-full"></span>
+                        @endif
+                    </button>
+                </div>
 
                 <!-- User Dropdown -->
                 <div class="relative">

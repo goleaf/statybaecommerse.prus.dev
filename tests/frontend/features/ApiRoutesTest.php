@@ -103,7 +103,7 @@ class ApiRoutesTest extends TestCase
     {
         $this->actingAs($this->user);
 
-        $response = $this->get('/api/notifications/stream');
+        $response = $this->get("/api/users/{$this->user->getKey()}/notifications/stream");
         $response->assertStatus(200);
         $response->assertHeader('Content-Type', 'text/event-stream');
     }
@@ -113,7 +113,7 @@ class ApiRoutesTest extends TestCase
      */
     public function test_notification_stream_route_without_authentication(): void
     {
-        $response = $this->get('/api/notifications/stream');
+        $response = $this->get("/api/users/{$this->user->getKey()}/notifications/stream");
         $response->assertStatus(401);
     }
 

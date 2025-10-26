@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Http\Controllers\Admin\AttributeTranslationController;
 use App\Http\Controllers\Admin\CollectionTranslationController;
+use App\Http\Controllers\Api\NotificationStreamController;
 use App\Http\Controllers\Api\V1\HealthController;
 use App\Http\Controllers\ApiDocsController;
 use App\Http\Controllers\Frontend\UserController;
@@ -26,6 +27,11 @@ Route::middleware(['web', 'signed'])
     ->get('/secure-media/{encodedPath}', SecureMediaDownloadController::class)
     ->where('encodedPath', '.*')
     ->name('media.secure-download');
+
+Route::middleware(['web'])
+    ->get('/api/users/{user}/notifications/stream', [NotificationStreamController::class, 'stream'])
+    // Expose a deterministic route name so the frontend can generate scoped SSE URLs per user.
+    ->name('api.notifications.stream');
 
 Route::middleware(['web'])->group(function () {
     Route::get('/docs/api', ApiDocsController::class)->name('docs.api');
