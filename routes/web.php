@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Http\Controllers\Admin\AttributeTranslationController;
+use App\Http\Controllers\Admin\ProductTranslationController;
 use App\Http\Controllers\Api\V1\HealthController;
 use App\Http\Controllers\ApiDocsController;
 use App\Http\Controllers\Frontend\UserController;
@@ -950,7 +951,7 @@ Route::middleware('auth')->group(function (): void {
         ->name('admin.categories.translations.save');
     Route::put('/admin/{locale}/collections/{id}/translations/{lang}', fn () => back())
         ->name('admin.collections.translations.save');
-    Route::put('/admin/{locale}/products/{id}/translations/{lang}', fn () => back())
+    Route::put('/admin/{locale}/products/{id}/translations/{lang}', [ProductTranslationController::class, 'update'])
         ->name('admin.products.translations.save');
     Route::put('/admin/{locale}/attributes/{id}/translations/{lang}', [AttributeTranslationController::class, 'update'])
         ->name('admin.attributes.translations.save');
@@ -1125,7 +1126,7 @@ Route::middleware('auth')->group(function (): void {
         ->name('admin.categories.translations.save');
     Route::put('/admin/{locale}/collections/{id}/translations/{lang}', fn () => back())
         ->name('admin.collections.translations.save');
-    Route::put('/admin/{locale}/products/{id}/translations/{lang}', fn () => back())
+    Route::put('/admin/{locale}/products/{id}/translations/{lang}', [ProductTranslationController::class, 'update'])
         ->name('admin.products.translations.save');
     Route::put('/admin/{locale}/attributes/{id}/translations/{lang}', [AttributeTranslationController::class, 'update'])
         ->name('admin.attributes.translations.save');
