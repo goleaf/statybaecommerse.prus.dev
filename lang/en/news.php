@@ -21,6 +21,13 @@ return [
     'end_of_results'     => 'You have reached the end of the news feed.',
     'search_news'        => 'Search news',
     'search_placeholder' => 'Enter search term...',
+    'empty_state'        => [
+        'description'  => 'Try adjusting filters or keywords to discover more newsroom stories.',
+        'tip_keywords' => 'Double-check spelling or try broader keywords to expand results.',
+        'tip_filters'  => 'Reset category, tag, or featured filters to widen the feed.',
+        'tip_latest'   => 'Browse the latest headlines to stay up to date with the newsroom.',
+        'cta'          => 'Browse latest news',
+    ],
     'filter_by_category' => 'Filter by category',
     'filter_by_tag'      => 'Filter by tag',
     'all_categories'     => 'All categories',

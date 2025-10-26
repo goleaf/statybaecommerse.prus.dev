@@ -8,6 +8,7 @@ use App\Models\News;
 use App\Models\NewsCategory;
 use App\Models\NewsTag;
 use App\Services\PaginationService;
+use App\Support\SearchQuerySanitizer;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -25,25 +26,53 @@ final class NewsController extends Controller
     public function index(Request $request): View|JsonResponse
     {
         $query = News::published()->with(['categories', 'tags', 'images'])->withCount('comments');
+
+        $searchTerm = SearchQuerySanitizer::sanitize($request->get('search'));
+        $categoryId = $request->filled('category') ? (int) $request->get('category') : null;
+        $tagId = $request->filled('tag') ? (int) $request->get('tag') : null;
+        $featuredOnly = $request->boolean('featured');
+
         // Search functionality
-        if ($request->filled('search')) {
-            $search = $request->get('search');
-            $query->search($search);
+        if ($searchTerm !== '') {
+            $query->search($searchTerm);
         }
         // Category filter
-        if ($request->filled('category')) {
-            $query->byCategory((int) $request->get('category'));
+        if ($categoryId !== null) {
+            $query->byCategory($categoryId);
         }
         // Tag filter
-        if ($request->filled('tag')) {
-            $query->byTag((int) $request->get('tag'));
+        if ($tagId !== null) {
+            $query->byTag($tagId);
         }
         // Featured filter
-        if ($request->boolean('featured')) {
+        if ($featuredOnly) {
             $query->featured();
         }
         $news = PaginationService::paginateWithContext($query->orderBy('published_at', 'desc'), 'news');
-        $news = $news->appends($request->except('page'));
+
+        $appends = $request->except('page');
+
+        if ($searchTerm === '') {
+            unset($appends['search']);
+        } else {
+            $appends['search'] = $searchTerm;
+        }
+
+        if ($categoryId !== null) {
+            $appends['category'] = $categoryId;
+        }
+
+        if ($tagId !== null) {
+            $appends['tag'] = $tagId;
+        }
+
+        if ($featuredOnly) {
+            $appends['featured'] = 1;
+        } else {
+            unset($appends['featured']);
+        }
+
+        $news = $news->appends($appends);
         $categories = NewsCategory::visible()->with('translations')->get();
         $tags = NewsTag::visible()->with('translations')->get();
         $featuredNews = News::published()
@@ -74,7 +103,16 @@ final class NewsController extends Controller
             ]);
         }
 
-        return view('news.index', compact('news', 'categories', 'tags', 'featuredNews'));
+        return view('news.index', [
+            'news'             => $news,
+            'categories'       => $categories,
+            'tags'             => $tags,
+            'featuredNews'     => $featuredNews,
+            'searchTerm'       => $searchTerm,
+            'selectedCategory' => $categoryId,
+            'selectedTag'      => $tagId,
+            'featuredOnly'     => $featuredOnly,
+        ]);
     }
 
     /**

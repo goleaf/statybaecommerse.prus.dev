@@ -57,3 +57,34 @@ it('returns autocomplete data for valid queries', function (): void {
     $response->assertOk();
     $response->assertJson(fn ($json) => $json->each(fn ($item) => $item->hasAll(['value', 'type'])));
 });
+
+it('sanitizes catalogue search queries before applying filters', function (): void {
+    $product = Product::factory()->create([
+        'name'         => 'Safety Helmet Pro',
+        'description'  => 'Industrial grade protection for active worksites.',
+        'is_visible'   => true,
+        'status'       => 'published',
+        'published_at' => now()->subDay(),
+    ]);
+    $product->forceFill(['is_active' => true])->save();
+
+    // Include a category to ensure the controller still responds with a hydrated dataset.
+    $category = Category::factory()->create([
+        'name'      => 'Safety',
+        'is_active' => true,
+    ]);
+    $product->categories()->attach($category->id);
+
+    $response = $this->get(route('frontend.search.index', ['q' => '<script>alert(1)</script> Helmet']));
+
+    $response->assertOk();
+    $response->assertViewHas('query', 'alert(1) Helmet');
+    $response->assertSee('Safety Helmet Pro');
+});
+
+it('strips unsafe characters from suggestion queries', function (): void {
+    $response = $this->getJson(route('frontend.search.suggestions', ['q' => '<>']))
+        ->assertOk();
+
+    expect($response->json())->toBeArray()->toBeEmpty();
+});
