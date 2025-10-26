@@ -10,6 +10,7 @@ use App\Models\Referral;
 use App\Models\ReferralReward;
 use Exception;
 use Illuminate\Support\Facades\Log;
+use function collect;
 
 /**
  * ReferralRewardService
@@ -41,7 +42,8 @@ final class ReferralRewardService
                 'applied_at'    => now(),
                 'expires_at'    => now()->addDays(30),
                 // 30 days to use
-                'metadata' => ['discount_id' => $discount->id, 'percentage' => $percentage, 'first_order_only' => true],
+                'metadata'    => ['discount_id' => $discount->id, 'percentage' => $percentage, 'first_order_only' => true],
+                'reward_data' => ['category' => 'discount', 'percentage' => $percentage],
             ]);
             Log::info('Referred discount created', ['reward_id' => $reward->id, 'referral_id' => $referralId, 'user_id' => $userId, 'order_id' => $orderId, 'discount_id' => $discount->id, 'percentage' => $percentage]);
 
@@ -56,19 +58,23 @@ final class ReferralRewardService
     /**
      * Handle createReferrerBonus functionality with proper error handling.
      */
-    public function createReferrerBonus(int $referralId, int $userId, float $amount): ?ReferralReward
+    public function createReferrerBonus(int $referralId, int $userId, float $amount, array $rewardData = []): ?ReferralReward
     {
         try {
+            $category = $rewardData['category'] ?? 'credit';
+            $currency = $rewardData['currency'] ?? ($category === 'points' ? 'PTS' : config('referral.referrer_bonus_currency', 'EUR'));
+            $expiresIn = (int) ($rewardData['expires_in_days'] ?? config('referral.referrer_bonus_expiration_days', 90));
             $reward = ReferralReward::create([
                 'referral_id'   => $referralId,
                 'user_id'       => $userId,
                 'type'          => 'referrer_bonus',
                 'amount'        => $amount,
-                'currency_code' => 'EUR',
+                'currency_code' => $currency,
                 'status'        => 'pending',
-                'expires_at'    => now()->addDays(90),
-                // 90 days to claim
-                'metadata' => ['bonus_type' => 'referral_completion', 'amount' => $amount],
+                'expires_at'    => now()->addDays(max(1, $expiresIn)),
+                // 90 days to claim by default
+                'metadata'    => array_merge(['bonus_type' => 'referral_completion', 'amount' => $amount], $rewardData),
+                'reward_data' => array_merge(['category' => $category, 'amount' => $amount], $rewardData),
             ]);
             Log::info('Referrer bonus created', ['reward_id' => $reward->id, 'referral_id' => $referralId, 'user_id' => $userId, 'amount' => $amount]);
 
@@ -78,6 +84,49 @@ final class ReferralRewardService
 
             return null;
         }
+    }
+
+    /**
+     * Automatically promote the referrer to the correct reward tier based on
+     * the number of completed referrals they have delivered.
+     */
+    public function createTieredReferrerReward(Referral $referral): ?ReferralReward
+    {
+        $tiers = collect(config('referral.reward_tiers', []))->sortBy('threshold');
+        if ($tiers->isEmpty()) {
+            return null;
+        }
+
+        $completedCount = Referral::where('referrer_id', $referral->referrer_id)->completed()->count();
+
+        // Walk the tiers from highest threshold to lowest so we always pick the
+        // most generous reward that the referrer qualifies for.
+        $selectedTier = $tiers->reverse()->first(static function (array $tier) use ($completedCount): bool {
+            return $completedCount >= (int) ($tier['threshold'] ?? 0);
+        });
+
+        if ($selectedTier === null) {
+            return null;
+        }
+
+        $amount = (float) ($selectedTier['amount'] ?? 0);
+        if ($amount <= 0) {
+            return null;
+        }
+
+        $category = (string) ($selectedTier['category'] ?? 'credit');
+        $currency = (string) ($selectedTier['currency'] ?? ($category === 'points' ? 'PTS' : config('referral.referrer_bonus_currency', 'EUR')));
+
+        return $this->createReferrerBonus(
+            $referral->id,
+            $referral->referrer_id,
+            $amount,
+            [
+                'category'       => $category,
+                'currency'       => $currency,
+                'tier_threshold' => (int) ($selectedTier['threshold'] ?? 0),
+            ]
+        );
     }
 
     /**

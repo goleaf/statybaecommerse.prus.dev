@@ -32,6 +32,14 @@ return [
     'referred_discount_percentage' => 5.0, // 5% discount for referred users
     'referrer_bonus_amount'        => 0.0, // Bonus amount for referrer (0 = disabled)
     'referrer_bonus_currency'      => 'EUR',
+    // Configure tiered incentives so referral campaigns can scale rewards as
+    // advocates hit milestones. Each tier describes the minimum number of
+    // completed referrals required plus the reward category and value.
+    'reward_tiers'                 => [
+        ['threshold' => 0, 'category' => 'credit', 'amount' => 5.00, 'currency' => 'EUR'],
+        ['threshold' => 5, 'category' => 'credit', 'amount' => 10.00, 'currency' => 'EUR'],
+        ['threshold' => 10, 'category' => 'points', 'amount' => 250.0, 'currency' => 'PTS'],
+    ],
 
     /*
     |--------------------------------------------------------------------------
@@ -56,6 +64,13 @@ return [
     |--------------------------------------------------------------------------
     */
     'registration_path' => '/register', // Path for registration with referral
+    // Allow marketing to configure default share targets for referral links.
+    'share_targets'     => [
+        'facebook' => 'https://www.facebook.com/sharer/sharer.php?u=%s',
+        'twitter'  => 'https://twitter.com/intent/tweet?url=%s',
+        'linkedin' => 'https://www.linkedin.com/sharing/share-offsite/?url=%s',
+        'email'    => 'mailto:?subject=%s&body=%s',
+    ],
 
     /*
     |--------------------------------------------------------------------------
