@@ -6,10 +6,13 @@ namespace App\Http\Controllers;
 
 use App\Models\Report;
 use App\Services\PaginationService;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 /**
@@ -22,38 +25,94 @@ final class ReportController extends Controller
     /**
      * Display a listing of the resource with pagination and filtering.
      */
-    public function index(Request $request): View
+    public function index(Request $request): View|RedirectResponse
     {
+        // Normalize legacy query parameters by redirecting early – this avoids
+        // collisions with Livewire components that reserve the `category`
+        // parameter for numeric IDs elsewhere in the storefront.
+        if ($request->has('category')) {
+            return redirect()->route('reports.index', array_merge(
+                $request->except('category'),
+                ['report_category' => $request->query('category')]
+            ));
+        }
+
+        // Validate and sanitize the incoming filter/sort payload so that we
+        // only rely on whitelisted query parameters before building the SQL
+        // query. This protects against SQL injection vectors and ensures the
+        // controller behaves predictably when unexpected input is provided.
+        $validated = $this->validateIndexRequest($request);
+
+        // Build the public report query by leaning on dedicated scopes for the
+        // active/public checks and making sure a translated name exists for the
+        // current locale so empty records do not leak into the storefront.
         $query = Report::query()
-            ->where('is_active', true)
-            ->where('is_public', true)
+            ->active()
+            ->public()
             ->whereNotNull('type')
             ->whereNotNull('category')
             ->whereNotNull('name->' . app()->getLocale());
-        // Apply filters
-        if ($request->filled('type')) {
-            $query->where('type', $request->get('type'));
+
+        // Apply optional filters that passed validation – the conditional guard
+        // prevents null values from altering the query builder state.
+        if (! empty($validated['type'])) {
+            $query->where('type', $validated['type']);
         }
-        if ($request->filled('category')) {
-            $query->where('category', $request->get('category'));
+
+        if (! empty($validated['report_category'])) {
+            $query->where('category', $validated['report_category']);
         }
-        if ($request->filled('search')) {
-            $search = $request->get('search');
-            $query->where(function ($q) use ($search) {
-                $q->where('name->' . app()->getLocale(), 'like', "%{$search}%")->orWhere('description->' . app()->getLocale(), 'like', "%{$search}%");
+
+        if (! empty($validated['search'])) {
+            $search = $validated['search'];
+
+            // Group the search constraints so name and description are checked
+            // together – this keeps the intent explicit and avoids precedence
+            // confusion when more where clauses are added in the future.
+            $query->where(function (Builder $builder) use ($search) {
+                $locale = app()->getLocale();
+
+                $builder
+                    ->where("name->{$locale}", 'like', "%{$search}%")
+                    ->orWhere("description->{$locale}", 'like', "%{$search}%");
             });
         }
-        // Apply sorting
-        $sortBy = $request->get('sort', 'created_at');
-        $sortDirection = $request->get('direction', 'desc');
-        if (in_array($sortBy, ['name', 'view_count', 'download_count', 'created_at'])) {
+
+        // Apply sanitized sorting, handling translated names separately so we
+        // order by the locale specific JSON key instead of the raw JSON blob.
+        $sortBy = $validated['sort'] ?? 'created_at';
+        $sortDirection = $validated['direction'] ?? 'desc';
+
+        if ($sortBy === 'name') {
+            $query->orderBy('name->' . app()->getLocale(), $sortDirection);
+        } else {
             $query->orderBy($sortBy, $sortDirection);
         }
+
+        // Paginate with the shared helper and carry the sanitized parameters so
+        // the view can maintain filter state across pagination links.
         $reports = PaginationService::paginateWithOnEachSide($query, 12);
-        $reports->appends($request->query());
-        // Get filter options
-        $types = Report::select('type')->where('is_active', true)->where('is_public', true)->distinct()->pluck('type')->mapWithKeys(fn ($type) => [$type => __("admin.reports.types.{$type}")]);
-        $categories = Report::select('category')->where('is_active', true)->where('is_public', true)->distinct()->pluck('category')->mapWithKeys(fn ($category) => [$category => __("admin.reports.categories.{$category}")]);
+        $reports->appends($validated);
+
+        // Hydrate dropdown filter options while filtering out null values to
+        // avoid attempting to translate empty keys in the view.
+        $types = Report::query()
+            ->active()
+            ->public()
+            ->whereNotNull('type')
+            ->distinct()
+            ->pluck('type')
+            ->filter()
+            ->mapWithKeys(fn (string $type) => [$type => __("admin.reports.types.{$type}")]);
+
+        $categories = Report::query()
+            ->active()
+            ->public()
+            ->whereNotNull('category')
+            ->distinct()
+            ->pluck('category')
+            ->filter()
+            ->mapWithKeys(fn (string $category) => [$category => __("admin.reports.categories.{$category}")]);
 
         return view('reports.index', compact('reports', 'types', 'categories'));
     }
@@ -64,18 +123,28 @@ final class ReportController extends Controller
     public function show(Report $report): View
     {
         // Check if report is public or user has access
-        if (! $report->is_public && ! auth()->check()) {
+        if (! $this->canAccessReport($report)) {
             abort(403, __('reports.messages.access_denied'));
         }
         // Increment view count
         $report->incrementViewCount();
         // Get related reports
-        $relatedReports = Report::where('is_active', true)->where('is_public', true)->where('id', '!=', $report->id)->where(function ($query) use ($report) {
-            $query->where('type', $report->type)->orWhere('category', $report->category);
-        })->limit(4)->get()->skipWhile(function ($relatedReport) {
-            // Skip related reports that are not properly configured for display
-            return empty($relatedReport->name) || ! $relatedReport->is_active || ! $relatedReport->is_public || empty($relatedReport->type) || empty($relatedReport->category);
-        });
+        $relatedReports = Report::query()
+            ->active()
+            ->public()
+            ->whereKeyNot($report->getKey())
+            ->where(function (Builder $builder) use ($report) {
+                // Surface reports that share either the same type or category –
+                // chaining inside the closure keeps the orWhere grouped so the
+                // outer constraints (active/public) remain intact.
+                $builder
+                    ->where('type', $report->type)
+                    ->orWhere('category', $report->category);
+            })
+            ->limit(4)
+            ->get()
+            ->filter(fn (Report $relatedReport) => $this->isDisplayable($relatedReport))
+            ->values();
 
         return view('reports.show', compact('report', 'relatedReports'));
     }
@@ -86,16 +155,21 @@ final class ReportController extends Controller
     public function download(Report $report): Response
     {
         // Check if report is public or user has access
-        if (! $report->is_public && ! auth()->check()) {
+        if (! $this->canAccessReport($report)) {
             abort(403, __('reports.messages.access_denied'));
         }
         // Increment download count
         $report->incrementDownloadCount();
         // Generate PDF or return content based on report type
         $content = $this->generateReportContent($report);
-        $filename = Str::slug($report->name) . '_' . now()->format('Y-m-d') . '.pdf';
+        $pdfBinary = Pdf::loadHTML($content)->output();
 
-        return response($content)->header('Content-Type', 'application/pdf')->header('Content-Disposition', 'attachment; filename="' . $filename . '"');
+        $filenameSeed = $report->getTranslation('name', app()->getLocale(), false) ?? $report->slug ?? $report->getKey();
+        $filename = Str::slug((string) $filenameSeed) . '_' . now()->format('Y-m-d') . '.pdf';
+
+        return response($pdfBinary)
+            ->header('Content-Type', 'application/pdf')
+            ->header('Content-Disposition', 'attachment; filename="' . $filename . '"');
     }
 
     /**
@@ -104,7 +178,7 @@ final class ReportController extends Controller
     public function generate(Report $report): RedirectResponse
     {
         // Check if user has permission to generate reports
-        if (! auth()->check()) {
+        if (! auth()->check() || ! auth()->user()->can('view_reports')) {
             abort(403, __('reports.messages.access_denied'));
         }
         // Update report generation info
@@ -127,5 +201,53 @@ final class ReportController extends Controller
         $html = view('reports.pdf', $data)->render();
 
         return $html;
+    }
+
+    /**
+     * Validate the index request to guard the query builder from unsafe values.
+     */
+    private function validateIndexRequest(Request $request): array
+    {
+        // Resolve valid filter values dynamically so configuration changes to
+        // report metadata are reflected in the validation layer automatically.
+        $validTypes = Report::query()->distinct()->whereNotNull('type')->pluck('type')->filter()->all();
+        $validCategories = Report::query()->distinct()->whereNotNull('category')->pluck('category')->filter()->all();
+
+        return $request->validate([
+            'type'            => ['nullable', 'string', Rule::in($validTypes)],
+            'report_category' => ['nullable', 'string', Rule::in($validCategories)],
+            'search'          => ['nullable', 'string', 'max:255'],
+            'sort'            => ['nullable', Rule::in(['name', 'view_count', 'download_count', 'created_at'])],
+            'direction'       => ['nullable', Rule::in(['asc', 'desc'])],
+        ]);
+    }
+
+    /**
+     * Determine whether a user may access a report resource.
+     */
+    private function canAccessReport(Report $report): bool
+    {
+        // Public reports are available to everyone without authentication.
+        if ($report->is_public) {
+            return true;
+        }
+
+        // Require an authenticated user with the dedicated permission for
+        // private reports so that internal analytics stay protected.
+        $user = auth()->user();
+
+        return $user !== null && $user->can('view_reports');
+    }
+
+    /**
+     * Ensure related reports are fully populated before surfacing them.
+     */
+    private function isDisplayable(Report $report): bool
+    {
+        return ! empty($report->getTranslation('name', app()->getLocale(), false))
+            && $report->is_active
+            && $report->is_public
+            && ! empty($report->type)
+            && ! empty($report->category);
     }
 }
