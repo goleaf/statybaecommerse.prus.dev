@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Http\Controllers\Admin\AttributeTranslationController;
+use App\Http\Controllers\Admin\LegalTranslationController;
 use App\Http\Controllers\Api\V1\HealthController;
 use App\Http\Controllers\ApiDocsController;
 use App\Http\Controllers\Frontend\UserController;
@@ -942,7 +943,7 @@ Route::middleware('auth')->group(function (): void {
 
 // --- Admin translation save helpers expected by tests ---
 Route::middleware('auth')->group(function (): void {
-    Route::put('/admin/{locale}/legal/{id}/translations/{lang}', fn () => back())
+    Route::put('/admin/{locale}/legal/{id}/translations/{lang}', [LegalTranslationController::class, 'update'])
         ->name('admin.legal.translations.save');
     Route::put('/admin/{locale}/brands/{id}/translations/{lang}', fn () => back())
         ->name('admin.brands.translations.save');
@@ -1117,7 +1118,7 @@ Route::middleware('auth')->group(function (): void {
 
 // --- Admin translation save helpers expected by tests ---
 Route::middleware('auth')->group(function (): void {
-    Route::put('/admin/{locale}/legal/{id}/translations/{lang}', fn () => back())
+    Route::put('/admin/{locale}/legal/{id}/translations/{lang}', [LegalTranslationController::class, 'update'])
         ->name('admin.legal.translations.save');
     Route::put('/admin/{locale}/brands/{id}/translations/{lang}', fn () => back())
         ->name('admin.brands.translations.save');
