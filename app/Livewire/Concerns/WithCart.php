@@ -14,20 +14,45 @@ use App\Services\Cart\CartService;
  */
 trait WithCart
 {
-    public function addToCart(int $productId, int $quantity = 1): void
+    /**
+     * Attempt to add the given product to the active cart session.
+     *
+     * Returns false when the action bails out (e.g. missing product or insufficient stock)
+     * so consuming components can avoid firing auxiliary side effects like analytics events.
+     */
+    public function addToCart(int $productId, int $quantity = 1, ?string $successMessage = null): bool
     {
-        $product = Product::query()->findOrFail($productId);
+        $product = Product::query()->find($productId);
 
-        if ($product->stock_quantity < $quantity) {
-            $this->notifyError(__('Not enough stock available'));
+        if ($product === null) {
+            $this->notifyError(__('The selected product is no longer available.'));
 
-            return;
+            return false;
         }
 
-        $this->persistCartItem($product, $quantity);
+        if ($product->shouldHideAddToCart()) {
+            $this->notifyWarning(__('This product is not available for online purchase.'));
+
+            return false;
+        }
+
+        $normalizedQuantity = max(1, $quantity);
+
+        if ($product->availableQuantity() < $normalizedQuantity) {
+            $this->notifyError(__('Not enough stock available'));
+
+            return false;
+        }
+
+        $this->persistCartItem($product, $normalizedQuantity, $successMessage);
+
+        return true;
     }
 
-    protected function persistCartItem(Product $product, int $quantity = 1): void
+    /**
+     * Persist the cart item snapshot and trigger downstream UI updates.
+     */
+    protected function persistCartItem(Product $product, int $quantity = 1, ?string $successMessage = null): void
     {
         $cartItems = session()->get('cart', []);
 
@@ -45,8 +70,14 @@ trait WithCart
 
         session()->put('cart', $cartItems);
 
+        $this->dispatch(
+            'add-to-cart',
+            productId: (int) $product->getKey(),
+            quantity: $quantity
+        );
+
         $this->dispatch('cart-updated');
-        $this->notifySuccess(__('Product added to cart'));
+        $this->notifySuccess($successMessage ?? __('Product added to cart'));
     }
 
     public function removeFromCart(int $productId): void

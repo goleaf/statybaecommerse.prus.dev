@@ -66,7 +66,7 @@ function ensureNotificationContainer() {
 
 const notify = resolveNotificationHandler();
 
-function updateCartCount() {
+const fallbackUpdateCartCount = () => {
     try {
         const storedCart = window.sessionStorage.getItem('cart');
         const parsedCart = storedCart ? JSON.parse(storedCart) : [];
@@ -103,6 +103,13 @@ function updateCartCount() {
 
         return 0;
     }
+};
+
+const updateCartCount =
+    typeof window.updateCartCount === 'function' ? window.updateCartCount : fallbackUpdateCartCount;
+
+if (typeof window.updateCartCount !== 'function') {
+    window.updateCartCount = updateCartCount;
 }
 
 function registerLivewireListeners() {
@@ -135,5 +142,4 @@ if (typeof window.Livewire !== 'undefined') {
     registerLivewireListeners();
 }
 
-window.updateCartCount = updateCartCount;
 export { updateCartCount };

@@ -262,6 +262,7 @@ final class SingleProduct extends Component
         $cartItem->updateTotalPrice();
         // Track add to cart in history
         $this->trackAddToCartHistory($product, $quantity);
+        $this->dispatch('add-to-cart', productId: $productId, quantity: $quantity);
         $this->dispatch('cart-updated');
     }
 

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Livewire\Components;
 
+use App\Livewire\Concerns\WithCart;
+use App\Livewire\Concerns\WithNotifications;
 use App\Models\Product;
 use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Computed;
@@ -18,6 +20,11 @@ use Livewire\Component;
  */
 final class ProductCard extends Component
 {
+    use WithCart {
+        addToCart as performAddToCart;
+    }
+    use WithNotifications;
+
     public Product $product;
 
     /**
@@ -37,10 +44,24 @@ final class ProductCard extends Component
      */
     public function addToCart(): void
     {
-        $this->dispatch('add-to-cart', productId: $this->product->id, quantity: 1);
-        // Track analytics
-        \App\Models\AnalyticsEvent::create(['event_type' => 'add_to_cart', 'user_id' => auth()->id(), 'session_id' => session()->getId(), 'properties' => ['product_id' => $this->product->id, 'product_name' => $this->product->name, 'product_price' => $this->product->price], 'created_at' => now()]);
-        $this->dispatch('notify', ['type' => 'success', 'message' => 'Produktas pridėtas į krepšelį!']);
+        $added = $this->performAddToCart($this->product->id);
+
+        if (! $added) {
+            return;
+        }
+
+        // Track analytics only after we know the cart mutation succeeded.
+        \App\Models\AnalyticsEvent::create([
+            'event_type' => 'add_to_cart',
+            'user_id'    => auth()->id(),
+            'session_id' => session()->getId(),
+            'properties' => [
+                'product_id'    => $this->product->id,
+                'product_name'  => $this->product->name,
+                'product_price' => $this->product->price,
+            ],
+            'created_at' => now(),
+        ]);
     }
 
     /**
