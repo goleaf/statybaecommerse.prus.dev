@@ -4,10 +4,13 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use App\Enums\NavigationGroup;
+use App\Filament\Resources\EmailCampaignResource;
 use App\Models\EmailCampaign;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
+use ReflectionClass;
 use Tests\TestCase;
 
 class EmailCampaignResourceTest extends TestCase
@@ -263,5 +266,18 @@ class EmailCampaignResourceTest extends TestCase
         foreach ($data as $key => $value) {
             $this->assertEquals($value, $campaign->$key);
         }
+    }
+
+    public function test_navigation_group_uses_campaigns_enum(): void
+    {
+        // Ensure the resource stays grouped under the campaigns navigation heading.
+        $reflection = new ReflectionClass(EmailCampaignResource::class);
+        $property = $reflection->getProperty('navigationGroup');
+        $property->setAccessible(true);
+
+        $this->assertSame(
+            NavigationGroup::Campaigns,
+            $property->getValue(),
+        );
     }
 }

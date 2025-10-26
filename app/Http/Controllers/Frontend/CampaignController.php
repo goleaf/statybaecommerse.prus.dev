@@ -6,9 +6,10 @@ namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
 use App\Models\Campaign;
-use DB;
+use App\Models\CampaignConversion;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 use OpenApi\Attributes as OA;
 
@@ -257,10 +258,298 @@ final class CampaignController extends Controller
     )]
     public function getCampaignAnalytics(Request $request): JsonResponse
     {
-        $period = $request->input('period', '30');
-        // days
-        $startDate = now()->subDays($period);
-        $analytics = ['period' => $period, 'start_date' => $startDate->format('Y-m-d'), 'end_date' => now()->format('Y-m-d'), 'campaigns_created' => Campaign::where('created_at', '>=', $startDate)->count(), 'campaigns_started' => Campaign::where('start_date', '>=', $startDate)->count(), 'campaigns_completed' => Campaign::where('end_date', '>=', $startDate)->where('status', 'completed')->count(), 'total_views' => Campaign::where('created_at', '>=', $startDate)->sum('total_views'), 'total_clicks' => Campaign::where('created_at', '>=', $startDate)->sum('total_clicks'), 'total_conversions' => Campaign::where('created_at', '>=', $startDate)->sum('total_conversions'), 'total_revenue' => Campaign::where('created_at', '>=', $startDate)->sum('total_revenue'), 'top_performing_campaigns' => Campaign::where('created_at', '>=', $startDate)->orderBy('conversion_rate', 'desc')->limit(5)->get(['id', 'name', 'type', 'conversion_rate', 'total_revenue']), 'campaign_types_breakdown' => Campaign::where('created_at', '>=', $startDate)->selectRaw('type, COUNT(*) as count, AVG(conversion_rate) as avg_conversion_rate')->groupBy('type')->get()];
+        // Normalise the requested window and clamp extremes to keep the query predictable.
+        $periodInput = $request->input('period', 30);
+        $period = (int) filter_var($periodInput, FILTER_VALIDATE_INT, ['options' => ['default' => 30]]);
+        $period = max(1, min(365, $period));
+
+        $now = now();
+        $startDate = $now->copy()->subDays($period);
+
+        // Load campaign activity without global scopes so archived/scheduled records contribute to the audit.
+        $campaigns = Campaign::query()
+            ->withoutGlobalScopes()
+            // Ensure we only analyse campaigns that existed within the requested window.
+            ->where('created_at', '>=', $startDate)
+            ->where('created_at', '<=', $now)
+            ->get([
+                'id',
+                'name',
+                'metadata',
+                'total_views',
+                'total_clicks',
+                'total_conversions',
+                'total_revenue',
+                'conversion_rate',
+                'budget_limit',
+                'starts_at',
+                'ends_at',
+                'status',
+                'created_at',
+            ]);
+
+        // Collect conversion level telemetry to power attribution, ROI, and journey metrics.
+        $conversions = CampaignConversion::query()
+            // Restrict attribution analytics to conversions that actually happened within the window.
+            ->where('converted_at', '>=', $startDate)
+            ->where('converted_at', '<=', $now)
+            ->get([
+                'id',
+                'campaign_id',
+                'conversion_value',
+                'conversion_rate',
+                'attribution_model',
+                'funnel_step',
+                'conversion_path',
+                'touchpoints',
+                'conversion_data',
+                'roi',
+                'roas',
+                'assisted_conversions',
+                'assisted_conversion_value',
+                'is_verified',
+                'is_attributed',
+                'cost_per_conversion',
+                'page_views',
+                'time_on_site',
+            ]);
+
+        // Summarise campaign engagement KPIs.
+        $engagementCampaigns = $campaigns->map(static function (Campaign $campaign): array {
+            $views = (int) ($campaign->getOriginal('total_views') ?? data_get($campaign->metadata, 'total_views', 0));
+            $clicks = (int) ($campaign->getOriginal('total_clicks') ?? data_get($campaign->metadata, 'total_clicks', 0));
+
+            return [
+                'id'                 => $campaign->getKey(),
+                'name'               => $campaign->name,
+                'views'              => $views,
+                'clicks'             => $clicks,
+                'click_through_rate' => $views > 0 ? round($clicks / $views * 100, 2) : 0.0,
+                'status'             => $campaign->status,
+            ];
+        });
+
+        $totalViews = (int) $engagementCampaigns->sum('views');
+        $totalClicks = (int) $engagementCampaigns->sum('clicks');
+        $averageCtr = $engagementCampaigns
+            ->filter(static fn (array $campaign): bool => $campaign['views'] > 0)
+            ->avg(static fn (array $campaign): float => $campaign['click_through_rate']) ?? 0.0;
+
+        $topEngagementCampaigns = $engagementCampaigns
+            ->sortByDesc('clicks')
+            ->take(5)
+            ->values()
+            ->all();
+
+        // Derive conversion-focused analytics.
+        $totalConversions = $conversions->count();
+        $averageConversionRate = ($conversions->avg(static fn (CampaignConversion $conversion): float => (float) ($conversion->conversion_rate ?? 0)) ?? 0.0) * 100;
+        $verifiedConversions = $conversions->filter(static fn (CampaignConversion $conversion): bool => (bool) $conversion->is_verified)->count();
+        $attributedConversions = $conversions->filter(static fn (CampaignConversion $conversion): bool => (bool) $conversion->is_attributed)->count();
+        $assistedConversions = (int) $conversions->sum(static fn (CampaignConversion $conversion): int => (int) ($conversion->assisted_conversions ?? 0));
+        $assistedConversionValue = (float) $conversions->sum(static fn (CampaignConversion $conversion): float => (float) ($conversion->assisted_conversion_value ?? 0));
+        $attributionBreakdown = $conversions
+            ->groupBy(static fn (CampaignConversion $conversion): string => (string) ($conversion->attribution_model ?? 'unspecified'))
+            ->map(static function ($group) use ($totalConversions) {
+                $count = $group->count();
+                $avgRate = ($group->avg(static fn (CampaignConversion $conversion): float => (float) ($conversion->conversion_rate ?? 0)) ?? 0.0) * 100;
+
+                return [
+                    'model'                   => (string) ($group->first()->attribution_model ?? 'unspecified'),
+                    'conversions'             => $count,
+                    'percentage'              => $totalConversions > 0 ? round($count / $totalConversions * 100, 2) : 0.0,
+                    'average_conversion_rate' => round($avgRate, 2),
+                    'average_value'           => round((float) $group->avg(static fn (CampaignConversion $conversion): float => (float) ($conversion->conversion_value ?? 0)), 2),
+                ];
+            })
+            ->values()
+            ->all();
+
+        // Compute ROI and budget efficiency metrics.
+        $totalRevenue = (float) $campaigns->sum(static fn (Campaign $campaign): float => (float) ($campaign->getOriginal('total_revenue') ?? data_get($campaign->metadata, 'total_revenue', 0)));
+        $totalBudget = (float) $campaigns->sum(static fn (Campaign $campaign): float => (float) (data_get($campaign->metadata, 'budget', $campaign->budget_limit ?? 0)));
+        $roiPercentage = $totalBudget > 0 ? round(($totalRevenue - $totalBudget) / $totalBudget * 100, 2) : 0.0;
+        $roas = $totalBudget > 0 ? round($totalRevenue / $totalBudget, 2) : 0.0;
+        $averageRoi = (float) ($conversions->avg(static fn (CampaignConversion $conversion): float => (float) ($conversion->roi ?? 0)) ?? 0.0);
+        $averageRoas = (float) ($conversions->avg(static fn (CampaignConversion $conversion): float => (float) ($conversion->roas ?? 0)) ?? 0.0);
+        $averageCostPerConversion = (float) ($conversions->avg(static fn (CampaignConversion $conversion): float => (float) ($conversion->cost_per_conversion ?? 0)) ?? 0.0);
+
+        // Translate conversion telemetry into journey insights.
+        $funnelBreakdown = $conversions
+            ->groupBy(static fn (CampaignConversion $conversion): string => (string) ($conversion->funnel_step ?? 'unknown'))
+            ->map(static function ($group) use ($totalConversions) {
+                $count = $group->count();
+
+                return [
+                    'step'        => (string) ($group->first()->funnel_step ?? 'unknown'),
+                    'conversions' => $count,
+                    'percentage'  => $totalConversions > 0 ? round($count / $totalConversions * 100, 2) : 0.0,
+                ];
+            })
+            ->values()
+            ->all();
+
+        $averageTouchpoints = $conversions->avg(static function (CampaignConversion $conversion): ?float {
+            $pathTouchpoints = data_get($conversion->conversion_path, 'touchpoints');
+
+            if (is_numeric($pathTouchpoints)) {
+                return (float) $pathTouchpoints;
+            }
+
+            $touchpointArray = $conversion->touchpoints;
+
+            if (is_array($touchpointArray)) {
+                return (float) count(array_filter($touchpointArray));
+            }
+
+            return null;
+        }) ?? 0.0;
+
+        $averageTimeOnSite = (float) ($conversions->avg(static fn (CampaignConversion $conversion): float => (float) ($conversion->time_on_site ?? 0)) ?? 0.0);
+        $averagePageViews = (float) ($conversions->avg(static fn (CampaignConversion $conversion): float => (float) ($conversion->page_views ?? 0)) ?? 0.0);
+
+        // Surface simple multi-variant comparisons by mining conversion payload metadata.
+        $conversionsWithCampaign = $conversions
+            ->filter(static fn (CampaignConversion $conversion): bool => $conversion->campaign_id !== null);
+
+        $variantPerformance = $conversionsWithCampaign
+            ->groupBy(static fn (CampaignConversion $conversion): int => (int) $conversion->campaign_id)
+            ->flatMap(static function ($campaignConversions, int $campaignId) use ($campaigns) {
+                $campaignName = optional($campaigns->firstWhere('id', $campaignId))->name ?? sprintf('Campaign #%d', $campaignId);
+
+                return $campaignConversions
+                    ->groupBy(static fn (CampaignConversion $conversion): string => (string) data_get($conversion->conversion_data, 'campaign_name', 'Standard Variant'))
+                    ->map(static function ($variantGroup, string $variantName) use ($campaignId, $campaignName) {
+                        $conversionValue = (float) $variantGroup->sum(static fn (CampaignConversion $conversion): float => (float) ($conversion->conversion_value ?? 0));
+                        $roiAverage = (float) ($variantGroup->avg(static fn (CampaignConversion $conversion): float => (float) ($conversion->roi ?? 0)) ?? 0.0);
+                        $roasAverage = (float) ($variantGroup->avg(static fn (CampaignConversion $conversion): float => (float) ($conversion->roas ?? 0)) ?? 0.0);
+
+                        return [
+                            'campaign_id'      => $campaignId,
+                            'campaign_name'    => $campaignName,
+                            'variant'          => $variantName,
+                            'conversions'      => $variantGroup->count(),
+                            'conversion_value' => round($conversionValue, 2),
+                            'average_roi'      => round($roiAverage, 2),
+                            'average_roas'     => round($roasAverage, 2),
+                        ];
+                    })
+                    ->values();
+            })
+            ->values();
+
+        $multiVariantCampaigns = $variantPerformance
+            ->groupBy('campaign_id')
+            ->filter(static fn ($variants): bool => $variants->count() > 1)
+            ->count();
+
+        $winningVariant = $variantPerformance
+            ->sort(static function (array $a, array $b): int {
+                $valueComparison = $b['conversion_value'] <=> $a['conversion_value'];
+
+                if ($valueComparison !== 0) {
+                    return $valueComparison;
+                }
+
+                return $b['conversions'] <=> $a['conversions'];
+            })
+            ->first();
+
+        // Assemble the final analytics payload grouping insights by marketing theme.
+        $analytics = [
+            'period' => [
+                'days'       => $period,
+                'label'      => sprintf('Last %d days', $period),
+                'start_date' => $startDate->format('Y-m-d'),
+                'end_date'   => $now->format('Y-m-d'),
+            ],
+            'totals' => [
+                'campaigns_created' => $campaigns->count(),
+                'campaigns_started' => Campaign::query()
+                    ->withoutGlobalScopes()
+                    // Exclude future launches so the metric reflects historical starts only.
+                    ->whereBetween('starts_at', [$startDate, $now])
+                    ->count(),
+                'campaigns_completed' => Campaign::query()
+                    ->withoutGlobalScopes()
+                    // Only count completions that wrapped up during the window.
+                    ->whereBetween('ends_at', [$startDate, $now])
+                    ->where('status', 'completed')
+                    ->count(),
+                'active_campaigns' => Campaign::query()
+                    ->withoutGlobalScopes()
+                    ->where('status', 'active')
+                    // Clamp to active campaigns that have started and not yet lapsed relative to the audit window.
+                    ->where(function ($query) use ($now): void {
+                        $query
+                            ->whereNull('starts_at')
+                            ->orWhere('starts_at', '<=', $now);
+                    })
+                    ->where(function ($query) use ($startDate): void {
+                        $query
+                            ->whereNull('ends_at')
+                            ->orWhere('ends_at', '>=', $startDate);
+                    })
+                    ->count(),
+            ],
+            'insights' => [
+                'views_clicks' => [
+                    'title'       => 'Views & Clicks',
+                    'description' => 'Campaign engagement',
+                    'metrics'     => [
+                        'total_views'                => $totalViews,
+                        'total_clicks'               => $totalClicks,
+                        'average_click_through_rate' => round((float) $averageCtr, 2),
+                        'top_campaigns'              => $topEngagementCampaigns,
+                    ],
+                ],
+                'conversions' => [
+                    'title'       => 'Conversions',
+                    'description' => 'Attribution modeling',
+                    'metrics'     => [
+                        'total_conversions'         => $totalConversions,
+                        'average_conversion_rate'   => round($averageConversionRate, 2),
+                        'verified_conversions'      => $verifiedConversions,
+                        'attributed_conversions'    => $attributedConversions,
+                        'assisted_conversions'      => $assistedConversions,
+                        'assisted_conversion_value' => round($assistedConversionValue, 2),
+                        'attribution_breakdown'     => $attributionBreakdown,
+                    ],
+                ],
+                'roi_tracking' => [
+                    'title'       => 'ROI Tracking',
+                    'description' => 'Return on ad spend',
+                    'metrics'     => [
+                        'total_revenue'               => round($totalRevenue, 2),
+                        'total_budget'                => round($totalBudget, 2),
+                        'roi_percentage'              => $roiPercentage,
+                        'roas'                        => $roas,
+                        'average_roi'                 => round($averageRoi, 2),
+                        'average_roas'                => round($averageRoas, 2),
+                        'average_cost_per_conversion' => round($averageCostPerConversion, 2),
+                    ],
+                ],
+                'customer_journey' => [
+                    'title'       => 'Customer Journey',
+                    'description' => 'Touchpoint analysis',
+                    'metrics'     => [
+                        'average_touchpoints'  => round($averageTouchpoints, 2),
+                        'average_time_on_site' => round($averageTimeOnSite, 2),
+                        'average_page_views'   => round($averagePageViews, 2),
+                        'funnel_breakdown'     => $funnelBreakdown,
+                    ],
+                ],
+                'a_b_testing' => [
+                    'title'       => 'A/B Testing',
+                    'description' => 'Multi-variant campaigns',
+                    'metrics'     => [
+                        'multi_variant_campaigns' => $multiVariantCampaigns,
+                        'winning_variant'         => $winningVariant,
+                        'variant_performance'     => $variantPerformance->take(10)->values()->all(),
+                    ],
+                ],
+            ],
+        ];
 
         return response()->json(['success' => true, 'data' => $analytics]);
     }
