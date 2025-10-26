@@ -8,6 +8,8 @@ use App\Models\Product;
 use App\Models\User;
 use App\Models\UserBehavior;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
@@ -101,7 +103,35 @@ abstract class BaseRecommendation
      */
     protected function cacheResult(string $key, Collection $result, int $ttl = 3600): Collection
     {
-        Cache::put($key, $result->toArray(), $ttl);
+        // Default to caching an empty marker so downstream callers can short-circuit quickly.
+        $payload = ['type' => 'empty'];
+
+        if ($result->isNotEmpty()) {
+            $firstItem = $result->first();
+
+            // When the collection contains Eloquent models we cache identifiers and relation names
+            // so cache hits can be re-hydrated with the same eager-loaded associations.
+            if ($firstItem instanceof Model) {
+                $modelClass = $firstItem::class;
+                $keyName = (new $modelClass())->getKeyName();
+
+                $payload = [
+                    'type'       => 'model_collection',
+                    'model'      => $modelClass,
+                    'key_name'   => $keyName,
+                    'ids'        => $result->map(static function (Model $model) use ($keyName): int|string|null {
+                        // Capture the model key for deterministic ordering after cache retrieval.
+                        return $model->getAttribute($keyName);
+                    })->filter()->values()->all(),
+                    'relations'  => array_keys($firstItem->getRelations()),
+                ];
+            } else {
+                // Fallback to storing the raw array data for non-model collections.
+                $payload = ['type' => 'array', 'items' => $result->toArray()];
+            }
+        }
+
+        Cache::put($key, $payload, $ttl);
 
         return $result;
     }
@@ -113,7 +143,58 @@ abstract class BaseRecommendation
     {
         $cached = Cache::get($key);
 
-        return $cached ? collect($cached) : null;
+        if (! $cached) {
+            // No cache hit.
+            return null;
+        }
+
+        if (Arr::get($cached, 'type') === 'empty') {
+            // Respect cached empty results to avoid redundant database work.
+            return new Collection();
+        }
+
+        // Handle hydrated model collections by re-querying the database with eager-loaded relations.
+        if (Arr::get($cached, 'type') === 'model_collection') {
+            $modelClass = Arr::get($cached, 'model');
+            $ids = Arr::get($cached, 'ids', []);
+            $keyName = Arr::get($cached, 'key_name');
+
+            if (! $modelClass || empty($ids) || ! is_subclass_of($modelClass, Model::class)) {
+                return new Collection();
+            }
+
+            $query = $modelClass::query();
+
+            // Apply eager-loaded relations if they were cached previously.
+            $relations = Arr::get($cached, 'relations', []);
+            if (! empty($relations)) {
+                $query->with($relations);
+            }
+
+            $models = $query->whereIn($keyName, $ids)->get()->keyBy($keyName);
+
+            $ordered = collect($ids)
+                ->map(static function ($id) use ($models) {
+                    // Rebuild the collection in the cached order while dropping missing records.
+                    return $models->get($id);
+                })
+                ->filter()
+                ->values();
+
+            return new Collection($ordered->all());
+        }
+
+        // For raw arrays we simply convert back into a collection of the stored items.
+        if (Arr::get($cached, 'type') === 'array') {
+            return new Collection(Arr::get($cached, 'items', []));
+        }
+
+        // Support legacy cache payloads that stored entire collections.
+        if ($cached instanceof Collection) {
+            return new Collection($cached->all());
+        }
+
+        return null;
     }
 
     /**
