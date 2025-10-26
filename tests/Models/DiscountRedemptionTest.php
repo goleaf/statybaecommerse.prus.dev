@@ -11,7 +11,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 
-uses(Tests\TestCase::class, RefreshDatabase::class);
+// Refresh the database between scenarios while the global Pest bootstrap loads the application TestCase.
+uses(RefreshDatabase::class);
 
 it('resolves its belongs to relationships', function (): void {
     // Arrange: create a fully-related redemption record for inspection.

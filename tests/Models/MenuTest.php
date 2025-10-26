@@ -5,15 +5,13 @@ declare(strict_types=1);
 use App\Models\Menu;
 use App\Models\MenuItem;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
-
-// Boot the full application kernel so model factories and database migrations are available.
-uses(TestCase::class, RefreshDatabase::class);
+// Boot the database refresh trait while the shared Pest bootstrap loads the Laravel TestCase kernel.
+uses(RefreshDatabase::class);
 
 describe('Menu model', function (): void {
     it('defines the expected fillable attributes', function (): void {
         // Create a fresh instance so we can verify the guarded attributes.
-        $menu = new Menu();
+        $menu = new Menu;
 
         // Ensuring the fillable list matches the schema prevents silent mass-assignment bugs.
         expect($menu->getFillable())->toBe([
@@ -42,15 +40,15 @@ describe('Menu model', function (): void {
 
         // Create child items with explicit sort orders for deterministic assertions.
         $laterItem = MenuItem::factory()->for($menu)->create([
-            'parent_id' => null,
+            'parent_id'  => null,
             'sort_order' => 20,
         ]);
         $earlierItem = MenuItem::factory()->for($menu)->create([
-            'parent_id' => null,
+            'parent_id'  => null,
             'sort_order' => 10,
         ]);
         $childItem = MenuItem::factory()->for($menu)->create([
-            'parent_id' => $earlierItem->id,
+            'parent_id'  => $earlierItem->id,
             'sort_order' => 5,
         ]);
 
@@ -69,11 +67,11 @@ describe('Menu model', function (): void {
         // Build a menu with a parent/child hierarchy for verification.
         $menu = Menu::factory()->create();
         $rootItem = MenuItem::factory()->for($menu)->create([
-            'parent_id' => null,
+            'parent_id'  => null,
             'sort_order' => 10,
         ]);
         $childItem = MenuItem::factory()->for($menu)->create([
-            'parent_id' => $rootItem->id,
+            'parent_id'  => $rootItem->id,
             'sort_order' => 5,
         ]);
 
@@ -110,11 +108,11 @@ describe('Menu model', function (): void {
     it('scopes menus by key value', function (): void {
         // Ensure we have a deterministic key to filter for.
         $targetMenu = Menu::factory()->create([
-            'key' => 'primary-menu',
+            'key'       => 'primary-menu',
             'is_active' => true,
         ]);
         Menu::factory()->create([
-            'key' => 'secondary-menu',
+            'key'       => 'secondary-menu',
             'is_active' => true,
         ]);
 
@@ -132,11 +130,11 @@ describe('Menu model', function (): void {
     it('scopes menus by location value', function (): void {
         // Persist menus with distinct locations to target in the scope.
         $headerMenu = Menu::factory()->create([
-            'location' => 'header',
+            'location'  => 'header',
             'is_active' => true,
         ]);
         Menu::factory()->create([
-            'location' => 'footer',
+            'location'  => 'footer',
             'is_active' => true,
         ]);
 
@@ -186,18 +184,18 @@ describe('Menu model', function (): void {
     it('orders menus alphabetically using scopeOrderedByName', function (): void {
         // Persist menus with intentionally jumbled names to confirm ordering.
         Menu::factory()->create([
-            'name' => 'Delta Menu',
-            'key' => 'delta-menu',
+            'name'      => 'Delta Menu',
+            'key'       => 'delta-menu',
             'is_active' => true,
         ]);
         Menu::factory()->create([
-            'name' => 'Alpha Menu',
-            'key' => 'alpha-menu',
+            'name'      => 'Alpha Menu',
+            'key'       => 'alpha-menu',
             'is_active' => true,
         ]);
         Menu::factory()->create([
-            'name' => 'Bravo Menu',
-            'key' => 'bravo-menu',
+            'name'      => 'Bravo Menu',
+            'key'       => 'bravo-menu',
             'is_active' => true,
         ]);
 
