@@ -7,8 +7,13 @@ namespace App\Http\Controllers;
 use App\Data\ProductRequestData;
 use App\Models\Product;
 use App\Models\ProductRequest;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Route;
 use Illuminate\View\View;
 
 /**
@@ -18,6 +23,8 @@ use Illuminate\View\View;
  */
 final class ProductRequestController extends Controller
 {
+    use AuthorizesRequests;
+
     /**
      * Show the form for creating a new resource.
      */
@@ -27,7 +34,7 @@ final class ProductRequestController extends Controller
             abort(404, __('translations.product_not_requestable'));
         }
 
-        return view('products.request-form', compact('product'));
+        return view('products.request-form', ['product' => $product]);
     }
 
     /**
@@ -37,13 +44,40 @@ final class ProductRequestController extends Controller
     {
         $product = Product::findOrFail($data->product_id);
         if (! $product->isRequestable()) {
-            return redirect()->back()->withErrors(['error' => __('translations.product_not_requestable')]);
+            // Preserve user input so the form can be redisplayed with validation feedback.
+            return Redirect::back()
+                ->withInput()
+                ->withErrors(['error' => __('translations.product_not_requestable')]);
         }
-        $productRequest = ProductRequest::create(['product_id' => $product->id, 'user_id' => auth()->id(), 'name' => $data->name, 'email' => $data->email, 'phone' => $data->phone, 'message' => $data->message, 'requested_quantity' => $data->requested_quantity, 'status' => 'pending']);
-        // Increment the requests count on the product
-        $product->incrementRequestsCount();
 
-        return redirect()->route('products.show', $product)->with('success', __('translations.product_request_submitted_successfully'));
+        // Resolve the authenticated user up-front to avoid repeated helper calls.
+        $userId = Auth::id();
+
+        if ($userId === null) {
+            // Guard against unexpected missing authentication contexts.
+            abort(403);
+        }
+
+        // Persist the request and increment the aggregate counter atomically.
+        DB::transaction(function () use ($product, $data, $userId): void {
+            ProductRequest::query()->create([
+                'product_id'         => $product->id,
+                'user_id'            => $userId,
+                'name'               => $data->name,
+                'email'              => $data->email,
+                'phone'              => $data->phone,
+                'message'            => $data->message,
+                'requested_quantity' => $data->requested_quantity,
+                'status'             => ProductRequest::STATUS_PENDING,
+            ]);
+
+            // Keep the product level request counter in sync with the stored record.
+            $product->incrementRequestsCount();
+        });
+
+        $productShowRoute = Route::has('products.show') ? 'products.show' : 'frontend.products.show';
+
+        return redirect()->route($productShowRoute, $product)->with('success', __('translations.product_request_submitted_successfully'));
     }
 
     /**
@@ -53,7 +87,7 @@ final class ProductRequestController extends Controller
     {
         $this->authorize('view', $productRequest);
 
-        return view('products.request-details', compact('productRequest'));
+        return view('products.request-details', ['productRequest' => $productRequest]);
     }
 
     /**
@@ -62,9 +96,18 @@ final class ProductRequestController extends Controller
     public function index(Request $request): View
     {
         $user = $request->user();
-        $productRequests = ProductRequest::with(['product', 'respondedBy'])->where('user_id', $user->id)->orderBy('created_at', 'desc')->paginate(10);
 
-        return view('products.requests-index', compact('productRequests'));
+        if ($user === null) {
+            // Consistently guard endpoints that require authentication.
+            abort(403);
+        }
+
+        $productRequests = ProductRequest::with(['product', 'respondedBy'])
+            ->where('user_id', $user->id)
+            ->orderBy('created_at', 'desc')
+            ->paginate(10);
+
+        return view('products.requests-index', ['productRequests' => $productRequests]);
     }
 
     /**
