@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Livewire;
 
+use App\Data\System\SystemSettingEntryData;
 use App\Services\SystemSettingsService;
 use Illuminate\Contracts\View\View;
 use Livewire\Component;
@@ -41,26 +42,35 @@ final class SystemSettingsDisplay extends Component
     public function render(): View
     {
         $settingsService = app(SystemSettingsService::class);
-        $settings = $this->showPublicOnly
+        $rawSettings = $this->showPublicOnly
             ? $settingsService->getPublicSettings()
             : $settingsService->getSettingsByGroup($this->group);
 
         $searchTerm = $this->search;
 
-        if ($searchTerm !== '') {
-            $settings = array_filter(
-                $settings,
-                static function ($value, string $key) use ($searchTerm): bool {
-                    $normalizedKey = stripos((string) $key, $searchTerm) !== false;
-                    $normalizedValue = is_scalar($value) && stripos((string) $value, $searchTerm) !== false;
+        $entries = collect($rawSettings)
+            ->map(function ($value, string $key): SystemSettingEntryData {
+                return new SystemSettingEntryData(
+                    key: $key,
+                    value: $value,
+                    isPublic: $this->showPublicOnly,
+                );
+            })
+            ->filter(static function (SystemSettingEntryData $entry) use ($searchTerm): bool {
+                if ($searchTerm === '') {
+                    return true;
+                }
 
-                    return $normalizedKey || $normalizedValue;
-                },
-                ARRAY_FILTER_USE_BOTH
-            );
-        }
+                $matchesKey = stripos($entry->key, $searchTerm) !== false;
+                $matchesValue = is_scalar($entry->value) && stripos((string) $entry->value, $searchTerm) !== false;
 
-        return view('livewire.system-settings-display', ['settings' => $settings, 'groups' => $this->getAvailableGroups()]);
+                return $matchesKey || $matchesValue;
+            })
+            ->map(static fn (SystemSettingEntryData $entry): array => $entry->toArray())
+            ->values()
+            ->all();
+
+        return view('livewire.system-settings-display', ['settings' => $entries, 'groups' => $this->getAvailableGroups()]);
     }
 
     /**

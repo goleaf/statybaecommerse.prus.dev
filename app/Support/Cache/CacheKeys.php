@@ -198,6 +198,18 @@ final class CacheKeys
         return sprintf('navigation:categories:%d:%s', $limit, $locale);
     }
 
+    public static function collectionFilters(int $collectionId, string $locale): string
+    {
+        // Dedicated cache namespace for collection attribute filters keyed by locale.
+        return sprintf('collection:%d:filters:%s', $collectionId, $locale);
+    }
+
+    public static function componentShowcase(string $segment, string $locale): string
+    {
+        // Shared cache bucket for the component showcase Livewire page.
+        return sprintf('component-showcase:%s:%s', $segment, $locale);
+    }
+
     public static function navigationFeaturedBrands(string $locale): string
     {
         return sprintf('navigation:featured-brands:%s', $locale);

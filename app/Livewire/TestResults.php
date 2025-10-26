@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Livewire;
 
+use App\Data\TestRunner\TestResultData;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\File;
 use JsonException;
@@ -37,11 +38,12 @@ final class TestResults extends Component
 
     public function loadResults(): void
     {
-        $this->results = $this->readResults();
-        $this->isRunning = ($this->results['status'] ?? 'completed') === 'running';
+        $resultData = $this->readResults();
+        $this->results = $resultData->toArray();
+        $this->isRunning = $resultData->status === 'running';
 
-        $totalTestsValue = $this->results['total_tests'] ?? 0;
-        $completedValue = $this->results['completed_tests'] ?? 0;
+        $totalTestsValue = $resultData->totalTests;
+        $completedValue = $resultData->completedTests;
 
         $totalTests = is_numeric($totalTestsValue) ? (int) $totalTestsValue : 0;
         $completedTests = is_numeric($completedValue) ? (int) $completedValue : 0;
@@ -60,41 +62,26 @@ final class TestResults extends Component
     }
 
     /**
-     * @return array<string, mixed>
+     * @return TestResultData
      */
-    private function readResults(): array
+    private function readResults(): TestResultData
     {
-        $defaults = [
-            'status'          => 'no_data',
-            'total_tests'     => 0,
-            'completed_tests' => 0,
-            'passed_tests'    => 0,
-            'failed_tests'    => 0,
-            'tests'           => [],
-            'errors'          => [],
-            'started_at'      => null,
-            'completed_at'    => null,
-        ];
-
         $path = storage_path('app/test-results.json');
 
         if (! File::exists($path)) {
-            return $defaults;
+            return new TestResultData('no_data', 0, 0, 0, 0, [], [], null, null);
         }
 
         try {
             $decoded = json_decode(File::get($path) ?: '[]', true, 512, JSON_THROW_ON_ERROR);
         } catch (JsonException $exception) {
-            return $defaults;
+            return new TestResultData('invalid', 0, 0, 0, 0, [], [$exception->getMessage()], null, null);
         }
 
         if (! is_array($decoded)) {
-            return $defaults;
+            return new TestResultData('invalid', 0, 0, 0, 0, [], [], null, null);
         }
 
-        /** @var array<string, mixed> $merged */
-        $merged = array_replace_recursive($defaults, $decoded);
-
-        return $merged;
+        return TestResultData::fromArray($decoded);
     }
 }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services\Shipping;
 
+use App\Data\Shipping\ShippingOptionData;
 use App\Models\CartItem;
 use App\Models\Country;
 use App\Models\ShippingOption;
@@ -21,8 +22,8 @@ final class ShippingOptionResolver
     /**
      * Resolve the shipping options that are valid for the provided cart state.
      *
-     * @param  BaseCollection<int, CartItem>|EloquentCollection<int, CartItem>                                             $cartItems
-     * @return BaseCollection<int, array{id:int,name:string,price:float,formatted_price:string,estimated_delivery:string}>
+     * @param  BaseCollection<int, CartItem>|EloquentCollection<int, CartItem> $cartItems
+     * @return BaseCollection<int, ShippingOptionData>
      */
     public function resolve(BaseCollection|EloquentCollection $cartItems, ?string $countryCode = null): BaseCollection
     {
@@ -50,7 +51,7 @@ final class ShippingOptionResolver
                 // Discard options that fall outside the configured weight or order amount constraints.
                 return $option->isEligibleForWeight($weight) && $option->isEligibleForOrderAmount($orderAmount);
             })
-            ->map(function (ShippingOption $option) use ($weight, $orderAmount): array {
+            ->map(function (ShippingOption $option) use ($weight, $orderAmount): ShippingOptionData {
                 $price = (float) $option->calculatePriceForOrder($weight, $orderAmount);
                 $rawId = $option->getAttribute('id');
                 if (! is_numeric($rawId)) {
@@ -58,13 +59,13 @@ final class ShippingOptionResolver
                 }
                 $normalizedId = is_numeric($rawId) ? (int) $rawId : 0;
 
-                return [
-                    'id'                 => $normalizedId,
-                    'name'               => $option->name,
-                    'price'              => $price,
-                    'formatted_price'    => app_money_format($price, $option->currency_code),
-                    'estimated_delivery' => $option->estimated_delivery_text,
-                ];
+                return new ShippingOptionData(
+                    id: $normalizedId,
+                    name: $option->name,
+                    price: $price,
+                    formattedPrice: app_money_format($price, $option->currency_code),
+                    estimatedDelivery: $option->estimated_delivery_text,
+                );
             })
             ->values();
     }

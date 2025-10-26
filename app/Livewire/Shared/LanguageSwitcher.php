@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Livewire\Shared;
 
+use App\Data\Common\LanguageLinkData;
 use Illuminate\Contracts\View\View;
 use Livewire\Component;
 
@@ -52,11 +53,20 @@ class LanguageSwitcher extends Component
             array_shift($parts);
         }
         $rest = trim(implode('/', $parts), '/');
-        $this->links = [];
+        $links = [];
+
         foreach ($this->locales as $loc) {
             $href = $rest === '' ? url('/' . $loc) : url('/' . $loc . '/' . $rest);
-            $this->links[$loc] = $href . $query;
+            $links[$loc] = new LanguageLinkData(
+                locale: $loc,
+                label: strtoupper($loc),
+                url: $href . $query,
+                active: $loc === $this->current,
+            );
         }
+
+        // Persist array payloads so Livewire can safely serialise the structure.
+        $this->links = array_map(static fn (LanguageLinkData $link): array => $link->toArray(), $links);
     }
 
     /**

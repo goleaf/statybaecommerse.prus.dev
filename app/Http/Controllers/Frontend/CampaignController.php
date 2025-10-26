@@ -230,11 +230,27 @@ final class CampaignController extends Controller
     )]
     public function getCampaignPerformance(): JsonResponse
     {
-        $performance = ['high_performing' => Campaign::where('conversion_rate', '>', 5)->count(), 'medium_performing' => Campaign::whereBetween('conversion_rate', [2, 5])->count(), 'low_performing' => Campaign::where('conversion_rate', '<', 2)->count(), 'needs_attention' => Campaign::where(function ($query): void {
-            $query->where('conversion_rate', '<', 2)->orWhere('total_views', '>', 0)->whereRaw('(total_clicks / total_views) < 0.01');
-        })->count()];
+        // Build labelled buckets so frontend visualizations can iterate deterministically.
+        $buckets = [
+            ['label' => 'high_performing', 'description' => 'Conversion rate above 5%.', 'count' => Campaign::where('conversion_rate', '>', 5)->count()],
+            ['label' => 'medium_performing', 'description' => 'Conversion rate between 2% and 5%.', 'count' => Campaign::whereBetween('conversion_rate', [2, 5])->count()],
+            ['label' => 'low_performing', 'description' => 'Conversion rate below 2%.', 'count' => Campaign::where('conversion_rate', '<', 2)->count()],
+            ['label' => 'needs_attention', 'description' => 'High impressions with under 1% CTR.', 'count' => Campaign::where(function ($query): void {
+                $query->where('conversion_rate', '<', 2)->orWhere('total_views', '>', 0)->whereRaw('(total_clicks / total_views) < 0.01');
+            })->count()],
+        ];
 
-        return response()->json(['success' => true, 'data' => $performance]);
+        $total = collect($buckets)->sum('count');
+
+        $payload = [
+            'buckets' => $buckets,
+            'summary' => [
+                'total_campaigns' => $total,
+                'generated_at'    => now()->toIso8601String(),
+            ],
+        ];
+
+        return response()->json(['success' => true, 'data' => $payload]);
     }
 
     /**
@@ -455,31 +471,70 @@ final class CampaignController extends Controller
             })
             ->first();
 
-        // Assemble the final analytics payload grouping insights by marketing theme.
-        $analytics = [
+        // Summarise engagement, conversion, and value metrics for chart widgets.
+        $data = [
+            'summary' => [
+                'engagement' => [
+                    'total_views'        => $totalViews,
+                    'total_clicks'       => $totalClicks,
+                    'average_ctr'        => round((float) $averageCtr, 2),
+                    'top_campaigns'      => $topEngagementCampaigns,
+                ],
+                'conversion' => [
+                    'total_conversions'         => $totalConversions,
+                    'average_conversion_rate'   => round($averageConversionRate, 2),
+                    'verified_conversions'      => $verifiedConversions,
+                    'attributed_conversions'    => $attributedConversions,
+                    'assisted_conversions'      => $assistedConversions,
+                    'assisted_conversion_value' => round($assistedConversionValue, 2),
+                    'attribution_breakdown'     => $attributionBreakdown,
+                ],
+                'value' => [
+                    'total_revenue'               => round($totalRevenue, 2),
+                    'total_budget'                => round($totalBudget, 2),
+                    'roi_percentage'              => $roiPercentage,
+                    'roas'                        => $roas,
+                    'average_roi'                 => round($averageRoi, 2),
+                    'average_roas'                => round($averageRoas, 2),
+                    'average_cost_per_conversion' => round($averageCostPerConversion, 2),
+                ],
+            ],
+            'journey' => [
+                'funnel_breakdown'    => $funnelBreakdown,
+                'average_touchpoints' => round($averageTouchpoints, 2),
+                'engagement_depth'    => [
+                    'average_time_on_site' => round($averageTimeOnSite, 2),
+                    'average_page_views'   => round($averagePageViews, 2),
+                ],
+            ],
+            'experimentation' => [
+                'multi_variant_campaigns' => $multiVariantCampaigns,
+                'winning_variant'         => $winningVariant,
+                'variant_performance'     => $variantPerformance->take(10)->values()->all(),
+            ],
+        ];
+
+        $meta = [
             'period' => [
                 'days'       => $period,
                 'label'      => sprintf('Last %d days', $period),
                 'start_date' => $startDate->format('Y-m-d'),
                 'end_date'   => $now->format('Y-m-d'),
             ],
-            'totals' => [
-                'campaigns_created' => $campaigns->count(),
-                'campaigns_started' => Campaign::query()
+            'counters' => [
+                'campaigns_created'  => $campaigns->count(),
+                'campaigns_started'  => Campaign::query()
                     ->withoutGlobalScopes()
-                    // Exclude future launches so the metric reflects historical starts only.
                     ->whereBetween('starts_at', [$startDate, $now])
                     ->count(),
                 'campaigns_completed' => Campaign::query()
                     ->withoutGlobalScopes()
-                    // Only count completions that wrapped up during the window.
                     ->whereBetween('ends_at', [$startDate, $now])
                     ->where('status', 'completed')
                     ->count(),
-                'active_campaigns' => Campaign::query()
+                'active_campaigns'    => Campaign::query()
                     ->withoutGlobalScopes()
                     ->where('status', 'active')
-                    // Clamp to active campaigns that have started and not yet lapsed relative to the audit window.
                     ->where(function ($query) use ($now): void {
                         $query
                             ->whereNull('starts_at')
@@ -492,66 +547,10 @@ final class CampaignController extends Controller
                     })
                     ->count(),
             ],
-            'insights' => [
-                'views_clicks' => [
-                    'title'       => 'Views & Clicks',
-                    'description' => 'Campaign engagement',
-                    'metrics'     => [
-                        'total_views'                => $totalViews,
-                        'total_clicks'               => $totalClicks,
-                        'average_click_through_rate' => round((float) $averageCtr, 2),
-                        'top_campaigns'              => $topEngagementCampaigns,
-                    ],
-                ],
-                'conversions' => [
-                    'title'       => 'Conversions',
-                    'description' => 'Attribution modeling',
-                    'metrics'     => [
-                        'total_conversions'         => $totalConversions,
-                        'average_conversion_rate'   => round($averageConversionRate, 2),
-                        'verified_conversions'      => $verifiedConversions,
-                        'attributed_conversions'    => $attributedConversions,
-                        'assisted_conversions'      => $assistedConversions,
-                        'assisted_conversion_value' => round($assistedConversionValue, 2),
-                        'attribution_breakdown'     => $attributionBreakdown,
-                    ],
-                ],
-                'roi_tracking' => [
-                    'title'       => 'ROI Tracking',
-                    'description' => 'Return on ad spend',
-                    'metrics'     => [
-                        'total_revenue'               => round($totalRevenue, 2),
-                        'total_budget'                => round($totalBudget, 2),
-                        'roi_percentage'              => $roiPercentage,
-                        'roas'                        => $roas,
-                        'average_roi'                 => round($averageRoi, 2),
-                        'average_roas'                => round($averageRoas, 2),
-                        'average_cost_per_conversion' => round($averageCostPerConversion, 2),
-                    ],
-                ],
-                'customer_journey' => [
-                    'title'       => 'Customer Journey',
-                    'description' => 'Touchpoint analysis',
-                    'metrics'     => [
-                        'average_touchpoints'  => round($averageTouchpoints, 2),
-                        'average_time_on_site' => round($averageTimeOnSite, 2),
-                        'average_page_views'   => round($averagePageViews, 2),
-                        'funnel_breakdown'     => $funnelBreakdown,
-                    ],
-                ],
-                'a_b_testing' => [
-                    'title'       => 'A/B Testing',
-                    'description' => 'Multi-variant campaigns',
-                    'metrics'     => [
-                        'multi_variant_campaigns' => $multiVariantCampaigns,
-                        'winning_variant'         => $winningVariant,
-                        'variant_performance'     => $variantPerformance->take(10)->values()->all(),
-                    ],
-                ],
-            ],
+            'generated_at' => now()->toIso8601String(),
         ];
 
-        return response()->json(['success' => true, 'data' => $analytics]);
+        return response()->json(['success' => true, 'data' => $data, 'meta' => $meta]);
     }
 
     /**
