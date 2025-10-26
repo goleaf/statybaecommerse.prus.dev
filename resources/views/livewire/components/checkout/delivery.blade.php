@@ -10,6 +10,14 @@
         </div>
     @else
         <form wire:submit="save" class="flex-1 space-y-3">
+            {{-- Surface a lightweight loading state so shoppers see when the options are being recalculated. --}}
+            <div
+                wire:loading.flex
+                wire:target="resolveOptions"
+                class="items-center justify-center hidden p-3 text-sm text-primary-600 bg-primary-50 border border-primary-200 rounded"
+            >
+                {{ __('Updating delivery options…') }}
+            </div>
             @error('currentSelected')
             <div class="p-4 border-l-4 border-red-400 bg-red-50">
                 <div class="flex">
@@ -32,41 +40,48 @@
                     <div class="-space-y-px bg-white">
                         @foreach($options as $option)
                             <label
-                                aria-label="{{ $option->name }}"
-                                aria-description="{{ $option->description }}"
+                                wire:key="shipping-option-{{ $option['id'] }}"
+                                aria-label="{{ $option['name'] }}"
+                                aria-description="{{ $option['description'] }}"
                                 @class([
                                     'group relative flex items-start justify-between cursor-pointer border p-4 focus:outline-none',
-                                    'data-[checked]:z-10 data-[checked]:border-green-200 data-[checked]:bg-green-50 z-10 border-primary-200 bg-primary-50' => $currentSelected === $option->id,
-                                    'border-gray-200' => $currentSelected !== $option->id,
+                                    'data-[checked]:z-10 data-[checked]:border-green-200 data-[checked]:bg-green-50 z-10 border-primary-200 bg-primary-50' => (int) $currentSelected === (int) $option['id'],
+                                    'border-gray-200' => (int) $currentSelected !== (int) $option['id'],
                                 ])
                             >
                                 <span class="flex flex-1">
                                     <input
                                         type="radio"
-                                        wire:model.live.debounce="currentSelected"
+                                        wire:model.live="currentSelected"
+                                        wire:click="selectOption({{ $option['id'] }})"
                                         name="shipping"
-                                        value="{{ $option->id }}"
+                                        value="{{ $option['id'] }}"
                                         class="mt-0.5 size-4 shrink-0 cursor-pointer border-gray-300 text-primary-500 focus:ring-primary-600 active:ring-2 active:ring-offset-2"
                                     >
                                     <span class="flex flex-col ml-3">
                                         <span
                                             @class([
                                                 'block text-sm font-heading',
-                                                'text-primary-950 font-medium' => $currentSelected === $option->id,
-                                                'text-gray-600' => $currentSelected !== $option->id,
+                                                'text-primary-950 font-medium' => (int) $currentSelected === (int) $option['id'],
+                                                'text-gray-600' => (int) $currentSelected !== (int) $option['id'],
                                             ])
-                                        >{{ $option->name }}</span>
+                                        >{{ $option['name'] }}</span>
                                         <span
                                             @class([
                                                 'block text-sm',
-                                                'text-primary-700' => $currentSelected === $option->id,
-                                                'text-gray-500' => $currentSelected !== $option->id,
+                                                'text-primary-700' => (int) $currentSelected === (int) $option['id'],
+                                                'text-gray-500' => (int) $currentSelected !== (int) $option['id'],
                                             ])
-                                        >{{ $option->description }}</span>
+                                        >{{ $option['description'] }}</span>
+                                        @if(! empty($option['estimated_delivery']))
+                                            <span class="mt-1 text-xs text-gray-400">
+                                                {{ $option['estimated_delivery'] }}
+                                            </span>
+                                        @endif
                                     </span>
                                 </span>
                                 <span class="text-sm font-medium text-primary-950">
-                                    {{ \Illuminate\Support\Number::currency($option->price, current_currency(), app()->getLocale()) }}
+                                    {{ $option['formatted_price'] ?? \Illuminate\Support\Number::currency($option['price'], $option['currency_code'], app()->getLocale()) }}
                                 </span>
                             </label>
                         @endforeach
@@ -78,6 +93,10 @@
                         :title="__('Go to checkout')"
                         class="w-full px-8 py-2 text-sm sm:w-auto"
                         wire:loading.attr="data-loading"
+                        wire:loading.attr="disabled"
+                        wire:loading.attr="aria-disabled"
+                        wire:target="save,resolveOptions"
+                        :disabled="$isResolving"
                     />
                 </div>
             </div>
