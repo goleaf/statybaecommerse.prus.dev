@@ -8,6 +8,7 @@ use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Collection;
 use App\Models\Product;
+use App\Models\Slider;
 use App\Observers\Concerns\ResolvesSupportedLocales;
 use App\Support\Cache\CacheInvalidator;
 use App\Support\Cache\CacheKeys;
@@ -56,6 +57,14 @@ final class CacheInvalidationService
 
         if ($model instanceof Collection) {
             $this->flushCollections();
+
+            return;
+        }
+
+        if ($model instanceof Slider) {
+            $this->flushSliders();
+
+            return;
         }
     }
 
@@ -181,6 +190,41 @@ final class CacheInvalidationService
                 );
 
                 Cache::tags($collectionLocaleTags)->forget(CacheKeys::homeCollections($locale));
+            }
+        }
+    }
+
+    /**
+     * Flush slider analytics caches and storefront slider payloads.
+     */
+    public function flushSliders(): void
+    {
+        // Slider analytics dashboards and storefront hero carousels use shared tags for easy invalidation.
+        $sliderTags = CacheTagHelper::merge(
+            CacheTagHelper::sliders(),
+            [CacheKeys::homeTag()]
+        );
+
+        $this->flushTags($sliderTags);
+
+        // Forget the analytics payload explicitly to support cache stores without tag support.
+        Cache::forget(CacheKeys::sliderAnalytics());
+
+        if (CacheTagHelper::supportsTags()) {
+            // Ensure the tag-aware cache entry is purged when the analytics payload was stored with tags.
+            Cache::tags(CacheTagHelper::sliders())->forget(CacheKeys::sliderAnalytics());
+        }
+
+        foreach ($this->supportedLocales() as $locale) {
+            Cache::forget(CacheKeys::homeSliders($locale));
+
+            if (CacheTagHelper::supportsTags()) {
+                $sliderLocaleTags = CacheTagHelper::merge(
+                    CacheTagHelper::sliders(),
+                    CacheTagHelper::locale($locale)
+                );
+
+                Cache::tags($sliderLocaleTags)->forget(CacheKeys::homeSliders($locale));
             }
         }
     }
