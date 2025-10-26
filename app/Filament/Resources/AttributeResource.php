@@ -8,21 +8,27 @@ use App\Filament\Resources\AttributeResource\Pages;
 use App\Models\Attribute;
 use App\Support\Concerns\HasNav;
 use BackedEnum;
-use Filament\Actions;
-use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Repeater;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Grid as SchemaGrid;
+use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\BulkAction;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -70,11 +76,11 @@ final class AttributeResource extends Resource
     public static function form(Schema $schema): Schema
     {
         // Leveraging the standard Filament Form pipeline keeps Livewire hydration predictable in tests.
-        return $schema->schema([
-            Section::make(__('attributes.basic_information'))
-                ->schema([
-                    Grid::make(2)
-                        ->schema([
+        return $schema->components([
+            SchemaSection::make(__('attributes.basic_information'))
+                ->components([
+                    SchemaGrid::make(2)
+                        ->components([
                             TextInput::make('name')
                                 ->label(__('attributes.name'))
                                 ->required()
@@ -91,8 +97,8 @@ final class AttributeResource extends Resource
                         ->maxLength(500)
                         ->columnSpanFull(),
                 ]),
-            Section::make(__('attributes.type_settings'))
-                ->schema([
+            SchemaSection::make(__('attributes.type_settings'))
+                ->components([
                     Select::make('type')
                         ->label(__('attributes.type'))
                         ->options([
@@ -131,10 +137,10 @@ final class AttributeResource extends Resource
                         ->label(__('attributes.is_filterable'))
                         ->default(true),
                 ]),
-            Section::make(__('attributes.validation'))
-                ->schema([
-                    Grid::make(2)
-                        ->schema([
+            SchemaSection::make(__('attributes.validation'))
+                ->components([
+                    SchemaGrid::make(2)
+                        ->components([
                             TextInput::make('min_length')
                                 ->label(__('attributes.min_length'))
                                 ->numeric()
@@ -217,8 +223,8 @@ final class AttributeResource extends Resource
                         })
                         ->columnSpanFull(),
                 ]),
-            Section::make(__('attributes.options'))
-                ->schema([
+            SchemaSection::make(__('attributes.options'))
+                ->components([
                     Repeater::make('options')
                         ->label(__('attributes.options'))
                         ->defaultItems(0)
@@ -240,10 +246,10 @@ final class AttributeResource extends Resource
                         ->columns(4)
                         ->addActionLabel(__('attributes.add_option')),
                 ]),
-            Section::make(__('attributes.settings'))
-                ->schema([
-                    Grid::make(2)
-                        ->schema([
+            SchemaSection::make(__('attributes.settings'))
+                ->components([
+                    SchemaGrid::make(2)
+                        ->components([
                             Toggle::make('is_active')
                                 ->label(__('attributes.is_active'))
                                 ->default(true),
@@ -375,9 +381,9 @@ final class AttributeResource extends Resource
                     ->native(false),
             ])
             ->actions([
-                Actions\ViewAction::make(),
-                Actions\EditAction::make(),
-                Actions\DeleteAction::make()
+                ViewAction::make(),
+                EditAction::make(),
+                DeleteAction::make()
                     ->label(__('attributes.delete'))
                     ->action(function (Attribute $record): void {
                         $record->forceDelete();
@@ -386,7 +392,7 @@ final class AttributeResource extends Resource
                             ->success()
                             ->send();
                     }),
-                Actions\Action::make('toggle_active')
+                Action::make('toggle_active')
                     ->label(fn (Attribute $record): string => $record->is_active ? __('attributes.deactivate') : __('attributes.activate'))
                     ->icon(fn (Attribute $record): string => $record->is_active ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
                     ->color(fn (Attribute $record): string => $record->is_active ? 'warning' : 'success')
@@ -401,8 +407,8 @@ final class AttributeResource extends Resource
                     ->requiresConfirmation(),
             ])
             ->bulkActions([
-                Actions\BulkActionGroup::make([
-                    Actions\DeleteBulkAction::make()
+                BulkActionGroup::make([
+                    DeleteBulkAction::make()
                         ->action(function (Collection $records): void {
                             $records->each->forceDelete();
                             Notification::make()
@@ -410,7 +416,7 @@ final class AttributeResource extends Resource
                                 ->success()
                                 ->send();
                         }),
-                    Actions\BulkAction::make('activate')
+                    BulkAction::make('activate')
                         ->label(__('attributes.activate_selected'))
                         ->icon('heroicon-o-eye')
                         ->color('success')
@@ -422,7 +428,7 @@ final class AttributeResource extends Resource
                                 ->send();
                         })
                         ->requiresConfirmation(),
-                    Actions\BulkAction::make('deactivate')
+                    BulkAction::make('deactivate')
                         ->label(__('attributes.deactivate_selected'))
                         ->icon('heroicon-o-eye-slash')
                         ->color('warning')

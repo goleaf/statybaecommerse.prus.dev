@@ -108,6 +108,8 @@ final class Brand extends Model implements HasMedia, TranslatableRecord
             'is_visible'  => 'boolean',
             'is_featured' => 'boolean',
             'is_premium'  => 'boolean',
+            // Treat social links as structured JSON to keep repeater payloads consistent across panels and APIs.
+            'social_links' => 'array',
         ];
     }
 
