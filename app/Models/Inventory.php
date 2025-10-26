@@ -104,7 +104,8 @@ final class Inventory extends Model
     {
         if (! array_key_exists($column, self::$columnPresence)) {
             $instance = new self;
-            self::$columnPresence[$column] = Schema::hasColumn($instance->getTable(), $column);
+            $table = $instance->getTable();
+            self::$columnPresence[$column] = Schema::hasTable($table) && Schema::hasColumn($table, $column);
         }
 
         return self::$columnPresence[$column];
