@@ -200,7 +200,7 @@ final class RecommendationService
             // Update user preferences
             $this->updateUserPreferences($user, $product, $interactionType);
         } catch (Exception $e) {
-            Log::error('Failed to track user interaction', ['error' => $e->getMessage(), 'user_id' => $user->id, 'product_id' => $product->id, 'interaction_type' => $interactionType]);
+            Log::error('Failed to track user interaction', ['error' => $e->getMessage(), 'user_id' => $user->id, 'product_id' => $product->id, 'event' => $interactionType]);
         }
     }
 

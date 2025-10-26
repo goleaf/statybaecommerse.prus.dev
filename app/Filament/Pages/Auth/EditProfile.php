@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Pages\Auth;
 
-
 use Filament\Schemas\Schema;
 use Filament\Auth\Pages\EditProfile as BaseEditProfile;
 use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;

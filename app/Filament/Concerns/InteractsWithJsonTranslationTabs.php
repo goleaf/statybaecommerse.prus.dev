@@ -59,16 +59,31 @@ trait InteractsWithJsonTranslationTabs
         }
 
         $locales = $this->getAvailableLocales();
+        $defaultLocale = $this->getDefaultLocale();
         /** @var array<string, array<string, mixed>> $translations */
         $translations = [];
 
         foreach ($fields as $field) {
             $fieldValue = $data[$field] ?? null;
-            unset($data[$field]);
 
+            // Retain scalar values in the base data so callers without translation tabs remain intact.
             if (! is_array($fieldValue)) {
+                if (filled($fieldValue)) {
+                    // Mirror scalar submissions into the default locale bucket to keep translation columns up to date.
+                    $translations[$defaultLocale][$field] = $fieldValue;
+                }
+
                 continue;
             }
+
+            // Only remove the field when we have locale-indexed input to avoid erasing scalar submissions.
+            unset($data[$field]);
+
+            // Track whether the default locale has an explicit value so we can fallback when it is omitted.
+            $defaultLocaleProvided = array_key_exists($defaultLocale, $fieldValue);
+
+            // Remember the first filled value across the allowed locales to use as a sensible fallback for the default locale.
+            $firstFilledLocaleValue = null;
 
             foreach ($fieldValue as $locale => $value) {
                 if (! is_string($locale)) {
@@ -79,7 +94,16 @@ trait InteractsWithJsonTranslationTabs
                     continue;
                 }
 
+                if ($firstFilledLocaleValue === null && filled($value)) {
+                    $firstFilledLocaleValue = $value;
+                }
+
                 $translations[$locale][$field] = $value;
+            }
+
+            // Seed the default locale with the first populated value when the submission omitted that locale entirely.
+            if (! $defaultLocaleProvided && $firstFilledLocaleValue !== null) {
+                $translations[$defaultLocale][$field] = $firstFilledLocaleValue;
             }
         }
 

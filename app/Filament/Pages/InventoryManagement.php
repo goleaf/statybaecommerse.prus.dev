@@ -24,9 +24,12 @@ final class InventoryManagement extends Page implements HasTable
     use InteractsWithTable;
 
     /**
-     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
+     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations and communicates
+     * the accepted union via PHPDoc for IDE support.
+     *
+     * @var string|\BackedEnum|null
      */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-archive-box';
+    protected static $navigationIcon = 'heroicon-o-archive-box';
 
     public static function getNavigationGroup(): BackedEnum|string|null
     {
