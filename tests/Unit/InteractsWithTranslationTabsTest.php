@@ -91,4 +91,44 @@ final class InteractsWithTranslationTabsTest extends TestCase
         // Verify that the base dataset regains the translated value for validation and fillable synchronisation.
         self::assertSame('Translated Name', $mutated['name']);
     }
+
+    public function test_before_validate_copies_first_filled_value_into_blank_default_locale(): void
+    {
+        $handler = new class
+        {
+            use InteractsWithTranslationTabs {
+                beforeValidate as public traitBeforeValidate;
+            }
+
+            /** @var array<string, mixed> */
+            public array $data = [
+                'name' => [
+                    'lt' => '',
+                    'en' => 'Fallback Name',
+                ],
+            ];
+
+            protected function getTranslatableFields(): array
+            {
+                return ['name'];
+            }
+
+            protected function getAvailableLocales(): array
+            {
+                return ['lt', 'en'];
+            }
+
+            protected function getDefaultLocale(): string
+            {
+                return 'lt';
+            }
+        };
+
+        // Trigger the lifecycle hook that normally runs within Filament's form pipeline.
+        $handler->traitBeforeValidate();
+
+        // Confirm the empty default locale reuses the populated secondary locale to satisfy required validation.
+        self::assertSame('Fallback Name', $handler->data['name']['lt']);
+        self::assertSame('Fallback Name', $handler->data['name']['en']);
+    }
 }

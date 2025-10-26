@@ -102,7 +102,7 @@ trait InteractsWithJsonTranslationTabs
             }
 
             // Seed the default locale with the first populated value when the submission omitted that locale entirely.
-            if (! $defaultLocaleProvided && $firstFilledLocaleValue !== null) {
+            if ((! $defaultLocaleProvided || blank($fieldValue[$defaultLocale] ?? null)) && $firstFilledLocaleValue !== null) {
                 $translations[$defaultLocale][$field] = $firstFilledLocaleValue;
             }
         }
