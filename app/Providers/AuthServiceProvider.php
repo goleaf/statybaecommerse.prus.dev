@@ -6,6 +6,7 @@ namespace App\Providers;
 
 use App\Models\Address;
 use App\Models\AdminUser;
+use App\Models\AuditLog;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Customer;
@@ -13,6 +14,7 @@ use App\Models\Export;
 use App\Models\Legal;
 use App\Models\Order;
 use App\Models\Product;
+use App\Models\ProductHistory;
 use App\Models\ProductRequest;
 use App\Models\Referral;
 use App\Models\ReferralCode;
@@ -20,6 +22,7 @@ use App\Models\Role;
 use App\Models\SystemSetting;
 use App\Models\User;
 use App\Policies\AddressPolicy;
+use App\Policies\AuditLogPolicy;
 use App\Policies\BrandPolicy;
 use App\Policies\CategoryPolicy;
 use App\Policies\CustomerPolicy;
@@ -27,6 +30,7 @@ use App\Policies\ExportPolicy;
 use App\Policies\LegalPolicy;
 use App\Policies\NotificationPolicy;
 use App\Policies\OrderPolicy;
+use App\Policies\ProductHistoryPolicy;
 use App\Policies\ProductPolicy;
 use App\Policies\ProductRequestPolicy;
 use App\Policies\ReferralCodePolicy;
@@ -47,6 +51,7 @@ final class AuthServiceProvider extends ServiceProvider
      */
     protected $policies = [
         Address::class => AddressPolicy::class,
+        AuditLog::class => AuditLogPolicy::class,
         Brand::class => BrandPolicy::class,
         Category::class => CategoryPolicy::class,
         Customer::class => CustomerPolicy::class,
@@ -55,6 +60,7 @@ final class AuthServiceProvider extends ServiceProvider
         Notification::class => NotificationPolicy::class,
         Order::class => OrderPolicy::class,
         Product::class => ProductPolicy::class,
+        ProductHistory::class => ProductHistoryPolicy::class,
         ProductRequest::class => ProductRequestPolicy::class,
         Referral::class => ReferralPolicy::class,
         ReferralCode::class => ReferralCodePolicy::class,

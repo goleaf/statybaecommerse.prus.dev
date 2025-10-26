@@ -58,6 +58,15 @@ return [
             'update'  => 'roles.update',
             'delete'  => 'roles.delete',
         ],
+        'audit_logs' => [
+            'viewAny' => 'audit_logs.viewAny',
+        ],
+        'product_histories' => [
+            'viewAny' => 'product_histories.viewAny',
+            'view'    => 'product_histories.view',
+            'create'  => 'product_histories.create',
+            'export'  => 'product_histories.export',
+        ],
     ],
 
     'roles' => [
@@ -70,6 +79,8 @@ return [
             'orders.viewAny', 'orders.view', 'orders.create', 'orders.update', 'orders.delete',
             'users.viewAny', 'users.view', 'users.create', 'users.update', 'users.delete',
             'roles.viewAny', 'roles.view', 'roles.create', 'roles.update', 'roles.delete',
+            'audit_logs.viewAny',
+            'product_histories.viewAny', 'product_histories.view', 'product_histories.create', 'product_histories.export',
         ],
         'administrator' => [
             'panel.access.admin',
@@ -79,6 +90,8 @@ return [
             'orders.viewAny', 'orders.view', 'orders.create', 'orders.update', 'orders.delete',
             'users.viewAny', 'users.view', 'users.create', 'users.update', 'users.delete',
             'roles.viewAny', 'roles.view', 'roles.create', 'roles.update', 'roles.delete',
+            'audit_logs.viewAny',
+            'product_histories.viewAny', 'product_histories.view', 'product_histories.create', 'product_histories.export',
         ],
         'manager' => [
             'panel.access.admin',

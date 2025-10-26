@@ -7,16 +7,29 @@ namespace Tests\Feature\Api;
 use App\Models\Document;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Laravel\Sanctum\Sanctum;
+use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
 final class AuditLogApiTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        config()->set('authorization.testing.skip_checks', false);
+
+        Role::create(['name' => 'admin', 'guard_name' => 'web']);
+        Role::create(['name' => 'viewer', 'guard_name' => 'web']);
+    }
+
     public function test_it_returns_paginated_audit_logs_for_entity(): void
     {
         $user = User::factory()->create();
-        $this->actingAs($user); // Provide an authenticated actor so audit attribution is deterministic.
+        $user->assignRole('admin');
+        Sanctum::actingAs($user, ['*']); // Provide an authenticated actor so audit attribution is deterministic.
 
         $document = Document::factory()->create([
             'status'     => 'draft',
@@ -42,7 +55,8 @@ final class AuditLogApiTest extends TestCase
     public function test_filters_by_action_when_requested(): void
     {
         $user = User::factory()->create();
-        $this->actingAs($user); // Ensure the created log is tagged with a single user for filtering assertions.
+        $user->assignRole('admin');
+        Sanctum::actingAs($user, ['*']); // Ensure the created log is tagged with a single user for filtering assertions.
 
         $document = Document::factory()->create([
             'status'     => 'draft',
@@ -61,5 +75,16 @@ final class AuditLogApiTest extends TestCase
         $response->assertOk();
         $this->assertSame('created', $response->json('data.0.action'));
         $this->assertCount(1, $response->json('data'));
+    }
+
+    public function test_viewer_role_is_forbidden_from_audit_logs(): void
+    {
+        $user = User::factory()->create();
+        $user->assignRole('viewer');
+        Sanctum::actingAs($user, ['*']);
+
+        $response = $this->getJson(route('api.audit-logs.index'));
+
+        $response->assertForbidden();
     }
 }

@@ -7,6 +7,9 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\AuditLogResource;
 use App\Models\AuditLog;
+use App\Support\ListQuery\ListQueryDefinition;
+use App\Support\ListQuery\ListQueryValidator;
+use App\Support\ListQuery\ListResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
@@ -14,36 +17,64 @@ final class AuditLogController extends Controller
 {
     public function index(Request $request): AnonymousResourceCollection
     {
-        $validated = $request->validate([
-            'entity_type' => ['nullable', 'string'],
-            'entity_id'   => ['nullable', 'string'],
-            'action'      => ['nullable', 'string'],
-            'per_page'    => ['nullable', 'integer', 'min:1', 'max:100'],
-        ]);
+        $this->authorize('viewAny', AuditLog::class);
+
+        $definition = new ListQueryDefinition(
+            filters: [
+                'entity_type' => [
+                    'type' => 'string',
+                    'nullable' => true,
+                    'column' => 'audit_logs.entity_type',
+                ],
+                'entity_id' => [
+                    'type' => 'string',
+                    'nullable' => true,
+                    'column' => 'audit_logs.entity_id',
+                ],
+                'action' => [
+                    'type' => 'string',
+                    'nullable' => true,
+                    'column' => 'audit_logs.action',
+                ],
+            ],
+            sortable: [
+                'created_at' => [
+                    'column' => 'audit_logs.created_at',
+                    'default_direction' => 'desc',
+                ],
+                'id' => [
+                    'column' => 'audit_logs.id',
+                ],
+            ],
+            defaultSort: 'created_at',
+            defaultDirection: 'desc',
+            defaultPerPage: 25,
+            maxPerPage: 100,
+            minPerPage: 1,
+        );
+
+        $listQuery = ListQueryValidator::fromRequest($request, $definition);
 
         $query = AuditLog::query()
-            ->with('user')
-            // Order by timestamp and primary key to keep the most recent mutation at the top even when created_at ties occur.
-            ->orderByDesc('created_at')
-            ->orderByDesc('id');
+            ->with('user');
 
-        // Allow callers to scope audit logs to a concrete model type.
-        if (! empty($validated['entity_type'])) {
-            $query->where('entity_type', $validated['entity_type']);
+        // Apply the sanitized filters and sort directives surfaced from the list
+        // query helper to ensure only allow-listed query parameters take effect.
+        $listQuery->applyFilters($query);
+        $listQuery->applySorts($query);
+
+        if (! $listQuery->hasSort('created_at')) {
+            $query->orderByDesc('audit_logs.created_at');
         }
 
-        // Filter by specific model identifier when needed.
-        if (! empty($validated['entity_id'])) {
-            $query->where('entity_id', $validated['entity_id']);
-        }
+        $query->orderByDesc('audit_logs.id');
 
-        // Support action-specific drill downs (created/updated/etc.).
-        if (! empty($validated['action'])) {
-            $query->where('action', $validated['action']);
-        }
+        $paginator = $query->paginate($listQuery->perPage(), ['*'], 'page', $listQuery->page());
 
-        $perPage = $validated['per_page'] ?? 25;
-
-        return AuditLogResource::collection($query->paginate($perPage));
+        return AuditLogResource::collection($paginator)
+            ->additional([
+                'meta' => ListResponse::meta($listQuery, $paginator),
+                'links' => ListResponse::links($paginator),
+            ]);
     }
 }
