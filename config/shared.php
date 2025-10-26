@@ -77,6 +77,25 @@ return [
         'recently_viewed'    => true,
     ],
 
+    'cart' => [
+        // Guard against unrealistic payloads by constraining hydrated quantities.
+        'min_quantity' => 1,
+        // Hard upper bound mirrors the storefront UI limit for manual cart adjustments.
+        'max_quantity' => 50,
+    ],
+
+    'tax' => [
+        // Default VAT rate applied when regional overrides are not present.
+        'default_rate' => 0.21,
+    ],
+
+    'shipping' => [
+        // Orders at or above this subtotal qualify for free delivery.
+        'free_threshold' => 50.0,
+        // Flat-rate fallback applied below the free shipping threshold.
+        'flat_rate'      => 5.99,
+    ],
+
     'validation' => [
         'max_search_length'   => 255,
         'min_password_length' => 8,
