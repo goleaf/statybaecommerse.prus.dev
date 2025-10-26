@@ -16,7 +16,11 @@
     </div>
 
     <!-- Statistics Cards -->
-    <p id="stats-period-label" class="mb-3 text-sm text-gray-500 text-right">
+    <p
+        id="stats-period-label"
+        data-analytics-period="label"
+        class="mb-3 text-sm text-gray-500 text-right"
+    >
         {{ __('campaign_clicks.all_time') }}
     </p>
     <div class="relative mb-8">
@@ -36,7 +40,13 @@
                     </div>
                     <div class="ml-4">
                         <p class="text-sm font-medium text-gray-600">{{ __('campaign_clicks.total_clicks') }}</p>
-                        <p class="text-2xl font-semibold text-gray-900" id="total-clicks">-</p>
+                        <p
+                            class="text-2xl font-semibold text-gray-900"
+                            id="total-clicks"
+                            data-analytics-stat="total_clicks"
+                        >
+                            -
+                        </p>
                     </div>
                 </div>
             </div>
@@ -49,7 +59,13 @@
                     </div>
                     <div class="ml-4">
                         <p class="text-sm font-medium text-gray-600">{{ __('campaign_clicks.converted_clicks') }}</p>
-                        <p class="text-2xl font-semibold text-gray-900" id="converted-clicks">-</p>
+                        <p
+                            class="text-2xl font-semibold text-gray-900"
+                            id="converted-clicks"
+                            data-analytics-stat="converted_clicks"
+                        >
+                            -
+                        </p>
                     </div>
                 </div>
             </div>
@@ -62,7 +78,13 @@
                     </div>
                     <div class="ml-4">
                         <p class="text-sm font-medium text-gray-600">{{ __('campaign_clicks.conversion_rate') }}</p>
-                        <p class="text-2xl font-semibold text-gray-900" id="conversion-rate">-</p>
+                        <p
+                            class="text-2xl font-semibold text-gray-900"
+                            id="conversion-rate"
+                            data-analytics-stat="conversion_rate"
+                        >
+                            -
+                        </p>
                     </div>
                 </div>
             </div>
@@ -75,7 +97,13 @@
                     </div>
                     <div class="ml-4">
                         <p class="text-sm font-medium text-gray-600">{{ __('campaign_clicks.conversion_value') }}</p>
-                        <p class="text-2xl font-semibold text-gray-900" id="conversion-value">-</p>
+                        <p
+                            class="text-2xl font-semibold text-gray-900"
+                            id="conversion-value"
+                            data-analytics-stat="conversion_value"
+                        >
+                            €0.00
+                        </p>
                     </div>
                 </div>
             </div>
@@ -272,17 +300,45 @@ function extractPeriodLabels(selectElement) {
  * Merge bucket-level metrics with legacy totals so the UI stays resilient.
  */
 function extractMetrics(bucket, data) {
-    if (!bucket) {
-        return { metrics: {}, label: null };
+    if (!bucket && !data) {
+        // Nothing to map when both sources are missing.
+        return { metrics: {}, totals: {}, enriched: null, label: null };
     }
 
-    const metrics = bucket.metrics ?? bucket ?? {};
+    const metrics = bucket?.metrics ?? bucket ?? {};
     const totals = data?.totals ?? {};
+    const periodLabel = data?.period?.label ?? bucket?.label ?? bucket?.title ?? bucket?.period ?? null;
+
+    // Harmonise the enriched analytics payload (period/totals/insights/charts) the API now emits so
+    // the legacy cards can surface the same metrics without custom client-side mapping everywhere.
+    const insights = data?.insights ?? null;
+    const charts = data?.charts ?? null;
+    let enriched = null;
+
+    if (insights && typeof insights === 'object') {
+        const totalClicks = Number(insights?.views_clicks?.metrics?.total_clicks);
+        const totalConversions = Number(insights?.conversions?.metrics?.total_conversions);
+        const averageConversionRate = Number(insights?.conversions?.metrics?.average_conversion_rate);
+        const totalRevenue = Number(
+            insights?.roi_tracking?.metrics?.total_revenue ??
+                charts?.conversion_trend?.kpis?.total_revenue ??
+                insights?.conversions?.metrics?.assisted_conversion_value
+        );
+
+        enriched = {
+            totalClicks: Number.isFinite(totalClicks) ? totalClicks : null,
+            totalConversions: Number.isFinite(totalConversions) ? totalConversions : null,
+            averageConversionRate: Number.isFinite(averageConversionRate) ? averageConversionRate : null,
+            totalRevenue: Number.isFinite(totalRevenue) ? totalRevenue : null,
+            label: periodLabel,
+        };
+    }
 
     return {
         metrics,
         totals,
-        label: bucket.label ?? bucket.title ?? bucket.period ?? null,
+        enriched,
+        label: periodLabel,
     };
 }
 
@@ -290,26 +346,84 @@ function extractMetrics(bucket, data) {
  * Update DOM nodes with the latest KPI values.
  */
 function updateStatisticsCards(extracted, periodLabels, period) {
-    const { metrics, totals, label } = extracted;
+    const { metrics, totals, enriched, label } = extracted;
 
-    const clicks = pickMetric(metrics, ['clicks', 'total_clicks', 'click_total', 'count'])
-        ?? pickMetric(totals, ['clicks', 'total_clicks']);
-    const converted = pickMetric(metrics, ['converted_clicks', 'conversions', 'converted', 'conversion_total'])
-        ?? pickMetric(totals, ['converted_clicks', 'conversions']);
-    const conversionRate = pickMetric(metrics, ['conversion_rate', 'ctr', 'click_through_rate'])
-        ?? pickMetric(totals, ['conversion_rate']);
-    const conversionValue = pickMetric(metrics, ['conversion_value', 'total_conversion_value', 'value', 'revenue'])
-        ?? pickMetric(totals, ['conversion_value', 'total_conversion_value']);
+    // Prefer the enriched payload when available, falling back to legacy totals afterwards.
+    const clicks = coalesceNumber(
+        enriched?.totalClicks,
+        pickMetric(metrics, ['clicks', 'total_clicks', 'click_total', 'count']),
+        pickMetric(totals, ['clicks', 'total_clicks'])
+    );
+    const converted = coalesceNumber(
+        enriched?.totalConversions,
+        pickMetric(metrics, ['converted_clicks', 'conversions', 'converted', 'conversion_total']),
+        pickMetric(totals, ['converted_clicks', 'conversions'])
+    );
+    const conversionRate = coalesceNumber(
+        enriched?.averageConversionRate,
+        pickMetric(metrics, ['conversion_rate', 'ctr', 'click_through_rate']),
+        pickMetric(totals, ['conversion_rate'])
+    );
+    const conversionValue = coalesceNumber(
+        enriched?.totalRevenue,
+        pickMetric(metrics, ['conversion_value', 'total_conversion_value', 'value', 'revenue']),
+        pickMetric(totals, ['conversion_value', 'total_conversion_value'])
+    );
 
-    document.getElementById('total-clicks').textContent = formatNumber(clicks);
-    document.getElementById('converted-clicks').textContent = formatNumber(converted);
-    document.getElementById('conversion-rate').textContent = formatPercentage(conversionRate);
-    document.getElementById('conversion-value').textContent = formatCurrency(conversionValue);
-
-    const periodLabel = document.getElementById('stats-period-label');
-    if (periodLabel) {
-        periodLabel.textContent = label ?? periodLabels[period] ?? periodLabels.day;
+    // Target the updated data attributes first to support selector-based widget tests.
+    const totalClicksNode = resolveAnalyticsStatElement('total_clicks', 'total-clicks');
+    if (totalClicksNode) {
+        totalClicksNode.textContent = formatNumber(clicks);
     }
+
+    const convertedNode = resolveAnalyticsStatElement('converted_clicks', 'converted-clicks');
+    if (convertedNode) {
+        convertedNode.textContent = formatNumber(converted);
+    }
+
+    const conversionRateNode = resolveAnalyticsStatElement('conversion_rate', 'conversion-rate');
+    if (conversionRateNode) {
+        conversionRateNode.textContent = formatPercentage(conversionRate);
+    }
+
+    const conversionValueNode = resolveAnalyticsStatElement('conversion_value', 'conversion-value');
+    if (conversionValueNode) {
+        conversionValueNode.textContent = formatCurrency(conversionValue);
+    }
+
+    const periodLabelNode = resolveAnalyticsPeriodLabel();
+    if (periodLabelNode) {
+        periodLabelNode.textContent = enriched?.label ?? label ?? periodLabels[period] ?? periodLabels.day;
+    }
+}
+
+/**
+ * Resolve the first numeric value from the provided candidates.
+ */
+function coalesceNumber(...candidates) {
+    for (const candidate of candidates) {
+        if (typeof candidate === 'number' && !Number.isNaN(candidate)) {
+            return candidate;
+        }
+    }
+
+    return null;
+}
+
+/**
+ * Find the DOM node for an analytics stat using the new data attributes while retaining legacy IDs.
+ */
+function resolveAnalyticsStatElement(statKey, fallbackId) {
+    // Honour the enriched selector contract tests rely on while keeping compatibility with the original IDs.
+    return document.querySelector(`[data-analytics-stat="${statKey}"]`) ?? document.getElementById(fallbackId);
+}
+
+/**
+ * Locate the element used for displaying the currently active analytics period label.
+ */
+function resolveAnalyticsPeriodLabel() {
+    // The label may be addressed by tests through the data attribute, so prefer it when available.
+    return document.querySelector('[data-analytics-period="label"]') ?? document.getElementById('stats-period-label');
 }
 
 /**
