@@ -28,7 +28,10 @@
             @enderror
 
             <div class="max-w-lg mx-auto lg:max-w-none">
-                <fieldset aria-label="{{ __('Delivery method') }}">
+                <fieldset aria-label="{{ __('Delivery method') }}"
+                          wire:loading.attr="disabled"
+                          wire:target="refreshShippingOptions,placeOrder">
+                    {{-- Freeze the option grid while Livewire fetches updated shipping data or submits the order. --}}
                     <div class="-space-y-px bg-white">
                         @foreach($options as $option)
                             <label
@@ -47,6 +50,8 @@
                                         name="shipping"
                                         value="{{ $option->id }}"
                                         class="mt-0.5 size-4 shrink-0 cursor-pointer border-gray-300 text-primary-500 focus:ring-primary-600 active:ring-2 active:ring-offset-2"
+                                        wire:loading.attr="disabled"
+                                        wire:target="refreshShippingOptions,placeOrder"
                                     >
                                     <span class="flex flex-col ml-3">
                                         <span
@@ -74,11 +79,19 @@
                 </fieldset>
 
                 <div class="pt-6 mt-10 border-t border-gray-200 sm:flex sm:items-center sm:justify-end">
-                    <x-buttons.submit
-                        :title="__('Go to checkout')"
+                    <x-buttons.primary
+                        type="submit"
                         class="w-full px-8 py-2 text-sm sm:w-auto"
-                        wire:loading.attr="data-loading"
-                    />
+                        wire:loading.attr="disabled"
+                        wire:target="save,refreshShippingOptions,placeOrder"
+                    >
+                        {{-- Keep the action button consistent with the guarded shipping inputs. --}}
+                        <span wire:loading.remove wire:target="save,refreshShippingOptions,placeOrder">{{ __('Go to checkout') }}</span>
+                        <span wire:loading wire:target="save,refreshShippingOptions,placeOrder" class="inline-flex items-center gap-2">
+                            <x-loading-dots class="bg-white" />
+                            {{ __('Loading…') }}
+                        </span>
+                    </x-buttons.primary>
                 </div>
             </div>
         </form>

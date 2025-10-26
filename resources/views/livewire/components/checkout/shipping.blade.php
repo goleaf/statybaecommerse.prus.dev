@@ -43,11 +43,14 @@
                         </div>
 
                         @if($addresses->has('shipping') && $addresses->get('shipping')->isNotEmpty())
-                            <fieldset aria-label="{{ __('Delivery addresses') }}" class="mt-3 divide-y divide-gray-200">
+                            <fieldset aria-label="{{ __('Delivery addresses') }}" class="mt-3 divide-y divide-gray-200"
+                                     wire:loading.attr="disabled"
+                                     wire:target="refreshShippingOptions,placeOrder">
+                                {{-- Disable the delivery address list whenever checkout recalculations run. --}}
                                 @foreach($addresses->get('shipping') as $shippingAddress)
                                     <label
-                                        for="shipping-address-{{ $shippingAddress->id }}"
-                                        class="relative flex items-start gap-3 py-3 cursor-pointer group focus:outline-none"
+                                            for="shipping-address-{{ $shippingAddress->id }}"
+                                            class="relative flex items-start gap-3 py-3 cursor-pointer group focus:outline-none"
                                     >
                                         <input
                                             type="radio"
@@ -56,6 +59,8 @@
                                             name="shipping"
                                             value="{{ $shippingAddress->id }}"
                                             class="mt-0.5 size-4 shrink-0 cursor-pointer border-gray-300 text-primary-500 focus:ring-primary-600 active:ring-2 active:ring-offset-2"
+                                            wire:loading.attr="disabled"
+                                            wire:target="refreshShippingOptions,placeOrder"
                                         >
                                         <span class="flex flex-col space-y-0.5 text-sm text-gray-500">
                                         <span class="font-medium text-gray-900">{{ $shippingAddress->full_name }}</span>
@@ -83,7 +88,9 @@
 
                         <div>
                             <label for="same_as_shipping" class="inline-flex items-center">
-                                <input wire:model.live="sameAsShipping" id="same_as_shipping" type="checkbox" class="border-gray-300 text-primary-500 focus:ring-primary-500" name="same_as_shipping">
+                                <input wire:model.live="sameAsShipping" id="same_as_shipping" type="checkbox" class="border-gray-300 text-primary-500 focus:ring-primary-500" name="same_as_shipping"
+                                       wire:loading.attr="disabled"
+                                       wire:target="refreshShippingOptions,placeOrder">
                                 <span class="text-sm text-gray-600 ms-2">{{ __("Same to delivery address") }}</span>
                             </label>
                         </div>
@@ -107,7 +114,10 @@
 
                         @if(! $sameAsShipping)
                             @if($addresses->has('billing') && $addresses->get('billing')->isNotEmpty())
-                                <fieldset aria-label="{{ __('Billing addresses') }}" class="divide-y divide-gray-200">
+                                <fieldset aria-label="{{ __('Billing addresses') }}" class="divide-y divide-gray-200"
+                                         wire:loading.attr="disabled"
+                                         wire:target="refreshShippingOptions,placeOrder">
+                                    {{-- Mirror the shipping guard so billing choices stay in sync with the refreshed options. --}}
                                     @foreach($addresses->get('billing') as $billingAddress)
                                         <label
                                             for="billing-address-{{ $billingAddress->id }}"
@@ -120,6 +130,8 @@
                                                 name="billing"
                                                 value="{{ $billingAddress->id }}"
                                                 class="mt-0.5 size-4 shrink-0 cursor-pointer border-gray-300 text-primary-500 focus:ring-primary-600 active:ring-2 active:ring-offset-2"
+                                                wire:loading.attr="disabled"
+                                                wire:target="refreshShippingOptions,placeOrder"
                                             >
                                             <span class="flex flex-col space-y-0.5 text-sm text-gray-500">
                                                 <span class="font-medium text-gray-900">{{ $billingAddress->full_name }}</span>
@@ -139,11 +151,19 @@
                 </div>
 
                 <div class="pt-6 mt-10 border-t border-gray-200 sm:flex sm:items-center sm:justify-end">
-                    <x-buttons.submit
-                        :title="__('Continue')"
+                    <x-buttons.primary
+                        type="submit"
                         class="w-full px-8 py-2 text-sm sm:w-auto"
-                        wire:loading.attr="data-loading"
-                    />
+                        wire:loading.attr="disabled"
+                        wire:target="save,refreshShippingOptions,placeOrder"
+                    >
+                        {{-- Provide immediate feedback while checkout progresses or refreshes shipping options. --}}
+                        <span wire:loading.remove wire:target="save,refreshShippingOptions,placeOrder">{{ __('Continue') }}</span>
+                        <span wire:loading wire:target="save,refreshShippingOptions,placeOrder" class="inline-flex items-center gap-2">
+                            <x-loading-dots class="bg-white" />
+                            {{ __('Loading…') }}
+                        </span>
+                    </x-buttons.primary>
                 </div>
             </div>
         </form>
