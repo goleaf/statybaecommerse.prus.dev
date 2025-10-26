@@ -21,18 +21,16 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Tabs;
 use Filament\Forms\Components\Tabs\Tab;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Form;
 use Filament\Notifications\Notification as FilamentNotification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
-use UnitEnum;
 
 final class CollectionRuleResource extends Resource
 {
@@ -43,13 +41,13 @@ final class CollectionRuleResource extends Resource
 
     protected static ?string $model = CollectionRule::class;
 
-    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
+    public static function getNavigationIcon(): string
     {
         // Surface a mechanical icon so merchandisers immediately identify automation tooling entries.
         return 'heroicon-o-cog-6-tooth';
     }
 
-    public static function getNavigationGroup(): UnitEnum|string|null
+    public static function getNavigationGroup(): string
     {
         // Keep the resource collocated with product configuration utilities for quicker discovery.
         return 'Products';
@@ -76,7 +74,7 @@ final class CollectionRuleResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Form $form): Form
+    public static function form(Schema $form): Schema
     {
         // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
         // Expose the schema via the Filament v4 `Form` instance to drop the deprecated array fallback.
@@ -96,7 +94,7 @@ final class CollectionRuleResource extends Resource
                                                 ->searchable()
                                                 ->preload()
                                                 ->required()
-                                                ->getOptionLabelFromRecordUsing(fn ($record) => "{$record->name}")
+                                                ->getOptionLabelFromRecordUsing(fn ($record): string => "{$record->name}")
                                                 ->columnSpan(1),
                                             TextInput::make('field')
                                                 ->label(__('admin.collection_rules.form.fields.field'))
@@ -146,7 +144,7 @@ final class CollectionRuleResource extends Resource
                                         ->content(fn ($record) => $record?->collection?->name ?? '-'),
                                     Placeholder::make('rule_description')
                                         ->label(__('admin.collection_rules.form.fields.rule_description'))
-                                        ->content(fn ($record) => $record
+                                        ->content(fn ($record): string => $record
                                             ? "{$record->field} {$record->operator} {$record->value}"
                                             : '-'),
                                 ])
