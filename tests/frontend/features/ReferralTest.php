@@ -52,7 +52,7 @@ final class ReferralTest extends TestCase
             'referred_email' => $user->email,
         ]);
 
-        $response->assertSessionHasErrors(['referred_email']);
+        $response->assertSessionHas('error', __('referrals.cannot_refer_yourself'));
     }
 
     public function test_user_cannot_refer_already_referred_user(): void
@@ -68,6 +68,17 @@ final class ReferralTest extends TestCase
 
         $response = $this->actingAs($referrer)->post(route('referrals.store'), [
             'referred_email' => $referred->email,
+        ]);
+
+        $response->assertSessionHas('error', __('referrals.user_already_referred'));
+    }
+
+    public function test_user_cannot_refer_unknown_email(): void
+    {
+        $referrer = User::factory()->create();
+
+        $response = $this->actingAs($referrer)->post(route('referrals.store'), [
+            'referred_email' => 'missing@example.com',
         ]);
 
         $response->assertSessionHasErrors(['referred_email']);
@@ -169,12 +180,16 @@ final class ReferralTest extends TestCase
 
     public function test_referral_statistics_are_updated(): void
     {
-        $user = User::factory()->create();
-        $referral = Referral::factory()->create(['referrer_id' => $user->id]);
+        $referrer = User::factory()->create();
+        $referred = User::factory()->create();
 
-        // Statistics should be updated when referral is created
+        $this->actingAs($referrer)->post(route('referrals.store'), [
+            'referred_email' => $referred->email,
+        ]);
+
+        // Statistics should be updated when referral is created through the controller
         $this->assertDatabaseHas('referral_statistics', [
-            'user_id'           => $user->id,
+            'user_id'           => $referrer->id,
             'total_referrals'   => 1,
             'pending_referrals' => 1,
         ]);

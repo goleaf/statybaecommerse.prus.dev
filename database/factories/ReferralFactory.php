@@ -18,8 +18,10 @@ final class ReferralFactory extends Factory
     public function definition(): array
     {
         return [
-            'referrer_id'   => null,
-            'referred_id'   => null,
+            // Create fully-related users by default so test fixtures always
+            // satisfy the not-null foreign key constraints on the table.
+            'referrer_id'   => User::factory(),
+            'referred_id'   => User::factory(),
             'referral_code' => $this->faker->unique()->regexify('[A-Z0-9]{8}'),
             'status'        => $this->faker->randomElement(['pending', 'completed', 'expired']),
             'completed_at'  => $this->faker->optional(0.3)->dateTimeBetween('-1 year', 'now'),
