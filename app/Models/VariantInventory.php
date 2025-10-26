@@ -9,6 +9,7 @@ use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\EnabledScope;
 use App\Models\Scopes\StatusScope;
 use App\Models\Scopes\TrackedScope;
+use DateTimeInterface;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -17,6 +18,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 /**
  * VariantInventory
@@ -69,11 +71,11 @@ final class VariantInventory extends Model
     protected function casts(): array
     {
         return [
-            'stock' => 'integer',
-            'reserved' => 'integer',
-            'available' => 'integer',
-            'reorder_point' => 'integer',
-            'reorder_quantity' => 'integer',
+            'stock'             => 'integer',
+            'reserved'          => 'integer',
+            'available'         => 'integer',
+            'reorder_point'     => 'integer',
+            'reorder_quantity'  => 'integer',
             'last_restocked_at' => 'datetime',
         ];
     }
@@ -191,16 +193,16 @@ final class VariantInventory extends Model
     {
         return match ($this->stock_status) {
             'out_of_stock' => 'Out of Stock',
-            'low_stock' => 'Low Stock',
-            'in_stock' => 'In Stock',
-            default => 'Unknown',
+            'low_stock'    => 'Low Stock',
+            'in_stock'     => 'In Stock',
+            default        => 'Unknown',
         };
     }
 
     /**
      * Handle scopeInStock functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeInStock($query)
     {
@@ -210,7 +212,7 @@ final class VariantInventory extends Model
     /**
      * Handle scopeLowStock functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeLowStock($query)
     {
@@ -220,7 +222,7 @@ final class VariantInventory extends Model
     /**
      * Handle scopeOutOfStock functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeOutOfStock($query)
     {
@@ -230,7 +232,7 @@ final class VariantInventory extends Model
     /**
      * Handle scopeNeedsReorder functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeNeedsReorder($query)
     {
@@ -240,7 +242,7 @@ final class VariantInventory extends Model
     /**
      * Handle scopeByWarehouse functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeByWarehouse($query, string $warehouseCode)
     {
@@ -252,7 +254,7 @@ final class VariantInventory extends Model
      */
     private static function newUnlockedQuery(): Builder
     {
-        return static::query()->withoutGlobalScopes([
+        return self::query()->withoutGlobalScopes([
             ActiveScope::class,
             EnabledScope::class,
             TrackedScope::class,
@@ -265,7 +267,7 @@ final class VariantInventory extends Model
      */
     public function reserveStock(
         int $quantity,
-        ?\DateTimeInterface $expiresAt = null,
+        ?DateTimeInterface $expiresAt = null,
         array $meta = [],
         ?string $referenceType = null,
         ?string $referenceId = null
@@ -274,41 +276,26 @@ final class VariantInventory extends Model
             return false;
         }
 
-        $reserved = DB::transaction(function () use ($quantity) {
-            $inventory = self::newUnlockedQuery()
+        $reserved = DB::transaction(function () use ($quantity): bool {
+            // Use an atomic update with a stock guard to prevent overselling in concurrent requests.
+            $affected = self::newUnlockedQuery()
                 ->whereKey($this->getKey())
-                ->lockForUpdate()
-                ->first();
+                ->whereRaw('(stock - reserved) >= ?', [$quantity])
+                ->update([
+                    'reserved'  => DB::raw('reserved + ' . (int) $quantity),
+                    'available' => DB::raw('CASE WHEN (stock - reserved - ' . (int) $quantity . ') > 0 THEN (stock - reserved - ' . (int) $quantity . ') ELSE 0 END'),
+                ]);
 
-            if (! $inventory instanceof self) {
+            if ($affected !== 1) {
                 return false;
             }
 
-            $currentReserved = (int) $inventory->reserved;
-            $currentStock = (int) $inventory->stock;
-            $available = max(0, $currentStock - $currentReserved);
-
-            if ($available < $quantity) {
-                return false;
-            }
-
-            $inventory->forceFill([
-                'reserved'  => $currentReserved + $quantity,
-                'available' => max(0, $currentStock - ($currentReserved + $quantity)),
-            ])->save();
-
-            $this->setRawAttributes($inventory->getAttributes(), true);
+            $this->refresh();
 
             return true;
         });
 
-        if (! $reserved) {
-            return false;
-        }
-
-        $this->refresh();
-
-        return true;
+        return (bool) $reserved;
     }
 
     /**
@@ -320,133 +307,127 @@ final class VariantInventory extends Model
             return false;
         }
 
-        $released = DB::transaction(function () use ($quantity) {
-            $inventory = self::newUnlockedQuery()
+        $released = DB::transaction(function () use ($quantity): bool {
+            // Protect against negative reservations by requiring the column to stay non-negative.
+            $affected = self::newUnlockedQuery()
                 ->whereKey($this->getKey())
-                ->lockForUpdate()
-                ->first();
+                ->where('reserved', '>=', $quantity)
+                ->update([
+                    'reserved'  => DB::raw('reserved - ' . (int) $quantity),
+                    'available' => DB::raw('CASE WHEN (stock - (reserved - ' . (int) $quantity . ')) > 0 THEN (stock - (reserved - ' . (int) $quantity . ')) ELSE 0 END'),
+                ]);
 
-            if (! $inventory instanceof self) {
+            if ($affected !== 1) {
                 return false;
             }
 
-            $currentReserved = (int) $inventory->reserved;
-
-            if ($currentReserved < $quantity) {
-                return false;
-            }
-
-            $inventory->forceFill([
-                'reserved'  => $currentReserved - $quantity,
-                'available' => max(0, ((int) $inventory->stock) - ($currentReserved - $quantity)),
-            ])->save();
-
-            $this->setRawAttributes($inventory->getAttributes(), true);
+            $this->refresh();
 
             return true;
         });
 
-        if (! $released) {
-            return false;
-        }
-
-        $this->refresh();
-
-        return true;
+        return (bool) $released;
     }
 
     /**
      * Add stock to inventory.
      */
-    public function addStock(int $quantity): bool
-    {
+    public function addStock(
+        int $quantity,
+        string $reason = 'restock',
+        ?int $actorId = null,
+        ?string $correlationId = null,
+        ?string $reference = null,
+        ?string $notes = null
+    ): bool {
         if ($quantity <= 0) {
             return false;
         }
 
-        $added = DB::transaction(function () use ($quantity) {
-            $inventory = self::newUnlockedQuery()
-                ->whereKey($this->getKey())
-                ->lockForUpdate()
-                ->first();
+        $correlation = $this->resolveCorrelationId($correlationId);
 
-            if (! $inventory instanceof self) {
+        $added = DB::transaction(function () use ($quantity, $reason, $actorId, $correlation, $reference, $notes): bool {
+            // Perform an atomic increment to keep the stock counter accurate under contention.
+            $affected = self::newUnlockedQuery()
+                ->whereKey($this->getKey())
+                ->update([
+                    'stock'             => DB::raw('stock + ' . (int) $quantity),
+                    'available'         => DB::raw('CASE WHEN ((stock + ' . (int) $quantity . ') - reserved) > 0 THEN ((stock + ' . (int) $quantity . ') - reserved) ELSE 0 END'),
+                    'last_restocked_at' => now(),
+                ]);
+
+            if ($affected !== 1) {
                 return false;
             }
 
-            $currentReserved = (int) $inventory->reserved;
-            $updatedStock = (int) $inventory->stock + $quantity;
+            $this->refresh();
 
-            $inventory->forceFill([
-                'stock'             => $updatedStock,
-                'available'         => max(0, $updatedStock - $currentReserved),
-                'last_restocked_at' => now(),
-            ])->save();
-
-            $this->setRawAttributes($inventory->getAttributes(), true);
+            $this->recordStockMovement($quantity, 'in', $reason, $actorId, $correlation, $reference, $notes);
 
             return true;
         });
 
-        if (! $added) {
-            return false;
-        }
-
-        $this->refresh();
-
-        return true;
+        return (bool) $added;
     }
 
     /**
      * Remove stock from inventory.
      */
-    public function removeStock(int $quantity): bool
-    {
+    public function removeStock(
+        int $quantity,
+        string $reason = 'manual_adjustment',
+        ?int $actorId = null,
+        ?string $correlationId = null,
+        ?string $reference = null,
+        ?string $notes = null
+    ): bool {
         if ($quantity <= 0) {
             return false;
         }
 
-        $removed = DB::transaction(function () use ($quantity) {
-            $inventory = self::newUnlockedQuery()
+        $correlation = $this->resolveCorrelationId($correlationId);
+
+        $removed = DB::transaction(function () use ($quantity, $reason, $actorId, $correlation, $reference, $notes): bool {
+            // Combine both stock and reserved guards to avoid negative balances during heavy throughput.
+            $affected = self::newUnlockedQuery()
                 ->whereKey($this->getKey())
-                ->lockForUpdate()
-                ->first();
+                ->where('stock', '>=', $quantity)
+                ->whereRaw('(stock - ' . (int) $quantity . ') >= reserved')
+                ->update([
+                    'stock'     => DB::raw('stock - ' . (int) $quantity),
+                    'available' => DB::raw('CASE WHEN (stock - ' . (int) $quantity . ' - reserved) > 0 THEN (stock - ' . (int) $quantity . ' - reserved) ELSE 0 END'),
+                ]);
 
-            if (! $inventory instanceof self) {
+            if ($affected !== 1) {
                 return false;
             }
 
-            $currentReserved = (int) $inventory->reserved;
-            $updatedStock = (int) $inventory->stock - $quantity;
+            $this->refresh();
 
-            if ($updatedStock < 0 || $updatedStock < $currentReserved) {
-                return false;
-            }
-
-            $inventory->forceFill([
-                'stock'     => $updatedStock,
-                'available' => max(0, $updatedStock - $currentReserved),
-            ])->save();
-
-            $this->setRawAttributes($inventory->getAttributes(), true);
+            $this->recordStockMovement($quantity, 'out', $reason, $actorId, $correlation, $reference, $notes);
 
             return true;
         });
 
-        if (! $removed) {
-            return false;
-        }
-
-        $this->refresh();
-
-        return true;
+        return (bool) $removed;
     }
 
-    public function adjustStock(int $quantity, string $reason = 'manual_adjustment'): bool
-    {
+    public function adjustStock(
+        int $quantity,
+        string $reason = 'manual_adjustment',
+        ?int $actorId = null,
+        ?string $correlationId = null,
+        ?string $reference = null,
+        ?string $notes = null
+    ): bool {
+        if ($quantity === 0) {
+            // Treat a zero adjustment as a no-op for idempotent API usage.
+            return true;
+        }
+
         return $quantity >= 0
-            ? $this->addStock($quantity)
-            : $this->removeStock(abs($quantity));
+            ? $this->addStock($quantity, $reason, $actorId, $correlationId, $reference, $notes)
+            : $this->removeStock(abs($quantity), $reason, $actorId, $correlationId, $reference, $notes);
     }
 
     public function reserve(int $quantity): bool
@@ -457,6 +438,50 @@ final class VariantInventory extends Model
     public function unreserve(int $quantity): bool
     {
         return $this->releaseStock($quantity);
+    }
+
+    /**
+     * Resolve a usable correlation id for audit events.
+     */
+    private function resolveCorrelationId(?string $correlationId = null): string
+    {
+        // Allow callers to supply their own identifier to support idempotent retries.
+        return $correlationId !== null && $correlationId !== ''
+            ? $correlationId
+            : Str::uuid()->toString();
+    }
+
+    /**
+     * Persist a stock movement record for traceability.
+     */
+    private function recordStockMovement(
+        int $quantity,
+        string $type,
+        string $reason,
+        ?int $actorId,
+        string $correlationId,
+        ?string $reference = null,
+        ?string $notes = null
+    ): void {
+        if ($quantity <= 0) {
+            return;
+        }
+
+        // Skip duplicate writes when a repeated call reuses the same correlation id.
+        if ($this->stockMovements()->where('correlation_id', $correlationId)->exists()) {
+            return;
+        }
+
+        $this->stockMovements()->create([
+            'quantity'       => $quantity,
+            'type'           => $type,
+            'reason'         => $reason,
+            'reference'      => $reference,
+            'correlation_id' => $correlationId,
+            'notes'          => $notes,
+            'user_id'        => $actorId,
+            'moved_at'       => now(),
+        ]);
     }
 
     /**
@@ -476,9 +501,9 @@ final class VariantInventory extends Model
     {
         return match ($this->stock_status) {
             'out_of_stock' => 'danger',
-            'low_stock' => 'warning',
-            'in_stock' => 'success',
-            default => 'secondary',
+            'low_stock'    => 'warning',
+            'in_stock'     => 'success',
+            default        => 'secondary',
         };
     }
 
@@ -489,9 +514,9 @@ final class VariantInventory extends Model
     {
         return match ($this->stock_status) {
             'out_of_stock' => 'Out of Stock',
-            'low_stock' => 'Low Stock',
-            'in_stock' => 'In Stock',
-            default => 'Unknown',
+            'low_stock'    => 'Low Stock',
+            'in_stock'     => 'In Stock',
+            default        => 'Unknown',
         };
     }
 }
