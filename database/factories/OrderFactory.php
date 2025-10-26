@@ -39,6 +39,7 @@ class OrderFactory extends Factory
             'partner_id' => null,
             'status' => $this->faker->randomElement(['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'completed']),
             'payment_status' => $this->faker->randomElement(['pending', 'paid', 'failed', 'refunded', 'partially_refunded']),
+            'payment_state' => 'created',
             'payment_method' => $this->faker->randomElement(['credit_card', 'bank_transfer', 'paypal', 'cash_on_delivery']),
             'payment_reference' => $this->faker->optional(0.6, null)->bothify('PAY-########'),
             'subtotal' => $subtotal,
@@ -79,6 +80,7 @@ class OrderFactory extends Factory
         return $this->state(fn (array $attributes) => [
             'status' => 'pending',
             'payment_status' => 'pending',
+            'payment_state' => 'created',
             'shipped_at' => null,
             'delivered_at' => null,
         ]);
@@ -92,6 +94,7 @@ class OrderFactory extends Factory
         return $this->state(fn (array $attributes) => [
             'status' => 'processing',
             'payment_status' => 'paid',
+            'payment_state' => 'paid',
             'shipped_at' => null,
             'delivered_at' => null,
         ]);
@@ -105,6 +108,7 @@ class OrderFactory extends Factory
         return $this->state(fn (array $attributes) => [
             'status' => 'confirmed',
             'payment_status' => 'paid',
+            'payment_state' => 'paid',
             'shipped_at' => null,
             'delivered_at' => null,
         ]);
@@ -118,6 +122,7 @@ class OrderFactory extends Factory
         return $this->state(fn (array $attributes) => [
             'status' => 'shipped',
             'payment_status' => 'paid',
+            'payment_state' => 'paid',
             'shipped_at' => $this->faker->dateTimeBetween('-7 days', 'now'),
             'delivered_at' => null,
         ]);
@@ -131,6 +136,7 @@ class OrderFactory extends Factory
         return $this->state(fn (array $attributes) => [
             'status' => 'delivered',
             'payment_status' => 'paid',
+            'payment_state' => 'paid',
             'shipped_at' => $this->faker->dateTimeBetween('-14 days', '-7 days'),
             'delivered_at' => $this->faker->dateTimeBetween('-7 days', 'now'),
         ]);
@@ -144,6 +150,7 @@ class OrderFactory extends Factory
         return $this->state(fn (array $attributes) => [
             'status' => 'completed',
             'payment_status' => 'paid',
+            'payment_state' => 'paid',
             'shipped_at' => $this->faker->dateTimeBetween('-30 days', '-14 days'),
             'delivered_at' => $this->faker->dateTimeBetween('-14 days', '-7 days'),
         ]);
@@ -157,6 +164,7 @@ class OrderFactory extends Factory
         return $this->state(fn (array $attributes) => [
             'status' => 'cancelled',
             'payment_status' => 'pending',
+            'payment_state' => 'created',
             'shipped_at' => null,
             'delivered_at' => null,
         ]);
@@ -169,6 +177,7 @@ class OrderFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'payment_status' => 'paid',
+            'payment_state' => 'paid',
         ]);
     }
 
@@ -180,6 +189,7 @@ class OrderFactory extends Factory
         return $this->state(fn (array $attributes) => [
             'payment_status' => 'failed',
             'status' => 'pending',
+            'payment_state' => 'created',
         ]);
     }
 
@@ -190,6 +200,7 @@ class OrderFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'payment_status' => 'refunded',
+            'payment_state' => 'refunded',
         ]);
     }
 

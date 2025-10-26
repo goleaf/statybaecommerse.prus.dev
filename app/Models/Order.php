@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Enums\OrderPaymentState;
 use App\Enums\OrderStatus;
 use App\Enums\PaymentMethod;
 use App\Enums\PaymentStatus;
@@ -61,7 +62,7 @@ final class Order extends Model
 
     public array $translatable = ['notes', 'billing_address', 'shipping_address'];
 
-    protected $fillable = ['number', 'user_id', 'status', 'subtotal', 'tax_amount', 'shipping_amount', 'discount_amount', 'total', 'currency', 'billing_address', 'shipping_address', 'notes', 'shipped_at', 'delivered_at', 'channel_id', 'shipping_option_id', 'partner_id', 'coupon_id', 'payment_status', 'payment_method', 'payment_reference'];
+    protected $fillable = ['number', 'user_id', 'status', 'subtotal', 'tax_amount', 'shipping_amount', 'discount_amount', 'total', 'currency', 'billing_address', 'shipping_address', 'notes', 'shipped_at', 'delivered_at', 'channel_id', 'shipping_option_id', 'partner_id', 'coupon_id', 'payment_status', 'payment_state', 'payment_method', 'payment_reference'];
 
     /**
      * Handle casts functionality with proper error handling.
@@ -72,6 +73,7 @@ final class Order extends Model
             'status'           => OrderStatus::class,
             'payment_status'   => PaymentStatus::class,
             'payment_method'   => PaymentMethod::class,
+            'payment_state'    => OrderPaymentState::class,
             'subtotal'         => 'decimal:2',
             'tax_amount'       => 'decimal:2',
             'shipping_amount'  => 'decimal:2',

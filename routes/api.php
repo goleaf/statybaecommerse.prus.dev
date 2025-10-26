@@ -10,7 +10,15 @@ use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\ExportDownloadController;
 use App\Http\Controllers\Api\V1\HealthController;
 use App\Http\Controllers\Api\V1\SearchController;
+use App\Http\Controllers\Webhooks\PaymentWebhookController;
 use Illuminate\Support\Facades\Route;
+
+Route::prefix('webhooks')
+    ->name('webhooks.')
+    ->group(function (): void {
+        Route::post('/stripe', [PaymentWebhookController::class, 'handleStripe'])->name('stripe');
+        Route::post('/notchpay', [PaymentWebhookController::class, 'handleNotchPay'])->name('notchpay');
+    });
 
 Route::middleware('auth:sanctum')
     ->prefix('notifications')
