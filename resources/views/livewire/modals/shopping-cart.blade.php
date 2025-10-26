@@ -71,7 +71,9 @@
                 </p>
             </div>
         </div>
-        <a 
+        <a
+            {{-- Navigate with Livewire to maintain modal and wizard state continuity --}}
+            wire:navigate
             href="{{ route('checkout.index', ['locale' => app()->getLocale()]) }}"
             class="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-6 py-4 text-lg font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
             wire:loading.attr="disabled"

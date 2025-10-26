@@ -21,9 +21,20 @@
 
         <div class="max-w-lg mx-auto lg:max-w-none">
             <fieldset aria-label="{{ __('Payment method') }}">
-                <div class="-space-y-px bg-white">
+                {{-- Display a loading hint while payment integrations hydrate --}}
+                <div
+                    wire:loading.flex
+                    class="items-center gap-2 p-3 mb-2 text-sm text-gray-500 bg-gray-50 border border-dashed border-gray-200 rounded"
+                >
+                    <x-loading-dots class="text-primary-600" aria-hidden="true" />
+                    <span>{{ __('Preparing payment methods...') }}</span>
+                </div>
+
+                <div class="-space-y-px bg-white" wire:loading.remove>
                     @foreach($methods as $method)
                         <label
+                            {{-- Stabilise morph transitions while iterating payment methods --}}
+                            wire:key="payment-method-{{ $method->id }}"
                             aria-label="{{ $method->name }}"
                             @class([
                                 'group relative flex items-center justify-between cursor-pointer border p-4 focus:outline-none',
