@@ -8,6 +8,7 @@ use App\Models\StockMovement;
 use App\Models\User;
 use App\Models\VariantInventory;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\StockMovement>
@@ -23,13 +24,15 @@ final class StockMovementFactory extends Factory
 
         return [
             'variant_inventory_id' => VariantInventory::factory(),
-            'quantity' => $this->faker->numberBetween(1, 100),
-            'type' => $this->faker->randomElement($types),
-            'reason' => $this->faker->randomElement($reasons),
-            'reference' => $this->faker->optional()->regexify('[A-Z]{2}-[0-9]{5}'),
-            'notes' => $this->faker->optional()->sentence(),
-            'user_id' => $this->faker->optional()->randomElement([User::factory()]),
-            'moved_at' => $this->faker->dateTimeBetween('-30 days', 'now'),
+            'quantity'             => $this->faker->numberBetween(1, 100),
+            'type'                 => $this->faker->randomElement($types),
+            'reason'               => $this->faker->randomElement($reasons),
+            'reference'            => $this->faker->optional()->regexify('[A-Z]{2}-[0-9]{5}'),
+            // Generate a deterministic correlation identifier so duplicate audits can be spotted in tests.
+            'correlation_id' => Str::uuid()->toString(),
+            'notes'          => $this->faker->optional()->sentence(),
+            'user_id'        => $this->faker->optional()->randomElement([User::factory()]),
+            'moved_at'       => $this->faker->dateTimeBetween('-30 days', 'now'),
         ];
     }
 
@@ -50,7 +53,7 @@ final class StockMovementFactory extends Factory
     public function sale(): static
     {
         return $this->state(fn (array $attributes) => [
-            'type' => 'out',
+            'type'   => 'out',
             'reason' => 'sale',
         ]);
     }
@@ -58,7 +61,7 @@ final class StockMovementFactory extends Factory
     public function restock(): static
     {
         return $this->state(fn (array $attributes) => [
-            'type' => 'in',
+            'type'   => 'in',
             'reason' => 'restock',
         ]);
     }

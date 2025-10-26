@@ -46,6 +46,8 @@ use Filament\Tables\Grouping\Group;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 use Log;
 use UnitEnum;
 
@@ -306,15 +308,15 @@ final class VariantInventoryResource extends Resource
                         // Calculated data points mirror the display table column trio for consistency.
                         Placeholder::make('is_low_stock')
                             ->label(__('admin.variant_inventory.is_low_stock'))
-                            ->content(fn (?VariantInventory $record): string => $record ? ($record->is_low_stock ? __('admin.variant_inventory.yes') : __('admin.variant_inventory.no')) : '-'),
+                            ->content(fn (?VariantInventory $record): string => $record instanceof \App\Models\VariantInventory ? ($record->is_low_stock ? __('admin.variant_inventory.yes') : __('admin.variant_inventory.no')) : '-'),
                         Placeholder::make('is_out_of_stock')
                             ->label(__('admin.variant_inventory.is_out_of_stock'))
-                            ->content(fn (?VariantInventory $record): string => $record ? ($record->is_out_of_stock ? __('admin.variant_inventory.yes') : __('admin.variant_inventory.no')) : '-'),
+                            ->content(fn (?VariantInventory $record): string => $record instanceof \App\Models\VariantInventory ? ($record->is_out_of_stock ? __('admin.variant_inventory.yes') : __('admin.variant_inventory.no')) : '-'),
                         Placeholder::make('stock_status')
                             ->label(__('admin.variant_inventory.stock_status'))
-                            ->content(fn (?VariantInventory $record): string => $record ? __('admin.variant_inventory.status_' . $record->stock_status) : '-'),
+                            ->content(fn (?VariantInventory $record): string => $record instanceof \App\Models\VariantInventory ? __('admin.variant_inventory.status_' . $record->stock_status) : '-'),
                     ])
-                    ->hidden(fn (?VariantInventory $record): bool => $record === null),
+                    ->hidden(fn (?VariantInventory $record): bool => !$record instanceof \App\Models\VariantInventory),
             ]);
     }
 
@@ -407,7 +409,7 @@ final class VariantInventoryResource extends Resource
                     ->label(__('admin.variant_inventory.stock'))
                     ->numeric()
                     ->sortable()
-                    ->color(fn ($state) => $state < 10 ? 'danger' : ($state < 50 ? 'warning' : 'success')),
+                    ->color(fn ($state): string => $state < 10 ? 'danger' : ($state < 50 ? 'warning' : 'success')),
                 TextColumn::make('reserved')
                     ->label(__('admin.variant_inventory.reserved'))
                     ->numeric()
@@ -417,7 +419,7 @@ final class VariantInventoryResource extends Resource
                     ->label(__('admin.variant_inventory.available'))
                     ->numeric()
                     ->sortable()
-                    ->color(fn ($state) => $state < 10 ? 'danger' : ($state < 50 ? 'warning' : 'success')),
+                    ->color(fn ($state): string => $state < 10 ? 'danger' : ($state < 50 ? 'warning' : 'success')),
                 TextColumn::make('threshold')
                     ->label(__('admin.variant_inventory.threshold'))
                     ->numeric()
@@ -456,17 +458,17 @@ final class VariantInventoryResource extends Resource
                 IconColumn::make('is_low_stock')
                     ->label(__('admin.variant_inventory.is_low_stock'))
                     ->boolean()
-                    ->color(fn ($state) => $state ? 'warning' : 'success')
+                    ->color(fn ($state): string => $state ? 'warning' : 'success')
                     ->toggleable(),
                 IconColumn::make('is_out_of_stock')
                     ->label(__('admin.variant_inventory.is_out_of_stock'))
                     ->boolean()
-                    ->color(fn ($state) => $state ? 'danger' : 'success')
+                    ->color(fn ($state): string => $state ? 'danger' : 'success')
                     ->toggleable(),
                 TextColumn::make('utilization_percentage')
                     ->label(__('admin.variant_inventory.utilization_percentage'))
                     ->formatStateUsing(static fn ($state): string => number_format((float) ($state ?? 0), 2) . '%')
-                    ->color(fn ($state) => $state > 80 ? 'warning' : 'success')
+                    ->color(fn ($state): string => $state > 80 ? 'warning' : 'success')
                     ->toggleable(),
                 TextColumn::make('last_restocked_at')
                     ->label(__('admin.variant_inventory.last_restocked_at'))
@@ -563,30 +565,48 @@ final class VariantInventoryResource extends Resource
                         $record = $livewire->getMountedTableActionRecord();
                         $quantity = (int) ($data['quantity'] ?? 0);
                         $type = $data['adjustment_type'] ?? 'add';
+                        $reason = trim((string) ($data['reason'] ?? '')) ?: 'manual_adjustment';
+                        $actorId = Auth::id();
+                        $correlationId = Str::uuid()->toString();
+
                         Log::info('adjust_stock action triggered', [
-                            'record_class' => get_class($record),
+                            'record_class' => $record::class,
                             'record_id'    => $record->getKey(),
                             'type'         => $type,
                             'quantity'     => $quantity,
+                            'reason'       => $reason,
                         ]);
+
+                        $result = false;
 
                         switch ($type) {
                             case 'add':
-                                $result = $record->addStock($quantity);
+                                $result = $record->addStock($quantity, $reason, $actorId, $correlationId);
                                 Log::info('addStock result', ['result' => $result]);
                                 break;
                             case 'subtract':
-                                $result = $record->removeStock($quantity);
+                                $result = $record->removeStock($quantity, $reason, $actorId, $correlationId);
                                 Log::info('removeStock result', ['result' => $result]);
                                 break;
                             case 'set':
-                                $record->stock = $quantity;
-                                $result = $record->updateAvailableStock();
-                                Log::info('setStock result', ['result' => $result]);
+                                $record->refresh();
+                                $difference = $quantity - (int) $record->stock;
+                                $result = $record->adjustStock($difference, $reason, $actorId, $correlationId);
+                                Log::info('setStock result', ['result' => $result, 'difference' => $difference]);
                                 break;
                         }
 
+                        if (! $result) {
+                            Notification::make()
+                                ->title(__('admin.variant_inventory.insufficient_stock'))
+                                ->danger()
+                                ->send();
+
+                            return;
+                        }
+
                         $record->refresh();
+
                         Notification::make()
                             ->title(__('admin.variant_inventory.stock_adjusted_successfully'))
                             ->success()
@@ -645,19 +665,23 @@ final class VariantInventoryResource extends Resource
                         ->action(function (Collection $records, array $data): void {
                             $quantity = (int) $data['quantity'];
                             $type = $data['adjustment_type'];
+                            $reason = trim((string) ($data['reason'] ?? '')) ?: 'manual_adjustment';
+                            $actorId = Auth::id();
                             $count = 0;
 
                             foreach ($records as $record) {
+                                $correlationId = Str::uuid()->toString();
                                 switch ($type) {
                                     case 'add':
-                                        $record->addStock($quantity);
+                                        $record->addStock($quantity, $reason, $actorId, $correlationId);
                                         break;
                                     case 'subtract':
-                                        $record->removeStock($quantity);
+                                        $record->removeStock($quantity, $reason, $actorId, $correlationId);
                                         break;
                                     case 'set':
-                                        $record->stock = $quantity;
-                                        $record->updateAvailableStock();
+                                        $record->refresh();
+                                        $difference = $quantity - (int) $record->stock;
+                                        $record->adjustStock($difference, $reason, $actorId, $correlationId);
                                         break;
                                 }
                                 $record->refresh();

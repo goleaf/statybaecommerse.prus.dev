@@ -31,14 +31,15 @@ final class StockMovement extends Model
 
     protected $table = 'stock_movements';
 
-    protected $fillable = ['variant_inventory_id', 'quantity', 'type', 'reason', 'reference', 'notes', 'user_id', 'moved_at'];
+    protected $fillable = ['variant_inventory_id', 'quantity', 'type', 'reason', 'reference', 'correlation_id', 'notes', 'user_id', 'moved_at'];
 
     /**
      * Handle casts functionality with proper error handling.
      */
     protected function casts(): array
     {
-        return ['quantity' => 'integer', 'moved_at' => 'datetime'];
+        // Ensure casting keeps metadata consistent when persisting audit rows.
+        return ['quantity' => 'integer', 'moved_at' => 'datetime', 'correlation_id' => 'string'];
     }
 
     /**
@@ -60,7 +61,7 @@ final class StockMovement extends Model
     /**
      * Handle scopeInbound functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeInbound($query)
     {
@@ -70,7 +71,7 @@ final class StockMovement extends Model
     /**
      * Handle scopeOutbound functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeOutbound($query)
     {
@@ -80,7 +81,7 @@ final class StockMovement extends Model
     /**
      * Handle scopeByReason functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeByReason($query, string $reason)
     {
@@ -90,7 +91,7 @@ final class StockMovement extends Model
     /**
      * Handle scopeByUser functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeByUser($query, int $userId)
     {
@@ -100,7 +101,7 @@ final class StockMovement extends Model
     /**
      * Handle scopeRecent functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeRecent($query, int $days = 30)
     {
@@ -113,8 +114,8 @@ final class StockMovement extends Model
     public function getTypeLabelAttribute(): string
     {
         return match ($this->type) {
-            'in' => __('inventory.stock_in'),
-            'out' => __('inventory.stock_out'),
+            'in'    => __('inventory.stock_in'),
+            'out'   => __('inventory.stock_out'),
             default => __('inventory.unknown'),
         };
     }
@@ -125,15 +126,15 @@ final class StockMovement extends Model
     public function getReasonLabelAttribute(): string
     {
         return match ($this->reason) {
-            'sale' => __('inventory.reason_sale'),
-            'return' => __('inventory.reason_return'),
-            'adjustment' => __('inventory.reason_adjustment'),
+            'sale'              => __('inventory.reason_sale'),
+            'return'            => __('inventory.reason_return'),
+            'adjustment'        => __('inventory.reason_adjustment'),
             'manual_adjustment' => __('inventory.reason_manual_adjustment'),
-            'restock' => __('inventory.reason_restock'),
-            'damage' => __('inventory.reason_damage'),
-            'theft' => __('inventory.reason_theft'),
-            'transfer' => __('inventory.reason_transfer'),
-            default => $this->reason,
+            'restock'           => __('inventory.reason_restock'),
+            'damage'            => __('inventory.reason_damage'),
+            'theft'             => __('inventory.reason_theft'),
+            'transfer'          => __('inventory.reason_transfer'),
+            default             => $this->reason,
         };
     }
 }
