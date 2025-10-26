@@ -36,15 +36,19 @@ Route::middleware('auth:sanctum')
 Route::prefix('products')
     ->name('api.products.')
     ->group(function (): void {
+        Route::get('/', [ProductController::class, 'index'])
+            ->middleware('throttle:api.read')
+            ->name('index');
+
         Route::get('search', [ProductController::class, 'search'])
             ->middleware('throttle:api.read')
             ->name('search');
 
-        Route::get('catalog', [ProductController::class, 'catalog'])
+        Route::get('catalog', [ProductController::class, 'index'])
             ->middleware('throttle:api.read')
             ->name('catalog');
 
-        Route::get('{slug}', [ProductController::class, 'show'])
+        Route::get('{product:slug}', [ProductController::class, 'show'])
             ->middleware('throttle:api.read')
             ->name('show');
     });
