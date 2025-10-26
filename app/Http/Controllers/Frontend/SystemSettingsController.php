@@ -134,9 +134,29 @@ final class SystemSettingsController extends Controller
      */
     public function categories(): JsonResponse
     {
-        $categories = SystemSettingCategory::active()->ordered()->get()->map(function ($category) {
-            return ['id' => $category->id, 'name' => $category->getTranslatedName(), 'slug' => $category->slug, 'description' => $category->getTranslatedDescription(), 'icon' => $category->getIconClass(), 'color' => $category->color, 'settings_count' => $category->getActiveSettingsCount()];
-        });
+        $categories = SystemSettingCategory::query()
+            // Preload the count of active settings to avoid running a query per category inside the map.
+            ->withCount([
+                'settings as active_settings_count' => function ($query) {
+                    // Limit the aggregated count to only active settings to mirror the previous helper logic.
+                    $query->active();
+                },
+            ])
+            ->active()
+            ->ordered()
+            ->get()
+            ->map(function ($category) {
+                // Reuse the aggregated count gathered above instead of issuing a fresh query for every category.
+                return [
+                    'id' => $category->id,
+                    'name' => $category->getTranslatedName(),
+                    'slug' => $category->slug,
+                    'description' => $category->getTranslatedDescription(),
+                    'icon' => $category->getIconClass(),
+                    'color' => $category->color,
+                    'settings_count' => $category->active_settings_count,
+                ];
+            });
 
         return response()->json(['success' => true, 'data' => $categories]);
     }
