@@ -10,8 +10,8 @@ use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\EnabledScope;
 use App\Models\Scopes\StatusScope;
 use App\Observers\ProductVariantObserver;
-use App\Traits\HasProductPricing;
 use App\Services\Pricing\VariantPriceService;
+use App\Traits\HasProductPricing;
 use App\Traits\HasTranslations;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
@@ -196,6 +196,15 @@ final class ProductVariant extends Model implements HasMedia, TranslatableRecord
     public function variantAttributeValues(): HasMany
     {
         return $this->hasMany(VariantAttributeValue::class, 'variant_id');
+    }
+
+    /**
+     * Provide the legacy values() relationship used by storefront filters.
+     */
+    public function values(): BelongsToMany
+    {
+        // Reuse the attribute pivot so attribute data remains consistent across accessors.
+        return $this->attributes();
     }
 
     /**
@@ -526,10 +535,10 @@ final class ProductVariant extends Model implements HasMedia, TranslatableRecord
         $name = $this->product->name;
         $attributes = $this->getVariantAttributes();
 
-        if (! empty($attributes)) {
+        if ($attributes !== []) {
             $attributeStrings = [];
             foreach ($attributes as $key => $value) {
-                $attributeStrings[] = ucfirst($key) . ': ' . $value;
+                $attributeStrings[] = ucfirst((string) $key) . ': ' . $value;
             }
             $name .= ' (' . implode(', ', $attributeStrings) . ')';
         }
@@ -546,11 +555,7 @@ final class ProductVariant extends Model implements HasMedia, TranslatableRecord
             return false;
         }
 
-        if ($this->track_inventory && $this->availableQuantity() <= 0 && ! $this->allow_backorder) {
-            return false;
-        }
-
-        return true;
+        return ! ($this->track_inventory && $this->availableQuantity() <= 0 && ! $this->allow_backorder);
     }
 
     /**
@@ -687,11 +692,7 @@ final class ProductVariant extends Model implements HasMedia, TranslatableRecord
             return false;
         }
 
-        if ($this->sale_end_date && $now->isAfter($this->sale_end_date)) {
-            return false;
-        }
-
-        return true;
+        return ! ($this->sale_end_date && $now->isAfter($this->sale_end_date));
     }
 
     /**
@@ -898,11 +899,11 @@ final class ProductVariant extends Model implements HasMedia, TranslatableRecord
     public function scopeOnSale($query)
     {
         return $query->where('is_on_sale', true)
-            ->where(function ($q) {
+            ->where(function ($q): void {
                 $q->whereNull('sale_start_date')
                     ->orWhere('sale_start_date', '<=', now());
             })
-            ->where(function ($q) {
+            ->where(function ($q): void {
                 $q->whereNull('sale_end_date')
                     ->orWhere('sale_end_date', '>=', now());
             });
