@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Http\Controllers\Admin\AttributeTranslationController;
+use App\Http\Controllers\Admin\CollectionTranslationController;
 use App\Http\Controllers\Api\V1\HealthController;
 use App\Http\Controllers\ApiDocsController;
 use App\Http\Controllers\Frontend\UserController;
@@ -948,7 +949,7 @@ Route::middleware('auth')->group(function (): void {
         ->name('admin.brands.translations.save');
     Route::put('/admin/{locale}/categories/{id}/translations/{lang}', fn () => back())
         ->name('admin.categories.translations.save');
-    Route::put('/admin/{locale}/collections/{id}/translations/{lang}', fn () => back())
+    Route::put('/admin/{locale}/collections/{id}/translations/{lang}', [CollectionTranslationController::class, 'update'])
         ->name('admin.collections.translations.save');
     Route::put('/admin/{locale}/products/{id}/translations/{lang}', fn () => back())
         ->name('admin.products.translations.save');
