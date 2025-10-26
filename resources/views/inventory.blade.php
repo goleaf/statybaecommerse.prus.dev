@@ -129,7 +129,8 @@
 
         @if($products->hasPages())
             <div class="px-6 py-4 border-t border-gray-200 dark:border-gray-700">
-                {{ $products->links() }}
+                {{-- Preserve active query parameters (search, filters) across pagination hops. --}}
+                {{ $products->appends(request()->query())->links() }}
             </div>
         @endif
     </div>
