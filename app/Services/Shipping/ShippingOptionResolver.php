@@ -7,8 +7,10 @@ namespace App\Services\Shipping;
 use App\Models\CartItem;
 use App\Models\Country;
 use App\Models\ShippingOption;
+use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Collection as BaseCollection;
+use Illuminate\Support\Facades\Session;
 
 /**
  * ShippingOptionResolver
@@ -22,7 +24,7 @@ final class ShippingOptionResolver
      * Resolve the shipping options that are valid for the provided cart state.
      *
      * @param  BaseCollection<int, CartItem>|EloquentCollection<int, CartItem>                                             $cartItems
-     * @return BaseCollection<int, array{id:int,name:string,price:float,formatted_price:string,estimated_delivery:string}>
+     * @return BaseCollection<int, array{id:int,name:string,price:float,currency:string|null,eta:string|null,formatted_price:string,estimated_delivery:string}>
      */
     public function resolve(BaseCollection|EloquentCollection $cartItems, ?string $countryCode = null): BaseCollection
     {
@@ -63,11 +65,62 @@ final class ShippingOptionResolver
                     'name'               => $option->name,
                     'description'        => $option->description,
                     'price'              => $price,
+                    'currency'           => $option->currency_code,
+                    'eta'                => $option->estimated_delivery_text,
                     'formatted_price'    => app_money_format($price, $option->currency_code),
                     'estimated_delivery' => $option->estimated_delivery_text,
                 ];
             })
             ->values();
+    }
+
+    /**
+     * Resolve shipping options for the active cart session and destination data.
+     *
+     * @param  Authenticatable|null         $user
+     * @param  array<string, mixed>         $destination
+     * @return array<int, array<string, mixed>>
+     */
+    public function forCart(?Authenticatable $user = null, array $destination = []): array
+    {
+        // Determine the relevant cart items by prioritising the current session and optional user.
+        $cartItems = CartItem::with('product')
+            ->where('session_id', Session::getId())
+            ->when($user !== null, function ($query) use ($user): void {
+                // Include persisted cart rows tied to the authenticated user for completeness.
+                $identifier = $user->getAuthIdentifier();
+
+                if ($identifier !== null) {
+                    $query->orWhere('user_id', $identifier);
+                }
+            })
+            ->get()
+            ->unique(static fn (CartItem $item): string => (string) $item->getKey());
+
+        if ($cartItems->isEmpty()) {
+            // Provide a graceful fallback when no cart data exists yet.
+            return [];
+        }
+
+        // Delegate to the core resolver, passing along the best-known country code.
+        $resolved = $this->resolve($cartItems, $this->extractCountryCode($destination));
+
+        return $resolved->values()->all();
+    }
+
+    /**
+     * Attempt to read a normalised country code from the provided destination payload.
+     */
+    private function extractCountryCode(array $destination): ?string
+    {
+        foreach (['country', 'country_code', 'countryCode'] as $key) {
+            $value = $destination[$key] ?? null;
+            if (is_string($value) && $value !== '') {
+                return $value;
+            }
+        }
+
+        return null;
     }
 
     /**
