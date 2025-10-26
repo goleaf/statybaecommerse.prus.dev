@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
@@ -237,6 +238,21 @@ final class VariantInventory extends Model
     public function scopeNeedsReorder($query)
     {
         return $query->whereRaw('available <= reorder_point');
+    }
+
+    /**
+     * Handle scopeExpiringSoon functionality with proper error handling.
+     *
+     * @param mixed $query
+     */
+    public function scopeExpiringSoon($query, int $days = 30)
+    {
+        // Leverage a configurable window so callers can tighten the threshold if necessary.
+        $cutoffDate = Carbon::now()->addDays($days);
+
+        return $query
+            ->whereNotNull('expiry_date')
+            ->whereDate('expiry_date', '<=', $cutoffDate);
     }
 
     /**
