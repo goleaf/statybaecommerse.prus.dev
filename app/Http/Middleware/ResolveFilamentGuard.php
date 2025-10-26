@@ -8,10 +8,11 @@ use Closure;
 use Filament\Facades\Filament;
 use Filament\Panel;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 final class ResolveFilamentGuard
 {
-    public function handle(Request $request, Closure $next)
+    public function handle(Request $request, Closure $next): Response
     {
         $guard = config('filament.auth.guard');
 
@@ -32,6 +33,9 @@ final class ResolveFilamentGuard
             auth()->shouldUse($guard);
         }
 
-        return $next($request);
+        /** @var Response $response */
+        $response = $next($request);
+
+        return $response;
     }
 }
