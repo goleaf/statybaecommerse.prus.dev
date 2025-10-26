@@ -89,9 +89,8 @@ final class ChannelResource extends Resource
                                     ->rules(['alpha_dash']),
                                 TextInput::make('code')
                                     ->label(__('admin.channels.code'))
-                                    // Allow empty values during edit operations while still requiring codes on create.
-                                    ->nullable()
-                                    ->required(fn (string $operation): bool => $operation === 'create')
+                                    // Keep the code mandatory for every operation so persisted rows remain in sync with the non-nullable column.
+                                    ->required()
                                     ->maxLength(50)
                                     ->unique(Channel::class, 'code', ignoreRecord: true)
                                     ->rules(['alpha_dash']),

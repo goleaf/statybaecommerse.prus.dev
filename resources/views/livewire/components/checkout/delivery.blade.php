@@ -31,13 +31,21 @@
                 <fieldset aria-label="{{ __('Delivery method') }}">
                     <div class="-space-y-px bg-white">
                         @foreach($options as $option)
+                            @php
+                                // Ensure array access even when legacy collections slip through.
+                                $optionId = (int) data_get($option, 'id');
+                                $optionName = (string) data_get($option, 'name', '');
+                                $optionDescription = (string) data_get($option, 'description', '');
+                                $optionPrice = (float) data_get($option, 'price', 0);
+                                $formattedPrice = (string) data_get($option, 'formatted_price', \Illuminate\Support\Number::currency($optionPrice, current_currency(), app()->getLocale()));
+                            @endphp
                             <label
-                                aria-label="{{ $option->name }}"
-                                aria-description="{{ $option->description }}"
+                                aria-label="{{ $optionName }}"
+                                aria-description="{{ $optionDescription }}"
                                 @class([
                                     'group relative flex items-start justify-between cursor-pointer border p-4 focus:outline-none',
-                                    'data-[checked]:z-10 data-[checked]:border-green-200 data-[checked]:bg-green-50 z-10 border-primary-200 bg-primary-50' => $currentSelected === $option->id,
-                                    'border-gray-200' => $currentSelected !== $option->id,
+                                    'data-[checked]:z-10 data-[checked]:border-green-200 data-[checked]:bg-green-50 z-10 border-primary-200 bg-primary-50' => $currentSelected === $optionId,
+                                    'border-gray-200' => $currentSelected !== $optionId,
                                 ])
                             >
                                 <span class="flex flex-1">
@@ -45,28 +53,28 @@
                                         type="radio"
                                         wire:model.live.debounce="currentSelected"
                                         name="shipping"
-                                        value="{{ $option->id }}"
+                                        value="{{ $optionId }}"
                                         class="mt-0.5 size-4 shrink-0 cursor-pointer border-gray-300 text-primary-500 focus:ring-primary-600 active:ring-2 active:ring-offset-2"
                                     >
                                     <span class="flex flex-col ml-3">
                                         <span
                                             @class([
                                                 'block text-sm font-heading',
-                                                'text-primary-950 font-medium' => $currentSelected === $option->id,
-                                                'text-gray-600' => $currentSelected !== $option->id,
+                                                'text-primary-950 font-medium' => $currentSelected === $optionId,
+                                                'text-gray-600' => $currentSelected !== $optionId,
                                             ])
-                                        >{{ $option->name }}</span>
+                                        >{{ $optionName }}</span>
                                         <span
                                             @class([
                                                 'block text-sm',
-                                                'text-primary-700' => $currentSelected === $option->id,
-                                                'text-gray-500' => $currentSelected !== $option->id,
+                                                'text-primary-700' => $currentSelected === $optionId,
+                                                'text-gray-500' => $currentSelected !== $optionId,
                                             ])
-                                        >{{ $option->description }}</span>
+                                        >{{ $optionDescription }}</span>
                                     </span>
                                 </span>
                                 <span class="text-sm font-medium text-primary-950">
-                                    {{ \Illuminate\Support\Number::currency($option->price, current_currency(), app()->getLocale()) }}
+                                    {{ $formattedPrice }}
                                 </span>
                             </label>
                         @endforeach
@@ -78,6 +86,8 @@
                         :title="__('Go to checkout')"
                         class="w-full px-8 py-2 text-sm sm:w-auto"
                         wire:loading.attr="data-loading"
+                        wire:target="save,handleShippingAddressSelected"
+                        :disabled="$isResolvingOptions"
                     />
                 </div>
             </div>
