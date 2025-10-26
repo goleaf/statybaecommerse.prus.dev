@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Livewire\Shared;
 
+use App\Data\Cart\CartLineItemData;
 use App\Models\AttributeValue;
 use App\Models\CartItem;
 use App\Models\Product;
@@ -201,6 +202,30 @@ final class ShoppingCart extends Component
             ->get();
 
         return $items;
+    }
+
+    /**
+     * @return array<int, array{id:int,name:string,quantity:int,unitPrice:float,totalPrice:float,thumbnailUrl:?string}>
+     */
+    public function getCartLinesProperty(): array
+    {
+        return $this->cartItems
+            ->map(static function (CartItem $item): CartLineItemData {
+                $product = $item->product;
+                $thumbnail = $product?->getFirstMediaUrl();
+
+                return new CartLineItemData(
+                    id: (int) $item->id,
+                    name: (string) ($product?->name ?? data_get($item->product_snapshot, 'name', '')),
+                    quantity: (int) $item->quantity,
+                    unitPrice: (float) $item->price,
+                    totalPrice: (float) $item->total_price,
+                    thumbnailUrl: is_string($thumbnail) && $thumbnail !== '' ? $thumbnail : null,
+                );
+            })
+            ->map(static fn (CartLineItemData $line): array => $line->toArray())
+            ->values()
+            ->all();
     }
 
     /**

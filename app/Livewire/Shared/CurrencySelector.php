@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Livewire\Shared;
 
+use App\Data\Currency\CurrencyOptionData;
 use App\Models\Country;
 use App\Models\Currency;
 use App\Models\Setting;
@@ -84,10 +85,10 @@ class CurrencySelector extends Component
         $defaultCode = (string) config('app.currency', 'EUR');
 
         if (app()->environment('testing')) {
-            return [$this->defaultCurrencyEntry($defaultCode)];
+            return [$this->defaultCurrencyEntry($defaultCode)->toArray()];
         }
 
-        /** @var array<int, array{id:int, code:string, symbol:string}> $currencies */
+        /** @var array<int, CurrencyOptionData> $currencies */
         $currencies = Cache::remember(
             CacheKeys::currencyEnabledList(),
             now()->addHours(6),
@@ -102,19 +103,22 @@ class CurrencySelector extends Component
                     ->where('is_enabled', true)
                     ->orderBy('code')
                     ->get(['id', 'code', 'symbol'])
-                    ->map(static function (Currency $currency): array {
-                        return [
-                            'id'     => (int) $currency->id,
-                            'code'   => (string) $currency->code,
-                            'symbol' => (string) $currency->symbol,
-                        ];
+                    ->map(static function (Currency $currency): CurrencyOptionData {
+                        return new CurrencyOptionData(
+                            id: (int) $currency->id,
+                            code: (string) $currency->code,
+                            symbol: (string) $currency->symbol,
+                        );
                     })
                     ->values()
                     ->all();
             }
         );
 
-        return $currencies;
+        return array_map(
+            static fn (CurrencyOptionData $option): array => $option->toArray(),
+            $currencies
+        );
     }
 
     /**
@@ -164,14 +168,14 @@ class CurrencySelector extends Component
     /**
      * Build a deterministic currency entry structure for fallback usage.
      *
-     * @return array{id:int, code:string, symbol:string}
+     * @return CurrencyOptionData
      */
-    private function defaultCurrencyEntry(string $code): array
+    private function defaultCurrencyEntry(string $code): CurrencyOptionData
     {
-        return [
-            'id'     => 1,
-            'code'   => $code,
-            'symbol' => (string) config('app.currency_symbol', '€'),
-        ];
+        return new CurrencyOptionData(
+            id: 1,
+            code: $code,
+            symbol: (string) config('app.currency_symbol', '€'),
+        );
     }
 }

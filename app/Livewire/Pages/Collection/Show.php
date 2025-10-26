@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Livewire\Pages\Collection;
 
+use App\Data\Collection\AttributeFilterGroupData;
+use App\Data\Collection\AttributeFilterValueData;
 use App\Models\AttributeValue;
 use App\Models\Collection as CollectionModel;
 use App\Models\CollectionRule;
@@ -14,6 +16,9 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use App\Support\Cache\CacheKeys;
+use App\Support\Cache\CacheTags;
+use App\Support\Cache\TagAwareCache;
 use Illuminate\Support\Collection;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
@@ -32,7 +37,7 @@ use Livewire\Component;
  * @property string|null            $sort
  * @property array<int, int|string> $selectedValues
  * @property-read LengthAwarePaginator<int, Product> $products
- * @property-read Collection<int, array{attribute_id:int, attribute_name:string, values:Collection<int, array{id:int, name:string, selected:bool}>}> $availableOptions
+ * @property-read Collection<int, AttributeFilterGroupData> $availableOptions
  * @property-read Collection<int, \App\Models\Brand> $availableBrands
  */
 #[Layout('components.layouts.base')]
@@ -144,73 +149,126 @@ class Show extends Component
     /**
      * Provide the available attribute filters for the current collection.
      *
-     * @return Collection<int, array{attribute_id:int, attribute_name:string, values:Collection<int, array{id:int, name:string, selected:bool}>}>
+     * @return Collection<int, AttributeFilterGroupData>
      */
     #[Computed]
     public function getAvailableOptionsProperty(): Collection
     {
         $collection = $this->collection;
 
-        $builder = Product::query()
-            ->where('is_visible', true)
-            ->whereNotNull('published_at')
-            ->where('published_at', '<=', now());
-
-        $this->applyCollectionScope($builder, $collection);
-
-        /** @var EloquentCollection<int, Product> $products */
-        $products = $builder->with(['variants.values.attribute'])->get();
+        // Pull the cached attribute/value matrix and then decorate it with the
+        // current selection state so Livewire hydration remains stable.
+        $baseGroups = $this->resolveCachedFilterGroups($collection);
 
         $selectedValues = collect($this->selectedValues)
             ->map(static fn (mixed $value): int => (int) $value)
             ->filter()
             ->values();
 
-        $options = [];
+        return $baseGroups->map(
+            function (AttributeFilterGroupData $group) use ($selectedValues): AttributeFilterGroupData {
+                // Rebuild the value list with updated selection markers for the UI.
+                $values = $group->values->map(
+                    static function (AttributeFilterValueData $value) use ($selectedValues): AttributeFilterValueData {
+                        $isSelected = $selectedValues->contains($value->id);
 
-        foreach ($products as $product) {
-            /** @var EloquentCollection<int, ProductVariant> $variants */
-            $variants = $product->variants;
-
-            foreach ($variants as $variant) {
-                /** @var EloquentCollection<int, AttributeValue> $values */
-                $values = $variant->values;
-
-                foreach ($values as $value) {
-                    $attribute = $value->attribute;
-
-                    if ($attribute === null) {
-                        continue;
+                        return new AttributeFilterValueData($value->id, $value->label, $isSelected);
                     }
+                );
 
-                    $attributeId = (int) $value->attribute_id;
-
-                    if (! array_key_exists($attributeId, $options)) {
-                        // Lazily build the option container for the attribute the first time we encounter it.
-                        $options[$attributeId] = [
-                            'attribute_id'   => $attributeId,
-                            'attribute_name' => (string) $attribute->name,
-                            'values'         => [],
-                        ];
-                    }
-
-                    $options[$attributeId]['values'][$value->id] = [
-                        'id'       => (int) $value->id,
-                        'name'     => (string) $value->name,
-                        'selected' => $selectedValues->contains((int) $value->id),
-                    ];
-                }
+                return new AttributeFilterGroupData($group->attributeId, $group->attributeName, $values);
             }
-        }
+        );
+    }
 
-        return collect($options)
-            ->map(static function (array $option): array {
-                // Normalize nested values to sequential collections for predictable rendering.
-                $option['values'] = collect($option['values'])->values();
+    /**
+     * Resolve and cache the attribute filter matrix for the current collection.
+     */
+    private function resolveCachedFilterGroups(?CollectionModel $collection): Collection
+    {
+        $locale = app()->getLocale();
 
-                return $option;
-            })
-            ->values();
+        /** @var Collection<int, AttributeFilterGroupData> $groups */
+        $groups = TagAwareCache::remember(
+            CacheKeys::collectionFilters($collection?->getKey() ?? 0, $locale),
+            now()->addMinutes(30),
+            function () use ($collection): Collection {
+                $builder = Product::query()
+                    ->where('is_visible', true)
+                    ->whereNotNull('published_at')
+                    ->where('published_at', '<=', now());
+
+                $this->applyCollectionScope($builder, $collection);
+
+                /** @var EloquentCollection<int, Product> $products */
+                $products = $builder->with(['variants.values.attribute'])->get();
+
+                $groups = [];
+
+                foreach ($products as $product) {
+                    /** @var EloquentCollection<int, ProductVariant> $variants */
+                    $variants = $product->variants;
+
+                    foreach ($variants as $variant) {
+                        /** @var EloquentCollection<int, AttributeValue> $values */
+                        $values = $variant->values;
+
+                        foreach ($values as $value) {
+                            $attribute = $value->attribute;
+
+                            if ($attribute === null) {
+                                continue;
+                            }
+
+                            $attributeId = (int) $value->attribute_id;
+
+                            if (! array_key_exists($attributeId, $groups)) {
+                                // Initialise a new group the first time an attribute is discovered.
+                                $groups[$attributeId] = new AttributeFilterGroupData(
+                                    attributeId: $attributeId,
+                                    attributeName: (string) $attribute->name,
+                                    values: collect()
+                                );
+                            }
+
+                            /** @var AttributeFilterGroupData $group */
+                            $group = $groups[$attributeId];
+
+                            $groups[$attributeId] = new AttributeFilterGroupData(
+                                attributeId: $group->attributeId,
+                                attributeName: $group->attributeName,
+                                values: $group->values->put(
+                                    (int) $value->id,
+                                    new AttributeFilterValueData(
+                                        id: (int) $value->id,
+                                        label: (string) $value->name,
+                                        selected: false,
+                                    )
+                                )
+                            );
+                        }
+                    }
+                }
+
+                return collect($groups)
+                    ->map(static function (AttributeFilterGroupData $group): AttributeFilterGroupData {
+                        // Ensure the nested collection is sequential for Blade iteration.
+                        return new AttributeFilterGroupData(
+                            attributeId: $group->attributeId,
+                            attributeName: $group->attributeName,
+                            values: $group->values->values(),
+                        );
+                    })
+                    ->values();
+            },
+            [
+                CacheTags::collections(),
+                CacheTags::products(),
+                CacheTags::locale($locale),
+            ]
+        );
+
+        return $groups;
     }
 
     /**

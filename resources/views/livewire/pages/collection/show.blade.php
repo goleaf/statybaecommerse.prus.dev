@@ -113,13 +113,15 @@
         <div class="mb-6">
             <h2 class="text-xl font-semibold mb-2">{{ __('Filter by') }}</h2>
             <div class="flex flex-wrap items-center gap-2 mb-2">
+                {{-- Collapse the nested filter groups so we can resolve labels for chips quickly. --}}
+                @php($flatValues = $options->flatMap(fn ($group) => $group->values))
                 @foreach (collect($selectedValues)->filter() as $valId)
-                    @php($val = $options->flatten(1)->firstWhere('id', (int) $valId) ?? null)
+                    @php($val = $flatValues->firstWhere('id', (int) $valId))
                     @if ($val)
                         <button type="button" wire:click="removeAttributeFilter({{ (int) $valId }})"
                                 wire:confirm="{{ __('translations.confirm_remove_attribute_filter') }}"
                                 class="inline-flex items-center gap-1 text-xs bg-gray-100 rounded-full px-2 py-1">
-                            <span>{{ $val->value }}</span>
+                            <span>{{ $val->label }}</span>
                             <span aria-hidden="true">×</span>
                         </button>
                     @endif
@@ -135,13 +137,13 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 @foreach ($options as $group)
                     <div>
-                        <div class="text-sm font-medium mb-2">{{ $group['attribute']->name }}</div>
+                        <div class="text-sm font-medium mb-2">{{ $group->attributeName }}</div>
                         <div class="flex flex-wrap gap-2">
-                            @foreach ($group['values'] as $val)
+                            @foreach ($group->values as $val)
                                 <label class="inline-flex items-center gap-1 text-sm">
                                     <input type="checkbox" wire:model.live="selectedValues"
                                            value="{{ $val->id }}" />
-                                    <span>{{ $val->value }}</span>
+                                    <span>{{ $val->label }}</span>
                                 </label>
                             @endforeach
                         </div>

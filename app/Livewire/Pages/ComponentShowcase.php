@@ -8,6 +8,9 @@ use App\Livewire\Concerns\WithNotifications;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
+use App\Support\Cache\CacheKeys;
+use App\Support\Cache\CacheTags;
+use App\Support\Cache\TagAwareCache;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Livewire\Attributes\Computed;
@@ -65,16 +68,32 @@ final class ComponentShowcase extends Component
     #[Computed]
     public function featuredProducts(): EloquentCollection
     {
-        return Product::query()
-            ->with(['brand', 'media', 'prices'])
-            ->where('is_visible', true)
-            ->where('is_featured', true)
-            ->limit(4)
-            ->get()
-            ->skipWhile(static function (Product $product): bool {
-                // Skip products that are not properly configured for showcase display.
-                return empty($product->name) || ! $product->is_visible || ! $product->is_featured || ($product->price ?? 0) <= 0 || empty($product->slug);
-            });
+        $locale = app()->getLocale();
+
+        /** @var EloquentCollection<int, Product> $products */
+        $products = TagAwareCache::remember(
+            CacheKeys::componentShowcase('featured', $locale),
+            now()->addMinutes(10),
+            static function (): EloquentCollection {
+                return Product::query()
+                    ->with(['brand', 'media', 'prices'])
+                    ->where('is_visible', true)
+                    ->where('is_featured', true)
+                    ->limit(4)
+                    ->get()
+                    ->skipWhile(static function (Product $product): bool {
+                        // Skip products that are not properly configured for showcase display.
+                        return empty($product->name) || ! $product->is_visible || ! $product->is_featured || ($product->price ?? 0) <= 0 || empty($product->slug);
+                    });
+            },
+            [
+                CacheTags::products(),
+                CacheTags::brands(),
+                CacheTags::locale($locale),
+            ]
+        );
+
+        return $products;
     }
 
     /**
@@ -83,14 +102,29 @@ final class ComponentShowcase extends Component
     #[Computed]
     public function categories(): EloquentCollection
     {
-        return Category::query()
-            ->where('is_visible', true)
-            ->limit(3)
-            ->get()
-            ->skipWhile(static function (Category $category): bool {
-                // Skip categories that are not properly configured for showcase display.
-                return empty($category->name) || ! $category->is_visible || empty($category->slug);
-            });
+        $locale = app()->getLocale();
+
+        /** @var EloquentCollection<int, Category> $categories */
+        $categories = TagAwareCache::remember(
+            CacheKeys::componentShowcase('categories', $locale),
+            now()->addMinutes(30),
+            static function (): EloquentCollection {
+                return Category::query()
+                    ->where('is_visible', true)
+                    ->limit(3)
+                    ->get()
+                    ->skipWhile(static function (Category $category): bool {
+                        // Skip categories that are not properly configured for showcase display.
+                        return empty($category->name) || ! $category->is_visible || empty($category->slug);
+                    });
+            },
+            [
+                CacheTags::categories(),
+                CacheTags::locale($locale),
+            ]
+        );
+
+        return $categories;
     }
 
     /**
@@ -99,14 +133,29 @@ final class ComponentShowcase extends Component
     #[Computed]
     public function brands(): EloquentCollection
     {
-        return Brand::query()
-            ->where('is_enabled', true)
-            ->limit(3)
-            ->get()
-            ->skipWhile(static function (Brand $brand): bool {
-                // Skip brands that are not properly configured for showcase display.
-                return empty($brand->name) || ! $brand->is_enabled || empty($brand->slug);
-            });
+        $locale = app()->getLocale();
+
+        /** @var EloquentCollection<int, Brand> $brands */
+        $brands = TagAwareCache::remember(
+            CacheKeys::componentShowcase('brands', $locale),
+            now()->addMinutes(30),
+            static function (): EloquentCollection {
+                return Brand::query()
+                    ->where('is_enabled', true)
+                    ->limit(3)
+                    ->get()
+                    ->skipWhile(static function (Brand $brand): bool {
+                        // Skip brands that are not properly configured for showcase display.
+                        return empty($brand->name) || ! $brand->is_enabled || empty($brand->slug);
+                    });
+            },
+            [
+                CacheTags::brands(),
+                CacheTags::locale($locale),
+            ]
+        );
+
+        return $brands;
     }
 
     /**
