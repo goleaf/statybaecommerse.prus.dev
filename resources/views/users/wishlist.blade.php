@@ -295,7 +295,11 @@ function addToCart(productVariantId, productId, quantity = 1) {
     .then(data => {
         if (data.success) {
             showNotification('{{ __("users.added_to_cart") }}', 'success');
-            updateCartCount();
+            if (typeof window.updateCartCount === 'function') {
+                window.updateCartCount();
+            } else {
+                refreshCartCountFallback();
+            }
         } else {
             showNotification(data.message || '{{ __("users.error_adding_to_cart") }}', 'error');
         }
@@ -352,7 +356,7 @@ function updateWishlistCount() {
         });
 }
 
-function updateCartCount() {
+function refreshCartCountFallback() {
     // Update cart count in navigation or other UI elements
     fetch('{{ route("cart.count") }}')
         .then(response => response.json())

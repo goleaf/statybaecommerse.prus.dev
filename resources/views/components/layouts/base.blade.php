@@ -149,6 +149,51 @@
 
     <!-- Notification Handler -->
     <script nonce="{{ csp_nonce() }}">
+        const ensureCartUpdater = () => {
+            if (typeof window.updateCartCount === 'function') {
+                return window.updateCartCount;
+            }
+
+            const updateCartCount = function () {
+                try {
+                    const storedCart = window.sessionStorage.getItem('cart');
+                    const parsedCart = storedCart ? JSON.parse(storedCart) : [];
+                    const cartItems = Array.isArray(parsedCart) ? parsedCart : Object.values(parsedCart || {});
+                    const count = cartItems.reduce((total, item) => total + (Number(item.quantity) || 0), 0);
+
+                    const el = document.getElementById('cart-count');
+                    if (el) {
+                        el.textContent = String(count);
+                        el.style.display = count > 0 ? 'inline' : 'none';
+                    }
+
+                    const counters = document.querySelectorAll('[data-cart-count]');
+                    counters.forEach((node) => {
+                        node.textContent = String(count);
+                        if (node instanceof HTMLElement) {
+                            node.style.display = count > 0 ? 'inline' : 'none';
+                        }
+                    });
+
+                    window.dispatchEvent(
+                        new CustomEvent('cart-updated', {
+                            detail: { quantity: count },
+                        }),
+                    );
+
+                    return count;
+                } catch (e) {
+                    return 0;
+                }
+            };
+
+            window.updateCartCount = updateCartCount;
+
+            return updateCartCount;
+        };
+
+        const cartCountUpdater = ensureCartUpdater();
+
         document.addEventListener('livewire:init', () => {
             Livewire.on('notify', (event) => {
                 const notification = event[0] || event;
@@ -156,7 +201,7 @@
             });
 
             Livewire.on('cart-updated', () => {
-                updateCartCount();
+                cartCountUpdater();
             });
         });
 
@@ -205,42 +250,6 @@
             }, 5000);
         }
 
-        function updateCartCount() {
-            // Update cart counters safely without assuming elements exist
-            try {
-                const storedCart = window.sessionStorage.getItem('cart');
-                const parsedCart = storedCart ? JSON.parse(storedCart) : [];
-                const cartItems = Array.isArray(parsedCart) ? parsedCart : Object.values(parsedCart || {});
-                const count = cartItems.reduce((total, item) => total + (Number(item.quantity) || 0), 0);
-
-                const el = document.getElementById('cart-count');
-                if (el) {
-                    el.textContent = String(count);
-                    el.style.display = count > 0 ? 'inline' : 'none';
-                }
-
-                const counters = document.querySelectorAll('[data-cart-count]');
-                counters.forEach((node) => {
-                    node.textContent = String(count);
-                    if (node instanceof HTMLElement) {
-                        node.style.display = count > 0 ? 'inline' : 'none';
-                    }
-                });
-                // Emit a browser event so standalone Alpine widgets receive the same signal.
-                window.dispatchEvent(
-                    new CustomEvent('cart-updated', {
-                        detail: { quantity: count },
-                    }),
-                );
-
-                return count;
-            } catch (e) {
-                // Silently ignore to avoid breaking pages without cart UI
-
-                return 0;
-            }
-        }
-
         // Hydrate the cart snapshot in sessionStorage so client listeners can read trusted data.
         try {
             const serverCartState = @json(array_values(session('cart', [])));
@@ -252,7 +261,7 @@
         }
 
         // Initialize cart count on page load
-        document.addEventListener('DOMContentLoaded', updateCartCount);
+        document.addEventListener('DOMContentLoaded', cartCountUpdater);
     </script>
 
     <!-- Additional scripts -->
