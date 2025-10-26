@@ -7,6 +7,7 @@ namespace Tests\Feature\Frontend;
 use App\Models\Referral;
 use App\Models\ReferralReward;
 use App\Models\User;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -31,10 +32,19 @@ final class ReferralControllerTest extends TestCase
         $response->assertStatus(200);
         $response->assertViewIs('referrals.index');
         $response->assertViewHas('referrals');
-        $response->assertViewHas('totalReferrals');
-        $response->assertViewHas('completedReferrals');
-        $response->assertViewHas('totalRewards');
-        $response->assertViewHas('pendingRewards');
+        $response->assertViewHas('referrals', function ($referrals): bool {
+            // Ensure the controller returns a paginator instead of a raw collection.
+            return $referrals instanceof LengthAwarePaginator;
+        });
+        $response->assertViewHas('stats');
+        $response->assertViewHas('stats', function (array $stats): bool {
+            // Validate the aggregate counters exposed to the Blade template.
+            return array_key_exists('total_referrals', $stats)
+                && array_key_exists('completed_referrals', $stats)
+                && array_key_exists('pending_referrals', $stats)
+                && array_key_exists('total_rewards', $stats);
+        });
+        $response->assertViewHas('referralCode');
     }
 
     public function test_can_view_create_referral_form(): void
