@@ -33,7 +33,6 @@ return [
     ],
     'order_status' => [
         'pending'    => 'Laukiantis',
-        'confirmed'  => 'Patvirtintas',
         'processing' => 'Apdorojamas',
         'shipped'    => 'Išsiųstas',
         'delivered'  => 'Pristatytas',
