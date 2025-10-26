@@ -86,7 +86,7 @@ class CurrencySelector extends Component
         $defaultCode = (string) config('app.currency', 'EUR');
 
         if (app()->environment('testing')) {
-            return [$this->defaultCurrencyEntry($defaultCode)];
+            return [$this->defaultCurrencyEntry($defaultCode)->toArray()];
         }
 
         /** @var array<int, array{id:int, code:string, symbol:string}> $payload */

@@ -46,7 +46,7 @@
                                         {{ $entry->key }}
                                     </p>
                                     <div class="ml-2 flex-shrink-0 flex">
-                                        @if($showPublicOnly)
+                                        @if($entry['isPublic'])
                                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
                                                 {{ __('system_settings.public') }}
                                             </span>
