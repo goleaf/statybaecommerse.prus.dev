@@ -7,8 +7,10 @@ namespace App\Livewire\Components\Checkout;
 use App\Actions\CreateOrder;
 use App\Actions\Payment\PayWithCash;
 use App\Enums\PaymentType;
+use App\Models\PaymentMethod;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Collection;
+use Livewire\Attributes\On;
 use Livewire\Attributes\Validate;
 use Spatie\LivewireWizard\Components\StepComponent;
 
@@ -29,6 +31,11 @@ class Payment extends StepComponent
      * @var array|Collection
      */
     public $methods = [];
+
+    /**
+     * Tracks whether shipping totals are recalculating so the payment CTA can be temporarily disabled.
+     */
+    public bool $shippingOptionsRefreshing = false;
 
     /**
      * Initialize the Livewire component with parameters.
@@ -68,5 +75,19 @@ class Payment extends StepComponent
     public function render(): View
     {
         return view('livewire.components.checkout.payment');
+    }
+
+    #[On('shipping-recalculation-started')]
+    public function handleShippingRecalculationStarted(): void
+    {
+        // Toggle the guard flag immediately so the button is disabled while delivery data refreshes.
+        $this->shippingOptionsRefreshing = true;
+    }
+
+    #[On('shipping-recalculation-finished')]
+    public function handleShippingRecalculationFinished(): void
+    {
+        // Reset the flag once delivery finishes recomputing available options.
+        $this->shippingOptionsRefreshing = false;
     }
 }

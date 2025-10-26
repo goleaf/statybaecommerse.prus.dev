@@ -49,11 +49,25 @@ class Delivery extends StepComponent
      */
     public function mount(): void
     {
-        // Restore the persisted selection so returning visitors keep their previous
-        // choice, then immediately resolve context-aware options for the cart.
-        $storedSelection = data_get(session()->get('checkout'), 'shipping_option.0.id');
-        $this->currentSelected = is_numeric($storedSelection) ? (int) $storedSelection : null;
-        $this->resolveOptions();
+        // Seed the initially selected option from the persisted checkout state.
+        $storedOption = data_get(session()->get('checkout'), 'shipping_option');
+        $this->currentSelected = $storedOption ? data_get($storedOption, '0.id') : null;
+
+        // Resolve shipping options immediately so the delivery step starts hydrated.
+        $this->recalculateOptions(data_get(session()->get('checkout'), 'shipping_address.id'));
+    }
+
+    /**
+     * Refresh shipping options whenever the shipping address changes upstream.
+     */
+    #[On('shipping-address-updated')]
+    public function handleShippingAddressUpdated(?int $shippingAddressId = null): void
+    {
+        // Clearing the validation bag ensures stale errors disappear when the address changes.
+        $this->resetErrorBag('currentSelected');
+        $this->resetValidation();
+
+        $this->recalculateOptions($shippingAddressId, true);
     }
 
     /**
@@ -124,7 +138,7 @@ class Delivery extends StepComponent
     #[On('checkout-address-updated')]
     public function handleCheckoutAddressUpdated(?int $addressId = null, ?string $countryCode = null): void
     {
-        $this->resolveOptions($addressId, $countryCode);
+        $this->recalculateOptions($addressId, true);
     }
 
     /**
@@ -165,14 +179,24 @@ class Delivery extends StepComponent
     /**
      * Resolve the current shipping options for the active cart and address.
      */
-    private function resolveOptions(?int $addressId = null, ?string $countryCode = null): void
+    private function recalculateOptions(?int $shippingAddressId = null, bool $emitLifecycleEvents = false): void
     {
         $this->isResolving = true;
+
+        // Forget previously stored shipping option whenever the address changes.
+        session()->forget('checkout.shipping_option');
+
+        if ($emitLifecycleEvents) {
+            // Broadcast that shipping is recalculating so downstream steps can react (disable pay now, etc.).
+            $this->dispatch('shipping-recalculation-started');
+        }
+
+        $countryCode = $this->resolveCountryCode($shippingAddressId);
 
         $resolver = app(ShippingOptionResolver::class);
         $cartItems = $this->getCartItems();
         /** @var SupportCollection<int, array{id:int,name:string,price:float,formatted_price:string,estimated_delivery:string}> $resolved */
-        $resolved = $resolver->resolve($cartItems->collect(), $countryCode ?? $this->resolveCountryCode($addressId));
+        $resolved = $resolver->resolve($cartItems->collect(), $countryCode);
 
         $optionIds = $resolved
             ->pluck('id')
@@ -218,6 +242,11 @@ class Delivery extends StepComponent
         }
 
         $this->isResolving = false;
+
+        if ($emitLifecycleEvents) {
+            // Notify listeners that the recalculation finished so UI controls can re-enable.
+            $this->dispatch('shipping-recalculation-finished');
+        }
     }
 
     /**
