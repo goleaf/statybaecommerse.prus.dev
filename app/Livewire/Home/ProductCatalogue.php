@@ -4,20 +4,23 @@ declare(strict_types=1);
 
 namespace App\Livewire\Home;
 
+use App\Data\Storefront\Home\CategoryFilterOptionData;
+use App\Data\Storefront\Home\ProductListItemData;
 use App\Livewire\Concerns\WithCart;
 use App\Livewire\Concerns\WithNotifications;
 use App\Models\Category;
 use App\Models\Product;
 use App\Support\Cache\CacheKeys;
 use App\Support\Cache\CacheTagHelper;
+use App\Support\Cache\CacheTags;
+use App\Support\Cache\TagAwareCache;
 use Filament\Infolists\Components\ViewEntry;
 use Filament\Schemas\Concerns\InteractsWithSchemas;
 use Filament\Schemas\Contracts\HasSchemas;
 use Filament\Schemas\Schema;
-use Illuminate\Cache\TaggableStore;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Contracts\View\View;
-use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Collection;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -60,23 +63,32 @@ final class ProductCatalogue extends Component implements HasSchemas
     }
 
     #[Computed]
-    public function categories(): array
+    public function categories(): Collection
     {
         $locale = app()->getLocale();
+        $cacheKey = CacheKeys::homeCatalogueCategories($locale);
 
-        $store = Cache::getStore();
-        $callback = static fn (): array => Category::query()
-            ->where('is_visible', true)
-            ->orderBy('name')
-            ->pluck('name', 'id')
-            ->toArray();
+        $callback = static function () use ($locale): Collection {
+            return Category::query()
+                ->with(['translations' => function ($query) use ($locale): void {
+                    $query->where('locale', $locale);
+                }])
+                ->where('is_visible', true)
+                ->orderBy('name')
+                ->get()
+                ->map(static function (Category $category) use ($locale): CategoryFilterOptionData {
+                    // Shape the option payload up-front so cached results remain serialisable.
+                    return CategoryFilterOptionData::fromModel($category, $locale);
+                });
+        };
 
-        if ($store instanceof TaggableStore) {
-            return Cache::tags(CacheTagHelper::merge(CacheTagHelper::categories(), CacheTagHelper::locale($locale)))
-                ->remember(CacheKeys::homeCatalogueCategories($locale), CacheKeys::TTL_FIVE_MINUTES, $callback);
-        }
+        $tags = CacheTagHelper::merge(
+            CacheTagHelper::categories(),
+            CacheTagHelper::locale($locale),
+            [CacheTags::home()]
+        );
 
-        return Cache::remember(CacheKeys::homeCatalogueCategories($locale), CacheKeys::TTL_FIVE_MINUTES, $callback);
+        return TagAwareCache::remember($cacheKey, CacheKeys::TTL_FIVE_MINUTES, $callback, $tags);
     }
 
     #[Computed]
@@ -119,7 +131,11 @@ final class ProductCatalogue extends Component implements HasSchemas
             default      => $query->orderByDesc('published_at'),
         };
 
-        return $query->paginate($this->perPage);
+        return $query->paginate($this->perPage)
+            ->through(function (Product $product) use ($locale): ProductListItemData {
+                // Convert catalogue entries into DTOs so pagination caches hydrate cleanly.
+                return ProductListItemData::fromModel($product, $locale);
+            });
     }
 
     public function catalogue(Schema $schema): Schema
