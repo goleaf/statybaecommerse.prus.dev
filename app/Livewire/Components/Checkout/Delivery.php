@@ -6,7 +6,6 @@ namespace App\Livewire\Components\Checkout;
 
 use App\Models\Address;
 use App\Models\CartItem;
-use App\Models\ShippingOption;
 use App\Services\Shipping\ShippingOptionResolver;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
@@ -22,13 +21,15 @@ use Spatie\LivewireWizard\Components\StepComponent;
  *
  * @property mixed    $options
  * @property int|null $currentSelected
+ *
+ * @method void nextStep()
  */
 class Delivery extends StepComponent
 {
     /**
      * Normalised shipping options resolved for the current checkout context.
      *
-     * @var array<int, array{id:int,name:string,price:float,formatted_price:string,estimated_delivery:string}>
+     * @var array<int, array{id:int,name:string,description:?string,price:float,formatted_price:string,estimated_delivery:?string}>
      */
     public array $options = [];
 
@@ -41,12 +42,12 @@ class Delivery extends StepComponent
     public function mount(): void
     {
         // Seed the initially selected option from the persisted checkout state.
-        $this->currentSelected = data_get(session()->get('checkout'), 'shipping_option')
-            ? data_get(session()->get('checkout'), 'shipping_option')[0]['id']
-            : null;
+        // Remember the option previously confirmed by the customer (if any).
+        $selectedFromSession = data_get(session()->get('checkout'), 'shipping_option.0.id');
+        $this->currentSelected = $this->normaliseOptionId($selectedFromSession);
 
         // Resolve shipping options immediately so the delivery step starts hydrated.
-        $this->recalculateOptions(data_get(session()->get('checkout'), 'shipping_address.id'));
+        $this->recalculateOptions($this->normaliseAddressId(data_get(session()->get('checkout'), 'shipping_address.id')));
     }
 
     /**
@@ -55,7 +56,15 @@ class Delivery extends StepComponent
     #[On('shipping-address-updated')]
     public function handleShippingAddressUpdated(?int $shippingAddressId = null): void
     {
-        $this->recalculateOptions($shippingAddressId);
+        // If the address has changed, clear any persisted shipping choice so totals cannot go stale.
+        $normalizedIncomingId = $this->normaliseAddressId($shippingAddressId);
+        $persistedAddressId = $this->normaliseAddressId(data_get(session()->get('checkout'), 'shipping_address.id'));
+        if ($normalizedIncomingId !== null && $persistedAddressId !== null && $normalizedIncomingId !== $persistedAddressId) {
+            session()->forget('checkout.shipping_option');
+            $this->currentSelected = null;
+        }
+
+        $this->recalculateOptions($normalizedIncomingId);
     }
 
     /**
@@ -65,22 +74,55 @@ class Delivery extends StepComponent
     {
         $this->validate();
         session()->forget('checkout.shipping_option');
-        $option = ShippingOption::query()->find($this->currentSelected)->toArray();
+
+        // Look up the resolved option so we retain the dynamically calculated price instead of the base model amount.
+        $resolvedOption = $this->getResolvedOptionById($this->currentSelected);
+        if ($resolvedOption === null) {
+            // Attempt to recover gracefully by recalculating once before failing hard.
+            $this->recalculateOptions($this->normaliseAddressId(data_get(session()->get('checkout'), 'shipping_address.id')));
+            $resolvedOption = $this->getResolvedOptionById($this->currentSelected);
+        }
+
+        if ($resolvedOption === null) {
+            $this->addError('currentSelected', __('The selected delivery option is no longer available.'));
+
+            return;
+        }
+
+        $option = $this->normaliseOptionForSession($resolvedOption);
         // Apply shipping discount context if any (free shipping or cap)
         $engine = app(\App\Services\Discounts\DiscountEngine::class);
-        $context = ['currency_code' => current_currency(), 'channel_id' => optional(config('app.url')), 'user_id' => optional(auth()->user())->id, 'now' => now(), 'cart' => ['subtotal' => (float) (session('cart.subtotal') ?? 0), 'items' => []], 'shipping' => ['base_amount' => (float) ($option['price'] ?? 0)]];
+        $baseAmount = (float) $option['price'];
+        $cartSubtotal = session('cart.subtotal');
+        $subtotal = is_numeric($cartSubtotal) ? (float) $cartSubtotal : 0.0;
+
+        $context = [
+            'currency_code' => current_currency(),
+            'channel_id'    => config('app.url'),
+            'user_id'       => Auth::id(),
+            'now'           => now(),
+            'cart'          => ['subtotal' => $subtotal, 'items' => []],
+            'shipping'      => ['base_amount' => $baseAmount],
+        ];
+
         $result = $engine->evaluate($context);
-        $shippingDiscount = (float) data_get($result, 'shipping.discount_amount', 0.0);
+        $evaluatedDiscount = data_get($result, 'shipping.discount_amount', 0.0);
+        $shippingDiscount = is_numeric($evaluatedDiscount) ? (float) $evaluatedDiscount : 0.0;
         if ($shippingDiscount > 0) {
-            $option['price'] = max(0, (float) ($option['price'] ?? 0) - $shippingDiscount);
+            $discounted = max(0.0, $baseAmount - $shippingDiscount);
+            $option['price'] = $discounted;
+            // Refresh the formatted amount so downstream summaries reflect the discounted value immediately.
+            $option['formatted_price'] = app_money_format($discounted, current_currency());
         }
-        session()->push('checkout.shipping_option', $option);
+        session()->put('checkout.shipping_option', [$option]);
         $this->dispatch('cart-price-update');
         $this->nextStep();
     }
 
     /**
      * Handle stepInfo functionality with proper error handling.
+     *
+     * @return array{label:string, complete:bool}
      */
     public function stepInfo(): array
     {
@@ -100,9 +142,6 @@ class Delivery extends StepComponent
      */
     private function recalculateOptions(?int $shippingAddressId = null): void
     {
-        // Forget previously stored shipping option whenever the address changes.
-        session()->forget('checkout.shipping_option');
-
         $countryCode = $this->resolveCountryCode($shippingAddressId);
 
         $cartItems = CartItem::with('product')
@@ -111,16 +150,24 @@ class Delivery extends StepComponent
 
         $resolver = app(ShippingOptionResolver::class);
 
+        /**
+         * The resolver returns context-aware shipping options enriched with computed prices.
+         *
+         * @var array<int, array{id:int,name:string,description:?string,price:float,formatted_price:string,estimated_delivery:?string}> $resolved
+         */
         $resolved = $resolver->resolve($cartItems, $countryCode)->toArray();
 
         $this->options = $resolved;
 
-        $availableIds = collect($resolved)->pluck('id')->all();
+        $selectedId = $this->currentSelected ?? $this->normaliseOptionId(data_get(session()->get('checkout'), 'shipping_option.0.id'));
+        $selectedOption = $this->findOptionInResolved($resolved, $selectedId);
 
-        if (! in_array($this->currentSelected, $availableIds, true)) {
+        if ($selectedOption === null && $resolved !== []) {
             // Default to the first available option to keep the UI interactive.
-            $this->currentSelected = $resolved[0]['id'] ?? null;
+            $selectedOption = $resolved[0];
         }
+
+        $this->currentSelected = $selectedOption !== null ? $selectedOption['id'] : null;
     }
 
     /**
@@ -134,10 +181,98 @@ class Delivery extends StepComponent
                 ->find($shippingAddressId);
 
             if ($address !== null) {
-                return $address->country_code;
+                $countryCode = $address->getAttribute('country_code');
+
+                return is_string($countryCode) ? $countryCode : null;
             }
         }
 
-        return data_get(session()->get('checkout'), 'shipping_address.country_code');
+        $countryCode = data_get(session()->get('checkout'), 'shipping_address.country_code');
+
+        return is_string($countryCode) ? $countryCode : null;
+    }
+
+    /**
+     * Retrieve the option from the in-memory collection using the provided identifier.
+     *
+     * @return array{id:int,name:string,description:?string,price:float,formatted_price:string,estimated_delivery:?string}|null
+     */
+    private function getResolvedOptionById(?int $optionId): ?array
+    {
+        if ($optionId === null) {
+            return null;
+        }
+
+        /** @var array<int, array{id:int,name:string,description:?string,price:float,formatted_price:string,estimated_delivery:?string}> $options */
+        $options = $this->options;
+
+        return $this->findOptionInResolved($options, $optionId);
+    }
+
+    /**
+     * Locate an option within the provided resolved dataset.
+     *
+     * @param  array<int, array{id:int,name:string,description:?string,price:float,formatted_price:string,estimated_delivery:?string}> $resolved
+     * @return array{id:int,name:string,description:?string,price:float,formatted_price:string,estimated_delivery:?string}|null
+     */
+    private function findOptionInResolved(array $resolved, ?int $optionId): ?array
+    {
+        if ($optionId === null) {
+            return null;
+        }
+
+        foreach ($resolved as $option) {
+            if ((int) $option['id'] === $optionId) {
+                return $option;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Prepare the resolved option for storage in the checkout session payload.
+     *
+     * @param  array{id:int,name:string,description:?string,price:float,formatted_price:string,estimated_delivery:?string} $option
+     * @return array{id:int,name:string,description:?string,price:float,formatted_price:string,estimated_delivery:?string}
+     */
+    private function normaliseOptionForSession(array $option): array
+    {
+        // Ensure scalar typing for downstream JSON encoding and persistence.
+        $description = $option['description'] ?? null;
+        $estimatedDelivery = $option['estimated_delivery'] ?? null;
+
+        return [
+            'id'                 => (int) $option['id'],
+            'name'               => (string) $option['name'],
+            'description'        => is_string($description) ? $description : null,
+            'price'              => (float) $option['price'],
+            'formatted_price'    => (string) $option['formatted_price'],
+            'estimated_delivery' => is_string($estimatedDelivery) ? $estimatedDelivery : null,
+        ];
+    }
+
+    /**
+     * Normalise arbitrary address identifiers into nullable integers.
+     */
+    private function normaliseAddressId(mixed $addressId): ?int
+    {
+        if (is_numeric($addressId)) {
+            return (int) $addressId;
+        }
+
+        return null;
+    }
+
+    /**
+     * Normalise arbitrary option identifiers into nullable integers.
+     */
+    private function normaliseOptionId(mixed $optionId): ?int
+    {
+        if (is_numeric($optionId)) {
+            return (int) $optionId;
+        }
+
+        return null;
     }
 }
