@@ -7,28 +7,23 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\AdminUserResource\Pages;
 use App\Models\AdminUser;
 use App\Support\Concerns\HasNav;
-<<<<<<< HEAD
 use App\Support\Filament\Components\Flatpickr;
 use DateTimeInterface;
-=======
-use App\Support\Filament\Components\Flatpickr;
-use DateTimeInterface;
->>>>>>> origin/codex/fix-admin-user-resource-tests
 use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Placeholder;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Form;
 use Filament\Notifications\Notification as FilamentNotification;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Grid as SchemaGrid;
-use Filament\Schemas\Components\Section as SchemaSection;
-use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
@@ -67,15 +62,15 @@ final class AdminUserResource extends Resource
     }
 
     /**
-     * Configure the Filament form schema using the v4 Schema contract so the
+     * Configure the Filament form using the v4 Form contract so the
      * resource signature remains compatible with the upstream Resource base class.
      */
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
-        return $schema->schema([
-            SchemaSection::make(__('admin.admin_users.form.sections.basic_information'))
+        return $form->schema([
+            Section::make(__('admin.admin_users.form.sections.basic_information'))
                 ->schema([
-                    SchemaGrid::make(2)
+                    Grid::make(2)
                         ->schema([
                             TextInput::make('name')
                                 ->label(__('admin.admin_users.form.fields.name'))
@@ -90,7 +85,7 @@ final class AdminUserResource extends Resource
                                 ->maxLength(255)
                                 ->columnSpan(1),
                         ]),
-                    SchemaGrid::make(2)
+                    Grid::make(2)
                         ->schema([
                             TextInput::make('password')
                                 ->label(__('admin.admin_users.form.fields.password'))
@@ -109,7 +104,7 @@ final class AdminUserResource extends Resource
                         ]),
                 ])
                 ->columns(1),
-            SchemaSection::make(__('admin.admin_users.form.sections.account_details'))
+            Section::make(__('admin.admin_users.form.sections.account_details'))
                 ->schema([
                     Placeholder::make('email_verified_at')
                         ->label(__('admin.admin_users.form.fields.email_verified_at'))
@@ -152,7 +147,7 @@ final class AdminUserResource extends Resource
                         }),
                 ])
                 ->columns(2),
-            SchemaSection::make(__('admin.admin_users.form.sections.roles_permissions'))
+            Section::make(__('admin.admin_users.form.sections.roles_permissions'))
                 ->schema([
                     Select::make('roles')
                         ->label(__('admin.admin_users.form.fields.roles'))
