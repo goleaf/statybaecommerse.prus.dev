@@ -61,7 +61,7 @@ class Cart extends Component
         $cart = $this->getCartSession();
         if ($cart) {
             $cart->remove($id);
-            $this->dispatch('cartUpdated');
+            $this->dispatch('cart-updated'); // Broadcast the unified cart change event.
             $this->refreshTotals();
         }
     }
@@ -95,7 +95,7 @@ class Cart extends Component
                 // ignore update failures
             }
         }
-        $this->dispatch('cartUpdated');
+        $this->dispatch('cart-updated'); // Ensure listeners refresh after quantity adjustments.
         $this->refreshTotals();
     }
 
@@ -113,7 +113,7 @@ class Cart extends Component
         } catch (Throwable $e) {
             // ignore
         }
-        $this->dispatch('cartUpdated');
+        $this->dispatch('cart-updated'); // Notify interested components about the increment.
         $this->refreshTotals();
     }
 
@@ -143,7 +143,7 @@ class Cart extends Component
         } catch (Throwable $e) {
             // ignore
         }
-        $this->dispatch('cartUpdated');
+        $this->dispatch('cart-updated'); // Emit the decremented state to shared listeners.
         $this->refreshTotals();
     }
 

@@ -23,7 +23,9 @@ final class ShoppingCartButton extends Component
 
     public string $sessionKey = '';
 
-    protected $listeners = ['cartUpdated' => 'updateCartCount'];
+    protected $listeners = [
+        'cart-updated' => 'updateCartCount', // Listen for the normalised cart update broadcast.
+    ];
 
     /**
      * Initialize the Livewire component with parameters.
