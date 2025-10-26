@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\OrdersByName;
 use App\Models\Scopes\DateRangeScope;
 use App\Models\Scopes\EnabledScope;
 use App\Models\Translations\PriceListTranslation;
@@ -36,11 +37,20 @@ use Spatie\Activitylog\Traits\LogsActivity;
 #[ScopedBy([EnabledScope::class, DateRangeScope::class])]
 final class PriceList extends Model
 {
-    use HasFactory, HasTranslations, LogsActivity, SoftDeletes;
+    use HasFactory;
+    use HasTranslations;
+    use LogsActivity;
+    use OrdersByName;
+    use SoftDeletes;
 
     protected string $translationModel = PriceListTranslation::class;
 
     protected $table = 'price_lists';
+
+    /**
+     * Rely on the human readable name column when applying the shared OrdersByName scope.
+     */
+    protected string $nameColumn = 'name';
 
     protected $fillable = ['name', 'code', 'currency_id', 'is_enabled', 'priority', 'starts_at', 'ends_at', 'description', 'metadata', 'is_default', 'auto_apply', 'min_order_amount', 'max_order_amount'];
 
@@ -136,16 +146,6 @@ final class PriceList extends Model
     public function scopeAutoApply($query)
     {
         return $query->where('auto_apply', true);
-    }
-
-    /**
-     * Handle scopeOrderedByName functionality with proper error handling.
-     *
-     * @param  mixed  $query
-     */
-    public function scopeOrderedByName($query, string $direction = 'asc')
-    {
-        return $query->orderBy('name', $direction);
     }
 
     /**

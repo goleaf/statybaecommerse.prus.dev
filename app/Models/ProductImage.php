@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\OrdersByName;
 use App\Models\Scopes\ActiveScope;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -43,10 +44,16 @@ final class ProductImage extends Model
 {
     /** @use HasFactory<\Database\Factories\ProductImageFactory> */
     use HasFactory;
+    use OrdersByName;
 
     protected $table = 'product_images';
 
     protected $fillable = ['product_id', 'path', 'alt_text', 'sort_order', 'is_active'];
+
+    /**
+     * Favour the alt_text column when sorting images so editors see human readable values first.
+     */
+    protected string $nameColumn = 'alt_text';
 
     protected $attributes = [
         'is_active' => true,

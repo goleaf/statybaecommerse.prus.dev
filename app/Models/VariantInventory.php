@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\OrdersByName;
 use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\EnabledScope;
 use App\Models\Scopes\StatusScope;
@@ -36,7 +37,9 @@ use Illuminate\Support\Facades\DB;
 #[ScopedBy([ActiveScope::class, EnabledScope::class, TrackedScope::class, StatusScope::class])]
 final class VariantInventory extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory;
+    use OrdersByName;
+    use SoftDeletes;
 
     protected $table = 'variant_inventories';
 

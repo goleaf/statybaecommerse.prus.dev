@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\OrdersByName;
 use App\Models\Scopes\ActiveScope;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Builder;
@@ -29,11 +30,17 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 final class ProductFeature extends Model
 {
     use HasFactory;
+    use OrdersByName;
 
     /**
      * @var array<int, string>
      */
     protected $fillable = ['product_id', 'feature_type', 'feature_key', 'feature_value', 'weight', 'is_active'];
+
+    /**
+     * Anchor alphabetical ordering to the feature_key so admin listings stay predictable.
+     */
+    protected string $nameColumn = 'feature_key';
 
     /**
      * @var array<string, string>
@@ -86,12 +93,4 @@ final class ProductFeature extends Model
         return $query->orderByDesc('feature_value');
     }
 
-    /**
-     * Order features alphabetically by their key name which functions as a
-     * human-friendly identifier in management interfaces.
-     */
-    public function scopeOrderedByName(Builder $query): Builder
-    {
-        return $query->orderBy('feature_key');
-    }
 }
