@@ -37,11 +37,19 @@ trait ConfiguresToggleableTableLayout
         $visibleColumns = array_values($table->getVisibleColumns());
         $contentGrid = $table->getContentGrid();
 
-        $isCurrentlyGrid = ((is_countable($columnsLayout) ? count($columnsLayout) : 0) === 1)
-            && $columnsLayout[0] instanceof GridLayoutColumn;
+        // Normalise the column layout to a simple sequential array so downstream checks
+        // never trip over unexpected traversable implementations or sparse indexes.
+        $normalizedColumnsLayout = is_array($columnsLayout)
+            ? array_values($columnsLayout)
+            : array_values(is_iterable($columnsLayout) ? iterator_to_array($columnsLayout) : []);
+
+        $isCurrentlyGrid = (count($normalizedColumnsLayout) === 1)
+            && $normalizedColumnsLayout[0] instanceof GridLayoutColumn;
 
         if (! $isCurrentlyGrid) {
-            $this->toggleableTableListLayout = array_values($columnsLayout);
+            // Preserve the original layout components so we can restore the list view
+            // after the user switches away from the grid presentation.
+            $this->toggleableTableListLayout = $normalizedColumnsLayout === [] ? null : $normalizedColumnsLayout;
             $this->toggleableTableListColumns = $visibleColumns;
             $this->toggleableTableListContentGrid = $contentGrid;
         }

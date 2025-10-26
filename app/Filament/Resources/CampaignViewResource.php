@@ -6,7 +6,6 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\CampaignViewResource\Pages;
 use App\Models\CampaignView;
-<<<<<<< HEAD
 use App\Support\Concerns\HasNav;
 use App\Support\Filament\Components\Flatpickr;
 use Filament\Forms\Components\Select;
