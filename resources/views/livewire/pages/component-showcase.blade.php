@@ -213,18 +213,21 @@
         </x-shared.section>
 
         {{-- Product Components Section --}}
-        @if($this->featuredProducts->count() > 0)
+        @if($featuredProducts->isNotEmpty())
             <x-shared.section 
                 title="Product Components"
                 description="E-commerce specific components"
                 icon="heroicon-o-cube"
             >
-                <x-shared.products-grid 
-                    :products="$this->featuredProducts"
-                    title="Featured Products"
-                    :columns="4"
-                    :show-pagination="false"
-                />
+                <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                    @foreach($featuredProducts as $product)
+                        @include('livewire.home.partials.product-card', [
+                            'product' => $product,
+                            'preset' => 'featured',
+                            'attributes' => new \Illuminate\View\ComponentAttributeBag(['class' => 'h-full']),
+                        ])
+                    @endforeach
+                </div>
             </x-shared.section>
         @endif
 

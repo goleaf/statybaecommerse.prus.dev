@@ -125,7 +125,8 @@
                     id="email"
                     type="email"
                     {{-- Keep the email field synced so unique validation feedback appears instantly. --}}
-                    wire:model.live="registrationForm.email"
+                    wire:model.live.debounce.500ms="registrationForm.email"
+                    x-on:input.debounce.500ms="$wire.validateOnly('registrationForm.email')"
                     autocomplete="email"
                     class="rounded-xl border border-slate-200 bg-white/90 px-4 py-3 text-base shadow-sm transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
                     placeholder="{{ __('you@example.com') }}"

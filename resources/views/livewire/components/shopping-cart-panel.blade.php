@@ -65,16 +65,27 @@
                     <div class="space-y-4">
                         @foreach($cartItems as $item)
                             @php
-                                $itemProduct = $item->product;
-                                $itemProductName = $itemProduct?->trans('name') ?? $itemProduct?->name;
-                                $itemBrandName = optional($itemProduct?->brand)?->trans('name') ?? optional($itemProduct?->brand)->name;
+                                $item = is_array($item) ? $item : (array) $item;
+                                $snapshot = isset($item['snapshot']) && is_array($item['snapshot']) ? $item['snapshot'] : [];
+                                $itemId = (int) ($item['id'] ?? 0);
+                                $quantity = max(1, (int) ($item['quantity'] ?? 1));
+                                $unitPrice = (float) ($item['unit_price'] ?? 0.0);
+                                $lineTotal = (float) ($item['total_price'] ?? ($unitPrice * $quantity));
+                                $itemName = $snapshot['name'] ?? $item['name'] ?? __('translations.product');
+                                $variantAttributes = isset($snapshot['variant_attributes']) && is_array($snapshot['variant_attributes'])
+                                    ? $snapshot['variant_attributes']
+                                    : [];
+                                $variantLabel = collect($variantAttributes)
+                                    ->map(static fn ($value, $key) => sprintf('%s: %s', (string) $key, (string) $value))
+                                    ->implode(', ');
+                                $imageUrl = $item['image_url'] ?? $snapshot['image'] ?? null;
                             @endphp
                             <div class="flex items-center space-x-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
                                 <!-- Product Image -->
                                 <div class="flex-shrink-0">
                                     <img 
-                                        src="{{ $itemProduct?->getFirstMediaUrl('images', 'thumb') ?: product_placeholder_url('thumb') }}"
-                                        alt="{{ $itemProductName }}"
+                                        src="{{ $imageUrl ?: product_placeholder_url('thumb') }}"
+                                        alt="{{ $itemName }}"
                                         class="w-12 h-12 object-cover rounded-md"
                                     >
                                 </div>
@@ -82,22 +93,24 @@
                                 <!-- Product Details -->
                                 <div class="flex-1 min-w-0">
                                     <h4 class="text-sm font-medium text-gray-900 dark:text-white truncate">
-                                        {{ $itemProductName }}
+                                        {{ $itemName }}
                                     </h4>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400">
-                                        {{ $itemBrandName }}
-                                    </p>
+                                    @if (! empty($variantLabel))
+                                        <p class="text-xs text-gray-500 dark:text-gray-400">
+                                            {{ $variantLabel }}
+                                        </p>
+                                    @endif
                                     <p class="text-sm font-semibold text-blue-600 dark:text-blue-400">
-                                        {{ app_money_format($item->price) }}
+                                        {{ app_money_format($lineTotal) }}
                                     </p>
                                 </div>
 
                                 <!-- Quantity Controls -->
                                 <div class="flex items-center space-x-2">
                                     <button 
-                                        wire:click="updateQuantity({{ $item->id }}, {{ $item->quantity - 1 }})"
+                                        wire:click="updateQuantity({{ $itemId }}, {{ $quantity - 1 }})"
                                         class="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
-                                        @if($item->quantity <= 1) disabled @endif
+                                        @if($quantity <= 1) disabled @endif
                                     >
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" />
@@ -105,11 +118,11 @@
                                     </button>
                                     
                                     <span class="text-sm font-medium text-gray-900 dark:text-white min-w-[2rem] text-center">
-                                        {{ $item->quantity }}
+                                        {{ $quantity }}
                                     </span>
                                     
                                     <button 
-                                        wire:click="updateQuantity({{ $item->id }}, {{ $item->quantity + 1 }})"
+                                        wire:click="updateQuantity({{ $itemId }}, {{ $quantity + 1 }})"
                                         class="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
                                     >
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -118,7 +131,7 @@
                                     </button>
                                     
                                     <button 
-                                        wire:click="removeItem({{ $item->id }})"
+                                        wire:click="removeItem({{ $itemId }})"
                                         wire:confirm="{{ __('translations.confirm_remove_cart_item') }}"
                                         class="p-1 text-red-400 hover:text-red-600"
                                         title="{{ __('translations.remove_item') }}"

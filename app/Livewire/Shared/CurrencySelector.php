@@ -13,6 +13,7 @@ use App\Support\Cache\CacheTags;
 use App\Support\Cache\TagAwareCache;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Session;
 use Livewire\Component;
 use Throwable;
 
@@ -21,15 +22,17 @@ use Throwable;
  *
  * Livewire component for CurrencySelector with reactive frontend functionality, real-time updates, and user interaction handling.
  *
- * @property array<int, CurrencyOptionData> $currencies
- * @property string|null                    $activeCurrencyCode
+ * @property array<int, array{id:int, code:string, symbol:string, active:bool}> $currencies
+ * @property string|null                                           $activeCurrencyCode
  */
 class CurrencySelector extends Component
 {
     /**
+     * Cache the typed DTOs internally so Livewire never hydrates them directly.
+     *
      * @var array<int, CurrencyOptionData>
      */
-    public array $currencies = [];
+    private array $currencyOptions = [];
 
     public ?string $activeCurrencyCode = null;
 
@@ -38,8 +41,26 @@ class CurrencySelector extends Component
      */
     public function mount(): void
     {
-        $this->currencies = $this->loadCurrencies();
-        $this->activeCurrencyCode = $this->resolveActiveCurrencyCode($this->currencies);
+        $this->currencyOptions = $this->loadCurrencies();
+        $this->activeCurrencyCode = $this->resolveActiveCurrencyCode($this->currencyOptions);
+    }
+
+    /**
+     * Expose primitive currency payloads for Blade consumption.
+     *
+     * @return array<int, array{id:int, code:string, symbol:string}>
+     */
+    public function getCurrenciesProperty(): array
+    {
+        return array_map(
+            fn (CurrencyOptionData $option): array => array_merge(
+                $option->toArray(),
+                [
+                    'active' => $option->code === $this->activeCurrencyCode,
+                ]
+            ),
+            $this->currencyOptions,
+        );
     }
 
     /**
@@ -48,6 +69,29 @@ class CurrencySelector extends Component
     public function render(): View
     {
         return view('livewire.shared.currency-selector');
+    }
+
+    /**
+     * Persist a new active currency selection initiated from the UI.
+     */
+    public function setCurrency(string $code): void
+    {
+        $normalised = strtoupper(trim($code));
+
+        if ($normalised === '' || $normalised === strtoupper((string) $this->activeCurrencyCode)) {
+            return;
+        }
+
+        $available = collect($this->currencyOptions)->first(static function (CurrencyOptionData $option) use ($normalised): bool {
+            return strtoupper($option->code) === $normalised;
+        });
+
+        if (! $available instanceof CurrencyOptionData) {
+            return;
+        }
+
+        Session::put('forced_currency', $available->code);
+        $this->activeCurrencyCode = $available->code;
     }
 
     /**
@@ -79,7 +123,7 @@ class CurrencySelector extends Component
     /**
      * Load the list of enabled currencies from cache or storage.
      *
-     * @return array<int, array{id:int, code:string, symbol:string}>
+     * @return array<int, CurrencyOptionData>
      */
     private function loadCurrencies(): array
     {
@@ -115,7 +159,8 @@ class CurrencySelector extends Component
      */
     private function resolveActiveCurrencyCode(array $currencies): ?string
     {
-        $fallbackCode = $currencies[0]->code ?? (string) config('app.currency', 'EUR');
+        $fallbackOption = $currencies[0] ?? null;
+        $fallbackCode = $fallbackOption?->code ?? (string) config('app.currency', 'EUR');
 
         if (app()->environment('testing')) {
             return $fallbackCode;

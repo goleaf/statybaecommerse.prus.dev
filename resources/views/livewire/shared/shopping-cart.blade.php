@@ -22,32 +22,32 @@
                 @if ($this->cartItems->count() > 0)
                     <div class="space-y-3 max-h-64 overflow-y-auto">
                         @foreach ($this->cartItems as $item)
-                            <div class="flex items-center space-x-3 border-b border-gray-100 pb-3">
-                                @if ($item->imageUrl)
-                                    <img src="{{ $item->imageUrl }}"
-                                         alt="{{ $item->name }}"
+                            <div wire:key="cart-item-{{ $item->id }}" class="flex items-center space-x-3 border-b border-gray-100 pb-3">
+                                @if (! empty($item['image_url']))
+                                    <img src="{{ $item['image_url'] }}"
+                                         alt="{{ $item['name'] }}"
                                          class="w-12 h-12 object-cover rounded">
                                 @endif
 
                                 <div class="flex-1">
-                                    <h4 class="text-sm font-medium">{{ $item->name }}</h4>
-                                    <p class="text-xs text-gray-500">{{ format_currency($item->unitPrice) }}</p>
+                                    <h4 class="text-sm font-medium">{{ $item['name'] }}</h4>
+                                    <p class="text-xs text-gray-500">{{ format_currency($item['unit_price']) }}</p>
 
                                     <div class="flex items-center space-x-2 mt-1">
-                                        <button wire:click="updateQuantity({{ $item->id }}, {{ $item->quantity - 1 }})"
+                                        <button wire:click="updateQuantity({{ $item['id'] }}, {{ $item['quantity'] - 1 }})"
                                                 class="text-gray-400 hover:text-gray-600">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/>
                                             </svg>
                                         </button>
-                                        <span class="text-sm">{{ $item->quantity }}</span>
-                                        <button wire:click="updateQuantity({{ $item->id }}, {{ $item->quantity + 1 }})"
+                                        <span class="text-sm">{{ $item['quantity'] }}</span>
+                                        <button wire:click="updateQuantity({{ $item['id'] }}, {{ $item['quantity'] + 1 }})"
                                                 class="text-gray-400 hover:text-gray-600">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
                                             </svg>
                                         </button>
-                                        <button wire:click="removeItem({{ $item->id }})"
+                                        <button wire:click="removeItem({{ $item['id'] }})"
                                                 wire:confirm="{{ __('translations.confirm_remove_cart_item') }}"
                                                 class="text-red-400 hover:text-red-600 ml-2">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

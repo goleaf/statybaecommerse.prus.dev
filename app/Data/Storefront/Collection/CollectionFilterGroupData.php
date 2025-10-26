@@ -33,6 +33,7 @@ final class CollectionFilterGroupData implements Arrayable
             'attribute' => $this->attribute->toArray(),
             'values'    => $this->values
                 ->map(static fn (CollectionFilterValueData $value): array => $value->toArray())
+                ->values()
                 ->all(),
         ];
     }

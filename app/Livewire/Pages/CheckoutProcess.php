@@ -17,6 +17,7 @@ use App\Models\OrderItem;
 use App\Models\ShippingOption;
 use App\Models\User;
 use App\Services\Cart\CartLifecycleService;
+use App\Services\Discounts\DiscountEngine;
 use App\Services\Pricing\PriceCalculator;
 use App\Services\Shipping\ShippingOptionResolver;
 use Illuminate\Contracts\View\View;
@@ -79,8 +80,16 @@ final class CheckoutProcess extends Component
 
     public float $selectedShippingPrice = 0.0;
 
-    /** @var list<array{id:int,name:string,price:float,formatted_price:string,estimated_delivery:string}> */
+    /** @var list<array{id:int,name:string,price:float,formatted_price:string,estimated_delivery:string,currency?:string|null,resolved_price?:float,badges?:array<int, array{type:string,label:string}>}> */
     public array $availableShippingOptions = [];
+
+    /**
+     * Flag indicating whether the resolver is currently recalculating options.
+     */
+    public bool $isResolvingShippingOptions = false;
+
+    /** @var array{id:int,name:string,price:float,formatted_price?:string|null,estimated_delivery?:string|null,currency_code?:string|null,resolved_price?:float,badges?:array<int, array{type:string,label:string}>}|array{} */
+    public array $selectedShippingSnapshot = [];
 
     /** @var array<string, string> */
     public array $paymentMethods = [];
@@ -102,7 +111,7 @@ final class CheckoutProcess extends Component
         }
 
         $this->initialisePaymentMethods();
-        $this->refreshShippingOptions();
+        $this->resolveShippingOptions();
     }
 
     /**
@@ -110,25 +119,31 @@ final class CheckoutProcess extends Component
      */
     public function toStep(int $targetStep): void
     {
-        // Validate current step before advancing
-        if ($this->currentStep === 1) {
-            // Persist address data for authenticated shoppers and refresh the available shipping matrix.
-            $this->persistAuthenticatedAddresses();
-            $this->refreshShippingOptions();
+        // Clamp the target step so we never render beyond the wizard bounds.
+        $targetStep = max(1, min(3, $targetStep));
+        $movingForward = $targetStep > $this->currentStep;
+
+        if ($movingForward) {
+            $this->validateCurrentStep();
         }
 
-        if ($this->currentStep === 2) {
+        if ($movingForward && $this->currentStep === 1) {
+            // Persist address data for authenticated shoppers and refresh the available shipping matrix.
+            $this->persistAuthenticatedAddresses();
+            $this->resolveShippingOptions();
+        }
+
+        if ($movingForward && $this->currentStep === 2) {
             // Lock in the shipping selection before moving to the payment stage.
             $this->ensureShippingSelection();
         }
 
-        if ($this->currentStep === 3) {
-            // Drop lingering payment validation errors before rendering the confirmation step.
-            $this->resetErrorBag('selectedPaymentMethod');
+        if ($targetStep < $this->currentStep) {
+            // Clear validation errors when the shopper navigates backwards.
+            $this->resetErrorBag();
         }
 
-        // Clamp the target step so we never render beyond the wizard bounds.
-        $this->currentStep = max(1, min(4, $targetStep));
+        $this->currentStep = $targetStep;
 
         // Notify listening components (like the order summary) that the
         // active step changed, enabling them to adjust their own UI state.
@@ -164,23 +179,14 @@ final class CheckoutProcess extends Component
     public function validateCurrentStep(): void
     {
         match ($this->currentStep) {
-<<<<<<< HEAD
-            1 => $this->validate([
-                'billing.first_name'  => 'required|string|max:255',
-                'billing.last_name'   => 'required|string|max:255',
-                'billing.email'       => 'required|email|max:255',
-                'billing.phone'       => 'required|string|max:255',
-                'billing.address'     => 'required|string|max:255',
-                'billing.city'        => 'required|string|max:255',
-                'billing.postal_code' => 'required|string|max:10',
-                'billing.country'     => 'required|string|size:2',
-            ]),
-            2       => $this->validate($this->shippingStepRules()),
-=======
             1       => $this->validate($this->addressStepRules()),
             2       => $this->validate($this->deliveryStepRules()),
->>>>>>> origin/codex/replace-placeholder-with-livewire-multi-step-ui
-            3       => $this->validate(['selectedPaymentMethod' => ['required', Rule::in(array_keys($this->paymentMethods))]]),
+            3       => $this->validate([
+                'selectedPaymentMethod' => [
+                    'required',
+                    Rule::in(array_keys($this->paymentMethods)),
+                ],
+            ]),
             default => null,
         };
     }
@@ -190,9 +196,9 @@ final class CheckoutProcess extends Component
      */
     public function placeOrder(): void
     {
-        if ($this->currentStep < 4) {
-            // Force customers through the review screen before completing the checkout.
-            $this->currentStep = 4;
+        if ($this->currentStep < 3) {
+            // Force customers through the payment screen before completing the checkout.
+            $this->toStep(3);
 
             return;
         }
@@ -507,66 +513,66 @@ final class CheckoutProcess extends Component
     /**
      * Refresh the available shipping options based on the current cart, destination, and package weight.
      */
-    public function refreshShippingOptions(mixed $resetSelection = false): void
+    public function resolveShippingOptions(mixed $resetSelection = false): void
     {
         $shouldResetSelection = is_bool($resetSelection)
             ? $resetSelection
             : in_array($resetSelection, [1, '1', 'true', 'on'], true);
-        $cartItems = $this->getCartItems();
-        $resolver = app(ShippingOptionResolver::class);
-        $options = $resolver->resolve(collect($cartItems->all()), $this->shipping['country'] ?? null);
 
         if ($shouldResetSelection) {
-            // Clear the selected option so customers explicitly confirm their choice after a change.
             $this->selectedShippingOption = null;
             $this->selectedShippingPrice = 0.0;
+            $this->selectedShippingSnapshot = [];
+            session()->forget('checkout.shipping_option');
         }
 
-        $this->availableShippingOptions = $options
-            // Preserve manual casting to stabilise Livewire hydration when shipping selections change.
-<<<<<<< HEAD
-            ->map(static fn ($option): array => $option instanceof ShippingOptionData ? $option->toArray() : (array) $option)
-            ->map(static function (array $option): array {
-                // Cast identifiers and monetary values to predictable scalar types for Livewire hydration.
-                $option['id'] = (int) $option['id'];
-                $option['price'] = (float) $option['price'];
-=======
-            ->map(
-                /**
-                 * @param  array{id:int|string,name:string,price:float|int|string,formatted_price:string,estimated_delivery:string,currency?:string|null,eta?:string|null} $option
-                 * @return array{id:int,name:string,price:float,formatted_price:string,estimated_delivery:string,currency?:string|null,eta?:string|null}
-                 */
-                static function (array $option): array {
-                    // Cast identifiers and monetary values to predictable scalar types for Livewire hydration.
-                    $option['id'] = (int) $option['id'];
-                    $option['price'] = (float) $option['price'];
->>>>>>> origin/codex/replace-placeholder-with-livewire-multi-step-ui
+        $this->isResolvingShippingOptions = true;
 
-                    return $option;
-                }
-            )
-            ->values()
-            ->all();
+        try {
+            $cartItems = $this->getCartItems();
+            $resolver = app(ShippingOptionResolver::class);
+            $options = $resolver->resolve(collect($cartItems->all()), $this->shipping['country'] ?? null);
+
+            $this->availableShippingOptions = $options
+                ->map(function ($option): array {
+                    $payload = $option instanceof ShippingOptionData ? $option->toArray() : (array) $option;
+                    $payload['id'] = (int) ($payload['id'] ?? 0);
+                    $baseAmount = (float) ($payload['price'] ?? 0.0);
+                    $currency = (string) ($payload['currency'] ?? $payload['currency_code'] ?? current_currency());
+                    $discount = $this->calculateShippingDiscount($baseAmount);
+                    $finalAmount = max(0.0, round($baseAmount - $discount, 2));
+
+                    $payload['resolved_price'] = $baseAmount;
+                    $payload['price'] = $finalAmount;
+                    $payload['formatted_price'] = (string) ($payload['formatted_price'] ?? app_money_format($finalAmount, $currency));
+                    $payload['currency'] = $currency;
+                    $payload['currency_code'] = $currency;
+                    $payload['badges'] = $this->buildShippingBadges($baseAmount, $finalAmount, $discount, $currency);
+
+                    return $payload;
+                })
+                ->values()
+                ->all();
+        } finally {
+            $this->isResolvingShippingOptions = false;
+        }
 
         if ($this->availableShippingOptions === []) {
             $this->selectedShippingOption = null;
             $this->selectedShippingPrice = 0.0;
+            $this->selectedShippingSnapshot = [];
             $this->addError('selectedShippingOption', __('No shipping methods are available for the provided address.'));
 
             return;
         }
 
-        /** @var list<array{id:int,name:string,price:float,formatted_price:string,estimated_delivery:string}> $options */
-        $options = $this->availableShippingOptions;
-
-        $selectedExists = collect($options)
+        $selectedExists = collect($this->availableShippingOptions)
             ->contains(fn (array $option): bool => $option['id'] === (int) $this->selectedShippingOption);
 
         if (! $selectedExists && ! $shouldResetSelection) {
             $this->selectedShippingOption = $this->availableShippingOptions[0]['id'];
         }
 
-        // Remove stale validation errors whenever a valid set of shipping choices is present again.
         $this->resetErrorBag('selectedShippingOption');
 
         $this->updateSelectedShippingPrice();
@@ -606,7 +612,15 @@ final class CheckoutProcess extends Component
         $selected = collect($this->availableShippingOptions)
             ->firstWhere('id', (int) $this->selectedShippingOption);
 
-        $this->selectedShippingPrice = $selected['price'] ?? 0.0;
+        if (is_array($selected)) {
+            $this->selectedShippingPrice = (float) ($selected['price'] ?? 0.0);
+            $this->selectedShippingSnapshot = $selected;
+            session()->put('checkout.shipping_option', [$selected]);
+        } else {
+            $this->selectedShippingPrice = 0.0;
+            $this->selectedShippingSnapshot = [];
+            session()->forget('checkout.shipping_option');
+        }
     }
 
     /**
@@ -645,11 +659,22 @@ final class CheckoutProcess extends Component
             return 0.0;
         }
 
+        if (($this->selectedShippingSnapshot['id'] ?? null) === $this->selectedShippingOption) {
+            return (float) ($this->selectedShippingSnapshot['price'] ?? 0.0);
+        }
+
         $resolver = app(ShippingOptionResolver::class);
         $options = $resolver->resolve(collect($cartItems->all()), $this->shipping['country'] ?? null);
         $match = $options->firstWhere('id', $this->selectedShippingOption);
 
-        return (float) ($match['price'] ?? $this->selectedShippingPrice);
+        if ($match === null) {
+            return $this->selectedShippingPrice;
+        }
+
+        $baseAmount = (float) ($match['price'] ?? 0.0);
+        $discount = $this->calculateShippingDiscount($baseAmount);
+
+        return max(0.0, round($baseAmount - $discount, 2));
     }
 
     /**
@@ -689,25 +714,7 @@ final class CheckoutProcess extends Component
      */
     protected function rules(): array
     {
-<<<<<<< HEAD
-        return [
-            'billing.first_name'     => 'required|string|max:255',
-            'billing.last_name'      => 'required|string|max:255',
-            'billing.email'          => 'required|email|max:255',
-            'billing.phone'          => 'required|string|max:255',
-            'billing.address'        => 'required|string|max:255',
-            'billing.city'           => 'required|string|max:255',
-            'billing.postal_code'    => 'required|string|max:10',
-            'billing.country'        => 'required|string|size:2',
-            'shipping.first_name'    => $this->sameAsShipping ? 'nullable|string|max:255' : 'required|string|max:255',
-            'shipping.last_name'     => $this->sameAsShipping ? 'nullable|string|max:255' : 'required|string|max:255',
-            'shipping.address'       => $this->sameAsShipping ? 'nullable|string|max:255' : 'required|string|max:255',
-            'shipping.city'          => $this->sameAsShipping ? 'nullable|string|max:255' : 'required|string|max:255',
-            'shipping.postal_code'   => $this->sameAsShipping ? 'nullable|string|max:10' : 'required|string|max:10',
-            'shipping.country'       => 'required|string|size:2',
-=======
         return $this->addressStepRules() + [
->>>>>>> origin/codex/replace-placeholder-with-livewire-multi-step-ui
             'selectedShippingOption' => ['required', 'integer', Rule::in($this->shippingOptionIds())],
             'selectedPaymentMethod'  => ['required', Rule::in(array_keys($this->paymentMethods))],
         ];
@@ -721,24 +728,24 @@ final class CheckoutProcess extends Component
     private function addressStepRules(): array
     {
         $rules = [
-            'billingFirstName'    => 'required|string|max:255',
-            'billingLastName'     => 'required|string|max:255',
-            'billingEmail'        => 'required|email|max:255',
-            'billingPhone'        => 'required|string|max:255',
-            'billingAddress'      => 'required|string|max:255',
-            'billingCity'         => 'required|string|max:255',
-            'billingPostalCode'   => 'required|string|max:10',
-            'billingCountryCode'  => 'required|string|size:2',
-            'shippingCountryCode' => 'required|string|size:2',
+            'billing.first_name'  => 'required|string|max:255',
+            'billing.last_name'   => 'required|string|max:255',
+            'billing.email'       => 'required|email|max:255',
+            'billing.phone'       => 'required|string|max:255',
+            'billing.address'     => 'required|string|max:255',
+            'billing.city'        => 'required|string|max:255',
+            'billing.postal_code' => 'required|string|max:10',
+            'billing.country'     => 'required|string|size:2',
+            'shipping.country'    => 'required|string|size:2',
         ];
 
         if (! $this->sameAsShipping) {
             // Require explicit recipient details whenever the parcel ships to a different address.
-            $rules['shippingFirstName'] = 'required|string|max:255';
-            $rules['shippingLastName'] = 'required|string|max:255';
-            $rules['shippingAddress'] = 'required|string|max:255';
-            $rules['shippingCity'] = 'required|string|max:255';
-            $rules['shippingPostalCode'] = 'required|string|max:10';
+            $rules['shipping.first_name'] = 'required|string|max:255';
+            $rules['shipping.last_name'] = 'required|string|max:255';
+            $rules['shipping.address'] = 'required|string|max:255';
+            $rules['shipping.city'] = 'required|string|max:255';
+            $rules['shipping.postal_code'] = 'required|string|max:10';
         }
 
         return $rules;
@@ -752,15 +759,6 @@ final class CheckoutProcess extends Component
     private function deliveryStepRules(): array
     {
         return [
-<<<<<<< HEAD
-            'shipping.first_name'    => 'required|string|max:255',
-            'shipping.last_name'     => 'required|string|max:255',
-            'shipping.address'       => 'required|string|max:255',
-            'shipping.city'          => 'required|string|max:255',
-            'shipping.postal_code'   => 'required|string|max:10',
-            'shipping.country'       => 'required|string|size:2',
-=======
->>>>>>> origin/codex/replace-placeholder-with-livewire-multi-step-ui
             'selectedShippingOption' => ['required', 'integer', Rule::in($this->shippingOptionIds())],
         ];
     }
@@ -820,7 +818,7 @@ final class CheckoutProcess extends Component
     {
         $this->synchroniseShippingFromBilling();
         if ($this->sameAsShipping) {
-            $this->refreshShippingOptions(resetSelection: true);
+            $this->resolveShippingOptions(resetSelection: true);
         }
     }
 
@@ -828,7 +826,7 @@ final class CheckoutProcess extends Component
     {
         $this->synchroniseShippingFromBilling();
         if ($this->sameAsShipping) {
-            $this->refreshShippingOptions(resetSelection: true);
+            $this->resolveShippingOptions(resetSelection: true);
         }
     }
 
@@ -843,7 +841,7 @@ final class CheckoutProcess extends Component
         $this->billing['country'] = is_string($country) ? strtoupper($country) : 'LT';
         $this->synchroniseShippingFromBilling();
         if ($this->sameAsShipping) {
-            $this->refreshShippingOptions(resetSelection: true);
+            $this->resolveShippingOptions(resetSelection: true);
         }
     }
 
@@ -851,17 +849,17 @@ final class CheckoutProcess extends Component
     {
         $country = $this->shipping['country'] ?? '';
         $this->shipping['country'] = is_string($country) ? strtoupper($country) : 'LT';
-        $this->refreshShippingOptions(resetSelection: true);
+        $this->resolveShippingOptions(resetSelection: true);
     }
 
     public function updatedShippingRegion(): void
     {
-        $this->refreshShippingOptions(resetSelection: true);
+        $this->resolveShippingOptions(resetSelection: true);
     }
 
     public function updatedShippingPostalCode(): void
     {
-        $this->refreshShippingOptions(resetSelection: true);
+        $this->resolveShippingOptions(resetSelection: true);
     }
 
     public function updatedSelectedShippingOption(): void

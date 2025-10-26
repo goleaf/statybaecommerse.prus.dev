@@ -1,9 +1,19 @@
 @php
-    use App\Data\Storefront\Home\CategoryShowcaseItemData;
+    use Illuminate\Contracts\Support\Arrayable;
     use Illuminate\Support\Collection;
 
-    /** @var Collection<int, CategoryShowcaseItemData> $categories */
-    $chunked = $categories->chunk(12);
+    /** @var iterable<int, array|Arrayable> $categories */
+    $categoryItems = collect($categories)->map(static function ($category): array {
+        if ($category instanceof Arrayable) {
+            $category = $category->toArray();
+        } elseif (! is_array($category)) {
+            $category = (array) $category;
+        }
+
+        return $category;
+    });
+
+    $chunked = $categoryItems->chunk(12);
 @endphp
 
 <div class="space-y-12">
@@ -11,8 +21,9 @@
         <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 lg:gap-6">
             @foreach ($chunk as $category)
                 @php
-                    $image = $category->imageUrl;
-                    $fallbackColor = match ($category->id % 6) {
+                    $id = (int) ($category['id'] ?? 0);
+                    $image = $category['image_url'] ?? null;
+                    $fallbackColor = match ($id % 6) {
                         0 => 'from-indigo-500/70 to-purple-500/70',
                         1 => 'from-blue-500/70 to-cyan-500/70',
                         2 => 'from-amber-500/70 to-orange-500/70',
@@ -21,16 +32,16 @@
                         default => 'from-slate-500/70 to-slate-700/70',
                     };
                 @endphp
-                <a href="{{ $category->url }}"
+                <a href="{{ $category['url'] ?? '#' }}"
                    class="group relative flex flex-col overflow-hidden rounded-3xl border border-white/10 bg-white/5 shadow-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl">
                     <div class="relative aspect-[4/3] overflow-hidden">
                         @if ($image)
-                            <img src="{{ $image }}" alt="{{ $category->name }}"
+                            <img src="{{ $image }}" alt="{{ $category['name'] ?? '' }}"
                                  class="h-full w-full object-cover transition duration-500 group-hover:scale-105">
                         @else
                             <div
                                  class="h-full w-full bg-gradient-to-br {{ $fallbackColor }} flex items-center justify-center text-white text-4xl font-semibold">
-                                {{ $category->placeholder() }}
+                                {{ $category['initial'] ?? '' }}
                             </div>
                         @endif
 
@@ -40,7 +51,7 @@
 
                         <div class="absolute bottom-4 left-4 right-4 space-y-2 text-white">
                             <h3 class="text-lg font-semibold leading-tight line-clamp-2">
-                                {{ $category->name }}
+                                {{ $category['name'] ?? '' }}
                             </h3>
                             <div class="flex items-center justify-between text-xs font-medium text-white/80">
                                 <span class="inline-flex items-center gap-1">
@@ -49,7 +60,8 @@
                                         <path stroke-linecap="round" stroke-linejoin="round"
                                               d="M3 7h18M3 12h18M3 17h18" />
                                     </svg>
-                                    {{ trans_choice('{0}Нет товаров|{1}1 товар|[2,*]:count товаров', $category->productsCount, ['count' => $category->productsCount]) }}
+                                    @php($productCount = (int) ($category['products_count'] ?? 0))
+                                    {{ trans_choice('{0}Нет товаров|{1}1 товар|[2,*]:count товаров', $productCount, ['count' => $productCount]) }}
                                 </span>
                                 <span class="inline-flex items-center gap-1 text-white/70">
                                     {{ __('Открыть') }}
@@ -62,9 +74,9 @@
                         </div>
                     </div>
 
-                    @if ($category->shortDescription)
+                    @if (! empty($category['short_description']))
                         <p class="px-6 pb-6 pt-4 text-sm text-white/70 line-clamp-2">
-                            {{ $category->shortDescription }}
+                            {{ $category['short_description'] }}
                         </p>
                     @endif
                 </a>

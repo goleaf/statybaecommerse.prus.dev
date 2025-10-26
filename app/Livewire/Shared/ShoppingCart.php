@@ -21,7 +21,7 @@ use Livewire\Component;
  * Livewire component for ShoppingCart with reactive frontend functionality, real-time updates, and user interaction handling.
  *
  * @property bool $isOpen
- * @property-read Collection<int, CartItemData> $cartItems
+ * @property-read Collection<int, array{id:int,product_id:int,variant_id:int|null,name:string,unit_price:float,quantity:int,total_price:float,snapshot:array<string,mixed>,image_url:?string}> $cartItems
  */
 final class ShoppingCart extends Component
 {
@@ -189,17 +189,16 @@ final class ShoppingCart extends Component
     }
 
     /**
-     * Handle getCartItemsProperty functionality with proper error handling.
-     */
-    /**
-     * @return Collection<int, CartItemData>
+     * Provide cart items as primitive arrays for safe Livewire hydration.
+     *
+     * @return Collection<int, array{id:int,product_id:int,variant_id:int|null,name:string,unit_price:float,quantity:int,total_price:float,snapshot:array<string,mixed>,image_url:?string}>
      */
     public function getCartItemsProperty(): Collection
     {
         return CartItem::with(['product', 'product.media'])
             ->where('session_id', Session::getId())
             ->get()
-            ->map(static fn (CartItem $item): CartItemData => CartItemData::fromModel($item));
+            ->map(static fn (CartItem $item): array => CartItemData::fromModel($item)->toArray());
     }
 
     /**
@@ -207,9 +206,9 @@ final class ShoppingCart extends Component
      */
     public function getCartTotalProperty(): float
     {
-        return $this->cartItems->sum(static function (CartItemData $item): float {
-            return $item->totalPrice;
-        });
+        return (float) $this->cartItems->sum(
+            static fn (array $item): float => (float) ($item['total_price'] ?? 0.0)
+        );
     }
 
     /**
@@ -217,9 +216,9 @@ final class ShoppingCart extends Component
      */
     public function getCartCountProperty(): int
     {
-        return (int) $this->cartItems->sum(static function (CartItemData $item): int {
-            return $item->quantity;
-        });
+        return (int) $this->cartItems->sum(
+            static fn (array $item): int => (int) ($item['quantity'] ?? 0)
+        );
     }
 
     /**
