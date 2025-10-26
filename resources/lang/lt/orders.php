@@ -85,6 +85,7 @@ return [
         'delivered'  => 'Pristatytas',
         'cancelled'  => 'Atšauktas',
         'refunded'   => 'Grąžintas',
+        'returned'   => 'Sugrąžintas',
     ],
     'statuses' => [
         'pending'    => 'Laukiantis',
@@ -93,6 +94,7 @@ return [
         'delivered'  => 'Pristatytas',
         'cancelled'  => 'Atšauktas',
         'refunded'   => 'Grąžintas',
+        'returned'   => 'Sugrąžintas',
     ],
     'item_statuses' => [
         'pending'    => 'Laukiantis',
@@ -102,16 +104,24 @@ return [
     ],
     // Payment statuses
     'payment_status' => [
-        'pending'  => 'Laukiantis',
-        'paid'     => 'Apmokėtas',
-        'failed'   => 'Nepavyko',
-        'refunded' => 'Grąžintas',
+        'pending'            => 'Laukiantis',
+        'authorized'         => 'Autorizuotas',
+        'captured'           => 'Nuskaičiuotas',
+        'settled'            => 'Užskaitytas',
+        'paid'               => 'Apmokėtas',
+        'failed'             => 'Nepavyko',
+        'refunded'           => 'Grąžintas',
+        'partially_refunded' => 'Iš dalies grąžintas',
     ],
     'payment_statuses' => [
-        'pending'  => 'Laukiantis',
-        'paid'     => 'Apmokėtas',
-        'failed'   => 'Nepavyko',
-        'refunded' => 'Grąžintas',
+        'pending'            => 'Laukiantis',
+        'authorized'         => 'Autorizuotas',
+        'captured'           => 'Nuskaičiuotas',
+        'settled'            => 'Užskaitytas',
+        'paid'               => 'Apmokėtas',
+        'failed'             => 'Nepavyko',
+        'refunded'           => 'Grąžintas',
+        'partially_refunded' => 'Iš dalies grąžintas',
     ],
     // Payment methods
     'payment_methods' => [

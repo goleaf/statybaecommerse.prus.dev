@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Database\Factories;
 
+use App\Enums\OrderPaymentState;
+use App\Enums\OrderStatus;
+use App\Enums\PaymentStatus;
 use App\Models\Channel;
 use App\Models\Country;
 use App\Models\Order;
@@ -37,9 +40,10 @@ class OrderFactory extends Factory
             'channel_id'        => null,
             'country_id'        => null,
             'partner_id'        => null,
-            'status'            => $this->faker->randomElement(['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'completed']),
-            'payment_status'    => $this->faker->randomElement(['pending', 'paid', 'failed', 'refunded', 'partially_refunded']),
-            'payment_state'     => 'created',
+            'status'            => $this->faker->randomElement(OrderStatus::values()),
+            // Keep payment statuses aligned with the enum so factories exercise every supported lifecycle case.
+            'payment_status'    => $this->faker->randomElement(collect(PaymentStatus::cases())->map(fn (PaymentStatus $status): string => $status->value)->all()),
+            'payment_state'     => OrderPaymentState::CREATED->value,
             'payment_method'    => $this->faker->randomElement(['credit_card', 'bank_transfer', 'paypal', 'cash_on_delivery']),
             'payment_reference' => $this->faker->optional(0.6, null)->bothify('PAY-########'),
             'subtotal'          => $subtotal,
@@ -78,9 +82,9 @@ class OrderFactory extends Factory
     public function pending(): static
     {
         return $this->state(fn (array $attributes) => [
-            'status'         => 'pending',
-            'payment_status' => 'pending',
-            'payment_state'  => 'created',
+            'status'         => OrderStatus::PENDING->value,
+            'payment_status' => PaymentStatus::PENDING->value,
+            'payment_state'  => OrderPaymentState::CREATED->value,
             'shipped_at'     => null,
             'delivered_at'   => null,
         ]);
@@ -92,9 +96,9 @@ class OrderFactory extends Factory
     public function processing(): static
     {
         return $this->state(fn (array $attributes) => [
-            'status'         => 'processing',
-            'payment_status' => 'paid',
-            'payment_state'  => 'paid',
+            'status'         => OrderStatus::PROCESSING->value,
+            'payment_status' => PaymentStatus::PAID->value,
+            'payment_state'  => OrderPaymentState::PAID->value,
             'shipped_at'     => null,
             'delivered_at'   => null,
         ]);
@@ -106,9 +110,9 @@ class OrderFactory extends Factory
     public function confirmed(): static
     {
         return $this->state(fn (array $attributes) => [
-            'status'         => 'confirmed',
-            'payment_status' => 'paid',
-            'payment_state'  => 'paid',
+            'status'         => OrderStatus::PROCESSING->value,
+            'payment_status' => PaymentStatus::PAID->value,
+            'payment_state'  => OrderPaymentState::PAID->value,
             'shipped_at'     => null,
             'delivered_at'   => null,
         ]);
@@ -120,9 +124,9 @@ class OrderFactory extends Factory
     public function shipped(): static
     {
         return $this->state(fn (array $attributes) => [
-            'status'         => 'shipped',
-            'payment_status' => 'paid',
-            'payment_state'  => 'paid',
+            'status'         => OrderStatus::SHIPPED->value,
+            'payment_status' => PaymentStatus::PAID->value,
+            'payment_state'  => OrderPaymentState::PAID->value,
             'shipped_at'     => $this->faker->dateTimeBetween('-7 days', 'now'),
             'delivered_at'   => null,
         ]);
@@ -134,9 +138,9 @@ class OrderFactory extends Factory
     public function delivered(): static
     {
         return $this->state(fn (array $attributes) => [
-            'status'         => 'delivered',
-            'payment_status' => 'paid',
-            'payment_state'  => 'paid',
+            'status'         => OrderStatus::DELIVERED->value,
+            'payment_status' => PaymentStatus::PAID->value,
+            'payment_state'  => OrderPaymentState::PAID->value,
             'shipped_at'     => $this->faker->dateTimeBetween('-14 days', '-7 days'),
             'delivered_at'   => $this->faker->dateTimeBetween('-7 days', 'now'),
         ]);
@@ -148,9 +152,10 @@ class OrderFactory extends Factory
     public function completed(): static
     {
         return $this->state(fn (array $attributes) => [
-            'status'         => 'completed',
-            'payment_status' => 'paid',
-            'payment_state'  => 'paid',
+            // Map legacy "completed" into the delivered enum case to stay aligned with the new status set.
+            'status'         => OrderStatus::DELIVERED->value,
+            'payment_status' => PaymentStatus::PAID->value,
+            'payment_state'  => OrderPaymentState::PAID->value,
             'shipped_at'     => $this->faker->dateTimeBetween('-30 days', '-14 days'),
             'delivered_at'   => $this->faker->dateTimeBetween('-14 days', '-7 days'),
         ]);
@@ -162,9 +167,9 @@ class OrderFactory extends Factory
     public function cancelled(): static
     {
         return $this->state(fn (array $attributes) => [
-            'status'         => 'cancelled',
-            'payment_status' => 'pending',
-            'payment_state'  => 'created',
+            'status'         => OrderStatus::CANCELLED->value,
+            'payment_status' => PaymentStatus::PENDING->value,
+            'payment_state'  => OrderPaymentState::CREATED->value,
             'shipped_at'     => null,
             'delivered_at'   => null,
         ]);
@@ -176,8 +181,8 @@ class OrderFactory extends Factory
     public function paid(): static
     {
         return $this->state(fn (array $attributes) => [
-            'payment_status' => 'paid',
-            'payment_state'  => 'paid',
+            'payment_status' => PaymentStatus::PAID->value,
+            'payment_state'  => OrderPaymentState::PAID->value,
         ]);
     }
 
@@ -187,9 +192,9 @@ class OrderFactory extends Factory
     public function paymentFailed(): static
     {
         return $this->state(fn (array $attributes) => [
-            'payment_status' => 'failed',
-            'status'         => 'pending',
-            'payment_state'  => 'created',
+            'payment_status' => PaymentStatus::FAILED->value,
+            'status'         => OrderStatus::PENDING->value,
+            'payment_state'  => OrderPaymentState::CREATED->value,
         ]);
     }
 
@@ -199,8 +204,8 @@ class OrderFactory extends Factory
     public function refunded(): static
     {
         return $this->state(fn (array $attributes) => [
-            'payment_status' => 'refunded',
-            'payment_state'  => 'refunded',
+            'payment_status' => PaymentStatus::REFUNDED->value,
+            'payment_state'  => OrderPaymentState::REFUNDED->value,
         ]);
     }
 

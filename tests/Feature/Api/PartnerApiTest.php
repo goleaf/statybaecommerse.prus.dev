@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Api;
 
+use App\Enums\OrderStatus;
+use App\Enums\PaymentStatus;
 use App\Models\ApiKey;
 use App\Models\Order;
 use App\Models\OrderItem;
@@ -32,8 +34,8 @@ final class PartnerApiTest extends TestCase
         $recentOrder = Order::factory()->create([
             'number'         => 'ORD-1002',
             'partner_id'     => $partner->getKey(),
-            'status'         => 'confirmed',
-            'payment_status' => 'paid',
+            'status'         => OrderStatus::PROCESSING->value,
+            'payment_status' => PaymentStatus::PAID->value,
             'payment_state'  => 'paid',
         ]);
         OrderItem::factory()->forOrder($recentOrder)->count(2)->create([
@@ -45,8 +47,8 @@ final class PartnerApiTest extends TestCase
         $olderOrder = Order::factory()->create([
             'number'         => 'ORD-1001',
             'partner_id'     => $partner->getKey(),
-            'status'         => 'processing',
-            'payment_status' => 'pending',
+            'status'         => OrderStatus::PROCESSING->value,
+            'payment_status' => PaymentStatus::PENDING->value,
             'payment_state'  => 'created',
             'created_at'     => now()->subDay(),
         ]);
@@ -200,8 +202,8 @@ final class PartnerApiTest extends TestCase
         $shipped = Order::factory()->create([
             'number'         => 'ORD-2001',
             'partner_id'     => $partner->getKey(),
-            'status'         => 'shipped',
-            'payment_status' => 'paid',
+            'status'         => OrderStatus::SHIPPED->value,
+            'payment_status' => PaymentStatus::PAID->value,
         ]);
         OrderItem::factory()->forOrder($shipped)->create([
             'unit_price' => 30.00,
@@ -212,8 +214,8 @@ final class PartnerApiTest extends TestCase
         Order::factory()->create([
             'number'         => 'ORD-2002',
             'partner_id'     => $partner->getKey(),
-            'status'         => 'pending',
-            'payment_status' => 'pending',
+            'status'         => OrderStatus::PENDING->value,
+            'payment_status' => PaymentStatus::PENDING->value,
         ]);
 
         // Act with a status filter to narrow the response payload.
