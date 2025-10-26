@@ -8,6 +8,7 @@ use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
 use Livewire\Attributes\Validate;
 use Livewire\Form;
@@ -42,10 +43,21 @@ final class RegistrationForm extends Form
 
     /**
      * Handle rules functionality with proper error handling.
+     *
+     * @return array<string, array<int, mixed>>
      */
     public function rules(): array
     {
-        return ['first_name' => ['required', 'string', 'max:255'], 'last_name' => ['required', 'string', 'max:255'], 'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class], 'password' => ['required', 'string', 'confirmed', Password::defaults()]];
+        return [
+            // Ensure the first name stays concise and free from invalid characters.
+            'first_name' => ['required', 'string', 'max:255'],
+            // Guard the last name field with the same strictness for consistency.
+            'last_name' => ['required', 'string', 'max:255'],
+            // Validate email uniqueness using the underlying table instead of the class string to avoid SQL errors.
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', Rule::unique(User::class, 'email')],
+            // Apply Laravel's default password requirements alongside confirmation checks.
+            'password' => ['required', 'string', 'confirmed', Password::defaults()],
+        ];
     }
 
     /**
@@ -54,6 +66,8 @@ final class RegistrationForm extends Form
     public function register(): User
     {
         $this->validate();
+        // Extract the validated payload while helping static analysers understand the resulting structure.
+        /** @var array{first_name: string, last_name: string, email: string, password: string} $validated */
         $validated = $this->only(['first_name', 'last_name', 'email', 'password']);
         $validated['password'] = Hash::make($validated['password']);
         $validated['preferred_locale'] = app()->getLocale();
