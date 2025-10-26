@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Frontend;
 use App\Http\Controllers\Controller;
 use App\Models\Campaign;
 use DB;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -229,9 +230,23 @@ final class CampaignController extends Controller
     )]
     public function getCampaignPerformance(): JsonResponse
     {
-        $performance = ['high_performing' => Campaign::where('conversion_rate', '>', 5)->count(), 'medium_performing' => Campaign::whereBetween('conversion_rate', [2, 5])->count(), 'low_performing' => Campaign::where('conversion_rate', '<', 2)->count(), 'needs_attention' => Campaign::where(function ($query): void {
-            $query->where('conversion_rate', '<', 2)->orWhere('total_views', '>', 0)->whereRaw('(total_clicks / total_views) < 0.01');
-        })->count()];
+        // Recalculate the "needs attention" bucket with grouped conditions so we do not accidentally
+        // apply the click-through constraint to every record and to safely handle zero-view campaigns.
+        $needsAttentionCount = Campaign::query()
+            ->where(static function (Builder $query): void {
+                $query
+                    // Flag campaigns with a very low conversion rate regardless of click metrics.
+                    ->where('conversion_rate', '<', 2)
+                    // Also capture campaigns that receive traffic but fail to generate clicks.
+                    ->orWhere(static function (Builder $subQuery): void {
+                        $subQuery
+                            ->where('total_views', '>', 0)
+                            ->whereRaw('(total_clicks / NULLIF(total_views, 0)) < ?', [0.01]);
+                    });
+            })
+            ->count();
+
+        $performance = ['high_performing' => Campaign::where('conversion_rate', '>', 5)->count(), 'medium_performing' => Campaign::whereBetween('conversion_rate', [2, 5])->count(), 'low_performing' => Campaign::where('conversion_rate', '<', 2)->count(), 'needs_attention' => $needsAttentionCount];
 
         return response()->json(['success' => true, 'data' => $performance]);
     }
@@ -257,10 +272,32 @@ final class CampaignController extends Controller
     )]
     public function getCampaignAnalytics(Request $request): JsonResponse
     {
-        $period = $request->input('period', '30');
-        // days
-        $startDate = now()->subDays($period);
-        $analytics = ['period' => $period, 'start_date' => $startDate->format('Y-m-d'), 'end_date' => now()->format('Y-m-d'), 'campaigns_created' => Campaign::where('created_at', '>=', $startDate)->count(), 'campaigns_started' => Campaign::where('start_date', '>=', $startDate)->count(), 'campaigns_completed' => Campaign::where('end_date', '>=', $startDate)->where('status', 'completed')->count(), 'total_views' => Campaign::where('created_at', '>=', $startDate)->sum('total_views'), 'total_clicks' => Campaign::where('created_at', '>=', $startDate)->sum('total_clicks'), 'total_conversions' => Campaign::where('created_at', '>=', $startDate)->sum('total_conversions'), 'total_revenue' => Campaign::where('created_at', '>=', $startDate)->sum('total_revenue'), 'top_performing_campaigns' => Campaign::where('created_at', '>=', $startDate)->orderBy('conversion_rate', 'desc')->limit(5)->get(['id', 'name', 'type', 'conversion_rate', 'total_revenue']), 'campaign_types_breakdown' => Campaign::where('created_at', '>=', $startDate)->selectRaw('type, COUNT(*) as count, AVG(conversion_rate) as avg_conversion_rate')->groupBy('type')->get()];
+        // Normalise the requested period to a safe day interval so analytics queries remain predictable.
+        $rawPeriod = $request->input('period', 30);
+        $period = filter_var($rawPeriod, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+        if ($period === false) {
+            $period = 30;
+        }
+        $period = min($period, 365);
+
+        $now = now();
+        $startDate = $now->copy()->subDays($period);
+        // Aggregate campaign types in PHP because the `type` accessor is backed by JSON metadata instead of a native column.
+        $campaignTypesBreakdown = Campaign::where('created_at', '>=', $startDate)
+            ->get(['metadata', 'conversion_rate'])
+            ->groupBy(static fn (Campaign $campaign): string => $campaign->type ?? 'unknown')
+            ->map(static function ($group, string $type): array {
+                $averageConversion = $group->avg('conversion_rate') ?? 0;
+
+                return [
+                    'type'                => $type,
+                    'count'               => $group->count(),
+                    'avg_conversion_rate' => round((float) $averageConversion, 2),
+                ];
+            })
+            ->values();
+
+        $analytics = ['period' => $period, 'start_date' => $startDate->format('Y-m-d'), 'end_date' => $now->format('Y-m-d'), 'campaigns_created' => Campaign::where('created_at', '>=', $startDate)->count(), 'campaigns_started' => Campaign::where('starts_at', '>=', $startDate)->count(), 'campaigns_completed' => Campaign::where('ends_at', '>=', $startDate)->where('status', 'completed')->count(), 'total_views' => Campaign::where('created_at', '>=', $startDate)->sum('total_views'), 'total_clicks' => Campaign::where('created_at', '>=', $startDate)->sum('total_clicks'), 'total_conversions' => Campaign::where('created_at', '>=', $startDate)->sum('total_conversions'), 'total_revenue' => Campaign::where('created_at', '>=', $startDate)->sum('total_revenue'), 'top_performing_campaigns' => Campaign::where('created_at', '>=', $startDate)->orderBy('conversion_rate', 'desc')->limit(5)->get(['id', 'name', 'metadata', 'conversion_rate', 'total_revenue']), 'campaign_types_breakdown' => $campaignTypesBreakdown];
 
         return response()->json(['success' => true, 'data' => $analytics]);
     }
