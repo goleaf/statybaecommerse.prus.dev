@@ -67,6 +67,8 @@ $serviceClasses = [
     App\Services\Recommendations\HybridRecommendation::class,
     App\Services\Recommendations\CrossSellRecommendation::class,
     App\Services\Recommendations\ContentBasedRecommendation::class,
+    App\Services\Recommendations\PersonalizedRecommendation::class,
+    App\Services\Recommendations\CategoryBasedRecommendation::class,
     App\Services\Recommendations\UpSellRecommendation::class,
 
     // Images
