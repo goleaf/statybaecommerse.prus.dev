@@ -32,14 +32,17 @@ final class CustomerGroupTest extends TestCase
     public function test_customer_group_casts_work_correctly(): void
     {
         $customerGroup = CustomerGroup::factory()->create([
-            'is_enabled'          => true,
-            'is_active'           => true,
-            'has_special_pricing' => true,
-            'discount_percentage' => 15.5,
-            'discount_fixed'      => 10.0,
-            'sort_order'          => 5,
-            'metadata'            => ['key' => 'value'],
-            'conditions'          => ['min_order' => 100],
+            'is_enabled'           => true,
+            'is_active'            => true,
+            'has_special_pricing'  => true,
+            'discount_percentage'  => 15.5,
+            'discount_fixed'       => 10.0,
+            'sort_order'           => 5,
+            'metadata'             => ['key' => 'value'],
+            'conditions'           => ['min_order' => 100],
+            'minimum_order_amount' => 250.75,
+            'credit_limit'         => 5000.00,
+            'payment_terms'        => 'Net 30',
         ]);
 
         $this->assertTrue($customerGroup->is_enabled);
@@ -52,6 +55,10 @@ final class CustomerGroupTest extends TestCase
         $this->assertSame(5, $customerGroup->sort_order);
         $this->assertIsArray($customerGroup->metadata);
         $this->assertIsArray($customerGroup->conditions);
+        $this->assertSame('250.75', $customerGroup->minimum_order_amount);
+        $this->assertSame('5000.00', $customerGroup->credit_limit);
+        $this->assertSame('net_30', $customerGroup->payment_terms);
+        $this->assertSame('Net 30', $customerGroup->getPaymentTerms());
     }
 
     public function test_customer_group_has_users_relationship(): void
@@ -119,7 +126,9 @@ final class CustomerGroupTest extends TestCase
         $disabledGroups = CustomerGroup::withoutGlobalScopes()->disabled()->get();
 
         $this->assertCount(1, $disabledGroups);
-        $this->assertFalse($disabledGroups->first()->is_enabled);
+        $firstDisabled = $disabledGroups->first();
+        $this->assertNotNull($firstDisabled);
+        $this->assertFalse($firstDisabled->is_enabled);
     }
 
     public function test_customer_group_scope_active(): void
@@ -131,8 +140,10 @@ final class CustomerGroupTest extends TestCase
         $activeGroups = CustomerGroup::active()->get();
 
         $this->assertCount(1, $activeGroups);
-        $this->assertTrue($activeGroups->first()->is_enabled);
-        $this->assertTrue($activeGroups->first()->is_active);
+        $firstActive = $activeGroups->first();
+        $this->assertNotNull($firstActive);
+        $this->assertTrue($firstActive->is_enabled);
+        $this->assertTrue($firstActive->is_active);
     }
 
     public function test_customer_group_scope_inactive(): void
@@ -143,19 +154,23 @@ final class CustomerGroupTest extends TestCase
         $inactiveGroups = CustomerGroup::withoutGlobalScopes()->inactive()->get();
 
         $this->assertCount(1, $inactiveGroups);
-        $this->assertFalse($inactiveGroups->first()->is_enabled);
-        $this->assertFalse($inactiveGroups->first()->is_active);
+        $firstInactive = $inactiveGroups->first();
+        $this->assertNotNull($firstInactive);
+        $this->assertFalse($firstInactive->is_enabled);
+        $this->assertFalse($firstInactive->is_active);
     }
 
     public function test_customer_group_scope_with_discount(): void
     {
-        CustomerGroup::factory()->create(['discount_percentage' => 10.0]);
-        CustomerGroup::factory()->create(['discount_percentage' => 0.0]);
+        CustomerGroup::factory()->create(['discount_percentage' => 10.0, 'discount_fixed' => 0.0]);
+        CustomerGroup::factory()->create(['discount_percentage' => 0.0, 'discount_fixed' => 25.0]);
+        CustomerGroup::factory()->create(['discount_percentage' => 0.0, 'discount_fixed' => 0.0]);
 
         $groupsWithDiscount = CustomerGroup::withoutGlobalScopes()->withDiscount()->get();
 
-        $this->assertCount(1, $groupsWithDiscount);
-        $this->assertGreaterThan(0, (float) $groupsWithDiscount->first()->discount_percentage);
+        $this->assertCount(2, $groupsWithDiscount);
+        // Ensure both percentage and fixed only configurations are considered active discounts.
+        $this->assertTrue($groupsWithDiscount->every(fn (CustomerGroup $group): bool => $group->hasAnyDiscount()));
     }
 
     public function test_customer_group_scope_with_special_pricing(): void
@@ -179,7 +194,9 @@ final class CustomerGroupTest extends TestCase
         $vipGroups = CustomerGroup::withoutGlobalScopes()->byType('vip')->get();
 
         $this->assertCount(1, $vipGroups);
-        $this->assertSame('vip', $vipGroups->first()->type);
+        $vip = $vipGroups->first();
+        $this->assertNotNull($vip);
+        $this->assertSame('vip', $vip->type);
     }
 
     public function test_customer_group_scope_default(): void
@@ -190,7 +207,9 @@ final class CustomerGroupTest extends TestCase
         $defaultGroups = CustomerGroup::withoutGlobalScopes()->default()->get();
 
         $this->assertCount(1, $defaultGroups);
-        $this->assertTrue($defaultGroups->first()->is_default);
+        $default = $defaultGroups->first();
+        $this->assertNotNull($default);
+        $this->assertTrue($default->is_default);
     }
 
     public function test_customer_group_scope_order_by_priority(): void
@@ -201,8 +220,13 @@ final class CustomerGroupTest extends TestCase
 
         $orderedGroups = CustomerGroup::withoutGlobalScopes()->orderByPriority()->get();
 
-        $this->assertSame(1, $orderedGroups->first()->sort_order);
-        $this->assertSame(3, $orderedGroups->last()->sort_order);
+        $firstOrdered = $orderedGroups->first();
+        $lastOrdered = $orderedGroups->last();
+
+        $this->assertNotNull($firstOrdered);
+        $this->assertNotNull($lastOrdered);
+        $this->assertSame(1, $firstOrdered->sort_order);
+        $this->assertSame(3, $lastOrdered->sort_order);
     }
 
     public function test_customer_group_has_discount_rate_method(): void
@@ -294,6 +318,40 @@ final class CustomerGroupTest extends TestCase
         $this->assertFalse($groupWithout->hasSpecialPricing());
     }
 
+    public function test_customer_group_financial_helpers(): void
+    {
+        $group = CustomerGroup::factory()->create([
+            'credit_limit'         => 2000.0,
+            'minimum_order_amount' => 150.5,
+            'payment_terms'        => 'Net 45',
+        ]);
+
+        // Verify the convenience helpers expose the B2B financial rules clearly.
+        $this->assertTrue($group->hasCreditLimit());
+        $this->assertSame(2000.0, $group->getCreditLimitAmount());
+        $this->assertTrue($group->requiresMinimumOrderAmount());
+        $this->assertSame(150.5, $group->getMinimumOrderAmount());
+        $this->assertSame('Net 45', $group->getPaymentTerms());
+    }
+
+    public function test_customer_group_permission_lookup(): void
+    {
+        $group = CustomerGroup::factory()->create([
+            'can_view_prices'  => true,
+            'can_place_orders' => false,
+            'can_view_catalog' => true,
+        ]);
+
+        // Friendly aliases should map to the appropriate boolean attributes.
+        $this->assertTrue($group->hasPermission('view_prices'));
+        $this->assertFalse($group->hasPermission('place_orders'));
+        $this->assertTrue($group->hasPermission('view_catalog'));
+        // Unknown permissions should safely default to false to avoid accidental grants.
+        $this->assertFalse($group->hasPermission('unknown_permission'));
+        // Direct column names should continue to behave identically.
+        $this->assertTrue($group->hasPermission('can_view_prices'));
+    }
+
     public function test_customer_group_get_users_count_attribute(): void
     {
         $customerGroup = CustomerGroup::factory()->create();
@@ -325,8 +383,7 @@ final class CustomerGroupTest extends TestCase
             'slug' => null,
         ]);
 
-        $this->assertNotNull($customerGroup->slug);
-        $this->assertIsString($customerGroup->slug);
+        $this->assertNotEmpty($customerGroup->slug);
     }
 
     public function test_customer_group_factory_active_state(): void
@@ -398,7 +455,7 @@ final class CustomerGroupTest extends TestCase
 
         $this->assertSame('wholesale', $customerGroup->type);
         $this->assertTrue($customerGroup->has_special_pricing);
-        $this->assertNotNull($customerGroup->minimum_order_amount);
+        $this->assertNotEmpty($customerGroup->minimum_order_amount);
     }
 
     public function test_customer_group_factory_corporate_state(): void
@@ -408,7 +465,7 @@ final class CustomerGroupTest extends TestCase
         $this->assertSame('corporate', $customerGroup->type);
         $this->assertTrue($customerGroup->has_special_pricing);
         $this->assertSame('net_30', $customerGroup->payment_terms);
-        $this->assertNotNull($customerGroup->credit_limit);
+        $this->assertNotEmpty($customerGroup->credit_limit);
     }
 
     public function test_customer_group_soft_deletes(): void
@@ -419,7 +476,9 @@ final class CustomerGroupTest extends TestCase
         $customerGroup->delete();
 
         $this->assertSoftDeleted('customer_groups', ['id' => $id]);
-        $this->assertNotNull($customerGroup->fresh()->deleted_at);
+        $deleted = CustomerGroup::withTrashed()->find($id);
+        $this->assertNotNull($deleted);
+        $this->assertNotNull($deleted->deleted_at);
     }
 
     public function test_customer_group_translations_work(): void
@@ -431,7 +490,6 @@ final class CustomerGroupTest extends TestCase
 
         $translations = $customerGroup->getTranslations('name');
 
-        $this->assertIsArray($translations);
         $this->assertArrayHasKey('lt', $translations);
         $this->assertArrayHasKey('en', $translations);
     }

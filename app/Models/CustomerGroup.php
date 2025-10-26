@@ -88,6 +88,20 @@ final class CustomerGroup extends Model
     public array $translatable = ['name', 'description'];
 
     /**
+     * Provide a typed lookup for group level permission toggles so helper
+     * methods can translate friendly keys (e.g. `view_prices`) into the
+     * persisted column names without duplicating string literals everywhere.
+     *
+     * @var array<string, string>
+     */
+    private const PERMISSION_ATTRIBUTE_MAP = [
+        'view_prices'  => 'can_view_prices',
+        'place_orders' => 'can_place_orders',
+        'view_catalog' => 'can_view_catalog',
+        'use_coupons'  => 'can_use_coupons',
+    ];
+
+    /**
      * Whitelist both the legacy segmentation flags and the modern management fields.
      *
      * Including the entire set keeps mass-assignment in sync with the Filament
@@ -116,6 +130,9 @@ final class CustomerGroup extends Model
         'type',
         'metadata',
         'conditions',
+        'minimum_order_amount',
+        'credit_limit',
+        'payment_terms',
     ];
 
     /**
@@ -146,8 +163,42 @@ final class CustomerGroup extends Model
                     continue;
                 }
 
-                $group->setTranslation($attribute, 'lt', $value);
-                $group->setTranslation($attribute, 'en', $value);
+                if ($value === null) {
+                    // Avoid clobbering translated JSON columns with empty payloads
+                    // so that existing locale specific content stays intact.
+                    continue;
+                }
+
+                if (! is_scalar($value)) {
+                    // Avoid clobbering translated JSON columns with empty payloads
+                    // so that existing locale specific content stays intact.
+                    continue;
+                }
+
+                $stringValue = trim((string) $value);
+
+                if ($stringValue === '') {
+                    continue;
+                }
+
+                $group->setTranslation($attribute, 'lt', $stringValue);
+                $group->setTranslation($attribute, 'en', $stringValue);
+            }
+
+            $rawTerms = $group->getAttribute('payment_terms');
+
+            if ($rawTerms === null) {
+                $group->setAttribute('payment_terms', 'net_30');
+            } elseif (is_scalar($rawTerms)) {
+                $normalizedTerms = Str::of((string) $rawTerms)
+                    ->lower()
+                    ->replace(' ', '_')
+                    ->replace('-', '_')
+                    ->value();
+
+                $group->setAttribute('payment_terms', $normalizedTerms !== '' ? $normalizedTerms : 'net_30');
+            } else {
+                $group->setAttribute('payment_terms', 'net_30');
             }
         });
     }
@@ -310,7 +361,13 @@ final class CustomerGroup extends Model
      */
     public function scopeWithDiscount(Builder $query): Builder
     {
-        return $query->where('discount_percentage', '>', 0);
+        // Match either percentage based or fixed discounts so B2B pricing rules
+        // surface every configured incentive when building dashboards.
+        return $query->where(static function (Builder $innerQuery): void {
+            $innerQuery
+                ->where('discount_percentage', '>', 0)
+                ->orWhere('discount_fixed', '>', 0);
+        });
     }
 
     /**
@@ -673,5 +730,128 @@ final class CustomerGroup extends Model
     public function hasSpecialPricing(): bool
     {
         return (bool) $this->getAttribute('has_special_pricing');
+    }
+
+    /**
+     * Determine whether the customer group enforces a positive credit limit.
+     */
+    public function hasCreditLimit(): bool
+    {
+        $creditLimit = $this->getAttribute('credit_limit');
+
+        if ($creditLimit === null || $creditLimit === '') {
+            // Missing credit limit means the group can spend without a ceiling.
+            return false;
+        }
+
+        if (! is_numeric($creditLimit)) {
+            return false;
+        }
+
+        $numericLimit = (float) $creditLimit;
+
+        return $numericLimit > 0.0;
+    }
+
+    /**
+     * Fetch the numeric credit limit, normalising it to a float for calculations.
+     */
+    public function getCreditLimitAmount(): ?float
+    {
+        $creditLimit = $this->getAttribute('credit_limit');
+
+        if (! is_numeric($creditLimit)) {
+            return null;
+        }
+
+        $numericLimit = (float) $creditLimit;
+
+        if ($numericLimit <= 0.0) {
+            return null;
+        }
+
+        // Round for deterministic comparisons in tests and reporting exports.
+        return round($numericLimit, 2);
+    }
+
+    /**
+     * Flag whether the group requires a minimum order amount before checkout.
+     */
+    public function requiresMinimumOrderAmount(): bool
+    {
+        $minimum = $this->getAttribute('minimum_order_amount');
+
+        if ($minimum === null || $minimum === '') {
+            return false;
+        }
+
+        if (! is_numeric($minimum)) {
+            return false;
+        }
+
+        $numericMinimum = (float) $minimum;
+
+        return $numericMinimum > 0.0;
+    }
+
+    /**
+     * Retrieve the minimum order threshold as a float for downstream validation.
+     */
+    public function getMinimumOrderAmount(): ?float
+    {
+        $minimum = $this->getAttribute('minimum_order_amount');
+
+        if (! is_numeric($minimum)) {
+            return null;
+        }
+
+        $numericMinimum = (float) $minimum;
+
+        if ($numericMinimum <= 0.0) {
+            return null;
+        }
+
+        return round($numericMinimum, 2);
+    }
+
+    /**
+     * Resolve configured payment terms such as "Net 30" or "Net 60".
+     */
+    public function getPaymentTerms(): ?string
+    {
+        $terms = $this->getAttribute('payment_terms');
+
+        if ($terms === null) {
+            return null;
+        }
+
+        if (! is_scalar($terms)) {
+            return null;
+        }
+
+        $normalised = trim((string) $terms);
+
+        if ($normalised === '') {
+            return null;
+        }
+
+        if (preg_match('/^net[_\s-]?(\d{1,3})$/i', $normalised, $matches) === 1) {
+            return 'Net ' . $matches[1];
+        }
+
+        return $normalised;
+    }
+
+    /**
+     * Check group specific permissions to drive catalogue access rules.
+     */
+    public function hasPermission(string $permission): bool
+    {
+        $attribute = self::PERMISSION_ATTRIBUTE_MAP[$permission] ?? $permission;
+
+        // Delegate to getAttribute so the cast layer keeps booleans consistent.
+        $value = $this->getAttribute($attribute);
+
+        return $this->normalizeBoolean($value);
     }
 }
