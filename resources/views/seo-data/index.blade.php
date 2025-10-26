@@ -68,6 +68,41 @@
         </form>
     </div>
 
+    @php
+        // Extract only the filters that are actively applied so we can render chip indicators for users.
+        $activeFilterChips = collect($activeFilters)
+            ->filter(fn ($value) => filled($value))
+            ->mapWithKeys(fn ($value, $key) => [$key => $value]);
+    @endphp
+
+    @if($activeFilterChips->isNotEmpty())
+        <div class="mb-6 flex flex-wrap items-center gap-2">
+            {{-- Provide quick-glance filter context via removable-style chips. --}}
+            <span class="text-sm font-medium text-gray-500 dark:text-gray-400">{{ __('search_active_filters') }}:</span>
+            @foreach($activeFilterChips as $filterKey => $filterValue)
+                @php
+                    $label = match($filterKey) {
+                        'locale' => $filterValue === 'lt' ? __('seo_data.lithuanian') : __('seo_data.english'),
+                        'type' => __($filterValue === 'App\\Models\\Product' ? 'seo_data.products' : ($filterValue === 'App\\Models\\Category' ? 'seo_data.categories' : 'seo_data.brands')),
+                        default => $filterValue,
+                    };
+
+                    $resetQuery = array_filter(
+                        array_merge(request()->query(), [$filterKey => null, 'page' => 1]),
+                        fn ($value) => filled($value)
+                    );
+                @endphp
+                <a
+                    href="{{ route('seo-data.index', $resetQuery) }}"
+                    class="inline-flex items-center gap-2 rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700 transition hover:bg-blue-100 dark:bg-blue-900/40 dark:text-blue-200"
+                >
+                    <span>{{ \Illuminate\Support\Str::headline($filterKey) }}: {{ $label }}</span>
+                    <span aria-hidden="true">&times;</span>
+                </a>
+            @endforeach
+        </div>
+    @endif
+
     <!-- SEO Data List -->
     <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
         @forelse($seoData as $seo)
@@ -152,7 +187,7 @@
     <!-- Pagination -->
     @if($seoData->hasPages())
         <div class="mt-8">
-            {{ $seoData->links() }}
+            {{ $seoData->appends(array_filter($activeFilters, fn ($value) => filled($value)))->links() }}
         </div>
     @endif
 </div>

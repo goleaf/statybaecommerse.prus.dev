@@ -55,7 +55,11 @@ class Delivery extends StepComponent
     #[On('shipping-address-updated')]
     public function handleShippingAddressUpdated(?int $shippingAddressId = null): void
     {
-        $this->recalculateOptions($shippingAddressId);
+        // Clearing the validation bag ensures stale errors disappear when the address changes.
+        $this->resetErrorBag('currentSelected');
+        $this->resetValidation();
+
+        $this->recalculateOptions($shippingAddressId, true);
     }
 
     /**
@@ -98,10 +102,15 @@ class Delivery extends StepComponent
     /**
      * Pull fresh options from the resolver so shipping reflects the latest address data.
      */
-    private function recalculateOptions(?int $shippingAddressId = null): void
+    private function recalculateOptions(?int $shippingAddressId = null, bool $emitLifecycleEvents = false): void
     {
         // Forget previously stored shipping option whenever the address changes.
         session()->forget('checkout.shipping_option');
+
+        if ($emitLifecycleEvents) {
+            // Broadcast that shipping is recalculating so downstream steps can react (disable pay now, etc.).
+            $this->dispatch('shipping-recalculation-started');
+        }
 
         $countryCode = $this->resolveCountryCode($shippingAddressId);
 
@@ -120,6 +129,11 @@ class Delivery extends StepComponent
         if (! in_array($this->currentSelected, $availableIds, true)) {
             // Default to the first available option to keep the UI interactive.
             $this->currentSelected = $resolved[0]['id'] ?? null;
+        }
+
+        if ($emitLifecycleEvents) {
+            // Notify listeners that the recalculation finished so UI controls can re-enable.
+            $this->dispatch('shipping-recalculation-finished');
         }
     }
 
