@@ -13,6 +13,7 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Mail\Mailable;
+use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Support\Str;
 
 use function in_array;
@@ -51,16 +52,18 @@ final class MailPreviewController
         $factory = $definitions[$mail]['make'];
         $mailable = $factory($locale);
 
-        $html = $mailable->render();
+        $preview = $this->renderMailablePreview($mailable, $locale);
 
-        $subject = $mailable->subject;
-
-        return new Response($html, 200, array_filter([
-            'Content-Type'   => 'text/html; charset=UTF-8',
+        return new Response($preview['html'], 200, array_filter([
+            // Expose the rendered markup with a deterministic content type for browser previews.
+            'Content-Type' => 'text/html; charset=UTF-8',
+            // Surface the mailable identifier so automated tooling can assert which template rendered.
             'X-Mail-Preview' => $mail,
-            'X-Mail-Locale'  => $locale,
-            'X-Mail-Subject' => $subject,
-        ]));
+            // Let callers verify the locale that ended up rendering the template.
+            'X-Mail-Locale' => $locale,
+            // Share the computed subject line when available so subject regressions are easy to spot.
+            'X-Mail-Subject' => $preview['subject'],
+        ], static fn (?string $value): bool => $value !== null));
     }
 
     /**
@@ -119,13 +122,76 @@ final class MailPreviewController
     {
         $configuredRaw = config('app.supported_locales', 'en');
         $configured = is_string($configuredRaw) && $configuredRaw !== '' ? $configuredRaw : 'en';
-        $locales = array_filter(array_map('trim', explode(',', $configured)));
+        $locales = array_filter(array_map(trim(...), explode(',', $configured)));
 
         if ($locales === []) {
             $locales = [app()->getLocale()];
         }
 
         return array_values(array_unique($locales));
+    }
+
+    /**
+     * Render the given mailable for preview purposes while keeping locale handling deterministic.
+     *
+     * @return array{html: string, subject: string|null}
+     */
+    private function renderMailablePreview(Mailable $mailable, string $locale): array
+    {
+        // Capture the original locale so we can safely restore it once rendering completes.
+        $previousLocale = app()->getLocale();
+        $html = '';
+        $subject = null;
+
+        try {
+            // Only switch locales when needed to keep render output predictable and isolated per preview.
+            if ($locale !== '' && $locale !== $previousLocale) {
+                app()->setLocale($locale);
+            }
+
+            // Render the mailable immediately so Markdown/Blade translations respect the requested locale.
+            $html = $mailable->render();
+            // Resolve the subject after rendering because envelope-based mailables populate it lazily.
+            $subject = $this->resolveMailableSubject($mailable);
+        } finally {
+            // Ensure the global locale is always restored to avoid bleeding into subsequent previews or requests.
+            if ($locale !== '' && $locale !== $previousLocale) {
+                app()->setLocale($previousLocale);
+            }
+        }
+
+        return [
+            'html'    => $html,
+            'subject' => $subject,
+        ];
+    }
+
+    /**
+     * Derive the most accurate subject line for the preview, supporting both legacy and modern mailables.
+     */
+    private function resolveMailableSubject(Mailable $mailable): ?string
+    {
+        // Prefer explicitly assigned subjects to honour legacy build() style mailables.
+        /** @var string|null $subjectProperty */
+        $subjectProperty = $mailable->subject;
+
+        if ($subjectProperty !== null && $subjectProperty !== '') {
+            return $subjectProperty;
+        }
+
+        // Fall back to the envelope contract so envelope()/subject() style mailables are supported too.
+        if (method_exists($mailable, 'envelope')) {
+            /** @var Envelope $envelope */
+            $envelope = $mailable->envelope();
+            $subject = $envelope->subject;
+
+            if (is_string($subject) && $subject !== '') {
+                return $subject;
+            }
+        }
+
+        // Return null when no subject could be resolved, keeping headers free of misleading data.
+        return null;
     }
 
     private function fakeOrder(string $locale): Order
