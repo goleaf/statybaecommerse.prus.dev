@@ -45,11 +45,11 @@ it('caches manual block recommendations and rehydrates products on subsequent re
 
     // Wire the configuration to an active block so the service can generate and cache results before reusing them.
     $block = RecommendationBlock::factory()->create([
-        'name'         => 'stub-block',
-        'is_active'    => true,
-        'config_ids'   => [$config->id],
+        'name'           => 'stub-block',
+        'is_active'      => true,
+        'config_ids'     => [$config->id],
         'cache_duration' => 600,
-        'max_products' => 5,
+        'max_products'   => 5,
     ]);
 
     $service = app(RecommendationService::class);

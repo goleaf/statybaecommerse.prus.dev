@@ -244,14 +244,14 @@ final class TranslationsRelationManager extends BaseRelationManager
     private function localeBadgeColor(string $locale): string
     {
         return match ($locale) {
-            'lt' => 'success',
-            'en' => 'primary',
-            'de' => 'warning',
-            'fr' => 'info',
-            'es' => 'danger',
-            'it' => 'secondary',
-            'pl' => 'gray',
-            'ru' => 'slate',
+            'lt'    => 'success',
+            'en'    => 'primary',
+            'de'    => 'warning',
+            'fr'    => 'info',
+            'es'    => 'danger',
+            'it'    => 'secondary',
+            'pl'    => 'gray',
+            'ru'    => 'slate',
             default => 'gray',
         };
     }

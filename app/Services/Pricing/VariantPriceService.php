@@ -36,7 +36,7 @@ final class VariantPriceService
      * Calculate the final variant price using the provided context (quantity, customer groups,
      * and preferred currency). The result always contains a full breakdown of each adjustment.
      *
-     * @param  array{quantity?: int, customer_group_ids?: array<int>, currency?: string, base_currency?: string, now?: CarbonInterface, record_history?: bool, history_reason?: string, history_price_type?: string, changed_by?: int|null}  $context
+     * @param array{quantity?: int, customer_group_ids?: array<int>, currency?: string, base_currency?: string, now?: CarbonInterface, record_history?: bool, history_reason?: string, history_price_type?: string, changed_by?: int|null} $context
      */
     public function calculate(ProductVariant $variant, array $context = []): VariantPriceResult
     {

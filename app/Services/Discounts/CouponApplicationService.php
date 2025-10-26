@@ -178,9 +178,9 @@ final class CouponApplicationService
     /**
      * Validate the coupon against the current shopping context and return an error message when invalid.
      *
-     * @param  array<string, mixed>            $context
-     * @param  Collection<int, int>            $productIds
-     * @param  Collection<int, int>            $categoryIds
+     * @param array<string, mixed> $context
+     * @param Collection<int, int> $productIds
+     * @param Collection<int, int> $categoryIds
      */
     private function validateCouponForContext(Coupon $coupon, array $context, float $subtotal, Collection $productIds, Collection $categoryIds): ?string
     {
@@ -223,7 +223,7 @@ final class CouponApplicationService
     /**
      * Resolve cart product and category identifiers once so repeated validations remain cheap.
      *
-     * @param  array<string, mixed>                  $context
+     * @param  array<string, mixed>                                    $context
      * @return array{0: Collection<int, int>, 1: Collection<int, int>}
      */
     private function resolveCartProductContext(array $context): array

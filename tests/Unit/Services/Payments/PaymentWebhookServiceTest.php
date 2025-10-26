@@ -24,12 +24,12 @@ final class PaymentWebhookServiceTest extends TestCase
 
         // Create a processing order that mirrors the state prior to a fulfillment webhook.
         $order = Order::factory()->create([
-            'status'          => 'processing',
-            'payment_status'  => null,
-            'delivered_at'    => null,
+            'status'         => 'processing',
+            'payment_status' => null,
+            'delivered_at'   => null,
         ]);
 
-        $service = new PaymentWebhookService();
+        $service = new PaymentWebhookService;
 
         // Call the private applyStateTransition helper via reflection so we can
         // verify the side effects that occur when a provider reports fulfillment.

@@ -5,8 +5,8 @@ declare(strict_types=1);
 use App\Models\News;
 use App\Models\NewsCategory;
 use App\Models\NewsComment;
-use App\Models\NewsTag;
 use App\Models\NewsImage;
+use App\Models\NewsTag;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);

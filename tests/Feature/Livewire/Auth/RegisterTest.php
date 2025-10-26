@@ -72,7 +72,7 @@ it('requires the password confirmation field before creating an account', functi
     // Assert: ensure the confirmation field is treated as required and no user gets persisted.
     $component->assertHasErrors([
         'registrationForm.password_confirmation' => ['required'],
-        'registrationForm.password' => ['confirmed'],
+        'registrationForm.password'              => ['confirmed'],
     ]);
     expect(User::where('email', 'jamie@example.com')->exists())->toBeFalse();
     expect(Auth::check())->toBeFalse();

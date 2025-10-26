@@ -35,7 +35,7 @@ return [
     // Configure tiered incentives so referral campaigns can scale rewards as
     // advocates hit milestones. Each tier describes the minimum number of
     // completed referrals required plus the reward category and value.
-    'reward_tiers'                 => [
+    'reward_tiers' => [
         ['threshold' => 0, 'category' => 'credit', 'amount' => 5.00, 'currency' => 'EUR'],
         ['threshold' => 5, 'category' => 'credit', 'amount' => 10.00, 'currency' => 'EUR'],
         ['threshold' => 10, 'category' => 'points', 'amount' => 250.0, 'currency' => 'PTS'],
@@ -65,7 +65,7 @@ return [
     */
     'registration_path' => '/register', // Path for registration with referral
     // Allow marketing to configure default share targets for referral links.
-    'share_targets'     => [
+    'share_targets' => [
         'facebook' => 'https://www.facebook.com/sharer/sharer.php?u=%s',
         'twitter'  => 'https://twitter.com/intent/tweet?url=%s',
         'linkedin' => 'https://www.linkedin.com/sharing/share-offsite/?url=%s',

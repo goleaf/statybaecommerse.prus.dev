@@ -90,7 +90,7 @@ final class CategoryController extends Controller
         return new ListQueryDefinition(
             filters: [
                 'search' => [
-                    'type'     => 'string',
+                    'type' => 'string',
                     // Allow searching the category name and description using a LIKE match.
                     'callback' => static function (Builder $builder, string $term): void {
                         $builder->where(function (Builder $query) use ($term): void {
@@ -102,9 +102,9 @@ final class CategoryController extends Controller
             ],
             sortable: [
                 // Sort alphabetically by the translated category name when requested.
-                'name'          => ['column' => 'categories.name'],
+                'name' => ['column' => 'categories.name'],
                 // Maintain the configured manual order for navigation contexts.
-                'sort_order'    => ['column' => 'categories.sort_order'],
+                'sort_order' => ['column' => 'categories.sort_order'],
                 // Expose product counts so consumers can prioritise fuller categories.
                 'product_count' => ['column' => 'products_count'],
             ],

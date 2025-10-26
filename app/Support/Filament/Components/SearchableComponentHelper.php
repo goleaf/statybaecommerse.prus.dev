@@ -190,8 +190,8 @@ final class SearchableComponentHelper
 
         // Preserve parity with the richer helper by pushing an empty payload alongside state/options.
         self::applyComponentState($component, [
-            'value'   => $model->getKey(),
-            'label'   => $labelResolver($model),
+            'value'   => $record->getKey(),
+            'label'   => $labelResolver($record),
             'payload' => [],
         ]);
     }
@@ -200,6 +200,7 @@ final class SearchableComponentHelper
      * Hydrate a SearchableInput component by resolving a model lazily.
      *
      * @template TModel of Model
+     *
      * @param callable(int): (TModel|null) $finder        Retrieve the model from a persisted store.
      * @param callable(TModel): string     $labelResolver Resolve the label for the hydrated option.
      */
@@ -267,40 +268,25 @@ final class SearchableComponentHelper
         string $payloadField,
         ?string $state,
         Closure $payloadResolver,
+        array $emptyPayload = []
     ): void {
         $identifier = self::normaliseIdentifier($state);
 
         if ($identifier === null) {
-            self::clear($component);
+            $set($lookupField, null);
             $set($payloadField, $emptyPayload);
 
             return;
         }
 
-        $model = $finder($identifier);
-
-        if (! $model instanceof Model) {
-            self::clear($component);
-            $set($payloadField, $emptyPayload);
+        $set($lookupField, $identifier);
+        $payload = $payloadResolver($identifier);
 
         if ($payload === null) {
+            $set($payloadField, $emptyPayload);
+
             return;
         }
-
-        $label = null;
-
-        if ($labelResolver !== null) {
-            $resolved = $labelResolver($model);
-            $label = is_string($resolved) && $resolved !== '' ? $resolved : null;
-        }
-
-        $payload = $payloadResolver($model);
-
-        self::applyComponentState($component, [
-            'value'   => $identifier,
-            'label'   => $label ?? ($component->getOptions()[(string) $identifier] ?? ''),
-            'payload' => $payload,
-        ]);
 
         $set($payloadField, is_array($payload) ? $payload : (array) $payload);
     }

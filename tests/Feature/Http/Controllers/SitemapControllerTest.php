@@ -22,7 +22,7 @@ final class SitemapControllerTest extends TestCase
 
         $sitemaps = [
             [
-                'loc' => 'https://example.test/en/sitemap.xml',
+                'loc'     => 'https://example.test/en/sitemap.xml',
                 'lastmod' => '2025-01-01T00:00:00+00:00',
             ],
         ];
@@ -48,10 +48,10 @@ final class SitemapControllerTest extends TestCase
 
         $urls = [
             [
-                'loc' => 'https://example.test/en/products/example',
-                'lastmod' => '2025-01-01T00:00:00+00:00',
+                'loc'        => 'https://example.test/en/products/example',
+                'lastmod'    => '2025-01-01T00:00:00+00:00',
                 'changefreq' => 'weekly',
-                'priority' => '0.8',
+                'priority'   => '0.8',
                 'alternates' => ['en' => 'https://example.test/en/products/example'],
             ],
         ];

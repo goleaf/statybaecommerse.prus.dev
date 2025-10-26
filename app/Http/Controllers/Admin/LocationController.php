@@ -15,12 +15,10 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
 
 use function in_array;
-
-use Illuminate\Support\Facades\Log;
-
 use function strtolower;
 use function trim;
 

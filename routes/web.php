@@ -3,9 +3,9 @@
 declare(strict_types=1);
 
 use App\Http\Controllers\Admin\AttributeTranslationController;
-use App\Http\Controllers\Admin\ProductTranslationController;
-use App\Http\Controllers\Admin\LegalTranslationController;
 use App\Http\Controllers\Admin\CollectionTranslationController;
+use App\Http\Controllers\Admin\LegalTranslationController;
+use App\Http\Controllers\Admin\ProductTranslationController;
 use App\Http\Controllers\Api\NotificationStreamController;
 use App\Http\Controllers\Api\V1\HealthController;
 use App\Http\Controllers\ApiDocsController;
