@@ -31,7 +31,6 @@ use Filament\Infolists\Components\Grid as InfolistGrid;
 use Filament\Infolists\Components\IconEntry;
 use Filament\Infolists\Components\Section as InfolistSection;
 use Filament\Infolists\Components\TextEntry;
-use Filament\Infolists\Infolist;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -306,10 +305,10 @@ final class DiscountConditionResource extends Resource
             ->defaultSort('priority', 'asc');
     }
 
-    public static function infolist(Infolist $infolist): Infolist
+    public static function infolist(Schema $schema): Schema
     {
         // Provide the infolist schema using the Filament v4 return type.
-        return $infolist
+        return $schema
             ->schema([
                 InfolistSection::make(__('discount_conditions.basic_information'))
                     ->schema([
