@@ -7,6 +7,7 @@ namespace App\Livewire\Pages;
 use App\Livewire\Concerns\WithCart;
 use App\Models\Product;
 use App\Models\ProductVariant;
+use App\Services\Pricing\VariantPriceService;
 use App\Support\Cache\CacheKeys;
 use App\Support\Cache\CacheTags;
 use Illuminate\Database\Eloquent\Collection;
@@ -505,12 +506,38 @@ final class SingleProduct extends Component
         $currency = function_exists('current_currency') ? current_currency() : null;
 
         if ($variant) {
-            $priceData = $variant->getPrice();
-            $current = $priceData?->value ?? ($variant->price !== null ? (float) $variant->price : null);
-            $compare = $priceData?->compare ?? ($variant->compare_price !== null ? (float) $variant->compare_price : null);
-            $discount = $priceData?->percentage;
+            /** @var VariantPriceService $priceService */
+            $priceService = app(VariantPriceService::class);
 
-            if ($discount === null && $compare && $current && $compare > $current) {
+            // Build the pricing context so the service can honour quantity-driven rules and locale currency.
+            $context = ['quantity' => $this->quantity];
+
+            if ($currency) {
+                $context['currency'] = $currency;
+            }
+
+            $result = $priceService->calculate($variant, $context);
+
+            $current = (float) $result->finalPrice;
+            $compare = $result->compareAtPrice !== null ? (float) $result->compareAtPrice : null;
+
+            // Fall back to other reference prices (regular, sale, or price-list) when compare-at is absent but
+            // the server-calculated figure indicates a higher anchor price for discount messaging.
+            if ($compare === null) {
+                $fallbackAnchors = array_filter([
+                    $result->regularPrice,
+                    $result->salePrice,
+                    $result->priceListPrice,
+                ], static fn (?float $amount) => $amount !== null && $amount > ($current + 0.0001));
+
+                if ($fallbackAnchors !== []) {
+                    $compare = (float) max($fallbackAnchors);
+                }
+            }
+
+            $discount = null;
+
+            if ($compare !== null && $compare > ($current + 0.0001)) {
                 $discount = round((($compare - $current) / $compare) * 100);
             }
 
@@ -518,7 +545,7 @@ final class SingleProduct extends Component
                 'current'  => $current,
                 'compare'  => $compare,
                 'discount' => $discount,
-                'currency' => $currency,
+                'currency' => $result->currency ?: $currency,
             ];
         }
 
