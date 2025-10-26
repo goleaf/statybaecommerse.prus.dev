@@ -96,7 +96,7 @@ final class Collection extends Model implements HasMedia, TranslatableRecord
      */
     public static function flushCaches(): void
     {
-        $locales = collect(config('app.supported_locales', 'en'))->when(fn ($v) => is_string($v), fn ($c) => collect(explode(',', (string) $c)))->map(fn ($v) => trim((string) $v))->filter()->values();
+        $locales = collect(config('app.supported_locales', 'en'))->when(is_string(...), fn ($c): \Illuminate\Support\Collection => collect(explode(',', (string) $c)))->map(fn ($v): string => trim((string) $v))->filter()->values();
         foreach ($locales as $loc) {
             Cache::forget("sitemap:urls:{$loc}");
         }
@@ -193,6 +193,15 @@ final class Collection extends Model implements HasMedia, TranslatableRecord
     public function isAutomatic(): bool
     {
         return (bool) $this->is_automatic;
+    }
+
+    /**
+     * Provide the legacy isAuto() helper expected by storefront Livewire components.
+     */
+    public function isAuto(): bool
+    {
+        // Delegate to the canonical accessor so both method names stay in sync.
+        return $this->isAutomatic();
     }
 
     /**
@@ -323,7 +332,7 @@ final class Collection extends Model implements HasMedia, TranslatableRecord
     {
         $locale = $locale ?: app()->getLocale();
 
-        return $query->with(['translations' => function ($q) use ($locale) {
+        return $query->with(['translations' => function ($q) use ($locale): void {
             $q->where('locale', $locale);
         }]);
     }
@@ -348,8 +357,6 @@ final class Collection extends Model implements HasMedia, TranslatableRecord
 
     /**
      * Handle getOrCreateTranslation functionality with proper error handling.
-     *
-     * @return App\Models\Translations\CollectionTranslation
      */
     public function getOrCreateTranslation(string $locale): \App\Models\Translations\CollectionTranslation
     {
