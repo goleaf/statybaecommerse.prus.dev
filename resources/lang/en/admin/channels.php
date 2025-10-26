@@ -1,0 +1,65 @@
+<?php
+
+declare(strict_types=1);
+
+return [
+    // Navigation and labels for the Channel management resource.
+    'navigation_label'     => 'Channels',
+    'plural_model_label'   => 'Channels',
+    'model_label'          => 'Channel',
+    'basic_information'    => 'Basic information',
+    'name'                 => 'Name',
+    'slug'                 => 'Slug',
+    'code'                 => 'Code',
+    'type'                 => 'Type',
+    'types'                => [
+        'web'    => 'Web',
+        'mobile' => 'Mobile',
+        'api'    => 'API',
+        'pos'    => 'Point of sale',
+    ],
+    'description'          => 'Description',
+    'configuration'        => 'Configuration',
+    'url'                  => 'URL',
+    'domain'               => 'Domain',
+    'timezone'             => 'Timezone',
+    'currency_code'        => 'Currency code',
+    'currency_symbol'      => 'Currency symbol',
+    'currency_position'    => 'Currency position',
+    'currency_positions'   => [
+        'before' => 'Before amount',
+        'after'  => 'After amount',
+    ],
+    'advanced_settings'    => 'Advanced settings',
+    'metadata'             => 'Metadata',
+    'metadata_key'         => 'Metadata key',
+    'metadata_value'       => 'Metadata value',
+    'add_metadata'         => 'Add metadata row',
+    'configuration_pairs'  => 'Configuration overrides',
+    'configuration_key'    => 'Configuration key',
+    'configuration_value'  => 'Configuration value',
+    'add_configuration'    => 'Add configuration row',
+    'payment_matrix_section' => 'Payment availability',
+    'payment_rows'         => [
+        'lt' => 'Lithuania',
+        'lv' => 'Latvia',
+        'ee' => 'Estonia',
+        'pl' => 'Poland',
+        'eu' => 'European Union',
+    ],
+    'payment_columns'      => [
+        'web'         => 'Web',
+        'pos'         => 'POS',
+        'marketplace' => 'Marketplace',
+    ],
+    'payment_matrix_label' => 'Enable supported payment options',
+    'payment_matrix_help'  => 'Toggle which payment types are available per region.',
+    'status'               => 'Status',
+    'is_enabled'           => 'Enabled',
+    'is_default'           => 'Default',
+    'is_active'            => 'Active',
+    'ssl_enabled'          => 'SSL enabled',
+    'analytics_enabled'    => 'Analytics enabled',
+    'sort_order'           => 'Sort order',
+];
+
