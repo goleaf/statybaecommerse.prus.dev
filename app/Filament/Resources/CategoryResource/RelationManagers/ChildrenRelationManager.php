@@ -5,11 +5,21 @@ declare(strict_types=1);
 namespace App\Filament\Resources\CategoryResource\RelationManagers;
 
 use App\Filament\RelationManagers\Support\BaseRelationManager;
+// Bring in Closure so inline annotations about schema arrays remain precise for tooling.
+use Closure;
+use Filament\Actions\Action;
+// Import the repeater component explicitly so the quick-edit modal schema renders without runtime errors.
+use Filament\Actions\ActionGroup;
 use Filament\Forms\Components\ColorPicker;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+// Include action types to keep schema annotations compatible with Filament's action components.
 use Filament\Forms\Components\Toggle;
+// Support grouped actions within quick-edit schemas for completeness.
 use Filament\Forms\Set;
+// Reference the base component type for quick-edit schema hints.
+use Filament\Schemas\Components\Component;
 use Filament\Schemas\Components\Grid as SchemaGrid;
 use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Schemas\Schema;
@@ -22,7 +32,11 @@ use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+// Allow schema annotations to include pre-rendered HTML segments when needed.
+use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Str;
+// Bring in the custom repeater action to keep inline editing for child categories functional.
+use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
 
 final class ChildrenRelationManager extends BaseRelationManager
 {
@@ -46,7 +60,14 @@ final class ChildrenRelationManager extends BaseRelationManager
                                 ->required()
                                 ->maxLength(255)
                                 ->live(onBlur: true)
-                                ->afterStateUpdated(fn (string $operation, $state, Set $set) => $operation === 'create' ? $set('slug', Str::slug($state)) : null),
+                                ->afterStateUpdated(function (string $operation, mixed $state, Set $set): void {
+                                    // Guard the slug helper against null or array states while still normalising the preview slug.
+                                    if ($operation !== 'create' || ! is_string($state)) {
+                                        return;
+                                    }
+
+                                    $set('slug', Str::slug($state));
+                                }),
                             TextInput::make('slug')
                                 ->label(__('categories.slug'))
                                 ->unique(ignoreRecord: true)
@@ -201,7 +222,11 @@ final class ChildrenRelationManager extends BaseRelationManager
                     ->modalWidth('5xl')
                     ->configureRepeater(function (Repeater $repeater): Repeater {
                         // Provide a quick-edit modal for managing records inline.
-                        return $repeater->schema($this->getQuickEditSchema());
+                        /** @var array<int, Component|Action|ActionGroup|Htmlable|string|Closure> $quickEditSchema */
+                        $quickEditSchema = $this->getQuickEditSchema();
+
+                        /** @phpstan-ignore-next-line The repeater package consumes full component arrays despite the helper signature. */
+                        return $repeater->schema($quickEditSchema);
                     }),
                 CreateAction::make(),
             ])

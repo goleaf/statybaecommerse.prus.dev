@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources\CategoryResource\RelationManagers;
 
 use App\Filament\RelationManagers\Support\BaseRelationManager;
+use App\Models\Product;
 use App\Support\Storage\SecureStorage;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -21,6 +22,10 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+// Import the Str helper so slug generation inside the inline create modal stays deterministic.
+use Illuminate\Support\Str;
+// Ensure the custom repeater action is available for bulk inline product adjustments.
+use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
 
 final class ProductsRelationManager extends BaseRelationManager
 {
@@ -40,7 +45,14 @@ final class ProductsRelationManager extends BaseRelationManager
                 ->required()
                 ->maxLength(255)
                 ->live(onBlur: true)
-                ->afterStateUpdated(fn (string $operation, $state, Set $set) => $operation === 'create' ? $set('slug', Str::slug($state)) : null),
+                ->afterStateUpdated(function (string $operation, mixed $state, Set $set): void {
+                    // Normalise the slug while tolerating non-string Livewire payloads during inline creation.
+                    if ($operation !== 'create' || ! is_string($state)) {
+                        return;
+                    }
+
+                    $set('slug', Str::slug($state));
+                }),
             TextInput::make('slug')
                 ->label(__('products.slug'))
                 ->unique(ignoreRecord: true)
@@ -80,7 +92,18 @@ final class ProductsRelationManager extends BaseRelationManager
                     ->label(__('products.image'))
                     ->circular()
                     ->size(40)
-                    ->getStateUsing(fn ($record) => $record->image ? SecureStorage::temporarySignedUrl($record->image) : null),
+                    ->getStateUsing(function (?Product $record): ?string {
+                        // Resolve the stored path only when the relation manager provides a concrete product instance.
+                        if (! $record instanceof Product) {
+                            return null;
+                        }
+
+                        $imagePath = $record->getAttribute('image');
+
+                        return is_string($imagePath) && $imagePath !== ''
+                            ? SecureStorage::temporarySignedUrl($imagePath)
+                            : null;
+                    }),
                 TextColumn::make('name')
                     ->label(__('products.name'))
                     ->searchable()
