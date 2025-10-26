@@ -37,12 +37,34 @@ final class ContentBasedRecommendation extends BaseRecommendation
             return collect();
         }
         $cacheKey = $this->generateCacheKey('content_based', $user, $product, $context);
-        $cached = $this->getCachedResult($cacheKey);
-        if ($cached) {
+        if ($cached = $this->getCachedResult($cacheKey)) {
+            $products = Product::query()
+                ->whereKey($cached->pluck('product_id')->filter()->all())
+                ->get()
+                ->keyBy('id');
+
             $collection = (new Product)->newCollection(
                 $cached
-                    ->pluck('similarProduct')
-                    ->filter(fn ($p) => $p instanceof Product && $p->is_visible)
+                    ->map(function ($row) use ($products): ?Product {
+                        // Guard against unexpected payloads by making sure the cached row is an array with a resolvable product id.
+                        if (! is_array($row)) {
+                            return null;
+                        }
+
+                        $productId = $row['product_id'] ?? null;
+                        $product = $products->get($productId);
+
+                        if (! $product instanceof Product || ! $product->is_visible) {
+                            return null;
+                        }
+
+                        // Rehydrate the cached similarity score onto the model so downstream ranking can still leverage it.
+                        $product->relevance_score = (float) ($row['score'] ?? 0.0);
+
+                        return $product;
+                    })
+                    ->filter()
+                    ->values()
                     ->all()
             );
 
@@ -62,7 +84,17 @@ final class ContentBasedRecommendation extends BaseRecommendation
                 ->all()
         );
 
-        return $this->cacheResult($cacheKey, $recommendations, $this->config['cache_ttl'] ?? 3600);
+        // Persist only lightweight identifiers and scores so cache entries stay serializable while keeping runtime results hydrated.
+        $this->cacheResult(
+            $cacheKey,
+            $recommendations->map(static fn (Product $product): array => [
+                'product_id' => $product->getKey(),
+                'score'      => (float) ($product->relevance_score ?? 0.0),
+            ]),
+            $this->config['cache_ttl'] ?? 3600
+        );
+
+        return $recommendations;
     }
 
     /**
@@ -96,8 +128,24 @@ final class ContentBasedRecommendation extends BaseRecommendation
 
         $products = $similarities
             ->take($this->maxResults)
-            ->pluck('product')
-            ->filter(fn ($candidate) => $candidate instanceof Product);
+            ->map(function ($entry): ?Product {
+                if (! is_array($entry)) {
+                    return null; // Skip malformed cache rows so they do not break recommendation rendering.
+                }
+
+                $candidate = $entry['product'] ?? null;
+
+                if (! $candidate instanceof Product) {
+                    return null;
+                }
+
+                // Attach the computed similarity score so later caching and ranking have direct access to the numeric value.
+                $candidate->relevance_score = (float) ($entry['similarity'] ?? 0.0);
+
+                return $candidate;
+            })
+            ->filter(fn ($candidate) => $candidate instanceof Product)
+            ->values();
 
         $collection = (new Product)->newCollection($products->all());
         $collection->each(static fn (Product $item) => $item->unsetRelation('brand'));
