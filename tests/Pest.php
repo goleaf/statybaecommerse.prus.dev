@@ -9,10 +9,12 @@ use Spatie\Permission\Models\Role;
 use Spatie\Permission\PermissionRegistrar;
 use Tests\Support\TestingDatabase;
 
-<<<<<<< HEAD
+// Centralise dataset registrations so Pest automatically discovers shared model datasets.
+require __DIR__ . '/Support/ModelDatasets.php';
+
+// Register the base TestCase for top-level feature, unit, and panel test suites.
 uses(Tests\TestCase::class)->in('Feature', 'Unit', 'admin', 'frontend', 'Performance');
-// Register the base TestCase for dedicated model quality suites introduced under tests/Models.
-uses(Tests\TestCase::class)->in('Models');
+// Model-focused suites declare their own TestCase bindings to attach specific traits.
 
 beforeAll(function () {
     $testingDatabasePath = TestingDatabase::path();
