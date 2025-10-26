@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace Tests\Feature\Frontend;
 
 use App\Models\Campaign;
+use App\Models\CampaignConversion;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Carbon;
 use Tests\TestCase;
 
 final class CampaignControllerTest extends TestCase
@@ -553,5 +555,197 @@ final class CampaignControllerTest extends TestCase
         ]);
 
         $response->assertStatus(419);  // CSRF token mismatch
+    }
+
+    public function test_campaign_analytics_endpoint_returns_structured_marketing_insights(): void
+    {
+        Carbon::setTestNow(Carbon::create(2025, 1, 15, 12));
+
+        $campaignA = Campaign::factory()->create([
+            'status'    => 'active',
+            'starts_at' => now()->subDays(5),
+            'ends_at'   => now()->addDays(5),
+        ]);
+
+        $campaignB = Campaign::factory()->create([
+            'status'    => 'completed',
+            'starts_at' => now()->subDays(3),
+            'ends_at'   => now()->subDay(),
+        ]);
+
+        $legacyCampaign = Campaign::factory()->create([
+            'status'    => 'active',
+            'starts_at' => now()->subDays(30),
+            'ends_at'   => now()->subDays(20),
+        ]);
+
+        $futureCampaign = Campaign::factory()->create([
+            'status'    => 'scheduled',
+            'starts_at' => now()->addDays(2),
+            'ends_at'   => now()->addDays(10),
+        ]);
+
+        $campaignA->forceFill([
+            'created_at'        => now()->subDays(3),
+            'updated_at'        => now()->subDays(3),
+            'total_views'       => 120,
+            'total_clicks'      => 45,
+            'total_conversions' => 12,
+            'total_revenue'     => 640,
+            'metadata'          => [
+                'budget'            => 320,
+                'total_views'       => 120,
+                'total_clicks'      => 45,
+                'total_conversions' => 12,
+                'total_revenue'     => 640,
+                'conversion_rate'   => 26.67,
+            ],
+        ])->save();
+
+        $campaignB->forceFill([
+            'created_at'        => now()->subDays(2),
+            'updated_at'        => now()->subDays(2),
+            'total_views'       => 60,
+            'total_clicks'      => 18,
+            'total_conversions' => 6,
+            'total_revenue'     => 210,
+            'metadata'          => [
+                'budget'            => 150,
+                'total_views'       => 60,
+                'total_clicks'      => 18,
+                'total_conversions' => 6,
+                'total_revenue'     => 210,
+                'conversion_rate'   => 33.33,
+            ],
+        ])->save();
+
+        // Backdate and forward-date auxiliary campaigns to assert time window clamping.
+        $legacyCampaign->forceFill([
+            'created_at' => now()->subDays(30),
+            'updated_at' => now()->subDays(30),
+        ])->save();
+
+        $futureCampaign->forceFill([
+            'created_at' => now()->addDay(),
+            'updated_at' => now()->addDay(),
+        ])->save();
+
+        CampaignConversion::withoutTimestamps(function () use ($campaignA, $campaignB): void {
+            CampaignConversion::factory()->create([
+                'campaign_id'               => $campaignA->id,
+                'conversion_value'          => 320,
+                'conversion_rate'           => 0.24,
+                'attribution_model'         => 'last_click',
+                'funnel_step'               => 'awareness',
+                'conversion_path'           => ['touchpoints' => 3],
+                'touchpoints'               => ['first_touch' => now()->subDays(4), 'last_touch' => now()->subDay()],
+                'conversion_data'           => ['campaign_name' => 'Variant A'],
+                'roi'                       => 1.8,
+                'roas'                      => 2.6,
+                'assisted_conversions'      => 2,
+                'assisted_conversion_value' => 120,
+                'is_verified'               => true,
+                'is_attributed'             => true,
+                'cost_per_conversion'       => 18,
+                'time_on_site'              => 240,
+                'page_views'                => 6,
+                'converted_at'              => now()->subDays(1),
+            ]);
+
+            CampaignConversion::factory()->create([
+                'campaign_id'               => $campaignA->id,
+                'conversion_value'          => 210,
+                'conversion_rate'           => 0.18,
+                'attribution_model'         => 'first_click',
+                'funnel_step'               => 'consideration',
+                'conversion_path'           => ['touchpoints' => 2],
+                'touchpoints'               => ['first_touch' => now()->subDays(5), 'last_touch' => now()->subHours(6)],
+                'conversion_data'           => ['campaign_name' => 'Variant B'],
+                'roi'                       => 1.2,
+                'roas'                      => 1.9,
+                'assisted_conversions'      => 1,
+                'assisted_conversion_value' => 90,
+                'is_verified'               => false,
+                'is_attributed'             => true,
+                'cost_per_conversion'       => 14,
+                'time_on_site'              => 160,
+                'page_views'                => 4,
+                'converted_at'              => now()->subHours(12),
+            ]);
+
+            CampaignConversion::factory()->create([
+                'campaign_id'               => $campaignB->id,
+                'conversion_value'          => 150,
+                'conversion_rate'           => 0.2,
+                'attribution_model'         => 'linear',
+                'funnel_step'               => 'purchase',
+                'conversion_path'           => ['touchpoints' => 4],
+                'touchpoints'               => ['first_touch' => now()->subDays(6), 'last_touch' => now()->subHours(2)],
+                'conversion_data'           => ['campaign_name' => 'Variant A'],
+                'roi'                       => 1.5,
+                'roas'                      => 2.1,
+                'assisted_conversions'      => 0,
+                'assisted_conversion_value' => 0,
+                'is_verified'               => true,
+                'is_attributed'             => false,
+                'cost_per_conversion'       => 12,
+                'time_on_site'              => 200,
+                'page_views'                => 5,
+                'converted_at'              => now()->subHours(3),
+            ]);
+
+            // Conversion recorded outside the requested window should be ignored by analytics.
+            CampaignConversion::factory()->create([
+                'campaign_id'      => $campaignA->id,
+                'conversion_value' => 275,
+                'conversion_rate'  => 0.22,
+                'converted_at'     => now()->subDays(10),
+            ]);
+
+            // Future-dated conversion must also be excluded from the audit window.
+            CampaignConversion::factory()->create([
+                'campaign_id'      => $campaignA->id,
+                'conversion_value' => 500,
+                'conversion_rate'  => 0.3,
+                'converted_at'     => now()->addDay(),
+            ]);
+        });
+
+        $response = $this->getJson(route('frontend.campaigns.api.analytics', ['period' => '7']));
+
+        $response->assertOk();
+
+        $payload = $response->json('data');
+
+        // Assert the time window and engagement insights were calculated correctly.
+        $this->assertSame(7, $payload['period']['days']);
+        $this->assertSame('Last 7 days', $payload['period']['label']);
+        $this->assertSame('2025-01-08', $payload['period']['start_date']);
+        $this->assertSame('2025-01-15', $payload['period']['end_date']);
+        $this->assertSame(180, $payload['insights']['views_clicks']['metrics']['total_views']);
+        $this->assertSame(63, $payload['insights']['views_clicks']['metrics']['total_clicks']);
+
+        // Validate the aggregate counters clamp to the rolling period.
+        $this->assertSame(2, $payload['totals']['campaigns_created']);
+        $this->assertSame(2, $payload['totals']['campaigns_started']);
+        $this->assertSame(1, $payload['totals']['campaigns_completed']);
+        $this->assertSame(1, $payload['totals']['active_campaigns']);
+
+        // Confirm conversion and ROI metrics are surfaced with attribution context.
+        $this->assertSame(3, $payload['insights']['conversions']['metrics']['total_conversions']);
+        $this->assertGreaterThan(0, $payload['insights']['conversions']['metrics']['average_conversion_rate']);
+        $this->assertSame(2, $payload['insights']['conversions']['metrics']['verified_conversions']);
+        $this->assertSame(2, $payload['insights']['conversions']['metrics']['attributed_conversions']);
+        $this->assertEquals(210.0, $payload['insights']['conversions']['metrics']['assisted_conversion_value']);
+        $this->assertEquals(470.0, $payload['insights']['roi_tracking']['metrics']['total_budget']);
+        $this->assertGreaterThan(0, $payload['insights']['roi_tracking']['metrics']['roi_percentage']);
+
+        // Ensure customer journey and multi-variant signals exist.
+        $this->assertNotEmpty($payload['insights']['customer_journey']['metrics']['funnel_breakdown']);
+        $this->assertSame(1, $payload['insights']['a_b_testing']['metrics']['multi_variant_campaigns']);
+        $this->assertNotEmpty($payload['insights']['a_b_testing']['metrics']['variant_performance']);
+        $this->assertFalse(collect($payload['insights']['a_b_testing']['metrics']['variant_performance'])->pluck('campaign_name')->contains('Campaign #0'));
+
+        Carbon::setTestNow();
     }
 }
