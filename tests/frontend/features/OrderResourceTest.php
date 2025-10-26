@@ -47,32 +47,32 @@ class OrderResourceTest extends TestCase
 
         Livewire::test(OrderResource\Pages\CreateOrder::class)
             ->fillForm([
-                'number' => 'ORD-TEST-001',
-                'user_id' => $user->id,
-                'status' => 'pending',
-                'subtotal' => 100.00,
-                'tax_amount' => 21.00,
-                'shipping_amount' => 5.00,
-                'discount_amount' => 0.00,
-                'total' => 126.00,
-                'currency' => 'EUR',
-                'billing_address' => ['name' => 'John Doe', 'email' => 'john@example.com'],
+                'number'           => 'ORD-TEST-001',
+                'user_id'          => $user->id,
+                'status'           => 'pending',
+                'subtotal'         => 100.00,
+                'tax_amount'       => 21.00,
+                'shipping_amount'  => 5.00,
+                'discount_amount'  => 0.00,
+                'total'            => 126.00,
+                'currency'         => 'EUR',
+                'billing_address'  => ['name' => 'John Doe', 'email' => 'john@example.com'],
                 'shipping_address' => ['name' => 'John Doe', 'address' => '123 Main St'],
-                'notes' => 'Test order',
-                'zone_id' => $zone->id,
-                'channel_id' => $channel->id,
-                'partner_id' => $partner->id,
-                'payment_status' => 'pending',
-                'payment_method' => 'credit_card',
+                'notes'            => 'Test order',
+                'zone_id'          => $zone->id,
+                'channel_id'       => $channel->id,
+                'partner_id'       => $partner->id,
+                'payment_status'   => 'pending',
+                'payment_method'   => 'credit_card',
             ])
             ->call('create')
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('orders', [
-            'number' => 'ORD-TEST-001',
+            'number'  => 'ORD-TEST-001',
             'user_id' => $user->id,
-            'status' => 'pending',
-            'total' => 126.00,
+            'status'  => 'pending',
+            'total'   => 126.00,
         ]);
     }
 
@@ -84,8 +84,8 @@ class OrderResourceTest extends TestCase
         Livewire::test(OrderResource\Pages\EditOrder::class, ['record' => $order->getRouteKey()])
             ->fillForm([
                 'user_id' => $newUser->id,
-                'status' => 'processing',
-                'notes' => 'Updated notes',
+                'status'  => 'processing',
+                'notes'   => 'Updated notes',
             ])
             ->call('save')
             ->assertHasNoFormErrors();
@@ -102,10 +102,10 @@ class OrderResourceTest extends TestCase
 
         Livewire::test(OrderResource\Pages\ViewOrder::class, ['record' => $order->getRouteKey()])
             ->assertFormSet([
-                'number' => $order->number,
+                'number'  => $order->number,
                 'user_id' => $order->user_id,
-                'status' => $order->status,
-                'total' => $order->total,
+                'status'  => $order->status,
+                'total'   => $order->total,
             ]);
     }
 
@@ -197,7 +197,7 @@ class OrderResourceTest extends TestCase
             ->filterTable('created_at', [
                 'range' => [
                     'start' => now()->subDay()->format('Y-m-d'),
-                    'end' => now()->addDay()->format('Y-m-d'),
+                    'end'   => now()->addDay()->format('Y-m-d'),
                 ],
             ])
             ->assertCanSeeTableRecords([$newOrder])
@@ -293,7 +293,7 @@ class OrderResourceTest extends TestCase
 
         Livewire::test(OrderResource\Pages\ListOrders::class)
             ->callTableBulkAction('export_selected', $orders, [
-                'format' => 'csv',
+                'format'  => 'csv',
                 'columns' => ['number', 'status'],
             ])
             ->assertHasNoTableBulkActionErrors();
@@ -360,9 +360,9 @@ class OrderResourceTest extends TestCase
 
         Livewire::test(OrderResource\Pages\CreateOrder::class)
             ->fillForm([
-                'user_id' => $user->id,
-                'status' => 'pending',
-                'total' => 100.00,
+                'user_id'  => $user->id,
+                'status'   => 'pending',
+                'total'    => 100.00,
                 'currency' => 'EUR',
             ])
             ->call('create')
@@ -380,8 +380,8 @@ class OrderResourceTest extends TestCase
         Livewire::test(OrderResource\Pages\CreateOrder::class)
             ->fillForm([
                 'user_id' => $user->id,
-                'status' => 'pending',
-                'total' => 100.00,
+                'status'  => 'pending',
+                'total'   => 100.00,
             ])
             ->call('create')
             ->assertHasNoFormErrors();

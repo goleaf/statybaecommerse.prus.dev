@@ -9,11 +9,17 @@ use JsonException;
 final class CacheKeys
 {
     public const TTL_MINUTE = 60;
+
     public const TTL_TWO_MINUTES = 120;
+
     public const TTL_FIVE_MINUTES = 300;
+
     public const TTL_ONE_HOUR = 3600;
+
     public const TTL_TWO_HOURS = 7200;
+
     public const TTL_SIX_HOURS = 21600;
+
     public const TTL_ONE_DAY = 86400;
 
     public static function productVisibleCount(): string
@@ -242,7 +248,7 @@ final class CacheKeys
     }
 
     /**
-     * @param  array<string, mixed>  $filters
+     * @param array<string, mixed> $filters
      */
     public static function categoryIndexFacetBrands(string $locale, array $filters): string
     {
@@ -250,7 +256,7 @@ final class CacheKeys
     }
 
     /**
-     * @param  array<string, mixed>  $filters
+     * @param array<string, mixed> $filters
      */
     public static function categoryIndexFacetCollections(string $locale, array $filters): string
     {
@@ -258,7 +264,7 @@ final class CacheKeys
     }
 
     /**
-     * @param  array<string, mixed>  $filters
+     * @param array<string, mixed> $filters
      */
     public static function categoryIndexFacetCategories(string $locale, array $filters): string
     {
@@ -266,7 +272,7 @@ final class CacheKeys
     }
 
     /**
-     * @param  array<string, mixed>  $filters
+     * @param array<string, mixed> $filters
      */
     public static function categoryIndexCategories(string $locale, array $filters): string
     {
@@ -274,7 +280,7 @@ final class CacheKeys
     }
 
     /**
-     * @param  array<string, mixed>  $options
+     * @param array<string, mixed> $options
      */
     public static function categoryShowProducts(int $categoryId, string $locale, array $options): string
     {
@@ -292,7 +298,7 @@ final class CacheKeys
     }
 
     /**
-     * @param  array<string, mixed>  $values
+     * @param array<string, mixed> $values
      */
     private static function hashFromArray(array $values): string
     {
@@ -312,7 +318,7 @@ final class CacheKeys
     }
 
     /**
-     * @param  array<mixed>  $values
+     * @param array<mixed> $values
      *
      * @throws JsonException
      */
@@ -326,7 +332,7 @@ final class CacheKeys
     /**
      * Normalise arrays before creating hashes so cache keys remain stable.
      *
-     * @param  array<mixed>  $values
+     * @param array<mixed> $values
      */
     private static function sortArrayRecursive(array &$values): void
     {
@@ -346,7 +352,7 @@ final class CacheKeys
     }
 
     /**
-     * @param  array<mixed>  $values
+     * @param array<mixed> $values
      */
     private static function isAssociative(array $values): bool
     {

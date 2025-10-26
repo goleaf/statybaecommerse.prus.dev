@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Logging;
 
+use function collect;
+
 use Illuminate\Log\Events\MessageLogged;
 use Illuminate\Support\Facades\Log;
 use Tests\TestCase;
-use function collect;
 
 final class HttpLoggingTest extends TestCase
 {
@@ -19,7 +20,7 @@ final class HttpLoggingTest extends TestCase
             $records = $records->push($event);
         });
 
-        $correlationId = 'test-correlation-'.uniqid('', true);
+        $correlationId = 'test-correlation-' . uniqid('', true);
 
         $response = $this->withHeader('X-Correlation-ID', $correlationId)->get('/up');
 

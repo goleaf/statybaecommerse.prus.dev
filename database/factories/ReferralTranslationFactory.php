@@ -24,8 +24,8 @@ class ReferralTranslationFactory extends Factory
     {
         return [
             'referral_id' => Referral::factory(),
-            'locale' => $this->faker->randomElement(['en', 'lt', 'ru']),
-            'title' => $this->faker->sentence(3),
+            'locale'      => $this->faker->randomElement(['en', 'lt', 'ru']),
+            'title'       => $this->faker->sentence(3),
             'description' => $this->faker->paragraph(),
         ];
     }

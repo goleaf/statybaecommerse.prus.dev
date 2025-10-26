@@ -41,9 +41,9 @@ describe('User Impersonation Unit Tests', function () {
         $regularUser = User::factory()->create(['is_admin' => false]);
 
         $impersonateData = [
-            'original_user_id' => $admin->id,
+            'original_user_id'     => $admin->id,
             'impersonated_user_id' => $regularUser->id,
-            'started_at' => now()->toISOString(),
+            'started_at'           => now()->toISOString(),
         ];
 
         expect($impersonateData)->toHaveKeys(['original_user_id', 'impersonated_user_id', 'started_at']);
@@ -65,10 +65,10 @@ describe('User Impersonation Unit Tests', function () {
 
     it('can test user model attributes', function () {
         $user = User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+            'name'      => 'Test User',
+            'email'     => 'test@example.com',
             'is_active' => true,
-            'is_admin' => false,
+            'is_admin'  => false,
         ]);
 
         expect($user->name)->toBe('Test User');

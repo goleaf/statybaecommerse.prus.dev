@@ -1,9 +1,11 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Tests\Unit;
 
-use App\Models\Translations\LegalTranslation;
 use App\Models\Legal;
+use App\Models\Translations\LegalTranslation;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -14,16 +16,16 @@ class LegalTest extends TestCase
     public function test_legal_can_be_created(): void
     {
         $legal = Legal::factory()->create([
-            'key' => 'privacy-policy',
-            'type' => 'privacy_policy',
-            'is_enabled' => true,
+            'key'         => 'privacy-policy',
+            'type'        => 'privacy_policy',
+            'is_enabled'  => true,
             'is_required' => true,
         ]);
 
         $this->assertDatabaseHas('legals', [
-            'key' => 'privacy-policy',
-            'type' => 'privacy_policy',
-            'is_enabled' => true,
+            'key'         => 'privacy-policy',
+            'type'        => 'privacy_policy',
+            'is_enabled'  => true,
             'is_required' => true,
         ]);
     }
@@ -31,10 +33,10 @@ class LegalTest extends TestCase
     public function test_legal_casts_work_correctly(): void
     {
         $legal = Legal::factory()->create([
-            'is_enabled' => true,
-            'is_required' => false,
-            'sort_order' => 10,
-            'meta_data' => ['version' => '1.0'],
+            'is_enabled'   => true,
+            'is_required'  => false,
+            'sort_order'   => 10,
+            'meta_data'    => ['version' => '1.0'],
             'published_at' => now(),
         ]);
 
@@ -266,9 +268,9 @@ class LegalTest extends TestCase
 
         $translation = LegalTranslation::factory()->create([
             'legal_id' => $legal->id,
-            'locale' => 'lt',
-            'title' => 'Test Title',
-            'content' => 'Test Content',
+            'locale'   => 'lt',
+            'title'    => 'Test Title',
+            'content'  => 'Test Content',
         ]);
 
         $this->assertTrue($legal->translations->contains($translation));
@@ -280,12 +282,12 @@ class LegalTest extends TestCase
 
         LegalTranslation::factory()->create([
             'legal_id' => $legal->id,
-            'locale' => 'lt',
+            'locale'   => 'lt',
         ]);
 
         LegalTranslation::factory()->create([
             'legal_id' => $legal->id,
-            'locale' => 'en',
+            'locale'   => 'en',
         ]);
 
         $locales = $legal->getAvailableLocales();
@@ -300,7 +302,7 @@ class LegalTest extends TestCase
 
         LegalTranslation::factory()->create([
             'legal_id' => $legal->id,
-            'locale' => 'lt',
+            'locale'   => 'lt',
         ]);
 
         $this->assertTrue($legal->hasTranslationFor('lt'));
@@ -324,11 +326,11 @@ class LegalTest extends TestCase
 
         $translation = LegalTranslation::factory()->create([
             'legal_id' => $legal->id,
-            'locale' => 'lt',
+            'locale'   => 'lt',
         ]);
 
         $result = $legal->updateTranslation('lt', [
-            'title' => 'Updated Title',
+            'title'   => 'Updated Title',
             'content' => 'Updated Content',
         ]);
 

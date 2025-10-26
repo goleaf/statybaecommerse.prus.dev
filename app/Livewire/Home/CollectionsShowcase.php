@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Livewire\Home;
 
 use App\Models\Collection as ProductCollection;
-use App\Services\Shared\CacheService as SharedCacheService;
 use App\Support\Cache\CacheKeys;
 use App\Support\Cache\CacheTagHelper;
 use Filament\Infolists\Components\ViewEntry;

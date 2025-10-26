@@ -11,14 +11,14 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\Response;
+use Throwable;
 
 final class AssignCorrelationId
 {
     public function __construct(
         private readonly LogContext $logContext,
         private readonly StructuredLogger $logger,
-    ) {
-    }
+    ) {}
 
     public function handle(Request $request, Closure $next): Response
     {
@@ -29,21 +29,21 @@ final class AssignCorrelationId
         $this->logContext->setRequestId($requestId);
         $this->logContext->merge([
             'http_method' => $request->getMethod(),
-            'path' => '/'.ltrim($request->path(), '/'),
-            'ip' => $request->ip(),
+            'path'        => '/' . ltrim($request->path(), '/'),
+            'ip'          => $request->ip(),
         ]);
 
         Log::withContext($this->logContext->toArray());
 
         $operation = $this->logger->operation('http_request', [
             'method' => $request->getMethod(),
-            'path' => '/'.ltrim($request->path(), '/'),
+            'path'   => '/' . ltrim($request->path(), '/'),
         ]);
 
         try {
             /** @var Response $response */
             $response = $next($request);
-        } catch (\Throwable $throwable) {
+        } catch (Throwable $throwable) {
             $this->logContext->setUserId($request->user()?->getAuthIdentifier());
             Log::withContext($this->logContext->toArray());
 
@@ -61,7 +61,7 @@ final class AssignCorrelationId
         Log::withContext($this->logContext->toArray());
 
         $operation->finish([
-            'status_code' => $response->getStatusCode(),
+            'status_code'    => $response->getStatusCode(),
             'content_length' => (int) $response->headers->get('Content-Length', 0),
         ]);
 

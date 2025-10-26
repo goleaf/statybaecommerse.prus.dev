@@ -24,14 +24,14 @@ final class AdminAuthorizationSeeder extends Seeder
 
             foreach ($allPermissions as $permission) {
                 Permission::firstOrCreate([
-                    'name' => $permission,
+                    'name'       => $permission,
                     'guard_name' => $guard,
                 ]);
             }
 
             foreach (AuthorizationMatrix::roles() as ['role' => $role]) {
                 $roleModel = Role::firstOrCreate([
-                    'name' => $role->value,
+                    'name'       => $role->value,
                     'guard_name' => $guard,
                 ]);
 

@@ -20,23 +20,23 @@ final class AnalyticsEventTest extends TestCase
         $product = Product::factory()->create();
 
         $event = AnalyticsEvent::factory()->create([
-            'event_type' => 'product_view',
-            'session_id' => 'test_session_123',
-            'user_id' => $user->id,
-            'url' => 'https://example.com/products/1',
-            'referrer' => 'https://google.com',
-            'ip_address' => '192.168.1.1',
-            'country_code' => 'LT',
-            'device_type' => 'desktop',
-            'browser' => 'Chrome',
-            'os' => 'Windows',
+            'event_type'        => 'product_view',
+            'session_id'        => 'test_session_123',
+            'user_id'           => $user->id,
+            'url'               => 'https://example.com/products/1',
+            'referrer'          => 'https://google.com',
+            'ip_address'        => '192.168.1.1',
+            'country_code'      => 'LT',
+            'device_type'       => 'desktop',
+            'browser'           => 'Chrome',
+            'os'                => 'Windows',
             'screen_resolution' => '1920x1080',
-            'trackable_type' => Product::class,
-            'trackable_id' => $product->id,
-            'value' => 25.99,
-            'currency' => 'EUR',
-            'properties' => ['category' => 'electronics', 'brand' => 'Samsung'],
-            'user_agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+            'trackable_type'    => Product::class,
+            'trackable_id'      => $product->id,
+            'value'             => 25.99,
+            'currency'          => 'EUR',
+            'properties'        => ['category' => 'electronics', 'brand' => 'Samsung'],
+            'user_agent'        => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
         ]);
 
         $this->assertInstanceOf(AnalyticsEvent::class, $event);
@@ -95,7 +95,7 @@ final class AnalyticsEventTest extends TestCase
     {
         $event = AnalyticsEvent::factory()->create([
             'properties' => ['key' => 'value', 'number' => 123],
-            'value' => 99.99,
+            'value'      => 99.99,
         ]);
 
         $this->assertIsArray($event->properties);
@@ -118,7 +118,7 @@ final class AnalyticsEventTest extends TestCase
         $product = Product::factory()->create();
         $event = AnalyticsEvent::factory()->create([
             'trackable_type' => Product::class,
-            'trackable_id' => $product->id,
+            'trackable_id'   => $product->id,
         ]);
 
         $this->assertInstanceOf(Product::class, $event->trackable);

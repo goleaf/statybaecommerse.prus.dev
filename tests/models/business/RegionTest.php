@@ -19,17 +19,17 @@ final class RegionTest extends TestCase
         $country = Country::factory()->create();
 
         $region = Region::factory()->create([
-            'name' => 'Test Region',
+            'name'       => 'Test Region',
             'country_id' => $country->id,
-            'level' => 1,
+            'level'      => 1,
             'is_enabled' => true,
-            'parent_id' => null,
+            'parent_id'  => null,
         ]);
 
         $this->assertDatabaseHas('regions', [
-            'name' => 'Test Region',
+            'name'       => 'Test Region',
             'country_id' => $country->id,
-            'level' => 1,
+            'level'      => 1,
             'is_enabled' => true,
         ]);
 
@@ -45,16 +45,16 @@ final class RegionTest extends TestCase
 
         // Create translation
         RegionTranslation::factory()->create([
-            'region_id' => $region->id,
-            'locale' => 'en',
-            'name' => 'English Name',
+            'region_id'   => $region->id,
+            'locale'      => 'en',
+            'name'        => 'English Name',
             'description' => 'English Description',
         ]);
 
         RegionTranslation::factory()->create([
-            'region_id' => $region->id,
-            'locale' => 'lt',
-            'name' => 'Lietuviškas Pavadinimas',
+            'region_id'   => $region->id,
+            'locale'      => 'lt',
+            'name'        => 'Lietuviškas Pavadinimas',
             'description' => 'Lietuviškas Aprašymas',
         ]);
 
@@ -96,24 +96,24 @@ final class RegionTest extends TestCase
         $country = Country::factory()->create();
 
         $rootRegion = Region::factory()->create([
-            'name' => 'Root Region',
+            'name'       => 'Root Region',
             'country_id' => $country->id,
-            'parent_id' => null,
-            'level' => 0,
+            'parent_id'  => null,
+            'level'      => 0,
         ]);
 
         $childRegion = Region::factory()->create([
-            'name' => 'Child Region',
+            'name'       => 'Child Region',
             'country_id' => $country->id,
-            'parent_id' => $rootRegion->id,
-            'level' => 1,
+            'parent_id'  => $rootRegion->id,
+            'level'      => 1,
         ]);
 
         $grandchildRegion = Region::factory()->create([
-            'name' => 'Grandchild Region',
+            'name'       => 'Grandchild Region',
             'country_id' => $country->id,
-            'parent_id' => $childRegion->id,
-            'level' => 2,
+            'parent_id'  => $childRegion->id,
+            'level'      => 2,
         ]);
 
         // Test parent relationship
@@ -149,10 +149,10 @@ final class RegionTest extends TestCase
     {
         $country = Country::factory()->create(['name' => 'Test Country']);
         $region = Region::factory()->create([
-            'name' => 'Test Region',
+            'name'       => 'Test Region',
             'country_id' => $country->id,
-            'level' => 1,
-            'parent_id' => null,
+            'level'      => 1,
+            'parent_id'  => null,
         ]);
 
         // Test full display name
@@ -187,7 +187,7 @@ final class RegionTest extends TestCase
 
         // Test update translation
         $this->assertTrue($region->updateTranslation('en', [
-            'name' => 'Updated English Name',
+            'name'        => 'Updated English Name',
             'description' => 'Updated Description',
         ]));
 
@@ -198,11 +198,11 @@ final class RegionTest extends TestCase
         // Test bulk update translations
         $this->assertTrue($region->updateTranslations([
             'lt' => [
-                'name' => 'Lietuviškas Pavadinimas',
+                'name'        => 'Lietuviškas Pavadinimas',
                 'description' => 'Lietuviškas Aprašymas',
             ],
             'de' => [
-                'name' => 'Deutscher Name',
+                'name'        => 'Deutscher Name',
                 'description' => 'Deutsche Beschreibung',
             ],
         ]));
@@ -219,7 +219,7 @@ final class RegionTest extends TestCase
         $parentRegion = Region::factory()->create(['country_id' => $country->id, 'parent_id' => null]);
         $region = Region::factory()->create([
             'country_id' => $country->id,
-            'parent_id' => $parentRegion->id,
+            'parent_id'  => $parentRegion->id,
         ]);
 
         // Test country relation
@@ -238,24 +238,24 @@ final class RegionTest extends TestCase
     public function test_region_search_scope(): void
     {
         Region::factory()->create([
-            'name' => 'Lithuania',
-            'code' => 'LT',
+            'name'        => 'Lithuania',
+            'code'        => 'LT',
             'description' => 'A country in Europe',
-            'parent_id' => null,
+            'parent_id'   => null,
         ]);
 
         Region::factory()->create([
-            'name' => 'Germany',
-            'code' => 'DE',
+            'name'        => 'Germany',
+            'code'        => 'DE',
             'description' => 'A country in Europe',
-            'parent_id' => null,
+            'parent_id'   => null,
         ]);
 
         Region::factory()->create([
-            'name' => 'France',
-            'code' => 'FR',
+            'name'        => 'France',
+            'code'        => 'FR',
             'description' => 'A country in Europe',
-            'parent_id' => null,
+            'parent_id'   => null,
         ]);
 
         // Test search by name

@@ -86,15 +86,15 @@ return new class extends Migration
         if (Schema::hasTable('products')) {
             Schema::table('products', function (Blueprint $table) {
                 $indexes = [
-                    'products_barcode_idx' => ['barcode'],
-                    'products_compare_price_idx' => ['compare_price'],
-                    'products_cost_price_idx' => ['cost_price'],
-                    'products_sort_order_idx' => ['sort_order'],
-                    'products_tax_class_idx' => ['tax_class'],
-                    'products_shipping_class_idx' => ['shipping_class'],
-                    'products_status_type_idx' => ['status', 'type'],
+                    'products_barcode_idx'          => ['barcode'],
+                    'products_compare_price_idx'    => ['compare_price'],
+                    'products_cost_price_idx'       => ['cost_price'],
+                    'products_sort_order_idx'       => ['sort_order'],
+                    'products_tax_class_idx'        => ['tax_class'],
+                    'products_shipping_class_idx'   => ['shipping_class'],
+                    'products_status_type_idx'      => ['status', 'type'],
                     'products_visible_featured_idx' => ['is_visible', 'is_featured'],
-                    'products_stock_tracking_idx' => ['manage_stock', 'track_stock'],
+                    'products_stock_tracking_idx'   => ['manage_stock', 'track_stock'],
                 ];
 
                 foreach ($indexes as $indexName => $columns) {

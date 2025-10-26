@@ -32,17 +32,17 @@ final class ExportDownloadController extends Controller
         $filename = $export->artifact_filename ?? basename($path);
 
         return Response::make($content, 200, [
-            'Content-Type' => $this->contentType($export->format),
-            'Content-Disposition' => 'attachment; filename="'.$filename.'"',
+            'Content-Type'        => $this->contentType($export->format),
+            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
         ]);
     }
 
     private function contentType(string $format): string
     {
         return match ($format) {
-            'csv' => 'text/csv; charset=UTF-8',
-            'xlsx' => 'application/vnd.ms-excel',
-            'pdf' => 'application/pdf',
+            'csv'   => 'text/csv; charset=UTF-8',
+            'xlsx'  => 'application/vnd.ms-excel',
+            'pdf'   => 'application/pdf',
             default => 'application/octet-stream',
         };
     }

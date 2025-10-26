@@ -48,11 +48,11 @@ final class ProductGalleryService
     public function arrangeForResponsiveGrid(Collection $products, string $breakpoint = 'lg'): Collection
     {
         $columnCount = match ($breakpoint) {
-            'sm' => 2,
-            'md' => 3,
-            'lg' => 4,
-            'xl' => 5,
-            '2xl' => 6,
+            'sm'    => 2,
+            'md'    => 3,
+            'lg'    => 4,
+            'xl'    => 5,
+            '2xl'   => 6,
             default => 4,
         };
 
@@ -103,7 +103,7 @@ final class ProductGalleryService
             $resultsPerPage <= 12 => 3,
             $resultsPerPage <= 20 => 4,
             $resultsPerPage <= 30 => 5,
-            default => 4,
+            default               => 4,
         };
 
         return $this->arrangeForGallery($products, $columnCount);
@@ -217,7 +217,7 @@ final class ProductGalleryService
     /**
      * Handle calculateProductQualityScore functionality with proper error handling.
      *
-     * @param  mixed  $product
+     * @param mixed $product
      */
     private function calculateProductQualityScore($product): float
     {

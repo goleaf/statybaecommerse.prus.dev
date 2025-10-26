@@ -46,7 +46,7 @@ final class LowStockAlert extends Notification implements ShouldQueue
     public function toMail(object $notifiable): MailMessage
     {
         // Compose a concise summary showing current stock levels and thresholds.
-        return (new MailMessage())
+        return (new MailMessage)
             ->subject(__('Low Stock Alert: :product', ['product' => $this->product->name]))
             ->line(__('Product :name is running low on stock.', ['name' => $this->product->name]))
             ->line(__('Current stock: :stock units', ['stock' => $this->product->stock_quantity]))
@@ -64,12 +64,12 @@ final class LowStockAlert extends Notification implements ShouldQueue
     {
         // Persist the stock details so dashboards can render a useful summary.
         return [
-            'product_id' => $this->product->id,
-            'product_name' => $this->product->name,
-            'product_sku' => $this->product->sku,
+            'product_id'    => $this->product->id,
+            'product_name'  => $this->product->name,
+            'product_sku'   => $this->product->sku,
             'current_stock' => $this->product->stock_quantity,
-            'threshold' => $this->product->low_stock_threshold,
-            'message' => __('Low stock alert for :product', ['product' => $this->product->name]),
+            'threshold'     => $this->product->low_stock_threshold,
+            'message'       => __('Low stock alert for :product', ['product' => $this->product->name]),
         ];
     }
 
@@ -82,7 +82,7 @@ final class LowStockAlert extends Notification implements ShouldQueue
         return FilamentNotification::make()
             ->title(__('Low Stock Alert'))
             ->body(__('Product :name is running low on stock (:stock units remaining)', [
-                'name' => $this->product->name,
+                'name'  => $this->product->name,
                 'stock' => $this->product->stock_quantity,
             ]))
             ->icon('heroicon-o-exclamation-triangle')

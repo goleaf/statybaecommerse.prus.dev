@@ -20,12 +20,12 @@ final class CouponUsageFactory extends Factory
     public function definition(): array
     {
         return [
-            'coupon_id' => Coupon::factory(),
-            'user_id' => User::factory(),
-            'order_id' => Order::factory(),
+            'coupon_id'       => Coupon::factory(),
+            'user_id'         => User::factory(),
+            'order_id'        => Order::factory(),
             'discount_amount' => fake()->randomFloat(2, 1, 50),
-            'used_at' => now(),
-            'metadata' => [],
+            'used_at'         => now(),
+            'metadata'        => [],
         ];
     }
 }

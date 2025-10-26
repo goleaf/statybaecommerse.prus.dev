@@ -1,15 +1,16 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models;
 
 use App\Models\Translations\CampaignConversionTranslation;
-use App\Models\Campaign;
 use App\Traits\HasTranslations;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 
 /**
@@ -36,10 +37,10 @@ final class CampaignConversion extends Model
     public $timestamps = true;
 
     public const SCOPE_COLUMN_HINTS = [
-        'is_active' => false,
+        'is_active'  => false,
         'is_visible' => false,
         'is_enabled' => false,
-        'status' => true,
+        'status'     => true,
     ];
 
     protected $fillable = [
@@ -240,7 +241,7 @@ final class CampaignConversion extends Model
         return $query->where('is_attributed', true);
     }
 
-    public function scopeForDateRange(Builder $query, Carbon|string $startDate, Carbon|string $endDate = null): Builder
+    public function scopeForDateRange(Builder $query, Carbon|string $startDate, Carbon|string|null $endDate = null): Builder
     {
         $start = $startDate instanceof Carbon ? $startDate : Carbon::parse((string) $startDate)->startOfDay();
         $end = $endDate instanceof Carbon ? $endDate : ($endDate ? Carbon::parse((string) $endDate) : null);
@@ -250,8 +251,8 @@ final class CampaignConversion extends Model
         }
 
         return $query
-            ->when($start, static fn(Builder $inner) => $inner->where('converted_at', '>=', $start))
-            ->when($end, static fn(Builder $inner) => $inner->where('converted_at', '<=', $end));
+            ->when($start, static fn (Builder $inner) => $inner->where('converted_at', '>=', $start))
+            ->when($end, static fn (Builder $inner) => $inner->where('converted_at', '<=', $end));
     }
 
     /**
@@ -425,12 +426,12 @@ final class CampaignConversion extends Model
     public function getAttributionValue(string $model = 'last_click'): float
     {
         return match ($model) {
-            'first_click' => $this->first_click_attribution ?? 0,
-            'linear' => $this->linear_attribution ?? 0,
-            'time_decay' => $this->time_decay_attribution ?? 0,
+            'first_click'    => $this->first_click_attribution ?? 0,
+            'linear'         => $this->linear_attribution ?? 0,
+            'time_decay'     => $this->time_decay_attribution ?? 0,
             'position_based' => $this->position_based_attribution ?? 0,
-            'data_driven' => $this->data_driven_attribution ?? 0,
-            default => $this->last_click_attribution ?? $this->conversion_value,
+            'data_driven'    => $this->data_driven_attribution ?? 0,
+            default          => $this->last_click_attribution ?? $this->conversion_value,
         };
     }
 }

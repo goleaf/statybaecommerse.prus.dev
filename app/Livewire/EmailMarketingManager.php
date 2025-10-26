@@ -6,6 +6,7 @@ namespace App\Livewire;
 
 use App\Models\Company;
 use App\Services\EmailMarketingService;
+use Exception;
 use Illuminate\Support\Facades\Log;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
@@ -15,17 +16,17 @@ use Livewire\Component;
  *
  * Livewire component for EmailMarketingManager with reactive frontend functionality, real-time updates, and user interaction handling.
  *
- * @property array $mailchimpStats
- * @property array $syncResults
- * @property bool $isSyncing
- * @property bool $showStats
+ * @property array  $mailchimpStats
+ * @property array  $syncResults
+ * @property bool   $isSyncing
+ * @property bool   $showStats
  * @property string $campaignSubject
  * @property string $campaignTitle
  * @property string $fromName
  * @property string $replyTo
  * @property string $selectedInterest
  * @property string $selectedCompany
- * @property mixed $listeners
+ * @property mixed  $listeners
  */
 final class EmailMarketingManager extends Component
 {
@@ -74,7 +75,7 @@ final class EmailMarketingManager extends Component
             $emailService = new EmailMarketingService;
             $this->mailchimpStats = $emailService->getMailchimpStats() ?? [];
             $this->showStats = true;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Failed to load Mailchimp stats', ['error' => $e->getMessage()]);
             session()->flash('error', 'Failed to load Mailchimp statistics. Please check your configuration.');
         }
@@ -91,7 +92,7 @@ final class EmailMarketingManager extends Component
             $this->syncResults = $emailService->bulkSyncSubscribers();
             session()->flash('success', sprintf('Sync completed! %d subscribers synced successfully, %d failed.', $this->syncResults['success'], $this->syncResults['failed']));
             $this->loadMailchimpStats();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Failed to sync subscribers', ['error' => $e->getMessage()]);
             session()->flash('error', 'Failed to sync subscribers. Please try again.');
         } finally {
@@ -121,7 +122,7 @@ final class EmailMarketingManager extends Component
             } else {
                 session()->flash('error', 'Failed to create campaign. Please try again.');
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Failed to create campaign', ['error' => $e->getMessage()]);
             session()->flash('error', 'Failed to create campaign. Please try again.');
         }
@@ -140,7 +141,7 @@ final class EmailMarketingManager extends Component
             } else {
                 session()->flash('error', "Failed to create interest segment for '{$interest}'.");
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Failed to create interest segment', ['interest' => $interest, 'error' => $e->getMessage()]);
             session()->flash('error', "Failed to create interest segment for '{$interest}'.");
         }

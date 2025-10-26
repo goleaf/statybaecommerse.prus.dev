@@ -20,22 +20,22 @@ final class LocationFactory extends Factory
         $type = $this->faker->randomElement($types);
 
         return [
-            'code' => strtoupper($this->faker->unique()->lexify('???###')),
-            'name' => $this->faker->company().' '.ucfirst($type),
-            'slug' => $this->faker->slug(),
-            'description' => $this->faker->paragraph(),
-            'type' => $type,
+            'code'           => strtoupper($this->faker->unique()->lexify('???###')),
+            'name'           => $this->faker->company() . ' ' . ucfirst($type),
+            'slug'           => $this->faker->slug(),
+            'description'    => $this->faker->paragraph(),
+            'type'           => $type,
             'address_line_1' => $this->faker->streetAddress(),
             'address_line_2' => $this->faker->optional()->secondaryAddress(),
-            'city' => $this->faker->city(),
-            'state' => $this->faker->optional()->state(),
-            'postal_code' => $this->faker->postcode(),
-            'country_code' => $this->faker->randomElement(['LT', 'US', 'GB']),
-            'phone' => $this->faker->optional()->phoneNumber(),
-            'email' => $this->faker->optional()->companyEmail(),
-            'latitude' => $this->faker->optional()->latitude(),
-            'longitude' => $this->faker->optional()->longitude(),
-            'opening_hours' => $this->faker->optional()->randomElement([
+            'city'           => $this->faker->city(),
+            'state'          => $this->faker->optional()->state(),
+            'postal_code'    => $this->faker->postcode(),
+            'country_code'   => $this->faker->randomElement(['LT', 'US', 'GB']),
+            'phone'          => $this->faker->optional()->phoneNumber(),
+            'email'          => $this->faker->optional()->companyEmail(),
+            'latitude'       => $this->faker->optional()->latitude(),
+            'longitude'      => $this->faker->optional()->longitude(),
+            'opening_hours'  => $this->faker->optional()->randomElement([
                 null,
                 [
                     ['day' => 'monday', 'open_time' => '09:00', 'close_time' => '17:00', 'is_closed' => false],
@@ -50,8 +50,8 @@ final class LocationFactory extends Factory
             'contact_info' => $this->faker->optional()->randomElement([
                 null,
                 [
-                    'manager' => $this->faker->name(),
-                    'department' => $this->faker->randomElement(['Warehouse', 'Sales', 'Customer Service']),
+                    'manager'           => $this->faker->name(),
+                    'department'        => $this->faker->randomElement(['Warehouse', 'Sales', 'Customer Service']),
                     'emergency_contact' => $this->faker->phoneNumber(),
                 ],
             ]),
@@ -65,7 +65,7 @@ final class LocationFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'type' => 'warehouse',
-            'name' => $this->faker->company().' Warehouse',
+            'name' => $this->faker->company() . ' Warehouse',
         ]);
     }
 
@@ -73,7 +73,7 @@ final class LocationFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'type' => 'store',
-            'name' => $this->faker->company().' Store',
+            'name' => $this->faker->company() . ' Store',
         ]);
     }
 
@@ -81,7 +81,7 @@ final class LocationFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'type' => 'office',
-            'name' => $this->faker->company().' Office',
+            'name' => $this->faker->company() . ' Office',
         ]);
     }
 
@@ -109,7 +109,7 @@ final class LocationFactory extends Factory
     public function withCoordinates(): static
     {
         return $this->state(fn (array $attributes) => [
-            'latitude' => $this->faker->latitude(),
+            'latitude'  => $this->faker->latitude(),
             'longitude' => $this->faker->longitude(),
         ]);
     }
@@ -133,10 +133,10 @@ final class LocationFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'contact_info' => [
-                'manager' => $this->faker->name(),
-                'department' => $this->faker->randomElement(['Warehouse', 'Sales', 'Customer Service']),
+                'manager'           => $this->faker->name(),
+                'department'        => $this->faker->randomElement(['Warehouse', 'Sales', 'Customer Service']),
                 'emergency_contact' => $this->faker->phoneNumber(),
-                'notes' => $this->faker->sentence(),
+                'notes'             => $this->faker->sentence(),
             ],
         ]);
     }
@@ -145,7 +145,7 @@ final class LocationFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'country_code' => 'LT',
-            'city' => $this->faker->randomElement(['Vilnius', 'Kaunas', 'Klaipėda', 'Šiauliai', 'Panevėžys']),
+            'city'         => $this->faker->randomElement(['Vilnius', 'Kaunas', 'Klaipėda', 'Šiauliai', 'Panevėžys']),
         ]);
     }
 }

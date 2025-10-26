@@ -16,6 +16,5 @@ final class PaymentWebhookResult
     public function __construct(
         public readonly array $payload,
         public readonly int $statusCode,
-    ) {
-    }
+    ) {}
 }

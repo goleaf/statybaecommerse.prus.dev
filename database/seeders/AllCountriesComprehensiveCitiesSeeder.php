@@ -34,8 +34,8 @@ final class AllCountriesComprehensiveCitiesSeeder extends Seeder
                     ['slug' => $cityData['slug']],
                     array_merge($cityDataForInsert, [
                         'country_id' => $country->id,
-                        'name' => $cityData['name']['en'],
-                        'code' => $cityData['code'],
+                        'name'       => $cityData['name']['en'],
+                        'code'       => $cityData['code'],
                         'is_enabled' => true,
                         'is_default' => false,
                     ])
@@ -45,9 +45,9 @@ final class AllCountriesComprehensiveCitiesSeeder extends Seeder
                 foreach (['lt', 'en'] as $locale) {
                     CityTranslation::updateOrCreate([
                         'city_id' => $city->id,
-                        'locale' => $locale,
+                        'locale'  => $locale,
                     ], [
-                        'name' => $cityData['name'][$locale] ?? $cityData['name']['en'],
+                        'name'        => $cityData['name'][$locale] ?? $cityData['name']['en'],
                         'description' => $cityData['description'][$locale] ?? '',
                     ]);
                 }

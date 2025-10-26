@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Services\Discounts\DiscountEngine;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -144,17 +146,17 @@ beforeEach(function () {
 it('applies percentage cart discount with code', function () {
     // seed minimal discount
     $data = [
-        'name' => 'Test Discount',
-        'type' => 'percentage',
-        'value' => 10,
-        'status' => 'active',
+        'name'            => 'Test Discount',
+        'type'            => 'percentage',
+        'value'           => 10,
+        'status'          => 'active',
         'stacking_policy' => 'stack',
-        'code' => 'ANY',
-        'apply_to' => 'cart',
-        'min_required' => 0,
-        'eligibility' => 'all',
-        'created_at' => now(),
-        'updated_at' => now(),
+        'code'            => 'ANY',
+        'apply_to'        => 'cart',
+        'min_required'    => 0,
+        'eligibility'     => 'all',
+        'created_at'      => now(),
+        'updated_at'      => now(),
     ];
     if (Schema::hasColumn('discounts', 'start_at')) {
         $data['start_at'] = now()->subDay();
@@ -171,22 +173,22 @@ it('applies percentage cart discount with code', function () {
     $discountId = DB::table('discounts')->insertGetId($data);
     DB::table('discount_codes')->insert([
         'discount_id' => $discountId,
-        'code' => 'TEST10',
-        'max_uses' => 10,
+        'code'        => 'TEST10',
+        'max_uses'    => 10,
         'usage_count' => 0,
-        'created_at' => now(),
-        'updated_at' => now(),
+        'created_at'  => now(),
+        'updated_at'  => now(),
     ]);
 
     $engine = app(DiscountEngine::class);
     $result = $engine->evaluate([
         'currency_code' => 'EUR',
-        'zone_id' => 1,
-        'code' => 'TEST10',
-        'now' => now(),
-        'cart' => [
+        'zone_id'       => 1,
+        'code'          => 'TEST10',
+        'now'           => now(),
+        'cart'          => [
             'subtotal' => 100.0,
-            'items' => [],
+            'items'    => [],
         ],
     ]);
 
@@ -194,7 +196,7 @@ it('applies percentage cart discount with code', function () {
 });
 
 it('respects first order only flag', function () {
-    $userInsert = ['email' => 'a'.rand().'@x.tld', 'password' => bcrypt('x'), 'created_at' => now(), 'updated_at' => now()];
+    $userInsert = ['email' => 'a' . rand() . '@x.tld', 'password' => bcrypt('x'), 'created_at' => now(), 'updated_at' => now()];
     if (Schema::hasColumn('users', 'name')) {
         $userInsert['name'] = 'A B';
     } else {
@@ -203,18 +205,18 @@ it('respects first order only flag', function () {
     }
     $uid = DB::table('users')->insertGetId($userInsert);
     $data2 = [
-        'name' => 'First Order Discount',
-        'type' => 'fixed',
-        'value' => 5,
-        'status' => 'active',
+        'name'             => 'First Order Discount',
+        'type'             => 'fixed',
+        'value'            => 5,
+        'status'           => 'active',
         'first_order_only' => true,
-        'stacking_policy' => 'stack',
-        'code' => 'FIRST',
-        'apply_to' => 'cart',
-        'created_at' => now(),
-        'updated_at' => now(),
-        'min_required' => 0,
-        'eligibility' => 'all',
+        'stacking_policy'  => 'stack',
+        'code'             => 'FIRST',
+        'apply_to'         => 'cart',
+        'created_at'       => now(),
+        'updated_at'       => now(),
+        'min_required'     => 0,
+        'eligibility'      => 'all',
     ];
     if (Schema::hasColumn('discounts', 'start_at')) {
         $data2['start_at'] = now()->subDay();

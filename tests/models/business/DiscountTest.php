@@ -17,16 +17,16 @@ class DiscountTest extends TestCase
     public function test_discount_can_be_created(): void
     {
         $discount = Discount::factory()->create([
-            'name' => 'Test Discount',
-            'type' => 'percentage',
-            'value' => 10.00,
+            'name'      => 'Test Discount',
+            'type'      => 'percentage',
+            'value'     => 10.00,
             'is_active' => true,
         ]);
 
         $this->assertDatabaseHas('discounts', [
-            'name' => 'Test Discount',
-            'type' => 'percentage',
-            'value' => 10.00,
+            'name'      => 'Test Discount',
+            'type'      => 'percentage',
+            'value'     => 10.00,
             'is_active' => true,
         ]);
     }
@@ -34,10 +34,10 @@ class DiscountTest extends TestCase
     public function test_discount_casts_work_correctly(): void
     {
         $discount = Discount::factory()->create([
-            'value' => 15.50,
+            'value'     => 15.50,
             'is_active' => true,
             'starts_at' => now(),
-            'ends_at' => now()->addDays(30),
+            'ends_at'   => now()->addDays(30),
         ]);
 
         $this->assertIsNumeric($discount->value);
@@ -81,23 +81,23 @@ class DiscountTest extends TestCase
     {
         $validDiscount = Discount::factory()->create([
             'is_active' => true,
-            'status' => 'active',
+            'status'    => 'active',
             'starts_at' => now()->subDay(),
-            'ends_at' => now()->addDay(),
+            'ends_at'   => now()->addDay(),
         ]);
 
         $expiredDiscount = Discount::factory()->create([
             'is_active' => true,
-            'status' => 'active',
+            'status'    => 'active',
             'starts_at' => now()->subDays(2),
-            'ends_at' => now()->subDay(),
+            'ends_at'   => now()->subDay(),
         ]);
 
         $futureDiscount = Discount::factory()->create([
             'is_active' => true,
-            'status' => 'active',
+            'status'    => 'active',
             'starts_at' => now()->addDay(),
-            'ends_at' => now()->addDays(2),
+            'ends_at'   => now()->addDays(2),
         ]);
 
         $this->assertTrue($validDiscount->isValid());
@@ -150,12 +150,12 @@ class DiscountTest extends TestCase
     public function test_discount_calculate_amount(): void
     {
         $percentageDiscount = Discount::factory()->create([
-            'type' => 'percentage',
+            'type'  => 'percentage',
             'value' => 20.00,
         ]);
 
         $fixedDiscount = Discount::factory()->create([
-            'type' => 'fixed',
+            'type'  => 'fixed',
             'value' => 15.00,
         ]);
 
@@ -179,12 +179,12 @@ class DiscountTest extends TestCase
     public function test_discount_is_expired(): void
     {
         $expiredDiscount = Discount::factory()->create([
-            'status' => 'active',
+            'status'  => 'active',
             'ends_at' => now()->subDay(),
         ]);
 
         $activeDiscount = Discount::factory()->create([
-            'status' => 'active',
+            'status'  => 'active',
             'ends_at' => now()->addDay(),
         ]);
 
@@ -196,12 +196,12 @@ class DiscountTest extends TestCase
     public function test_discount_is_not_started(): void
     {
         $futureDiscount = Discount::factory()->create([
-            'status' => 'active',
+            'status'    => 'active',
             'starts_at' => now()->addDay(),
         ]);
 
         $activeDiscount = Discount::factory()->create([
-            'status' => 'active',
+            'status'    => 'active',
             'starts_at' => now()->subDay(),
         ]);
 

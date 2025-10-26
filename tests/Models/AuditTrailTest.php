@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Tests\Models;
 
@@ -16,7 +18,7 @@ final class AuditTrailTest extends TestCase
     public function test_audit_trail_has_expected_fillable_and_casts(): void
     {
         // Instantiate the model to inspect its configuration without persisting records.
-        $model = new AuditTrail();
+        $model = new AuditTrail;
 
         // Verify that the fillable attributes guard against mass-assignment vulnerabilities.
         self::assertSame([
@@ -44,13 +46,13 @@ final class AuditTrailTest extends TestCase
         // Persist an audit trail entry referencing the created models.
         $auditTrail = AuditTrail::query()->create([
             'auditable_type' => $auditable->getMorphClass(),
-            'auditable_id' => $auditable->getKey(),
-            'event' => 'updated',
-            'actor_type' => $actor->getMorphClass(),
-            'actor_id' => $actor->getKey(),
-            'reason' => 'Testing relationships',
-            'request_id' => 'req-123',
-            'diff' => ['name' => ['previous' => 'Old', 'current' => 'New']],
+            'auditable_id'   => $auditable->getKey(),
+            'event'          => 'updated',
+            'actor_type'     => $actor->getMorphClass(),
+            'actor_id'       => $actor->getKey(),
+            'reason'         => 'Testing relationships',
+            'request_id'     => 'req-123',
+            'diff'           => ['name' => ['previous' => 'Old', 'current' => 'New']],
         ])->fresh();
 
         // Confirm the morph relationships hydrate the expected model instances.
@@ -68,20 +70,20 @@ final class AuditTrailTest extends TestCase
     {
         // Prepare a diff payload containing multiple fields for accessor testing.
         $diff = [
-            'name' => ['previous' => 'Before', 'current' => 'After'],
+            'name'  => ['previous' => 'Before', 'current' => 'After'],
             'email' => ['previous' => 'before@example.test', 'current' => 'after@example.test'],
         ];
 
         // Create an audit record to exercise the attribute accessors.
         $auditTrail = AuditTrail::query()->create([
             'auditable_type' => User::class,
-            'auditable_id' => 42,
-            'event' => 'updated',
-            'actor_type' => null,
-            'actor_id' => null,
-            'reason' => null,
-            'request_id' => 'req-456',
-            'diff' => $diff,
+            'auditable_id'   => 42,
+            'event'          => 'updated',
+            'actor_type'     => null,
+            'actor_id'       => null,
+            'reason'         => null,
+            'request_id'     => 'req-456',
+            'diff'           => $diff,
         ])->fresh();
 
         // The auditable label should include the class basename and identifier.
@@ -162,4 +164,3 @@ final class AuditTrailTest extends TestCase
         self::assertSame(0, AuditTrail::query()->count());
     }
 }
-

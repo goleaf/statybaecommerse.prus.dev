@@ -25,7 +25,7 @@ final class CurrencyResourceTest extends TestCase
         parent::setUp();
 
         $this->actingAs(User::factory()->create([
-            'email' => 'admin@example.com',
+            'email'    => 'admin@example.com',
             'is_admin' => true,
         ]));
     }
@@ -41,21 +41,21 @@ final class CurrencyResourceTest extends TestCase
     public function test_can_create_currency(): void
     {
         $currencyData = [
-            'name' => 'Test Currency',
-            'code' => 'TST',
-            'symbol' => 'T$',
-            'iso_code' => 'TST-001',
-            'description' => 'Test currency description',
-            'exchange_rate' => 1.25,
-            'base_currency' => 'EUR',
-            'decimal_places' => 2,
-            'symbol_position' => 'after',
+            'name'                => 'Test Currency',
+            'code'                => 'TST',
+            'symbol'              => 'T$',
+            'iso_code'            => 'TST-001',
+            'description'         => 'Test currency description',
+            'exchange_rate'       => 1.25,
+            'base_currency'       => 'EUR',
+            'decimal_places'      => 2,
+            'symbol_position'     => 'after',
             'thousands_separator' => ',',
-            'decimal_separator' => '.',
-            'is_active' => true,
-            'is_default' => false,
-            'sort_order' => 1,
-            'auto_update_rate' => false,
+            'decimal_separator'   => '.',
+            'is_active'           => true,
+            'is_default'          => false,
+            'sort_order'          => 1,
+            'auto_update_rate'    => false,
         ];
 
         Livewire::test(CurrencyResource\Pages\CreateCurrency::class)
@@ -280,8 +280,8 @@ final class CurrencyResourceTest extends TestCase
     {
         Livewire::test(CurrencyResource\Pages\CreateCurrency::class)
             ->fillForm([
-                'name' => 'Test Currency',
-                'code' => 'TST',
+                'name'          => 'Test Currency',
+                'code'          => 'TST',
                 'exchange_rate' => 'invalid',
             ])
             ->call('create')
@@ -292,8 +292,8 @@ final class CurrencyResourceTest extends TestCase
     {
         Livewire::test(CurrencyResource\Pages\CreateCurrency::class)
             ->fillForm([
-                'name' => 'Test Currency',
-                'code' => 'TST',
+                'name'          => 'Test Currency',
+                'code'          => 'TST',
                 'exchange_rate' => -1.0,
             ])
             ->call('create')
@@ -304,8 +304,8 @@ final class CurrencyResourceTest extends TestCase
     {
         Livewire::test(CurrencyResource\Pages\CreateCurrency::class)
             ->fillForm([
-                'name' => 'Test Currency',
-                'code' => 'TST',
+                'name'           => 'Test Currency',
+                'code'           => 'TST',
                 'decimal_places' => 10,
             ])
             ->call('create')
@@ -347,7 +347,7 @@ final class CurrencyResourceTest extends TestCase
         $currency = Currency::factory()->create([
             'is_default' => true,
             'is_enabled' => true,
-            'is_active' => true,
+            'is_active'  => true,
         ]);
 
         $this->assertTrue($currency->isDefault());
@@ -359,7 +359,7 @@ final class CurrencyResourceTest extends TestCase
     {
         $currency = Currency::factory()->create([
             'symbol' => '$',
-            'code' => 'USD',
+            'code'   => 'USD',
         ]);
 
         $this->assertEquals('$', $currency->formatted_symbol);
@@ -369,7 +369,7 @@ final class CurrencyResourceTest extends TestCase
     {
         $currency = Currency::factory()->create([
             'symbol' => null,
-            'code' => 'USD',
+            'code'   => 'USD',
         ]);
 
         $this->assertEquals('USD', $currency->formatted_symbol);
@@ -378,7 +378,7 @@ final class CurrencyResourceTest extends TestCase
     public function test_currency_formatted_exchange_rate(): void
     {
         $currency = Currency::factory()->create([
-            'exchange_rate' => 1.234567,
+            'exchange_rate'  => 1.234567,
             'decimal_places' => 2,
         ]);
 
@@ -388,8 +388,8 @@ final class CurrencyResourceTest extends TestCase
     public function test_currency_format_amount(): void
     {
         $currency = Currency::factory()->create([
-            'symbol' => '$',
-            'code' => 'USD',
+            'symbol'         => '$',
+            'code'           => 'USD',
             'decimal_places' => 2,
         ]);
 
@@ -400,8 +400,8 @@ final class CurrencyResourceTest extends TestCase
     public function test_currency_format_amount_without_symbol(): void
     {
         $currency = Currency::factory()->create([
-            'symbol' => null,
-            'code' => 'USD',
+            'symbol'         => null,
+            'code'           => 'USD',
             'decimal_places' => 2,
         ]);
 
@@ -454,9 +454,9 @@ final class CurrencyResourceTest extends TestCase
     public function test_currency_symbol_position_before(): void
     {
         $currency = Currency::factory()->create([
-            'symbol' => '$',
+            'symbol'          => '$',
             'symbol_position' => 'before',
-            'decimal_places' => 2,
+            'decimal_places'  => 2,
         ]);
 
         $formatted = $currency->formatAmount(100.0);
@@ -466,9 +466,9 @@ final class CurrencyResourceTest extends TestCase
     public function test_currency_symbol_position_after(): void
     {
         $currency = Currency::factory()->create([
-            'symbol' => '$',
+            'symbol'          => '$',
             'symbol_position' => 'after',
-            'decimal_places' => 2,
+            'decimal_places'  => 2,
         ]);
 
         $formatted = $currency->formatAmount(100.0);
@@ -479,8 +479,8 @@ final class CurrencyResourceTest extends TestCase
     {
         $currency = Currency::factory()->create([
             'thousands_separator' => ',',
-            'decimal_separator' => '.',
-            'decimal_places' => 2,
+            'decimal_separator'   => '.',
+            'decimal_places'      => 2,
         ]);
 
         $formatted = $currency->formatAmount(1234567.89);
@@ -491,8 +491,8 @@ final class CurrencyResourceTest extends TestCase
     {
         $currency = Currency::factory()->create([
             'thousands_separator' => '.',
-            'decimal_separator' => ',',
-            'decimal_places' => 2,
+            'decimal_separator'   => ',',
+            'decimal_places'      => 2,
         ]);
 
         $formatted = $currency->formatAmount(1234.56);

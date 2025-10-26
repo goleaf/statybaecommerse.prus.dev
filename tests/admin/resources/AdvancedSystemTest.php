@@ -30,10 +30,10 @@ beforeEach(function (): void {
     $adminRole->givePermissionTo($additionalPermissions);
 
     $this->admin = User::factory()->create([
-        'name' => 'System Admin',
-        'email' => 'admin@system.test',
+        'name'      => 'System Admin',
+        'email'     => 'admin@system.test',
         'is_active' => true,
-        'is_admin' => true,
+        'is_admin'  => true,
     ]);
     $this->admin->assignRole($adminRole);
 });
@@ -52,7 +52,7 @@ it('can access all advanced admin pages', function (): void {
     foreach ($pages as $page) {
         $response = $this->actingAs($this->admin)->get($page);
         if ($response->status() !== 200) {
-            dump("Failed page: $page with status: ".$response->status());
+            dump("Failed page: $page with status: " . $response->status());
         }
         $response->assertOk();
     }
@@ -88,14 +88,14 @@ it('can perform customer segmentation', function (): void {
     // Create orders for segmentation
     Order::factory()->create([
         'user_id' => $highValueCustomer->id,
-        'status' => 'completed',
-        'total' => 1500.0,
+        'status'  => 'completed',
+        'total'   => 1500.0,
     ]);
 
     Order::factory()->create([
         'user_id' => $regularCustomer->id,
-        'status' => 'completed',
-        'total' => 300.0,
+        'status'  => 'completed',
+        'total'   => 300.0,
     ]);
 
     Livewire::actingAs($this->admin)
@@ -120,8 +120,8 @@ it('can create customer groups and assign users', function (): void {
 
 it('can perform SEO audits and optimization', function (): void {
     $product = Product::factory()->create([
-        'name' => 'Test Product',
-        'seo_title' => null,
+        'name'            => 'Test Product',
+        'seo_title'       => null,
         'seo_description' => null,
     ]);
 
@@ -159,7 +159,7 @@ it('can manage inventory with bulk operations', function (): void {
         ->test(\App\Filament\Pages\InventoryManagement::class)
         ->callTableBulkAction('bulk_stock_update', $products, [
             'operation' => 'increase',
-            'quantity' => 5,
+            'quantity'  => 5,
         ]);
 
     foreach ($products as $product) {
@@ -180,17 +180,17 @@ it('can generate product recommendations', function (): void {
     // Create order history for personalized recommendations
     $order = Order::factory()->create([
         'user_id' => $user->id,
-        'status' => 'completed',
+        'status'  => 'completed',
     ]);
 
     \App\Models\OrderItem::factory()->create([
-        'order_id' => $order->id,
+        'order_id'   => $order->id,
         'product_id' => $product1->id,
     ]);
 
     Livewire::actingAs($user)
         ->test(\App\Livewire\Components\ProductRecommendations::class, [
-            'type' => 'personalized',
+            'type'   => 'personalized',
             'userId' => $user->id,
         ])
         ->assertSee($product2->name);  // Should recommend product2 based on category
@@ -202,7 +202,7 @@ it('can track recently viewed products', function (): void {
 
     Livewire::test(\App\Livewire\Components\ProductRecommendations::class, [
         'productId' => $product1->id,
-        'type' => 'recently_viewed',
+        'type'      => 'recently_viewed',
     ])
         ->call('trackView');
 

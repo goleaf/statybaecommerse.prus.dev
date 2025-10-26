@@ -14,10 +14,9 @@ use Illuminate\Database\Eloquent\Model;
 interface DocumentServiceContract
 {
     /**
-     * @param  DocumentVariables  $variables
+     * @param DocumentVariables $variables
      */
     public function generateDocument(DocumentTemplate $template, Model $relatedModel, array $variables = [], ?string $title = null, bool $sendNotification = false): Document;
 
     public function generatePdf(Document $document): string;
 }
-

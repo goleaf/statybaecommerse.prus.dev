@@ -40,14 +40,14 @@ describe('DocumentTemplate Resource', function () {
 
     it('can create document template', function () {
         $newData = [
-            'name' => 'New Invoice Template',
+            'name'        => 'New Invoice Template',
             'description' => 'A template for invoices',
-            'content' => '<h1>Invoice #{{ORDER_NUMBER}}</h1>',
-            'variables' => ['ORDER_NUMBER', 'CUSTOMER_NAME'],
-            'type' => 'invoice',
-            'category' => 'sales',
-            'settings' => ['page_size' => 'A4'],
-            'is_active' => true,
+            'content'     => '<h1>Invoice #{{ORDER_NUMBER}}</h1>',
+            'variables'   => ['ORDER_NUMBER', 'CUSTOMER_NAME'],
+            'type'        => 'invoice',
+            'category'    => 'sales',
+            'settings'    => ['page_size' => 'A4'],
+            'is_active'   => true,
         ];
 
         livewire(DocumentTemplateResource\Pages\CreateDocumentTemplate::class)
@@ -56,9 +56,9 @@ describe('DocumentTemplate Resource', function () {
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('document_templates', [
-            'name' => 'New Invoice Template',
-            'type' => 'invoice',
-            'category' => 'sales',
+            'name'      => 'New Invoice Template',
+            'type'      => 'invoice',
+            'category'  => 'sales',
             'is_active' => true,
         ]);
     });
@@ -66,9 +66,9 @@ describe('DocumentTemplate Resource', function () {
     it('validates required fields when creating', function () {
         livewire(DocumentTemplateResource\Pages\CreateDocumentTemplate::class)
             ->fillForm([
-                'name' => '',
+                'name'    => '',
                 'content' => '',
-                'type' => '',
+                'type'    => '',
             ])
             ->call('create')
             ->assertHasFormErrors(['name', 'content', 'type']);
@@ -76,9 +76,9 @@ describe('DocumentTemplate Resource', function () {
 
     it('automatically generates slug from name', function () {
         $newData = [
-            'name' => 'My Custom Template',
-            'content' => '<h1>Test</h1>',
-            'type' => 'receipt',
+            'name'     => 'My Custom Template',
+            'content'  => '<h1>Test</h1>',
+            'type'     => 'receipt',
             'category' => 'sales',
         ];
 
@@ -106,9 +106,9 @@ describe('DocumentTemplate Resource', function () {
 
         livewire(DocumentTemplateResource\Pages\ViewDocumentTemplate::class, ['record' => $template->getRouteKey()])
             ->assertFormSet([
-                'name' => $template->name,
-                'type' => $template->type,
-                'category' => $template->category,
+                'name'      => $template->name,
+                'type'      => $template->type,
+                'category'  => $template->category,
                 'is_active' => $template->is_active,
             ]);
     });
@@ -126,21 +126,21 @@ describe('DocumentTemplate Resource', function () {
 
         livewire(DocumentTemplateResource\Pages\EditDocumentTemplate::class, ['record' => $template->getRouteKey()])
             ->assertFormSet([
-                'name' => $template->name,
+                'name'        => $template->name,
                 'description' => $template->description,
-                'content' => $template->content,
-                'type' => $template->type,
-                'category' => $template->category,
-                'is_active' => $template->is_active,
+                'content'     => $template->content,
+                'type'        => $template->type,
+                'category'    => $template->category,
+                'is_active'   => $template->is_active,
             ]);
     });
 
     it('can save document template', function () {
         $template = DocumentTemplate::factory()->create();
         $newData = [
-            'name' => 'Updated Template',
+            'name'        => 'Updated Template',
             'description' => 'Updated description',
-            'is_active' => false,
+            'is_active'   => false,
         ];
 
         livewire(DocumentTemplateResource\Pages\EditDocumentTemplate::class, ['record' => $template->getRouteKey()])
@@ -302,10 +302,10 @@ describe('DocumentTemplate Resource', function () {
 
         livewire(DocumentTemplateResource\Pages\CreateDocumentTemplate::class)
             ->fillForm([
-                'name' => 'New Template',
-                'slug' => 'existing-slug',
-                'content' => '<h1>Test</h1>',
-                'type' => 'invoice',
+                'name'     => 'New Template',
+                'slug'     => 'existing-slug',
+                'content'  => '<h1>Test</h1>',
+                'type'     => 'invoice',
                 'category' => 'sales',
             ])
             ->call('create')

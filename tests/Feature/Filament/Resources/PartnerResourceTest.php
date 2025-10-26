@@ -21,7 +21,7 @@ class PartnerResourceTest extends TestCase
 
         // Create test user with admin role
         $this->user = User::factory()->create([
-            'email' => 'admin@example.com',
+            'email'    => 'admin@example.com',
             'is_admin' => true,
         ]);
 
@@ -46,13 +46,13 @@ class PartnerResourceTest extends TestCase
         $this->actingAs($this->user);
 
         $partnerData = [
-            'name' => 'Test Partner',
-            'code' => 'TEST001',
-            'tier_id' => $this->partnerTier->id,
-            'is_enabled' => true,
-            'contact_email' => 'partner@test.com',
-            'contact_phone' => '+37060000000',
-            'discount_rate' => 10.5,
+            'name'            => 'Test Partner',
+            'code'            => 'TEST001',
+            'tier_id'         => $this->partnerTier->id,
+            'is_enabled'      => true,
+            'contact_email'   => 'partner@test.com',
+            'contact_phone'   => '+37060000000',
+            'discount_rate'   => 10.5,
             'commission_rate' => 5.0,
         ];
 
@@ -62,13 +62,13 @@ class PartnerResourceTest extends TestCase
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('partners', [
-            'name' => 'Test Partner',
-            'code' => 'TEST001',
-            'tier_id' => $this->partnerTier->id,
-            'is_enabled' => true,
-            'contact_email' => 'partner@test.com',
-            'contact_phone' => '+37060000000',
-            'discount_rate' => 10.5,
+            'name'            => 'Test Partner',
+            'code'            => 'TEST001',
+            'tier_id'         => $this->partnerTier->id,
+            'is_enabled'      => true,
+            'contact_email'   => 'partner@test.com',
+            'contact_phone'   => '+37060000000',
+            'discount_rate'   => 10.5,
             'commission_rate' => 5.0,
         ]);
     }
@@ -88,8 +88,8 @@ class PartnerResourceTest extends TestCase
     public function test_can_edit_partner(): void
     {
         $partner = Partner::factory()->create([
-            'tier_id' => $this->partnerTier->id,
-            'name' => 'Original Name',
+            'tier_id'       => $this->partnerTier->id,
+            'name'          => 'Original Name',
             'discount_rate' => 5.0,
         ]);
 
@@ -97,17 +97,17 @@ class PartnerResourceTest extends TestCase
 
         Livewire::test(\App\Filament\Resources\PartnerResource\Pages\EditPartner::class, ['record' => $partner->id])
             ->fillForm([
-                'name' => 'Updated Name',
-                'discount_rate' => 15.0,
+                'name'            => 'Updated Name',
+                'discount_rate'   => 15.0,
                 'commission_rate' => 7.5,
             ])
             ->call('save')
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('partners', [
-            'id' => $partner->id,
-            'name' => 'Updated Name',
-            'discount_rate' => 15.0,
+            'id'              => $partner->id,
+            'name'            => 'Updated Name',
+            'discount_rate'   => 15.0,
             'commission_rate' => 7.5,
         ]);
     }
@@ -146,12 +146,12 @@ class PartnerResourceTest extends TestCase
     public function test_can_filter_partners_by_enabled_status(): void
     {
         $enabledPartner = Partner::factory()->create([
-            'tier_id' => $this->partnerTier->id,
+            'tier_id'    => $this->partnerTier->id,
             'is_enabled' => true,
         ]);
 
         $disabledPartner = Partner::factory()->create([
-            'tier_id' => $this->partnerTier->id,
+            'tier_id'    => $this->partnerTier->id,
             'is_enabled' => false,
         ]);
 
@@ -167,12 +167,12 @@ class PartnerResourceTest extends TestCase
     {
         $partner1 = Partner::factory()->create([
             'tier_id' => $this->partnerTier->id,
-            'name' => 'ABC Company',
+            'name'    => 'ABC Company',
         ]);
 
         $partner2 = Partner::factory()->create([
             'tier_id' => $this->partnerTier->id,
-            'name' => 'XYZ Corporation',
+            'name'    => 'XYZ Corporation',
         ]);
 
         $this->actingAs($this->user);
@@ -187,12 +187,12 @@ class PartnerResourceTest extends TestCase
     {
         $partner1 = Partner::factory()->create([
             'tier_id' => $this->partnerTier->id,
-            'code' => 'PART001',
+            'code'    => 'PART001',
         ]);
 
         $partner2 = Partner::factory()->create([
             'tier_id' => $this->partnerTier->id,
-            'code' => 'PART002',
+            'code'    => 'PART002',
         ]);
 
         $this->actingAs($this->user);
@@ -224,12 +224,12 @@ class PartnerResourceTest extends TestCase
     {
         $partner1 = Partner::factory()->create([
             'tier_id' => $this->partnerTier->id,
-            'name' => 'Zebra Company',
+            'name'    => 'Zebra Company',
         ]);
 
         $partner2 = Partner::factory()->create([
             'tier_id' => $this->partnerTier->id,
-            'name' => 'Alpha Corporation',
+            'name'    => 'Alpha Corporation',
         ]);
 
         $this->actingAs($this->user);
@@ -242,12 +242,12 @@ class PartnerResourceTest extends TestCase
     public function test_can_sort_partners_by_discount_rate(): void
     {
         $partner1 = Partner::factory()->create([
-            'tier_id' => $this->partnerTier->id,
+            'tier_id'       => $this->partnerTier->id,
             'discount_rate' => 15.0,
         ]);
 
         $partner2 = Partner::factory()->create([
-            'tier_id' => $this->partnerTier->id,
+            'tier_id'       => $this->partnerTier->id,
             'discount_rate' => 5.0,
         ]);
 
@@ -261,12 +261,12 @@ class PartnerResourceTest extends TestCase
     public function test_can_sort_partners_by_commission_rate(): void
     {
         $partner1 = Partner::factory()->create([
-            'tier_id' => $this->partnerTier->id,
+            'tier_id'         => $this->partnerTier->id,
             'commission_rate' => 10.0,
         ]);
 
         $partner2 = Partner::factory()->create([
-            'tier_id' => $this->partnerTier->id,
+            'tier_id'         => $this->partnerTier->id,
             'commission_rate' => 3.0,
         ]);
 
@@ -300,15 +300,15 @@ class PartnerResourceTest extends TestCase
     {
         $existingPartner = Partner::factory()->create([
             'tier_id' => $this->partnerTier->id,
-            'code' => 'EXISTING001',
+            'code'    => 'EXISTING001',
         ]);
 
         $this->actingAs($this->user);
 
         $partnerData = [
-            'name' => 'Test Partner',
-            'code' => 'EXISTING001',  // Same code as existing partner
-            'tier_id' => $this->partnerTier->id,
+            'name'       => 'Test Partner',
+            'code'       => 'EXISTING001',  // Same code as existing partner
+            'tier_id'    => $this->partnerTier->id,
             'is_enabled' => true,
         ];
 
@@ -323,10 +323,10 @@ class PartnerResourceTest extends TestCase
         $this->actingAs($this->user);
 
         $partnerData = [
-            'name' => 'Test Partner',
-            'code' => 'TEST001',
-            'tier_id' => $this->partnerTier->id,
-            'is_enabled' => true,
+            'name'          => 'Test Partner',
+            'code'          => 'TEST001',
+            'tier_id'       => $this->partnerTier->id,
+            'is_enabled'    => true,
             'contact_email' => 'invalid-email',  // Invalid email format
         ];
 
@@ -341,10 +341,10 @@ class PartnerResourceTest extends TestCase
         $this->actingAs($this->user);
 
         $partnerData = [
-            'name' => 'Test Partner',
-            'code' => 'TEST001',
-            'tier_id' => $this->partnerTier->id,
-            'is_enabled' => true,
+            'name'          => 'Test Partner',
+            'code'          => 'TEST001',
+            'tier_id'       => $this->partnerTier->id,
+            'is_enabled'    => true,
             'discount_rate' => 150.0,  // Invalid: exceeds 100%
         ];
 
@@ -359,10 +359,10 @@ class PartnerResourceTest extends TestCase
         $this->actingAs($this->user);
 
         $partnerData = [
-            'name' => 'Test Partner',
-            'code' => 'TEST001',
-            'tier_id' => $this->partnerTier->id,
-            'is_enabled' => true,
+            'name'            => 'Test Partner',
+            'code'            => 'TEST001',
+            'tier_id'         => $this->partnerTier->id,
+            'is_enabled'      => true,
             'commission_rate' => 150.0,  // Invalid: exceeds 100%
         ];
 

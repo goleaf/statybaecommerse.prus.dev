@@ -2,8 +2,6 @@
 
 declare(strict_types=1);
 
-use App\Support\ErrorCode;
-
 return [
     'titles' => [
         // @translators: Rodoma, kai prašomas puslapis ar įrašas nerandamas (HTTP 404).

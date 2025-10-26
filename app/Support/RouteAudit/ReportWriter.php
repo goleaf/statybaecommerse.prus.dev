@@ -29,8 +29,8 @@ final class ReportWriter
     }
 
     /**
-     * @param array<string, mixed> $staticReport
-     * @param array<string, mixed> $dynamicReport
+     * @param  array<string, mixed> $staticReport
+     * @param  array<string, mixed> $dynamicReport
      * @return array<string, mixed>
      */
     private function merge(array $staticReport, array $dynamicReport): array
@@ -50,9 +50,9 @@ final class ReportWriter
             $fingerprint = (string) $route['fingerprint'];
 
             $dynamic = $dynamicRoutes[$fingerprint] ?? [
-                'guest' => null,
-                'auth'  => null,
-                'notes' => '',
+                'guest'  => null,
+                'auth'   => null,
+                'notes'  => '',
                 'status' => 'not-tested',
             ];
 
@@ -75,9 +75,9 @@ final class ReportWriter
             'static'      => $staticReport,
             'dynamic'     => $dynamicReport,
             'summary'     => [
-                'totalRoutes' => count($routes),
-                'staticErrors' => (int) ($staticReport['errors'] ?? 0),
-                'staticWarnings' => (int) ($staticReport['warnings'] ?? 0),
+                'totalRoutes'     => count($routes),
+                'staticErrors'    => (int) ($staticReport['errors'] ?? 0),
+                'staticWarnings'  => (int) ($staticReport['warnings'] ?? 0),
                 'dynamicFailures' => count(array_filter($routes, static function ($route): bool {
                     return ($route['dynamic']['status'] ?? '') === 'failed';
                 })),

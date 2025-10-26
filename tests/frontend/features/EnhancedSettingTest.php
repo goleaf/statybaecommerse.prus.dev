@@ -21,7 +21,7 @@ final class EnhancedSettingTest extends TestCase
 
         $this->adminUser = User::factory()->create([
             'email' => 'admin@test.com',
-            'name' => 'Admin User',
+            'name'  => 'Admin User',
         ]);
 
         // Assign admin role if it exists
@@ -34,20 +34,20 @@ final class EnhancedSettingTest extends TestCase
     public function test_enhanced_setting_can_be_created(): void
     {
         $setting = EnhancedSetting::create([
-            'group' => 'general',
-            'key' => 'site_name',
-            'value' => 'Test Site',
-            'type' => 'text',
-            'description' => 'The name of the site',
-            'is_public' => true,
+            'group'        => 'general',
+            'key'          => 'site_name',
+            'value'        => 'Test Site',
+            'type'         => 'text',
+            'description'  => 'The name of the site',
+            'is_public'    => true,
             'is_encrypted' => false,
-            'sort_order' => 1,
+            'sort_order'   => 1,
         ]);
 
         $this->assertDatabaseHas('enhanced_settings', [
-            'key' => 'site_name',
-            'value' => 'Test Site',
-            'type' => 'text',
+            'key'       => 'site_name',
+            'value'     => 'Test Site',
+            'type'      => 'text',
             'is_public' => true,
         ]);
 
@@ -57,10 +57,10 @@ final class EnhancedSettingTest extends TestCase
     public function test_enhanced_setting_can_be_retrieved_by_key(): void
     {
         EnhancedSetting::create([
-            'group' => 'general',
-            'key' => 'app_name',
-            'value' => 'My App',
-            'type' => 'text',
+            'group'       => 'general',
+            'key'         => 'app_name',
+            'value'       => 'My App',
+            'type'        => 'text',
             'description' => 'Application name',
         ]);
 
@@ -76,7 +76,7 @@ final class EnhancedSettingTest extends TestCase
         EnhancedSetting::setValue('test_key', 'test_value', 'test_group');
 
         $this->assertDatabaseHas('enhanced_settings', [
-            'key' => 'test_key',
+            'key'   => 'test_key',
             'value' => 'test_value',
             'group' => 'test_group',
         ]);
@@ -85,7 +85,7 @@ final class EnhancedSettingTest extends TestCase
         EnhancedSetting::setValue('test_key', 'updated_value');
 
         $this->assertDatabaseHas('enhanced_settings', [
-            'key' => 'test_key',
+            'key'   => 'test_key',
             'value' => 'updated_value',
         ]);
 
@@ -95,10 +95,10 @@ final class EnhancedSettingTest extends TestCase
     public function test_enhanced_setting_encryption(): void
     {
         $setting = EnhancedSetting::create([
-            'group' => 'security',
-            'key' => 'api_secret',
-            'value' => 'secret_value',
-            'type' => 'text',
+            'group'        => 'security',
+            'key'          => 'api_secret',
+            'value'        => 'secret_value',
+            'type'         => 'text',
             'is_encrypted' => true,
         ]);
 
@@ -116,20 +116,20 @@ final class EnhancedSettingTest extends TestCase
     public function test_enhanced_setting_scopes(): void
     {
         EnhancedSetting::create([
-            'group' => 'general',
-            'key' => 'setting1',
-            'value' => 'value1',
-            'type' => 'text',
-            'is_public' => true,
+            'group'      => 'general',
+            'key'        => 'setting1',
+            'value'      => 'value1',
+            'type'       => 'text',
+            'is_public'  => true,
             'sort_order' => 2,
         ]);
 
         EnhancedSetting::create([
-            'group' => 'email',
-            'key' => 'setting2',
-            'value' => 'value2',
-            'type' => 'text',
-            'is_public' => false,
+            'group'      => 'email',
+            'key'        => 'setting2',
+            'value'      => 'value2',
+            'type'       => 'text',
+            'is_public'  => false,
             'sort_order' => 1,
         ]);
 
@@ -155,8 +155,8 @@ final class EnhancedSettingTest extends TestCase
 
         $setting = new EnhancedSetting([
             'group' => 'config',
-            'key' => 'json_setting',
-            'type' => 'json',
+            'key'   => 'json_setting',
+            'type'  => 'json',
         ]);
         $setting->value = $jsonData;
         $setting->save();
@@ -172,9 +172,9 @@ final class EnhancedSettingTest extends TestCase
     {
         $setting = EnhancedSetting::create([
             'group' => 'features',
-            'key' => 'feature_enabled',
+            'key'   => 'feature_enabled',
             'value' => true,
-            'type' => 'boolean',
+            'type'  => 'boolean',
         ]);
 
         $this->assertTrue($setting->value);
@@ -186,10 +186,10 @@ final class EnhancedSettingTest extends TestCase
         $validationRules = ['required', 'string', 'max:255'];
 
         $setting = EnhancedSetting::create([
-            'group' => 'validation',
-            'key' => 'validated_setting',
-            'value' => 'test',
-            'type' => 'text',
+            'group'            => 'validation',
+            'key'              => 'validated_setting',
+            'value'            => 'test',
+            'type'             => 'text',
             'validation_rules' => $validationRules,
         ]);
 
@@ -223,19 +223,19 @@ final class EnhancedSettingTest extends TestCase
 
         // Test that we can create a setting through the model (Filament uses Livewire, not direct HTTP)
         $setting = EnhancedSetting::create([
-            'group' => 'test',
-            'key' => 'test_setting',
-            'locale' => 'en',
-            'value' => 'test_value',
-            'type' => 'text',
-            'description' => 'Test setting description',
-            'is_public' => true,
+            'group'        => 'test',
+            'key'          => 'test_setting',
+            'locale'       => 'en',
+            'value'        => 'test_value',
+            'type'         => 'text',
+            'description'  => 'Test setting description',
+            'is_public'    => true,
             'is_encrypted' => false,
-            'sort_order' => 1,
+            'sort_order'   => 1,
         ]);
 
         $this->assertDatabaseHas('enhanced_settings', [
-            'key' => 'test_setting',
+            'key'   => 'test_setting',
             'group' => 'test',
         ]);
     }
@@ -245,7 +245,7 @@ final class EnhancedSettingTest extends TestCase
         $this->actingAs($this->adminUser);
 
         $setting = EnhancedSetting::factory()->create([
-            'type' => 'text',
+            'type'  => 'text',
             'value' => 'test value',
         ]);
 
@@ -266,7 +266,7 @@ final class EnhancedSettingTest extends TestCase
         $this->actingAs($this->adminUser);
 
         $setting = EnhancedSetting::factory()->create([
-            'type' => 'text',
+            'type'  => 'text',
             'value' => 'test value',
         ]);
 
@@ -287,19 +287,19 @@ final class EnhancedSettingTest extends TestCase
         $this->actingAs($this->adminUser);
 
         $setting = EnhancedSetting::factory()->create([
-            'key' => 'original_key',
+            'key'   => 'original_key',
             'value' => 'original_value',
         ]);
 
         // Test that we can update a setting through the model
         $setting->update([
-            'key' => 'updated_key',
-            'value' => 'updated_value',
+            'key'         => 'updated_key',
+            'value'       => 'updated_value',
             'description' => 'Updated description',
         ]);
 
         $this->assertDatabaseHas('enhanced_settings', [
-            'id' => $setting->id,
+            'id'  => $setting->id,
             'key' => 'updated_key',
         ]);
     }
@@ -345,14 +345,14 @@ final class EnhancedSettingTest extends TestCase
 
         // Try to create another setting with the same key
         $settingData = [
-            'group' => 'test',
-            'key' => 'unique_key',  // Duplicate key
-            'value' => 'test_value',
-            'type' => 'text',
-            'description' => 'Test setting description',
-            'is_public' => true,
+            'group'        => 'test',
+            'key'          => 'unique_key',  // Duplicate key
+            'value'        => 'test_value',
+            'type'         => 'text',
+            'description'  => 'Test setting description',
+            'is_public'    => true,
             'is_encrypted' => false,
-            'sort_order' => 1,
+            'sort_order'   => 1,
         ];
 
         $response = $this->post('/admin/normal-settings', $settingData);
@@ -375,10 +375,10 @@ final class EnhancedSettingTest extends TestCase
         app()->setLocale('lt');
 
         $setting = EnhancedSetting::create([
-            'group' => 'general',
-            'key' => 'site_title_lt',
-            'value' => 'Svetainės pavadinimas',
-            'type' => 'text',
+            'group'       => 'general',
+            'key'         => 'site_title_lt',
+            'value'       => 'Svetainės pavadinimas',
+            'type'        => 'text',
             'description' => 'Lietuviškas svetainės pavadinimas',
         ]);
 
@@ -387,10 +387,10 @@ final class EnhancedSettingTest extends TestCase
         app()->setLocale('en');
 
         $englishSetting = EnhancedSetting::create([
-            'group' => 'general',
-            'key' => 'site_title_en',
-            'value' => 'Site Title',
-            'type' => 'text',
+            'group'       => 'general',
+            'key'         => 'site_title_en',
+            'value'       => 'Site Title',
+            'type'        => 'text',
             'description' => 'English site title',
         ]);
 

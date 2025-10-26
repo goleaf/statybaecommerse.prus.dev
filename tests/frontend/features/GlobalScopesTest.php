@@ -28,26 +28,26 @@ final class GlobalScopesTest extends TestCase
     {
         // Create test products with different states
         $activeProduct = Product::factory()->create([
-            'is_visible' => true,
-            'is_enabled' => true,
+            'is_visible'   => true,
+            'is_enabled'   => true,
             'published_at' => now()->subDay(),
         ]);
 
         $inactiveProduct = Product::factory()->create([
-            'is_visible' => false,
-            'is_enabled' => true,
+            'is_visible'   => false,
+            'is_enabled'   => true,
             'published_at' => now()->subDay(),
         ]);
 
         $unpublishedProduct = Product::factory()->create([
-            'is_visible' => true,
-            'is_enabled' => true,
+            'is_visible'   => true,
+            'is_enabled'   => true,
             'published_at' => now()->addDay(),
         ]);
 
         $inactiveUnpublishedProduct = Product::factory()->create([
-            'is_visible' => false,
-            'is_enabled' => false,
+            'is_visible'   => false,
+            'is_enabled'   => false,
             'published_at' => now()->addDay(),
         ]);
 
@@ -144,17 +144,17 @@ final class GlobalScopesTest extends TestCase
     {
         // Create test news with different states
         $publishedNews = News::factory()->create([
-            'is_visible' => true,
+            'is_visible'   => true,
             'published_at' => now()->subDay(),
         ]);
 
         $unpublishedNews = News::factory()->create([
-            'is_visible' => true,
+            'is_visible'   => true,
             'published_at' => now()->addDay(),
         ]);
 
         $invisibleNews = News::factory()->create([
-            'is_visible' => false,
+            'is_visible'   => false,
             'published_at' => now()->subDay(),
         ]);
 
@@ -172,17 +172,17 @@ final class GlobalScopesTest extends TestCase
     {
         // Create test posts with different states
         $publishedPost = Post::factory()->create([
-            'status' => 'published',
+            'status'       => 'published',
             'published_at' => now()->subDay(),
         ]);
 
         $draftPost = Post::factory()->create([
-            'status' => 'draft',
+            'status'       => 'draft',
             'published_at' => now()->subDay(),
         ]);
 
         $scheduledPost = Post::factory()->create([
-            'status' => 'published',
+            'status'       => 'published',
             'published_at' => now()->addDay(),
         ]);
 
@@ -221,17 +221,17 @@ final class GlobalScopesTest extends TestCase
     {
         // Create test discounts with different states
         $activeDiscount = Discount::factory()->create([
-            'is_active' => true,
+            'is_active'  => true,
             'is_enabled' => true,
         ]);
 
         $inactiveDiscount = Discount::factory()->create([
-            'is_active' => false,
+            'is_active'  => false,
             'is_enabled' => true,
         ]);
 
         $disabledDiscount = Discount::factory()->create([
-            'is_active' => true,
+            'is_active'  => true,
             'is_enabled' => false,
         ]);
 
@@ -270,17 +270,17 @@ final class GlobalScopesTest extends TestCase
     {
         // Create test feature flags with different states
         $activeFlag = FeatureFlag::factory()->create([
-            'is_active' => true,
+            'is_active'  => true,
             'is_enabled' => true,
         ]);
 
         $inactiveFlag = FeatureFlag::factory()->create([
-            'is_active' => false,
+            'is_active'  => false,
             'is_enabled' => true,
         ]);
 
         $disabledFlag = FeatureFlag::factory()->create([
-            'is_active' => true,
+            'is_active'  => true,
             'is_enabled' => false,
         ]);
 
@@ -319,17 +319,17 @@ final class GlobalScopesTest extends TestCase
     {
         // Create test collections with different states
         $activeCollection = Collection::factory()->create([
-            'is_active' => true,
+            'is_active'  => true,
             'is_visible' => true,
         ]);
 
         $inactiveCollection = Collection::factory()->create([
-            'is_active' => false,
+            'is_active'  => false,
             'is_visible' => true,
         ]);
 
         $invisibleCollection = Collection::factory()->create([
-            'is_active' => true,
+            'is_active'  => true,
             'is_visible' => false,
         ]);
 
@@ -352,14 +352,14 @@ final class GlobalScopesTest extends TestCase
         ]);
 
         $activeProduct = Product::factory()->create([
-            'is_visible' => true,
-            'is_enabled' => true,
+            'is_visible'   => true,
+            'is_enabled'   => true,
             'published_at' => now()->subDay(),
         ]);
 
         $inactiveProduct = Product::factory()->create([
-            'is_visible' => false,
-            'is_enabled' => true,
+            'is_visible'   => false,
+            'is_enabled'   => true,
             'published_at' => now()->subDay(),
         ]);
 
@@ -376,23 +376,23 @@ final class GlobalScopesTest extends TestCase
     {
         // Create products with different states
         $featuredProduct = Product::factory()->create([
-            'is_visible' => true,
-            'is_enabled' => true,
-            'is_featured' => true,
+            'is_visible'   => true,
+            'is_enabled'   => true,
+            'is_featured'  => true,
             'published_at' => now()->subDay(),
         ]);
 
         $regularProduct = Product::factory()->create([
-            'is_visible' => true,
-            'is_enabled' => true,
-            'is_featured' => false,
+            'is_visible'   => true,
+            'is_enabled'   => true,
+            'is_featured'  => false,
             'published_at' => now()->subDay(),
         ]);
 
         $inactiveFeaturedProduct = Product::factory()->create([
-            'is_visible' => false,
-            'is_enabled' => true,
-            'is_featured' => true,
+            'is_visible'   => false,
+            'is_enabled'   => true,
+            'is_featured'  => true,
             'published_at' => now()->subDay(),
         ]);
 

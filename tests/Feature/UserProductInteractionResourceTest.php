@@ -58,24 +58,24 @@ final class UserProductInteractionResourceTest extends TestCase
 
         Livewire::test(UserProductInteractionResource\Pages\CreateUserProductInteraction::class)
             ->fillForm([
-                'user_id' => $user->id,
-                'product_id' => $product->id,
+                'user_id'            => $user->id,
+                'product_id'         => $product->id,
                 'product_variant_id' => $variant->id,
-                'event' => 'click',
-                'occurred_at' => $occurredAt,
-                'meta' => [
+                'event'              => 'click',
+                'occurred_at'        => $occurredAt,
+                'meta'               => [
                     'rating' => '4.5',
-                    'count' => '2',
+                    'count'  => '2',
                 ],
             ])
             ->call('create')
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('user_product_interactions', [
-            'user_id' => $user->id,
-            'product_id' => $product->id,
+            'user_id'            => $user->id,
+            'product_id'         => $product->id,
             'product_variant_id' => $variant->id,
-            'event' => 'click',
+            'event'              => 'click',
         ]);
     }
 

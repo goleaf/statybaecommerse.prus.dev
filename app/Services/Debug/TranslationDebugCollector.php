@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services\Debug;
 
 use Illuminate\Support\Facades\Log;
+use Throwable;
 
 /**
  * TranslationDebugCollector
@@ -22,7 +23,7 @@ class TranslationDebugCollector
         if (function_exists('debugbar') && app()->bound('debugbar')) {
             try {
                 app('debugbar')->addMessage($data, 'translation');
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
                 // ignore
             }
         }

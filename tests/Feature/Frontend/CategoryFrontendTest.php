@@ -38,20 +38,20 @@ final class CategoryFrontendTest extends TestCase
         $category = Category::factory()->create(['name' => 'Ventiliacijos sistemos', 'slug' => 'ventiliacijos-sistemos']);
 
         $product = Product::factory()->for($brand)->create([
-            'name' => 'Ventiliatoriaus komplektas',
-            'slug' => 'ventiliatoriaus-komplektas',
-            'is_visible' => true,
-            'status' => 'published',
+            'name'         => 'Ventiliatoriaus komplektas',
+            'slug'         => 'ventiliatoriaus-komplektas',
+            'is_visible'   => true,
+            'status'       => 'published',
             'published_at' => now()->subDay(),
         ]);
         $product->categories()->attach($category->id);
 
         Price::factory()->create([
             'priceable_type' => Product::class,
-            'priceable_id' => $product->id,
-            'currency_id' => 1,
-            'amount' => 149.00,
-            'is_enabled' => true,
+            'priceable_id'   => $product->id,
+            'currency_id'    => 1,
+            'amount'         => 149.00,
+            'is_enabled'     => true,
         ]);
 
         $this->get(route('frontend.categories.show', $category))

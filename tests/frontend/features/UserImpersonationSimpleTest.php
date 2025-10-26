@@ -42,9 +42,9 @@ describe('User Impersonation Basic Functionality', function () {
         // Test the impersonation logic directly
         session([
             'impersonate' => [
-                'original_user_id' => $admin->id,
+                'original_user_id'     => $admin->id,
                 'impersonated_user_id' => $targetUser->id,
-                'started_at' => now()->toISOString(),
+                'started_at'           => now()->toISOString(),
             ],
         ]);
 
@@ -64,9 +64,9 @@ describe('User Impersonation Basic Functionality', function () {
         // Start impersonation
         session([
             'impersonate' => [
-                'original_user_id' => $admin->id,
+                'original_user_id'     => $admin->id,
                 'impersonated_user_id' => $targetUser->id,
-                'started_at' => now()->toISOString(),
+                'started_at'           => now()->toISOString(),
             ],
         ]);
         auth()->login($targetUser);
@@ -107,9 +107,9 @@ describe('User Impersonation Basic Functionality', function () {
         // Start impersonation
         session([
             'impersonate' => [
-                'original_user_id' => $admin->id,
+                'original_user_id'     => $admin->id,
                 'impersonated_user_id' => $targetUser->id,
-                'started_at' => now()->toISOString(),
+                'started_at'           => now()->toISOString(),
             ],
         ]);
 

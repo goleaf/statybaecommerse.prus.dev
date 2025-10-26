@@ -79,12 +79,12 @@ return [
     'unverified_only' => 'Unverified Only',
     'active_only'     => 'Active Only',
     'inactive_only'   => 'Inactive Only',
-    'badges' => [
-        'active' => 'Active',
+    'badges'          => [
+        'active'   => 'Active',
         'inactive' => 'Inactive',
     ],
-    'created_from'    => 'Created From',
-    'created_until'   => 'Created Until',
+    'created_from'  => 'Created From',
+    'created_until' => 'Created Until',
 
     'verify_email'                => 'Verify Email',
     'activate'                    => 'Activate',

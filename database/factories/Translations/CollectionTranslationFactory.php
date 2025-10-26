@@ -18,14 +18,14 @@ class CollectionTranslationFactory extends Factory
     public function definition(): array
     {
         return [
-            'collection_id' => Collection::factory(),
-            'locale' => $this->faker->randomElement(['lt', 'en']),
-            'name' => $this->faker->words(2, true),
-            'slug' => $this->faker->slug(),
-            'description' => $this->faker->paragraph(),
-            'meta_title' => $this->faker->sentence(6),
+            'collection_id'    => Collection::factory(),
+            'locale'           => $this->faker->randomElement(['lt', 'en']),
+            'name'             => $this->faker->words(2, true),
+            'slug'             => $this->faker->slug(),
+            'description'      => $this->faker->paragraph(),
+            'meta_title'       => $this->faker->sentence(6),
             'meta_description' => $this->faker->sentence(12),
-            'meta_keywords' => $this->faker->words(3),
+            'meta_keywords'    => $this->faker->words(3),
         ];
     }
 }

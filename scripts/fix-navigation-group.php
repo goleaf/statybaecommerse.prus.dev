@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-require_once __DIR__.'/../vendor/autoload.php';
+require_once __DIR__ . '/../vendor/autoload.php';
 
 use App\Support\Filament\Constants\NavigationGroupConstants;
 
-$baseDir = __DIR__.'/../app/Filament/Resources';
+$baseDir = __DIR__ . '/../app/Filament/Resources';
 
 $rii = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($baseDir));
 $updated = 0;
@@ -35,7 +35,7 @@ foreach ($rii as $file) {
         if (strpos($code, NavigationGroupConstants::UNIT_ENUM_USE) === false) {
             // Insert after last use statement
             if (preg_match('/^(.*?namespace[^;]+;\s*)((?:use[^;]+;\s*)*)/s', $code, $mm)) {
-                $code = preg_replace('/^(.*?namespace[^;]+;\s*)((?:use[^;]+;\s*)*)/s', '$1$2'.NavigationGroupConstants::UNIT_ENUM_USE."\n", $code, 1);
+                $code = preg_replace('/^(.*?namespace[^;]+;\s*)((?:use[^;]+;\s*)*)/s', '$1$2' . NavigationGroupConstants::UNIT_ENUM_USE . "\n", $code, 1);
             }
         }
         // Insert method after class opening brace

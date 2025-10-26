@@ -58,8 +58,8 @@ it('unit: filters non displayable products and limits results', function (): voi
         manageStock: true,
         isInStock: false,
         stockQuantity: 0,
-        images: new ProductImageCollection(),
-        variants: new ProductVariantCollection(),
+        images: new ProductImageCollection,
+        variants: new ProductVariantCollection,
         description: null,
         shortDescription: null,
     );
@@ -70,7 +70,7 @@ it('unit: filters non displayable products and limits results', function (): voi
         $hiddenProduct,
     ]));
 
-    $useCase = new SearchProductsUseCase($repository, new DisplayableProductSpecification());
+    $useCase = new SearchProductsUseCase($repository, new DisplayableProductSpecification);
 
     $output = $useCase->execute(new SearchProductsInputDto('visible', 10, 10));
     $payload = ProductContractPresenter::fromSearch($output);

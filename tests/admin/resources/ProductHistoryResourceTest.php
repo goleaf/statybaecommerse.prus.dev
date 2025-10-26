@@ -26,21 +26,21 @@ final class ProductHistoryResourceTest extends TestCase
         $product = Product::factory()->create();
 
         $historyData = [
-            'product_id' => $product->id,
-            'action' => 'price_changed',
-            'old_value' => '100.00',
-            'new_value' => '120.00',
+            'product_id'  => $product->id,
+            'action'      => 'price_changed',
+            'old_value'   => '100.00',
+            'new_value'   => '120.00',
             'description' => 'Price updated from 100 to 120',
-            'user_id' => auth()->id(),
+            'user_id'     => auth()->id(),
         ];
 
         $history = ProductHistory::create($historyData);
 
         $this->assertDatabaseHas('product_histories', [
             'product_id' => $product->id,
-            'action' => 'price_changed',
-            'old_value' => '100.00',
-            'new_value' => '120.00',
+            'action'     => 'price_changed',
+            'old_value'  => '100.00',
+            'new_value'  => '120.00',
         ]);
 
         $this->assertEquals('price_changed', $history->action);
@@ -54,12 +54,12 @@ final class ProductHistoryResourceTest extends TestCase
 
         ProductHistory::factory()->create([
             'product_id' => $product->id,
-            'action' => 'price_changed',
+            'action'     => 'price_changed',
         ]);
 
         ProductHistory::factory()->create([
             'product_id' => $product->id,
-            'action' => 'stock_changed',
+            'action'     => 'stock_changed',
         ]);
 
         $priceChanges = ProductHistory::where('action', 'price_changed')->get();
@@ -77,13 +77,13 @@ final class ProductHistoryResourceTest extends TestCase
 
         ProductHistory::factory()->create([
             'product_id' => $product->id,
-            'action' => 'created',
+            'action'     => 'created',
             'created_at' => now(),
         ]);
 
         ProductHistory::factory()->create([
             'product_id' => $product->id,
-            'action' => 'updated',
+            'action'     => 'updated',
             'created_at' => now()->subDays(2),
         ]);
 
@@ -102,7 +102,7 @@ final class ProductHistoryResourceTest extends TestCase
 
         $history = ProductHistory::factory()->create([
             'product_id' => $product->id,
-            'action' => 'status_changed',
+            'action'     => 'status_changed',
         ]);
 
         $this->assertInstanceOf(Product::class, $history->product);
@@ -116,8 +116,8 @@ final class ProductHistoryResourceTest extends TestCase
 
         $history = ProductHistory::factory()->create([
             'product_id' => $product->id,
-            'user_id' => $user->id,
-            'action' => 'deleted',
+            'user_id'    => $user->id,
+            'action'     => 'deleted',
         ]);
 
         $this->assertInstanceOf(User::class, $history->user);

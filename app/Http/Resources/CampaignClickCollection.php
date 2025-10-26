@@ -37,18 +37,18 @@ class CampaignClickCollection extends ResourceCollection
         $payload = [
             'data' => $this->collection,
             'meta' => [
-                'total' => $this->total(),
-                'count' => $this->count(),
-                'per_page' => $this->perPage(),
-                'current_page' => $this->currentPage(),
-                'total_pages' => $this->lastPage(),
+                'total'          => $this->total(),
+                'count'          => $this->count(),
+                'per_page'       => $this->perPage(),
+                'current_page'   => $this->currentPage(),
+                'total_pages'    => $this->lastPage(),
                 'has_more_pages' => $this->hasMorePages(),
             ],
             'links' => [
                 'first' => $this->url(1),
-                'last' => $this->url($this->lastPage()),
-                'prev' => $this->previousPageUrl(),
-                'next' => $this->nextPageUrl(),
+                'last'  => $this->url($this->lastPage()),
+                'prev'  => $this->previousPageUrl(),
+                'next'  => $this->nextPageUrl(),
             ],
         ];
 
@@ -56,10 +56,10 @@ class CampaignClickCollection extends ResourceCollection
             $payload['meta'] = array_merge($payload['meta'], [
                 'query' => [
                     // Surface the exact pagination, sorting, and filter inputs used.
-                    'page' => $this->listQuery->page(),
+                    'page'     => $this->listQuery->page(),
                     'per_page' => $this->listQuery->perPage(),
-                    'sort' => $this->listQuery->sorts(),
-                    'filters' => $this->listQuery->filters(),
+                    'sort'     => $this->listQuery->sorts(),
+                    'filters'  => $this->listQuery->filters(),
                 ],
             ], $this->additionalMeta);
         } elseif ($this->additionalMeta !== []) {

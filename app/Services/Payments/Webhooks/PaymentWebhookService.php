@@ -59,7 +59,7 @@ final class PaymentWebhookService
         if ($existingEvent instanceof PaymentWebhookEvent && $existingEvent->status === PaymentWebhookEventStatus::PROCESSED) {
             // Preserve the original processed state while acknowledging the replay.
             return new PaymentWebhookResult([
-                'status' => PaymentWebhookEventStatus::IGNORED->value,
+                'status'  => PaymentWebhookEventStatus::IGNORED->value,
                 'message' => 'Duplicate event ignored.',
             ], 200);
         }
@@ -92,7 +92,7 @@ final class PaymentWebhookService
                 $event->save();
 
                 return new PaymentWebhookResult([
-                    'status' => PaymentWebhookEventStatus::PROCESSED->value,
+                    'status'  => PaymentWebhookEventStatus::PROCESSED->value,
                     'message' => 'Event already applied.',
                 ], 200);
             }
@@ -106,14 +106,14 @@ final class PaymentWebhookService
             $event->save();
 
             Log::info('Processed payment webhook event.', [
-                'provider' => $provider,
-                'event_id' => $eventId,
-                'order_id' => $order->id,
+                'provider'     => $provider,
+                'event_id'     => $eventId,
+                'order_id'     => $order->id,
                 'target_state' => $targetState->value,
             ]);
 
             return new PaymentWebhookResult([
-                'status' => PaymentWebhookEventStatus::PROCESSED->value,
+                'status'  => PaymentWebhookEventStatus::PROCESSED->value,
                 'message' => 'Event processed.',
             ], 200);
         } catch (Throwable $exception) {
@@ -263,12 +263,12 @@ final class PaymentWebhookService
     private function mapTargetState(string $status): OrderPaymentState
     {
         return match (strtolower($status)) {
-            'created' => OrderPaymentState::CREATED,
-            'paid' => OrderPaymentState::PAID,
-            'fulfilled' => OrderPaymentState::FULFILLED,
+            'created'            => OrderPaymentState::CREATED,
+            'paid'               => OrderPaymentState::PAID,
+            'fulfilled'          => OrderPaymentState::FULFILLED,
             'partially_refunded' => OrderPaymentState::PARTIALLY_REFUNDED,
-            'refunded' => OrderPaymentState::REFUNDED,
-            default => throw new MalformedWebhookPayloadException("Unknown webhook status [{$status}]."),
+            'refunded'           => OrderPaymentState::REFUNDED,
+            default              => throw new MalformedWebhookPayloadException("Unknown webhook status [{$status}]."),
         };
     }
 

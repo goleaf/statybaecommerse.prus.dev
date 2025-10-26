@@ -15,12 +15,12 @@ use Livewire\Component;
  * Livewire component for VoiceSearch with reactive frontend functionality, real-time updates, and user interaction handling.
  *
  * @property string $query
- * @property bool $isListening
- * @property bool $isSupported
+ * @property bool   $isListening
+ * @property bool   $isSupported
  * @property string $status
- * @property int $maxResults
- * @property int $minQueryLength
- * @property array $searchTypes
+ * @property int    $maxResults
+ * @property int    $minQueryLength
+ * @property array  $searchTypes
  */
 final class VoiceSearch extends Component
 {

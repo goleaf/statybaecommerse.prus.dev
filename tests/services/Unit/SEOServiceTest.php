@@ -13,7 +13,7 @@ uses(TestCase::class);
 
 beforeEach(function () {
     URL::shouldReceive('route')->andReturnUsing(function ($name, $params = []) {
-        return 'https://example.test/'.$name.'/'.(is_array($params) ? (implode('-', $params)) : $params);
+        return 'https://example.test/' . $name . '/' . (is_array($params) ? (implode('-', $params)) : $params);
     });
 });
 

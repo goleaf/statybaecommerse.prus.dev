@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use Exception;
 use Spatie\Image\Enums\Fit;
 use Spatie\Image\Image;
 use Spatie\MediaLibrary\Conversions\Conversion;
@@ -41,16 +42,16 @@ final class ImageConversionService
         $basePath = dirname($originalPath);
         $filename = pathinfo($media->file_name, PATHINFO_FILENAME);
         $sizes = match ($collection) {
-            'logo' => ['xs' => ['width' => 64, 'height' => 64], 'sm' => ['width' => 128, 'height' => 128], 'md' => ['width' => 200, 'height' => 200], 'lg' => ['width' => 400, 'height' => 400]],
+            'logo'   => ['xs' => ['width' => 64, 'height' => 64], 'sm' => ['width' => 128, 'height' => 128], 'md' => ['width' => 200, 'height' => 200], 'lg' => ['width' => 400, 'height' => 400]],
             'banner' => ['sm' => ['width' => 800, 'height' => 400], 'md' => ['width' => 1200, 'height' => 600], 'lg' => ['width' => 1920, 'height' => 960]],
-            default => [],
+            default  => [],
         };
         foreach ($sizes as $size => $dimensions) {
-            $outputPath = $basePath."/conversions/{$filename}-{$collection}-{$size}.webp";
+            $outputPath = $basePath . "/conversions/{$filename}-{$collection}-{$size}.webp";
             try {
                 Image::load($originalPath)->fit(Fit::Contain, $dimensions['width'], $dimensions['height'])->quality(85)->save($outputPath);
-            } catch (\Exception $e) {
-                logger()->warning("Failed to generate WebP conversion for {$media->name}: ".$e->getMessage());
+            } catch (Exception $e) {
+                logger()->warning("Failed to generate WebP conversion for {$media->name}: " . $e->getMessage());
             }
         }
     }

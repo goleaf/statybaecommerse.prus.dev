@@ -35,10 +35,10 @@ final readonly class ProductVariantDto
     public function toArray(): array
     {
         return [
-            'id' => $this->id,
-            'name' => $this->name,
-            'sku' => $this->sku,
-            'price' => $this->price,
+            'id'             => $this->id,
+            'name'           => $this->name,
+            'sku'            => $this->sku,
+            'price'          => $this->price,
             'stock_quantity' => $this->stockQuantity,
         ];
     }

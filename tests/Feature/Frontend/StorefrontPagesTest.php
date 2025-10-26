@@ -25,9 +25,9 @@ final class StorefrontPagesTest extends TestCase
         $category = Category::factory()->create();
 
         $product = Product::factory()->create([
-            'name' => 'Profesionalus plaktukas',
-            'status' => 'published',
-            'is_visible' => true,
+            'name'         => 'Profesionalus plaktukas',
+            'status'       => 'published',
+            'is_visible'   => true,
             'published_at' => now()->subDay(),
         ]);
 
@@ -42,9 +42,9 @@ final class StorefrontPagesTest extends TestCase
     public function test_product_show_page_renders_successfully(): void
     {
         $product = Product::factory()->create([
-            'name' => 'Kampuotasis šlifuoklis',
-            'status' => 'published',
-            'is_visible' => true,
+            'name'         => 'Kampuotasis šlifuoklis',
+            'status'       => 'published',
+            'is_visible'   => true,
             'published_at' => now()->subDay(),
         ]);
 
@@ -61,9 +61,9 @@ final class StorefrontPagesTest extends TestCase
         ]);
 
         $product = Product::factory()->create([
-            'name' => 'Fasadiniai dažai',
-            'status' => 'published',
-            'is_visible' => true,
+            'name'         => 'Fasadiniai dažai',
+            'status'       => 'published',
+            'is_visible'   => true,
             'published_at' => now()->subDay(),
         ]);
 
@@ -82,10 +82,10 @@ final class StorefrontPagesTest extends TestCase
         ]);
 
         Product::factory()->create([
-            'name' => 'Makita suktuvas',
-            'brand_id' => $brand->id,
-            'status' => 'published',
-            'is_visible' => true,
+            'name'         => 'Makita suktuvas',
+            'brand_id'     => $brand->id,
+            'status'       => 'published',
+            'is_visible'   => true,
             'published_at' => now()->subDay(),
         ]);
 
@@ -98,9 +98,9 @@ final class StorefrontPagesTest extends TestCase
     public function test_cart_add_update_remove_flow_via_json(): void
     {
         $product = Product::factory()->create([
-            'price' => 49.99,
-            'status' => 'published',
-            'is_visible' => true,
+            'price'        => 49.99,
+            'status'       => 'published',
+            'is_visible'   => true,
             'published_at' => now()->subDay(),
         ]);
 
@@ -110,7 +110,7 @@ final class StorefrontPagesTest extends TestCase
             ->withSession($sessionData)
             ->postJson(route('frontend.cart.add'), [
                 'product_id' => $product->id,
-                'quantity' => 2,
+                'quantity'   => 2,
             ])
             ->assertCreated();
 
@@ -139,9 +139,9 @@ final class StorefrontPagesTest extends TestCase
     {
         $user = User::factory()->create();
         $product = Product::factory()->create([
-            'price' => 89.99,
-            'status' => 'published',
-            'is_visible' => true,
+            'price'        => 89.99,
+            'status'       => 'published',
+            'is_visible'   => true,
             'published_at' => now()->subDay(),
         ]);
 
@@ -160,7 +160,7 @@ final class StorefrontPagesTest extends TestCase
             ->withSession(['initiated' => true])
             ->postJson(route('frontend.checkout.process'), [
                 'payment_method' => 'card',
-                'confirm' => true,
+                'confirm'        => true,
             ])
             ->assertCreated()
             ->assertJsonPath('success', true);

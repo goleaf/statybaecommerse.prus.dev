@@ -25,7 +25,7 @@ class RecommendationConfigResourceTest extends TestCase
         parent::setUp();
 
         $this->actingAs(User::factory()->create([
-            'email' => 'admin@example.com',
+            'email'    => 'admin@example.com',
             'is_admin' => true,
         ]));
     }
@@ -44,17 +44,17 @@ class RecommendationConfigResourceTest extends TestCase
 
         Livewire::test(CreateRecommendationConfig::class)
             ->fillForm([
-                'name' => $newData->name,
-                'type' => 'collaborative',
-                'description' => $newData->description,
-                'min_score' => 0.1,
-                'max_results' => 10,
+                'name'         => $newData->name,
+                'type'         => 'collaborative',
+                'description'  => $newData->description,
+                'min_score'    => 0.1,
+                'max_results'  => 10,
                 'decay_factor' => 0.9,
-                'priority' => 0,
-                'is_active' => true,
-                'is_default' => false,
-                'cache_ttl' => 60,
-                'sort_order' => 0,
+                'priority'     => 0,
+                'is_active'    => true,
+                'is_default'   => false,
+                'cache_ttl'    => 60,
+                'sort_order'   => 0,
             ])
             ->call('create')
             ->assertHasNoFormErrors();
@@ -73,17 +73,17 @@ class RecommendationConfigResourceTest extends TestCase
             'record' => $config->getRouteKey(),
         ])
             ->fillForm([
-                'name' => 'Updated Config',
-                'min_score' => 0.2,
+                'name'        => 'Updated Config',
+                'min_score'   => 0.2,
                 'max_results' => 20,
             ])
             ->call('save')
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('recommendation_configs', [
-            'id' => $config->id,
-            'name' => 'Updated Config',
-            'min_score' => 0.2,
+            'id'          => $config->id,
+            'name'        => 'Updated Config',
+            'min_score'   => 0.2,
             'max_results' => 20,
         ]);
     }
@@ -182,7 +182,7 @@ class RecommendationConfigResourceTest extends TestCase
 
         foreach ($configs as $config) {
             $this->assertDatabaseHas('recommendation_configs', [
-                'id' => $config->id,
+                'id'        => $config->id,
                 'is_active' => true,
             ]);
         }
@@ -198,7 +198,7 @@ class RecommendationConfigResourceTest extends TestCase
 
         foreach ($configs as $config) {
             $this->assertDatabaseHas('recommendation_configs', [
-                'id' => $config->id,
+                'id'        => $config->id,
                 'is_active' => false,
             ]);
         }
@@ -215,7 +215,7 @@ class RecommendationConfigResourceTest extends TestCase
             ->assertHasNoActionErrors();
 
         $this->assertDatabaseHas('recommendation_configs', [
-            'id' => $config->id,
+            'id'        => $config->id,
             'is_active' => true,
         ]);
     }
@@ -231,7 +231,7 @@ class RecommendationConfigResourceTest extends TestCase
             ->assertHasNoActionErrors();
 
         $this->assertDatabaseHas('recommendation_configs', [
-            'id' => $config->id,
+            'id'         => $config->id,
             'is_default' => true,
         ]);
     }
@@ -248,12 +248,12 @@ class RecommendationConfigResourceTest extends TestCase
             ->assertHasNoActionErrors();
 
         $this->assertDatabaseHas('recommendation_configs', [
-            'id' => $newDefault->id,
+            'id'         => $newDefault->id,
             'is_default' => true,
         ]);
 
         $this->assertDatabaseHas('recommendation_configs', [
-            'id' => $existingDefault->id,
+            'id'         => $existingDefault->id,
             'is_default' => false,
         ]);
     }
@@ -297,8 +297,8 @@ class RecommendationConfigResourceTest extends TestCase
     {
         Livewire::test(CreateRecommendationConfig::class)
             ->fillForm([
-                'name' => 'Test Config',
-                'type' => 'collaborative',
+                'name'      => 'Test Config',
+                'type'      => 'collaborative',
                 'min_score' => 'invalid',
             ])
             ->call('create')
@@ -309,8 +309,8 @@ class RecommendationConfigResourceTest extends TestCase
     {
         Livewire::test(CreateRecommendationConfig::class)
             ->fillForm([
-                'name' => 'Test Config',
-                'type' => 'collaborative',
+                'name'        => 'Test Config',
+                'type'        => 'collaborative',
                 'max_results' => 'invalid',
             ])
             ->call('create')
@@ -347,7 +347,7 @@ class RecommendationConfigResourceTest extends TestCase
 
         $this->assertDatabaseHas('recommendation_config_products', [
             'recommendation_config_id' => $config->id,
-            'product_id' => $products->first()->id,
+            'product_id'               => $products->first()->id,
         ]);
     }
 
@@ -381,7 +381,7 @@ class RecommendationConfigResourceTest extends TestCase
 
         $this->assertDatabaseHas('recommendation_config_categories', [
             'recommendation_config_id' => $config->id,
-            'category_id' => $categories->first()->id,
+            'category_id'              => $categories->first()->id,
         ]);
     }
 

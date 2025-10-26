@@ -249,7 +249,7 @@ final class VariantBulkPriceUpdate extends Action
     /**
      * Build a sale period date picker using Flatpickr when available, falling back to Filament's DateTimePicker otherwise.
      *
-     * @param  Closure(): Carbon  $default
+     * @param Closure(): Carbon $default
      */
     private static function makeSalePeriodPicker(string $name, string $label, Closure $default)
     {

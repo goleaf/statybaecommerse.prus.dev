@@ -52,17 +52,17 @@ final class ProductVariantAttributeMatrixService
             ];
 
             $variantAttributeValues[] = [
-                'variant_id' => $variant->getKey(),
-                'attribute_id' => $attributeId,
-                'attribute_name' => $attribute?->name,
-                'attribute_value' => $attributeValue->value,
+                'variant_id'              => $variant->getKey(),
+                'attribute_id'            => $attributeId,
+                'attribute_name'          => $attribute?->name,
+                'attribute_value'         => $attributeValue->value,
                 'attribute_value_display' => $attributeValue->display_value ?? $attributeValue->value,
-                'attribute_value_lt' => $attributeValue->getTranslation('value', 'lt', false) ?? $attributeValue->value,
-                'attribute_value_en' => $attributeValue->getTranslation('value', 'en', false) ?? $attributeValue->value,
-                'attribute_value_slug' => $attributeValue->slug,
-                'sort_order' => $index,
-                'is_filterable' => (bool) ($attribute?->is_filterable ?? true),
-                'is_searchable' => (bool) ($attribute?->is_searchable ?? true),
+                'attribute_value_lt'      => $attributeValue->getTranslation('value', 'lt', false) ?? $attributeValue->value,
+                'attribute_value_en'      => $attributeValue->getTranslation('value', 'en', false) ?? $attributeValue->value,
+                'attribute_value_slug'    => $attributeValue->slug,
+                'sort_order'              => $index,
+                'is_filterable'           => (bool) ($attribute?->is_filterable ?? true),
+                'is_searchable'           => (bool) ($attribute?->is_searchable ?? true),
             ];
         }
 
@@ -89,7 +89,7 @@ final class ProductVariantAttributeMatrixService
         return $matrixSelections
             ->concat($legacy)
             ->filter(fn (array $selection): bool => isset($selection['attribute_id'], $selection['attribute_value_id']))
-            ->unique(fn (array $selection): string => $selection['attribute_id'].'-'.$selection['attribute_value_id'])
+            ->unique(fn (array $selection): string => $selection['attribute_id'] . '-' . $selection['attribute_value_id'])
             ->values();
     }
 
@@ -105,7 +105,7 @@ final class ProductVariantAttributeMatrixService
                 }
 
                 return [
-                    'attribute_id' => (int) $attributeId,
+                    'attribute_id'       => (int) $attributeId,
                     'attribute_value_id' => (int) $attributeValueId,
                 ];
             })
@@ -139,7 +139,7 @@ final class ProductVariantAttributeMatrixService
             return collect($selectedKeys)
                 ->filter(fn ($selected): bool => is_numeric($selected))
                 ->map(fn ($selected): array => [
-                    'attribute_id' => $attributeId,
+                    'attribute_id'       => $attributeId,
                     'attribute_value_id' => (int) $selected,
                 ])
                 ->values()
@@ -148,7 +148,7 @@ final class ProductVariantAttributeMatrixService
 
         if (is_numeric($value)) {
             return [[
-                'attribute_id' => $attributeId,
+                'attribute_id'       => $attributeId,
                 'attribute_value_id' => (int) $value,
             ]];
         }

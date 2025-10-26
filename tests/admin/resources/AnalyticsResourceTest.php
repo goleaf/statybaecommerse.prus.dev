@@ -14,7 +14,7 @@ uses(RefreshDatabase::class);
 beforeEach(function () {
     $this->adminUser = User::factory()->create([
         'email' => 'admin@admin.com',
-        'name' => 'Admin User',
+        'name'  => 'Admin User',
     ]);
 
     // Assign admin role if using Spatie permissions
@@ -44,14 +44,14 @@ it('can view analytics dashboard page', function () {
 it('displays correct analytics data', function () {
     // Create test orders
     $orders = Order::factory()->count(5)->create([
-        'status' => 'completed',
-        'total' => 100.0,
+        'status'     => 'completed',
+        'total'      => 100.0,
         'created_at' => now()->subDays(5),
     ]);
 
     $pendingOrders = Order::factory()->count(2)->create([
-        'status' => 'pending',
-        'total' => 50.0,
+        'status'     => 'pending',
+        'total'      => 50.0,
         'created_at' => now()->subDays(2),
     ]);
 
@@ -83,7 +83,7 @@ it('can filter orders by date range', function () {
         ->filterTable('created_at', [
             'range' => [
                 'start' => now()->subDays(10)->format('Y-m-d'),
-                'end' => now()->format('Y-m-d'),
+                'end'   => now()->format('Y-m-d'),
             ],
         ])
         ->assertSuccessful();
@@ -130,7 +130,7 @@ it('can refresh analytics data', function () {
 
 it('displays correct table columns', function () {
     $order = Order::factory()->create([
-        'total' => 150.5,
+        'total'  => 150.5,
         'status' => 'completed',
     ]);
 

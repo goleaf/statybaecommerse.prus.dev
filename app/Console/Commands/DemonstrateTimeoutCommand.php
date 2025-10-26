@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
+use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Support\LazyCollection;
 
@@ -26,10 +27,10 @@ final class DemonstrateTimeoutCommand extends Command
         $this->newLine();
 
         match ($operation) {
-            'numbers' => $this->demonstrateNumbers($timeout, $items),
+            'numbers'  => $this->demonstrateNumbers($timeout, $items),
             'products' => $this->demonstrateProducts($timeout),
-            'users' => $this->demonstrateUsers($timeout),
-            default => $this->error("Unknown operation: {$operation}")
+            'users'    => $this->demonstrateUsers($timeout),
+            default    => $this->error("Unknown operation: {$operation}")
         };
 
         return 0;
@@ -90,8 +91,8 @@ final class DemonstrateTimeoutCommand extends Command
             $duration = now()->diffInSeconds($startTime);
             $this->info("✅ Processed {$processedCount} products in {$duration} seconds");
 
-        } catch (\Exception $e) {
-            $this->error('Error processing products: '.$e->getMessage());
+        } catch (Exception $e) {
+            $this->error('Error processing products: ' . $e->getMessage());
         }
     }
 
@@ -126,8 +127,8 @@ final class DemonstrateTimeoutCommand extends Command
             $duration = now()->diffInSeconds($startTime);
             $this->info("✅ Processed {$processedCount} users in {$duration} seconds");
 
-        } catch (\Exception $e) {
-            $this->error('Error processing users: '.$e->getMessage());
+        } catch (Exception $e) {
+            $this->error('Error processing users: ' . $e->getMessage());
         }
     }
 }

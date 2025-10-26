@@ -21,12 +21,12 @@ final class UserExport implements Exportable
     public function columns(): array
     {
         return [
-            'name' => new ExportColumn('name', __('users.fields.name'), 'name'),
-            'email' => new ExportColumn('email', __('users.fields.email'), 'email'),
-            'is_active' => new ExportColumn('is_active', __('users.fields.is_active'), 'is_active'),
+            'name'          => new ExportColumn('name', __('users.fields.name'), 'name'),
+            'email'         => new ExportColumn('email', __('users.fields.email'), 'email'),
+            'is_active'     => new ExportColumn('is_active', __('users.fields.is_active'), 'is_active'),
             'last_login_at' => new ExportColumn('last_login_at', __('users.fields.last_login_at'), 'last_login_at'),
-            'created_at' => new ExportColumn('created_at', __('users.fields.created_at'), 'created_at'),
-            'orders_count' => new ExportColumn('orders_count', __('users.fields.orders_count'), 'orders_count'),
+            'created_at'    => new ExportColumn('created_at', __('users.fields.created_at'), 'created_at'),
+            'orders_count'  => new ExportColumn('orders_count', __('users.fields.orders_count'), 'orders_count'),
         ];
     }
 

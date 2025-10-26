@@ -22,21 +22,20 @@ final class ExportRequestData extends Data
         public array $ids = [],
         public ?string $locale = null,
         public ?string $timezone = null,
-    ) {
-    }
+    ) {}
 
     public function toPayload(): array
     {
         return [
-            'name' => $this->name,
+            'name'       => $this->name,
             'exportable' => $this->exportable,
-            'entity' => $this->entityEnum()?->value,
-            'format' => $this->normalizedFormat(),
-            'columns' => $this->requestedColumns(),
-            'filters' => $this->filters,
+            'entity'     => $this->entityEnum()?->value,
+            'format'     => $this->normalizedFormat(),
+            'columns'    => $this->requestedColumns(),
+            'filters'    => $this->filters,
             'record_ids' => $this->recordIdentifiers(),
-            'user_id' => $this->userId,
-            'meta' => $this->metadata(),
+            'user_id'    => $this->userId,
+            'meta'       => $this->metadata(),
         ];
     }
 
@@ -94,7 +93,7 @@ final class ExportRequestData extends Data
     public function metadata(): array
     {
         $extras = array_filter([
-            'locale' => $this->locale,
+            'locale'   => $this->locale,
             'timezone' => $this->timezone,
         ], static fn ($value): bool => $value !== null && $value !== '');
 

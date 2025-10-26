@@ -73,17 +73,17 @@ final class CompanyEmailCampaignSeoDataGlobalScopesTest extends TestCase
         // Create test referrals
         $activeReferral = Referral::factory()->create([
             'is_active' => true,
-            'status' => 'active',
+            'status'    => 'active',
         ]);
 
         $inactiveReferral = Referral::factory()->create([
             'is_active' => false,
-            'status' => 'active',
+            'status'    => 'active',
         ]);
 
         $pendingReferral = Referral::factory()->create([
             'is_active' => true,
-            'status' => 'pending',
+            'status'    => 'pending',
         ]);
 
         // Test that only active referrals with allowed status are returned
@@ -163,17 +163,17 @@ final class CompanyEmailCampaignSeoDataGlobalScopesTest extends TestCase
         // Test different combinations of referral scopes
         $referral1 = Referral::factory()->create([
             'is_active' => true,
-            'status' => 'active',
+            'status'    => 'active',
         ]);
 
         $referral2 = Referral::factory()->create([
             'is_active' => false,
-            'status' => 'active',
+            'status'    => 'active',
         ]);
 
         $referral3 = Referral::factory()->create([
             'is_active' => true,
-            'status' => 'pending',
+            'status'    => 'pending',
         ]);
 
         // Test bypassing specific scopes
@@ -225,22 +225,22 @@ final class CompanyEmailCampaignSeoDataGlobalScopesTest extends TestCase
         // Test multiple scope filtering with referrals
         $referral1 = Referral::factory()->create([
             'is_active' => true,
-            'status' => 'active',
+            'status'    => 'active',
         ]);
 
         $referral2 = Referral::factory()->create([
             'is_active' => false,
-            'status' => 'active',
+            'status'    => 'active',
         ]);
 
         $referral3 = Referral::factory()->create([
             'is_active' => true,
-            'status' => 'pending',
+            'status'    => 'pending',
         ]);
 
         $referral4 = Referral::factory()->create([
             'is_active' => false,
-            'status' => 'pending',
+            'status'    => 'pending',
         ]);
 
         // Test that only active referrals with allowed status are returned

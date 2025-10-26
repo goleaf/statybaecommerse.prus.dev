@@ -8,20 +8,20 @@ use Livewire\Livewire;
 
 it('can complete advanced checkout flow', function () {
     $product = Product::factory()->create([
-        'name' => 'Test Product',
-        'price' => 99.99,
+        'name'           => 'Test Product',
+        'price'          => 99.99,
         'stock_quantity' => 10,
-        'is_visible' => true,
+        'is_visible'     => true,
     ]);
 
     // Add product to cart first
     session()->put('cart', [
         [
-            'id' => $product->id,
-            'name' => $product->name,
-            'price' => $product->price,
+            'id'       => $product->id,
+            'name'     => $product->name,
+            'price'    => $product->price,
             'quantity' => 2,
-            'sku' => $product->sku,
+            'sku'      => $product->sku,
         ],
     ]);
 
@@ -60,9 +60,9 @@ it('can calculate totals correctly', function () {
 
     session()->put('cart', [
         [
-            'id' => $product->id,
-            'name' => $product->name,
-            'price' => 100.00,
+            'id'       => $product->id,
+            'name'     => $product->name,
+            'price'    => 100.00,
             'quantity' => 2,
         ],
     ]);
@@ -89,8 +89,8 @@ it('can show customer dashboard with stats', function () {
     // Create some test data
     $order = \App\Models\Order::factory()->create([
         'user_id' => $user->id,
-        'status' => 'completed',
-        'total' => 150.00,
+        'status'  => 'completed',
+        'total'   => 150.00,
     ]);
 
     Livewire::actingAs($user)

@@ -61,13 +61,13 @@ final class ProductIndexRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'q' => ['nullable', 'string', 'max:120'],
-            'category' => ['nullable', 'string', 'max:120', 'regex:/^[A-Za-z0-9_-]+$/'],
+            'q'         => ['nullable', 'string', 'max:120'],
+            'category'  => ['nullable', 'string', 'max:120', 'regex:/^[A-Za-z0-9_-]+$/'],
             'price_min' => ['nullable', 'numeric', 'min:0'],
             'price_max' => ['nullable', 'numeric', 'min:0', 'gte:price_min'],
-            'sort' => ['nullable', Rule::enum(ProductSort::class)],
-            'per_page' => ['nullable', 'integer', 'min:1', 'max:50'],
-            'page' => ['nullable', 'integer', 'min:1'],
+            'sort'      => ['nullable', Rule::enum(ProductSort::class)],
+            'per_page'  => ['nullable', 'integer', 'min:1', 'max:50'],
+            'page'      => ['nullable', 'integer', 'min:1'],
         ];
     }
 
@@ -82,13 +82,13 @@ final class ProductIndexRequest extends FormRequest
         $validated = parent::validated($key, $default);
 
         return array_merge([
-            'q' => null,
-            'category' => null,
+            'q'         => null,
+            'category'  => null,
             'price_min' => null,
             'price_max' => null,
-            'sort' => ProductSort::NAME_ASC->value,
-            'per_page' => 20,
-            'page' => 1,
+            'sort'      => ProductSort::NAME_ASC->value,
+            'per_page'  => 20,
+            'page'      => 1,
         ], $validated);
     }
 

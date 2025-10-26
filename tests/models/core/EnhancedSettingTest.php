@@ -34,11 +34,11 @@ final class EnhancedSettingTest extends TestCase
     public function test_enhanced_setting_has_correct_casts(): void
     {
         $expectedCasts = [
-            'id' => 'int',
+            'id'               => 'int',
             'validation_rules' => 'json',
-            'is_public' => 'boolean',
-            'is_encrypted' => 'boolean',
-            'sort_order' => 'integer',
+            'is_public'        => 'boolean',
+            'is_encrypted'     => 'boolean',
+            'sort_order'       => 'integer',
         ];
 
         $setting = new EnhancedSetting;
@@ -59,13 +59,13 @@ final class EnhancedSettingTest extends TestCase
     {
         $setting = new EnhancedSetting([
             'is_encrypted' => true,
-            'value' => encrypt('secret_value'),
+            'value'        => encrypt('secret_value'),
         ]);
 
         // Mock the encrypted value
         $setting->setRawAttributes([
             'is_encrypted' => true,
-            'value' => encrypt('secret_value'),
+            'value'        => encrypt('secret_value'),
         ]);
 
         $this->assertEquals('secret_value', $setting->value);
@@ -75,7 +75,7 @@ final class EnhancedSettingTest extends TestCase
     {
         $setting = new EnhancedSetting([
             'is_encrypted' => false,
-            'value' => 'plain_value',
+            'value'        => 'plain_value',
         ]);
 
         $this->assertEquals('plain_value', $setting->value);
@@ -135,21 +135,21 @@ final class EnhancedSettingTest extends TestCase
     public function test_enhanced_setting_ordered_scope(): void
     {
         $setting1 = EnhancedSetting::factory()->create([
-            'group' => 'general',
+            'group'      => 'general',
             'sort_order' => 3,
-            'key' => 'setting_c',
+            'key'        => 'setting_c',
         ]);
 
         $setting2 = EnhancedSetting::factory()->create([
-            'group' => 'general',
+            'group'      => 'general',
             'sort_order' => 1,
-            'key' => 'setting_a',
+            'key'        => 'setting_a',
         ]);
 
         $setting3 = EnhancedSetting::factory()->create([
-            'group' => 'email',
+            'group'      => 'email',
             'sort_order' => 2,
-            'key' => 'setting_b',
+            'key'        => 'setting_b',
         ]);
 
         $orderedSettings = EnhancedSetting::ordered()->get();
@@ -172,9 +172,9 @@ final class EnhancedSettingTest extends TestCase
         app()->setLocale('en');
 
         EnhancedSetting::factory()->create([
-            'key' => 'test_key',
-            'value' => 'test_value',
-            'type' => 'text',
+            'key'    => 'test_key',
+            'value'  => 'test_value',
+            'type'   => 'text',
             'locale' => 'en',
         ]);
 
@@ -194,7 +194,7 @@ final class EnhancedSettingTest extends TestCase
         EnhancedSetting::setValue('new_key', 'new_value', 'new_group');
 
         $this->assertDatabaseHas('enhanced_settings', [
-            'key' => 'new_key',
+            'key'   => 'new_key',
             'value' => 'new_value',
             'group' => 'new_group',
         ]);
@@ -203,7 +203,7 @@ final class EnhancedSettingTest extends TestCase
         EnhancedSetting::setValue('new_key', 'updated_value');
 
         $this->assertDatabaseHas('enhanced_settings', [
-            'key' => 'new_key',
+            'key'   => 'new_key',
             'value' => 'updated_value',
         ]);
 
@@ -218,15 +218,15 @@ final class EnhancedSettingTest extends TestCase
                 'key1' => 'value1',
                 'key2' => 'value2',
             ],
-            'array' => [1, 2, 3, 4, 5],
+            'array'   => [1, 2, 3, 4, 5],
             'boolean' => true,
-            'null' => null,
+            'null'    => null,
         ];
 
         $setting = EnhancedSetting::create([
-            'key' => 'json_test',
-            'value' => json_encode($jsonData),
-            'type' => 'json',
+            'key'    => 'json_test',
+            'value'  => json_encode($jsonData),
+            'type'   => 'json',
             'locale' => 'en',
         ]);
 
@@ -251,7 +251,7 @@ final class EnhancedSettingTest extends TestCase
         ];
 
         $setting = new EnhancedSetting([
-            'key' => 'validation_test',
+            'key'              => 'validation_test',
             'validation_rules' => $rules,
         ]);
 
@@ -264,8 +264,8 @@ final class EnhancedSettingTest extends TestCase
     public function test_enhanced_setting_boolean_values(): void
     {
         $setting = new EnhancedSetting([
-            'key' => 'boolean_test',
-            'is_public' => true,
+            'key'          => 'boolean_test',
+            'is_public'    => true,
             'is_encrypted' => false,
         ]);
 
@@ -278,7 +278,7 @@ final class EnhancedSettingTest extends TestCase
     public function test_enhanced_setting_sort_order_integer(): void
     {
         $setting = new EnhancedSetting([
-            'key' => 'sort_test',
+            'key'        => 'sort_test',
             'sort_order' => '123',  // String input
         ]);
 
@@ -289,9 +289,9 @@ final class EnhancedSettingTest extends TestCase
     public function test_enhanced_setting_handles_null_values(): void
     {
         $setting = new EnhancedSetting([
-            'key' => 'null_test',
-            'value' => null,
-            'description' => null,
+            'key'              => 'null_test',
+            'value'            => null,
+            'description'      => null,
             'validation_rules' => null,
         ]);
 
@@ -303,8 +303,8 @@ final class EnhancedSettingTest extends TestCase
     public function test_enhanced_setting_handles_empty_values(): void
     {
         $setting = new EnhancedSetting([
-            'key' => 'empty_test',
-            'value' => '',
+            'key'         => 'empty_test',
+            'value'       => '',
             'description' => '',
         ]);
 

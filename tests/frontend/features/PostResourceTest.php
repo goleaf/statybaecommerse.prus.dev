@@ -69,7 +69,7 @@ it('can edit a post', function (): void {
 it('saves tags as a comma separated string', function () {
     $post = Post::factory()->create([
         'user_id' => $this->user->id,
-        'tags' => 'alpha, beta',
+        'tags'    => 'alpha, beta',
     ]);
 
     Livewire::test(EditPost::class, ['record' => $post->getRouteKey()])

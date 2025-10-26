@@ -8,13 +8,13 @@ use App\Models\Product;
 
 it('can create an attribute', function () {
     $attribute = Attribute::factory()->create([
-        'name' => 'Color',
-        'slug' => 'color',
-        'type' => 'select',
-        'is_required' => true,
+        'name'          => 'Color',
+        'slug'          => 'color',
+        'type'          => 'select',
+        'is_required'   => true,
         'is_filterable' => true,
         'is_searchable' => false,
-        'sort_order' => 1,
+        'sort_order'    => 1,
     ]);
 
     expect($attribute->name)->toBe('Color');

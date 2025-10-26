@@ -6,8 +6,8 @@ namespace App\Support\Filament\Components;
 
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\DateTimePicker;
-use Filament\Schemas\Components\Group;
 use Filament\Forms\Components\TimePicker;
+use Filament\Schemas\Components\Group;
 
 final class Flatpickr
 {

@@ -26,7 +26,7 @@ final class DiagnosticsSeedersTest extends TestCase
     /**
      * Ensure the notification seeder executes successfully and persists notification records.
      */
-    public function testNotificationSeederCreatesRecords(): void
+    public function test_notification_seeder_creates_records(): void
     {
         Artisan::call('db:seed', ['--class' => NotificationSeeder::class, '--no-interaction' => true]);
 
@@ -36,7 +36,7 @@ final class DiagnosticsSeedersTest extends TestCase
     /**
      * Confirm the comprehensive order seeder builds orders with associated order items.
      */
-    public function testOrderSeederBuildsOrdersWithItems(): void
+    public function test_order_seeder_builds_orders_with_items(): void
     {
         Artisan::call('db:seed', ['--class' => OrderSeeder::class, '--no-interaction' => true]);
 
@@ -47,7 +47,7 @@ final class DiagnosticsSeedersTest extends TestCase
     /**
      * Verify the partner seeder provisions tiers and partner records without throwing exceptions.
      */
-    public function testPartnerSeederPopulatesTiersAndPartners(): void
+    public function test_partner_seeder_populates_tiers_and_partners(): void
     {
         Artisan::call('db:seed', ['--class' => PartnerSeeder::class, '--no-interaction' => true]);
 

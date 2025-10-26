@@ -8,6 +8,7 @@ use App\Data\Pricing\PriceBreakdown;
 use App\Models\Order;
 use App\Services\Pricing\PriceConfiguration;
 use App\Support\Contracts\ContractPathResolver;
+use BackedEnum;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 
@@ -33,7 +34,7 @@ final class OrderContract
 
         return self::envelope([
             'order' => $orderPayload,
-            'item' => $orderPayload,
+            'item'  => $orderPayload,
         ], $meta);
     }
 
@@ -46,7 +47,7 @@ final class OrderContract
 
         return self::envelope([
             'orders' => $items,
-            'items' => $items,
+            'items'  => $items,
         ], $meta + ['total' => count($items)]);
     }
 
@@ -64,8 +65,8 @@ final class OrderContract
             'id'     => $order->getKey(),
             'number' => (string) $order->number,
             'status' => [
-                'state'         => $status instanceof \BackedEnum ? $status->value : (string) $status,
-                'payment_state' => $paymentStatus instanceof \BackedEnum ? $paymentStatus->value : $paymentStatus,
+                'state'         => $status instanceof BackedEnum ? $status->value : (string) $status,
+                'payment_state' => $paymentStatus instanceof BackedEnum ? $paymentStatus->value : $paymentStatus,
             ],
             'totals' => $breakdown->toContractTotals(),
             'items'  => $order->items->map(static fn ($item): array => [

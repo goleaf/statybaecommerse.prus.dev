@@ -18,8 +18,8 @@ final class LowStockAlertTest extends TestCase
     public function test_notification_can_be_created(): void
     {
         $product = Product::factory()->create([
-            'name' => 'Test Product',
-            'stock_quantity' => 5,
+            'name'                => 'Test Product',
+            'stock_quantity'      => 5,
             'low_stock_threshold' => 10,
         ]);
 
@@ -43,9 +43,9 @@ final class LowStockAlertTest extends TestCase
     {
         $user = User::factory()->create();
         $product = Product::factory()->create([
-            'name' => 'Test Product',
-            'sku' => 'TEST-001',
-            'stock_quantity' => 5,
+            'name'                => 'Test Product',
+            'sku'                 => 'TEST-001',
+            'stock_quantity'      => 5,
             'low_stock_threshold' => 10,
         ]);
 
@@ -70,8 +70,8 @@ final class LowStockAlertTest extends TestCase
     {
         $user = User::factory()->create();
         $product = Product::factory()->create([
-            'name' => 'Test Product',
-            'stock_quantity' => 5,
+            'name'                => 'Test Product',
+            'stock_quantity'      => 5,
             'low_stock_threshold' => 10,
         ]);
 
@@ -80,8 +80,8 @@ final class LowStockAlertTest extends TestCase
 
         $this->assertDatabaseHas('notifications', [
             'notifiable_type' => User::class,
-            'notifiable_id' => $user->id,
-            'type' => LowStockAlert::class,
+            'notifiable_id'   => $user->id,
+            'type'            => LowStockAlert::class,
         ]);
 
         $dbNotification = DatabaseNotification::where('notifiable_id', $user->id)->first();

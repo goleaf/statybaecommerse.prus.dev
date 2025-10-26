@@ -21,7 +21,7 @@ class SystemSettingCategoryResourceTest extends TestCase
         parent::setUp();
 
         $this->adminUser = User::factory()->create([
-            'email' => 'admin@example.com',
+            'email'    => 'admin@example.com',
             'is_admin' => true,
         ]);
     }
@@ -38,13 +38,13 @@ class SystemSettingCategoryResourceTest extends TestCase
     public function test_can_create_system_setting_category(): void
     {
         $categoryData = [
-            'name' => 'Test Category',
-            'slug' => 'test-category',
+            'name'        => 'Test Category',
+            'slug'        => 'test-category',
             'description' => 'Test description',
-            'icon' => 'heroicon-o-cog',
-            'color' => '#FF0000',
-            'sort_order' => 1,
-            'is_active' => true,
+            'icon'        => 'heroicon-o-cog',
+            'color'       => '#FF0000',
+            'sort_order'  => 1,
+            'is_active'   => true,
         ];
 
         Livewire::actingAs($this->adminUser)
@@ -54,13 +54,13 @@ class SystemSettingCategoryResourceTest extends TestCase
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('system_setting_categories', [
-            'name' => 'Test Category',
-            'slug' => 'test-category',
+            'name'        => 'Test Category',
+            'slug'        => 'test-category',
             'description' => 'Test description',
-            'icon' => 'heroicon-o-cog',
-            'color' => '#FF0000',
-            'sort_order' => 1,
-            'is_active' => true,
+            'icon'        => 'heroicon-o-cog',
+            'color'       => '#FF0000',
+            'sort_order'  => 1,
+            'is_active'   => true,
         ]);
     }
 
@@ -72,8 +72,8 @@ class SystemSettingCategoryResourceTest extends TestCase
         ]);
 
         $updatedData = [
-            'name' => 'Updated Name',
-            'slug' => 'updated-slug',
+            'name'        => 'Updated Name',
+            'slug'        => 'updated-slug',
             'description' => 'Updated description',
         ];
 
@@ -84,9 +84,9 @@ class SystemSettingCategoryResourceTest extends TestCase
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('system_setting_categories', [
-            'id' => $category->id,
-            'name' => 'Updated Name',
-            'slug' => 'updated-slug',
+            'id'          => $category->id,
+            'name'        => 'Updated Name',
+            'slug'        => 'updated-slug',
             'description' => 'Updated description',
         ]);
     }
@@ -94,14 +94,14 @@ class SystemSettingCategoryResourceTest extends TestCase
     public function test_can_view_system_setting_category(): void
     {
         $category = SystemSettingCategory::factory()->create([
-            'name' => 'Test Category',
+            'name'        => 'Test Category',
             'description' => 'Test description',
         ]);
 
         Livewire::actingAs($this->adminUser)
             ->test('filament.admin.resources.system-setting-categories.pages.view-system-setting-category', ['record' => $category->id])
             ->assertFormSet([
-                'name' => 'Test Category',
+                'name'        => 'Test Category',
                 'description' => 'Test description',
             ]);
     }
@@ -148,7 +148,7 @@ class SystemSettingCategoryResourceTest extends TestCase
 
         foreach ($categories as $category) {
             $this->assertDatabaseHas('system_setting_categories', [
-                'id' => $category->id,
+                'id'        => $category->id,
                 'is_active' => true,
             ]);
         }
@@ -166,7 +166,7 @@ class SystemSettingCategoryResourceTest extends TestCase
 
         foreach ($categories as $category) {
             $this->assertDatabaseHas('system_setting_categories', [
-                'id' => $category->id,
+                'id'        => $category->id,
                 'is_active' => false,
             ]);
         }
@@ -177,7 +177,7 @@ class SystemSettingCategoryResourceTest extends TestCase
         $parentCategory = SystemSettingCategory::factory()->create(['name' => 'Parent Category']);
         $childCategory = SystemSettingCategory::factory()->create([
             'parent_id' => $parentCategory->id,
-            'name' => 'Child Category',
+            'name'      => 'Child Category',
         ]);
         $otherCategory = SystemSettingCategory::factory()->create(['name' => 'Other Category']);
 
@@ -257,8 +257,8 @@ class SystemSettingCategoryResourceTest extends TestCase
     {
         $parentCategory = SystemSettingCategory::factory()->create(['name' => 'Parent Category']);
         $childData = [
-            'name' => 'Child Category',
-            'slug' => 'child-category',
+            'name'      => 'Child Category',
+            'slug'      => 'child-category',
             'parent_id' => $parentCategory->id,
         ];
 
@@ -269,8 +269,8 @@ class SystemSettingCategoryResourceTest extends TestCase
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('system_setting_categories', [
-            'name' => 'Child Category',
-            'slug' => 'child-category',
+            'name'      => 'Child Category',
+            'slug'      => 'child-category',
             'parent_id' => $parentCategory->id,
         ]);
     }

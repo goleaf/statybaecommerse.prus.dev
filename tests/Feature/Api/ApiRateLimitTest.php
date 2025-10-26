@@ -1,12 +1,12 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Tests\Feature\Api;
 
 use App\Enums\ExportStatus;
 use App\Models\Export;
 use App\Models\User;
-use Illuminate\Support\Facades\RateLimiter;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
 use Laravel\Sanctum\Sanctum;
 
@@ -39,10 +39,10 @@ final class ApiRateLimitTest extends RateLimitTestCase
         $this->saturateRateLimit($user, 'autocomplete', 'api.autocomplete');
 
         $payload = [
-            'model_class' => User::class,
+            'model_class'  => User::class,
             'search_field' => 'name',
-            'label_field' => 'name',
-            'value_field' => 'id',
+            'label_field'  => 'name',
+            'value_field'  => 'id',
             'search_query' => 'Jane',
         ];
 
@@ -59,11 +59,11 @@ final class ApiRateLimitTest extends RateLimitTestCase
         $export = Export::factory()
             ->for($user, 'requestedBy')
             ->create([
-                'status' => ExportStatus::Completed,
-                'artifact_disk' => 'public',
-                'artifact_path' => 'exports/example.csv',
+                'status'            => ExportStatus::Completed,
+                'artifact_disk'     => 'public',
+                'artifact_path'     => 'exports/example.csv',
                 'artifact_filename' => 'example.csv',
-                'requested_by' => $user->getKey(),
+                'requested_by'      => $user->getKey(),
             ]);
 
         $this->clearRateLimit($user, 'exports', 'api.exports');

@@ -20,15 +20,15 @@ class CollectionFactory extends Factory
         $name = $this->faker->unique()->words(2, true);
 
         return [
-            'name' => Str::title($name),
-            'slug' => Str::slug($name.'-'.$this->faker->unique()->randomNumber()),
-            'description' => $this->faker->boolean(60) ? '<p>'.$this->faker->paragraphs(2, true).'</p>' : null,
-            'is_visible' => true,
-            'is_active' => true,
-            'sort_order' => $this->faker->numberBetween(0, 10),
-            'seo_title' => $this->faker->boolean(40) ? $this->faker->sentence(6) : null,
+            'name'            => Str::title($name),
+            'slug'            => Str::slug($name . '-' . $this->faker->unique()->randomNumber()),
+            'description'     => $this->faker->boolean(60) ? '<p>' . $this->faker->paragraphs(2, true) . '</p>' : null,
+            'is_visible'      => true,
+            'is_active'       => true,
+            'sort_order'      => $this->faker->numberBetween(0, 10),
+            'seo_title'       => $this->faker->boolean(40) ? $this->faker->sentence(6) : null,
             'seo_description' => $this->faker->boolean(40) ? $this->faker->sentence(12) : null,
-            'is_automatic' => false,
+            'is_automatic'    => false,
         ];
     }
 

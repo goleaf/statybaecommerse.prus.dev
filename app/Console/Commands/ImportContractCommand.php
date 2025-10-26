@@ -54,7 +54,7 @@ final class ImportContractCommand extends Command
             $disk->makeDirectory($importsPath);
         }
 
-        $relativePath = $importsPath.'/'.$file;
+        $relativePath = $importsPath . '/' . $file;
         if (! $disk->exists($relativePath)) {
             throw new InvalidArgumentException("Import file [{$relativePath}] does not exist on disk [{$diskName}].");
         }
@@ -66,8 +66,8 @@ final class ImportContractCommand extends Command
         Log::channel((string) config('data-transfer.log_channel', 'maintenance'))
             ->info('Data contract import completed.', [
                 'contract' => $contractKey,
-                'format' => $format,
-                'path' => $absolutePath,
+                'format'   => $format,
+                'path'     => $absolutePath,
             ]);
 
         $this->components->info("Import completed from: {$absolutePath}");

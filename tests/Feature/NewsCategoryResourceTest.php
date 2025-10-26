@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Tests\Feature;
 
@@ -17,7 +19,7 @@ final class NewsCategoryResourceTest extends TestCase
         parent::setUp();
 
         $adminUser = User::factory()->create([
-            'email' => 'admin@example.com',
+            'email'    => 'admin@example.com',
             'is_admin' => true,
         ]);
 
@@ -38,13 +40,13 @@ final class NewsCategoryResourceTest extends TestCase
     {
         // Arrange
         $categoryData = [
-            'name' => 'Test Category',
-            'slug' => 'test-category',
+            'name'        => 'Test Category',
+            'slug'        => 'test-category',
             'description' => 'Test category description',
-            'color' => '#FF0000',
-            'icon' => 'heroicon-o-tag',
-            'sort_order' => 1,
-            'is_visible' => true,
+            'color'       => '#FF0000',
+            'icon'        => 'heroicon-o-tag',
+            'sort_order'  => 1,
+            'is_visible'  => true,
         ];
 
         // Act
@@ -55,9 +57,9 @@ final class NewsCategoryResourceTest extends TestCase
 
         // Assert
         $this->assertDatabaseHas('news_categories', [
-            'slug' => 'test-category',
-            'color' => '#FF0000',
-            'icon' => 'heroicon-o-tag',
+            'slug'       => 'test-category',
+            'color'      => '#FF0000',
+            'icon'       => 'heroicon-o-tag',
             'sort_order' => 1,
             'is_visible' => true,
         ]);
@@ -67,15 +69,15 @@ final class NewsCategoryResourceTest extends TestCase
     {
         // Arrange
         $category = NewsCategory::factory()->create([
-            'name' => 'Original Category',
+            'name'  => 'Original Category',
             'color' => '#000000',
         ]);
 
         $updatedData = [
-            'name' => 'Updated Category',
+            'name'        => 'Updated Category',
             'description' => 'Updated description',
-            'color' => '#FF0000',
-            'is_visible' => false,
+            'color'       => '#FF0000',
+            'is_visible'  => false,
         ];
 
         // Act
@@ -88,8 +90,8 @@ final class NewsCategoryResourceTest extends TestCase
 
         // Assert
         $this->assertDatabaseHas('news_categories', [
-            'id' => $category->id,
-            'color' => '#FF0000',
+            'id'         => $category->id,
+            'color'      => '#FF0000',
             'is_visible' => false,
         ]);
     }
@@ -205,24 +207,24 @@ final class NewsCategoryResourceTest extends TestCase
     {
         // Arrange
         $category = NewsCategory::factory()->create([
-            'name' => 'Test Category',
-            'slug' => 'test-category',
+            'name'        => 'Test Category',
+            'slug'        => 'test-category',
             'description' => 'Test description',
-            'color' => '#FF0000',
-            'icon' => 'heroicon-o-tag',
+            'color'       => '#FF0000',
+            'icon'        => 'heroicon-o-tag',
         ]);
 
         $category->translations()->createMany([
             [
-                'locale' => 'lt',
-                'name' => 'Test Category',
-                'slug' => 'test-category-lt',
+                'locale'      => 'lt',
+                'name'        => 'Test Category',
+                'slug'        => 'test-category-lt',
                 'description' => 'Test description',
             ],
             [
-                'locale' => 'en',
-                'name' => 'Test Category',
-                'slug' => 'test-category-en',
+                'locale'      => 'en',
+                'name'        => 'Test Category',
+                'slug'        => 'test-category-en',
                 'description' => 'Test description',
             ],
         ]);
@@ -232,11 +234,11 @@ final class NewsCategoryResourceTest extends TestCase
             'record' => $category->slug,
         ])
             ->assertFormSet([
-                'name' => 'Test Category',
-                'slug' => 'test-category',
+                'name'        => 'Test Category',
+                'slug'        => 'test-category',
                 'description' => 'Test description',
-                'color' => '#FF0000',
-                'icon' => 'heroicon-o-tag',
+                'color'       => '#FF0000',
+                'icon'        => 'heroicon-o-tag',
             ]);
     }
 
@@ -259,9 +261,9 @@ final class NewsCategoryResourceTest extends TestCase
         $parentCategory = NewsCategory::factory()->create();
 
         $childCategoryData = [
-            'name' => 'Child Category',
-            'slug' => 'child-category',
-            'parent_id' => $parentCategory->id,
+            'name'       => 'Child Category',
+            'slug'       => 'child-category',
+            'parent_id'  => $parentCategory->id,
             'sort_order' => 1,
         ];
 
@@ -273,8 +275,8 @@ final class NewsCategoryResourceTest extends TestCase
 
         // Assert
         $this->assertDatabaseHas('news_categories', [
-            'name' => 'Child Category',
-            'slug' => 'child-category',
+            'name'      => 'Child Category',
+            'slug'      => 'child-category',
             'parent_id' => $parentCategory->id,
         ]);
     }
@@ -291,7 +293,7 @@ final class NewsCategoryResourceTest extends TestCase
 
         // Assert
         $this->assertDatabaseHas('news_categories', [
-            'id' => $category2->id,
+            'id'         => $category2->id,
             'sort_order' => 1,
         ]);
     }
@@ -315,7 +317,7 @@ final class NewsCategoryResourceTest extends TestCase
     {
         // Arrange
         $categoryData = [
-            'name' => 'Test Category Name',
+            'name'        => 'Test Category Name',
             'description' => 'Test description',
         ];
 

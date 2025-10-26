@@ -11,6 +11,7 @@ use App\Models\Product;
 use App\Models\Setting;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Schema;
 use Tests\TestCase;
 
 final class ComprehensiveSystemTest extends TestCase
@@ -122,7 +123,7 @@ final class ComprehensiveSystemTest extends TestCase
     public function test_settings_system_works(): void
     {
         Setting::factory()->create([
-            'key' => 'test_setting',
+            'key'   => 'test_setting',
             'value' => 'test_value',
         ]);
 
@@ -132,14 +133,14 @@ final class ComprehensiveSystemTest extends TestCase
     public function test_cart_session_functionality(): void
     {
         $product = Product::factory()->create([
-            'is_visible' => true,
+            'is_visible'     => true,
             'stock_quantity' => 10,
         ]);
 
         session()->put('cart', [
             $product->id => [
-                'name' => $product->name,
-                'price' => $product->price,
+                'name'     => $product->name,
+                'price'    => $product->price,
                 'quantity' => 2,
             ],
         ]);
@@ -156,14 +157,14 @@ final class ComprehensiveSystemTest extends TestCase
         // Create translations
         $category->translations()->create([
             'locale' => 'en',
-            'name' => 'Electronics',
-            'slug' => 'electronics',
+            'name'   => 'Electronics',
+            'slug'   => 'electronics',
         ]);
 
         $category->translations()->create([
             'locale' => 'lt',
-            'name' => 'Elektronika',
-            'slug' => 'elektronika',
+            'name'   => 'Elektronika',
+            'slug'   => 'elektronika',
         ]);
 
         app()->setLocale('en');
@@ -176,7 +177,7 @@ final class ComprehensiveSystemTest extends TestCase
     public function test_product_visibility_and_publishing_works(): void
     {
         $visibleProduct = Product::factory()->create([
-            'is_visible' => true,
+            'is_visible'   => true,
             'published_at' => now()->subDay(),
         ]);
 
@@ -185,7 +186,7 @@ final class ComprehensiveSystemTest extends TestCase
         ]);
 
         $unpublishedProduct = Product::factory()->create([
-            'is_visible' => true,
+            'is_visible'   => true,
             'published_at' => now()->addDay(),
         ]);
 
@@ -204,7 +205,7 @@ final class ComprehensiveSystemTest extends TestCase
     private function assertDatabaseTableExists(string $table): void
     {
         $this->assertTrue(
-            \Schema::hasTable($table),
+            Schema::hasTable($table),
             "Database table '{$table}' does not exist"
         );
     }

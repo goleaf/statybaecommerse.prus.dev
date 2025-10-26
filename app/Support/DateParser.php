@@ -7,6 +7,7 @@ namespace App\Support;
 use DateTime;
 use DateTimeInterface;
 use Illuminate\Support\Carbon;
+use Throwable;
 
 final class DateParser
 {
@@ -23,7 +24,7 @@ final class DateParser
         if (is_string($value) && trim($value) !== '') {
             try {
                 return Carbon::parse($value);
-            } catch (\Throwable) {
+            } catch (Throwable) {
                 // fallthrough to fallback handling
             }
         }
@@ -50,4 +51,3 @@ final class DateParser
         return Carbon::instance($dt);
     }
 }
-

@@ -37,7 +37,7 @@ final class SearchController extends Controller
                 })
                 ->paginate(20)
                 ->appends([
-                    'q' => $query,
+                    'q'        => $query,
                     'category' => $category,
                 ])
                 ->withPath(route('frontend.search.index'));
@@ -65,9 +65,9 @@ final class SearchController extends Controller
             ->get(['id', 'name', 'slug'])
             ->map(function ($product) {
                 return [
-                    'id' => $product->id,
+                    'id'   => $product->id,
                     'name' => $product->name,
-                    'url' => route('frontend.products.show', $product),
+                    'url'  => route('frontend.products.show', $product),
                 ];
             });
 

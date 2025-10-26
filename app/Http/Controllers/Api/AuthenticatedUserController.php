@@ -37,7 +37,7 @@ final class AuthenticatedUserController extends Controller
         if ($user->trashed()) {
             return response()->json([
                 'success' => false,
-                'message' => __('errors.'.ErrorCodes::NOT_FOUND),
+                'message' => __('errors.' . ErrorCodes::NOT_FOUND),
             ], 404);
         }
 
@@ -53,23 +53,23 @@ final class AuthenticatedUserController extends Controller
         } catch (Throwable $exception) {
             Log::warning('Fell back to minimal authenticated user payload.', [
                 'exception' => $exception,
-                'user_id' => $user->getKey(),
+                'user_id'   => $user->getKey(),
             ]);
 
             return response()->json([
                 'contract' => UserContract::CONTRACT,
-                'version' => UserContract::VERSION,
-                'data' => [
-                    'id' => $user->getKey(),
+                'version'  => UserContract::VERSION,
+                'data'     => [
+                    'id'        => $user->getKey(),
                     'full_name' => $user->full_name,
-                    'contact' => [
+                    'contact'   => [
                         'email' => $user->email,
                         'phone' => $user->phone_number,
                     ],
                 ],
                 'meta' => [
                     'generated_at' => now()->toISOString(),
-                    'is_partial' => true,
+                    'is_partial'   => true,
                 ],
             ]);
         }

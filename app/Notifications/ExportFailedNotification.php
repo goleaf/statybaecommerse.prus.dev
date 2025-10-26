@@ -33,7 +33,7 @@ final class ExportFailedNotification extends Notification implements ShouldQueue
         // Provide a helpful fallback so the copy stays readable without a stored reason.
         $reason = $this->export->failure_reason ?? __('exports.notifications.failed.unknown_reason');
 
-        return (new MailMessage())
+        return (new MailMessage)
             ->subject(__('exports.notifications.failed.subject', ['name' => $this->export->name]))
             ->line(__('exports.notifications.failed.intro'))
             ->line(__('exports.notifications.failed.reason', ['reason' => $reason]))
@@ -47,9 +47,9 @@ final class ExportFailedNotification extends Notification implements ShouldQueue
     {
         // Store the reason along with the key data for follow-up debugging.
         return [
-            'export_id' => $this->export->getKey(),
-            'name' => $this->export->name,
-            'status' => $this->export->status->value,
+            'export_id'      => $this->export->getKey(),
+            'name'           => $this->export->name,
+            'status'         => $this->export->status->value,
             'failure_reason' => $this->export->failure_reason ?? __('exports.notifications.failed.unknown_reason'),
         ];
     }

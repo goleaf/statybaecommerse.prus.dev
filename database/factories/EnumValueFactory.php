@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -17,19 +19,19 @@ class EnumValueFactory extends Factory
     public function definition(): array
     {
         $types = [
-            'navigation_group' => 'Navigation Group',
-            'order_status' => 'Order Status',
-            'payment_status' => 'Payment Status',
-            'shipping_status' => 'Shipping Status',
-            'user_role' => 'User Role',
-            'product_status' => 'Product Status',
-            'campaign_type' => 'Campaign Type',
-            'discount_type' => 'Discount Type',
+            'navigation_group'  => 'Navigation Group',
+            'order_status'      => 'Order Status',
+            'payment_status'    => 'Payment Status',
+            'shipping_status'   => 'Shipping Status',
+            'user_role'         => 'User Role',
+            'product_status'    => 'Product Status',
+            'campaign_type'     => 'Campaign Type',
+            'discount_type'     => 'Discount Type',
             'notification_type' => 'Notification Type',
-            'document_type' => 'Document Type',
-            'address_type' => 'Address Type',
-            'priority' => 'Priority',
-            'status' => 'Status',
+            'document_type'     => 'Document Type',
+            'address_type'      => 'Address Type',
+            'priority'          => 'Priority',
+            'status'            => 'Status',
         ];
 
         $type = fake()->randomElement(array_keys($types));
@@ -37,19 +39,19 @@ class EnumValueFactory extends Factory
         $value = fake()->words(2, true);
 
         return [
-            'type' => $type,
-            'key' => $key,
-            'value' => $value,
-            'name' => fake()->words(3, true),
+            'type'        => $type,
+            'key'         => $key,
+            'value'       => $value,
+            'name'        => fake()->words(3, true),
             'description' => fake()->sentence(),
-            'sort_order' => fake()->numberBetween(1, 100),
-            'is_active' => fake()->boolean(80),
-            'is_default' => fake()->boolean(10),
-            'metadata' => [
+            'sort_order'  => fake()->numberBetween(1, 100),
+            'is_active'   => fake()->boolean(80),
+            'is_default'  => fake()->boolean(10),
+            'metadata'    => [
                 'usage_count' => fake()->numberBetween(0, 100),
-                'color' => fake()->hexColor(),
-                'icon' => fake()->randomElement(['heroicon-o-star', 'heroicon-o-check', 'heroicon-o-x']),
-                'category' => fake()->word(),
+                'color'       => fake()->hexColor(),
+                'icon'        => fake()->randomElement(['heroicon-o-star', 'heroicon-o-check', 'heroicon-o-x']),
+                'category'    => fake()->word(),
             ],
         ];
     }
@@ -78,8 +80,8 @@ class EnumValueFactory extends Factory
     public function navigationGroup(): static
     {
         return $this->state(fn (array $attributes) => [
-            'type' => 'navigation_group',
-            'key' => fake()->randomElement(['products', 'orders', 'customers', 'marketing', 'reports', 'system']),
+            'type'  => 'navigation_group',
+            'key'   => fake()->randomElement(['products', 'orders', 'customers', 'marketing', 'reports', 'system']),
             'value' => fake()->words(2, true),
         ]);
     }
@@ -87,8 +89,8 @@ class EnumValueFactory extends Factory
     public function orderStatus(): static
     {
         return $this->state(fn (array $attributes) => [
-            'type' => 'order_status',
-            'key' => fake()->randomElement(['pending', 'processing', 'shipped', 'delivered', 'cancelled', 'refunded']),
+            'type'  => 'order_status',
+            'key'   => fake()->randomElement(['pending', 'processing', 'shipped', 'delivered', 'cancelled', 'refunded']),
             'value' => fake()->words(2, true),
         ]);
     }
@@ -96,8 +98,8 @@ class EnumValueFactory extends Factory
     public function paymentStatus(): static
     {
         return $this->state(fn (array $attributes) => [
-            'type' => 'payment_status',
-            'key' => fake()->randomElement(['pending', 'paid', 'failed', 'refunded', 'partially_refunded']),
+            'type'  => 'payment_status',
+            'key'   => fake()->randomElement(['pending', 'paid', 'failed', 'refunded', 'partially_refunded']),
             'value' => fake()->words(2, true),
         ]);
     }

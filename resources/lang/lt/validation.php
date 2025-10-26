@@ -1,22 +1,24 @@
 <?php
 
+declare(strict_types=1);
+
 return [
     'required' => 'Laukas :attribute yra privalomas.',
-    'email' => ':attribute turi būti galiojantis el. pašto adresas.',
-    'min' => [
-        'string' => ':attribute turi būti ne trumpesnis nei :min simbolių.',
+    'email'    => ':attribute turi būti galiojantis el. pašto adresas.',
+    'min'      => [
+        'string'  => ':attribute turi būti ne trumpesnis nei :min simbolių.',
         'numeric' => ':attribute turi būti ne mažesnis nei :min.',
     ],
     'max' => [
-        'string' => ':attribute negali būti ilgesnis nei :max simbolių.',
+        'string'  => ':attribute negali būti ilgesnis nei :max simbolių.',
         'numeric' => ':attribute negali būti didesnis nei :max.',
     ],
-    'unique' => ':attribute jau egzistuoja.',
-    'confirmed' => ':attribute patvirtinimas nesutampa.',
+    'unique'     => ':attribute jau egzistuoja.',
+    'confirmed'  => ':attribute patvirtinimas nesutampa.',
     'attributes' => [
-        'email' => 'el. paštas',
-        'password' => 'slaptažodis',
+        'email'      => 'el. paštas',
+        'password'   => 'slaptažodis',
         'first_name' => 'vardas',
-        'last_name' => 'pavardė',
+        'last_name'  => 'pavardė',
     ],
 ];

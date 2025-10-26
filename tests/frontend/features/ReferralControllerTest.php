@@ -7,8 +7,9 @@ namespace Tests\Feature\Frontend;
 use App\Models\Referral;
 use App\Models\ReferralReward;
 use App\Models\User;
-use Illuminate\Pagination\LengthAwarePaginator;
+use DB;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Tests\TestCase;
 
 final class ReferralControllerTest extends TestCase
@@ -61,8 +62,8 @@ final class ReferralControllerTest extends TestCase
 
         $response = $this->post(route('referrals.store'), [
             'referred_email' => $referredUser->email,
-            'title' => 'Test Referral',
-            'description' => 'Test Description',
+            'title'          => 'Test Referral',
+            'description'    => 'Test Description',
         ]);
 
         $response->assertRedirect(route('referrals.index'));
@@ -71,7 +72,7 @@ final class ReferralControllerTest extends TestCase
         $this->assertDatabaseHas('referrals', [
             'referrer_id' => $this->user->id,
             'referred_id' => $referredUser->id,
-            'status' => 'pending',
+            'status'      => 'pending',
         ]);
     }
 
@@ -79,8 +80,8 @@ final class ReferralControllerTest extends TestCase
     {
         $response = $this->post(route('referrals.store'), [
             'referred_email' => $this->user->email,
-            'title' => 'Test Referral',
-            'description' => 'Test Description',
+            'title'          => 'Test Referral',
+            'description'    => 'Test Description',
         ]);
 
         $response->assertRedirect();
@@ -98,8 +99,8 @@ final class ReferralControllerTest extends TestCase
 
         $response = $this->post(route('referrals.store'), [
             'referred_email' => $referredUser->email,
-            'title' => 'Test Referral',
-            'description' => 'Test Description',
+            'title'          => 'Test Referral',
+            'description'    => 'Test Description',
         ]);
 
         $response->assertRedirect();
@@ -114,7 +115,7 @@ final class ReferralControllerTest extends TestCase
             Referral::factory()->create([
                 'referrer_id' => $this->user->id,
                 'referred_id' => $referredUser->id,
-                'status' => 'pending',
+                'status'      => 'pending',
             ]);
         }
 
@@ -122,8 +123,8 @@ final class ReferralControllerTest extends TestCase
 
         $response = $this->post(route('referrals.store'), [
             'referred_email' => $newReferredUser->email,
-            'title' => 'Test Referral',
-            'description' => 'Test Description',
+            'title'          => 'Test Referral',
+            'description'    => 'Test Description',
         ]);
 
         $response->assertRedirect();
@@ -133,7 +134,7 @@ final class ReferralControllerTest extends TestCase
     public function test_validation_requires_referred_email(): void
     {
         $response = $this->post(route('referrals.store'), [
-            'title' => 'Test Referral',
+            'title'       => 'Test Referral',
             'description' => 'Test Description',
         ]);
 
@@ -144,8 +145,8 @@ final class ReferralControllerTest extends TestCase
     {
         $response = $this->post(route('referrals.store'), [
             'referred_email' => 'invalid-email',
-            'title' => 'Test Referral',
-            'description' => 'Test Description',
+            'title'          => 'Test Referral',
+            'description'    => 'Test Description',
         ]);
 
         $response->assertSessionHasErrors(['referred_email']);
@@ -155,8 +156,8 @@ final class ReferralControllerTest extends TestCase
     {
         $response = $this->post(route('referrals.store'), [
             'referred_email' => 'nonexistent@example.com',
-            'title' => 'Test Referral',
-            'description' => 'Test Description',
+            'title'          => 'Test Referral',
+            'description'    => 'Test Description',
         ]);
 
         $response->assertSessionHasErrors(['referred_email']);
@@ -185,7 +186,7 @@ final class ReferralControllerTest extends TestCase
         $response->assertJson([
             'success' => false,
             'message' => __('referrals.code_already_exists'),
-            'code' => 'EXISTING',
+            'code'    => 'EXISTING',
         ]);
     }
 
@@ -193,9 +194,9 @@ final class ReferralControllerTest extends TestCase
     {
         $referrer = User::factory()->create();
         $referral = Referral::factory()->create([
-            'referrer_id' => $referrer->id,
+            'referrer_id'   => $referrer->id,
             'referral_code' => 'TEST123',
-            'status' => 'pending',
+            'status'        => 'pending',
         ]);
 
         $response = $this->post(route('referrals.apply_code'), [
@@ -209,7 +210,7 @@ final class ReferralControllerTest extends TestCase
         ]);
 
         $this->assertDatabaseHas('referrals', [
-            'id' => $referral->id,
+            'id'          => $referral->id,
             'referred_id' => $this->user->id,
         ]);
     }
@@ -230,9 +231,9 @@ final class ReferralControllerTest extends TestCase
     public function test_cannot_apply_own_code(): void
     {
         $referral = Referral::factory()->create([
-            'referrer_id' => $this->user->id,
+            'referrer_id'   => $this->user->id,
             'referral_code' => 'OWNCODE',
-            'status' => 'pending',
+            'status'        => 'pending',
         ]);
 
         $response = $this->post(route('referrals.apply_code'), [
@@ -250,9 +251,9 @@ final class ReferralControllerTest extends TestCase
     {
         $referrer = User::factory()->create();
         $referral = Referral::factory()->create([
-            'referrer_id' => $referrer->id,
+            'referrer_id'   => $referrer->id,
             'referral_code' => 'TEST123',
-            'status' => 'pending',
+            'status'        => 'pending',
         ]);
 
         // Create existing referral for this user
@@ -349,8 +350,8 @@ final class ReferralControllerTest extends TestCase
 
         $response = $this->post(route('referrals.store'), [
             'referred_email' => $referredUser->email,
-            'title' => 'Test Referral',
-            'description' => 'Test Description',
+            'title'          => 'Test Referral',
+            'description'    => 'Test Description',
         ], [
             'HTTP_USER_AGENT' => 'Test Browser',
         ]);
@@ -372,8 +373,8 @@ final class ReferralControllerTest extends TestCase
 
         $response = $this->post(route('referrals.store'), [
             'referred_email' => $referredUser->email,
-            'title' => 'Test Referral',
-            'description' => 'Test Description',
+            'title'          => 'Test Referral',
+            'description'    => 'Test Description',
         ]);
 
         $response->assertRedirect(route('referrals.index'));
@@ -391,13 +392,13 @@ final class ReferralControllerTest extends TestCase
         $referredUser = User::factory()->create();
 
         // Mock database error
-        \DB::shouldReceive('beginTransaction')->once();
-        \DB::shouldReceive('rollBack')->once();
+        DB::shouldReceive('beginTransaction')->once();
+        DB::shouldReceive('rollBack')->once();
 
         $response = $this->post(route('referrals.store'), [
             'referred_email' => $referredUser->email,
-            'title' => 'Test Referral',
-            'description' => 'Test Description',
+            'title'          => 'Test Referral',
+            'description'    => 'Test Description',
         ]);
 
         $response->assertRedirect();

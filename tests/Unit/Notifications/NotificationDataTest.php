@@ -39,17 +39,17 @@ final class NotificationDataTest extends TestCase
     public function test_payload_data_from_model_includes_context(): void
     {
         $notification = new Notification([
-            'id' => (string) Str::uuid(),
-            'type' => 'App\\Notifications\\TestNotification',
+            'id'              => (string) Str::uuid(),
+            'type'            => 'App\\Notifications\\TestNotification',
             'notifiable_type' => User::class,
-            'notifiable_id' => 1,
-            'data' => [
-                'title' => 'Test',
-                'message' => 'Message',
-                'type' => 'info',
-                'urgent' => true,
-                'color' => 'blue',
-                'tags' => ['alpha', 'beta'],
+            'notifiable_id'   => 1,
+            'data'            => [
+                'title'    => 'Test',
+                'message'  => 'Message',
+                'type'     => 'info',
+                'urgent'   => true,
+                'color'    => 'blue',
+                'tags'     => ['alpha', 'beta'],
                 'order_id' => 42,
             ],
         ]);

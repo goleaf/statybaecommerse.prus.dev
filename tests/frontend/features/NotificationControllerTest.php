@@ -36,11 +36,11 @@ final class NotificationControllerTest extends TestCase
     public function test_mark_notification_as_read_success(): void
     {
         $notification = DatabaseNotification::create([
-            'id' => 'test-notification-read',
-            'type' => TestNotification::class,
+            'id'              => 'test-notification-read',
+            'type'            => TestNotification::class,
             'notifiable_type' => User::class,
-            'notifiable_id' => $this->user->id,
-            'data' => ['title' => 'Test', 'message' => 'Test message'],
+            'notifiable_id'   => $this->user->id,
+            'data'            => ['title' => 'Test', 'message' => 'Test message'],
         ]);
 
         $this->assertNull($notification->read_at);
@@ -73,11 +73,11 @@ final class NotificationControllerTest extends TestCase
     {
         $otherUser = User::factory()->create();
         $notification = DatabaseNotification::create([
-            'id' => 'test-notification-unauthorized',
-            'type' => TestNotification::class,
+            'id'              => 'test-notification-unauthorized',
+            'type'            => TestNotification::class,
             'notifiable_type' => User::class,
-            'notifiable_id' => $otherUser->id,
-            'data' => ['title' => 'Test', 'message' => 'Test message'],
+            'notifiable_id'   => $otherUser->id,
+            'data'            => ['title' => 'Test', 'message' => 'Test message'],
         ]);
 
         $response = $this->actingAs($this->user)
@@ -92,12 +92,12 @@ final class NotificationControllerTest extends TestCase
     public function test_mark_notification_as_unread_success(): void
     {
         $notification = DatabaseNotification::create([
-            'id' => 'test-notification-unread',
-            'type' => TestNotification::class,
+            'id'              => 'test-notification-unread',
+            'type'            => TestNotification::class,
             'notifiable_type' => User::class,
-            'notifiable_id' => $this->user->id,
-            'data' => ['title' => 'Test', 'message' => 'Test message'],
-            'read_at' => now(),
+            'notifiable_id'   => $this->user->id,
+            'data'            => ['title' => 'Test', 'message' => 'Test message'],
+            'read_at'         => now(),
         ]);
 
         $this->assertNotNull($notification->read_at);
@@ -131,11 +131,11 @@ final class NotificationControllerTest extends TestCase
         $otherUser = User::factory()->create();
 
         $notification = DatabaseNotification::create([
-            'id' => 'test-notification-unauthorized-unread',
-            'type' => TestNotification::class,
+            'id'              => 'test-notification-unauthorized-unread',
+            'type'            => TestNotification::class,
             'notifiable_type' => User::class,
-            'notifiable_id' => $otherUser->id,
-            'data' => ['title' => 'Test', 'message' => 'Test message'],
+            'notifiable_id'   => $otherUser->id,
+            'data'            => ['title' => 'Test', 'message' => 'Test message'],
         ]);
 
         $response = $this->actingAs($this->user)
@@ -151,19 +151,19 @@ final class NotificationControllerTest extends TestCase
     {
         // Create multiple unread notifications
         DatabaseNotification::create([
-            'id' => 'test-notification-1',
-            'type' => TestNotification::class,
+            'id'              => 'test-notification-1',
+            'type'            => TestNotification::class,
             'notifiable_type' => User::class,
-            'notifiable_id' => $this->user->id,
-            'data' => ['title' => 'Test 1', 'message' => 'Test message 1'],
+            'notifiable_id'   => $this->user->id,
+            'data'            => ['title' => 'Test 1', 'message' => 'Test message 1'],
         ]);
 
         DatabaseNotification::create([
-            'id' => 'test-notification-2',
-            'type' => TestNotification::class,
+            'id'              => 'test-notification-2',
+            'type'            => TestNotification::class,
             'notifiable_type' => User::class,
-            'notifiable_id' => $this->user->id,
-            'data' => ['title' => 'Test 2', 'message' => 'Test message 2'],
+            'notifiable_id'   => $this->user->id,
+            'data'            => ['title' => 'Test 2', 'message' => 'Test message 2'],
         ]);
 
         $this->assertEquals(2, $this->user->unreadNotifications()->count());
@@ -183,11 +183,11 @@ final class NotificationControllerTest extends TestCase
     public function test_delete_notification_success(): void
     {
         $notification = DatabaseNotification::create([
-            'id' => 'test-notification-delete',
-            'type' => TestNotification::class,
+            'id'              => 'test-notification-delete',
+            'type'            => TestNotification::class,
             'notifiable_type' => User::class,
-            'notifiable_id' => $this->user->id,
-            'data' => ['title' => 'Test', 'message' => 'Test message'],
+            'notifiable_id'   => $this->user->id,
+            'data'            => ['title' => 'Test', 'message' => 'Test message'],
         ]);
 
         $response = $this->actingAs($this->user)
@@ -230,11 +230,11 @@ final class NotificationControllerTest extends TestCase
     {
         $otherUser = User::factory()->create();
         $notification = DatabaseNotification::create([
-            'id' => 'test-notification-unauthorized-delete',
-            'type' => TestNotification::class,
+            'id'              => 'test-notification-unauthorized-delete',
+            'type'            => TestNotification::class,
             'notifiable_type' => User::class,
-            'notifiable_id' => $otherUser->id,
-            'data' => ['title' => 'Test', 'message' => 'Test message'],
+            'notifiable_id'   => $otherUser->id,
+            'data'            => ['title' => 'Test', 'message' => 'Test message'],
         ]);
 
         $response = $this->actingAs($this->user)
@@ -250,19 +250,19 @@ final class NotificationControllerTest extends TestCase
     {
         // Create multiple notifications
         DatabaseNotification::create([
-            'id' => 'test-notification-clear-1',
-            'type' => TestNotification::class,
+            'id'              => 'test-notification-clear-1',
+            'type'            => TestNotification::class,
             'notifiable_type' => User::class,
-            'notifiable_id' => $this->user->id,
-            'data' => ['title' => 'Test 1', 'message' => 'Test message 1'],
+            'notifiable_id'   => $this->user->id,
+            'data'            => ['title' => 'Test 1', 'message' => 'Test message 1'],
         ]);
 
         DatabaseNotification::create([
-            'id' => 'test-notification-clear-2',
-            'type' => TestNotification::class,
+            'id'              => 'test-notification-clear-2',
+            'type'            => TestNotification::class,
             'notifiable_type' => User::class,
-            'notifiable_id' => $this->user->id,
-            'data' => ['title' => 'Test 2', 'message' => 'Test message 2'],
+            'notifiable_id'   => $this->user->id,
+            'data'            => ['title' => 'Test 2', 'message' => 'Test message 2'],
         ]);
 
         $this->assertEquals(2, $this->user->notifications()->count());
@@ -283,29 +283,29 @@ final class NotificationControllerTest extends TestCase
     {
         // Create unread notifications
         DatabaseNotification::create([
-            'id' => 'test-notification-count-1',
-            'type' => TestNotification::class,
+            'id'              => 'test-notification-count-1',
+            'type'            => TestNotification::class,
             'notifiable_type' => User::class,
-            'notifiable_id' => $this->user->id,
-            'data' => ['title' => 'Test 1', 'message' => 'Test message 1'],
+            'notifiable_id'   => $this->user->id,
+            'data'            => ['title' => 'Test 1', 'message' => 'Test message 1'],
         ]);
 
         DatabaseNotification::create([
-            'id' => 'test-notification-count-2',
-            'type' => TestNotification::class,
+            'id'              => 'test-notification-count-2',
+            'type'            => TestNotification::class,
             'notifiable_type' => User::class,
-            'notifiable_id' => $this->user->id,
-            'data' => ['title' => 'Test 2', 'message' => 'Test message 2'],
+            'notifiable_id'   => $this->user->id,
+            'data'            => ['title' => 'Test 2', 'message' => 'Test message 2'],
         ]);
 
         // Create read notification
         DatabaseNotification::create([
-            'id' => 'test-notification-count-3',
-            'type' => TestNotification::class,
+            'id'              => 'test-notification-count-3',
+            'type'            => TestNotification::class,
             'notifiable_type' => User::class,
-            'notifiable_id' => $this->user->id,
-            'data' => ['title' => 'Test 3', 'message' => 'Test message 3'],
-            'read_at' => now(),
+            'notifiable_id'   => $this->user->id,
+            'data'            => ['title' => 'Test 3', 'message' => 'Test message 3'],
+            'read_at'         => now(),
         ]);
 
         $response = $this->actingAs($this->user)
@@ -321,30 +321,30 @@ final class NotificationControllerTest extends TestCase
     {
         // Create notifications with different timestamps
         $notification1 = DatabaseNotification::create([
-            'id' => 'test-notification-recent-1',
-            'type' => TestNotification::class,
+            'id'              => 'test-notification-recent-1',
+            'type'            => TestNotification::class,
             'notifiable_type' => User::class,
-            'notifiable_id' => $this->user->id,
-            'data' => ['title' => 'Recent 1', 'message' => 'Recent message 1'],
-            'created_at' => now()->subMinutes(1),
+            'notifiable_id'   => $this->user->id,
+            'data'            => ['title' => 'Recent 1', 'message' => 'Recent message 1'],
+            'created_at'      => now()->subMinutes(1),
         ]);
 
         $notification2 = DatabaseNotification::create([
-            'id' => 'test-notification-recent-2',
-            'type' => TestNotification::class,
+            'id'              => 'test-notification-recent-2',
+            'type'            => TestNotification::class,
             'notifiable_type' => User::class,
-            'notifiable_id' => $this->user->id,
-            'data' => ['title' => 'Recent 2', 'message' => 'Recent message 2'],
-            'created_at' => now()->subMinutes(2),
+            'notifiable_id'   => $this->user->id,
+            'data'            => ['title' => 'Recent 2', 'message' => 'Recent message 2'],
+            'created_at'      => now()->subMinutes(2),
         ]);
 
         $notification3 = DatabaseNotification::create([
-            'id' => 'test-notification-recent-3',
-            'type' => TestNotification::class,
+            'id'              => 'test-notification-recent-3',
+            'type'            => TestNotification::class,
             'notifiable_type' => User::class,
-            'notifiable_id' => $this->user->id,
-            'data' => ['title' => 'Recent 3', 'message' => 'Recent message 3'],
-            'created_at' => now()->subMinutes(3),
+            'notifiable_id'   => $this->user->id,
+            'data'            => ['title' => 'Recent 3', 'message' => 'Recent message 3'],
+            'created_at'      => now()->subMinutes(3),
         ]);
 
         $response = $this->actingAs($this->user)
@@ -378,12 +378,12 @@ final class NotificationControllerTest extends TestCase
         // Create 7 notifications
         for ($i = 1; $i <= 7; $i++) {
             DatabaseNotification::create([
-                'id' => "test-notification-limit-{$i}",
-                'type' => TestNotification::class,
+                'id'              => "test-notification-limit-{$i}",
+                'type'            => TestNotification::class,
                 'notifiable_type' => User::class,
-                'notifiable_id' => $this->user->id,
-                'data' => ['title' => "Test {$i}", 'message' => "Test message {$i}"],
-                'created_at' => now()->subMinutes($i),
+                'notifiable_id'   => $this->user->id,
+                'data'            => ['title' => "Test {$i}", 'message' => "Test message {$i}"],
+                'created_at'      => now()->subMinutes($i),
             ]);
         }
 

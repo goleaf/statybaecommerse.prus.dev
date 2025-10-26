@@ -53,22 +53,22 @@ final class PartnerResourceTest extends TestCase
 
         Livewire::test(PartnerResource\Pages\CreatePartner::class)
             ->fillForm([
-                'name' => 'New Partner Co',
-                'code' => 'new-partner-co',
-                'contact_email' => 'partner@example.test',
-                'contact_phone' => '+37060012345',
-                'tier_id' => $tier->id,
-                'is_enabled' => true,
-                'discount_rate' => 0.0500,
+                'name'            => 'New Partner Co',
+                'code'            => 'new-partner-co',
+                'contact_email'   => 'partner@example.test',
+                'contact_phone'   => '+37060012345',
+                'tier_id'         => $tier->id,
+                'is_enabled'      => true,
+                'discount_rate'   => 0.0500,
                 'commission_rate' => 0.0100,
             ])
             ->call('create')
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('partners', [
-            'code' => 'new-partner-co',
+            'code'          => 'new-partner-co',
             'contact_email' => 'partner@example.test',
-            'is_enabled' => 1,
+            'is_enabled'    => 1,
         ]);
     }
 
@@ -76,26 +76,26 @@ final class PartnerResourceTest extends TestCase
     {
         $this->actingAs($this->adminUser);
         $partner = Partner::factory()->create([
-            'name' => 'Old Name',
-            'code' => 'old-code-001',
+            'name'          => 'Old Name',
+            'code'          => 'old-code-001',
             'contact_email' => 'old@example.test',
-            'is_enabled' => true,
+            'is_enabled'    => true,
         ]);
 
         Livewire::test(PartnerResource\Pages\EditPartner::class, ['record' => $partner->getKey()])
             ->fillForm([
-                'name' => 'Updated Name',
+                'name'          => 'Updated Name',
                 'contact_email' => 'updated@example.test',
-                'is_enabled' => false,
+                'is_enabled'    => false,
             ])
             ->call('save')
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('partners', [
-            'id' => $partner->id,
-            'name' => 'Updated Name',
+            'id'            => $partner->id,
+            'name'          => 'Updated Name',
             'contact_email' => 'updated@example.test',
-            'is_enabled' => 0,
+            'is_enabled'    => 0,
         ]);
     }
 

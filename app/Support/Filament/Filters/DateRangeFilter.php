@@ -10,9 +10,9 @@ use Illuminate\Support\Carbon;
 final class DateRangeFilter
 {
     /**
-     * @param  array{start?: string|null, end?: string|null}|null  $range
+     * @param array{start?: string|null, end?: string|null}|null $range
      */
-    public static function apply(Builder $query, array|null $range, string $column, bool $withTime = false): Builder
+    public static function apply(Builder $query, ?array $range, string $column, bool $withTime = false): Builder
     {
         if (! is_array($range)) {
             return $query;

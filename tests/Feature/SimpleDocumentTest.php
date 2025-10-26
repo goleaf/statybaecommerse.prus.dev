@@ -19,22 +19,22 @@ final class SimpleDocumentTest extends TestCase
         $template = DocumentTemplate::factory()->create();
 
         $document = Document::create([
-            'title' => 'Test Document',
-            'content' => 'Test content',
-            'status' => 'draft',
-            'format' => 'pdf',
+            'title'                => 'Test Document',
+            'content'              => 'Test content',
+            'status'               => 'draft',
+            'format'               => 'pdf',
             'document_template_id' => $template->id,
-            'documentable_type' => 'App\Models\Order',
-            'documentable_id' => 1,
-            'created_by' => $user->id,
-            'variables' => [
+            'documentable_type'    => 'App\Models\Order',
+            'documentable_id'      => 1,
+            'created_by'           => $user->id,
+            'variables'            => [
                 'company_name' => 'Test Company',
                 'order_number' => 'ORD-001',
             ],
         ]);
 
         $this->assertDatabaseHas('documents', [
-            'title' => 'Test Document',
+            'title'  => 'Test Document',
             'status' => 'draft',
             'format' => 'pdf',
         ]);
@@ -51,14 +51,14 @@ final class SimpleDocumentTest extends TestCase
         $template = DocumentTemplate::factory()->create();
 
         $document = Document::create([
-            'title' => 'Test Document',
-            'content' => 'Test content',
-            'status' => 'draft',
-            'format' => 'pdf',
+            'title'                => 'Test Document',
+            'content'              => 'Test content',
+            'status'               => 'draft',
+            'format'               => 'pdf',
             'document_template_id' => $template->id,
-            'documentable_type' => 'App\Models\Order',
-            'documentable_id' => 1,
-            'created_by' => $user->id,
+            'documentable_type'    => 'App\Models\Order',
+            'documentable_id'      => 1,
+            'created_by'           => $user->id,
         ]);
 
         $this->assertInstanceOf(DocumentTemplate::class, $document->template);
@@ -73,14 +73,14 @@ final class SimpleDocumentTest extends TestCase
         $template = DocumentTemplate::factory()->create();
 
         $document = Document::create([
-            'title' => 'Test Document',
-            'content' => 'Test content',
-            'status' => 'draft',
-            'format' => 'pdf',
+            'title'                => 'Test Document',
+            'content'              => 'Test content',
+            'status'               => 'draft',
+            'format'               => 'pdf',
             'document_template_id' => $template->id,
-            'documentable_type' => 'App\Models\Order',
-            'documentable_id' => 1,
-            'created_by' => $user->id,
+            'documentable_type'    => 'App\Models\Order',
+            'documentable_id'      => 1,
+            'created_by'           => $user->id,
         ]);
 
         $this->assertTrue($document->isDraft());

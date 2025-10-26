@@ -40,11 +40,11 @@ final class InventoryManagementTest extends TestCase
         $category = Category::factory()->create(['name' => 'Test Category']);
 
         $product = Product::factory()->create([
-            'name' => 'Test Product',
-            'sku' => 'TEST-001',
-            'brand_id' => $brand->id,
-            'manage_stock' => true,
-            'stock_quantity' => 10,
+            'name'                => 'Test Product',
+            'sku'                 => 'TEST-001',
+            'brand_id'            => $brand->id,
+            'manage_stock'        => true,
+            'stock_quantity'      => 10,
             'low_stock_threshold' => 5,
         ]);
 
@@ -62,22 +62,22 @@ final class InventoryManagementTest extends TestCase
     public function test_inventory_management_page_shows_stock_status(): void
     {
         Product::factory()->create([
-            'name' => 'In Stock Product',
-            'manage_stock' => true,
-            'stock_quantity' => 10,
+            'name'                => 'In Stock Product',
+            'manage_stock'        => true,
+            'stock_quantity'      => 10,
             'low_stock_threshold' => 5,
         ]);
 
         Product::factory()->create([
-            'name' => 'Low Stock Product',
-            'manage_stock' => true,
-            'stock_quantity' => 3,
+            'name'                => 'Low Stock Product',
+            'manage_stock'        => true,
+            'stock_quantity'      => 3,
             'low_stock_threshold' => 5,
         ]);
 
         Product::factory()->create([
-            'name' => 'Out of Stock Product',
-            'manage_stock' => true,
+            'name'           => 'Out of Stock Product',
+            'manage_stock'   => true,
             'stock_quantity' => 0,
         ]);
 
@@ -93,19 +93,19 @@ final class InventoryManagementTest extends TestCase
     public function test_inventory_management_page_shows_summary_cards(): void
     {
         Product::factory()->count(10)->create([
-            'manage_stock' => true,
-            'stock_quantity' => 10,
+            'manage_stock'        => true,
+            'stock_quantity'      => 10,
             'low_stock_threshold' => 5,
         ]);
 
         Product::factory()->count(3)->create([
-            'manage_stock' => true,
-            'stock_quantity' => 3,
+            'manage_stock'        => true,
+            'stock_quantity'      => 3,
             'low_stock_threshold' => 5,
         ]);
 
         Product::factory()->count(2)->create([
-            'manage_stock' => true,
+            'manage_stock'   => true,
             'stock_quantity' => 0,
         ]);
 
@@ -128,22 +128,22 @@ final class InventoryManagementTest extends TestCase
     public function test_inventory_management_page_filters_work(): void
     {
         Product::factory()->create([
-            'name' => 'In Stock Product',
-            'manage_stock' => true,
-            'stock_quantity' => 10,
+            'name'                => 'In Stock Product',
+            'manage_stock'        => true,
+            'stock_quantity'      => 10,
             'low_stock_threshold' => 5,
         ]);
 
         Product::factory()->create([
-            'name' => 'Low Stock Product',
-            'manage_stock' => true,
-            'stock_quantity' => 3,
+            'name'                => 'Low Stock Product',
+            'manage_stock'        => true,
+            'stock_quantity'      => 3,
             'low_stock_threshold' => 5,
         ]);
 
         Product::factory()->create([
-            'name' => 'Out of Stock Product',
-            'manage_stock' => true,
+            'name'           => 'Out of Stock Product',
+            'manage_stock'   => true,
             'stock_quantity' => 0,
         ]);
 
@@ -170,12 +170,12 @@ final class InventoryManagementTest extends TestCase
     {
         Product::factory()->create([
             'name' => 'Special Product',
-            'sku' => 'SPEC-001',
+            'sku'  => 'SPEC-001',
         ]);
 
         Product::factory()->create([
             'name' => 'Regular Product',
-            'sku' => 'REG-001',
+            'sku'  => 'REG-001',
         ]);
 
         $response = $this->actingAs($this->adminUser)
@@ -192,17 +192,17 @@ final class InventoryManagementTest extends TestCase
         $brand2 = Brand::factory()->create(['name' => 'Brand B']);
 
         Product::factory()->create([
-            'name' => 'Product A',
+            'name'     => 'Product A',
             'brand_id' => $brand1->id,
         ]);
 
         Product::factory()->create([
-            'name' => 'Product B',
+            'name'     => 'Product B',
             'brand_id' => $brand2->id,
         ]);
 
         $response = $this->actingAs($this->adminUser)
-            ->get('/admin/inventory-management?tableFilters[brand][value]='.$brand1->id);
+            ->get('/admin/inventory-management?tableFilters[brand][value]=' . $brand1->id);
 
         $response->assertOk();
         $response->assertSee('Product A');
@@ -212,12 +212,12 @@ final class InventoryManagementTest extends TestCase
     public function test_inventory_management_page_tracking_filter_works(): void
     {
         Product::factory()->create([
-            'name' => 'Tracked Product',
+            'name'         => 'Tracked Product',
             'manage_stock' => true,
         ]);
 
         Product::factory()->create([
-            'name' => 'Not Tracked Product',
+            'name'         => 'Not Tracked Product',
             'manage_stock' => false,
         ]);
 

@@ -16,18 +16,18 @@ class CouponTest extends TestCase
     public function test_coupon_can_be_created(): void
     {
         $coupon = Coupon::factory()->create([
-            'code' => 'SAVE20',
-            'name' => '20% Off Coupon',
-            'type' => 'percentage',
-            'value' => 20.0,
+            'code'      => 'SAVE20',
+            'name'      => '20% Off Coupon',
+            'type'      => 'percentage',
+            'value'     => 20.0,
             'is_active' => true,
         ]);
 
         $this->assertDatabaseHas('coupons', [
-            'code' => 'SAVE20',
-            'name' => '20% Off Coupon',
-            'type' => 'percentage',
-            'value' => 20.0,
+            'code'      => 'SAVE20',
+            'name'      => '20% Off Coupon',
+            'type'      => 'percentage',
+            'value'     => 20.0,
             'is_active' => true,
         ]);
     }
@@ -35,9 +35,9 @@ class CouponTest extends TestCase
     public function test_coupon_casts_work_correctly(): void
     {
         $coupon = Coupon::factory()->create([
-            'value' => 15.5,
-            'is_active' => true,
-            'starts_at' => now(),
+            'value'      => 15.5,
+            'is_active'  => true,
+            'starts_at'  => now(),
             'expires_at' => now()->addDays(30),
         ]);
 
@@ -73,20 +73,20 @@ class CouponTest extends TestCase
     public function test_coupon_scope_valid(): void
     {
         $validCoupon = Coupon::factory()->create([
-            'is_active' => true,
-            'starts_at' => now()->subDay(),
+            'is_active'  => true,
+            'starts_at'  => now()->subDay(),
             'expires_at' => now()->addDay(),
         ]);
 
         $expiredCoupon = Coupon::factory()->create([
-            'is_active' => true,
-            'starts_at' => now()->subDays(2),
+            'is_active'  => true,
+            'starts_at'  => now()->subDays(2),
             'expires_at' => now()->subDay(),
         ]);
 
         $futureCoupon = Coupon::factory()->create([
-            'is_active' => true,
-            'starts_at' => now()->addDay(),
+            'is_active'  => true,
+            'starts_at'  => now()->addDay(),
             'expires_at' => now()->addDays(2),
         ]);
 
@@ -123,7 +123,7 @@ class CouponTest extends TestCase
     {
         $coupon = Coupon::factory()->create([
             'usage_limit' => 100,
-            'used_count' => 50,
+            'used_count'  => 50,
         ]);
 
         $this->assertEquals(100, $coupon->usage_limit);
@@ -171,18 +171,18 @@ class CouponTest extends TestCase
     public function test_coupon_can_calculate_discount(): void
     {
         $percentageCoupon = Coupon::factory()->create([
-            'type' => 'percentage',
-            'value' => 20.0,
-            'is_active' => true,
-            'starts_at' => now()->subDay(),
+            'type'       => 'percentage',
+            'value'      => 20.0,
+            'is_active'  => true,
+            'starts_at'  => now()->subDay(),
             'expires_at' => now()->addDay(),
         ]);
 
         $fixedCoupon = Coupon::factory()->create([
-            'type' => 'fixed',
-            'value' => 15.0,
-            'is_active' => true,
-            'starts_at' => now()->subDay(),
+            'type'       => 'fixed',
+            'value'      => 15.0,
+            'is_active'  => true,
+            'starts_at'  => now()->subDay(),
             'expires_at' => now()->addDay(),
         ]);
 
@@ -193,14 +193,14 @@ class CouponTest extends TestCase
     public function test_coupon_can_check_validity(): void
     {
         $validCoupon = Coupon::factory()->create([
-            'is_active' => true,
-            'starts_at' => now()->subDay(),
+            'is_active'  => true,
+            'starts_at'  => now()->subDay(),
             'expires_at' => now()->addDay(),
         ]);
 
         $invalidCoupon = Coupon::factory()->create([
-            'is_active' => false,
-            'starts_at' => now()->subDay(),
+            'is_active'  => false,
+            'starts_at'  => now()->subDay(),
             'expires_at' => now()->addDay(),
         ]);
 

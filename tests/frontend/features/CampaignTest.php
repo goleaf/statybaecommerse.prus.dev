@@ -90,7 +90,7 @@ final class CampaignTest extends TestCase
 
         $response = $this->post(route('frontend.campaigns.click', $campaign), [
             'type' => 'cta',
-            'url' => 'https://example.com',
+            'url'  => 'https://example.com',
         ]);
 
         $response->assertStatus(200);
@@ -102,12 +102,12 @@ final class CampaignTest extends TestCase
     {
         $campaign = Campaign::factory()->create([
             'total_conversions' => 0,
-            'total_revenue' => 0,
+            'total_revenue'     => 0,
         ]);
 
         $response = $this->post(route('frontend.campaigns.conversion', $campaign), [
-            'type' => 'purchase',
-            'value' => 100.50,
+            'type'     => 'purchase',
+            'value'    => 100.50,
             'order_id' => 123,
         ]);
 
@@ -298,14 +298,14 @@ final class CampaignTest extends TestCase
     public function test_campaign_recommendations_api_endpoint(): void
     {
         $campaign = Campaign::factory()->create([
-            'total_views' => 1000,
-            'total_clicks' => 5,
+            'total_views'       => 1000,
+            'total_clicks'      => 5,
             'total_conversions' => 1,
-            'budget_limit' => 1000,
-            'total_revenue' => 950,
-            'end_date' => now()->addDays(3),
-            'cta_text' => null,
-            'content' => 'Short',
+            'budget_limit'      => 1000,
+            'total_revenue'     => 950,
+            'end_date'          => now()->addDays(3),
+            'cta_text'          => null,
+            'content'           => 'Short',
         ]);
 
         $response = $this->get(route('frontend.campaigns.recommendations', $campaign));
@@ -358,7 +358,7 @@ final class CampaignTest extends TestCase
 
         $campaign = Campaign::factory()->create([
             'channel_id' => $channel->id,
-            'zone_id' => $zone->id,
+            'zone_id'    => $zone->id,
         ]);
 
         $campaign->targetCategories()->attach($category->id);
@@ -386,7 +386,7 @@ final class CampaignTest extends TestCase
 
         $response = $this->actingAs($user)->post(route('frontend.campaigns.click', $campaign), [
             'type' => 'cta',
-            'url' => 'https://example.com',
+            'url'  => 'https://example.com',
         ]);
 
         $response->assertStatus(200);
@@ -399,12 +399,12 @@ final class CampaignTest extends TestCase
         $user = User::factory()->create();
         $campaign = Campaign::factory()->create([
             'total_conversions' => 0,
-            'total_revenue' => 0,
+            'total_revenue'     => 0,
         ]);
 
         $response = $this->actingAs($user)->post(route('frontend.campaigns.conversion', $campaign), [
-            'type' => 'purchase',
-            'value' => 250.75,
+            'type'     => 'purchase',
+            'value'    => 250.75,
             'order_id' => 456,
         ]);
 

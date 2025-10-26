@@ -8,4 +8,3 @@ test('search query must be provided', function (): void {
     expect(fn () => new NotificationSearchData(''))->toThrow(InvalidArgumentException::class);
     expect(fn () => new NotificationSearchData('   '))->toThrow(InvalidArgumentException::class);
 });
-

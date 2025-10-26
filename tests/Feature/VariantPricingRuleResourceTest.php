@@ -41,32 +41,32 @@ final class VariantPricingRuleResourceTest extends TestCase
 
         Livewire::test(VariantPricingRuleResource\Pages\CreateVariantPricingRule::class)
             ->fillForm([
-                'name' => 'Test Pricing Rule',
-                'type' => 'percentage',
-                'value' => 10.50,
+                'name'               => 'Test Pricing Rule',
+                'type'               => 'percentage',
+                'value'              => 10.50,
                 'product_variant_id' => $productVariant->id,
-                'customer_group_id' => $customerGroup->id,
-                'min_quantity' => 1,
-                'max_quantity' => 100,
-                'priority' => 1,
-                'is_active' => true,
-                'is_cumulative' => false,
-                'description' => 'Test description',
+                'customer_group_id'  => $customerGroup->id,
+                'min_quantity'       => 1,
+                'max_quantity'       => 100,
+                'priority'           => 1,
+                'is_active'          => true,
+                'is_cumulative'      => false,
+                'description'        => 'Test description',
             ])
             ->call('create')
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('variant_pricing_rules', [
-            'name' => 'Test Pricing Rule',
-            'type' => 'percentage',
-            'value' => 10.50,
+            'name'               => 'Test Pricing Rule',
+            'type'               => 'percentage',
+            'value'              => 10.50,
             'product_variant_id' => $productVariant->id,
-            'customer_group_id' => $customerGroup->id,
-            'min_quantity' => 1,
-            'max_quantity' => 100,
-            'priority' => 1,
-            'is_active' => true,
-            'is_cumulative' => false,
+            'customer_group_id'  => $customerGroup->id,
+            'min_quantity'       => 1,
+            'max_quantity'       => 100,
+            'priority'           => 1,
+            'is_active'          => true,
+            'is_cumulative'      => false,
         ]);
     }
 
@@ -78,17 +78,17 @@ final class VariantPricingRuleResourceTest extends TestCase
             'record' => $variantPricingRule->getRouteKey(),
         ])
             ->fillForm([
-                'name' => 'Updated Pricing Rule',
-                'type' => 'fixed',
+                'name'  => 'Updated Pricing Rule',
+                'type'  => 'fixed',
                 'value' => 25.00,
             ])
             ->call('save')
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('variant_pricing_rules', [
-            'id' => $variantPricingRule->id,
-            'name' => 'Updated Pricing Rule',
-            'type' => 'fixed',
+            'id'    => $variantPricingRule->id,
+            'name'  => 'Updated Pricing Rule',
+            'type'  => 'fixed',
             'value' => 25.00,
         ]);
     }
@@ -123,7 +123,7 @@ final class VariantPricingRuleResourceTest extends TestCase
             ->callTableAction('toggle_active', $variantPricingRule);
 
         $this->assertDatabaseHas('variant_pricing_rules', [
-            'id' => $variantPricingRule->id,
+            'id'        => $variantPricingRule->id,
             'is_active' => true,
         ]);
     }
@@ -137,7 +137,7 @@ final class VariantPricingRuleResourceTest extends TestCase
 
         foreach ($variantPricingRules as $rule) {
             $this->assertDatabaseHas('variant_pricing_rules', [
-                'id' => $rule->id,
+                'id'        => $rule->id,
                 'is_active' => true,
             ]);
         }
@@ -152,7 +152,7 @@ final class VariantPricingRuleResourceTest extends TestCase
 
         foreach ($variantPricingRules as $rule) {
             $this->assertDatabaseHas('variant_pricing_rules', [
-                'id' => $rule->id,
+                'id'        => $rule->id,
                 'is_active' => false,
             ]);
         }
@@ -223,8 +223,8 @@ final class VariantPricingRuleResourceTest extends TestCase
     {
         Livewire::test(VariantPricingRuleResource\Pages\CreateVariantPricingRule::class)
             ->fillForm([
-                'name' => '',
-                'type' => 'percentage',
+                'name'  => '',
+                'type'  => 'percentage',
                 'value' => 10.50,
             ])
             ->call('create')
@@ -235,8 +235,8 @@ final class VariantPricingRuleResourceTest extends TestCase
     {
         Livewire::test(VariantPricingRuleResource\Pages\CreateVariantPricingRule::class)
             ->fillForm([
-                'name' => 'Test Rule',
-                'type' => '',
+                'name'  => 'Test Rule',
+                'type'  => '',
                 'value' => 10.50,
             ])
             ->call('create')
@@ -247,8 +247,8 @@ final class VariantPricingRuleResourceTest extends TestCase
     {
         Livewire::test(VariantPricingRuleResource\Pages\CreateVariantPricingRule::class)
             ->fillForm([
-                'name' => 'Test Rule',
-                'type' => 'percentage',
+                'name'  => 'Test Rule',
+                'type'  => 'percentage',
                 'value' => '',
             ])
             ->call('create')
@@ -259,9 +259,9 @@ final class VariantPricingRuleResourceTest extends TestCase
     {
         Livewire::test(VariantPricingRuleResource\Pages\CreateVariantPricingRule::class)
             ->fillForm([
-                'name' => 'Test Rule',
-                'type' => 'percentage',
-                'value' => 10.50,
+                'name'               => 'Test Rule',
+                'type'               => 'percentage',
+                'value'              => 10.50,
                 'product_variant_id' => '',
             ])
             ->call('create')

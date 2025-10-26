@@ -41,7 +41,7 @@ final class Show extends Component
             $this->redirect(
                 route('localized.brands.show', [
                     'locale' => app()->getLocale(),
-                    'slug' => $canonicalSlug,
+                    'slug'   => $canonicalSlug,
                 ]),
                 301
             );

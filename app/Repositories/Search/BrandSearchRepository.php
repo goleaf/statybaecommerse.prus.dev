@@ -82,14 +82,14 @@ SQL;
         $description = $row->description ?: ($row->translated_description ?: null);
 
         return [
-            'id' => (int) $row->id,
-            'type' => 'brand',
-            'title' => (string) $row->name,
-            'subtitle' => __('frontend.search.brand_with_products', ['count' => $productsCount]),
-            'description' => $description,
-            'image' => null,
-            'url' => route('brands.show', $row->slug),
-            'products_count' => $productsCount,
+            'id'              => (int) $row->id,
+            'type'            => 'brand',
+            'title'           => (string) $row->name,
+            'subtitle'        => __('frontend.search.brand_with_products', ['count' => $productsCount]),
+            'description'     => $description,
+            'image'           => null,
+            'url'             => route('brands.show', $row->slug),
+            'products_count'  => $productsCount,
             'relevance_score' => $this->calculateRelevanceScore($row, $queryData->query()),
         ];
     }
@@ -140,7 +140,7 @@ SQL;
                 $parts[] = '  AND b.is_visible = 1';
             }
 
-            $clauses = $parts ? "\n".implode("\n", $parts) : '';
+            $clauses = $parts ? "\n" . implode("\n", $parts) : '';
         }
 
         return $clauses;
@@ -166,7 +166,7 @@ SQL;
                 $parts[] = "  AND p.status = 'published'";
             }
 
-            $clauses = $parts ? "\n".implode("\n", $parts) : '';
+            $clauses = $parts ? "\n" . implode("\n", $parts) : '';
         }
 
         return $clauses;

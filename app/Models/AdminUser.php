@@ -34,6 +34,7 @@ final class AdminUser extends Authenticatable implements FilamentUser
 {
     /** @use HasFactory<\Database\Factories\AdminUserFactory> */
     use HasFactory;
+
     use HasRoles;
     use Notifiable;
 

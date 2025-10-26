@@ -51,28 +51,28 @@ final class ProductResourceFrontendTest extends TestCase
     public function test_can_create_update_and_soft_delete_product(): void
     {
         $product = Product::create([
-            'name' => 'Test Product',
-            'slug' => 'test-product',
-            'sku' => 'TEST-1234',
-            'price' => '19.99',
-            'status' => 'draft',
-            'is_visible' => true,
+            'name'         => 'Test Product',
+            'slug'         => 'test-product',
+            'sku'          => 'TEST-1234',
+            'price'        => '19.99',
+            'status'       => 'draft',
+            'is_visible'   => true,
             'published_at' => now(),
         ]);
 
         $this->assertDatabaseHas('products', [
-            'id' => $product->id,
+            'id'   => $product->id,
             'name' => 'Test Product',
         ]);
 
         $product->update([
-            'name' => 'Updated Product',
+            'name'   => 'Updated Product',
             'status' => 'published',
         ]);
 
         $this->assertDatabaseHas('products', [
-            'id' => $product->id,
-            'name' => 'Updated Product',
+            'id'     => $product->id,
+            'name'   => 'Updated Product',
             'status' => 'published',
         ]);
 

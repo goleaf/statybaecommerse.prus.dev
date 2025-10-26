@@ -17,14 +17,14 @@ beforeEach(function (): void {
     $this->adminUser->assignRole('super_admin');
 
     $this->seedEnum = EnumValue::factory()->create([
-        'type' => 'order_status',
-        'key' => 'pending',
-        'value' => 'Pending',
-        'name' => 'Pending Order',
+        'type'        => 'order_status',
+        'key'         => 'pending',
+        'value'       => 'Pending',
+        'name'        => 'Pending Order',
         'description' => 'Order awaiting processing',
-        'is_active' => true,
-        'is_default' => false,
-        'metadata' => ['category' => 'orders'],
+        'is_active'   => true,
+        'is_default'  => false,
+        'metadata'    => ['category' => 'orders'],
     ]);
 });
 
@@ -47,23 +47,23 @@ it('can create an enum value through enum management resource', function (): voi
     Livewire::actingAs($this->adminUser)
         ->test(Pages\CreateEnumManagement::class)
         ->fillForm([
-            'type' => 'product_status',
-            'key' => 'available',
-            'value' => 'Available',
-            'name' => 'Available Product',
+            'type'        => 'product_status',
+            'key'         => 'available',
+            'value'       => 'Available',
+            'name'        => 'Available Product',
             'description' => 'Products ready for sale',
-            'sort_order' => 5,
-            'is_active' => true,
-            'is_default' => false,
-            'metadata' => ['channel' => 'admin'],
+            'sort_order'  => 5,
+            'is_active'   => true,
+            'is_default'  => false,
+            'metadata'    => ['channel' => 'admin'],
         ])
         ->call('create')
         ->assertHasNoFormErrors();
 
     $this->assertDatabaseHas('enum_values', [
-        'type' => 'product_status',
-        'key' => 'available',
-        'name' => 'Available Product',
+        'type'              => 'product_status',
+        'key'               => 'available',
+        'name'              => 'Available Product',
         'metadata->channel' => 'admin',
     ]);
 });
@@ -72,9 +72,9 @@ it('can edit an enum value through enum management resource', function (): void 
     Livewire::actingAs($this->adminUser)
         ->test(Pages\EditEnumManagement::class, ['record' => $this->seedEnum->getRouteKey()])
         ->fillForm([
-            'name' => 'Pending Order Updated',
+            'name'        => 'Pending Order Updated',
             'description' => 'Updated description',
-            'metadata' => ['category' => 'orders', 'updated' => true],
+            'metadata'    => ['category' => 'orders', 'updated' => true],
         ])
         ->call('save')
         ->assertHasNoFormErrors();
@@ -114,11 +114,11 @@ it('can toggle activation status from the table', function (): void {
 
 it('can set an enum value as default', function (): void {
     $enumOne = EnumValue::factory()->create([
-        'type' => 'shipping_status',
+        'type'       => 'shipping_status',
         'is_default' => true,
     ]);
     $enumTwo = EnumValue::factory()->create([
-        'type' => 'shipping_status',
+        'type'       => 'shipping_status',
         'is_default' => false,
     ]);
 

@@ -21,10 +21,10 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  *
  * Eloquent model representing the Document entity with comprehensive relationships, scopes, and business logic for the e-commerce system.
  *
- * @property mixed $fillable
- * @property mixed $casts
- * @property bool  $is_public
- * @property bool  $is_downloadable
+ * @property mixed       $fillable
+ * @property mixed       $casts
+ * @property bool        $is_public
+ * @property bool        $is_downloadable
  * @property string|null $name
  *
  * @phpstan-use HasFactory<\Database\Factories\DocumentFactory>
@@ -105,7 +105,7 @@ final class Document extends Model
      */
     protected $attributes = [
         // Keep boolean flags predictable for newly instantiated models.
-        'is_public' => false,
+        'is_public'       => false,
         'is_downloadable' => true,
     ];
 

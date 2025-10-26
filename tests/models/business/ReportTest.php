@@ -6,7 +6,7 @@ use App\Models\Report;
 
 it('casts attributes correctly', function (): void {
     $report = Report::factory()->make([
-        'filters' => ['status' => 'paid'],
+        'filters'   => ['status' => 'paid'],
         'is_active' => true,
     ]);
 

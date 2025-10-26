@@ -77,10 +77,10 @@ return new class extends Migration
             $foreign = $table->foreign($column)->references($referencedColumn)->on($referencedTable);
 
             match (strtolower($onDelete)) {
-                'cascade' => $foreign->cascadeOnDelete(),
+                'cascade'  => $foreign->cascadeOnDelete(),
                 'restrict' => $foreign->restrictOnDelete(),
                 'set null' => $foreign->nullOnDelete(),
-                default => null,
+                default    => null,
             };
         });
     }

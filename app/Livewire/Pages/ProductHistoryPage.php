@@ -15,11 +15,11 @@ use Livewire\WithPagination;
  * Livewire component for ProductHistoryPage with reactive frontend functionality, real-time updates, and user interaction handling.
  *
  * @property Product $product
- * @property int $perPage
- * @property string $actionFilter
- * @property string $dateFilter
- * @property mixed $listeners
- * @property mixed $queryString
+ * @property int     $perPage
+ * @property string  $actionFilter
+ * @property string  $dateFilter
+ * @property mixed   $listeners
+ * @property mixed   $queryString
  */
 final class ProductHistoryPage extends Component
 {

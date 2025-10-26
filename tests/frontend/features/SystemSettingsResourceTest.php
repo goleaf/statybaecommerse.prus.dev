@@ -53,22 +53,22 @@ final class SystemSettingsResourceTest extends TestCase
 
         Livewire::test(SystemSettingsResource\Pages\CreateSystemSetting::class)
             ->fillForm([
-                'key' => $newData->key,
+                'key'          => $newData->key,
                 'display_name' => $newData->display_name,
-                'type' => $newData->type,
-                'value' => $newData->value,
-                'description' => $newData->description,
-                'group' => $newData->group,
-                'is_public' => $newData->is_public,
-                'is_required' => $newData->is_required,
+                'type'         => $newData->type,
+                'value'        => $newData->value,
+                'description'  => $newData->description,
+                'group'        => $newData->group,
+                'is_public'    => $newData->is_public,
+                'is_required'  => $newData->is_required,
             ])
             ->call('create')
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('settings', [
-            'key' => $newData->key,
+            'key'          => $newData->key,
             'display_name' => $newData->display_name,
-            'type' => $newData->type,
+            'type'         => $newData->type,
         ]);
     }
 
@@ -88,9 +88,9 @@ final class SystemSettingsResourceTest extends TestCase
 
         Livewire::test(SystemSettingsResource\Pages\EditSystemSetting::class, ['record' => $setting->getRouteKey()])
             ->fillForm([
-                'key' => $newData->key,
+                'key'          => $newData->key,
                 'display_name' => $newData->display_name,
-                'value' => $newData->value,
+                'value'        => $newData->value,
             ])
             ->call('save')
             ->assertHasNoFormErrors();

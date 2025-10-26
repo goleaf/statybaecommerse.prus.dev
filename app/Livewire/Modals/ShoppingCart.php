@@ -15,9 +15,9 @@ use Laravelcm\LivewireSlideOvers\SlideOverComponent;
  *
  * Livewire component for ShoppingCart with reactive frontend functionality, real-time updates, and user interaction handling.
  *
- * @property float $subtotal
+ * @property float          $subtotal
  * @property CartCollection $items
- * @property string|null $sessionKey
+ * @property string|null    $sessionKey
  */
 class ShoppingCart extends SlideOverComponent
 {

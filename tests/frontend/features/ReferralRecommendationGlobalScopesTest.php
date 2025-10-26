@@ -23,21 +23,21 @@ final class ReferralRecommendationGlobalScopesTest extends TestCase
     {
         // Create test referral campaigns
         $activeCampaign = ReferralCampaign::factory()->create([
-            'is_active' => true,
+            'is_active'  => true,
             'start_date' => now()->subDay(),
-            'end_date' => now()->addDay(),
+            'end_date'   => now()->addDay(),
         ]);
 
         $inactiveCampaign = ReferralCampaign::factory()->create([
-            'is_active' => false,
+            'is_active'  => false,
             'start_date' => now()->subDay(),
-            'end_date' => now()->addDay(),
+            'end_date'   => now()->addDay(),
         ]);
 
         $expiredCampaign = ReferralCampaign::factory()->create([
-            'is_active' => true,
+            'is_active'  => true,
             'start_date' => now()->subDays(2),
-            'end_date' => now()->subDay(),
+            'end_date'   => now()->subDay(),
         ]);
 
         // Test that only active campaigns within date range are returned
@@ -58,26 +58,26 @@ final class ReferralRecommendationGlobalScopesTest extends TestCase
 
         // Create test referral codes
         $userActiveCode = ReferralCode::factory()->create([
-            'user_id' => $user->id,
-            'is_active' => true,
+            'user_id'    => $user->id,
+            'is_active'  => true,
             'expires_at' => now()->addDay(),
         ]);
 
         $userInactiveCode = ReferralCode::factory()->create([
-            'user_id' => $user->id,
-            'is_active' => false,
+            'user_id'    => $user->id,
+            'is_active'  => false,
             'expires_at' => now()->addDay(),
         ]);
 
         $otherUserCode = ReferralCode::factory()->create([
-            'user_id' => User::factory()->create()->id,
-            'is_active' => true,
+            'user_id'    => User::factory()->create()->id,
+            'is_active'  => true,
             'expires_at' => now()->addDay(),
         ]);
 
         $expiredCode = ReferralCode::factory()->create([
-            'user_id' => $user->id,
-            'is_active' => true,
+            'user_id'    => $user->id,
+            'is_active'  => true,
             'expires_at' => now()->subDay(),
         ]);
 
@@ -154,15 +154,15 @@ final class ReferralRecommendationGlobalScopesTest extends TestCase
     {
         // Create test data with relationships
         $activeCampaign = ReferralCampaign::factory()->create([
-            'is_active' => true,
+            'is_active'  => true,
             'start_date' => now()->subDay(),
-            'end_date' => now()->addDay(),
+            'end_date'   => now()->addDay(),
         ]);
 
         $inactiveCampaign = ReferralCampaign::factory()->create([
-            'is_active' => false,
+            'is_active'  => false,
             'start_date' => now()->subDay(),
-            'end_date' => now()->addDay(),
+            'end_date'   => now()->addDay(),
         ]);
 
         // Test that relationships also apply global scopes
@@ -175,21 +175,21 @@ final class ReferralRecommendationGlobalScopesTest extends TestCase
     {
         // Test different combinations of referral campaign scopes
         $campaign1 = ReferralCampaign::factory()->create([
-            'is_active' => true,
+            'is_active'  => true,
             'start_date' => now()->subDay(),
-            'end_date' => now()->addDay(),
+            'end_date'   => now()->addDay(),
         ]);
 
         $campaign2 = ReferralCampaign::factory()->create([
-            'is_active' => false,
+            'is_active'  => false,
             'start_date' => now()->subDay(),
-            'end_date' => now()->addDay(),
+            'end_date'   => now()->addDay(),
         ]);
 
         $campaign3 = ReferralCampaign::factory()->create([
-            'is_active' => true,
+            'is_active'  => true,
             'start_date' => now()->subDays(2),
-            'end_date' => now()->subDay(),
+            'end_date'   => now()->subDay(),
         ]);
 
         // Test bypassing specific scopes
@@ -207,26 +207,26 @@ final class ReferralRecommendationGlobalScopesTest extends TestCase
 
         // Test different combinations of referral code scopes
         $code1 = ReferralCode::factory()->create([
-            'user_id' => $user->id,
-            'is_active' => true,
+            'user_id'    => $user->id,
+            'is_active'  => true,
             'expires_at' => now()->addDay(),
         ]);
 
         $code2 = ReferralCode::factory()->create([
-            'user_id' => $user->id,
-            'is_active' => false,
+            'user_id'    => $user->id,
+            'is_active'  => false,
             'expires_at' => now()->addDay(),
         ]);
 
         $code3 = ReferralCode::factory()->create([
-            'user_id' => User::factory()->create()->id,
-            'is_active' => true,
+            'user_id'    => User::factory()->create()->id,
+            'is_active'  => true,
             'expires_at' => now()->addDay(),
         ]);
 
         $code4 = ReferralCode::factory()->create([
-            'user_id' => $user->id,
-            'is_active' => true,
+            'user_id'    => $user->id,
+            'is_active'  => true,
             'expires_at' => now()->subDay(),
         ]);
 
@@ -278,21 +278,21 @@ final class ReferralRecommendationGlobalScopesTest extends TestCase
 
         // Test multiple scope filtering with referral campaigns
         $campaign1 = ReferralCampaign::factory()->create([
-            'is_active' => true,
+            'is_active'  => true,
             'start_date' => now()->subDay(),
-            'end_date' => now()->addDay(),
+            'end_date'   => now()->addDay(),
         ]);
 
         $campaign2 = ReferralCampaign::factory()->create([
-            'is_active' => false,
+            'is_active'  => false,
             'start_date' => now()->subDay(),
-            'end_date' => now()->addDay(),
+            'end_date'   => now()->addDay(),
         ]);
 
         $campaign3 = ReferralCampaign::factory()->create([
-            'is_active' => true,
+            'is_active'  => true,
             'start_date' => now()->subDays(2),
-            'end_date' => now()->subDay(),
+            'end_date'   => now()->subDay(),
         ]);
 
         // Test that only active campaigns within date range are returned
@@ -320,14 +320,14 @@ final class ReferralRecommendationGlobalScopesTest extends TestCase
 
         // Create referral codes for different users
         $user1Code = ReferralCode::factory()->create([
-            'user_id' => $user1->id,
-            'is_active' => true,
+            'user_id'    => $user1->id,
+            'is_active'  => true,
             'expires_at' => now()->addDay(),
         ]);
 
         $user2Code = ReferralCode::factory()->create([
-            'user_id' => $user2->id,
-            'is_active' => true,
+            'user_id'    => $user2->id,
+            'is_active'  => true,
             'expires_at' => now()->addDay(),
         ]);
 
@@ -352,21 +352,21 @@ final class ReferralRecommendationGlobalScopesTest extends TestCase
     {
         // Test date range scope with different date scenarios
         $campaign1 = ReferralCampaign::factory()->create([
-            'is_active' => true,
+            'is_active'  => true,
             'start_date' => now()->subDay(),
-            'end_date' => now()->addDay(),
+            'end_date'   => now()->addDay(),
         ]);
 
         $campaign2 = ReferralCampaign::factory()->create([
-            'is_active' => true,
+            'is_active'  => true,
             'start_date' => now()->addDay(),
-            'end_date' => now()->addDays(2),
+            'end_date'   => now()->addDays(2),
         ]);
 
         $campaign3 = ReferralCampaign::factory()->create([
-            'is_active' => true,
+            'is_active'  => true,
             'start_date' => now()->subDays(2),
-            'end_date' => now()->subDay(),
+            'end_date'   => now()->subDay(),
         ]);
 
         // Test that only campaigns within date range are returned

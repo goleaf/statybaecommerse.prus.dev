@@ -15,6 +15,7 @@ use App\Models\Translations\CampaignTranslation;
 use Faker\Factory as FakerFactory;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
+use Throwable;
 
 final class CampaignSeeder extends Seeder
 {
@@ -86,7 +87,7 @@ final class CampaignSeeder extends Seeder
                     foreach ($selectedProducts as $product) {
                         $targets->push(CampaignProductTarget::factory()->make([
                             'target_type' => 'product',
-                            'product_id' => $product->id,
+                            'product_id'  => $product->id,
                             'category_id' => null,
                         ]));
                     }
@@ -99,7 +100,7 @@ final class CampaignSeeder extends Seeder
                     foreach ($selectedCategories as $category) {
                         $targets->push(CampaignProductTarget::factory()->make([
                             'target_type' => 'category',
-                            'product_id' => null,
+                            'product_id'  => null,
                             'category_id' => $category->id,
                         ]));
                     }
@@ -120,59 +121,59 @@ final class CampaignSeeder extends Seeder
         // Create special seasonal campaigns
         $seasonalCampaigns = [
             [
-                'name' => 'Summer Sale 2024',
-                'slug' => 'summer-sale-2024',
-                'status' => 'active',
-                'is_featured' => true,
+                'name'             => 'Summer Sale 2024',
+                'slug'             => 'summer-sale-2024',
+                'status'           => 'active',
+                'is_featured'      => true,
                 'display_priority' => 10,
-                'starts_at' => now()->subDays(10),
-                'ends_at' => now()->addDays(20),
-                'banner_image' => 'summer-sale-banner.jpg',
-                'cta_text' => 'Shop Summer Collection',
-                'cta_url' => '/collections/summer',
-                'meta_title' => 'Summer Sale 2024 - Up to 50% Off',
+                'starts_at'        => now()->subDays(10),
+                'ends_at'          => now()->addDays(20),
+                'banner_image'     => 'summer-sale-banner.jpg',
+                'cta_text'         => 'Shop Summer Collection',
+                'cta_url'          => '/collections/summer',
+                'meta_title'       => 'Summer Sale 2024 - Up to 50% Off',
                 'meta_description' => 'Discover amazing summer deals with up to 50% off on selected items. Limited time offer!',
-                'target_audience' => [
+                'target_audience'  => [
                     'age_range' => '18-45',
-                    'gender' => 'all',
+                    'gender'    => 'all',
                     'interests' => ['fashion', 'summer', 'outdoor'],
                 ],
             ],
             [
-                'name' => 'Black Friday 2024',
-                'slug' => 'black-friday-2024',
-                'status' => 'scheduled',
-                'is_featured' => true,
+                'name'             => 'Black Friday 2024',
+                'slug'             => 'black-friday-2024',
+                'status'           => 'scheduled',
+                'is_featured'      => true,
                 'display_priority' => 10,
-                'starts_at' => now()->addDays(30),
-                'ends_at' => now()->addDays(33),
-                'banner_image' => 'black-friday-banner.jpg',
-                'cta_text' => 'Get Early Access',
-                'cta_url' => '/black-friday',
-                'meta_title' => 'Black Friday 2024 - Biggest Sale of the Year',
+                'starts_at'        => now()->addDays(30),
+                'ends_at'          => now()->addDays(33),
+                'banner_image'     => 'black-friday-banner.jpg',
+                'cta_text'         => 'Get Early Access',
+                'cta_url'          => '/black-friday',
+                'meta_title'       => 'Black Friday 2024 - Biggest Sale of the Year',
                 'meta_description' => "Don't miss our biggest sale of the year! Massive discounts on all products.",
-                'target_audience' => [
+                'target_audience'  => [
                     'age_range' => 'all',
-                    'gender' => 'all',
+                    'gender'    => 'all',
                     'interests' => ['shopping', 'deals', 'electronics'],
                 ],
             ],
             [
-                'name' => 'New Year Special',
-                'slug' => 'new-year-special-2024',
-                'status' => 'scheduled',
-                'is_featured' => true,
+                'name'             => 'New Year Special',
+                'slug'             => 'new-year-special-2024',
+                'status'           => 'scheduled',
+                'is_featured'      => true,
                 'display_priority' => 9,
-                'starts_at' => now()->addDays(60),
-                'ends_at' => now()->addDays(67),
-                'banner_image' => 'new-year-banner.jpg',
-                'cta_text' => 'Start Fresh',
-                'cta_url' => '/new-year',
-                'meta_title' => 'New Year Special - Fresh Start with New Products',
+                'starts_at'        => now()->addDays(60),
+                'ends_at'          => now()->addDays(67),
+                'banner_image'     => 'new-year-banner.jpg',
+                'cta_text'         => 'Start Fresh',
+                'cta_url'          => '/new-year',
+                'meta_title'       => 'New Year Special - Fresh Start with New Products',
                 'meta_description' => 'Start the new year with our special collection of fresh and innovative products.',
-                'target_audience' => [
+                'target_audience'  => [
                     'age_range' => '25-55',
-                    'gender' => 'all',
+                    'gender'    => 'all',
                     'interests' => ['lifestyle', 'wellness', 'home'],
                 ],
             ],
@@ -189,11 +190,11 @@ final class CampaignSeeder extends Seeder
             // Add analytics data for active campaigns
             if ($campaign->status === 'active') {
                 $campaign->update([
-                    'total_views' => fake()->numberBetween(1000, 10000),
-                    'total_clicks' => fake()->numberBetween(100, 1000),
+                    'total_views'       => fake()->numberBetween(1000, 10000),
+                    'total_clicks'      => fake()->numberBetween(100, 1000),
                     'total_conversions' => fake()->numberBetween(20, 200),
-                    'total_revenue' => fake()->randomFloat(2, 2000, 20000),
-                    'conversion_rate' => fake()->randomFloat(2, 2, 20),
+                    'total_revenue'     => fake()->randomFloat(2, 2000, 20000),
+                    'conversion_rate'   => fake()->randomFloat(2, 2, 20),
                 ]);
             }
         }
@@ -215,7 +216,7 @@ final class CampaignSeeder extends Seeder
             CampaignTranslation::updateOrCreate(
                 [
                     'campaign_id' => $campaign->id,
-                    'locale' => $locale,
+                    'locale'      => $locale,
                 ],
                 $data
             );
@@ -244,18 +245,18 @@ final class CampaignSeeder extends Seeder
         $metaTitle = $isDefaultLocale ? $baseMetaTitle : sprintf('%s - %s', $faker->sentence(3), $faker->words(2, true));
         $metaDescription = $isDefaultLocale ? $baseMetaDescription : $faker->sentence(16);
 
-        $slugBase = $campaign->slug ?? Str::slug($campaign->name ?? 'campaign-'.$campaign->id);
-        $slug = $isDefaultLocale ? $slugBase : Str::slug($slugBase.'-'.$locale);
+        $slugBase = $campaign->slug ?? Str::slug($campaign->name ?? 'campaign-' . $campaign->id);
+        $slug = $isDefaultLocale ? $slugBase : Str::slug($slugBase . '-' . $locale);
 
         return [
-            'name' => $name,
-            'slug' => $slug,
-            'description' => $description,
-            'subject' => $subject,
-            'content' => $content,
-            'cta_text' => $this->localizedCallToAction($locale),
-            'banner_alt_text' => $this->localizedBannerAltText($locale, $name),
-            'meta_title' => $metaTitle,
+            'name'             => $name,
+            'slug'             => $slug,
+            'description'      => $description,
+            'subject'          => $subject,
+            'content'          => $content,
+            'cta_text'         => $this->localizedCallToAction($locale),
+            'banner_alt_text'  => $this->localizedBannerAltText($locale, $name),
+            'meta_title'       => $metaTitle,
             'meta_description' => $metaDescription,
         ];
     }
@@ -263,10 +264,10 @@ final class CampaignSeeder extends Seeder
     private function localizedCallToAction(string $locale): string
     {
         return match ($locale) {
-            'lt' => 'Peržiūrėti pasiūlymą',
-            'en' => 'View the offer',
-            'de' => 'Angebot ansehen',
-            'ru' => 'Посмотреть предложение',
+            'lt'    => 'Peržiūrėti pasiūlymą',
+            'en'    => 'View the offer',
+            'de'    => 'Angebot ansehen',
+            'ru'    => 'Посмотреть предложение',
             default => 'View the offer',
         };
     }
@@ -274,21 +275,21 @@ final class CampaignSeeder extends Seeder
     private function localizedBannerAltText(string $locale, string $campaignName): string
     {
         return match ($locale) {
-            'lt' => $campaignName.' kampanijos baneris',
-            'en' => $campaignName.' campaign banner',
-            'de' => 'Kampagnenbanner '.$campaignName,
-            'ru' => 'Баннер кампании '.$campaignName,
-            default => $campaignName.' banner',
+            'lt'    => $campaignName . ' kampanijos baneris',
+            'en'    => $campaignName . ' campaign banner',
+            'de'    => 'Kampagnenbanner ' . $campaignName,
+            'ru'    => 'Баннер кампании ' . $campaignName,
+            default => $campaignName . ' banner',
         };
     }
 
     private function fakerLocale(string $locale): string
     {
         return match ($locale) {
-            'lt' => 'lt_LT',
-            'en' => 'en_US',
-            'de' => 'de_DE',
-            'ru' => 'ru_RU',
+            'lt'    => 'lt_LT',
+            'en'    => 'en_US',
+            'de'    => 'de_DE',
+            'ru'    => 'ru_RU',
             default => 'en_US',
         };
     }
@@ -318,7 +319,7 @@ final class CampaignSeeder extends Seeder
                 $modelClass::factory()->count($missing)->create();
 
                 return $modelClass::query()->pluck('id');
-            } catch (\Throwable $exception) {
+            } catch (Throwable $exception) {
                 // Swallow factory exceptions to keep seeding resilient
             }
         }
@@ -337,7 +338,7 @@ final class CampaignSeeder extends Seeder
         } catch (QueryException $exception) {
             if ($this->isMissingTableException($exception, 'campaign_clicks')) {
                 $this->skipCampaignClickSeeding = true;
-                $this->command?->warn('Skipping campaign click seeding: '.$exception->getMessage());
+                $this->command?->warn('Skipping campaign click seeding: ' . $exception->getMessage());
 
                 return;
             }
@@ -357,7 +358,7 @@ final class CampaignSeeder extends Seeder
         } catch (QueryException $exception) {
             if ($this->isMissingTableException($exception, 'campaign_conversions')) {
                 $this->skipCampaignConversionSeeding = true;
-                $this->command?->warn('Skipping campaign conversion seeding: '.$exception->getMessage());
+                $this->command?->warn('Skipping campaign conversion seeding: ' . $exception->getMessage());
 
                 return;
             }
@@ -375,7 +376,7 @@ final class CampaignSeeder extends Seeder
         try {
             CampaignProductTarget::query()->create([
                 'campaign_id' => $campaignId,
-                'product_id' => $productId,
+                'product_id'  => $productId,
                 'category_id' => $categoryId,
                 'target_type' => $targetType,
             ]);

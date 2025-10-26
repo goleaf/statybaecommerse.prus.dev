@@ -57,9 +57,9 @@ return [
     'in_app_exclude' => $csvToArray(env('SENTRY_IN_APP_EXCLUDE')),
 
     'breadcrumbs' => [
-        'logs' => (bool) env('SENTRY_BREADCRUMBS_LOGS_ENABLED', true),
-        'sql_queries' => (bool) env('SENTRY_BREADCRUMBS_SQL_QUERIES_ENABLED', true),
-        'queue_info' => (bool) env('SENTRY_BREADCRUMBS_QUEUE_INFO_ENABLED', true),
+        'logs'         => (bool) env('SENTRY_BREADCRUMBS_LOGS_ENABLED', true),
+        'sql_queries'  => (bool) env('SENTRY_BREADCRUMBS_SQL_QUERIES_ENABLED', true),
+        'queue_info'   => (bool) env('SENTRY_BREADCRUMBS_QUEUE_INFO_ENABLED', true),
         'command_info' => (bool) env('SENTRY_BREADCRUMBS_COMMAND_INFO_ENABLED', true),
     ],
 ];

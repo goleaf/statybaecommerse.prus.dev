@@ -140,9 +140,9 @@ describe('User Impersonation Actions', function () {
         // Start impersonation
         session([
             'impersonate' => [
-                'original_user_id' => $this->admin->id,
+                'original_user_id'     => $this->admin->id,
                 'impersonated_user_id' => $targetUser->id,
-                'started_at' => now()->toISOString(),
+                'started_at'           => now()->toISOString(),
             ],
         ]);
         auth()->login($targetUser);
@@ -158,9 +158,9 @@ describe('User Impersonation Actions', function () {
     it('shows stop impersonation button when impersonating', function () {
         session([
             'impersonate' => [
-                'original_user_id' => $this->admin->id,
+                'original_user_id'     => $this->admin->id,
                 'impersonated_user_id' => 999,
-                'started_at' => now()->toISOString(),
+                'started_at'           => now()->toISOString(),
             ],
         ]);
 
@@ -192,9 +192,9 @@ describe('User Impersonation Notifications', function () {
 
         Livewire::test(\App\Filament\Pages\UserImpersonation::class)
             ->callTableAction('send_notification', $targetUser, [
-                'title' => 'Test Notification',
+                'title'   => 'Test Notification',
                 'message' => 'This is a test message',
-                'type' => 'info',
+                'type'    => 'info',
             ])
             ->assertNotified(__('admin.notifications.notification_sent'));
 
@@ -206,9 +206,9 @@ describe('User Impersonation Notifications', function () {
 
         Livewire::test(\App\Filament\Pages\UserImpersonation::class)
             ->callTableAction('send_notification', $targetUser, [
-                'title' => '',
+                'title'   => '',
                 'message' => '',
-                'type' => '',
+                'type'    => '',
             ])
             ->assertHasTableActionErrors(['title', 'message', 'type']);
     });
@@ -280,11 +280,11 @@ describe('User Impersonation Filters', function () {
 
     it('can filter by recent activity', function () {
         $recentUser = User::factory()->create([
-            'is_admin' => false,
+            'is_admin'      => false,
             'last_login_at' => now()->subDays(5),
         ]);
         $oldUser = User::factory()->create([
-            'is_admin' => false,
+            'is_admin'      => false,
             'last_login_at' => now()->subDays(60),
         ]);
 
@@ -335,9 +335,9 @@ describe('User Impersonation Middleware', function () {
         // Start impersonation
         session([
             'impersonate' => [
-                'original_user_id' => $admin->id,
+                'original_user_id'     => $admin->id,
                 'impersonated_user_id' => $targetUser->id,
-                'started_at' => now()->toISOString(),
+                'started_at'           => now()->toISOString(),
             ],
         ]);
 

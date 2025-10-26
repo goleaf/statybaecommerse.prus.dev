@@ -18,24 +18,24 @@ final class CampaignClickTest extends TestCase
     {
         $campaign = Campaign::factory()->create();
         $click = CampaignClick::factory()->create([
-            'campaign_id' => $campaign->id,
-            'session_id' => 'test_session_123',
-            'ip_address' => '192.168.1.1',
-            'user_agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-            'click_type' => 'banner',
-            'clicked_url' => 'https://example.com/product/123',
-            'clicked_at' => now(),
-            'device_type' => 'desktop',
-            'browser' => 'Chrome',
-            'os' => 'Windows',
-            'country' => 'US',
-            'city' => 'New York',
-            'utm_source' => 'google',
-            'utm_medium' => 'cpc',
-            'utm_campaign' => 'summer_sale',
+            'campaign_id'      => $campaign->id,
+            'session_id'       => 'test_session_123',
+            'ip_address'       => '192.168.1.1',
+            'user_agent'       => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+            'click_type'       => 'banner',
+            'clicked_url'      => 'https://example.com/product/123',
+            'clicked_at'       => now(),
+            'device_type'      => 'desktop',
+            'browser'          => 'Chrome',
+            'os'               => 'Windows',
+            'country'          => 'US',
+            'city'             => 'New York',
+            'utm_source'       => 'google',
+            'utm_medium'       => 'cpc',
+            'utm_campaign'     => 'summer_sale',
             'conversion_value' => 25.50,
-            'is_converted' => true,
-            'conversion_data' => ['product_id' => 123, 'amount' => 25.50],
+            'is_converted'     => true,
+            'conversion_data'  => ['product_id' => 123, 'amount' => 25.50],
         ]);
 
         $this->assertInstanceOf(CampaignClick::class, $click);
@@ -95,10 +95,10 @@ final class CampaignClickTest extends TestCase
     public function test_campaign_click_casts(): void
     {
         $click = CampaignClick::factory()->create([
-            'clicked_at' => '2024-01-01 12:00:00',
+            'clicked_at'       => '2024-01-01 12:00:00',
             'conversion_value' => '15.75',
-            'is_converted' => true,
-            'conversion_data' => ['test' => 'data'],
+            'is_converted'     => true,
+            'conversion_data'  => ['test' => 'data'],
         ]);
 
         $this->assertInstanceOf(\Carbon\Carbon::class, $click->clicked_at);
@@ -138,12 +138,12 @@ final class CampaignClickTest extends TestCase
         $campaign = Campaign::factory()->create();
 
         $convertedClick = CampaignClick::factory()->create([
-            'campaign_id' => $campaign->id,
+            'campaign_id'  => $campaign->id,
             'is_converted' => true,
         ]);
 
         $nonConvertedClick = CampaignClick::factory()->create([
-            'campaign_id' => $campaign->id,
+            'campaign_id'  => $campaign->id,
             'is_converted' => false,
         ]);
 

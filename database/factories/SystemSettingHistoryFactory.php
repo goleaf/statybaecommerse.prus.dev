@@ -28,10 +28,10 @@ final class SystemSettingHistoryFactory extends Factory
 
         return [
             'system_setting_id' => SystemSetting::factory(),
-            'old_value' => fake()->boolean(70) ? fake()->sentence() : null,
-            'new_value' => fake()->boolean(80) ? fake()->sentence() : null,
-            'changed_by' => User::factory(),
-            'change_reason' => fake()->randomElement($reasons),
+            'old_value'         => fake()->boolean(70) ? fake()->sentence() : null,
+            'new_value'         => fake()->boolean(80) ? fake()->sentence() : null,
+            'changed_by'        => User::factory(),
+            'change_reason'     => fake()->randomElement($reasons),
         ];
     }
 

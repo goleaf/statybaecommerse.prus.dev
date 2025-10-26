@@ -31,28 +31,28 @@ final class DashboardTimeSeriesRepository
             })->all();
 
             return [
-                'labels' => $labels,
+                'labels'   => $labels,
                 'datasets' => [
                     [
-                        'label' => trans('admin/dashboard.charts.revenue'),
-                        'data' => $revenue->all(),
-                        'borderColor' => '#10B981',
+                        'label'           => trans('admin/dashboard.charts.revenue'),
+                        'data'            => $revenue->all(),
+                        'borderColor'     => '#10B981',
                         'backgroundColor' => 'rgba(16, 185, 129, 0.15)',
-                        'yAxisID' => 'y1',
+                        'yAxisID'         => 'y1',
                     ],
                     [
-                        'label' => trans('admin/dashboard.charts.orders'),
-                        'data' => $orders->all(),
-                        'borderColor' => '#3B82F6',
+                        'label'           => trans('admin/dashboard.charts.orders'),
+                        'data'            => $orders->all(),
+                        'borderColor'     => '#3B82F6',
                         'backgroundColor' => 'rgba(59, 130, 246, 0.15)',
-                        'yAxisID' => 'y',
+                        'yAxisID'         => 'y',
                     ],
                     [
-                        'label' => trans('admin/dashboard.charts.users'),
-                        'data' => $users->all(),
-                        'borderColor' => '#F97316',
+                        'label'           => trans('admin/dashboard.charts.users'),
+                        'data'            => $users->all(),
+                        'borderColor'     => '#F97316',
                         'backgroundColor' => 'rgba(249, 115, 22, 0.15)',
-                        'yAxisID' => 'y',
+                        'yAxisID'         => 'y',
                     ],
                 ],
             ];

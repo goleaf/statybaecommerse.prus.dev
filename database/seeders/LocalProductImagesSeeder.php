@@ -8,6 +8,7 @@ use App\Models\Product;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
+use Throwable;
 
 final class LocalProductImagesSeeder extends Seeder
 {
@@ -34,20 +35,20 @@ final class LocalProductImagesSeeder extends Seeder
 
         // Create simple SVG images for different product categories
         $productImages = [
-            'drill.svg' => $this->createDrillSvg(),
-            'hammer.svg' => $this->createHammerSvg(),
-            'saw.svg' => $this->createSawSvg(),
-            'screwdriver.svg' => $this->createScrewdriverSvg(),
-            'wrench.svg' => $this->createWrenchSvg(),
-            'level.svg' => $this->createLevelSvg(),
-            'safety-helmet.svg' => $this->createHelmetSvg(),
-            'safety-boots.svg' => $this->createBootsSvg(),
+            'drill.svg'          => $this->createDrillSvg(),
+            'hammer.svg'         => $this->createHammerSvg(),
+            'saw.svg'            => $this->createSawSvg(),
+            'screwdriver.svg'    => $this->createScrewdriverSvg(),
+            'wrench.svg'         => $this->createWrenchSvg(),
+            'level.svg'          => $this->createLevelSvg(),
+            'safety-helmet.svg'  => $this->createHelmetSvg(),
+            'safety-boots.svg'   => $this->createBootsSvg(),
             'measuring-tape.svg' => $this->createMeasuringTapeSvg(),
-            'pliers.svg' => $this->createPliersSvg(),
+            'pliers.svg'         => $this->createPliersSvg(),
         ];
 
         foreach ($productImages as $filename => $content) {
-            $path = $imageDir.'/'.$filename;
+            $path = $imageDir . '/' . $filename;
             if (! File::exists($path)) {
                 File::put($path, $content);
                 $this->command->info("Created: {$filename}");
@@ -82,16 +83,16 @@ final class LocalProductImagesSeeder extends Seeder
                     // Add the new image
                     $product->addMedia($imagePath)
                         ->withCustomProperties(['source' => 'local_svg'])
-                        ->usingName($product->name.' Image')
+                        ->usingName($product->name . ' Image')
                         ->toMediaCollection('images');
 
                     $this->command->info("✓ Added {$imageFile} to: {$product->name}");
                 }
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
                 Log::warning('Failed to add local image to product', [
-                    'product_id' => $product->id,
+                    'product_id'   => $product->id,
                     'product_name' => $product->name,
-                    'error' => $e->getMessage(),
+                    'error'        => $e->getMessage(),
                 ]);
             }
         }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Models\Menu;
 use App\Models\MenuItem;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+
 // Boot the database refresh trait while the shared Pest bootstrap loads the Laravel TestCase kernel.
 uses(RefreshDatabase::class);
 

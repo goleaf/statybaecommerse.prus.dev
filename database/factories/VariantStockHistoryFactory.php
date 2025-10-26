@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Factories;
 
@@ -23,25 +25,25 @@ class VariantStockHistoryFactory extends Factory
         $changeType = $this->faker->randomElement($changeTypes);
         $oldQuantity = $this->faker->numberBetween(0, 100);
         $quantityChange = match ($changeType) {
-            'increase' => $this->faker->numberBetween(1, 20),
-            'decrease' => -$this->faker->numberBetween(1, min(10, max(1, $oldQuantity))),
+            'increase'   => $this->faker->numberBetween(1, 20),
+            'decrease'   => -$this->faker->numberBetween(1, min(10, max(1, $oldQuantity))),
             'adjustment' => $this->faker->numberBetween(-5, 10),
-            'reserve' => -$this->faker->numberBetween(1, min(5, max(1, $oldQuantity))),
-            'unreserve' => $this->faker->numberBetween(1, 10),
-            default => 0,
+            'reserve'    => -$this->faker->numberBetween(1, min(5, max(1, $oldQuantity))),
+            'unreserve'  => $this->faker->numberBetween(1, 10),
+            default      => 0,
         };
         $newQuantity = max(0, $oldQuantity + $quantityChange);
 
         return [
-            'variant_id' => ProductVariant::factory(),
-            'old_quantity' => $oldQuantity,
-            'new_quantity' => $newQuantity,
+            'variant_id'      => ProductVariant::factory(),
+            'old_quantity'    => $oldQuantity,
+            'new_quantity'    => $newQuantity,
             'quantity_change' => $quantityChange,  // Use calculated change from match expression
-            'change_type' => $changeType,
-            'change_reason' => $this->faker->randomElement($changeReasons),
-            'changed_by' => User::factory(),
-            'reference_type' => $changeType === 'increase' || $changeType === 'decrease' ? $this->faker->randomElement($referenceTypes) : null,
-            'reference_id' => $changeType === 'increase' || $changeType === 'decrease' ? $this->faker->numberBetween(1, 100) : null,
+            'change_type'     => $changeType,
+            'change_reason'   => $this->faker->randomElement($changeReasons),
+            'changed_by'      => User::factory(),
+            'reference_type'  => $changeType === 'increase' || $changeType === 'decrease' ? $this->faker->randomElement($referenceTypes) : null,
+            'reference_id'    => $changeType === 'increase' || $changeType === 'decrease' ? $this->faker->numberBetween(1, 100) : null,
         ];
     }
 
@@ -51,9 +53,9 @@ class VariantStockHistoryFactory extends Factory
      */
     public function withQuantities(int $oldQuantity, int $newQuantity): static
     {
-        return $this->state(fn(array $attributes) => [
-            'old_quantity' => $oldQuantity,
-            'new_quantity' => $newQuantity,
+        return $this->state(fn (array $attributes) => [
+            'old_quantity'    => $oldQuantity,
+            'new_quantity'    => $newQuantity,
             'quantity_change' => $newQuantity - $oldQuantity,
         ]);
     }
@@ -66,9 +68,9 @@ class VariantStockHistoryFactory extends Factory
             $newQuantity = $oldQuantity + $quantityChange;
 
             return [
-                'change_type' => 'increase',
-                'old_quantity' => $oldQuantity,
-                'new_quantity' => $newQuantity,
+                'change_type'     => 'increase',
+                'old_quantity'    => $oldQuantity,
+                'new_quantity'    => $newQuantity,
                 'quantity_change' => $quantityChange,
             ];
         });
@@ -82,9 +84,9 @@ class VariantStockHistoryFactory extends Factory
             $newQuantity = max(0, $oldQuantity + $quantityChange);
 
             return [
-                'change_type' => 'decrease',
-                'old_quantity' => $oldQuantity,
-                'new_quantity' => $newQuantity,
+                'change_type'     => 'decrease',
+                'old_quantity'    => $oldQuantity,
+                'new_quantity'    => $newQuantity,
                 'quantity_change' => $quantityChange,
             ];
         });
@@ -98,9 +100,9 @@ class VariantStockHistoryFactory extends Factory
             $newQuantity = max(0, $oldQuantity + $quantityChange);
 
             return [
-                'change_type' => 'adjustment',
-                'old_quantity' => $oldQuantity,
-                'new_quantity' => $newQuantity,
+                'change_type'     => 'adjustment',
+                'old_quantity'    => $oldQuantity,
+                'new_quantity'    => $newQuantity,
                 'quantity_change' => $quantityChange,
             ];
         });
@@ -114,9 +116,9 @@ class VariantStockHistoryFactory extends Factory
             $newQuantity = max(0, $oldQuantity + $quantityChange);
 
             return [
-                'change_type' => 'reserve',
-                'old_quantity' => $oldQuantity,
-                'new_quantity' => $newQuantity,
+                'change_type'     => 'reserve',
+                'old_quantity'    => $oldQuantity,
+                'new_quantity'    => $newQuantity,
                 'quantity_change' => $quantityChange,
             ];
         });
@@ -130,9 +132,9 @@ class VariantStockHistoryFactory extends Factory
             $newQuantity = $oldQuantity + $quantityChange;
 
             return [
-                'change_type' => 'unreserve',
-                'old_quantity' => $oldQuantity,
-                'new_quantity' => $newQuantity,
+                'change_type'     => 'unreserve',
+                'old_quantity'    => $oldQuantity,
+                'new_quantity'    => $newQuantity,
                 'quantity_change' => $quantityChange,
             ];
         });

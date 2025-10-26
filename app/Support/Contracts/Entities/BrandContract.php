@@ -33,7 +33,7 @@ final class BrandContract
 
         return self::envelope([
             'brand' => $brandPayload,
-            'item' => $brandPayload,
+            'item'  => $brandPayload,
         ], $meta);
     }
 
@@ -45,7 +45,7 @@ final class BrandContract
 
         $data = [
             'brands' => $mapped,
-            'items' => $mapped,
+            'items'  => $mapped,
         ];
 
         if ($paginator instanceof LengthAwarePaginator) {
@@ -87,7 +87,7 @@ final class BrandContract
             return route('brands.show', $slug);
         }
 
-        return url('/brands/'.$slug);
+        return url('/brands/' . $slug);
     }
 
     private static function envelope(array $data, array $meta = []): array

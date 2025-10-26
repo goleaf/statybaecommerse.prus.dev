@@ -16,7 +16,7 @@ final class CollectionRuleTest extends TestCase
 
     public function test_fillable_configuration_includes_rule_columns(): void
     {
-        $model = new CollectionRule();
+        $model = new CollectionRule;
 
         $this->assertContains('collection_id', $model->getFillable());
         $this->assertContains('field', $model->getFillable());
@@ -26,7 +26,7 @@ final class CollectionRuleTest extends TestCase
 
     public function test_casts_configuration_sets_position_and_active_types(): void
     {
-        $casts = (new CollectionRule())->getCasts();
+        $casts = (new CollectionRule)->getCasts();
 
         $this->assertSame('integer', $casts['position'] ?? null);
         $this->assertSame('boolean', $casts['is_active'] ?? null);
@@ -38,13 +38,13 @@ final class CollectionRuleTest extends TestCase
 
         $first = CollectionRule::factory()->create([
             'collection_id' => $collection->id,
-            'position' => null,
-            'is_active' => null,
+            'position'      => null,
+            'is_active'     => null,
         ]);
         $second = CollectionRule::factory()->create([
             'collection_id' => $collection->id,
-            'position' => null,
-            'is_active' => null,
+            'position'      => null,
+            'is_active'     => null,
         ]);
 
         $this->assertSame(1, $first->position);

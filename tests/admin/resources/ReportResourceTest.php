@@ -32,12 +32,12 @@ final class ReportResourceTest extends TestCase
     public function test_can_create_report(): void
     {
         $reportData = [
-            'name' => 'Test Report',
-            'slug' => 'test-report',
+            'name'        => 'Test Report',
+            'slug'        => 'test-report',
             'description' => 'Test report description',
-            'type' => 'sales',
-            'category' => 'analytics',
-            'is_active' => true,
+            'type'        => 'sales',
+            'category'    => 'analytics',
+            'is_active'   => true,
         ];
 
         Livewire::test(\App\Filament\Resources\ReportResource\Pages\CreateReport::class)
@@ -60,15 +60,15 @@ final class ReportResourceTest extends TestCase
             'record' => $report->getRouteKey(),
         ])
             ->fillForm([
-                'name' => 'Updated Report Name',
+                'name'        => 'Updated Report Name',
                 'description' => 'Updated description',
             ])
             ->call('save')
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('reports', [
-            'id' => $report->id,
-            'name' => 'Updated Report Name',
+            'id'          => $report->id,
+            'name'        => 'Updated Report Name',
             'description' => 'Updated description',
         ]);
     }
@@ -142,7 +142,7 @@ final class ReportResourceTest extends TestCase
             ->assertHasNoTableActionErrors();
 
         $this->assertDatabaseHas('reports', [
-            'id' => $report->id,
+            'id'        => $report->id,
             'is_active' => false,
         ]);
     }
@@ -159,7 +159,7 @@ final class ReportResourceTest extends TestCase
     public function test_view_report_uses_table_repeaters_and_empty_states(): void
     {
         $report = Report::factory()->create([
-            'filters' => [],
+            'filters'  => [],
             'settings' => [],
             'metadata' => [],
         ]);

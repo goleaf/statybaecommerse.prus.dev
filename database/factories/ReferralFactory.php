@@ -18,27 +18,27 @@ final class ReferralFactory extends Factory
     public function definition(): array
     {
         return [
-            'referrer_id' => null,
-            'referred_id' => null,
+            'referrer_id'   => null,
+            'referred_id'   => null,
             'referral_code' => $this->faker->unique()->regexify('[A-Z0-9]{8}'),
-            'status' => $this->faker->randomElement(['pending', 'completed', 'expired']),
-            'completed_at' => $this->faker->optional(0.3)->dateTimeBetween('-1 year', 'now'),
-            'expires_at' => $this->faker->optional(0.7)->dateTimeBetween('now', '+1 year'),
-            'metadata' => $this->faker->optional(0.5)->randomElements([
-                'utm_source' => $this->faker->randomElement(['google', 'facebook', 'twitter', 'email']),
-                'utm_medium' => $this->faker->randomElement(['cpc', 'social', 'email', 'organic']),
+            'status'        => $this->faker->randomElement(['pending', 'completed', 'expired']),
+            'completed_at'  => $this->faker->optional(0.3)->dateTimeBetween('-1 year', 'now'),
+            'expires_at'    => $this->faker->optional(0.7)->dateTimeBetween('now', '+1 year'),
+            'metadata'      => $this->faker->optional(0.5)->randomElements([
+                'utm_source'   => $this->faker->randomElement(['google', 'facebook', 'twitter', 'email']),
+                'utm_medium'   => $this->faker->randomElement(['cpc', 'social', 'email', 'organic']),
                 'utm_campaign' => $this->faker->randomElement(['summer2024', 'winter2024', 'spring2024']),
-                'device' => $this->faker->randomElement(['desktop', 'mobile', 'tablet']),
-                'browser' => $this->faker->randomElement(['chrome', 'firefox', 'safari', 'edge']),
+                'device'       => $this->faker->randomElement(['desktop', 'mobile', 'tablet']),
+                'browser'      => $this->faker->randomElement(['chrome', 'firefox', 'safari', 'edge']),
             ]),
-            'source' => $this->faker->randomElement(['website', 'email', 'social', 'mobile_app', 'partner']),
-            'campaign' => $this->faker->optional(0.6)->randomElement(['summer2024', 'winter2024', 'spring2024', 'referral_bonus', 'new_user']),
-            'utm_source' => $this->faker->optional(0.4)->randomElement(['google', 'facebook', 'twitter', 'linkedin']),
-            'utm_medium' => $this->faker->optional(0.4)->randomElement(['cpc', 'social', 'email', 'organic']),
+            'source'       => $this->faker->randomElement(['website', 'email', 'social', 'mobile_app', 'partner']),
+            'campaign'     => $this->faker->optional(0.6)->randomElement(['summer2024', 'winter2024', 'spring2024', 'referral_bonus', 'new_user']),
+            'utm_source'   => $this->faker->optional(0.4)->randomElement(['google', 'facebook', 'twitter', 'linkedin']),
+            'utm_medium'   => $this->faker->optional(0.4)->randomElement(['cpc', 'social', 'email', 'organic']),
             'utm_campaign' => $this->faker->optional(0.4)->randomElement(['summer2024', 'winter2024', 'spring2024']),
-            'ip_address' => $this->faker->optional(0.8)->ipv4(),
-            'user_agent' => $this->faker->optional(0.8)->userAgent(),
-            'title' => [
+            'ip_address'   => $this->faker->optional(0.8)->ipv4(),
+            'user_agent'   => $this->faker->optional(0.8)->userAgent(),
+            'title'        => [
                 'en' => $this->faker->sentence(3),
                 'lt' => $this->faker->sentence(3),
             ],
@@ -76,7 +76,7 @@ final class ReferralFactory extends Factory
     public function pending(): static
     {
         return $this->state(fn (array $attributes) => [
-            'status' => 'pending',
+            'status'       => 'pending',
             'completed_at' => null,
         ]);
     }
@@ -84,7 +84,7 @@ final class ReferralFactory extends Factory
     public function completed(): static
     {
         return $this->state(fn (array $attributes) => [
-            'status' => 'completed',
+            'status'       => 'completed',
             'completed_at' => $this->faker->dateTimeBetween('-1 year', 'now'),
         ]);
     }
@@ -92,7 +92,7 @@ final class ReferralFactory extends Factory
     public function expired(): static
     {
         return $this->state(fn (array $attributes) => [
-            'status' => 'expired',
+            'status'     => 'expired',
             'expires_at' => $this->faker->dateTimeBetween('-1 year', '-1 day'),
         ]);
     }
@@ -100,7 +100,7 @@ final class ReferralFactory extends Factory
     public function active(): static
     {
         return $this->state(fn (array $attributes) => [
-            'status' => 'pending',
+            'status'     => 'pending',
             'expires_at' => $this->faker->dateTimeBetween('now', '+1 year'),
         ]);
     }

@@ -1,18 +1,20 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models;
 
 use App\Models\Scopes\UserOwnedScope;
 use App\Traits\HasTranslations;
+use Eloquent;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
-use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
-use Eloquent;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 /**
  * ProductHistory
@@ -60,15 +62,16 @@ final class ProductHistory extends Model
 {
     /** @use HasFactory<\Database\Factories\ProductHistoryFactory> */
     use HasFactory;
+
     use HasTranslations;
     use LogsActivity;
 
     protected $fillable = ['product_id', 'user_id', 'action', 'field_name', 'old_value', 'new_value', 'description', 'ip_address', 'user_agent', 'metadata', 'causer_type', 'causer_id', 'created_at', 'updated_at'];
 
     protected $casts = [
-        'metadata' => 'array',
-        'old_value' => 'json',
-        'new_value' => 'json',
+        'metadata'   => 'array',
+        'old_value'  => 'json',
+        'new_value'  => 'json',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
@@ -95,7 +98,7 @@ final class ProductHistory extends Model
      */
     public function getActivitylogOptions(): LogOptions
     {
-        return LogOptions::defaults()->logOnly(['action', 'field_name', 'description'])->logOnlyDirty()->dontSubmitEmptyLogs()->setDescriptionForEvent(fn(string $eventName) => "ProductHistory {$eventName}")->useLogName('product_history');
+        return LogOptions::defaults()->logOnly(['action', 'field_name', 'description'])->logOnlyDirty()->dontSubmitEmptyLogs()->setDescriptionForEvent(fn (string $eventName) => "ProductHistory {$eventName}")->useLogName('product_history');
     }
 
     // Relations
@@ -211,14 +214,14 @@ final class ProductHistory extends Model
     public function getActionDisplayAttribute(): string
     {
         return match ($this->action) {
-            'created' => __('admin.product_history.actions.created'),
-            'updated' => __('admin.product_history.actions.updated'),
-            'deleted' => __('admin.product_history.actions.deleted'),
-            'restored' => __('admin.product_history.actions.restored'),
+            'created'       => __('admin.product_history.actions.created'),
+            'updated'       => __('admin.product_history.actions.updated'),
+            'deleted'       => __('admin.product_history.actions.deleted'),
+            'restored'      => __('admin.product_history.actions.restored'),
             'price_changed' => __('admin.product_history.actions.price_changed'),
             'stock_changed', 'stock_updated' => __('admin.product_history.actions.stock_updated'),
             'status_changed' => __('admin.product_history.actions.status_changed'),
-            default => $this->action,
+            default          => $this->action,
         };
     }
 
@@ -291,7 +294,7 @@ final class ProductHistory extends Model
      */
     public function getChangeImpact(): string
     {
-        if (!$this->isSignificantChange()) {
+        if (! $this->isSignificantChange()) {
             return 'low';
         }
         if (in_array($this->field_name, ['price', 'sale_price', 'stock_quantity'])) {
@@ -314,22 +317,22 @@ final class ProductHistory extends Model
         $userId = $user !== null ? $user->id : auth()->id();
 
         return self::create([
-            'product_id' => $product->id,
-            'user_id' => $userId,
-            'action' => $action,
-            'field_name' => $fieldName,
-            'old_value' => $oldValue,
-            'new_value' => $newValue,
+            'product_id'  => $product->id,
+            'user_id'     => $userId,
+            'action'      => $action,
+            'field_name'  => $fieldName,
+            'old_value'   => $oldValue,
+            'new_value'   => $newValue,
             'description' => $description,
-            'ip_address' => request()->ip(),
-            'user_agent' => request()->userAgent(),
-            'metadata' => [
+            'ip_address'  => request()->ip(),
+            'user_agent'  => request()->userAgent(),
+            'metadata'    => [
                 'product_name' => $product->name,
-                'product_sku' => $product->sku,
-                'timestamp' => now()->toISOString(),
+                'product_sku'  => $product->sku,
+                'timestamp'    => now()->toISOString(),
             ],
             'causer_type' => User::class,
-            'causer_id' => $userId,
+            'causer_id'   => $userId,
         ]);
     }
 

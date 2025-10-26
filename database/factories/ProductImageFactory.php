@@ -24,8 +24,8 @@ final class ProductImageFactory extends Factory
     {
         return [
             'product_id' => Product::factory(),
-            'path' => 'product-images/'.$this->faker->uuid().'.jpg',
-            'alt_text' => $this->faker->sentence(3),
+            'path'       => 'product-images/' . $this->faker->uuid() . '.jpg',
+            'alt_text'   => $this->faker->sentence(3),
             'sort_order' => $this->faker->numberBetween(0, 10),
         ];
     }
@@ -36,8 +36,8 @@ final class ProductImageFactory extends Factory
     public function main(): static
     {
         return $this->state(fn (array $attributes) => [
-            'path' => 'product-images/main-'.$this->faker->uuid().'.jpg',
-            'alt_text' => 'Main product image',
+            'path'       => 'product-images/main-' . $this->faker->uuid() . '.jpg',
+            'alt_text'   => 'Main product image',
             'sort_order' => 1,
         ]);
     }
@@ -48,8 +48,8 @@ final class ProductImageFactory extends Factory
     public function gallery(): static
     {
         return $this->state(fn (array $attributes) => [
-            'path' => 'product-images/gallery-'.$this->faker->uuid().'.jpg',
-            'alt_text' => 'Gallery image',
+            'path'       => 'product-images/gallery-' . $this->faker->uuid() . '.jpg',
+            'alt_text'   => 'Gallery image',
             'sort_order' => $this->faker->numberBetween(2, 5),
         ]);
     }
@@ -60,8 +60,8 @@ final class ProductImageFactory extends Factory
     public function lifestyle(): static
     {
         return $this->state(fn (array $attributes) => [
-            'path' => 'product-images/lifestyle-'.$this->faker->uuid().'.jpg',
-            'alt_text' => 'Lifestyle image',
+            'path'       => 'product-images/lifestyle-' . $this->faker->uuid() . '.jpg',
+            'alt_text'   => 'Lifestyle image',
             'sort_order' => $this->faker->numberBetween(6, 8),
         ]);
     }
@@ -72,8 +72,8 @@ final class ProductImageFactory extends Factory
     public function technical(): static
     {
         return $this->state(fn (array $attributes) => [
-            'path' => 'product-images/technical-'.$this->faker->uuid().'.jpg',
-            'alt_text' => 'Technical specification image',
+            'path'       => 'product-images/technical-' . $this->faker->uuid() . '.jpg',
+            'alt_text'   => 'Technical specification image',
             'sort_order' => $this->faker->numberBetween(9, 10),
         ]);
     }
@@ -84,8 +84,8 @@ final class ProductImageFactory extends Factory
     public function thumbnail(): static
     {
         return $this->state(fn (array $attributes) => [
-            'path' => 'product-images/thumb-'.$this->faker->uuid().'.jpg',
-            'alt_text' => 'Thumbnail image',
+            'path'       => 'product-images/thumb-' . $this->faker->uuid() . '.jpg',
+            'alt_text'   => 'Thumbnail image',
             'sort_order' => 0,
         ]);
     }
@@ -96,8 +96,8 @@ final class ProductImageFactory extends Factory
     public function highRes(): static
     {
         return $this->state(fn (array $attributes) => [
-            'path' => 'product-images/high-res-'.$this->faker->uuid().'.jpg',
-            'alt_text' => 'High resolution image',
+            'path'       => 'product-images/high-res-' . $this->faker->uuid() . '.jpg',
+            'alt_text'   => 'High resolution image',
             'sort_order' => $this->faker->numberBetween(1, 3),
         ]);
     }
@@ -142,7 +142,7 @@ final class ProductImageFactory extends Factory
 
         return $this->state(fn (array $attributes) => [
             'product_id' => $product->id,
-            'path' => "product-images/{$productSlug}/".$this->faker->uuid().'.jpg',
+            'path'       => "product-images/{$productSlug}/" . $this->faker->uuid() . '.jpg',
         ]);
     }
 
@@ -156,7 +156,7 @@ final class ProductImageFactory extends Factory
 
         return $this->state(fn (array $attributes) => [
             'product_id' => $product->id,
-            'path' => "product-images/{$productSlug}/".$this->faker->uuid().'.jpg',
+            'path'       => "product-images/{$productSlug}/" . $this->faker->uuid() . '.jpg',
         ])->count($count);
     }
 
@@ -196,7 +196,7 @@ final class ProductImageFactory extends Factory
     public function withExtension(string $extension): static
     {
         return $this->state(fn (array $attributes) => [
-            'path' => 'product-images/'.$this->faker->uuid().'.'.$extension,
+            'path' => 'product-images/' . $this->faker->uuid() . '.' . $extension,
         ]);
     }
 
@@ -230,7 +230,7 @@ final class ProductImageFactory extends Factory
     public function inDirectory(string $directory): static
     {
         return $this->state(fn (array $attributes) => [
-            'path' => $directory.'/'.$this->faker->uuid().'.jpg',
+            'path' => $directory . '/' . $this->faker->uuid() . '.jpg',
         ]);
     }
 
@@ -240,7 +240,7 @@ final class ProductImageFactory extends Factory
     public function withDimensions(int $width, int $height): static
     {
         return $this->state(fn (array $attributes) => [
-            'path' => 'product-images/'.$this->faker->uuid()."_{$width}x{$height}.jpg",
+            'path'     => 'product-images/' . $this->faker->uuid() . "_{$width}x{$height}.jpg",
             'alt_text' => "Product image {$width}x{$height}",
         ]);
     }
@@ -253,7 +253,7 @@ final class ProductImageFactory extends Factory
         $categorySlug = strtolower(str_replace(' ', '-', $category));
 
         return $this->state(fn (array $attributes) => [
-            'path' => "product-images/{$categorySlug}/".$this->faker->uuid().'.jpg',
+            'path'     => "product-images/{$categorySlug}/" . $this->faker->uuid() . '.jpg',
             'alt_text' => "{$category} product image",
         ]);
     }

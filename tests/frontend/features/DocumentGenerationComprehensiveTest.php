@@ -28,18 +28,18 @@ final class DocumentGenerationComprehensiveTest extends TestCase
     public function it_can_create_document_template(): void
     {
         $template = DocumentTemplate::factory()->create([
-            'name' => 'Invoice Template',
-            'type' => 'invoice',
-            'category' => 'sales',
-            'content' => '<h1>Invoice #$ORDER_NUMBER</h1><p>Customer: $CUSTOMER_NAME</p>',
+            'name'      => 'Invoice Template',
+            'type'      => 'invoice',
+            'category'  => 'sales',
+            'content'   => '<h1>Invoice #$ORDER_NUMBER</h1><p>Customer: $CUSTOMER_NAME</p>',
             'variables' => ['ORDER_NUMBER', 'CUSTOMER_NAME'],
             'is_active' => true,
         ]);
 
         $this->assertDatabaseHas('document_templates', [
-            'name' => 'Invoice Template',
-            'type' => 'invoice',
-            'category' => 'sales',
+            'name'      => 'Invoice Template',
+            'type'      => 'invoice',
+            'category'  => 'sales',
             'is_active' => true,
         ]);
 
@@ -51,19 +51,19 @@ final class DocumentGenerationComprehensiveTest extends TestCase
     {
         $user = User::factory()->create(['name' => 'John Doe']);
         $order = Order::factory()->create([
-            'number' => 'ORD-001',
+            'number'  => 'ORD-001',
             'user_id' => $user->id,
         ]);
 
         $template = DocumentTemplate::factory()->create([
-            'name' => 'Invoice Template',
-            'type' => 'invoice',
-            'content' => '<h1>Invoice #$ORDER_NUMBER</h1><p>Customer: $CUSTOMER_NAME</p>',
+            'name'      => 'Invoice Template',
+            'type'      => 'invoice',
+            'content'   => '<h1>Invoice #$ORDER_NUMBER</h1><p>Customer: $CUSTOMER_NAME</p>',
             'variables' => ['ORDER_NUMBER', 'CUSTOMER_NAME'],
         ]);
 
         $document = $this->documentService->generateDocument($template, $order, [
-            'ORDER_NUMBER' => $order->number,
+            'ORDER_NUMBER'  => $order->number,
             'CUSTOMER_NAME' => $user->name,
         ]);
 
@@ -80,8 +80,8 @@ final class DocumentGenerationComprehensiveTest extends TestCase
     {
         $user = User::factory()->create(['name' => 'Jane Smith', 'email' => 'jane@example.com']);
         $order = Order::factory()->create([
-            'number' => 'ORD-002',
-            'total' => 150.0,
+            'number'  => 'ORD-002',
+            'total'   => 150.0,
             'user_id' => $user->id,
         ]);
 
@@ -107,8 +107,8 @@ final class DocumentGenerationComprehensiveTest extends TestCase
         ]);
 
         $variables = [
-            '$ORDER_NUMBER' => 'ORD-003',
-            '$ORDER_TOTAL' => '299.99',
+            '$ORDER_NUMBER'  => 'ORD-003',
+            '$ORDER_TOTAL'   => '299.99',
             '$CUSTOMER_NAME' => 'Bob Johnson',
         ];
 
@@ -234,9 +234,9 @@ final class DocumentGenerationComprehensiveTest extends TestCase
     {
         $template = DocumentTemplate::factory()->create([
             'settings' => [
-                'page_size' => 'A4',
+                'page_size'   => 'A4',
                 'orientation' => 'portrait',
-                'margins' => '10mm',
+                'margins'     => '10mm',
             ],
         ]);
 
@@ -294,15 +294,15 @@ final class DocumentGenerationComprehensiveTest extends TestCase
     public function it_can_check_if_document_is_generated(): void
     {
         $generatedDocument = Document::factory()->create([
-            'status' => 'published',
+            'status'       => 'published',
             'generated_at' => now(),
-            'file_path' => 'documents/test.pdf',
+            'file_path'    => 'documents/test.pdf',
         ]);
 
         $notGeneratedDocument = Document::factory()->create([
-            'status' => 'draft',
+            'status'       => 'draft',
             'generated_at' => null,
-            'file_path' => null,
+            'file_path'    => null,
         ]);
 
         $this->assertTrue($generatedDocument->isGenerated());
@@ -338,7 +338,7 @@ final class DocumentGenerationComprehensiveTest extends TestCase
     public function it_handles_multilanguage_templates(): void
     {
         $template = DocumentTemplate::factory()->create([
-            'content' => '<h1>$COMPANY_NAME</h1><p>$GREETING</p>',
+            'content'   => '<h1>$COMPANY_NAME</h1><p>$GREETING</p>',
             'variables' => ['COMPANY_NAME', 'GREETING'],
         ]);
 
@@ -346,7 +346,7 @@ final class DocumentGenerationComprehensiveTest extends TestCase
         app()->setLocale('lt');
         $ltVariables = [
             'COMPANY_NAME' => 'Mano Įmonė',
-            'GREETING' => 'Sveiki',
+            'GREETING'     => 'Sveiki',
         ];
 
         $ltContent = $this->documentService->renderTemplate($template, $ltVariables);
@@ -357,7 +357,7 @@ final class DocumentGenerationComprehensiveTest extends TestCase
         app()->setLocale('en');
         $enVariables = [
             'COMPANY_NAME' => 'My Company',
-            'GREETING' => 'Hello',
+            'GREETING'     => 'Hello',
         ];
 
         $enContent = $this->documentService->renderTemplate($template, $enVariables);

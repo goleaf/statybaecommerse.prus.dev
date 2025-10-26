@@ -28,11 +28,11 @@ enum OrderPaymentState: string
         }
 
         return match ($this) {
-            self::CREATED => $target === self::PAID,
-            self::PAID => in_array($target, [self::FULFILLED, self::PARTIALLY_REFUNDED, self::REFUNDED], true),
-            self::FULFILLED => in_array($target, [self::PARTIALLY_REFUNDED, self::REFUNDED], true),
+            self::CREATED            => $target === self::PAID,
+            self::PAID               => in_array($target, [self::FULFILLED, self::PARTIALLY_REFUNDED, self::REFUNDED], true),
+            self::FULFILLED          => in_array($target, [self::PARTIALLY_REFUNDED, self::REFUNDED], true),
             self::PARTIALLY_REFUNDED => $target === self::REFUNDED,
-            self::REFUNDED => false,
+            self::REFUNDED           => false,
         };
     }
 }

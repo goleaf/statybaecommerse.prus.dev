@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Widgets;
 
+use Exception;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use ReflectionClass;
 use Tests\TestCase;
 
 /**
@@ -26,8 +28,8 @@ class WidgetTestSuite extends TestCase
             try {
                 $widget = new $widgetClass;
                 $this->assertInstanceOf(\Filament\Widgets\Widget::class, $widget);
-            } catch (\Exception $e) {
-                $this->fail("Widget {$widgetClass} could not be instantiated: ".$e->getMessage());
+            } catch (Exception $e) {
+                $this->fail("Widget {$widgetClass} could not be instantiated: " . $e->getMessage());
             }
         }
     }
@@ -40,7 +42,7 @@ class WidgetTestSuite extends TestCase
             $widget = new $widgetClass;
 
             // Check for view property
-            $reflection = new \ReflectionClass($widget);
+            $reflection = new ReflectionClass($widget);
             $this->assertTrue($reflection->hasProperty('view'), "Widget {$widgetClass} missing view property");
         }
     }
@@ -51,7 +53,7 @@ class WidgetTestSuite extends TestCase
 
         foreach ($widgetClasses as $widgetClass) {
             $widget = new $widgetClass;
-            $reflection = new \ReflectionClass($widget);
+            $reflection = new ReflectionClass($widget);
 
             if ($reflection->hasProperty('view')) {
                 $viewProperty = $reflection->getProperty('view');
@@ -70,7 +72,7 @@ class WidgetTestSuite extends TestCase
 
         foreach ($widgetClasses as $widgetClass) {
             $widget = new $widgetClass;
-            $reflection = new \ReflectionClass($widget);
+            $reflection = new ReflectionClass($widget);
 
             if ($reflection->hasProperty('columnSpan')) {
                 $columnSpanProperty = $reflection->getProperty('columnSpan');
@@ -96,8 +98,8 @@ class WidgetTestSuite extends TestCase
                 // Check if widget has getView method
                 $this->assertTrue(method_exists($widget, 'getView'), "Widget {$widgetClass} missing getView method");
 
-            } catch (\Exception $e) {
-                $this->fail("Widget {$widgetClass} render test failed: ".$e->getMessage());
+            } catch (Exception $e) {
+                $this->fail("Widget {$widgetClass} render test failed: " . $e->getMessage());
             }
         }
     }
@@ -107,7 +109,7 @@ class WidgetTestSuite extends TestCase
         $widgetClasses = $this->getWidgetClasses();
 
         foreach ($widgetClasses as $widgetClass) {
-            $reflection = new \ReflectionClass($widgetClass);
+            $reflection = new ReflectionClass($widgetClass);
 
             // Check if widget extends proper base class
             $this->assertTrue(

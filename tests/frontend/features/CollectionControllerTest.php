@@ -18,7 +18,7 @@ class CollectionControllerTest extends TestCase
     {
         $collections = Collection::factory()->count(3)->create([
             'is_visible' => true,
-            'is_active' => true,
+            'is_active'  => true,
         ]);
 
         $response = $this->get('/collections');
@@ -32,7 +32,7 @@ class CollectionControllerTest extends TestCase
     {
         $collection = Collection::factory()->create([
             'is_visible' => true,
-            'is_active' => true,
+            'is_active'  => true,
         ]);
 
         $response = $this->get("/collections/{$collection->slug}");
@@ -45,14 +45,14 @@ class CollectionControllerTest extends TestCase
     public function test_can_search_collections(): void
     {
         $collection1 = Collection::factory()->create([
-            'name' => 'Summer Collection',
+            'name'       => 'Summer Collection',
             'is_visible' => true,
-            'is_active' => true,
+            'is_active'  => true,
         ]);
         $collection2 = Collection::factory()->create([
-            'name' => 'Winter Collection',
+            'name'       => 'Winter Collection',
             'is_visible' => true,
-            'is_active' => true,
+            'is_active'  => true,
         ]);
 
         $response = $this->get('/collections?search=Summer');
@@ -66,13 +66,13 @@ class CollectionControllerTest extends TestCase
     {
         $manualCollection = Collection::factory()->create([
             'is_automatic' => false,
-            'is_visible' => true,
-            'is_active' => true,
+            'is_visible'   => true,
+            'is_active'    => true,
         ]);
         $automaticCollection = Collection::factory()->create([
             'is_automatic' => true,
-            'is_visible' => true,
-            'is_active' => true,
+            'is_visible'   => true,
+            'is_active'    => true,
         ]);
 
         $response = $this->get('/collections?type=manual');
@@ -86,7 +86,7 @@ class CollectionControllerTest extends TestCase
     {
         $collection = Collection::factory()->create([
             'is_visible' => true,
-            'is_active' => true,
+            'is_active'  => true,
         ]);
         $products = Product::factory()->count(3)->create(['status' => 'published', 'published_at' => now()]);
         $collection->products()->attach($products->pluck('id'));
@@ -102,11 +102,11 @@ class CollectionControllerTest extends TestCase
     {
         $collection = Collection::factory()->create([
             'is_visible' => true,
-            'is_active' => true,
+            'is_active'  => true,
         ]);
         $category = Category::factory()->create();
         $products = Product::factory()->count(3)->create([
-            'status' => 'published',
+            'status'       => 'published',
             'published_at' => now(),
         ]);
         $products->first()->categories()->attach($category->id);
@@ -122,7 +122,7 @@ class CollectionControllerTest extends TestCase
     {
         $collection = Collection::factory()->create([
             'is_visible' => true,
-            'is_active' => true,
+            'is_active'  => true,
         ]);
         $products = collect([
             Product::factory()->create(['status' => 'published', 'published_at' => now(), 'price' => 100]),
@@ -141,7 +141,7 @@ class CollectionControllerTest extends TestCase
     {
         $collection = Collection::factory()->create([
             'is_visible' => true,
-            'is_active' => true,
+            'is_active'  => true,
         ]);
         $products = collect([
             Product::factory()->create(['status' => 'published', 'published_at' => now(), 'price' => 50]),
@@ -159,14 +159,14 @@ class CollectionControllerTest extends TestCase
     public function test_can_search_collections_via_api(): void
     {
         $collection1 = Collection::factory()->create([
-            'name' => 'Summer Collection',
+            'name'       => 'Summer Collection',
             'is_visible' => true,
-            'is_active' => true,
+            'is_active'  => true,
         ]);
         $collection2 = Collection::factory()->create([
-            'name' => 'Winter Collection',
+            'name'       => 'Winter Collection',
             'is_visible' => true,
-            'is_active' => true,
+            'is_active'  => true,
         ]);
 
         $response = $this->get('/collections/api/search?q=Summer');
@@ -180,11 +180,11 @@ class CollectionControllerTest extends TestCase
     {
         $visibleCollection = Collection::factory()->create([
             'is_visible' => true,
-            'is_active' => true,
+            'is_active'  => true,
         ]);
         $hiddenCollection = Collection::factory()->create([
             'is_visible' => false,
-            'is_active' => true,
+            'is_active'  => true,
         ]);
 
         $response = $this->get('/collections');
@@ -198,11 +198,11 @@ class CollectionControllerTest extends TestCase
     {
         $activeCollection = Collection::factory()->create([
             'is_visible' => true,
-            'is_active' => true,
+            'is_active'  => true,
         ]);
         $inactiveCollection = Collection::factory()->create([
             'is_visible' => true,
-            'is_active' => false,
+            'is_active'  => false,
         ]);
 
         $response = $this->get('/collections');
@@ -216,7 +216,7 @@ class CollectionControllerTest extends TestCase
     {
         $hiddenCollection = Collection::factory()->create([
             'is_visible' => false,
-            'is_active' => true,
+            'is_active'  => true,
         ]);
 
         $response = $this->get("/collections/{$hiddenCollection->slug}");
@@ -228,7 +228,7 @@ class CollectionControllerTest extends TestCase
     {
         $inactiveCollection = Collection::factory()->create([
             'is_visible' => true,
-            'is_active' => false,
+            'is_active'  => false,
         ]);
 
         $response = $this->get("/collections/{$inactiveCollection->slug}");
@@ -240,11 +240,11 @@ class CollectionControllerTest extends TestCase
     {
         $collection = Collection::factory()->create([
             'is_visible' => true,
-            'is_active' => true,
+            'is_active'  => true,
         ]);
         $relatedCollection = Collection::factory()->create([
             'is_visible' => true,
-            'is_active' => true,
+            'is_active'  => true,
         ]);
         $products = Product::factory()->count(2)->create(['status' => 'published', 'published_at' => now()]);
         $collection->products()->attach($products->pluck('id'));
@@ -260,7 +260,7 @@ class CollectionControllerTest extends TestCase
     {
         Collection::factory()->count(15)->create([
             'is_visible' => true,
-            'is_active' => true,
+            'is_active'  => true,
         ]);
 
         $response = $this->get('/collections');
@@ -272,8 +272,8 @@ class CollectionControllerTest extends TestCase
     public function test_collection_products_pagination(): void
     {
         $collection = Collection::factory()->create([
-            'is_visible' => true,
-            'is_active' => true,
+            'is_visible'        => true,
+            'is_active'         => true,
             'products_per_page' => 5,
         ]);
         $products = Product::factory()->count(10)->create(['status' => 'published', 'published_at' => now()]);
@@ -288,11 +288,11 @@ class CollectionControllerTest extends TestCase
     public function test_collection_meta_tags(): void
     {
         $collection = Collection::factory()->create([
-            'is_visible' => true,
-            'is_active' => true,
-            'meta_title' => 'Custom Meta Title',
+            'is_visible'       => true,
+            'is_active'        => true,
+            'meta_title'       => 'Custom Meta Title',
             'meta_description' => 'Custom Meta Description',
-            'meta_keywords' => ['keyword1', 'keyword2'],
+            'meta_keywords'    => ['keyword1', 'keyword2'],
         ]);
 
         $response = $this->get("/collections/{$collection->slug}");
@@ -306,7 +306,7 @@ class CollectionControllerTest extends TestCase
     {
         $collection = Collection::factory()->create([
             'is_visible' => true,
-            'is_active' => true,
+            'is_active'  => true,
         ]);
 
         $response = $this->get("/collections/{$collection->slug}");
@@ -319,8 +319,8 @@ class CollectionControllerTest extends TestCase
     {
         $automaticCollection = Collection::factory()->create([
             'is_automatic' => true,
-            'is_visible' => true,
-            'is_active' => true,
+            'is_visible'   => true,
+            'is_active'    => true,
         ]);
 
         $response = $this->get("/collections/{$automaticCollection->slug}");
@@ -333,7 +333,7 @@ class CollectionControllerTest extends TestCase
     {
         $collection = Collection::factory()->create([
             'is_visible' => true,
-            'is_active' => true,
+            'is_active'  => true,
         ]);
         $products = Product::factory()->count(5)->create(['status' => 'published', 'published_at' => now()]);
         $collection->products()->attach($products->pluck('id'));
@@ -356,7 +356,7 @@ class CollectionControllerTest extends TestCase
     {
         $collection = Collection::factory()->create([
             'is_visible' => true,
-            'is_active' => true,
+            'is_active'  => true,
         ]);
 
         $response = $this->get("/collections/{$collection->slug}");

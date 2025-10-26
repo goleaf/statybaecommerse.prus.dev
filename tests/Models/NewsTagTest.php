@@ -1,10 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Tests\Models;
 
 use App\Models\News;
 use App\Models\NewsTag;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use ReflectionProperty;
 use Tests\TestCase;
 
 final class NewsTagTest extends TestCase
@@ -14,7 +17,7 @@ final class NewsTagTest extends TestCase
     public function test_news_tag_configuration_matches_expected_contract(): void
     {
         // Instantiate a fresh model instance to inspect its configuration without touching the database.
-        $model = new NewsTag();
+        $model = new NewsTag;
 
         // Confirm the fillable configuration protects against mass-assignment issues.
         self::assertSame([
@@ -30,13 +33,13 @@ final class NewsTagTest extends TestCase
         // Ensure the casts definition keeps booleans and integers strongly typed.
         self::assertSame([
             'is_visible' => 'boolean',
-            'is_active' => 'boolean',
+            'is_active'  => 'boolean',
             'sort_order' => 'integer',
         ], $model->getCasts());
 
         // Validate that the translation model mapping targets the dedicated translation class.
         // Inspect the protected translation model property via reflection to confirm the mapping.
-        $translationProperty = new \ReflectionProperty(NewsTag::class, 'translationModel');
+        $translationProperty = new ReflectionProperty(NewsTag::class, 'translationModel');
         $translationProperty->setAccessible(true);
         self::assertSame(\App\Models\Translations\NewsTagTranslation::class, $translationProperty->getValue($model));
     }

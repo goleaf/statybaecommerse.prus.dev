@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-$baseDir = __DIR__.'/../app/Filament';
+$baseDir = __DIR__ . '/../app/Filament';
 
 $rii = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($baseDir));
 $updated = 0;

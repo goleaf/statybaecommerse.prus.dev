@@ -60,27 +60,27 @@ final class NewsGlobalScopesTest extends TestCase
     {
         // Create test news comments
         $activeApprovedVisibleComment = NewsComment::factory()->create([
-            'is_active' => true,
+            'is_active'   => true,
             'is_approved' => true,
-            'is_visible' => true,
+            'is_visible'  => true,
         ]);
 
         $inactiveComment = NewsComment::factory()->create([
-            'is_active' => false,
+            'is_active'   => false,
             'is_approved' => true,
-            'is_visible' => true,
+            'is_visible'  => true,
         ]);
 
         $unapprovedComment = NewsComment::factory()->create([
-            'is_active' => true,
+            'is_active'   => true,
             'is_approved' => false,
-            'is_visible' => true,
+            'is_visible'  => true,
         ]);
 
         $invisibleComment = NewsComment::factory()->create([
-            'is_active' => true,
+            'is_active'   => true,
             'is_approved' => true,
-            'is_visible' => false,
+            'is_visible'  => false,
         ]);
 
         // Test that only active, approved, and visible comments are returned
@@ -115,17 +115,17 @@ final class NewsGlobalScopesTest extends TestCase
     {
         // Create test attribute values
         $activeEnabledValue = AttributeValue::factory()->create([
-            'is_active' => true,
+            'is_active'  => true,
             'is_enabled' => true,
         ]);
 
         $inactiveValue = AttributeValue::factory()->create([
-            'is_active' => false,
+            'is_active'  => false,
             'is_enabled' => true,
         ]);
 
         $disabledValue = AttributeValue::factory()->create([
-            'is_active' => true,
+            'is_active'  => true,
             'is_enabled' => false,
         ]);
 
@@ -230,27 +230,27 @@ final class NewsGlobalScopesTest extends TestCase
     {
         // Test different combinations of comment scopes
         $comment1 = NewsComment::factory()->create([
-            'is_active' => true,
+            'is_active'   => true,
             'is_approved' => true,
-            'is_visible' => true,
+            'is_visible'  => true,
         ]);
 
         $comment2 = NewsComment::factory()->create([
-            'is_active' => false,
+            'is_active'   => false,
             'is_approved' => true,
-            'is_visible' => true,
+            'is_visible'  => true,
         ]);
 
         $comment3 = NewsComment::factory()->create([
-            'is_active' => true,
+            'is_active'   => true,
             'is_approved' => false,
-            'is_visible' => true,
+            'is_visible'  => true,
         ]);
 
         $comment4 = NewsComment::factory()->create([
-            'is_active' => true,
+            'is_active'   => true,
             'is_approved' => true,
-            'is_visible' => false,
+            'is_visible'  => false,
         ]);
 
         // Test bypassing specific scopes

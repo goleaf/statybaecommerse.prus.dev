@@ -30,7 +30,7 @@ it('ensures Filament resource pages can resolve their resource classes', functio
             continue;
         }
 
-        $class = $namespaceMatch[1].'\\'.$classMatch[1];
+        $class = $namespaceMatch[1] . '\\' . $classMatch[1];
 
         if (! class_exists($class) || ! is_subclass_of($class, Page::class)) {
             continue;
@@ -39,12 +39,12 @@ it('ensures Filament resource pages can resolve their resource classes', functio
         try {
             $property = new \ReflectionProperty($class, 'resource');
             if ($property->isStatic() && ! $property->isInitialized()) {
-                $issues[] = $class.' has an uninitialised static $resource property ('.$file->getPathname().').';
+                $issues[] = $class . ' has an uninitialised static $resource property (' . $file->getPathname() . ').';
 
                 continue;
             }
         } catch (\ReflectionException $exception) {
-            $issues[] = $class.' is missing the static $resource property: '.$exception->getMessage();
+            $issues[] = $class . ' is missing the static $resource property: ' . $exception->getMessage();
 
             continue;
         }
@@ -52,9 +52,9 @@ it('ensures Filament resource pages can resolve their resource classes', functio
         try {
             $class::getResource();
         } catch (\Throwable $exception) {
-            $issues[] = $class.'::getResource() failed: '.$exception->getMessage();
+            $issues[] = $class . '::getResource() failed: ' . $exception->getMessage();
         }
     }
 
-    expect($issues, 'The following Filament page classes are misconfigured: '.implode(', ', $issues))->toBeEmpty();
+    expect($issues, 'The following Filament page classes are misconfigured: ' . implode(', ', $issues))->toBeEmpty();
 });

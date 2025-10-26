@@ -71,9 +71,9 @@ describe('User Impersonation Comprehensive Tests', function () {
     describe('Impersonation Session Management', function () {
         it('can start impersonation session', function () {
             $impersonateData = [
-                'original_user_id' => $this->admin->id,
+                'original_user_id'     => $this->admin->id,
                 'impersonated_user_id' => $this->regularUser->id,
-                'started_at' => now()->toISOString(),
+                'started_at'           => now()->toISOString(),
             ];
 
             Session::put('impersonate', $impersonateData);
@@ -88,9 +88,9 @@ describe('User Impersonation Comprehensive Tests', function () {
         it('can stop impersonation session', function () {
             // Start impersonation
             Session::put('impersonate', [
-                'original_user_id' => $this->admin->id,
+                'original_user_id'     => $this->admin->id,
                 'impersonated_user_id' => $this->regularUser->id,
-                'started_at' => now()->toISOString(),
+                'started_at'           => now()->toISOString(),
             ]);
             Auth::login($this->regularUser);
 
@@ -118,9 +118,9 @@ describe('User Impersonation Comprehensive Tests', function () {
         it('handles impersonation middleware correctly', function () {
             // Start impersonation
             Session::put('impersonate', [
-                'original_user_id' => $this->admin->id,
+                'original_user_id'     => $this->admin->id,
                 'impersonated_user_id' => $this->regularUser->id,
-                'started_at' => now()->toISOString(),
+                'started_at'           => now()->toISOString(),
             ]);
 
             // Make a request that goes through the middleware
@@ -182,7 +182,7 @@ describe('User Impersonation Comprehensive Tests', function () {
         it('can access impersonated user documents', function () {
             $document = Document::factory()->create([
                 'documentable_type' => User::class,
-                'documentable_id' => $this->regularUser->id,
+                'documentable_id'   => $this->regularUser->id,
             ]);
 
             Auth::login($this->regularUser);
@@ -214,7 +214,7 @@ describe('User Impersonation Comprehensive Tests', function () {
 
         it('can access impersonated user default address', function () {
             $address = Address::factory()->create([
-                'user_id' => $this->regularUser->id,
+                'user_id'    => $this->regularUser->id,
                 'is_default' => true,
             ]);
 
@@ -226,8 +226,8 @@ describe('User Impersonation Comprehensive Tests', function () {
 
         it('can access impersonated user billing address', function () {
             $address = Address::factory()->create([
-                'user_id' => $this->regularUser->id,
-                'type' => 'billing',
+                'user_id'    => $this->regularUser->id,
+                'type'       => 'billing',
                 'is_default' => true,
             ]);
 
@@ -239,8 +239,8 @@ describe('User Impersonation Comprehensive Tests', function () {
 
         it('can access impersonated user shipping address', function () {
             $address = Address::factory()->create([
-                'user_id' => $this->regularUser->id,
-                'type' => 'shipping',
+                'user_id'    => $this->regularUser->id,
+                'type'       => 'shipping',
                 'is_default' => true,
             ]);
 
@@ -265,9 +265,9 @@ describe('User Impersonation Comprehensive Tests', function () {
     describe('Security and Validation', function () {
         it('validates impersonation session data', function () {
             $impersonateData = [
-                'original_user_id' => $this->admin->id,
+                'original_user_id'     => $this->admin->id,
                 'impersonated_user_id' => $this->regularUser->id,
-                'started_at' => now()->toISOString(),
+                'started_at'           => now()->toISOString(),
             ];
 
             expect($impersonateData)->toHaveKeys(['original_user_id', 'impersonated_user_id', 'started_at']);
@@ -290,9 +290,9 @@ describe('User Impersonation Comprehensive Tests', function () {
 
         it('validates original user exists for stopping impersonation', function () {
             Session::put('impersonate', [
-                'original_user_id' => 99999, // Non-existent user
+                'original_user_id'     => 99999, // Non-existent user
                 'impersonated_user_id' => $this->regularUser->id,
-                'started_at' => now()->toISOString(),
+                'started_at'           => now()->toISOString(),
             ]);
 
             $originalUserId = Session::get('impersonate.original_user_id');
@@ -312,9 +312,9 @@ describe('User Impersonation Comprehensive Tests', function () {
 
         it('handles corrupted impersonation session data', function () {
             Session::put('impersonate', [
-                'original_user_id' => 'invalid',
+                'original_user_id'     => 'invalid',
                 'impersonated_user_id' => 'invalid',
-                'started_at' => 'invalid',
+                'started_at'           => 'invalid',
             ]);
 
             $originalUserId = Session::get('impersonate.original_user_id');
@@ -326,9 +326,9 @@ describe('User Impersonation Comprehensive Tests', function () {
         it('handles deleted user during impersonation', function () {
             // Start impersonation
             Session::put('impersonate', [
-                'original_user_id' => $this->admin->id,
+                'original_user_id'     => $this->admin->id,
                 'impersonated_user_id' => $this->regularUser->id,
-                'started_at' => now()->toISOString(),
+                'started_at'           => now()->toISOString(),
             ]);
 
             // Delete the impersonated user
@@ -345,16 +345,16 @@ describe('User Impersonation Comprehensive Tests', function () {
 
             // Start first impersonation
             Session::put('impersonate', [
-                'original_user_id' => $this->admin->id,
+                'original_user_id'     => $this->admin->id,
                 'impersonated_user_id' => $user1->id,
-                'started_at' => now()->toISOString(),
+                'started_at'           => now()->toISOString(),
             ]);
 
             // Start second impersonation (should replace first)
             Session::put('impersonate', [
-                'original_user_id' => $this->admin->id,
+                'original_user_id'     => $this->admin->id,
                 'impersonated_user_id' => $user2->id,
-                'started_at' => now()->toISOString(),
+                'started_at'           => now()->toISOString(),
             ]);
 
             expect(Session::get('impersonate.impersonated_user_id'))->toBe($user2->id);

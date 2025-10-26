@@ -22,23 +22,23 @@ final class SystemSettingTest extends TestCase
 
         $settingData = [
             'category_id' => $category->id,
-            'key' => 'app.name',
-            'name' => 'Application Name',
-            'value' => 'My Application',
-            'type' => 'string',
-            'group' => 'general',
+            'key'         => 'app.name',
+            'name'        => 'Application Name',
+            'value'       => 'My Application',
+            'type'        => 'string',
+            'group'       => 'general',
             'description' => 'The name of the application',
-            'is_public' => true,
+            'is_public'   => true,
             'is_required' => true,
-            'is_active' => true,
-            'updated_by' => $user->id,
+            'is_active'   => true,
+            'updated_by'  => $user->id,
         ];
 
         $setting = SystemSetting::create($settingData);
 
         $this->assertDatabaseHas('system_settings', [
-            'key' => 'app.name',
-            'name' => 'Application Name',
+            'key'   => 'app.name',
+            'name'  => 'Application Name',
             'value' => 'My Application',
         ]);
 
@@ -51,8 +51,8 @@ final class SystemSettingTest extends TestCase
     public function test_can_get_setting_value_by_key(): void
     {
         SystemSetting::factory()->create([
-            'key' => 'app.name',
-            'value' => 'My Application',
+            'key'       => 'app.name',
+            'value'     => 'My Application',
             'is_active' => true,
         ]);
 
@@ -69,14 +69,14 @@ final class SystemSettingTest extends TestCase
         $this->actingAs($user);
 
         SystemSetting::setValue('app.name', 'New Application Name', [
-            'type' => 'string',
-            'group' => 'general',
+            'type'      => 'string',
+            'group'     => 'general',
             'is_public' => true,
         ]);
 
         $this->assertDatabaseHas('system_settings', [
-            'key' => 'app.name',
-            'value' => 'New Application Name',
+            'key'        => 'app.name',
+            'value'      => 'New Application Name',
             'updated_by' => $user->id,
         ]);
     }
@@ -84,15 +84,15 @@ final class SystemSettingTest extends TestCase
     public function test_can_get_public_setting(): void
     {
         SystemSetting::factory()->create([
-            'key' => 'app.name',
-            'value' => 'Public App',
+            'key'       => 'app.name',
+            'value'     => 'Public App',
             'is_public' => true,
             'is_active' => true,
         ]);
 
         SystemSetting::factory()->create([
-            'key' => 'app.secret',
-            'value' => 'Secret Value',
+            'key'       => 'app.secret',
+            'value'     => 'Secret Value',
             'is_public' => false,
             'is_active' => true,
         ]);
@@ -107,9 +107,9 @@ final class SystemSettingTest extends TestCase
     public function test_encrypted_value_handling(): void
     {
         $setting = SystemSetting::factory()->create([
-            'type' => 'string',
+            'type'         => 'string',
             'is_encrypted' => true,
-            'value' => 'Secret Value',
+            'value'        => 'Secret Value',
         ]);
 
         $this->assertNotEquals('Secret Value', $setting->getRawOriginal('value'));
@@ -119,7 +119,7 @@ final class SystemSettingTest extends TestCase
     public function test_boolean_value_casting(): void
     {
         $setting = SystemSetting::factory()->create([
-            'type' => 'boolean',
+            'type'  => 'boolean',
             'value' => true,
         ]);
 
@@ -132,7 +132,7 @@ final class SystemSettingTest extends TestCase
         $arrayValue = ['key1' => 'value1', 'key2' => 'value2'];
 
         $setting = SystemSetting::factory()->create([
-            'type' => 'array',
+            'type'  => 'array',
             'value' => $arrayValue,
         ]);
 
@@ -145,7 +145,7 @@ final class SystemSettingTest extends TestCase
         $jsonValue = ['nested' => ['key' => 'value']];
 
         $setting = SystemSetting::factory()->create([
-            'type' => 'json',
+            'type'  => 'json',
             'value' => $jsonValue,
         ]);
 
@@ -172,14 +172,14 @@ final class SystemSettingTest extends TestCase
     public function test_searchable_scope(): void
     {
         SystemSetting::factory()->create([
-            'key' => 'app.name',
-            'name' => 'Application Name',
+            'key'         => 'app.name',
+            'name'        => 'Application Name',
             'description' => 'The main application name',
         ]);
 
         SystemSetting::factory()->create([
-            'key' => 'app.version',
-            'name' => 'Application Version',
+            'key'         => 'app.version',
+            'name'        => 'Application Version',
             'description' => 'Current version number',
         ]);
 
@@ -193,14 +193,14 @@ final class SystemSettingTest extends TestCase
     public function test_can_get_formatted_value(): void
     {
         $booleanSetting = SystemSetting::factory()->create([
-            'type' => 'boolean',
+            'type'  => 'boolean',
             'value' => true,
         ]);
 
         $this->assertStringContainsString('Taip', $booleanSetting->getFormattedValue());
 
         $arraySetting = SystemSetting::factory()->create([
-            'type' => 'array',
+            'type'  => 'array',
             'value' => ['key' => 'value'],
         ]);
 
@@ -212,7 +212,7 @@ final class SystemSettingTest extends TestCase
     public function test_can_get_validation_rules(): void
     {
         $setting = SystemSetting::factory()->create([
-            'is_required' => true,
+            'is_required'      => true,
             'validation_rules' => ['min' => 1, 'max' => 100],
         ]);
 
@@ -225,7 +225,7 @@ final class SystemSettingTest extends TestCase
     public function test_can_get_form_field_config(): void
     {
         $setting = SystemSetting::factory()->create([
-            'type' => 'string',
+            'type'        => 'string',
             'is_required' => true,
             'is_readonly' => false,
         ]);
@@ -256,10 +256,10 @@ final class SystemSettingTest extends TestCase
 
         $this->assertDatabaseHas('system_setting_history', [
             'system_setting_id' => $setting->id,
-            'old_value' => 'old value',
-            'new_value' => 'new value',
-            'change_reason' => 'Test change',
-            'changed_by' => $user->id,
+            'old_value'         => 'old value',
+            'new_value'         => 'new value',
+            'change_reason'     => 'Test change',
+            'changed_by'        => $user->id,
         ]);
     }
 
@@ -283,11 +283,11 @@ final class SystemSettingTest extends TestCase
         $setting2 = SystemSetting::factory()->create();
 
         $dependency = SystemSettingDependency::create([
-            'setting_id' => $setting1->id,
+            'setting_id'            => $setting1->id,
             'depends_on_setting_id' => $setting2->id,
-            'condition' => 'equals',
-            'condition_value' => 'test',
-            'is_active' => true,
+            'condition'             => 'equals',
+            'condition_value'       => 'test',
+            'is_active'             => true,
         ]);
 
         $this->assertTrue($setting1->hasDependencies());
@@ -302,11 +302,11 @@ final class SystemSettingTest extends TestCase
         $setting2 = SystemSetting::factory()->create();
 
         $dependency = SystemSettingDependency::create([
-            'setting_id' => $setting2->id,
+            'setting_id'            => $setting2->id,
             'depends_on_setting_id' => $setting1->id,
-            'condition' => 'equals',
-            'condition_value' => 'test',
-            'is_active' => true,
+            'condition'             => 'equals',
+            'condition_value'       => 'test',
+            'is_active'             => true,
         ]);
 
         $this->assertTrue($dependency->isConditionMet());
@@ -321,11 +321,11 @@ final class SystemSettingTest extends TestCase
         $setting2 = SystemSetting::factory()->create();
 
         SystemSettingDependency::create([
-            'setting_id' => $setting2->id,
+            'setting_id'            => $setting2->id,
             'depends_on_setting_id' => $setting1->id,
-            'condition' => 'equals',
-            'condition_value' => 'enabled',
-            'is_active' => true,
+            'condition'             => 'equals',
+            'condition_value'       => 'enabled',
+            'is_active'             => true,
         ]);
 
         $this->assertTrue($setting2->canBeEnabled());
@@ -340,11 +340,11 @@ final class SystemSettingTest extends TestCase
         $setting2 = SystemSetting::factory()->create();
 
         SystemSettingDependency::create([
-            'setting_id' => $setting2->id,
+            'setting_id'            => $setting2->id,
             'depends_on_setting_id' => $setting1->id,
-            'condition' => 'equals',
-            'condition_value' => 'enabled',
-            'is_active' => true,
+            'condition'             => 'equals',
+            'condition_value'       => 'enabled',
+            'is_active'             => true,
         ]);
 
         $status = $setting2->getDependencyStatus();

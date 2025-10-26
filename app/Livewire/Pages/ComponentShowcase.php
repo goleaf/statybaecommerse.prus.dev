@@ -21,7 +21,7 @@ use Livewire\Component;
  *
  * @property string $testInput
  * @property string $testSelect
- * @property bool $showModal
+ * @property bool   $showModal
  * @property-read EloquentCollection<int, Product> $featuredProducts
  * @property-read EloquentCollection<int, Category> $categories
  * @property-read EloquentCollection<int, Brand> $brands
@@ -44,10 +44,10 @@ final class ComponentShowcase extends Component
     {
         match ($type) {
             'success' => $this->notifySuccess('Success notification!', 'Success'),
-            'error' => $this->notifyError('Error notification!', 'Error'),
+            'error'   => $this->notifyError('Error notification!', 'Error'),
             'warning' => $this->notifyWarning('Warning notification!', 'Warning'),
-            'info' => $this->notifyInfo('Info notification!', 'Info'),
-            default => $this->notifyInfo('Info notification!', 'Info'),
+            'info'    => $this->notifyInfo('Info notification!', 'Info'),
+            default   => $this->notifyInfo('Info notification!', 'Info'),
         };
     }
 

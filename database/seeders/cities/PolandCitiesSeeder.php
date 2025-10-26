@@ -9,6 +9,7 @@ use App\Models\Country;
 use App\Models\Translations\CityTranslation;
 use App\Models\Zone;
 use Illuminate\Database\Seeder;
+use Str;
 
 final class PolandCitiesSeeder extends Seeder
 {
@@ -22,13 +23,13 @@ final class PolandCitiesSeeder extends Seeder
         $cities = [
             // Mazowieckie (Warsaw region)
             [
-                'name' => 'Warsaw',
-                'code' => 'PL-MZ-WAW',
-                'is_capital' => true,
-                'is_default' => true,
-                'latitude' => 52.2297,
-                'longitude' => 21.0122,
-                'population' => 1790658,
+                'name'         => 'Warsaw',
+                'code'         => 'PL-MZ-WAW',
+                'is_capital'   => true,
+                'is_default'   => true,
+                'latitude'     => 52.2297,
+                'longitude'    => 21.0122,
+                'population'   => 1790658,
                 'postal_codes' => ['00-001', '00-002', '00-003'],
                 'translations' => [
                     'lt' => ['name' => 'Varšuva', 'description' => 'Lenkijos sostinė'],
@@ -36,11 +37,11 @@ final class PolandCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Radom',
-                'code' => 'PL-MZ-RAD',
-                'latitude' => 51.4025,
-                'longitude' => 21.1471,
-                'population' => 210000,
+                'name'         => 'Radom',
+                'code'         => 'PL-MZ-RAD',
+                'latitude'     => 51.4025,
+                'longitude'    => 21.1471,
+                'population'   => 210000,
                 'postal_codes' => ['26-600'],
                 'translations' => [
                     'lt' => ['name' => 'Radomas', 'description' => 'Pramonės miestas'],
@@ -48,11 +49,11 @@ final class PolandCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Płock',
-                'code' => 'PL-MZ-PLO',
-                'latitude' => 52.5464,
-                'longitude' => 19.7064,
-                'population' => 120000,
+                'name'         => 'Płock',
+                'code'         => 'PL-MZ-PLO',
+                'latitude'     => 52.5464,
+                'longitude'    => 19.7064,
+                'population'   => 120000,
                 'postal_codes' => ['09-400'],
                 'translations' => [
                     'lt' => ['name' => 'Płock', 'description' => 'Istorinis miestas'],
@@ -61,11 +62,11 @@ final class PolandCitiesSeeder extends Seeder
             ],
             // Małopolskie (Krakow region)
             [
-                'name' => 'Krakow',
-                'code' => 'PL-MA-KRA',
-                'latitude' => 50.0647,
-                'longitude' => 19.945,
-                'population' => 779115,
+                'name'         => 'Krakow',
+                'code'         => 'PL-MA-KRA',
+                'latitude'     => 50.0647,
+                'longitude'    => 19.945,
+                'population'   => 779115,
                 'postal_codes' => ['30-001', '30-002'],
                 'translations' => [
                     'lt' => ['name' => 'Krokuva', 'description' => 'Kultūros sostinė'],
@@ -73,11 +74,11 @@ final class PolandCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Tarnów',
-                'code' => 'PL-MA-TAR',
-                'latitude' => 50.0128,
-                'longitude' => 20.9864,
-                'population' => 110000,
+                'name'         => 'Tarnów',
+                'code'         => 'PL-MA-TAR',
+                'latitude'     => 50.0128,
+                'longitude'    => 20.9864,
+                'population'   => 110000,
                 'postal_codes' => ['33-100'],
                 'translations' => [
                     'lt' => ['name' => 'Tarnuvas', 'description' => 'Chemijos pramonės centras'],
@@ -85,11 +86,11 @@ final class PolandCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Nowy Sącz',
-                'code' => 'PL-MA-NOW',
-                'latitude' => 49.6214,
-                'longitude' => 20.6969,
-                'population' => 83000,
+                'name'         => 'Nowy Sącz',
+                'code'         => 'PL-MA-NOW',
+                'latitude'     => 49.6214,
+                'longitude'    => 20.6969,
+                'population'   => 83000,
                 'postal_codes' => ['33-300'],
                 'translations' => [
                     'lt' => ['name' => 'Nowy Sącz', 'description' => 'Pietų Lenkijos miestas'],
@@ -98,11 +99,11 @@ final class PolandCitiesSeeder extends Seeder
             ],
             // Śląskie (Silesia region)
             [
-                'name' => 'Katowice',
-                'code' => 'PL-SL-KAT',
-                'latitude' => 50.2649,
-                'longitude' => 19.0238,
-                'population' => 294510,
+                'name'         => 'Katowice',
+                'code'         => 'PL-SL-KAT',
+                'latitude'     => 50.2649,
+                'longitude'    => 19.0238,
+                'population'   => 294510,
                 'postal_codes' => ['40-001'],
                 'translations' => [
                     'lt' => ['name' => 'Katovicai', 'description' => 'Šlonsko centras'],
@@ -110,11 +111,11 @@ final class PolandCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Częstochowa',
-                'code' => 'PL-SL-CZE',
-                'latitude' => 50.7969,
-                'longitude' => 19.1242,
-                'population' => 220000,
+                'name'         => 'Częstochowa',
+                'code'         => 'PL-SL-CZE',
+                'latitude'     => 50.7969,
+                'longitude'    => 19.1242,
+                'population'   => 220000,
                 'postal_codes' => ['42-200'],
                 'translations' => [
                     'lt' => ['name' => 'Čenstakova', 'description' => 'Pilgrimų miestas'],
@@ -122,11 +123,11 @@ final class PolandCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Sosnowiec',
-                'code' => 'PL-SL-SOS',
-                'latitude' => 50.2863,
-                'longitude' => 19.104,
-                'population' => 200000,
+                'name'         => 'Sosnowiec',
+                'code'         => 'PL-SL-SOS',
+                'latitude'     => 50.2863,
+                'longitude'    => 19.104,
+                'population'   => 200000,
                 'postal_codes' => ['41-200'],
                 'translations' => [
                     'lt' => ['name' => 'Sosnoviecas', 'description' => 'Pramonės miestas'],
@@ -134,11 +135,11 @@ final class PolandCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Gliwice',
-                'code' => 'PL-SL-GLI',
-                'latitude' => 50.2945,
-                'longitude' => 18.6714,
-                'population' => 180000,
+                'name'         => 'Gliwice',
+                'code'         => 'PL-SL-GLI',
+                'latitude'     => 50.2945,
+                'longitude'    => 18.6714,
+                'population'   => 180000,
                 'postal_codes' => ['44-100'],
                 'translations' => [
                     'lt' => ['name' => 'Glicai', 'description' => 'Technologijų centras'],
@@ -146,11 +147,11 @@ final class PolandCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Zabrze',
-                'code' => 'PL-SL-ZAB',
-                'latitude' => 50.3249,
-                'longitude' => 18.7857,
-                'population' => 170000,
+                'name'         => 'Zabrze',
+                'code'         => 'PL-SL-ZAB',
+                'latitude'     => 50.3249,
+                'longitude'    => 18.7857,
+                'population'   => 170000,
                 'postal_codes' => ['41-800'],
                 'translations' => [
                     'lt' => ['name' => 'Zabžė', 'description' => 'Anglies pramonės centras'],
@@ -158,11 +159,11 @@ final class PolandCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Bytom',
-                'code' => 'PL-SL-BYT',
-                'latitude' => 50.348,
-                'longitude' => 18.9328,
-                'population' => 160000,
+                'name'         => 'Bytom',
+                'code'         => 'PL-SL-BYT',
+                'latitude'     => 50.348,
+                'longitude'    => 18.9328,
+                'population'   => 160000,
                 'postal_codes' => ['41-900'],
                 'translations' => [
                     'lt' => ['name' => 'Bitomas', 'description' => 'Istorinis miestas'],
@@ -170,11 +171,11 @@ final class PolandCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Ruda Śląska',
-                'code' => 'PL-SL-RUD',
-                'latitude' => 50.2923,
-                'longitude' => 18.8563,
-                'population' => 140000,
+                'name'         => 'Ruda Śląska',
+                'code'         => 'PL-SL-RUD',
+                'latitude'     => 50.2923,
+                'longitude'    => 18.8563,
+                'population'   => 140000,
                 'postal_codes' => ['41-700'],
                 'translations' => [
                     'lt' => ['name' => 'Ruda Šlonska', 'description' => 'Pramonės miestas'],
@@ -182,11 +183,11 @@ final class PolandCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Rybnik',
-                'code' => 'PL-SL-RYB',
-                'latitude' => 50.1022,
-                'longitude' => 18.5464,
-                'population' => 140000,
+                'name'         => 'Rybnik',
+                'code'         => 'PL-SL-RYB',
+                'latitude'     => 50.1022,
+                'longitude'    => 18.5464,
+                'population'   => 140000,
                 'postal_codes' => ['44-200'],
                 'translations' => [
                     'lt' => ['name' => 'Ribnikas', 'description' => 'Anglies pramonės centras'],
@@ -194,11 +195,11 @@ final class PolandCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Tychy',
-                'code' => 'PL-SL-TYC',
-                'latitude' => 50.12,
-                'longitude' => 19.1667,
-                'population' => 130000,
+                'name'         => 'Tychy',
+                'code'         => 'PL-SL-TYC',
+                'latitude'     => 50.12,
+                'longitude'    => 19.1667,
+                'population'   => 130000,
                 'postal_codes' => ['43-100'],
                 'translations' => [
                     'lt' => ['name' => 'Tichai', 'description' => 'Alaus pramonės centras'],
@@ -206,11 +207,11 @@ final class PolandCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Dąbrowa Górnicza',
-                'code' => 'PL-SL-DAB',
-                'latitude' => 50.3219,
-                'longitude' => 19.1875,
-                'population' => 120000,
+                'name'         => 'Dąbrowa Górnicza',
+                'code'         => 'PL-SL-DAB',
+                'latitude'     => 50.3219,
+                'longitude'    => 19.1875,
+                'population'   => 120000,
                 'postal_codes' => ['41-300'],
                 'translations' => [
                     'lt' => ['name' => 'Dombrova Gurniča', 'description' => 'Anglies pramonės centras'],
@@ -219,11 +220,11 @@ final class PolandCitiesSeeder extends Seeder
             ],
             // Wielkopolskie (Poznań region)
             [
-                'name' => 'Poznań',
-                'code' => 'PL-WP-POZ',
-                'latitude' => 52.4064,
-                'longitude' => 16.9252,
-                'population' => 534813,
+                'name'         => 'Poznań',
+                'code'         => 'PL-WP-POZ',
+                'latitude'     => 52.4064,
+                'longitude'    => 16.9252,
+                'population'   => 534813,
                 'postal_codes' => ['60-001'],
                 'translations' => [
                     'lt' => ['name' => 'Poznanė', 'description' => 'Vakarų Lenkijos centras'],
@@ -231,11 +232,11 @@ final class PolandCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Kalisz',
-                'code' => 'PL-WP-KAL',
-                'latitude' => 51.7619,
-                'longitude' => 18.0911,
-                'population' => 100000,
+                'name'         => 'Kalisz',
+                'code'         => 'PL-WP-KAL',
+                'latitude'     => 51.7619,
+                'longitude'    => 18.0911,
+                'population'   => 100000,
                 'postal_codes' => ['62-800'],
                 'translations' => [
                     'lt' => ['name' => 'Kališas', 'description' => 'Istorinis miestas'],
@@ -243,11 +244,11 @@ final class PolandCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Konin',
-                'code' => 'PL-WP-KON',
-                'latitude' => 52.2233,
-                'longitude' => 18.2511,
-                'population' => 75000,
+                'name'         => 'Konin',
+                'code'         => 'PL-WP-KON',
+                'latitude'     => 52.2233,
+                'longitude'    => 18.2511,
+                'population'   => 75000,
                 'postal_codes' => ['62-500'],
                 'translations' => [
                     'lt' => ['name' => 'Koninas', 'description' => 'Energetikos centras'],
@@ -256,11 +257,11 @@ final class PolandCitiesSeeder extends Seeder
             ],
             // Dolnośląskie (Wrocław region)
             [
-                'name' => 'Wrocław',
-                'code' => 'PL-DS-WRO',
-                'latitude' => 51.1079,
-                'longitude' => 17.0385,
-                'population' => 641607,
+                'name'         => 'Wrocław',
+                'code'         => 'PL-DS-WRO',
+                'latitude'     => 51.1079,
+                'longitude'    => 17.0385,
+                'population'   => 641607,
                 'postal_codes' => ['50-001'],
                 'translations' => [
                     'lt' => ['name' => 'Vroclavas', 'description' => 'Pietvakarių Lenkijos centras'],
@@ -268,11 +269,11 @@ final class PolandCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Wałbrzych',
-                'code' => 'PL-DS-WAL',
-                'latitude' => 50.7708,
-                'longitude' => 16.2844,
-                'population' => 110000,
+                'name'         => 'Wałbrzych',
+                'code'         => 'PL-DS-WAL',
+                'latitude'     => 50.7708,
+                'longitude'    => 16.2844,
+                'population'   => 110000,
                 'postal_codes' => ['58-300'],
                 'translations' => [
                     'lt' => ['name' => 'Valbžichas', 'description' => 'Anglies pramonės centras'],
@@ -280,11 +281,11 @@ final class PolandCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Legnica',
-                'code' => 'PL-DS-LEG',
-                'latitude' => 51.21,
-                'longitude' => 16.1619,
-                'population' => 100000,
+                'name'         => 'Legnica',
+                'code'         => 'PL-DS-LEG',
+                'latitude'     => 51.21,
+                'longitude'    => 16.1619,
+                'population'   => 100000,
                 'postal_codes' => ['59-220'],
                 'translations' => [
                     'lt' => ['name' => 'Legnica', 'description' => 'Metalurgijos centras'],
@@ -293,11 +294,11 @@ final class PolandCitiesSeeder extends Seeder
             ],
             // Lubelskie
             [
-                'name' => 'Lublin',
-                'code' => 'PL-LU-LUB',
-                'latitude' => 51.2465,
-                'longitude' => 22.5684,
-                'population' => 339784,
+                'name'         => 'Lublin',
+                'code'         => 'PL-LU-LUB',
+                'latitude'     => 51.2465,
+                'longitude'    => 22.5684,
+                'population'   => 339784,
                 'postal_codes' => ['20-001'],
                 'translations' => [
                     'lt' => ['name' => 'Liublinas', 'description' => 'Rytų Lenkijos centras'],
@@ -305,11 +306,11 @@ final class PolandCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Chełm',
-                'code' => 'PL-LU-CHE',
-                'latitude' => 51.1333,
-                'longitude' => 23.4833,
-                'population' => 60000,
+                'name'         => 'Chełm',
+                'code'         => 'PL-LU-CHE',
+                'latitude'     => 51.1333,
+                'longitude'    => 23.4833,
+                'population'   => 60000,
                 'postal_codes' => ['22-100'],
                 'translations' => [
                     'lt' => ['name' => 'Chelmas', 'description' => 'Sienos miestas'],
@@ -318,11 +319,11 @@ final class PolandCitiesSeeder extends Seeder
             ],
             // Podlaskie
             [
-                'name' => 'Białystok',
-                'code' => 'PL-PD-BIA',
-                'latitude' => 53.1325,
-                'longitude' => 23.1688,
-                'population' => 297554,
+                'name'         => 'Białystok',
+                'code'         => 'PL-PD-BIA',
+                'latitude'     => 53.1325,
+                'longitude'    => 23.1688,
+                'population'   => 297554,
                 'postal_codes' => ['15-001'],
                 'translations' => [
                     'lt' => ['name' => 'Balstogė', 'description' => 'Šiaurės rytų Lenkijos centras'],
@@ -330,11 +331,11 @@ final class PolandCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Suwałki',
-                'code' => 'PL-PD-SUW',
-                'latitude' => 54.1019,
-                'longitude' => 22.9308,
-                'population' => 69000,
+                'name'         => 'Suwałki',
+                'code'         => 'PL-PD-SUW',
+                'latitude'     => 54.1019,
+                'longitude'    => 22.9308,
+                'population'   => 69000,
                 'postal_codes' => ['16-400'],
                 'translations' => [
                     'lt' => ['name' => 'Suvalkai', 'description' => 'Sienos miestas su Lietuva'],
@@ -343,11 +344,11 @@ final class PolandCitiesSeeder extends Seeder
             ],
             // Lubuskie
             [
-                'name' => 'Zielona Góra',
-                'code' => 'PL-LB-ZIE',
-                'latitude' => 51.9356,
-                'longitude' => 15.5064,
-                'population' => 140000,
+                'name'         => 'Zielona Góra',
+                'code'         => 'PL-LB-ZIE',
+                'latitude'     => 51.9356,
+                'longitude'    => 15.5064,
+                'population'   => 140000,
                 'postal_codes' => ['65-001'],
                 'translations' => [
                     'lt' => ['name' => 'Zeliona Gura', 'description' => 'Vyno pramonės centras'],
@@ -355,11 +356,11 @@ final class PolandCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Gorzów Wielkopolski',
-                'code' => 'PL-LB-GOR',
-                'latitude' => 52.7364,
-                'longitude' => 15.2289,
-                'population' => 120000,
+                'name'         => 'Gorzów Wielkopolski',
+                'code'         => 'PL-LB-GOR',
+                'latitude'     => 52.7364,
+                'longitude'    => 15.2289,
+                'population'   => 120000,
                 'postal_codes' => ['66-400'],
                 'translations' => [
                     'lt' => ['name' => 'Goržuvas Velkopolskis', 'description' => 'Pramonės miestas'],
@@ -368,11 +369,11 @@ final class PolandCitiesSeeder extends Seeder
             ],
             // Zachodniopomorskie
             [
-                'name' => 'Szczecin',
-                'code' => 'PL-ZP-SZC',
-                'latitude' => 53.4285,
-                'longitude' => 14.5528,
-                'population' => 400990,
+                'name'         => 'Szczecin',
+                'code'         => 'PL-ZP-SZC',
+                'latitude'     => 53.4285,
+                'longitude'    => 14.5528,
+                'population'   => 400990,
                 'postal_codes' => ['70-001'],
                 'translations' => [
                     'lt' => ['name' => 'Ščecinas', 'description' => 'Uostamiesčis'],
@@ -380,11 +381,11 @@ final class PolandCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Koszalin',
-                'code' => 'PL-ZP-KOS',
-                'latitude' => 54.1903,
-                'longitude' => 16.1819,
-                'population' => 107000,
+                'name'         => 'Koszalin',
+                'code'         => 'PL-ZP-KOS',
+                'latitude'     => 54.1903,
+                'longitude'    => 16.1819,
+                'population'   => 107000,
                 'postal_codes' => ['75-001'],
                 'translations' => [
                     'lt' => ['name' => 'Košalinas', 'description' => 'Pajūrio miestas'],
@@ -393,11 +394,11 @@ final class PolandCitiesSeeder extends Seeder
             ],
             // Pomorskie
             [
-                'name' => 'Gdańsk',
-                'code' => 'PL-PM-GDA',
-                'latitude' => 54.352,
-                'longitude' => 18.6466,
-                'population' => 470907,
+                'name'         => 'Gdańsk',
+                'code'         => 'PL-PM-GDA',
+                'latitude'     => 54.352,
+                'longitude'    => 18.6466,
+                'population'   => 470907,
                 'postal_codes' => ['80-001'],
                 'translations' => [
                     'lt' => ['name' => 'Gdanskas', 'description' => 'Baltijos jūros uostas'],
@@ -405,11 +406,11 @@ final class PolandCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Gdynia',
-                'code' => 'PL-PM-GDY',
-                'latitude' => 54.5189,
-                'longitude' => 18.5305,
-                'population' => 245867,
+                'name'         => 'Gdynia',
+                'code'         => 'PL-PM-GDY',
+                'latitude'     => 54.5189,
+                'longitude'    => 18.5305,
+                'population'   => 245867,
                 'postal_codes' => ['81-001'],
                 'translations' => [
                     'lt' => ['name' => 'Gdinija', 'description' => 'Modernus uostamiesčis'],
@@ -417,11 +418,11 @@ final class PolandCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Słupsk',
-                'code' => 'PL-PM-SLU',
-                'latitude' => 54.4642,
-                'longitude' => 17.0286,
-                'population' => 90000,
+                'name'         => 'Słupsk',
+                'code'         => 'PL-PM-SLU',
+                'latitude'     => 54.4642,
+                'longitude'    => 17.0286,
+                'population'   => 90000,
                 'postal_codes' => ['76-200'],
                 'translations' => [
                     'lt' => ['name' => 'Slupskas', 'description' => 'Pajūrio miestas'],
@@ -430,11 +431,11 @@ final class PolandCitiesSeeder extends Seeder
             ],
             // Kujawsko-Pomorskie
             [
-                'name' => 'Bydgoszcz',
-                'code' => 'PL-KP-BYD',
-                'latitude' => 53.1235,
-                'longitude' => 18.0084,
-                'population' => 346739,
+                'name'         => 'Bydgoszcz',
+                'code'         => 'PL-KP-BYD',
+                'latitude'     => 53.1235,
+                'longitude'    => 18.0084,
+                'population'   => 346739,
                 'postal_codes' => ['85-001'],
                 'translations' => [
                     'lt' => ['name' => 'Bidgoščas', 'description' => 'Pramonės centras'],
@@ -442,11 +443,11 @@ final class PolandCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Toruń',
-                'code' => 'PL-KP-TOR',
-                'latitude' => 53.0138,
-                'longitude' => 18.5984,
-                'population' => 201106,
+                'name'         => 'Toruń',
+                'code'         => 'PL-KP-TOR',
+                'latitude'     => 53.0138,
+                'longitude'    => 18.5984,
+                'population'   => 201106,
                 'postal_codes' => ['87-100'],
                 'translations' => [
                     'lt' => ['name' => 'Torunė', 'description' => 'Koperniko miestas'],
@@ -454,11 +455,11 @@ final class PolandCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Włocławek',
-                'code' => 'PL-KP-WLO',
-                'latitude' => 52.6481,
-                'longitude' => 19.0678,
-                'population' => 110000,
+                'name'         => 'Włocławek',
+                'code'         => 'PL-KP-WLO',
+                'latitude'     => 52.6481,
+                'longitude'    => 19.0678,
+                'population'   => 110000,
                 'postal_codes' => ['87-800'],
                 'translations' => [
                     'lt' => ['name' => 'Vloclavekas', 'description' => 'Chemijos pramonės centras'],
@@ -467,11 +468,11 @@ final class PolandCitiesSeeder extends Seeder
             ],
             // Warmińsko-Mazurskie
             [
-                'name' => 'Olsztyn',
-                'code' => 'PL-WN-OLS',
-                'latitude' => 53.7784,
-                'longitude' => 20.4801,
-                'population' => 171979,
+                'name'         => 'Olsztyn',
+                'code'         => 'PL-WN-OLS',
+                'latitude'     => 53.7784,
+                'longitude'    => 20.4801,
+                'population'   => 171979,
                 'postal_codes' => ['10-001'],
                 'translations' => [
                     'lt' => ['name' => 'Olštynas', 'description' => 'Šiaurės Lenkijos centras'],
@@ -479,11 +480,11 @@ final class PolandCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Elbląg',
-                'code' => 'PL-WN-ELB',
-                'latitude' => 54.1561,
-                'longitude' => 19.4047,
-                'population' => 120000,
+                'name'         => 'Elbląg',
+                'code'         => 'PL-WN-ELB',
+                'latitude'     => 54.1561,
+                'longitude'    => 19.4047,
+                'population'   => 120000,
                 'postal_codes' => ['82-300'],
                 'translations' => [
                     'lt' => ['name' => 'Elblongas', 'description' => 'Istorinis miestas'],
@@ -492,11 +493,11 @@ final class PolandCitiesSeeder extends Seeder
             ],
             // Podkarpackie
             [
-                'name' => 'Rzeszów',
-                'code' => 'PL-PK-RZE',
-                'latitude' => 50.0413,
-                'longitude' => 21.9991,
-                'population' => 196821,
+                'name'         => 'Rzeszów',
+                'code'         => 'PL-PK-RZE',
+                'latitude'     => 50.0413,
+                'longitude'    => 21.9991,
+                'population'   => 196821,
                 'postal_codes' => ['35-001'],
                 'translations' => [
                     'lt' => ['name' => 'Žešuvas', 'description' => 'Pietryčių Lenkijos centras'],
@@ -504,11 +505,11 @@ final class PolandCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Przemyśl',
-                'code' => 'PL-PK-PRZ',
-                'latitude' => 49.7844,
-                'longitude' => 22.7672,
-                'population' => 60000,
+                'name'         => 'Przemyśl',
+                'code'         => 'PL-PK-PRZ',
+                'latitude'     => 49.7844,
+                'longitude'    => 22.7672,
+                'population'   => 60000,
                 'postal_codes' => ['37-700'],
                 'translations' => [
                     'lt' => ['name' => 'Pšemyslas', 'description' => 'Sienos miestas su Ukraina'],
@@ -517,11 +518,11 @@ final class PolandCitiesSeeder extends Seeder
             ],
             // Świętokrzyskie
             [
-                'name' => 'Kielce',
-                'code' => 'PL-SK-KIE',
-                'latitude' => 50.8661,
-                'longitude' => 20.6286,
-                'population' => 194852,
+                'name'         => 'Kielce',
+                'code'         => 'PL-SK-KIE',
+                'latitude'     => 50.8661,
+                'longitude'    => 20.6286,
+                'population'   => 194852,
                 'postal_codes' => ['25-001'],
                 'translations' => [
                     'lt' => ['name' => 'Kelcai', 'description' => 'Centrinės Lenkijos centras'],
@@ -530,11 +531,11 @@ final class PolandCitiesSeeder extends Seeder
             ],
             // Łódzkie
             [
-                'name' => 'Łódź',
-                'code' => 'PL-LD-LOD',
-                'latitude' => 51.7592,
-                'longitude' => 19.456,
-                'population' => 677286,
+                'name'         => 'Łódź',
+                'code'         => 'PL-LD-LOD',
+                'latitude'     => 51.7592,
+                'longitude'    => 19.456,
+                'population'   => 677286,
                 'postal_codes' => ['90-001'],
                 'translations' => [
                     'lt' => ['name' => 'Lodzė', 'description' => 'Tekstilės pramonės centras'],
@@ -542,11 +543,11 @@ final class PolandCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Piotrków Trybunalski',
-                'code' => 'PL-LD-PIO',
-                'latitude' => 51.4056,
-                'longitude' => 19.7031,
-                'population' => 75000,
+                'name'         => 'Piotrków Trybunalski',
+                'code'         => 'PL-LD-PIO',
+                'latitude'     => 51.4056,
+                'longitude'    => 19.7031,
+                'population'   => 75000,
                 'postal_codes' => ['97-300'],
                 'translations' => [
                     'lt' => ['name' => 'Piotrkuvas Tribunalskis', 'description' => 'Istorinis miestas'],
@@ -555,11 +556,11 @@ final class PolandCitiesSeeder extends Seeder
             ],
             // Opolskie
             [
-                'name' => 'Opole',
-                'code' => 'PL-OP-OPO',
-                'latitude' => 50.6751,
-                'longitude' => 17.9213,
-                'population' => 128034,
+                'name'         => 'Opole',
+                'code'         => 'PL-OP-OPO',
+                'latitude'     => 50.6751,
+                'longitude'    => 17.9213,
+                'population'   => 128034,
                 'postal_codes' => ['45-001'],
                 'translations' => [
                     'lt' => ['name' => 'Opolė', 'description' => 'Pietų Lenkijos centras'],
@@ -567,11 +568,11 @@ final class PolandCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Kędzierzyn-Koźle',
-                'code' => 'PL-OP-KED',
-                'latitude' => 50.3500,
-                'longitude' => 18.2167,
-                'population' => 60000,
+                'name'         => 'Kędzierzyn-Koźle',
+                'code'         => 'PL-OP-KED',
+                'latitude'     => 50.3500,
+                'longitude'    => 18.2167,
+                'population'   => 60000,
                 'postal_codes' => ['47-200'],
                 'translations' => [
                     'lt' => ['name' => 'Kędzierzyn-Koźle', 'description' => 'Chemijos pramonės centras'],
@@ -579,11 +580,11 @@ final class PolandCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Nysa',
-                'code' => 'PL-OP-NYS',
-                'latitude' => 50.4667,
-                'longitude' => 17.3333,
-                'population' => 45000,
+                'name'         => 'Nysa',
+                'code'         => 'PL-OP-NYS',
+                'latitude'     => 50.4667,
+                'longitude'    => 17.3333,
+                'population'   => 45000,
                 'postal_codes' => ['48-300'],
                 'translations' => [
                     'lt' => ['name' => 'Nysa', 'description' => 'Istorinis miestas'],
@@ -592,11 +593,11 @@ final class PolandCitiesSeeder extends Seeder
             ],
             // Additional Mazowieckie cities
             [
-                'name' => 'Siedlce',
-                'code' => 'PL-MZ-SIE',
-                'latitude' => 52.1667,
-                'longitude' => 22.2833,
-                'population' => 77000,
+                'name'         => 'Siedlce',
+                'code'         => 'PL-MZ-SIE',
+                'latitude'     => 52.1667,
+                'longitude'    => 22.2833,
+                'population'   => 77000,
                 'postal_codes' => ['08-100'],
                 'translations' => [
                     'lt' => ['name' => 'Sedlce', 'description' => 'Rytų Mazovijos centras'],
@@ -604,11 +605,11 @@ final class PolandCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Pruszków',
-                'code' => 'PL-MZ-PRU',
-                'latitude' => 52.1667,
-                'longitude' => 20.8000,
-                'population' => 60000,
+                'name'         => 'Pruszków',
+                'code'         => 'PL-MZ-PRU',
+                'latitude'     => 52.1667,
+                'longitude'    => 20.8000,
+                'population'   => 60000,
                 'postal_codes' => ['05-800'],
                 'translations' => [
                     'lt' => ['name' => 'Pruszków', 'description' => 'Varšuvos priemiestis'],
@@ -616,11 +617,11 @@ final class PolandCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Legionowo',
-                'code' => 'PL-MZ-LEG',
-                'latitude' => 52.4000,
-                'longitude' => 20.9167,
-                'population' => 54000,
+                'name'         => 'Legionowo',
+                'code'         => 'PL-MZ-LEG',
+                'latitude'     => 52.4000,
+                'longitude'    => 20.9167,
+                'population'   => 54000,
                 'postal_codes' => ['05-120'],
                 'translations' => [
                     'lt' => ['name' => 'Legionowo', 'description' => 'Varšuvos priemiestis'],
@@ -628,11 +629,11 @@ final class PolandCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Ostrołęka',
-                'code' => 'PL-MZ-OST',
-                'latitude' => 53.0833,
-                'longitude' => 21.5667,
-                'population' => 52000,
+                'name'         => 'Ostrołęka',
+                'code'         => 'PL-MZ-OST',
+                'latitude'     => 53.0833,
+                'longitude'    => 21.5667,
+                'population'   => 52000,
                 'postal_codes' => ['07-400'],
                 'translations' => [
                     'lt' => ['name' => 'Ostrołęka', 'description' => 'Šiaurės Mazovijos centras'],
@@ -640,11 +641,11 @@ final class PolandCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Ciechanów',
-                'code' => 'PL-MZ-CIE',
-                'latitude' => 52.8833,
-                'longitude' => 20.6167,
-                'population' => 45000,
+                'name'         => 'Ciechanów',
+                'code'         => 'PL-MZ-CIE',
+                'latitude'     => 52.8833,
+                'longitude'    => 20.6167,
+                'population'   => 45000,
                 'postal_codes' => ['06-400'],
                 'translations' => [
                     'lt' => ['name' => 'Ciechanów', 'description' => 'Istorinis miestas'],
@@ -652,11 +653,11 @@ final class PolandCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Żyrardów',
-                'code' => 'PL-MZ-ZYR',
-                'latitude' => 52.0500,
-                'longitude' => 20.4333,
-                'population' => 41000,
+                'name'         => 'Żyrardów',
+                'code'         => 'PL-MZ-ZYR',
+                'latitude'     => 52.0500,
+                'longitude'    => 20.4333,
+                'population'   => 41000,
                 'postal_codes' => ['96-300'],
                 'translations' => [
                     'lt' => ['name' => 'Żyrardów', 'description' => 'Tekstilės pramonės miestas'],
@@ -665,11 +666,11 @@ final class PolandCitiesSeeder extends Seeder
             ],
             // Additional Małopolskie cities
             [
-                'name' => 'Nowy Sącz',
-                'code' => 'PL-MA-NOW',
-                'latitude' => 49.6167,
-                'longitude' => 20.7167,
-                'population' => 83000,
+                'name'         => 'Nowy Sącz',
+                'code'         => 'PL-MA-NOW',
+                'latitude'     => 49.6167,
+                'longitude'    => 20.7167,
+                'population'   => 83000,
                 'postal_codes' => ['33-300'],
                 'translations' => [
                     'lt' => ['name' => 'Nowy Sącz', 'description' => 'Pietų Małopolskos centras'],
@@ -677,11 +678,11 @@ final class PolandCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Chrzanów',
-                'code' => 'PL-MA-CHR',
-                'latitude' => 50.1333,
-                'longitude' => 19.4000,
-                'population' => 37000,
+                'name'         => 'Chrzanów',
+                'code'         => 'PL-MA-CHR',
+                'latitude'     => 50.1333,
+                'longitude'    => 19.4000,
+                'population'   => 37000,
                 'postal_codes' => ['32-500'],
                 'translations' => [
                     'lt' => ['name' => 'Chrzanów', 'description' => 'Pramonės miestas'],
@@ -689,11 +690,11 @@ final class PolandCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Olkusz',
-                'code' => 'PL-MA-OLK',
-                'latitude' => 50.2833,
-                'longitude' => 19.5667,
-                'population' => 36000,
+                'name'         => 'Olkusz',
+                'code'         => 'PL-MA-OLK',
+                'latitude'     => 50.2833,
+                'longitude'    => 19.5667,
+                'population'   => 36000,
                 'postal_codes' => ['32-300'],
                 'translations' => [
                     'lt' => ['name' => 'Olkusz', 'description' => 'Kasybos miestas'],
@@ -701,11 +702,11 @@ final class PolandCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Bochnia',
-                'code' => 'PL-MA-BOC',
-                'latitude' => 49.9667,
-                'longitude' => 20.4333,
-                'population' => 30000,
+                'name'         => 'Bochnia',
+                'code'         => 'PL-MA-BOC',
+                'latitude'     => 49.9667,
+                'longitude'    => 20.4333,
+                'population'   => 30000,
                 'postal_codes' => ['32-700'],
                 'translations' => [
                     'lt' => ['name' => 'Bochnia', 'description' => 'Druskos kasybos miestas'],
@@ -713,11 +714,11 @@ final class PolandCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Gorlice',
-                'code' => 'PL-MA-GOR',
-                'latitude' => 49.6500,
-                'longitude' => 21.1667,
-                'population' => 28000,
+                'name'         => 'Gorlice',
+                'code'         => 'PL-MA-GOR',
+                'latitude'     => 49.6500,
+                'longitude'    => 21.1667,
+                'population'   => 28000,
                 'postal_codes' => ['38-300'],
                 'translations' => [
                     'lt' => ['name' => 'Gorlice', 'description' => 'Naftos pramonės centras'],
@@ -725,11 +726,11 @@ final class PolandCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Zakopane',
-                'code' => 'PL-MA-ZAK',
-                'latitude' => 49.3000,
-                'longitude' => 19.9667,
-                'population' => 27000,
+                'name'         => 'Zakopane',
+                'code'         => 'PL-MA-ZAK',
+                'latitude'     => 49.3000,
+                'longitude'    => 19.9667,
+                'population'   => 27000,
                 'postal_codes' => ['34-500'],
                 'translations' => [
                     'lt' => ['name' => 'Zakopane', 'description' => 'Žiemos sporto miestas'],
@@ -738,11 +739,11 @@ final class PolandCitiesSeeder extends Seeder
             ],
             // Additional Śląskie cities
             [
-                'name' => 'Jaworzno',
-                'code' => 'PL-SL-JAW',
-                'latitude' => 50.2000,
-                'longitude' => 19.2667,
-                'population' => 92000,
+                'name'         => 'Jaworzno',
+                'code'         => 'PL-SL-JAW',
+                'latitude'     => 50.2000,
+                'longitude'    => 19.2667,
+                'population'   => 92000,
                 'postal_codes' => ['43-600'],
                 'translations' => [
                     'lt' => ['name' => 'Jaworzno', 'description' => 'Anglies kasybos miestas'],
@@ -750,11 +751,11 @@ final class PolandCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Jastrzębie-Zdrój',
-                'code' => 'PL-SL-JAS',
-                'latitude' => 49.9500,
-                'longitude' => 18.5833,
-                'population' => 90000,
+                'name'         => 'Jastrzębie-Zdrój',
+                'code'         => 'PL-SL-JAS',
+                'latitude'     => 49.9500,
+                'longitude'    => 18.5833,
+                'population'   => 90000,
                 'postal_codes' => ['44-330'],
                 'translations' => [
                     'lt' => ['name' => 'Jastrzębie-Zdrój', 'description' => 'Anglies ir kurortinis miestas'],
@@ -762,11 +763,11 @@ final class PolandCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Mysłowice',
-                'code' => 'PL-SL-MYS',
-                'latitude' => 50.2333,
-                'longitude' => 19.1333,
-                'population' => 75000,
+                'name'         => 'Mysłowice',
+                'code'         => 'PL-SL-MYS',
+                'latitude'     => 50.2333,
+                'longitude'    => 19.1333,
+                'population'   => 75000,
                 'postal_codes' => ['41-400'],
                 'translations' => [
                     'lt' => ['name' => 'Mysłowice', 'description' => 'Pramonės miestas'],
@@ -774,11 +775,11 @@ final class PolandCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Siemianowice Śląskie',
-                'code' => 'PL-SL-SIE',
-                'latitude' => 50.3000,
-                'longitude' => 19.0333,
-                'population' => 69000,
+                'name'         => 'Siemianowice Śląskie',
+                'code'         => 'PL-SL-SIE',
+                'latitude'     => 50.3000,
+                'longitude'    => 19.0333,
+                'population'   => 69000,
                 'postal_codes' => ['41-100'],
                 'translations' => [
                     'lt' => ['name' => 'Siemianowice Śląskie', 'description' => 'Pramonės miestas'],
@@ -786,11 +787,11 @@ final class PolandCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Żory',
-                'code' => 'PL-SL-ZOR',
-                'latitude' => 50.0500,
-                'longitude' => 18.7000,
-                'population' => 62000,
+                'name'         => 'Żory',
+                'code'         => 'PL-SL-ZOR',
+                'latitude'     => 50.0500,
+                'longitude'    => 18.7000,
+                'population'   => 62000,
                 'postal_codes' => ['44-240'],
                 'translations' => [
                     'lt' => ['name' => 'Żory', 'description' => 'Istorinis miestas'],
@@ -798,11 +799,11 @@ final class PolandCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Piekary Śląskie',
-                'code' => 'PL-SL-PIE',
-                'latitude' => 50.3667,
-                'longitude' => 18.9500,
-                'population' => 55000,
+                'name'         => 'Piekary Śląskie',
+                'code'         => 'PL-SL-PIE',
+                'latitude'     => 50.3667,
+                'longitude'    => 18.9500,
+                'population'   => 55000,
                 'postal_codes' => ['41-940'],
                 'translations' => [
                     'lt' => ['name' => 'Piekary Śląskie', 'description' => 'Anglies kasybos miestas'],
@@ -810,11 +811,11 @@ final class PolandCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Ruda Śląska',
-                'code' => 'PL-SL-RUD',
-                'latitude' => 50.2667,
-                'longitude' => 18.8667,
-                'population' => 140000,
+                'name'         => 'Ruda Śląska',
+                'code'         => 'PL-SL-RUD',
+                'latitude'     => 50.2667,
+                'longitude'    => 18.8667,
+                'population'   => 140000,
                 'postal_codes' => ['41-700'],
                 'translations' => [
                     'lt' => ['name' => 'Ruda Śląska', 'description' => 'Anglies kasybos miestas'],
@@ -823,11 +824,11 @@ final class PolandCitiesSeeder extends Seeder
             ],
             // Additional Wielkopolskie cities
             [
-                'name' => 'Kalisz',
-                'code' => 'PL-WP-KAL',
-                'latitude' => 51.7667,
-                'longitude' => 18.0833,
-                'population' => 100000,
+                'name'         => 'Kalisz',
+                'code'         => 'PL-WP-KAL',
+                'latitude'     => 51.7667,
+                'longitude'    => 18.0833,
+                'population'   => 100000,
                 'postal_codes' => ['62-800'],
                 'translations' => [
                     'lt' => ['name' => 'Kalisz', 'description' => 'Istorinis miestas'],
@@ -835,11 +836,11 @@ final class PolandCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Konin',
-                'code' => 'PL-WP-KON',
-                'latitude' => 52.2167,
-                'longitude' => 18.2500,
-                'population' => 75000,
+                'name'         => 'Konin',
+                'code'         => 'PL-WP-KON',
+                'latitude'     => 52.2167,
+                'longitude'    => 18.2500,
+                'population'   => 75000,
                 'postal_codes' => ['62-500'],
                 'translations' => [
                     'lt' => ['name' => 'Konin', 'description' => 'Anglies kasybos miestas'],
@@ -847,11 +848,11 @@ final class PolandCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Piła',
-                'code' => 'PL-WP-PIL',
-                'latitude' => 53.1500,
-                'longitude' => 16.7333,
-                'population' => 74000,
+                'name'         => 'Piła',
+                'code'         => 'PL-WP-PIL',
+                'latitude'     => 53.1500,
+                'longitude'    => 16.7333,
+                'population'   => 74000,
                 'postal_codes' => ['64-920'],
                 'translations' => [
                     'lt' => ['name' => 'Piła', 'description' => 'Šiaurės Wielkopolskos centras'],
@@ -859,11 +860,11 @@ final class PolandCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Ostrów Wielkopolski',
-                'code' => 'PL-WP-OST',
-                'latitude' => 51.6500,
-                'longitude' => 17.8167,
-                'population' => 72000,
+                'name'         => 'Ostrów Wielkopolski',
+                'code'         => 'PL-WP-OST',
+                'latitude'     => 51.6500,
+                'longitude'    => 17.8167,
+                'population'   => 72000,
                 'postal_codes' => ['63-400'],
                 'translations' => [
                     'lt' => ['name' => 'Ostrów Wielkopolski', 'description' => 'Pramonės miestas'],
@@ -871,11 +872,11 @@ final class PolandCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Gniezno',
-                'code' => 'PL-WP-GNI',
-                'latitude' => 52.5333,
-                'longitude' => 17.6000,
-                'population' => 69000,
+                'name'         => 'Gniezno',
+                'code'         => 'PL-WP-GNI',
+                'latitude'     => 52.5333,
+                'longitude'    => 17.6000,
+                'population'   => 69000,
                 'postal_codes' => ['62-200'],
                 'translations' => [
                     'lt' => ['name' => 'Gniezno', 'description' => 'Pirmoji Lenkijos sostinė'],
@@ -883,11 +884,11 @@ final class PolandCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Leszno',
-                'code' => 'PL-WP-LES',
-                'latitude' => 51.8333,
-                'longitude' => 16.5667,
-                'population' => 64000,
+                'name'         => 'Leszno',
+                'code'         => 'PL-WP-LES',
+                'latitude'     => 51.8333,
+                'longitude'    => 16.5667,
+                'population'   => 64000,
                 'postal_codes' => ['64-100'],
                 'translations' => [
                     'lt' => ['name' => 'Leszno', 'description' => 'Pramonės miestas'],
@@ -896,11 +897,11 @@ final class PolandCitiesSeeder extends Seeder
             ],
             // Additional Dolnośląskie cities
             [
-                'name' => 'Jelenia Góra',
-                'code' => 'PL-DS-JEL',
-                'latitude' => 50.9000,
-                'longitude' => 15.7333,
-                'population' => 80000,
+                'name'         => 'Jelenia Góra',
+                'code'         => 'PL-DS-JEL',
+                'latitude'     => 50.9000,
+                'longitude'    => 15.7333,
+                'population'   => 80000,
                 'postal_codes' => ['58-500'],
                 'translations' => [
                     'lt' => ['name' => 'Jelenia Góra', 'description' => 'Karkonošų miestas'],
@@ -908,11 +909,11 @@ final class PolandCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Legnica',
-                'code' => 'PL-DS-LEG',
-                'latitude' => 51.2167,
-                'longitude' => 16.1667,
-                'population' => 100000,
+                'name'         => 'Legnica',
+                'code'         => 'PL-DS-LEG',
+                'latitude'     => 51.2167,
+                'longitude'    => 16.1667,
+                'population'   => 100000,
                 'postal_codes' => ['59-220'],
                 'translations' => [
                     'lt' => ['name' => 'Legnica', 'description' => 'Istorinis miestas'],
@@ -920,11 +921,11 @@ final class PolandCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Głogów',
-                'code' => 'PL-DS-GLO',
-                'latitude' => 51.6667,
-                'longitude' => 16.0833,
-                'population' => 68000,
+                'name'         => 'Głogów',
+                'code'         => 'PL-DS-GLO',
+                'latitude'     => 51.6667,
+                'longitude'    => 16.0833,
+                'population'   => 68000,
                 'postal_codes' => ['67-200'],
                 'translations' => [
                     'lt' => ['name' => 'Głogów', 'description' => 'Vario kasybos miestas'],
@@ -932,11 +933,11 @@ final class PolandCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Świdnica',
-                'code' => 'PL-DS-SWI',
-                'latitude' => 50.8500,
-                'longitude' => 16.4833,
-                'population' => 57000,
+                'name'         => 'Świdnica',
+                'code'         => 'PL-DS-SWI',
+                'latitude'     => 50.8500,
+                'longitude'    => 16.4833,
+                'population'   => 57000,
                 'postal_codes' => ['58-100'],
                 'translations' => [
                     'lt' => ['name' => 'Świdnica', 'description' => 'Istorinis miestas'],
@@ -944,11 +945,11 @@ final class PolandCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Bolesławiec',
-                'code' => 'PL-DS-BOL',
-                'latitude' => 51.2667,
-                'longitude' => 15.5667,
-                'population' => 40000,
+                'name'         => 'Bolesławiec',
+                'code'         => 'PL-DS-BOL',
+                'latitude'     => 51.2667,
+                'longitude'    => 15.5667,
+                'population'   => 40000,
                 'postal_codes' => ['59-700'],
                 'translations' => [
                     'lt' => ['name' => 'Bolesławiec', 'description' => 'Keramikos miestas'],
@@ -956,11 +957,11 @@ final class PolandCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Zgorzelec',
-                'code' => 'PL-DS-ZGO',
-                'latitude' => 51.1500,
-                'longitude' => 15.0167,
-                'population' => 32000,
+                'name'         => 'Zgorzelec',
+                'code'         => 'PL-DS-ZGO',
+                'latitude'     => 51.1500,
+                'longitude'    => 15.0167,
+                'population'   => 32000,
                 'postal_codes' => ['59-900'],
                 'translations' => [
                     'lt' => ['name' => 'Zgorzelec', 'description' => 'Sienos miestas'],
@@ -973,19 +974,19 @@ final class PolandCitiesSeeder extends Seeder
             $city = City::updateOrCreate(
                 ['code' => $cityData['code']],
                 [
-                    'name' => $cityData['name'],
-                    'slug' => \Str::slug($cityData['name'].'-'.$cityData['code']),
-                    'is_enabled' => true,
-                    'is_default' => $cityData['is_default'] ?? false,
-                    'is_capital' => $cityData['is_capital'] ?? false,
-                    'country_id' => $poland->id,
-                    'zone_id' => $euZone?->id,
-                    'level' => 1,
-                    'latitude' => $cityData['latitude'],
-                    'longitude' => $cityData['longitude'],
-                    'population' => $cityData['population'],
+                    'name'         => $cityData['name'],
+                    'slug'         => Str::slug($cityData['name'] . '-' . $cityData['code']),
+                    'is_enabled'   => true,
+                    'is_default'   => $cityData['is_default'] ?? false,
+                    'is_capital'   => $cityData['is_capital'] ?? false,
+                    'country_id'   => $poland->id,
+                    'zone_id'      => $euZone?->id,
+                    'level'        => 1,
+                    'latitude'     => $cityData['latitude'],
+                    'longitude'    => $cityData['longitude'],
+                    'population'   => $cityData['population'],
                     'postal_codes' => $cityData['postal_codes'],
-                    'sort_order' => 0,
+                    'sort_order'   => 0,
                 ]
             );
 
@@ -994,10 +995,10 @@ final class PolandCitiesSeeder extends Seeder
                 CityTranslation::updateOrCreate(
                     [
                         'city_id' => $city->id,
-                        'locale' => $locale,
+                        'locale'  => $locale,
                     ],
                     [
-                        'name' => $translation['name'],
+                        'name'        => $translation['name'],
                         'description' => $translation['description'],
                     ]
                 );

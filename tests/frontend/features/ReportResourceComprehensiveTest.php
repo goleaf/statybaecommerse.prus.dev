@@ -8,9 +8,10 @@ use App\Filament\Resources\ReportResource;
 use App\Models\Report;
 use App\Models\User;
 use App\Support\Nav;
+use Exception;
 use Filament\Actions\DeleteAction;
-use Filament\Actions\EditAction;
 use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -31,7 +32,7 @@ class ReportResourceComprehensiveTest extends TestCase
         // Create admin user
         $this->adminUser = User::factory()->create([
             'email' => 'admin@test.com',
-            'name' => 'Admin User',
+            'name'  => 'Admin User',
         ]);
 
         // Ensure role exists and assign it
@@ -157,14 +158,14 @@ class ReportResourceComprehensiveTest extends TestCase
         $this->actingAs($this->adminUser);
 
         $reportData = [
-            'name' => 'Test Sales Report',
-            'type' => 'sales',
-            'date_range' => 'last_30_days',
-            'start_date' => now()->subDays(30)->toDateString(),
-            'end_date' => now()->toDateString(),
-            'filters' => ['status' => 'paid'],
+            'name'        => 'Test Sales Report',
+            'type'        => 'sales',
+            'date_range'  => 'last_30_days',
+            'start_date'  => now()->subDays(30)->toDateString(),
+            'end_date'    => now()->toDateString(),
+            'filters'     => ['status' => 'paid'],
             'description' => 'Test report description',
-            'is_active' => true,
+            'is_active'   => true,
         ];
 
         Livewire::test(ReportResource\Pages\CreateReport::class)
@@ -173,10 +174,10 @@ class ReportResourceComprehensiveTest extends TestCase
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('reports', [
-            'name' => $reportData['name'],
-            'type' => $reportData['type'],
+            'name'       => $reportData['name'],
+            'type'       => $reportData['type'],
             'date_range' => $reportData['date_range'],
-            'is_active' => $reportData['is_active'],
+            'is_active'  => $reportData['is_active'],
         ]);
     }
 
@@ -219,10 +220,10 @@ class ReportResourceComprehensiveTest extends TestCase
         ]);
 
         $updatedData = [
-            'name' => 'Updated Report Name',
-            'type' => 'customers',
+            'name'        => 'Updated Report Name',
+            'type'        => 'customers',
             'description' => 'Updated description',
-            'is_active' => false,
+            'is_active'   => false,
         ];
 
         Livewire::test(ReportResource\Pages\EditReport::class, [
@@ -289,10 +290,10 @@ class ReportResourceComprehensiveTest extends TestCase
         $this->actingAs($this->adminUser);
 
         $report = Report::factory()->create([
-            'name' => 'Test Report',
-            'type' => 'sales',
+            'name'       => 'Test Report',
+            'type'       => 'sales',
             'date_range' => 'last_30_days',
-            'is_active' => true,
+            'is_active'  => true,
         ]);
 
         Livewire::test(ReportResource\Pages\ListReports::class)
@@ -381,8 +382,8 @@ class ReportResourceComprehensiveTest extends TestCase
 
         $report = Report::factory()->create([
             'filters' => [
-                'status' => 'paid',
-                'category' => 'electronics',
+                'status'     => 'paid',
+                'category'   => 'electronics',
                 'min_amount' => 100,
             ],
         ]);
@@ -391,10 +392,10 @@ class ReportResourceComprehensiveTest extends TestCase
             ->assertCanSeeTableRecords([$report]);
 
         $this->assertDatabaseHas('reports', [
-            'id' => $report->id,
+            'id'      => $report->id,
             'filters' => json_encode([
-                'status' => 'paid',
-                'category' => 'electronics',
+                'status'     => 'paid',
+                'category'   => 'electronics',
                 'min_amount' => 100,
             ]),
         ]);
@@ -433,17 +434,17 @@ class ReportResourceComprehensiveTest extends TestCase
         $report = Report::factory()->create([
             'date_range' => 'custom',
             'start_date' => $startDate,
-            'end_date' => $endDate,
+            'end_date'   => $endDate,
         ]);
 
         Livewire::test(ReportResource\Pages\ListReports::class)
             ->assertCanSeeTableRecords([$report]);
 
         $this->assertDatabaseHas('reports', [
-            'id' => $report->id,
+            'id'         => $report->id,
             'date_range' => 'custom',
             'start_date' => $startDate,
-            'end_date' => $endDate,
+            'end_date'   => $endDate,
         ]);
     }
 
@@ -454,7 +455,7 @@ class ReportResourceComprehensiveTest extends TestCase
 
         $report = Report::factory()->create([
             'start_date' => null,
-            'end_date' => null,
+            'end_date'   => null,
         ]);
 
         Livewire::test(ReportResource\Pages\ListReports::class)
@@ -502,8 +503,8 @@ class ReportResourceComprehensiveTest extends TestCase
 
         $report = Report::factory()->create([
             'filters' => [
-                'search' => 'test@example.com',
-                'category' => 'Electronics & Gadgets',
+                'search'      => 'test@example.com',
+                'category'    => 'Electronics & Gadgets',
                 'price_range' => '$100-$500',
             ],
         ]);
@@ -559,7 +560,7 @@ class ReportResourceComprehensiveTest extends TestCase
         $report = Report::factory()->create([
             'date_range' => 'custom',
             'start_date' => '2024-01-01',
-            'end_date' => '2024-12-31',
+            'end_date'   => '2024-12-31',
         ]);
 
         Livewire::test(ReportResource\Pages\ListReports::class)
@@ -575,16 +576,16 @@ class ReportResourceComprehensiveTest extends TestCase
             'filters' => [
                 'date_range' => [
                     'start' => '2024-01-01',
-                    'end' => '2024-12-31',
+                    'end'   => '2024-12-31',
                 ],
-                'categories' => ['electronics', 'clothing', 'books'],
+                'categories'  => ['electronics', 'clothing', 'books'],
                 'price_range' => [
                     'min' => 10,
                     'max' => 1000,
                 ],
-                'statuses' => ['paid', 'pending', 'shipped'],
+                'statuses'      => ['paid', 'pending', 'shipped'],
                 'custom_fields' => [
-                    'region' => 'EU',
+                    'region'   => 'EU',
                     'currency' => 'EUR',
                 ],
             ],
@@ -616,8 +617,8 @@ class ReportResourceComprehensiveTest extends TestCase
         // Test with empty strings
         Livewire::test(ReportResource\Pages\CreateReport::class)
             ->fillForm([
-                'name' => '',
-                'type' => '',
+                'name'       => '',
+                'type'       => '',
                 'date_range' => '',
             ])
             ->call('create')
@@ -792,8 +793,8 @@ class ReportResourceComprehensiveTest extends TestCase
         try {
             Livewire::test(ReportResource\Pages\ListReports::class)
                 ->assertCanSeeTableRecords([$report]);
-        } catch (\Exception $e) {
-            $this->fail('Resource should handle errors gracefully: '.$e->getMessage());
+        } catch (Exception $e) {
+            $this->fail('Resource should handle errors gracefully: ' . $e->getMessage());
         }
     }
 

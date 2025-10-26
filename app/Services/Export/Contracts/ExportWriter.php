@@ -7,12 +7,12 @@ namespace App\Services\Export\Contracts;
 interface ExportWriter
 {
     /**
-     * @param  array<int, string>  $headers
+     * @param array<int, string> $headers
      */
     public function open(string $disk, string $path, array $headers): void;
 
     /**
-     * @param  array<int, string>  $row
+     * @param array<int, string> $row
      */
     public function append(array $row): void;
 

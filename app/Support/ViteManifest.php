@@ -87,4 +87,3 @@ final class ViteManifest
         return public_path('build/manifest.json');
     }
 }
-

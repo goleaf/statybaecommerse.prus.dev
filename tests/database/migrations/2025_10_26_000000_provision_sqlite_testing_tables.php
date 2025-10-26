@@ -68,7 +68,7 @@ return new class extends Migration
                 $table->id();
                 if ($teamsEnabled) {
                     $table->unsignedBigInteger($teamKey)->nullable();
-                    $table->index($teamKey, 'roles_'.$teamKey.'_index');
+                    $table->index($teamKey, 'roles_' . $teamKey . '_index');
                 }
                 $table->string('name');
                 $table->string('guard_name');
@@ -83,7 +83,7 @@ return new class extends Migration
                 $table->unsignedBigInteger('permission_id');
                 if ($teamsEnabled) {
                     $table->unsignedBigInteger($teamKey)->nullable();
-                    $table->index($teamKey, 'model_has_permissions_'.$teamKey.'_index');
+                    $table->index($teamKey, 'model_has_permissions_' . $teamKey . '_index');
                 }
                 $table->string('model_type');
                 $table->unsignedBigInteger($modelKey);
@@ -99,7 +99,7 @@ return new class extends Migration
                 $table->unsignedBigInteger('role_id');
                 if ($teamsEnabled) {
                     $table->unsignedBigInteger($teamKey)->nullable();
-                    $table->index($teamKey, 'model_has_roles_'.$teamKey.'_index');
+                    $table->index($teamKey, 'model_has_roles_' . $teamKey . '_index');
                 }
                 $table->string('model_type');
                 $table->unsignedBigInteger($modelKey);

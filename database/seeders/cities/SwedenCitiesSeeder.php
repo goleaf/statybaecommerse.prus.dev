@@ -9,6 +9,7 @@ use App\Models\Country;
 use App\Models\Translations\CityTranslation;
 use App\Models\Zone;
 use Illuminate\Database\Seeder;
+use Str;
 
 final class SwedenCitiesSeeder extends Seeder
 {
@@ -20,13 +21,13 @@ final class SwedenCitiesSeeder extends Seeder
         $cities = [
             // Stockholm
             [
-                'name' => 'Stockholm',
-                'code' => 'SE-AB-STO',
-                'is_capital' => true,
-                'is_default' => true,
-                'latitude' => 59.3293,
-                'longitude' => 18.0686,
-                'population' => 975551,
+                'name'         => 'Stockholm',
+                'code'         => 'SE-AB-STO',
+                'is_capital'   => true,
+                'is_default'   => true,
+                'latitude'     => 59.3293,
+                'longitude'    => 18.0686,
+                'population'   => 975551,
                 'postal_codes' => ['10000', '10001', '10002'],
                 'translations' => [
                     'lt' => ['name' => 'Stokholmas', 'description' => 'Švedijos sostinė'],
@@ -34,11 +35,11 @@ final class SwedenCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Södertälje',
-                'code' => 'SE-AB-SOD',
-                'latitude' => 59.1956,
-                'longitude' => 17.6253,
-                'population' => 100000,
+                'name'         => 'Södertälje',
+                'code'         => 'SE-AB-SOD',
+                'latitude'     => 59.1956,
+                'longitude'    => 17.6253,
+                'population'   => 100000,
                 'postal_codes' => ['15100'],
                 'translations' => [
                     'lt' => ['name' => 'Soderteljė', 'description' => 'Pramonės miestas'],
@@ -47,11 +48,11 @@ final class SwedenCitiesSeeder extends Seeder
             ],
             // Västra Götaland
             [
-                'name' => 'Gothenburg',
-                'code' => 'SE-O-GOT',
-                'latitude' => 57.7089,
-                'longitude' => 11.9746,
-                'population' => 579281,
+                'name'         => 'Gothenburg',
+                'code'         => 'SE-O-GOT',
+                'latitude'     => 57.7089,
+                'longitude'    => 11.9746,
+                'population'   => 579281,
                 'postal_codes' => ['40000'],
                 'translations' => [
                     'lt' => ['name' => 'Geteborgas', 'description' => 'Antrasis didžiausias Švedijos miestas'],
@@ -59,11 +60,11 @@ final class SwedenCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Malmö',
-                'code' => 'SE-O-MAL',
-                'latitude' => 55.605,
-                'longitude' => 13.0038,
-                'population' => 347949,
+                'name'         => 'Malmö',
+                'code'         => 'SE-O-MAL',
+                'latitude'     => 55.605,
+                'longitude'    => 13.0038,
+                'population'   => 347949,
                 'postal_codes' => ['20000'],
                 'translations' => [
                     'lt' => ['name' => 'Malmiu', 'description' => 'Pietų Švedijos centras'],
@@ -71,11 +72,11 @@ final class SwedenCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Västerås',
-                'code' => 'SE-O-VAS',
-                'latitude' => 59.6162,
-                'longitude' => 16.5528,
-                'population' => 150000,
+                'name'         => 'Västerås',
+                'code'         => 'SE-O-VAS',
+                'latitude'     => 59.6162,
+                'longitude'    => 16.5528,
+                'population'   => 150000,
                 'postal_codes' => ['72000'],
                 'translations' => [
                     'lt' => ['name' => 'Vesterosas', 'description' => 'Pramonės miestas'],
@@ -83,11 +84,11 @@ final class SwedenCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Örebro',
-                'code' => 'SE-O-ORE',
-                'latitude' => 59.2741,
-                'longitude' => 15.2066,
-                'population' => 156000,
+                'name'         => 'Örebro',
+                'code'         => 'SE-O-ORE',
+                'latitude'     => 59.2741,
+                'longitude'    => 15.2066,
+                'population'   => 156000,
                 'postal_codes' => ['70000'],
                 'translations' => [
                     'lt' => ['name' => 'Orebro', 'description' => 'Centrinės Švedijos miestas'],
@@ -96,11 +97,11 @@ final class SwedenCitiesSeeder extends Seeder
             ],
             // Skåne
             [
-                'name' => 'Lund',
-                'code' => 'SE-M-LUN',
-                'latitude' => 55.7047,
-                'longitude' => 13.191,
-                'population' => 121893,
+                'name'         => 'Lund',
+                'code'         => 'SE-M-LUN',
+                'latitude'     => 55.7047,
+                'longitude'    => 13.191,
+                'population'   => 121893,
                 'postal_codes' => ['22000'],
                 'translations' => [
                     'lt' => ['name' => 'Lundas', 'description' => 'Universitetų miestas'],
@@ -108,11 +109,11 @@ final class SwedenCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Helsingborg',
-                'code' => 'SE-M-HEL',
-                'latitude' => 56.0465,
-                'longitude' => 12.6945,
-                'population' => 149280,
+                'name'         => 'Helsingborg',
+                'code'         => 'SE-M-HEL',
+                'latitude'     => 56.0465,
+                'longitude'    => 12.6945,
+                'population'   => 149280,
                 'postal_codes' => ['25000'],
                 'translations' => [
                     'lt' => ['name' => 'Helsingborgas', 'description' => 'Uostamiesčis'],
@@ -120,11 +121,11 @@ final class SwedenCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Kristianstad',
-                'code' => 'SE-M-KRI',
-                'latitude' => 56.0294,
-                'longitude' => 14.1567,
-                'population' => 41000,
+                'name'         => 'Kristianstad',
+                'code'         => 'SE-M-KRI',
+                'latitude'     => 56.0294,
+                'longitude'    => 14.1567,
+                'population'   => 41000,
                 'postal_codes' => ['29000'],
                 'translations' => [
                     'lt' => ['name' => 'Kristianstadas', 'description' => 'Istorinis miestas'],
@@ -133,11 +134,11 @@ final class SwedenCitiesSeeder extends Seeder
             ],
             // Uppsala
             [
-                'name' => 'Uppsala',
-                'code' => 'SE-C-UPP',
-                'latitude' => 59.8586,
-                'longitude' => 17.6389,
-                'population' => 230767,
+                'name'         => 'Uppsala',
+                'code'         => 'SE-C-UPP',
+                'latitude'     => 59.8586,
+                'longitude'    => 17.6389,
+                'population'   => 230767,
                 'postal_codes' => ['75000'],
                 'translations' => [
                     'lt' => ['name' => 'Upsala', 'description' => 'Universitetų miestas'],
@@ -146,11 +147,11 @@ final class SwedenCitiesSeeder extends Seeder
             ],
             // Östergötland
             [
-                'name' => 'Linköping',
-                'code' => 'SE-E-LIN',
-                'latitude' => 58.4108,
-                'longitude' => 15.6214,
-                'population' => 164616,
+                'name'         => 'Linköping',
+                'code'         => 'SE-E-LIN',
+                'latitude'     => 58.4108,
+                'longitude'    => 15.6214,
+                'population'   => 164616,
                 'postal_codes' => ['58000'],
                 'translations' => [
                     'lt' => ['name' => 'Linkiopingas', 'description' => 'Technologijų centras'],
@@ -158,11 +159,11 @@ final class SwedenCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Norrköping',
-                'code' => 'SE-E-NOR',
-                'latitude' => 58.5877,
-                'longitude' => 16.1924,
-                'population' => 143171,
+                'name'         => 'Norrköping',
+                'code'         => 'SE-E-NOR',
+                'latitude'     => 58.5877,
+                'longitude'    => 16.1924,
+                'population'   => 143171,
                 'postal_codes' => ['60000'],
                 'translations' => [
                     'lt' => ['name' => 'Norkiopingas', 'description' => 'Pramonės miestas'],
@@ -171,11 +172,11 @@ final class SwedenCitiesSeeder extends Seeder
             ],
             // Jönköping
             [
-                'name' => 'Jönköping',
-                'code' => 'SE-F-JON',
-                'latitude' => 57.7826,
-                'longitude' => 14.1618,
-                'population' => 141081,
+                'name'         => 'Jönköping',
+                'code'         => 'SE-F-JON',
+                'latitude'     => 57.7826,
+                'longitude'    => 14.1618,
+                'population'   => 141081,
                 'postal_codes' => ['55000'],
                 'translations' => [
                     'lt' => ['name' => 'Jonkiopingas', 'description' => 'Junkopingo sostinė'],
@@ -184,11 +185,11 @@ final class SwedenCitiesSeeder extends Seeder
             ],
             // Kronoberg
             [
-                'name' => 'Växjö',
-                'code' => 'SE-G-VAX',
-                'latitude' => 56.8777,
-                'longitude' => 14.8091,
-                'population' => 90000,
+                'name'         => 'Växjö',
+                'code'         => 'SE-G-VAX',
+                'latitude'     => 56.8777,
+                'longitude'    => 14.8091,
+                'population'   => 90000,
                 'postal_codes' => ['35000'],
                 'translations' => [
                     'lt' => ['name' => 'Veksio', 'description' => 'Kronobergo sostinė'],
@@ -197,11 +198,11 @@ final class SwedenCitiesSeeder extends Seeder
             ],
             // Kalmar
             [
-                'name' => 'Kalmar',
-                'code' => 'SE-H-KAL',
-                'latitude' => 56.6616,
-                'longitude' => 16.3616,
-                'population' => 41000,
+                'name'         => 'Kalmar',
+                'code'         => 'SE-H-KAL',
+                'latitude'     => 56.6616,
+                'longitude'    => 16.3616,
+                'population'   => 41000,
                 'postal_codes' => ['39000'],
                 'translations' => [
                     'lt' => ['name' => 'Kalmaras', 'description' => 'Kalmaro sostinė'],
@@ -210,11 +211,11 @@ final class SwedenCitiesSeeder extends Seeder
             ],
             // Gotland
             [
-                'name' => 'Visby',
-                'code' => 'SE-I-VIS',
-                'latitude' => 57.6344,
-                'longitude' => 18.2947,
-                'population' => 24000,
+                'name'         => 'Visby',
+                'code'         => 'SE-I-VIS',
+                'latitude'     => 57.6344,
+                'longitude'    => 18.2947,
+                'population'   => 24000,
                 'postal_codes' => ['62000'],
                 'translations' => [
                     'lt' => ['name' => 'Visbis', 'description' => 'Gotlando sostinė'],
@@ -223,11 +224,11 @@ final class SwedenCitiesSeeder extends Seeder
             ],
             // Blekinge
             [
-                'name' => 'Karlskrona',
-                'code' => 'SE-K-KAR',
-                'latitude' => 56.1612,
-                'longitude' => 15.5869,
-                'population' => 66000,
+                'name'         => 'Karlskrona',
+                'code'         => 'SE-K-KAR',
+                'latitude'     => 56.1612,
+                'longitude'    => 15.5869,
+                'population'   => 66000,
                 'postal_codes' => ['37000'],
                 'translations' => [
                     'lt' => ['name' => 'Karlskrona', 'description' => 'Blekingės sostinė'],
@@ -236,11 +237,11 @@ final class SwedenCitiesSeeder extends Seeder
             ],
             // Halland
             [
-                'name' => 'Halmstad',
-                'code' => 'SE-N-HAL',
-                'latitude' => 56.6745,
-                'longitude' => 12.8572,
-                'population' => 70000,
+                'name'         => 'Halmstad',
+                'code'         => 'SE-N-HAL',
+                'latitude'     => 56.6745,
+                'longitude'    => 12.8572,
+                'population'   => 70000,
                 'postal_codes' => ['30000'],
                 'translations' => [
                     'lt' => ['name' => 'Halmstadas', 'description' => 'Hallando sostinė'],
@@ -249,11 +250,11 @@ final class SwedenCitiesSeeder extends Seeder
             ],
             // Värmland
             [
-                'name' => 'Karlstad',
-                'code' => 'SE-S-KAR',
-                'latitude' => 59.3793,
-                'longitude' => 13.5036,
-                'population' => 95000,
+                'name'         => 'Karlstad',
+                'code'         => 'SE-S-KAR',
+                'latitude'     => 59.3793,
+                'longitude'    => 13.5036,
+                'population'   => 95000,
                 'postal_codes' => ['65000'],
                 'translations' => [
                     'lt' => ['name' => 'Karlstadas', 'description' => 'Vermlando sostinė'],
@@ -262,11 +263,11 @@ final class SwedenCitiesSeeder extends Seeder
             ],
             // Örebro
             [
-                'name' => 'Örebro',
-                'code' => 'SE-T-ORE',
-                'latitude' => 59.2741,
-                'longitude' => 15.2066,
-                'population' => 156000,
+                'name'         => 'Örebro',
+                'code'         => 'SE-T-ORE',
+                'latitude'     => 59.2741,
+                'longitude'    => 15.2066,
+                'population'   => 156000,
                 'postal_codes' => ['70000'],
                 'translations' => [
                     'lt' => ['name' => 'Orebro', 'description' => 'Orebro sostinė'],
@@ -275,11 +276,11 @@ final class SwedenCitiesSeeder extends Seeder
             ],
             // Västmanland
             [
-                'name' => 'Västerås',
-                'code' => 'SE-U-VAS',
-                'latitude' => 59.6162,
-                'longitude' => 16.5528,
-                'population' => 150000,
+                'name'         => 'Västerås',
+                'code'         => 'SE-U-VAS',
+                'latitude'     => 59.6162,
+                'longitude'    => 16.5528,
+                'population'   => 150000,
                 'postal_codes' => ['72000'],
                 'translations' => [
                     'lt' => ['name' => 'Vesterosas', 'description' => 'Vestmanlando sostinė'],
@@ -288,11 +289,11 @@ final class SwedenCitiesSeeder extends Seeder
             ],
             // Dalarna
             [
-                'name' => 'Falun',
-                'code' => 'SE-W-FAL',
-                'latitude' => 60.6036,
-                'longitude' => 15.626,
-                'population' => 58000,
+                'name'         => 'Falun',
+                'code'         => 'SE-W-FAL',
+                'latitude'     => 60.6036,
+                'longitude'    => 15.626,
+                'population'   => 58000,
                 'postal_codes' => ['79000'],
                 'translations' => [
                     'lt' => ['name' => 'Falunas', 'description' => 'Dalarnos sostinė'],
@@ -301,11 +302,11 @@ final class SwedenCitiesSeeder extends Seeder
             ],
             // Gävleborg
             [
-                'name' => 'Gävle',
-                'code' => 'SE-X-GAV',
-                'latitude' => 60.6745,
-                'longitude' => 17.1417,
-                'population' => 100000,
+                'name'         => 'Gävle',
+                'code'         => 'SE-X-GAV',
+                'latitude'     => 60.6745,
+                'longitude'    => 17.1417,
+                'population'   => 100000,
                 'postal_codes' => ['80000'],
                 'translations' => [
                     'lt' => ['name' => 'Gevlė', 'description' => 'Gevleborgo sostinė'],
@@ -314,11 +315,11 @@ final class SwedenCitiesSeeder extends Seeder
             ],
             // Västernorrland
             [
-                'name' => 'Sundsvall',
-                'code' => 'SE-Y-SUN',
-                'latitude' => 62.3908,
-                'longitude' => 17.3069,
-                'population' => 100000,
+                'name'         => 'Sundsvall',
+                'code'         => 'SE-Y-SUN',
+                'latitude'     => 62.3908,
+                'longitude'    => 17.3069,
+                'population'   => 100000,
                 'postal_codes' => ['85000'],
                 'translations' => [
                     'lt' => ['name' => 'Sundsvallas', 'description' => 'Pramonės miestas'],
@@ -327,11 +328,11 @@ final class SwedenCitiesSeeder extends Seeder
             ],
             // Jämtland
             [
-                'name' => 'Östersund',
-                'code' => 'SE-Z-OST',
-                'latitude' => 63.1792,
-                'longitude' => 14.6356,
-                'population' => 65000,
+                'name'         => 'Östersund',
+                'code'         => 'SE-Z-OST',
+                'latitude'     => 63.1792,
+                'longitude'    => 14.6356,
+                'population'   => 65000,
                 'postal_codes' => ['83000'],
                 'translations' => [
                     'lt' => ['name' => 'Osterstundas', 'description' => 'Jemtlando sostinė'],
@@ -340,11 +341,11 @@ final class SwedenCitiesSeeder extends Seeder
             ],
             // Västerbotten
             [
-                'name' => 'Umeå',
-                'code' => 'SE-AC-UME',
-                'latitude' => 63.8258,
-                'longitude' => 20.263,
-                'population' => 130000,
+                'name'         => 'Umeå',
+                'code'         => 'SE-AC-UME',
+                'latitude'     => 63.8258,
+                'longitude'    => 20.263,
+                'population'   => 130000,
                 'postal_codes' => ['90000'],
                 'translations' => [
                     'lt' => ['name' => 'Umeo', 'description' => 'Universitetų miestas'],
@@ -353,11 +354,11 @@ final class SwedenCitiesSeeder extends Seeder
             ],
             // Norrbotten
             [
-                'name' => 'Luleå',
-                'code' => 'SE-BD-LUL',
-                'latitude' => 65.5842,
-                'longitude' => 22.1547,
-                'population' => 78000,
+                'name'         => 'Luleå',
+                'code'         => 'SE-BD-LUL',
+                'latitude'     => 65.5842,
+                'longitude'    => 22.1547,
+                'population'   => 78000,
                 'postal_codes' => ['95000'],
                 'translations' => [
                     'lt' => ['name' => 'Luleo', 'description' => 'Pramonės miestas'],
@@ -370,19 +371,19 @@ final class SwedenCitiesSeeder extends Seeder
             $city = City::updateOrCreate(
                 ['code' => $cityData['code']],
                 [
-                    'name' => $cityData['name'],
-                    'slug' => \Str::slug($cityData['name'].'-'.$cityData['code']),
-                    'is_enabled' => true,
-                    'is_default' => $cityData['is_default'] ?? false,
-                    'is_capital' => $cityData['is_capital'] ?? false,
-                    'country_id' => $sweden->id,
-                    'zone_id' => $euZone?->id,
-                    'level' => 1,
-                    'latitude' => $cityData['latitude'],
-                    'longitude' => $cityData['longitude'],
-                    'population' => $cityData['population'],
+                    'name'         => $cityData['name'],
+                    'slug'         => Str::slug($cityData['name'] . '-' . $cityData['code']),
+                    'is_enabled'   => true,
+                    'is_default'   => $cityData['is_default'] ?? false,
+                    'is_capital'   => $cityData['is_capital'] ?? false,
+                    'country_id'   => $sweden->id,
+                    'zone_id'      => $euZone?->id,
+                    'level'        => 1,
+                    'latitude'     => $cityData['latitude'],
+                    'longitude'    => $cityData['longitude'],
+                    'population'   => $cityData['population'],
                     'postal_codes' => $cityData['postal_codes'],
-                    'sort_order' => 0,
+                    'sort_order'   => 0,
                 ]
             );
 
@@ -391,10 +392,10 @@ final class SwedenCitiesSeeder extends Seeder
                 CityTranslation::updateOrCreate(
                     [
                         'city_id' => $city->id,
-                        'locale' => $locale,
+                        'locale'  => $locale,
                     ],
                     [
-                        'name' => $translation['name'],
+                        'name'        => $translation['name'],
                         'description' => $translation['description'],
                     ]
                 );

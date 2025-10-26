@@ -36,11 +36,11 @@ final class ReferralResourceTest extends TestCase
 
         Livewire::test(\App\Filament\Resources\ReferralResource\Pages\CreateReferral::class)
             ->fillForm([
-                'referrer_id' => $referrer->id,
-                'referred_id' => $referred->id,
+                'referrer_id'   => $referrer->id,
+                'referred_id'   => $referred->id,
                 'referral_code' => 'TEST123',
-                'status' => 'pending',
-                'title' => [
+                'status'        => 'pending',
+                'title'         => [
                     'en' => 'Test Referral',
                     'lt' => 'Testo Rekomendacija',
                 ],
@@ -53,10 +53,10 @@ final class ReferralResourceTest extends TestCase
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('referrals', [
-            'referrer_id' => $referrer->id,
-            'referred_id' => $referred->id,
+            'referrer_id'   => $referrer->id,
+            'referred_id'   => $referred->id,
             'referral_code' => 'TEST123',
-            'status' => 'pending',
+            'status'        => 'pending',
         ]);
     }
 
@@ -70,8 +70,8 @@ final class ReferralResourceTest extends TestCase
         ])
             ->fillForm([
                 'referrer_id' => $newReferrer->id,
-                'status' => 'completed',
-                'title' => [
+                'status'      => 'completed',
+                'title'       => [
                     'en' => 'Updated Title',
                     'lt' => 'Atnaujintas Pavadinimas',
                 ],
@@ -80,9 +80,9 @@ final class ReferralResourceTest extends TestCase
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('referrals', [
-            'id' => $referral->id,
+            'id'          => $referral->id,
             'referrer_id' => $newReferrer->id,
-            'status' => 'completed',
+            'status'      => 'completed',
         ]);
     }
 
@@ -115,7 +115,7 @@ final class ReferralResourceTest extends TestCase
             ->callTableAction('restore', $referral);
 
         $this->assertDatabaseHas('referrals', [
-            'id' => $referral->id,
+            'id'         => $referral->id,
             'deleted_at' => null,
         ]);
     }
@@ -139,7 +139,7 @@ final class ReferralResourceTest extends TestCase
             ->callTableAction('mark_completed', $referral);
 
         $this->assertDatabaseHas('referrals', [
-            'id' => $referral->id,
+            'id'     => $referral->id,
             'status' => 'completed',
         ]);
     }
@@ -152,7 +152,7 @@ final class ReferralResourceTest extends TestCase
             ->callTableAction('mark_expired', $referral);
 
         $this->assertDatabaseHas('referrals', [
-            'id' => $referral->id,
+            'id'     => $referral->id,
             'status' => 'expired',
         ]);
     }
@@ -204,11 +204,11 @@ final class ReferralResourceTest extends TestCase
     public function test_can_filter_by_about_to_expire(): void
     {
         $aboutToExpireReferral = Referral::factory()->create([
-            'status' => 'pending',
+            'status'     => 'pending',
             'expires_at' => now()->addDays(3),
         ]);
         $notExpiringReferral = Referral::factory()->create([
-            'status' => 'pending',
+            'status'     => 'pending',
             'expires_at' => now()->addDays(30),
         ]);
 
@@ -271,7 +271,7 @@ final class ReferralResourceTest extends TestCase
 
         foreach ($referrals as $referral) {
             $this->assertDatabaseHas('referrals', [
-                'id' => $referral->id,
+                'id'     => $referral->id,
                 'status' => 'completed',
             ]);
         }
@@ -286,7 +286,7 @@ final class ReferralResourceTest extends TestCase
 
         foreach ($referrals as $referral) {
             $this->assertDatabaseHas('referrals', [
-                'id' => $referral->id,
+                'id'     => $referral->id,
                 'status' => 'expired',
             ]);
         }
@@ -298,9 +298,9 @@ final class ReferralResourceTest extends TestCase
 
         Livewire::test(\App\Filament\Resources\ReferralResource\Pages\CreateReferral::class)
             ->fillForm([
-                'referred_id' => $referred->id,
+                'referred_id'   => $referred->id,
                 'referral_code' => 'TEST123',
-                'status' => 'pending',
+                'status'        => 'pending',
             ])
             ->call('create')
             ->assertHasFormErrors(['referrer_id' => 'required']);
@@ -312,9 +312,9 @@ final class ReferralResourceTest extends TestCase
 
         Livewire::test(\App\Filament\Resources\ReferralResource\Pages\CreateReferral::class)
             ->fillForm([
-                'referrer_id' => $referrer->id,
+                'referrer_id'   => $referrer->id,
                 'referral_code' => 'TEST123',
-                'status' => 'pending',
+                'status'        => 'pending',
             ])
             ->call('create')
             ->assertHasFormErrors(['referred_id' => 'required']);
@@ -329,7 +329,7 @@ final class ReferralResourceTest extends TestCase
             ->fillForm([
                 'referrer_id' => $referrer->id,
                 'referred_id' => $referred->id,
-                'status' => 'pending',
+                'status'      => 'pending',
             ])
             ->call('create')
             ->assertHasFormErrors(['referral_code' => 'required']);
@@ -343,10 +343,10 @@ final class ReferralResourceTest extends TestCase
 
         Livewire::test(\App\Filament\Resources\ReferralResource\Pages\CreateReferral::class)
             ->fillForm([
-                'referrer_id' => $referrer->id,
-                'referred_id' => $referred->id,
+                'referrer_id'   => $referrer->id,
+                'referred_id'   => $referred->id,
                 'referral_code' => 'UNIQUE123',
-                'status' => 'pending',
+                'status'        => 'pending',
             ])
             ->call('create')
             ->assertHasFormErrors(['referral_code' => 'unique']);
@@ -359,11 +359,11 @@ final class ReferralResourceTest extends TestCase
 
         Livewire::test(\App\Filament\Resources\ReferralResource\Pages\CreateReferral::class)
             ->fillForm([
-                'referrer_id' => $referrer->id,
-                'referred_id' => $referred->id,
+                'referrer_id'   => $referrer->id,
+                'referred_id'   => $referred->id,
                 'referral_code' => 'TEST123',
-                'status' => 'pending',
-                'title' => [
+                'status'        => 'pending',
+                'title'         => [
                     'en' => 'English Title',
                     'lt' => 'Lietuvių Pavadinimas',
                 ],

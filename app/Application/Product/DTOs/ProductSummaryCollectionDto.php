@@ -14,9 +14,7 @@ final readonly class ProductSummaryCollectionDto
     /**
      * @param list<ProductSummaryDto> $items
      */
-    public function __construct(private array $items)
-    {
-    }
+    public function __construct(private array $items) {}
 
     public static function fromDomainCollection(ProductCollection $products): self
     {

@@ -15,9 +15,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * Eloquent model representing the CollectionTranslation entity with comprehensive relationships, scopes, and business logic for the e-commerce system.
  *
  * @property string $factory
- * @property mixed $table
- * @property mixed $fillable
- * @property mixed $timestamps
+ * @property mixed  $table
+ * @property mixed  $fillable
+ * @property mixed  $timestamps
  *
  * @method static \Illuminate\Database\Eloquent\Builder|CollectionTranslation newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|CollectionTranslation newQuery()

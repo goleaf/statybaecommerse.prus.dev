@@ -11,11 +11,11 @@ uses(RefreshDatabase::class);
 describe('Brand Model', function () {
     it('can be created with valid data', function () {
         $brand = Brand::factory()->create([
-            'name' => 'Test Brand',
-            'slug' => 'test-brand',
+            'name'        => 'Test Brand',
+            'slug'        => 'test-brand',
             'description' => 'Test brand description',
-            'website' => 'https://testbrand.com',
-            'is_enabled' => true,
+            'website'     => 'https://testbrand.com',
+            'is_enabled'  => true,
         ]);
 
         expect($brand->name)->toBe('Test Brand');
@@ -106,9 +106,9 @@ describe('Brand Model', function () {
 
     it('can be searched globally', function () {
         $brand = Brand::factory()->create([
-            'name' => 'Searchable Brand',
+            'name'        => 'Searchable Brand',
             'description' => 'This brand is searchable',
-            'website' => 'https://searchable.com',
+            'website'     => 'https://searchable.com',
         ]);
 
         $searchResults = Brand::where('name', 'like', '%Searchable%')
@@ -157,9 +157,9 @@ describe('Brand Model', function () {
         $brand = Brand::factory()->create();
         $translation = \App\Models\Translations\BrandTranslation::factory()->create([
             'brand_id' => $brand->id,
-            'locale' => 'lt',
-            'name' => 'Test Brand LT',
-            'slug' => 'test-brand-lt',
+            'locale'   => 'lt',
+            'name'     => 'Test Brand LT',
+            'slug'     => 'test-brand-lt',
         ]);
 
         expect($brand->translations)->toHaveCount(1);
@@ -171,8 +171,8 @@ describe('Brand Model', function () {
         $brand = Brand::factory()->create(['name' => 'Default Brand']);
         $translation = \App\Models\Translations\BrandTranslation::factory()->create([
             'brand_id' => $brand->id,
-            'locale' => 'lt',
-            'name' => 'Translated Brand',
+            'locale'   => 'lt',
+            'name'     => 'Translated Brand',
         ]);
 
         app()->setLocale('lt');
@@ -184,8 +184,8 @@ describe('Brand Model', function () {
         $brand = Brand::factory()->create(['slug' => 'default-brand']);
         $translation = \App\Models\Translations\BrandTranslation::factory()->create([
             'brand_id' => $brand->id,
-            'locale' => 'lt',
-            'slug' => 'translated-brand',
+            'locale'   => 'lt',
+            'slug'     => 'translated-brand',
         ]);
 
         app()->setLocale('lt');
@@ -197,7 +197,7 @@ describe('Brand Model', function () {
         $brand = Brand::factory()->create();
         \App\Models\Translations\BrandTranslation::factory()->create([
             'brand_id' => $brand->id,
-            'locale' => 'lt',
+            'locale'   => 'lt',
         ]);
 
         expect($brand->hasTranslation('lt'))->toBeTrue();
@@ -208,11 +208,11 @@ describe('Brand Model', function () {
         $brand = Brand::factory()->create();
         \App\Models\Translations\BrandTranslation::factory()->create([
             'brand_id' => $brand->id,
-            'locale' => 'lt',
+            'locale'   => 'lt',
         ]);
         \App\Models\Translations\BrandTranslation::factory()->create([
             'brand_id' => $brand->id,
-            'locale' => 'en',
+            'locale'   => 'en',
         ]);
 
         $locales = $brand->getAvailableLocales();

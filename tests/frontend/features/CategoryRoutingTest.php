@@ -18,14 +18,14 @@ final class CategoryRoutingTest extends TestCase
         // Create a category with translations (using the specific URL that was failing)
         $category = Category::factory()->create([
             'is_visible' => true,
-            'slug' => 'sandarinimo-pleveles-ir-juostos-lt',
+            'slug'       => 'sandarinimo-pleveles-ir-juostos-lt',
         ]);
 
         CategoryTranslation::create([
             'category_id' => $category->id,
-            'locale' => 'lt',
-            'name' => 'Sandarinimo plevelės ir juostos',
-            'slug' => 'sandarinimo-pleveles-ir-juostos-lt',
+            'locale'      => 'lt',
+            'name'        => 'Sandarinimo plevelės ir juostos',
+            'slug'        => 'sandarinimo-pleveles-ir-juostos-lt',
             'description' => 'Sandarinimo plevelės ir juostos kategorija',
         ]);
 

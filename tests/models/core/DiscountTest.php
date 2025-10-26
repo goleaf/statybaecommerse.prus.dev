@@ -7,11 +7,11 @@ use App\Models\DiscountCondition;
 
 it('can create a discount', function () {
     $discount = Discount::factory()->create([
-        'name' => 'Summer Sale',
-        'type' => 'percentage',
-        'value' => 20.00,
+        'name'      => 'Summer Sale',
+        'type'      => 'percentage',
+        'value'     => 20.00,
         'starts_at' => now(),
-        'ends_at' => now()->addDays(30),
+        'ends_at'   => now()->addDays(30),
         'is_active' => true,
     ]);
 
@@ -32,19 +32,19 @@ it('has conditions relationship', function () {
 it('can check if discount is currently active', function () {
     $activeDiscount = Discount::factory()->create([
         'starts_at' => now()->subDays(1),
-        'ends_at' => now()->addDays(1),
+        'ends_at'   => now()->addDays(1),
         'is_active' => true,
     ]);
 
     $expiredDiscount = Discount::factory()->create([
         'starts_at' => now()->subDays(10),
-        'ends_at' => now()->subDays(1),
+        'ends_at'   => now()->subDays(1),
         'is_active' => true,
     ]);
 
     $inactiveDiscount = Discount::factory()->create([
         'starts_at' => now()->subDays(1),
-        'ends_at' => now()->addDays(1),
+        'ends_at'   => now()->addDays(1),
         'is_active' => false,
     ]);
 
@@ -55,7 +55,7 @@ it('can check if discount is currently active', function () {
 
 it('can calculate discount amount for percentage type', function () {
     $discount = Discount::factory()->create([
-        'type' => 'percentage',
+        'type'  => 'percentage',
         'value' => 20.00,
     ]);
 
@@ -65,7 +65,7 @@ it('can calculate discount amount for percentage type', function () {
 
 it('can calculate discount amount for fixed type', function () {
     $discount = Discount::factory()->create([
-        'type' => 'fixed',
+        'type'  => 'fixed',
         'value' => 15.00,
     ]);
 
@@ -86,15 +86,15 @@ it('can filter active discounts', function () {
 it('can filter current discounts', function () {
     $currentDiscount = Discount::factory()->create([
         'starts_at' => now()->subDays(1),
-        'ends_at' => now()->addDays(1),
+        'ends_at'   => now()->addDays(1),
     ]);
     $futureDiscount = Discount::factory()->create([
         'starts_at' => now()->addDays(1),
-        'ends_at' => now()->addDays(10),
+        'ends_at'   => now()->addDays(10),
     ]);
     $expiredDiscount = Discount::factory()->create([
         'starts_at' => now()->subDays(10),
-        'ends_at' => now()->subDays(1),
+        'ends_at'   => now()->subDays(1),
     ]);
 
     $currentDiscounts = Discount::where('starts_at', '<=', now())

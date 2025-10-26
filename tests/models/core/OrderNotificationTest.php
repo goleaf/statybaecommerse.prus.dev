@@ -17,10 +17,10 @@ final class OrderNotificationTest extends TestCase
     public function test_notification_can_be_created(): void
     {
         $orderData = [
-            'id' => 1,
-            'order_number' => 'ORD-001',
-            'total' => 100.00,
-            'status' => 'pending',
+            'id'            => 1,
+            'order_number'  => 'ORD-001',
+            'total'         => 100.00,
+            'status'        => 'pending',
             'customer_name' => 'John Doe',
         ];
 
@@ -46,10 +46,10 @@ final class OrderNotificationTest extends TestCase
     {
         $user = User::factory()->create();
         $orderData = [
-            'id' => 1,
-            'order_number' => 'ORD-001',
-            'total' => 100.00,
-            'status' => 'pending',
+            'id'            => 1,
+            'order_number'  => 'ORD-001',
+            'total'         => 100.00,
+            'status'        => 'pending',
             'customer_name' => 'John Doe',
         ];
 
@@ -109,10 +109,10 @@ final class OrderNotificationTest extends TestCase
     {
         $user = User::factory()->create();
         $orderData = [
-            'id' => 1,
+            'id'           => 1,
             'order_number' => 'ORD-001',
-            'total' => 100.00,
-            'status' => 'pending',
+            'total'        => 100.00,
+            'status'       => 'pending',
         ];
 
         $notification = new OrderNotification('created', $orderData);
@@ -120,8 +120,8 @@ final class OrderNotificationTest extends TestCase
 
         $this->assertDatabaseHas('notifications', [
             'notifiable_type' => User::class,
-            'notifiable_id' => $user->id,
-            'type' => OrderNotification::class,
+            'notifiable_id'   => $user->id,
+            'type'            => OrderNotification::class,
         ]);
 
         $dbNotification = DatabaseNotification::where('notifiable_id', $user->id)->first();

@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace App\Support\Media;
 
 use Illuminate\Support\Arr;
-use Spatie\MediaLibrary\MediaCollections\Models\Media;
+
 use function safe_asset;
+
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 final class PlaceholderResolver
 {

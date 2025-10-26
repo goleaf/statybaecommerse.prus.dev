@@ -13,10 +13,10 @@ beforeEach(function () {
     Http::fake([
         'mailchimp.com/*' => Http::response([
             'stats' => [
-                'member_count' => 150,
+                'member_count'      => 150,
                 'unsubscribe_count' => 5,
-                'cleaned_count' => 2,
-                'pending_count' => 3,
+                'cleaned_count'     => 2,
+                'pending_count'     => 3,
             ],
         ], 200),
     ]);
@@ -43,9 +43,9 @@ test('email marketing manager can sync all subscribers', function () {
     // Mock successful sync responses
     Http::fake([
         'mailchimp.com/3.0/lists/*/members' => Http::response([
-            'id' => 'test-member-id',
+            'id'            => 'test-member-id',
             'email_address' => 'test@example.com',
-            'status' => 'subscribed',
+            'status'        => 'subscribed',
         ], 201),
     ]);
 
@@ -64,7 +64,7 @@ test('email marketing manager validates campaign form', function () {
     $component->call('createCampaign');
 
     $component->assertHasErrors([
-        'campaignTitle' => 'required',
+        'campaignTitle'   => 'required',
         'campaignSubject' => 'required',
     ]);
 });
@@ -73,11 +73,11 @@ test('email marketing manager can create campaign', function () {
     // Mock campaign creation response
     Http::fake([
         'mailchimp.com/3.0/campaigns' => Http::response([
-            'id' => 'test-campaign-id',
-            'type' => 'regular',
+            'id'       => 'test-campaign-id',
+            'type'     => 'regular',
             'settings' => [
                 'subject_line' => 'Test Campaign',
-                'title' => 'Test Campaign Title',
+                'title'        => 'Test Campaign Title',
             ],
         ], 201),
     ]);
@@ -97,8 +97,8 @@ test('email marketing manager can create interest segment', function () {
     // Mock segment creation response
     Http::fake([
         'mailchimp.com/3.0/lists/*/segments' => Http::response([
-            'id' => 'test-segment-id',
-            'name' => 'Products Subscribers',
+            'id'           => 'test-segment-id',
+            'name'         => 'Products Subscribers',
             'member_count' => 25,
         ], 201),
     ]);

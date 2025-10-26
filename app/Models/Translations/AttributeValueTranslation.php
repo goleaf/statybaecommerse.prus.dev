@@ -203,7 +203,7 @@ final class AttributeValueTranslation extends Model
     /**
      * Handle getMissingLocalesForAttributeValue functionality with proper error handling.
      *
-     * @param  array<int, string>  $supportedLocales
+     * @param  array<int, string> $supportedLocales
      * @return array<int, string>
      */
     public static function getMissingLocalesForAttributeValue(int $attributeValueId, array $supportedLocales): array

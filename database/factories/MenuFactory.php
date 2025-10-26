@@ -22,11 +22,11 @@ final class MenuFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => fake()->words(2, true),
-            'key' => fake()->unique()->slug(),
-            'location' => fake()->randomElement(['header', 'footer', 'sidebar', 'mobile']),
+            'name'        => fake()->words(2, true),
+            'key'         => fake()->unique()->slug(),
+            'location'    => fake()->randomElement(['header', 'footer', 'sidebar', 'mobile']),
             'description' => fake()->sentence(),
-            'is_active' => fake()->boolean(80), // 80% chance of being active
+            'is_active'   => fake()->boolean(80), // 80% chance of being active
         ];
     }
 

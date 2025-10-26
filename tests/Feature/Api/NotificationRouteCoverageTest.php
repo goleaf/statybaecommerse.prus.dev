@@ -8,6 +8,8 @@ use App\Http\Controllers\Api\NotificationController;
 use Illuminate\Routing\Route;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Route as RouteFacade;
+use ReflectionClass;
+use ReflectionMethod;
 use Tests\TestCase;
 
 final class NotificationRouteCoverageTest extends TestCase
@@ -35,7 +37,7 @@ final class NotificationRouteCoverageTest extends TestCase
             ->filter(function (Route $route): bool {
                 $action = $route->getActionName();
 
-                return str_contains($action, NotificationController::class.'@');
+                return str_contains($action, NotificationController::class . '@');
             })
             ->mapWithKeys(function (Route $route): array {
                 $action = $route->getActionName();
@@ -51,10 +53,10 @@ final class NotificationRouteCoverageTest extends TestCase
      */
     private function controllerMethods(): array
     {
-        return Collection::make((new \ReflectionClass(NotificationController::class))->getMethods(\ReflectionMethod::IS_PUBLIC))
+        return Collection::make((new ReflectionClass(NotificationController::class))->getMethods(ReflectionMethod::IS_PUBLIC))
             // Filter ensures we only evaluate the controller's declared actions instead of inherited framework methods.
-            ->filter(static fn (\ReflectionMethod $method): bool => $method->class === NotificationController::class && ! $method->isConstructor())
-            ->map(static fn (\ReflectionMethod $method): string => $method->name)
+            ->filter(static fn (ReflectionMethod $method): bool => $method->class === NotificationController::class && ! $method->isConstructor())
+            ->map(static fn (ReflectionMethod $method): string => $method->name)
             ->toArray();
     }
 }

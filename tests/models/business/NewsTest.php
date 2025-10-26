@@ -13,13 +13,13 @@ uses(RefreshDatabase::class);
 
 beforeEach(function () {
     $this->news = News::factory()->create([
-        'is_visible' => true,
-        'is_featured' => false,
+        'is_visible'   => true,
+        'is_featured'  => false,
         'published_at' => now()->subDay(),
-        'author_name' => 'Test Author',
+        'author_name'  => 'Test Author',
         'author_email' => 'test@example.com',
-        'view_count' => 0,
-        'meta_data' => ['key' => 'value'],
+        'view_count'   => 0,
+        'meta_data'    => ['key' => 'value'],
     ]);
 });
 
@@ -37,14 +37,14 @@ it('can check if news is published', function () {
     expect($this->news->isPublished())->toBeTrue();
 
     $unpublishedNews = News::factory()->create([
-        'is_visible' => false,
+        'is_visible'   => false,
         'published_at' => now()->subDay(),
     ]);
 
     expect($unpublishedNews->isPublished())->toBeFalse();
 
     $futureNews = News::factory()->create([
-        'is_visible' => true,
+        'is_visible'   => true,
         'published_at' => now()->addDay(),
     ]);
 
@@ -104,17 +104,17 @@ it('can have images', function () {
 
 it('can scope published news', function () {
     $publishedNews = News::factory()->create([
-        'is_visible' => true,
+        'is_visible'   => true,
         'published_at' => now()->subDay(),
     ]);
 
     $unpublishedNews = News::factory()->create([
-        'is_visible' => false,
+        'is_visible'   => false,
         'published_at' => now()->subDay(),
     ]);
 
     $futureNews = News::factory()->create([
-        'is_visible' => true,
+        'is_visible'   => true,
         'published_at' => now()->addDay(),
     ]);
 
@@ -163,18 +163,18 @@ it('can scope by tag', function () {
 it('can search news by title and content', function () {
     $searchableNews = News::factory()->create();
     $searchableNews->translations()->create([
-        'locale' => 'lt',
-        'title' => 'Test News Title',
-        'slug' => 'test-news-title',
+        'locale'  => 'lt',
+        'title'   => 'Test News Title',
+        'slug'    => 'test-news-title',
         'summary' => 'Test summary',
         'content' => 'Test content with searchable text',
     ]);
 
     $otherNews = News::factory()->create();
     $otherNews->translations()->create([
-        'locale' => 'lt',
-        'title' => 'Other News',
-        'slug' => 'other-news',
+        'locale'  => 'lt',
+        'title'   => 'Other News',
+        'slug'    => 'other-news',
         'summary' => 'Other summary',
         'content' => 'Other content',
     ]);
@@ -187,12 +187,12 @@ it('can search news by title and content', function () {
 
 it('can get translated attributes', function () {
     $this->news->translations()->create([
-        'locale' => 'lt',
-        'title' => 'Test Title',
-        'slug' => 'test-slug',
-        'summary' => 'Test Summary',
-        'content' => 'Test Content',
-        'seo_title' => 'SEO Title',
+        'locale'          => 'lt',
+        'title'           => 'Test Title',
+        'slug'            => 'test-slug',
+        'summary'         => 'Test Summary',
+        'content'         => 'Test Content',
+        'seo_title'       => 'SEO Title',
         'seo_description' => 'SEO Description',
     ]);
 

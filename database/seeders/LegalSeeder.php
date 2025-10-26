@@ -16,7 +16,7 @@ class LegalSeeder extends Seeder
 
         $legalDocuments = [
             [
-                'key' => 'privacy',
+                'key'   => 'privacy',
                 'title' => [
                     'lt' => 'Privatumo politika',
                     'en' => 'Privacy Policy',
@@ -27,7 +27,7 @@ class LegalSeeder extends Seeder
                 ],
             ],
             [
-                'key' => 'terms',
+                'key'   => 'terms',
                 'title' => [
                     'lt' => 'Naudojimosi sąlygos',
                     'en' => 'Terms of Use',
@@ -38,7 +38,7 @@ class LegalSeeder extends Seeder
                 ],
             ],
             [
-                'key' => 'refund',
+                'key'   => 'refund',
                 'title' => [
                     'lt' => 'Grąžinimo politika',
                     'en' => 'Refund Policy',
@@ -49,7 +49,7 @@ class LegalSeeder extends Seeder
                 ],
             ],
             [
-                'key' => 'shipping',
+                'key'   => 'shipping',
                 'title' => [
                     'lt' => 'Pristatymo politika',
                     'en' => 'Shipping Policy',
@@ -72,20 +72,20 @@ class LegalSeeder extends Seeder
             // Create translations for each locale
             foreach ($locales as $locale) {
                 $title = $document['title'][$locale] ?? $document['title']['lt'];
-                $slug = \Illuminate\Support\Str::slug($title).'-'.$locale;
+                $slug = \Illuminate\Support\Str::slug($title) . '-' . $locale;
 
                 LegalTranslation::updateOrCreate([
                     'legal_id' => $legal->id,
-                    'locale' => $locale,
+                    'locale'   => $locale,
                 ], [
-                    'title' => $title,
+                    'title'   => $title,
                     'content' => $document['content'][$locale] ?? $document['content']['lt'],
-                    'slug' => $slug,
+                    'slug'    => $slug,
                 ]);
             }
         }
 
-        $this->command?->info('LegalSeeder: seeded legal documents with translations (locales: '.implode(',', $locales).').');
+        $this->command?->info('LegalSeeder: seeded legal documents with translations (locales: ' . implode(',', $locales) . ').');
     }
 
     private function supportedLocales(): array

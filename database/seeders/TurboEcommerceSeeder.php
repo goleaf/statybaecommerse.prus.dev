@@ -16,6 +16,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\LazyCollection;
 use Illuminate\Support\Str;
+use Throwable;
 
 /**
  * An ultra-fast, idempotent, and scalable seeder for large product catalogs.
@@ -149,27 +150,27 @@ final class TurboEcommerceSeeder extends Seeder
                 $product = Product::factory()
                     ->for($brand, 'brand')
                     ->create([
-                        'name' => $nameLt,
-                        'slug' => Str::slug($nameLt.'-'.Str::random(6)),
-                        'description' => '—',
-                        'short_description' => '—',
-                        'sku' => 'PRD-'.strtoupper(Str::random(10)),
-                        'price' => $price,
-                        'sale_price' => (mt_rand(0, 100) < 20) ? round($price * 0.85, 2) : null,
-                        'manage_stock' => (mt_rand(0, 100) < 85),
-                        'stock_quantity' => mt_rand(0, 500),
+                        'name'                => $nameLt,
+                        'slug'                => Str::slug($nameLt . '-' . Str::random(6)),
+                        'description'         => '—',
+                        'short_description'   => '—',
+                        'sku'                 => 'PRD-' . strtoupper(Str::random(10)),
+                        'price'               => $price,
+                        'sale_price'          => (mt_rand(0, 100) < 20) ? round($price * 0.85, 2) : null,
+                        'manage_stock'        => (mt_rand(0, 100) < 85),
+                        'stock_quantity'      => mt_rand(0, 500),
                         'low_stock_threshold' => mt_rand(3, 25),
-                        'weight' => mt_rand(10, 2500) / 100,
-                        'length' => mt_rand(10, 3000) / 10,
-                        'width' => mt_rand(10, 3000) / 10,
-                        'height' => mt_rand(10, 1500) / 10,
-                        'is_visible' => true,
-                        'is_featured' => (mt_rand(0, 100) < 10),
-                        'published_at' => now(),
-                        'seo_title' => $nameLt,
-                        'seo_description' => '—',
-                        'status' => 'published',
-                        'type' => 'simple',
+                        'weight'              => mt_rand(10, 2500) / 100,
+                        'length'              => mt_rand(10, 3000) / 10,
+                        'width'               => mt_rand(10, 3000) / 10,
+                        'height'              => mt_rand(10, 1500) / 10,
+                        'is_visible'          => true,
+                        'is_featured'         => (mt_rand(0, 100) < 10),
+                        'published_at'        => now(),
+                        'seo_title'           => $nameLt,
+                        'seo_description'     => '—',
+                        'status'              => 'published',
+                        'type'                => 'simple',
                     ]);
 
                 $products->push($product);
@@ -244,12 +245,12 @@ final class TurboEcommerceSeeder extends Seeder
                     ProductTranslation::factory()
                         ->for($product, 'product')
                         ->make([
-                            'locale' => $locale,
-                            'name' => $this->translateLike($product->name, $locale),
-                            'slug' => Str::slug($this->translateLike($product->name, $locale).'-'.substr($product->slug, -6)),
-                            'summary' => $this->translateLike('Profesionalus įrankis', $locale),
-                            'description' => $this->translateLike('Aukštos kokybės produktas profesionalams ir mėgėjams.', $locale),
-                            'seo_title' => $this->translateLike($product->name, $locale),
+                            'locale'          => $locale,
+                            'name'            => $this->translateLike($product->name, $locale),
+                            'slug'            => Str::slug($this->translateLike($product->name, $locale) . '-' . substr($product->slug, -6)),
+                            'summary'         => $this->translateLike('Profesionalus įrankis', $locale),
+                            'description'     => $this->translateLike('Aukštos kokybės produktas profesionalams ir mėgėjams.', $locale),
+                            'seo_title'       => $this->translateLike($product->name, $locale),
                             'seo_description' => $this->translateLike('Pirkite geriausia kaina. Greitas pristatymas.', $locale),
                         ])
                         ->toArray()
@@ -287,8 +288,8 @@ final class TurboEcommerceSeeder extends Seeder
                         ProductImage::factory()
                             ->for($product, 'product')
                             ->create([
-                                'path' => 'storage/shared_product_images/'.basename($path),
-                                'alt_text' => $product->name,
+                                'path'       => 'storage/shared_product_images/' . basename($path),
+                                'alt_text'   => $product->name,
                                 'sort_order' => $current + $index + 1,
                             ]);
                     }
@@ -301,14 +302,14 @@ final class TurboEcommerceSeeder extends Seeder
                     foreach ($toDelete as $img) {
                         try {
                             $img->delete();
-                        } catch (\Throwable $e) {  /* ignore */
+                        } catch (Throwable $e) {  /* ignore */
                         }
                     }
                 }
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
                 Log::warning('Turbo image ensure failed', [
                     'product_id' => $product->id,
-                    'error' => $e->getMessage(),
+                    'error'      => $e->getMessage(),
                 ]);
             }
         }
@@ -321,7 +322,7 @@ final class TurboEcommerceSeeder extends Seeder
         }
 
         // If directory already has enough images, reuse them
-        $existing = glob($this->sharedImagePoolDir.DIRECTORY_SEPARATOR.'pool_image_*.webp') ?: [];
+        $existing = glob($this->sharedImagePoolDir . DIRECTORY_SEPARATOR . 'pool_image_*.webp') ?: [];
         if (count($existing) >= $count) {
             $this->sharedImagePool = array_values($existing);
 
@@ -335,23 +336,23 @@ final class TurboEcommerceSeeder extends Seeder
         $generated = [];
         for ($i = 1; $i <= $needed; $i++) {
             try {
-                $name = 'Sample Product Image '.($i + count($existing));
+                $name = 'Sample Product Image ' . ($i + count($existing));
                 $file = $this->imageGen->generateWebPImage(
                     text: $name,
                     width: 600,
                     height: 600,
                     backgroundColor: null,
                     textColor: '#FFFFFF',
-                    filename: 'pool_image_'.str_pad((string) ($i + count($existing)), 3, '0', STR_PAD_LEFT)
+                    filename: 'pool_image_' . str_pad((string) ($i + count($existing)), 3, '0', STR_PAD_LEFT)
                 );
 
                 // Move into pool directory if generated elsewhere
-                $dest = $this->sharedImagePoolDir.DIRECTORY_SEPARATOR.basename($file);
+                $dest = $this->sharedImagePoolDir . DIRECTORY_SEPARATOR . basename($file);
                 if ($file !== $dest) {
                     @rename($file, $dest);
                 }
                 $generated[] = $dest;
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
                 Log::warning('Shared image generation failed', [
                     'index' => $i,
                     'error' => $e->getMessage(),
@@ -385,11 +386,11 @@ final class TurboEcommerceSeeder extends Seeder
     {
         // Lightweight pseudo-translation to avoid network calls but ensure per-locale difference
         return match ($locale) {
-            'lt' => $text,
-            'en' => $text.' (EN)',
-            'ru' => $text.' (RU)',
-            'de' => $text.' (DE)',
-            default => $text.' ('.strtoupper($locale).')',
+            'lt'    => $text,
+            'en'    => $text . ' (EN)',
+            'ru'    => $text . ' (RU)',
+            'de'    => $text . ' (DE)',
+            default => $text . ' (' . strtoupper($locale) . ')',
         };
     }
 

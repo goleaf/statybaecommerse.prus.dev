@@ -31,9 +31,9 @@ final class ReferralRewardSeeder extends Seeder
             ->referrerBonus()
             ->state(function () use ($users, $referrals) {
                 return [
-                    'user_id' => $users->random()->id,
+                    'user_id'     => $users->random()->id,
                     'referral_id' => $referrals->random()->id,
-                    'title' => [
+                    'title'       => [
                         'en' => 'Referrer Bonus',
                         'lt' => 'Referralo bonusas',
                     ],
@@ -51,10 +51,10 @@ final class ReferralRewardSeeder extends Seeder
             ->referredDiscount()
             ->state(function () use ($users, $referrals, $orders) {
                 return [
-                    'user_id' => $users->random()->id,
+                    'user_id'     => $users->random()->id,
                     'referral_id' => $referrals->random()->id,
-                    'order_id' => $orders->random()->id,
-                    'title' => [
+                    'order_id'    => $orders->random()->id,
+                    'title'       => [
                         'en' => 'Welcome Discount',
                         'lt' => 'Sveikinimo nuolaida',
                     ],
@@ -72,9 +72,9 @@ final class ReferralRewardSeeder extends Seeder
             ->pending()
             ->state(function () use ($users, $referrals) {
                 return [
-                    'user_id' => $users->random()->id,
+                    'user_id'     => $users->random()->id,
                     'referral_id' => $referrals->random()->id,
-                    'title' => [
+                    'title'       => [
                         'en' => 'Pending Reward',
                         'lt' => 'Laukiantis atlygis',
                     ],
@@ -92,10 +92,10 @@ final class ReferralRewardSeeder extends Seeder
             ->applied()
             ->state(function () use ($users, $referrals, $orders) {
                 return [
-                    'user_id' => $users->random()->id,
+                    'user_id'     => $users->random()->id,
                     'referral_id' => $referrals->random()->id,
-                    'order_id' => $orders->random()->id,
-                    'title' => [
+                    'order_id'    => $orders->random()->id,
+                    'title'       => [
                         'en' => 'Applied Reward',
                         'lt' => 'Pritaikytas atlygis',
                     ],
@@ -113,9 +113,9 @@ final class ReferralRewardSeeder extends Seeder
             ->expired()
             ->state(function () use ($users, $referrals) {
                 return [
-                    'user_id' => $users->random()->id,
+                    'user_id'     => $users->random()->id,
                     'referral_id' => $referrals->random()->id,
-                    'title' => [
+                    'title'       => [
                         'en' => 'Expired Reward',
                         'lt' => 'Pasibaigęs atlygis',
                     ],

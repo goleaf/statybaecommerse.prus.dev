@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace App\Support\ListQuery;
 
 use Carbon\CarbonImmutable;
+use DateTimeInterface;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Throwable;
 
 final class ListQueryValidator
 {
@@ -17,7 +19,7 @@ final class ListQueryValidator
     }
 
     /**
-     * @param  array<string, mixed>  $input
+     * @param array<string, mixed> $input
      */
     public static function fromArray(array $input, ListQueryDefinition $definition): ListQuery
     {
@@ -50,7 +52,7 @@ final class ListQueryValidator
     }
 
     /**
-     * @param  array<string, mixed>  $input
+     * @param  array<string, mixed>                                                                                                                              $input
      * @return array{0: array<int, array{key: string, value: mixed, column: string|null, operator: string, callback: (callable)|null}>, 1: array<string, mixed>}
      */
     private static function prepareFilters(array $input, ListQueryDefinition $definition): array
@@ -84,9 +86,9 @@ final class ListQueryValidator
 
             $filters[$key] = $casted;
             $filterDefinitions[] = [
-                'key' => $key,
-                'value' => $casted,
-                'column' => $config['column'] ?? null,
+                'key'      => $key,
+                'value'    => $casted,
+                'column'   => $config['column'] ?? null,
                 'operator' => $config['operator'] ?? '=',
                 'callback' => $config['callback'] ?? null,
             ];
@@ -96,7 +98,7 @@ final class ListQueryValidator
     }
 
     /**
-     * @param  array<string, mixed>  $input
+     * @param  array<string, mixed>                                                                                                              $input
      * @return array{0: array<int, array{key: string, column: string, direction: string}>, 1: array<int, array{key: string, direction: string}>}
      */
     private static function prepareSorts(array $input, ListQueryDefinition $definition): array
@@ -115,13 +117,13 @@ final class ListQueryValidator
             $direction = strtolower($direction) === 'desc' ? 'desc' : 'asc';
 
             $sortDefinitions[] = [
-                'key' => $sortKey,
-                'column' => $column,
+                'key'       => $sortKey,
+                'column'    => $column,
                 'direction' => $direction,
             ];
 
             $sorts[] = [
-                'key' => $sortKey,
+                'key'       => $sortKey,
                 'direction' => $direction,
             ];
         }
@@ -131,13 +133,13 @@ final class ListQueryValidator
             $direction = strtolower((string) $direction) === 'desc' ? 'desc' : 'asc';
 
             $sortDefinitions[] = [
-                'key' => $default,
-                'column' => $sortable[$default]['column'],
+                'key'       => $default,
+                'column'    => $sortable[$default]['column'],
                 'direction' => $direction,
             ];
 
             $sorts[] = [
-                'key' => $default,
+                'key'       => $default,
                 'direction' => $direction,
             ];
         }
@@ -193,10 +195,10 @@ final class ListQueryValidator
         return match ($type) {
             'int', 'integer' => self::castInteger($value),
             'bool', 'boolean' => self::castBoolean($value),
-            'date' => self::castDate($value, false),
+            'date'     => self::castDate($value, false),
             'datetime' => self::castDate($value, true),
-            'array' => is_array($value) ? $value : null,
-            default => self::castString($value, $allowEmpty),
+            'array'    => is_array($value) ? $value : null,
+            default    => self::castString($value, $allowEmpty),
         };
     }
 
@@ -226,13 +228,13 @@ final class ListQueryValidator
 
     private static function castDate(mixed $value, bool $withTime): ?string
     {
-        if (! is_string($value) && ! $value instanceof \DateTimeInterface) {
+        if (! is_string($value) && ! $value instanceof DateTimeInterface) {
             return null;
         }
 
         try {
-            $date = $value instanceof \DateTimeInterface ? CarbonImmutable::instance($value) : new CarbonImmutable($value);
-        } catch (\Throwable) {
+            $date = $value instanceof DateTimeInterface ? CarbonImmutable::instance($value) : new CarbonImmutable($value);
+        } catch (Throwable) {
             return null;
         }
 

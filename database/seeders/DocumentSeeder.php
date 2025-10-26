@@ -79,7 +79,7 @@ final class DocumentSeeder extends Seeder
         Document::factory()
             ->count(3)
             ->state([
-                'title' => 'Report '.fake()->unique()->numerify('#RPT-###'),
+                'title'  => 'Report ' . fake()->unique()->numerify('#RPT-###'),
                 'status' => 'generated',
                 'format' => 'pdf',
             ])

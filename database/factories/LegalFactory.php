@@ -21,14 +21,14 @@ class LegalFactory extends Factory
         $key = fake()->unique()->slug(2);
 
         return [
-            'key' => $key,
-            'type' => $type,
-            'is_enabled' => fake()->boolean(80), // 80% chance of being enabled
+            'key'         => $key,
+            'type'        => $type,
+            'is_enabled'  => fake()->boolean(80), // 80% chance of being enabled
             'is_required' => fake()->boolean(20), // 20% chance of being required
-            'sort_order' => fake()->numberBetween(0, 100),
-            'meta_data' => [
-                'version' => fake()->randomFloat(1, 1.0, 5.0),
-                'last_reviewed' => fake()->dateTimeBetween('-1 year', 'now')->format('Y-m-d'),
+            'sort_order'  => fake()->numberBetween(0, 100),
+            'meta_data'   => [
+                'version'          => fake()->randomFloat(1, 1.0, 5.0),
+                'last_reviewed'    => fake()->dateTimeBetween('-1 year', 'now')->format('Y-m-d'),
                 'review_frequency' => fake()->randomElement(['monthly', 'quarterly', 'annually']),
             ],
             'published_at' => fake()->boolean(70) ? fake()->dateTimeBetween('-1 year', 'now') : null,
@@ -73,8 +73,8 @@ class LegalFactory extends Factory
     public function privacyPolicy(): static
     {
         return $this->state(fn (array $attributes) => [
-            'key' => 'privacy-policy',
-            'type' => 'privacy_policy',
+            'key'         => 'privacy-policy',
+            'type'        => 'privacy_policy',
             'is_required' => true,
         ]);
     }
@@ -82,8 +82,8 @@ class LegalFactory extends Factory
     public function termsOfUse(): static
     {
         return $this->state(fn (array $attributes) => [
-            'key' => 'terms-of-use',
-            'type' => 'terms_of_use',
+            'key'         => 'terms-of-use',
+            'type'        => 'terms_of_use',
             'is_required' => true,
         ]);
     }
@@ -91,7 +91,7 @@ class LegalFactory extends Factory
     public function refundPolicy(): static
     {
         return $this->state(fn (array $attributes) => [
-            'key' => 'refund-policy',
+            'key'  => 'refund-policy',
             'type' => 'refund_policy',
         ]);
     }
@@ -99,7 +99,7 @@ class LegalFactory extends Factory
     public function shippingPolicy(): static
     {
         return $this->state(fn (array $attributes) => [
-            'key' => 'shipping-policy',
+            'key'  => 'shipping-policy',
             'type' => 'shipping_policy',
         ]);
     }

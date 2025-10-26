@@ -40,9 +40,9 @@ final class DomainExceptionResponseTest extends TestCase
                 'status',
                 'detail',
                 'instance',
-                'error' => ['code', 'context'],
+                'error'       => ['code', 'context'],
                 'correlation' => ['trace_id', 'correlation_id'],
-                'meta' => ['locale', 'timestamp'],
+                'meta'        => ['locale', 'timestamp'],
             ])
             ->assertJsonPath('type', ApiErrorResponse::typeFor(ErrorCodes::ORDER_NOT_FOUND))
             ->assertJsonPath('title', ErrorCodes::describe(ErrorCodes::ORDER_NOT_FOUND))

@@ -24,14 +24,14 @@ final class CanBeOneOfManyFinalTest extends TestCase
         $oldVariant = ProductVariant::factory()->create([
             'product_id' => $product->id,
             'is_enabled' => true,
-            'status' => 'active',
+            'status'     => 'active',
             'created_at' => now()->subDays(5),
         ]);
 
         $latestVariant = ProductVariant::factory()->create([
             'product_id' => $product->id,
             'is_enabled' => true,
-            'status' => 'active',
+            'status'     => 'active',
             'created_at' => now()->subDays(1),
         ]);
 
@@ -50,12 +50,12 @@ final class CanBeOneOfManyFinalTest extends TestCase
 
         // Create multiple child categories
         $oldChild = Category::factory()->create([
-            'parent_id' => $parentCategory->id,
+            'parent_id'  => $parentCategory->id,
             'created_at' => now()->subDays(5),
         ]);
 
         $latestChild = Category::factory()->create([
-            'parent_id' => $parentCategory->id,
+            'parent_id'  => $parentCategory->id,
             'created_at' => now()->subDays(1),
         ]);
 

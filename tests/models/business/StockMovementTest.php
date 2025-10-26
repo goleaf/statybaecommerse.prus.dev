@@ -47,13 +47,13 @@ final class StockMovementTest extends TestCase
         $this->location = Location::factory()->create();
         $this->supplier = Partner::factory()->create();
         $this->stockItem = VariantInventory::factory()->create([
-            'variant_id' => $this->variant->id,
+            'variant_id'  => $this->variant->id,
             'location_id' => $this->location->id,
             'supplier_id' => $this->supplier->id,
         ]);
         $this->stockMovement = StockMovement::factory()->create([
             'variant_inventory_id' => $this->stockItem->id,
-            'user_id' => $this->user->id,
+            'user_id'              => $this->user->id,
         ]);
     }
 
@@ -73,12 +73,12 @@ final class StockMovementTest extends TestCase
     {
         $inboundMovement = StockMovement::factory()->create([
             'variant_inventory_id' => $this->stockItem->id,
-            'type' => 'in',
+            'type'                 => 'in',
         ]);
 
         $outboundMovement = StockMovement::factory()->create([
             'variant_inventory_id' => $this->stockItem->id,
-            'type' => 'out',
+            'type'                 => 'out',
         ]);
 
         $inboundMovements = StockMovement::inbound()->get();
@@ -91,12 +91,12 @@ final class StockMovementTest extends TestCase
     {
         $inboundMovement = StockMovement::factory()->create([
             'variant_inventory_id' => $this->stockItem->id,
-            'type' => 'in',
+            'type'                 => 'in',
         ]);
 
         $outboundMovement = StockMovement::factory()->create([
             'variant_inventory_id' => $this->stockItem->id,
-            'type' => 'out',
+            'type'                 => 'out',
         ]);
 
         $outboundMovements = StockMovement::outbound()->get();
@@ -109,12 +109,12 @@ final class StockMovementTest extends TestCase
     {
         $saleMovement = StockMovement::factory()->create([
             'variant_inventory_id' => $this->stockItem->id,
-            'reason' => 'sale',
+            'reason'               => 'sale',
         ]);
 
         $returnMovement = StockMovement::factory()->create([
             'variant_inventory_id' => $this->stockItem->id,
-            'reason' => 'return',
+            'reason'               => 'return',
         ]);
 
         $saleMovements = StockMovement::byReason('sale')->get();
@@ -128,7 +128,7 @@ final class StockMovementTest extends TestCase
         $anotherUser = User::factory()->create();
         $anotherMovement = StockMovement::factory()->create([
             'variant_inventory_id' => $this->stockItem->id,
-            'user_id' => $anotherUser->id,
+            'user_id'              => $anotherUser->id,
         ]);
 
         $userMovements = StockMovement::byUser($this->user->id)->get();
@@ -141,12 +141,12 @@ final class StockMovementTest extends TestCase
     {
         $recentMovement = StockMovement::factory()->create([
             'variant_inventory_id' => $this->stockItem->id,
-            'moved_at' => now()->subDays(5),
+            'moved_at'             => now()->subDays(5),
         ]);
 
         $oldMovement = StockMovement::factory()->create([
             'variant_inventory_id' => $this->stockItem->id,
-            'moved_at' => now()->subDays(35),
+            'moved_at'             => now()->subDays(35),
         ]);
 
         $recentMovements = StockMovement::recent(30)->get();
@@ -160,12 +160,12 @@ final class StockMovementTest extends TestCase
     {
         $inboundMovement = StockMovement::factory()->create([
             'variant_inventory_id' => $this->stockItem->id,
-            'type' => 'in',
+            'type'                 => 'in',
         ]);
 
         $outboundMovement = StockMovement::factory()->create([
             'variant_inventory_id' => $this->stockItem->id,
-            'type' => 'out',
+            'type'                 => 'out',
         ]);
 
         $this->assertEquals(__('inventory.stock_in'), $inboundMovement->type_label);
@@ -176,42 +176,42 @@ final class StockMovementTest extends TestCase
     {
         $saleMovement = StockMovement::factory()->create([
             'variant_inventory_id' => $this->stockItem->id,
-            'reason' => 'sale',
+            'reason'               => 'sale',
         ]);
 
         $returnMovement = StockMovement::factory()->create([
             'variant_inventory_id' => $this->stockItem->id,
-            'reason' => 'return',
+            'reason'               => 'return',
         ]);
 
         $adjustmentMovement = StockMovement::factory()->create([
             'variant_inventory_id' => $this->stockItem->id,
-            'reason' => 'adjustment',
+            'reason'               => 'adjustment',
         ]);
 
         $manualAdjustmentMovement = StockMovement::factory()->create([
             'variant_inventory_id' => $this->stockItem->id,
-            'reason' => 'manual_adjustment',
+            'reason'               => 'manual_adjustment',
         ]);
 
         $restockMovement = StockMovement::factory()->create([
             'variant_inventory_id' => $this->stockItem->id,
-            'reason' => 'restock',
+            'reason'               => 'restock',
         ]);
 
         $damageMovement = StockMovement::factory()->create([
             'variant_inventory_id' => $this->stockItem->id,
-            'reason' => 'damage',
+            'reason'               => 'damage',
         ]);
 
         $theftMovement = StockMovement::factory()->create([
             'variant_inventory_id' => $this->stockItem->id,
-            'reason' => 'theft',
+            'reason'               => 'theft',
         ]);
 
         $transferMovement = StockMovement::factory()->create([
             'variant_inventory_id' => $this->stockItem->id,
-            'reason' => 'transfer',
+            'reason'               => 'transfer',
         ]);
 
         $this->assertEquals(__('inventory.reason_sale'), $saleMovement->reason_label);
@@ -229,7 +229,7 @@ final class StockMovementTest extends TestCase
         // Create a movement with valid type first, then modify it in memory to test the logic
         $movement = StockMovement::factory()->create([
             'variant_inventory_id' => $this->stockItem->id,
-            'type' => 'in',
+            'type'                 => 'in',
         ]);
 
         // Test the logic by setting an invalid type in memory (not saving to DB)
@@ -242,7 +242,7 @@ final class StockMovementTest extends TestCase
         // Create a movement with valid reason first, then modify it in memory to test the logic
         $movement = StockMovement::factory()->create([
             'variant_inventory_id' => $this->stockItem->id,
-            'reason' => 'sale',
+            'reason'               => 'sale',
         ]);
 
         // Test the logic by setting an unknown reason in memory (not saving to DB)
@@ -254,24 +254,24 @@ final class StockMovementTest extends TestCase
     {
         $movement = StockMovement::factory()->create([
             'variant_inventory_id' => $this->stockItem->id,
-            'quantity' => 25,
-            'type' => 'in',
-            'reason' => 'restock',
-            'reference' => 'PO-12345',
-            'notes' => 'Restocked from supplier',
-            'user_id' => $this->user->id,
-            'moved_at' => now(),
+            'quantity'             => 25,
+            'type'                 => 'in',
+            'reason'               => 'restock',
+            'reference'            => 'PO-12345',
+            'notes'                => 'Restocked from supplier',
+            'user_id'              => $this->user->id,
+            'moved_at'             => now(),
         ]);
 
         $this->assertDatabaseHas('stock_movements', [
-            'id' => $movement->id,
+            'id'                   => $movement->id,
             'variant_inventory_id' => $this->stockItem->id,
-            'quantity' => 25,
-            'type' => 'in',
-            'reason' => 'restock',
-            'reference' => 'PO-12345',
-            'notes' => 'Restocked from supplier',
-            'user_id' => $this->user->id,
+            'quantity'             => 25,
+            'type'                 => 'in',
+            'reason'               => 'restock',
+            'reference'            => 'PO-12345',
+            'notes'                => 'Restocked from supplier',
+            'user_id'              => $this->user->id,
         ]);
     }
 
@@ -279,13 +279,13 @@ final class StockMovementTest extends TestCase
     {
         $movement = StockMovement::factory()->create([
             'variant_inventory_id' => $this->stockItem->id,
-            'user_id' => null,
+            'user_id'              => null,
         ]);
 
         $this->assertDatabaseHas('stock_movements', [
-            'id' => $movement->id,
+            'id'                   => $movement->id,
             'variant_inventory_id' => $this->stockItem->id,
-            'user_id' => null,
+            'user_id'              => null,
         ]);
 
         $this->assertNull($movement->user);
@@ -295,13 +295,13 @@ final class StockMovementTest extends TestCase
     {
         $movement = StockMovement::factory()->create([
             'variant_inventory_id' => $this->stockItem->id,
-            'reference' => null,
+            'reference'            => null,
         ]);
 
         $this->assertDatabaseHas('stock_movements', [
-            'id' => $movement->id,
+            'id'                   => $movement->id,
             'variant_inventory_id' => $this->stockItem->id,
-            'reference' => null,
+            'reference'            => null,
         ]);
     }
 
@@ -309,13 +309,13 @@ final class StockMovementTest extends TestCase
     {
         $movement = StockMovement::factory()->create([
             'variant_inventory_id' => $this->stockItem->id,
-            'notes' => null,
+            'notes'                => null,
         ]);
 
         $this->assertDatabaseHas('stock_movements', [
-            'id' => $movement->id,
+            'id'                   => $movement->id,
             'variant_inventory_id' => $this->stockItem->id,
-            'notes' => null,
+            'notes'                => null,
         ]);
     }
 
@@ -323,7 +323,7 @@ final class StockMovementTest extends TestCase
     {
         $movement = StockMovement::factory()->create([
             'variant_inventory_id' => $this->stockItem->id,
-            'quantity' => '25',
+            'quantity'             => '25',
         ]);
 
         $this->assertIsInt($movement->quantity);
@@ -334,7 +334,7 @@ final class StockMovementTest extends TestCase
     {
         $movement = StockMovement::factory()->create([
             'variant_inventory_id' => $this->stockItem->id,
-            'moved_at' => '2024-01-20 12:00:00',
+            'moved_at'             => '2024-01-20 12:00:00',
         ]);
 
         $this->assertInstanceOf(\Carbon\Carbon::class, $movement->moved_at);

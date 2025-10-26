@@ -6,8 +6,8 @@ namespace App\View\Creators;
 
 use App\Services\SEOService;
 use App\Support\Seo\LocaleUrlGenerator;
-use Illuminate\Support\Facades\Route;
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\Facades\Route;
 
 /**
  * SeoDataCreator
@@ -33,19 +33,19 @@ final class SeoDataCreator
         $seoData = $this->generateSeoData($viewName, $viewData);
 
         $view->with([
-            'seo' => $seoData,
-            'metaTitle' => $seoData['title'],
+            'seo'             => $seoData,
+            'metaTitle'       => $seoData['title'],
             'metaDescription' => $seoData['description'],
-            'metaKeywords' => is_array($seoData['keywords'])
+            'metaKeywords'    => is_array($seoData['keywords'])
                 ? implode(', ', array_filter(array_map(static fn ($keyword): string => trim((string) $keyword), $seoData['keywords'])))
                 : (string) $seoData['keywords'],
-            'canonicalUrl' => $seoData['canonical_url'],
-            'ogTitle' => $seoData['og_title'],
-            'ogDescription' => $seoData['og_description'],
-            'ogImage' => $seoData['og_image'],
-            'ogType' => $seoData['og_type'],
-            'twitterCard' => $seoData['twitter_card'],
-            'structuredData' => $seoData['structured_data'],
+            'canonicalUrl'     => $seoData['canonical_url'],
+            'ogTitle'          => $seoData['og_title'],
+            'ogDescription'    => $seoData['og_description'],
+            'ogImage'          => $seoData['og_image'],
+            'ogType'           => $seoData['og_type'],
+            'twitterCard'      => $seoData['twitter_card'],
+            'structuredData'   => $seoData['structured_data'],
             'alternateLocales' => $seoData['alternate_locales'],
         ]);
     }
@@ -56,27 +56,27 @@ final class SeoDataCreator
     private function generateSeoData(string $viewName, array $viewData): array
     {
         $defaultSeo = [
-            'title' => config('app.name'),
-            'description' => __('seo.default_description'),
-            'keywords' => __('seo.default_keywords'),
-            'canonical_url' => request()->url(),
-            'og_title' => config('app.name'),
-            'og_description' => __('seo.default_description'),
-            'og_image' => og_placeholder_url(),
-            'og_type' => 'website',
-            'twitter_card' => 'summary_large_image',
-            'structured_data' => [],
+            'title'             => config('app.name'),
+            'description'       => __('seo.default_description'),
+            'keywords'          => __('seo.default_keywords'),
+            'canonical_url'     => request()->url(),
+            'og_title'          => config('app.name'),
+            'og_description'    => __('seo.default_description'),
+            'og_image'          => og_placeholder_url(),
+            'og_type'           => 'website',
+            'twitter_card'      => 'summary_large_image',
+            'structured_data'   => [],
             'alternate_locales' => $this->localeUrlGenerator->fallbackAlternateLocales(),
         ];
 
         // Generate view-specific SEO data
         $seoData = match (true) {
-            str_contains($viewName, 'products.show') => $this->getProductSeoData($viewData),
+            str_contains($viewName, 'products.show')   => $this->getProductSeoData($viewData),
             str_contains($viewName, 'categories.show') => $this->getCategorySeoData($viewData),
-            str_contains($viewName, 'brands.show') => $this->getBrandSeoData($viewData),
-            str_contains($viewName, 'shop.index') => $this->getShopSeoData($viewData),
+            str_contains($viewName, 'brands.show')     => $this->getBrandSeoData($viewData),
+            str_contains($viewName, 'shop.index')      => $this->getShopSeoData($viewData),
             str_contains($viewName, 'users.dashboard') => $this->getUserDashboardSeoData($viewData),
-            default => $defaultSeo,
+            default                                    => $defaultSeo,
         };
 
         // Merge with default data
@@ -105,15 +105,15 @@ final class SeoDataCreator
         }
 
         return [
-            'title' => $product->getTranslatedName().' - '.config('app.name'),
-            'description' => $product->getTranslatedDescription() ?: __('seo.product_default_description', ['name' => $product->getTranslatedName()]),
-            'keywords' => $this->generateProductKeywords($product),
-            'og_title' => $product->getTranslatedName(),
-            'og_description' => $product->getTranslatedDescription() ?: __('seo.product_default_description', ['name' => $product->getTranslatedName()]),
-            'og_image' => $product->featured_image_url ?: og_placeholder_url(),
-            'og_type' => 'product',
+            'title'           => $product->getTranslatedName() . ' - ' . config('app.name'),
+            'description'     => $product->getTranslatedDescription() ?: __('seo.product_default_description', ['name' => $product->getTranslatedName()]),
+            'keywords'        => $this->generateProductKeywords($product),
+            'og_title'        => $product->getTranslatedName(),
+            'og_description'  => $product->getTranslatedDescription() ?: __('seo.product_default_description', ['name' => $product->getTranslatedName()]),
+            'og_image'        => $product->featured_image_url ?: og_placeholder_url(),
+            'og_type'         => 'product',
             'structured_data' => $this->generateProductStructuredData($product),
-            'canonical_url' => $this->localeUrlGenerator->localizedRoute(
+            'canonical_url'   => $this->localeUrlGenerator->localizedRoute(
                 'localized.products.show',
                 ['product' => $this->localeUrlGenerator->translatedValue($product, app()->getLocale(), 'getTranslatedSlug', 'slug', 'slug') ?? $product->slug],
                 app()->getLocale()
@@ -139,14 +139,14 @@ final class SeoDataCreator
         }
 
         return [
-            'title' => $category->getTranslatedName().' - '.config('app.name'),
-            'description' => $category->getTranslatedDescription() ?: __('seo.category_default_description', ['name' => $category->getTranslatedName()]),
-            'keywords' => $this->generateCategoryKeywords($category),
-            'og_title' => $category->getTranslatedName(),
-            'og_description' => $category->getTranslatedDescription() ?: __('seo.category_default_description', ['name' => $category->getTranslatedName()]),
-            'og_image' => $category->image_url ?: og_placeholder_url(),
+            'title'           => $category->getTranslatedName() . ' - ' . config('app.name'),
+            'description'     => $category->getTranslatedDescription() ?: __('seo.category_default_description', ['name' => $category->getTranslatedName()]),
+            'keywords'        => $this->generateCategoryKeywords($category),
+            'og_title'        => $category->getTranslatedName(),
+            'og_description'  => $category->getTranslatedDescription() ?: __('seo.category_default_description', ['name' => $category->getTranslatedName()]),
+            'og_image'        => $category->image_url ?: og_placeholder_url(),
             'structured_data' => $this->generateCategoryStructuredData($category),
-            'canonical_url' => $this->localeUrlGenerator->localizedRoute(
+            'canonical_url'   => $this->localeUrlGenerator->localizedRoute(
                 'localized.categories.show',
                 ['category' => $this->localeUrlGenerator->translatedValue($category, app()->getLocale(), 'getTranslatedSlug', 'slug', 'slug') ?? $category->slug],
                 app()->getLocale()
@@ -172,14 +172,14 @@ final class SeoDataCreator
         }
 
         return [
-            'title' => $brand->getTranslatedName().' - '.config('app.name'),
-            'description' => $brand->getTranslatedDescription() ?: __('seo.brand_default_description', ['name' => $brand->getTranslatedName()]),
-            'keywords' => $this->generateBrandKeywords($brand),
-            'og_title' => $brand->getTranslatedName(),
-            'og_description' => $brand->getTranslatedDescription() ?: __('seo.brand_default_description', ['name' => $brand->getTranslatedName()]),
-            'og_image' => $brand->logo_url ?: og_placeholder_url(),
+            'title'           => $brand->getTranslatedName() . ' - ' . config('app.name'),
+            'description'     => $brand->getTranslatedDescription() ?: __('seo.brand_default_description', ['name' => $brand->getTranslatedName()]),
+            'keywords'        => $this->generateBrandKeywords($brand),
+            'og_title'        => $brand->getTranslatedName(),
+            'og_description'  => $brand->getTranslatedDescription() ?: __('seo.brand_default_description', ['name' => $brand->getTranslatedName()]),
+            'og_image'        => $brand->logo_url ?: og_placeholder_url(),
             'structured_data' => $this->generateBrandStructuredData($brand),
-            'canonical_url' => $this->localeUrlGenerator->localizedRoute(
+            'canonical_url'   => $this->localeUrlGenerator->localizedRoute(
                 'localized.brands.show',
                 ['slug' => $this->localeUrlGenerator->translatedValue($brand, app()->getLocale(), 'getTranslatedSlug', 'slug', 'slug') ?? $brand->slug],
                 app()->getLocale()
@@ -199,13 +199,13 @@ final class SeoDataCreator
     private function getShopSeoData(array $viewData): array
     {
         return [
-            'title' => __('seo.shop_title').' - '.config('app.name'),
-            'description' => __('seo.shop_description'),
-            'keywords' => __('seo.shop_keywords'),
-            'og_title' => __('seo.shop_title'),
-            'og_description' => __('seo.shop_description'),
-            'structured_data' => $this->generateShopStructuredData(),
-            'canonical_url' => $this->localeUrlGenerator->localizedRoute('localized.home', [], app()->getLocale()) ?: url('/'.app()->getLocale()),
+            'title'             => __('seo.shop_title') . ' - ' . config('app.name'),
+            'description'       => __('seo.shop_description'),
+            'keywords'          => __('seo.shop_keywords'),
+            'og_title'          => __('seo.shop_title'),
+            'og_description'    => __('seo.shop_description'),
+            'structured_data'   => $this->generateShopStructuredData(),
+            'canonical_url'     => $this->localeUrlGenerator->localizedRoute('localized.home', [], app()->getLocale()) ?: url('/' . app()->getLocale()),
             'alternate_locales' => $this->localeUrlGenerator->generateAlternates(
                 'localized.home',
                 fn (string $locale) => []
@@ -295,9 +295,9 @@ final class SeoDataCreator
     private function getUserDashboardSeoData(array $viewData): array
     {
         return [
-            'title' => __('seo.dashboard_title').' - '.config('app.name'),
+            'title'       => __('seo.dashboard_title') . ' - ' . config('app.name'),
             'description' => __('seo.dashboard_description'),
-            'robots' => 'noindex, nofollow', // Don't index user dashboards
+            'robots'      => 'noindex, nofollow', // Don't index user dashboards
         ];
     }
 
@@ -347,20 +347,20 @@ final class SeoDataCreator
     private function generateProductStructuredData($product): array
     {
         return [
-            '@context' => 'https://schema.org',
-            '@type' => 'Product',
-            'name' => $product->getTranslatedName(),
+            '@context'    => 'https://schema.org',
+            '@type'       => 'Product',
+            'name'        => $product->getTranslatedName(),
             'description' => $product->getTranslatedDescription(),
-            'image' => $product->featured_image_url,
-            'brand' => [
+            'image'       => $product->featured_image_url,
+            'brand'       => [
                 '@type' => 'Brand',
-                'name' => $product->brand?->getTranslatedName(),
+                'name'  => $product->brand?->getTranslatedName(),
             ],
             'offers' => [
-                '@type' => 'Offer',
-                'price' => $product->price,
+                '@type'         => 'Offer',
+                'price'         => $product->price,
                 'priceCurrency' => current_currency(),
-                'availability' => $product->is_in_stock ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+                'availability'  => $product->is_in_stock ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
             ],
         ];
     }
@@ -371,9 +371,9 @@ final class SeoDataCreator
     private function generateCategoryStructuredData($category): array
     {
         return [
-            '@context' => 'https://schema.org',
-            '@type' => 'CollectionPage',
-            'name' => $category->getTranslatedName(),
+            '@context'    => 'https://schema.org',
+            '@type'       => 'CollectionPage',
+            'name'        => $category->getTranslatedName(),
             'description' => $category->getTranslatedDescription(),
         ];
     }
@@ -384,11 +384,11 @@ final class SeoDataCreator
     private function generateBrandStructuredData($brand): array
     {
         return [
-            '@context' => 'https://schema.org',
-            '@type' => 'Brand',
-            'name' => $brand->getTranslatedName(),
+            '@context'    => 'https://schema.org',
+            '@type'       => 'Brand',
+            'name'        => $brand->getTranslatedName(),
             'description' => $brand->getTranslatedDescription(),
-            'logo' => $brand->logo_url,
+            'logo'        => $brand->logo_url,
         ];
     }
 
@@ -398,11 +398,11 @@ final class SeoDataCreator
     private function generateShopStructuredData(): array
     {
         return [
-            '@context' => 'https://schema.org',
-            '@type' => 'Store',
-            'name' => config('app.name'),
+            '@context'    => 'https://schema.org',
+            '@type'       => 'Store',
+            'name'        => config('app.name'),
             'description' => __('seo.shop_description'),
-            'url' => config('app.url'),
+            'url'         => config('app.url'),
         ];
     }
 }

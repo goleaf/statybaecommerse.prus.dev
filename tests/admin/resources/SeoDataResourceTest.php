@@ -23,23 +23,23 @@ final class SeoDataResourceTest extends TestCase
     public function test_can_create_seo_data(): void
     {
         $seoData = [
-            'title' => 'Test SEO Title',
+            'title'       => 'Test SEO Title',
             'description' => 'Test SEO description',
-            'keywords' => 'test, seo, keywords',
-            'type' => 'page',
-            'url' => '/test-page',
-            'is_active' => true,
-            'is_indexed' => true,
+            'keywords'    => 'test, seo, keywords',
+            'type'        => 'page',
+            'url'         => '/test-page',
+            'is_active'   => true,
+            'is_indexed'  => true,
         ];
 
         $seo = SeoData::create($seoData);
 
         $this->assertDatabaseHas('seo_data', [
-            'title' => json_encode(['lt' => 'Test SEO Title']),
+            'title'       => json_encode(['lt' => 'Test SEO Title']),
             'description' => json_encode(['lt' => 'Test SEO description']),
-            'keywords' => json_encode(['test', 'seo', 'keywords']),
-            'type' => 'page',
-            'url' => '/test-page',
+            'keywords'    => json_encode(['test', 'seo', 'keywords']),
+            'type'        => 'page',
+            'url'         => '/test-page',
         ]);
 
         $this->assertEquals('Test SEO Title', $seo->title);
@@ -52,9 +52,9 @@ final class SeoDataResourceTest extends TestCase
         $seo = SeoData::factory()->create();
 
         $seo->update([
-            'title' => 'Updated SEO Title',
+            'title'       => 'Updated SEO Title',
             'description' => 'Updated SEO description',
-            'is_indexed' => false,
+            'is_indexed'  => false,
         ]);
 
         $this->assertEquals('Updated SEO Title', $seo->getTranslation('title', 'lt'));

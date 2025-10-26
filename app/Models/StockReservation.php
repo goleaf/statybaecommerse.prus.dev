@@ -8,9 +8,10 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
+use InvalidArgumentException;
 
 /**
- * @property int $quantity
+ * @property int    $quantity
  * @property string $status
  */
 final class StockReservation extends Model
@@ -18,8 +19,11 @@ final class StockReservation extends Model
     use HasFactory;
 
     public const STATUS_RESERVED = 'reserved';
+
     public const STATUS_RELEASED = 'released';
+
     public const STATUS_COMPLETED = 'completed';
+
     public const STATUS_EXPIRED = 'expired';
 
     protected $fillable = [
@@ -39,12 +43,12 @@ final class StockReservation extends Model
     protected function casts(): array
     {
         return [
-            'quantity' => 'integer',
+            'quantity'    => 'integer',
             'reserved_at' => 'datetime',
-            'expires_at' => 'datetime',
+            'expires_at'  => 'datetime',
             'released_at' => 'datetime',
             'consumed_at' => 'datetime',
-            'meta' => 'array',
+            'meta'        => 'array',
         ];
     }
 
@@ -92,7 +96,7 @@ final class StockReservation extends Model
 
         if ($quantity === null || $quantity >= $this->quantity) {
             $this->forceFill([
-                'status' => self::STATUS_RELEASED,
+                'status'      => self::STATUS_RELEASED,
                 'released_at' => Carbon::now(),
             ])->save();
 
@@ -103,8 +107,8 @@ final class StockReservation extends Model
 
         $this->replicate()
             ->forceFill([
-                'quantity' => $quantity,
-                'status' => self::STATUS_RELEASED,
+                'quantity'    => $quantity,
+                'status'      => self::STATUS_RELEASED,
                 'released_at' => Carbon::now(),
             ])
             ->save();
@@ -121,7 +125,7 @@ final class StockReservation extends Model
 
         if ($quantity >= $this->quantity) {
             $this->forceFill([
-                'status' => self::STATUS_COMPLETED,
+                'status'      => self::STATUS_COMPLETED,
                 'consumed_at' => Carbon::now(),
             ])->save();
 
@@ -132,8 +136,8 @@ final class StockReservation extends Model
 
         $this->replicate()
             ->forceFill([
-                'quantity' => $quantity,
-                'status' => self::STATUS_COMPLETED,
+                'quantity'    => $quantity,
+                'status'      => self::STATUS_COMPLETED,
                 'consumed_at' => Carbon::now(),
             ])
             ->save();
@@ -147,7 +151,7 @@ final class StockReservation extends Model
     public function expire(): void
     {
         $this->forceFill([
-            'status' => self::STATUS_EXPIRED,
+            'status'      => self::STATUS_EXPIRED,
             'released_at' => Carbon::now(),
         ])->save();
     }
@@ -155,7 +159,7 @@ final class StockReservation extends Model
     private function ensurePositiveQuantity(?int $quantity): void
     {
         if ($quantity !== null && $quantity <= 0) {
-            throw new \InvalidArgumentException('Reservation adjustments must use positive quantities.');
+            throw new InvalidArgumentException('Reservation adjustments must use positive quantities.');
         }
     }
 }

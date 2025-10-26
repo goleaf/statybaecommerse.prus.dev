@@ -51,7 +51,7 @@ it('can display post show page', function () {
 
 it('can search posts', function () {
     $searchablePost = Post::factory()->published()->create([
-        'title' => 'Unique Searchable Title',
+        'title'   => 'Unique Searchable Title',
         'user_id' => $this->user->id,
     ]);
     attachPostMedia($searchablePost);
@@ -155,7 +155,7 @@ it('can filter posts by author on index', function () {
 
 it('can search posts by title', function () {
     $searchablePost = Post::factory()->published()->create([
-        'title' => 'Searchable Title',
+        'title'   => 'Searchable Title',
         'user_id' => $this->user->id,
     ]);
     attachPostMedia($searchablePost);
@@ -208,9 +208,9 @@ it('shows related posts on post show page', function () {
 
 it('shows post meta information', function () {
     $post = Post::factory()->published()->create([
-        'meta_title' => 'Custom Meta Title',
+        'meta_title'       => 'Custom Meta Title',
         'meta_description' => 'Custom meta description',
-        'user_id' => $this->user->id,
+        'user_id'          => $this->user->id,
     ]);
     attachPostMedia($post);
 
@@ -224,7 +224,7 @@ it('shows post meta information', function () {
 
 it('shows post tags if available', function () {
     $post = Post::factory()->published()->create([
-        'tags' => 'tag1, tag2, tag3',
+        'tags'    => 'tag1, tag2, tag3',
         'user_id' => $this->user->id,
     ]);
     attachPostMedia($post);
@@ -251,10 +251,10 @@ it('shows featured badge for featured posts', function () {
 
 it('shows post statistics', function () {
     $post = Post::factory()->published()->create([
-        'views_count' => 100,
-        'likes_count' => 25,
+        'views_count'    => 100,
+        'likes_count'    => 25,
         'comments_count' => 10,
-        'user_id' => $this->user->id,
+        'user_id'        => $this->user->id,
     ]);
     attachPostMedia($post);
 

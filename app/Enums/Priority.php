@@ -15,10 +15,10 @@ enum Priority: string
     public function getLabel(): string
     {
         return match ($this) {
-            self::LOW => __('enums.priority.low'),
-            self::MEDIUM => __('enums.priority.medium'),
-            self::HIGH => __('enums.priority.high'),
-            self::URGENT => __('enums.priority.urgent'),
+            self::LOW      => __('enums.priority.low'),
+            self::MEDIUM   => __('enums.priority.medium'),
+            self::HIGH     => __('enums.priority.high'),
+            self::URGENT   => __('enums.priority.urgent'),
             self::CRITICAL => __('enums.priority.critical'),
         };
     }
@@ -26,10 +26,10 @@ enum Priority: string
     public function getColor(): string
     {
         return match ($this) {
-            self::LOW => 'gray',
-            self::MEDIUM => 'info',
-            self::HIGH => 'warning',
-            self::URGENT => 'danger',
+            self::LOW      => 'gray',
+            self::MEDIUM   => 'info',
+            self::HIGH     => 'warning',
+            self::URGENT   => 'danger',
             self::CRITICAL => 'danger',
         };
     }
@@ -37,10 +37,10 @@ enum Priority: string
     public function getIcon(): string
     {
         return match ($this) {
-            self::LOW => 'heroicon-o-minus-circle',
-            self::MEDIUM => 'heroicon-o-information-circle',
-            self::HIGH => 'heroicon-o-exclamation-triangle',
-            self::URGENT => 'heroicon-o-fire',
+            self::LOW      => 'heroicon-o-minus-circle',
+            self::MEDIUM   => 'heroicon-o-information-circle',
+            self::HIGH     => 'heroicon-o-exclamation-triangle',
+            self::URGENT   => 'heroicon-o-fire',
             self::CRITICAL => 'heroicon-o-bolt',
         };
     }

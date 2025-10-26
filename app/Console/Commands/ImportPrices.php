@@ -58,7 +58,7 @@ class ImportPrices extends Command
         }
         if (! empty($batch)) {
             $pending = Bus::batch($batch)->name('Import Prices')->dispatch();
-            $this->info('Batch ID: '.$pending->id);
+            $this->info('Batch ID: ' . $pending->id);
         }
         fclose($fh);
 

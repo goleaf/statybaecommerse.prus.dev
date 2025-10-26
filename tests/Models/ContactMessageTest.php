@@ -11,7 +11,7 @@ uses(RefreshDatabase::class);
 describe('ContactMessage model', function (): void {
     it('stores fillable attributes correctly', function (): void {
         // Arrange: create a model instance to inspect the fillable configuration.
-        $contactMessage = new ContactMessage();
+        $contactMessage = new ContactMessage;
 
         // Assert: the fillable array contains every mass-assignable attribute.
         expect($contactMessage->getFillable())->toMatchArray([
@@ -29,8 +29,8 @@ describe('ContactMessage model', function (): void {
     it('casts timestamp attributes to carbon instances', function (): void {
         // Arrange: persist a record so the timestamps are populated.
         $contactMessage = ContactMessage::query()->create([
-            'name' => 'Jane Doe',
-            'email' => 'jane@example.com',
+            'name'    => 'Jane Doe',
+            'email'   => 'jane@example.com',
             'subject' => 'Question',
             'message' => 'Could you help me?',
         ]);
@@ -43,22 +43,22 @@ describe('ContactMessage model', function (): void {
     it('can order records alphabetically by name with the scopeOrderedByName scope', function (): void {
         // Arrange: create records in a non-alphabetical order to verify the scope sorting.
         ContactMessage::query()->create([
-            'name' => 'Charlie Contact',
-            'email' => 'charlie@example.com',
+            'name'    => 'Charlie Contact',
+            'email'   => 'charlie@example.com',
             'subject' => 'Support',
             'message' => 'Need some assistance.',
         ]);
 
         ContactMessage::query()->create([
-            'name' => 'Alice Contact',
-            'email' => 'alice@example.com',
+            'name'    => 'Alice Contact',
+            'email'   => 'alice@example.com',
             'subject' => 'Feedback',
             'message' => 'Just sharing feedback.',
         ]);
 
         ContactMessage::query()->create([
-            'name' => 'Bob Contact',
-            'email' => 'bob@example.com',
+            'name'    => 'Bob Contact',
+            'email'   => 'bob@example.com',
             'subject' => 'Request',
             'message' => 'Requesting more info.',
         ]);

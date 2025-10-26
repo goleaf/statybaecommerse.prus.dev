@@ -45,8 +45,8 @@ trait BuildsProductCatalogueQuery
         if ($keyword !== '') {
             $query->where(static function (Builder $builder) use ($keyword): void {
                 $builder
-                    ->where('name', 'like', '%'.Str::lower($keyword).'%')
-                    ->orWhere('sku', 'like', '%'.Str::upper($keyword).'%');
+                    ->where('name', 'like', '%' . Str::lower($keyword) . '%')
+                    ->orWhere('sku', 'like', '%' . Str::upper($keyword) . '%');
             });
         }
 
@@ -59,16 +59,16 @@ trait BuildsProductCatalogueQuery
 
         $sort = (string) ($filters['sort'] ?? 'latest');
         match ($sort) {
-            'price_asc' => $query->orderByRaw('COALESCE(NULLIF(sale_price, 0), price) asc'),
+            'price_asc'  => $query->orderByRaw('COALESCE(NULLIF(sale_price, 0), price) asc'),
             'price_desc' => $query->orderByRaw('COALESCE(NULLIF(sale_price, 0), price) desc'),
-            'name' => $query->orderBy('name'),
-            default => $query->orderByDesc('published_at')->orderBy('name'),
+            'name'       => $query->orderBy('name'),
+            default      => $query->orderByDesc('published_at')->orderBy('name'),
         };
 
         return [
             'keyword' => $keyword,
-            'filter' => $filter,
-            'sort' => $sort,
+            'filter'  => $filter,
+            'sort'    => $sort,
         ];
     }
 

@@ -99,14 +99,14 @@ it('unit: can create analytics event', function () {
     $user = User::factory()->create();
 
     $event = AnalyticsEvent::create([
-        'event_name' => 'Test Event',
-        'event_type' => 'page_view',
-        'description' => 'Test description',
-        'user_id' => $user->id,
-        'session_id' => 'test-session-123',
-        'ip_address' => '127.0.0.1',
-        'user_agent' => 'Mozilla/5.0',
-        'is_important' => false,
+        'event_name'    => 'Test Event',
+        'event_type'    => 'page_view',
+        'description'   => 'Test description',
+        'user_id'       => $user->id,
+        'session_id'    => 'test-session-123',
+        'ip_address'    => '127.0.0.1',
+        'user_agent'    => 'Mozilla/5.0',
+        'is_important'  => false,
         'is_conversion' => false,
     ]);
 
@@ -121,7 +121,7 @@ it('unit: can track analytics event using static method', function () {
     $this->actingAs($user);
 
     $event = AnalyticsEvent::track('page_view', [
-        'page' => '/test-page',
+        'page'  => '/test-page',
         'title' => 'Test Page',
     ], $user);
 
@@ -387,15 +387,15 @@ it('unit: can get revenue stats', function () {
     $yesterday = now()->subDay()->format('Y-m-d');
 
     AnalyticsEvent::factory()->create([
-        'value' => 100,
+        'value'      => 100,
         'created_at' => $today,
     ]);
     AnalyticsEvent::factory()->create([
-        'value' => 50,
+        'value'      => 50,
         'created_at' => $today,
     ]);
     AnalyticsEvent::factory()->create([
-        'value' => 75,
+        'value'      => 75,
         'created_at' => $yesterday,
     ]);
 
@@ -410,7 +410,7 @@ it('unit: can handle trackable morph relationship', function () {
     $user = User::factory()->create();
     $event = AnalyticsEvent::factory()->create([
         'trackable_type' => User::class,
-        'trackable_id' => $user->id,
+        'trackable_id'   => $user->id,
     ]);
 
     expect($event->trackable)->toBeInstanceOf(User::class);
@@ -433,7 +433,7 @@ it('unit: can cast event_data to array', function () {
 
 it('unit: can cast boolean fields', function () {
     $event = AnalyticsEvent::factory()->create([
-        'is_important' => true,
+        'is_important'  => true,
         'is_conversion' => false,
     ]);
 

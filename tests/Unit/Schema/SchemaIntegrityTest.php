@@ -160,9 +160,9 @@ SQL,
     {
         return collect(DB::select("PRAGMA foreign_key_list('{$table}')"))
             ->map(fn ($foreignKey): array => [
-                'from' => $foreignKey->from ?? $foreignKey['from'] ?? null,
-                'table' => $foreignKey->table ?? $foreignKey['table'] ?? null,
-                'to' => $foreignKey->to ?? $foreignKey['to'] ?? null,
+                'from'      => $foreignKey->from ?? $foreignKey['from'] ?? null,
+                'table'     => $foreignKey->table ?? $foreignKey['table'] ?? null,
+                'to'        => $foreignKey->to ?? $foreignKey['to'] ?? null,
                 'on_delete' => strtoupper($foreignKey->on_delete ?? $foreignKey['on_delete'] ?? ''),
             ]);
     }

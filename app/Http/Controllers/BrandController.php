@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Models\Brand;
+use Exception;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -55,19 +56,19 @@ final class BrandController extends Controller
                            $product->price > 0 &&
                            ! empty($product->slug);
                 });
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // If there's an error loading products, return empty collection
             $products = collect();
         }
 
         // Get SEO data
-        $seoTitle = $brand->getTranslatedSeoTitle() ?: $brand->getTranslatedName().' - '.config('app.name');
+        $seoTitle = $brand->getTranslatedSeoTitle() ?: $brand->getTranslatedName() . ' - ' . config('app.name');
         $seoDescription = $brand->getTranslatedSeoDescription() ?: $brand->getTranslatedDescription();
 
         return view('frontend.brands.show', [
-            'brand' => $brand,
-            'products' => $products,
-            'seoTitle' => $seoTitle,
+            'brand'          => $brand,
+            'products'       => $products,
+            'seoTitle'       => $seoTitle,
             'seoDescription' => $seoDescription,
         ]);
     }

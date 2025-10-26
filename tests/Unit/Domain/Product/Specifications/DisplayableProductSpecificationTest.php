@@ -34,7 +34,7 @@ it('unit: accepts visible products with price and slug', function (): void {
         shortDescription: 'Short description',
     );
 
-    $specification = new DisplayableProductSpecification();
+    $specification = new DisplayableProductSpecification;
 
     expect($specification->isSatisfiedBy($product))->toBeTrue();
 });
@@ -54,8 +54,8 @@ it('unit: rejects hidden or non priced products', function (): void {
         manageStock: true,
         isInStock: false,
         stockQuantity: 0,
-        images: new ProductImageCollection(),
-        variants: new ProductVariantCollection(),
+        images: new ProductImageCollection,
+        variants: new ProductVariantCollection,
         description: null,
         shortDescription: null,
     );
@@ -74,8 +74,8 @@ it('unit: rejects hidden or non priced products', function (): void {
         manageStock: true,
         isInStock: false,
         stockQuantity: 0,
-        images: new ProductImageCollection(),
-        variants: new ProductVariantCollection(),
+        images: new ProductImageCollection,
+        variants: new ProductVariantCollection,
         description: null,
         shortDescription: null,
     );
@@ -94,13 +94,13 @@ it('unit: rejects hidden or non priced products', function (): void {
         manageStock: true,
         isInStock: true,
         stockQuantity: 0,
-        images: new ProductImageCollection(),
-        variants: new ProductVariantCollection(),
+        images: new ProductImageCollection,
+        variants: new ProductVariantCollection,
         description: null,
         shortDescription: null,
     );
 
-    $specification = new DisplayableProductSpecification();
+    $specification = new DisplayableProductSpecification;
 
     expect($specification->isSatisfiedBy($hidden))->toBeFalse()
         ->and($specification->isSatisfiedBy($free))->toBeFalse()

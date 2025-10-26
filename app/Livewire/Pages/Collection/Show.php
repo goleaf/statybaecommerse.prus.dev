@@ -9,12 +9,12 @@ use App\Models\Collection as CollectionModel;
 use App\Models\CollectionRule;
 use App\Models\Product;
 use App\Models\ProductVariant;
+use BackedEnum;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
-use BackedEnum;
+use Illuminate\Support\Collection;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Url;
@@ -25,11 +25,11 @@ use Livewire\Component;
  *
  * Livewire component for Show with reactive frontend functionality, real-time updates, and user interaction handling.
  *
- * @property string $slug
- * @property CollectionModel|null $collection
- * @property int $page
+ * @property string                 $slug
+ * @property CollectionModel|null   $collection
+ * @property int                    $page
  * @property array<int, int|string> $brandIds
- * @property string|null $sort
+ * @property string|null            $sort
  * @property array<int, int|string> $selectedValues
  * @property-read LengthAwarePaginator<int, Product> $products
  * @property-read Collection<int, array{attribute_id:int, attribute_name:string, values:Collection<int, array{id:int, name:string, selected:bool}>}> $availableOptions
@@ -133,9 +133,9 @@ class Show extends Component
             ->where('published_at', '<=', now());
 
         match ($this->sort) {
-            'name_asc' => $query->orderBy('name'),
+            'name_asc'  => $query->orderBy('name'),
             'name_desc' => $query->orderByDesc('name'),
-            default => $query->orderByDesc('published_at'),
+            default     => $query->orderByDesc('published_at'),
         };
 
         return $query->paginate(12);
@@ -188,15 +188,15 @@ class Show extends Component
                     if (! array_key_exists($attributeId, $options)) {
                         // Lazily build the option container for the attribute the first time we encounter it.
                         $options[$attributeId] = [
-                            'attribute_id' => $attributeId,
+                            'attribute_id'   => $attributeId,
                             'attribute_name' => (string) $attribute->name,
-                            'values' => [],
+                            'values'         => [],
                         ];
                     }
 
                     $options[$attributeId]['values'][$value->id] = [
-                        'id' => (int) $value->id,
-                        'name' => (string) $value->name,
+                        'id'       => (int) $value->id,
+                        'name'     => (string) $value->name,
                         'selected' => $selectedValues->contains((int) $value->id),
                     ];
                 }
@@ -300,8 +300,8 @@ class Show extends Component
     {
         return view('livewire.pages.collection.show', [
             'collection' => $this->collection,
-            'products' => $this->products,
-            'options' => $this->availableOptions,
+            'products'   => $this->products,
+            'options'    => $this->availableOptions,
         ])->title($this->collection?->name ?? __('Collection'));
     }
 
@@ -356,9 +356,9 @@ class Show extends Component
             ->get(['field', 'operator', 'value'])
             ->map(static function (CollectionRule $rule): array {
                 return [
-                    'field' => (string) $rule->field,
+                    'field'    => (string) $rule->field,
                     'operator' => (string) $rule->operator,
-                    'value' => $rule->value,
+                    'value'    => $rule->value,
                 ];
             });
     }
@@ -388,7 +388,7 @@ class Show extends Component
     /**
      * Apply an individual rule constraint to the provided query builder.
      *
-     * @param  'where'|'orWhere'  $booleanMethod
+     * @param 'where'|'orWhere' $booleanMethod
      */
     private function applyRuleConstraint(Builder $query, array $rule, string $booleanMethod): void
     {
@@ -406,10 +406,10 @@ class Show extends Component
             $query->{$booleanMethod}(static function (Builder $builder) use ($operator, $pattern): void {
                 match ($operator) {
                     'contains', 'starts_with', 'ends_with' => $builder->where('name', 'like', $pattern),
-                    'not_contains' => $builder->where('name', 'not like', $pattern),
-                    'equals_to' => $builder->where('name', '=', $pattern),
+                    'not_contains'  => $builder->where('name', 'not like', $pattern),
+                    'equals_to'     => $builder->where('name', '=', $pattern),
                     'not_equals_to' => $builder->where('name', '!=', $pattern),
-                    default => null,
+                    default         => null,
                 };
             });
 
@@ -428,11 +428,11 @@ class Show extends Component
                     $priceQuery->whereRelation('currency', 'code', current_currency());
 
                     match ($operator) {
-                        'less_than' => $priceQuery->where('amount', '<', $amount),
-                        'greater_than' => $priceQuery->where('amount', '>', $amount),
-                        'equals_to' => $priceQuery->where('amount', '=', $amount),
+                        'less_than'     => $priceQuery->where('amount', '<', $amount),
+                        'greater_than'  => $priceQuery->where('amount', '>', $amount),
+                        'equals_to'     => $priceQuery->where('amount', '=', $amount),
                         'not_equals_to' => $priceQuery->where('amount', '!=', $amount),
-                        default => null,
+                        default         => null,
                     };
                 });
             });
@@ -479,7 +479,7 @@ class Show extends Component
         return match ($operator) {
             'contains', 'not_contains' => "%{$escaped}%",
             'starts_with' => "{$escaped}%",
-            'ends_with' => "%{$escaped}",
+            'ends_with'   => "%{$escaped}",
             'equals_to', 'not_equals_to' => $escaped,
             default => null,
         };

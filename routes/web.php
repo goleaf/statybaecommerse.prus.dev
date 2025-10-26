@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 use App\Http\Controllers\Api\V1\HealthController;
 use App\Http\Controllers\ApiDocsController;
+use App\Http\Controllers\Frontend\UserController;
 use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\MailPreviewController;
-use App\Http\Controllers\Frontend\UserController;
 use App\Http\Controllers\NewsCommentController;
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\SecureMediaDownloadController;

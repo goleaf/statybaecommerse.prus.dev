@@ -41,8 +41,8 @@ describe('CampaignResource', function (): void {
 
     it('can render campaign resource view and edit pages', function (): void {
         $campaign = Campaign::factory()->create([
-            'name' => 'Test Campaign',
-            'slug' => 'test-campaign',
+            'name'   => 'Test Campaign',
+            'slug'   => 'test-campaign',
             'status' => 'draft',
         ]);
 
@@ -58,13 +58,13 @@ describe('CampaignResource', function (): void {
 
         Livewire::test(\App\Filament\Resources\CampaignResource\Pages\CreateCampaign::class)
             ->fillForm([
-                'status' => 'active',
-                'starts_at' => now()->format('Y-m-d H:i:s'),
-                'name_lt' => 'Testinė kampanija',
-                'slug_lt' => 'testine-kampanija',
+                'status'         => 'active',
+                'starts_at'      => now()->format('Y-m-d H:i:s'),
+                'name_lt'        => 'Testinė kampanija',
+                'slug_lt'        => 'testine-kampanija',
                 'description_lt' => 'Aprašymas',
-                'name_en' => 'Test Campaign',
-                'slug_en' => 'test-campaign-en',
+                'name_en'        => 'Test Campaign',
+                'slug_en'        => 'test-campaign-en',
                 'description_en' => 'Description',
             ])
             ->call('create')
@@ -75,7 +75,7 @@ describe('CampaignResource', function (): void {
 
     it('can edit a campaign via filament form', function (): void {
         $campaign = Campaign::factory()->create([
-            'name' => 'Original Campaign',
+            'name'   => 'Original Campaign',
             'status' => 'draft',
         ]);
 
@@ -83,7 +83,7 @@ describe('CampaignResource', function (): void {
 
         Livewire::test(\App\Filament\Resources\CampaignResource\Pages\EditCampaign::class, ['record' => $campaign->getKey()])
             ->fillForm([
-                'name' => 'Updated Campaign',
+                'name'   => 'Updated Campaign',
                 'status' => 'active',
             ])
             ->call('save')
@@ -146,12 +146,12 @@ describe('SystemSettingsResource', function (): void {
 
         Livewire::test(\App\Filament\Resources\SystemSettingsResource\Pages\CreateSystemSetting::class)
             ->fillForm([
-                'key' => 'test_setting',
-                'value' => 'test_value',
+                'key'          => 'test_setting',
+                'value'        => 'test_value',
                 'display_name' => 'Test Setting',
-                'description' => 'Test description',
-                'type' => 'string',
-                'is_public' => true,
+                'description'  => 'Test description',
+                'type'         => 'string',
+                'is_public'    => true,
             ])
             ->call('create')
             ->assertHasNoFormErrors();
@@ -161,7 +161,7 @@ describe('SystemSettingsResource', function (): void {
 
     it('can edit a system setting via filament form', function (): void {
         $setting = Setting::factory()->create([
-            'key' => 'original_setting',
+            'key'   => 'original_setting',
             'value' => 'original_value',
         ]);
 
@@ -169,7 +169,7 @@ describe('SystemSettingsResource', function (): void {
 
         Livewire::test(\App\Filament\Resources\SystemSettingsResource\Pages\EditSystemSetting::class, ['record' => $setting->getKey()])
             ->fillForm([
-                'value' => 'updated_value',
+                'value'        => 'updated_value',
                 'display_name' => 'Updated Setting',
             ])
             ->call('save')
@@ -221,8 +221,8 @@ describe('NotificationResource', function (): void {
 
         Livewire::test(\App\Filament\Resources\NotificationResource\Pages\CreateNotification::class)
             ->fillForm([
-                'type' => 'info',
-                'title' => 'Test Notification',
+                'type'    => 'info',
+                'title'   => 'Test Notification',
                 'message' => 'This is a test notification',
                 'user_id' => $this->admin->id,
                 'is_read' => false,
@@ -235,7 +235,7 @@ describe('NotificationResource', function (): void {
 
     it('can edit a notification via filament form', function (): void {
         $notification = Notification::factory()->create([
-            'title' => 'Original Title',
+            'title'   => 'Original Title',
             'is_read' => false,
         ]);
 
@@ -243,7 +243,7 @@ describe('NotificationResource', function (): void {
 
         Livewire::test(\App\Filament\Resources\NotificationResource\Pages\EditNotification::class, ['record' => $notification->getKey()])
             ->fillForm([
-                'title' => 'Updated Title',
+                'title'   => 'Updated Title',
                 'is_read' => true,
             ])
             ->call('save')
@@ -299,7 +299,7 @@ describe('AnalyticsEventResource', function (): void {
             ->fillForm([
                 'event_name' => 'test_event',
                 'event_type' => 'page_view',
-                'user_id' => $this->admin->id,
+                'user_id'    => $this->admin->id,
                 'session_id' => 'test_session_123',
                 'properties' => ['page' => '/test'],
             ])
@@ -371,11 +371,11 @@ describe('PartnerTierResource', function (): void {
 
         Livewire::test(\App\Filament\Resources\PartnerTierResource\Pages\CreatePartnerTier::class)
             ->fillForm([
-                'name' => 'Gold Partner',
-                'description' => 'Gold tier partner',
+                'name'                => 'Gold Partner',
+                'description'         => 'Gold tier partner',
                 'discount_percentage' => 15.0,
-                'min_order_value' => 1000.0,
-                'is_active' => true,
+                'min_order_value'     => 1000.0,
+                'is_active'           => true,
             ])
             ->call('create')
             ->assertHasNoFormErrors();
@@ -385,7 +385,7 @@ describe('PartnerTierResource', function (): void {
 
     it('can edit a partner tier via filament form', function (): void {
         $tier = PartnerTier::factory()->create([
-            'name' => 'Original Tier',
+            'name'                => 'Original Tier',
             'discount_percentage' => 10.0,
         ]);
 
@@ -393,7 +393,7 @@ describe('PartnerTierResource', function (): void {
 
         Livewire::test(\App\Filament\Resources\PartnerTierResource\Pages\EditPartnerTier::class, ['record' => $tier->getKey()])
             ->fillForm([
-                'name' => 'Updated Tier',
+                'name'                => 'Updated Tier',
                 'discount_percentage' => 20.0,
             ])
             ->call('save')

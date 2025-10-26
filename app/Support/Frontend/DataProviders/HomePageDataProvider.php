@@ -13,9 +13,7 @@ use Illuminate\Support\Facades\Cache;
 
 final class HomePageDataProvider
 {
-    public function __construct(private readonly ProductCatalogueDataProvider $products)
-    {
-    }
+    public function __construct(private readonly ProductCatalogueDataProvider $products) {}
 
     public function get(): array
     {
@@ -23,21 +21,21 @@ final class HomePageDataProvider
 
         $stats = Cache::remember("frontend:home:stats:{$locale}", now()->addMinutes(1), function (): array {
             return [
-                'products_count' => $this->countPublishedProducts(),
+                'products_count'   => $this->countPublishedProducts(),
                 'categories_count' => Category::query()->count(),
-                'brands_count' => $this->countVisibleBrands(),
-                'reviews_count' => Review::query()->where('is_approved', true)->count(),
-                'avg_rating' => (float) (Review::query()->where('is_approved', true)->avg('rating') ?? 0.0),
+                'brands_count'     => $this->countVisibleBrands(),
+                'reviews_count'    => Review::query()->where('is_approved', true)->count(),
+                'avg_rating'       => (float) (Review::query()->where('is_approved', true)->avg('rating') ?? 0.0),
             ];
         });
 
         return [
-            'stats' => $stats,
-            'featuredProducts' => $this->products->featured(),
-            'latestProducts' => $this->products->latest(),
-            'trendingProducts' => $this->products->trending(),
-            'saleProducts' => $this->products->onSale(),
-            'topCategories' => $this->collectTopCategories(),
+            'stats'             => $stats,
+            'featuredProducts'  => $this->products->featured(),
+            'latestProducts'    => $this->products->latest(),
+            'trendingProducts'  => $this->products->trending(),
+            'saleProducts'      => $this->products->onSale(),
+            'topCategories'     => $this->collectTopCategories(),
             'highlightedBrands' => $this->collectHighlightedBrands(),
         ];
     }

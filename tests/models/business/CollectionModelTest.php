@@ -28,21 +28,21 @@ final class CollectionModelTest extends TestCase
     public function test_collection_fillable_attributes(): void
     {
         $collection = Collection::factory()->create([
-            'name' => 'Test Collection',
-            'slug' => 'test-collection',
-            'description' => 'Test description',
-            'is_visible' => true,
-            'is_automatic' => false,
-            'sort_order' => 1,
-            'seo_title' => 'SEO Title',
-            'seo_description' => 'SEO Description',
-            'is_active' => true,
-            'meta_title' => 'Meta Title',
-            'meta_description' => 'Meta Description',
-            'meta_keywords' => ['keyword1', 'keyword2'],
-            'display_type' => 'grid',
+            'name'              => 'Test Collection',
+            'slug'              => 'test-collection',
+            'description'       => 'Test description',
+            'is_visible'        => true,
+            'is_automatic'      => false,
+            'sort_order'        => 1,
+            'seo_title'         => 'SEO Title',
+            'seo_description'   => 'SEO Description',
+            'is_active'         => true,
+            'meta_title'        => 'Meta Title',
+            'meta_description'  => 'Meta Description',
+            'meta_keywords'     => ['keyword1', 'keyword2'],
+            'display_type'      => 'grid',
             'products_per_page' => 12,
-            'show_filters' => true,
+            'show_filters'      => true,
         ]);
 
         $this->assertEquals('Test Collection', $collection->name);
@@ -65,13 +65,13 @@ final class CollectionModelTest extends TestCase
     public function test_collection_casts_are_applied_correctly(): void
     {
         $collection = Collection::factory()->create([
-            'is_visible' => '1',
-            'is_automatic' => '0',
-            'sort_order' => '5',
-            'is_active' => '1',
+            'is_visible'        => '1',
+            'is_automatic'      => '0',
+            'sort_order'        => '5',
+            'is_active'         => '1',
             'products_per_page' => '20',
-            'show_filters' => '1',
-            'meta_keywords' => ['keyword1', 'keyword2'],
+            'show_filters'      => '1',
+            'meta_keywords'     => ['keyword1', 'keyword2'],
         ]);
 
         $this->assertIsBool($collection->is_visible);
@@ -166,9 +166,9 @@ final class CollectionModelTest extends TestCase
         $collection = Collection::factory()->create();
         $translation = CollectionTranslation::factory()->create([
             'collection_id' => $collection->id,
-            'locale' => 'en',
-            'name' => 'English Name',
-            'description' => 'English Description',
+            'locale'        => 'en',
+            'name'          => 'English Name',
+            'description'   => 'English Description',
         ]);
 
         $this->assertCount(1, $collection->translations);
@@ -181,16 +181,16 @@ final class CollectionModelTest extends TestCase
 
         CollectionTranslation::factory()->create([
             'collection_id' => $collection->id,
-            'locale' => 'en',
-            'name' => 'English Name',
-            'description' => 'English Description',
+            'locale'        => 'en',
+            'name'          => 'English Name',
+            'description'   => 'English Description',
         ]);
 
         CollectionTranslation::factory()->create([
             'collection_id' => $collection->id,
-            'locale' => 'lt',
-            'name' => 'Lithuanian Name',
-            'description' => 'Lithuanian Description',
+            'locale'        => 'lt',
+            'name'          => 'Lithuanian Name',
+            'description'   => 'Lithuanian Description',
         ]);
 
         app()->setLocale('en');
@@ -208,8 +208,8 @@ final class CollectionModelTest extends TestCase
 
         CollectionTranslation::factory()->create([
             'collection_id' => $collection->id,
-            'locale' => 'en',
-            'name' => 'English Name',
+            'locale'        => 'en',
+            'name'          => 'English Name',
         ]);
 
         app()->setLocale('lt');
@@ -293,8 +293,8 @@ final class CollectionModelTest extends TestCase
         $collection = Collection::factory()->create();
         CollectionTranslation::factory()->create([
             'collection_id' => $collection->id,
-            'locale' => 'en',
-            'name' => 'English Name',
+            'locale'        => 'en',
+            'name'          => 'English Name',
         ]);
 
         $collections = Collection::withTranslations()->get();
@@ -380,8 +380,8 @@ final class CollectionModelTest extends TestCase
     public function test_collection_rules_can_be_array(): void
     {
         $rules = [
-            'category' => 'tools',
-            'brand' => 'bosch',
+            'category'  => 'tools',
+            'brand'     => 'bosch',
             'price_min' => 100,
         ];
         $collection = Collection::factory()->create(['rules' => $rules]);

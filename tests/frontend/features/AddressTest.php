@@ -44,15 +44,15 @@ final class AddressTest extends TestCase
         $country = Country::factory()->create();
 
         $addressData = [
-            'type' => AddressType::SHIPPING->value,
-            'first_name' => 'John',
-            'last_name' => 'Doe',
+            'type'           => AddressType::SHIPPING->value,
+            'first_name'     => 'John',
+            'last_name'      => 'Doe',
             'address_line_1' => 'Test Street 123',
-            'city' => 'Vilnius',
-            'postal_code' => 'LT-01234',
-            'country_code' => 'LT',
-            'country_id' => $country->id,
-            'is_default' => true,
+            'city'           => 'Vilnius',
+            'postal_code'    => 'LT-01234',
+            'country_code'   => 'LT',
+            'country_id'     => $country->id,
+            'is_default'     => true,
         ];
 
         $response = $this->actingAs($user)->post(route('frontend.addresses.store'), $addressData);
@@ -61,14 +61,14 @@ final class AddressTest extends TestCase
         $response->assertSessionHas('success', __('translations.address_created_successfully'));
 
         $this->assertDatabaseHas('addresses', [
-            'user_id' => $user->id,
-            'type' => AddressType::SHIPPING->value,
-            'first_name' => 'John',
-            'last_name' => 'Doe',
+            'user_id'        => $user->id,
+            'type'           => AddressType::SHIPPING->value,
+            'first_name'     => 'John',
+            'last_name'      => 'Doe',
             'address_line_1' => 'Test Street 123',
-            'city' => 'Vilnius',
-            'postal_code' => 'LT-01234',
-            'is_default' => true,
+            'city'           => 'Vilnius',
+            'postal_code'    => 'LT-01234',
+            'is_default'     => true,
         ]);
     }
 
@@ -102,14 +102,14 @@ final class AddressTest extends TestCase
         $address = Address::factory()->create(['user_id' => $user->id]);
 
         $updateData = [
-            'type' => AddressType::BILLING->value,
-            'first_name' => 'Jane',
-            'last_name' => 'Smith',
+            'type'           => AddressType::BILLING->value,
+            'first_name'     => 'Jane',
+            'last_name'      => 'Smith',
             'address_line_1' => 'Updated Street 456',
-            'city' => 'Kaunas',
-            'postal_code' => 'LT-56789',
-            'country_code' => 'LT',
-            'is_default' => false,
+            'city'           => 'Kaunas',
+            'postal_code'    => 'LT-56789',
+            'country_code'   => 'LT',
+            'is_default'     => false,
         ];
 
         $response = $this->actingAs($user)->put(route('frontend.addresses.update', $address), $updateData);
@@ -118,14 +118,14 @@ final class AddressTest extends TestCase
         $response->assertSessionHas('success', __('translations.address_updated_successfully'));
 
         $this->assertDatabaseHas('addresses', [
-            'id' => $address->id,
-            'type' => AddressType::BILLING->value,
-            'first_name' => 'Jane',
-            'last_name' => 'Smith',
+            'id'             => $address->id,
+            'type'           => AddressType::BILLING->value,
+            'first_name'     => 'Jane',
+            'last_name'      => 'Smith',
             'address_line_1' => 'Updated Street 456',
-            'city' => 'Kaunas',
-            'postal_code' => 'LT-56789',
-            'is_default' => false,
+            'city'           => 'Kaunas',
+            'postal_code'    => 'LT-56789',
+            'is_default'     => false,
         ]);
     }
 
@@ -146,11 +146,11 @@ final class AddressTest extends TestCase
     {
         $user = User::factory()->create();
         $defaultAddress = Address::factory()->create([
-            'user_id' => $user->id,
+            'user_id'    => $user->id,
             'is_default' => true,
         ]);
         $newDefaultAddress = Address::factory()->create([
-            'user_id' => $user->id,
+            'user_id'    => $user->id,
             'is_default' => false,
         ]);
 
@@ -160,12 +160,12 @@ final class AddressTest extends TestCase
         $response->assertSessionHas('success', __('translations.address_set_as_default'));
 
         $this->assertDatabaseHas('addresses', [
-            'id' => $newDefaultAddress->id,
+            'id'         => $newDefaultAddress->id,
             'is_default' => true,
         ]);
 
         $this->assertDatabaseHas('addresses', [
-            'id' => $defaultAddress->id,
+            'id'         => $defaultAddress->id,
             'is_default' => false,
         ]);
     }
@@ -181,11 +181,11 @@ final class AddressTest extends TestCase
         $response->assertSessionHas('success', __('translations.address_duplicated'));
 
         $this->assertDatabaseHas('addresses', [
-            'user_id' => $user->id,
-            'first_name' => $address->first_name,
-            'last_name' => $address->last_name,
+            'user_id'        => $user->id,
+            'first_name'     => $address->first_name,
+            'last_name'      => $address->last_name,
             'address_line_1' => $address->address_line_1,
-            'is_default' => false, // Duplicated address should not be default
+            'is_default'     => false, // Duplicated address should not be default
         ]);
     }
 
@@ -208,13 +208,13 @@ final class AddressTest extends TestCase
         $address = Address::factory()->create(['user_id' => $user2->id]);
 
         $updateData = [
-            'type' => AddressType::BILLING->value,
-            'first_name' => 'Hacker',
-            'last_name' => 'User',
+            'type'           => AddressType::BILLING->value,
+            'first_name'     => 'Hacker',
+            'last_name'      => 'User',
             'address_line_1' => 'Hacked Street',
-            'city' => 'Hacked City',
-            'postal_code' => 'LT-00000',
-            'country_code' => 'LT',
+            'city'           => 'Hacked City',
+            'postal_code'    => 'LT-00000',
+            'country_code'   => 'LT',
         ];
 
         $response = $this->actingAs($user1)->put(route('frontend.addresses.update', $address), $updateData);
@@ -290,16 +290,16 @@ final class AddressTest extends TestCase
         $country = Country::factory()->create();
 
         $addressData = [
-            'type' => AddressType::SHIPPING->value,
-            'first_name' => 'John',
-            'last_name' => 'Doe',
-            'company_name' => 'Test Company Ltd',
-            'company_vat' => 'LT123456789',
+            'type'           => AddressType::SHIPPING->value,
+            'first_name'     => 'John',
+            'last_name'      => 'Doe',
+            'company_name'   => 'Test Company Ltd',
+            'company_vat'    => 'LT123456789',
             'address_line_1' => 'Business Street 123',
-            'city' => 'Vilnius',
-            'postal_code' => 'LT-01234',
-            'country_code' => 'LT',
-            'country_id' => $country->id,
+            'city'           => 'Vilnius',
+            'postal_code'    => 'LT-01234',
+            'country_code'   => 'LT',
+            'country_id'     => $country->id,
         ];
 
         $response = $this->actingAs($user)->post(route('frontend.addresses.store'), $addressData);
@@ -307,9 +307,9 @@ final class AddressTest extends TestCase
         $response->assertRedirect(route('frontend.addresses.index'));
 
         $this->assertDatabaseHas('addresses', [
-            'user_id' => $user->id,
+            'user_id'      => $user->id,
             'company_name' => 'Test Company Ltd',
-            'company_vat' => 'LT123456789',
+            'company_vat'  => 'LT123456789',
         ]);
     }
 
@@ -319,19 +319,19 @@ final class AddressTest extends TestCase
         $country = Country::factory()->create();
 
         $addressData = [
-            'type' => AddressType::HOME->value,
-            'first_name' => 'John',
-            'last_name' => 'Doe',
+            'type'           => AddressType::HOME->value,
+            'first_name'     => 'John',
+            'last_name'      => 'Doe',
             'address_line_1' => 'Home Street 123',
-            'apartment' => 'Apt 5B',
-            'floor' => '3rd Floor',
-            'building' => 'Building A',
-            'landmark' => 'Near the shopping center',
-            'instructions' => 'Ring the doorbell twice',
-            'city' => 'Vilnius',
-            'postal_code' => 'LT-01234',
-            'country_code' => 'LT',
-            'country_id' => $country->id,
+            'apartment'      => 'Apt 5B',
+            'floor'          => '3rd Floor',
+            'building'       => 'Building A',
+            'landmark'       => 'Near the shopping center',
+            'instructions'   => 'Ring the doorbell twice',
+            'city'           => 'Vilnius',
+            'postal_code'    => 'LT-01234',
+            'country_code'   => 'LT',
+            'country_id'     => $country->id,
         ];
 
         $response = $this->actingAs($user)->post(route('frontend.addresses.store'), $addressData);
@@ -339,11 +339,11 @@ final class AddressTest extends TestCase
         $response->assertRedirect(route('frontend.addresses.index'));
 
         $this->assertDatabaseHas('addresses', [
-            'user_id' => $user->id,
+            'user_id'   => $user->id,
             'apartment' => 'Apt 5B',
-            'floor' => '3rd Floor',
-            'building' => 'Building A',
-            'landmark' => 'Near the shopping center',
+            'floor'     => '3rd Floor',
+            'building'  => 'Building A',
+            'landmark'  => 'Near the shopping center',
         ]);
 
         // Check that instructions are stored as translatable JSON
@@ -357,16 +357,16 @@ final class AddressTest extends TestCase
         $country = Country::factory()->create();
 
         $addressData = [
-            'type' => AddressType::WORK->value,
-            'first_name' => 'John',
-            'last_name' => 'Doe',
+            'type'           => AddressType::WORK->value,
+            'first_name'     => 'John',
+            'last_name'      => 'Doe',
             'address_line_1' => 'Work Street 123',
-            'city' => 'Vilnius',
-            'postal_code' => 'LT-01234',
-            'country_code' => 'LT',
-            'country_id' => $country->id,
-            'phone' => '+37012345678',
-            'email' => 'john.doe@example.com',
+            'city'           => 'Vilnius',
+            'postal_code'    => 'LT-01234',
+            'country_code'   => 'LT',
+            'country_id'     => $country->id,
+            'phone'          => '+37012345678',
+            'email'          => 'john.doe@example.com',
         ];
 
         $response = $this->actingAs($user)->post(route('frontend.addresses.store'), $addressData);
@@ -375,8 +375,8 @@ final class AddressTest extends TestCase
 
         $this->assertDatabaseHas('addresses', [
             'user_id' => $user->id,
-            'phone' => '+37012345678',
-            'email' => 'john.doe@example.com',
+            'phone'   => '+37012345678',
+            'email'   => 'john.doe@example.com',
         ]);
     }
 
@@ -387,14 +387,14 @@ final class AddressTest extends TestCase
 
         foreach (AddressType::cases() as $type) {
             $addressData = [
-                'type' => $type->value,
-                'first_name' => 'John',
-                'last_name' => 'Doe',
+                'type'           => $type->value,
+                'first_name'     => 'John',
+                'last_name'      => 'Doe',
                 'address_line_1' => 'Test Street 123',
-                'city' => 'Vilnius',
-                'postal_code' => 'LT-01234',
-                'country_code' => 'LT',
-                'country_id' => $country->id,
+                'city'           => 'Vilnius',
+                'postal_code'    => 'LT-01234',
+                'country_code'   => 'LT',
+                'country_id'     => $country->id,
             ];
 
             $response = $this->actingAs($user)->post(route('frontend.addresses.store'), $addressData);
@@ -403,7 +403,7 @@ final class AddressTest extends TestCase
 
             $this->assertDatabaseHas('addresses', [
                 'user_id' => $user->id,
-                'type' => $type->value,
+                'type'    => $type->value,
             ]);
         }
     }
@@ -414,16 +414,16 @@ final class AddressTest extends TestCase
         $country = Country::factory()->create();
 
         $addressData = [
-            'type' => AddressType::SHIPPING->value,
-            'first_name' => 'John',
-            'last_name' => 'Doe',
+            'type'           => AddressType::SHIPPING->value,
+            'first_name'     => 'John',
+            'last_name'      => 'Doe',
             'address_line_1' => 'Test Street 123',
-            'city' => 'Vilnius',
-            'postal_code' => 'LT-01234',
-            'country_code' => 'LT',
-            'country_id' => $country->id,
-            'is_billing' => true,
-            'is_shipping' => true,
+            'city'           => 'Vilnius',
+            'postal_code'    => 'LT-01234',
+            'country_code'   => 'LT',
+            'country_id'     => $country->id,
+            'is_billing'     => true,
+            'is_shipping'    => true,
         ];
 
         $response = $this->actingAs($user)->post(route('frontend.addresses.store'), $addressData);
@@ -431,8 +431,8 @@ final class AddressTest extends TestCase
         $response->assertRedirect(route('frontend.addresses.index'));
 
         $this->assertDatabaseHas('addresses', [
-            'user_id' => $user->id,
-            'is_billing' => true,
+            'user_id'     => $user->id,
+            'is_billing'  => true,
             'is_shipping' => true,
         ]);
     }

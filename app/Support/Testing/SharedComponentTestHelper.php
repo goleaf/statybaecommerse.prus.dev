@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Support\Testing;
 
+use Exception;
 use Illuminate\Testing\TestView;
 
 final class SharedComponentTestHelper
@@ -11,13 +12,13 @@ final class SharedComponentTestHelper
     public static function assertButtonHasVariant(TestView $view, string $variant): void
     {
         $variantClasses = match ($variant) {
-            'primary' => 'bg-blue-600',
+            'primary'   => 'bg-blue-600',
             'secondary' => 'bg-gray-200',
-            'danger' => 'bg-red-600',
-            'success' => 'bg-green-600',
-            'warning' => 'bg-yellow-600',
-            'ghost' => 'hover:bg-gray-100',
-            default => 'bg-blue-600',
+            'danger'    => 'bg-red-600',
+            'success'   => 'bg-green-600',
+            'warning'   => 'bg-yellow-600',
+            'ghost'     => 'hover:bg-gray-100',
+            default     => 'bg-blue-600',
         };
 
         $view->assertSee($variantClasses, false);
@@ -26,10 +27,10 @@ final class SharedComponentTestHelper
     public static function assertButtonHasSize(TestView $view, string $size): void
     {
         $sizeClasses = match ($size) {
-            'sm' => 'px-3 py-2 text-sm',
-            'md' => 'px-4 py-2 text-sm',
-            'lg' => 'px-6 py-3 text-base',
-            'xl' => 'px-8 py-4 text-lg',
+            'sm'    => 'px-3 py-2 text-sm',
+            'md'    => 'px-4 py-2 text-sm',
+            'lg'    => 'px-6 py-3 text-base',
+            'xl'    => 'px-8 py-4 text-lg',
             default => 'px-4 py-2 text-sm',
         };
 
@@ -46,14 +47,14 @@ final class SharedComponentTestHelper
     public static function assertBadgeHasVariant(TestView $view, string $variant): void
     {
         $variantClasses = match ($variant) {
-            'primary' => 'bg-blue-100 text-blue-800',
+            'primary'   => 'bg-blue-100 text-blue-800',
             'secondary' => 'bg-gray-100 text-gray-800',
-            'success' => 'bg-green-100 text-green-800',
-            'warning' => 'bg-yellow-100 text-yellow-800',
-            'danger' => 'bg-red-100 text-red-800',
-            'info' => 'bg-purple-100 text-purple-800',
-            'gray' => 'bg-gray-100 text-gray-600',
-            default => 'bg-blue-100 text-blue-800',
+            'success'   => 'bg-green-100 text-green-800',
+            'warning'   => 'bg-yellow-100 text-yellow-800',
+            'danger'    => 'bg-red-100 text-red-800',
+            'info'      => 'bg-purple-100 text-purple-800',
+            'gray'      => 'bg-gray-100 text-gray-600',
+            default     => 'bg-blue-100 text-blue-800',
         };
 
         $view->assertSee($variantClasses, false);
@@ -73,8 +74,8 @@ final class SharedComponentTestHelper
     {
         $actionMap = [
             'wishlist' => 'toggleWishlist',
-            'compare' => 'addToCompare',
-            'cart' => 'addToCart',
+            'compare'  => 'addToCompare',
+            'cart'     => 'addToCart',
         ];
 
         foreach ($actions as $action) {
@@ -87,7 +88,7 @@ final class SharedComponentTestHelper
     public static function assertEmptyStateHasAction(TestView $view, string $actionType): void
     {
         $actionElements = [
-            'url' => 'href=',
+            'url'  => 'href=',
             'wire' => 'wire:click=',
         ];
 
@@ -120,11 +121,11 @@ final class SharedComponentTestHelper
 
         $maxWidth = $config['maxWidth'] ?? 'md';
         $widthClasses = match ($maxWidth) {
-            'sm' => 'sm:max-w-sm',
-            'md' => 'sm:max-w-md',
-            'lg' => 'sm:max-w-lg',
-            'xl' => 'sm:max-w-xl',
-            '2xl' => 'sm:max-w-2xl',
+            'sm'    => 'sm:max-w-sm',
+            'md'    => 'sm:max-w-md',
+            'lg'    => 'sm:max-w-lg',
+            'xl'    => 'sm:max-w-xl',
+            '2xl'   => 'sm:max-w-2xl',
             default => 'sm:max-w-md',
         };
 
@@ -135,10 +136,10 @@ final class SharedComponentTestHelper
     {
         $typeClasses = match ($type) {
             'success' => 'bg-green-50 border-green-200 text-green-800',
-            'error' => 'bg-red-50 border-red-200 text-red-800',
+            'error'   => 'bg-red-50 border-red-200 text-red-800',
             'warning' => 'bg-yellow-50 border-yellow-200 text-yellow-800',
-            'info' => 'bg-blue-50 border-blue-200 text-blue-800',
-            default => 'bg-blue-50 border-blue-200 text-blue-800',
+            'info'    => 'bg-blue-50 border-blue-200 text-blue-800',
+            default   => 'bg-blue-50 border-blue-200 text-blue-800',
         };
 
         $view->assertSee($typeClasses, false);
@@ -162,10 +163,10 @@ final class SharedComponentTestHelper
     public static function assertLoadingHasType(TestView $view, string $type): void
     {
         $typeElements = [
-            'spinner' => 'animate-spin',
+            'spinner'  => 'animate-spin',
             'skeleton' => 'animate-pulse',
-            'pulse' => 'animate-pulse',
-            'dots' => 'animate-bounce',
+            'pulse'    => 'animate-pulse',
+            'dots'     => 'animate-bounce',
         ];
 
         if (isset($typeElements[$type])) {
@@ -214,7 +215,7 @@ final class SharedComponentTestHelper
         }
 
         if (! $hasDarkMode) {
-            throw new \Exception('Component does not support dark mode');
+            throw new Exception('Component does not support dark mode');
         }
     }
 }

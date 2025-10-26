@@ -8,6 +8,7 @@ use App\Models\Product;
 use App\Services\Images\LocalImageGeneratorService;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Log;
+use Throwable;
 
 final class RealProductImagesSeeder extends Seeder
 {
@@ -72,7 +73,7 @@ final class RealProductImagesSeeder extends Seeder
                     $product
                         ->addMedia($imagePath)
                         ->withCustomProperties(['source' => 'local_generated'])
-                        ->usingName($product->name.' Image')
+                        ->usingName($product->name . ' Image')
                         ->toMediaCollection('images');
 
                     // Clean up temp file
@@ -84,11 +85,11 @@ final class RealProductImagesSeeder extends Seeder
                 } else {
                     $this->command->warn("Failed to generate image for: {$product->name}");
                 }
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
                 Log::warning('Failed to generate image for product', [
-                    'product_id' => $product->id,
+                    'product_id'   => $product->id,
                     'product_name' => $product->name,
-                    'error' => $e->getMessage(),
+                    'error'        => $e->getMessage(),
                 ]);
                 $this->command->warn("Error generating image for {$product->name}: {$e->getMessage()}");
             }

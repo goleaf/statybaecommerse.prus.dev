@@ -37,7 +37,7 @@ final class XlsxExportWriter implements ExportWriter
     }
 
     /**
-     * @param  array<int, array<int, string>>  $rows
+     * @param array<int, array<int, string>> $rows
      */
     private function buildSpreadsheetXml(array $rows): string
     {

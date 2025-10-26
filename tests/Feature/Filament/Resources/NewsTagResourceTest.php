@@ -23,7 +23,7 @@ final class NewsTagResourceTest extends TestCase
 
         // Create admin user with proper permissions
         $this->admin = User::factory()->create([
-            'email' => 'admin@example.com',
+            'email'    => 'admin@example.com',
             'is_admin' => true,
         ]);
 
@@ -59,19 +59,19 @@ final class NewsTagResourceTest extends TestCase
         $this->actingAs($this->admin);
 
         $newsTagData = [
-            'name' => 'Test Tag',
-            'slug' => 'test-tag',
+            'name'        => 'Test Tag',
+            'slug'        => 'test-tag',
             'description' => 'Test description',
-            'is_visible' => true,
-            'sort_order' => 1,
-            'color' => '#3B82F6',
+            'is_visible'  => true,
+            'sort_order'  => 1,
+            'color'       => '#3B82F6',
         ];
 
         $response = $this->post('/admin/news-tags', $newsTagData);
 
         $this->assertDatabaseHas('news_tags', [
-            'name' => 'Test Tag',
-            'slug' => 'test-tag',
+            'name'       => 'Test Tag',
+            'slug'       => 'test-tag',
             'is_visible' => true,
         ]);
     }
@@ -107,20 +107,20 @@ final class NewsTagResourceTest extends TestCase
         $this->actingAs($this->admin);
 
         $updateData = [
-            'name' => 'Updated Tag',
-            'slug' => 'updated-tag',
+            'name'        => 'Updated Tag',
+            'slug'        => 'updated-tag',
             'description' => 'Updated description',
-            'is_visible' => false,
-            'sort_order' => 2,
-            'color' => '#10B981',
+            'is_visible'  => false,
+            'sort_order'  => 2,
+            'color'       => '#10B981',
         ];
 
         $response = $this->put("/admin/news-tags/{$newsTag->id}", $updateData);
 
         $this->assertDatabaseHas('news_tags', [
-            'id' => $newsTag->id,
-            'name' => 'Updated Tag',
-            'slug' => 'updated-tag',
+            'id'         => $newsTag->id,
+            'name'       => 'Updated Tag',
+            'slug'       => 'updated-tag',
             'is_visible' => false,
         ]);
     }
@@ -273,7 +273,7 @@ final class NewsTagResourceTest extends TestCase
         $response = $this->post("/admin/news-tags/{$newsTag->id}/activate");
 
         $this->assertDatabaseHas('news_tags', [
-            'id' => $newsTag->id,
+            'id'         => $newsTag->id,
             'is_visible' => true,
         ]);
     }
@@ -287,7 +287,7 @@ final class NewsTagResourceTest extends TestCase
         $response = $this->post("/admin/news-tags/{$newsTag->id}/deactivate");
 
         $this->assertDatabaseHas('news_tags', [
-            'id' => $newsTag->id,
+            'id'         => $newsTag->id,
             'is_visible' => false,
         ]);
     }
@@ -321,7 +321,7 @@ final class NewsTagResourceTest extends TestCase
 
         foreach ($newsTags as $newsTag) {
             $this->assertDatabaseHas('news_tags', [
-                'id' => $newsTag->id,
+                'id'         => $newsTag->id,
                 'is_visible' => true,
             ]);
         }
@@ -339,7 +339,7 @@ final class NewsTagResourceTest extends TestCase
 
         foreach ($newsTags as $newsTag) {
             $this->assertDatabaseHas('news_tags', [
-                'id' => $newsTag->id,
+                'id'         => $newsTag->id,
                 'is_visible' => false,
             ]);
         }
@@ -481,8 +481,8 @@ final class NewsTagResourceTest extends TestCase
     public function test_news_tag_can_be_replicated(): void
     {
         $originalTag = NewsTag::factory()->create([
-            'name' => 'Original Tag',
-            'slug' => 'original-tag',
+            'name'  => 'Original Tag',
+            'slug'  => 'original-tag',
             'color' => '#3B82F6',
         ]);
 
@@ -492,8 +492,8 @@ final class NewsTagResourceTest extends TestCase
         $replicatedTag->save();
 
         $this->assertDatabaseHas('news_tags', [
-            'name' => 'Replicated Tag',
-            'slug' => 'replicated-tag',
+            'name'  => 'Replicated Tag',
+            'slug'  => 'replicated-tag',
             'color' => '#3B82F6',
         ]);
     }
@@ -510,7 +510,7 @@ final class NewsTagResourceTest extends TestCase
     {
         $newsTag = NewsTag::factory()->create([
             'is_visible' => true,
-            'color' => '#3B82F6',
+            'color'      => '#3B82F6',
             'sort_order' => 1,
         ]);
 

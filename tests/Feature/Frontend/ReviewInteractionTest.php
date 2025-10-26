@@ -31,7 +31,7 @@ final class ReviewInteractionTest extends TestCase
         $this->postJson(route('frontend.reviews.like', $review))
             ->assertOk()
             ->assertJson([
-                'helpful_count' => 1,
+                'helpful_count'  => 1,
                 'reported_count' => 0,
             ]);
 

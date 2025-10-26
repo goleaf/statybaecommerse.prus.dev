@@ -13,11 +13,11 @@ beforeEach(function () {
 
 it('can create a review', function () {
     $review = Review::factory()->create([
-        'product_id' => $this->product->id,
-        'user_id' => $this->user->id,
-        'title' => 'Great Product',
-        'content' => 'This product is amazing!',
-        'rating' => 5,
+        'product_id'  => $this->product->id,
+        'user_id'     => $this->user->id,
+        'title'       => 'Great Product',
+        'content'     => 'This product is amazing!',
+        'rating'      => 5,
         'is_approved' => false,
     ]);
 
@@ -30,7 +30,7 @@ it('can create a review', function () {
 it('belongs to a product', function () {
     $review = Review::factory()->create([
         'product_id' => $this->product->id,
-        'user_id' => $this->user->id,
+        'user_id'    => $this->user->id,
     ]);
 
     expect($review->product->id)->toBe($this->product->id);
@@ -39,7 +39,7 @@ it('belongs to a product', function () {
 it('belongs to a user', function () {
     $review = Review::factory()->create([
         'product_id' => $this->product->id,
-        'user_id' => $this->user->id,
+        'user_id'    => $this->user->id,
     ]);
 
     expect($review->user->id)->toBe($this->user->id);
@@ -47,8 +47,8 @@ it('belongs to a user', function () {
 
 it('can be approved', function () {
     $review = Review::factory()->create([
-        'product_id' => $this->product->id,
-        'user_id' => $this->user->id,
+        'product_id'  => $this->product->id,
+        'user_id'     => $this->user->id,
         'is_approved' => false,
         'approved_at' => null,
     ]);
@@ -61,8 +61,8 @@ it('can be approved', function () {
 
 it('can be rejected', function () {
     $review = Review::factory()->create([
-        'product_id' => $this->product->id,
-        'user_id' => $this->user->id,
+        'product_id'  => $this->product->id,
+        'user_id'     => $this->user->id,
         'is_approved' => true,
         'approved_at' => now(),
     ]);
@@ -75,13 +75,13 @@ it('can be rejected', function () {
 
 it('can filter approved reviews', function () {
     $approvedReview = Review::factory()->create([
-        'product_id' => $this->product->id,
-        'user_id' => $this->user->id,
+        'product_id'  => $this->product->id,
+        'user_id'     => $this->user->id,
         'is_approved' => true,
     ]);
     $pendingReview = Review::factory()->create([
-        'product_id' => $this->product->id,
-        'user_id' => $this->user->id,
+        'product_id'  => $this->product->id,
+        'user_id'     => $this->user->id,
         'is_approved' => false,
     ]);
 
@@ -93,13 +93,13 @@ it('can filter approved reviews', function () {
 
 it('can filter pending reviews', function () {
     $approvedReview = Review::factory()->create([
-        'product_id' => $this->product->id,
-        'user_id' => $this->user->id,
+        'product_id'  => $this->product->id,
+        'user_id'     => $this->user->id,
         'is_approved' => true,
     ]);
     $pendingReview = Review::factory()->create([
-        'product_id' => $this->product->id,
-        'user_id' => $this->user->id,
+        'product_id'  => $this->product->id,
+        'user_id'     => $this->user->id,
         'is_approved' => false,
     ]);
 
@@ -111,15 +111,15 @@ it('can filter pending reviews', function () {
 
 it('can filter reviews by rating', function () {
     $fiveStarReview = Review::factory()->create([
-        'product_id' => $this->product->id,
-        'user_id' => $this->user->id,
-        'rating' => 5,
+        'product_id'  => $this->product->id,
+        'user_id'     => $this->user->id,
+        'rating'      => 5,
         'is_approved' => true,
     ]);
     $threeStarReview = Review::factory()->create([
-        'product_id' => $this->product->id,
-        'user_id' => $this->user->id,
-        'rating' => 3,
+        'product_id'  => $this->product->id,
+        'user_id'     => $this->user->id,
+        'rating'      => 3,
         'is_approved' => true,
     ]);
 
@@ -131,37 +131,37 @@ it('can filter reviews by rating', function () {
 
 it('validates rating is between 1 and 5', function () {
     expect(fn () => Review::create([
-        'product_id' => $this->product->id,
-        'user_id' => $this->user->id,
-        'reviewer_name' => 'Test User',
+        'product_id'     => $this->product->id,
+        'user_id'        => $this->user->id,
+        'reviewer_name'  => 'Test User',
         'reviewer_email' => 'test@example.com',
-        'title' => 'Test Review',
-        'content' => 'Test content',
-        'rating' => 6, // Invalid
+        'title'          => 'Test Review',
+        'content'        => 'Test content',
+        'rating'         => 6, // Invalid
     ]))->toThrow(\InvalidArgumentException::class);
 
     expect(fn () => Review::create([
-        'product_id' => $this->product->id,
-        'user_id' => $this->user->id,
-        'reviewer_name' => 'Test User',
+        'product_id'     => $this->product->id,
+        'user_id'        => $this->user->id,
+        'reviewer_name'  => 'Test User',
         'reviewer_email' => 'test@example.com',
-        'title' => 'Test Review',
-        'content' => 'Test content',
-        'rating' => 0, // Invalid
+        'title'          => 'Test Review',
+        'content'        => 'Test content',
+        'rating'         => 0, // Invalid
     ]))->toThrow(\InvalidArgumentException::class);
 });
 
 it('calculates average rating for a product', function () {
     Review::factory()->create([
-        'product_id' => $this->product->id,
-        'user_id' => $this->user->id,
-        'rating' => 5,
+        'product_id'  => $this->product->id,
+        'user_id'     => $this->user->id,
+        'rating'      => 5,
         'is_approved' => true,
     ]);
     Review::factory()->create([
-        'product_id' => $this->product->id,
-        'user_id' => User::factory()->create()->id,
-        'rating' => 3,
+        'product_id'  => $this->product->id,
+        'user_id'     => User::factory()->create()->id,
+        'rating'      => 3,
         'is_approved' => true,
     ]);
 

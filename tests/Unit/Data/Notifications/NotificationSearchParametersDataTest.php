@@ -14,7 +14,7 @@ final class NotificationSearchParametersDataTest extends TestCase
     public function test_from_array_builds_filter_and_term(): void
     {
         $search = NotificationSearchParametersData::fromArray([
-            'q' => 'urgent order',
+            'q'    => 'urgent order',
             'type' => 'order',
             'read' => false,
         ]);

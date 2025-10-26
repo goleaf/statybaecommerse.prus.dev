@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace App\Livewire\Components;
 
 use App\Services\SearchPaginationService;
+use Exception;
 use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
+use Log;
 
 /**
  * InfiniteScrollSearch
@@ -183,8 +185,8 @@ final class InfiniteScrollSearch extends Component
                 $this->availableFilters = $paginationService->getAvailableFilters($this->results);
             }
 
-        } catch (\Exception $e) {
-            \Log::warning('Infinite scroll search failed: '.$e->getMessage());
+        } catch (Exception $e) {
+            Log::warning('Infinite scroll search failed: ' . $e->getMessage());
             $this->addError('search', 'Search failed. Please try again.');
         } finally {
             $this->isLoading = false;
@@ -196,8 +198,8 @@ final class InfiniteScrollSearch extends Component
         try {
             $paginationService = app(SearchPaginationService::class);
             $this->availableFilters = $paginationService->getAvailableFilters($this->results);
-        } catch (\Exception $e) {
-            \Log::warning('Available filters loading failed: '.$e->getMessage());
+        } catch (Exception $e) {
+            Log::warning('Available filters loading failed: ' . $e->getMessage());
         }
     }
 
@@ -225,27 +227,27 @@ final class InfiniteScrollSearch extends Component
     {
         return [
             'relevance' => __('frontend.sort_by_relevance'),
-            'name' => __('frontend.sort_by_name'),
-            'price' => __('frontend.sort_by_price'),
-            'date' => __('frontend.sort_by_date'),
-            'rating' => __('frontend.sort_by_rating'),
+            'name'      => __('frontend.sort_by_name'),
+            'price'     => __('frontend.sort_by_price'),
+            'date'      => __('frontend.sort_by_date'),
+            'rating'    => __('frontend.sort_by_rating'),
         ];
     }
 
     public function getTypeOptionsProperty(): array
     {
         return [
-            'products' => __('frontend.products'),
-            'categories' => __('frontend.categories'),
-            'brands' => __('frontend.brands'),
+            'products'    => __('frontend.products'),
+            'categories'  => __('frontend.categories'),
+            'brands'      => __('frontend.brands'),
             'collections' => __('frontend.collections'),
-            'attributes' => __('frontend.attributes'),
-            'locations' => __('frontend.locations'),
-            'countries' => __('frontend.countries'),
-            'cities' => __('frontend.cities'),
-            'orders' => __('frontend.orders'),
-            'customers' => __('frontend.customers'),
-            'addresses' => __('frontend.addresses'),
+            'attributes'  => __('frontend.attributes'),
+            'locations'   => __('frontend.locations'),
+            'countries'   => __('frontend.countries'),
+            'cities'      => __('frontend.cities'),
+            'orders'      => __('frontend.orders'),
+            'customers'   => __('frontend.customers'),
+            'addresses'   => __('frontend.addresses'),
         ];
     }
 }

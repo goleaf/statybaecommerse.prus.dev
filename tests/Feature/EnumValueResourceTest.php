@@ -36,14 +36,14 @@ final class EnumValueResourceTest extends TestCase
     public function test_can_create_enum_value(): void
     {
         $enumValueData = [
-            'type' => 'product_status',
-            'key' => 'active',
-            'name' => 'Active',
-            'value' => 'active',
+            'type'        => 'product_status',
+            'key'         => 'active',
+            'name'        => 'Active',
+            'value'       => 'active',
             'description' => 'Product is active',
-            'sort_order' => 1,
-            'is_active' => true,
-            'is_default' => false,
+            'sort_order'  => 1,
+            'is_active'   => true,
+            'is_default'  => false,
         ];
 
         Livewire::test('App\Filament\Resources\EnumValueResource\Pages\CreateEnumValue')
@@ -53,7 +53,7 @@ final class EnumValueResourceTest extends TestCase
 
         $this->assertDatabaseHas('enum_values', [
             'type' => 'product_status',
-            'key' => 'active',
+            'key'  => 'active',
             'name' => 'Active',
         ]);
     }
@@ -62,11 +62,11 @@ final class EnumValueResourceTest extends TestCase
     {
         $enumValue = EnumValue::factory()->create([
             'type' => 'product_status',
-            'key' => 'active',
+            'key'  => 'active',
         ]);
 
         $updatedData = [
-            'name' => 'Updated Active',
+            'name'        => 'Updated Active',
             'description' => 'Updated description',
         ];
 
@@ -78,8 +78,8 @@ final class EnumValueResourceTest extends TestCase
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('enum_values', [
-            'id' => $enumValue->id,
-            'name' => 'Updated Active',
+            'id'          => $enumValue->id,
+            'name'        => 'Updated Active',
             'description' => 'Updated description',
         ]);
     }
@@ -140,7 +140,7 @@ final class EnumValueResourceTest extends TestCase
 
         foreach ($enumValues as $enumValue) {
             $this->assertDatabaseHas('enum_values', [
-                'id' => $enumValue->id,
+                'id'        => $enumValue->id,
                 'is_active' => true,
             ]);
         }
@@ -155,7 +155,7 @@ final class EnumValueResourceTest extends TestCase
 
         foreach ($enumValues as $enumValue) {
             $this->assertDatabaseHas('enum_values', [
-                'id' => $enumValue->id,
+                'id'        => $enumValue->id,
                 'is_active' => false,
             ]);
         }
@@ -164,11 +164,11 @@ final class EnumValueResourceTest extends TestCase
     public function test_can_set_default_enum_value(): void
     {
         $enumValue1 = EnumValue::factory()->create([
-            'type' => 'product_status',
+            'type'       => 'product_status',
             'is_default' => true,
         ]);
         $enumValue2 = EnumValue::factory()->create([
-            'type' => 'product_status',
+            'type'       => 'product_status',
             'is_default' => false,
         ]);
 
@@ -176,12 +176,12 @@ final class EnumValueResourceTest extends TestCase
             ->callTableBulkAction('set_default', [$enumValue2]);
 
         $this->assertDatabaseHas('enum_values', [
-            'id' => $enumValue1->id,
+            'id'         => $enumValue1->id,
             'is_default' => false,
         ]);
 
         $this->assertDatabaseHas('enum_values', [
-            'id' => $enumValue2->id,
+            'id'         => $enumValue2->id,
             'is_default' => true,
         ]);
     }
@@ -190,9 +190,9 @@ final class EnumValueResourceTest extends TestCase
     {
         Livewire::test('App\Filament\Resources\EnumValueResource\Pages\CreateEnumValue')
             ->fillForm([
-                'type' => '',
-                'key' => '',
-                'name' => '',
+                'type'  => '',
+                'key'   => '',
+                'name'  => '',
                 'value' => '',
             ])
             ->call('create')
@@ -205,9 +205,9 @@ final class EnumValueResourceTest extends TestCase
 
         Livewire::test('App\Filament\Resources\EnumValueResource\Pages\CreateEnumValue')
             ->fillForm([
-                'type' => 'product_status',
-                'key' => 'existing_key',
-                'name' => 'Test',
+                'type'  => 'product_status',
+                'key'   => 'existing_key',
+                'name'  => 'Test',
                 'value' => 'test',
             ])
             ->call('create')

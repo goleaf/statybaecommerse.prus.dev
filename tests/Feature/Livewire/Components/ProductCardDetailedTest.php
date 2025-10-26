@@ -10,9 +10,9 @@ use Livewire\Livewire;
 
 beforeEach(function () {
     $this->product = Product::factory()->create([
-        'name' => 'Test Product Detailed',
-        'price' => 199.99,
-        'status' => 'published',
+        'name'       => 'Test Product Detailed',
+        'price'      => 199.99,
+        'status'     => 'published',
         'is_visible' => true,
     ]);
 });
@@ -38,7 +38,7 @@ it('feature: tracks analytics when adding to cart', function () {
         ->call('addToCart');
 
     $this->assertDatabaseHas(AnalyticsEvent::class, [
-        'event_type' => 'add_to_cart',
+        'event_type'             => 'add_to_cart',
         'properties->product_id' => $this->product->id,
     ]);
 });
@@ -91,9 +91,9 @@ it('feature: tracks analytics when viewing product page', function () {
         ->call('viewProduct');
 
     $this->assertDatabaseHas(AnalyticsEvent::class, [
-        'event_type' => 'product_view',
+        'event_type'             => 'product_view',
         'properties->product_id' => $this->product->id,
-        'properties->view_type' => 'card_click',
+        'properties->view_type'  => 'card_click',
     ]);
 });
 
@@ -127,11 +127,11 @@ it('feature: refreshes status on events', function () {
 
 it('feature: handles component properties correctly', function () {
     $component = Livewire::test(ProductCardDetailed::class, [
-        'product' => $this->product,
+        'product'       => $this->product,
         'showQuickView' => true,
-        'showCompare' => false,
-        'showWishlist' => true,
-        'layout' => 'list',
+        'showCompare'   => false,
+        'showWishlist'  => true,
+        'layout'        => 'list',
     ]);
 
     $component->assertSet('showQuickView', true)

@@ -6,6 +6,8 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
 
 class PHPDocServeCommand extends Command
 {
@@ -61,7 +63,7 @@ class PHPDocServeCommand extends Command
         $this->newLine();
 
         // Start the server
-        $command = 'cd '.escapeshellarg($htmlDir)." && php -S {$host}:{$port}";
+        $command = 'cd ' . escapeshellarg($htmlDir) . " && php -S {$host}:{$port}";
 
         // Use passthru to show server output
         passthru($command);
@@ -90,8 +92,8 @@ class PHPDocServeCommand extends Command
      */
     private function showDocumentationStats(string $htmlDir): void
     {
-        $iterator = new \RecursiveIteratorIterator(
-            new \RecursiveDirectoryIterator($htmlDir)
+        $iterator = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($htmlDir)
         );
 
         $fileCount = 0;
@@ -106,7 +108,7 @@ class PHPDocServeCommand extends Command
 
         $this->line('📊 Documentation Statistics:');
         $this->line("  • Files: {$fileCount}");
-        $this->line('  • Size: '.$this->formatBytes($totalSize));
+        $this->line('  • Size: ' . $this->formatBytes($totalSize));
     }
 
     /**
@@ -120,6 +122,6 @@ class PHPDocServeCommand extends Command
             $bytes /= 1024;
         }
 
-        return round($bytes, $precision).' '.$units[$i];
+        return round($bytes, $precision) . ' ' . $units[$i];
     }
 }

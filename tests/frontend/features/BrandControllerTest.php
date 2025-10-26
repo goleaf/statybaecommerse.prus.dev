@@ -11,11 +11,11 @@ uses(RefreshDatabase::class);
 beforeEach(function () {
     $this->user = User::factory()->create();
     $this->brand = Brand::factory()->create([
-        'name' => 'Test Brand',
-        'slug' => 'test-brand',
+        'name'        => 'Test Brand',
+        'slug'        => 'test-brand',
         'description' => 'Test brand description',
-        'website' => 'https://testbrand.com',
-        'is_enabled' => true,
+        'website'     => 'https://testbrand.com',
+        'is_enabled'  => true,
     ]);
 });
 
@@ -46,7 +46,7 @@ it('displays localized brands index page', function () {
 it('displays localized brand page', function () {
     $response = $this->get(route('localized.brands.show', [
         'locale' => 'en',
-        'slug' => $this->brand->slug,
+        'slug'   => $this->brand->slug,
     ]));
 
     $response->assertOk();
@@ -101,7 +101,7 @@ it('handles brand with website link', function () {
 
 it('displays brand SEO information', function () {
     $brand = Brand::factory()->create([
-        'seo_title' => 'SEO Title',
+        'seo_title'       => 'SEO Title',
         'seo_description' => 'SEO Description',
     ]);
 

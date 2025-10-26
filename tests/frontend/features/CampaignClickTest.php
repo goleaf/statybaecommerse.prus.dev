@@ -51,19 +51,19 @@ class CampaignClickTest extends TestCase
         $campaign = Campaign::factory()->create();
 
         $clickData = [
-            'campaign_id' => $campaign->id,
-            'session_id' => 'test-session-123',
-            'ip_address' => '192.168.1.1',
-            'user_agent' => 'Mozilla/5.0 Test Browser',
-            'click_type' => 'cta',
-            'clicked_url' => 'https://example.com/cta',
-            'device_type' => 'desktop',
-            'browser' => 'chrome',
-            'os' => 'windows',
-            'country' => 'Lithuania',
-            'city' => 'Vilnius',
-            'utm_source' => 'google',
-            'utm_medium' => 'cpc',
+            'campaign_id'  => $campaign->id,
+            'session_id'   => 'test-session-123',
+            'ip_address'   => '192.168.1.1',
+            'user_agent'   => 'Mozilla/5.0 Test Browser',
+            'click_type'   => 'cta',
+            'clicked_url'  => 'https://example.com/cta',
+            'device_type'  => 'desktop',
+            'browser'      => 'chrome',
+            'os'           => 'windows',
+            'country'      => 'Lithuania',
+            'city'         => 'Vilnius',
+            'utm_source'   => 'google',
+            'utm_medium'   => 'cpc',
             'utm_campaign' => 'test-campaign',
         ];
 
@@ -92,8 +92,8 @@ class CampaignClickTest extends TestCase
 
         $this->assertDatabaseHas('campaign_clicks', [
             'campaign_id' => $campaign->id,
-            'session_id' => 'test-session-123',
-            'click_type' => 'cta',
+            'session_id'  => 'test-session-123',
+            'click_type'  => 'cta',
         ]);
     }
 
@@ -105,16 +105,16 @@ class CampaignClickTest extends TestCase
         $click = CampaignClick::factory()->create(['customer_id' => $user->id]);
 
         $updateData = [
-            'is_converted' => true,
+            'is_converted'     => true,
             'conversion_value' => 150.75,
-            'conversion_data' => ['product_id' => 123, 'category' => 'electronics'],
+            'conversion_data'  => ['product_id' => 123, 'category' => 'electronics'],
         ];
 
         $response = $this->putJson("/api/campaign-clicks/{$click->id}", $updateData);
 
         $response->assertStatus(200);
         $response->assertJsonFragment([
-            'is_converted' => true,
+            'is_converted'     => true,
             'conversion_value' => 150.75,
         ]);
 
@@ -208,10 +208,10 @@ class CampaignClickTest extends TestCase
 
         $clickData = [
             'campaign_id' => $campaign->id,
-            'session_id' => 'guest-session-123',
-            'ip_address' => '192.168.1.1',
-            'user_agent' => 'Mozilla/5.0 Guest Browser',
-            'click_type' => 'banner',
+            'session_id'  => 'guest-session-123',
+            'ip_address'  => '192.168.1.1',
+            'user_agent'  => 'Mozilla/5.0 Guest Browser',
+            'click_type'  => 'banner',
             'clicked_url' => 'https://example.com/banner',
         ];
 
@@ -220,7 +220,7 @@ class CampaignClickTest extends TestCase
         $response->assertStatus(201);
         $this->assertDatabaseHas('campaign_clicks', [
             'campaign_id' => $campaign->id,
-            'session_id' => 'guest-session-123',
+            'session_id'  => 'guest-session-123',
             'customer_id' => null,
         ]);
     }
@@ -230,25 +230,25 @@ class CampaignClickTest extends TestCase
         $campaign = Campaign::factory()->create();
 
         $clickData = [
-            'campaign_id' => $campaign->id,
-            'session_id' => 'utm-session-123',
-            'click_type' => 'cta',
-            'utm_source' => 'google',
-            'utm_medium' => 'cpc',
+            'campaign_id'  => $campaign->id,
+            'session_id'   => 'utm-session-123',
+            'click_type'   => 'cta',
+            'utm_source'   => 'google',
+            'utm_medium'   => 'cpc',
             'utm_campaign' => 'summer-sale',
-            'utm_term' => 'discount',
-            'utm_content' => 'banner-ad',
+            'utm_term'     => 'discount',
+            'utm_content'  => 'banner-ad',
         ];
 
         $response = $this->postJson('/api/campaign-clicks', $clickData);
 
         $response->assertStatus(201);
         $response->assertJsonFragment([
-            'utm_source' => 'google',
-            'utm_medium' => 'cpc',
+            'utm_source'   => 'google',
+            'utm_medium'   => 'cpc',
             'utm_campaign' => 'summer-sale',
-            'utm_term' => 'discount',
-            'utm_content' => 'banner-ad',
+            'utm_term'     => 'discount',
+            'utm_content'  => 'banner-ad',
         ]);
     }
 
@@ -291,8 +291,8 @@ class CampaignClickTest extends TestCase
     public function test_campaign_click_validation(): void
     {
         $response = $this->postJson('/api/campaign-clicks', [
-            'campaign_id' => 999999, // Non-existent campaign
-            'click_type' => 'invalid_type',
+            'campaign_id'      => 999999, // Non-existent campaign
+            'click_type'       => 'invalid_type',
             'conversion_value' => 'not_a_number',
         ]);
 

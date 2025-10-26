@@ -32,7 +32,7 @@ test('each Filament resource page declares its resource property', function () u
             continue;
         }
 
-        if (! Str::contains($file->getPathname(), DIRECTORY_SEPARATOR.'Pages'.DIRECTORY_SEPARATOR)) {
+        if (! Str::contains($file->getPathname(), DIRECTORY_SEPARATOR . 'Pages' . DIRECTORY_SEPARATOR)) {
             continue;
         }
 
@@ -52,6 +52,6 @@ test('each Filament resource page declares its resource property', function () u
         }
     }
 
-    expect($missingResourceProperty, 'The following page classes do not declare a protected static string $resource property: '.implode(', ', $missingResourceProperty))
+    expect($missingResourceProperty, 'The following page classes do not declare a protected static string $resource property: ' . implode(', ', $missingResourceProperty))
         ->toBeEmpty();
 });

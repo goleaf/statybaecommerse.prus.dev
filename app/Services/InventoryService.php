@@ -6,6 +6,7 @@ namespace App\Services;
 
 use App\Models\Product;
 use App\Models\ProductVariant;
+use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -34,7 +35,7 @@ final class InventoryService
             DB::commit();
 
             return true;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             DB::rollBack();
             Log::error('Failed to adjust product stock', ['product_id' => $product->id, 'quantity' => $quantity, 'error' => $e->getMessage()]);
 
@@ -60,7 +61,7 @@ final class InventoryService
             DB::commit();
 
             return true;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             DB::rollBack();
             Log::error('Failed to adjust variant stock', ['variant_id' => $variant->id, 'quantity' => $quantity, 'error' => $e->getMessage()]);
 

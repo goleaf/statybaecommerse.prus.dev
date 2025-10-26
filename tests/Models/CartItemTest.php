@@ -16,7 +16,7 @@ final class CartItemTest extends TestCase
 
     public function test_fillable_attributes_cover_expected_cart_columns(): void
     {
-        $model = new CartItem();
+        $model = new CartItem;
 
         $this->assertContains('session_id', $model->getFillable());
         $this->assertContains('quantity', $model->getFillable());
@@ -26,7 +26,7 @@ final class CartItemTest extends TestCase
 
     public function test_casts_configuration_handles_numeric_and_array_fields(): void
     {
-        $casts = (new CartItem())->getCasts();
+        $casts = (new CartItem)->getCasts();
 
         $this->assertSame('integer', $casts['quantity'] ?? null);
         $this->assertSame('decimal:2', $casts['unit_price'] ?? null);

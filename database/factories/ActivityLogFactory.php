@@ -34,37 +34,37 @@ final class ActivityLogFactory extends Factory
         $subjectTypes = ['App\Models\User', 'App\Models\Product', 'App\Models\Order', 'App\Models\Category'];
 
         return [
-            'log_name' => fake()->randomElement($logNames),
-            'description' => fake()->sentence(),
-            'event' => fake()->randomElement($events),
+            'log_name'     => fake()->randomElement($logNames),
+            'description'  => fake()->sentence(),
+            'event'        => fake()->randomElement($events),
             'subject_type' => fake()->randomElement($subjectTypes),
-            'subject_id' => fake()->numberBetween(1, 100),
-            'causer_type' => 'App\Models\User',
-            'causer_id' => User::factory(),
-            'properties' => [
+            'subject_id'   => fake()->numberBetween(1, 100),
+            'causer_type'  => 'App\Models\User',
+            'causer_id'    => User::factory(),
+            'properties'   => [
                 'old_values' => fake()->words(3),
                 'new_values' => fake()->words(3),
-                'changes' => fake()->words(2),
-                'metadata' => [
-                    'ip' => fake()->ipv4(),
+                'changes'    => fake()->words(2),
+                'metadata'   => [
+                    'ip'         => fake()->ipv4(),
                     'user_agent' => fake()->userAgent(),
-                    'timestamp' => fake()->dateTime()->format('Y-m-d H:i:s'),
+                    'timestamp'  => fake()->dateTime()->format('Y-m-d H:i:s'),
                 ],
             ],
-            'batch_uuid' => Str::uuid(),
-            'ip_address' => fake()->ipv4(),
-            'user_agent' => fake()->userAgent(),
-            'device_type' => fake()->randomElement($deviceTypes),
-            'browser' => fake()->randomElement($browsers),
-            'os' => fake()->randomElement($operatingSystems),
-            'country' => fake()->randomElement($countries),
+            'batch_uuid'   => Str::uuid(),
+            'ip_address'   => fake()->ipv4(),
+            'user_agent'   => fake()->userAgent(),
+            'device_type'  => fake()->randomElement($deviceTypes),
+            'browser'      => fake()->randomElement($browsers),
+            'os'           => fake()->randomElement($operatingSystems),
+            'country'      => fake()->randomElement($countries),
             'is_important' => fake()->boolean(20),  // 20% chance of being important
-            'is_system' => fake()->boolean(30),  // 30% chance of being system
-            'severity' => fake()->randomElement($severities),
-            'category' => fake()->randomElement($categories),
-            'notes' => fake()->optional(0.3)->sentence(),
-            'created_at' => fake()->dateTimeBetween('-30 days', 'now'),
-            'updated_at' => fake()->dateTimeBetween('-30 days', 'now'),
+            'is_system'    => fake()->boolean(30),  // 30% chance of being system
+            'severity'     => fake()->randomElement($severities),
+            'category'     => fake()->randomElement($categories),
+            'notes'        => fake()->optional(0.3)->sentence(),
+            'created_at'   => fake()->dateTimeBetween('-30 days', 'now'),
+            'updated_at'   => fake()->dateTimeBetween('-30 days', 'now'),
         ];
     }
 
@@ -114,7 +114,7 @@ final class ActivityLogFactory extends Factory
     public function forUser(User $user): static
     {
         return $this->state(fn (array $attributes) => [
-            'causer_id' => $user->id,
+            'causer_id'   => $user->id,
             'causer_type' => 'App\Models\User',
         ]);
     }

@@ -18,8 +18,8 @@ use OpenTelemetry\SDK\Trace\Sampler\ParentBased;
 use OpenTelemetry\SDK\Trace\Sampler\TraceIdRatioBasedSampler;
 use OpenTelemetry\SDK\Trace\SpanExporterInterface;
 use OpenTelemetry\SDK\Trace\SpanProcessor\BatchSpanProcessor;
-use OpenTelemetry\SDK\Trace\TracerProviderInterface;
 use OpenTelemetry\SDK\Trace\TracerProviderBuilder;
+use OpenTelemetry\SDK\Trace\TracerProviderInterface;
 use OpenTelemetry\SemConv\ResourceAttributes;
 use Throwable;
 
@@ -48,8 +48,8 @@ final class TelemetryManager
     /**
      * @template TReturn
      *
-     * @param  callable(?SpanInterface):TReturn  $callback
-     * @param  array<string, int|float|string|bool|null>  $attributes
+     * @param  callable(?SpanInterface):TReturn          $callback
+     * @param  array<string, int|float|string|bool|null> $attributes
      * @return TReturn
      */
     public function inSpan(string $name, callable $callback, array $attributes = [])
@@ -99,7 +99,7 @@ final class TelemetryManager
 
             $resource = $this->createResource();
 
-            $builder = (new TracerProviderBuilder())
+            $builder = (new TracerProviderBuilder)
                 ->addSpanProcessor(new BatchSpanProcessor($exporter))
                 ->setSampler($sampler)
                 ->setResource($resource);
@@ -113,7 +113,7 @@ final class TelemetryManager
         } catch (Throwable $exception) {
             Log::warning('Telemetry boot failed', [
                 'exception' => $exception::class,
-                'message' => $exception->getMessage(),
+                'message'   => $exception->getMessage(),
             ]);
             $this->enabled = false;
             $this->tracerProvider = null;
@@ -126,8 +126,8 @@ final class TelemetryManager
         $default = ResourceInfoFactory::defaultResource();
 
         $custom = ResourceInfoFactory::create(Attributes::create([
-            ResourceAttributes::SERVICE_NAME => config('observability.tracing.service_name', config('app.name', 'laravel')),
-            ResourceAttributes::SERVICE_NAMESPACE => config('observability.tracing.service_namespace', 'statybaecommerse'),
+            ResourceAttributes::SERVICE_NAME           => config('observability.tracing.service_name', config('app.name', 'laravel')),
+            ResourceAttributes::SERVICE_NAMESPACE      => config('observability.tracing.service_namespace', 'statybaecommerse'),
             ResourceAttributes::DEPLOYMENT_ENVIRONMENT => config('app.env'),
         ]));
 
@@ -142,9 +142,9 @@ final class TelemetryManager
             $transport = $this->createTransport($endpoint);
         } catch (Throwable $exception) {
             Log::warning('Telemetry transport creation failed', [
-                'endpoint' => $endpoint,
+                'endpoint'  => $endpoint,
                 'exception' => $exception::class,
-                'message' => $exception->getMessage(),
+                'message'   => $exception->getMessage(),
             ]);
 
             return null;
@@ -159,7 +159,7 @@ final class TelemetryManager
         $compression = config('observability.tracing.otlp.compression');
         $timeout = (float) config('observability.tracing.otlp.timeout', 10.0);
 
-        return (new OtlpHttpTransportFactory())->create(
+        return (new OtlpHttpTransportFactory)->create(
             $endpoint,
             'application/x-protobuf',
             $headers,
@@ -204,7 +204,7 @@ final class TelemetryManager
         } catch (Throwable $exception) {
             Log::warning('Telemetry shutdown failed', [
                 'exception' => $exception::class,
-                'message' => $exception->getMessage(),
+                'message'   => $exception->getMessage(),
             ]);
         }
     }

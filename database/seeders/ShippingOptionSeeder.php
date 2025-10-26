@@ -30,14 +30,14 @@ class ShippingOptionSeeder extends Seeder
             ShippingOption::factory()
                 ->for($zone)
                 ->state([
-                    'name' => 'DHL Express',
-                    'slug' => 'dhl-express-'.$zone->id,
-                    'description' => 'Fast and reliable express delivery',
-                    'carrier_name' => 'DHL',
-                    'service_type' => 'Express',
-                    'price' => 15.99,
-                    'is_default' => true,
-                    'sort_order' => 1,
+                    'name'               => 'DHL Express',
+                    'slug'               => 'dhl-express-' . $zone->id,
+                    'description'        => 'Fast and reliable express delivery',
+                    'carrier_name'       => 'DHL',
+                    'service_type'       => 'Express',
+                    'price'              => 15.99,
+                    'is_default'         => true,
+                    'sort_order'         => 1,
                     'estimated_days_min' => 1,
                     'estimated_days_max' => 2,
                 ])
@@ -47,13 +47,13 @@ class ShippingOptionSeeder extends Seeder
             ShippingOption::factory()
                 ->for($zone)
                 ->state([
-                    'name' => 'DHL Standard',
-                    'slug' => 'dhl-standard-'.$zone->id,
-                    'description' => 'Standard delivery service',
-                    'carrier_name' => 'DHL',
-                    'service_type' => 'Standard',
-                    'price' => 9.99,
-                    'sort_order' => 2,
+                    'name'               => 'DHL Standard',
+                    'slug'               => 'dhl-standard-' . $zone->id,
+                    'description'        => 'Standard delivery service',
+                    'carrier_name'       => 'DHL',
+                    'service_type'       => 'Standard',
+                    'price'              => 9.99,
+                    'sort_order'         => 2,
                     'estimated_days_min' => 3,
                     'estimated_days_max' => 5,
                 ])
@@ -63,13 +63,13 @@ class ShippingOptionSeeder extends Seeder
             ShippingOption::factory()
                 ->for($zone)
                 ->state([
-                    'name' => 'UPS Economy',
-                    'slug' => 'ups-economy-'.$zone->id,
-                    'description' => 'Economical delivery option',
-                    'carrier_name' => 'UPS',
-                    'service_type' => 'Economy',
-                    'price' => 6.99,
-                    'sort_order' => 3,
+                    'name'               => 'UPS Economy',
+                    'slug'               => 'ups-economy-' . $zone->id,
+                    'description'        => 'Economical delivery option',
+                    'carrier_name'       => 'UPS',
+                    'service_type'       => 'Economy',
+                    'price'              => 6.99,
+                    'sort_order'         => 3,
                     'estimated_days_min' => 5,
                     'estimated_days_max' => 7,
                 ])
@@ -80,16 +80,16 @@ class ShippingOptionSeeder extends Seeder
                 ->for($zone)
                 ->free()
                 ->state([
-                    'slug' => 'free-shipping-'.$zone->id,
-                    'description' => 'Free shipping for orders over €50',
-                    'sort_order' => 4,
-                    'min_order_amount' => 50.0,
+                    'slug'               => 'free-shipping-' . $zone->id,
+                    'description'        => 'Free shipping for orders over €50',
+                    'sort_order'         => 4,
+                    'min_order_amount'   => 50.0,
                     'estimated_days_min' => 7,
                     'estimated_days_max' => 10,
                 ])
                 ->create();
         }
 
-        $this->command->info('Shipping options seeded successfully for '.$zones->count().' zones.');
+        $this->command->info('Shipping options seeded successfully for ' . $zones->count() . ' zones.');
     }
 }

@@ -8,11 +8,14 @@ use App\Models\Category;
 use App\Models\Product;
 use App\Models\ProductImage;
 use App\Support\Storage\SecureStorage;
+use DOMDocument;
+use DOMElement;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Throwable;
 
 final class XmlCatalogService
 {
@@ -30,7 +33,7 @@ final class XmlCatalogService
         $only = $options['only'] ?? 'all';
         $result = [
             'categories' => ['created' => 0, 'updated' => 0],
-            'products' => ['created' => 0, 'updated' => 0],
+            'products'   => ['created' => 0, 'updated' => 0],
         ];
 
         DB::transaction(function () use ($xml, $only, &$result, $options): void {
@@ -49,7 +52,7 @@ final class XmlCatalogService
     {
         $only = $options['only'] ?? 'all';
 
-        $doc = new \DOMDocument('1.0', 'UTF-8');
+        $doc = new DOMDocument('1.0', 'UTF-8');
         $doc->formatOutput = true;
         $catalog = $doc->createElement('catalog');
         $doc->appendChild($catalog);
@@ -110,28 +113,28 @@ final class XmlCatalogService
                     // Base
                     $baseEl = $doc->createElement('base');
                     $fields = [
-                        'price' => $product->price,
-                        'compare_price' => $product->compare_price,
-                        'cost_price' => $product->cost_price,
-                        'sale_price' => $product->sale_price,
-                        'weight' => $product->weight,
-                        'length' => $product->length,
-                        'width' => $product->width,
-                        'height' => $product->height,
-                        'status' => $product->status,
-                        'type' => $product->type,
-                        'brand_id' => $product->brand_id,
-                        'tax_class' => $product->tax_class,
-                        'shipping_class' => $product->shipping_class,
-                        'manage_stock' => $this->boolToString((bool) $product->manage_stock),
-                        'track_stock' => $this->boolToString((bool) $product->track_stock),
-                        'allow_backorder' => $this->boolToString((bool) $product->allow_backorder),
-                        'stock_quantity' => $product->stock_quantity,
+                        'price'               => $product->price,
+                        'compare_price'       => $product->compare_price,
+                        'cost_price'          => $product->cost_price,
+                        'sale_price'          => $product->sale_price,
+                        'weight'              => $product->weight,
+                        'length'              => $product->length,
+                        'width'               => $product->width,
+                        'height'              => $product->height,
+                        'status'              => $product->status,
+                        'type'                => $product->type,
+                        'brand_id'            => $product->brand_id,
+                        'tax_class'           => $product->tax_class,
+                        'shipping_class'      => $product->shipping_class,
+                        'manage_stock'        => $this->boolToString((bool) $product->manage_stock),
+                        'track_stock'         => $this->boolToString((bool) $product->track_stock),
+                        'allow_backorder'     => $this->boolToString((bool) $product->allow_backorder),
+                        'stock_quantity'      => $product->stock_quantity,
                         'low_stock_threshold' => $product->low_stock_threshold,
-                        'minimum_quantity' => $product->minimum_quantity,
-                        'is_visible' => $this->boolToString((bool) $product->is_visible),
-                        'is_featured' => $this->boolToString((bool) $product->is_featured),
-                        'is_requestable' => $this->boolToString((bool) $product->is_requestable),
+                        'minimum_quantity'    => $product->minimum_quantity,
+                        'is_visible'          => $this->boolToString((bool) $product->is_visible),
+                        'is_featured'         => $this->boolToString((bool) $product->is_featured),
+                        'is_requestable'      => $this->boolToString((bool) $product->is_requestable),
                     ];
                     foreach ($fields as $k => $v) {
                         if ($v !== null && $v !== '') {
@@ -217,11 +220,11 @@ final class XmlCatalogService
             }
 
             $payload = $this->filterExistingColumns('categories', [
-                'slug' => $slug,
-                'is_enabled' => $this->toBool((string) ($c->base->is_enabled ?? '1')),
-                'is_visible' => $this->toBool((string) ($c->base->is_visible ?? '1')),
-                'sort_order' => (int) ((string) ($c->base->sort_order ?? '0')),
-                'show_in_menu' => $this->toBool((string) ($c->base->show_in_menu ?? '0')),
+                'slug'          => $slug,
+                'is_enabled'    => $this->toBool((string) ($c->base->is_enabled ?? '1')),
+                'is_visible'    => $this->toBool((string) ($c->base->is_visible ?? '1')),
+                'sort_order'    => (int) ((string) ($c->base->sort_order ?? '0')),
+                'show_in_menu'  => $this->toBool((string) ($c->base->show_in_menu ?? '0')),
                 'product_limit' => (int) ((string) ($c->base->product_limit ?? '0')),
             ]);
 
@@ -264,11 +267,11 @@ final class XmlCatalogService
                 foreach ($c->translations->translation as $t) {
                     $locale = (string) $t['locale'] ?: 'lt';
                     $trPayload = [
-                        'name' => trim((string) ($t->name ?? '')),
-                        'description' => trim((string) ($t->description ?? '')),
+                        'name'              => trim((string) ($t->name ?? '')),
+                        'description'       => trim((string) ($t->description ?? '')),
                         'short_description' => trim((string) ($t->short_description ?? '')),
-                        'seo_title' => trim((string) ($t->seo_title ?? '')),
-                        'seo_description' => trim((string) ($t->seo_description ?? '')),
+                        'seo_title'         => trim((string) ($t->seo_title ?? '')),
+                        'seo_description'   => trim((string) ($t->seo_description ?? '')),
                     ];
                     $trPayload = array_filter($trPayload, fn ($v) => $v !== '' && $v !== null);
                     if (! empty($trPayload)) {
@@ -403,7 +406,7 @@ final class XmlCatalogService
                 try {
                     $product = Product::query()->create($payload);
                     $created++;
-                } catch (\Throwable $e) {
+                } catch (Throwable $e) {
                     // Handle unique constraint (e.g., soft-deleted product exists with same SKU/slug)
                     $existing = null;
                     if ($sku !== '') {
@@ -447,12 +450,12 @@ final class XmlCatalogService
                 foreach ($p->translations->translation as $t) {
                     $locale = (string) $t['locale'] ?: 'lt';
                     $trPayload = [
-                        'name' => trim((string) ($t->name ?? '')),
-                        'slug' => trim((string) ($t->slug ?? '')),
-                        'description' => trim((string) ($t->description ?? '')),
+                        'name'              => trim((string) ($t->name ?? '')),
+                        'slug'              => trim((string) ($t->slug ?? '')),
+                        'description'       => trim((string) ($t->description ?? '')),
                         'short_description' => trim((string) ($t->short_description ?? '')),
-                        'seo_title' => trim((string) ($t->seo_title ?? '')),
-                        'seo_description' => trim((string) ($t->seo_description ?? '')),
+                        'seo_title'         => trim((string) ($t->seo_title ?? '')),
+                        'seo_description'   => trim((string) ($t->seo_description ?? '')),
                     ];
                     $trPayload = array_filter($trPayload, fn ($v) => $v !== '' && $v !== null);
                     if (! empty($trPayload)) {
@@ -479,8 +482,8 @@ final class XmlCatalogService
                     if ($storedPath !== '') {
                         ProductImage::query()->create([
                             'product_id' => $product->id,
-                            'path' => $storedPath,
-                            'alt_text' => $alt !== '' ? $alt : ($payload['name'] ?? $product->name ?? ''),
+                            'path'       => $storedPath,
+                            'alt_text'   => $alt !== '' ? $alt : ($payload['name'] ?? $product->name ?? ''),
                             'sort_order' => $index,
                         ]);
                         $index++;
@@ -497,7 +500,7 @@ final class XmlCatalogService
         return ['created' => $created, 'updated' => $updated];
     }
 
-    private function appendIfNotNull(\DOMDocument $doc, \DOMElement $parent, string $name, ?string $value): void
+    private function appendIfNotNull(DOMDocument $doc, DOMElement $parent, string $name, ?string $value): void
     {
         if ($value === null || $value === '') {
             return;
@@ -544,10 +547,10 @@ final class XmlCatalogService
                 if (preg_match('/^data:(.*?);base64,(.*)$/', $src, $m)) {
                     $mime = strtolower($m[1] ?? 'image/jpeg');
                     $extension = match ($mime) {
-                        'image/png' => 'png',
+                        'image/png'  => 'png',
                         'image/webp' => 'webp',
-                        'image/gif' => 'gif',
-                        default => 'jpg',
+                        'image/gif'  => 'gif',
+                        default      => 'jpg',
                     };
                     $contents = base64_decode($m[2] ?? '', true) ?: null;
                 }
@@ -565,13 +568,13 @@ final class XmlCatalogService
             if (! $contents) {
                 return '';
             }
-            $dir = 'product-images/'.(string) $product->id;
-            $filename = 'image-'.$index.'-'.Str::random(8).'.'.$extension;
-            $path = $dir.'/'.$filename;
+            $dir = 'product-images/' . (string) $product->id;
+            $filename = 'image-' . $index . '-' . Str::random(8) . '.' . $extension;
+            $path = $dir . '/' . $filename;
             Storage::disk(SecureStorage::disk())->put($path, $contents);
 
             return SecureStorage::temporarySignedUrl($path);
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             return '';
         }
     }

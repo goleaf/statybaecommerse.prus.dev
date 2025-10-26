@@ -13,14 +13,15 @@ use App\Models\DocumentTemplate;
 use App\Services\Discounts\DiscountContextBuilder;
 use App\Services\Discounts\DiscountEngine;
 use App\Services\DocumentService;
+use Carbon\CarbonInterface;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Database\Eloquent\Builder;
-use Carbon\CarbonInterface;
+use Throwable;
 
 /**
  * DiscountCodeController
@@ -45,7 +46,7 @@ final class DiscountCodeController extends Controller
     {
         return response()->json([
             'success' => false,
-            'reason' => $reason,
+            'reason'  => $reason,
             'message' => $message,
         ], $status);
     }
@@ -65,10 +66,10 @@ final class DiscountCodeController extends Controller
         if (! $code->isValid()) {
             $expiresAt = $code->expires_at instanceof CarbonInterface ? $code->expires_at : null;
             $message = match (true) {
-                $code->hasReachedLimit() => __('discount_code_limit_reached'),
+                $code->hasReachedLimit()                                       => __('discount_code_limit_reached'),
                 $expiresAt instanceof CarbonInterface && $expiresAt->lt(now()) => __('discount_code_expired_message'),
-                ! $code->is_active => __('discount_code_inactive'),
-                default => __('discount_code_invalid'),
+                ! $code->is_active                                             => __('discount_code_inactive'),
+                default                                                        => __('discount_code_invalid'),
             };
 
             return response()->json(['valid' => false, 'message' => $message], 422);
@@ -194,10 +195,10 @@ final class DiscountCodeController extends Controller
 
         // Persist or refresh the pending ledger entry so audits can trace redemption attempts.
         $ledgerMetadata = [
-            'source' => 'frontend.apply',
+            'source'       => 'frontend.apply',
             'context_hash' => hash('sha256', (string) json_encode([
                 'subtotal' => $subtotal,
-                'items' => count((array) data_get($context, 'cart.items', [])),
+                'items'    => count((array) data_get($context, 'cart.items', [])),
             ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PARTIAL_OUTPUT_ON_ERROR)),
         ];
 
@@ -210,47 +211,47 @@ final class DiscountCodeController extends Controller
 
         if ($ledger) {
             $ledger->forceFill([
-                'amount_saved' => round($discountAmount, 2),
+                'amount_saved'  => round($discountAmount, 2),
                 'currency_code' => current_currency(),
-                'metadata' => array_merge($ledger->metadata ?? [], $ledgerMetadata),
-                'redeemed_at' => null,
-                'status' => 'pending',
-                'ip_address' => $request->ip(),
-                'user_agent' => (string) $request->userAgent(),
+                'metadata'      => array_merge($ledger->metadata ?? [], $ledgerMetadata),
+                'redeemed_at'   => null,
+                'status'        => 'pending',
+                'ip_address'    => $request->ip(),
+                'user_agent'    => (string) $request->userAgent(),
             ])->save();
         } else {
             $ledger = DiscountRedemption::create([
-                'discount_id' => $discount->getKey(),
-                'code_id' => $code->getKey(),
-                'order_id' => $validated['order_id'] ?? null,
-                'user_id' => $userId,
-                'amount_saved' => round($discountAmount, 2),
+                'discount_id'   => $discount->getKey(),
+                'code_id'       => $code->getKey(),
+                'order_id'      => $validated['order_id'] ?? null,
+                'user_id'       => $userId,
+                'amount_saved'  => round($discountAmount, 2),
                 'currency_code' => current_currency(),
-                'redeemed_at' => null,
-                'status' => 'pending',
-                'metadata' => $ledgerMetadata,
-                'ip_address' => $request->ip(),
-                'user_agent' => (string) $request->userAgent(),
+                'redeemed_at'   => null,
+                'status'        => 'pending',
+                'metadata'      => $ledgerMetadata,
+                'ip_address'    => $request->ip(),
+                'user_agent'    => (string) $request->userAgent(),
             ]);
         }
 
         $payload = [
-            'id' => $code->getKey(),
-            'code' => $code->code,
-            'discount_id' => $discount->getKey(),
-            'discount_amount' => round($discountAmount, 2),
+            'id'                => $code->getKey(),
+            'code'              => $code->code,
+            'discount_id'       => $discount->getKey(),
+            'discount_amount'   => round($discountAmount, 2),
             'shipping_discount' => round($shippingDiscount, 2),
-            'is_stackable' => (bool) $code->is_stackable,
-            'ledger_id' => $ledger?->getKey(),
-            'pricing' => $pricing,
+            'is_stackable'      => (bool) $code->is_stackable,
+            'ledger_id'         => $ledger?->getKey(),
+            'pricing'           => $pricing,
         ];
 
         session()->put('checkout.discount_code', $payload);
 
         return response()->json([
-            'success' => true,
-            'reason' => null,
-            'message' => __('discount_code_success'),
+            'success'       => true,
+            'reason'        => null,
+            'message'       => __('discount_code_success'),
             'discount_code' => $payload,
         ]);
     }
@@ -274,7 +275,7 @@ final class DiscountCodeController extends Controller
             ->first();
         if ($redemption) {
             $redemption->forceFill([
-                'status' => 'cancelled',
+                'status'      => 'cancelled',
                 'redeemed_at' => null,
             ])->save();
         }
@@ -333,15 +334,15 @@ final class DiscountCodeController extends Controller
             $expiresAt = $code->expires_at instanceof CarbonInterface ? $code->expires_at : null;
 
             return [
-                'id' => $code->id,
-                'code' => $code->code,
+                'id'          => $code->id,
+                'code'        => $code->code,
                 'description' => $code->description,
-                'discount' => [
-                    'name' => $discount->name,
-                    'type' => $discount->type,
+                'discount'    => [
+                    'name'  => $discount->name,
+                    'type'  => $discount->type,
                     'value' => $discount->value,
                 ],
-                'expires_at' => $expiresAt?->format('d/m/Y'),
+                'expires_at'     => $expiresAt?->format('d/m/Y'),
                 'remaining_uses' => $code->remaining_uses,
             ];
         })->values();
@@ -362,7 +363,7 @@ final class DiscountCodeController extends Controller
 
             if (! $discountCode->discount instanceof Discount) {
                 return response()->json([
-                    'error' => 'Discount data unavailable',
+                    'error'   => 'Discount data unavailable',
                     'message' => __('discount_code_invalid'),
                 ], 422);
             }
@@ -373,18 +374,18 @@ final class DiscountCodeController extends Controller
 
             // Prepare the variable map that will be injected into the template.
             $variables = [
-                'DISCOUNT_CODE' => $discountCode->code,
-                'DISCOUNT_NAME' => $discount->name,
+                'DISCOUNT_CODE'        => $discountCode->code,
+                'DISCOUNT_NAME'        => $discount->name,
                 'DISCOUNT_DESCRIPTION' => $discountCode->description,
-                'DISCOUNT_VALUE' => $discount->value,
-                'DISCOUNT_TYPE' => $discount->type,
-                'USAGE_LIMIT' => $discountCode->usage_limit ?? 'Unlimited',
-                'USAGE_COUNT' => $discountCode->usage_count,
-                'REMAINING_USES' => $discountCode->remaining_uses ?? 'Unlimited',
-                'STARTS_AT' => $startsAt?->format('d/m/Y H:i') ?? 'Immediately',
-                'EXPIRES_AT' => $expiresAt?->format('d/m/Y H:i') ?? 'Never',
-                'STATUS' => $discountCode->status,
-                'IS_ACTIVE' => $discountCode->is_active ? 'Yes' : 'No',
+                'DISCOUNT_VALUE'       => $discount->value,
+                'DISCOUNT_TYPE'        => $discount->type,
+                'USAGE_LIMIT'          => $discountCode->usage_limit ?? 'Unlimited',
+                'USAGE_COUNT'          => $discountCode->usage_count,
+                'REMAINING_USES'       => $discountCode->remaining_uses ?? 'Unlimited',
+                'STARTS_AT'            => $startsAt?->format('d/m/Y H:i') ?? 'Immediately',
+                'EXPIRES_AT'           => $expiresAt?->format('d/m/Y H:i') ?? 'Never',
+                'STATUS'               => $discountCode->status,
+                'IS_ACTIVE'            => $discountCode->is_active ? 'Yes' : 'No',
             ];
 
             $document = $this->documentService->generateDocument($template, $discountCode, $variables);
@@ -396,8 +397,8 @@ final class DiscountCodeController extends Controller
 
                 if ($request->wantsJson()) {
                     return response()->json([
-                        'success' => true,
-                        'document_id' => $document->id,
+                        'success'      => true,
+                        'document_id'  => $document->id,
                         'download_url' => $downloadUrl,
                     ]);
                 }
@@ -408,10 +409,10 @@ final class DiscountCodeController extends Controller
             return response($document->content, 200, ['Content-Type' => 'text/html']);
         } catch (ModelNotFoundException $exception) {
             return response()->json([
-                'error' => 'Template not found',
+                'error'   => 'Template not found',
                 'message' => $exception->getMessage(),
             ], 404);
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             return response()->json(['error' => 'Failed to generate document', 'message' => $e->getMessage()], 500);
         }
     }

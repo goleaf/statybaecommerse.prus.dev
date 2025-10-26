@@ -7,6 +7,9 @@ namespace App\Jobs;
 use App\Models\Brand;
 use App\Models\Product;
 use Carbon\Carbon;
+
+use function collect;
+
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
@@ -15,7 +18,6 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\LazyCollection;
 use Illuminate\Support\Str;
 use Throwable;
-use function collect;
 
 /**
  * ImportProductsChunk
@@ -32,11 +34,9 @@ class ImportProductsChunk implements ShouldQueue
     public int $tries = 5;
 
     /**
-     * @param  array<int, array<string, mixed>>  $rows
+     * @param array<int, array<string, mixed>> $rows
      */
-    public function __construct(private readonly array $rows)
-    {
-    }
+    public function __construct(private readonly array $rows) {}
 
     /**
      * Define retry backoff windows (in seconds).
@@ -73,8 +73,8 @@ class ImportProductsChunk implements ShouldQueue
                     $this->processRow($row);
                 } catch (Throwable $exception) {
                     Log::error('Product import row failed.', [
-                        'slug' => $row['slug'] ?? null,
-                        'name' => $row['name'] ?? null,
+                        'slug'  => $row['slug'] ?? null,
+                        'name'  => $row['name'] ?? null,
                         'error' => $exception->getMessage(),
                     ]);
                 }
@@ -106,7 +106,7 @@ class ImportProductsChunk implements ShouldQueue
     }
 
     /**
-     * @param  array<string, mixed>  $row
+     * @param array<string, mixed> $row
      */
     private function processRow(array $row): void
     {

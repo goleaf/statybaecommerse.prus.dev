@@ -20,30 +20,30 @@ final class ProductVariantTabsTest extends TestCase
         $this->withoutVite();
 
         ProductVariant::factory()->create([
-            'track_inventory' => false,
-            'available_quantity' => 0,
-            'stock_quantity' => 0,
+            'track_inventory'     => false,
+            'available_quantity'  => 0,
+            'stock_quantity'      => 0,
             'low_stock_threshold' => 5,
         ]);
 
         ProductVariant::factory()->create([
-            'track_inventory' => true,
-            'available_quantity' => 10,
-            'stock_quantity' => 12,
+            'track_inventory'     => true,
+            'available_quantity'  => 10,
+            'stock_quantity'      => 12,
             'low_stock_threshold' => 5,
         ]);
 
         ProductVariant::factory()->create([
-            'track_inventory' => true,
-            'available_quantity' => 2,
-            'stock_quantity' => 4,
+            'track_inventory'     => true,
+            'available_quantity'  => 2,
+            'stock_quantity'      => 4,
             'low_stock_threshold' => 5,
         ]);
 
         ProductVariant::factory()->create([
-            'track_inventory' => true,
-            'available_quantity' => 0,
-            'stock_quantity' => 3,
+            'track_inventory'     => true,
+            'available_quantity'  => 0,
+            'stock_quantity'      => 3,
             'low_stock_threshold' => 5,
         ]);
     }

@@ -66,17 +66,17 @@ class ProductTranslationFactory extends Factory
         $name = $this->faker->words(3, true);
 
         return [
-            'product_id' => Product::factory(),
-            'locale' => $this->faker->randomElement(['lt', 'en']),
-            'name' => $name,
-            'slug' => \Illuminate\Support\Str::slug($name),
-            'summary' => $this->faker->sentence(10),
-            'description' => $this->faker->paragraphs(3, true),
+            'product_id'        => Product::factory(),
+            'locale'            => $this->faker->randomElement(['lt', 'en']),
+            'name'              => $name,
+            'slug'              => \Illuminate\Support\Str::slug($name),
+            'summary'           => $this->faker->sentence(10),
+            'description'       => $this->faker->paragraphs(3, true),
             'short_description' => $this->faker->sentence(5),
-            'seo_title' => $name.' - '.$this->faker->words(2, true),
-            'seo_description' => $this->faker->sentence(15),
-            'meta_keywords' => $this->faker->words(5),
-            'alt_text' => $this->faker->sentence(3),
+            'seo_title'         => $name . ' - ' . $this->faker->words(2, true),
+            'seo_description'   => $this->faker->sentence(15),
+            'meta_keywords'     => $this->faker->words(5),
+            'alt_text'          => $this->faker->sentence(3),
         ];
     }
 
@@ -84,7 +84,7 @@ class ProductTranslationFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'locale' => 'lt',
-            'name' => $this->faker->randomElement([
+            'name'   => $this->faker->randomElement([
                 'Elektrinis perforatorius',
                 'Kampuotasis šlifuoklis',
                 'Elektrinis pjūklas',
@@ -103,7 +103,7 @@ class ProductTranslationFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'locale' => 'en',
-            'name' => $this->faker->randomElement([
+            'name'   => $this->faker->randomElement([
                 'Electric Drill',
                 'Angle Grinder',
                 'Electric Saw',

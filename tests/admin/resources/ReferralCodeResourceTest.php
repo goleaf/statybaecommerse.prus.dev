@@ -39,30 +39,30 @@ final class ReferralCodeResourceTest extends TestCase
 
         Livewire::test(ReferralCodeResource\Pages\CreateReferralCode::class)
             ->fillForm([
-                'user_id' => $user->id,
-                'code' => 'TEST123',
-                'is_active' => true,
-                'title' => ['lt' => 'Test kodas', 'en' => 'Test code'],
-                'description' => ['lt' => 'Test aprašymas', 'en' => 'Test description'],
-                'usage_limit' => 100,
+                'user_id'       => $user->id,
+                'code'          => 'TEST123',
+                'is_active'     => true,
+                'title'         => ['lt' => 'Test kodas', 'en' => 'Test code'],
+                'description'   => ['lt' => 'Test aprašymas', 'en' => 'Test description'],
+                'usage_limit'   => 100,
                 'reward_amount' => 10.50,
-                'reward_type' => 'fixed',
-                'source' => 'admin',
-                'campaign_id' => $campaign->id,
-                'tags' => ['test', 'promo'],
+                'reward_type'   => 'fixed',
+                'source'        => 'admin',
+                'campaign_id'   => $campaign->id,
+                'tags'          => ['test', 'promo'],
             ])
             ->call('create')
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('referral_codes', [
-            'user_id' => $user->id,
-            'code' => 'TEST123',
-            'is_active' => true,
-            'usage_limit' => 100,
+            'user_id'       => $user->id,
+            'code'          => 'TEST123',
+            'is_active'     => true,
+            'usage_limit'   => 100,
             'reward_amount' => 10.50,
-            'reward_type' => 'fixed',
-            'source' => 'admin',
-            'campaign_id' => $campaign->id,
+            'reward_type'   => 'fixed',
+            'source'        => 'admin',
+            'campaign_id'   => $campaign->id,
         ]);
     }
 
@@ -75,22 +75,22 @@ final class ReferralCodeResourceTest extends TestCase
             'record' => $referralCode->getRouteKey(),
         ])
             ->fillForm([
-                'user_id' => $newUser->id,
-                'code' => 'UPDATED123',
-                'is_active' => false,
-                'title' => ['lt' => 'Atnaujintas kodas', 'en' => 'Updated code'],
-                'usage_limit' => 200,
+                'user_id'       => $newUser->id,
+                'code'          => 'UPDATED123',
+                'is_active'     => false,
+                'title'         => ['lt' => 'Atnaujintas kodas', 'en' => 'Updated code'],
+                'usage_limit'   => 200,
                 'reward_amount' => 25.00,
             ])
             ->call('save')
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('referral_codes', [
-            'id' => $referralCode->id,
-            'user_id' => $newUser->id,
-            'code' => 'UPDATED123',
-            'is_active' => false,
-            'usage_limit' => 200,
+            'id'            => $referralCode->id,
+            'user_id'       => $newUser->id,
+            'code'          => 'UPDATED123',
+            'is_active'     => false,
+            'usage_limit'   => 200,
             'reward_amount' => 25.00,
         ]);
     }
@@ -103,8 +103,8 @@ final class ReferralCodeResourceTest extends TestCase
             'record' => $referralCode->getRouteKey(),
         ])
             ->assertFormSet([
-                'user_id' => $referralCode->user_id,
-                'code' => $referralCode->code,
+                'user_id'   => $referralCode->user_id,
+                'code'      => $referralCode->code,
                 'is_active' => $referralCode->is_active,
             ]);
     }
@@ -135,11 +135,11 @@ final class ReferralCodeResourceTest extends TestCase
     public function test_can_filter_expired_referral_codes(): void
     {
         $expiredCode = ReferralCode::factory()->create([
-            'is_active' => false,
+            'is_active'  => false,
             'expires_at' => now()->subDay(),
         ]);
         $activeCode = ReferralCode::factory()->create([
-            'is_active' => true,
+            'is_active'  => true,
             'expires_at' => now()->addDay(),
         ]);
 
@@ -239,8 +239,8 @@ final class ReferralCodeResourceTest extends TestCase
     {
         Livewire::test(ReferralCodeResource\Pages\CreateReferralCode::class)
             ->fillForm([
-                'user_id' => null,
-                'code' => '',
+                'user_id'   => null,
+                'code'      => '',
                 'is_active' => null,
             ])
             ->call('create')
@@ -254,8 +254,8 @@ final class ReferralCodeResourceTest extends TestCase
 
         Livewire::test(ReferralCodeResource\Pages\CreateReferralCode::class)
             ->fillForm([
-                'user_id' => $user->id,
-                'code' => 'UNIQUE123',
+                'user_id'   => $user->id,
+                'code'      => 'UNIQUE123',
                 'is_active' => true,
             ])
             ->call('create')

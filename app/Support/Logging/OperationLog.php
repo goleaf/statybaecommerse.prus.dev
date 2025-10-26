@@ -15,8 +15,7 @@ final class OperationLog
         private readonly string $operation,
         private readonly array $context,
         private readonly float $startedAt
-    ) {
-    }
+    ) {}
 
     public function context(): array
     {

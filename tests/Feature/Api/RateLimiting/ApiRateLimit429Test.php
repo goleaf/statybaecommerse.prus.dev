@@ -23,7 +23,7 @@ final class ApiRateLimit429Test extends RateLimitTestCase
         Sanctum::actingAs($user, ['profile.read'], 'sanctum');
 
         $ipKey = 'ip:127.0.0.1';
-        $userKey = 'user:'.$user->getAuthIdentifier();
+        $userKey = 'user:' . $user->getAuthIdentifier();
         RateLimiter::clear($ipKey);
         RateLimiter::clear($userKey);
 
@@ -42,11 +42,11 @@ final class ApiRateLimit429Test extends RateLimitTestCase
         $user = $this->makeSanctumUser(202);
         Sanctum::actingAs($user, ['profile.read', 'system.autocomplete'], 'sanctum');
 
-        $key = 'user:'.$user->getAuthIdentifier().'|autocomplete';
+        $key = 'user:' . $user->getAuthIdentifier() . '|autocomplete';
         RateLimiter::clear($key);
 
         $payload = [
-            'model_class' => User::class,
+            'model_class'  => User::class,
             'search_query' => 'demo',
         ];
 
@@ -85,12 +85,12 @@ final class ApiRateLimit429Test extends RateLimitTestCase
         return Export::unguarded(function (): Export {
             /** @var Export $export */
             $export = Export::query()->create([
-                'uuid' => (string) Str::uuid(),
-                'name' => 'Rate Limit Export',
-                'format' => 'csv',
-                'status' => ExportStatus::Completed,
-                'artifact_disk' => 'secure-media',
-                'artifact_path' => 'exports/rate-limit.csv',
+                'uuid'              => (string) Str::uuid(),
+                'name'              => 'Rate Limit Export',
+                'format'            => 'csv',
+                'status'            => ExportStatus::Completed,
+                'artifact_disk'     => 'secure-media',
+                'artifact_path'     => 'exports/rate-limit.csv',
                 'artifact_filename' => 'rate-limit.csv',
             ]);
 

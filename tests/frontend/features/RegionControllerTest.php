@@ -43,7 +43,7 @@ final class RegionControllerTest extends TestCase
 
         $response = $this->get(route('regions.index', [
             'country' => $country->id,
-            'level' => 1,
+            'level'   => 1,
         ]));
 
         $response->assertOk();
@@ -149,7 +149,7 @@ final class RegionControllerTest extends TestCase
         $parentRegion = Region::factory()->create(['country_id' => $country->id]);
         $region = Region::factory()->create([
             'country_id' => $country->id,
-            'parent_id' => $parentRegion->id,
+            'parent_id'  => $parentRegion->id,
         ]);
 
         $response = $this->get(route('regions.show', $region));

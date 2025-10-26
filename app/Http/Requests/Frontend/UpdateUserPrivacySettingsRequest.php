@@ -16,7 +16,7 @@ class UpdateUserPrivacySettingsRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'privacy_settings' => ['nullable', 'array'],
+            'privacy_settings'   => ['nullable', 'array'],
             'privacy_settings.*' => ['boolean'],
         ];
     }

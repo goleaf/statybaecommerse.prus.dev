@@ -16,18 +16,18 @@ it('can create product with translations', function () {
 
     // Create translations
     ProductTranslation::create([
-        'product_id' => $product->id,
-        'locale' => 'en',
-        'name' => 'Test Product EN',
-        'slug' => 'test-product-en',
+        'product_id'  => $product->id,
+        'locale'      => 'en',
+        'name'        => 'Test Product EN',
+        'slug'        => 'test-product-en',
         'description' => 'English description',
     ]);
 
     ProductTranslation::create([
-        'product_id' => $product->id,
-        'locale' => 'lt',
-        'name' => 'Testas Produktas',
-        'slug' => 'testas-produktas',
+        'product_id'  => $product->id,
+        'locale'      => 'lt',
+        'name'        => 'Testas Produktas',
+        'slug'        => 'testas-produktas',
         'description' => 'Lietuviškas aprašymas',
     ]);
 

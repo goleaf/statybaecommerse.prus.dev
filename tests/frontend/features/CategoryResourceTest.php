@@ -66,8 +66,8 @@ class CategoryResourceTest extends TestCase
     public function test_category_table_has_required_columns(): void
     {
         $category = Category::factory()->create([
-            'name' => 'Test Category',
-            'slug' => 'test-category',
+            'name'       => 'Test Category',
+            'slug'       => 'test-category',
             'is_visible' => true,
         ]);
 
@@ -103,7 +103,7 @@ class CategoryResourceTest extends TestCase
         $category2 = Category::factory()->create(['name' => 'Another Category']);
 
         $this->actingAs($this->user)
-            ->get(CategoryResource::getUrl('index').'?search=Unique')
+            ->get(CategoryResource::getUrl('index') . '?search=Unique')
             ->assertSee('Unique Category Name')
             ->assertDontSee('Another Category');
     }
@@ -158,7 +158,7 @@ class CategoryResourceTest extends TestCase
     {
         $parentCategory = Category::factory()->create(['name' => 'Parent Category']);
         $childCategory = Category::factory()->create([
-            'name' => 'Child Category',
+            'name'      => 'Child Category',
             'parent_id' => $parentCategory->id,
         ]);
 

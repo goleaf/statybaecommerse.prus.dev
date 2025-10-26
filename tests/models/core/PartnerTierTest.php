@@ -16,21 +16,21 @@ final class PartnerTierTest extends TestCase
     public function test_partner_tier_can_be_created(): void
     {
         $partnerTier = PartnerTier::factory()->create([
-            'name' => 'Gold Tier',
-            'code' => 'GOLD',
-            'discount_rate' => 0.10,
-            'commission_rate' => 0.05,
+            'name'                => 'Gold Tier',
+            'code'                => 'GOLD',
+            'discount_rate'       => 0.10,
+            'commission_rate'     => 0.05,
             'minimum_order_value' => 1000.00,
-            'is_enabled' => true,
+            'is_enabled'          => true,
         ]);
 
         $this->assertDatabaseHas('partner_tiers', [
-            'name' => 'Gold Tier',
-            'code' => 'GOLD',
-            'discount_rate' => 0.10,
-            'commission_rate' => 0.05,
+            'name'                => 'Gold Tier',
+            'code'                => 'GOLD',
+            'discount_rate'       => 0.10,
+            'commission_rate'     => 0.05,
             'minimum_order_value' => 1000.00,
-            'is_enabled' => true,
+            'is_enabled'          => true,
         ]);
     }
 
@@ -52,11 +52,11 @@ final class PartnerTierTest extends TestCase
     public function test_partner_tier_has_correct_casts(): void
     {
         $partnerTier = PartnerTier::factory()->create([
-            'discount_rate' => '0.10',
-            'commission_rate' => '0.05',
+            'discount_rate'       => '0.10',
+            'commission_rate'     => '0.05',
             'minimum_order_value' => '1000.00',
-            'is_enabled' => '1',
-            'benefits' => ['key' => 'value'],
+            'is_enabled'          => '1',
+            'benefits'            => ['key' => 'value'],
         ]);
 
         $this->assertIsNumeric($partnerTier->discount_rate);
@@ -118,11 +118,11 @@ final class PartnerTierTest extends TestCase
     {
         $benefits = [
             [
-                'key' => 'Priority Support',
+                'key'   => 'Priority Support',
                 'value' => '24/7 dedicated support',
             ],
             [
-                'key' => 'Marketing Materials',
+                'key'   => 'Marketing Materials',
                 'value' => 'Access to exclusive resources',
             ],
         ];

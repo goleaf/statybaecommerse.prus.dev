@@ -22,10 +22,10 @@ beforeEach(function (): void {
     $adminRole->givePermissionTo($additionalPermissions);
 
     $this->admin = User::factory()->create([
-        'name' => 'Test Admin',
-        'email' => 'admin@test.com',
+        'name'      => 'Test Admin',
+        'email'     => 'admin@test.com',
         'is_active' => true,
-        'is_admin' => true,
+        'is_admin'  => true,
     ]);
     $this->admin->assignRole($adminRole);
 });
@@ -58,9 +58,9 @@ it('can access advanced reports page', function (): void {
 
 it('can impersonate users', function (): void {
     $customer = User::factory()->create([
-        'name' => 'Test Customer',
-        'email' => 'customer@test.com',
-        'is_admin' => false,
+        'name'      => 'Test Customer',
+        'email'     => 'customer@test.com',
+        'is_admin'  => false,
         'is_active' => true,
     ]);
 
@@ -92,7 +92,7 @@ it('can update product stock through inventory management', function (): void {
     Livewire::actingAs($this->admin)
         ->test(\App\Filament\Pages\InventoryManagement::class)
         ->callTableAction('update_stock', $product, [
-            'stock_quantity' => 25,
+            'stock_quantity'      => 25,
             'low_stock_threshold' => 5,
         ]);
 
@@ -107,7 +107,7 @@ it('can perform bulk stock updates', function (): void {
         ->test(\App\Filament\Pages\InventoryManagement::class)
         ->callTableBulkAction('bulk_stock_update', $products, [
             'operation' => 'increase',
-            'quantity' => 5,
+            'quantity'  => 5,
         ]);
 
     foreach ($products as $product) {
@@ -123,9 +123,9 @@ it('can send notifications to users', function (): void {
         ->assertSuccessful()
         ->mountTableAction('send_notification', $customer)
         ->setTableActionData([
-            'title' => 'Test Notification',
+            'title'   => 'Test Notification',
             'message' => 'This is a test message',
-            'type' => 'info',
+            'type'    => 'info',
         ])
         ->callMountedTableAction();
 

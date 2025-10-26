@@ -8,44 +8,44 @@ return [
     'navigation' => [
         'groups' => [
             [
-                'key' => 'dashboard',
+                'key'   => 'dashboard',
                 'label' => 'admin.navigation.dashboard',
-                'icon' => 'heroicon-o-home',
+                'icon'  => 'heroicon-o-home',
             ],
             [
-                'key' => 'commerce',
+                'key'   => 'commerce',
                 'label' => 'admin.navigation.commerce',
-                'icon' => 'heroicon-o-shopping-bag',
+                'icon'  => 'heroicon-o-shopping-bag',
             ],
             [
-                'key' => AdminNavigationGroup::Products->value,
+                'key'   => AdminNavigationGroup::Products->value,
                 'label' => 'admin.navigation.products',
-                'icon' => 'heroicon-o-cube',
+                'icon'  => 'heroicon-o-cube',
             ],
             [
-                'key' => AdminNavigationGroup::Marketing->value,
+                'key'   => AdminNavigationGroup::Marketing->value,
                 'label' => 'admin.navigation.marketing',
-                'icon' => 'heroicon-o-megaphone',
+                'icon'  => 'heroicon-o-megaphone',
             ],
             [
-                'key' => AdminNavigationGroup::Content->value,
+                'key'   => AdminNavigationGroup::Content->value,
                 'label' => 'admin.navigation.content',
-                'icon' => 'heroicon-o-document-text',
+                'icon'  => 'heroicon-o-document-text',
             ],
             [
-                'key' => AdminNavigationGroup::Analytics->value,
+                'key'   => AdminNavigationGroup::Analytics->value,
                 'label' => 'admin.navigation.analytics',
-                'icon' => 'heroicon-o-chart-bar',
+                'icon'  => 'heroicon-o-chart-bar',
             ],
             [
-                'key' => AdminNavigationGroup::System->value,
+                'key'   => AdminNavigationGroup::System->value,
                 'label' => 'admin.navigation.system',
-                'icon' => 'heroicon-o-cog-6-tooth',
+                'icon'  => 'heroicon-o-cog-6-tooth',
             ],
             [
-                'key' => 'recommendation-system',
+                'key'   => 'recommendation-system',
                 'label' => 'translations.recommendation_system',
-                'icon' => 'heroicon-o-sparkles',
+                'icon'  => 'heroicon-o-sparkles',
             ],
         ],
         'resources' => [

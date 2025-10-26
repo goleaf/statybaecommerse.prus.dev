@@ -14,23 +14,23 @@ use Livewire\Component;
  *
  * Livewire component for AdvancedSearch with reactive frontend functionality, real-time updates, and user interaction handling.
  *
- * @property string $query
- * @property array $results
- * @property bool $showResults
- * @property bool $showFilters
- * @property int $maxResults
- * @property int $minQueryLength
- * @property bool $isSearching
- * @property array $selectedCategories
- * @property array $selectedBrands
- * @property array $selectedCollections
+ * @property string     $query
+ * @property array      $results
+ * @property bool       $showResults
+ * @property bool       $showFilters
+ * @property int        $maxResults
+ * @property int        $minQueryLength
+ * @property bool       $isSearching
+ * @property array      $selectedCategories
+ * @property array      $selectedBrands
+ * @property array      $selectedCollections
  * @property float|null $minPrice
  * @property float|null $maxPrice
- * @property bool $inStockOnly
- * @property string $sortBy
- * @property array $availableCategories
- * @property array $availableBrands
- * @property array $availableCollections
+ * @property bool       $inStockOnly
+ * @property string     $sortBy
+ * @property array      $availableCategories
+ * @property array      $availableBrands
+ * @property array      $availableCollections
  */
 final class AdvancedSearch extends Component
 {
@@ -195,11 +195,11 @@ final class AdvancedSearch extends Component
     public function sortResults(array $results): array
     {
         return match ($this->sortBy) {
-            'price_low' => $this->sortByPrice($results, 'asc'),
+            'price_low'  => $this->sortByPrice($results, 'asc'),
             'price_high' => $this->sortByPrice($results, 'desc'),
-            'name' => $this->sortByName($results),
-            'relevance' => $this->sortByRelevance($results),
-            default => $results,
+            'name'       => $this->sortByName($results),
+            'relevance'  => $this->sortByRelevance($results),
+            default      => $results,
         };
     }
 

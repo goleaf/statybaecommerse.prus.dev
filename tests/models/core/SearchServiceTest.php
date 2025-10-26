@@ -25,11 +25,11 @@ final class SearchServiceTest extends TestCase
         $this->searchService = app(SearchService::class);
         Cache::flush();
         config([
-            'search.driver' => 'database',
-            'search.scout.enabled' => false,
-            'scout.driver' => 'collection',
-            'cache.default' => 'array',
-            'cache.stores.array' => ['driver' => 'array'],
+            'search.driver'         => 'database',
+            'search.scout.enabled'  => false,
+            'scout.driver'          => 'collection',
+            'cache.default'         => 'array',
+            'cache.stores.array'    => ['driver' => 'array'],
             'database.redis.client' => 'predis',
         ]);
     }
@@ -87,7 +87,7 @@ final class SearchServiceTest extends TestCase
 
         // Create a product for this brand to satisfy the products_count > 0 condition
         $this->createPublishedProduct([
-            'name' => 'Brand Product',
+            'name'     => 'Brand Product',
             'brand_id' => $brand->id,
         ]);
 
@@ -146,12 +146,12 @@ final class SearchServiceTest extends TestCase
     public function test_search_includes_featured_products_bonus(): void
     {
         $regularProduct = $this->createPublishedProduct([
-            'name' => 'Regular Test Product',
+            'name'        => 'Regular Test Product',
             'is_featured' => false,
         ]);
 
         $featuredProduct = $this->createPublishedProduct([
-            'name' => 'Featured Test Product',
+            'name'        => 'Featured Test Product',
             'is_featured' => true,
         ]);
 
@@ -185,9 +185,9 @@ final class SearchServiceTest extends TestCase
     public function test_search_uses_scout_when_enabled(): void
     {
         config([
-            'search.driver' => 'scout',
+            'search.driver'        => 'scout',
             'search.scout.enabled' => true,
-            'scout.driver' => 'collection',
+            'scout.driver'         => 'collection',
         ]);
 
         $brand = $this->createSearchableBrand([
@@ -200,9 +200,9 @@ final class SearchServiceTest extends TestCase
         ]);
 
         $product = $this->createPublishedProduct([
-            'name' => 'Scout Drill',
+            'name'     => 'Scout Drill',
             'brand_id' => $brand->id,
-            'price' => 199.00,
+            'price'    => 199.00,
         ]);
 
         $category->products()->attach($product);
@@ -281,9 +281,9 @@ final class SearchServiceTest extends TestCase
     public function test_search_excludes_invisible_products(): void
     {
         Product::factory()->create([
-            'name' => 'Invisible Test Product',
-            'is_visible' => false,
-            'status' => 'published',
+            'name'         => 'Invisible Test Product',
+            'is_visible'   => false,
+            'status'       => 'published',
             'published_at' => now()->subDay(),
         ]);
 
@@ -301,9 +301,9 @@ final class SearchServiceTest extends TestCase
     public function test_search_excludes_unpublished_products(): void
     {
         Product::factory()->create([
-            'name' => 'Future Test Product',
-            'is_visible' => true,
-            'status' => 'published',
+            'name'         => 'Future Test Product',
+            'is_visible'   => true,
+            'status'       => 'published',
             'published_at' => now()->addDay(),
         ]);
 
@@ -321,8 +321,8 @@ final class SearchServiceTest extends TestCase
     private function createPublishedProduct(array $attributes = []): Product
     {
         return Product::factory()->create(array_merge([
-            'is_visible' => true,
-            'status' => 'published',
+            'is_visible'   => true,
+            'status'       => 'published',
             'published_at' => now()->subDay(),
         ], $attributes));
     }
@@ -332,7 +332,7 @@ final class SearchServiceTest extends TestCase
         $defaults = $this->filterAttributesForTable('categories', [
             'is_visible' => true,
             'is_enabled' => true,
-            'is_active' => true,
+            'is_active'  => true,
         ]);
 
         return Category::factory()->create(array_merge($defaults, $attributes));
@@ -342,7 +342,7 @@ final class SearchServiceTest extends TestCase
     {
         $defaults = $this->filterAttributesForTable('brands', [
             'is_enabled' => true,
-            'is_active' => true,
+            'is_active'  => true,
             'is_visible' => true,
         ]);
 
@@ -350,7 +350,7 @@ final class SearchServiceTest extends TestCase
     }
 
     /**
-     * @param  array<string, mixed>  $attributes
+     * @param  array<string, mixed> $attributes
      * @return array<string, mixed>
      */
     private function filterAttributesForTable(string $table, array $attributes): array

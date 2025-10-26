@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 return [
     // Navigation
     'navigation' => [
@@ -8,43 +10,43 @@ return [
 
     // Models
     'models' => [
-        'partner_tier' => 'Partnerių lygių',
+        'partner_tier'  => 'Partnerių lygių',
         'partner_tiers' => 'Partnerių lygių',
     ],
 
     // Fields
     'fields' => [
-        'name' => 'Pavadinimas',
-        'code' => 'Kodas',
-        'is_enabled' => 'Įjungtas',
-        'discount_rate' => 'Nuolaidos procentas',
-        'commission_rate' => 'Komisijos procentas',
+        'name'                => 'Pavadinimas',
+        'code'                => 'Kodas',
+        'is_enabled'          => 'Įjungtas',
+        'discount_rate'       => 'Nuolaidos procentas',
+        'commission_rate'     => 'Komisijos procentas',
         'minimum_order_value' => 'Minimali užsakymo vertė',
-        'benefits' => 'Privalumai',
-        'created_at' => 'Sukurta',
-        'updated_at' => 'Atnaujinta',
+        'benefits'            => 'Privalumai',
+        'created_at'          => 'Sukurta',
+        'updated_at'          => 'Atnaujinta',
     ],
 
     // Sections
     'sections' => [
-        'basic_information' => 'Pagrindinė informacija',
+        'basic_information'  => 'Pagrindinė informacija',
         'financial_settings' => 'Finansiniai nustatymai',
-        'benefits' => 'Privalumai',
+        'benefits'           => 'Privalumai',
     ],
 
     // Actions
     'actions' => [
         'create' => 'Sukurti',
-        'view' => 'Peržiūrėti',
-        'edit' => 'Redaguoti',
+        'view'   => 'Peržiūrėti',
+        'edit'   => 'Redaguoti',
         'delete' => 'Ištrinti',
     ],
 
     // Help text
-    'name_help' => 'Lygių pavadinimas',
-    'code_help' => 'Unikalus lygių kodas',
-    'discount_rate_help' => 'Nuolaidos procentas (0-100)',
-    'commission_rate_help' => 'Komisijos procentas (0-100)',
+    'name_help'                => 'Lygių pavadinimas',
+    'code_help'                => 'Unikalus lygių kodas',
+    'discount_rate_help'       => 'Nuolaidos procentas (0-100)',
+    'commission_rate_help'     => 'Komisijos procentas (0-100)',
     'minimum_order_value_help' => 'Minimali užsakymo vertė (€)',
-    'benefits_help' => 'Lygių privalumai',
+    'benefits_help'            => 'Lygių privalumai',
 ];

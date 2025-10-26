@@ -17,4 +17,3 @@ final class DiscountConditionTestRequestTest extends TestCase
             ->assertStatus(422);
     }
 }
-

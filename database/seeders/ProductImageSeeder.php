@@ -35,8 +35,8 @@ final class ProductImageSeeder extends Seeder
     private function createProductImages($products): void
     {
         $imageTypes = [
-            'main' => ['main', 'primary', 'hero'],
-            'gallery' => ['gallery', 'detail', 'close-up', 'angle'],
+            'main'      => ['main', 'primary', 'hero'],
+            'gallery'   => ['gallery', 'detail', 'close-up', 'angle'],
             'lifestyle' => ['lifestyle', 'in-use', 'context'],
             'technical' => ['technical', 'specification', 'diagram'],
         ];
@@ -55,7 +55,7 @@ final class ProductImageSeeder extends Seeder
                 $this->createImageForProduct(
                     $product,
                     'gallery',
-                    'Gallery image '.($i + 1),
+                    'Gallery image ' . ($i + 1),
                     $i + 2
                 );
                 $createdImages++;
@@ -68,7 +68,7 @@ final class ProductImageSeeder extends Seeder
                     $this->createImageForProduct(
                         $product,
                         'lifestyle',
-                        'Lifestyle image '.($i + 1),
+                        'Lifestyle image ' . ($i + 1),
                         $createdImages + $i + 1
                     );
                     $createdImages++;
@@ -82,7 +82,7 @@ final class ProductImageSeeder extends Seeder
                     $this->createImageForProduct(
                         $product,
                         'technical',
-                        'Technical image '.($i + 1),
+                        'Technical image ' . ($i + 1),
                         $createdImages + $i + 1
                     );
                     $createdImages++;
@@ -105,20 +105,20 @@ final class ProductImageSeeder extends Seeder
 
                 // Create a physical placeholder for this variation so URLs resolve
                 $dimensions = match ($size) {
-                    'thumb' => [200, 200],
-                    'small' => [400, 400],
+                    'thumb'  => [200, 200],
+                    'small'  => [400, 400],
                     'medium' => [600, 600],
-                    'large' => [800, 800],
+                    'large'  => [800, 800],
                     'xlarge' => [1200, 1200],
-                    default => [600, 600],
+                    default  => [600, 600],
                 };
                 $this->createPlaceholderImage($path, $dimensions[0], $dimensions[1]);
 
                 ProductImage::factory()
                     ->for($product)
                     ->create([
-                        'path' => $path,
-                        'alt_text' => "{$product->name} - {$size} image",
+                        'path'       => $path,
+                        'alt_text'   => "{$product->name} - {$size} image",
                         'sort_order' => $this->getSortOrderForSize($size),
                     ]);
             }
@@ -138,8 +138,8 @@ final class ProductImageSeeder extends Seeder
         ProductImage::factory()
             ->for($product)
             ->create([
-                'path' => $imagePath,
-                'alt_text' => $altText,
+                'path'       => $imagePath,
+                'alt_text'   => $altText,
                 'sort_order' => $sortOrder,
             ]);
     }
@@ -161,12 +161,12 @@ final class ProductImageSeeder extends Seeder
     private function getSortOrderForSize(string $size): int
     {
         return match ($size) {
-            'thumb' => 1,
-            'small' => 2,
+            'thumb'  => 1,
+            'small'  => 2,
             'medium' => 3,
-            'large' => 4,
+            'large'  => 4,
             'xlarge' => 5,
-            default => 0,
+            default  => 0,
         };
     }
 
@@ -186,10 +186,10 @@ final class ProductImageSeeder extends Seeder
 
             // Create different sized placeholder images
             $sizes = [
-                'thumb' => [200, 200],
-                'small' => [400, 400],
+                'thumb'  => [200, 200],
+                'small'  => [400, 400],
                 'medium' => [600, 600],
-                'large' => [800, 800],
+                'large'  => [800, 800],
                 'xlarge' => [1200, 1200],
             ];
 
@@ -228,6 +228,7 @@ final class ProductImageSeeder extends Seeder
 
                 @imagejpeg($image, $fullPath, 80);
                 @imagedestroy($image);
+
                 return;
             }
         }

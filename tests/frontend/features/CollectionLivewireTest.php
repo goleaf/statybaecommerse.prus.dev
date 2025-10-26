@@ -29,9 +29,9 @@ final class CollectionLivewireTest extends TestCase
     public function test_collection_index_shows_collections(): void
     {
         $collection = Collection::factory()->create([
-            'name' => 'Test Collection',
+            'name'       => 'Test Collection',
             'is_visible' => true,
-            'is_active' => true,
+            'is_active'  => true,
         ]);
 
         Livewire::test(Index::class)
@@ -41,15 +41,15 @@ final class CollectionLivewireTest extends TestCase
     public function test_collection_index_hides_invisible_collections(): void
     {
         $visibleCollection = Collection::factory()->create([
-            'name' => 'Visible Collection',
+            'name'       => 'Visible Collection',
             'is_visible' => true,
-            'is_active' => true,
+            'is_active'  => true,
         ]);
 
         $hiddenCollection = Collection::factory()->create([
-            'name' => 'Hidden Collection',
+            'name'       => 'Hidden Collection',
             'is_visible' => false,
-            'is_active' => true,
+            'is_active'  => true,
         ]);
 
         Livewire::test(Index::class)
@@ -60,15 +60,15 @@ final class CollectionLivewireTest extends TestCase
     public function test_collection_index_hides_inactive_collections(): void
     {
         $activeCollection = Collection::factory()->create([
-            'name' => 'Active Collection',
+            'name'       => 'Active Collection',
             'is_visible' => true,
-            'is_active' => true,
+            'is_active'  => true,
         ]);
 
         $inactiveCollection = Collection::factory()->create([
-            'name' => 'Inactive Collection',
+            'name'       => 'Inactive Collection',
             'is_visible' => true,
-            'is_active' => false,
+            'is_active'  => false,
         ]);
 
         Livewire::test(Index::class)
@@ -90,7 +90,7 @@ final class CollectionLivewireTest extends TestCase
     {
         $collection = Collection::factory()->create([
             'is_visible' => true,
-            'is_active' => true,
+            'is_active'  => true,
         ]);
 
         Livewire::test(Show::class, ['collection' => $collection])
@@ -101,9 +101,9 @@ final class CollectionLivewireTest extends TestCase
     public function test_collection_show_displays_collection_name(): void
     {
         $collection = Collection::factory()->create([
-            'name' => 'Test Collection',
+            'name'       => 'Test Collection',
             'is_visible' => true,
-            'is_active' => true,
+            'is_active'  => true,
         ]);
 
         Livewire::test(Show::class, ['collection' => $collection])
@@ -114,8 +114,8 @@ final class CollectionLivewireTest extends TestCase
     {
         $collection = Collection::factory()->create([
             'description' => 'Test Description',
-            'is_visible' => true,
-            'is_active' => true,
+            'is_visible'  => true,
+            'is_active'   => true,
         ]);
 
         Livewire::test(Show::class, ['collection' => $collection])
@@ -197,8 +197,8 @@ final class CollectionLivewireTest extends TestCase
 
         \App\Models\Translations\CollectionTranslation::factory()->create([
             'collection_id' => $collection->id,
-            'locale' => 'lt',
-            'slug' => 'new-slug',
+            'locale'        => 'lt',
+            'slug'          => 'new-slug',
         ]);
 
         Livewire::test(Show::class, ['collection' => $collection])
@@ -226,14 +226,14 @@ final class CollectionLivewireTest extends TestCase
     public function test_collection_show_related_collections(): void
     {
         $collection = Collection::factory()->create([
-            'is_visible' => true,
-            'is_active' => true,
+            'is_visible'   => true,
+            'is_active'    => true,
             'display_type' => 'grid',
         ]);
 
         $relatedCollection = Collection::factory()->create([
-            'is_visible' => true,
-            'is_active' => true,
+            'is_visible'   => true,
+            'is_active'    => true,
             'display_type' => 'grid',
         ]);
 

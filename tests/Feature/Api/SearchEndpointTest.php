@@ -23,22 +23,22 @@ final class SearchEndpointTest extends TestCase
         $exactProduct = Product::factory()
             ->hasAttached($category, [], 'categories')
             ->create([
-                'name' => 'Precision Hammer',
+                'name'              => 'Precision Hammer',
                 'short_description' => 'High quality hammer for precise work',
-                'brand_id' => $brand->id,
-                'price' => 120,
-                'is_visible' => true,
-                'published_at' => now()->subDay(),
+                'brand_id'          => $brand->id,
+                'price'             => 120,
+                'is_visible'        => true,
+                'published_at'      => now()->subDay(),
             ]);
 
         Product::factory()
             ->hasAttached($category, [], 'categories')
             ->create([
-                'name' => 'Heavy Duty Hammer',
-                'description' => 'Durable hammer suited for industrial jobs',
-                'brand_id' => $brand->id,
-                'price' => 80,
-                'is_visible' => true,
+                'name'         => 'Heavy Duty Hammer',
+                'description'  => 'Durable hammer suited for industrial jobs',
+                'brand_id'     => $brand->id,
+                'price'        => 80,
+                'is_visible'   => true,
                 'published_at' => now()->subDays(2),
             ]);
 
@@ -54,12 +54,12 @@ final class SearchEndpointTest extends TestCase
     public function test_search_endpoint_is_resilient_to_injection_sequences(): void
     {
         Product::factory()->create([
-            'name' => 'Injection Safe Product',
-            'is_visible' => true,
+            'name'         => 'Injection Safe Product',
+            'is_visible'   => true,
             'published_at' => now()->subDay(),
         ]);
 
-        $response = $this->getJson('/api/v1/search?q='.urlencode("Injection Safe' OR 1=1 --"));
+        $response = $this->getJson('/api/v1/search?q=' . urlencode("Injection Safe' OR 1=1 --"));
         $response->assertOk();
 
         $payload = $response->json('data.products.items');
@@ -73,8 +73,8 @@ final class SearchEndpointTest extends TestCase
     public function test_search_endpoint_enforces_per_page_cap(): void
     {
         Product::factory()->count(5)->create([
-            'name' => 'Cap Test Product',
-            'is_visible' => true,
+            'name'         => 'Cap Test Product',
+            'is_visible'   => true,
             'published_at' => now()->subDay(),
         ]);
 
@@ -92,13 +92,13 @@ final class SearchEndpointTest extends TestCase
         DB::statement('CREATE INDEX IF NOT EXISTS products_name_idx ON products (name)');
 
         Product::factory()->create([
-            'name' => 'Planner Product',
-            'is_visible' => true,
+            'name'         => 'Planner Product',
+            'is_visible'   => true,
             'published_at' => now()->subDay(),
         ]);
 
         $builder = Product::query()->select('id')->where('name', 'like', 'Planner%');
-        $plan = DB::select('EXPLAIN '.$builder->toSql(), $builder->getBindings());
+        $plan = DB::select('EXPLAIN ' . $builder->toSql(), $builder->getBindings());
 
         $planString = json_encode($plan, JSON_THROW_ON_ERROR);
         self::assertStringContainsString('INDEX', strtoupper($planString));

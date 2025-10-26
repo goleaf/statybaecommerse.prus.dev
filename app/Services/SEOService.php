@@ -21,7 +21,7 @@ final class SEOService
      */
     public static function getProductSEO(Product $product): array
     {
-        $title = $product->meta_title ?? $product->name.' - '.config('app.name');
+        $title = $product->meta_title ?? $product->name . ' - ' . config('app.name');
         $description = $product->meta_description ?? Str::limit(strip_tags($product->description), 160);
         $keywords = $product->meta_keywords ?? self::generateProductKeywords($product);
 
@@ -33,7 +33,7 @@ final class SEOService
      */
     public static function getCategorySEO(Category $category): array
     {
-        $title = $category->meta_title ?? $category->name.' - '.config('app.name');
+        $title = $category->meta_title ?? $category->name . ' - ' . config('app.name');
         $description = $category->meta_description ?? Str::limit(strip_tags($category->description), 160);
 
         return ['title' => $title, 'description' => $description, 'canonical' => route('category.show', ['category' => $category->slug]), 'og_title' => $title, 'og_description' => $description, 'og_image' => $category->getFirstMediaUrl('images', 'image-lg') ?: $category->getFirstMediaUrl('images'), 'og_type' => 'website'];
@@ -44,7 +44,7 @@ final class SEOService
      */
     public static function getBrandSEO(Brand $brand): array
     {
-        $title = $brand->meta_title ?? $brand->name.' Products - '.config('app.name');
+        $title = $brand->meta_title ?? $brand->name . ' Products - ' . config('app.name');
         $description = $brand->meta_description ?? Str::limit(strip_tags($brand->description), 160);
 
         return ['title' => $title, 'description' => $description, 'canonical' => route('brands.show', $brand->slug), 'og_title' => $title, 'og_description' => $description, 'og_image' => $brand->getFirstMediaUrl('logo', 'logo-md') ?: $brand->getFirstMediaUrl('logo'), 'og_type' => 'website'];

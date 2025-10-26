@@ -7,6 +7,7 @@ namespace Database\Factories;
 use App\Models\EmailCampaign;
 use App\Models\NotificationTemplate;
 use App\Models\User;
+use DateTimeInterface;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
@@ -29,16 +30,16 @@ final class EmailCampaignFactory extends Factory
         $clickedCount = $this->faker->numberBetween(0, $openedCount);
 
         return [
-            'name' => $name,
-            'description' => $this->faker->paragraph(),
-            'subject' => $this->faker->sentence(6),
-            'content' => $this->faker->paragraphs(3, true),
-            'html_content' => sprintf('<p>%s</p>', implode('</p><p>', $this->faker->paragraphs(2))),
-            'from_email' => $this->faker->unique()->safeEmail(),
-            'from_name' => $this->faker->name(),
-            'reply_to' => $this->faker->safeEmail(),
-            'is_active' => $status !== 'cancelled' ? $this->faker->boolean(70) : false,
-            'status' => $status,
+            'name'            => $name,
+            'description'     => $this->faker->paragraph(),
+            'subject'         => $this->faker->sentence(6),
+            'content'         => $this->faker->paragraphs(3, true),
+            'html_content'    => sprintf('<p>%s</p>', implode('</p><p>', $this->faker->paragraphs(2))),
+            'from_email'      => $this->faker->unique()->safeEmail(),
+            'from_name'       => $this->faker->name(),
+            'reply_to'        => $this->faker->safeEmail(),
+            'is_active'       => $status !== 'cancelled' ? $this->faker->boolean(70) : false,
+            'status'          => $status,
             'target_audience' => [
                 'segments' => $this->faker->randomElements([
                     'all_customers',
@@ -49,31 +50,31 @@ final class EmailCampaignFactory extends Factory
                 ], $this->faker->numberBetween(1, 3)),
                 'filters' => [
                     'last_purchase_days' => $this->faker->numberBetween(7, 90),
-                    'min_orders' => $this->faker->numberBetween(0, 5),
+                    'min_orders'         => $this->faker->numberBetween(0, 5),
                 ],
             ],
-            'total_recipients' => $totalRecipients,
-            'sent_count' => $sentCount,
-            'delivered_count' => $deliveredCount,
-            'opened_count' => $openedCount,
-            'clicked_count' => $clickedCount,
+            'total_recipients'   => $totalRecipients,
+            'sent_count'         => $sentCount,
+            'delivered_count'    => $deliveredCount,
+            'opened_count'       => $openedCount,
+            'clicked_count'      => $clickedCount,
             'unsubscribed_count' => $this->faker->numberBetween(0, $sentCount),
-            'scheduled_at' => fn (array $attributes) => $this->scheduledAt($attributes['status']),
-            'sent_at' => fn (array $attributes) => $this->sentAt($attributes['status']),
-            'completed_at' => fn (array $attributes) => $this->completedAt($attributes['status']),
-            'settings' => [
-                'track_opens' => true,
-                'track_clicks' => $this->faker->boolean(),
+            'scheduled_at'       => fn (array $attributes) => $this->scheduledAt($attributes['status']),
+            'sent_at'            => fn (array $attributes) => $this->sentAt($attributes['status']),
+            'completed_at'       => fn (array $attributes) => $this->completedAt($attributes['status']),
+            'settings'           => [
+                'track_opens'            => true,
+                'track_clicks'           => $this->faker->boolean(),
                 'send_time_optimization' => $this->faker->boolean(),
-                'utm_campaign' => Str::slug($name),
+                'utm_campaign'           => Str::slug($name),
             ],
             'metadata' => [
-                'source' => $this->faker->randomElement(['manual', 'automation', 'import']),
-                'notes' => $this->faker->sentence(),
+                'source'         => $this->faker->randomElement(['manual', 'automation', 'import']),
+                'notes'          => $this->faker->sentence(),
                 'last_synced_at' => $this->faker->optional()->dateTimeBetween('-1 week', 'now'),
             ],
             'template_id' => null,
-            'created_by' => null,
+            'created_by'  => null,
         ];
     }
 
@@ -94,9 +95,9 @@ final class EmailCampaignFactory extends Factory
     public function draft(): static
     {
         return $this->state(fn (array $attributes) => [
-            'status' => 'draft',
+            'status'       => 'draft',
             'scheduled_at' => null,
-            'sent_at' => null,
+            'sent_at'      => null,
             'completed_at' => null,
         ]);
     }
@@ -104,9 +105,9 @@ final class EmailCampaignFactory extends Factory
     public function scheduled(): static
     {
         return $this->state(fn (array $attributes) => [
-            'status' => 'scheduled',
+            'status'       => 'scheduled',
             'scheduled_at' => $this->faker->dateTimeBetween('+1 hour', '+3 days'),
-            'sent_at' => null,
+            'sent_at'      => null,
             'completed_at' => null,
         ]);
     }
@@ -114,14 +115,14 @@ final class EmailCampaignFactory extends Factory
     public function sent(): static
     {
         return $this->state(fn (array $attributes) => [
-            'status' => 'sent',
+            'status'       => 'sent',
             'scheduled_at' => $this->faker->dateTimeBetween('-2 days', '-1 hour'),
-            'sent_at' => $this->faker->dateTimeBetween('-1 hour', 'now'),
+            'sent_at'      => $this->faker->dateTimeBetween('-1 hour', 'now'),
             'completed_at' => $this->faker->dateTimeBetween('-1 hour', 'now'),
         ]);
     }
 
-    private function scheduledAt(string $status): ?\DateTimeInterface
+    private function scheduledAt(string $status): ?DateTimeInterface
     {
         return match ($status) {
             'scheduled', 'sending' => $this->faker->dateTimeBetween('+1 hour', '+3 days'),
@@ -130,7 +131,7 @@ final class EmailCampaignFactory extends Factory
         };
     }
 
-    private function sentAt(string $status): ?\DateTimeInterface
+    private function sentAt(string $status): ?DateTimeInterface
     {
         return match ($status) {
             'sending', 'sent' => $this->faker->dateTimeBetween('-2 days', 'now'),
@@ -138,7 +139,7 @@ final class EmailCampaignFactory extends Factory
         };
     }
 
-    private function completedAt(string $status): ?\DateTimeInterface
+    private function completedAt(string $status): ?DateTimeInterface
     {
         return match ($status) {
             'sent', 'cancelled' => $this->faker->dateTimeBetween('-1 day', 'now'),

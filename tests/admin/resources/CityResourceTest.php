@@ -21,7 +21,7 @@ final class CityResourceTest extends TestCase
         parent::setUp();
 
         $this->adminUser = User::factory()->create([
-            'email' => 'admin@example.com',
+            'email'    => 'admin@example.com',
             'is_admin' => true,
         ]);
     }
@@ -42,14 +42,14 @@ final class CityResourceTest extends TestCase
         $country = Country::factory()->create();
 
         $cityData = [
-            'name' => 'Test City',
-            'code' => 'TC',
+            'name'        => 'Test City',
+            'code'        => 'TC',
             'description' => 'Test description',
-            'country_id' => $country->id,
-            'is_active' => true,
-            'is_capital' => false,
-            'population' => 100000,
-            'sort_order' => 1,
+            'country_id'  => $country->id,
+            'is_active'   => true,
+            'is_capital'  => false,
+            'population'  => 100000,
+            'sort_order'  => 1,
         ];
 
         $response = $this
@@ -57,8 +57,8 @@ final class CityResourceTest extends TestCase
             ->post(route('filament.admin.resources.cities.create'), $cityData);
 
         $this->assertDatabaseHas('cities', [
-            'name' => 'Test City',
-            'code' => 'TC',
+            'name'       => 'Test City',
+            'code'       => 'TC',
             'country_id' => $country->id,
         ]);
     }
@@ -69,7 +69,7 @@ final class CityResourceTest extends TestCase
         $country = Country::factory()->create();
 
         $updateData = [
-            'name' => 'Updated City',
+            'name'       => 'Updated City',
             'country_id' => $country->id,
             'is_capital' => true,
         ];
@@ -79,8 +79,8 @@ final class CityResourceTest extends TestCase
             ->put(route('filament.admin.resources.cities.update', ['record' => $city->id]), $updateData);
 
         $this->assertDatabaseHas('cities', [
-            'id' => $city->id,
-            'name' => 'Updated City',
+            'id'         => $city->id,
+            'name'       => 'Updated City',
             'country_id' => $country->id,
             'is_capital' => true,
         ]);
@@ -219,7 +219,7 @@ final class CityResourceTest extends TestCase
 
         foreach ($cities as $city) {
             $this->assertDatabaseHas('cities', [
-                'id' => $city->id,
+                'id'        => $city->id,
                 'is_active' => true,
             ]);
         }
@@ -237,7 +237,7 @@ final class CityResourceTest extends TestCase
 
         foreach ($cities as $city) {
             $this->assertDatabaseHas('cities', [
-                'id' => $city->id,
+                'id'        => $city->id,
                 'is_active' => false,
             ]);
         }
@@ -252,7 +252,7 @@ final class CityResourceTest extends TestCase
             ->post(route('filament.admin.resources.cities.toggle-active', ['record' => $city->id]));
 
         $this->assertDatabaseHas('cities', [
-            'id' => $city->id,
+            'id'        => $city->id,
             'is_active' => true,
         ]);
     }
@@ -263,24 +263,24 @@ final class CityResourceTest extends TestCase
         $parentCity = City::factory()->create();
 
         $cityData = [
-            'name' => 'Test City',
-            'code' => 'TC',
-            'description' => 'Test description',
-            'country_id' => $country->id,
-            'parent_id' => $parentCity->id,
-            'level' => 1,
-            'type' => 'urban',
-            'area' => 100.5,
-            'density' => 500.25,
-            'elevation' => 200.75,
-            'timezone' => 'Europe/Vilnius',
+            'name'          => 'Test City',
+            'code'          => 'TC',
+            'description'   => 'Test description',
+            'country_id'    => $country->id,
+            'parent_id'     => $parentCity->id,
+            'level'         => 1,
+            'type'          => 'urban',
+            'area'          => 100.5,
+            'density'       => 500.25,
+            'elevation'     => 200.75,
+            'timezone'      => 'Europe/Vilnius',
             'currency_code' => 'EUR',
             'language_code' => 'lt',
-            'phone_code' => '+370',
-            'population' => 100000,
-            'is_active' => true,
-            'is_capital' => false,
-            'sort_order' => 1,
+            'phone_code'    => '+370',
+            'population'    => 100000,
+            'is_active'     => true,
+            'is_capital'    => false,
+            'sort_order'    => 1,
         ];
 
         $response = $this
@@ -288,23 +288,23 @@ final class CityResourceTest extends TestCase
             ->post(route('filament.admin.resources.cities.create'), $cityData);
 
         $this->assertDatabaseHas('cities', [
-            'name' => 'Test City',
-            'code' => 'TC',
-            'country_id' => $country->id,
-            'parent_id' => $parentCity->id,
-            'level' => 1,
-            'type' => 'urban',
-            'area' => 100.5,
-            'density' => 500.25,
-            'elevation' => 200.75,
-            'timezone' => 'Europe/Vilnius',
+            'name'          => 'Test City',
+            'code'          => 'TC',
+            'country_id'    => $country->id,
+            'parent_id'     => $parentCity->id,
+            'level'         => 1,
+            'type'          => 'urban',
+            'area'          => 100.5,
+            'density'       => 500.25,
+            'elevation'     => 200.75,
+            'timezone'      => 'Europe/Vilnius',
             'currency_code' => 'EUR',
             'language_code' => 'lt',
-            'phone_code' => '+370',
-            'population' => 100000,
-            'is_active' => true,
-            'is_capital' => false,
-            'sort_order' => 1,
+            'phone_code'    => '+370',
+            'population'    => 100000,
+            'is_active'     => true,
+            'is_capital'    => false,
+            'sort_order'    => 1,
         ]);
     }
 
@@ -315,24 +315,24 @@ final class CityResourceTest extends TestCase
         $parentCity = City::factory()->create();
 
         $updateData = [
-            'name' => 'Updated City',
-            'code' => 'UC',
-            'description' => 'Updated description',
-            'country_id' => $country->id,
-            'parent_id' => $parentCity->id,
-            'level' => 2,
-            'type' => 'metropolitan',
-            'area' => 200.75,
-            'density' => 750.5,
-            'elevation' => 300.25,
-            'timezone' => 'Europe/London',
+            'name'          => 'Updated City',
+            'code'          => 'UC',
+            'description'   => 'Updated description',
+            'country_id'    => $country->id,
+            'parent_id'     => $parentCity->id,
+            'level'         => 2,
+            'type'          => 'metropolitan',
+            'area'          => 200.75,
+            'density'       => 750.5,
+            'elevation'     => 300.25,
+            'timezone'      => 'Europe/London',
             'currency_code' => 'GBP',
             'language_code' => 'en',
-            'phone_code' => '+44',
-            'population' => 200000,
-            'is_active' => true,
-            'is_capital' => true,
-            'sort_order' => 2,
+            'phone_code'    => '+44',
+            'population'    => 200000,
+            'is_active'     => true,
+            'is_capital'    => true,
+            'sort_order'    => 2,
         ];
 
         $response = $this
@@ -340,24 +340,24 @@ final class CityResourceTest extends TestCase
             ->put(route('filament.admin.resources.cities.update', ['record' => $city->id]), $updateData);
 
         $this->assertDatabaseHas('cities', [
-            'id' => $city->id,
-            'name' => 'Updated City',
-            'code' => 'UC',
-            'country_id' => $country->id,
-            'parent_id' => $parentCity->id,
-            'level' => 2,
-            'type' => 'metropolitan',
-            'area' => 200.75,
-            'density' => 750.5,
-            'elevation' => 300.25,
-            'timezone' => 'Europe/London',
+            'id'            => $city->id,
+            'name'          => 'Updated City',
+            'code'          => 'UC',
+            'country_id'    => $country->id,
+            'parent_id'     => $parentCity->id,
+            'level'         => 2,
+            'type'          => 'metropolitan',
+            'area'          => 200.75,
+            'density'       => 750.5,
+            'elevation'     => 300.25,
+            'timezone'      => 'Europe/London',
             'currency_code' => 'GBP',
             'language_code' => 'en',
-            'phone_code' => '+44',
-            'population' => 200000,
-            'is_active' => true,
-            'is_capital' => true,
-            'sort_order' => 2,
+            'phone_code'    => '+44',
+            'population'    => 200000,
+            'is_active'     => true,
+            'is_capital'    => true,
+            'sort_order'    => 2,
         ]);
     }
 
@@ -366,12 +366,12 @@ final class CityResourceTest extends TestCase
         $country = Country::factory()->create();
 
         $cityData = [
-            'name' => 'Test City',
-            'code' => 'TC',
+            'name'       => 'Test City',
+            'code'       => 'TC',
             'country_id' => $country->id,
-            'latitude' => 54.6872,
-            'longitude' => 25.2797,
-            'is_active' => true,
+            'latitude'   => 54.6872,
+            'longitude'  => 25.2797,
+            'is_active'  => true,
         ];
 
         $response = $this
@@ -379,8 +379,8 @@ final class CityResourceTest extends TestCase
             ->post(route('filament.admin.resources.cities.create'), $cityData);
 
         $this->assertDatabaseHas('cities', [
-            'name' => 'Test City',
-            'latitude' => 54.6872,
+            'name'      => 'Test City',
+            'latitude'  => 54.6872,
             'longitude' => 25.2797,
         ]);
     }
@@ -392,9 +392,9 @@ final class CityResourceTest extends TestCase
         $childCity = City::factory()->create(['level' => 1, 'parent_id' => $parentCity->id]);
 
         $this->assertDatabaseHas('cities', [
-            'id' => $childCity->id,
+            'id'        => $childCity->id,
             'parent_id' => $parentCity->id,
-            'level' => 1,
+            'level'     => 1,
         ]);
     }
 
@@ -413,8 +413,8 @@ final class CityResourceTest extends TestCase
         City::factory()->create(['code' => 'TC']);
 
         $cityData = [
-            'name' => 'Test City',
-            'code' => 'TC',  // Duplicate code
+            'name'       => 'Test City',
+            'code'       => 'TC',  // Duplicate code
             'country_id' => $country->id,
         ];
 
@@ -430,12 +430,12 @@ final class CityResourceTest extends TestCase
         $country = Country::factory()->create();
 
         $cityData = [
-            'name' => 'Test City',
+            'name'       => 'Test City',
             'country_id' => $country->id,
             'population' => 'invalid',
-            'area' => 'invalid',
-            'density' => 'invalid',
-            'elevation' => 'invalid',
+            'area'       => 'invalid',
+            'density'    => 'invalid',
+            'elevation'  => 'invalid',
         ];
 
         $response = $this
@@ -450,10 +450,10 @@ final class CityResourceTest extends TestCase
         $country = Country::factory()->create();
 
         $cityData = [
-            'name' => 'Test City',
+            'name'       => 'Test City',
             'country_id' => $country->id,
-            'latitude' => 95.0,  // Invalid latitude
-            'longitude' => 185.0,  // Invalid longitude
+            'latitude'   => 95.0,  // Invalid latitude
+            'longitude'  => 185.0,  // Invalid longitude
         ];
 
         $response = $this

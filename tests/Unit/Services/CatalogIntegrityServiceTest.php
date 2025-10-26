@@ -11,11 +11,12 @@ use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Models\Translations\ProductTranslation;
 use App\Services\CatalogIntegrityService;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Tests\TestCase;
+use Throwable;
 
 final class CatalogIntegrityServiceTest extends TestCase
 {
@@ -43,12 +44,12 @@ final class CatalogIntegrityServiceTest extends TestCase
             Schema::table('product_translations', function (Blueprint $table): void {
                 $table->dropUnique('product_translations_locale_slug_unique');
             });
-        } catch (\Throwable $exception) {
+        } catch (Throwable $exception) {
             try {
                 Schema::table('product_translations', function (Blueprint $table): void {
                     $table->dropUnique(['locale', 'slug']);
                 });
-            } catch (\Throwable) {
+            } catch (Throwable) {
                 // Ignore: fall back to raw statement below.
             }
 
@@ -81,14 +82,14 @@ final class CatalogIntegrityServiceTest extends TestCase
 
         ProductTranslation::factory()->create([
             'product_id' => $productA->id,
-            'locale' => 'lt',
-            'slug' => 'duplicated-slug',
+            'locale'     => 'lt',
+            'slug'       => 'duplicated-slug',
         ]);
 
         ProductTranslation::factory()->create([
             'product_id' => $productB->id,
-            'locale' => 'lt',
-            'slug' => 'duplicated-slug',
+            'locale'     => 'lt',
+            'slug'       => 'duplicated-slug',
         ]);
 
         $service = app(CatalogIntegrityService::class);

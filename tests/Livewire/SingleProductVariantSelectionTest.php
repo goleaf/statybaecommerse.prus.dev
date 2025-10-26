@@ -20,24 +20,24 @@ final class SingleProductVariantSelectionTest extends TestCase
     public function test_variant_selection_updates_pricing_summary(): void
     {
         $product = Product::factory()->create([
-            'type' => 'variable',
-            'is_visible' => true,
-            'status' => 'published',
+            'type'         => 'variable',
+            'is_visible'   => true,
+            'status'       => 'published',
             'published_at' => now(),
         ]);
 
         $defaultVariant = ProductVariant::factory()->for($product)->create([
-            'price' => 49.99,
-            'compare_price' => 59.99,
+            'price'              => 49.99,
+            'compare_price'      => 59.99,
             'is_default_variant' => true,
-            'is_default' => true,
+            'is_default'         => true,
         ]);
 
         $alternativeVariant = ProductVariant::factory()->for($product)->create([
-            'price' => 89.50,
-            'compare_price' => 109.50,
+            'price'              => 89.50,
+            'compare_price'      => 109.50,
             'is_default_variant' => false,
-            'is_default' => false,
+            'is_default'         => false,
         ]);
 
         $component = Livewire::test(SingleProduct::class, ['product' => $product]);
@@ -60,20 +60,20 @@ final class SingleProductVariantSelectionTest extends TestCase
     public function test_gallery_switches_to_variant_images(): void
     {
         $product = Product::factory()->create([
-            'type' => 'variable',
-            'is_visible' => true,
-            'status' => 'published',
+            'type'         => 'variable',
+            'is_visible'   => true,
+            'status'       => 'published',
             'published_at' => now(),
         ]);
 
         $variant = ProductVariant::factory()->for($product)->create([
             'is_default_variant' => true,
-            'is_default' => true,
+            'is_default'         => true,
         ]);
 
         VariantImage::factory()->for($variant, 'variant')->create([
             'image_path' => 'products/sample.jpg',
-            'alt_text' => 'Variant Primary',
+            'alt_text'   => 'Variant Primary',
             'sort_order' => 1,
             'is_primary' => true,
         ]);

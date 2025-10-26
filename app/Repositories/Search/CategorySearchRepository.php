@@ -144,7 +144,7 @@ SQL;
                 $parts[] = '  AND c.is_active = 1';
             }
 
-            $clauses = $parts ? "\n".implode("\n", $parts) : '';
+            $clauses = $parts ? "\n" . implode("\n", $parts) : '';
         }
 
         return $clauses;
@@ -170,7 +170,7 @@ SQL;
                 $parts[] = "  AND p.status = 'published'";
             }
 
-            $clauses = $parts ? "\n".implode("\n", $parts) : '';
+            $clauses = $parts ? "\n" . implode("\n", $parts) : '';
         }
 
         return $clauses;

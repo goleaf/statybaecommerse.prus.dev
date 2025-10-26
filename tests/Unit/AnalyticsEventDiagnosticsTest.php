@@ -121,7 +121,7 @@ final class AnalyticsEventDiagnosticsTest extends TestCase
     /**
      * The conversion currency accessor should gracefully fall back to EUR when null is provided.
      */
-    public function testConversionCurrencyDefaultsToEuro(): void
+    public function test_conversion_currency_defaults_to_euro(): void
     {
         $event = AnalyticsEvent::factory()->create(['conversion_currency' => null]);
 
@@ -131,7 +131,7 @@ final class AnalyticsEventDiagnosticsTest extends TestCase
     /**
      * The scoped query helpers must filter by event type correctly.
      */
-    public function testScopeFiltersByEventType(): void
+    public function test_scope_filters_by_event_type(): void
     {
         $matching = AnalyticsEvent::factory()->create(['event_type' => 'page_view']);
         AnalyticsEvent::factory()->create(['event_type' => 'purchase']);
@@ -145,7 +145,7 @@ final class AnalyticsEventDiagnosticsTest extends TestCase
     /**
      * Analytics events should retain the owning user relationship when present.
      */
-    public function testUserRelationshipResolves(): void
+    public function test_user_relationship_resolves(): void
     {
         $user = User::factory()->create();
         $event = AnalyticsEvent::factory()->for($user)->create();

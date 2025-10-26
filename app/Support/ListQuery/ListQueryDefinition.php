@@ -24,8 +24,8 @@ use InvalidArgumentException;
 final class ListQueryDefinition
 {
     /**
-     * @param  array<string, FilterConfig>  $filters
-     * @param  array<string, string|SortConfig>  $sortable
+     * @param array<string, FilterConfig>      $filters
+     * @param array<string, string|SortConfig> $sortable
      */
     public function __construct(
         private readonly array $filters = [],
@@ -70,7 +70,7 @@ final class ListQueryDefinition
             }
 
             $normalised[$key] = [
-                'column' => $config['column'],
+                'column'            => $config['column'],
                 'default_direction' => $config['default_direction'] ?? null,
             ];
         }

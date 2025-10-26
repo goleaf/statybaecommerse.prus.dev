@@ -17,12 +17,12 @@ final class UiTranslationFactory extends Factory
     public function definition(): array
     {
         return [
-            'key' => fake()->unique()->slug(3),
-            'locale' => fake()->randomElement(['lt', 'en']),
-            'value' => fake()->sentence(),
-            'group' => fake()->randomElement(['admin', 'news', 'products', 'orders', 'general']),
+            'key'      => fake()->unique()->slug(3),
+            'locale'   => fake()->randomElement(['lt', 'en']),
+            'value'    => fake()->sentence(),
+            'group'    => fake()->randomElement(['admin', 'news', 'products', 'orders', 'general']),
             'metadata' => [
-                'context' => fake()->word(),
+                'context'     => fake()->word(),
                 'description' => fake()->sentence(),
             ],
         ];
@@ -53,7 +53,7 @@ final class UiTranslationFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'locale' => 'lt',
-            'value' => fake()->randomElement([
+            'value'  => fake()->randomElement([
                 'Pavadinimas',
                 'Aprašymas',
                 'Kategorija',
@@ -76,7 +76,7 @@ final class UiTranslationFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'locale' => 'en',
-            'value' => fake()->randomElement([
+            'value'  => fake()->randomElement([
                 'Title',
                 'Description',
                 'Category',
@@ -99,7 +99,7 @@ final class UiTranslationFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'group' => 'news',
-            'key' => 'news.'.fake()->randomElement([
+            'key'   => 'news.' . fake()->randomElement([
                 'fields.title',
                 'fields.content',
                 'fields.author',
@@ -115,7 +115,7 @@ final class UiTranslationFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'group' => 'admin',
-            'key' => 'admin.'.fake()->randomElement([
+            'key'   => 'admin.' . fake()->randomElement([
                 'common.save',
                 'common.cancel',
                 'common.edit',

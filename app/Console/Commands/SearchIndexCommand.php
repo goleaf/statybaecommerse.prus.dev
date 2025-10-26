@@ -60,9 +60,9 @@ final class SearchIndexCommand extends Command
     private function resolveModels(string $only): array
     {
         $map = [
-            'product' => Product::class,
+            'product'  => Product::class,
             'category' => Category::class,
-            'brand' => Brand::class,
+            'brand'    => Brand::class,
         ];
 
         if ($only === '') {

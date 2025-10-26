@@ -15,12 +15,12 @@ use Illuminate\Support\Collection;
 final class ProductListingDataProvider
 {
     private const SORTS = [
-        'latest' => ['label' => 'Newest arrivals', 'sort_by' => 'created_at', 'direction' => 'desc'],
-        'name' => ['label' => 'Name A-Z', 'sort_by' => 'name', 'direction' => 'asc'],
-        'price_asc' => ['label' => 'Price: Low to High', 'sort_by' => 'price', 'direction' => 'asc'],
+        'latest'     => ['label' => 'Newest arrivals', 'sort_by' => 'created_at', 'direction' => 'desc'],
+        'name'       => ['label' => 'Name A-Z', 'sort_by' => 'name', 'direction' => 'asc'],
+        'price_asc'  => ['label' => 'Price: Low to High', 'sort_by' => 'price', 'direction' => 'asc'],
         'price_desc' => ['label' => 'Price: High to Low', 'sort_by' => 'price', 'direction' => 'desc'],
-        'popular' => ['label' => 'Most popular', 'sort_by' => 'popularity', 'direction' => 'desc'],
-        'rating' => ['label' => 'Best rated', 'sort_by' => 'rating', 'direction' => 'desc'],
+        'popular'    => ['label' => 'Most popular', 'sort_by' => 'popularity', 'direction' => 'desc'],
+        'rating'     => ['label' => 'Best rated', 'sort_by' => 'rating', 'direction' => 'desc'],
     ];
 
     public function __construct(private readonly ProductService $productService) {}
@@ -95,7 +95,7 @@ final class ProductListingDataProvider
             'categories',
             'prices.currency',
             'translations' => static fn ($query) => $query->where('locale', app()->getLocale()),
-            'reviews' => static fn ($query) => $query->where('is_approved', true)->latest('created_at')->limit(5),
+            'reviews'      => static fn ($query) => $query->where('is_approved', true)->latest('created_at')->limit(5),
         ]);
     }
 

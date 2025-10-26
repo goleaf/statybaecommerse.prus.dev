@@ -34,14 +34,14 @@ final class ProductImageResourceTest extends TestCase
         app()->setLocale('en');
 
         $this->admin = User::factory()->create([
-            'email' => 'admin@example.com',
+            'email'    => 'admin@example.com',
             'is_admin' => true,
         ]);
 
         $this->product = Product::factory()->create([
-            'status' => 'published',
+            'status'       => 'published',
             'published_at' => now(),
-            'is_visible' => true,
+            'is_visible'   => true,
         ]);
 
         Storage::fake('public');
@@ -53,7 +53,7 @@ final class ProductImageResourceTest extends TestCase
     {
         $image = ProductImage::factory()->create([
             'product_id' => $this->product->id,
-            'alt_text' => 'Hero image',
+            'alt_text'   => 'Hero image',
             'sort_order' => 1,
         ]);
 
@@ -70,8 +70,8 @@ final class ProductImageResourceTest extends TestCase
         Livewire::test(CreateProductImage::class)
             ->fillForm([
                 'product_id' => $this->product->id,
-                'path' => $file,
-                'alt_text' => 'Gallery image',
+                'path'       => $file,
+                'alt_text'   => 'Gallery image',
                 'sort_order' => 2,
             ])
             ->call('create')
@@ -87,23 +87,23 @@ final class ProductImageResourceTest extends TestCase
     {
         $image = ProductImage::factory()->create([
             'product_id' => $this->product->id,
-            'alt_text' => 'Original alt',
+            'alt_text'   => 'Original alt',
             'sort_order' => 1,
         ]);
 
         Livewire::test(EditProductImage::class, ['record' => $image->getRouteKey()])
             ->fillForm([
                 'product_id' => $this->product->id,
-                'path' => [$image->path],
-                'alt_text' => 'Updated alt text',
+                'path'       => [$image->path],
+                'alt_text'   => 'Updated alt text',
                 'sort_order' => 5,
             ])
             ->call('save')
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('product_images', [
-            'id' => $image->id,
-            'alt_text' => 'Updated alt text',
+            'id'         => $image->id,
+            'alt_text'   => 'Updated alt text',
             'sort_order' => 5,
         ]);
     }

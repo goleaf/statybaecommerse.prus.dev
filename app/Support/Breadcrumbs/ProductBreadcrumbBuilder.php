@@ -33,7 +33,7 @@ final class ProductBreadcrumbBuilder
     /**
      * Convert UI breadcrumb items into Schema.org list items.
      *
-     * @param  array<int, array{label: string, url: string|null}>  $displayItems
+     * @param  array<int, array{label: string, url: string|null}>                                 $displayItems
      * @return array<int, array{'@type': string, position: int, name: string, item: string|null}>
      */
     public static function schemaFromDisplay(array $displayItems): array
@@ -42,10 +42,10 @@ final class ProductBreadcrumbBuilder
             ->values()
             ->map(function (array $item, int $index) {
                 return [
-                    '@type' => 'ListItem',
+                    '@type'    => 'ListItem',
                     'position' => $index + 1,
-                    'name' => $item['label'],
-                    'item' => $item['url'],
+                    'name'     => $item['label'],
+                    'item'     => $item['url'],
                 ];
             })
             ->all();
@@ -60,19 +60,19 @@ final class ProductBreadcrumbBuilder
 
         $items->push([
             'label' => __('breadcrumbs.department'),
-            'url' => url('/'),
+            'url'   => url('/'),
         ]);
 
         if ($category = self::resolvePrimaryCategory($product)) {
             $items->push([
                 'label' => $category->trans('name') ?? $category->name,
-                'url' => self::resolveCategoryUrl($category),
+                'url'   => self::resolveCategoryUrl($category),
             ]);
         }
 
         $items->push([
             'label' => $product->trans('name') ?? $product->name,
-            'url' => self::resolveProductUrl($product),
+            'url'   => self::resolveProductUrl($product),
         ]);
 
         return $items
@@ -111,7 +111,7 @@ final class ProductBreadcrumbBuilder
         }
 
         return route('localized.categories.show', [
-            'locale' => app()->getLocale(),
+            'locale'   => app()->getLocale(),
             'category' => $slug,
         ]);
     }

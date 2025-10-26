@@ -29,7 +29,7 @@ final class ApiKeyResourceTest extends TestCase
         parent::setUp();
 
         $this->admin = User::factory()->create([
-            'email' => 'admin@example.com',
+            'email'    => 'admin@example.com',
             'is_admin' => true,
         ]);
     }
@@ -58,8 +58,8 @@ final class ApiKeyResourceTest extends TestCase
 
         Livewire::test(CreateApiKey::class)
             ->fillForm([
-                'name' => 'Public integration',
-                'scopes' => $scopes,
+                'name'       => 'Public integration',
+                'scopes'     => $scopes,
                 'rate_limit' => '',
             ])
             ->call('create')
@@ -80,7 +80,7 @@ final class ApiKeyResourceTest extends TestCase
     public function test_admin_can_edit_api_key_and_update_plain_text_secret(): void
     {
         $apiKey = ApiKey::factory()->create([
-            'name' => 'Legacy key',
+            'name'       => 'Legacy key',
             'rate_limit' => 250,
         ]);
 
@@ -90,8 +90,8 @@ final class ApiKeyResourceTest extends TestCase
 
         Livewire::test(EditApiKey::class, ['record' => $apiKey->getKey()])
             ->fillForm([
-                'name' => 'Legacy key v2',
-                'rate_limit' => 500,
+                'name'           => 'Legacy key v2',
+                'rate_limit'     => 500,
                 'plain_text_key' => $newPlainText,
             ])
             ->call('save')
@@ -110,7 +110,7 @@ final class ApiKeyResourceTest extends TestCase
     public function test_regenerate_table_action_updates_credentials_and_redirects(): void
     {
         $apiKey = ApiKey::factory()->create([
-            'key' => ApiKey::hashKey('sk_OLDKEY'),
+            'key'          => ApiKey::hashKey('sk_OLDKEY'),
             'last_used_at' => now(),
         ]);
 
@@ -153,7 +153,7 @@ final class ApiKeyResourceTest extends TestCase
         $labels = ApiKeyScope::options();
         foreach (ApiKeyScope::cases() as $case) {
             $this->assertArrayHasKey($case->value, $labels);
-            $this->assertSame(__('api_keys.scopes.'.str_replace('.', '_', $case->value).'.label'), $labels[$case->value]);
+            $this->assertSame(__('api_keys.scopes.' . str_replace('.', '_', $case->value) . '.label'), $labels[$case->value]);
         }
     }
 

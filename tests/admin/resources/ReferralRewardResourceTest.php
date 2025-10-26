@@ -25,21 +25,21 @@ final class ReferralRewardResourceTest extends TestCase
         $user = User::factory()->create();
 
         $rewardData = [
-            'user_id' => $user->id,
-            'type' => 'discount',
-            'amount' => 10.00,
-            'status' => 'pending',
+            'user_id'     => $user->id,
+            'type'        => 'discount',
+            'amount'      => 10.00,
+            'status'      => 'pending',
             'description' => 'Referral discount reward',
-            'is_active' => true,
+            'is_active'   => true,
         ];
 
         $reward = ReferralReward::create($rewardData);
 
         $this->assertDatabaseHas('referral_rewards', [
             'user_id' => $user->id,
-            'type' => 'discount',
-            'amount' => 10.00,
-            'status' => 'pending',
+            'type'    => 'discount',
+            'amount'  => 10.00,
+            'status'  => 'pending',
         ]);
 
         $this->assertEquals($user->id, $reward->user_id);
@@ -109,14 +109,14 @@ final class ReferralRewardResourceTest extends TestCase
 
         ReferralReward::factory()->create([
             'user_id' => $user->id,
-            'amount' => 10.00,
-            'status' => 'paid',
+            'amount'  => 10.00,
+            'status'  => 'paid',
         ]);
 
         ReferralReward::factory()->create([
             'user_id' => $user->id,
-            'amount' => 15.00,
-            'status' => 'paid',
+            'amount'  => 15.00,
+            'status'  => 'paid',
         ]);
 
         $totalAmount = ReferralReward::where('user_id', $user->id)

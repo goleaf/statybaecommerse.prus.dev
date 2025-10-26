@@ -56,6 +56,6 @@ class TableAvailability
 
     private function cacheKey(string $table, ?string $connection): string
     {
-        return $connection === null ? $table : $connection.'::'.$table;
+        return $connection === null ? $table : $connection . '::' . $table;
     }
 }

@@ -16,12 +16,12 @@ class ChannelTest extends TestCase
     public function test_channel_can_be_created(): void
     {
         $channel = Channel::factory()->create([
-            'name' => 'Online Store',
+            'name'       => 'Online Store',
             'is_enabled' => true,
         ]);
 
         $this->assertDatabaseHas('channels', [
-            'name' => 'Online Store',
+            'name'       => 'Online Store',
             'is_enabled' => true,
         ]);
     }
@@ -135,7 +135,7 @@ class ChannelTest extends TestCase
     {
         $channel = Channel::factory()->create([
             'configuration' => [
-                'theme' => 'default',
+                'theme'    => 'default',
                 'currency' => 'EUR',
                 'language' => 'lt',
                 'timezone' => 'Europe/Vilnius',
@@ -170,9 +170,9 @@ class ChannelTest extends TestCase
     public function test_channel_can_have_meta_information(): void
     {
         $channel = Channel::factory()->create([
-            'meta_title' => 'Online Store - Channel Title',
+            'meta_title'       => 'Online Store - Channel Title',
             'meta_description' => 'Channel description for SEO',
-            'meta_keywords' => 'store, online, shopping',
+            'meta_keywords'    => 'store, online, shopping',
         ]);
 
         $this->assertEquals('Online Store - Channel Title', $channel->meta_title);
@@ -184,7 +184,7 @@ class ChannelTest extends TestCase
     {
         $channel = Channel::factory()->create([
             'analytics_tracking_id' => 'GA-123456789',
-            'analytics_enabled' => true,
+            'analytics_enabled'     => true,
         ]);
 
         $this->assertEquals('GA-123456789', $channel->analytics_tracking_id);
@@ -194,7 +194,7 @@ class ChannelTest extends TestCase
     public function test_channel_can_have_payment_settings(): void
     {
         $channel = Channel::factory()->create([
-            'payment_methods' => ['credit_card', 'paypal', 'bank_transfer'],
+            'payment_methods'        => ['credit_card', 'paypal', 'bank_transfer'],
             'default_payment_method' => 'credit_card',
         ]);
 
@@ -208,7 +208,7 @@ class ChannelTest extends TestCase
     public function test_channel_can_have_shipping_settings(): void
     {
         $channel = Channel::factory()->create([
-            'shipping_methods' => ['standard', 'express', 'overnight'],
+            'shipping_methods'        => ['standard', 'express', 'overnight'],
             'default_shipping_method' => 'standard',
             'free_shipping_threshold' => 100.00,
         ]);
@@ -224,8 +224,8 @@ class ChannelTest extends TestCase
     public function test_channel_can_have_currency_settings(): void
     {
         $channel = Channel::factory()->create([
-            'currency_code' => 'EUR',
-            'currency_symbol' => '€',
+            'currency_code'     => 'EUR',
+            'currency_symbol'   => '€',
             'currency_position' => 'after',
         ]);
 
@@ -237,7 +237,7 @@ class ChannelTest extends TestCase
     public function test_channel_can_have_language_settings(): void
     {
         $channel = Channel::factory()->create([
-            'default_language' => 'lt',
+            'default_language'    => 'lt',
             'supported_languages' => ['lt', 'en', 'ru'],
         ]);
 
@@ -251,8 +251,8 @@ class ChannelTest extends TestCase
     public function test_channel_can_have_contact_information(): void
     {
         $channel = Channel::factory()->create([
-            'contact_email' => 'support@example.com',
-            'contact_phone' => '+37012345678',
+            'contact_email'   => 'support@example.com',
+            'contact_phone'   => '+37012345678',
             'contact_address' => 'Vilnius, Lithuania',
         ]);
 
@@ -265,9 +265,9 @@ class ChannelTest extends TestCase
     {
         $channel = Channel::factory()->create([
             'social_media' => [
-                'facebook' => 'https://facebook.com/example',
+                'facebook'  => 'https://facebook.com/example',
                 'instagram' => 'https://instagram.com/example',
-                'twitter' => 'https://twitter.com/example',
+                'twitter'   => 'https://twitter.com/example',
             ],
         ]);
 
@@ -281,9 +281,9 @@ class ChannelTest extends TestCase
     {
         $channel = Channel::factory()->create([
             'legal_documents' => [
-                'privacy_policy' => 'privacy-policy',
+                'privacy_policy'   => 'privacy-policy',
                 'terms_of_service' => 'terms-of-service',
-                'cookie_policy' => 'cookie-policy',
+                'cookie_policy'    => 'cookie-policy',
             ],
         ]);
 

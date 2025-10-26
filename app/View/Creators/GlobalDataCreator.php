@@ -27,28 +27,28 @@ final class GlobalDataCreator
     {
         $view->with([
             // Global application data
-            'appName' => config('app.name'),
-            'appUrl' => config('app.url'),
-            'appVersion' => config('app.version', '1.0.0'),
+            'appName'        => config('app.name'),
+            'appUrl'         => config('app.url'),
+            'appVersion'     => config('app.version', '1.0.0'),
             'appEnvironment' => app()->environment(),
 
             // Current locale and currency
-            'currentLocale' => app()->getLocale(),
-            'currentCurrency' => current_currency(),
-            'supportedLocales' => config('shared.localization.supported_locales', ['lt', 'en']),
+            'currentLocale'       => app()->getLocale(),
+            'currentCurrency'     => current_currency(),
+            'supportedLocales'    => config('shared.localization.supported_locales', ['lt', 'en']),
             'supportedCurrencies' => config('shared.localization.supported_currencies', ['EUR']),
 
             // Global settings
             'isMaintenanceMode' => app()->isDownForMaintenance(),
-            'isDebugMode' => config('app.debug', false),
+            'isDebugMode'       => config('app.debug', false),
 
             // Cache keys for performance
             'cachePrefix' => config('cache.prefix', 'laravel'),
 
             // Global timestamps (year-month-day format)
             'currentTimestamp' => now()->timestamp,
-            'currentDate' => now()->format(config('datetime.formats.date', 'Y-m-d')),
-            'currentDateTime' => now()->format(config('datetime.formats.datetime_full', 'Y-m-d H:i:s')),
+            'currentDate'      => now()->format(config('datetime.formats.date', 'Y-m-d')),
+            'currentDateTime'  => now()->format(config('datetime.formats.datetime_full', 'Y-m-d H:i:s')),
         ]);
     }
 }

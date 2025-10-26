@@ -94,7 +94,7 @@ final class SubscriberTest extends TestCase
     {
         $subscriber = Subscriber::factory()->create([
             'first_name' => 'John',
-            'last_name' => 'Doe',
+            'last_name'  => 'Doe',
         ]);
 
         $this->assertEquals('John Doe', $subscriber->full_name);
@@ -104,7 +104,7 @@ final class SubscriberTest extends TestCase
     {
         $subscriber = Subscriber::factory()->create([
             'first_name' => '',
-            'last_name' => '',
+            'last_name'  => '',
         ]);
 
         $this->assertEquals('', $subscriber->full_name);
@@ -269,9 +269,9 @@ final class SubscriberTest extends TestCase
         $user = User::factory()->create(['email' => 'test@example.com']);
 
         $subscriber = Subscriber::subscribe([
-            'email' => 'test@example.com',
+            'email'      => 'test@example.com',
             'first_name' => 'John',
-            'last_name' => 'Doe',
+            'last_name'  => 'Doe',
         ]);
 
         $this->assertInstanceOf(Subscriber::class, $subscriber);
@@ -284,9 +284,9 @@ final class SubscriberTest extends TestCase
     public function test_subscriber_static_subscribe_without_existing_user(): void
     {
         $subscriber = Subscriber::subscribe([
-            'email' => 'new@example.com',
+            'email'      => 'new@example.com',
             'first_name' => 'Jane',
-            'last_name' => 'Doe',
+            'last_name'  => 'Doe',
         ]);
 
         $this->assertInstanceOf(Subscriber::class, $subscriber);

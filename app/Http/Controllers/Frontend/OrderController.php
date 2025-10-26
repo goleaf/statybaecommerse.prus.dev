@@ -8,8 +8,9 @@ use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\ProductVariant;
-use App\Traits\HandlesContentNegotiation;
 use App\Services\Pricing\PriceCalculator;
+use App\Traits\HandlesContentNegotiation;
+use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -109,20 +110,20 @@ final class OrderController extends Controller
 
             // Create order
             $order = Order::create([
-                'number' => 'ORD-'.strtoupper(uniqid()),
-                'user_id' => $user->id,
-                'status' => 'pending',
-                'subtotal' => $breakdown->subtotal,
-                'tax_amount' => $breakdown->tax,
-                'shipping_amount' => $breakdown->shipping,
-                'discount_amount' => $breakdown->discount,
-                'total' => $breakdown->total,
-                'currency' => $breakdown->currency,
-                'billing_address' => $validated['billing_address'],
+                'number'           => 'ORD-' . strtoupper(uniqid()),
+                'user_id'          => $user->id,
+                'status'           => 'pending',
+                'subtotal'         => $breakdown->subtotal,
+                'tax_amount'       => $breakdown->tax,
+                'shipping_amount'  => $breakdown->shipping,
+                'discount_amount'  => $breakdown->discount,
+                'total'            => $breakdown->total,
+                'currency'         => $breakdown->currency,
+                'billing_address'  => $validated['billing_address'],
                 'shipping_address' => $validated['shipping_address'],
-                'notes' => $validated['notes'],
-                'payment_method' => $validated['payment_method'],
-                'payment_status' => 'pending',
+                'notes'            => $validated['notes'],
+                'payment_method'   => $validated['payment_method'],
+                'payment_status'   => 'pending',
             ]);
             // Create order items
             foreach ($items as $item) {
@@ -131,7 +132,7 @@ final class OrderController extends Controller
             DB::commit();
 
             return redirect()->route('frontend.orders.show', $order)->with('success', __('orders.messages.created_successfully'));
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             DB::rollBack();
 
             return back()->withInput()->with('error', __('orders.messages.creation_failed'));
@@ -187,16 +188,16 @@ final class OrderController extends Controller
             $breakdown = app(PriceCalculator::class)->breakdown($subtotal);
 
             $order->update([
-                'subtotal' => $breakdown->subtotal,
-                'tax_amount' => $breakdown->tax,
-                'shipping_amount' => $breakdown->shipping,
-                'discount_amount' => $breakdown->discount,
-                'total' => $breakdown->total,
-                'currency' => $breakdown->currency,
-                'billing_address' => $validated['billing_address'],
+                'subtotal'         => $breakdown->subtotal,
+                'tax_amount'       => $breakdown->tax,
+                'shipping_amount'  => $breakdown->shipping,
+                'discount_amount'  => $breakdown->discount,
+                'total'            => $breakdown->total,
+                'currency'         => $breakdown->currency,
+                'billing_address'  => $validated['billing_address'],
                 'shipping_address' => $validated['shipping_address'],
-                'notes' => $validated['notes'],
-                'payment_method' => $validated['payment_method'],
+                'notes'            => $validated['notes'],
+                'payment_method'   => $validated['payment_method'],
             ]);
             // Create new order items
             foreach ($items as $item) {
@@ -205,7 +206,7 @@ final class OrderController extends Controller
             DB::commit();
 
             return redirect()->route('frontend.orders.show', $order)->with('success', __('orders.messages.updated_successfully'));
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             DB::rollBack();
 
             return back()->withInput()->with('error', __('orders.messages.update_failed'));

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Tests\Models;
 
@@ -13,7 +15,7 @@ final class NotificationTemplateTest extends TestCase
     public function test_notification_template_configuration_is_explicit(): void
     {
         // Instantiate the model directly so we can make assertions about its metadata without touching the database.
-        $model = new NotificationTemplate();
+        $model = new NotificationTemplate;
 
         // Guard mass-assignment by verifying the precise list of attributes allowed for bulk operations.
         self::assertSame([
@@ -29,8 +31,8 @@ final class NotificationTemplateTest extends TestCase
 
         // Ensure JSON columns are correctly cast to arrays alongside the boolean flag for the active state.
         self::assertSame([
-            'subject' => 'array',
-            'content' => 'array',
+            'subject'   => 'array',
+            'content'   => 'array',
             'variables' => 'array',
             'is_active' => 'boolean',
         ], $model->getCasts());
@@ -40,12 +42,12 @@ final class NotificationTemplateTest extends TestCase
     {
         // Persist a template with localized payloads to exercise the helper methods.
         $template = NotificationTemplate::query()->create([
-            'name' => 'Order Confirmation',
-            'slug' => 'order-confirmation',
-            'type' => 'email',
-            'event' => 'order_created',
-            'subject' => ['en' => 'Order #:number', 'lt' => 'Užsakymas #:number'],
-            'content' => ['en' => 'Hi {{name}}', 'lt' => 'Sveiki {{name}}'],
+            'name'      => 'Order Confirmation',
+            'slug'      => 'order-confirmation',
+            'type'      => 'email',
+            'event'     => 'order_created',
+            'subject'   => ['en' => 'Order #:number', 'lt' => 'Užsakymas #:number'],
+            'content'   => ['en' => 'Hi {{name}}', 'lt' => 'Sveiki {{name}}'],
             'variables' => ['name', 'number'],
             'is_active' => true,
         ])->fresh();
@@ -64,12 +66,12 @@ final class NotificationTemplateTest extends TestCase
     {
         // Create a minimal template so we can assert how placeholders are expanded.
         $template = NotificationTemplate::query()->create([
-            'name' => 'Password Reset',
-            'slug' => 'password-reset',
-            'type' => 'email',
-            'event' => 'password_reset',
-            'subject' => ['en' => 'Reset link for {{email}}'],
-            'content' => ['en' => 'Click here {{url}}'],
+            'name'      => 'Password Reset',
+            'slug'      => 'password-reset',
+            'type'      => 'email',
+            'event'     => 'password_reset',
+            'subject'   => ['en' => 'Reset link for {{email}}'],
+            'content'   => ['en' => 'Click here {{url}}'],
             'variables' => ['email', 'url'],
             'is_active' => true,
         ])->fresh();
@@ -85,34 +87,34 @@ final class NotificationTemplateTest extends TestCase
     {
         // Seed multiple templates so scope combinations can be validated independently.
         NotificationTemplate::query()->create([
-            'name' => 'A Template',
-            'slug' => 'a-template',
-            'type' => 'email',
-            'event' => 'user_registered',
-            'subject' => ['en' => 'A'],
-            'content' => ['en' => 'A'],
+            'name'      => 'A Template',
+            'slug'      => 'a-template',
+            'type'      => 'email',
+            'event'     => 'user_registered',
+            'subject'   => ['en' => 'A'],
+            'content'   => ['en' => 'A'],
             'variables' => ['name'],
             'is_active' => true,
         ]);
 
         NotificationTemplate::query()->create([
-            'name' => 'C Template',
-            'slug' => 'c-template',
-            'type' => 'sms',
-            'event' => 'order_created',
-            'subject' => ['en' => 'C'],
-            'content' => ['en' => 'C'],
+            'name'      => 'C Template',
+            'slug'      => 'c-template',
+            'type'      => 'sms',
+            'event'     => 'order_created',
+            'subject'   => ['en' => 'C'],
+            'content'   => ['en' => 'C'],
             'variables' => ['code'],
             'is_active' => false,
         ]);
 
         NotificationTemplate::query()->create([
-            'name' => 'B Template',
-            'slug' => 'b-template',
-            'type' => 'email',
-            'event' => 'order_created',
-            'subject' => ['en' => 'B'],
-            'content' => ['en' => 'B'],
+            'name'      => 'B Template',
+            'slug'      => 'b-template',
+            'type'      => 'email',
+            'event'     => 'order_created',
+            'subject'   => ['en' => 'B'],
+            'content'   => ['en' => 'B'],
             'variables' => ['order'],
             'is_active' => true,
         ]);
@@ -133,23 +135,23 @@ final class NotificationTemplateTest extends TestCase
     {
         // Create an inactive template followed by an active one to confirm the helper respects the status.
         NotificationTemplate::query()->create([
-            'name' => 'Inactive Password Reset',
-            'slug' => 'inactive-password-reset',
-            'type' => 'email',
-            'event' => 'password_reset',
-            'subject' => ['en' => 'Inactive'],
-            'content' => ['en' => 'Inactive'],
+            'name'      => 'Inactive Password Reset',
+            'slug'      => 'inactive-password-reset',
+            'type'      => 'email',
+            'event'     => 'password_reset',
+            'subject'   => ['en' => 'Inactive'],
+            'content'   => ['en' => 'Inactive'],
             'variables' => ['name'],
             'is_active' => false,
         ]);
 
         $activeTemplate = NotificationTemplate::query()->create([
-            'name' => 'Active Password Reset',
-            'slug' => 'active-password-reset',
-            'type' => 'email',
-            'event' => 'password_reset',
-            'subject' => ['en' => 'Active'],
-            'content' => ['en' => 'Active'],
+            'name'      => 'Active Password Reset',
+            'slug'      => 'active-password-reset',
+            'type'      => 'email',
+            'event'     => 'password_reset',
+            'subject'   => ['en' => 'Active'],
+            'content'   => ['en' => 'Active'],
             'variables' => ['name'],
             'is_active' => true,
         ])->fresh();
@@ -162,12 +164,12 @@ final class NotificationTemplateTest extends TestCase
     {
         // Store data with whitespace and duplicate entries to ensure normalization happens.
         $template = NotificationTemplate::query()->create([
-            'name' => 'Variables Example',
-            'slug' => 'variables-example',
-            'type' => 'email',
-            'event' => 'example_event',
-            'subject' => ['en' => 'Subject'],
-            'content' => ['en' => 'Content'],
+            'name'      => 'Variables Example',
+            'slug'      => 'variables-example',
+            'type'      => 'email',
+            'event'     => 'example_event',
+            'subject'   => ['en' => 'Subject'],
+            'content'   => ['en' => 'Content'],
             'variables' => [' name ', 'email', 'email', 123],
             'is_active' => true,
         ])->fresh();
@@ -176,4 +178,3 @@ final class NotificationTemplateTest extends TestCase
         self::assertSame(['name', 'email', '123'], $template->getAvailableVariables());
     }
 }
-

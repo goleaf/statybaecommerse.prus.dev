@@ -25,7 +25,7 @@ class RecommendationCacheResourceTest extends TestCase
         parent::setUp();
 
         $this->actingAs(User::factory()->create([
-            'email' => 'admin@example.com',
+            'email'    => 'admin@example.com',
             'is_admin' => true,
         ]));
     }
@@ -46,21 +46,21 @@ class RecommendationCacheResourceTest extends TestCase
 
         Livewire::test(CreateRecommendationCache::class)
             ->fillForm([
-                'cache_key' => 'test-cache-key',
-                'block_id' => $block->id,
-                'user_id' => $user->id,
-                'product_id' => $product->id,
+                'cache_key'    => 'test-cache-key',
+                'block_id'     => $block->id,
+                'user_id'      => $user->id,
+                'product_id'   => $product->id,
                 'context_type' => 'homepage',
-                'hit_count' => 0,
-                'expires_at' => now()->addHours(24),
+                'hit_count'    => 0,
+                'expires_at'   => now()->addHours(24),
             ])
             ->call('create')
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('recommendation_cache', [
-            'cache_key' => 'test-cache-key',
-            'block_id' => $block->id,
-            'user_id' => $user->id,
+            'cache_key'  => 'test-cache-key',
+            'block_id'   => $block->id,
+            'user_id'    => $user->id,
             'product_id' => $product->id,
         ]);
     }
@@ -74,15 +74,15 @@ class RecommendationCacheResourceTest extends TestCase
             'record' => $cache->getRouteKey(),
         ])
             ->fillForm([
-                'block_id' => $newBlock->id,
+                'block_id'  => $newBlock->id,
                 'hit_count' => 5,
             ])
             ->call('save')
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('recommendation_cache', [
-            'id' => $cache->id,
-            'block_id' => $newBlock->id,
+            'id'        => $cache->id,
+            'block_id'  => $newBlock->id,
             'hit_count' => 5,
         ]);
     }
@@ -198,9 +198,9 @@ class RecommendationCacheResourceTest extends TestCase
 
         Livewire::test(CreateRecommendationCache::class)
             ->fillForm([
-                'cache_key' => '',
-                'block_id' => $block->id,
-                'user_id' => $user->id,
+                'cache_key'  => '',
+                'block_id'   => $block->id,
+                'user_id'    => $user->id,
                 'expires_at' => now()->addHours(24),
             ])
             ->call('create')
@@ -215,9 +215,9 @@ class RecommendationCacheResourceTest extends TestCase
 
         Livewire::test(CreateRecommendationCache::class)
             ->fillForm([
-                'cache_key' => 'existing-key',
-                'block_id' => $block->id,
-                'user_id' => $user->id,
+                'cache_key'  => 'existing-key',
+                'block_id'   => $block->id,
+                'user_id'    => $user->id,
                 'expires_at' => now()->addHours(24),
             ])
             ->call('create')
@@ -230,9 +230,9 @@ class RecommendationCacheResourceTest extends TestCase
 
         Livewire::test(CreateRecommendationCache::class)
             ->fillForm([
-                'cache_key' => 'test-key',
-                'block_id' => null,
-                'user_id' => $user->id,
+                'cache_key'  => 'test-key',
+                'block_id'   => null,
+                'user_id'    => $user->id,
                 'expires_at' => now()->addHours(24),
             ])
             ->call('create')
@@ -245,9 +245,9 @@ class RecommendationCacheResourceTest extends TestCase
 
         Livewire::test(CreateRecommendationCache::class)
             ->fillForm([
-                'cache_key' => 'test-key',
-                'block_id' => $block->id,
-                'user_id' => null,
+                'cache_key'  => 'test-key',
+                'block_id'   => $block->id,
+                'user_id'    => null,
                 'expires_at' => now()->addHours(24),
             ])
             ->call('create')
@@ -261,9 +261,9 @@ class RecommendationCacheResourceTest extends TestCase
 
         Livewire::test(CreateRecommendationCache::class)
             ->fillForm([
-                'cache_key' => 'test-key',
-                'block_id' => $block->id,
-                'user_id' => $user->id,
+                'cache_key'  => 'test-key',
+                'block_id'   => $block->id,
+                'user_id'    => $user->id,
                 'expires_at' => null,
             ])
             ->call('create')

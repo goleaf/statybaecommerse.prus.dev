@@ -23,7 +23,7 @@ final class SystemSettingCategoryTranslationResourceTest extends TestCase
         parent::setUp();
 
         $this->adminUser = User::factory()->create([
-            'email' => 'admin@example.com',
+            'email'    => 'admin@example.com',
             'is_admin' => true,
         ]);
 
@@ -64,9 +64,9 @@ final class SystemSettingCategoryTranslationResourceTest extends TestCase
 
         $translationData = [
             'system_setting_category_id' => $category->id,
-            'locale' => 'lt',
-            'name' => 'Lietuviškas pavadinimas',
-            'description' => 'Lietuviškas aprašymas',
+            'locale'                     => 'lt',
+            'name'                       => 'Lietuviškas pavadinimas',
+            'description'                => 'Lietuviškas aprašymas',
         ];
 
         // Act
@@ -101,7 +101,7 @@ final class SystemSettingCategoryTranslationResourceTest extends TestCase
             ->create();
 
         $updatedData = [
-            'name' => 'Atnaujintas pavadinimas',
+            'name'        => 'Atnaujintas pavadinimas',
             'description' => 'Atnaujintas aprašymas',
         ];
 
@@ -110,8 +110,8 @@ final class SystemSettingCategoryTranslationResourceTest extends TestCase
 
         // Assert
         $this->assertDatabaseHas('system_setting_category_translations', [
-            'id' => $translation->id,
-            'name' => $updatedData['name'],
+            'id'          => $translation->id,
+            'name'        => $updatedData['name'],
             'description' => $updatedData['description'],
         ]);
     }
@@ -147,8 +147,8 @@ final class SystemSettingCategoryTranslationResourceTest extends TestCase
         // Assert
         $this->assertDatabaseHas('system_setting_category_translations', [
             'system_setting_category_id' => $category->id,
-            'locale' => $translation->locale,
-            'name' => $translation->name.' (Copy)',
+            'locale'                     => $translation->locale,
+            'name'                       => $translation->name . ' (Copy)',
         ]);
     }
 
@@ -263,8 +263,8 @@ final class SystemSettingCategoryTranslationResourceTest extends TestCase
     {
         // Arrange
         $translationData = [
-            'locale' => 'lt',
-            'name' => 'Test Name',
+            'locale'      => 'lt',
+            'name'        => 'Test Name',
             'description' => 'Test Description',
         ];
 
@@ -281,8 +281,8 @@ final class SystemSettingCategoryTranslationResourceTest extends TestCase
 
         $translationData = [
             'system_setting_category_id' => $category->id,
-            'name' => 'Test Name',
-            'description' => 'Test Description',
+            'name'                       => 'Test Name',
+            'description'                => 'Test Description',
         ];
 
         // Act & Assert
@@ -298,8 +298,8 @@ final class SystemSettingCategoryTranslationResourceTest extends TestCase
 
         $translationData = [
             'system_setting_category_id' => $category->id,
-            'locale' => 'lt',
-            'description' => 'Test Description',
+            'locale'                     => 'lt',
+            'description'                => 'Test Description',
         ];
 
         // Act & Assert
@@ -320,9 +320,9 @@ final class SystemSettingCategoryTranslationResourceTest extends TestCase
 
         $translationData = [
             'system_setting_category_id' => $category->id,
-            'locale' => 'lt',
-            'name' => 'Another Name',
-            'description' => 'Another Description',
+            'locale'                     => 'lt',
+            'name'                       => 'Another Name',
+            'description'                => 'Another Description',
         ];
 
         // Act & Assert
@@ -335,16 +335,16 @@ final class SystemSettingCategoryTranslationResourceTest extends TestCase
     {
         // Arrange
         $categoryData = [
-            'name' => 'New Category',
-            'slug' => 'new-category',
+            'name'        => 'New Category',
+            'slug'        => 'new-category',
             'description' => 'New Category Description',
         ];
 
         $translationData = [
             'system_setting_category_id' => null,  // Will be created via form
-            'locale' => 'lt',
-            'name' => 'Lietuviškas pavadinimas',
-            'description' => 'Lietuviškas aprašymas',
+            'locale'                     => 'lt',
+            'name'                       => 'Lietuviškas pavadinimas',
+            'description'                => 'Lietuviškas aprašymas',
         ];
 
         // Act
@@ -359,8 +359,8 @@ final class SystemSettingCategoryTranslationResourceTest extends TestCase
         $category = SystemSettingCategory::where('slug', $categoryData['slug'])->first();
         $this->assertDatabaseHas('system_setting_category_translations', [
             'system_setting_category_id' => $category->id,
-            'locale' => $translationData['locale'],
-            'name' => $translationData['name'],
+            'locale'                     => $translationData['locale'],
+            'name'                       => $translationData['name'],
         ]);
     }
 
@@ -457,7 +457,7 @@ final class SystemSettingCategoryTranslationResourceTest extends TestCase
         $translation = SystemSettingCategoryTranslation::factory()
             ->forCategory($category)
             ->create([
-                'name' => $longName,
+                'name'        => $longName,
                 'description' => $longDescription,
             ]);
 

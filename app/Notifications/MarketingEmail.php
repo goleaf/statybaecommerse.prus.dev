@@ -48,7 +48,7 @@ final class MarketingEmail extends Notification implements ShouldQueue
         // Gracefully resolve the recipient name for the greeting.
         $name = $notifiable->name ?? $notifiable->email ?? __('valued customer');
 
-        $mail = (new MailMessage())
+        $mail = (new MailMessage)
             ->subject($this->subject)
             ->greeting(__('notifications.greeting', ['name' => $name]));
 
@@ -82,10 +82,10 @@ final class MarketingEmail extends Notification implements ShouldQueue
     {
         // Persist the email metadata for analytics dashboards.
         return [
-            'subject' => $this->subject,
-            'content' => $this->content,
+            'subject'  => $this->subject,
+            'content'  => $this->content,
             'template' => $this->template,
-            'sent_at' => now()->toIso8601String(),
+            'sent_at'  => now()->toIso8601String(),
         ];
     }
 }

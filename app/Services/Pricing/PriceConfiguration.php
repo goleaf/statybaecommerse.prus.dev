@@ -7,6 +7,7 @@ namespace App\Services\Pricing;
 use App\Models\Setting;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
+use Throwable;
 
 final class PriceConfiguration
 {
@@ -79,10 +80,10 @@ final class PriceConfiguration
     {
         try {
             return app_setting($key, $default);
-        } catch (\Throwable $exception) {
+        } catch (Throwable $exception) {
             if (class_exists(Setting::class)) {
                 Log::debug('Failed to read setting for pricing configuration', [
-                    'key' => $key,
+                    'key'       => $key,
                     'exception' => $exception->getMessage(),
                 ]);
             }

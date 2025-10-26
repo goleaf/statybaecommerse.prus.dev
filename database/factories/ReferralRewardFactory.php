@@ -23,10 +23,10 @@ final class ReferralRewardFactory extends Factory
 
         return [
             'referral_id' => null,
-            'user_id' => User::factory(),
-            'order_id' => null,
-            'type' => $type,
-            'title' => [
+            'user_id'     => User::factory(),
+            'order_id'    => null,
+            'type'        => $type,
+            'title'       => [
                 'en' => fake()->sentence(3),
                 'lt' => fake()->sentence(3),
             ],
@@ -34,29 +34,29 @@ final class ReferralRewardFactory extends Factory
                 'en' => fake()->paragraph(),
                 'lt' => fake()->paragraph(),
             ],
-            'amount' => fake()->randomFloat(2, 5, 100),
+            'amount'        => fake()->randomFloat(2, 5, 100),
             'currency_code' => 'EUR',
-            'status' => 'pending',
-            'applied_at' => null,
-            'created_at' => now(),
-            'updated_at' => now(),
-            'expires_at' => fake()->optional(0.3)->dateTimeBetween('now', '+1 year'),
-            'is_active' => true,
-            'priority' => fake()->numberBetween(0, 100),
-            'conditions' => fake()->optional(0.2)->randomElements([
+            'status'        => 'pending',
+            'applied_at'    => null,
+            'created_at'    => now(),
+            'updated_at'    => now(),
+            'expires_at'    => fake()->optional(0.3)->dateTimeBetween('now', '+1 year'),
+            'is_active'     => true,
+            'priority'      => fake()->numberBetween(0, 100),
+            'conditions'    => fake()->optional(0.2)->randomElements([
                 ['field' => 'order_total', 'operator' => '>=', 'value' => 50],
                 ['field' => 'user_type', 'operator' => '=', 'value' => 'premium'],
                 ['field' => 'category', 'operator' => 'in', 'value' => ['electronics', 'clothing']],
             ], fake()->numberBetween(1, 3)),
             'metadata' => fake()->optional(0.3)->randomElements([
-                'source' => fake()->randomElement(['email', 'social', 'direct']),
-                'campaign' => fake()->word(),
+                'source'         => fake()->randomElement(['email', 'social', 'direct']),
+                'campaign'       => fake()->word(),
                 'referrer_level' => fake()->numberBetween(1, 5),
             ]),
             'reward_data' => fake()->optional(0.4)->randomElements([
                 'discount_percentage' => fake()->numberBetween(5, 25),
-                'free_shipping' => fake()->boolean(),
-                'bonus_points' => fake()->numberBetween(100, 1000),
+                'free_shipping'       => fake()->boolean(),
+                'bonus_points'        => fake()->numberBetween(100, 1000),
             ]),
         ];
     }
@@ -64,7 +64,7 @@ final class ReferralRewardFactory extends Factory
     public function pending(): static
     {
         return $this->state(fn (array $attributes) => [
-            'status' => 'pending',
+            'status'     => 'pending',
             'applied_at' => null,
         ]);
     }
@@ -72,7 +72,7 @@ final class ReferralRewardFactory extends Factory
     public function applied(): static
     {
         return $this->state(fn (array $attributes) => [
-            'status' => 'applied',
+            'status'     => 'applied',
             'applied_at' => fake()->dateTimeBetween('-1 year', 'now'),
         ]);
     }
@@ -80,7 +80,7 @@ final class ReferralRewardFactory extends Factory
     public function expired(): static
     {
         return $this->state(fn (array $attributes) => [
-            'status' => 'expired',
+            'status'     => 'expired',
             'expires_at' => fake()->dateTimeBetween('-1 year', '-1 day'),
         ]);
     }

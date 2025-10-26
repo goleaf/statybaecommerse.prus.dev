@@ -46,13 +46,13 @@ beforeEach(function () {
     ]);
 
     $this->testInventory = Inventory::factory()->create([
-        'product_id' => $this->testProduct->id,
+        'product_id'  => $this->testProduct->id,
         'location_id' => $this->testLocation->id,
-        'quantity' => 100,
-        'reserved' => 10,
-        'incoming' => 5,
-        'threshold' => 20,
-        'is_tracked' => true,
+        'quantity'    => 100,
+        'reserved'    => 10,
+        'incoming'    => 5,
+        'threshold'   => 20,
+        'is_tracked'  => true,
     ]);
 });
 
@@ -70,25 +70,25 @@ it('can create a new inventory record', function () {
     Livewire::actingAs($this->adminUser)
         ->test(InventoryResource\Pages\CreateInventory::class)
         ->fillForm([
-            'product_id' => $product->id,
+            'product_id'  => $product->id,
             'location_id' => $location->id,
-            'quantity' => 50,
-            'reserved' => 5,
-            'incoming' => 3,
-            'threshold' => 10,
-            'is_tracked' => true,
+            'quantity'    => 50,
+            'reserved'    => 5,
+            'incoming'    => 3,
+            'threshold'   => 10,
+            'is_tracked'  => true,
         ])
         ->call('create')
         ->assertHasNoFormErrors();
 
     $this->assertDatabaseHas('inventories', [
-        'product_id' => $product->id,
+        'product_id'  => $product->id,
         'location_id' => $location->id,
-        'quantity' => 50,
-        'reserved' => 5,
-        'incoming' => 3,
-        'threshold' => 10,
-        'is_tracked' => true,
+        'quantity'    => 50,
+        'reserved'    => 5,
+        'incoming'    => 3,
+        'threshold'   => 10,
+        'is_tracked'  => true,
     ]);
 });
 
@@ -103,19 +103,19 @@ it('can edit an inventory record', function () {
     Livewire::actingAs($this->adminUser)
         ->test(InventoryResource\Pages\EditInventory::class, ['record' => $this->testInventory->id])
         ->fillForm([
-            'quantity' => 200,
-            'reserved' => 20,
-            'incoming' => 10,
+            'quantity'  => 200,
+            'reserved'  => 20,
+            'incoming'  => 10,
             'threshold' => 30,
         ])
         ->call('save')
         ->assertHasNoFormErrors();
 
     $this->assertDatabaseHas('inventories', [
-        'id' => $this->testInventory->id,
-        'quantity' => 200,
-        'reserved' => 20,
-        'incoming' => 10,
+        'id'        => $this->testInventory->id,
+        'quantity'  => 200,
+        'reserved'  => 20,
+        'incoming'  => 10,
         'threshold' => 30,
     ]);
 });
@@ -137,9 +137,9 @@ it('validates required fields when creating inventory', function () {
     Livewire::actingAs($this->adminUser)
         ->test(InventoryResource\Pages\CreateInventory::class)
         ->fillForm([
-            'product_id' => null,
+            'product_id'  => null,
             'location_id' => null,
-            'quantity' => null,
+            'quantity'    => null,
         ])
         ->call('create')
         ->assertHasFormErrors(['product_id', 'location_id', 'quantity']);
@@ -152,12 +152,12 @@ it('validates numeric fields in inventory form', function () {
     Livewire::actingAs($this->adminUser)
         ->test(InventoryResource\Pages\CreateInventory::class)
         ->fillForm([
-            'product_id' => $product->id,
+            'product_id'  => $product->id,
             'location_id' => $location->id,
-            'quantity' => 'not-a-number',
-            'reserved' => 'invalid',
-            'incoming' => 'invalid',
-            'threshold' => 'invalid',
+            'quantity'    => 'not-a-number',
+            'reserved'    => 'invalid',
+            'incoming'    => 'invalid',
+            'threshold'   => 'invalid',
         ])
         ->call('create')
         ->assertHasFormErrors(['quantity', 'reserved', 'incoming', 'threshold']);
@@ -220,18 +220,18 @@ it('can adjust stock for inventory record', function () {
     Livewire::actingAs($this->adminUser)
         ->test(InventoryResource\Pages\ListInventories::class)
         ->callTableAction('adjust_stock', $this->testInventory, [
-            'quantity' => 150,
-            'reserved' => 25,
-            'incoming' => 10,
+            'quantity'  => 150,
+            'reserved'  => 25,
+            'incoming'  => 10,
             'threshold' => 30,
         ])
         ->assertHasNoActionErrors();
 
     $this->assertDatabaseHas('inventories', [
-        'id' => $this->testInventory->id,
-        'quantity' => 150,
-        'reserved' => 25,
-        'incoming' => 10,
+        'id'        => $this->testInventory->id,
+        'quantity'  => 150,
+        'reserved'  => 25,
+        'incoming'  => 10,
         'threshold' => 30,
     ]);
 });
@@ -281,20 +281,20 @@ it('can reserve stock for inventory record', function () {
 it('can filter inventories by stock status', function () {
     // Create inventories with different stock statuses
     $outOfStock = Inventory::factory()->create([
-        'quantity' => 0,
-        'reserved' => 0,
+        'quantity'  => 0,
+        'reserved'  => 0,
         'threshold' => 10,
     ]);
 
     $lowStock = Inventory::factory()->create([
-        'quantity' => 5,
-        'reserved' => 0,
+        'quantity'  => 5,
+        'reserved'  => 0,
         'threshold' => 10,
     ]);
 
     $inStock = Inventory::factory()->create([
-        'quantity' => 50,
-        'reserved' => 0,
+        'quantity'  => 50,
+        'reserved'  => 0,
         'threshold' => 10,
     ]);
 
@@ -321,26 +321,26 @@ it('can perform bulk stock adjustments', function () {
     Livewire::actingAs($this->adminUser)
         ->test(InventoryResource\Pages\ListInventories::class)
         ->callTableBulkAction('adjust_stock', [$inventory1->id, $inventory2->id], [
-            'quantity' => 100,
-            'reserved' => 10,
-            'incoming' => 5,
+            'quantity'  => 100,
+            'reserved'  => 10,
+            'incoming'  => 5,
             'threshold' => 20,
         ])
         ->assertHasNoBulkActionErrors();
 
     $this->assertDatabaseHas('inventories', [
-        'id' => $inventory1->id,
-        'quantity' => 100,
-        'reserved' => 10,
-        'incoming' => 5,
+        'id'        => $inventory1->id,
+        'quantity'  => 100,
+        'reserved'  => 10,
+        'incoming'  => 5,
         'threshold' => 20,
     ]);
 
     $this->assertDatabaseHas('inventories', [
-        'id' => $inventory2->id,
-        'quantity' => 100,
-        'reserved' => 10,
-        'incoming' => 5,
+        'id'        => $inventory2->id,
+        'quantity'  => 100,
+        'reserved'  => 10,
+        'incoming'  => 5,
         'threshold' => 20,
     ]);
 });
@@ -413,14 +413,14 @@ it('shows correct stock status badges', function () {
     ]);
 
     $lowStock = Inventory::factory()->create([
-        'quantity' => 5,
-        'reserved' => 0,
+        'quantity'  => 5,
+        'reserved'  => 0,
         'threshold' => 10,
     ]);
 
     $inStock = Inventory::factory()->create([
-        'quantity' => 50,
-        'reserved' => 0,
+        'quantity'  => 50,
+        'reserved'  => 0,
         'threshold' => 10,
     ]);
 
@@ -436,7 +436,7 @@ it('can search inventories by product name', function () {
 
     $this
         ->actingAs($this->adminUser)
-        ->get(InventoryResource::getUrl('index').'?search=Special')
+        ->get(InventoryResource::getUrl('index') . '?search=Special')
         ->assertOk();
 });
 
@@ -446,7 +446,7 @@ it('can search inventories by location name', function () {
 
     $this
         ->actingAs($this->adminUser)
-        ->get(InventoryResource::getUrl('index').'?search=Special')
+        ->get(InventoryResource::getUrl('index') . '?search=Special')
         ->assertOk();
 });
 
@@ -456,14 +456,14 @@ it('can sort inventories by quantity', function () {
 
     $this
         ->actingAs($this->adminUser)
-        ->get(InventoryResource::getUrl('index').'?sort=quantity&direction=asc')
+        ->get(InventoryResource::getUrl('index') . '?sort=quantity&direction=asc')
         ->assertOk();
 });
 
 it('can sort inventories by created date', function () {
     $this
         ->actingAs($this->adminUser)
-        ->get(InventoryResource::getUrl('index').'?sort=created_at&direction=desc')
+        ->get(InventoryResource::getUrl('index') . '?sort=created_at&direction=desc')
         ->assertOk();
 });
 

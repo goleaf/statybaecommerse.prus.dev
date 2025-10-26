@@ -137,8 +137,8 @@ final class ReviewController extends Controller
 
         if ($likedBy->contains($userId)) {
             return response()->json([
-                'message' => __('You have already marked this review as helpful.'),
-                'helpful_count' => (int) ($review->helpful_count ?? $likedBy->count()),
+                'message'        => __('You have already marked this review as helpful.'),
+                'helpful_count'  => (int) ($review->helpful_count ?? $likedBy->count()),
                 'reported_count' => (int) ($review->reported_count ?? 0),
             ]);
         }
@@ -155,8 +155,8 @@ final class ReviewController extends Controller
         $review->refresh();
 
         return response()->json([
-            'message' => __('Thanks for your feedback!'),
-            'helpful_count' => (int) ($review->helpful_count ?? $likedBy->count()),
+            'message'        => __('Thanks for your feedback!'),
+            'helpful_count'  => (int) ($review->helpful_count ?? $likedBy->count()),
             'reported_count' => (int) ($review->reported_count ?? 0),
         ]);
     }
@@ -178,8 +178,8 @@ final class ReviewController extends Controller
 
         if ($reportedBy->contains($userId)) {
             return response()->json([
-                'message' => __('You have already reported this review.'),
-                'helpful_count' => (int) ($review->helpful_count ?? 0),
+                'message'        => __('You have already reported this review.'),
+                'helpful_count'  => (int) ($review->helpful_count ?? 0),
                 'reported_count' => (int) ($review->reported_count ?? $reportedBy->count()),
             ]);
         }
@@ -202,8 +202,8 @@ final class ReviewController extends Controller
         $review->refresh();
 
         return response()->json([
-            'message' => __('Thanks for letting us know.'),
-            'helpful_count' => (int) ($review->helpful_count ?? 0),
+            'message'        => __('Thanks for letting us know.'),
+            'helpful_count'  => (int) ($review->helpful_count ?? 0),
             'reported_count' => (int) ($review->reported_count ?? $reportedBy->count()),
         ]);
     }

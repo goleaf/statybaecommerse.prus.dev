@@ -18,8 +18,8 @@ final class ListNotificationsRequest extends FormRequest
     {
         return [
             'per_page' => ['sometimes', 'integer', 'min:1', 'max:100'],
-            'type' => ['sometimes', 'string', 'max:255'],
-            'read' => ['sometimes', 'boolean'],
+            'type'     => ['sometimes', 'string', 'max:255'],
+            'read'     => ['sometimes', 'boolean'],
         ];
     }
 

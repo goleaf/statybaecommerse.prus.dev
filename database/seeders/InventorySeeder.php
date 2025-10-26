@@ -43,8 +43,8 @@ final class InventorySeeder extends Seeder
                                 ->for($locationsById->get($locationId))
                                 ->state([
                                     'is_tracked' => true,
-                                    'incoming' => fake()->numberBetween(0, 20),
-                                    'threshold' => fake()->numberBetween(5, 15),
+                                    'incoming'   => fake()->numberBetween(0, 20),
+                                    'threshold'  => fake()->numberBetween(5, 15),
                                 ])
                                 ->make();
                         }

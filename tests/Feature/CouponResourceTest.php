@@ -21,7 +21,7 @@ final class CouponResourceTest extends TestCase
         parent::setUp();
 
         $this->actingAs(User::factory()->create([
-            'email' => 'admin@example.com',
+            'email'    => 'admin@example.com',
             'is_admin' => true,
         ]));
     }
@@ -37,21 +37,21 @@ final class CouponResourceTest extends TestCase
     public function test_can_create_coupon(): void
     {
         $couponData = [
-            'code' => 'TEST20',
-            'name' => 'Test Coupon',
-            'description' => 'Test coupon description',
-            'type' => 'percentage',
-            'value' => 20.0,
-            'minimum_amount' => 50.0,
-            'maximum_discount' => 100.0,
-            'usage_limit' => 100,
+            'code'                 => 'TEST20',
+            'name'                 => 'Test Coupon',
+            'description'          => 'Test coupon description',
+            'type'                 => 'percentage',
+            'value'                => 20.0,
+            'minimum_amount'       => 50.0,
+            'maximum_discount'     => 100.0,
+            'usage_limit'          => 100,
             'usage_limit_per_user' => 1,
-            'is_active' => true,
-            'is_public' => false,
-            'is_auto_apply' => false,
-            'is_stackable' => false,
-            'starts_at' => now(),
-            'expires_at' => now()->addDays(30),
+            'is_active'            => true,
+            'is_public'            => false,
+            'is_auto_apply'        => false,
+            'is_stackable'         => false,
+            'starts_at'            => now(),
+            'expires_at'           => now()->addDays(30),
         ];
 
         Livewire::test(CouponResource\Pages\CreateCoupon::class)
@@ -200,7 +200,7 @@ final class CouponResourceTest extends TestCase
             ->callTableAction('duplicate', $coupon);
 
         $this->assertDatabaseHas('coupons', [
-            'code' => 'ORIGINAL_copy_'.time(),
+            'code' => 'ORIGINAL_copy_' . time(),
             'name' => 'Original Coupon (Copy)',
         ]);
     }
@@ -235,8 +235,8 @@ final class CouponResourceTest extends TestCase
     {
         Livewire::test(CouponResource\Pages\CreateCoupon::class)
             ->fillForm([
-                'code' => '',
-                'type' => 'percentage',
+                'code'  => '',
+                'type'  => 'percentage',
                 'value' => 20.0,
             ])
             ->call('create')
@@ -249,8 +249,8 @@ final class CouponResourceTest extends TestCase
 
         Livewire::test(CouponResource\Pages\CreateCoupon::class)
             ->fillForm([
-                'code' => 'EXISTING',
-                'type' => 'percentage',
+                'code'  => 'EXISTING',
+                'type'  => 'percentage',
                 'value' => 20.0,
             ])
             ->call('create')
@@ -261,8 +261,8 @@ final class CouponResourceTest extends TestCase
     {
         Livewire::test(CouponResource\Pages\CreateCoupon::class)
             ->fillForm([
-                'code' => 'INVALID CODE',
-                'type' => 'percentage',
+                'code'  => 'INVALID CODE',
+                'type'  => 'percentage',
                 'value' => 20.0,
             ])
             ->call('create')
@@ -273,8 +273,8 @@ final class CouponResourceTest extends TestCase
     {
         Livewire::test(CouponResource\Pages\CreateCoupon::class)
             ->fillForm([
-                'code' => 'TEST',
-                'type' => 'percentage',
+                'code'  => 'TEST',
+                'type'  => 'percentage',
                 'value' => 'invalid',
             ])
             ->call('create')
@@ -285,8 +285,8 @@ final class CouponResourceTest extends TestCase
     {
         Livewire::test(CouponResource\Pages\CreateCoupon::class)
             ->fillForm([
-                'code' => 'TEST',
-                'type' => 'percentage',
+                'code'  => 'TEST',
+                'type'  => 'percentage',
                 'value' => -10.0,
             ])
             ->call('create')
@@ -306,16 +306,16 @@ final class CouponResourceTest extends TestCase
     public function test_coupon_scope_valid(): void
     {
         Coupon::factory()->create([
-            'is_active' => true,
-            'starts_at' => now()->subDay(),
-            'expires_at' => now()->addDay(),
+            'is_active'   => true,
+            'starts_at'   => now()->subDay(),
+            'expires_at'  => now()->addDay(),
             'usage_limit' => 10,
-            'used_count' => 5,
+            'used_count'  => 5,
         ]);
 
         Coupon::factory()->create([
-            'is_active' => false,
-            'starts_at' => now()->subDay(),
+            'is_active'  => false,
+            'starts_at'  => now()->subDay(),
             'expires_at' => now()->addDay(),
         ]);
 
@@ -357,11 +357,11 @@ final class CouponResourceTest extends TestCase
     public function test_coupon_helper_methods(): void
     {
         $coupon = Coupon::factory()->create([
-            'is_active' => true,
-            'starts_at' => now()->subDay(),
-            'expires_at' => now()->addDay(),
+            'is_active'   => true,
+            'starts_at'   => now()->subDay(),
+            'expires_at'  => now()->addDay(),
             'usage_limit' => 10,
-            'used_count' => 5,
+            'used_count'  => 5,
         ]);
 
         $this->assertTrue($coupon->isValid());
@@ -373,8 +373,8 @@ final class CouponResourceTest extends TestCase
     public function test_coupon_calculate_discount_percentage(): void
     {
         $coupon = Coupon::factory()->create([
-            'type' => 'percentage',
-            'value' => 20.0,
+            'type'      => 'percentage',
+            'value'     => 20.0,
             'is_active' => true,
         ]);
 
@@ -385,8 +385,8 @@ final class CouponResourceTest extends TestCase
     public function test_coupon_calculate_discount_fixed(): void
     {
         $coupon = Coupon::factory()->create([
-            'type' => 'fixed',
-            'value' => 15.0,
+            'type'      => 'fixed',
+            'value'     => 15.0,
             'is_active' => true,
         ]);
 
@@ -397,8 +397,8 @@ final class CouponResourceTest extends TestCase
     public function test_coupon_calculate_discount_free_shipping(): void
     {
         $coupon = Coupon::factory()->create([
-            'type' => 'free_shipping',
-            'value' => 0.0,
+            'type'      => 'free_shipping',
+            'value'     => 0.0,
             'is_active' => true,
         ]);
 
@@ -409,10 +409,10 @@ final class CouponResourceTest extends TestCase
     public function test_coupon_minimum_amount_validation(): void
     {
         $coupon = Coupon::factory()->create([
-            'type' => 'percentage',
-            'value' => 20.0,
+            'type'           => 'percentage',
+            'value'          => 20.0,
             'minimum_amount' => 50.0,
-            'is_active' => true,
+            'is_active'      => true,
         ]);
 
         $this->assertFalse($coupon->canBeUsed(30.0));
@@ -423,8 +423,8 @@ final class CouponResourceTest extends TestCase
     {
         $coupon = Coupon::factory()->create([
             'usage_limit' => 5,
-            'used_count' => 5,
-            'is_active' => true,
+            'used_count'  => 5,
+            'is_active'   => true,
         ]);
 
         $this->assertFalse($coupon->isValid());
@@ -434,7 +434,7 @@ final class CouponResourceTest extends TestCase
     {
         $coupon = Coupon::factory()->create([
             'expires_at' => now()->subDay(),
-            'is_active' => true,
+            'is_active'  => true,
         ]);
 
         $this->assertTrue($coupon->isExpired());
@@ -494,7 +494,7 @@ final class CouponResourceTest extends TestCase
     {
         $coupon = Coupon::factory()->create([
             'usage_limit' => 100,
-            'used_count' => 25,
+            'used_count'  => 25,
         ]);
 
         $remainingUses = $coupon->usage_limit - $coupon->used_count;
@@ -504,7 +504,7 @@ final class CouponResourceTest extends TestCase
     public function test_coupon_value_formatting_percentage(): void
     {
         $coupon = Coupon::factory()->create([
-            'type' => 'percentage',
+            'type'  => 'percentage',
             'value' => 20.0,
         ]);
 
@@ -516,7 +516,7 @@ final class CouponResourceTest extends TestCase
     public function test_coupon_value_formatting_fixed(): void
     {
         $coupon = Coupon::factory()->create([
-            'type' => 'fixed',
+            'type'  => 'fixed',
             'value' => 15.0,
         ]);
 
@@ -528,7 +528,7 @@ final class CouponResourceTest extends TestCase
     public function test_coupon_value_formatting_free_shipping(): void
     {
         $coupon = Coupon::factory()->create([
-            'type' => 'free_shipping',
+            'type'  => 'free_shipping',
             'value' => 0.0,
         ]);
 

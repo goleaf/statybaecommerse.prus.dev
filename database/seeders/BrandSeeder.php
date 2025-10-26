@@ -7,6 +7,7 @@ namespace Database\Seeders;
 use App\Models\Brand;
 use App\Services\Images\LocalImageGeneratorService;
 use Illuminate\Database\Seeder;
+use Throwable;
 
 final class BrandSeeder extends Seeder
 {
@@ -37,32 +38,32 @@ final class BrandSeeder extends Seeder
             if (! $existingBrand) {
                 /** @var Brand $brand */
                 $brand = Brand::factory()->create([
-                    'name' => $definition['name'],
-                    'slug' => $slug,
-                    'description' => "{$definition['name']} profesionalūs statybos įrankiai ir sprendimai.",
-                    'website' => 'https://'.$slug.'.lt',
-                    'is_enabled' => true,
-                    'is_featured' => $definition['featured'],
-                    'seo_title' => $definition['name'],
+                    'name'            => $definition['name'],
+                    'slug'            => $slug,
+                    'description'     => "{$definition['name']} profesionalūs statybos įrankiai ir sprendimai.",
+                    'website'         => 'https://' . $slug . '.lt',
+                    'is_enabled'      => true,
+                    'is_featured'     => $definition['featured'],
+                    'seo_title'       => $definition['name'],
                     'seo_description' => "Atraskite {$definition['name']} įrankių asortimentą statybos projektams.",
                 ]);
 
                 // Create translations manually to avoid factory creating additional brands
                 $brand->translations()->createMany([
                     [
-                        'locale' => 'lt',
-                        'name' => $definition['name'],
-                        'slug' => $slug,
-                        'description' => "Profesionalūs {$definition['name']} įrankiai Lietuvos rinkai.",
-                        'seo_title' => $definition['name'],
+                        'locale'          => 'lt',
+                        'name'            => $definition['name'],
+                        'slug'            => $slug,
+                        'description'     => "Profesionalūs {$definition['name']} įrankiai Lietuvos rinkai.",
+                        'seo_title'       => $definition['name'],
                         'seo_description' => "Patikimi {$definition['name']} įrankiai statyboms Lietuvoje.",
                     ],
                     [
-                        'locale' => 'en',
-                        'name' => $definition['name'].' (EN)',
-                        'slug' => $slug.'-en',
-                        'description' => "Professional {$definition['name']} tools for the European market.",
-                        'seo_title' => $definition['name'].' (EN)',
+                        'locale'          => 'en',
+                        'name'            => $definition['name'] . ' (EN)',
+                        'slug'            => $slug . '-en',
+                        'description'     => "Professional {$definition['name']} tools for the European market.",
+                        'seo_title'       => $definition['name'] . ' (EN)',
                         'seo_description' => "Reliable {$definition['name']} tools for construction projects.",
                     ],
                 ]);
@@ -90,10 +91,10 @@ final class BrandSeeder extends Seeder
             $brand
                 ->addMedia($logoPath)
                 ->withCustomProperties(['source' => 'local_generated'])
-                ->usingName($brand->name.' Logo')
-                ->usingFileName(str($brand->slug)->slug()->toString().'-logo.webp')
+                ->usingName($brand->name . ' Logo')
+                ->usingFileName(str($brand->slug)->slug()->toString() . '-logo.webp')
                 ->toMediaCollection('logo');
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             report($e);
         } finally {
             if (isset($logoPath) && file_exists($logoPath)) {

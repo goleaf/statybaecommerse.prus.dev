@@ -34,16 +34,16 @@ final class ProductTest extends TestCase
         $category = $this->createTestCategory();
 
         $product = Product::factory()->create([
-            'name' => 'Test Product',
-            'slug' => 'test-product',
-            'sku' => 'TEST001',
+            'name'        => 'Test Product',
+            'slug'        => 'test-product',
+            'sku'         => 'TEST001',
             'description' => 'Test description',
-            'price' => 99.99,
-            'sale_price' => 79.99,
-            'brand_id' => $brand->id,
-            'is_visible' => true,
+            'price'       => 99.99,
+            'sale_price'  => 79.99,
+            'brand_id'    => $brand->id,
+            'is_visible'  => true,
             'is_featured' => false,
-            'status' => 'published',
+            'status'      => 'published',
         ]);
 
         $this->assertInstanceOf(Product::class, $product);
@@ -70,9 +70,9 @@ final class ProductTest extends TestCase
 
         // Test with translation
         $product->updateTranslation('en', [
-            'name' => 'English Name',
+            'name'        => 'English Name',
             'description' => 'English Description',
-            'slug' => 'english-slug',
+            'slug'        => 'english-slug',
         ]);
 
         $this->assertEquals('English Name', $product->getTranslatedName('en'));
@@ -87,8 +87,8 @@ final class ProductTest extends TestCase
 
         // Create test products with specific attributes
         $publishedProduct = Product::factory()->create([
-            'is_visible' => true,
-            'status' => 'published',
+            'is_visible'   => true,
+            'status'       => 'published',
             'published_at' => now()->subDay(),
         ]);
         $draftProduct = Product::factory()->create(['status' => 'draft']);
@@ -114,14 +114,14 @@ final class ProductTest extends TestCase
     public function test_product_helper_methods(): void
     {
         $product = Product::factory()->create([
-            'name' => 'Test Product',
-            'sku' => 'TEST001',
-            'price' => 100.00,
+            'name'       => 'Test Product',
+            'sku'        => 'TEST001',
+            'price'      => 100.00,
             'sale_price' => 80.00,
             'cost_price' => 60.00,
-            'length' => 10.0,
-            'width' => 5.0,
-            'height' => 2.0,
+            'length'     => 10.0,
+            'width'      => 5.0,
+            'height'     => 2.0,
         ]);
 
         // Test info methods
@@ -152,7 +152,7 @@ final class ProductTest extends TestCase
     public function test_product_pricing_calculations(): void
     {
         $product = Product::factory()->create([
-            'price' => 100.00,
+            'price'      => 100.00,
             'sale_price' => 80.00,
             'cost_price' => 60.00,
         ]);
@@ -174,7 +174,7 @@ final class ProductTest extends TestCase
     {
         $product = Product::factory()->create([
             'length' => 10.0,
-            'width' => 5.0,
+            'width'  => 5.0,
             'height' => 2.0,
         ]);
 
@@ -190,8 +190,8 @@ final class ProductTest extends TestCase
     public function test_product_stock_methods(): void
     {
         $product = Product::factory()->create([
-            'manage_stock' => true,
-            'stock_quantity' => 10,
+            'manage_stock'        => true,
+            'stock_quantity'      => 10,
             'low_stock_threshold' => 5,
         ]);
 
@@ -255,7 +255,7 @@ final class ProductTest extends TestCase
 
         // Test update translation
         $this->assertTrue($product->updateTranslation('en', [
-            'name' => 'English Name',
+            'name'        => 'English Name',
             'description' => 'English Description',
         ]));
 
@@ -268,7 +268,7 @@ final class ProductTest extends TestCase
     {
         $product = Product::factory()->create([
             'name' => 'Test Product',
-            'sku' => 'TEST001',
+            'sku'  => 'TEST001',
         ]);
 
         $displayName = $product->getFullDisplayName();
@@ -283,8 +283,8 @@ final class ProductTest extends TestCase
     public function test_product_published_status(): void
     {
         $product = Product::factory()->create([
-            'is_visible' => true,
-            'status' => 'published',
+            'is_visible'   => true,
+            'status'       => 'published',
             'published_at' => now()->subDay(),
         ]);
 

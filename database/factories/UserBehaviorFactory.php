@@ -55,26 +55,26 @@ final class UserBehaviorFactory extends Factory
         ];
 
         return [
-            'user_id' => User::factory(),
-            'session_id' => $this->faker->uuid(),
-            'product_id' => Product::factory(),
-            'category_id' => Category::factory(),
+            'user_id'       => User::factory(),
+            'session_id'    => $this->faker->uuid(),
+            'product_id'    => Product::factory(),
+            'category_id'   => Category::factory(),
             'behavior_type' => $this->faker->randomElement($behaviorTypes),
-            'referrer' => $this->faker->randomElement($referrers),
-            'user_agent' => $this->faker->randomElement($userAgents),
-            'ip_address' => $this->faker->ipv4(),
-            'metadata' => [
-                'page_url' => $this->faker->url(),
-                'page_title' => $this->faker->sentence(3),
-                'viewport_width' => $this->faker->numberBetween(320, 1920),
-                'viewport_height' => $this->faker->numberBetween(568, 1080),
+            'referrer'      => $this->faker->randomElement($referrers),
+            'user_agent'    => $this->faker->randomElement($userAgents),
+            'ip_address'    => $this->faker->ipv4(),
+            'metadata'      => [
+                'page_url'          => $this->faker->url(),
+                'page_title'        => $this->faker->sentence(3),
+                'viewport_width'    => $this->faker->numberBetween(320, 1920),
+                'viewport_height'   => $this->faker->numberBetween(568, 1080),
                 'screen_resolution' => $this->faker->randomElement(['1920x1080', '1366x768', '1440x900', '1536x864', '1280x720']),
-                'color_depth' => $this->faker->randomElement([24, 32]),
-                'timezone' => $this->faker->timezone(),
-                'language' => $this->faker->randomElement(['en', 'lt', 'es', 'fr', 'de']),
-                'is_mobile' => $this->faker->boolean(30),
-                'is_tablet' => $this->faker->boolean(10),
-                'is_desktop' => $this->faker->boolean(60),
+                'color_depth'       => $this->faker->randomElement([24, 32]),
+                'timezone'          => $this->faker->timezone(),
+                'language'          => $this->faker->randomElement(['en', 'lt', 'es', 'fr', 'de']),
+                'is_mobile'         => $this->faker->boolean(30),
+                'is_tablet'         => $this->faker->boolean(10),
+                'is_desktop'        => $this->faker->boolean(60),
             ],
             'created_at' => $this->faker->dateTimeBetween('-30 days', 'now'),
         ];
@@ -87,9 +87,9 @@ final class UserBehaviorFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'behavior_type' => 'view',
-            'metadata' => array_merge($attributes['metadata'] ?? [], [
+            'metadata'      => array_merge($attributes['metadata'] ?? [], [
                 'view_duration' => $this->faker->numberBetween(1, 300),
-                'scroll_depth' => $this->faker->numberBetween(0, 100),
+                'scroll_depth'  => $this->faker->numberBetween(0, 100),
             ]),
         ]);
     }
@@ -101,8 +101,8 @@ final class UserBehaviorFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'behavior_type' => 'click',
-            'metadata' => array_merge($attributes['metadata'] ?? [], [
-                'click_element' => $this->faker->randomElement(['button', 'link', 'image', 'product_card']),
+            'metadata'      => array_merge($attributes['metadata'] ?? [], [
+                'click_element'  => $this->faker->randomElement(['button', 'link', 'image', 'product_card']),
                 'click_position' => [
                     'x' => $this->faker->numberBetween(0, 1920),
                     'y' => $this->faker->numberBetween(0, 1080),
@@ -118,9 +118,9 @@ final class UserBehaviorFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'behavior_type' => 'add_to_cart',
-            'metadata' => array_merge($attributes['metadata'] ?? [], [
-                'quantity' => $this->faker->numberBetween(1, 5),
-                'price' => $this->faker->randomFloat(2, 10, 1000),
+            'metadata'      => array_merge($attributes['metadata'] ?? [], [
+                'quantity'   => $this->faker->numberBetween(1, 5),
+                'price'      => $this->faker->randomFloat(2, 10, 1000),
                 'variant_id' => $this->faker->optional()->uuid(),
             ]),
         ]);
@@ -133,12 +133,12 @@ final class UserBehaviorFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'behavior_type' => 'purchase',
-            'metadata' => array_merge($attributes['metadata'] ?? [], [
-                'order_id' => $this->faker->uuid(),
-                'total_amount' => $this->faker->randomFloat(2, 20, 2000),
+            'metadata'      => array_merge($attributes['metadata'] ?? [], [
+                'order_id'       => $this->faker->uuid(),
+                'total_amount'   => $this->faker->randomFloat(2, 20, 2000),
                 'payment_method' => $this->faker->randomElement(['credit_card', 'paypal', 'bank_transfer', 'crypto']),
-                'currency' => 'EUR',
-                'items_count' => $this->faker->numberBetween(1, 10),
+                'currency'       => 'EUR',
+                'items_count'    => $this->faker->numberBetween(1, 10),
             ]),
         ]);
     }
@@ -150,11 +150,11 @@ final class UserBehaviorFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'behavior_type' => 'search',
-            'product_id' => null,
-            'metadata' => array_merge($attributes['metadata'] ?? [], [
-                'search_query' => $this->faker->words(3, true),
+            'product_id'    => null,
+            'metadata'      => array_merge($attributes['metadata'] ?? [], [
+                'search_query'         => $this->faker->words(3, true),
                 'search_results_count' => $this->faker->numberBetween(0, 500),
-                'search_filters' => $this->faker->optional()->randomElements(['category', 'price', 'brand', 'color'], $this->faker->numberBetween(1, 3)),
+                'search_filters'       => $this->faker->optional()->randomElements(['category', 'price', 'brand', 'color'], $this->faker->numberBetween(1, 3)),
             ]),
         ]);
     }
@@ -220,10 +220,10 @@ final class UserBehaviorFactory extends Factory
                 'Mozilla/5.0 (Linux; Android 11; SM-G991B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.120 Mobile Safari/537.36',
             ]),
             'metadata' => array_merge($attributes['metadata'] ?? [], [
-                'is_mobile' => true,
-                'is_tablet' => false,
-                'is_desktop' => false,
-                'viewport_width' => $this->faker->numberBetween(320, 414),
+                'is_mobile'       => true,
+                'is_tablet'       => false,
+                'is_desktop'      => false,
+                'viewport_width'  => $this->faker->numberBetween(320, 414),
                 'viewport_height' => $this->faker->numberBetween(568, 896),
             ]),
         ]);
@@ -236,7 +236,7 @@ final class UserBehaviorFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'behavior_type' => 'wishlist',
-            'metadata' => array_merge($attributes['metadata'] ?? [], [
+            'metadata'      => array_merge($attributes['metadata'] ?? [], [
                 'wishlist_note' => $this->faker->optional()->sentence(),
             ]),
         ]);
@@ -249,10 +249,10 @@ final class UserBehaviorFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'behavior_type' => 'filter',
-            'metadata' => array_merge($attributes['metadata'] ?? [], [
+            'metadata'      => array_merge($attributes['metadata'] ?? [], [
                 'filters_applied' => $this->faker->randomElements(['price', 'brand', 'color', 'size'], $this->faker->numberBetween(1, 3)),
-                'page_url' => $this->faker->url(),
-                'page_title' => $this->faker->sentence(3),
+                'page_url'        => $this->faker->url(),
+                'page_title'      => $this->faker->sentence(3),
             ]),
         ]);
     }
@@ -268,10 +268,10 @@ final class UserBehaviorFactory extends Factory
                 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
             ]),
             'metadata' => array_merge($attributes['metadata'] ?? [], [
-                'is_mobile' => false,
-                'is_tablet' => false,
-                'is_desktop' => true,
-                'viewport_width' => $this->faker->numberBetween(1024, 1920),
+                'is_mobile'       => false,
+                'is_tablet'       => false,
+                'is_desktop'      => true,
+                'viewport_width'  => $this->faker->numberBetween(1024, 1920),
                 'viewport_height' => $this->faker->numberBetween(768, 1080),
             ]),
         ]);

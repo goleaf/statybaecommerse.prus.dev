@@ -12,11 +12,11 @@ it('paginates results with correct flags', function () {
     $results = [];
     for ($i = 1; $i <= 50; $i++) {
         $results[] = [
-            'id' => $i,
-            'price' => $i,
-            'type' => $i % 2 ? 'a' : 'b',
-            'category' => 'c'.($i % 3),
-            'brand' => 'b'.($i % 2),
+            'id'             => $i,
+            'price'          => $i,
+            'type'           => $i % 2 ? 'a' : 'b',
+            'category'       => 'c' . ($i % 3),
+            'brand'          => 'b' . ($i % 2),
             'average_rating' => ($i % 5) + 1,
         ];
     }
@@ -41,10 +41,10 @@ it('applies filters to results', function () {
     ];
 
     $out = $svc->paginateSearchResults($results, 'q', 1, 20, [
-        'type' => 'a',
-        'price_min' => 10,
-        'price_max' => 500,
-        'brand' => 'acme',
+        'type'       => 'a',
+        'price_min'  => 10,
+        'price_max'  => 500,
+        'brand'      => 'acme',
         'rating_min' => 4.0,
     ]);
 

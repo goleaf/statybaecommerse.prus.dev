@@ -36,8 +36,8 @@ final class ArrayOffsetsAndCollectionsTest extends UnitTestCase
             manageStock: false,
             isInStock: true,
             stockQuantity: 0,
-            images: new ProductImageCollection(),
-            variants: new ProductVariantCollection(),
+            images: new ProductImageCollection,
+            variants: new ProductVariantCollection,
         );
 
         $this->assertNull($product->getBrandName());
@@ -52,4 +52,3 @@ final class ArrayOffsetsAndCollectionsTest extends UnitTestCase
         $this->assertNull($item->product_sku);
     }
 }
-

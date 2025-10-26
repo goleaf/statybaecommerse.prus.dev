@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace App\Support\Monitoring;
 
+use function collect;
+
 use Illuminate\Contracts\Database\ConnectionResolverInterface;
 use Illuminate\Database\QueryException;
 use Illuminate\Queue\QueueManager;
 use Illuminate\Support\Facades\Log;
-use function collect;
+use Throwable;
 
 final class ApplicationMetrics
 {
@@ -17,8 +19,7 @@ final class ApplicationMetrics
         private readonly QueueMetricsStore $queueMetrics,
         private readonly QueueManager $queueManager,
         private readonly ConnectionResolverInterface $connectionResolver,
-    ) {
-    }
+    ) {}
 
     /**
      * @return array{
@@ -59,8 +60,8 @@ final class ApplicationMetrics
 
         return [
             'queues' => [
-                'depth' => $queueDepth,
-                'metrics' => $queueMetrics,
+                'depth'             => $queueDepth,
+                'metrics'           => $queueMetrics,
                 'failed_jobs_table' => $failedJobs,
             ],
             'cache' => $this->cacheMetrics->snapshot(),
@@ -77,7 +78,7 @@ final class ApplicationMetrics
         foreach ($snapshot['queues']['depth'] as $metric) {
             $labels = $this->formatLabels([
                 'connection' => $metric['connection'],
-                'queue' => $metric['queue'],
+                'queue'      => $metric['queue'],
             ]);
             $lines[] = sprintf('queue_depth%s %d', $labels, $metric['size']);
         }
@@ -91,7 +92,7 @@ final class ApplicationMetrics
         foreach ($snapshot['queues']['metrics']['queues'] as $metric) {
             $labels = $this->formatLabels([
                 'connection' => $metric['connection'],
-                'queue' => $metric['queue'],
+                'queue'      => $metric['queue'],
             ]);
             $lines[] = sprintf('queue_job_failures_total%s %d', $labels, $metric['failed']);
         }
@@ -101,7 +102,7 @@ final class ApplicationMetrics
         foreach ($snapshot['queues']['metrics']['queues'] as $metric) {
             $labels = $this->formatLabels([
                 'connection' => $metric['connection'],
-                'queue' => $metric['queue'],
+                'queue'      => $metric['queue'],
             ]);
             $lines[] = sprintf('queue_jobs_processed_total%s %d', $labels, $metric['processed']);
         }
@@ -132,7 +133,7 @@ final class ApplicationMetrics
             $lines[] = sprintf('cache_store_misses_total%s %d', $labels, $storeMetric['misses']);
         }
 
-        return implode("\n", $lines)."\n";
+        return implode("\n", $lines) . "\n";
     }
 
     /**
@@ -148,11 +149,11 @@ final class ApplicationMetrics
 
             try {
                 $size = $this->queueManager->connection($name)->size($queueName);
-            } catch (\Throwable $exception) {
+            } catch (Throwable $exception) {
                 Log::debug('Queue size lookup failed', [
                     'connection' => $name,
-                    'queue' => $queueName,
-                    'exception' => $exception::class,
+                    'queue'      => $queueName,
+                    'exception'  => $exception::class,
                 ]);
 
                 return;
@@ -160,8 +161,8 @@ final class ApplicationMetrics
 
             $metrics[] = [
                 'connection' => $name,
-                'queue' => $queueName,
-                'size' => (int) $size,
+                'queue'      => $queueName,
+                'size'       => (int) $size,
             ];
         });
 
@@ -178,8 +179,8 @@ final class ApplicationMetrics
         } catch (QueryException $exception) {
             Log::debug('Failed jobs table unavailable', [
                 'connection' => $connectionName,
-                'table' => $table,
-                'exception' => $exception::class,
+                'table'      => $table,
+                'exception'  => $exception::class,
             ]);
 
             return 0;
@@ -187,7 +188,7 @@ final class ApplicationMetrics
     }
 
     /**
-     * @param  array<string, string|int>  $labels
+     * @param array<string, string|int> $labels
      */
     private function formatLabels(array $labels): string
     {
@@ -200,7 +201,7 @@ final class ApplicationMetrics
             $parts[] = sprintf('%s="%s"', $this->sanitize((string) $key), $this->sanitize((string) $value));
         }
 
-        return '{'.implode(',', $parts).'}';
+        return '{' . implode(',', $parts) . '}';
     }
 
     private function sanitize(string $value): string

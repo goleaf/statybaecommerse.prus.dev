@@ -34,7 +34,7 @@ final class ExportReadyNotification extends Notification implements ShouldQueue
     public function toMail(object $notifiable): MailMessage
     {
         // Highlight the availability and expiry in the email copy.
-        return (new MailMessage())
+        return (new MailMessage)
             ->subject(__('exports.notifications.ready.subject', ['name' => $this->export->name]))
             ->line(__('exports.notifications.ready.intro'))
             ->action(__('exports.notifications.ready.action'), $this->downloadUrl)
@@ -48,10 +48,10 @@ final class ExportReadyNotification extends Notification implements ShouldQueue
     {
         // Persist metadata for dashboards and audit logs.
         return [
-            'export_id' => $this->export->getKey(),
-            'name' => $this->export->name,
-            'format' => $this->export->format,
-            'download_url' => $this->downloadUrl,
+            'export_id'          => $this->export->getKey(),
+            'name'               => $this->export->name,
+            'format'             => $this->export->format,
+            'download_url'       => $this->downloadUrl,
             'expires_in_minutes' => $this->ttlMinutes,
         ];
     }

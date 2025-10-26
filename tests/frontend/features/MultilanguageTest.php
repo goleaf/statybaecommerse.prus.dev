@@ -25,7 +25,7 @@ class MultilanguageTest extends TestCase
 
         $this->adminUser = User::factory()->create([
             'email' => 'admin@test.com',
-            'name' => 'Admin User',
+            'name'  => 'Admin User',
         ]);
 
         // Give the user admin permissions
@@ -258,12 +258,12 @@ class MultilanguageTest extends TestCase
         // Test Euro formatting for Lithuanian locale
         app()->setLocale('lt');
         $amount = 1234.56;
-        $formatted = number_format($amount, 2).' €';
+        $formatted = number_format($amount, 2) . ' €';
         expect($formatted)->toBe('1,234.56 €');
 
         // Test Euro formatting for English locale
         app()->setLocale('en');
-        $formatted = '€'.number_format($amount, 2);
+        $formatted = '€' . number_format($amount, 2);
         expect($formatted)->toBe('€1,234.56');
     }
 

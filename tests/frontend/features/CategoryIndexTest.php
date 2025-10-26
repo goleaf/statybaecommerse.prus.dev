@@ -15,22 +15,22 @@ beforeEach(function () {
     $this->brand = Brand::factory()->create(['name' => 'Test Brand', 'is_enabled' => true]);
 
     $this->categoryWithProducts = Category::factory()->create([
-        'name' => 'Electronics',
+        'name'        => 'Electronics',
         'description' => 'Electronic devices and gadgets',
-        'is_visible' => true,
+        'is_visible'  => true,
     ]);
 
     $this->categoryWithoutProducts = Category::factory()->create([
-        'name' => 'Books',
+        'name'        => 'Books',
         'description' => 'Books and literature',
-        'is_visible' => true,
+        'is_visible'  => true,
     ]);
 
     // Create products for the first category
     Product::factory()->count(3)->create([
-        'brand_id' => $this->brand->id,
+        'brand_id'   => $this->brand->id,
         'is_visible' => true,
-        'price' => 100.00,
+        'price'      => 100.00,
     ])->each(function ($product) {
         $product->categories()->attach($this->categoryWithProducts->id);
     });
@@ -120,9 +120,9 @@ it('resets pagination when filters change', function () {
 it('persists filters in URL', function () {
     livewire(Index::class)
         ->fillForm([
-            'search' => 'Electronics',
+            'search'  => 'Electronics',
             'brandId' => $this->brand->id,
-            'sort' => 'name_desc',
+            'sort'    => 'name_desc',
         ])
         ->assertSet('search', 'Electronics')
         ->assertSet('brandId', $this->brand->id)

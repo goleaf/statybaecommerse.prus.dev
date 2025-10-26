@@ -5,7 +5,7 @@ declare(strict_types=1);
 use Illuminate\Filesystem\Filesystem;
 
 it('feature: does not use inline notification strings', function (): void {
-    $filesystem = new Filesystem();
+    $filesystem = new Filesystem;
     $invalidUsages = [];
 
     foreach ($filesystem->allFiles(app_path()) as $file) {

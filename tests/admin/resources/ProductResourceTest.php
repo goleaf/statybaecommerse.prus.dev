@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace Tests\Feature;
 
 use App\Filament\Resources\ProductResource;
-use App\Support\Nav;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\User;
+use App\Support\Nav;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -24,7 +24,7 @@ class ProductResourceTest extends TestCase
         parent::setUp();
 
         $this->actingAs(User::factory()->create([
-            'email' => 'admin@test.com',
+            'email'     => 'admin@test.com',
             'is_active' => true,
         ]));
     }
@@ -94,9 +94,9 @@ class ProductResourceTest extends TestCase
 
         $product = Product::factory()->create([
             'brand_id' => $brand->id,
-            'name' => 'Test Product',
-            'sku' => 'TEST-001',
-            'price' => 99.99,
+            'name'     => 'Test Product',
+            'sku'      => 'TEST-001',
+            'price'    => 99.99,
         ]);
 
         $resource = new ProductResource;
@@ -109,8 +109,8 @@ class ProductResourceTest extends TestCase
 
         // Test that product was created
         $this->assertDatabaseHas('products', [
-            'name' => 'Test Product',
-            'sku' => 'TEST-001',
+            'name'  => 'Test Product',
+            'sku'   => 'TEST-001',
             'price' => 99.99,
         ]);
     }

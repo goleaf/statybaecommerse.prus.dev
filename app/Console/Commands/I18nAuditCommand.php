@@ -206,7 +206,7 @@ final class I18nAuditCommand extends Command
     }
 
     /**
-     * @param  array<string, mixed>  $translations
+     * @param  array<string, mixed> $translations
      * @return array<string, mixed>
      */
     private function prependKeys(array $translations, string $prefix): array
@@ -225,7 +225,7 @@ final class I18nAuditCommand extends Command
     }
 
     /**
-     * @param  array<mixed>  $values
+     * @param  array<mixed>         $values
      * @return array<string, mixed>
      */
     private function flatten(array $values, string $prefix = ''): array
@@ -281,7 +281,7 @@ final class I18nAuditCommand extends Command
             $this->line(" - {$locale}:");
 
             if ($missing !== []) {
-                $this->error('   Missing ('.count($missing).'):');
+                $this->error('   Missing (' . count($missing) . '):');
 
                 foreach ($missing as $key) {
                     $this->line("     • {$key}");
@@ -289,7 +289,7 @@ final class I18nAuditCommand extends Command
             }
 
             if ($extra !== []) {
-                $this->error('   Extra ('.count($extra).'):');
+                $this->error('   Extra (' . count($extra) . '):');
 
                 foreach ($extra as $key) {
                     $this->line("     • {$key}");
@@ -297,7 +297,7 @@ final class I18nAuditCommand extends Command
             }
 
             if ($untranslated !== []) {
-                $this->warn('   Untranslated ('.count($untranslated).'):');
+                $this->warn('   Untranslated (' . count($untranslated) . '):');
 
                 foreach ($untranslated as $key) {
                     $this->line("     • {$key}");

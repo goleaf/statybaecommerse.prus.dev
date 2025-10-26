@@ -4,13 +4,15 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Database;
 
+use function collect;
+
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
-use Tests\TestCase;
 
-use function collect;
 use function str_contains;
+
+use Tests\TestCase;
 
 final class SchemaIntegrityTest extends TestCase
 {

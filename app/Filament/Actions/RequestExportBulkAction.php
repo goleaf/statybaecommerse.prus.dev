@@ -25,7 +25,7 @@ final class RequestExportBulkAction
         $config = config(sprintf('exports.entities.%s', $type->value));
         $columns = collect($config['columns'] ?? [])->mapWithKeys(fn ($column, $key) => [$key => $column['label']])->all();
 
-        return BulkAction::make('export_'.$type->value)
+        return BulkAction::make('export_' . $type->value)
             ->label(__('Export'))
             ->icon('heroicon-o-arrow-down-tray')
             ->color('info')
@@ -72,13 +72,13 @@ final class RequestExportBulkAction
                 });
 
                 $request = ExportRequestData::from([
-                    'entity' => $type->value,
-                    'filters' => $filters,
-                    'columns' => array_values($data['columns'] ?? []),
-                    'format' => $data['format'],
-                    'locale' => $data['locale'] ?? app()->getLocale(),
+                    'entity'   => $type->value,
+                    'filters'  => $filters,
+                    'columns'  => array_values($data['columns'] ?? []),
+                    'format'   => $data['format'],
+                    'locale'   => $data['locale'] ?? app()->getLocale(),
                     'timezone' => $data['timezone'] ?? config('app.timezone'),
-                    'ids' => $records->pluck('id')->all(),
+                    'ids'      => $records->pluck('id')->all(),
                 ]);
 
                 $exportService->queueExport($request, $user);

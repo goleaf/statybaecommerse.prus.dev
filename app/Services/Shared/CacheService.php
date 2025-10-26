@@ -7,6 +7,7 @@ namespace App\Services\Shared;
 use App\Services\CacheInvalidationService;
 use App\Support\Cache\CacheTagHelper;
 use Closure;
+use DateInterval;
 use Illuminate\Cache\TaggableStore;
 use Illuminate\Support\Facades\Cache;
 
@@ -39,7 +40,7 @@ final class CacheService
      * @template TValue
      *
      * @param  Closure(): TValue  $callback
-     * @param  array<int, string>  $tags
+     * @param  array<int, string> $tags
      * @return TValue
      */
     public function rememberShort(string $key, Closure $callback, ?int $ttl = null, array $tags = []): mixed
@@ -53,7 +54,7 @@ final class CacheService
      * @template TValue
      *
      * @param  Closure(): TValue  $callback
-     * @param  array<int, string>  $tags
+     * @param  array<int, string> $tags
      * @return TValue
      */
     public function rememberDefault(string $key, Closure $callback, ?int $ttl = null, array $tags = []): mixed
@@ -67,7 +68,7 @@ final class CacheService
      * @template TValue
      *
      * @param  Closure(): TValue  $callback
-     * @param  array<int, string>  $tags
+     * @param  array<int, string> $tags
      * @return TValue
      */
     public function rememberLong(string $key, Closure $callback, ?int $ttl = null, array $tags = []): mixed
@@ -78,11 +79,11 @@ final class CacheService
     /**
      * @template TValue
      *
-     * @param  array<int, string>  $tags
+     * @param  array<int, string> $tags
      * @param  Closure(): TValue  $callback
      * @return TValue
      */
-    private function rememberWithTags(array $tags, string $key, int|\DateInterval $ttl, Closure $callback): mixed
+    private function rememberWithTags(array $tags, string $key, int|DateInterval $ttl, Closure $callback): mixed
     {
         if ($tags !== [] && $this->supportsTags) {
             return Cache::tags($tags)->remember($key, $ttl, $callback);

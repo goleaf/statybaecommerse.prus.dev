@@ -27,8 +27,8 @@ final class MenuQueryPerformanceTest extends TestCase
             ->count(3)
             ->visible()
             ->sequence(fn (int $index) => [
-                'menu_id' => $menu->id,
-                'label' => 'Punktas '.($index + 1),
+                'menu_id'    => $menu->id,
+                'label'      => 'Punktas ' . ($index + 1),
                 'sort_order' => $index,
             ])
             ->create()
@@ -36,9 +36,9 @@ final class MenuQueryPerformanceTest extends TestCase
                 MenuItem::factory()
                     ->visible()
                     ->create([
-                        'menu_id' => $menu->id,
+                        'menu_id'   => $menu->id,
                         'parent_id' => $item->id,
-                        'label' => 'Vaikas '.($index + 1),
+                        'label'     => 'Vaikas ' . ($index + 1),
                     ]);
             });
 
@@ -53,6 +53,6 @@ final class MenuQueryPerformanceTest extends TestCase
         $this->assertSame(200, $response->status());
 
         $queries = DB::getQueryLog();
-        $this->assertLessThanOrEqual(4, count($queries), 'Menu index executed too many queries: '.count($queries));
+        $this->assertLessThanOrEqual(4, count($queries), 'Menu index executed too many queries: ' . count($queries));
     }
 }

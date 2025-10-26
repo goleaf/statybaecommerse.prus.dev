@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 // Script to fix common Filament RelationManager syntax errors
 
 $files = glob('/www/wwwroot/statybaecommerse.prus.dev/app/Filament/**/*RelationManager.php');

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models;
 
@@ -6,11 +8,11 @@ use App\Models\Concerns\OrdersByName;
 use App\Models\Scopes\UserOwnedScope;
 use Database\Factories\UserPreferenceFactory;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
 
 /**
@@ -18,13 +20,13 @@ use Illuminate\Support\Carbon;
  *
  * Eloquent model representing the UserPreference entity with comprehensive relationships, scopes, and business logic for the e-commerce system.
  *
- * @property int $id
- * @property int $user_id
- * @property string $preference_type
- * @property string $preference_key
- * @property float|null $preference_score
- * @property array<string, mixed>|null $metadata
- * @property \Illuminate\Support\Carbon $last_updated
+ * @property int                             $id
+ * @property int                             $user_id
+ * @property string                          $preference_type
+ * @property string                          $preference_key
+ * @property float|null                      $preference_score
+ * @property array<string, mixed>|null       $metadata
+ * @property \Illuminate\Support\Carbon      $last_updated
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  *
@@ -123,8 +125,8 @@ final class UserPreference extends Model
     protected function preferenceScore(): Attribute
     {
         return Attribute::make(
-            get: static fn(mixed $value): ?float => self::normaliseScore($value),
-            set: static fn(mixed $value): ?float => self::normaliseScore($value),
+            get: static fn (mixed $value): ?float => self::normaliseScore($value),
+            set: static fn (mixed $value): ?float => self::normaliseScore($value),
         );
     }
 
@@ -136,8 +138,8 @@ final class UserPreference extends Model
     protected function value(): Attribute
     {
         return Attribute::make(
-            get: static fn(mixed $value, array $attributes): ?float => self::normaliseScore($attributes['preference_score'] ?? $value),
-            set: static fn(mixed $value): array => ['preference_score' => self::normaliseScore($value)],
+            get: static fn (mixed $value, array $attributes): ?float => self::normaliseScore($attributes['preference_score'] ?? $value),
+            set: static fn (mixed $value): array => ['preference_score' => self::normaliseScore($value)],
         );
     }
 
@@ -147,8 +149,8 @@ final class UserPreference extends Model
     protected function name(): Attribute
     {
         return Attribute::make(
-            get: static fn(mixed $value, array $attributes): ?string => $attributes['preference_type'] ?? ($value !== null ? (string) $value : null),
-            set: static fn(mixed $value): array => ['preference_type' => $value],
+            get: static fn (mixed $value, array $attributes): ?string => $attributes['preference_type'] ?? ($value !== null ? (string) $value : null),
+            set: static fn (mixed $value): array => ['preference_type' => $value],
         );
     }
 
@@ -158,8 +160,8 @@ final class UserPreference extends Model
     protected function key(): Attribute
     {
         return Attribute::make(
-            get: static fn(mixed $value, array $attributes): ?string => $attributes['preference_key'] ?? ($value !== null ? (string) $value : null),
-            set: static fn(mixed $value): array => ['preference_key' => $value],
+            get: static fn (mixed $value, array $attributes): ?string => $attributes['preference_key'] ?? ($value !== null ? (string) $value : null),
+            set: static fn (mixed $value): array => ['preference_key' => $value],
         );
     }
 
@@ -183,7 +185,7 @@ final class UserPreference extends Model
 
                 return is_array($payload) ? $payload : null;
             },
-            set: static fn(mixed $value): array => ['metadata' => is_array($value) ? $value : null],
+            set: static fn (mixed $value): array => ['metadata' => is_array($value) ? $value : null],
         );
     }
 
@@ -193,8 +195,8 @@ final class UserPreference extends Model
     protected function getNameColumn(): string
     {
         return match ($this->nameColumn) {
-            'name' => 'preference_type',
-            'key' => 'preference_key',
+            'name'  => 'preference_type',
+            'key'   => 'preference_key',
             default => $this->getOrdersByNameColumn(),
         };
     }
@@ -207,12 +209,12 @@ final class UserPreference extends Model
     protected function lastUpdated(): Attribute
     {
         return Attribute::make(
-            get: static fn(mixed $value): ?Carbon => $value === null ? null : Carbon::parse((string) $value),
-            set: static fn(mixed $value): ?string => match (true) {
+            get: static fn (mixed $value): ?Carbon => $value === null ? null : Carbon::parse((string) $value),
+            set: static fn (mixed $value): ?string => match (true) {
                 $value instanceof Carbon => $value->toDateTimeString(),
-                is_string($value) => $value,
-                $value === null => null,
-                default => (string) $value,
+                is_string($value)        => $value,
+                $value === null          => null,
+                default                  => (string) $value,
             },
         );
     }

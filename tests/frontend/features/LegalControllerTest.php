@@ -18,8 +18,8 @@ class LegalControllerTest extends TestCase
         $legal = Legal::factory()->enabled()->published()->create();
         LegalTranslation::factory()->create([
             'legal_id' => $legal->id,
-            'locale' => 'lt',
-            'title' => 'Test Legal Document',
+            'locale'   => 'lt',
+            'title'    => 'Test Legal Document',
         ]);
 
         $response = $this->get(route('legal.index'));
@@ -33,9 +33,9 @@ class LegalControllerTest extends TestCase
         $legal = Legal::factory()->enabled()->published()->create(['key' => 'privacy-policy']);
         LegalTranslation::factory()->create([
             'legal_id' => $legal->id,
-            'locale' => 'lt',
-            'title' => 'Privatumo politika',
-            'content' => '<p>Privatumo politikos turinys...</p>',
+            'locale'   => 'lt',
+            'title'    => 'Privatumo politika',
+            'content'  => '<p>Privatumo politikos turinys...</p>',
         ]);
 
         $response = $this->get(route('legal.show', 'privacy-policy'));
@@ -77,14 +77,14 @@ class LegalControllerTest extends TestCase
 
         LegalTranslation::factory()->create([
             'legal_id' => $privacyPolicy->id,
-            'locale' => 'lt',
-            'title' => 'Privatumo politika',
+            'locale'   => 'lt',
+            'title'    => 'Privatumo politika',
         ]);
 
         LegalTranslation::factory()->create([
             'legal_id' => $termsOfUse->id,
-            'locale' => 'lt',
-            'title' => 'Naudojimosi sąlygos',
+            'locale'   => 'lt',
+            'title'    => 'Naudojimosi sąlygos',
         ]);
 
         $response = $this->get(route('legal.type', 'privacy_policy'));
@@ -99,9 +99,9 @@ class LegalControllerTest extends TestCase
         $legal = Legal::factory()->enabled()->published()->create();
         LegalTranslation::factory()->create([
             'legal_id' => $legal->id,
-            'locale' => 'lt',
-            'title' => 'Privatumo politika',
-            'content' => 'Privatumo politikos turinys su raktažodžiais',
+            'locale'   => 'lt',
+            'title'    => 'Privatumo politika',
+            'content'  => 'Privatumo politikos turinys su raktažodžiais',
         ]);
 
         $response = $this->get(route('legal.search', ['q' => 'privatumo']));
@@ -117,14 +117,14 @@ class LegalControllerTest extends TestCase
 
         LegalTranslation::factory()->create([
             'legal_id' => $privacyPolicy->id,
-            'locale' => 'lt',
-            'title' => 'Privatumo politika',
+            'locale'   => 'lt',
+            'title'    => 'Privatumo politika',
         ]);
 
         LegalTranslation::factory()->create([
             'legal_id' => $termsOfUse->id,
-            'locale' => 'lt',
-            'title' => 'Naudojimosi sąlygos',
+            'locale'   => 'lt',
+            'title'    => 'Naudojimosi sąlygos',
         ]);
 
         $response = $this->get(route('legal.search', ['type' => 'privacy_policy']));
@@ -139,8 +139,8 @@ class LegalControllerTest extends TestCase
         $legal = Legal::factory()->enabled()->published()->create();
         LegalTranslation::factory()->create([
             'legal_id' => $legal->id,
-            'locale' => 'lt',
-            'slug' => 'privacy-policy-lt',
+            'locale'   => 'lt',
+            'slug'     => 'privacy-policy-lt',
         ]);
 
         $response = $this->get(route('legal.sitemap'));
@@ -155,8 +155,8 @@ class LegalControllerTest extends TestCase
         $legal = Legal::factory()->enabled()->published()->create();
         LegalTranslation::factory()->create([
             'legal_id' => $legal->id,
-            'locale' => 'lt',
-            'title' => 'Privatumo politika',
+            'locale'   => 'lt',
+            'title'    => 'Privatumo politika',
         ]);
 
         $response = $this->get(route('legal.rss'));
@@ -190,14 +190,14 @@ class LegalControllerTest extends TestCase
 
         LegalTranslation::factory()->create([
             'legal_id' => $privacyPolicy->id,
-            'locale' => 'lt',
-            'title' => 'Privatumo politika',
+            'locale'   => 'lt',
+            'title'    => 'Privatumo politika',
         ]);
 
         LegalTranslation::factory()->create([
             'legal_id' => $termsOfUse->id,
-            'locale' => 'lt',
-            'title' => 'Naudojimosi sąlygos',
+            'locale'   => 'lt',
+            'title'    => 'Naudojimosi sąlygos',
         ]);
 
         $response = $this->get(route('legal.show', $privacyPolicy->key));
@@ -209,19 +209,19 @@ class LegalControllerTest extends TestCase
     public function test_legal_show_page_shows_document_metadata(): void
     {
         $legal = Legal::factory()->enabled()->published()->create([
-            'key' => 'privacy-policy',
+            'key'       => 'privacy-policy',
             'meta_data' => [
-                'version' => '2.0',
+                'version'        => '2.0',
                 'effective_date' => '2024-01-01',
-                'last_reviewed' => '2024-06-01',
+                'last_reviewed'  => '2024-06-01',
             ],
         ]);
 
         LegalTranslation::factory()->create([
             'legal_id' => $legal->id,
-            'locale' => 'lt',
-            'title' => 'Privatumo politika',
-            'content' => '<p>Turinys...</p>',
+            'locale'   => 'lt',
+            'title'    => 'Privatumo politika',
+            'content'  => '<p>Turinys...</p>',
         ]);
 
         $response = $this->get(route('legal.show', 'privacy-policy'));
@@ -237,9 +237,9 @@ class LegalControllerTest extends TestCase
         $legal = Legal::factory()->enabled()->published()->create(['key' => 'privacy-policy']);
         LegalTranslation::factory()->create([
             'legal_id' => $legal->id,
-            'locale' => 'lt',
-            'title' => 'Privatumo politika',
-            'content' => str_repeat('<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. </p>', 10),
+            'locale'   => 'lt',
+            'title'    => 'Privatumo politika',
+            'content'  => str_repeat('<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. </p>', 10),
         ]);
 
         $response = $this->get(route('legal.show', 'privacy-policy'));
@@ -253,8 +253,8 @@ class LegalControllerTest extends TestCase
         $legal = Legal::factory()->required()->enabled()->published()->create(['key' => 'privacy-policy']);
         LegalTranslation::factory()->create([
             'legal_id' => $legal->id,
-            'locale' => 'lt',
-            'title' => 'Privatumo politika',
+            'locale'   => 'lt',
+            'title'    => 'Privatumo politika',
         ]);
 
         $response = $this->get(route('legal.show', 'privacy-policy'));
@@ -270,14 +270,14 @@ class LegalControllerTest extends TestCase
 
         LegalTranslation::factory()->create([
             'legal_id' => $privacyPolicy->id,
-            'locale' => 'lt',
-            'title' => 'Privatumo politika',
+            'locale'   => 'lt',
+            'title'    => 'Privatumo politika',
         ]);
 
         LegalTranslation::factory()->create([
             'legal_id' => $termsOfUse->id,
-            'locale' => 'lt',
-            'title' => 'Naudojimosi sąlygos',
+            'locale'   => 'lt',
+            'title'    => 'Naudojimosi sąlygos',
         ]);
 
         $response = $this->get(route('legal.index'));
@@ -292,8 +292,8 @@ class LegalControllerTest extends TestCase
         $legal = Legal::factory()->enabled()->published()->create(['key' => 'privacy-policy']);
         LegalTranslation::factory()->create([
             'legal_id' => $legal->id,
-            'locale' => 'en',
-            'title' => 'Privacy Policy',
+            'locale'   => 'en',
+            'title'    => 'Privacy Policy',
         ]);
 
         // Set locale to Lithuanian but only English translation exists

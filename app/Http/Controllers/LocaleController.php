@@ -87,7 +87,7 @@ final class LocaleController
     }
 
     /**
-     * @param  array<int, string>  $supported
+     * @param array<int, string> $supported
      */
     private function resolveLocale(?string $candidate, array $supported): string
     {
@@ -105,7 +105,7 @@ final class LocaleController
     }
 
     /**
-     * @param  array<int, string>  $supported
+     * @param array<int, string> $supported
      */
     private function preferredFallbackLocale(array $supported): ?string
     {
@@ -124,7 +124,7 @@ final class LocaleController
     }
 
     /**
-     * @param  array<int, string>  $supported
+     * @param array<int, string> $supported
      */
     private function fallbackRedirect(array $supported): string
     {

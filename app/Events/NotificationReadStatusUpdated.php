@@ -31,7 +31,7 @@ final class NotificationReadStatusUpdated implements ShouldBroadcast
      */
     public function broadcastOn(): array
     {
-        return [new PrivateChannel('user.'.$this->notification->notifiable_id), new Channel('notifications')];
+        return [new PrivateChannel('user.' . $this->notification->notifiable_id), new Channel('notifications')];
     }
 
     /**

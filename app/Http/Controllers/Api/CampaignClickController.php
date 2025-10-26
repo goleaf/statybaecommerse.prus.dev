@@ -439,7 +439,7 @@ final class CampaignClickController extends Controller
             });
             fclose($handle);
         }, 200, $headers);
-}
+    }
 
     private function campaignClickListDefinition(): ListQueryDefinition
     {
@@ -448,19 +448,19 @@ final class CampaignClickController extends Controller
             ->maxPerPage(100)
             ->defaultSort('clicked_at', 'desc')
             ->allowedSorts([
-                'clicked_at' => ['column' => 'clicked_at'],
-                'created_at' => ['column' => 'created_at'],
+                'clicked_at'       => ['column' => 'clicked_at'],
+                'created_at'       => ['column' => 'created_at'],
                 'conversion_value' => ['column' => 'conversion_value'],
             ])
             ->filters([
-                'campaign_id' => ['type' => 'int', 'column' => 'campaign_id'],
-                'click_type' => ['type' => 'string', 'column' => 'click_type'],
-                'device_type' => ['type' => 'string', 'column' => 'device_type'],
+                'campaign_id'  => ['type' => 'int', 'column' => 'campaign_id'],
+                'click_type'   => ['type' => 'string', 'column' => 'click_type'],
+                'device_type'  => ['type' => 'string', 'column' => 'device_type'],
                 'is_converted' => ['type' => 'bool', 'column' => 'is_converted'],
-                'country' => ['type' => 'string', 'column' => 'country'],
-                'utm_source' => ['type' => 'string', 'column' => 'utm_source'],
-                'date_from' => ['type' => 'date', 'column' => 'clicked_at', 'operator' => '>='],
-                'date_to' => ['type' => 'date', 'column' => 'clicked_at', 'operator' => '<='],
+                'country'      => ['type' => 'string', 'column' => 'country'],
+                'utm_source'   => ['type' => 'string', 'column' => 'utm_source'],
+                'date_from'    => ['type' => 'date', 'column' => 'clicked_at', 'operator' => '>='],
+                'date_to'      => ['type' => 'date', 'column' => 'clicked_at', 'operator' => '<='],
             ]);
     }
 }

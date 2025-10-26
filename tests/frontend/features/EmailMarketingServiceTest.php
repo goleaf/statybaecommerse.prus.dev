@@ -12,10 +12,10 @@ beforeEach(function () {
     Http::fake([
         'mailchimp.com/*' => Http::response([
             'stats' => [
-                'member_count' => 150,
+                'member_count'      => 150,
                 'unsubscribe_count' => 5,
-                'cleaned_count' => 2,
-                'pending_count' => 3,
+                'cleaned_count'     => 2,
+                'pending_count'     => 3,
             ],
         ], 200),
     ]);
@@ -23,11 +23,11 @@ beforeEach(function () {
 
 test('email marketing service can sync subscriber to mailchimp', function () {
     $subscriber = Subscriber::factory()->create([
-        'email' => 'test@example.com',
+        'email'      => 'test@example.com',
         'first_name' => 'John',
-        'last_name' => 'Doe',
-        'status' => 'active',
-        'interests' => ['products', 'news'],
+        'last_name'  => 'Doe',
+        'status'     => 'active',
+        'interests'  => ['products', 'news'],
     ]);
 
     $emailService = new EmailMarketingService;
@@ -35,9 +35,9 @@ test('email marketing service can sync subscriber to mailchimp', function () {
     // Mock the HTTP response for subscriber sync
     Http::fake([
         'mailchimp.com/3.0/lists/*/members' => Http::response([
-            'id' => 'test-member-id',
+            'id'            => 'test-member-id',
             'email_address' => 'test@example.com',
-            'status' => 'subscribed',
+            'status'        => 'subscribed',
         ], 201),
     ]);
 
@@ -50,20 +50,20 @@ test('email marketing service can create campaign', function () {
     $emailService = new EmailMarketingService;
 
     $campaignData = [
-        'subject' => 'Test Campaign',
-        'title' => 'Test Campaign Title',
+        'subject'   => 'Test Campaign',
+        'title'     => 'Test Campaign Title',
         'from_name' => 'Test Company',
-        'reply_to' => 'test@example.com',
+        'reply_to'  => 'test@example.com',
     ];
 
     // Mock the HTTP response for campaign creation
     Http::fake([
         'mailchimp.com/3.0/campaigns' => Http::response([
-            'id' => 'test-campaign-id',
-            'type' => 'regular',
+            'id'       => 'test-campaign-id',
+            'type'     => 'regular',
             'settings' => [
                 'subject_line' => 'Test Campaign',
-                'title' => 'Test Campaign Title',
+                'title'        => 'Test Campaign Title',
             ],
         ], 201),
     ]);
@@ -96,9 +96,9 @@ test('email marketing service can bulk sync subscribers', function () {
     // Mock successful HTTP responses for all sync requests
     Http::fake([
         'mailchimp.com/3.0/lists/*/members' => Http::response([
-            'id' => 'test-member-id',
+            'id'            => 'test-member-id',
             'email_address' => 'test@example.com',
-            'status' => 'subscribed',
+            'status'        => 'subscribed',
         ], 201),
     ]);
 
@@ -116,8 +116,8 @@ test('email marketing service can create interest segment', function () {
     // Mock the HTTP response for segment creation
     Http::fake([
         'mailchimp.com/3.0/lists/*/segments' => Http::response([
-            'id' => 'test-segment-id',
-            'name' => 'Products Subscribers',
+            'id'           => 'test-segment-id',
+            'name'         => 'Products Subscribers',
             'member_count' => 25,
         ], 201),
     ]);
@@ -135,8 +135,8 @@ test('email marketing service handles api errors gracefully', function () {
     // Mock HTTP error response
     Http::fake([
         'mailchimp.com/*' => Http::response([
-            'type' => 'http://developer.mailchimp.com/documentation/mailchimp/guides/error-glossary/',
-            'title' => 'Invalid Resource',
+            'type'   => 'http://developer.mailchimp.com/documentation/mailchimp/guides/error-glossary/',
+            'title'  => 'Invalid Resource',
             'status' => 400,
             'detail' => 'The resource submitted could not be validated.',
         ], 400),
@@ -203,16 +203,16 @@ test('email marketing service can get campaign analytics', function () {
     // Mock the HTTP response for campaign analytics
     Http::fake([
         "mailchimp.com/3.0/campaigns/{$campaignId}" => Http::response([
-            'id' => $campaignId,
-            'type' => 'regular',
-            'status' => 'sent',
+            'id'          => $campaignId,
+            'type'        => 'regular',
+            'status'      => 'sent',
             'emails_sent' => 100,
-            'opens' => [
-                'opens_total' => 25,
+            'opens'       => [
+                'opens_total'  => 25,
                 'unique_opens' => 20,
             ],
             'clicks' => [
-                'clicks_total' => 10,
+                'clicks_total'  => 10,
                 'unique_clicks' => 8,
             ],
         ], 200),

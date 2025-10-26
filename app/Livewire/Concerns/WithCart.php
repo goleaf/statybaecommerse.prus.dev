@@ -35,11 +35,11 @@ trait WithCart
             $cartItems[$product->getKey()]['quantity'] += $quantity;
         } else {
             $cartItems[$product->getKey()] = [
-                'name' => $product->name,
-                'price' => $product->price,
+                'name'     => $product->name,
+                'price'    => $product->price,
                 'quantity' => $quantity,
-                'image' => $product->getFirstMediaUrl('images'),
-                'sku' => $product->sku,
+                'image'    => $product->getFirstMediaUrl('images'),
+                'sku'      => $product->sku,
             ];
         }
 

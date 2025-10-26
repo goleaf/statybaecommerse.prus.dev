@@ -25,24 +25,24 @@ final class NewsCategorySeeder extends Seeder
 
         $definitions = [
             [
-                'sort_order' => 0,
-                'attributes' => ['color' => '#1e40af', 'icon' => 'heroicon-o-newspaper'],
+                'sort_order'   => 0,
+                'attributes'   => ['color' => '#1e40af', 'icon' => 'heroicon-o-newspaper'],
                 'translations' => [
                     'lt' => ['name' => 'Naujienos', 'description' => 'Pagrindinių įmonės naujienų apžvalga.'],
                     'en' => ['name' => 'News', 'description' => 'Overview of the latest company news.'],
                 ],
             ],
             [
-                'sort_order' => 1,
-                'attributes' => ['color' => '#047857', 'icon' => 'heroicon-o-rectangle-stack'],
+                'sort_order'   => 1,
+                'attributes'   => ['color' => '#047857', 'icon' => 'heroicon-o-rectangle-stack'],
                 'translations' => [
                     'lt' => ['name' => 'Projektai', 'description' => 'Vykdomų ir baigtų projektų pristatymas.'],
                     'en' => ['name' => 'Projects', 'description' => 'Highlights of ongoing and finished projects.'],
                 ],
             ],
             [
-                'sort_order' => 2,
-                'attributes' => ['color' => '#c2410c', 'icon' => 'heroicon-o-light-bulb'],
+                'sort_order'   => 2,
+                'attributes'   => ['color' => '#c2410c', 'icon' => 'heroicon-o-light-bulb'],
                 'translations' => [
                     'lt' => ['name' => 'Patarimai', 'description' => 'Praktiniai patarimai ir rekomendacijos klientams.'],
                     'en' => ['name' => 'Tips', 'description' => 'Practical tips and recommendations for customers.'],
@@ -74,10 +74,10 @@ final class NewsCategorySeeder extends Seeder
                 NewsCategoryTranslation::factory()
                     ->state([
                         'news_category_id' => $category->id,
-                        'locale' => $locale,
-                        'name' => $translation['name'],
-                        'slug' => Str::slug($translation['name']),
-                        'description' => $translation['description'],
+                        'locale'           => $locale,
+                        'name'             => $translation['name'],
+                        'slug'             => Str::slug($translation['name']),
+                        'description'      => $translation['description'],
                     ])
                     ->create();
             }

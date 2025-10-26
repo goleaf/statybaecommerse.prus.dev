@@ -25,63 +25,63 @@ enum OrderStatus: string implements EnumInterface
     case RETURNED = 'returned';
 
     private const LABEL_DEFAULTS = [
-        'pending' => 'Pending',
-        'confirmed' => 'Confirmed',
+        'pending'    => 'Pending',
+        'confirmed'  => 'Confirmed',
         'processing' => 'Processing',
-        'shipped' => 'Shipped',
-        'delivered' => 'Delivered',
-        'completed' => 'Completed',
-        'cancelled' => 'Cancelled',
-        'refunded' => 'Refunded',
-        'returned' => 'Returned',
+        'shipped'    => 'Shipped',
+        'delivered'  => 'Delivered',
+        'completed'  => 'Completed',
+        'cancelled'  => 'Cancelled',
+        'refunded'   => 'Refunded',
+        'returned'   => 'Returned',
     ];
 
     private const DESCRIPTION_DEFAULTS = [
-        'pending' => 'Order received and awaiting confirmation.',
-        'confirmed' => 'Order confirmed and preparing for processing.',
+        'pending'    => 'Order received and awaiting confirmation.',
+        'confirmed'  => 'Order confirmed and preparing for processing.',
         'processing' => 'Order is being prepared for shipment.',
-        'shipped' => 'Order has left the warehouse and is in transit.',
-        'delivered' => 'Order successfully delivered to the customer.',
-        'completed' => 'Order completed including any post-delivery checks.',
-        'cancelled' => 'Order cancelled before fulfillment.',
-        'refunded' => 'Order refunded to the customer.',
-        'returned' => 'Order returned by the customer.',
+        'shipped'    => 'Order has left the warehouse and is in transit.',
+        'delivered'  => 'Order successfully delivered to the customer.',
+        'completed'  => 'Order completed including any post-delivery checks.',
+        'cancelled'  => 'Order cancelled before fulfillment.',
+        'refunded'   => 'Order refunded to the customer.',
+        'returned'   => 'Order returned by the customer.',
     ];
 
     private const ICON_MAP = [
-        'pending' => 'heroicon-o-clock',
-        'confirmed' => 'heroicon-o-check-circle',
+        'pending'    => 'heroicon-o-clock',
+        'confirmed'  => 'heroicon-o-check-circle',
         'processing' => 'heroicon-o-cog-6-tooth',
-        'shipped' => 'heroicon-o-truck',
-        'delivered' => 'heroicon-o-check-badge',
-        'completed' => 'heroicon-o-flag',
-        'cancelled' => 'heroicon-o-x-circle',
-        'refunded' => 'heroicon-o-arrow-uturn-left',
-        'returned' => 'heroicon-o-arrow-uturn-right',
+        'shipped'    => 'heroicon-o-truck',
+        'delivered'  => 'heroicon-o-check-badge',
+        'completed'  => 'heroicon-o-flag',
+        'cancelled'  => 'heroicon-o-x-circle',
+        'refunded'   => 'heroicon-o-arrow-uturn-left',
+        'returned'   => 'heroicon-o-arrow-uturn-right',
     ];
 
     private const COLOR_MAP = [
-        'pending' => 'warning',
-        'confirmed' => 'info',
+        'pending'    => 'warning',
+        'confirmed'  => 'info',
         'processing' => 'primary',
-        'shipped' => 'success',
-        'delivered' => 'success',
-        'completed' => 'success',
-        'cancelled' => 'danger',
-        'refunded' => 'secondary',
-        'returned' => 'warning',
+        'shipped'    => 'success',
+        'delivered'  => 'success',
+        'completed'  => 'success',
+        'cancelled'  => 'danger',
+        'refunded'   => 'secondary',
+        'returned'   => 'warning',
     ];
 
     private const PRIORITY_MAP = [
-        'pending' => 1,
-        'confirmed' => 2,
+        'pending'    => 1,
+        'confirmed'  => 2,
         'processing' => 3,
-        'shipped' => 4,
-        'delivered' => 5,
-        'completed' => 6,
-        'cancelled' => 7,
-        'refunded' => 8,
-        'returned' => 9,
+        'shipped'    => 4,
+        'delivered'  => 5,
+        'completed'  => 6,
+        'cancelled'  => 7,
+        'refunded'   => 8,
+        'returned'   => 9,
     ];
 
     /**
@@ -152,12 +152,12 @@ enum OrderStatus: string implements EnumInterface
     {
         // Supply a consistent metadata payload for UI components and API responses.
         return [
-            'value' => $this->value,
-            'label' => $this->label(),
+            'value'       => $this->value,
+            'label'       => $this->label(),
             'description' => $this->description(),
-            'icon' => $this->icon(),
-            'color' => $this->color(),
-            'priority' => $this->priority(),
+            'icon'        => $this->icon(),
+            'color'       => $this->color(),
+            'priority'    => $this->priority(),
         ];
     }
 
@@ -181,11 +181,11 @@ enum OrderStatus: string implements EnumInterface
         return self::ordered()
             ->mapWithKeys(fn (self $case): array => [
                 $case->value => [
-                    'label' => $case->label(),
+                    'label'       => $case->label(),
                     'description' => $case->description(),
-                    'icon' => $case->icon(),
-                    'color' => $case->color(),
-                    'priority' => $case->priority(),
+                    'icon'        => $case->icon(),
+                    'color'       => $case->color(),
+                    'priority'    => $case->priority(),
                 ],
             ])
             ->toArray();

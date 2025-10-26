@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Filament;
 
-use App\Filament\Resources\CustomerResource;
 use App\Models\City;
 use App\Models\Company;
 use App\Models\Country;

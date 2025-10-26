@@ -20,8 +20,7 @@ final class RepositoryRegistry
     private function __construct(
         private readonly Container $container,
         private readonly array $definitions,
-    ) {
-    }
+    ) {}
 
     public static function fromConfig(Container $container): self
     {
@@ -110,14 +109,13 @@ final class RepositoryRegistry
     private static function defaultDefinitions(): array
     {
         return [
-            'users' => UserRepository::class,
+            'users'    => UserRepository::class,
             'products' => ProductRepository::class,
         ];
     }
 
     /**
-     * @param array<string, mixed>|null $definitions
-     *
+     * @param  array<string, mixed>|null      $definitions
      * @return array<string, RepositoryClass>
      */
     private static function normalizeDefinitions($definitions, bool $allowEmpty = false): array

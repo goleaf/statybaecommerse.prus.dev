@@ -36,10 +36,10 @@ class VariantStockResourceTest extends TestCase
         $location = Location::factory()->create();
 
         $variantStock = VariantInventory::factory()->create([
-            'variant_id' => $variant->id,
+            'variant_id'  => $variant->id,
             'location_id' => $location->id,
-            'stock' => 100,
-            'threshold' => 10,
+            'stock'       => 100,
+            'threshold'   => 10,
         ]);
 
         $this->actingAs($this->adminUser);
@@ -63,40 +63,40 @@ class VariantStockResourceTest extends TestCase
 
         Livewire::test(\App\Filament\Resources\VariantStockResource\Pages\CreateVariantStock::class)
             ->fillForm([
-                'variant_id' => $variant->id,
-                'location_id' => $location->id,
-                'stock' => 50,
-                'reserved' => 5,
-                'incoming' => 10,
-                'threshold' => 5,
-                'reorder_point' => 3,
+                'variant_id'      => $variant->id,
+                'location_id'     => $location->id,
+                'stock'           => 50,
+                'reserved'        => 5,
+                'incoming'        => 10,
+                'threshold'       => 5,
+                'reorder_point'   => 3,
                 'max_stock_level' => 200,
-                'cost_per_unit' => 25.50,
-                'supplier_id' => $supplier->id,
-                'batch_number' => 'BATCH001',
-                'expiry_date' => now()->addDays(30)->format('Y-m-d'),
-                'status' => 'active',
-                'is_tracked' => true,
-                'notes' => 'Test stock entry',
+                'cost_per_unit'   => 25.50,
+                'supplier_id'     => $supplier->id,
+                'batch_number'    => 'BATCH001',
+                'expiry_date'     => now()->addDays(30)->format('Y-m-d'),
+                'status'          => 'active',
+                'is_tracked'      => true,
+                'notes'           => 'Test stock entry',
             ])
             ->call('create')
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('variant_inventories', [
-            'variant_id' => $variant->id,
-            'location_id' => $location->id,
-            'stock' => 50,
-            'reserved' => 5,
-            'incoming' => 10,
-            'threshold' => 5,
-            'reorder_point' => 3,
+            'variant_id'      => $variant->id,
+            'location_id'     => $location->id,
+            'stock'           => 50,
+            'reserved'        => 5,
+            'incoming'        => 10,
+            'threshold'       => 5,
+            'reorder_point'   => 3,
             'max_stock_level' => 200,
-            'cost_per_unit' => 25.50,
-            'supplier_id' => $supplier->id,
-            'batch_number' => 'BATCH001',
-            'status' => 'active',
-            'is_tracked' => true,
-            'notes' => 'Test stock entry',
+            'cost_per_unit'   => 25.50,
+            'supplier_id'     => $supplier->id,
+            'batch_number'    => 'BATCH001',
+            'status'          => 'active',
+            'is_tracked'      => true,
+            'notes'           => 'Test stock entry',
         ]);
     }
 
@@ -107,9 +107,9 @@ class VariantStockResourceTest extends TestCase
         $location = Location::factory()->create();
 
         $variantStock = VariantInventory::factory()->create([
-            'variant_id' => $variant->id,
+            'variant_id'  => $variant->id,
             'location_id' => $location->id,
-            'stock' => 100,
+            'stock'       => 100,
         ]);
 
         $this->actingAs($this->adminUser);
@@ -118,18 +118,18 @@ class VariantStockResourceTest extends TestCase
             'record' => $variantStock->id,
         ])
             ->fillForm([
-                'stock' => 150,
+                'stock'     => 150,
                 'threshold' => 20,
-                'notes' => 'Updated stock entry',
+                'notes'     => 'Updated stock entry',
             ])
             ->call('save')
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('variant_inventories', [
-            'id' => $variantStock->id,
-            'stock' => 150,
+            'id'        => $variantStock->id,
+            'stock'     => 150,
             'threshold' => 20,
-            'notes' => 'Updated stock entry',
+            'notes'     => 'Updated stock entry',
         ]);
     }
 
@@ -140,7 +140,7 @@ class VariantStockResourceTest extends TestCase
         $location = Location::factory()->create();
 
         $variantStock = VariantInventory::factory()->create([
-            'variant_id' => $variant->id,
+            'variant_id'  => $variant->id,
             'location_id' => $location->id,
         ]);
 
@@ -165,12 +165,12 @@ class VariantStockResourceTest extends TestCase
         $location2 = Location::factory()->create(['name' => 'Warehouse B']);
 
         $stock1 = VariantInventory::factory()->create([
-            'variant_id' => $variant->id,
+            'variant_id'  => $variant->id,
             'location_id' => $location1->id,
         ]);
 
         $stock2 = VariantInventory::factory()->create([
-            'variant_id' => $variant->id,
+            'variant_id'  => $variant->id,
             'location_id' => $location2->id,
         ]);
 
@@ -189,17 +189,17 @@ class VariantStockResourceTest extends TestCase
         $location = Location::factory()->create();
 
         $lowStock = VariantInventory::factory()->create([
-            'variant_id' => $variant->id,
+            'variant_id'  => $variant->id,
             'location_id' => $location->id,
-            'stock' => 5,
-            'threshold' => 10,
+            'stock'       => 5,
+            'threshold'   => 10,
         ]);
 
         $normalStock = VariantInventory::factory()->create([
-            'variant_id' => $variant->id,
+            'variant_id'  => $variant->id,
             'location_id' => $location->id,
-            'stock' => 50,
-            'threshold' => 10,
+            'stock'       => 50,
+            'threshold'   => 10,
         ]);
 
         $this->actingAs($this->adminUser);
@@ -217,15 +217,15 @@ class VariantStockResourceTest extends TestCase
         $location = Location::factory()->create();
 
         $stock1 = VariantInventory::factory()->create([
-            'variant_id' => $variant->id,
+            'variant_id'  => $variant->id,
             'location_id' => $location->id,
-            'stock' => 100,
+            'stock'       => 100,
         ]);
 
         $stock2 = VariantInventory::factory()->create([
-            'variant_id' => $variant->id,
+            'variant_id'  => $variant->id,
             'location_id' => $location->id,
-            'stock' => 200,
+            'stock'       => 200,
         ]);
 
         $this->actingAs($this->adminUser);
@@ -233,17 +233,17 @@ class VariantStockResourceTest extends TestCase
         Livewire::test(\App\Filament\Resources\VariantStockResource\Pages\ListVariantStocks::class)
             ->callTableBulkAction('bulk_adjust_stock', [$stock1, $stock2], [
                 'quantity' => 50,
-                'reason' => 'bulk_restock',
+                'reason'   => 'bulk_restock',
             ])
             ->assertHasNoBulkActionErrors();
 
         $this->assertDatabaseHas('variant_inventories', [
-            'id' => $stock1->id,
+            'id'    => $stock1->id,
             'stock' => 150,
         ]);
 
         $this->assertDatabaseHas('variant_inventories', [
-            'id' => $stock2->id,
+            'id'    => $stock2->id,
             'stock' => 250,
         ]);
     }
@@ -255,10 +255,10 @@ class VariantStockResourceTest extends TestCase
         $location = Location::factory()->create();
 
         $variantStock = VariantInventory::factory()->create([
-            'variant_id' => $variant->id,
+            'variant_id'  => $variant->id,
             'location_id' => $location->id,
-            'stock' => 100,
-            'reserved' => 0,
+            'stock'       => 100,
+            'reserved'    => 0,
         ]);
 
         $this->actingAs($this->adminUser);
@@ -270,7 +270,7 @@ class VariantStockResourceTest extends TestCase
             ->assertHasNoActionErrors();
 
         $this->assertDatabaseHas('variant_inventories', [
-            'id' => $variantStock->id,
+            'id'       => $variantStock->id,
             'reserved' => 25,
         ]);
     }
@@ -282,10 +282,10 @@ class VariantStockResourceTest extends TestCase
         $location = Location::factory()->create();
 
         $variantStock = VariantInventory::factory()->create([
-            'variant_id' => $variant->id,
+            'variant_id'  => $variant->id,
             'location_id' => $location->id,
-            'stock' => 100,
-            'reserved' => 50,
+            'stock'       => 100,
+            'reserved'    => 50,
         ]);
 
         $this->actingAs($this->adminUser);
@@ -297,7 +297,7 @@ class VariantStockResourceTest extends TestCase
             ->assertHasNoActionErrors();
 
         $this->assertDatabaseHas('variant_inventories', [
-            'id' => $variantStock->id,
+            'id'       => $variantStock->id,
             'reserved' => 30,
         ]);
     }
@@ -310,10 +310,10 @@ class VariantStockResourceTest extends TestCase
 
         // Create low stock items
         VariantInventory::factory()->count(3)->create([
-            'variant_id' => $variant->id,
+            'variant_id'  => $variant->id,
             'location_id' => $location->id,
-            'stock' => 5,
-            'threshold' => 10,
+            'stock'       => 5,
+            'threshold'   => 10,
         ]);
 
         $this->actingAs($this->adminUser);
@@ -331,10 +331,10 @@ class VariantStockResourceTest extends TestCase
 
         // Create out of stock items
         VariantInventory::factory()->count(2)->create([
-            'variant_id' => $variant->id,
+            'variant_id'  => $variant->id,
             'location_id' => $location->id,
-            'stock' => 0,
-            'threshold' => 10,
+            'stock'       => 0,
+            'threshold'   => 10,
         ]);
 
         $this->actingAs($this->adminUser);

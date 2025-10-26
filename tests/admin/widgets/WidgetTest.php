@@ -29,12 +29,12 @@ describe('Filament Widgets', function () {
             // Create test orders
             Order::factory()->count(5)->create([
                 'created_at' => today(),
-                'total' => 10000,  // $100.00
+                'total'      => 10000,  // $100.00
             ]);
 
             Order::factory()->count(3)->create([
                 'created_at' => today()->subDay(),
-                'total' => 5000,  // $50.00
+                'total'      => 5000,  // $50.00
             ]);
 
             $widget = Livewire::test(EcommerceOverview::class);
@@ -52,7 +52,7 @@ describe('Filament Widgets', function () {
         it('displays correct revenue statistics', function () {
             Order::factory()->count(2)->create([
                 'created_at' => today(),
-                'total' => 15000,  // $150.00 each
+                'total'      => 15000,  // $150.00 each
             ]);
 
             $widget = Livewire::test(EcommerceOverview::class);
@@ -115,21 +115,21 @@ describe('Filament Widgets', function () {
             $order1 = Order::factory()->create(['status' => 'completed']);
             $order1->items()->create([
                 'product_id' => $product1->id,
-                'name' => $product1->name,
-                'sku' => $product1->sku ?? 'SKU-001',
-                'quantity' => 5,
+                'name'       => $product1->name,
+                'sku'        => $product1->sku ?? 'SKU-001',
+                'quantity'   => 5,
                 'unit_price' => 1000,
-                'total' => 5000,
+                'total'      => 5000,
             ]);
 
             $order2 = Order::factory()->create(['status' => 'completed']);
             $order2->items()->create([
                 'product_id' => $product2->id,
-                'name' => $product2->name,
-                'sku' => $product2->sku ?? 'SKU-002',
-                'quantity' => 3,
+                'name'       => $product2->name,
+                'sku'        => $product2->sku ?? 'SKU-002',
+                'quantity'   => 3,
                 'unit_price' => 2000,
-                'total' => 6000,
+                'total'      => 6000,
             ]);
 
             Livewire::test(TopSellingProductsWidget::class)
@@ -144,22 +144,22 @@ describe('Filament Widgets', function () {
             $order1 = Order::factory()->create(['status' => 'completed']);
             $order1->items()->create([
                 'product_id' => $product1->id,
-                'name' => $product1->name,
-                'sku' => $product1->sku ?? 'SKU-001',
-                'quantity' => 2,
+                'name'       => $product1->name,
+                'sku'        => $product1->sku ?? 'SKU-001',
+                'quantity'   => 2,
                 'unit_price' => 1000,
-                'total' => 2000,
+                'total'      => 2000,
             ]);
 
             // Product 2: 10 items sold
             $order2 = Order::factory()->create(['status' => 'completed']);
             $order2->items()->create([
                 'product_id' => $product2->id,
-                'name' => $product2->name,
-                'sku' => $product2->sku ?? 'SKU-002',
-                'quantity' => 10,
+                'name'       => $product2->name,
+                'sku'        => $product2->sku ?? 'SKU-002',
+                'quantity'   => 10,
                 'unit_price' => 1000,
-                'total' => 10000,
+                'total'      => 10000,
             ]);
 
             Livewire::test(TopSellingProductsWidget::class)
@@ -174,22 +174,22 @@ describe('Filament Widgets', function () {
             $order = Order::factory()->create(['status' => 'completed']);
             $order->items()->create([
                 'product_id' => $productWithSales->id,
-                'name' => $productWithSales->name,
-                'sku' => $productWithSales->sku ?? 'SKU-001',
-                'quantity' => 1,
+                'name'       => $productWithSales->name,
+                'sku'        => $productWithSales->sku ?? 'SKU-001',
+                'quantity'   => 1,
                 'unit_price' => 1000,
-                'total' => 1000,
+                'total'      => 1000,
             ]);
 
             // Create pending order for second product (should not count)
             $pendingOrder = Order::factory()->create(['status' => 'pending']);
             $pendingOrder->items()->create([
                 'product_id' => $productWithoutSales->id,
-                'name' => $productWithoutSales->name,
-                'sku' => $productWithoutSales->sku ?? 'SKU-002',
-                'quantity' => 1,
+                'name'       => $productWithoutSales->name,
+                'sku'        => $productWithoutSales->sku ?? 'SKU-002',
+                'quantity'   => 1,
                 'unit_price' => 1000,
-                'total' => 1000,
+                'total'      => 1000,
             ]);
 
             Livewire::test(TopSellingProductsWidget::class)
@@ -203,11 +203,11 @@ describe('Filament Widgets', function () {
             $order = Order::factory()->create(['status' => 'completed']);
             $order->items()->create([
                 'product_id' => $product->id,
-                'name' => $product->name,
-                'sku' => $product->sku ?? 'SKU-001',
-                'quantity' => 5,
+                'name'       => $product->name,
+                'sku'        => $product->sku ?? 'SKU-001',
+                'quantity'   => 5,
                 'unit_price' => 2000,  // $20.00
-                'total' => 10000,
+                'total'      => 10000,
             ]);
 
             Livewire::test(TopSellingProductsWidget::class)
@@ -222,11 +222,11 @@ describe('Filament Widgets', function () {
                 $order = Order::factory()->create(['status' => 'completed']);
                 $order->items()->create([
                     'product_id' => $product->id,
-                    'name' => $product->name,
-                    'sku' => $product->sku ?? 'SKU-'.str_pad($index + 1, 3, '0', STR_PAD_LEFT),
-                    'quantity' => 15 - $index,  // Descending quantities
+                    'name'       => $product->name,
+                    'sku'        => $product->sku ?? 'SKU-' . str_pad($index + 1, 3, '0', STR_PAD_LEFT),
+                    'quantity'   => 15 - $index,  // Descending quantities
                     'unit_price' => 1000,
-                    'total' => (15 - $index) * 1000,
+                    'total'      => (15 - $index) * 1000,
                 ]);
             }
 

@@ -34,12 +34,12 @@ it('can list users', function () {
 
 it('can create user', function () {
     $newData = [
-        'first_name' => 'John',
-        'last_name' => 'Doe',
-        'email' => 'john@example.com',
-        'password' => 'password123',
+        'first_name'       => 'John',
+        'last_name'        => 'Doe',
+        'email'            => 'john@example.com',
+        'password'         => 'password123',
         'preferred_locale' => 'en',
-        'is_active' => true,
+        'is_active'        => true,
     ];
 
     Livewire::test(UserResource\Pages\CreateUser::class)
@@ -48,11 +48,11 @@ it('can create user', function () {
         ->assertHasNoFormErrors();
 
     $this->assertDatabaseHas('users', [
-        'first_name' => 'John',
-        'last_name' => 'Doe',
-        'email' => 'john@example.com',
+        'first_name'       => 'John',
+        'last_name'        => 'Doe',
+        'email'            => 'john@example.com',
         'preferred_locale' => 'en',
-        'is_active' => true,
+        'is_active'        => true,
     ]);
 });
 
@@ -60,12 +60,12 @@ it('can validate user creation', function () {
     Livewire::test(UserResource\Pages\CreateUser::class)
         ->fillForm([
             'first_name' => '',
-            'email' => 'invalid-email',
+            'email'      => 'invalid-email',
         ])
         ->call('create')
         ->assertHasFormErrors([
             'first_name' => 'required',
-            'email' => 'email',
+            'email'      => 'email',
         ]);
 });
 
@@ -73,9 +73,9 @@ it('can edit user', function () {
     $user = User::factory()->create();
 
     $newData = [
-        'first_name' => 'Updated',
-        'last_name' => 'Name',
-        'email' => 'updated@example.com',
+        'first_name'       => 'Updated',
+        'last_name'        => 'Name',
+        'email'            => 'updated@example.com',
         'preferred_locale' => 'lt',
     ];
 
@@ -133,14 +133,14 @@ it('can filter users by verification status', function () {
 it('can search users by name and email', function () {
     $user1 = User::factory()->create([
         'first_name' => 'John',
-        'last_name' => 'Doe',
-        'email' => 'john@example.com',
+        'last_name'  => 'Doe',
+        'email'      => 'john@example.com',
     ]);
 
     $user2 = User::factory()->create([
         'first_name' => 'Jane',
-        'last_name' => 'Smith',
-        'email' => 'jane@example.com',
+        'last_name'  => 'Smith',
+        'email'      => 'jane@example.com',
     ]);
 
     Livewire::test(UserResource\Pages\ListUsers::class)
@@ -172,7 +172,7 @@ it('queues user export from bulk action', function () {
     Livewire::test(UserResource\Pages\ListUsers::class)
         ->loadTable()
         ->callTableBulkAction('export_selected', $users, [
-            'format' => 'pdf',
+            'format'  => 'pdf',
             'columns' => ['name', 'email'],
         ]);
 

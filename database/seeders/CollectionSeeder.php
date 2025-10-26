@@ -9,6 +9,7 @@ use App\Models\Translations\CollectionTranslation;
 use App\Services\Images\LocalImageGeneratorService;
 use Database\Seeders\Data\HouseBuilderCollections;
 use Illuminate\Database\Seeder;
+use Throwable;
 
 class CollectionSeeder extends Seeder
 {
@@ -32,9 +33,9 @@ class CollectionSeeder extends Seeder
 
             if ($existingCollection) {
                 $existingCollection->update([
-                    'name' => $primaryTranslation['name'],
-                    'sort_order' => $definition['sort_order'],
-                    'is_visible' => true,
+                    'name'         => $primaryTranslation['name'],
+                    'sort_order'   => $definition['sort_order'],
+                    'is_visible'   => true,
                     'is_automatic' => $definition['is_automatic'] ?? false,
                     'display_type' => $definition['display_type'] ?? 'grid',
                 ]);
@@ -43,10 +44,10 @@ class CollectionSeeder extends Seeder
                 // Use factory to create collection
                 $collection = Collection::factory()
                     ->state([
-                        'slug' => $slug,
-                        'name' => $primaryTranslation['name'],
-                        'sort_order' => $definition['sort_order'],
-                        'is_visible' => true,
+                        'slug'         => $slug,
+                        'name'         => $primaryTranslation['name'],
+                        'sort_order'   => $definition['sort_order'],
+                        'is_visible'   => true,
                         'is_automatic' => $definition['is_automatic'] ?? false,
                         'display_type' => $definition['display_type'] ?? 'grid',
                     ])
@@ -58,30 +59,30 @@ class CollectionSeeder extends Seeder
 
                 $existingTranslation = CollectionTranslation::where([
                     'collection_id' => $collection->id,
-                    'locale' => $locale,
+                    'locale'        => $locale,
                 ])->first();
 
                 if ($existingTranslation) {
                     $existingTranslation->update([
-                        'name' => $translation['name'],
-                        'slug' => $locale === 'lt' ? $slug : $slug.'-'.$locale,
-                        'description' => $translation['description'],
-                        'meta_title' => $translation['name'].' | '.config('app.name'),
+                        'name'             => $translation['name'],
+                        'slug'             => $locale === 'lt' ? $slug : $slug . '-' . $locale,
+                        'description'      => $translation['description'],
+                        'meta_title'       => $translation['name'] . ' | ' . config('app.name'),
                         'meta_description' => $translation['description'],
-                        'meta_keywords' => $translation['keywords'] ?? [],
+                        'meta_keywords'    => $translation['keywords'] ?? [],
                     ]);
                 } else {
                     // Use factory to create translation
                     CollectionTranslation::factory()
                         ->for($collection)
                         ->state([
-                            'locale' => $locale,
-                            'name' => $translation['name'],
-                            'slug' => $locale === 'lt' ? $slug : $slug.'-'.$locale,
-                            'description' => $translation['description'],
-                            'meta_title' => $translation['name'].' | '.config('app.name'),
+                            'locale'           => $locale,
+                            'name'             => $translation['name'],
+                            'slug'             => $locale === 'lt' ? $slug : $slug . '-' . $locale,
+                            'description'      => $translation['description'],
+                            'meta_title'       => $translation['name'] . ' | ' . config('app.name'),
                             'meta_description' => $translation['description'],
-                            'meta_keywords' => $translation['keywords'] ?? [],
+                            'meta_keywords'    => $translation['keywords'] ?? [],
                         ])
                         ->create();
                 }
@@ -101,7 +102,7 @@ class CollectionSeeder extends Seeder
                 $collection
                     ->addMedia($imagePath)
                     ->withCustomProperties(['source' => 'generated'])
-                    ->usingName($label.' Image')
+                    ->usingName($label . ' Image')
                     ->toMediaCollection('images');
 
                 if (file_exists($imagePath)) {
@@ -110,19 +111,19 @@ class CollectionSeeder extends Seeder
             }
 
             if (! $collection->hasMedia('banner')) {
-                $bannerPath = $this->imageGenerator->generateCollectionImage($label.' Banner');
+                $bannerPath = $this->imageGenerator->generateCollectionImage($label . ' Banner');
                 $collection
                     ->addMedia($bannerPath)
                     ->withCustomProperties(['source' => 'generated'])
-                    ->usingName($label.' Banner')
+                    ->usingName($label . ' Banner')
                     ->toMediaCollection('banner');
 
                 if (file_exists($bannerPath)) {
                     unlink($bannerPath);
                 }
             }
-        } catch (\Throwable $exception) {
-            $this->command?->warn('CollectionSeeder: failed to generate imagery for '.$collection->slug.': '.$exception->getMessage());
+        } catch (Throwable $exception) {
+            $this->command?->warn('CollectionSeeder: failed to generate imagery for ' . $collection->slug . ': ' . $exception->getMessage());
         }
     }
 

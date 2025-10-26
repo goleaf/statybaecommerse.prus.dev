@@ -33,7 +33,7 @@ abstract class AbstractSearchRepository
     final public function explain(SearchQueryData $queryData, int $limit): array
     {
         return $this->connection->select(
-            'EXPLAIN '.$this->searchStatement($limit),
+            'EXPLAIN ' . $this->searchStatement($limit),
             $this->bindings($queryData, $limit)
         );
     }
@@ -44,7 +44,7 @@ abstract class AbstractSearchRepository
     {
         $escaped = str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], $value);
 
-        return '%'.$escaped.'%';
+        return '%' . $escaped . '%';
     }
 
     /**
@@ -53,7 +53,7 @@ abstract class AbstractSearchRepository
     private function remember(string $type, SearchQueryData $queryData, int $limit, callable $resolver): array
     {
         $context = array_merge($queryData->context(), [
-            'type' => $type,
+            'type'  => $type,
             'limit' => $limit,
         ]);
 

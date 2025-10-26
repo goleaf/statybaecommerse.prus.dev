@@ -7,6 +7,7 @@ namespace App\Livewire\Pages;
 use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
+use Throwable;
 
 /**
  * Cart
@@ -38,7 +39,7 @@ class Cart extends Component
         }
         try {
             return \Darryldecode\Cart\Facades\CartFacade::session(session()->getId());
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             return null;
         }
     }
@@ -90,7 +91,7 @@ class Cart extends Component
             // Darryldecode\Cart supports absolute updates via ['quantity' => ['relative' => false, 'value' => X]]
             try {
                 $cart->update($id, ['quantity' => ['relative' => false, 'value' => $quantity]]);
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
                 // ignore update failures
             }
         }
@@ -109,7 +110,7 @@ class Cart extends Component
         }
         try {
             $cart->update($id, ['quantity' => 1]);
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             // ignore
         }
         $this->dispatch('cartUpdated');
@@ -139,7 +140,7 @@ class Cart extends Component
             } else {
                 $cart->update($id, ['quantity' => -1]);
             }
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             // ignore
         }
         $this->dispatch('cartUpdated');

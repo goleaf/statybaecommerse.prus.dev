@@ -49,7 +49,7 @@ final class LocalizationAuditTest extends TestCase
             'audit' => [
                 'general' => [
                     'greeting' => 'Sveiki',
-                    'extra' => 'Papildomas',
+                    'extra'    => 'Papildomas',
                 ],
             ],
         ], [
@@ -125,8 +125,8 @@ final class LocalizationAuditTest extends TestCase
     }
 
     /**
-     * @param  array<mixed>  $php
-     * @param  array<mixed>  $json
+     * @param array<mixed> $php
+     * @param array<mixed> $json
      */
     private function writeLocale(string $locale, array $php, array $json = []): void
     {
@@ -136,8 +136,8 @@ final class LocalizationAuditTest extends TestCase
             $this->filesystem->makeDirectory($directory, 0755, true);
         }
 
-        $phpPath = $directory.'/audit.php';
-        $phpContent = "<?php\n\nreturn ".var_export($php, true).";\n";
+        $phpPath = $directory . '/audit.php';
+        $phpContent = "<?php\n\nreturn " . var_export($php, true) . ";\n";
         $this->filesystem->put($phpPath, $phpContent);
 
         if ($json !== []) {

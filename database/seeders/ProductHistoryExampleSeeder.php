@@ -29,10 +29,10 @@ final class ProductHistoryExampleSeeder extends Seeder
                 ->for($brand)
                 ->hasAttached($category)
                 ->create([
-                    'slug' => self::PRODUCT_SLUG,
-                    'name' => 'Akrilo hermetikas UE3YIQ',
-                    'status' => 'published',
-                    'is_visible' => true,
+                    'slug'         => self::PRODUCT_SLUG,
+                    'name'         => 'Akrilo hermetikas UE3YIQ',
+                    'status'       => 'published',
+                    'is_visible'   => true,
                     'published_at' => Carbon::create(2024, 10, 1, 8, 0, 0),
                 ]);
 
@@ -43,9 +43,9 @@ final class ProductHistoryExampleSeeder extends Seeder
     private function createCatalogManager(): User
     {
         return User::factory()->create([
-            'email' => 'catalog.manager@statybae.lt',
+            'email'            => 'catalog.manager@statybae.lt',
             'preferred_locale' => 'lt',
-            'name' => 'Catalog Manager',
+            'name'             => 'Catalog Manager',
         ]);
     }
 
@@ -64,8 +64,8 @@ final class ProductHistoryExampleSeeder extends Seeder
 
         // Only create if no brands exist at all
         return Brand::factory()->create([
-            'name' => 'StatyBae Premium',
-            'slug' => 'statybae-premium',
+            'name'       => 'StatyBae Premium',
+            'slug'       => 'statybae-premium',
             'is_enabled' => true,
         ]);
     }
@@ -75,11 +75,11 @@ final class ProductHistoryExampleSeeder extends Seeder
         return Category::query()->firstWhere('slug', 'akriliniai-hermetikai')
             ?? Category::factory()
                 ->state([
-                    'slug' => 'akriliniai-hermetikai',
-                    'name' => 'Akriliniai hermetikai',
-                    'seo_title' => 'Akriliniai hermetikai',
+                    'slug'            => 'akriliniai-hermetikai',
+                    'name'            => 'Akriliniai hermetikai',
+                    'seo_title'       => 'Akriliniai hermetikai',
                     'seo_description' => 'Akriliniai hermetikai ir sandarinimo sprendimai statyboms.',
-                    'is_visible' => true,
+                    'is_visible'      => true,
                 ])
                 ->create();
     }
@@ -94,32 +94,32 @@ final class ProductHistoryExampleSeeder extends Seeder
         ProductTranslation::factory()
             ->for($product)
             ->state([
-                'locale' => 'lt',
-                'name' => $product->name,
-                'slug' => self::PRODUCT_SLUG,
-                'summary' => 'Profesionalus akrilo hermetikas sandarinimo darbams.',
-                'description' => 'Lietuviškas akrilo hermetikas, skirtas profesionaliam langų, durų ir apdailos sandarinimui. Sudaro elastingą, dažomą paviršių.',
+                'locale'            => 'lt',
+                'name'              => $product->name,
+                'slug'              => self::PRODUCT_SLUG,
+                'summary'           => 'Profesionalus akrilo hermetikas sandarinimo darbams.',
+                'description'       => 'Lietuviškas akrilo hermetikas, skirtas profesionaliam langų, durų ir apdailos sandarinimui. Sudaro elastingą, dažomą paviršių.',
                 'short_description' => 'Profesionalus akrilo hermetikas, kuris išlieka elastingas.',
-                'seo_title' => $product->seo_title ?? 'Akrilo hermetikas UE3YIQ',
-                'seo_description' => $product->seo_description ?? 'Aukštos kokybės akrilo hermetikas profesionalams ir meistrams.',
-                'meta_keywords' => ['akrilas', 'hermetikas', 'sandarinimas', 'statyba'],
-                'alt_text' => 'Akrilo hermetiko tūbelė UE3YIQ',
+                'seo_title'         => $product->seo_title ?? 'Akrilo hermetikas UE3YIQ',
+                'seo_description'   => $product->seo_description ?? 'Aukštos kokybės akrilo hermetikas profesionalams ir meistrams.',
+                'meta_keywords'     => ['akrilas', 'hermetikas', 'sandarinimas', 'statyba'],
+                'alt_text'          => 'Akrilo hermetiko tūbelė UE3YIQ',
             ])
             ->create();
 
         ProductTranslation::factory()
             ->for($product)
             ->state([
-                'locale' => 'en',
-                'name' => 'Acrylic Sealant UE3YIQ',
-                'slug' => 'acrylic-sealant-ue3yiq',
-                'summary' => 'Professional acrylic sealant for joinery and finishing.',
-                'description' => 'Flexible acrylic sealant for windows, doors and finishing joints. Forms a paintable, long-lasting seal.',
+                'locale'            => 'en',
+                'name'              => 'Acrylic Sealant UE3YIQ',
+                'slug'              => 'acrylic-sealant-ue3yiq',
+                'summary'           => 'Professional acrylic sealant for joinery and finishing.',
+                'description'       => 'Flexible acrylic sealant for windows, doors and finishing joints. Forms a paintable, long-lasting seal.',
                 'short_description' => 'Flexible acrylic sealant designed for interior sealing jobs.',
-                'seo_title' => 'Acrylic Sealant UE3YIQ',
-                'seo_description' => 'Reliable acrylic sealant with excellent adhesion and elasticity.',
-                'meta_keywords' => ['acrylic sealant', 'interior', 'construction'],
-                'alt_text' => 'Acrylic sealant tube UE3YIQ',
+                'seo_title'         => 'Acrylic Sealant UE3YIQ',
+                'seo_description'   => 'Reliable acrylic sealant with excellent adhesion and elasticity.',
+                'meta_keywords'     => ['acrylic sealant', 'interior', 'construction'],
+                'alt_text'          => 'Acrylic sealant tube UE3YIQ',
             ])
             ->create();
     }
@@ -128,9 +128,9 @@ final class ProductHistoryExampleSeeder extends Seeder
     {
         $baseMetadata = [
             'product_name' => $product->name,
-            'product_sku' => $product->sku,
-            'brand' => $product->brand?->name,
-            'categories' => $product->categories->pluck('name')->toArray(),
+            'product_sku'  => $product->sku,
+            'brand'        => $product->brand?->name,
+            'categories'   => $product->categories->pluck('name')->toArray(),
         ];
 
         ProductHistory::factory()
@@ -139,16 +139,16 @@ final class ProductHistoryExampleSeeder extends Seeder
             ->created()
             ->state([
                 'field_name' => 'product',
-                'new_value' => [
-                    'name' => $product->name,
-                    'sku' => $product->sku,
-                    'price' => 5.49,
+                'new_value'  => [
+                    'name'   => $product->name,
+                    'sku'    => $product->sku,
+                    'price'  => 5.49,
                     'status' => 'published',
                 ],
                 'description' => 'Initial product import from supplier ERP.',
-                'metadata' => ['source' => 'erp_sync', 'channel' => 'b2b_import'] + $baseMetadata,
-                'created_at' => Carbon::create(2024, 10, 1, 8, 0),
-                'updated_at' => Carbon::create(2024, 10, 1, 8, 0),
+                'metadata'    => ['source' => 'erp_sync', 'channel' => 'b2b_import'] + $baseMetadata,
+                'created_at'  => Carbon::create(2024, 10, 1, 8, 0),
+                'updated_at'  => Carbon::create(2024, 10, 1, 8, 0),
             ])
             ->create();
 
@@ -157,12 +157,12 @@ final class ProductHistoryExampleSeeder extends Seeder
             ->for($user)
             ->priceChanged()
             ->state([
-                'old_value' => 5.49,
-                'new_value' => 5.19,
+                'old_value'   => 5.49,
+                'new_value'   => 5.19,
                 'description' => 'Autumn promotion applied for seasonal campaign.',
-                'metadata' => ['reason' => 'autumn_campaign', 'change_percentage' => -5.46] + $baseMetadata,
-                'created_at' => Carbon::create(2024, 10, 15, 9, 30),
-                'updated_at' => Carbon::create(2024, 10, 15, 9, 30),
+                'metadata'    => ['reason' => 'autumn_campaign', 'change_percentage' => -5.46] + $baseMetadata,
+                'created_at'  => Carbon::create(2024, 10, 15, 9, 30),
+                'updated_at'  => Carbon::create(2024, 10, 15, 9, 30),
             ])
             ->create();
 
@@ -171,12 +171,12 @@ final class ProductHistoryExampleSeeder extends Seeder
             ->for($user)
             ->stockUpdated()
             ->state([
-                'old_value' => 150,
-                'new_value' => 220,
+                'old_value'   => 150,
+                'new_value'   => 220,
                 'description' => 'Warehouse replenishment processed.',
-                'metadata' => ['stock_change' => 70, 'reason' => 'restock', 'supplier' => 'StatyBae Logistics'] + $baseMetadata,
-                'created_at' => Carbon::create(2024, 11, 2, 14, 10),
-                'updated_at' => Carbon::create(2024, 11, 2, 14, 10),
+                'metadata'    => ['stock_change' => 70, 'reason' => 'restock', 'supplier' => 'StatyBae Logistics'] + $baseMetadata,
+                'created_at'  => Carbon::create(2024, 11, 2, 14, 10),
+                'updated_at'  => Carbon::create(2024, 11, 2, 14, 10),
             ])
             ->create();
 
@@ -185,13 +185,13 @@ final class ProductHistoryExampleSeeder extends Seeder
             ->for($user)
             ->updated()
             ->state([
-                'field_name' => 'description',
-                'old_value' => $product->description,
-                'new_value' => $product->description.' Papildytas informacija apie dažomumą.',
+                'field_name'  => 'description',
+                'old_value'   => $product->description,
+                'new_value'   => $product->description . ' Papildytas informacija apie dažomumą.',
                 'description' => 'Description enriched with paintability details.',
-                'metadata' => ['reason' => 'seo_optimization'] + $baseMetadata,
-                'created_at' => Carbon::create(2024, 12, 5, 10, 5),
-                'updated_at' => Carbon::create(2024, 12, 5, 10, 5),
+                'metadata'    => ['reason' => 'seo_optimization'] + $baseMetadata,
+                'created_at'  => Carbon::create(2024, 12, 5, 10, 5),
+                'updated_at'  => Carbon::create(2024, 12, 5, 10, 5),
             ])
             ->create();
 
@@ -200,12 +200,12 @@ final class ProductHistoryExampleSeeder extends Seeder
             ->for($user)
             ->statusChanged()
             ->state([
-                'old_value' => 'published',
-                'new_value' => 'draft',
+                'old_value'   => 'published',
+                'new_value'   => 'draft',
                 'description' => 'Temporarily disabled due to packaging update.',
-                'metadata' => ['reason' => 'packaging_update'] + $baseMetadata,
-                'created_at' => Carbon::create(2025, 1, 15, 8, 45),
-                'updated_at' => Carbon::create(2025, 1, 15, 8, 45),
+                'metadata'    => ['reason' => 'packaging_update'] + $baseMetadata,
+                'created_at'  => Carbon::create(2025, 1, 15, 8, 45),
+                'updated_at'  => Carbon::create(2025, 1, 15, 8, 45),
             ])
             ->create();
 
@@ -214,12 +214,12 @@ final class ProductHistoryExampleSeeder extends Seeder
             ->for($user)
             ->statusChanged()
             ->state([
-                'old_value' => 'draft',
-                'new_value' => 'published',
+                'old_value'   => 'draft',
+                'new_value'   => 'published',
                 'description' => 'Re-enabled after packaging update approval.',
-                'metadata' => ['reason' => 'packaging_approved'] + $baseMetadata,
-                'created_at' => Carbon::create(2025, 1, 28, 16, 30),
-                'updated_at' => Carbon::create(2025, 1, 28, 16, 30),
+                'metadata'    => ['reason' => 'packaging_approved'] + $baseMetadata,
+                'created_at'  => Carbon::create(2025, 1, 28, 16, 30),
+                'updated_at'  => Carbon::create(2025, 1, 28, 16, 30),
             ])
             ->create();
 
@@ -228,13 +228,13 @@ final class ProductHistoryExampleSeeder extends Seeder
             ->for($user)
             ->updated()
             ->state([
-                'field_name' => 'is_visible',
-                'old_value' => true,
-                'new_value' => true,
+                'field_name'  => 'is_visible',
+                'old_value'   => true,
+                'new_value'   => true,
                 'description' => 'Visibility confirmed for new packaging batch.',
-                'metadata' => ['reason' => 'quality_assurance'] + $baseMetadata,
-                'created_at' => Carbon::create(2025, 1, 28, 16, 35),
-                'updated_at' => Carbon::create(2025, 1, 28, 16, 35),
+                'metadata'    => ['reason' => 'quality_assurance'] + $baseMetadata,
+                'created_at'  => Carbon::create(2025, 1, 28, 16, 35),
+                'updated_at'  => Carbon::create(2025, 1, 28, 16, 35),
             ])
             ->create();
     }

@@ -18,12 +18,12 @@ class PriceFactory extends Factory
 
         return [
             'priceable_type' => 'Product',
-            'priceable_id' => fn () => \App\Models\Product::factory(),
-            'currency_id' => fn () => 1, // Default currency
-            'amount' => round($amount, 2),
+            'priceable_id'   => fn () => \App\Models\Product::factory(),
+            'currency_id'    => fn () => 1, // Default currency
+            'amount'         => round($amount, 2),
             'compare_amount' => $compare ? round($compare, 2) : null,
-            'cost_amount' => $cost ? round($cost, 2) : null,
-            'metadata' => null,
+            'cost_amount'    => $cost ? round($cost, 2) : null,
+            'metadata'       => null,
         ];
     }
 }

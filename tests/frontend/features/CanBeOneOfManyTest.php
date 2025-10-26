@@ -22,12 +22,12 @@ final class CanBeOneOfManyTest extends TestCase
 
         // Create multiple orders
         $oldOrder = Order::factory()->create([
-            'user_id' => $user->id,
+            'user_id'    => $user->id,
             'created_at' => now()->subDays(5),
         ]);
 
         $latestOrder = Order::factory()->create([
-            'user_id' => $user->id,
+            'user_id'    => $user->id,
             'created_at' => now()->subDays(1),
         ]);
 
@@ -46,20 +46,20 @@ final class CanBeOneOfManyTest extends TestCase
 
         // Create orders with different statuses
         $pendingOrder = Order::factory()->create([
-            'user_id' => $user->id,
-            'status' => 'pending',
+            'user_id'    => $user->id,
+            'status'     => 'pending',
             'created_at' => now()->subDays(1),
         ]);
 
         $completedOrder = Order::factory()->create([
-            'user_id' => $user->id,
-            'status' => 'completed',
+            'user_id'    => $user->id,
+            'status'     => 'completed',
             'created_at' => now()->subDays(2),
         ]);
 
         $deliveredOrder = Order::factory()->create([
-            'user_id' => $user->id,
-            'status' => 'delivered',
+            'user_id'    => $user->id,
+            'status'     => 'delivered',
             'created_at' => now()->subDays(3),
         ]);
 
@@ -76,17 +76,17 @@ final class CanBeOneOfManyTest extends TestCase
         // Create orders with different totals
         $lowValueOrder = Order::factory()->create([
             'user_id' => $user->id,
-            'total' => 100.00,
+            'total'   => 100.00,
         ]);
 
         $highValueOrder = Order::factory()->create([
             'user_id' => $user->id,
-            'total' => 500.00,
+            'total'   => 500.00,
         ]);
 
         $mediumValueOrder = Order::factory()->create([
             'user_id' => $user->id,
-            'total' => 250.00,
+            'total'   => 250.00,
         ]);
 
         // Refresh the user to clear any cached relationships
@@ -105,13 +105,13 @@ final class CanBeOneOfManyTest extends TestCase
 
         // Create multiple reviews
         $oldReview = Review::factory()->create([
-            'user_id' => $user->id,
+            'user_id'    => $user->id,
             'product_id' => $product->id,
             'created_at' => now()->subDays(5),
         ]);
 
         $latestReview = Review::factory()->create([
-            'user_id' => $user->id,
+            'user_id'    => $user->id,
             'product_id' => $product->id,
             'created_at' => now()->subDays(1),
         ]);
@@ -143,21 +143,21 @@ final class CanBeOneOfManyTest extends TestCase
 
         // Create reviews with different ratings
         $lowRatingReview = Review::factory()->create([
-            'user_id' => $user->id,
+            'user_id'    => $user->id,
             'product_id' => $product->id,
-            'rating' => 2,
+            'rating'     => 2,
         ]);
 
         $highRatingReview = Review::factory()->create([
-            'user_id' => $user->id,
+            'user_id'    => $user->id,
             'product_id' => $product->id,
-            'rating' => 5,
+            'rating'     => 5,
         ]);
 
         $mediumRatingReview = Review::factory()->create([
-            'user_id' => $user->id,
+            'user_id'    => $user->id,
             'product_id' => $product->id,
-            'rating' => 3,
+            'rating'     => 3,
         ]);
 
         // Refresh the user to clear any cached relationships
@@ -177,13 +177,13 @@ final class CanBeOneOfManyTest extends TestCase
         // Create multiple reviews
         $oldReview = Review::factory()->create([
             'product_id' => $product->id,
-            'user_id' => $user->id,
+            'user_id'    => $user->id,
             'created_at' => now()->subDays(5),
         ]);
 
         $latestReview = Review::factory()->create([
             'product_id' => $product->id,
-            'user_id' => $user->id,
+            'user_id'    => $user->id,
             'created_at' => now()->subDays(1),
         ]);
 
@@ -204,14 +204,14 @@ final class CanBeOneOfManyTest extends TestCase
         // Create reviews with different ratings
         $lowRatingReview = Review::factory()->create([
             'product_id' => $product->id,
-            'user_id' => $user->id,
-            'rating' => 2,
+            'user_id'    => $user->id,
+            'rating'     => 2,
         ]);
 
         $highRatingReview = Review::factory()->create([
             'product_id' => $product->id,
-            'user_id' => $user->id,
-            'rating' => 5,
+            'user_id'    => $user->id,
+            'rating'     => 5,
         ]);
 
         // Refresh the product to clear any cached relationships
@@ -230,17 +230,17 @@ final class CanBeOneOfManyTest extends TestCase
 
         // Create reviews with different approval statuses
         $pendingReview = Review::factory()->create([
-            'product_id' => $product->id,
-            'user_id' => $user->id,
+            'product_id'  => $product->id,
+            'user_id'     => $user->id,
             'is_approved' => false,
-            'created_at' => now()->subDays(1),
+            'created_at'  => now()->subDays(1),
         ]);
 
         $approvedReview = Review::factory()->create([
-            'product_id' => $product->id,
-            'user_id' => $user->id,
+            'product_id'  => $product->id,
+            'user_id'     => $user->id,
             'is_approved' => true,
-            'created_at' => now()->subDays(2),
+            'created_at'  => now()->subDays(2),
         ]);
 
         // Test the latestApprovedReview relationship
@@ -257,16 +257,16 @@ final class CanBeOneOfManyTest extends TestCase
         $oldPriceChange = ProductHistory::factory()->create([
             'product_id' => $product->id,
             'field_name' => 'price',
-            'old_value' => '100.00',
-            'new_value' => '120.00',
+            'old_value'  => '100.00',
+            'new_value'  => '120.00',
             'created_at' => now()->subDays(5),
         ]);
 
         $latestPriceChange = ProductHistory::factory()->create([
             'product_id' => $product->id,
             'field_name' => 'price',
-            'old_value' => '120.00',
-            'new_value' => '150.00',
+            'old_value'  => '120.00',
+            'new_value'  => '150.00',
             'created_at' => now()->subDays(1),
         ]);
 
@@ -284,21 +284,21 @@ final class CanBeOneOfManyTest extends TestCase
         // Create multiple order items
         $oldItem = $order->items()->create([
             'product_id' => $product->id,
-            'name' => $product->name,
-            'sku' => $product->sku,
-            'quantity' => 1,
-            'price' => 100.00,
-            'total' => 100.00,
+            'name'       => $product->name,
+            'sku'        => $product->sku,
+            'quantity'   => 1,
+            'price'      => 100.00,
+            'total'      => 100.00,
             'created_at' => now()->subDays(5),
         ]);
 
         $latestItem = $order->items()->create([
             'product_id' => $product->id,
-            'name' => $product->name,
-            'sku' => $product->sku,
-            'quantity' => 2,
-            'price' => 150.00,
-            'total' => 300.00,
+            'name'       => $product->name,
+            'sku'        => $product->sku,
+            'quantity'   => 2,
+            'price'      => 150.00,
+            'total'      => 300.00,
             'created_at' => now()->subDays(1),
         ]);
 
@@ -314,7 +314,7 @@ final class CanBeOneOfManyTest extends TestCase
 
         // Create an order
         $order = Order::factory()->create([
-            'user_id' => $user->id,
+            'user_id'    => $user->id,
             'created_at' => now()->subDays(2),
         ]);
 

@@ -9,6 +9,4 @@ use RuntimeException;
 /**
  * Raised whenever the computed HMAC does not match the provided signature.
  */
-final class InvalidSignatureException extends RuntimeException
-{
-}
+final class InvalidSignatureException extends RuntimeException {}

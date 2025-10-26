@@ -15,18 +15,18 @@ class NotificationTemplateTest extends TestCase
     public function test_notification_template_can_be_created(): void
     {
         $template = NotificationTemplate::factory()->create([
-            'name' => 'Order Confirmation',
-            'type' => 'email',
-            'subject' => 'Your order has been confirmed',
-            'body' => 'Thank you for your order. Order number: {{order_number}}',
+            'name'      => 'Order Confirmation',
+            'type'      => 'email',
+            'subject'   => 'Your order has been confirmed',
+            'body'      => 'Thank you for your order. Order number: {{order_number}}',
             'is_active' => true,
         ]);
 
         $this->assertDatabaseHas('notification_templates', [
-            'name' => 'Order Confirmation',
-            'type' => 'email',
-            'subject' => 'Your order has been confirmed',
-            'body' => 'Thank you for your order. Order number: {{order_number}}',
+            'name'      => 'Order Confirmation',
+            'type'      => 'email',
+            'subject'   => 'Your order has been confirmed',
+            'body'      => 'Thank you for your order. Order number: {{order_number}}',
             'is_active' => true,
         ]);
     }
@@ -34,9 +34,9 @@ class NotificationTemplateTest extends TestCase
     public function test_notification_template_casts_work_correctly(): void
     {
         $template = NotificationTemplate::factory()->create([
-            'is_active' => true,
+            'is_active'  => true,
             'is_default' => false,
-            'variables' => ['order_number', 'customer_name'],
+            'variables'  => ['order_number', 'customer_name'],
             'created_at' => now(),
         ]);
 
@@ -144,8 +144,8 @@ class NotificationTemplateTest extends TestCase
     {
         $template = NotificationTemplate::factory()->create([
             'conditions' => [
-                'order_value' => '> 100',
-                'customer_type' => 'premium',
+                'order_value'    => '> 100',
+                'customer_type'  => 'premium',
                 'payment_method' => 'credit_card',
             ],
         ]);
@@ -161,8 +161,8 @@ class NotificationTemplateTest extends TestCase
         $template = NotificationTemplate::factory()->create([
             'metadata' => [
                 'created_by' => 'admin',
-                'version' => '1.0',
-                'tags' => ['order', 'confirmation', 'email'],
+                'version'    => '1.0',
+                'tags'       => ['order', 'confirmation', 'email'],
             ],
         ]);
 
@@ -215,7 +215,7 @@ class NotificationTemplateTest extends TestCase
     public function test_notification_template_can_have_sender(): void
     {
         $template = NotificationTemplate::factory()->create([
-            'sender_name' => 'Store Support',
+            'sender_name'  => 'Store Support',
             'sender_email' => 'support@store.com',
         ]);
 
@@ -236,7 +236,7 @@ class NotificationTemplateTest extends TestCase
     {
         $template = NotificationTemplate::factory()->create([
             'headers' => [
-                'X-Priority' => '1',
+                'X-Priority'        => '1',
                 'X-MSMail-Priority' => 'High',
             ],
         ]);

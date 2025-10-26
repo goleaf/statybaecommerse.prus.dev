@@ -10,15 +10,15 @@ uses(RefreshDatabase::class);
 
 beforeEach(function () {
     $this->product = Product::factory()->create([
-        'name' => 'Test Product',
+        'name'       => 'Test Product',
         'is_enabled' => true,
     ]);
 
     $this->variantCombination = VariantCombination::factory()->create([
-        'product_id' => $this->product->id,
+        'product_id'             => $this->product->id,
         'attribute_combinations' => [
             'color' => 'red',
-            'size' => 'large',
+            'size'  => 'large',
         ],
         'is_available' => true,
     ]);
@@ -82,12 +82,12 @@ describe('VariantCombination Model', function () {
 
     it('unit: can scope available combinations', function () {
         $availableCombination = VariantCombination::factory()->create([
-            'product_id' => $this->product->id,
+            'product_id'   => $this->product->id,
             'is_available' => true,
         ]);
 
         $unavailableCombination = VariantCombination::factory()->create([
-            'product_id' => $this->product->id,
+            'product_id'   => $this->product->id,
             'is_available' => false,
         ]);
 
@@ -115,12 +115,12 @@ describe('VariantCombination Model', function () {
 
     it('unit: can scope by attribute value', function () {
         $redCombination = VariantCombination::factory()->create([
-            'product_id' => $this->product->id,
+            'product_id'             => $this->product->id,
             'attribute_combinations' => ['color' => 'red'],
         ]);
 
         $blueCombination = VariantCombination::factory()->create([
-            'product_id' => $this->product->id,
+            'product_id'             => $this->product->id,
             'attribute_combinations' => ['color' => 'blue'],
         ]);
 
@@ -134,24 +134,24 @@ describe('VariantCombination Model', function () {
 
     it('unit: can scope by combination', function () {
         $redLargeCombination = VariantCombination::factory()->create([
-            'product_id' => $this->product->id,
+            'product_id'             => $this->product->id,
             'attribute_combinations' => [
                 'color' => 'red',
-                'size' => 'large',
+                'size'  => 'large',
             ],
         ]);
 
         $blueSmallCombination = VariantCombination::factory()->create([
-            'product_id' => $this->product->id,
+            'product_id'             => $this->product->id,
             'attribute_combinations' => [
                 'color' => 'blue',
-                'size' => 'small',
+                'size'  => 'small',
             ],
         ]);
 
         $redLargeCombinations = VariantCombination::byCombination([
             'color' => 'red',
-            'size' => 'large',
+            'size'  => 'large',
         ])->get();
 
         expect($redLargeCombinations)->toContainModel($redLargeCombination);
@@ -168,20 +168,20 @@ describe('VariantCombination Model', function () {
 
         \App\Models\AttributeValue::factory()->create([
             'attribute_id' => $colorAttribute->id,
-            'value' => 'red',
+            'value'        => 'red',
         ]);
         \App\Models\AttributeValue::factory()->create([
             'attribute_id' => $colorAttribute->id,
-            'value' => 'blue',
+            'value'        => 'blue',
         ]);
 
         \App\Models\AttributeValue::factory()->create([
             'attribute_id' => $sizeAttribute->id,
-            'value' => 'small',
+            'value'        => 'small',
         ]);
         \App\Models\AttributeValue::factory()->create([
             'attribute_id' => $sizeAttribute->id,
-            'value' => 'large',
+            'value'        => 'large',
         ]);
 
         $product->attributes()->attach([$colorAttribute->id, $sizeAttribute->id]);
@@ -200,7 +200,7 @@ describe('VariantCombination Model', function () {
 
         expect($combinations)->toHaveCount(1);
         expect($combinations[0])->toBe([
-            '__fallback' => 'product-'.(string) $product->getKey(),
+            '__fallback' => 'product-' . (string) $product->getKey(),
         ]);
     });
 
@@ -219,7 +219,7 @@ describe('VariantCombination Model', function () {
         $combination = ['color' => 'red', 'size' => 'large'];
 
         $variantCombination = VariantCombination::factory()->create([
-            'product_id' => $product->id,
+            'product_id'             => $product->id,
             'attribute_combinations' => $combination,
         ]);
 
@@ -232,12 +232,12 @@ describe('VariantCombination Model', function () {
         $product = Product::factory()->create();
 
         $availableCombination = VariantCombination::factory()->create([
-            'product_id' => $product->id,
+            'product_id'   => $product->id,
             'is_available' => true,
         ]);
 
         $unavailableCombination = VariantCombination::factory()->create([
-            'product_id' => $product->id,
+            'product_id'   => $product->id,
             'is_available' => false,
         ]);
 
@@ -292,25 +292,25 @@ describe('VariantCombination Model', function () {
 
     it('unit: handles empty attribute combinations', function () {
         $emptyCombination = VariantCombination::factory()->create([
-            'product_id' => $this->product->id,
+            'product_id'             => $this->product->id,
             'attribute_combinations' => [],
         ]);
 
         expect($emptyCombination->formatted_combinations)->toBe('No combinations');
         expect($emptyCombination->combination_hash)->toBe(
-            hash('sha256', 'fallback:'.$this->product->getKey())
+            hash('sha256', 'fallback:' . $this->product->getKey())
         );
     });
 
     it('unit: handles null attribute combinations', function () {
         $nullCombination = VariantCombination::factory()->create([
-            'product_id' => $this->product->id,
+            'product_id'             => $this->product->id,
             'attribute_combinations' => null,
         ]);
 
         expect($nullCombination->formatted_combinations)->toBe('No combinations');
         expect($nullCombination->combination_hash)->toBe(
-            hash('sha256', 'fallback:'.$this->product->getKey())
+            hash('sha256', 'fallback:' . $this->product->getKey())
         );
     });
 
@@ -325,9 +325,9 @@ describe('VariantCombination Model', function () {
 
     it('unit: can be created with specific attributes', function () {
         $combination = VariantCombination::factory()->create([
-            'product_id' => $this->product->id,
+            'product_id'             => $this->product->id,
             'attribute_combinations' => ['test' => 'value'],
-            'is_available' => false,
+            'is_available'           => false,
         ]);
 
         expect($combination->product_id)->toBe($this->product->id);

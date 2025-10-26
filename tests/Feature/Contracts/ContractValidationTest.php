@@ -17,10 +17,12 @@ use App\Support\Contracts\Entities\OrderContract;
 use App\Support\Contracts\Entities\ProductContract;
 use App\Support\Contracts\Entities\UserContract;
 use App\Support\Contracts\SimpleJsonSchemaValidator;
+
+use function collect;
+
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
-use function collect;
 
 final class ContractValidationTest extends TestCase
 {
@@ -40,12 +42,12 @@ final class ContractValidationTest extends TestCase
         $category = Category::factory()->create();
         $product = Product::factory()->create([
             'is_visible' => true,
-            'status' => 'active',
-            'metadata' => ['power' => '1200W'],
+            'status'     => 'active',
+            'metadata'   => ['power' => '1200W'],
         ]);
         $product->categories()->attach($category);
 
-        $response = $this->getJson('/api/products/search?q='.urlencode(substr($product->name, 0, 4)));
+        $response = $this->getJson('/api/products/search?q=' . urlencode(substr($product->name, 0, 4)));
 
         $response->assertOk();
         $payload = $response->json();
@@ -83,7 +85,7 @@ final class ContractValidationTest extends TestCase
     {
         $brand = Brand::factory()->create(['is_enabled' => true]);
 
-        $response = $this->getJson('/api/brands/'.$brand->slug);
+        $response = $this->getJson('/api/brands/' . $brand->slug);
         $response->assertOk();
         $payload = $response->json();
         $this->assertSame([], $this->validator->validate($payload, BrandContract::schemaPath()));
@@ -98,26 +100,26 @@ final class ContractValidationTest extends TestCase
         $user = User::factory()->create();
         $product = Product::factory()->create([
             'is_visible' => true,
-            'status' => 'active',
+            'status'     => 'active',
         ]);
         $order = Order::factory()->for($user)->create([
-            'status' => 'completed',
+            'status'         => 'completed',
             'payment_status' => 'paid',
         ]);
         OrderItem::factory()->for($order)->forProduct($product)->create([
             'quantity' => 2,
         ]);
         OrderShipping::factory()->create([
-            'order_id' => $order->id,
-            'carrier_name' => 'DPD',
-            'service' => 'Classic',
-            'status' => 'in_transit',
+            'order_id'        => $order->id,
+            'carrier_name'    => 'DPD',
+            'service'         => 'Classic',
+            'status'          => 'in_transit',
             'tracking_number' => 'LT123456789',
-            'tracking_url' => 'https://tracking.example.com/LT123456789',
+            'tracking_url'    => 'https://tracking.example.com/LT123456789',
         ]);
 
         $this->actingAs($user);
-        $response = $this->getJson('/api/orders/'.$order->number);
+        $response = $this->getJson('/api/orders/' . $order->number);
         $response->assertOk();
         $payload = $response->json();
         $this->assertSame([], $this->validator->validate($payload, OrderContract::schemaPath()));
@@ -131,7 +133,7 @@ final class ContractValidationTest extends TestCase
     {
         $user = User::factory()->create([
             'first_name' => 'Jonas',
-            'last_name' => 'Meistras',
+            'last_name'  => 'Meistras',
         ]);
 
         Sanctum::actingAs($user, ['profile.read']);

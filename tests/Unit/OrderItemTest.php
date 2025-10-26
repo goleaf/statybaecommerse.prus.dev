@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Tests\Unit;
 
@@ -30,29 +32,29 @@ final class OrderItemTest extends TestCase
 
         $this->order = Order::factory()->create([
             'user_id' => $this->user->id,
-            'number' => 'ORD-001',
-            'status' => 'pending',
-            'total' => 100.0,
+            'number'  => 'ORD-001',
+            'status'  => 'pending',
+            'total'   => 100.0,
         ]);
 
         $this->product = Product::factory()->create([
-            'name' => 'Test Product',
-            'sku' => 'TEST-001',
+            'name'  => 'Test Product',
+            'sku'   => 'TEST-001',
             'price' => 25.0,
         ]);
 
         $this->variant = ProductVariant::factory()->create([
             'product_id' => $this->product->id,
-            'name' => 'Test Variant',
-            'sku' => 'TEST-001-VAR',
-            'price' => 25.0,
+            'name'       => 'Test Variant',
+            'sku'        => 'TEST-001-VAR',
+            'price'      => 25.0,
         ]);
     }
 
     public function test_order_item_belongs_to_order(): void
     {
         $orderItem = OrderItem::factory()->create([
-            'order_id' => $this->order->id,
+            'order_id'   => $this->order->id,
             'product_id' => $this->product->id,
         ]);
 
@@ -63,7 +65,7 @@ final class OrderItemTest extends TestCase
     public function test_order_item_belongs_to_product(): void
     {
         $orderItem = OrderItem::factory()->create([
-            'order_id' => $this->order->id,
+            'order_id'   => $this->order->id,
             'product_id' => $this->product->id,
         ]);
 
@@ -74,8 +76,8 @@ final class OrderItemTest extends TestCase
     public function test_order_item_belongs_to_product_variant(): void
     {
         $orderItem = OrderItem::factory()->create([
-            'order_id' => $this->order->id,
-            'product_id' => $this->product->id,
+            'order_id'           => $this->order->id,
+            'product_id'         => $this->product->id,
             'product_variant_id' => $this->variant->id,
         ]);
 
@@ -86,8 +88,8 @@ final class OrderItemTest extends TestCase
     public function test_order_item_can_have_null_variant(): void
     {
         $orderItem = OrderItem::factory()->create([
-            'order_id' => $this->order->id,
-            'product_id' => $this->product->id,
+            'order_id'           => $this->order->id,
+            'product_id'         => $this->product->id,
             'product_variant_id' => null,
         ]);
 
@@ -119,12 +121,12 @@ final class OrderItemTest extends TestCase
     public function test_order_item_casts(): void
     {
         $orderItem = OrderItem::factory()->create([
-            'order_id' => $this->order->id,
+            'order_id'   => $this->order->id,
             'product_id' => $this->product->id,
-            'quantity' => '5',
+            'quantity'   => '5',
             'unit_price' => '25.50',
-            'price' => '25.50',
-            'total' => '127.50',
+            'price'      => '25.50',
+            'total'      => '127.50',
         ]);
 
         $this->assertIsInt($orderItem->quantity);
@@ -136,11 +138,11 @@ final class OrderItemTest extends TestCase
     public function test_order_item_auto_calculates_total_on_creating(): void
     {
         $orderItem = OrderItem::factory()->create([
-            'order_id' => $this->order->id,
+            'order_id'   => $this->order->id,
             'product_id' => $this->product->id,
-            'quantity' => 3,
+            'quantity'   => 3,
             'unit_price' => 20.0,
-            'total' => null,  // Let it auto-calculate
+            'total'      => null,  // Let it auto-calculate
         ]);
 
         $this->assertEquals(60.0, $orderItem->total);
@@ -149,15 +151,15 @@ final class OrderItemTest extends TestCase
     public function test_order_item_auto_calculates_total_on_updating(): void
     {
         $orderItem = OrderItem::factory()->create([
-            'order_id' => $this->order->id,
+            'order_id'   => $this->order->id,
             'product_id' => $this->product->id,
-            'quantity' => 2,
+            'quantity'   => 2,
             'unit_price' => 25.0,
-            'total' => 50.0,
+            'total'      => 50.0,
         ]);
 
         $orderItem->update([
-            'quantity' => 4,
+            'quantity'   => 4,
             'unit_price' => 30.0,
         ]);
 
@@ -167,10 +169,10 @@ final class OrderItemTest extends TestCase
     public function test_order_item_sets_unit_price_from_price_if_empty(): void
     {
         $orderItem = OrderItem::factory()->create([
-            'order_id' => $this->order->id,
+            'order_id'   => $this->order->id,
             'product_id' => $this->product->id,
-            'quantity' => 1,
-            'price' => 50.0,
+            'quantity'   => 1,
+            'price'      => 50.0,
             'unit_price' => null,
         ]);
 
@@ -180,10 +182,10 @@ final class OrderItemTest extends TestCase
     public function test_order_item_updates_unit_price_when_price_changes(): void
     {
         $orderItem = OrderItem::factory()->create([
-            'order_id' => $this->order->id,
+            'order_id'   => $this->order->id,
             'product_id' => $this->product->id,
-            'quantity' => 1,
-            'price' => 25.0,
+            'quantity'   => 1,
+            'price'      => 25.0,
             'unit_price' => 25.0,
         ]);
 
@@ -197,15 +199,15 @@ final class OrderItemTest extends TestCase
     public function test_order_item_does_not_override_unit_price_when_both_change(): void
     {
         $orderItem = OrderItem::factory()->create([
-            'order_id' => $this->order->id,
+            'order_id'   => $this->order->id,
             'product_id' => $this->product->id,
-            'quantity' => 1,
-            'price' => 25.0,
+            'quantity'   => 1,
+            'price'      => 25.0,
             'unit_price' => 25.0,
         ]);
 
         $orderItem->update([
-            'price' => 30.0,
+            'price'      => 30.0,
             'unit_price' => 35.0,
         ]);
 
@@ -215,11 +217,11 @@ final class OrderItemTest extends TestCase
     public function test_order_item_calculates_total_with_discount(): void
     {
         $orderItem = OrderItem::factory()->create([
-            'order_id' => $this->order->id,
+            'order_id'   => $this->order->id,
             'product_id' => $this->product->id,
-            'quantity' => 2,
+            'quantity'   => 2,
             'unit_price' => 50.0,
-            'total' => 80.0,  // 100 - 20 discount
+            'total'      => 80.0,  // 100 - 20 discount
         ]);
 
         $this->assertEquals(80.0, $orderItem->total);
@@ -240,7 +242,7 @@ final class OrderItemTest extends TestCase
     public function test_order_item_timestamps(): void
     {
         $orderItem = OrderItem::factory()->create([
-            'order_id' => $this->order->id,
+            'order_id'   => $this->order->id,
             'product_id' => $this->product->id,
         ]);
 
@@ -251,9 +253,9 @@ final class OrderItemTest extends TestCase
     public function test_order_item_can_have_notes(): void
     {
         $orderItem = OrderItem::factory()->create([
-            'order_id' => $this->order->id,
+            'order_id'   => $this->order->id,
             'product_id' => $this->product->id,
-            'notes' => 'Special instructions for this item',
+            'notes'      => 'Special instructions for this item',
         ]);
 
         $this->assertEquals('Special instructions for this item', $orderItem->notes);
@@ -262,10 +264,10 @@ final class OrderItemTest extends TestCase
     public function test_order_item_with_variant_includes_variant_name(): void
     {
         $orderItem = OrderItem::factory()->create([
-            'order_id' => $this->order->id,
-            'product_id' => $this->product->id,
+            'order_id'           => $this->order->id,
+            'product_id'         => $this->product->id,
             'product_variant_id' => $this->variant->id,
-            'name' => $this->product->name . ' - ' . $this->variant->name,
+            'name'               => $this->product->name . ' - ' . $this->variant->name,
         ]);
 
         $this->assertStringContainsString($this->product->name, $orderItem->name);
@@ -276,9 +278,9 @@ final class OrderItemTest extends TestCase
     {
         // Note: Database allows 0 quantity, validation should be handled at application level
         $orderItem = OrderItem::factory()->create([
-            'order_id' => $this->order->id,
+            'order_id'   => $this->order->id,
             'product_id' => $this->product->id,
-            'quantity' => 0,
+            'quantity'   => 0,
         ]);
 
         $this->assertEquals(0, $orderItem->quantity);
@@ -288,7 +290,7 @@ final class OrderItemTest extends TestCase
     {
         // Note: Database allows negative prices (for discounts), validation should be handled at application level
         $orderItem = OrderItem::factory()->create([
-            'order_id' => $this->order->id,
+            'order_id'   => $this->order->id,
             'product_id' => $this->product->id,
             'unit_price' => -10.0,
         ]);
@@ -299,11 +301,11 @@ final class OrderItemTest extends TestCase
     public function test_order_item_total_can_be_zero_with_discount(): void
     {
         $orderItem = OrderItem::factory()->create([
-            'order_id' => $this->order->id,
+            'order_id'   => $this->order->id,
             'product_id' => $this->product->id,
-            'quantity' => 1,
+            'quantity'   => 1,
             'unit_price' => 50.0,
-            'total' => 0.0,  // 50 - 50 discount
+            'total'      => 0.0,  // 50 - 50 discount
         ]);
 
         $this->assertEquals(0.0, $orderItem->total);
@@ -312,10 +314,10 @@ final class OrderItemTest extends TestCase
     public function test_order_item_boot_methods_work_correctly(): void
     {
         $orderItem = new OrderItem([
-            'order_id' => $this->order->id,
+            'order_id'   => $this->order->id,
             'product_id' => $this->product->id,
-            'quantity' => 2,
-            'price' => 25.0,
+            'quantity'   => 2,
+            'price'      => 25.0,
         ]);
 
         $orderItem->save();
@@ -327,9 +329,9 @@ final class OrderItemTest extends TestCase
     public function test_order_item_auto_sets_name_from_product(): void
     {
         $orderItem = OrderItem::factory()->create([
-            'order_id' => $this->order->id,
+            'order_id'   => $this->order->id,
             'product_id' => $this->product->id,
-            'name' => null,
+            'name'       => null,
         ]);
 
         $this->assertEquals($this->product->name, $orderItem->name);
@@ -338,10 +340,10 @@ final class OrderItemTest extends TestCase
     public function test_order_item_auto_sets_name_from_product_and_variant(): void
     {
         $orderItem = OrderItem::factory()->create([
-            'order_id' => $this->order->id,
-            'product_id' => $this->product->id,
+            'order_id'           => $this->order->id,
+            'product_id'         => $this->product->id,
             'product_variant_id' => $this->variant->id,
-            'name' => null,
+            'name'               => null,
         ]);
 
         $expectedName = $this->product->name . ' - ' . $this->variant->name;
@@ -351,9 +353,9 @@ final class OrderItemTest extends TestCase
     public function test_order_item_auto_sets_sku_from_product(): void
     {
         $orderItem = OrderItem::factory()->create([
-            'order_id' => $this->order->id,
+            'order_id'   => $this->order->id,
             'product_id' => $this->product->id,
-            'sku' => null,
+            'sku'        => null,
         ]);
 
         $this->assertEquals($this->product->sku, $orderItem->sku);
@@ -362,10 +364,10 @@ final class OrderItemTest extends TestCase
     public function test_order_item_auto_sets_sku_from_variant(): void
     {
         $orderItem = OrderItem::factory()->create([
-            'order_id' => $this->order->id,
-            'product_id' => $this->product->id,
+            'order_id'           => $this->order->id,
+            'product_id'         => $this->product->id,
             'product_variant_id' => $this->variant->id,
-            'sku' => null,
+            'sku'                => null,
         ]);
 
         $this->assertEquals($this->variant->sku, $orderItem->sku);
@@ -374,11 +376,11 @@ final class OrderItemTest extends TestCase
     public function test_order_item_calculates_total_with_discount_on_creation(): void
     {
         $orderItem = new OrderItem([
-            'order_id' => $this->order->id,
-            'product_id' => $this->product->id,
-            'name' => 'Test Item',
-            'quantity' => 5,
-            'unit_price' => 20.0,
+            'order_id'        => $this->order->id,
+            'product_id'      => $this->product->id,
+            'name'            => 'Test Item',
+            'quantity'        => 5,
+            'unit_price'      => 20.0,
             'discount_amount' => 10.0,
         ]);
 
@@ -392,12 +394,12 @@ final class OrderItemTest extends TestCase
     public function test_order_item_recalculates_total_when_discount_changes(): void
     {
         $orderItem = OrderItem::factory()->create([
-            'order_id' => $this->order->id,
-            'product_id' => $this->product->id,
-            'quantity' => 4,
-            'unit_price' => 25.0,
+            'order_id'        => $this->order->id,
+            'product_id'      => $this->product->id,
+            'quantity'        => 4,
+            'unit_price'      => 25.0,
             'discount_amount' => 0,
-            'total' => 100.0,
+            'total'           => 100.0,
         ]);
 
         $orderItem->update(['discount_amount' => 20.0]);
@@ -408,11 +410,11 @@ final class OrderItemTest extends TestCase
     public function test_order_item_handles_large_discount(): void
     {
         $orderItem = new OrderItem([
-            'order_id' => $this->order->id,
-            'product_id' => $this->product->id,
-            'name' => 'Test Item',
-            'quantity' => 2,
-            'unit_price' => 30.0,
+            'order_id'        => $this->order->id,
+            'product_id'      => $this->product->id,
+            'name'            => 'Test Item',
+            'quantity'        => 2,
+            'unit_price'      => 30.0,
             'discount_amount' => 70.0,
         ]);
 
@@ -426,10 +428,10 @@ final class OrderItemTest extends TestCase
     public function test_order_item_discount_amount_defaults_to_zero(): void
     {
         $orderItem = new OrderItem([
-            'order_id' => $this->order->id,
+            'order_id'   => $this->order->id,
             'product_id' => $this->product->id,
-            'name' => 'Test Item',
-            'quantity' => 3,
+            'name'       => 'Test Item',
+            'quantity'   => 3,
             'unit_price' => 15.0,
         ]);
 
@@ -441,11 +443,11 @@ final class OrderItemTest extends TestCase
     public function test_order_item_preserves_manually_set_total(): void
     {
         $orderItem = OrderItem::factory()->create([
-            'order_id' => $this->order->id,
+            'order_id'   => $this->order->id,
             'product_id' => $this->product->id,
-            'quantity' => 3,
+            'quantity'   => 3,
             'unit_price' => 20.0,
-            'total' => 55.0,
+            'total'      => 55.0,
         ]);
 
         $this->assertEquals(55.0, $orderItem->total);
@@ -454,11 +456,11 @@ final class OrderItemTest extends TestCase
     public function test_order_item_updates_total_when_quantity_changes(): void
     {
         $orderItem = OrderItem::factory()->create([
-            'order_id' => $this->order->id,
+            'order_id'   => $this->order->id,
             'product_id' => $this->product->id,
-            'quantity' => 2,
+            'quantity'   => 2,
             'unit_price' => 25.0,
-            'total' => 50.0,
+            'total'      => 50.0,
         ]);
 
         $orderItem->update(['quantity' => 5]);
@@ -469,7 +471,7 @@ final class OrderItemTest extends TestCase
     public function test_order_item_status_has_default(): void
     {
         $orderItem = OrderItem::factory()->create([
-            'order_id' => $this->order->id,
+            'order_id'   => $this->order->id,
             'product_id' => $this->product->id,
         ]);
 
@@ -480,9 +482,9 @@ final class OrderItemTest extends TestCase
     public function test_order_item_can_have_status(): void
     {
         $orderItem = OrderItem::factory()->create([
-            'order_id' => $this->order->id,
+            'order_id'   => $this->order->id,
             'product_id' => $this->product->id,
-            'status' => 'pending',
+            'status'     => 'pending',
         ]);
 
         $this->assertEquals('pending', $orderItem->status);
@@ -491,8 +493,8 @@ final class OrderItemTest extends TestCase
     public function test_order_item_eager_loads_relationships(): void
     {
         $orderItem = OrderItem::factory()->create([
-            'order_id' => $this->order->id,
-            'product_id' => $this->product->id,
+            'order_id'           => $this->order->id,
+            'product_id'         => $this->product->id,
             'product_variant_id' => $this->variant->id,
         ]);
 
@@ -506,8 +508,8 @@ final class OrderItemTest extends TestCase
     public function test_order_item_discount_amount_cast_to_float(): void
     {
         $orderItem = OrderItem::factory()->create([
-            'order_id' => $this->order->id,
-            'product_id' => $this->product->id,
+            'order_id'        => $this->order->id,
+            'product_id'      => $this->product->id,
             'discount_amount' => '15.50',
         ]);
 
@@ -518,11 +520,11 @@ final class OrderItemTest extends TestCase
     public function test_order_item_complex_discount_calculation(): void
     {
         $orderItem = new OrderItem([
-            'order_id' => $this->order->id,
-            'product_id' => $this->product->id,
-            'name' => 'Test Item',
-            'quantity' => 10,
-            'unit_price' => 99.99,
+            'order_id'        => $this->order->id,
+            'product_id'      => $this->product->id,
+            'name'            => 'Test Item',
+            'quantity'        => 10,
+            'unit_price'      => 99.99,
             'discount_amount' => 249.99,
         ]);
 

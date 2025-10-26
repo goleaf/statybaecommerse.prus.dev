@@ -6,6 +6,7 @@ namespace App\Livewire\Components;
 
 use App\Models\Product;
 use App\Models\Stock;
+use DB;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Cache;
 use Livewire\Attributes\Computed;
@@ -17,14 +18,14 @@ use Livewire\Component;
  *
  * Livewire component for LiveInventoryTracker with reactive frontend functionality, real-time updates, and user interaction handling.
  *
- * @property bool $autoRefresh
- * @property int $refreshInterval
- * @property array $selectedCategories
- * @property array $selectedBrands
+ * @property bool   $autoRefresh
+ * @property int    $refreshInterval
+ * @property array  $selectedCategories
+ * @property array  $selectedBrands
  * @property string $stockFilter
  * @property string $sortBy
- * @property bool $showOnlyLowStock
- * @property int $lowStockThreshold
+ * @property bool   $showOnlyLowStock
+ * @property int    $lowStockThreshold
  */
 final class LiveInventoryTracker extends Component
 {
@@ -139,8 +140,8 @@ final class LiveInventoryTracker extends Component
             $inStockProducts = $query->where('stock_quantity', '>', 0)->count();
             $lowStockProducts = $query->where('stock_quantity', '>', 0)->where('stock_quantity', '<=', $this->lowStockThreshold)->count();
             $outOfStockProducts = $query->where('stock_quantity', '<=', 0)->count();
-            $totalStockValue = $query->sum(\DB::raw('stock_quantity * price'));
-            $lowStockValue = $query->where('stock_quantity', '>', 0)->where('stock_quantity', '<=', $this->lowStockThreshold)->sum(\DB::raw('stock_quantity * price'));
+            $totalStockValue = $query->sum(DB::raw('stock_quantity * price'));
+            $lowStockValue = $query->where('stock_quantity', '>', 0)->where('stock_quantity', '<=', $this->lowStockThreshold)->sum(DB::raw('stock_quantity * price'));
 
             return ['total_products' => $totalProducts, 'in_stock' => $inStockProducts, 'low_stock' => $lowStockProducts, 'out_of_stock' => $outOfStockProducts, 'total_stock_value' => $totalStockValue, 'low_stock_value' => $lowStockValue, 'stock_health_percentage' => $totalProducts > 0 ? round($inStockProducts / $totalProducts * 100, 1) : 0];
         });
@@ -152,7 +153,7 @@ final class LiveInventoryTracker extends Component
     #[Computed(persist: true, seconds: 180)]
     public function inventoryItems(): array
     {
-        $cacheKey = "live_inventory_items_{$this->stockFilter}_{$this->sortBy}_{$this->lowStockThreshold}_".implode(',', $this->selectedCategories).'_'.implode(',', $this->selectedBrands);
+        $cacheKey = "live_inventory_items_{$this->stockFilter}_{$this->sortBy}_{$this->lowStockThreshold}_" . implode(',', $this->selectedCategories) . '_' . implode(',', $this->selectedBrands);
 
         return Cache::remember($cacheKey, 180, function () {
             $query = Product::with(['brand', 'categories', 'media'])->where('is_visible', true);
@@ -166,16 +167,16 @@ final class LiveInventoryTracker extends Component
             }
             // Apply stock filter
             match ($this->stockFilter) {
-                'low' => $query->where('stock_quantity', '>', 0)->where('stock_quantity', '<=', $this->lowStockThreshold),
-                'out' => $query->where('stock_quantity', '<=', 0),
+                'low'      => $query->where('stock_quantity', '>', 0)->where('stock_quantity', '<=', $this->lowStockThreshold),
+                'out'      => $query->where('stock_quantity', '<=', 0),
                 'in_stock' => $query->where('stock_quantity', '>', 0),
-                default => null,
+                default    => null,
             };
             // Apply sorting
             match ($this->sortBy) {
-                'name' => $query->orderBy('name'),
+                'name'         => $query->orderBy('name'),
                 'last_updated' => $query->orderBy('updated_at', 'desc'),
-                default => $query->orderBy('stock_quantity'),
+                default        => $query->orderBy('stock_quantity'),
             };
 
             return $query->limit(50)->get()->skipWhile(function ($product) {
@@ -310,7 +311,7 @@ final class LiveInventoryTracker extends Component
     private function clearCache(): void
     {
         Cache::forget("live_inventory_stats_{$this->stockFilter}_{$this->lowStockThreshold}");
-        Cache::forget("live_inventory_items_{$this->stockFilter}_{$this->sortBy}_{$this->lowStockThreshold}_".implode(',', $this->selectedCategories).'_'.implode(',', $this->selectedBrands));
+        Cache::forget("live_inventory_items_{$this->stockFilter}_{$this->sortBy}_{$this->lowStockThreshold}_" . implode(',', $this->selectedCategories) . '_' . implode(',', $this->selectedBrands));
         Cache::forget("live_low_stock_alerts_{$this->lowStockThreshold}");
     }
 

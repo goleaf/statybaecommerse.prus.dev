@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Tests\Models\Business;
 
@@ -23,7 +25,7 @@ final class AttributeValueTest extends TestCase
         parent::setUp();
 
         $this->attribute = Attribute::factory()->create([
-            'is_active' => true,
+            'is_active'  => true,
             'is_enabled' => true,
             'is_visible' => true,
         ]);
@@ -58,9 +60,9 @@ final class AttributeValueTest extends TestCase
     {
         $attributeValue = AttributeValue::factory()->create([
             'attribute_id' => $this->attribute->id,
-            'metadata' => ['created_by' => 'tester'],
-            'is_default' => true,
-            'sort_order' => 7,
+            'metadata'     => ['created_by' => 'tester'],
+            'is_default'   => true,
+            'sort_order'   => 7,
         ]);
 
         $this->assertIsArray($attributeValue->metadata);
@@ -86,9 +88,9 @@ final class AttributeValueTest extends TestCase
         ]);
 
         $product = Product::factory()->create([
-            'status' => 'published',
+            'status'       => 'published',
             'published_at' => Carbon::now()->subDay(),
-            'is_visible' => true,
+            'is_visible'   => true,
         ]);
 
         $attributeValue->products()->attach($product->id, [
@@ -109,14 +111,14 @@ final class AttributeValueTest extends TestCase
         ]);
 
         $product = Product::factory()->create([
-            'status' => 'published',
+            'status'       => 'published',
             'published_at' => Carbon::now()->subDay(),
-            'is_visible' => true,
+            'is_visible'   => true,
         ]);
 
         $variant = ProductVariant::factory()->create([
             'product_id' => $product->id,
-            'status' => 'active',
+            'status'     => 'active',
         ]);
 
         $attributeValue->variants()->attach($variant->id, [
@@ -134,12 +136,12 @@ final class AttributeValueTest extends TestCase
     {
         $enabled = AttributeValue::factory()->create([
             'attribute_id' => $this->attribute->id,
-            'is_enabled' => true,
+            'is_enabled'   => true,
         ]);
 
         $disabled = AttributeValue::factory()->create([
             'attribute_id' => $this->attribute->id,
-            'is_enabled' => false,
+            'is_enabled'   => false,
         ]);
 
         $results = AttributeValue::query()
@@ -176,17 +178,17 @@ final class AttributeValueTest extends TestCase
     {
         $first = AttributeValue::factory()->create([
             'attribute_id' => $this->attribute->id,
-            'sort_order' => 1,
+            'sort_order'   => 1,
         ]);
 
         $second = AttributeValue::factory()->create([
             'attribute_id' => $this->attribute->id,
-            'sort_order' => 2,
+            'sort_order'   => 2,
         ]);
 
         $third = AttributeValue::factory()->create([
             'attribute_id' => $this->attribute->id,
-            'sort_order' => 3,
+            'sort_order'   => 3,
         ]);
 
         $orderedIds = AttributeValue::query()
@@ -200,33 +202,33 @@ final class AttributeValueTest extends TestCase
     public function test_filter_scopes_match_column_values(): void
     {
         $matching = AttributeValue::factory()->create([
-            'attribute_id' => $this->attribute->id,
-            'value' => 'Red',
+            'attribute_id'  => $this->attribute->id,
+            'value'         => 'Red',
             'display_value' => 'Bright Red',
-            'hex_color' => '#FF0000',
-            'image' => 'red.png',
+            'hex_color'     => '#FF0000',
+            'image'         => 'red.png',
         ]);
 
         AttributeValue::factory()->create([
-            'attribute_id' => $this->attribute->id,
-            'value' => 'Blue',
+            'attribute_id'  => $this->attribute->id,
+            'value'         => 'Blue',
             'display_value' => 'Ocean Blue',
-            'hex_color' => '#0000FF',
-            'image' => 'blue.png',
+            'hex_color'     => '#0000FF',
+            'image'         => 'blue.png',
         ]);
 
         $otherAttribute = Attribute::factory()->create([
-            'is_active' => true,
+            'is_active'  => true,
             'is_enabled' => true,
             'is_visible' => true,
         ]);
 
         AttributeValue::factory()->create([
-            'attribute_id' => $otherAttribute->id,
-            'value' => 'Red',
+            'attribute_id'  => $otherAttribute->id,
+            'value'         => 'Red',
             'display_value' => 'Bright Red',
-            'hex_color' => '#FF0000',
-            'image' => 'red.png',
+            'hex_color'     => '#FF0000',
+            'image'         => 'red.png',
         ]);
 
         $this->assertEquals(

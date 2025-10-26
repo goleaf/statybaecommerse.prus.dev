@@ -38,7 +38,7 @@ final class PdfExportWriter implements ExportWriter
     }
 
     /**
-     * @param  array<int, string>  $lines
+     * @param array<int, string> $lines
      */
     private function buildPdf(array $lines): string
     {
@@ -71,14 +71,14 @@ final class PdfExportWriter implements ExportWriter
 
         $pdf .= "trailer\n";
         $pdf .= sprintf("<< /Size %d /Root 1 0 R >>\n", count($offsets));
-        $pdf .= "startxref\n".$xrefPosition."\n";
+        $pdf .= "startxref\n" . $xrefPosition . "\n";
         $pdf .= '%%EOF';
 
         return $pdf;
     }
 
     /**
-     * @param  array<int, string>  $lines
+     * @param array<int, string> $lines
      */
     private function buildContentStream(array $lines): string
     {

@@ -41,16 +41,16 @@ final class PaymentWebhookTest extends TestCase
         Config::set('payments.notchpay.webhook.tolerance', 300);
 
         $order = Order::factory()->pending()->create([
-            'total' => 199.50,
+            'total'    => 199.50,
             'currency' => 'EUR',
         ]);
 
         $payload = [
-            'event_id' => 'evt_invalid',
+            'event_id'     => 'evt_invalid',
             'order_number' => $order->number,
-            'amount' => '199.50',
-            'currency' => 'EUR',
-            'status' => 'paid',
+            'amount'       => '199.50',
+            'currency'     => 'EUR',
+            'status'       => 'paid',
         ];
 
         $timestamp = (string) Carbon::now()->timestamp;
@@ -74,16 +74,16 @@ final class PaymentWebhookTest extends TestCase
         $this->configureNotchPay();
 
         $order = Order::factory()->pending()->create([
-            'total' => 150.00,
+            'total'    => 150.00,
             'currency' => 'EUR',
         ]);
 
         $payload = [
-            'event_id' => 'evt_paid',
+            'event_id'     => 'evt_paid',
             'order_number' => $order->number,
-            'amount' => '150.00',
-            'currency' => 'EUR',
-            'status' => 'paid',
+            'amount'       => '150.00',
+            'currency'     => 'EUR',
+            'status'       => 'paid',
         ];
 
         $timestamp = Carbon::now()->timestamp;
@@ -127,16 +127,16 @@ final class PaymentWebhookTest extends TestCase
         $this->configureNotchPay();
 
         $order = Order::factory()->pending()->create([
-            'total' => 300.00,
+            'total'    => 300.00,
             'currency' => 'EUR',
         ]);
 
         $paidPayload = [
-            'event_id' => 'evt_paid_state',
+            'event_id'     => 'evt_paid_state',
             'order_number' => $order->number,
-            'amount' => '300.00',
-            'currency' => 'EUR',
-            'status' => 'paid',
+            'amount'       => '300.00',
+            'currency'     => 'EUR',
+            'status'       => 'paid',
         ];
 
         $timestamp = Carbon::now()->timestamp;
@@ -148,11 +148,11 @@ final class PaymentWebhookTest extends TestCase
         ])->postJson(route('webhooks.notchpay'), $paidPayload)->assertOk();
 
         $partialRefundPayload = [
-            'event_id' => 'evt_partial_refund',
+            'event_id'     => 'evt_partial_refund',
             'order_number' => $order->number,
-            'amount' => '300.00',
-            'currency' => 'EUR',
-            'status' => 'partially_refunded',
+            'amount'       => '300.00',
+            'currency'     => 'EUR',
+            'status'       => 'partially_refunded',
         ];
 
         $refundTimestamp = Carbon::now()->timestamp;

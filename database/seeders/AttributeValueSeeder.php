@@ -15,10 +15,10 @@ final class AttributeValueSeeder extends Seeder
         $definitions = collect([
             'color' => [
                 [
-                    'value'        => 'Raudona',
-                    'display_value'=> 'R',
-                    'color_code'   => '#FF0000',
-                    'translations' => [
+                    'value'         => 'Raudona',
+                    'display_value' => 'R',
+                    'color_code'    => '#FF0000',
+                    'translations'  => [
                         'lt' => 'Raudona',
                         'en' => 'Red',
                         'de' => 'Rot',
@@ -26,10 +26,10 @@ final class AttributeValueSeeder extends Seeder
                     ],
                 ],
                 [
-                    'value'        => 'Mėlyna',
-                    'display_value'=> 'M',
-                    'color_code'   => '#0000FF',
-                    'translations' => [
+                    'value'         => 'Mėlyna',
+                    'display_value' => 'M',
+                    'color_code'    => '#0000FF',
+                    'translations'  => [
                         'lt' => 'Mėlyna',
                         'en' => 'Blue',
                         'de' => 'Blau',
@@ -37,10 +37,10 @@ final class AttributeValueSeeder extends Seeder
                     ],
                 ],
                 [
-                    'value'        => 'Žalia',
-                    'display_value'=> 'Ž',
-                    'color_code'   => '#00FF00',
-                    'translations' => [
+                    'value'         => 'Žalia',
+                    'display_value' => 'Ž',
+                    'color_code'    => '#00FF00',
+                    'translations'  => [
                         'lt' => 'Žalia',
                         'en' => 'Green',
                         'de' => 'Grün',
@@ -48,10 +48,10 @@ final class AttributeValueSeeder extends Seeder
                     ],
                 ],
                 [
-                    'value'        => 'Juoda',
-                    'display_value'=> 'J',
-                    'color_code'   => '#000000',
-                    'translations' => [
+                    'value'         => 'Juoda',
+                    'display_value' => 'J',
+                    'color_code'    => '#000000',
+                    'translations'  => [
                         'lt' => 'Juoda',
                         'en' => 'Black',
                         'de' => 'Schwarz',
@@ -59,10 +59,10 @@ final class AttributeValueSeeder extends Seeder
                     ],
                 ],
                 [
-                    'value'        => 'Balta',
-                    'display_value'=> 'B',
-                    'color_code'   => '#FFFFFF',
-                    'translations' => [
+                    'value'         => 'Balta',
+                    'display_value' => 'B',
+                    'color_code'    => '#FFFFFF',
+                    'translations'  => [
                         'lt' => 'Balta',
                         'en' => 'White',
                         'de' => 'Weiß',
@@ -72,9 +72,9 @@ final class AttributeValueSeeder extends Seeder
             ],
             'size' => [
                 [
-                    'value'        => 'XS',
-                    'display_value'=> 'Ekstra mažas',
-                    'translations' => [
+                    'value'         => 'XS',
+                    'display_value' => 'Ekstra mažas',
+                    'translations'  => [
                         'lt' => 'Ekstra mažas',
                         'en' => 'Extra Small',
                         'de' => 'Extra Klein',
@@ -82,9 +82,9 @@ final class AttributeValueSeeder extends Seeder
                     ],
                 ],
                 [
-                    'value'        => 'S',
-                    'display_value'=> 'Mažas',
-                    'translations' => [
+                    'value'         => 'S',
+                    'display_value' => 'Mažas',
+                    'translations'  => [
                         'lt' => 'Mažas',
                         'en' => 'Small',
                         'de' => 'Klein',
@@ -92,9 +92,9 @@ final class AttributeValueSeeder extends Seeder
                     ],
                 ],
                 [
-                    'value'        => 'M',
-                    'display_value'=> 'Vidutinis',
-                    'translations' => [
+                    'value'         => 'M',
+                    'display_value' => 'Vidutinis',
+                    'translations'  => [
                         'lt' => 'Vidutinis',
                         'en' => 'Medium',
                         'de' => 'Mittel',
@@ -102,9 +102,9 @@ final class AttributeValueSeeder extends Seeder
                     ],
                 ],
                 [
-                    'value'        => 'L',
-                    'display_value'=> 'Didelis',
-                    'translations' => [
+                    'value'         => 'L',
+                    'display_value' => 'Didelis',
+                    'translations'  => [
                         'lt' => 'Didelis',
                         'en' => 'Large',
                         'de' => 'Groß',
@@ -112,9 +112,9 @@ final class AttributeValueSeeder extends Seeder
                     ],
                 ],
                 [
-                    'value'        => 'XL',
-                    'display_value'=> 'Ekstra didelis',
-                    'translations' => [
+                    'value'         => 'XL',
+                    'display_value' => 'Ekstra didelis',
+                    'translations'  => [
                         'lt' => 'Ekstra didelis',
                         'en' => 'Extra Large',
                         'de' => 'Extra Groß',
@@ -124,9 +124,9 @@ final class AttributeValueSeeder extends Seeder
             ],
             'material' => [
                 [
-                    'value'        => 'Medvilnė',
-                    'display_value'=> 'Medvilnė',
-                    'translations' => [
+                    'value'         => 'Medvilnė',
+                    'display_value' => 'Medvilnė',
+                    'translations'  => [
                         'lt' => 'Medvilnė',
                         'en' => 'Cotton',
                         'de' => 'Baumwolle',
@@ -134,9 +134,9 @@ final class AttributeValueSeeder extends Seeder
                     ],
                 ],
                 [
-                    'value'        => 'Poliesteris',
-                    'display_value'=> 'Poliesteris',
-                    'translations' => [
+                    'value'         => 'Poliesteris',
+                    'display_value' => 'Poliesteris',
+                    'translations'  => [
                         'lt' => 'Poliesteris',
                         'en' => 'Polyester',
                         'de' => 'Polyester',
@@ -144,9 +144,9 @@ final class AttributeValueSeeder extends Seeder
                     ],
                 ],
                 [
-                    'value'        => 'Vilna',
-                    'display_value'=> 'Vilna',
-                    'translations' => [
+                    'value'         => 'Vilna',
+                    'display_value' => 'Vilna',
+                    'translations'  => [
                         'lt' => 'Vilna',
                         'en' => 'Wool',
                         'de' => 'Wolle',
@@ -154,9 +154,9 @@ final class AttributeValueSeeder extends Seeder
                     ],
                 ],
                 [
-                    'value'        => 'Šilkas',
-                    'display_value'=> 'Šilkas',
-                    'translations' => [
+                    'value'         => 'Šilkas',
+                    'display_value' => 'Šilkas',
+                    'translations'  => [
                         'lt' => 'Šilkas',
                         'en' => 'Silk',
                         'de' => 'Seide',
@@ -177,15 +177,15 @@ final class AttributeValueSeeder extends Seeder
                 $attributeValue = AttributeValue::query()->updateOrCreate(
                     [
                         'attribute_id' => $attribute->getKey(),
-                        'slug' => str($value['value'])->slug()->toString(),
+                        'slug'         => str($value['value'])->slug()->toString(),
                     ],
                     [
-                        'value' => $value['value'],
+                        'value'         => $value['value'],
                         'display_value' => $value['display_value'],
-                        'color_code' => $value['color_code'] ?? null,
-                        'is_enabled' => true,
-                        'is_active' => true,
-                        'sort_order' => $index + 1,
+                        'color_code'    => $value['color_code'] ?? null,
+                        'is_enabled'    => true,
+                        'is_active'     => true,
+                        'sort_order'    => $index + 1,
                     ],
                 );
 

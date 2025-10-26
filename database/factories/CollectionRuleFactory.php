@@ -19,10 +19,10 @@ class CollectionRuleFactory extends Factory
     {
         return [
             'collection_id' => Collection::factory(),
-            'field' => $this->faker->randomElement(['category_id', 'brand_id', 'price', 'status']),
-            'operator' => $this->faker->randomElement(['equals', 'not_equals', 'greater_than', 'less_than', 'contains']),
-            'value' => $this->faker->word(),
-            'position' => $this->faker->numberBetween(0, 10),
+            'field'         => $this->faker->randomElement(['category_id', 'brand_id', 'price', 'status']),
+            'operator'      => $this->faker->randomElement(['equals', 'not_equals', 'greater_than', 'less_than', 'contains']),
+            'value'         => $this->faker->word(),
+            'position'      => $this->faker->numberBetween(0, 10),
         ];
     }
 }

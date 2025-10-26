@@ -15,10 +15,10 @@ use Livewire\Component;
  * Livewire component for RelatedProducts with reactive frontend functionality, real-time updates, and user interaction handling.
  *
  * @property Product $product
- * @property int $limit
- * @property string $title
- * @property bool $showTitle
- * @property string $class
+ * @property int     $limit
+ * @property string  $title
+ * @property bool    $showTitle
+ * @property string  $class
  */
 final class RelatedProducts extends Component
 {

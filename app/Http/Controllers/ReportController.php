@@ -29,7 +29,7 @@ final class ReportController extends Controller
             ->where('is_public', true)
             ->whereNotNull('type')
             ->whereNotNull('category')
-            ->whereNotNull('name->'.app()->getLocale());
+            ->whereNotNull('name->' . app()->getLocale());
         // Apply filters
         if ($request->filled('type')) {
             $query->where('type', $request->get('type'));
@@ -40,7 +40,7 @@ final class ReportController extends Controller
         if ($request->filled('search')) {
             $search = $request->get('search');
             $query->where(function ($q) use ($search) {
-                $q->where('name->'.app()->getLocale(), 'like', "%{$search}%")->orWhere('description->'.app()->getLocale(), 'like', "%{$search}%");
+                $q->where('name->' . app()->getLocale(), 'like', "%{$search}%")->orWhere('description->' . app()->getLocale(), 'like', "%{$search}%");
             });
         }
         // Apply sorting
@@ -93,9 +93,9 @@ final class ReportController extends Controller
         $report->incrementDownloadCount();
         // Generate PDF or return content based on report type
         $content = $this->generateReportContent($report);
-        $filename = Str::slug($report->name).'_'.now()->format('Y-m-d').'.pdf';
+        $filename = Str::slug($report->name) . '_' . now()->format('Y-m-d') . '.pdf';
 
-        return response($content)->header('Content-Type', 'application/pdf')->header('Content-Disposition', 'attachment; filename="'.$filename.'"');
+        return response($content)->header('Content-Type', 'application/pdf')->header('Content-Disposition', 'attachment; filename="' . $filename . '"');
     }
 
     /**

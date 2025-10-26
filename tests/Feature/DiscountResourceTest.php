@@ -34,11 +34,11 @@ class DiscountResourceTest extends TestCase
     public function test_can_create_discount(): void
     {
         $discountData = [
-            'name' => 'Test Discount',
-            'type' => 'percentage',
-            'value' => 10.0,
-            'status' => 'active',
-            'is_active' => true,
+            'name'       => 'Test Discount',
+            'type'       => 'percentage',
+            'value'      => 10.0,
+            'status'     => 'active',
+            'is_active'  => true,
             'is_enabled' => true,
         ];
 
@@ -48,8 +48,8 @@ class DiscountResourceTest extends TestCase
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('discounts', [
-            'name' => 'Test Discount',
-            'type' => 'percentage',
+            'name'  => 'Test Discount',
+            'type'  => 'percentage',
             'value' => 10.0,
         ]);
     }
@@ -62,15 +62,15 @@ class DiscountResourceTest extends TestCase
             'record' => $discount->id,
         ])
             ->fillForm([
-                'name' => 'Updated Discount Name',
+                'name'  => 'Updated Discount Name',
                 'value' => 15.0,
             ])
             ->call('save')
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('discounts', [
-            'id' => $discount->id,
-            'name' => 'Updated Discount Name',
+            'id'    => $discount->id,
+            'name'  => 'Updated Discount Name',
             'value' => 15.0,
         ]);
     }
@@ -107,8 +107,8 @@ class DiscountResourceTest extends TestCase
             ->assertHasNoTableActionErrors();
 
         $this->assertDatabaseHas('discounts', [
-            'name' => $discount->name.' (Copy)',
-            'slug' => $discount->slug.'-copy',
+            'name'   => $discount->name . ' (Copy)',
+            'slug'   => $discount->slug . '-copy',
             'status' => 'draft',
         ]);
     }
@@ -145,7 +145,7 @@ class DiscountResourceTest extends TestCase
 
         foreach ($discounts as $discount) {
             $this->assertDatabaseHas('discounts', [
-                'id' => $discount->id,
+                'id'        => $discount->id,
                 'is_active' => true,
             ]);
         }
@@ -161,7 +161,7 @@ class DiscountResourceTest extends TestCase
 
         foreach ($discounts as $discount) {
             $this->assertDatabaseHas('discounts', [
-                'id' => $discount->id,
+                'id'        => $discount->id,
                 'is_active' => false,
             ]);
         }
@@ -171,8 +171,8 @@ class DiscountResourceTest extends TestCase
     {
         Livewire::test(\App\Filament\Resources\DiscountResource\Pages\CreateDiscount::class)
             ->fillForm([
-                'name' => '',  // Required field
-                'type' => 'invalid_type',  // Invalid type
+                'name'  => '',  // Required field
+                'type'  => 'invalid_type',  // Invalid type
                 'value' => -10,  // Negative value
             ])
             ->call('create')
@@ -183,9 +183,9 @@ class DiscountResourceTest extends TestCase
     {
         Livewire::test(\App\Filament\Resources\DiscountResource\Pages\CreateDiscount::class)
             ->fillForm([
-                'name' => 'Test Discount Name',
-                'type' => 'percentage',
-                'value' => 10.0,
+                'name'   => 'Test Discount Name',
+                'type'   => 'percentage',
+                'value'  => 10.0,
                 'status' => 'active',
             ])
             ->call('create')

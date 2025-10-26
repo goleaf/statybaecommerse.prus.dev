@@ -22,18 +22,18 @@ final class LegalPagesTest extends TestCase
                 LegalTranslation::factory()
                     ->english()
                     ->state([
-                        'title' => $expectedTitle,
-                        'content' => '<p>Test content for '.$expectedTitle.'</p>',
-                        'seo_title' => $expectedTitle,
-                        'seo_description' => 'SEO description for '.$expectedTitle,
+                        'title'           => $expectedTitle,
+                        'content'         => '<p>Test content for ' . $expectedTitle . '</p>',
+                        'seo_title'       => $expectedTitle,
+                        'seo_description' => 'SEO description for ' . $expectedTitle,
                     ]),
                 'translations'
             )
             ->create([
-                'key' => $state['key'],
-                'type' => $state['type'],
-                'is_enabled' => true,
-                'is_required' => $state['is_required'] ?? false,
+                'key'          => $state['key'],
+                'type'         => $state['type'],
+                'is_enabled'   => true,
+                'is_required'  => $state['is_required'] ?? false,
                 'published_at' => now(),
             ]);
 
@@ -59,34 +59,34 @@ final class LegalPagesTest extends TestCase
         return [
             'privacy page' => [
                 'routeName' => 'frontend.legal.privacy',
-                'state' => [
-                    'key' => 'privacy-policy',
-                    'type' => 'privacy_policy',
+                'state'     => [
+                    'key'         => 'privacy-policy',
+                    'type'        => 'privacy_policy',
                     'is_required' => true,
                 ],
                 'expectedTitle' => 'Privacy Policy',
             ],
             'terms page' => [
                 'routeName' => 'frontend.legal.terms',
-                'state' => [
-                    'key' => 'terms-of-use',
-                    'type' => 'terms_of_use',
+                'state'     => [
+                    'key'         => 'terms-of-use',
+                    'type'        => 'terms_of_use',
                     'is_required' => true,
                 ],
                 'expectedTitle' => 'Terms & Conditions',
             ],
             'cookie policy page' => [
                 'routeName' => 'frontend.legal.cookies',
-                'state' => [
-                    'key' => 'cookie-policy',
+                'state'     => [
+                    'key'  => 'cookie-policy',
                     'type' => 'cookie_policy',
                 ],
                 'expectedTitle' => 'Cookie Policy',
             ],
             'return policy page' => [
                 'routeName' => 'frontend.legal.returns',
-                'state' => [
-                    'key' => 'return-policy',
+                'state'     => [
+                    'key'  => 'return-policy',
                     'type' => 'refund_policy',
                 ],
                 'expectedTitle' => 'Return & Refund Policy',

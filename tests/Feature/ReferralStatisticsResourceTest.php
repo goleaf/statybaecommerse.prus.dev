@@ -23,7 +23,7 @@ final class ReferralStatisticsResourceTest extends TestCase
         parent::setUp();
 
         $this->adminUser = User::factory()->create([
-            'email' => 'admin@example.com',
+            'email'    => 'admin@example.com',
             'is_admin' => true,
         ]);
     }
@@ -44,14 +44,14 @@ final class ReferralStatisticsResourceTest extends TestCase
         Livewire::actingAs($this->adminUser)
             ->test(CreateReferralStatistics::class)
             ->fillForm([
-                'user_id' => $user->id,
-                'date' => now()->toDateString(),
-                'total_referrals' => 5,
-                'completed_referrals' => 3,
-                'pending_referrals' => 2,
-                'total_rewards_earned' => 10.5,
+                'user_id'               => $user->id,
+                'date'                  => now()->toDateString(),
+                'total_referrals'       => 5,
+                'completed_referrals'   => 3,
+                'pending_referrals'     => 2,
+                'total_rewards_earned'  => 10.5,
                 'total_discounts_given' => 4.0,
-                'metadata' => ['source' => 'test'],
+                'metadata'              => ['source' => 'test'],
             ])
             ->call('create')
             ->assertHasNoFormErrors();
@@ -83,7 +83,7 @@ final class ReferralStatisticsResourceTest extends TestCase
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('referral_statistics', [
-            'id' => $record->id,
+            'id'              => $record->id,
             'total_referrals' => 10,
         ]);
     }
@@ -104,24 +104,24 @@ final class ReferralStatisticsResourceTest extends TestCase
         Livewire::actingAs($this->adminUser)
             ->test(CreateReferralStatistics::class)
             ->fillForm([
-                'user_id' => $user->id,
-                'date' => now()->toDateString(),
-                'total_referrals' => 10,
-                'completed_referrals' => 8,
-                'pending_referrals' => 2,
-                'total_rewards_earned' => 50.0,
+                'user_id'               => $user->id,
+                'date'                  => now()->toDateString(),
+                'total_referrals'       => 10,
+                'completed_referrals'   => 8,
+                'pending_referrals'     => 2,
+                'total_rewards_earned'  => 50.0,
                 'total_discounts_given' => 25.0,
             ])
             ->call('create')
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('referral_statistics', [
-            'user_id' => $user->id,
-            'date' => now()->startOfDay()->toDateTimeString(),
-            'total_referrals' => 10,
-            'completed_referrals' => 8,
-            'pending_referrals' => 2,
-            'total_rewards_earned' => 50.0,
+            'user_id'               => $user->id,
+            'date'                  => now()->startOfDay()->toDateTimeString(),
+            'total_referrals'       => 10,
+            'completed_referrals'   => 8,
+            'pending_referrals'     => 2,
+            'total_rewards_earned'  => 50.0,
             'total_discounts_given' => 25.0,
         ]);
     }
@@ -135,10 +135,10 @@ final class ReferralStatisticsResourceTest extends TestCase
                 'record' => $statistics->getRouteKey(),
             ])
             ->fillForm([
-                'total_referrals' => 15,
-                'completed_referrals' => 12,
-                'pending_referrals' => 3,
-                'total_rewards_earned' => 75.0,
+                'total_referrals'       => 15,
+                'completed_referrals'   => 12,
+                'pending_referrals'     => 3,
+                'total_rewards_earned'  => 75.0,
                 'total_discounts_given' => 40.0,
             ])
             ->call('save')
@@ -201,7 +201,7 @@ final class ReferralStatisticsResourceTest extends TestCase
         Livewire::actingAs($this->adminUser)
             ->test(ListReferralStatistics::class)
             ->filterTable('date_range', [
-                'from' => '2024-01-01',
+                'from'  => '2024-01-01',
                 'until' => '2024-01-31',
             ])
             ->assertCanSeeTableRecords([$statistics1, $statistics2])
@@ -297,8 +297,8 @@ final class ReferralStatisticsResourceTest extends TestCase
         Livewire::actingAs($this->adminUser)
             ->test(CreateReferralStatistics::class)
             ->fillForm([
-                'user_id' => '',
-                'date' => '',
+                'user_id'         => '',
+                'date'            => '',
                 'total_referrals' => 'invalid',
             ])
             ->call('create')
@@ -320,10 +320,10 @@ final class ReferralStatisticsResourceTest extends TestCase
     public function test_statistics_are_displayed_correctly(): void
     {
         $statistics = ReferralStatistics::factory()->create([
-            'total_referrals' => 10,
-            'completed_referrals' => 8,
-            'pending_referrals' => 2,
-            'total_rewards_earned' => 50.0,
+            'total_referrals'       => 10,
+            'completed_referrals'   => 8,
+            'pending_referrals'     => 2,
+            'total_rewards_earned'  => 50.0,
             'total_discounts_given' => 25.0,
         ]);
 

@@ -19,14 +19,14 @@ class ReviewFactory extends Factory
     public function definition(): array
     {
         return [
-            'product_id' => Product::factory(),
-            'user_id' => User::factory(),
-            'reviewer_name' => $this->faker->name(),
+            'product_id'     => Product::factory(),
+            'user_id'        => User::factory(),
+            'reviewer_name'  => $this->faker->name(),
             'reviewer_email' => $this->faker->email(),
-            'rating' => $this->faker->numberBetween(1, 5),
-            'title' => $this->faker->sentence(4),
-            'content' => $this->faker->paragraph(),
-            'is_approved' => $this->faker->boolean(80),
+            'rating'         => $this->faker->numberBetween(1, 5),
+            'title'          => $this->faker->sentence(4),
+            'content'        => $this->faker->paragraph(),
+            'is_approved'    => $this->faker->boolean(80),
         ];
     }
 

@@ -26,7 +26,7 @@ it('validates checkout payload before processing orders', function (): void {
 
     CartItem::factory()->create([
         'session_id' => session()->getId(),
-        'user_id' => $user->id,
+        'user_id'    => $user->id,
     ]);
 
     $response = postJson(route('frontend.checkout.process'), []);
@@ -68,7 +68,7 @@ it('throttles repeated checkout attempts', function (): void {
     Config::set('checkout.rate_limit.attempts', 1);
     Config::set('checkout.rate_limit.decay_seconds', 60);
 
-    $limiterKey = 'checkout:user:'.$user->id;
+    $limiterKey = 'checkout:user:' . $user->id;
     RateLimiter::clear($limiterKey);
 
     postJson(route('frontend.checkout.process'), [])
@@ -89,7 +89,7 @@ it('returns 500 when the checkout transaction fails', function (): void {
 
     $cartItem = CartItem::factory()->create([
         'session_id' => session()->getId(),
-        'user_id' => $user->id,
+        'user_id'    => $user->id,
     ]);
 
     DB::shouldReceive('transaction')
@@ -98,7 +98,7 @@ it('returns 500 when the checkout transaction fails', function (): void {
 
     postJson(route('frontend.checkout.process'), [
         'payment_method' => 'card',
-        'confirm' => 'yes',
+        'confirm'        => 'yes',
     ])
         ->assertStatus(500)
         ->assertJson(['success' => false]);

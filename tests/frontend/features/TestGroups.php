@@ -285,14 +285,14 @@ class TestGroups
     public static function getAllGroups(): array
     {
         return [
-            'admin' => self::getAdminTests(),
-            'widgets' => self::getWidgetTests(),
-            'api' => self::getApiTests(),
+            'admin'       => self::getAdminTests(),
+            'widgets'     => self::getWidgetTests(),
+            'api'         => self::getApiTests(),
             'integration' => self::getIntegrationTests(),
-            'unit' => self::getUnitTests(),
+            'unit'        => self::getUnitTests(),
             'controllers' => self::getControllerTests(),
-            'models' => self::getModelTests(),
-            'pages' => self::getPageTests(),
+            'models'      => self::getModelTests(),
+            'pages'       => self::getPageTests(),
         ];
     }
 }

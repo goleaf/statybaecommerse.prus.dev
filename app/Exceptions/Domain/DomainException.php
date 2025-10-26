@@ -13,9 +13,9 @@ use Exception;
 abstract class DomainException extends Exception
 {
     /**
-     * @param  ErrorCode  $errorCode  Machine readable error code that describes the failure.
-     * @param  array<string, mixed>  $context  Placeholder replacements that will be injected into the translation string.
-     * @param  int  $status  HTTP status code that best represents the failure.
+     * @param ErrorCode            $errorCode Machine readable error code that describes the failure.
+     * @param array<string, mixed> $context   Placeholder replacements that will be injected into the translation string.
+     * @param int                  $status    HTTP status code that best represents the failure.
      */
     public function __construct(
         private readonly ErrorCode $errorCode,

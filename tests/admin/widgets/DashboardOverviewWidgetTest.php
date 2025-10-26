@@ -56,22 +56,22 @@ class DashboardOverviewWidgetTest extends TestCase
         $product = Product::factory()->create();
 
         $order = Order::factory()->create([
-            'user_id' => $user->id,
-            'total' => 100.00,
-            'status' => 'completed',
+            'user_id'    => $user->id,
+            'total'      => 100.00,
+            'status'     => 'completed',
             'created_at' => now(),
         ]);
 
         $review = Review::factory()->create([
-            'product_id' => $product->id,
-            'rating' => 5,
+            'product_id'  => $product->id,
+            'rating'      => 5,
             'is_approved' => true,
-            'created_at' => now(),
+            'created_at'  => now(),
         ]);
 
         $campaign = Campaign::factory()->create([
-            'name' => 'Test Campaign',
-            'status' => 'active',
+            'name'       => 'Test Campaign',
+            'status'     => 'active',
             'created_at' => now(),
         ]);
 

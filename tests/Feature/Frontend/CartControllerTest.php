@@ -33,7 +33,7 @@ final class CartControllerTest extends TestCase
 
         $response = $this->post(route('frontend.cart.add'), [
             'product_id' => $product->id,
-            'quantity' => 2,
+            'quantity'   => 2,
         ]);
 
         $response->assertRedirect(route('frontend.cart.index'));
@@ -46,7 +46,7 @@ final class CartControllerTest extends TestCase
 
         $response = $this->post(route('frontend.cart.add'), [
             'product_id' => $product->id,
-            'quantity' => 0,
+            'quantity'   => 0,
         ]);
 
         $response->assertSessionHasErrors('quantity');
@@ -62,7 +62,7 @@ final class CartControllerTest extends TestCase
             ],
         ])->post(route('frontend.cart.update'), [
             'product_id' => $product->id,
-            'quantity' => 5,
+            'quantity'   => 5,
         ]);
 
         $this->assertEquals(5, session('cart')[(string) $product->id]['quantity']);
@@ -84,8 +84,8 @@ final class CartControllerTest extends TestCase
     public function test_clear_empties_cart_and_discount(): void
     {
         $this->withSession([
-            'cart' => [1 => ['product_id' => 1, 'name' => 'Item', 'price' => 10, 'quantity' => 1, 'sku' => 'SKU-1']],
-            'cart_discount' => 5,
+            'cart'           => [1 => ['product_id' => 1, 'name' => 'Item', 'price' => 10, 'quantity' => 1, 'sku' => 'SKU-1']],
+            'cart_discount'  => 5,
             'applied_coupon' => ['code' => 'TEST'],
         ])->post(route('frontend.cart.clear'));
 
@@ -97,16 +97,16 @@ final class CartControllerTest extends TestCase
     private function createVisibleProduct(): Product
     {
         $brand = Brand::factory()->create([
-            'is_active' => true,
+            'is_active'  => true,
             'is_enabled' => true,
             'is_visible' => true,
         ]);
         $category = Category::factory()->create(['is_visible' => true]);
 
         $product = Product::factory()->create([
-            'brand_id' => $brand->id,
-            'is_visible' => true,
-            'status' => 'active',
+            'brand_id'     => $brand->id,
+            'is_visible'   => true,
+            'status'       => 'active',
             'published_at' => now(),
         ]);
         $product->categories()->attach($category->id);

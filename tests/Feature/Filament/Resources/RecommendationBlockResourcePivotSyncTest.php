@@ -29,14 +29,14 @@ final class RecommendationBlockResourcePivotSyncTest extends TestCase
         $this->resolveAdminPanel();
 
         config([
-            'app.locale' => 'en',
+            'app.locale'          => 'en',
             'app.fallback_locale' => 'en',
             'activitylog.enabled' => false,
         ]);
 
         app()->setLocale('en');
 
-        app()->singleton(CartService::class, fn () => new class()
+        app()->singleton(CartService::class, fn () => new class
         {
             public function getCount(?int $userId, ?string $sessionId): int
             {
@@ -54,7 +54,7 @@ final class RecommendationBlockResourcePivotSyncTest extends TestCase
             }
         });
 
-        app()->singleton(CacheService::class, fn () => new class()
+        app()->singleton(CacheService::class, fn () => new class
         {
             public function rememberShort(string $key, callable $callback, ?int $ttl = null): mixed
             {
@@ -71,13 +71,11 @@ final class RecommendationBlockResourcePivotSyncTest extends TestCase
                 return collect();
             }
 
-            public function forgetPattern(string $pattern): void
-            {
-            }
+            public function forgetPattern(string $pattern): void {}
         });
 
         $this->admin = User::factory()->create([
-            'email' => 'admin@example.com',
+            'email'    => 'admin@example.com',
             'is_admin' => true,
         ]);
 
@@ -94,15 +92,15 @@ final class RecommendationBlockResourcePivotSyncTest extends TestCase
 
         Livewire::test(CreateRecommendationBlock::class)
             ->fillForm([
-                'name' => 'homepage-featured',
-                'title' => 'Homepage Featured',
-                'description' => 'Block used on homepage for featured products.',
-                'type' => 'featured',
-                'position' => 'top',
-                'product_ids' => $products->pluck('id')->all(),
-                'max_products' => 3,
-                'is_active' => true,
-                'show_title' => true,
+                'name'             => 'homepage-featured',
+                'title'            => 'Homepage Featured',
+                'description'      => 'Block used on homepage for featured products.',
+                'type'             => 'featured',
+                'position'         => 'top',
+                'product_ids'      => $products->pluck('id')->all(),
+                'max_products'     => 3,
+                'is_active'        => true,
+                'show_title'       => true,
                 'show_description' => true,
             ])
             ->call('create')
@@ -120,7 +118,7 @@ final class RecommendationBlockResourcePivotSyncTest extends TestCase
         foreach ($products as $product) {
             $this->assertDatabaseHas('recommendation_block_products', [
                 'recommendation_block_id' => $block->getKey(),
-                'product_id' => $product->getKey(),
+                'product_id'              => $product->getKey(),
             ]);
         }
     }

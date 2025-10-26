@@ -10,6 +10,7 @@ use Filament\View\PanelsRenderHook;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\View\View;
 use Livewire\Attributes\Url;
+use ReflectionMethod;
 
 trait HasWidgetTabs
 {
@@ -35,7 +36,7 @@ trait HasWidgetTabs
         // Call the parent's mount implementation when it exists so we don't break
         // any Livewire lifecycle hooks that upstream pages rely on.
         if (method_exists(parent::class, 'mount')) {
-            $parentMount = new \ReflectionMethod(parent::class, 'mount');
+            $parentMount = new ReflectionMethod(parent::class, 'mount');
 
             // Only invoke the parent mount if it doesn't expect required parameters to
             // avoid triggering argument count errors on components with custom mounts.

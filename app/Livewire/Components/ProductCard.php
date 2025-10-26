@@ -206,7 +206,7 @@ final class ProductCard extends Component
             return __('translations.out_of_stock');
         }
         if ($this->product->low_stock_threshold && $this->product->stock_quantity <= $this->product->low_stock_threshold) {
-            return $this->product->stock_quantity.' '.__('translations.left');
+            return $this->product->stock_quantity . ' ' . __('translations.left');
         }
 
         return __('translations.in_stock');

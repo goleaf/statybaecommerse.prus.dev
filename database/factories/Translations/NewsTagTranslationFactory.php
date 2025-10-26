@@ -22,9 +22,9 @@ final class NewsTagTranslationFactory extends Factory
 
         return [
             'news_tag_id' => NewsTag::factory(),
-            'locale' => fake()->randomElement(['lt', 'en']),
-            'name' => $name,
-            'slug' => Str::slug($name),
+            'locale'      => fake()->randomElement(['lt', 'en']),
+            'name'        => $name,
+            'slug'        => Str::slug($name),
             'description' => fake()->sentence(),
         ];
     }

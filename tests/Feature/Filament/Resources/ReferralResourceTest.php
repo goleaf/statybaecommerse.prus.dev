@@ -14,7 +14,7 @@ uses(RefreshDatabase::class);
 
 beforeEach(function () {
     Permission::query()->firstOrCreate([
-        'name' => 'view notifications',
+        'name'       => 'view notifications',
         'guard_name' => 'web',
     ]);
 });
@@ -44,11 +44,11 @@ it('feature: loads view and edit pages', function () {
     $this->actingAs($user);
 
     $referral = Referral::factory()->create([
-        'referrer_id' => $referrer->id,
-        'referred_id' => $referred->id,
+        'referrer_id'   => $referrer->id,
+        'referred_id'   => $referred->id,
         'referral_code' => 'CODE-12345',
-        'status' => 'pending',
-        'title' => 'Test Referral',
+        'status'        => 'pending',
+        'title'         => 'Test Referral',
     ]);
 
     $this
@@ -68,11 +68,11 @@ it('feature: creates a referral via form action', function () {
 
     Livewire::test(CreateReferral::class)
         ->fillForm([
-            'referrer_id' => $referrer->id,
-            'referred_id' => $referred->id,
+            'referrer_id'   => $referrer->id,
+            'referred_id'   => $referred->id,
             'referral_code' => 'CODE-ABC',
-            'status' => 'pending',
-            'title' => 'Nauja rekomendacija',
+            'status'        => 'pending',
+            'title'         => 'Nauja rekomendacija',
         ])
         ->call('create')
         ->assertHasNoErrors();

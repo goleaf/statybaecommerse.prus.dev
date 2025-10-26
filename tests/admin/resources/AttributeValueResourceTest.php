@@ -47,26 +47,26 @@ class AttributeValueResourceTest extends TestCase
 
         $response = $this->post('/admin/attribute-values', [
             'attribute_id' => $attribute->id,
-            'value' => 'Test Value',
-            'description' => 'Test Description',
-            'color_code' => '#FF0000',
-            'sort_order' => 1,
-            'is_enabled' => true,
-            'is_required' => false,
-            'is_default' => false,
+            'value'        => 'Test Value',
+            'description'  => 'Test Description',
+            'color_code'   => '#FF0000',
+            'sort_order'   => 1,
+            'is_enabled'   => true,
+            'is_required'  => false,
+            'is_default'   => false,
         ]);
 
         $response->assertRedirect('/admin/attribute-values');
 
         $this->assertDatabaseHas('attribute_values', [
             'attribute_id' => $attribute->id,
-            'value' => 'Test Value',
-            'description' => 'Test Description',
-            'color_code' => '#FF0000',
-            'sort_order' => 1,
-            'is_enabled' => true,
-            'is_required' => false,
-            'is_default' => false,
+            'value'        => 'Test Value',
+            'description'  => 'Test Description',
+            'color_code'   => '#FF0000',
+            'sort_order'   => 1,
+            'is_enabled'   => true,
+            'is_required'  => false,
+            'is_default'   => false,
         ]);
     }
 
@@ -76,16 +76,16 @@ class AttributeValueResourceTest extends TestCase
 
         $response = $this->post('/admin/attribute-values', [
             'attribute_id' => $attribute->id,
-            'value' => 'Test Value',
+            'value'        => 'Test Value',
             'translations' => [
                 [
-                    'locale' => 'en',
-                    'value' => 'English Value',
+                    'locale'      => 'en',
+                    'value'       => 'English Value',
                     'description' => 'English Description',
                 ],
                 [
-                    'locale' => 'lt',
-                    'value' => 'Lithuanian Value',
+                    'locale'      => 'lt',
+                    'value'       => 'Lithuanian Value',
                     'description' => 'Lithuanian Description',
                 ],
             ],
@@ -98,16 +98,16 @@ class AttributeValueResourceTest extends TestCase
 
         $this->assertDatabaseHas('attribute_value_translations', [
             'attribute_value_id' => $attributeValue->id,
-            'locale' => 'en',
-            'value' => 'English Value',
-            'description' => 'English Description',
+            'locale'             => 'en',
+            'value'              => 'English Value',
+            'description'        => 'English Description',
         ]);
 
         $this->assertDatabaseHas('attribute_value_translations', [
             'attribute_value_id' => $attributeValue->id,
-            'locale' => 'lt',
-            'value' => 'Lithuanian Value',
-            'description' => 'Lithuanian Description',
+            'locale'             => 'lt',
+            'value'              => 'Lithuanian Value',
+            'description'        => 'Lithuanian Description',
         ]);
     }
 
@@ -126,31 +126,31 @@ class AttributeValueResourceTest extends TestCase
         $attribute = Attribute::factory()->create();
         $attributeValue = AttributeValue::factory()->create([
             'attribute_id' => $attribute->id,
-            'value' => 'Original Value',
+            'value'        => 'Original Value',
         ]);
 
         $response = $this->put("/admin/attribute-values/{$attributeValue->id}", [
             'attribute_id' => $attribute->id,
-            'value' => 'Updated Value',
-            'description' => 'Updated Description',
-            'color_code' => '#00FF00',
-            'sort_order' => 2,
-            'is_enabled' => false,
-            'is_required' => true,
-            'is_default' => true,
+            'value'        => 'Updated Value',
+            'description'  => 'Updated Description',
+            'color_code'   => '#00FF00',
+            'sort_order'   => 2,
+            'is_enabled'   => false,
+            'is_required'  => true,
+            'is_default'   => true,
         ]);
 
         $response->assertRedirect("/admin/attribute-values/{$attributeValue->id}/edit");
 
         $this->assertDatabaseHas('attribute_values', [
-            'id' => $attributeValue->id,
-            'value' => 'Updated Value',
+            'id'          => $attributeValue->id,
+            'value'       => 'Updated Value',
             'description' => 'Updated Description',
-            'color_code' => '#00FF00',
-            'sort_order' => 2,
-            'is_enabled' => false,
+            'color_code'  => '#00FF00',
+            'sort_order'  => 2,
+            'is_enabled'  => false,
             'is_required' => true,
-            'is_default' => true,
+            'is_default'  => true,
         ]);
     }
 
@@ -161,23 +161,23 @@ class AttributeValueResourceTest extends TestCase
 
         $translation = AttributeValueTranslation::factory()->create([
             'attribute_value_id' => $attributeValue->id,
-            'locale' => 'en',
-            'value' => 'Original English Value',
+            'locale'             => 'en',
+            'value'              => 'Original English Value',
         ]);
 
         $response = $this->put("/admin/attribute-values/{$attributeValue->id}", [
             'attribute_id' => $attribute->id,
-            'value' => 'Updated Value',
+            'value'        => 'Updated Value',
             'translations' => [
                 [
-                    'id' => $translation->id,
-                    'locale' => 'en',
-                    'value' => 'Updated English Value',
+                    'id'          => $translation->id,
+                    'locale'      => 'en',
+                    'value'       => 'Updated English Value',
                     'description' => 'Updated English Description',
                 ],
                 [
-                    'locale' => 'lt',
-                    'value' => 'Lithuanian Value',
+                    'locale'      => 'lt',
+                    'value'       => 'Lithuanian Value',
                     'description' => 'Lithuanian Description',
                 ],
             ],
@@ -186,16 +186,16 @@ class AttributeValueResourceTest extends TestCase
         $response->assertRedirect("/admin/attribute-values/{$attributeValue->id}/edit");
 
         $this->assertDatabaseHas('attribute_value_translations', [
-            'id' => $translation->id,
-            'value' => 'Updated English Value',
+            'id'          => $translation->id,
+            'value'       => 'Updated English Value',
             'description' => 'Updated English Description',
         ]);
 
         $this->assertDatabaseHas('attribute_value_translations', [
             'attribute_value_id' => $attributeValue->id,
-            'locale' => 'lt',
-            'value' => 'Lithuanian Value',
-            'description' => 'Lithuanian Description',
+            'locale'             => 'lt',
+            'value'              => 'Lithuanian Value',
+            'description'        => 'Lithuanian Description',
         ]);
     }
 
@@ -234,7 +234,7 @@ class AttributeValueResourceTest extends TestCase
         $response->assertRedirect('/admin/attribute-values');
 
         $this->assertDatabaseHas('attribute_values', [
-            'id' => $attributeValue->id,
+            'id'         => $attributeValue->id,
             'deleted_at' => null,
         ]);
     }
@@ -261,12 +261,12 @@ class AttributeValueResourceTest extends TestCase
 
         $enabledValue = AttributeValue::factory()->create([
             'attribute_id' => $attribute1->id,
-            'is_enabled' => true,
+            'is_enabled'   => true,
         ]);
 
         $disabledValue = AttributeValue::factory()->create([
             'attribute_id' => $attribute2->id,
-            'is_enabled' => false,
+            'is_enabled'   => false,
         ]);
 
         // Test enabled filter
@@ -287,11 +287,11 @@ class AttributeValueResourceTest extends TestCase
         $attribute = Attribute::factory()->create();
         $attributeValue1 = AttributeValue::factory()->create([
             'attribute_id' => $attribute->id,
-            'value' => 'Red Color',
+            'value'        => 'Red Color',
         ]);
         $attributeValue2 = AttributeValue::factory()->create([
             'attribute_id' => $attribute->id,
-            'value' => 'Blue Color',
+            'value'        => 'Blue Color',
         ]);
 
         $response = $this->get('/admin/attribute-values?search=Red');
@@ -305,7 +305,7 @@ class AttributeValueResourceTest extends TestCase
         $attributeValue2 = AttributeValue::factory()->create(['attribute_id' => $attribute->id]);
 
         $response = $this->post('/admin/attribute-values/bulk-actions', [
-            'action' => 'delete',
+            'action'  => 'delete',
             'records' => [$attributeValue1->id, $attributeValue2->id],
         ]);
 
@@ -357,13 +357,13 @@ class AttributeValueResourceTest extends TestCase
         $attribute = Attribute::factory()->create();
         $attributeValue1 = AttributeValue::factory()->create([
             'attribute_id' => $attribute->id,
-            'slug' => 'test-slug',
+            'slug'         => 'test-slug',
         ]);
 
         $response = $this->post('/admin/attribute-values', [
             'attribute_id' => $attribute->id,
-            'value' => 'Test Value',
-            'slug' => 'test-slug',  // Duplicate slug
+            'value'        => 'Test Value',
+            'slug'         => 'test-slug',  // Duplicate slug
         ]);
 
         $response->assertSessionHasErrors(['slug']);
@@ -375,11 +375,11 @@ class AttributeValueResourceTest extends TestCase
 
         $response = $this->post('/admin/attribute-values', [
             'attribute_id' => $attribute->id,
-            'value' => 'Test Value',
-            'metadata' => [
+            'value'        => 'Test Value',
+            'metadata'     => [
                 'created_by' => 'admin',
-                'version' => '1.0',
-                'tags' => ['red', 'color'],
+                'version'    => '1.0',
+                'tags'       => ['red', 'color'],
             ],
         ]);
 
@@ -389,8 +389,8 @@ class AttributeValueResourceTest extends TestCase
         $this->assertNotNull($attributeValue);
         $this->assertEquals([
             'created_by' => 'admin',
-            'version' => '1.0',
-            'tags' => ['red', 'color'],
+            'version'    => '1.0',
+            'tags'       => ['red', 'color'],
         ], $attributeValue->metadata);
     }
 }

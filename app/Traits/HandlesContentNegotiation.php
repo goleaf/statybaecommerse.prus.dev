@@ -10,6 +10,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\View\View;
+use SimpleXMLElement;
 
 /**
  * HandlesContentNegotiation
@@ -41,7 +42,7 @@ trait HandlesContentNegotiation
         if ($request->accepts(['text/csv', 'application/csv'])) {
             $csv = $this->arrayToCsv($payload);
 
-            return response($csv, 200, ['Content-Type' => 'text/csv; charset=utf-8', 'Content-Disposition' => 'attachment; filename="export_'.now()->format('Y-m-d_H-i-s').'.csv"']);
+            return response($csv, 200, ['Content-Type' => 'text/csv; charset=utf-8', 'Content-Disposition' => 'attachment; filename="export_' . now()->format('Y-m-d_H-i-s') . '.csv"']);
         }
         // HTML response (web browsers, default)
         if ($viewName) {
@@ -91,14 +92,14 @@ trait HandlesContentNegotiation
             })->toArray();
 
             return [
-                'products' => $items,
+                'products'   => $items,
                 'pagination' => [
                     'current_page' => $products->currentPage(),
-                    'last_page' => $products->lastPage(),
-                    'per_page' => $products->perPage(),
-                    'total' => $products->total(),
-                    'from' => $products->firstItem(),
-                    'to' => $products->lastItem(),
+                    'last_page'    => $products->lastPage(),
+                    'per_page'     => $products->perPage(),
+                    'total'        => $products->total(),
+                    'from'         => $products->firstItem(),
+                    'to'           => $products->lastItem(),
                 ],
             ];
         }
@@ -130,7 +131,7 @@ trait HandlesContentNegotiation
      */
     protected function arrayToXml(array $data, string $rootElement = 'root'): string
     {
-        $xml = new \SimpleXMLElement("<?xml version='1.0' encoding='UTF-8'?><{$rootElement}></{$rootElement}>");
+        $xml = new SimpleXMLElement("<?xml version='1.0' encoding='UTF-8'?><{$rootElement}></{$rootElement}>");
         $this->arrayToXmlRecursive($data, $xml);
 
         return $xml->asXML();
@@ -139,7 +140,7 @@ trait HandlesContentNegotiation
     /**
      * Recursively convert array to XML
      */
-    protected function arrayToXmlRecursive(array $data, \SimpleXMLElement $xml): void
+    protected function arrayToXmlRecursive(array $data, SimpleXMLElement $xml): void
     {
         foreach ($data as $key => $value) {
             if (is_array($value)) {

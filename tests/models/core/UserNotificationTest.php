@@ -17,8 +17,8 @@ final class UserNotificationTest extends TestCase
     public function test_notification_can_be_created(): void
     {
         $userData = [
-            'id' => 1,
-            'name' => 'John Doe',
+            'id'    => 1,
+            'name'  => 'John Doe',
             'email' => 'john@example.com',
         ];
 
@@ -44,8 +44,8 @@ final class UserNotificationTest extends TestCase
     {
         $user = User::factory()->create();
         $userData = [
-            'id' => 1,
-            'name' => 'John Doe',
+            'id'    => 1,
+            'name'  => 'John Doe',
             'email' => 'john@example.com',
         ];
 
@@ -107,8 +107,8 @@ final class UserNotificationTest extends TestCase
     {
         $user = User::factory()->create();
         $userData = [
-            'id' => 1,
-            'name' => 'John Doe',
+            'id'    => 1,
+            'name'  => 'John Doe',
             'email' => 'john@example.com',
         ];
 
@@ -117,8 +117,8 @@ final class UserNotificationTest extends TestCase
 
         $this->assertDatabaseHas('notifications', [
             'notifiable_type' => User::class,
-            'notifiable_id' => $user->id,
-            'type' => UserNotification::class,
+            'notifiable_id'   => $user->id,
+            'type'            => UserNotification::class,
         ]);
 
         $dbNotification = DatabaseNotification::where('notifiable_id', $user->id)->first();

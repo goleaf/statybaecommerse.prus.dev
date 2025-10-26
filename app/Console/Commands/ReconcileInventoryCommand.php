@@ -68,13 +68,13 @@ final class ReconcileInventoryCommand extends Command
 
                 if ($reserved !== (int) $inventory->reserved) {
                     $inventory->forceFill([
-                        'reserved' => $reserved,
+                        'reserved'  => $reserved,
                         'available' => max(0, $inventory->stock - $reserved),
                     ])->save();
 
                     $anomalies->push(
                         __('Variant inventory :id reserved count corrected (:stored => :actual)', [
-                            'id' => $inventory->getKey(),
+                            'id'     => $inventory->getKey(),
                             'stored' => $inventory->reserved,
                             'actual' => $reserved,
                         ])
@@ -84,7 +84,7 @@ final class ReconcileInventoryCommand extends Command
                 if ($reserved > $inventory->stock) {
                     $anomalies->push(
                         __('Variant inventory :id reserved quantity exceeds stock by :difference units', [
-                            'id' => $inventory->getKey(),
+                            'id'         => $inventory->getKey(),
                             'difference' => $reserved - $inventory->stock,
                         ])
                     );
@@ -102,10 +102,10 @@ final class ReconcileInventoryCommand extends Command
                 if ($reserved > $product->stock_quantity) {
                     $anomalies->push(
                         __('Product :name (ID :id) reservations exceed available stock (:reserved / :stock)', [
-                            'name' => $product->name,
-                            'id' => $product->getKey(),
+                            'name'     => $product->name,
+                            'id'       => $product->getKey(),
                             'reserved' => $reserved,
-                            'stock' => $product->stock_quantity,
+                            'stock'    => $product->stock_quantity,
                         ])
                     );
                 }

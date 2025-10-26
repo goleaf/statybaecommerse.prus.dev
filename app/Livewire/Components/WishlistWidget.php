@@ -16,8 +16,8 @@ use Livewire\Component;
  * Livewire component for WishlistWidget with reactive frontend functionality, real-time updates, and user interaction handling.
  *
  * @property array $wishlistItems
- * @property bool $showWishlist
- * @property int $totalItems
+ * @property bool  $showWishlist
+ * @property int   $totalItems
  */
 final class WishlistWidget extends Component
 {

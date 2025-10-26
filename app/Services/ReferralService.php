@@ -10,6 +10,7 @@ use App\Models\Referral;
 use App\Models\ReferralCode;
 use App\Models\ReferralStatistics;
 use App\Models\User;
+use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -36,11 +37,11 @@ final class ReferralService
             $referred = User::findOrFail($referredId);
             // Check if user was already referred
             if (Referral::userAlreadyReferred($referredId)) {
-                throw new \Exception('User has already been referred');
+                throw new Exception('User has already been referred');
             }
             // Check if referrer can make referrals
             if (! Referral::canUserRefer($referrerId)) {
-                throw new \Exception('Referrer has reached referral limit');
+                throw new Exception('Referrer has reached referral limit');
             }
             // Generate referral code if not provided
             if (! $referralCode) {
@@ -53,7 +54,7 @@ final class ReferralService
             Log::info('Referral created', ['referral_id' => $referral->id, 'referrer_id' => $referrerId, 'referred_id' => $referredId, 'referral_code' => $referralCode]);
 
             return $referral;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Failed to create referral', ['referrer_id' => $referrerId, 'referred_id' => $referredId, 'error' => $e->getMessage()]);
 
             return null;
@@ -70,7 +71,7 @@ final class ReferralService
             // Find the referral
             $referral = Referral::where('referred_id', $referredUserId)->where('status', 'pending')->first();
             if (! $referral) {
-                throw new \Exception('No pending referral found for user');
+                throw new Exception('No pending referral found for user');
             }
             // Mark referral as completed
             $referral->markAsCompleted();
@@ -82,7 +83,7 @@ final class ReferralService
             Log::info('Referral completed', ['referral_id' => $referral->id, 'referrer_id' => $referral->referrer_id, 'referred_id' => $referredUserId, 'order_id' => $orderId]);
 
             return true;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             DB::rollBack();
             Log::error('Failed to process referral completion', ['referred_user_id' => $referredUserId, 'order_id' => $orderId, 'error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
 
@@ -124,7 +125,7 @@ final class ReferralService
             Log::info('Referral code generated for user', ['user_id' => $userId, 'code' => $code]);
 
             return $referralCode;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Failed to generate referral code', ['user_id' => $userId, 'error' => $e->getMessage()]);
 
             return null;
@@ -155,12 +156,12 @@ final class ReferralService
             $stats = ReferralStatistics::getOrCreateForUserAndDate($userId, $today);
             match ($action) {
                 'increment_referrals' => $stats->incrementReferrals(),
-                'complete_referral' => $stats->completeReferral(),
-                'add_reward' => $stats->addRewardEarned(0),
+                'complete_referral'   => $stats->completeReferral(),
+                'add_reward'          => $stats->addRewardEarned(0),
                 // Amount will be set separately
                 'add_discount' => $stats->addDiscountGiven(0),
             };
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // Log the error but don't fail the referral completion
             Log::warning('Failed to update referral statistics', ['user_id' => $userId, 'action' => $action, 'error' => $e->getMessage()]);
         }

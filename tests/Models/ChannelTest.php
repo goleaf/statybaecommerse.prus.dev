@@ -17,7 +17,7 @@ final class ChannelTest extends TestCase
 
     public function test_fillable_attributes_cover_core_channel_columns(): void
     {
-        $model = new Channel();
+        $model = new Channel;
 
         $this->assertContains('name', $model->getFillable());
         $this->assertContains('code', $model->getFillable());
@@ -26,7 +26,7 @@ final class ChannelTest extends TestCase
 
     public function test_casts_configuration_handles_toggles_and_metadata(): void
     {
-        $casts = (new Channel())->getCasts();
+        $casts = (new Channel)->getCasts();
 
         $this->assertSame('boolean', $casts['is_enabled'] ?? null);
         $this->assertSame('boolean', $casts['is_default'] ?? null);

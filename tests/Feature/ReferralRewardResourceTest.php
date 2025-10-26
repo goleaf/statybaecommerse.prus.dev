@@ -24,7 +24,7 @@ class ReferralRewardResourceTest extends TestCase
         Filament::setCurrentPanel('admin');
 
         $this->actingAs(User::factory()->create([
-            'email' => 'admin@example.com',
+            'email'    => 'admin@example.com',
             'is_admin' => true,
         ]));
     }
@@ -44,34 +44,34 @@ class ReferralRewardResourceTest extends TestCase
 
         Livewire::test(\App\Filament\Resources\ReferralRewardResource\Pages\CreateReferralReward::class)
             ->fillForm([
-                'referral_id' => $referral->id,
-                'user_id' => $user->id,
-                'type' => 'discount',
-                'amount' => 10.0,
+                'referral_id'   => $referral->id,
+                'user_id'       => $user->id,
+                'type'          => 'discount',
+                'amount'        => 10.0,
                 'currency_code' => 'EUR',
-                'status' => 'pending',
-                'title' => 'Test Reward',
-                'description' => 'Test Description',
-                'is_active' => true,
-                'priority' => 1,
+                'status'        => 'pending',
+                'title'         => 'Test Reward',
+                'description'   => 'Test Description',
+                'is_active'     => true,
+                'priority'      => 1,
             ])
             ->call('create')
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('referral_rewards', [
-            'referral_id' => $referral->id,
-            'user_id' => $user->id,
-            'type' => 'discount',
-            'amount' => 10.0,
+            'referral_id'   => $referral->id,
+            'user_id'       => $user->id,
+            'type'          => 'discount',
+            'amount'        => 10.0,
             'currency_code' => 'EUR',
-            'status' => 'pending',
-            'is_active' => true,
-            'priority' => 1,
+            'status'        => 'pending',
+            'is_active'     => true,
+            'priority'      => 1,
         ]);
 
         // Assert translatable fields stored for default locale
         $this->assertDatabaseHas('referral_rewards', [
-            'title->lt' => 'Test Reward',
+            'title->lt'       => 'Test Reward',
             'description->lt' => 'Test Description',
         ]);
     }
@@ -84,10 +84,10 @@ class ReferralRewardResourceTest extends TestCase
             'record' => $referralReward->getRouteKey(),
         ])
             ->fillForm([
-                'title' => 'Updated Title',
+                'title'       => 'Updated Title',
                 'description' => 'Updated Description',
-                'amount' => 20.0,
-                'type' => 'discount',
+                'amount'      => 20.0,
+                'type'        => 'discount',
             ])
             ->call('save')
             ->assertHasNoFormErrors();
@@ -232,7 +232,7 @@ class ReferralRewardResourceTest extends TestCase
     {
         Livewire::test(\App\Filament\Resources\ReferralRewardResource\Pages\CreateReferralReward::class)
             ->fillForm([
-                'title' => '',  // Required field
+                'title'  => '',  // Required field
                 'amount' => 'invalid',  // Must be numeric
             ])
             ->call('create')
@@ -246,8 +246,8 @@ class ReferralRewardResourceTest extends TestCase
         $order = Order::factory()->create();
         $referralReward = ReferralReward::factory()->create([
             'referral_id' => $referral->id,
-            'user_id' => $user->id,
-            'order_id' => $order->id,
+            'user_id'     => $user->id,
+            'order_id'    => $order->id,
         ]);
 
         Livewire::test(\App\Filament\Resources\ReferralRewardResource\Pages\ViewReferralReward::class, [

@@ -35,7 +35,7 @@ final class ExportCompletedNotification extends Notification implements ShouldQu
         // Respect the configured TTL so the email mirrors the database payload.
         $expiresIn = (int) config('export.download_url_ttl', 60);
 
-        return (new MailMessage())
+        return (new MailMessage)
             ->subject(__('exports.notifications.completed.subject', ['name' => $this->export->name]))
             ->line(__('exports.notifications.completed.intro'))
             ->line(__('exports.notifications.completed.format', ['format' => strtoupper($this->export->format)]))
@@ -50,10 +50,10 @@ final class ExportCompletedNotification extends Notification implements ShouldQu
     {
         // Persist enough context for administrators to audit finished exports.
         return [
-            'export_id' => $this->export->getKey(),
-            'name' => $this->export->name,
-            'format' => $this->export->format,
-            'download_url' => $this->downloadUrl,
+            'export_id'          => $this->export->getKey(),
+            'name'               => $this->export->name,
+            'format'             => $this->export->format,
+            'download_url'       => $this->downloadUrl,
             'expires_in_minutes' => (int) config('export.download_url_ttl', 60),
         ];
     }

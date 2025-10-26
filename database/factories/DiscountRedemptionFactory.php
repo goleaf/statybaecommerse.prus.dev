@@ -21,19 +21,19 @@ final class DiscountRedemptionFactory extends Factory
     public function definition(): array
     {
         return [
-            'discount_id' => Discount::factory(),
-            'code_id' => DiscountCode::factory(),
-            'user_id' => User::factory(),
-            'order_id' => Order::factory(),
-            'amount_saved' => $this->faker->randomFloat(2, 5, 100),
+            'discount_id'   => Discount::factory(),
+            'code_id'       => DiscountCode::factory(),
+            'user_id'       => User::factory(),
+            'order_id'      => Order::factory(),
+            'amount_saved'  => $this->faker->randomFloat(2, 5, 100),
             'currency_code' => $this->faker->randomElement(['EUR', 'USD', 'GBP']),
-            'redeemed_at' => $this->faker->dateTimeBetween('-30 days', 'now'),
-            'status' => $this->faker->randomElement(['pending', 'redeemed', 'expired', 'cancelled']),
-            'notes' => $this->faker->optional(0.3)->sentence(),
-            'ip_address' => $this->faker->ipv4(),
-            'user_agent' => $this->faker->userAgent(),
-            'created_by' => User::factory(),
-            'updated_by' => User::factory(),
+            'redeemed_at'   => $this->faker->dateTimeBetween('-30 days', 'now'),
+            'status'        => $this->faker->randomElement(['pending', 'redeemed', 'expired', 'cancelled']),
+            'notes'         => $this->faker->optional(0.3)->sentence(),
+            'ip_address'    => $this->faker->ipv4(),
+            'user_agent'    => $this->faker->userAgent(),
+            'created_by'    => User::factory(),
+            'updated_by'    => User::factory(),
         ];
     }
 

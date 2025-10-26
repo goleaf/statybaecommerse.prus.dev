@@ -39,36 +39,36 @@ final class SeoDataResourceTest extends TestCase
 
         Livewire::test(\App\Filament\Resources\SeoDataResource\Pages\CreateSeoData::class)
             ->fillForm([
-                'seoable_type' => Product::class,
-                'seoable_id' => $product->id,
-                'locale' => 'lt',
-                'title' => 'Test SEO Title',
-                'description' => 'Test SEO description for the page',
-                'keywords' => 'test, seo, keywords',
+                'seoable_type'  => Product::class,
+                'seoable_id'    => $product->id,
+                'locale'        => 'lt',
+                'title'         => 'Test SEO Title',
+                'description'   => 'Test SEO description for the page',
+                'keywords'      => 'test, seo, keywords',
                 'canonical_url' => 'https://example.com/test-page',
-                'no_index' => false,
-                'no_follow' => false,
+                'no_index'      => false,
+                'no_follow'     => false,
             ])
             ->call('create')
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('seo_data', [
-            'seoable_type' => Product::class,
-            'seoable_id' => $product->id,
-            'locale' => 'lt',
-            'title' => 'Test SEO Title',
-            'description' => 'Test SEO description for the page',
-            'keywords' => json_encode(['test', 'seo', 'keywords']),
+            'seoable_type'  => Product::class,
+            'seoable_id'    => $product->id,
+            'locale'        => 'lt',
+            'title'         => 'Test SEO Title',
+            'description'   => 'Test SEO description for the page',
+            'keywords'      => json_encode(['test', 'seo', 'keywords']),
             'canonical_url' => 'https://example.com/test-page',
-            'no_index' => false,
-            'no_follow' => false,
+            'no_index'      => false,
+            'no_follow'     => false,
         ]);
     }
 
     public function test_can_edit_seo_data(): void
     {
         $seoData = SeoData::factory()->create([
-            'title' => 'Original Title',
+            'title'       => 'Original Title',
             'description' => 'Original Description',
         ]);
 
@@ -76,15 +76,15 @@ final class SeoDataResourceTest extends TestCase
             'record' => $seoData->getRouteKey(),
         ])
             ->fillForm([
-                'title' => 'Updated Title',
+                'title'       => 'Updated Title',
                 'description' => 'Updated Description',
             ])
             ->call('save')
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('seo_data', [
-            'id' => $seoData->id,
-            'title' => 'Updated Title',
+            'id'          => $seoData->id,
+            'title'       => 'Updated Title',
             'description' => 'Updated Description',
         ]);
     }
@@ -129,11 +129,11 @@ final class SeoDataResourceTest extends TestCase
 
         SeoData::factory()->create([
             'seoable_type' => Product::class,
-            'seoable_id' => $product->id,
+            'seoable_id'   => $product->id,
         ]);
         SeoData::factory()->create([
             'seoable_type' => Category::class,
-            'seoable_id' => $category->id,
+            'seoable_id'   => $category->id,
         ]);
 
         Livewire::test(\App\Filament\Resources\SeoDataResource\Pages\ListSeoData::class)
@@ -257,11 +257,11 @@ final class SeoDataResourceTest extends TestCase
 
         SeoData::factory()->create([
             'seoable_type' => Product::class,
-            'seoable_id' => $product->id,
+            'seoable_id'   => $product->id,
         ]);
         SeoData::factory()->create([
             'seoable_type' => Category::class,
-            'seoable_id' => $category->id,
+            'seoable_id'   => $category->id,
         ]);
 
         Livewire::test(\App\Filament\Resources\SeoDataResource\Pages\ListSeoData::class)
@@ -276,11 +276,11 @@ final class SeoDataResourceTest extends TestCase
 
         SeoData::factory()->create([
             'seoable_type' => Product::class,
-            'seoable_id' => $product->id,
+            'seoable_id'   => $product->id,
         ]);
         SeoData::factory()->create([
             'seoable_type' => Category::class,
-            'seoable_id' => $category->id,
+            'seoable_id'   => $category->id,
         ]);
 
         Livewire::test(\App\Filament\Resources\SeoDataResource\Pages\ListSeoData::class)
@@ -294,11 +294,11 @@ final class SeoDataResourceTest extends TestCase
 
         SeoData::factory()->create([
             'seoable_type' => Product::class,
-            'seoable_id' => $product->id,
+            'seoable_id'   => $product->id,
         ]);
         SeoData::factory()->create([
             'seoable_type' => Brand::class,
-            'seoable_id' => $brand->id,
+            'seoable_id'   => $brand->id,
         ]);
 
         Livewire::test(\App\Filament\Resources\SeoDataResource\Pages\ListSeoData::class)
@@ -326,17 +326,17 @@ final class SeoDataResourceTest extends TestCase
     public function test_can_use_needs_optimization_tab(): void
     {
         SeoData::factory()->create([
-            'title' => 'Test Title',
-            'description' => 'Test Description',
-            'keywords' => 'test, keywords',
-            'canonical_url' => 'https://example.com',
+            'title'           => 'Test Title',
+            'description'     => 'Test Description',
+            'keywords'        => 'test, keywords',
+            'canonical_url'   => 'https://example.com',
             'structured_data' => ['@context' => 'https://schema.org'],
         ]);
         SeoData::factory()->create([
-            'title' => null,
-            'description' => null,
-            'keywords' => null,
-            'canonical_url' => null,
+            'title'           => null,
+            'description'     => null,
+            'keywords'        => null,
+            'canonical_url'   => null,
             'structured_data' => null,
         ]);
 
@@ -347,19 +347,19 @@ final class SeoDataResourceTest extends TestCase
     public function test_can_use_excellent_seo_tab(): void
     {
         SeoData::factory()->create([
-            'title' => 'Test Title',
-            'description' => 'Test Description',
-            'keywords' => 'test, keywords',
-            'canonical_url' => 'https://example.com',
+            'title'           => 'Test Title',
+            'description'     => 'Test Description',
+            'keywords'        => 'test, keywords',
+            'canonical_url'   => 'https://example.com',
             'structured_data' => ['@context' => 'https://schema.org'],
-            'no_index' => false,
-            'no_follow' => false,
+            'no_index'        => false,
+            'no_follow'       => false,
         ]);
         SeoData::factory()->create([
-            'title' => null,
-            'description' => null,
-            'keywords' => null,
-            'canonical_url' => null,
+            'title'           => null,
+            'description'     => null,
+            'keywords'        => null,
+            'canonical_url'   => null,
             'structured_data' => null,
         ]);
 

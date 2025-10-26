@@ -20,7 +20,7 @@ class InventoryResourceTest extends TestCase
         parent::setUp();
 
         $this->actingAs(User::factory()->create([
-            'email' => 'admin@example.com',
+            'email'    => 'admin@example.com',
             'is_admin' => true,
         ]));
     }
@@ -31,13 +31,13 @@ class InventoryResourceTest extends TestCase
         $location = Location::factory()->create();
 
         $inventory = Inventory::factory()->create([
-            'product_id' => $product->id,
+            'product_id'  => $product->id,
             'location_id' => $location->id,
-            'quantity' => 100,
-            'reserved' => 10,
-            'incoming' => 5,
-            'threshold' => 20,
-            'is_tracked' => true,
+            'quantity'    => 100,
+            'reserved'    => 10,
+            'incoming'    => 5,
+            'threshold'   => 20,
+            'is_tracked'  => true,
         ]);
 
         $this
@@ -60,23 +60,23 @@ class InventoryResourceTest extends TestCase
             ->assertOk();
 
         $this->post('/admin/inventories', [
-            'product_id' => $product->id,
+            'product_id'  => $product->id,
             'location_id' => $location->id,
-            'quantity' => 50,
-            'reserved' => 5,
-            'incoming' => 10,
-            'threshold' => 15,
-            'is_tracked' => true,
+            'quantity'    => 50,
+            'reserved'    => 5,
+            'incoming'    => 10,
+            'threshold'   => 15,
+            'is_tracked'  => true,
         ])->assertRedirect();
 
         $this->assertDatabaseHas('inventories', [
-            'product_id' => $product->id,
+            'product_id'  => $product->id,
             'location_id' => $location->id,
-            'quantity' => 50,
-            'reserved' => 5,
-            'incoming' => 10,
-            'threshold' => 15,
-            'is_tracked' => true,
+            'quantity'    => 50,
+            'reserved'    => 5,
+            'incoming'    => 10,
+            'threshold'   => 15,
+            'is_tracked'  => true,
         ]);
     }
 
@@ -85,7 +85,7 @@ class InventoryResourceTest extends TestCase
         $product = Product::factory()->create();
         $location = Location::factory()->create();
         $inventory = Inventory::factory()->create([
-            'product_id' => $product->id,
+            'product_id'  => $product->id,
             'location_id' => $location->id,
         ]);
 
@@ -101,7 +101,7 @@ class InventoryResourceTest extends TestCase
         $product = Product::factory()->create();
         $location = Location::factory()->create();
         $inventory = Inventory::factory()->create([
-            'product_id' => $product->id,
+            'product_id'  => $product->id,
             'location_id' => $location->id,
         ]);
 
@@ -110,21 +110,21 @@ class InventoryResourceTest extends TestCase
             ->assertOk();
 
         $this->put("/admin/inventories/{$inventory->id}", [
-            'product_id' => $product->id,
+            'product_id'  => $product->id,
             'location_id' => $location->id,
-            'quantity' => 75,
-            'reserved' => 8,
-            'incoming' => 12,
-            'threshold' => 25,
-            'is_tracked' => false,
+            'quantity'    => 75,
+            'reserved'    => 8,
+            'incoming'    => 12,
+            'threshold'   => 25,
+            'is_tracked'  => false,
         ])->assertRedirect();
 
         $this->assertDatabaseHas('inventories', [
-            'id' => $inventory->id,
-            'quantity' => 75,
-            'reserved' => 8,
-            'incoming' => 12,
-            'threshold' => 25,
+            'id'         => $inventory->id,
+            'quantity'   => 75,
+            'reserved'   => 8,
+            'incoming'   => 12,
+            'threshold'  => 25,
             'is_tracked' => false,
         ]);
     }
@@ -134,7 +134,7 @@ class InventoryResourceTest extends TestCase
         $product = Product::factory()->create();
         $location = Location::factory()->create();
         $inventory = Inventory::factory()->create([
-            'product_id' => $product->id,
+            'product_id'  => $product->id,
             'location_id' => $location->id,
         ]);
 
@@ -154,17 +154,17 @@ class InventoryResourceTest extends TestCase
         $location = Location::factory()->create();
 
         Inventory::factory()->create([
-            'product_id' => $product1->id,
+            'product_id'  => $product1->id,
             'location_id' => $location->id,
         ]);
 
         Inventory::factory()->create([
-            'product_id' => $product2->id,
+            'product_id'  => $product2->id,
             'location_id' => $location->id,
         ]);
 
         $this
-            ->get('/admin/inventories?product='.$product1->id)
+            ->get('/admin/inventories?product=' . $product1->id)
             ->assertOk()
             ->assertSee('Product 1')
             ->assertDontSee('Product 2');
@@ -177,17 +177,17 @@ class InventoryResourceTest extends TestCase
         $location2 = Location::factory()->create(['name' => 'Location 2']);
 
         Inventory::factory()->create([
-            'product_id' => $product->id,
+            'product_id'  => $product->id,
             'location_id' => $location1->id,
         ]);
 
         Inventory::factory()->create([
-            'product_id' => $product->id,
+            'product_id'  => $product->id,
             'location_id' => $location2->id,
         ]);
 
         $this
-            ->get('/admin/inventories?location='.$location1->id)
+            ->get('/admin/inventories?location=' . $location1->id)
             ->assertOk()
             ->assertSee('Location 1')
             ->assertDontSee('Location 2');
@@ -200,28 +200,28 @@ class InventoryResourceTest extends TestCase
 
         // Out of stock
         Inventory::factory()->create([
-            'product_id' => $product->id,
+            'product_id'  => $product->id,
             'location_id' => $location->id,
-            'quantity' => 0,
-            'reserved' => 0,
+            'quantity'    => 0,
+            'reserved'    => 0,
         ]);
 
         // Low stock
         Inventory::factory()->create([
-            'product_id' => $product->id,
+            'product_id'  => $product->id,
             'location_id' => $location->id,
-            'quantity' => 10,
-            'reserved' => 5,
-            'threshold' => 20,
+            'quantity'    => 10,
+            'reserved'    => 5,
+            'threshold'   => 20,
         ]);
 
         // In stock
         Inventory::factory()->create([
-            'product_id' => $product->id,
+            'product_id'  => $product->id,
             'location_id' => $location->id,
-            'quantity' => 100,
-            'reserved' => 10,
-            'threshold' => 20,
+            'quantity'    => 100,
+            'reserved'    => 10,
+            'threshold'   => 20,
         ]);
 
         $this
@@ -246,15 +246,15 @@ class InventoryResourceTest extends TestCase
         $location = Location::factory()->create();
 
         Inventory::factory()->create([
-            'product_id' => $product->id,
+            'product_id'  => $product->id,
             'location_id' => $location->id,
-            'is_tracked' => true,
+            'is_tracked'  => true,
         ]);
 
         Inventory::factory()->create([
-            'product_id' => $product->id,
+            'product_id'  => $product->id,
             'location_id' => $location->id,
-            'is_tracked' => false,
+            'is_tracked'  => false,
         ]);
 
         $this
@@ -272,38 +272,38 @@ class InventoryResourceTest extends TestCase
         $location = Location::factory()->create();
 
         $inventory1 = Inventory::factory()->create([
-            'product_id' => $product->id,
+            'product_id'  => $product->id,
             'location_id' => $location->id,
-            'quantity' => 50,
+            'quantity'    => 50,
         ]);
 
         $inventory2 = Inventory::factory()->create([
-            'product_id' => $product->id,
+            'product_id'  => $product->id,
             'location_id' => $location->id,
-            'quantity' => 75,
+            'quantity'    => 75,
         ]);
 
         $this->post('/admin/inventories/bulk-adjust-stock', [
-            'records' => [$inventory1->id, $inventory2->id],
-            'quantity' => 100,
-            'reserved' => 10,
-            'incoming' => 5,
+            'records'   => [$inventory1->id, $inventory2->id],
+            'quantity'  => 100,
+            'reserved'  => 10,
+            'incoming'  => 5,
             'threshold' => 20,
         ])->assertRedirect();
 
         $this->assertDatabaseHas('inventories', [
-            'id' => $inventory1->id,
-            'quantity' => 100,
-            'reserved' => 10,
-            'incoming' => 5,
+            'id'        => $inventory1->id,
+            'quantity'  => 100,
+            'reserved'  => 10,
+            'incoming'  => 5,
             'threshold' => 20,
         ]);
 
         $this->assertDatabaseHas('inventories', [
-            'id' => $inventory2->id,
-            'quantity' => 100,
-            'reserved' => 10,
-            'incoming' => 5,
+            'id'        => $inventory2->id,
+            'quantity'  => 100,
+            'reserved'  => 10,
+            'incoming'  => 5,
             'threshold' => 20,
         ]);
     }
@@ -314,18 +314,18 @@ class InventoryResourceTest extends TestCase
         $location = Location::factory()->create();
 
         $inventory = Inventory::factory()->create([
-            'product_id' => $product->id,
+            'product_id'  => $product->id,
             'location_id' => $location->id,
-            'quantity' => 50,
+            'quantity'    => 50,
         ]);
 
         $this->post('/admin/inventories/bulk-add-stock', [
-            'records' => [$inventory->id],
+            'records'      => [$inventory->id],
             'add_quantity' => 25,
         ])->assertRedirect();
 
         $this->assertDatabaseHas('inventories', [
-            'id' => $inventory->id,
+            'id'       => $inventory->id,
             'quantity' => 75,
         ]);
     }
@@ -336,18 +336,18 @@ class InventoryResourceTest extends TestCase
         $location = Location::factory()->create();
 
         $inventory = Inventory::factory()->create([
-            'product_id' => $product->id,
+            'product_id'  => $product->id,
             'location_id' => $location->id,
-            'is_tracked' => true,
+            'is_tracked'  => true,
         ]);
 
         $this->post('/admin/inventories/bulk-toggle-tracking', [
-            'records' => [$inventory->id],
+            'records'    => [$inventory->id],
             'is_tracked' => false,
         ])->assertRedirect();
 
         $this->assertDatabaseHas('inventories', [
-            'id' => $inventory->id,
+            'id'         => $inventory->id,
             'is_tracked' => false,
         ]);
     }
@@ -358,10 +358,10 @@ class InventoryResourceTest extends TestCase
         $location = Location::factory()->create();
 
         $inventory = Inventory::factory()->create([
-            'product_id' => $product->id,
+            'product_id'  => $product->id,
             'location_id' => $location->id,
-            'quantity' => 100,
-            'reserved' => 20,
+            'quantity'    => 100,
+            'reserved'    => 20,
         ]);
 
         $this->assertEquals(80, $inventory->available_quantity);
@@ -374,29 +374,29 @@ class InventoryResourceTest extends TestCase
 
         // Out of stock
         $inventory1 = Inventory::factory()->create([
-            'product_id' => $product->id,
+            'product_id'  => $product->id,
             'location_id' => $location->id,
-            'quantity' => 0,
-            'reserved' => 0,
-            'threshold' => 10,
+            'quantity'    => 0,
+            'reserved'    => 0,
+            'threshold'   => 10,
         ]);
 
         // Low stock
         $inventory2 = Inventory::factory()->create([
-            'product_id' => $product->id,
+            'product_id'  => $product->id,
             'location_id' => $location->id,
-            'quantity' => 15,
-            'reserved' => 5,
-            'threshold' => 20,
+            'quantity'    => 15,
+            'reserved'    => 5,
+            'threshold'   => 20,
         ]);
 
         // In stock
         $inventory3 = Inventory::factory()->create([
-            'product_id' => $product->id,
+            'product_id'  => $product->id,
             'location_id' => $location->id,
-            'quantity' => 100,
-            'reserved' => 10,
-            'threshold' => 20,
+            'quantity'    => 100,
+            'reserved'    => 10,
+            'threshold'   => 20,
         ]);
 
         $this->assertTrue($inventory1->isOutOfStock());

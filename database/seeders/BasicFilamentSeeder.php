@@ -98,37 +98,37 @@ final class BasicFilamentSeeder extends Seeder
         collect([
             'privacy-policy' => [
                 'lt' => [
-                    'title' => 'Privatumo politika',
-                    'slug' => 'privatumo-politika',
+                    'title'   => 'Privatumo politika',
+                    'slug'    => 'privatumo-politika',
                     'content' => '<h1>Privatumo politika</h1><p>Mes saugome jūsų asmens duomenis.</p>',
                 ],
                 'en' => [
-                    'title' => 'Privacy Policy',
-                    'slug' => 'privacy-policy',
+                    'title'   => 'Privacy Policy',
+                    'slug'    => 'privacy-policy',
                     'content' => '<h1>Privacy Policy</h1><p>We respect your privacy and protect your data.</p>',
                 ],
             ],
             'terms-of-service' => [
                 'lt' => [
-                    'title' => 'Paslaugų teikimo sąlygos',
-                    'slug' => 'paslaugu-teikimo-salygos',
+                    'title'   => 'Paslaugų teikimo sąlygos',
+                    'slug'    => 'paslaugu-teikimo-salygos',
                     'content' => '<h1>Paslaugų teikimo sąlygos</h1><p>Naudodamiesi svetaine sutinkate su šiomis sąlygomis.</p>',
                 ],
                 'en' => [
-                    'title' => 'Terms of Service',
-                    'slug' => 'terms-of-service',
+                    'title'   => 'Terms of Service',
+                    'slug'    => 'terms-of-service',
                     'content' => '<h1>Terms of Service</h1><p>By using the site you agree to these terms.</p>',
                 ],
             ],
             'cookie-policy' => [
                 'lt' => [
-                    'title' => 'Slapukų politika',
-                    'slug' => 'slapuku-politika',
+                    'title'   => 'Slapukų politika',
+                    'slug'    => 'slapuku-politika',
                     'content' => '<h1>Slapukų politika</h1><p>Naudojame slapukus geresnei patirčiai.</p>',
                 ],
                 'en' => [
-                    'title' => 'Cookie Policy',
-                    'slug' => 'cookie-policy',
+                    'title'   => 'Cookie Policy',
+                    'slug'    => 'cookie-policy',
                     'content' => '<h1>Cookie Policy</h1><p>We use cookies to improve your experience.</p>',
                 ],
             ],
@@ -142,9 +142,9 @@ final class BasicFilamentSeeder extends Seeder
                 LegalTranslation::query()->updateOrCreate(
                     [
                         'legal_id' => $legal->getKey(),
-                        'locale' => $locale,
+                        'locale'   => $locale,
                     ],
-                    $translation + ['seo_title' => $translation['title'], 'seo_description' => $translation['title'].' – '.$translation['slug']]
+                    $translation + ['seo_title' => $translation['title'], 'seo_description' => $translation['title'] . ' – ' . $translation['slug']]
                 );
             });
         });
@@ -155,10 +155,10 @@ final class BasicFilamentSeeder extends Seeder
         $user = User::query()->firstOrCreate(
             ['email' => $email],
             [
-                'name' => $name,
-                'password' => Hash::make('password'),
+                'name'              => $name,
+                'password'          => Hash::make('password'),
                 'email_verified_at' => now(),
-                'preferred_locale' => 'lt',
+                'preferred_locale'  => 'lt',
             ]
         );
 

@@ -24,9 +24,9 @@ final class SearchExplorerPageTest extends TestCase
         $brand = Brand::factory()->create(['name' => 'Explorer Brand', 'is_enabled' => true]);
 
         Product::factory()->create([
-            'name' => 'Explorer Product',
-            'brand_id' => $brand->id,
-            'is_visible' => true,
+            'name'         => 'Explorer Product',
+            'brand_id'     => $brand->id,
+            'is_visible'   => true,
             'published_at' => now()->subDay(),
         ]);
 

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Tests\Models;
 
@@ -17,7 +19,7 @@ final class PriceTest extends TestCase
     public function test_price_has_expected_configuration(): void
     {
         // Instantiate the model without persisting to inspect its guarded configuration.
-        $model = new Price();
+        $model = new Price;
 
         // Validate the mass-assignable attributes to guard against accidental over-posting.
         self::assertSame([
@@ -57,13 +59,13 @@ final class PriceTest extends TestCase
         // Persist the price record and attach a translated label to exercise all relations.
         $price = Price::factory()->create([
             'priceable_type' => $product->getMorphClass(),
-            'priceable_id' => $product->getKey(),
-            'currency_id' => $currency->getKey(),
+            'priceable_id'   => $product->getKey(),
+            'currency_id'    => $currency->getKey(),
         ]);
 
         $translation = $price->translations()->create([
-            'locale' => 'en',
-            'name' => 'Retail price',
+            'locale'      => 'en',
+            'name'        => 'Retail price',
             'description' => 'Retail price description',
         ]);
 
@@ -100,36 +102,36 @@ final class PriceTest extends TestCase
         // Build a variety of prices that cover enabled, disabled, active, and expired scenarios.
         $active = Price::factory()->create([
             'priceable_type' => $product->getMorphClass(),
-            'priceable_id' => $product->getKey(),
-            'currency_id' => $eur->getKey(),
-            'is_enabled' => true,
-            'starts_at' => now()->subDay(),
-            'ends_at' => now()->addDay(),
+            'priceable_id'   => $product->getKey(),
+            'currency_id'    => $eur->getKey(),
+            'is_enabled'     => true,
+            'starts_at'      => now()->subDay(),
+            'ends_at'        => now()->addDay(),
         ]);
 
         $disabled = Price::factory()->create([
             'priceable_type' => $product->getMorphClass(),
-            'priceable_id' => $product->getKey(),
-            'currency_id' => $eur->getKey(),
-            'is_enabled' => false,
+            'priceable_id'   => $product->getKey(),
+            'currency_id'    => $eur->getKey(),
+            'is_enabled'     => false,
         ]);
 
         $expired = Price::factory()->create([
             'priceable_type' => $product->getMorphClass(),
-            'priceable_id' => $product->getKey(),
-            'currency_id' => $eur->getKey(),
-            'is_enabled' => true,
-            'starts_at' => now()->subDays(5),
-            'ends_at' => now()->subDay(),
+            'priceable_id'   => $product->getKey(),
+            'currency_id'    => $eur->getKey(),
+            'is_enabled'     => true,
+            'starts_at'      => now()->subDays(5),
+            'ends_at'        => now()->subDay(),
         ]);
 
         $usdActive = Price::factory()->create([
             'priceable_type' => $product->getMorphClass(),
-            'priceable_id' => $product->getKey(),
-            'currency_id' => $usd->getKey(),
-            'is_enabled' => true,
-            'starts_at' => now()->subDay(),
-            'ends_at' => now()->addDays(2),
+            'priceable_id'   => $product->getKey(),
+            'currency_id'    => $usd->getKey(),
+            'is_enabled'     => true,
+            'starts_at'      => now()->subDay(),
+            'ends_at'        => now()->addDays(2),
         ]);
 
         // The enabled scope should include all records with the boolean flag set.
@@ -172,13 +174,13 @@ final class PriceTest extends TestCase
         // Create a baseline active price with a discount applied.
         $price = Price::factory()->create([
             'priceable_type' => $product->getMorphClass(),
-            'priceable_id' => $product->getKey(),
-            'currency_id' => $currency->getKey(),
-            'amount' => 100,
+            'priceable_id'   => $product->getKey(),
+            'currency_id'    => $currency->getKey(),
+            'amount'         => 100,
             'compare_amount' => 150,
-            'is_enabled' => true,
-            'starts_at' => now()->subDay(),
-            'ends_at' => now()->addDay(),
+            'is_enabled'     => true,
+            'starts_at'      => now()->subDay(),
+            'ends_at'        => now()->addDay(),
         ]);
 
         // The accessors should report an active price and the rounded discount percentage.
@@ -219,19 +221,19 @@ final class PriceTest extends TestCase
         $currency = Currency::factory()->create(['code' => 'EUR']);
         $price = Price::factory()->create([
             'priceable_type' => $product->getMorphClass(),
-            'priceable_id' => $product->getKey(),
-            'currency_id' => $currency->getKey(),
+            'priceable_id'   => $product->getKey(),
+            'currency_id'    => $currency->getKey(),
         ]);
 
         $price->translations()->create([
-            'locale' => 'en',
-            'name' => 'English Retail',
+            'locale'      => 'en',
+            'name'        => 'English Retail',
             'description' => 'English retail description',
         ]);
 
         $price->translations()->create([
-            'locale' => 'lt',
-            'name' => 'Lietuviškas mažmeninis',
+            'locale'      => 'lt',
+            'name'        => 'Lietuviškas mažmeninis',
             'description' => 'Lietuviškas mažmeninės kainos aprašymas',
         ]);
 
@@ -254,4 +256,3 @@ final class PriceTest extends TestCase
         Carbon::setTestNow();
     }
 }
-

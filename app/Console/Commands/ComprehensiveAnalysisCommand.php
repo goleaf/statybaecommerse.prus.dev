@@ -44,8 +44,8 @@ final class ComprehensiveAnalysisCommand extends Command
         $this->line(sprintf('🔧 Resources with navigation issues: %d', count($resourcesWithNavigationIssues)));
 
         $this->reportList('❌ MODELS WITHOUT RESOURCES', $modelsWithoutResources);
-        $this->reportList('⚠️  EMPTY RESOURCES', array_map(static fn (string $model): string => $model.'Resource.php', $emptyResources));
-        $this->reportList('🔧 RESOURCES WITH ISSUES', array_map(static fn (string $model): string => $model.'Resource.php', $resourcesWithIssues));
+        $this->reportList('⚠️  EMPTY RESOURCES', array_map(static fn (string $model): string => $model . 'Resource.php', $emptyResources));
+        $this->reportList('🔧 RESOURCES WITH ISSUES', array_map(static fn (string $model): string => $model . 'Resource.php', $resourcesWithIssues));
         $this->reportList('⚠️  RESOURCES USING OLD FORM CLASS', $resourcesUsingOldForm);
         $this->reportList('🔧 RESOURCES WITH NAVIGATION GROUP ISSUES', $resourcesWithNavigationIssues);
 
@@ -68,7 +68,7 @@ final class ComprehensiveAnalysisCommand extends Command
      */
     private function collectModels(): array
     {
-        $files = glob(base_path('app/Models').'/*.php');
+        $files = glob(base_path('app/Models') . '/*.php');
         $models = [];
 
         foreach ($files as $file) {
@@ -87,7 +87,7 @@ final class ComprehensiveAnalysisCommand extends Command
      */
     private function collectResources(): array
     {
-        $files = glob(base_path('app/Filament/Resources').'/*Resource.php');
+        $files = glob(base_path('app/Filament/Resources') . '/*Resource.php');
         $resources = [];
 
         foreach ($files as $file) {
@@ -98,7 +98,7 @@ final class ComprehensiveAnalysisCommand extends Command
     }
 
     /**
-     * @param  array<int, string>  $models
+     * @param  array<int, string>                                                                                $models
      * @return array{0: array<int, string>, 1: array<int, string>, 2: array<int, string>, 3: array<int, string>}
      */
     private function analyzeModels(array $models): array
@@ -134,7 +134,7 @@ final class ComprehensiveAnalysisCommand extends Command
 
                 if ($returnCode !== 0) {
                     $resourcesWithIssues[] = $model;
-                    $this->error('  ❌ Syntax error: '.implode(' ', $output));
+                    $this->error('  ❌ Syntax error: ' . implode(' ', $output));
                 }
             }
         }
@@ -143,7 +143,7 @@ final class ComprehensiveAnalysisCommand extends Command
     }
 
     /**
-     * @param  array<int, string>  $resources
+     * @param  array<int, string>                                                         $resources
      * @return array{0: array<int, string>, 1: array<int, string>, 2: array<int, string>}
      */
     private function analyzeResources(array $resources): array
@@ -153,7 +153,7 @@ final class ComprehensiveAnalysisCommand extends Command
         $resourcesWithNavigationIssues = [];
 
         foreach ($resources as $resourceFile) {
-            $fullPath = base_path('app/Filament/Resources/'.$resourceFile);
+            $fullPath = base_path('app/Filament/Resources/' . $resourceFile);
             $content = file_get_contents($fullPath) ?: '';
 
             $this->line(sprintf('🔍 Analyzing resource: %s', $resourceFile));
@@ -176,7 +176,7 @@ final class ComprehensiveAnalysisCommand extends Command
     }
 
     /**
-     * @param  array<int, string>  $items
+     * @param array<int, string> $items
      */
     private function reportList(string $title, array $items): void
     {
@@ -185,10 +185,10 @@ final class ComprehensiveAnalysisCommand extends Command
         }
 
         $this->newline();
-        $this->line($title.':');
+        $this->line($title . ':');
 
         foreach ($items as $item) {
-            $this->line('- '.$item);
+            $this->line('- ' . $item);
         }
     }
 }

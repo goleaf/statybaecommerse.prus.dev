@@ -16,11 +16,11 @@ beforeEach(function () {
 
 it('can create a review', function () {
     $reviewData = [
-        'product_id' => $this->product->id,
-        'rating' => 5,
-        'title' => 'Great product!',
-        'content' => 'This product exceeded my expectations.',
-        'reviewer_name' => 'John Doe',
+        'product_id'     => $this->product->id,
+        'rating'         => 5,
+        'title'          => 'Great product!',
+        'content'        => 'This product exceeded my expectations.',
+        'reviewer_name'  => 'John Doe',
         'reviewer_email' => 'john@example.com',
     ];
 
@@ -38,7 +38,7 @@ it('can create a review', function () {
 
 it('can approve a review', function () {
     $review = Review::factory()->create([
-        'product_id' => $this->product->id,
+        'product_id'  => $this->product->id,
         'is_approved' => false,
     ]);
 
@@ -52,7 +52,7 @@ it('can approve a review', function () {
 
 it('can reject a review', function () {
     $review = Review::factory()->create([
-        'product_id' => $this->product->id,
+        'product_id'  => $this->product->id,
         'is_approved' => true,
     ]);
 
@@ -67,18 +67,18 @@ it('can reject a review', function () {
 it('validates rating range', function () {
     expect(function () {
         Review::create([
-            'product_id' => $this->product->id,
-            'rating' => 6, // Invalid rating
-            'reviewer_name' => 'John Doe',
+            'product_id'     => $this->product->id,
+            'rating'         => 6, // Invalid rating
+            'reviewer_name'  => 'John Doe',
             'reviewer_email' => 'john@example.com',
         ]);
     })->toThrow(InvalidArgumentException::class);
 
     expect(function () {
         Review::create([
-            'product_id' => $this->product->id,
-            'rating' => 0, // Invalid rating
-            'reviewer_name' => 'John Doe',
+            'product_id'     => $this->product->id,
+            'rating'         => 0, // Invalid rating
+            'reviewer_name'  => 'John Doe',
             'reviewer_email' => 'john@example.com',
         ]);
     })->toThrow(InvalidArgumentException::class);

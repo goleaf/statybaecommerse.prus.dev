@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Tests\Models;
 
@@ -15,7 +17,7 @@ final class ProductSimilarityTest extends TestCase
     public function test_fillable_and_casts_configuration(): void
     {
         // Create a fresh model instance to examine the guarded configuration arrays.
-        $model = new ProductSimilarity();
+        $model = new ProductSimilarity;
 
         // Confirm mass-assignable attributes guard against accidental column exposure.
         self::assertSame([
@@ -31,14 +33,14 @@ final class ProductSimilarityTest extends TestCase
         self::assertSame([
             'similarity_score' => 'decimal:6',
             'calculation_data' => 'array',
-            'calculated_at' => 'datetime',
+            'calculated_at'    => 'datetime',
         ], $model->getCasts());
     }
 
     public function test_relationships_return_expected_relation_types(): void
     {
         // Instantiate the model and assert each relationship returns an eloquent relation instance.
-        $model = new ProductSimilarity();
+        $model = new ProductSimilarity;
 
         self::assertInstanceOf(BelongsTo::class, $model->product());
         self::assertInstanceOf(BelongsTo::class, $model->similarProduct());

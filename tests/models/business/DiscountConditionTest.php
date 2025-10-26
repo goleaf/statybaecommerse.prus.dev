@@ -42,28 +42,28 @@ final class DiscountConditionTest extends TestCase
         // Insert directly to avoid foreign key constraint issues
         $conditionId = \Illuminate\Support\Facades\DB::table('discount_conditions')->insertGetId([
             'discount_id' => $discount->id,
-            'type' => 'cart_total',
-            'operator' => 'greater_than',
-            'value' => json_encode(100),
-            'position' => 1,
-            'is_active' => true,
-            'priority' => 5,
-            'metadata' => json_encode(['test' => 'data']),
-            'created_at' => now(),
-            'updated_at' => now(),
+            'type'        => 'cart_total',
+            'operator'    => 'greater_than',
+            'value'       => json_encode(100),
+            'position'    => 1,
+            'is_active'   => true,
+            'priority'    => 5,
+            'metadata'    => json_encode(['test' => 'data']),
+            'created_at'  => now(),
+            'updated_at'  => now(),
         ]);
 
         $condition = DiscountCondition::find($conditionId);
 
         $this->assertDatabaseHas('discount_conditions', [
-            'id' => $condition->id,
+            'id'          => $condition->id,
             'discount_id' => $discount->id,
-            'type' => 'cart_total',
-            'operator' => 'greater_than',
-            'value' => json_encode(100),
-            'position' => 1,
-            'is_active' => true,
-            'priority' => 5,
+            'type'        => 'cart_total',
+            'operator'    => 'greater_than',
+            'value'       => json_encode(100),
+            'position'    => 1,
+            'is_active'   => true,
+            'priority'    => 5,
         ]);
     }
 
@@ -82,9 +82,9 @@ final class DiscountConditionTest extends TestCase
 
         $translation = DiscountConditionTranslation::create([
             'discount_condition_id' => $condition->id,
-            'locale' => 'lt',
-            'name' => 'Test Condition',
-            'description' => 'Test Description',
+            'locale'                => 'lt',
+            'name'                  => 'Test Condition',
+            'description'           => 'Test Description',
         ]);
 
         $this->assertTrue($condition->translations()->exists());
@@ -94,9 +94,9 @@ final class DiscountConditionTest extends TestCase
     public function test_discount_condition_matches_numeric_values(): void
     {
         $condition = DiscountCondition::factory()->create([
-            'type' => 'cart_total',
-            'operator' => 'greater_than',
-            'value' => 100,
+            'type'      => 'cart_total',
+            'operator'  => 'greater_than',
+            'value'     => 100,
             'is_active' => true,
         ]);
 
@@ -107,9 +107,9 @@ final class DiscountConditionTest extends TestCase
     public function test_discount_condition_matches_string_values(): void
     {
         $condition = DiscountCondition::factory()->create([
-            'type' => 'product',
-            'operator' => 'contains',
-            'value' => 'test',
+            'type'      => 'product',
+            'operator'  => 'contains',
+            'value'     => 'test',
             'is_active' => true,
         ]);
 
@@ -120,9 +120,9 @@ final class DiscountConditionTest extends TestCase
     public function test_discount_condition_matches_array_values(): void
     {
         $condition = DiscountCondition::factory()->create([
-            'type' => 'category',
-            'operator' => 'in_array',
-            'value' => ['electronics', 'clothing'],
+            'type'      => 'category',
+            'operator'  => 'in_array',
+            'value'     => ['electronics', 'clothing'],
             'is_active' => true,
         ]);
 
@@ -133,9 +133,9 @@ final class DiscountConditionTest extends TestCase
     public function test_discount_condition_does_not_match_when_inactive(): void
     {
         $condition = DiscountCondition::factory()->create([
-            'type' => 'cart_total',
-            'operator' => 'greater_than',
-            'value' => 100,
+            'type'      => 'cart_total',
+            'operator'  => 'greater_than',
+            'value'     => 100,
             'is_active' => false,
         ]);
 
@@ -145,9 +145,9 @@ final class DiscountConditionTest extends TestCase
     public function test_discount_condition_is_valid_for_context(): void
     {
         $condition = DiscountCondition::factory()->create([
-            'type' => 'cart_total',
-            'operator' => 'greater_than',
-            'value' => 100,
+            'type'      => 'cart_total',
+            'operator'  => 'greater_than',
+            'value'     => 100,
             'is_active' => true,
         ]);
 
@@ -262,9 +262,9 @@ final class DiscountConditionTest extends TestCase
     public function test_discount_condition_human_readable_condition(): void
     {
         $condition = DiscountCondition::factory()->create([
-            'type' => 'cart_total',
+            'type'     => 'cart_total',
             'operator' => 'greater_than',
-            'value' => 100,
+            'value'    => 100,
         ]);
 
         $this->assertIsString($condition->human_readable_condition);
@@ -277,8 +277,8 @@ final class DiscountConditionTest extends TestCase
 
         $translation = DiscountConditionTranslation::create([
             'discount_condition_id' => $condition->id,
-            'locale' => 'lt',
-            'name' => 'Test Name',
+            'locale'                => 'lt',
+            'name'                  => 'Test Name',
         ]);
 
         $this->assertEquals('Test Name', $condition->translated_name);
@@ -290,8 +290,8 @@ final class DiscountConditionTest extends TestCase
 
         $translation = DiscountConditionTranslation::create([
             'discount_condition_id' => $condition->id,
-            'locale' => 'lt',
-            'description' => 'Test Description',
+            'locale'                => 'lt',
+            'description'           => 'Test Description',
         ]);
 
         $this->assertEquals('Test Description', $condition->translated_description);
@@ -300,11 +300,11 @@ final class DiscountConditionTest extends TestCase
     public function test_discount_condition_casts(): void
     {
         $condition = DiscountCondition::factory()->create([
-            'value' => ['test' => 'data'],
-            'metadata' => ['meta' => 'value'],
+            'value'     => ['test' => 'data'],
+            'metadata'  => ['meta' => 'value'],
             'is_active' => true,
-            'priority' => 5,
-            'position' => 1,
+            'priority'  => 5,
+            'position'  => 1,
         ]);
 
         $this->assertIsArray($condition->value);

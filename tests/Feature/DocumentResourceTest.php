@@ -39,14 +39,14 @@ class DocumentResourceTest extends TestCase
         $user = User::factory()->create();
 
         $documentData = [
-            'title' => 'Test Document',
-            'content' => 'Test content',
-            'status' => 'draft',
-            'format' => 'pdf',
+            'title'                => 'Test Document',
+            'content'              => 'Test content',
+            'status'               => 'draft',
+            'format'               => 'pdf',
             'document_template_id' => $template->id,
-            'documentable_type' => Order::class,
-            'documentable_id' => $order->id,
-            'created_by' => $user->id,
+            'documentable_type'    => Order::class,
+            'documentable_id'      => $order->id,
+            'created_by'           => $user->id,
         ];
 
         Livewire::test(\App\Filament\Resources\DocumentResource\Pages\CreateDocument::class)
@@ -55,9 +55,9 @@ class DocumentResourceTest extends TestCase
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('documents', [
-            'title' => 'Test Document',
+            'title'   => 'Test Document',
             'content' => 'Test content',
-            'status' => 'draft',
+            'status'  => 'draft',
         ]);
     }
 
@@ -69,15 +69,15 @@ class DocumentResourceTest extends TestCase
             'record' => $document->id,
         ])
             ->fillForm([
-                'title' => 'Updated Document Title',
+                'title'   => 'Updated Document Title',
                 'content' => 'Updated content',
             ])
             ->call('save')
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('documents', [
-            'id' => $document->id,
-            'title' => 'Updated Document Title',
+            'id'      => $document->id,
+            'title'   => 'Updated Document Title',
             'content' => 'Updated content',
         ]);
     }
@@ -114,7 +114,7 @@ class DocumentResourceTest extends TestCase
             ->assertHasNoTableActionErrors();
 
         $this->assertDatabaseHas('documents', [
-            'id' => $document->id,
+            'id'     => $document->id,
             'status' => 'generated',
         ]);
     }
@@ -128,7 +128,7 @@ class DocumentResourceTest extends TestCase
             ->assertHasNoTableActionErrors();
 
         $this->assertDatabaseHas('documents', [
-            'id' => $document->id,
+            'id'     => $document->id,
             'status' => 'published',
         ]);
     }
@@ -142,7 +142,7 @@ class DocumentResourceTest extends TestCase
             ->assertHasNoTableActionErrors();
 
         $this->assertDatabaseHas('documents', [
-            'id' => $document->id,
+            'id'     => $document->id,
             'status' => 'archived',
         ]);
     }
@@ -229,7 +229,7 @@ class DocumentResourceTest extends TestCase
 
         foreach ($documents as $document) {
             $this->assertDatabaseHas('documents', [
-                'id' => $document->id,
+                'id'     => $document->id,
                 'status' => 'generated',
             ]);
         }
@@ -245,7 +245,7 @@ class DocumentResourceTest extends TestCase
 
         foreach ($documents as $document) {
             $this->assertDatabaseHas('documents', [
-                'id' => $document->id,
+                'id'     => $document->id,
                 'status' => 'published',
             ]);
         }
@@ -261,7 +261,7 @@ class DocumentResourceTest extends TestCase
 
         foreach ($documents as $document) {
             $this->assertDatabaseHas('documents', [
-                'id' => $document->id,
+                'id'     => $document->id,
                 'status' => 'archived',
             ]);
         }
@@ -271,7 +271,7 @@ class DocumentResourceTest extends TestCase
     {
         Livewire::test(\App\Filament\Resources\DocumentResource\Pages\CreateDocument::class)
             ->fillForm([
-                'title' => '', // Required field
+                'title'  => '', // Required field
                 'status' => 'invalid_status', // Invalid status
                 'format' => 'invalid_format', // Invalid format
             ])

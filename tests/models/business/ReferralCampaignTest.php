@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Tests\Unit;
 
@@ -13,15 +15,15 @@ final class ReferralCampaignTest extends TestCase
     public function test_referral_campaign_can_be_created(): void
     {
         $campaign = ReferralCampaign::factory()->create([
-            'name' => 'Test Referral Campaign',
-            'description' => 'Test description',
-            'is_active' => true,
-            'start_date' => now(),
-            'end_date' => now()->addDays(30),
-            'reward_amount' => 10.0,
-            'reward_type' => 'fixed',
+            'name'                   => 'Test Referral Campaign',
+            'description'            => 'Test description',
+            'is_active'              => true,
+            'start_date'             => now(),
+            'end_date'               => now()->addDays(30),
+            'reward_amount'          => 10.0,
+            'reward_type'            => 'fixed',
             'max_referrals_per_user' => 5,
-            'max_total_referrals' => 100,
+            'max_total_referrals'    => 100,
         ]);
 
         $this->assertInstanceOf(ReferralCampaign::class, $campaign);
@@ -61,14 +63,14 @@ final class ReferralCampaignTest extends TestCase
     public function test_referral_campaign_casts(): void
     {
         $campaign = ReferralCampaign::factory()->create([
-            'is_active' => true,
-            'start_date' => '2024-01-01 00:00:00',
-            'end_date' => '2024-12-31 23:59:59',
-            'reward_amount' => '25.50',
+            'is_active'              => true,
+            'start_date'             => '2024-01-01 00:00:00',
+            'end_date'               => '2024-12-31 23:59:59',
+            'reward_amount'          => '25.50',
             'max_referrals_per_user' => '10',
-            'max_total_referrals' => '500',
-            'conditions' => ['min_purchase' => 100],
-            'metadata' => ['source' => 'email'],
+            'max_total_referrals'    => '500',
+            'conditions'             => ['min_purchase' => 100],
+            'metadata'               => ['source' => 'email'],
         ]);
 
         $this->assertTrue($campaign->is_active);
@@ -107,9 +109,9 @@ final class ReferralCampaignTest extends TestCase
     public function test_referral_campaign_scopes(): void
     {
         $activeCampaign = ReferralCampaign::factory()->create([
-            'is_active' => true,
+            'is_active'  => true,
             'start_date' => now()->subDay(),
-            'end_date' => now()->addMonth(),
+            'end_date'   => now()->addMonth(),
         ]);
         $inactiveCampaign = ReferralCampaign::factory()->create(['is_active' => false]);
 
@@ -122,9 +124,9 @@ final class ReferralCampaignTest extends TestCase
     public function test_referral_campaign_is_active_method(): void
     {
         $activeCampaign = ReferralCampaign::factory()->create([
-            'is_active' => true,
+            'is_active'  => true,
             'start_date' => now()->subDay(),
-            'end_date' => now()->addMonth(),
+            'end_date'   => now()->addMonth(),
         ]);
         $inactiveCampaign = ReferralCampaign::factory()->create(['is_active' => false]);
 
@@ -137,21 +139,21 @@ final class ReferralCampaignTest extends TestCase
         $now = now();
 
         $runningCampaign = ReferralCampaign::factory()->create([
-            'is_active' => true,
+            'is_active'  => true,
             'start_date' => $now->copy()->subDays(1),
-            'end_date' => $now->copy()->addDays(1),
+            'end_date'   => $now->copy()->addDays(1),
         ]);
 
         $notStartedCampaign = ReferralCampaign::factory()->create([
-            'is_active' => true,
+            'is_active'  => true,
             'start_date' => $now->copy()->addDays(1),
-            'end_date' => $now->copy()->addDays(30),
+            'end_date'   => $now->copy()->addDays(30),
         ]);
 
         $expiredCampaign = ReferralCampaign::factory()->create([
-            'is_active' => true,
+            'is_active'  => true,
             'start_date' => $now->copy()->subDays(30),
-            'end_date' => $now->copy()->subDays(1),
+            'end_date'   => $now->copy()->subDays(1),
         ]);
 
         $this->assertTrue($runningCampaign->isRunning());
@@ -196,15 +198,15 @@ final class ReferralCampaignTest extends TestCase
         $now = now();
 
         $validCampaign = ReferralCampaign::factory()->create([
-            'is_active' => true,
+            'is_active'  => true,
             'start_date' => $now->copy()->subDays(1),
-            'end_date' => $now->copy()->addDays(1),
+            'end_date'   => $now->copy()->addDays(1),
         ]);
 
         $inactiveCampaign = ReferralCampaign::factory()->create([
-            'is_active' => false,
+            'is_active'  => false,
             'start_date' => $now->copy()->subDays(1),
-            'end_date' => $now->copy()->addDays(1),
+            'end_date'   => $now->copy()->addDays(1),
         ]);
 
         $this->assertTrue($validCampaign->canAcceptReferrals());
@@ -215,7 +217,7 @@ final class ReferralCampaignTest extends TestCase
     {
         $campaign = ReferralCampaign::factory()->create([
             'reward_amount' => 15.75,
-            'reward_type' => 'fixed',
+            'reward_type'   => 'fixed',
         ]);
 
         $this->assertEquals(15.75, $campaign->getRewardAmount());

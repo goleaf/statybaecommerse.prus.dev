@@ -9,7 +9,7 @@ use App\Models\User;
 beforeEach(function () {
     $this->adminUser = User::factory()->create([
         'email' => 'admin@test.com',
-        'name' => 'Admin User',
+        'name'  => 'Admin User',
     ]);
 
     // Assign admin role if roles exist
@@ -21,17 +21,17 @@ beforeEach(function () {
 
 it('can create a country model', function () {
     $country = Country::create([
-        'cca2' => 'LT',
-        'cca3' => 'LTU',
+        'cca2'               => 'LT',
+        'cca3'               => 'LTU',
         'phone_calling_code' => '370',
-        'flag' => '🇱🇹',
-        'region' => 'Europe',
-        'subregion' => 'Northern Europe',
-        'latitude' => 55.169438,
-        'longitude' => 23.881275,
-        'currencies' => ['EUR'],
-        'is_enabled' => true,
-        'sort_order' => 1,
+        'flag'               => '🇱🇹',
+        'region'             => 'Europe',
+        'subregion'          => 'Northern Europe',
+        'latitude'           => 55.169438,
+        'longitude'          => 23.881275,
+        'currencies'         => ['EUR'],
+        'is_enabled'         => true,
+        'sort_order'         => 1,
     ]);
 
     expect($country->cca2)->toBe('LT');
@@ -40,32 +40,32 @@ it('can create a country model', function () {
     expect($country->is_enabled)->toBeTrue();
 
     $this->assertDatabaseHas('countries', [
-        'cca2' => 'LT',
-        'cca3' => 'LTU',
+        'cca2'               => 'LT',
+        'cca3'               => 'LTU',
         'phone_calling_code' => '370',
-        'region' => 'Europe',
+        'region'             => 'Europe',
     ]);
 });
 
 it('can create country translations', function () {
     $country = Country::create([
-        'cca2' => 'LT',
-        'cca3' => 'LTU',
+        'cca2'               => 'LT',
+        'cca3'               => 'LTU',
         'phone_calling_code' => '370',
-        'flag' => '🇱🇹',
-        'region' => 'Europe',
-        'subregion' => 'Northern Europe',
-        'latitude' => 55.169438,
-        'longitude' => 23.881275,
-        'currencies' => ['EUR'],
-        'is_enabled' => true,
-        'sort_order' => 1,
+        'flag'               => '🇱🇹',
+        'region'             => 'Europe',
+        'subregion'          => 'Northern Europe',
+        'latitude'           => 55.169438,
+        'longitude'          => 23.881275,
+        'currencies'         => ['EUR'],
+        'is_enabled'         => true,
+        'sort_order'         => 1,
     ]);
 
     $translation = CountryTranslation::create([
-        'country_id' => $country->id,
-        'locale' => 'en',
-        'name' => 'Lithuania',
+        'country_id'    => $country->id,
+        'locale'        => 'en',
+        'name'          => 'Lithuania',
         'name_official' => 'Republic of Lithuania',
     ]);
 
@@ -73,39 +73,39 @@ it('can create country translations', function () {
     expect($translation->name_official)->toBe('Republic of Lithuania');
 
     $this->assertDatabaseHas('country_translations', [
-        'country_id' => $country->id,
-        'locale' => 'en',
-        'name' => 'Lithuania',
+        'country_id'    => $country->id,
+        'locale'        => 'en',
+        'name'          => 'Lithuania',
         'name_official' => 'Republic of Lithuania',
     ]);
 });
 
 it('has translations relationship', function () {
     $country = Country::create([
-        'cca2' => 'LT',
-        'cca3' => 'LTU',
+        'cca2'               => 'LT',
+        'cca3'               => 'LTU',
         'phone_calling_code' => '370',
-        'flag' => '🇱🇹',
-        'region' => 'Europe',
-        'subregion' => 'Northern Europe',
-        'latitude' => 55.169438,
-        'longitude' => 23.881275,
-        'currencies' => ['EUR'],
-        'is_enabled' => true,
-        'sort_order' => 1,
+        'flag'               => '🇱🇹',
+        'region'             => 'Europe',
+        'subregion'          => 'Northern Europe',
+        'latitude'           => 55.169438,
+        'longitude'          => 23.881275,
+        'currencies'         => ['EUR'],
+        'is_enabled'         => true,
+        'sort_order'         => 1,
     ]);
 
     CountryTranslation::create([
-        'country_id' => $country->id,
-        'locale' => 'en',
-        'name' => 'Lithuania',
+        'country_id'    => $country->id,
+        'locale'        => 'en',
+        'name'          => 'Lithuania',
         'name_official' => 'Republic of Lithuania',
     ]);
 
     CountryTranslation::create([
-        'country_id' => $country->id,
-        'locale' => 'lt',
-        'name' => 'Lietuva',
+        'country_id'    => $country->id,
+        'locale'        => 'lt',
+        'name'          => 'Lietuva',
         'name_official' => 'Lietuvos Respublika',
     ]);
 
@@ -118,30 +118,30 @@ it('has translations relationship', function () {
 
 it('returns translated name via trans method', function () {
     $country = Country::create([
-        'cca2' => 'LT',
-        'cca3' => 'LTU',
+        'cca2'               => 'LT',
+        'cca3'               => 'LTU',
         'phone_calling_code' => '370',
-        'flag' => '🇱🇹',
-        'region' => 'Europe',
-        'subregion' => 'Northern Europe',
-        'latitude' => 55.169438,
-        'longitude' => 23.881275,
-        'currencies' => ['EUR'],
-        'is_enabled' => true,
-        'sort_order' => 1,
+        'flag'               => '🇱🇹',
+        'region'             => 'Europe',
+        'subregion'          => 'Northern Europe',
+        'latitude'           => 55.169438,
+        'longitude'          => 23.881275,
+        'currencies'         => ['EUR'],
+        'is_enabled'         => true,
+        'sort_order'         => 1,
     ]);
 
     CountryTranslation::create([
-        'country_id' => $country->id,
-        'locale' => 'en',
-        'name' => 'Lithuania',
+        'country_id'    => $country->id,
+        'locale'        => 'en',
+        'name'          => 'Lithuania',
         'name_official' => 'Republic of Lithuania',
     ]);
 
     CountryTranslation::create([
-        'country_id' => $country->id,
-        'locale' => 'lt',
-        'name' => 'Lietuva',
+        'country_id'    => $country->id,
+        'locale'        => 'lt',
+        'name'          => 'Lietuva',
         'name_official' => 'Lietuvos Respublika',
     ]);
 
@@ -160,23 +160,23 @@ it('returns translated name via trans method', function () {
 
 it('has display name attribute with phone code', function () {
     $country = Country::create([
-        'cca2' => 'LT',
-        'cca3' => 'LTU',
+        'cca2'               => 'LT',
+        'cca3'               => 'LTU',
         'phone_calling_code' => '370',
-        'flag' => '🇱🇹',
-        'region' => 'Europe',
-        'subregion' => 'Northern Europe',
-        'latitude' => 55.169438,
-        'longitude' => 23.881275,
-        'currencies' => ['EUR'],
-        'is_enabled' => true,
-        'sort_order' => 1,
+        'flag'               => '🇱🇹',
+        'region'             => 'Europe',
+        'subregion'          => 'Northern Europe',
+        'latitude'           => 55.169438,
+        'longitude'          => 23.881275,
+        'currencies'         => ['EUR'],
+        'is_enabled'         => true,
+        'sort_order'         => 1,
     ]);
 
     CountryTranslation::create([
-        'country_id' => $country->id,
-        'locale' => 'en',
-        'name' => 'Lithuania',
+        'country_id'    => $country->id,
+        'locale'        => 'en',
+        'name'          => 'Lithuania',
         'name_official' => 'Republic of Lithuania',
     ]);
 
@@ -203,23 +203,23 @@ it('displays countries in admin index', function () {
 
     // Create test country
     $lithuania = Country::create([
-        'cca2' => 'LT',
-        'cca3' => 'LTU',
+        'cca2'               => 'LT',
+        'cca3'               => 'LTU',
         'phone_calling_code' => '370',
-        'flag' => '🇱🇹',
-        'region' => 'Europe',
-        'subregion' => 'Northern Europe',
-        'latitude' => 55.169438,
-        'longitude' => 23.881275,
-        'currencies' => ['EUR'],
-        'is_enabled' => true,
-        'sort_order' => 1,
+        'flag'               => '🇱🇹',
+        'region'             => 'Europe',
+        'subregion'          => 'Northern Europe',
+        'latitude'           => 55.169438,
+        'longitude'          => 23.881275,
+        'currencies'         => ['EUR'],
+        'is_enabled'         => true,
+        'sort_order'         => 1,
     ]);
 
     CountryTranslation::create([
-        'country_id' => $lithuania->id,
-        'locale' => 'en',
-        'name' => 'Lithuania',
+        'country_id'    => $lithuania->id,
+        'locale'        => 'en',
+        'name'          => 'Lithuania',
         'name_official' => 'Republic of Lithuania',
     ]);
 
@@ -232,17 +232,17 @@ it('displays countries in admin index', function () {
 
 it('supports soft deletes', function () {
     $country = Country::create([
-        'cca2' => 'LT',
-        'cca3' => 'LTU',
+        'cca2'               => 'LT',
+        'cca3'               => 'LTU',
         'phone_calling_code' => '370',
-        'flag' => '🇱🇹',
-        'region' => 'Europe',
-        'subregion' => 'Northern Europe',
-        'latitude' => 55.169438,
-        'longitude' => 23.881275,
-        'currencies' => ['EUR'],
-        'is_enabled' => true,
-        'sort_order' => 1,
+        'flag'               => '🇱🇹',
+        'region'             => 'Europe',
+        'subregion'          => 'Northern Europe',
+        'latitude'           => 55.169438,
+        'longitude'          => 23.881275,
+        'currencies'         => ['EUR'],
+        'is_enabled'         => true,
+        'sort_order'         => 1,
     ]);
 
     $country->delete();

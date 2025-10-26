@@ -19,12 +19,12 @@ final class NewsletterControllerTest extends TestCase
         ]);
 
         $response->assertOk()->assertJson([
-            'status' => 'success',
+            'status'  => 'success',
             'message' => __('newsletter.subscribed_successfully'),
         ]);
 
         $this->assertDatabaseHas('subscribers', [
-            'email' => 'jane.doe@example.com',
+            'email'  => 'jane.doe@example.com',
             'status' => 'active',
         ]);
     }
@@ -51,12 +51,12 @@ final class NewsletterControllerTest extends TestCase
         ]);
 
         $response->assertOk()->assertJson([
-            'status' => 'success',
+            'status'  => 'success',
             'message' => __('subscribers.unsubscribed_successfully'),
         ]);
 
         $this->assertDatabaseHas('subscribers', [
-            'email' => $subscriber->email,
+            'email'  => $subscriber->email,
             'status' => 'unsubscribed',
         ]);
     }

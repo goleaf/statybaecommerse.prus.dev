@@ -81,24 +81,24 @@ beforeEach(function (): void {
 
 test('it queues export records and dispatches the processor job', function (): void {
     $userId = DB::table('users')->insertGetId([
-        'name' => 'Queue User',
-        'email' => 'queue@example.com',
-        'password' => 'secret',
+        'name'       => 'Queue User',
+        'email'      => 'queue@example.com',
+        'password'   => 'secret',
         'created_at' => now(),
         'updated_at' => now(),
     ]);
 
     $rows = [
         FakeExportRow::query()->create([
-            'number' => 'ORD-1001',
-            'status' => 'pending',
-            'total' => '120.00',
+            'number'     => 'ORD-1001',
+            'status'     => 'pending',
+            'total'      => '120.00',
             'created_at' => now()->subDay(),
         ]),
         FakeExportRow::query()->create([
-            'number' => 'ORD-1002',
-            'status' => 'processing',
-            'total' => '220.00',
+            'number'     => 'ORD-1002',
+            'status'     => 'processing',
+            'total'      => '220.00',
             'created_at' => now(),
         ]),
     ];
@@ -125,9 +125,9 @@ test('it queues export records and dispatches the processor job', function (): v
 
 test('it processes queued exports and stores downloadable artifacts', function (): void {
     $userId = DB::table('users')->insertGetId([
-        'name' => 'Process User',
-        'email' => 'process@example.com',
-        'password' => 'secret',
+        'name'       => 'Process User',
+        'email'      => 'process@example.com',
+        'password'   => 'secret',
         'created_at' => now(),
         'updated_at' => now(),
     ]);
@@ -174,17 +174,17 @@ test('it processes queued exports and stores downloadable artifacts', function (
 
 test('it marks exports as failed when processing throws an exception', function (): void {
     $userId = DB::table('users')->insertGetId([
-        'name' => 'Failing User',
-        'email' => 'failure@example.com',
-        'password' => 'secret',
+        'name'       => 'Failing User',
+        'email'      => 'failure@example.com',
+        'password'   => 'secret',
         'created_at' => now(),
         'updated_at' => now(),
     ]);
 
     FakeExportRow::query()->create([
-        'number' => 'ORD-3001',
-        'status' => 'pending',
-        'total' => '15.00',
+        'number'     => 'ORD-3001',
+        'status'     => 'pending',
+        'total'      => '15.00',
         'created_at' => now(),
     ]);
 
@@ -236,7 +236,7 @@ class TestOrderExportable implements Exportable
         return [
             'number' => new ExportColumn('number', 'Number', 'number'),
             'status' => new ExportColumn('status', 'Status', 'status'),
-            'total' => new ExportColumn('total', 'Total', 'total'),
+            'total'  => new ExportColumn('total', 'Total', 'total'),
         ];
     }
 

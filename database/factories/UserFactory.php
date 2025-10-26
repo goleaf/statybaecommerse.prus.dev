@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Factories;
 
 use App\Enums\AddressType;
@@ -38,13 +40,13 @@ class UserFactory extends Factory
         );
 
         $state = [
-            'name' => $firstName.' '.$lastName,
-            'email' => $email,
+            'name'              => $firstName . ' ' . $lastName,
+            'email'             => $email,
             'email_verified_at' => now(),
-            'password' => static::$password ??= Hash::make('password'),
-            'preferred_locale' => fake()->randomElement(['en', 'lt']),
-            'is_admin' => false,
-            'remember_token' => Str::random(10),
+            'password'          => static::$password ??= Hash::make('password'),
+            'preferred_locale'  => fake()->randomElement(['en', 'lt']),
+            'is_admin'          => false,
+            'remember_token'    => Str::random(10),
         ];
 
         // Some test runs (e.g. partial migrations, in-memory DBs) may not yet
@@ -72,36 +74,36 @@ class UserFactory extends Factory
     public function admin(): static
     {
         return $this->state(fn (array $attributes) => [
-            'is_admin' => true,
+            'is_admin'          => true,
             'email_verified_at' => now(),
-            'is_active' => true,
-            'password' => static::$password ??= Hash::make('password'),
+            'is_active'         => true,
+            'password'          => static::$password ??= Hash::make('password'),
         ]);
     }
 
     public function shippingAddress(): static
     {
         return $this->hasAddresses(1, fn (): array => [
-            'type' => AddressType::SHIPPING,
-            'is_default' => true,
-            'is_shipping' => true,
-            'country_code' => 'LT',
-            'city' => 'Vilnius',
+            'type'           => AddressType::SHIPPING,
+            'is_default'     => true,
+            'is_shipping'    => true,
+            'country_code'   => 'LT',
+            'city'           => 'Vilnius',
             'address_line_1' => 'Gedimino pr. 1',
-            'postal_code' => '01103',
-            'phone' => '+370'.fake()->numberBetween(60000000, 69999999),
+            'postal_code'    => '01103',
+            'phone'          => '+370' . fake()->numberBetween(60000000, 69999999),
         ]);
     }
 
     public function billingAddress(): static
     {
         return $this->hasAddresses(1, fn (): array => [
-            'type' => AddressType::BILLING,
-            'is_billing' => true,
-            'country_code' => 'LT',
-            'city' => 'Vilnius',
+            'type'           => AddressType::BILLING,
+            'is_billing'     => true,
+            'country_code'   => 'LT',
+            'city'           => 'Vilnius',
             'address_line_1' => 'Konstitucijos pr. 7',
-            'postal_code' => '09308',
+            'postal_code'    => '09308',
         ]);
     }
 

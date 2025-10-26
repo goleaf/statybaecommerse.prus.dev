@@ -68,7 +68,7 @@ final class ProductContractPresenter
 
         return self::envelope([
             'product' => $product,
-            'item' => $product,
+            'item'    => $product,
         ]);
     }
 

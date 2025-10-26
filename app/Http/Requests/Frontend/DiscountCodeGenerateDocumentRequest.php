@@ -17,8 +17,7 @@ final class DiscountCodeGenerateDocumentRequest extends FormRequest
     {
         return [
             'template_id' => ['required', 'exists:document_templates,id'],
-            'format' => ['required', 'in:html,pdf'],
+            'format'      => ['required', 'in:html,pdf'],
         ];
     }
 }
-

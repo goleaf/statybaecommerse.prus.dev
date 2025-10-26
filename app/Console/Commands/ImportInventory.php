@@ -58,7 +58,7 @@ class ImportInventory extends Command
         }
         if (! empty($batch)) {
             $pending = Bus::batch($batch)->name('Import Inventory')->dispatch();
-            $this->info('Batch ID: '.$pending->id);
+            $this->info('Batch ID: ' . $pending->id);
         }
         fclose($fh);
 

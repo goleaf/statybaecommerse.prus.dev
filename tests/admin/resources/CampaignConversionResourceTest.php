@@ -40,34 +40,34 @@ class CampaignConversionResourceTest extends TestCase
         $order = Order::factory()->create();
 
         $conversionData = [
-            'campaign_id' => $campaign->id,
-            'customer_id' => $customer->id,
-            'order_id' => $order->id,
-            'conversion_type' => 'purchase',
+            'campaign_id'      => $campaign->id,
+            'customer_id'      => $customer->id,
+            'order_id'         => $order->id,
+            'conversion_type'  => 'purchase',
             'conversion_value' => 150.50,
-            'status' => 'completed',
-            'converted_at' => now()->format('Y-m-d H:i:s'),
-            'source' => 'google',
-            'medium' => 'cpc',
-            'device_type' => 'desktop',
-            'country' => 'LT',
-            'city' => 'Vilnius',
+            'status'           => 'completed',
+            'converted_at'     => now()->format('Y-m-d H:i:s'),
+            'source'           => 'google',
+            'medium'           => 'cpc',
+            'device_type'      => 'desktop',
+            'country'          => 'LT',
+            'city'             => 'Vilnius',
         ];
 
         $response = $this->post('/admin/campaign-conversions', $conversionData);
 
         $this->assertDatabaseHas('campaign_conversions', [
-            'campaign_id' => $campaign->id,
-            'customer_id' => $customer->id,
-            'order_id' => $order->id,
-            'conversion_type' => 'purchase',
+            'campaign_id'      => $campaign->id,
+            'customer_id'      => $customer->id,
+            'order_id'         => $order->id,
+            'conversion_type'  => 'purchase',
             'conversion_value' => 150.50,
-            'status' => 'completed',
-            'source' => 'google',
-            'medium' => 'cpc',
-            'device_type' => 'desktop',
-            'country' => 'LT',
-            'city' => 'Vilnius',
+            'status'           => 'completed',
+            'source'           => 'google',
+            'medium'           => 'cpc',
+            'device_type'      => 'desktop',
+            'country'          => 'LT',
+            'city'             => 'Vilnius',
         ]);
     }
 
@@ -87,24 +87,24 @@ class CampaignConversionResourceTest extends TestCase
     {
         $conversion = CampaignConversion::factory()->create([
             'conversion_value' => 100,
-            'status' => 'pending',
+            'status'           => 'pending',
         ]);
 
         $updateData = [
             'conversion_value' => 200,
-            'status' => 'completed',
-            'source' => 'facebook',
-            'medium' => 'social',
+            'status'           => 'completed',
+            'source'           => 'facebook',
+            'medium'           => 'social',
         ];
 
         $response = $this->put("/admin/campaign-conversions/{$conversion->id}", $updateData);
 
         $this->assertDatabaseHas('campaign_conversions', [
-            'id' => $conversion->id,
+            'id'               => $conversion->id,
             'conversion_value' => 200,
-            'status' => 'completed',
-            'source' => 'facebook',
-            'medium' => 'social',
+            'status'           => 'completed',
+            'source'           => 'facebook',
+            'medium'           => 'social',
         ]);
     }
 
@@ -234,12 +234,12 @@ class CampaignConversionResourceTest extends TestCase
         ]);
 
         $this->assertDatabaseHas('campaign_conversions', [
-            'id' => $conversion1->id,
+            'id'     => $conversion1->id,
             'status' => 'completed',
         ]);
 
         $this->assertDatabaseHas('campaign_conversions', [
-            'id' => $conversion2->id,
+            'id'     => $conversion2->id,
             'status' => 'completed',
         ]);
     }
@@ -253,7 +253,7 @@ class CampaignConversionResourceTest extends TestCase
         ]);
 
         $this->assertDatabaseHas('campaign_conversions', [
-            'id' => $conversion->id,
+            'id'  => $conversion->id,
             'roi' => 1.0, // (100-50)/50 = 1.0
         ]);
     }
@@ -270,10 +270,10 @@ class CampaignConversionResourceTest extends TestCase
         $campaign = Campaign::factory()->create();
 
         $response = $this->post('/admin/campaign-conversions', [
-            'campaign_id' => $campaign->id,
-            'conversion_type' => 'purchase',
+            'campaign_id'      => $campaign->id,
+            'conversion_type'  => 'purchase',
             'conversion_value' => 'invalid',
-            'converted_at' => now()->format('Y-m-d H:i:s'),
+            'converted_at'     => now()->format('Y-m-d H:i:s'),
         ]);
 
         $response->assertSessionHasErrors(['conversion_value']);
@@ -298,7 +298,7 @@ class CampaignConversionResourceTest extends TestCase
         $conversion = CampaignConversion::factory()->create([
             'campaign_id' => $campaign->id,
             'customer_id' => $customer->id,
-            'order_id' => $order->id,
+            'order_id'    => $order->id,
         ]);
 
         $response = $this->get("/admin/campaign-conversions/{$conversion->id}");
@@ -313,12 +313,12 @@ class CampaignConversionResourceTest extends TestCase
     {
         CampaignConversion::factory()->count(10)->create([
             'conversion_value' => 100,
-            'converted_at' => now()->subDays(5),
+            'converted_at'     => now()->subDays(5),
         ]);
 
         CampaignConversion::factory()->count(5)->create([
             'conversion_value' => 200,
-            'converted_at' => now()->subDays(10),
+            'converted_at'     => now()->subDays(10),
         ]);
 
         $response = $this->get('/admin/campaign-conversions');

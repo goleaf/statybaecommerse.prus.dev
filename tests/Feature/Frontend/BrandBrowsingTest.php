@@ -54,9 +54,9 @@ final class BrandBrowsingTest extends TestCase
     private function createPublishedProduct(array $overrides = []): Product
     {
         return Product::factory()->create(array_merge([
-            'status' => 'published',
-            'is_visible' => true,
-            'is_enabled' => true,
+            'status'       => 'published',
+            'is_visible'   => true,
+            'is_enabled'   => true,
             'published_at' => Carbon::now()->subDay(),
         ], $overrides));
     }

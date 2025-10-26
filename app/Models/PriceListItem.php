@@ -62,7 +62,6 @@ final class PriceListItem extends Model
     use HasFactory;
 
     use HasTranslations;
-
     use OrdersByName;
 
     /**
@@ -371,8 +370,6 @@ final class PriceListItem extends Model
 
     /**
      * Direct the shared OrdersByName scope to the translated name payload by default.
-     *
-     * @var string
      */
     protected string $nameColumn = 'name';
 

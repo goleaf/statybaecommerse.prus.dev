@@ -10,6 +10,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\LazyCollection;
+use Throwable;
 
 /**
  * ImportPricesChunk
@@ -75,7 +76,7 @@ class ImportPricesChunk implements ShouldQueue
             }
             try {
                 DB::table('prices')->upsert([$data], ['priceable_type', 'priceable_id', 'currency_id'], ['amount', 'compare_amount']);
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
                 // continue
             }
         });

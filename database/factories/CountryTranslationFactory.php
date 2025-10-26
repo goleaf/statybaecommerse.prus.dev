@@ -18,11 +18,11 @@ final class CountryTranslationFactory extends Factory
     public function definition(): array
     {
         return [
-            'country_id' => Country::factory(),
-            'locale' => $this->faker->randomElement(['en', 'lt', 'de', 'fr', 'es', 'it']),
-            'name' => $this->faker->country(),
+            'country_id'    => Country::factory(),
+            'locale'        => $this->faker->randomElement(['en', 'lt', 'de', 'fr', 'es', 'it']),
+            'name'          => $this->faker->country(),
             'name_official' => $this->faker->optional(0.7)->country(),
-            'description' => $this->faker->optional(0.6)->paragraph(),
+            'description'   => $this->faker->optional(0.6)->paragraph(),
         ];
     }
 

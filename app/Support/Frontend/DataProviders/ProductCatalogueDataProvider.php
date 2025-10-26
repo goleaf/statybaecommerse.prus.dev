@@ -20,10 +20,10 @@ final class ProductCatalogueDataProvider
      * @var array<string, string>
      */
     private const SORT_OPTIONS = [
-        'featured' => 'Featured',
-        'latest' => 'Newest arrivals',
-        'price_asc' => 'Price: Low to High',
-        'price_desc' => 'Price: High to Low',
+        'featured'    => 'Featured',
+        'latest'      => 'Newest arrivals',
+        'price_asc'   => 'Price: Low to High',
+        'price_desc'  => 'Price: High to Low',
         'bestsellers' => 'Popular picks',
     ];
 
@@ -34,7 +34,7 @@ final class ProductCatalogueDataProvider
      */
     private const FILTER_OPTIONS = [
         'featured' => 'Featured only',
-        'sale' => 'On sale',
+        'sale'     => 'On sale',
         'in_stock' => 'In stock',
     ];
 
@@ -63,14 +63,14 @@ final class ProductCatalogueDataProvider
         $products = $this->paginate($query, $filters);
 
         return [
-            'products' => $products,
-            'availableSorts' => $this->sortOptions(),
-            'activeSort' => $this->resolveSortKey($filters['sort'] ?? null),
+            'products'         => $products,
+            'availableSorts'   => $this->sortOptions(),
+            'activeSort'       => $this->resolveSortKey($filters['sort'] ?? null),
             'availableFilters' => $this->filterOptions(),
-            'activeFilter' => $filters['filter'] ?? null,
-            'categories' => $this->categoryHighlights(),
-            'brands' => $this->brandHighlights(),
-            'searchTerm' => $filters['q'] ?? $filters['search'] ?? null,
+            'activeFilter'     => $filters['filter'] ?? null,
+            'categories'       => $this->categoryHighlights(),
+            'brands'           => $this->brandHighlights(),
+            'searchTerm'       => $filters['q'] ?? $filters['search'] ?? null,
         ];
     }
 
@@ -113,7 +113,7 @@ final class ProductCatalogueDataProvider
             ->get();
 
         return [
-            'product' => $product,
+            'product'         => $product,
             'relatedProducts' => $relatedProducts,
             'primaryCategory' => $product->categories->first(),
         ];
@@ -170,8 +170,8 @@ final class ProductCatalogueDataProvider
     {
         if ($search = $filters['q'] ?? $filters['search'] ?? null) {
             $query->where(function (Builder $builder) use ($search): void {
-                $builder->where('name', 'like', '%'.$search.'%')
-                    ->orWhere('sku', 'like', '%'.$search.'%');
+                $builder->where('name', 'like', '%' . $search . '%')
+                    ->orWhere('sku', 'like', '%' . $search . '%');
             });
         }
 
@@ -202,7 +202,7 @@ final class ProductCatalogueDataProvider
     {
         match ($filter) {
             'featured' => $query->where('is_featured', true),
-            'sale' => $query->whereNotNull('sale_price')->whereColumn('sale_price', '<', 'price'),
+            'sale'     => $query->whereNotNull('sale_price')->whereColumn('sale_price', '<', 'price'),
             'in_stock' => $query->where(static function (Builder $builder): void {
                 $builder->where('manage_stock', false)
                     ->orWhere('stock_quantity', '>', 0);
@@ -214,11 +214,11 @@ final class ProductCatalogueDataProvider
     private function applySort(Builder $query, string $sort): void
     {
         match ($sort) {
-            'latest' => $query->orderByDesc('published_at'),
-            'price_asc' => $query->orderBy('price')->orderBy('name'),
-            'price_desc' => $query->orderByDesc('price')->orderBy('name'),
+            'latest'      => $query->orderByDesc('published_at'),
+            'price_asc'   => $query->orderBy('price')->orderBy('name'),
+            'price_desc'  => $query->orderByDesc('price')->orderBy('name'),
             'bestsellers' => $query->orderByDesc('requests_count')->orderByDesc('published_at'),
-            default => $query->orderByDesc('is_featured')->orderByDesc('published_at'),
+            default       => $query->orderByDesc('is_featured')->orderByDesc('published_at'),
         };
     }
 

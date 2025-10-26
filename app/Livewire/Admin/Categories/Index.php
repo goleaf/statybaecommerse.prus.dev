@@ -17,8 +17,8 @@ use Livewire\WithPagination;
  * @property string $search
  * @property string $sortBy
  * @property string $sortDirection
- * @property int $perPage
- * @property mixed $queryString
+ * @property int    $perPage
+ * @property mixed  $queryString
  */
 final class Index extends Component
 {
@@ -61,7 +61,7 @@ final class Index extends Component
     public function render(): View
     {
         $categories = Category::query()->when($this->search, function ($query) {
-            $query->where('name', 'like', '%'.$this->search.'%')->orWhere('description', 'like', '%'.$this->search.'%');
+            $query->where('name', 'like', '%' . $this->search . '%')->orWhere('description', 'like', '%' . $this->search . '%');
         })->orderBy($this->sortBy, $this->sortDirection)->paginate($this->perPage);
 
         return view('livewire.admin.categories.index', ['categories' => $categories]);

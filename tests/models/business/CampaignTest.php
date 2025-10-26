@@ -18,14 +18,14 @@ final class CampaignTest extends TestCase
     public function test_campaign_can_be_created(): void
     {
         $campaign = Campaign::factory()->create([
-            'name' => 'Test Campaign',
-            'slug' => 'test-campaign',
-            'status' => 'active',
-            'is_featured' => true,
+            'name'               => 'Test Campaign',
+            'slug'               => 'test-campaign',
+            'status'             => 'active',
+            'is_featured'        => true,
             'send_notifications' => true,
-            'track_conversions' => true,
-            'max_uses' => 100,
-            'budget_limit' => 1000.00,
+            'track_conversions'  => true,
+            'max_uses'           => 100,
+            'budget_limit'       => 1000.00,
         ]);
 
         $this->assertInstanceOf(Campaign::class, $campaign);
@@ -68,14 +68,14 @@ final class CampaignTest extends TestCase
     public function test_campaign_casts(): void
     {
         $campaign = Campaign::factory()->create([
-            'starts_at' => '2024-01-01 00:00:00',
-            'ends_at' => '2024-12-31 23:59:59',
-            'is_featured' => true,
+            'starts_at'          => '2024-01-01 00:00:00',
+            'ends_at'            => '2024-12-31 23:59:59',
+            'is_featured'        => true,
             'send_notifications' => false,
-            'track_conversions' => true,
-            'max_uses' => 50,
-            'budget_limit' => 500.00,
-            'metadata' => ['key' => 'value'],
+            'track_conversions'  => true,
+            'max_uses'           => 50,
+            'budget_limit'       => 500.00,
+            'metadata'           => ['key' => 'value'],
         ]);
 
         $this->assertInstanceOf(\Carbon\Carbon::class, $campaign->starts_at);
@@ -123,8 +123,8 @@ final class CampaignTest extends TestCase
         // Create a translation
         $translation = CampaignTranslation::factory()->create([
             'campaign_id' => $campaign->id,
-            'locale' => 'lt',
-            'name' => 'Testo Kampanija',
+            'locale'      => 'lt',
+            'name'        => 'Testo Kampanija',
         ]);
 
         $this->assertEquals('Testo Kampanija', $campaign->getTranslatedName('lt'));
@@ -166,17 +166,17 @@ final class CampaignTest extends TestCase
         $now = now();
         $pastCampaign = Campaign::factory()->create([
             'starts_at' => $now->copy()->subDays(10),
-            'ends_at' => $now->copy()->subDays(1),
+            'ends_at'   => $now->copy()->subDays(1),
         ]);
 
         $currentCampaign = Campaign::factory()->create([
             'starts_at' => $now->copy()->subDays(1),
-            'ends_at' => $now->copy()->addDays(1),
+            'ends_at'   => $now->copy()->addDays(1),
         ]);
 
         $futureCampaign = Campaign::factory()->create([
             'starts_at' => $now->copy()->addDays(1),
-            'ends_at' => $now->copy()->addDays(10),
+            'ends_at'   => $now->copy()->addDays(10),
         ]);
 
         $this->assertTrue($pastCampaign->isExpired());

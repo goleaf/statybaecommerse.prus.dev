@@ -18,19 +18,19 @@ class LegalTranslationFactory extends Factory
     public function definition(): array
     {
         $title = fake()->sentence(3);
-        $slug = \Illuminate\Support\Str::slug($title).'-'.fake()->randomElement(['lt', 'en']);
+        $slug = \Illuminate\Support\Str::slug($title) . '-' . fake()->randomElement(['lt', 'en']);
 
         return [
-            'legal_id' => Legal::factory(),
-            'locale' => fake()->randomElement(['lt', 'en']),
-            'title' => $title,
-            'slug' => $slug,
-            'content' => '<p>'.fake()->paragraphs(5, true).'</p>',
-            'seo_title' => fake()->sentence(2),
+            'legal_id'        => Legal::factory(),
+            'locale'          => fake()->randomElement(['lt', 'en']),
+            'title'           => $title,
+            'slug'            => $slug,
+            'content'         => '<p>' . fake()->paragraphs(5, true) . '</p>',
+            'seo_title'       => fake()->sentence(2),
             'seo_description' => fake()->sentence(10),
-            'meta_data' => [
-                'word_count' => fake()->numberBetween(100, 2000),
-                'reading_time' => fake()->numberBetween(1, 10),
+            'meta_data'       => [
+                'word_count'    => fake()->numberBetween(100, 2000),
+                'reading_time'  => fake()->numberBetween(1, 10),
                 'last_reviewed' => fake()->dateTimeBetween('-1 year', 'now')->format('Y-m-d'),
             ],
         ];
@@ -39,11 +39,11 @@ class LegalTranslationFactory extends Factory
     public function lithuanian(): static
     {
         return $this->state(fn (array $attributes) => [
-            'locale' => 'lt',
-            'title' => fake('lt_LT')->sentence(3),
-            'slug' => \Illuminate\Support\Str::slug(fake('lt_LT')->sentence(3)).'-lt',
-            'content' => '<p>'.fake('lt_LT')->paragraphs(5, true).'</p>',
-            'seo_title' => fake('lt_LT')->sentence(2),
+            'locale'          => 'lt',
+            'title'           => fake('lt_LT')->sentence(3),
+            'slug'            => \Illuminate\Support\Str::slug(fake('lt_LT')->sentence(3)) . '-lt',
+            'content'         => '<p>' . fake('lt_LT')->paragraphs(5, true) . '</p>',
+            'seo_title'       => fake('lt_LT')->sentence(2),
             'seo_description' => fake('lt_LT')->sentence(10),
         ]);
     }
@@ -51,11 +51,11 @@ class LegalTranslationFactory extends Factory
     public function english(): static
     {
         return $this->state(fn (array $attributes) => [
-            'locale' => 'en',
-            'title' => fake()->sentence(3),
-            'slug' => \Illuminate\Support\Str::slug(fake()->sentence(3)).'-en',
-            'content' => '<p>'.fake()->paragraphs(5, true).'</p>',
-            'seo_title' => fake()->sentence(2),
+            'locale'          => 'en',
+            'title'           => fake()->sentence(3),
+            'slug'            => \Illuminate\Support\Str::slug(fake()->sentence(3)) . '-en',
+            'content'         => '<p>' . fake()->paragraphs(5, true) . '</p>',
+            'seo_title'       => fake()->sentence(2),
             'seo_description' => fake()->sentence(10),
         ]);
     }
@@ -67,7 +67,7 @@ class LegalTranslationFactory extends Factory
                 'Privatumo politika',
                 'Privacy Policy',
             ]),
-            'content' => '<h2>Privatumo politika</h2><p>'.fake()->paragraphs(10, true).'</p>',
+            'content' => '<h2>Privatumo politika</h2><p>' . fake()->paragraphs(10, true) . '</p>',
         ]);
     }
 
@@ -78,7 +78,7 @@ class LegalTranslationFactory extends Factory
                 'Naudojimosi sąlygos',
                 'Terms of Use',
             ]),
-            'content' => '<h2>Naudojimosi sąlygos</h2><p>'.fake()->paragraphs(8, true).'</p>',
+            'content' => '<h2>Naudojimosi sąlygos</h2><p>' . fake()->paragraphs(8, true) . '</p>',
         ]);
     }
 
@@ -89,7 +89,7 @@ class LegalTranslationFactory extends Factory
                 'Grąžinimo politika',
                 'Refund Policy',
             ]),
-            'content' => '<h2>Grąžinimo politika</h2><p>'.fake()->paragraphs(6, true).'</p>',
+            'content' => '<h2>Grąžinimo politika</h2><p>' . fake()->paragraphs(6, true) . '</p>',
         ]);
     }
 
@@ -100,7 +100,7 @@ class LegalTranslationFactory extends Factory
                 'Pristatymo politika',
                 'Shipping Policy',
             ]),
-            'content' => '<h2>Pristatymo politika</h2><p>'.fake()->paragraphs(7, true).'</p>',
+            'content' => '<h2>Pristatymo politika</h2><p>' . fake()->paragraphs(7, true) . '</p>',
         ]);
     }
 }

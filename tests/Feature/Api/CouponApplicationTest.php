@@ -15,13 +15,13 @@ final class CouponApplicationTest extends TestCase
     public function test_can_apply_coupon(): void
     {
         $coupon = Coupon::factory()->create([
-            'code' => 'SAVE10',
-            'type' => 'percentage',
-            'value' => 10,
-            'starts_at' => now()->subDay(),
-            'expires_at' => now()->addDay(),
-            'minimum_amount' => 50,
-            'usage_limit' => null,
+            'code'                 => 'SAVE10',
+            'type'                 => 'percentage',
+            'value'                => 10,
+            'starts_at'            => now()->subDay(),
+            'expires_at'           => now()->addDay(),
+            'minimum_amount'       => 50,
+            'usage_limit'          => null,
             'usage_limit_per_user' => null,
         ]);
 
@@ -56,13 +56,13 @@ final class CouponApplicationTest extends TestCase
     public function test_can_remove_coupon(): void
     {
         Coupon::factory()->create([
-            'code' => 'REMOVE20',
-            'type' => 'fixed',
-            'value' => 20,
-            'starts_at' => now()->subDay(),
-            'expires_at' => now()->addDay(),
-            'minimum_amount' => 10,
-            'usage_limit' => null,
+            'code'                 => 'REMOVE20',
+            'type'                 => 'fixed',
+            'value'                => 20,
+            'starts_at'            => now()->subDay(),
+            'expires_at'           => now()->addDay(),
+            'minimum_amount'       => 10,
+            'usage_limit'          => null,
             'usage_limit_per_user' => null,
         ]);
 

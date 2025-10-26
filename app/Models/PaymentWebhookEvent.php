@@ -37,8 +37,8 @@ class PaymentWebhookEvent extends Model
     protected function casts(): array
     {
         return [
-            'status' => PaymentWebhookEventStatus::class,
-            'payload' => 'array',
+            'status'       => PaymentWebhookEventStatus::class,
+            'payload'      => 'array',
             'processed_at' => 'datetime',
         ];
     }

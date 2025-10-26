@@ -228,16 +228,16 @@ class WishlistItemResourceTest extends TestCase
         $this->actingAs($this->adminUser);
 
         $productWithoutVariant = Product::factory()->create([
-            'name' => 'Simple Product',
-            'price' => 200.00,
+            'name'       => 'Simple Product',
+            'price'      => 200.00,
             'sale_price' => 150.00,
         ]);
 
         $wishlistItemWithoutVariant = WishlistItem::factory()->create([
             'wishlist_id' => $this->wishlist->id,
-            'product_id' => $productWithoutVariant->id,
-            'variant_id' => null,
-            'quantity' => 4,
+            'product_id'  => $productWithoutVariant->id,
+            'variant_id'  => null,
+            'quantity'    => 4,
         ]);
 
         Livewire::test(\App\Filament\Resources\WishlistItemResource\Pages\ListWishlistItems::class)

@@ -17,7 +17,7 @@ use Spatie\LivewireWizard\Components\StepComponent;
  * Livewire component for Shipping with reactive frontend functionality, real-time updates, and user interaction handling.
  *
  * @property int|null $shippingAddressId
- * @property bool $sameAsShipping
+ * @property bool     $sameAsShipping
  * @property int|null $billingAddressId
  */
 class Shipping extends StepComponent

@@ -35,12 +35,12 @@ final class ReferralSystemTest extends TestCase
         parent::setUp();
 
         $this->referrer = User::factory()->create([
-            'name' => 'John Referrer',
+            'name'  => 'John Referrer',
             'email' => 'referrer@example.com',
         ]);
 
         $this->referred = User::factory()->create([
-            'name' => 'Jane Referred',
+            'name'  => 'Jane Referred',
             'email' => 'referred@example.com',
         ]);
 
@@ -267,8 +267,8 @@ final class ReferralSystemTest extends TestCase
         $referral = Referral::factory()->create([
             'referrer_id' => $this->referrer->id,
             'referred_id' => $this->referred->id,
-            'status' => 'pending',
-            'expires_at' => now()->subDay(),
+            'status'      => 'pending',
+            'expires_at'  => now()->subDay(),
         ]);
 
         $count = $this->referralService->cleanupExpiredReferrals();
@@ -290,9 +290,9 @@ final class ReferralSystemTest extends TestCase
         // Create expired reward
         $reward = ReferralReward::factory()->create([
             'referral_id' => $referral->id,
-            'user_id' => $this->referred->id,
-            'status' => 'pending',
-            'expires_at' => now()->subDay(),
+            'user_id'     => $this->referred->id,
+            'status'      => 'pending',
+            'expires_at'  => now()->subDay(),
         ]);
 
         $count = $this->referralRewardService->cleanupExpiredRewards();
@@ -339,18 +339,18 @@ final class ReferralSystemTest extends TestCase
         // Create some rewards
         ReferralReward::factory()->create([
             'referral_id' => $referral->id,
-            'user_id' => $this->referrer->id,
-            'type' => 'referrer_bonus',
-            'amount' => 10.0,
-            'status' => 'pending',
+            'user_id'     => $this->referrer->id,
+            'type'        => 'referrer_bonus',
+            'amount'      => 10.0,
+            'status'      => 'pending',
         ]);
 
         ReferralReward::factory()->create([
             'referral_id' => $referral->id,
-            'user_id' => $this->referrer->id,
-            'type' => 'referrer_bonus',
-            'amount' => 5.0,
-            'status' => 'applied',
+            'user_id'     => $this->referrer->id,
+            'type'        => 'referrer_bonus',
+            'amount'      => 5.0,
+            'status'      => 'applied',
         ]);
 
         $totals = $this->referralRewardService->getTotalRewardsValue($this->referrer->id);

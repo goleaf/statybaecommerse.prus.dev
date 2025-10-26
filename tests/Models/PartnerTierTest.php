@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Tests\Models;
 
@@ -14,7 +16,7 @@ final class PartnerTierTest extends TestCase
     public function test_partner_tier_has_expected_configuration(): void
     {
         // Instantiate the model so we can inspect configuration without touching the database.
-        $model = new PartnerTier();
+        $model = new PartnerTier;
 
         // Validate fillable columns to guard against mass-assignment issues.
         self::assertSame([

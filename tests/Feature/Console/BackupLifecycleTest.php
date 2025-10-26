@@ -10,7 +10,6 @@ use App\Support\Repositories\ProductRepository;
 use App\Support\Repositories\UserRepository;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
-use Illuminate\Testing\PendingCommand;
 use Tests\TestCase;
 
 final class BackupLifecycleTest extends TestCase
@@ -34,15 +33,15 @@ final class BackupLifecycleTest extends TestCase
         config()->set('backup.storage_path', $backupRoot);
         config()->set('backup.media_paths', []);
         config()->set('backup.repositories', [
-            'users' => UserRepository::class,
+            'users'    => UserRepository::class,
             'products' => ProductRepository::class,
         ]);
         config()->set('backup.verify.working_path', $verifyWorkingPath);
         config()->set('backup.verify.connection_name', 'backup-verify-test');
         config()->set('backup.verify.connection', [
-            'driver' => 'sqlite',
-            'database' => $verifyDatabasePath,
-            'prefix' => '',
+            'driver'                  => 'sqlite',
+            'database'                => $verifyDatabasePath,
+            'prefix'                  => '',
             'foreign_key_constraints' => true,
         ]);
 
@@ -57,7 +56,7 @@ final class BackupLifecycleTest extends TestCase
             Product::factory()->count(3)->create();
 
             $this->artisan('backup:prepare', [
-                '--connection' => 'sqlite',
+                '--connection'   => 'sqlite',
                 '--storage-path' => $backupRoot,
             ])->assertExitCode(0);
 
@@ -72,7 +71,7 @@ final class BackupLifecycleTest extends TestCase
 
             $this->assertSame('sqlite', $metadata['artifacts']['database']['driver'] ?? null);
             $this->assertSame([
-                'users' => UserRepository::class,
+                'users'    => UserRepository::class,
                 'products' => ProductRepository::class,
             ], $metadata['repositories'] ?? []);
             $this->assertSame(2, $metadata['counts']['users'] ?? null);
@@ -81,7 +80,7 @@ final class BackupLifecycleTest extends TestCase
             $this->artisan('backup:verify', [
                 '--storage-path' => $backupRoot,
                 '--working-path' => $verifyWorkingPath,
-                '--connection' => 'backup-verify-test',
+                '--connection'   => 'backup-verify-test',
             ])->assertExitCode(0);
             $this->assertFileExists($verifyDatabasePath);
         } finally {

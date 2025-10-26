@@ -52,14 +52,14 @@ describe('EcommerceOverview Widget', function (): void {
 
         // Create orders for this month
         $order1 = Order::factory()->create([
-            'user_id' => $user->id,
-            'total' => 100.00,
+            'user_id'    => $user->id,
+            'total'      => 100.00,
             'created_at' => now()->startOfMonth()->addDays(5),
         ]);
 
         $order2 = Order::factory()->create([
-            'user_id' => $user->id,
-            'total' => 200.00,
+            'user_id'    => $user->id,
+            'total'      => 200.00,
             'created_at' => now()->startOfMonth()->addDays(10),
         ]);
 
@@ -80,13 +80,13 @@ describe('EcommerceOverview Widget', function (): void {
     it('calculates month-over-month changes correctly', function (): void {
         // Create last month's data
         $lastMonthOrder = Order::factory()->create([
-            'total' => 100.00,
+            'total'      => 100.00,
             'created_at' => now()->subMonth()->startOfMonth()->addDays(5),
         ]);
 
         // Create this month's data
         $thisMonthOrder = Order::factory()->create([
-            'total' => 200.00,
+            'total'      => 200.00,
             'created_at' => now()->startOfMonth()->addDays(5),
         ]);
 
@@ -123,24 +123,24 @@ describe('TopProductsWidget', function (): void {
 
         // Create order items
         \App\Models\OrderItem::factory()->create([
-            'order_id' => $order1->id,
+            'order_id'   => $order1->id,
             'product_id' => $product1->id,
-            'quantity' => 10,
-            'total' => 100.00,
+            'quantity'   => 10,
+            'total'      => 100.00,
         ]);
 
         \App\Models\OrderItem::factory()->create([
-            'order_id' => $order2->id,
+            'order_id'   => $order2->id,
             'product_id' => $product2->id,
-            'quantity' => 5,
-            'total' => 50.00,
+            'quantity'   => 5,
+            'total'      => 50.00,
         ]);
 
         \App\Models\OrderItem::factory()->create([
-            'order_id' => $order3->id,
+            'order_id'   => $order3->id,
             'product_id' => $product3->id,
-            'quantity' => 15,
-            'total' => 150.00,
+            'quantity'   => 15,
+            'total'      => 150.00,
         ]);
 
         actingAs($this->admin);
@@ -160,10 +160,10 @@ describe('TopProductsWidget', function (): void {
         foreach ($products as $index => $product) {
             $order = Order::factory()->create();
             \App\Models\OrderItem::factory()->create([
-                'order_id' => $order->id,
+                'order_id'   => $order->id,
                 'product_id' => $product->id,
-                'quantity' => $index + 1, // Different quantities
-                'total' => ($index + 1) * 10,
+                'quantity'   => $index + 1, // Different quantities
+                'total'      => ($index + 1) * 10,
             ]);
         }
 
@@ -187,18 +187,18 @@ describe('RealtimeAnalyticsWidget', function (): void {
     it('displays today\'s analytics correctly', function (): void {
         // Create today's orders
         $todayOrder1 = Order::factory()->create([
-            'total' => 100.00,
+            'total'      => 100.00,
             'created_at' => now()->startOfDay()->addHours(2),
         ]);
 
         $todayOrder2 = Order::factory()->create([
-            'total' => 200.00,
+            'total'      => 200.00,
             'created_at' => now()->startOfDay()->addHours(5),
         ]);
 
         // Create yesterday's orders
         $yesterdayOrder = Order::factory()->create([
-            'total' => 50.00,
+            'total'      => 50.00,
             'created_at' => now()->subDay()->startOfDay()->addHours(3),
         ]);
 
@@ -223,13 +223,13 @@ describe('RealtimeAnalyticsWidget', function (): void {
     it('calculates day-over-day changes correctly', function (): void {
         // Create yesterday's data
         $yesterdayOrder = Order::factory()->create([
-            'total' => 100.00,
+            'total'      => 100.00,
             'created_at' => now()->subDay()->startOfDay()->addHours(5),
         ]);
 
         // Create today's data
         $todayOrder = Order::factory()->create([
-            'total' => 200.00,
+            'total'      => 200.00,
             'created_at' => now()->startOfDay()->addHours(5),
         ]);
 

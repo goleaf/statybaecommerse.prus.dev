@@ -27,28 +27,28 @@ final class CartItemResourceTest extends TestCase
         $product = Product::factory()->create();
 
         $cartItemData = [
-            'user_id' => $user->id,
-            'product_id' => $product->id,
-            'quantity' => 2,
-            'unit_price' => 10.5,
-            'price' => 10.5,
-            'total_price' => 21.0,
-            'session_id' => 'test-session-123',
+            'user_id'          => $user->id,
+            'product_id'       => $product->id,
+            'quantity'         => 2,
+            'unit_price'       => 10.5,
+            'price'            => 10.5,
+            'total_price'      => 21.0,
+            'session_id'       => 'test-session-123',
             'minimum_quantity' => 1,
-            'notes' => 'Test cart item',
+            'notes'            => 'Test cart item',
         ];
 
         $cartItem = CartItem::create($cartItemData);
 
         $this->assertDatabaseHas('cart_items', [
-            'user_id' => $user->id,
-            'product_id' => $product->id,
-            'quantity' => 2,
-            'unit_price' => 10.5,
-            'total_price' => 21.0,
-            'session_id' => 'test-session-123',
+            'user_id'          => $user->id,
+            'product_id'       => $product->id,
+            'quantity'         => 2,
+            'unit_price'       => 10.5,
+            'total_price'      => 21.0,
+            'session_id'       => 'test-session-123',
             'minimum_quantity' => 1,
-            'notes' => 'Test cart item',
+            'notes'            => 'Test cart item',
         ]);
 
         $this->assertEquals($user->id, $cartItem->user_id);
@@ -63,10 +63,10 @@ final class CartItemResourceTest extends TestCase
         $cartItem = CartItem::factory()->create();
 
         $cartItem->update([
-            'quantity' => 5,
-            'unit_price' => 15.75,
+            'quantity'    => 5,
+            'unit_price'  => 15.75,
             'total_price' => 78.75,
-            'notes' => 'Updated notes',
+            'notes'       => 'Updated notes',
         ]);
 
         $this->assertEquals(5, $cartItem->quantity);
@@ -130,18 +130,18 @@ final class CartItemResourceTest extends TestCase
         $product2 = Product::factory()->create();
 
         CartItem::factory()->create([
-            'user_id' => $currentUser->id,
-            'product_id' => $product1->id,
-            'quantity' => 2,
-            'unit_price' => 10.0,
+            'user_id'     => $currentUser->id,
+            'product_id'  => $product1->id,
+            'quantity'    => 2,
+            'unit_price'  => 10.0,
             'total_price' => 20.0,
         ]);
 
         CartItem::factory()->create([
-            'user_id' => $currentUser->id,
-            'product_id' => $product2->id,
-            'quantity' => 3,
-            'unit_price' => 15.0,
+            'user_id'     => $currentUser->id,
+            'product_id'  => $product2->id,
+            'quantity'    => 3,
+            'unit_price'  => 15.0,
             'total_price' => 45.0,
         ]);
 
@@ -166,8 +166,8 @@ final class CartItemResourceTest extends TestCase
     public function test_can_update_quantity_and_recalculate_total(): void
     {
         $cartItem = CartItem::factory()->create([
-            'quantity' => 2,
-            'unit_price' => 10.0,
+            'quantity'    => 2,
+            'unit_price'  => 10.0,
             'total_price' => 20.0,
         ]);
 
@@ -180,8 +180,8 @@ final class CartItemResourceTest extends TestCase
     public function test_can_increment_quantity(): void
     {
         $cartItem = CartItem::factory()->create([
-            'quantity' => 2,
-            'unit_price' => 10.0,
+            'quantity'    => 2,
+            'unit_price'  => 10.0,
             'total_price' => 20.0,
         ]);
 
@@ -194,8 +194,8 @@ final class CartItemResourceTest extends TestCase
     public function test_can_decrement_quantity(): void
     {
         $cartItem = CartItem::factory()->create([
-            'quantity' => 5,
-            'unit_price' => 10.0,
+            'quantity'    => 5,
+            'unit_price'  => 10.0,
             'total_price' => 50.0,
         ]);
 
@@ -221,7 +221,7 @@ final class CartItemResourceTest extends TestCase
     public function test_can_get_formatted_prices(): void
     {
         $cartItem = CartItem::factory()->create([
-            'unit_price' => 12.5,
+            'unit_price'  => 12.5,
             'total_price' => 25.0,
         ]);
 
@@ -233,12 +233,12 @@ final class CartItemResourceTest extends TestCase
     public function test_can_check_if_needs_restocking(): void
     {
         $cartItemLow = CartItem::factory()->create([
-            'quantity' => 5,
+            'quantity'         => 5,
             'minimum_quantity' => 10,
         ]);
 
         $cartItemHigh = CartItem::factory()->create([
-            'quantity' => 15,
+            'quantity'         => 15,
             'minimum_quantity' => 10,
         ]);
 

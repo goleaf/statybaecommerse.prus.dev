@@ -18,52 +18,52 @@ final class LocationSeeder extends Seeder
         $definitions = [
             [
                 'attributes' => [
-                    'code' => 'WH-001',
+                    'code'           => 'WH-001',
                     'address_line_1' => 'Sandėlio g. 1',
-                    'city' => 'Vilnius',
-                    'postal_code' => '01100',
-                    'country_code' => 'LT',
-                    'phone' => '+37060000001',
-                    'email' => 'warehouse@shop.lt',
-                    'is_enabled' => true,
-                    'is_default' => true,
-                    'type' => 'warehouse',
+                    'city'           => 'Vilnius',
+                    'postal_code'    => '01100',
+                    'country_code'   => 'LT',
+                    'phone'          => '+37060000001',
+                    'email'          => 'warehouse@shop.lt',
+                    'is_enabled'     => true,
+                    'is_default'     => true,
+                    'type'           => 'warehouse',
                 ],
                 'translations' => [
                     'lt' => [
-                        'name' => 'Pagrindinis sandėlis',
-                        'slug' => 'pagrindinis-sandelys',
+                        'name'        => 'Pagrindinis sandėlis',
+                        'slug'        => 'pagrindinis-sandelys',
                         'description' => 'Pagrindinė prekių saugojimo vieta.',
                     ],
                     'en' => [
-                        'name' => 'Main Warehouse',
-                        'slug' => 'main-warehouse',
+                        'name'        => 'Main Warehouse',
+                        'slug'        => 'main-warehouse',
                         'description' => 'Primary storage location.',
                     ],
                 ],
             ],
             [
                 'attributes' => [
-                    'code' => 'WH-002',
+                    'code'           => 'WH-002',
                     'address_line_1' => 'Pramonės g. 10',
-                    'city' => 'Kaunas',
-                    'postal_code' => '44100',
-                    'country_code' => 'LT',
-                    'phone' => '+37060000002',
-                    'email' => 'backup@shop.lt',
-                    'is_enabled' => true,
-                    'is_default' => false,
-                    'type' => 'warehouse',
+                    'city'           => 'Kaunas',
+                    'postal_code'    => '44100',
+                    'country_code'   => 'LT',
+                    'phone'          => '+37060000002',
+                    'email'          => 'backup@shop.lt',
+                    'is_enabled'     => true,
+                    'is_default'     => false,
+                    'type'           => 'warehouse',
                 ],
                 'translations' => [
                     'lt' => [
-                        'name' => 'Atsarginis sandėlis',
-                        'slug' => 'atsarginis-sandelys',
+                        'name'        => 'Atsarginis sandėlis',
+                        'slug'        => 'atsarginis-sandelys',
                         'description' => 'Papildoma atsargų vieta.',
                     ],
                     'en' => [
-                        'name' => 'Backup Warehouse',
-                        'slug' => 'backup-warehouse',
+                        'name'        => 'Backup Warehouse',
+                        'slug'        => 'backup-warehouse',
                         'description' => 'Secondary stock location.',
                     ],
                 ],
@@ -89,9 +89,9 @@ final class LocationSeeder extends Seeder
                 LocationTranslation::factory()
                     ->for($location)
                     ->state([
-                        'locale' => $locale,
-                        'name' => $translation['name'],
-                        'slug' => $translation['slug'] ?? Str::slug($translation['name']),
+                        'locale'      => $locale,
+                        'name'        => $translation['name'],
+                        'slug'        => $translation['slug'] ?? Str::slug($translation['name']),
                         'description' => $translation['description'] ?? '',
                     ])
                     ->create();

@@ -14,7 +14,7 @@ trait HasSafeSerialization
     /**
      * Get safe attributes for public display (excludes sensitive fields)
      *
-     * @param  array  $additionalExclusions  Additional fields to exclude
+     * @param array $additionalExclusions Additional fields to exclude
      */
     public function getSafeAttributes(array $additionalExclusions = []): array
     {
@@ -27,7 +27,7 @@ trait HasSafeSerialization
     /**
      * Get safe attributes for API responses
      *
-     * @param  array  $additionalExclusions  Additional fields to exclude
+     * @param array $additionalExclusions Additional fields to exclude
      */
     public function getApiSafeAttributes(array $additionalExclusions = []): array
     {
@@ -40,7 +40,7 @@ trait HasSafeSerialization
     /**
      * Get safe attributes for admin display (excludes most sensitive fields)
      *
-     * @param  array  $additionalExclusions  Additional fields to exclude
+     * @param array $additionalExclusions Additional fields to exclude
      */
     public function getAdminSafeAttributes(array $additionalExclusions = []): array
     {
@@ -77,7 +77,7 @@ trait HasSafeSerialization
     /**
      * Convert model to array with safe attributes for public display
      *
-     * @param  array  $additionalExclusions  Additional fields to exclude
+     * @param array $additionalExclusions Additional fields to exclude
      */
     public function toSafeArray(array $additionalExclusions = []): array
     {
@@ -87,7 +87,7 @@ trait HasSafeSerialization
     /**
      * Convert model to array with safe attributes for API responses
      *
-     * @param  array  $additionalExclusions  Additional fields to exclude
+     * @param array $additionalExclusions Additional fields to exclude
      */
     public function toApiSafeArray(array $additionalExclusions = []): array
     {
@@ -97,7 +97,7 @@ trait HasSafeSerialization
     /**
      * Convert model to array with safe attributes for admin display
      *
-     * @param  array  $additionalExclusions  Additional fields to exclude
+     * @param array $additionalExclusions Additional fields to exclude
      */
     public function toAdminSafeArray(array $additionalExclusions = []): array
     {

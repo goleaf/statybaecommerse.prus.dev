@@ -30,7 +30,7 @@ final class ProfileControllerTest extends TestCase
         $user = User::factory()->create();
 
         $response = $this->actingAs($user)->put(route('frontend.profile.update'), [
-            'name' => 'Updated Name',
+            'name'  => 'Updated Name',
             'email' => 'updated@example.com',
         ]);
 
@@ -44,7 +44,7 @@ final class ProfileControllerTest extends TestCase
         User::factory()->create(['email' => 'existing@example.com']);
 
         $response = $this->actingAs($user)->put(route('frontend.profile.update'), [
-            'name' => 'Updated Name',
+            'name'  => 'Updated Name',
             'email' => 'existing@example.com',
         ]);
 
@@ -56,19 +56,19 @@ final class ProfileControllerTest extends TestCase
         $user = User::factory()->create();
 
         $response = $this->actingAs($user)->post(route('frontend.profile.store-address'), [
-            'type' => AddressType::SHIPPING->value,
-            'first_name' => 'Jonas',
-            'last_name' => 'Jonaitis',
+            'type'           => AddressType::SHIPPING->value,
+            'first_name'     => 'Jonas',
+            'last_name'      => 'Jonaitis',
             'address_line_1' => 'Example g. 1',
-            'city' => 'Vilnius',
-            'postal_code' => '01100',
-            'country_code' => 'LT',
-            'is_default' => true,
+            'city'           => 'Vilnius',
+            'postal_code'    => '01100',
+            'country_code'   => 'LT',
+            'is_default'     => true,
         ]);
 
         $response->assertRedirect(route('frontend.profile.addresses'));
         $this->assertDatabaseHas('addresses', [
-            'user_id' => $user->id,
+            'user_id'    => $user->id,
             'first_name' => 'Jonas',
             'is_default' => true,
         ]);
@@ -78,32 +78,32 @@ final class ProfileControllerTest extends TestCase
     {
         $user = User::factory()->create();
         $address = Address::factory()->create([
-            'user_id' => $user->id,
-            'type' => AddressType::SHIPPING,
-            'first_name' => 'Old',
-            'last_name' => 'Name',
+            'user_id'        => $user->id,
+            'type'           => AddressType::SHIPPING,
+            'first_name'     => 'Old',
+            'last_name'      => 'Name',
             'address_line_1' => 'Street 1',
-            'city' => 'Vilnius',
-            'postal_code' => '01100',
-            'country_code' => 'LT',
+            'city'           => 'Vilnius',
+            'postal_code'    => '01100',
+            'country_code'   => 'LT',
         ]);
 
         $response = $this->actingAs($user)->put(route('frontend.profile.update-address', $address), [
-            'type' => AddressType::BILLING->value,
-            'first_name' => 'New',
-            'last_name' => 'Name',
+            'type'           => AddressType::BILLING->value,
+            'first_name'     => 'New',
+            'last_name'      => 'Name',
             'address_line_1' => 'Street 2',
-            'city' => 'Kaunas',
-            'postal_code' => '22222',
-            'country_code' => 'LT',
-            'is_default' => true,
+            'city'           => 'Kaunas',
+            'postal_code'    => '22222',
+            'country_code'   => 'LT',
+            'is_default'     => true,
         ]);
 
         $response->assertRedirect(route('frontend.profile.addresses'));
         $this->assertDatabaseHas('addresses', [
-            'id' => $address->id,
+            'id'         => $address->id,
             'first_name' => 'New',
-            'city' => 'Kaunas',
+            'city'       => 'Kaunas',
             'is_default' => true,
         ]);
     }
@@ -112,14 +112,14 @@ final class ProfileControllerTest extends TestCase
     {
         $user = User::factory()->create();
         $address = Address::factory()->create([
-            'user_id' => $user->id,
-            'type' => AddressType::HOME,
-            'first_name' => 'Delete',
-            'last_name' => 'Me',
+            'user_id'        => $user->id,
+            'type'           => AddressType::HOME,
+            'first_name'     => 'Delete',
+            'last_name'      => 'Me',
             'address_line_1' => 'Street 1',
-            'city' => 'Vilnius',
-            'postal_code' => '01100',
-            'country_code' => 'LT',
+            'city'           => 'Vilnius',
+            'postal_code'    => '01100',
+            'country_code'   => 'LT',
         ]);
 
         $response = $this->actingAs($user)->delete(route('frontend.profile.delete-address', $address));

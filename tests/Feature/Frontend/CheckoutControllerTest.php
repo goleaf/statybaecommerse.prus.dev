@@ -35,39 +35,39 @@ final class CheckoutControllerTest extends TestCase
         $cartItem = [
             (string) $product->id => [
                 'product_id' => $product->id,
-                'name' => $product->name,
-                'price' => 20.0,
-                'quantity' => 2,
-                'sku' => 'SKU-123',
+                'name'       => $product->name,
+                'price'      => 20.0,
+                'quantity'   => 2,
+                'sku'        => 'SKU-123',
             ],
         ];
 
         $response = $this->actingAs($user)->withSession(['cart' => $cartItem])->post(route('frontend.checkout.process'), [
-            'full_name' => 'Test User',
-            'email' => 'test@example.com',
-            'phone' => '123456789',
+            'full_name'      => 'Test User',
+            'email'          => 'test@example.com',
+            'phone'          => '123456789',
             'address_line_1' => 'Main street 1',
             'address_line_2' => 'Apt 2',
-            'city' => 'Vilnius',
-            'postal_code' => '12345',
-            'country' => 'Lithuania',
+            'city'           => 'Vilnius',
+            'postal_code'    => '12345',
+            'country'        => 'Lithuania',
             'payment_method' => 'card',
-            'notes' => 'Leave at door',
+            'notes'          => 'Leave at door',
         ]);
 
         $response->assertRedirect(route('frontend.checkout.success'));
 
         $this->assertDatabaseHas('orders', [
-            'user_id' => $user->id,
-            'subtotal' => 40.0,
-            'tax_amount' => 8.4,
+            'user_id'         => $user->id,
+            'subtotal'        => 40.0,
+            'tax_amount'      => 8.4,
             'shipping_amount' => 5.99,
             'discount_amount' => 0,
-            'total' => 54.39,
+            'total'           => 54.39,
         ]);
         $this->assertDatabaseHas('order_items', [
             'product_id' => $product->id,
-            'quantity' => 2,
+            'quantity'   => 2,
         ]);
         $this->assertEmpty(session('cart', []));
         $this->assertNull(session('cart_discount'));
@@ -83,12 +83,12 @@ final class CheckoutControllerTest extends TestCase
         $user = User::factory()->create();
 
         $response = $this->actingAs($user)->post(route('frontend.checkout.process'), [
-            'full_name' => 'Test User',
-            'email' => 'test@example.com',
+            'full_name'      => 'Test User',
+            'email'          => 'test@example.com',
             'address_line_1' => 'Main street 1',
-            'city' => 'Vilnius',
-            'postal_code' => '12345',
-            'country' => 'Lithuania',
+            'city'           => 'Vilnius',
+            'postal_code'    => '12345',
+            'country'        => 'Lithuania',
             'payment_method' => 'card',
         ]);
 
@@ -110,16 +110,16 @@ final class CheckoutControllerTest extends TestCase
     private function createVisibleProduct(): Product
     {
         $brand = Brand::factory()->create([
-            'is_active' => true,
+            'is_active'  => true,
             'is_enabled' => true,
             'is_visible' => true,
         ]);
         $category = Category::factory()->create(['is_visible' => true]);
 
         $product = Product::factory()->create([
-            'brand_id' => $brand->id,
-            'is_visible' => true,
-            'status' => 'active',
+            'brand_id'     => $brand->id,
+            'is_visible'   => true,
+            'status'       => 'active',
             'published_at' => now(),
         ]);
         $product->categories()->attach($category->id);

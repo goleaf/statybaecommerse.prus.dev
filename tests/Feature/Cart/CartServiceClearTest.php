@@ -5,7 +5,6 @@ declare(strict_types=1);
 use App\Models\CartItem;
 use App\Models\User;
 use App\Services\Cart\CartService;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 
 it('clears both primary and fallback session carts and cached/session state', function (): void {
     $user = User::factory()->create();

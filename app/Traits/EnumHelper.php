@@ -209,7 +209,7 @@ trait EnumHelper
      */
     public static function forValidation(): string
     {
-        return 'in:'.implode(',', self::values());
+        return 'in:' . implode(',', self::values());
     }
 
     /**
@@ -217,7 +217,7 @@ trait EnumHelper
      */
     public static function forDatabase(): string
     {
-        return "enum('".implode("','", self::values())."')";
+        return "enum('" . implode("','", self::values()) . "')";
     }
 
     /**
@@ -233,12 +233,12 @@ trait EnumHelper
      */
     public static function forTypeScript(): string
     {
-        $enum = 'export enum '.class_basename(static::class)." {\n";
+        $enum = 'export enum ' . class_basename(static::class) . " {\n";
         foreach (self::cases() as $case) {
-            $enum .= '  '.strtoupper($case->value)." = '".$case->value."',\n";
+            $enum .= '  ' . strtoupper($case->value) . " = '" . $case->value . "',\n";
         }
 
-        return $enum.'}';
+        return $enum . '}';
     }
 
     /**
@@ -246,12 +246,12 @@ trait EnumHelper
      */
     public static function forJavaScript(): string
     {
-        $object = 'const '.class_basename(static::class)." = {\n";
+        $object = 'const ' . class_basename(static::class) . " = {\n";
         foreach (self::cases() as $case) {
-            $object .= '  '.strtoupper($case->value).": '".$case->value."',\n";
+            $object .= '  ' . strtoupper($case->value) . ": '" . $case->value . "',\n";
         }
 
-        return $object.'};';
+        return $object . '};';
     }
 
     /**
@@ -261,10 +261,10 @@ trait EnumHelper
     {
         $css = ":root {\n";
         foreach (self::cases() as $case) {
-            $css .= '  --'.str_replace('_', '-', $case->value).": '".$case->value."';\n";
+            $css .= '  --' . str_replace('_', '-', $case->value) . ": '" . $case->value . "';\n";
         }
 
-        return $css.'}';
+        return $css . '}';
     }
 
     /**

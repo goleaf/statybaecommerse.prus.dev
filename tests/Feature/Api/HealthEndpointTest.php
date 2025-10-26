@@ -31,8 +31,8 @@ final class HealthEndpointTest extends TestCase
             'timestamp',
             'checks' => [
                 'database' => ['status', 'latency_ms'],
-                'cache' => ['status', 'latency_ms'],
-                'disk' => ['status', 'latency_ms'],
+                'cache'    => ['status', 'latency_ms'],
+                'disk'     => ['status', 'latency_ms'],
             ],
         ]);
 
@@ -66,13 +66,13 @@ final class HealthEndpointTest extends TestCase
             public function report(bool $includeQueue = false): array
             {
                 return [
-                    'status' => 'error',
+                    'status'    => 'error',
                     'timestamp' => now()->toIso8601String(),
-                    'checks' => [
+                    'checks'    => [
                         'database' => [
-                            'status' => 'failed',
+                            'status'     => 'failed',
                             'latency_ms' => 0.0,
-                            'message' => 'Simulated failure',
+                            'message'    => 'Simulated failure',
                         ],
                     ],
                 ];

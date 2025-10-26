@@ -35,13 +35,13 @@ class AttributeValueControllerTest extends TestCase
 
         $attributeValue1 = AttributeValue::factory()->create([
             'attribute_id' => $attribute1->id,
-            'value' => 'Red',
-            'color_code' => '#FF0000',
+            'value'        => 'Red',
+            'color_code'   => '#FF0000',
         ]);
 
         $attributeValue2 = AttributeValue::factory()->create([
             'attribute_id' => $attribute2->id,
-            'value' => 'Blue',
+            'value'        => 'Blue',
         ]);
 
         // Filter by attribute
@@ -149,12 +149,12 @@ class AttributeValueControllerTest extends TestCase
 
         $attributeValue1 = AttributeValue::factory()->create([
             'attribute_id' => $attribute1->id,
-            'value' => 'Red',
+            'value'        => 'Red',
         ]);
 
         $attributeValue2 = AttributeValue::factory()->create([
             'attribute_id' => $attribute2->id,
-            'value' => 'Blue',
+            'value'        => 'Blue',
         ]);
 
         // Filter by attribute
@@ -179,11 +179,11 @@ class AttributeValueControllerTest extends TestCase
         $attribute = Attribute::factory()->create();
         $attributeValue1 = AttributeValue::factory()->create([
             'attribute_id' => $attribute->id,
-            'value' => 'Red Color',
+            'value'        => 'Red Color',
         ]);
         $attributeValue2 = AttributeValue::factory()->create([
             'attribute_id' => $attribute->id,
-            'value' => 'Blue Color',
+            'value'        => 'Blue Color',
         ]);
 
         $response = $this->get(route('attribute-values.search', ['q' => 'Red']));
@@ -219,16 +219,16 @@ class AttributeValueControllerTest extends TestCase
 
         $attributeValue1 = AttributeValue::factory()->create([
             'attribute_id' => $attribute1->id,
-            'value' => 'Red',
+            'value'        => 'Red',
         ]);
 
         $attributeValue2 = AttributeValue::factory()->create([
             'attribute_id' => $attribute2->id,
-            'value' => 'Red',
+            'value'        => 'Red',
         ]);
 
         $response = $this->get(route('attribute-values.search', [
-            'q' => 'Red',
+            'q'            => 'Red',
             'attribute_id' => $attribute1->id,
         ]));
 
@@ -244,20 +244,20 @@ class AttributeValueControllerTest extends TestCase
         $attribute = Attribute::factory()->create();
         $attributeValue = AttributeValue::factory()->create([
             'attribute_id' => $attribute->id,
-            'value' => 'Default Value',
+            'value'        => 'Default Value',
         ]);
 
         // Create translations
         AttributeValueTranslation::factory()->create([
             'attribute_value_id' => $attributeValue->id,
-            'locale' => 'en',
-            'value' => 'English Value',
+            'locale'             => 'en',
+            'value'              => 'English Value',
         ]);
 
         AttributeValueTranslation::factory()->create([
             'attribute_value_id' => $attributeValue->id,
-            'locale' => 'lt',
-            'value' => 'Lithuanian Value',
+            'locale'             => 'lt',
+            'value'              => 'Lithuanian Value',
         ]);
 
         // Test with English locale
@@ -311,8 +311,8 @@ class AttributeValueControllerTest extends TestCase
 
         $product = Product::factory()->create();
         $variant = $product->variants()->create([
-            'sku' => 'TEST-VARIANT',
-            'price' => 99.99,
+            'sku'            => 'TEST-VARIANT',
+            'price'          => 99.99,
             'stock_quantity' => 10,
         ]);
         $attributeValue->variants()->attach($variant->id);
@@ -328,10 +328,10 @@ class AttributeValueControllerTest extends TestCase
         $attribute = Attribute::factory()->create();
         $attributeValue = AttributeValue::factory()->create([
             'attribute_id' => $attribute->id,
-            'metadata' => [
+            'metadata'     => [
                 'created_by' => 'admin',
-                'version' => '1.0',
-                'tags' => ['red', 'color'],
+                'version'    => '1.0',
+                'tags'       => ['red', 'color'],
             ],
         ]);
 
@@ -349,7 +349,7 @@ class AttributeValueControllerTest extends TestCase
         $attribute = Attribute::factory()->create();
         $attributeValue = AttributeValue::factory()->create([
             'attribute_id' => $attribute->id,
-            'color_code' => '#FF0000',
+            'color_code'   => '#FF0000',
         ]);
 
         $response = $this->get(route('attribute-values.show', $attributeValue));
@@ -363,9 +363,9 @@ class AttributeValueControllerTest extends TestCase
         $attribute = Attribute::factory()->create();
         $attributeValue = AttributeValue::factory()->create([
             'attribute_id' => $attribute->id,
-            'is_enabled' => true,
-            'is_required' => true,
-            'is_default' => true,
+            'is_enabled'   => true,
+            'is_required'  => true,
+            'is_default'   => true,
         ]);
 
         $response = $this->get(route('attribute-values.show', $attributeValue));

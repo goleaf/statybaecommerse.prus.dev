@@ -16,11 +16,11 @@ final class CategoryTest extends TestCase
     public function test_category_can_be_created(): void
     {
         $category = Category::factory()->create([
-            'name' => 'Test Category',
-            'slug' => 'test-category',
+            'name'        => 'Test Category',
+            'slug'        => 'test-category',
             'description' => 'Test category description',
-            'is_enabled' => true,
-            'is_visible' => true,
+            'is_enabled'  => true,
+            'is_visible'  => true,
         ]);
 
         $this->assertInstanceOf(Category::class, $category);
@@ -34,7 +34,7 @@ final class CategoryTest extends TestCase
     public function test_category_translation_methods(): void
     {
         $category = Category::factory()->create([
-            'name' => 'Original Name',
+            'name'        => 'Original Name',
             'description' => 'Original Description',
         ]);
 
@@ -85,7 +85,7 @@ final class CategoryTest extends TestCase
     public function test_category_helper_methods(): void
     {
         $category = Category::factory()->create([
-            'name' => 'Test Category',
+            'name'       => 'Test Category',
             'is_enabled' => true,
             'is_visible' => true,
         ]);
@@ -213,7 +213,7 @@ final class CategoryTest extends TestCase
     public function test_category_seo_methods(): void
     {
         $category = Category::factory()->create([
-            'seo_title' => 'SEO Title',
+            'seo_title'       => 'SEO Title',
             'seo_description' => 'SEO Description',
             // Note: seo_keywords column doesn't exist in database
         ]);

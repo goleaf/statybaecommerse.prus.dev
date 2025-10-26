@@ -26,9 +26,9 @@ return new class extends Migration
             }
 
             foreach ([
-                'order_shippings_order_id_index' => 'order_id',
-                'order_shippings_status_idx' => 'status',
-                'order_shippings_created_at_idx' => 'created_at',
+                'order_shippings_order_id_index'      => 'order_id',
+                'order_shippings_status_idx'          => 'status',
+                'order_shippings_created_at_idx'      => 'created_at',
                 'order_shippings_tracking_number_idx' => 'tracking_number',
             ] as $indexName => $column) {
                 DB::statement(sprintf(
@@ -51,9 +51,9 @@ return new class extends Migration
         }
 
         foreach ([
-            'order_shippings_order_id_index' => 'order_id',
-            'order_shippings_status_idx' => 'status',
-            'order_shippings_created_at_idx' => 'created_at',
+            'order_shippings_order_id_index'      => 'order_id',
+            'order_shippings_status_idx'          => 'status',
+            'order_shippings_created_at_idx'      => 'created_at',
             'order_shippings_tracking_number_idx' => 'tracking_number',
         ] as $indexName => $column) {
             if (! $this->indexExists('order_shippings', $indexName)) {

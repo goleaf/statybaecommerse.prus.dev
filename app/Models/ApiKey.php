@@ -18,6 +18,7 @@ final class ApiKey extends Model
     use HasFactory;
 
     public const KEY_PREFIX = 'sk';
+
     public const KEY_LENGTH = 56;
 
     protected $table = 'api_keys';
@@ -28,12 +29,12 @@ final class ApiKey extends Model
      * @var array<string, string>
      */
     protected $casts = [
-        'scopes' => 'array',
-        'permissions' => 'array',
-        'rate_limits' => 'array',
+        'scopes'       => 'array',
+        'permissions'  => 'array',
+        'rate_limits'  => 'array',
         'last_used_at' => 'datetime',
-        'expires_at' => 'datetime',
-        'is_active' => 'boolean',
+        'expires_at'   => 'datetime',
+        'is_active'    => 'boolean',
     ];
 
     /**
@@ -52,7 +53,7 @@ final class ApiKey extends Model
 
     protected static function booted(): void
     {
-        static::creating(static function (ApiKey $apiKey): void {
+        self::creating(static function (ApiKey $apiKey): void {
             if (! isset($apiKey->attributes['key']) || $apiKey->attributes['key'] === '') {
                 $credentials = self::generateCredentials();
                 $apiKey->key = $credentials['hashed'];
@@ -86,7 +87,7 @@ final class ApiKey extends Model
 
         return [
             'plain_text' => $plainText,
-            'hashed' => self::hashKey($plainText),
+            'hashed'     => self::hashKey($plainText),
         ];
     }
 
@@ -125,7 +126,7 @@ final class ApiKey extends Model
     {
         return [
             'plain_text' => $plainText,
-            'hashed' => self::hashKey($plainText),
+            'hashed'     => self::hashKey($plainText),
         ];
     }
 
@@ -171,7 +172,7 @@ final class ApiKey extends Model
     /**
      * Determine whether the API key grants any of the requested scopes.
      *
-     * @param  array<int, string>  $scopes
+     * @param array<int, string> $scopes
      */
     public function hasAnyScope(array $scopes): bool
     {
@@ -264,13 +265,13 @@ final class ApiKey extends Model
         $secret = self::generatePlainTextSecret();
 
         $this->forceFill([
-            'key' => $credentials['hashed'],
-            'secret' => $secret,
+            'key'          => $credentials['hashed'],
+            'secret'       => $secret,
             'last_used_at' => null,
         ])->save();
 
         return [
-            'plain_text_key' => $credentials['plain_text'],
+            'plain_text_key'    => $credentials['plain_text'],
             'plain_text_secret' => $secret,
         ];
     }
@@ -315,7 +316,7 @@ final class ApiKey extends Model
     /**
      * Scope a query to order API keys alphabetically by their display name.
      *
-     * @param  Builder<ApiKey>  $query
+     * @param  Builder<ApiKey> $query
      * @return Builder<ApiKey>
      */
     public function scopeOrderedByName(Builder $query): Builder

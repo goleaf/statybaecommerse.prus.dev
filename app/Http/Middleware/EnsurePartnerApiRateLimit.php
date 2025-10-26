@@ -61,7 +61,7 @@ final class EnsurePartnerApiRateLimit
     /**
      * Handle legacy partner API rate limiting semantics for hashed key integrations.
      *
-     * @param  Closure(Request): Response  $next
+     * @param Closure(Request): Response $next
      */
     private function handleLegacy(Request $request, Closure $next): Response
     {

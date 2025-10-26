@@ -70,7 +70,7 @@ class UserManagementResourceTest extends TestCase
     public function test_user_table_has_required_columns(): void
     {
         $targetUser = User::factory()->create([
-            'name' => 'Test User',
+            'name'  => 'Test User',
             'email' => 'test@example.com',
         ]);
 
@@ -113,7 +113,7 @@ class UserManagementResourceTest extends TestCase
 
         $this
             ->actingAs($this->user)
-            ->get(UserManagementResource::getUrl('index').'?search=Unique')
+            ->get(UserManagementResource::getUrl('index') . '?search=Unique')
             ->assertSee('Unique User Name')
             ->assertDontSee('Another User');
     }
@@ -145,7 +145,7 @@ class UserManagementResourceTest extends TestCase
     public function test_user_management_resource_has_global_search_result_details(): void
     {
         $targetUser = User::factory()->create([
-            'name' => 'Test User',
+            'name'  => 'Test User',
             'email' => 'test@example.com',
         ]);
 

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use App\Filament\Resources\CustomerGroupResource\Pages\ListCustomerGroups;
 use App\Models\CustomerGroup;
@@ -22,12 +24,12 @@ it('feature: can list customer groups in admin panel', function () {
 
 it('feature: can create a new customer group with basic fields', function () {
     $customerGroupData = [
-        'name' => 'VIP Customers',
-        'code' => 'VIP',
-        'description' => 'High-value customers',
+        'name'                => 'VIP Customers',
+        'code'                => 'VIP',
+        'description'         => 'High-value customers',
         'discount_percentage' => 15,
-        'is_active' => true,
-        'is_default' => false,
+        'is_active'           => true,
+        'is_default'          => false,
     ];
 
     Livewire::actingAs($this->adminUser)

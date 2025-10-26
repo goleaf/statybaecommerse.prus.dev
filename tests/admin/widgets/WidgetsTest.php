@@ -31,7 +31,7 @@ final class WidgetsTest extends TestCase
 
         $this->adminUser = User::factory()->create([
             'email' => 'admin@test.com',
-            'name' => 'Admin User',
+            'name'  => 'Admin User',
         ]);
 
         // Give the user admin permissions
@@ -51,8 +51,8 @@ final class WidgetsTest extends TestCase
 
             // Create test data
             Order::factory()->count(5)->create([
-                'status' => 'completed',
-                'total' => 100.0,
+                'status'     => 'completed',
+                'total'      => 100.0,
                 'created_at' => now(),
             ]);
 
@@ -65,7 +65,7 @@ final class WidgetsTest extends TestCase
             ]);
 
             Review::factory()->count(8)->create([
-                'rating' => 4.5,
+                'rating'     => 4.5,
                 'created_at' => now(),
             ]);
 
@@ -84,17 +84,17 @@ final class WidgetsTest extends TestCase
         // Create orders with specific amounts
         Order::factory()->create([
             'status' => 'completed',
-            'total' => 150.0,  // €150.00
+            'total'  => 150.0,  // €150.00
         ]);
 
         Order::factory()->create([
             'status' => 'completed',
-            'total' => 250.0,  // €250.00
+            'total'  => 250.0,  // €250.00
         ]);
 
         Order::factory()->create([
             'status' => 'pending',
-            'total' => 100.0,  // Should not be counted
+            'total'  => 100.0,  // Should not be counted
         ]);
 
         $widget = new EnhancedEcommerceOverview;
@@ -139,12 +139,12 @@ final class WidgetsTest extends TestCase
 
         Order::factory()->create([
             'status' => 'completed',
-            'total' => 100.0,  // €100.00
+            'total'  => 100.0,  // €100.00
         ]);
 
         Order::factory()->create([
             'status' => 'completed',
-            'total' => 200.0,  // €200.00
+            'total'  => 200.0,  // €200.00
         ]);
 
         $widget = new EnhancedEcommerceOverview;
@@ -175,12 +175,12 @@ final class WidgetsTest extends TestCase
 
         // Create test orders
         Order::factory()->count(3)->create([
-            'total' => 10000,
+            'total'      => 10000,
             'created_at' => now()->subDays(5),
         ]);
 
         Order::factory()->count(2)->create([
-            'total' => 15000,
+            'total'      => 15000,
             'created_at' => now()->subDays(10),
         ]);
 
@@ -309,15 +309,15 @@ final class WidgetsTest extends TestCase
 
         // Current month orders
         Order::factory()->count(5)->create([
-            'status' => 'completed',
-            'total' => 100.0,
+            'status'     => 'completed',
+            'total'      => 100.0,
             'created_at' => now(),
         ]);
 
         // Previous month orders
         Order::factory()->count(3)->create([
-            'status' => 'completed',
-            'total' => 100.0,
+            'status'     => 'completed',
+            'total'      => 100.0,
             'created_at' => now()->subMonth(),
         ]);
 
@@ -339,14 +339,14 @@ final class WidgetsTest extends TestCase
 
         // Current month better than previous
         Order::factory()->count(5)->create([
-            'status' => 'completed',
-            'total' => 1000,  // Higher total for current month
+            'status'     => 'completed',
+            'total'      => 1000,  // Higher total for current month
             'created_at' => now(),
         ]);
 
         Order::factory()->count(3)->create([
-            'status' => 'completed',
-            'total' => 500,  // Lower total for previous month
+            'status'     => 'completed',
+            'total'      => 500,  // Lower total for previous month
             'created_at' => now()->subMonth(),
         ]);
 
@@ -365,14 +365,14 @@ final class WidgetsTest extends TestCase
 
         // Current month better than previous
         Order::factory()->count(5)->create([
-            'status' => 'completed',
-            'total' => 1000,  // Higher total for current month
+            'status'     => 'completed',
+            'total'      => 1000,  // Higher total for current month
             'created_at' => now(),
         ]);
 
         Order::factory()->count(3)->create([
-            'status' => 'completed',
-            'total' => 500,  // Lower total for previous month
+            'status'     => 'completed',
+            'total'      => 500,  // Lower total for previous month
             'created_at' => now()->subMonth(),
         ]);
 
@@ -399,13 +399,13 @@ final class WidgetsTest extends TestCase
 
         // Orders within last 30 days
         Order::factory()->count(3)->create([
-            'total' => 10000,
+            'total'      => 10000,
             'created_at' => now()->subDays(15),
         ]);
 
         // Orders older than 30 days (should be excluded)
         Order::factory()->count(2)->create([
-            'total' => 10000,
+            'total'      => 10000,
             'created_at' => now()->subDays(45),
         ]);
 

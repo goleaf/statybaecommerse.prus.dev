@@ -111,6 +111,7 @@ final class LegalTranslation extends Model
     {
         return $query->whereNotNull('slug')->where('slug', '!=', '');
     }
+
     // Accessors
     /**
      * Handle getFormattedTitleAttribute functionality with proper error handling.

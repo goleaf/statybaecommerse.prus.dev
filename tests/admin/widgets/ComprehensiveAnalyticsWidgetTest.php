@@ -59,15 +59,15 @@ class ComprehensiveAnalyticsWidgetTest extends TestCase
         // $variant = ProductVariant::factory()->create(['product_id' => $product->id]);
 
         $order = Order::factory()->create([
-            'user_id' => $user->id,
-            'total' => 100.00,
-            'status' => 'completed',
+            'user_id'    => $user->id,
+            'total'      => 100.00,
+            'status'     => 'completed',
             'created_at' => now(),
         ]);
 
         $review = Review::factory()->create([
             'product_id' => $product->id,
-            'rating' => 5,
+            'rating'     => 5,
             'created_at' => now(),
         ]);
 

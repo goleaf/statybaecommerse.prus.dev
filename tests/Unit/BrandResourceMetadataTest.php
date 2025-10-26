@@ -19,7 +19,7 @@ final class BrandResourceMetadataTest extends TestCase
     /**
      * The resource should remain bound to the Brand model class.
      */
-    public function testResourceReferencesBrandModel(): void
+    public function test_resource_references_brand_model(): void
     {
         $this->assertSame(Brand::class, BrandResource::getModel());
     }
@@ -27,11 +27,11 @@ final class BrandResourceMetadataTest extends TestCase
     /**
      * The customized query must skip the enabled and active global scopes so diagnostics can see every brand.
      */
-    public function testEloquentQueryIgnoresVisibilityScopes(): void
+    public function test_eloquent_query_ignores_visibility_scopes(): void
     {
         $disabledBrand = Brand::factory()->createQuietly([
             'is_enabled' => false,
-            'is_active' => false,
+            'is_active'  => false,
         ]);
 
         $this->assertTrue(

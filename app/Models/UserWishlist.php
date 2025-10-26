@@ -1,15 +1,17 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models;
 
 use App\Models\Scopes\UserOwnedScope;
 use Database\Factories\UserWishlistFactory;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
@@ -43,6 +45,7 @@ final class UserWishlist extends Model
 {
     /** @use HasFactory<UserWishlistFactory> */
     use HasFactory;
+
     use SoftDeletes;
 
     protected $fillable = ['user_id', 'name', 'description', 'is_public', 'is_default'];
@@ -55,7 +58,7 @@ final class UserWishlist extends Model
     protected function casts(): array
     {
         return [
-            'is_public' => 'boolean',
+            'is_public'  => 'boolean',
             'is_default' => 'boolean',
             'created_at' => 'datetime',
             'updated_at' => 'datetime',
@@ -96,7 +99,7 @@ final class UserWishlist extends Model
      */
     public function hasProduct(int $productId, ?int $variantId = null): bool
     {
-        return $this->items()->where('product_id', $productId)->when($variantId, fn($query) => $query->where('variant_id', $variantId))->exists();
+        return $this->items()->where('product_id', $productId)->when($variantId, fn ($query) => $query->where('variant_id', $variantId))->exists();
     }
 
     /**
@@ -108,8 +111,8 @@ final class UserWishlist extends Model
         $item = $this->items()->create([
             'product_id' => $productId,
             'variant_id' => $variantId,
-            'quantity' => $quantity,
-            'notes' => $notes,
+            'quantity'   => $quantity,
+            'notes'      => $notes,
         ]);
 
         return $item;
@@ -120,7 +123,7 @@ final class UserWishlist extends Model
      */
     public function removeProduct(int $productId, ?int $variantId = null): bool
     {
-        return $this->items()->where('product_id', $productId)->when($variantId, fn($query) => $query->where('variant_id', $variantId))->delete() > 0;
+        return $this->items()->where('product_id', $productId)->when($variantId, fn ($query) => $query->where('variant_id', $variantId))->delete() > 0;
     }
 
     /**

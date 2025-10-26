@@ -10,30 +10,30 @@ uses(Illuminate\Foundation\Testing\RefreshDatabase::class);
 beforeEach(function () {
     // Set up test data
     $this->country = Country::create([
-        'cca2' => 'LT',
-        'cca3' => 'LTU',
+        'cca2'               => 'LT',
+        'cca3'               => 'LTU',
         'phone_calling_code' => '370',
-        'flag' => '🇱🇹',
-        'region' => 'Europe',
-        'subregion' => 'Northern Europe',
-        'latitude' => 55.169438,
-        'longitude' => 23.881275,
-        'currencies' => ['EUR'],
-        'is_enabled' => true,
-        'sort_order' => 1,
+        'flag'               => '🇱🇹',
+        'region'             => 'Europe',
+        'subregion'          => 'Northern Europe',
+        'latitude'           => 55.169438,
+        'longitude'          => 23.881275,
+        'currencies'         => ['EUR'],
+        'is_enabled'         => true,
+        'sort_order'         => 1,
     ]);
 
     CountryTranslation::create([
-        'country_id' => $this->country->id,
-        'locale' => 'lt',
-        'name' => 'Lietuva',
+        'country_id'    => $this->country->id,
+        'locale'        => 'lt',
+        'name'          => 'Lietuva',
         'name_official' => 'Lietuvos Respublika',
     ]);
 
     CountryTranslation::create([
-        'country_id' => $this->country->id,
-        'locale' => 'en',
-        'name' => 'Lithuania',
+        'country_id'    => $this->country->id,
+        'locale'        => 'en',
+        'name'          => 'Lithuania',
         'name_official' => 'Republic of Lithuania',
     ]);
 });
@@ -223,9 +223,9 @@ it('enforces unique constraints on translations', function () {
     // Try to create duplicate translation
     expect(function () {
         CountryTranslation::create([
-            'country_id' => $this->country->id,
-            'locale' => 'lt',  // Duplicate locale for same country
-            'name' => 'Duplicate Lietuva',
+            'country_id'    => $this->country->id,
+            'locale'        => 'lt',  // Duplicate locale for same country
+            'name'          => 'Duplicate Lietuva',
             'name_official' => 'Duplicate Official',
         ]);
     })->toThrow(\Illuminate\Database\QueryException::class);

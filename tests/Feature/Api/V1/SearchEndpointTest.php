@@ -21,16 +21,16 @@ final class SearchEndpointTest extends TestCase
         $brand = Brand::factory()->create(['name' => 'Focus Brand', 'is_enabled' => true]);
 
         Product::factory()->create([
-            'name' => 'Alpha Hammer',
-            'brand_id' => $brand->id,
-            'is_visible' => true,
+            'name'         => 'Alpha Hammer',
+            'brand_id'     => $brand->id,
+            'is_visible'   => true,
             'published_at' => now()->subDay(),
         ]);
 
         Product::factory()->create([
-            'name' => 'Alpha Hammer Deluxe',
-            'brand_id' => $brand->id,
-            'is_visible' => true,
+            'name'         => 'Alpha Hammer Deluxe',
+            'brand_id'     => $brand->id,
+            'is_visible'   => true,
             'published_at' => now()->subDay(),
         ]);
 
@@ -49,21 +49,21 @@ final class SearchEndpointTest extends TestCase
         $brand = Brand::factory()->create(['name' => 'Secure Brand', 'is_enabled' => true]);
 
         Product::factory()->create([
-            'name' => 'Secure Drill',
-            'brand_id' => $brand->id,
-            'is_visible' => true,
+            'name'         => 'Secure Drill',
+            'brand_id'     => $brand->id,
+            'is_visible'   => true,
             'published_at' => now()->subDay(),
         ]);
 
         Product::factory()->create([
-            'name' => 'Unrelated Item',
-            'brand_id' => $brand->id,
-            'is_visible' => true,
+            'name'         => 'Unrelated Item',
+            'brand_id'     => $brand->id,
+            'is_visible'   => true,
             'published_at' => now()->subDay(),
         ]);
 
         $payload = [
-            'query' => "Secure%' OR 1=1 --",
+            'query'    => "Secure%' OR 1=1 --",
             'per_page' => 10,
         ];
 
@@ -81,9 +81,9 @@ final class SearchEndpointTest extends TestCase
         $category = Category::factory()->create(['name' => 'Limit Category', 'is_visible' => true]);
 
         $product = Product::factory()->create([
-            'name' => 'Limit Product',
-            'brand_id' => $brand->id,
-            'is_visible' => true,
+            'name'         => 'Limit Product',
+            'brand_id'     => $brand->id,
+            'is_visible'   => true,
             'published_at' => now()->subDay(),
         ]);
         $category->products()->attach($product);
@@ -113,8 +113,8 @@ final class SearchEndpointTest extends TestCase
     {
         $repository = app(ProductSearchRepository::class);
         $queryData = SearchQueryData::fromArray([
-            'query' => 'plan',
-            'page' => 1,
+            'query'    => 'plan',
+            'page'     => 1,
             'per_page' => 5,
         ], ['locale' => app()->getLocale()]);
 

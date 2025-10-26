@@ -12,16 +12,30 @@ final class JsonTranslationTabsHydrationTest extends TestCase
 {
     public function test_hydrates_default_locale_when_missing(): void
     {
-        $handler = new class {
+        $handler = new class
+        {
             use InteractsWithJsonTranslationTabs { hydrateFormWithTranslations as public traitHydrate; }
 
-            protected function getTranslatableFields(): array { return ['title']; }
-            protected function getAvailableLocales(): array { return ['lt', 'en']; }
-            protected function getDefaultLocale(): string { return 'lt'; }
+            protected function getTranslatableFields(): array
+            {
+                return ['title'];
+            }
+
+            protected function getAvailableLocales(): array
+            {
+                return ['lt', 'en'];
+            }
+
+            protected function getDefaultLocale(): string
+            {
+                return 'lt';
+            }
         };
 
-        $record = new class extends Model {
+        $record = new class extends Model
+        {
             public $title = 'DefaultTitle';
+
             public $title_translations = ['en' => 'TitleEn'];
         };
 
@@ -32,4 +46,3 @@ final class JsonTranslationTabsHydrationTest extends TestCase
         self::assertSame('TitleEn', $data['title']['en']);
     }
 }
-

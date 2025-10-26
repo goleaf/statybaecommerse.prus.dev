@@ -52,7 +52,7 @@ class CampaignPerformanceWidgetTest extends TestCase
     {
         // Create sample campaign data
         $campaign = Campaign::factory()->create([
-            'name' => 'Test Campaign',
+            'name'   => 'Test Campaign',
             'status' => 'active',
         ]);
 

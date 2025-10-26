@@ -20,12 +20,12 @@ final class AdminPresetDiscountsSeeder extends Seeder
         if ($vipGroup) {
             $vipDiscount = Discount::factory()
                 ->state([
-                    'name' => 'VIP 12% Off',
-                    'code' => 'VIP12',
-                    'type' => 'percentage',
-                    'value' => 12.0,
-                    'priority' => 20,
-                    'exclusive' => false,
+                    'name'            => 'VIP 12% Off',
+                    'code'            => 'VIP12',
+                    'type'            => 'percentage',
+                    'value'           => 12.0,
+                    'priority'        => 20,
+                    'exclusive'       => false,
                     'stacking_policy' => 'single_best',
                 ])
                 ->create();
@@ -33,9 +33,9 @@ final class AdminPresetDiscountsSeeder extends Seeder
             // Create condition for customer group if model supports it
             if (method_exists($vipDiscount, 'conditions')) {
                 $vipDiscount->conditions()->create([
-                    'type' => 'customer_group',
+                    'type'     => 'customer_group',
                     'operator' => 'equals_to',
-                    'value' => json_encode([$vipGroup->id]),
+                    'value'    => json_encode([$vipGroup->id]),
                     'position' => 0,
                 ]);
             }

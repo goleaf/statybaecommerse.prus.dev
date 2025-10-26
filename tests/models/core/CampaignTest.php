@@ -28,18 +28,18 @@ final class CampaignTest extends TestCase
     public function test_campaign_can_be_created(): void
     {
         $campaign = Campaign::factory()->create([
-            'name' => 'Test Campaign',
-            'status' => 'active',
+            'name'     => 'Test Campaign',
+            'status'   => 'active',
             'metadata' => [
-                'type' => 'email',
+                'type'   => 'email',
                 'budget' => 1000.0,
                 'source' => 'manual',
-                'tags' => ['test'],
+                'tags'   => ['test'],
             ],
         ]);
 
         $this->assertDatabaseHas('discount_campaigns', [
-            'name' => 'Test Campaign',
+            'name'   => 'Test Campaign',
             'status' => 'active',
         ]);
 
@@ -55,8 +55,8 @@ final class CampaignTest extends TestCase
 
         $translation = CampaignTranslation::factory()->create([
             'campaign_id' => $campaign->id,
-            'locale' => 'en',
-            'name' => 'English Name',
+            'locale'      => 'en',
+            'name'        => 'English Name',
             'description' => 'English Description',
         ]);
 
@@ -184,9 +184,9 @@ final class CampaignTest extends TestCase
     public function test_active_scope(): void
     {
         $activeCampaign = Campaign::factory()->create([
-            'status' => 'active',
+            'status'    => 'active',
             'starts_at' => now()->subDay(),
-            'ends_at' => now()->addDay(),
+            'ends_at'   => now()->addDay(),
         ]);
 
         $inactiveCampaign = Campaign::factory()->create([
@@ -194,9 +194,9 @@ final class CampaignTest extends TestCase
         ]);
 
         $expiredCampaign = Campaign::factory()->create([
-            'status' => 'active',
+            'status'    => 'active',
             'starts_at' => now()->subDay(),
-            'ends_at' => now()->subHour(),
+            'ends_at'   => now()->subHour(),
         ]);
 
         $activeCampaigns = Campaign::active()->get();
@@ -224,12 +224,12 @@ final class CampaignTest extends TestCase
         ]);
 
         $expiredByDate = Campaign::factory()->create([
-            'status' => 'active',
+            'status'  => 'active',
             'ends_at' => now()->subDay(),
         ]);
 
         $activeCampaign = Campaign::factory()->create([
-            'status' => 'active',
+            'status'  => 'active',
             'ends_at' => now()->addDay(),
         ]);
 
@@ -313,9 +313,9 @@ final class CampaignTest extends TestCase
     public function test_is_active_method(): void
     {
         $activeCampaign = Campaign::factory()->create([
-            'status' => 'active',
+            'status'    => 'active',
             'starts_at' => now()->subDay(),
-            'ends_at' => now()->addDay(),
+            'ends_at'   => now()->addDay(),
         ]);
 
         $inactiveCampaign = Campaign::factory()->create([
@@ -343,12 +343,12 @@ final class CampaignTest extends TestCase
     public function test_is_scheduled_method(): void
     {
         $scheduledCampaign = Campaign::factory()->create([
-            'status' => 'scheduled',
+            'status'    => 'scheduled',
             'starts_at' => now()->addDay(),
         ]);
 
         $activeCampaign = Campaign::factory()->create([
-            'status' => 'active',
+            'status'    => 'active',
             'starts_at' => now()->subDay(),
         ]);
 
@@ -359,17 +359,17 @@ final class CampaignTest extends TestCase
     public function test_is_within_budget_method(): void
     {
         $campaignWithinBudget = Campaign::factory()->create([
-            'budget_limit' => 1000,
+            'budget_limit'  => 1000,
             'total_revenue' => 500,
         ]);
 
         $campaignOverBudget = Campaign::factory()->create([
-            'budget_limit' => 1000,
+            'budget_limit'  => 1000,
             'total_revenue' => 1200,
         ]);
 
         $campaignNoLimit = Campaign::factory()->create([
-            'budget_limit' => null,
+            'budget_limit'  => null,
             'total_revenue' => 500,
         ]);
 
@@ -381,7 +381,7 @@ final class CampaignTest extends TestCase
     public function test_get_click_through_rate_method(): void
     {
         $campaign = Campaign::factory()->create([
-            'total_views' => 1000,
+            'total_views'  => 1000,
             'total_clicks' => 50,
         ]);
 
@@ -391,7 +391,7 @@ final class CampaignTest extends TestCase
     public function test_get_click_through_rate_with_zero_views(): void
     {
         $campaign = Campaign::factory()->create([
-            'total_views' => 0,
+            'total_views'  => 0,
             'total_clicks' => 50,
         ]);
 
@@ -401,7 +401,7 @@ final class CampaignTest extends TestCase
     public function test_get_conversion_rate_method(): void
     {
         $campaign = Campaign::factory()->create([
-            'total_clicks' => 100,
+            'total_clicks'      => 100,
             'total_conversions' => 5,
         ]);
 
@@ -411,7 +411,7 @@ final class CampaignTest extends TestCase
     public function test_get_conversion_rate_with_zero_clicks(): void
     {
         $campaign = Campaign::factory()->create([
-            'total_clicks' => 0,
+            'total_clicks'      => 0,
             'total_conversions' => 5,
         ]);
 
@@ -421,7 +421,7 @@ final class CampaignTest extends TestCase
     public function test_get_roi_method(): void
     {
         $campaign = Campaign::factory()->create([
-            'budget_limit' => 1000,
+            'budget_limit'  => 1000,
             'total_revenue' => 1200,
         ]);
 
@@ -431,7 +431,7 @@ final class CampaignTest extends TestCase
     public function test_get_roi_with_zero_budget(): void
     {
         $campaign = Campaign::factory()->create([
-            'budget_limit' => 0,
+            'budget_limit'  => 0,
             'total_revenue' => 1200,
         ]);
 
@@ -446,10 +446,10 @@ final class CampaignTest extends TestCase
 
         $this->assertDatabaseHas('campaign_views', [
             'campaign_id' => $campaign->id,
-            'session_id' => 'session123',
-            'ip_address' => '192.168.1.1',
-            'user_agent' => 'Mozilla/5.0',
-            'referer' => 'https://example.com',
+            'session_id'  => 'session123',
+            'ip_address'  => '192.168.1.1',
+            'user_agent'  => 'Mozilla/5.0',
+            'referer'     => 'https://example.com',
             'customer_id' => 1,
         ]);
 
@@ -464,10 +464,10 @@ final class CampaignTest extends TestCase
 
         $this->assertDatabaseHas('campaign_clicks', [
             'campaign_id' => $campaign->id,
-            'session_id' => 'session123',
-            'ip_address' => '192.168.1.1',
-            'user_agent' => 'Mozilla/5.0',
-            'click_type' => 'cta',
+            'session_id'  => 'session123',
+            'ip_address'  => '192.168.1.1',
+            'user_agent'  => 'Mozilla/5.0',
+            'click_type'  => 'cta',
             'clicked_url' => 'https://example.com',
             'customer_id' => 1,
         ]);
@@ -479,19 +479,19 @@ final class CampaignTest extends TestCase
     {
         $campaign = Campaign::factory()->create([
             'total_conversions' => 0,
-            'total_revenue' => 0,
+            'total_revenue'     => 0,
         ]);
 
         $campaign->recordConversion('purchase', 100.5, 1, 1, 'session123', ['order_total' => 100.5]);
 
         $this->assertDatabaseHas('campaign_conversions', [
-            'campaign_id' => $campaign->id,
-            'order_id' => 1,
-            'customer_id' => 1,
-            'conversion_type' => 'purchase',
+            'campaign_id'      => $campaign->id,
+            'order_id'         => 1,
+            'customer_id'      => 1,
+            'conversion_type'  => 'purchase',
             'conversion_value' => 100.5,
-            'session_id' => 'session123',
-            'conversion_data' => json_encode(['order_total' => 100.5]),
+            'session_id'       => 'session123',
+            'conversion_data'  => json_encode(['order_total' => 100.5]),
         ]);
 
         $freshCampaign = $campaign->fresh();
@@ -580,7 +580,7 @@ final class CampaignTest extends TestCase
     {
         $campaign = Campaign::factory()->create([
             'start_date' => now()->subDays(10),
-            'end_date' => now()->addDays(5),
+            'end_date'   => now()->addDays(5),
         ]);
         $this->assertEquals(15, $campaign->duration);
 
@@ -604,7 +604,7 @@ final class CampaignTest extends TestCase
     {
         $campaign = Campaign::factory()->create([
             'start_date' => now()->subDays(5),
-            'end_date' => now()->addDays(5),
+            'end_date'   => now()->addDays(5),
         ]);
         $this->assertEquals(50.0, $campaign->progress_percentage);
 
@@ -615,7 +615,7 @@ final class CampaignTest extends TestCase
     public function test_budget_utilization_accessor(): void
     {
         $campaign = Campaign::factory()->create([
-            'budget_limit' => 1000,
+            'budget_limit'  => 1000,
             'total_revenue' => 500,
         ]);
         $this->assertEquals(50.0, $campaign->budget_utilization);
@@ -627,11 +627,11 @@ final class CampaignTest extends TestCase
     public function test_performance_score_accessor(): void
     {
         $campaign = Campaign::factory()->create([
-            'total_views' => 1000,
-            'total_clicks' => 100,
+            'total_views'       => 1000,
+            'total_clicks'      => 100,
             'total_conversions' => 10,
-            'budget_limit' => 1000,
-            'total_revenue' => 1200,
+            'budget_limit'      => 1000,
+            'total_revenue'     => 1200,
         ]);
 
         $score = $campaign->performance_score;
@@ -643,11 +643,11 @@ final class CampaignTest extends TestCase
     public function test_performance_grade_accessor(): void
     {
         $highPerformingCampaign = Campaign::factory()->create([
-            'total_views' => 1000,
-            'total_clicks' => 200,
+            'total_views'       => 1000,
+            'total_clicks'      => 200,
             'total_conversions' => 50,
-            'budget_limit' => 1000,
-            'total_revenue' => 2000,
+            'budget_limit'      => 1000,
+            'total_revenue'     => 2000,
         ]);
         $this->assertContains($highPerformingCampaign->performance_grade, ['A+', 'A', 'B+', 'B', 'C+', 'C', 'D', 'F']);
     }
@@ -661,10 +661,10 @@ final class CampaignTest extends TestCase
     public function test_get_statistics_method(): void
     {
         $campaign = Campaign::factory()->create([
-            'total_views' => 1000,
-            'total_clicks' => 100,
+            'total_views'       => 1000,
+            'total_clicks'      => 100,
             'total_conversions' => 10,
-            'total_revenue' => 1000,
+            'total_revenue'     => 1000,
         ]);
 
         $statistics = $campaign->getStatistics();
@@ -703,19 +703,19 @@ final class CampaignTest extends TestCase
     public function test_is_high_performing_method(): void
     {
         $highPerformingCampaign = Campaign::factory()->create([
-            'total_views' => 1000,
-            'total_clicks' => 200,
+            'total_views'       => 1000,
+            'total_clicks'      => 200,
             'total_conversions' => 50,
-            'budget_limit' => 1000,
-            'total_revenue' => 2000,
+            'budget_limit'      => 1000,
+            'total_revenue'     => 2000,
         ]);
 
         $lowPerformingCampaign = Campaign::factory()->create([
-            'total_views' => 1000,
-            'total_clicks' => 10,
+            'total_views'       => 1000,
+            'total_clicks'      => 10,
             'total_conversions' => 1,
-            'budget_limit' => 1000,
-            'total_revenue' => 100,
+            'budget_limit'      => 1000,
+            'total_revenue'     => 100,
         ]);
 
         $this->assertTrue($highPerformingCampaign->isHighPerforming());
@@ -725,19 +725,19 @@ final class CampaignTest extends TestCase
     public function test_is_underperforming_method(): void
     {
         $underperformingCampaign = Campaign::factory()->create([
-            'total_views' => 1000,
-            'total_clicks' => 5,
+            'total_views'       => 1000,
+            'total_clicks'      => 5,
             'total_conversions' => 0,
-            'budget_limit' => 1000,
-            'total_revenue' => 0,
+            'budget_limit'      => 1000,
+            'total_revenue'     => 0,
         ]);
 
         $goodCampaign = Campaign::factory()->create([
-            'total_views' => 1000,
-            'total_clicks' => 100,
+            'total_views'       => 1000,
+            'total_clicks'      => 100,
             'total_conversions' => 10,
-            'budget_limit' => 1000,
-            'total_revenue' => 1000,
+            'budget_limit'      => 1000,
+            'total_revenue'     => 1000,
         ]);
 
         $this->assertTrue($underperformingCampaign->isUnderperforming());
@@ -747,19 +747,19 @@ final class CampaignTest extends TestCase
     public function test_needs_attention_method(): void
     {
         $campaignNeedingAttention = Campaign::factory()->create([
-            'total_views' => 1000,
-            'total_clicks' => 5,
+            'total_views'       => 1000,
+            'total_clicks'      => 5,
             'total_conversions' => 0,
-            'budget_limit' => 1000,
-            'total_revenue' => 950, // High budget utilization
+            'budget_limit'      => 1000,
+            'total_revenue'     => 950, // High budget utilization
         ]);
 
         $goodCampaign = Campaign::factory()->create([
-            'total_views' => 1000,
-            'total_clicks' => 100,
+            'total_views'       => 1000,
+            'total_clicks'      => 100,
             'total_conversions' => 10,
-            'budget_limit' => 1000,
-            'total_revenue' => 500,
+            'budget_limit'      => 1000,
+            'total_revenue'     => 500,
         ]);
 
         $this->assertTrue($campaignNeedingAttention->needsAttention());
@@ -798,12 +798,12 @@ final class CampaignTest extends TestCase
     public function test_can_be_completed_method(): void
     {
         $expiredActiveCampaign = Campaign::factory()->create([
-            'status' => 'active',
+            'status'   => 'active',
             'end_date' => now()->subDay(),
         ]);
 
         $activeCampaign = Campaign::factory()->create([
-            'status' => 'active',
+            'status'   => 'active',
             'end_date' => now()->addDay(),
         ]);
 
@@ -814,14 +814,14 @@ final class CampaignTest extends TestCase
     public function test_get_recommended_actions_method(): void
     {
         $campaign = Campaign::factory()->create([
-            'total_views' => 1000,
-            'total_clicks' => 5,
+            'total_views'       => 1000,
+            'total_clicks'      => 5,
             'total_conversions' => 1,
-            'budget_limit' => 1000,
-            'total_revenue' => 950,
-            'end_date' => now()->addDays(3),
-            'cta_text' => null,
-            'content' => 'Short',
+            'budget_limit'      => 1000,
+            'total_revenue'     => 950,
+            'end_date'          => now()->addDays(3),
+            'cta_text'          => null,
+            'content'           => 'Short',
         ]);
 
         $actions = $campaign->getRecommendedActions();
@@ -839,13 +839,13 @@ final class CampaignTest extends TestCase
     public function test_duplicate_for_new_period_method(): void
     {
         $originalCampaign = Campaign::factory()->create([
-            'name' => 'Original Campaign',
-            'slug' => 'original-campaign',
-            'status' => 'active',
-            'total_views' => 100,
-            'total_clicks' => 10,
+            'name'              => 'Original Campaign',
+            'slug'              => 'original-campaign',
+            'status'            => 'active',
+            'total_views'       => 100,
+            'total_clicks'      => 10,
             'total_conversions' => 1,
-            'total_revenue' => 100,
+            'total_revenue'     => 100,
         ]);
 
         $newStartDate = now()->addDays(30);
@@ -893,10 +893,10 @@ final class CampaignTest extends TestCase
     public function test_get_content_summary_method(): void
     {
         $campaign = Campaign::factory()->create([
-            'subject' => 'Test Subject',
-            'content' => '<p>This is a test content with more than 100 characters to test the content length calculation properly.</p>',
-            'cta_text' => 'Click Here',
-            'cta_url' => 'https://example.com',
+            'subject'      => 'Test Subject',
+            'content'      => '<p>This is a test content with more than 100 characters to test the content length calculation properly.</p>',
+            'cta_text'     => 'Click Here',
+            'cta_url'      => 'https://example.com',
             'banner_image' => 'banner.jpg',
         ]);
 
@@ -913,13 +913,13 @@ final class CampaignTest extends TestCase
     public function test_get_automation_summary_method(): void
     {
         $campaign = Campaign::factory()->create([
-            'auto_start' => true,
-            'auto_end' => false,
+            'auto_start'           => true,
+            'auto_end'             => false,
             'auto_pause_on_budget' => true,
-            'send_notifications' => true,
-            'track_conversions' => false,
-            'is_featured' => true,
-            'social_media_ready' => false,
+            'send_notifications'   => true,
+            'track_conversions'    => false,
+            'is_featured'          => true,
+            'social_media_ready'   => false,
         ]);
 
         $summary = $campaign->getAutomationSummary();

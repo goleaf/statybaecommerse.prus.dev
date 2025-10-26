@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Services;
 
-use ArrayObject;
 use App\Services\DataFilteringService;
+use ArrayObject;
 use Illuminate\Support\Collection;
 use PHPUnit\Framework\TestCase;
 
@@ -16,7 +16,7 @@ final class DataFilteringServiceTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->service = new DataFilteringService();
+        $this->service = new DataFilteringService;
     }
 
     public function test_filter_quality_products_removes_invalid_entries_regardless_of_position(): void
@@ -24,53 +24,53 @@ final class DataFilteringServiceTest extends TestCase
         $products = Collection::make([
             // Leading invalid product should be discarded.
             [
-                'id' => 1,
-                'name' => '',
-                'is_visible' => true,
-                'price' => 10.0,
-                'slug' => 'placeholder-product',
+                'id'             => 1,
+                'name'           => '',
+                'is_visible'     => true,
+                'price'          => 10.0,
+                'slug'           => 'placeholder-product',
                 'stock_quantity' => 5,
-                'is_published' => true,
+                'is_published'   => true,
             ],
             // First valid product should be retained.
             [
-                'id' => 2,
-                'name' => 'Starter Pack',
-                'is_visible' => true,
-                'price' => 15.0,
-                'slug' => 'starter-pack',
+                'id'             => 2,
+                'name'           => 'Starter Pack',
+                'is_visible'     => true,
+                'price'          => 15.0,
+                'slug'           => 'starter-pack',
                 'stock_quantity' => 10,
-                'is_published' => true,
+                'is_published'   => true,
             ],
             // Mid-collection invalid entry previously slipped through the skipWhile gate.
             [
-                'id' => 3,
-                'name' => 'Hidden Bundle',
-                'is_visible' => false,
-                'price' => 25.0,
-                'slug' => 'hidden-bundle',
+                'id'             => 3,
+                'name'           => 'Hidden Bundle',
+                'is_visible'     => false,
+                'price'          => 25.0,
+                'slug'           => 'hidden-bundle',
                 'stock_quantity' => 2,
-                'is_published' => true,
+                'is_published'   => true,
             ],
             // Trailing valid item ensures we retain all good data points.
             [
-                'id' => 4,
-                'name' => 'Premium Pack',
-                'is_visible' => true,
-                'price' => 45.0,
-                'slug' => 'premium-pack',
+                'id'             => 4,
+                'name'           => 'Premium Pack',
+                'is_visible'     => true,
+                'price'          => 45.0,
+                'slug'           => 'premium-pack',
                 'stock_quantity' => 3,
-                'is_published' => true,
+                'is_published'   => true,
             ],
             // Trailing invalid item should be filtered as well.
             [
-                'id' => 5,
-                'name' => 'Sold Out Edition',
-                'is_visible' => true,
-                'price' => 30.0,
-                'slug' => 'sold-out-edition',
+                'id'             => 5,
+                'name'           => 'Sold Out Edition',
+                'is_visible'     => true,
+                'price'          => 30.0,
+                'slug'           => 'sold-out-edition',
                 'stock_quantity' => 0,
-                'is_published' => true,
+                'is_published'   => true,
             ],
         ]);
 
@@ -83,33 +83,33 @@ final class DataFilteringServiceTest extends TestCase
     {
         $items = Collection::make([
             [
-                'id' => 11,
-                'price' => 5,
+                'id'       => 11,
+                'price'    => 5,
                 'category' => 'electronics',
                 'in_stock' => true,
             ],
             [
-                'id' => 12,
-                'price' => 55,
+                'id'       => 12,
+                'price'    => 55,
                 'category' => 'electronics',
                 'in_stock' => false,
             ],
             [
-                'id' => 13,
-                'price' => 75,
+                'id'       => 13,
+                'price'    => 75,
                 'category' => 'gaming',
                 'in_stock' => true,
             ],
             [
-                'id' => 14,
-                'price' => 85,
+                'id'       => 14,
+                'price'    => 85,
                 'category' => 'electronics',
                 'in_stock' => true,
             ],
         ]);
 
         $criteria = [
-            'price' => ['min' => 50, 'max' => 100],
+            'price'    => ['min' => 50, 'max' => 100],
             'category' => 'electronics',
             'in_stock' => true,
         ];
@@ -124,17 +124,17 @@ final class DataFilteringServiceTest extends TestCase
         $products = Collection::make([
             // Object payload should be considered within range.
             (object) [
-                'id' => 101,
+                'id'    => 101,
                 'price' => 24.99,
             ],
             // ArrayAccess payload demonstrates support for offset-based lookups.
             new ArrayObject([
-                'id' => 102,
+                'id'    => 102,
                 'price' => 30.01,
             ]),
             // Array payload verifies upper bound handling.
             [
-                'id' => 103,
+                'id'    => 103,
                 'price' => 18.50,
             ],
         ]);

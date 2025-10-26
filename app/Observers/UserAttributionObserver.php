@@ -129,7 +129,7 @@ final class UserAttributionObserver
 
         $table = $model->getTable();
         $connectionName = $model->getConnectionName() ?? config('database.default');
-        $cacheKey = $connectionName.'::'.$table;
+        $cacheKey = $connectionName . '::' . $table;
 
         if (! array_key_exists($cacheKey, $columnCache)) {
             $columnCache[$cacheKey] = Schema::connection($connectionName)->getColumnListing($table);

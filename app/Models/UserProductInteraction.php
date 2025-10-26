@@ -5,17 +5,12 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Models\Concerns\OrdersByName;
-use App\Models\Product;
-use App\Models\ProductVariant;
-use App\Models\Scopes\ActiveScope;
-use App\Models\Scopes\PublishedScope;
-use App\Models\Scopes\VisibleScope;
-use App\Models\User;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
+use JsonException;
 
 /**
  * UserProductInteraction
@@ -51,7 +46,7 @@ final class UserProductInteraction extends Model
      * Attribute casting rules for the consolidated payload fields.
      */
     protected $casts = [
-        'meta' => 'array',
+        'meta'        => 'array',
         'occurred_at' => 'datetime',
     ];
 
@@ -59,7 +54,7 @@ final class UserProductInteraction extends Model
      * Normalise legacy payloads before the base fill logic runs so both the
      * new and old attribute names hydrate correctly.
      *
-     * @param  array<string,mixed>  $attributes
+     * @param array<string,mixed> $attributes
      */
     public function fill(array $attributes)
     {
@@ -80,7 +75,7 @@ final class UserProductInteraction extends Model
      * Convert legacy attribute keys into their modern counterparts and collect
      * any column assignments that should bypass mass-assignment protections.
      *
-     * @param  array<string,mixed>  $attributes
+     * @param  array<string,mixed>                                   $attributes
      * @return array{0: array<string,mixed>, 1: array<string,mixed>}
      */
     private function mapLegacyAttributes(array $attributes): array
@@ -141,7 +136,7 @@ final class UserProductInteraction extends Model
                 if (is_string($value) && $value !== '') {
                     try {
                         $decoded = json_decode($value, true, 512, JSON_THROW_ON_ERROR) ?: [];
-                    } catch (\JsonException $exception) {
+                    } catch (JsonException $exception) {
                         $decoded = [];
                     }
                 } elseif (is_array($value)) {
@@ -165,7 +160,7 @@ final class UserProductInteraction extends Model
 
                 try {
                     $encoded = $metaArray === [] ? null : json_encode($metaArray, JSON_THROW_ON_ERROR);
-                } catch (\JsonException $exception) {
+                } catch (JsonException $exception) {
                     $encoded = json_encode($metaArray);
                 }
 
@@ -222,7 +217,7 @@ final class UserProductInteraction extends Model
                 $carbon = $value instanceof Carbon ? $value : ($value !== null ? Carbon::parse((string) $value) : null);
 
                 return [
-                    'occurred_at' => $carbon,
+                    'occurred_at'      => $carbon,
                     'last_interaction' => $carbon,
                 ];
             }
@@ -335,9 +330,9 @@ final class UserProductInteraction extends Model
         $meta['last_interaction'] = now();
 
         $this->update([
-            'occurred_at' => now(),
-            'meta' => $meta,
-            'rating' => $meta['rating'],
+            'occurred_at'      => now(),
+            'meta'             => $meta,
+            'rating'           => $meta['rating'],
             'last_interaction' => $meta['last_interaction'],
         ]);
     }

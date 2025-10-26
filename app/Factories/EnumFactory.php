@@ -12,6 +12,7 @@ use App\Enums\PaymentType;
 use App\Enums\ProductStatus;
 use App\Enums\UserRole;
 use InvalidArgumentException;
+use ValueError;
 
 final class EnumFactory
 {
@@ -28,7 +29,7 @@ final class EnumFactory
 
         try {
             return $enumClass::from($value);
-        } catch (\ValueError $e) {
+        } catch (ValueError $e) {
             throw new InvalidArgumentException("Invalid value '{$value}' for enum '{$enumName}'");
         }
     }
@@ -102,7 +103,7 @@ final class EnumFactory
 
         // Apply custom validation rules
         foreach ($rules as $rule => $expected) {
-            $method = 'is'.ucfirst($rule);
+            $method = 'is' . ucfirst($rule);
 
             if (method_exists($enum, $method)) {
                 $actual = $enum->$method();
@@ -274,13 +275,13 @@ final class EnumFactory
     private static function getEnumClass(string $enumName): ?string
     {
         return match ($enumName) {
-            'address_type' => AddressType::class,
+            'address_type'     => AddressType::class,
             'navigation_group' => NavigationGroup::class,
-            'order_status' => OrderStatus::class,
-            'payment_type' => PaymentType::class,
-            'product_status' => ProductStatus::class,
-            'user_role' => UserRole::class,
-            default => null,
+            'order_status'     => OrderStatus::class,
+            'payment_type'     => PaymentType::class,
+            'product_status'   => ProductStatus::class,
+            'user_role'        => UserRole::class,
+            default            => null,
         };
     }
 

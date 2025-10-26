@@ -20,4 +20,3 @@ final class DiscountCodeRemoveRequest extends FormRequest
         ];
     }
 }
-

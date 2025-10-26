@@ -54,10 +54,10 @@ final class FixSimpleFilamentIssuesCommand extends Command
         $errors = [];
 
         foreach ($criticalResources as $resource) {
-            $file = base_path('app/Filament/Resources/'.$resource.'.php');
+            $file = base_path('app/Filament/Resources/' . $resource . '.php');
 
             if (! file_exists($file)) {
-                $this->error('❌ File not found: '.$file);
+                $this->error('❌ File not found: ' . $file);
 
                 continue;
             }
@@ -65,7 +65,7 @@ final class FixSimpleFilamentIssuesCommand extends Command
             $content = file_get_contents($file) ?: '';
             $originalContent = $content;
 
-            $this->output->write('Processing: '.$resource.'... ');
+            $this->output->write('Processing: ' . $resource . '... ');
 
             $lines = explode(PHP_EOL, $content);
             $uniqueImports = [];
@@ -95,7 +95,7 @@ final class FixSimpleFilamentIssuesCommand extends Command
                     $fixedFiles[] = $file;
                     $this->info('✅ FIXED');
                 } else {
-                    $errors[] = '❌ Failed to write: '.$file;
+                    $errors[] = '❌ Failed to write: ' . $file;
                     $this->error('❌ WRITE ERROR');
                 }
             } else {
@@ -105,15 +105,15 @@ final class FixSimpleFilamentIssuesCommand extends Command
 
         $this->newline();
         $this->line('=== SUMMARY ===');
-        $this->line('Files fixed: '.count($fixedFiles));
-        $this->line('Errors: '.count($errors));
+        $this->line('Files fixed: ' . count($fixedFiles));
+        $this->line('Errors: ' . count($errors));
 
         if ($fixedFiles !== []) {
             $this->newline();
             $this->line('Fixed files:');
 
             foreach ($fixedFiles as $file) {
-                $this->line('- '.basename($file));
+                $this->line('- ' . basename($file));
             }
         }
 
@@ -139,21 +139,21 @@ final class FixSimpleFilamentIssuesCommand extends Command
             exec(sprintf('php -l %s 2>&1', escapeshellarg($file)), $output, $returnCode);
 
             if ($returnCode !== 0) {
-                $syntaxErrors[] = basename($file).': '.implode(' ', $output);
+                $syntaxErrors[] = basename($file) . ': ' . implode(' ', $output);
             } else {
                 $syntaxOk[] = basename($file);
             }
         }
 
-        $this->line('✅ Files with valid syntax: '.count($syntaxOk));
-        $this->line('❌ Files with syntax errors: '.count($syntaxErrors));
+        $this->line('✅ Files with valid syntax: ' . count($syntaxOk));
+        $this->line('❌ Files with syntax errors: ' . count($syntaxErrors));
 
         if ($syntaxErrors !== []) {
             $this->newline();
             $this->line('Syntax errors found:');
 
             foreach ($syntaxErrors as $error) {
-                $this->error('- '.$error);
+                $this->error('- ' . $error);
             }
         }
 

@@ -22,14 +22,14 @@ final class ReferralStatisticsFactory extends Factory
         $pendingReferrals = max(0, $totalReferrals - $completedReferrals);
 
         return [
-            'user_id' => User::factory(),
-            'date' => now()->toDateString(),
-            'total_referrals' => $totalReferrals,
-            'completed_referrals' => $completedReferrals,
-            'pending_referrals' => $pendingReferrals,
-            'total_rewards_earned' => fake()->randomFloat(2, 0, 1000),
+            'user_id'               => User::factory(),
+            'date'                  => now()->toDateString(),
+            'total_referrals'       => $totalReferrals,
+            'completed_referrals'   => $completedReferrals,
+            'pending_referrals'     => $pendingReferrals,
+            'total_rewards_earned'  => fake()->randomFloat(2, 0, 1000),
             'total_discounts_given' => fake()->randomFloat(2, 0, 1000),
-            'metadata' => [],
+            'metadata'              => [],
         ];
     }
 }

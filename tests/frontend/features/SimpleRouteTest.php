@@ -344,7 +344,7 @@ class SimpleRouteTest extends TestCase
     {
         // Test POST without CSRF token (should fail)
         $response = $this->post('/api/discount-codes/validate', [
-            'code' => 'TEST_CODE',
+            'code'   => 'TEST_CODE',
             'amount' => 100.00,
         ], [
             'X-CSRF-TOKEN' => 'invalid-token',

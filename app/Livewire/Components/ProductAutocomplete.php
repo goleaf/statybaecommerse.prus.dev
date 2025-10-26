@@ -14,17 +14,17 @@ use Livewire\Component;
  *
  * Livewire component for ProductAutocomplete with reactive frontend functionality, real-time updates, and user interaction handling.
  *
- * @property string $query
- * @property array $results
- * @property bool $showResults
- * @property int $maxResults
- * @property int $minQueryLength
- * @property bool $isSearching
+ * @property string   $query
+ * @property array    $results
+ * @property bool     $showResults
+ * @property int      $maxResults
+ * @property int      $minQueryLength
+ * @property bool     $isSearching
  * @property int|null $selectedProductId
- * @property string $selectedProductName
- * @property bool $required
- * @property string $placeholder
- * @property string $name
+ * @property string   $selectedProductName
+ * @property bool     $required
+ * @property string   $placeholder
+ * @property string   $name
  */
 final class ProductAutocomplete extends Component
 {

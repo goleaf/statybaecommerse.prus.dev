@@ -7,15 +7,15 @@ use Tests\TestCase;
 uses(TestCase::class);
 
 /**
- * @param class-string $modelClass
+ * @param class-string     $modelClass
  * @param non-empty-string $relation
- * @param class-string $expectedRelationClass
+ * @param class-string     $expectedRelationClass
  */
 it('exposes expected relation accessors', function (string $modelClass, string $relation, string $expectedRelationClass): void {
     /** @var class-string $modelClass */
     $modelClass = $modelClass;
 
-    $model = new $modelClass();
+    $model = new $modelClass;
 
     /** @var class-string $expectedRelationClass */
     $expectedRelationClass = $expectedRelationClass;

@@ -33,7 +33,7 @@ final class CategoryDocsImporter
                 if ($item === '.' || $item === '..') {
                     continue;
                 }
-                $fullPath = $path.DIRECTORY_SEPARATOR.$item;
+                $fullPath = $path . DIRECTORY_SEPARATOR . $item;
                 if (is_dir($fullPath)) {
                     $name = Str::of($item)->replace(['_', '-'], ' ')->title()->value();
                     $slug = $this->buildSlugFromPath($fullPath, $normalizedBasePath);
@@ -86,7 +86,7 @@ final class CategoryDocsImporter
      */
     private function buildSlugFromPath(string $path, string $basePath): string
     {
-        $relative = Str::of($path)->replaceFirst(rtrim($basePath, DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR, '')->value();
+        $relative = Str::of($path)->replaceFirst(rtrim($basePath, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR, '')->value();
         $relative = Str::of($relative)->replace(['\\', '/'], '-')->value();
         $relative = Str::of($relative)->replace('.md', '')->value();
         $slug = Str::slug($relative);
@@ -94,7 +94,7 @@ final class CategoryDocsImporter
         $original = $slug;
         $i = 2;
         while (Category::query()->where('slug', $slug)->exists()) {
-            $slug = $original.'-'.$i;
+            $slug = $original . '-' . $i;
             $i++;
         }
 
@@ -123,7 +123,7 @@ final class CategoryDocsImporter
             }
             $plain = ltrim($line, '# ');
             $name = Str::of($plain)->trim()->value();
-            $slug = Str::slug(($parentId ?? 0).'-'.$name);
+            $slug = Str::slug(($parentId ?? 0) . '-' . $name);
             $category = Category::query()->where('slug', $slug)->first();
             if ($category) {
                 $payload = ['name' => $name, 'parent_id' => $parentId, 'is_enabled' => true];

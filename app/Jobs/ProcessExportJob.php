@@ -10,7 +10,4 @@ namespace App\Jobs;
  * New code should depend on {@see ProcessExport}, but tests and integrations that
  * still expect the older class continue to function through this thin wrapper.
  */
-final class ProcessExportJob extends ProcessExport
-{
-}
-
+final class ProcessExportJob extends ProcessExport {}

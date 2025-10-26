@@ -27,15 +27,15 @@ it('can render enhanced settings create page', function () {
 
 it('can create enhanced setting', function () {
     $payload = [
-        'group' => 'general',
-        'key' => 'site_name',
-        'type' => 'text',
-        'value' => 'My Shop',
-        'description' => 'Site display name',
-        'is_public' => true,
-        'is_encrypted' => false,
+        'group'            => 'general',
+        'key'              => 'site_name',
+        'type'             => 'text',
+        'value'            => 'My Shop',
+        'description'      => 'Site display name',
+        'is_public'        => true,
+        'is_encrypted'     => false,
         'validation_rules' => [],
-        'sort_order' => 0,
+        'sort_order'       => 0,
     ];
 
     actingAs($this->admin)
@@ -59,20 +59,20 @@ it('can render enhanced setting view and edit pages', function () {
 
 it('can update enhanced setting', function () {
     $record = EnhancedSetting::factory()->create([
-        'key' => 'old_key',
+        'key'   => 'old_key',
         'value' => 'old',
     ]);
 
     $update = [
-        'group' => $record->group,
-        'key' => 'new_key',
-        'type' => $record->type,
-        'value' => 'new',
-        'description' => $record->description,
-        'is_public' => $record->is_public,
-        'is_encrypted' => $record->is_encrypted,
+        'group'            => $record->group,
+        'key'              => 'new_key',
+        'type'             => $record->type,
+        'value'            => 'new',
+        'description'      => $record->description,
+        'is_public'        => $record->is_public,
+        'is_encrypted'     => $record->is_encrypted,
         'validation_rules' => $record->validation_rules,
-        'sort_order' => $record->sort_order,
+        'sort_order'       => $record->sort_order,
     ];
 
     actingAs($this->admin)

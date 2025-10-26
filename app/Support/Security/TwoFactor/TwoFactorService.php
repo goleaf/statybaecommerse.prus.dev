@@ -11,9 +11,7 @@ use App\Models\User;
  */
 final class TwoFactorService
 {
-    public function __construct(private readonly TotpGenerator $generator)
-    {
-    }
+    public function __construct(private readonly TotpGenerator $generator) {}
 
     /**
      * Verify a submitted code against the user's configured second factor.

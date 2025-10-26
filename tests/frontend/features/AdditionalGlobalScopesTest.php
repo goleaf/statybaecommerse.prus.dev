@@ -24,17 +24,17 @@ final class AdditionalGlobalScopesTest extends TestCase
         // Create test variant inventories
         $activeInventory = VariantInventory::factory()->create([
             'is_tracked' => true,
-            'status' => 'active',
+            'status'     => 'active',
         ]);
 
         $inactiveInventory = VariantInventory::factory()->create([
             'is_tracked' => false,
-            'status' => 'active',
+            'status'     => 'active',
         ]);
 
         $inactiveStatusInventory = VariantInventory::factory()->create([
             'is_tracked' => true,
-            'status' => 'inactive',
+            'status'     => 'inactive',
         ]);
 
         // Test that only active inventories with active status are returned
@@ -152,17 +152,17 @@ final class AdditionalGlobalScopesTest extends TestCase
         // Create test product requests
         $user1Request = ProductRequest::factory()->create([
             'user_id' => $user1->id,
-            'status' => 'pending',
+            'status'  => 'pending',
         ]);
 
         $user2Request = ProductRequest::factory()->create([
             'user_id' => $user2->id,
-            'status' => 'pending',
+            'status'  => 'pending',
         ]);
 
         $cancelledRequest = ProductRequest::factory()->create([
             'user_id' => $user1->id,
-            'status' => 'cancelled',
+            'status'  => 'cancelled',
         ]);
 
         // Test that only current user's requests with allowed status are returned

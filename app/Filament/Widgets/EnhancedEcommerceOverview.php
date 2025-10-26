@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Widgets;
 
-use UnitEnum;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\Review;
@@ -13,6 +12,7 @@ use BackedEnum;
 use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 use Illuminate\Support\Carbon;
+use UnitEnum;
 
 final class EnhancedEcommerceOverview extends StatsOverviewWidget
 {
@@ -21,8 +21,8 @@ final class EnhancedEcommerceOverview extends StatsOverviewWidget
      */
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-presentation-chart-line';
 
-    /** @var string|\UnitEnum|null Ensure the widget stays surfaced within the dashboard group. */
-    protected static \UnitEnum|string|null $navigationGroup = 'Dashboard';
+    /** @var string|UnitEnum|null Ensure the widget stays surfaced within the dashboard group. */
+    protected static UnitEnum|string|null $navigationGroup = 'Dashboard';
 
     /**
      * Localize the navigation label to align with analytics translations.
@@ -31,6 +31,7 @@ final class EnhancedEcommerceOverview extends StatsOverviewWidget
     {
         return __('analytics.enhanced_overview.navigation_label');
     }
+
     protected string $maxHeight = '32rem';
 
     protected ?string $pollingInterval = '15s';

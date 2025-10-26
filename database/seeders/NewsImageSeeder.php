@@ -28,19 +28,19 @@ final class NewsImageSeeder extends Seeder
                     ->for($newsArticle, 'news')
                     ->create([
                         'is_featured' => $i === 0,
-                        'sort_order' => $i + 1,
-                        'file_path' => 'news-images/'.fake()->uuid().'.jpg',
-                        'alt_text' => fake()->sentence(6),
-                        'caption' => fake()->sentence(10),
-                        'file_size' => fake()->numberBetween(100000, 2000000),
-                        'mime_type' => fake()->randomElement([
+                        'sort_order'  => $i + 1,
+                        'file_path'   => 'news-images/' . fake()->uuid() . '.jpg',
+                        'alt_text'    => fake()->sentence(6),
+                        'caption'     => fake()->sentence(10),
+                        'file_size'   => fake()->numberBetween(100000, 2000000),
+                        'mime_type'   => fake()->randomElement([
                             'image/jpeg',
                             'image/png',
                             'image/gif',
                             'image/webp',
                         ]),
                         'dimensions' => [
-                            'width' => fake()->numberBetween(400, 1920),
+                            'width'  => fake()->numberBetween(400, 1920),
                             'height' => fake()->numberBetween(300, 1080),
                         ],
                     ]);

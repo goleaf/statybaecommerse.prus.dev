@@ -18,17 +18,17 @@ final class AnalyticsEventTest extends TestCase
         $user = User::factory()->create();
 
         $event = AnalyticsEvent::create([
-            'event_type' => 'page_view',
-            'session_id' => 'test-session-123',
-            'user_id' => $user->id,
-            'properties' => [],
-            'properties' => ['page' => 'home', 'duration' => 30],
-            'url' => 'https://example.com',
-            'referrer' => 'https://google.com',
-            'user_agent' => 'Mozilla/5.0 (Test Browser)',
-            'ip_address' => '192.168.1.1',
+            'event_type'   => 'page_view',
+            'session_id'   => 'test-session-123',
+            'user_id'      => $user->id,
+            'properties'   => [],
+            'properties'   => ['page' => 'home', 'duration' => 30],
+            'url'          => 'https://example.com',
+            'referrer'     => 'https://google.com',
+            'user_agent'   => 'Mozilla/5.0 (Test Browser)',
+            'ip_address'   => '192.168.1.1',
             'country_code' => 'US',
-            'created_at' => now(),
+            'created_at'   => now(),
         ]);
 
         $this->assertInstanceOf(AnalyticsEvent::class, $event);
@@ -50,10 +50,10 @@ final class AnalyticsEventTest extends TestCase
         $event = AnalyticsEvent::create([
             'event_type' => 'product_view',
             'session_id' => 'test-session-456',
-            'user_id' => $user->id,
+            'user_id'    => $user->id,
             'properties' => [],
             'properties' => ['product_id' => 123],
-            'url' => 'https://example.com/product/123',
+            'url'        => 'https://example.com/product/123',
             'created_at' => now(),
         ]);
 
@@ -66,9 +66,9 @@ final class AnalyticsEventTest extends TestCase
         $event = AnalyticsEvent::create([
             'event_type' => 'page_view',
             'session_id' => 'anonymous-session-789',
-            'user_id' => null,
+            'user_id'    => null,
             'properties' => ['page' => 'about'],
-            'url' => 'https://example.com/about',
+            'url'        => 'https://example.com/about',
             'created_at' => now(),
         ]);
 
@@ -82,7 +82,7 @@ final class AnalyticsEventTest extends TestCase
             'event_type' => 'add_to_cart',
             'session_id' => 'test-session-101',
             'properties' => ['product_id' => 456, 'quantity' => 2, 'price' => 29.99],
-            'url' => 'https://example.com/cart',
+            'url'        => 'https://example.com/cart',
             'created_at' => now(),
         ]);
 
@@ -99,7 +99,7 @@ final class AnalyticsEventTest extends TestCase
         AnalyticsEvent::create([
             'event_type' => 'page_view',
             'session_id' => 'session-1',
-            'user_id' => $user->id,
+            'user_id'    => $user->id,
             'properties' => [],
             'created_at' => now(),
         ]);
@@ -107,7 +107,7 @@ final class AnalyticsEventTest extends TestCase
         AnalyticsEvent::create([
             'event_type' => 'product_view',
             'session_id' => 'session-2',
-            'user_id' => $user->id,
+            'user_id'    => $user->id,
             'properties' => [],
             'created_at' => now(),
         ]);
@@ -128,7 +128,7 @@ final class AnalyticsEventTest extends TestCase
         AnalyticsEvent::create([
             'event_type' => 'page_view',
             'session_id' => 'session-abc',
-            'user_id' => $user->id,
+            'user_id'    => $user->id,
             'properties' => [],
             'created_at' => now(),
         ]);
@@ -136,7 +136,7 @@ final class AnalyticsEventTest extends TestCase
         AnalyticsEvent::create([
             'event_type' => 'product_view',
             'session_id' => 'session-xyz',
-            'user_id' => $user->id,
+            'user_id'    => $user->id,
             'properties' => [],
             'created_at' => now(),
         ]);
@@ -158,14 +158,14 @@ final class AnalyticsEventTest extends TestCase
         AnalyticsEvent::create([
             'event_type' => 'page_view',
             'session_id' => 'session-1',
-            'user_id' => $user1->id,
+            'user_id'    => $user1->id,
             'created_at' => now(),
         ]);
 
         AnalyticsEvent::create([
             'event_type' => 'product_view',
             'session_id' => 'session-2',
-            'user_id' => $user2->id,
+            'user_id'    => $user2->id,
             'created_at' => now(),
         ]);
 
@@ -185,7 +185,7 @@ final class AnalyticsEventTest extends TestCase
         AnalyticsEvent::create([
             'event_type' => 'page_view',
             'session_id' => 'session-1',
-            'user_id' => $user->id,
+            'user_id'    => $user->id,
             'properties' => [],
             'created_at' => now()->subDays(5),
         ]);
@@ -193,7 +193,7 @@ final class AnalyticsEventTest extends TestCase
         AnalyticsEvent::create([
             'event_type' => 'product_view',
             'session_id' => 'session-2',
-            'user_id' => $user->id,
+            'user_id'    => $user->id,
             'properties' => [],
             'created_at' => now()->subDays(2),
         ]);
@@ -201,7 +201,7 @@ final class AnalyticsEventTest extends TestCase
         AnalyticsEvent::create([
             'event_type' => 'purchase',
             'session_id' => 'session-3',
-            'user_id' => $user->id,
+            'user_id'    => $user->id,
             'properties' => [],
             'created_at' => now()->subDays(1),
         ]);

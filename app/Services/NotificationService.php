@@ -29,29 +29,29 @@ final class NotificationService
     ): Notification {
         $notificationData = array_merge(
             [
-                'type' => $type,
+                'type'   => $type,
                 'urgent' => $urgent,
-                'color' => $color,
-                'tags' => $tags,
+                'color'  => $color,
+                'tags'   => $tags,
             ],
             $data,
         );
 
         return Notification::create([
-            'type' => $type,
+            'type'            => $type,
             'notifiable_type' => get_class($notifiable),
-            'notifiable_id' => $notifiable->id,
-            'data' => $notificationData,
+            'notifiable_id'   => $notifiable->id,
+            'data'            => $notificationData,
         ]);
     }
 
     public function createOrderNotification(User $user, string $action, array $orderData = [], bool $urgent = false): Notification
     {
         $data = [
-            'title' => __('notifications.order.'.$action),
-            'message' => $this->getOrderMessage($action, $orderData),
-            'type' => 'order',
-            'order_id' => $orderData['id'] ?? null,
+            'title'        => __('notifications.order.' . $action),
+            'message'      => $this->getOrderMessage($action, $orderData),
+            'type'         => 'order',
+            'order_id'     => $orderData['id'] ?? null,
             'order_number' => $orderData['number'] ?? null,
         ];
 
@@ -61,10 +61,10 @@ final class NotificationService
     public function createProductNotification(User $user, string $action, array $productData = [], bool $urgent = false): Notification
     {
         $data = [
-            'title' => __('notifications.product.'.$action),
-            'message' => $this->getProductMessage($action, $productData),
-            'type' => 'product',
-            'product_id' => $productData['id'] ?? null,
+            'title'        => __('notifications.product.' . $action),
+            'message'      => $this->getProductMessage($action, $productData),
+            'type'         => 'product',
+            'product_id'   => $productData['id'] ?? null,
             'product_name' => $productData['name'] ?? null,
         ];
 
@@ -186,26 +186,26 @@ final class NotificationService
     private function getOrderMessage(string $action, array $orderData): string
     {
         return match ($action) {
-            'created' => "Naujas užsakymas #{$orderData['number']} buvo sukurtas.",
-            'updated' => "Užsakymas #{$orderData['number']} buvo atnaujintas.",
+            'created'   => "Naujas užsakymas #{$orderData['number']} buvo sukurtas.",
+            'updated'   => "Užsakymas #{$orderData['number']} buvo atnaujintas.",
             'cancelled' => "Užsakymas #{$orderData['number']} buvo atšauktas.",
             'completed' => "Užsakymas #{$orderData['number']} buvo užbaigtas.",
-            'shipped' => "Užsakymas #{$orderData['number']} buvo išsiųstas.",
+            'shipped'   => "Užsakymas #{$orderData['number']} buvo išsiųstas.",
             'delivered' => "Užsakymas #{$orderData['number']} buvo pristatytas.",
-            default => "Užsakymas #{$orderData['number']} buvo {$action}.",
+            default     => "Užsakymas #{$orderData['number']} buvo {$action}.",
         };
     }
 
     private function getProductMessage(string $action, array $productData): string
     {
         return match ($action) {
-            'created' => "Naujas produktas '{$productData['name']}' buvo sukurtas.",
-            'updated' => "Produktas '{$productData['name']}' buvo atnaujintas.",
-            'deleted' => "Produktas '{$productData['name']}' buvo ištrintas.",
-            'low_stock' => "Produktas '{$productData['name']}' turi mažai atsargų.",
-            'out_of_stock' => "Produktas '{$productData['name']}' baigėsi atsargos.",
+            'created'       => "Naujas produktas '{$productData['name']}' buvo sukurtas.",
+            'updated'       => "Produktas '{$productData['name']}' buvo atnaujintas.",
+            'deleted'       => "Produktas '{$productData['name']}' buvo ištrintas.",
+            'low_stock'     => "Produktas '{$productData['name']}' turi mažai atsargų.",
+            'out_of_stock'  => "Produktas '{$productData['name']}' baigėsi atsargos.",
             'back_in_stock' => "Produktas '{$productData['name']}' atsikūrė atsargos.",
-            default => "Produktas '{$productData['name']}' buvo {$action}.",
+            default         => "Produktas '{$productData['name']}' buvo {$action}.",
         };
     }
 

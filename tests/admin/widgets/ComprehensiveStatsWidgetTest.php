@@ -52,17 +52,17 @@ class ComprehensiveStatsWidgetTest extends TestCase
         $product = Product::factory()->create();
 
         $order = Order::factory()->create([
-            'user_id' => $user->id,
-            'total' => 100.0,
-            'status' => 'completed',
+            'user_id'    => $user->id,
+            'total'      => 100.0,
+            'status'     => 'completed',
             'created_at' => now(),
         ]);
 
         $review = Review::factory()->create([
-            'product_id' => $product->id,
-            'rating' => 5,
+            'product_id'  => $product->id,
+            'rating'      => 5,
             'is_approved' => true,
-            'created_at' => now(),
+            'created_at'  => now(),
         ]);
 
         $widget = new ComprehensiveStatsWidget;
@@ -128,14 +128,14 @@ class ComprehensiveStatsWidgetTest extends TestCase
     {
         // Create completed orders
         Order::factory()->create([
-            'total' => 100.0,
-            'status' => 'completed',
+            'total'      => 100.0,
+            'status'     => 'completed',
             'created_at' => now(),
         ]);
 
         Order::factory()->create([
-            'total' => 50.0,
-            'status' => 'completed',
+            'total'      => 50.0,
+            'status'     => 'completed',
             'created_at' => now(),
         ]);
 

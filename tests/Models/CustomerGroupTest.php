@@ -28,7 +28,7 @@ final class CustomerGroupTest extends TestCase
     public function test_it_exposes_expected_fillable_attributes(): void
     {
         // Instantiate a fresh model so we can check the mass-assignable whitelist.
-        $group = new CustomerGroup();
+        $group = new CustomerGroup;
 
         // Verify a representative subset of attributes is guarded correctly.
         $this->assertContains('name', $group->getFillable());
@@ -40,7 +40,7 @@ final class CustomerGroupTest extends TestCase
     public function test_it_exposes_expected_casts(): void
     {
         // Build the casts array and inspect the keys we rely on in business logic.
-        $casts = (new CustomerGroup())->getCasts();
+        $casts = (new CustomerGroup)->getCasts();
 
         // Confirm that numeric and boolean flags are converted into their proper types.
         $this->assertSame('decimal:2', $casts['discount_fixed']);
@@ -104,7 +104,7 @@ final class CustomerGroupTest extends TestCase
         $orderedNames = CustomerGroup::query()
             ->orderedByName('en')
             ->get()
-            ->map(fn(CustomerGroup $group) => $group->getTranslation('name', 'en'))
+            ->map(fn (CustomerGroup $group) => $group->getTranslation('name', 'en'))
             ->all();
 
         $this->assertSame([
@@ -119,7 +119,7 @@ final class CustomerGroupTest extends TestCase
         // Combine both percentage and fixed discounts to ensure the helper evaluates truthy states correctly.
         $group = CustomerGroup::factory()->create([
             'discount_percentage' => 0,
-            'discount_fixed' => 5,
+            'discount_fixed'      => 5,
         ]);
 
         // The helper should consider the fixed discount sufficient for a positive response.

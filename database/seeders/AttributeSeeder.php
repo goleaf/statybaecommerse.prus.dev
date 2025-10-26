@@ -14,9 +14,9 @@ final class AttributeSeeder extends Seeder
     {
         $attributes = collect([
             [
-                'slug' => 'color',
-                'type' => 'select',
-                'sort_order' => 1,
+                'slug'         => 'color',
+                'type'         => 'select',
+                'sort_order'   => 1,
                 'translations' => [
                     'lt' => 'Spalva',
                     'en' => 'Color',
@@ -24,9 +24,9 @@ final class AttributeSeeder extends Seeder
                 ],
             ],
             [
-                'slug' => 'size',
-                'type' => 'select',
-                'sort_order' => 2,
+                'slug'         => 'size',
+                'type'         => 'select',
+                'sort_order'   => 2,
                 'translations' => [
                     'lt' => 'Dydis',
                     'en' => 'Size',
@@ -34,9 +34,9 @@ final class AttributeSeeder extends Seeder
                 ],
             ],
             [
-                'slug' => 'weight',
-                'type' => 'number',
-                'sort_order' => 3,
+                'slug'         => 'weight',
+                'type'         => 'number',
+                'sort_order'   => 3,
                 'translations' => [
                     'lt' => 'Svoris',
                     'en' => 'Weight',
@@ -44,9 +44,9 @@ final class AttributeSeeder extends Seeder
                 ],
             ],
             [
-                'slug' => 'material',
-                'type' => 'text',
-                'sort_order' => 4,
+                'slug'         => 'material',
+                'type'         => 'text',
+                'sort_order'   => 4,
                 'translations' => [
                     'lt' => 'Medžiaga',
                     'en' => 'Material',
@@ -54,9 +54,9 @@ final class AttributeSeeder extends Seeder
                 ],
             ],
             [
-                'slug' => 'length',
-                'type' => 'number',
-                'sort_order' => 5,
+                'slug'         => 'length',
+                'type'         => 'number',
+                'sort_order'   => 5,
                 'translations' => [
                     'lt' => 'Ilgis',
                     'en' => 'Length',
@@ -64,9 +64,9 @@ final class AttributeSeeder extends Seeder
                 ],
             ],
             [
-                'slug' => 'width',
-                'type' => 'number',
-                'sort_order' => 6,
+                'slug'         => 'width',
+                'type'         => 'number',
+                'sort_order'   => 6,
                 'translations' => [
                     'lt' => 'Plotis',
                     'en' => 'Width',
@@ -74,9 +74,9 @@ final class AttributeSeeder extends Seeder
                 ],
             ],
             [
-                'slug' => 'height',
-                'type' => 'number',
-                'sort_order' => 7,
+                'slug'         => 'height',
+                'type'         => 'number',
+                'sort_order'   => 7,
                 'translations' => [
                     'lt' => 'Aukštis',
                     'en' => 'Height',
@@ -84,9 +84,9 @@ final class AttributeSeeder extends Seeder
                 ],
             ],
             [
-                'slug' => 'color-palette',
-                'type' => 'multiselect',
-                'sort_order' => 8,
+                'slug'         => 'color-palette',
+                'type'         => 'multiselect',
+                'sort_order'   => 8,
                 'translations' => [
                     'lt' => 'Spalvų paletė',
                     'en' => 'Color Palette',
@@ -94,9 +94,9 @@ final class AttributeSeeder extends Seeder
                 ],
             ],
             [
-                'slug' => 'voltage',
-                'type' => 'number',
-                'sort_order' => 9,
+                'slug'         => 'voltage',
+                'type'         => 'number',
+                'sort_order'   => 9,
                 'translations' => [
                     'lt' => 'Įtampa',
                     'en' => 'Voltage',
@@ -104,9 +104,9 @@ final class AttributeSeeder extends Seeder
                 ],
             ],
             [
-                'slug' => 'battery-capacity',
-                'type' => 'text',
-                'sort_order' => 10,
+                'slug'         => 'battery-capacity',
+                'type'         => 'text',
+                'sort_order'   => 10,
                 'translations' => [
                     'lt' => 'Akumuliatoriaus talpa',
                     'en' => 'Battery Capacity',
@@ -114,9 +114,9 @@ final class AttributeSeeder extends Seeder
                 ],
             ],
             [
-                'slug' => 'power-source',
-                'type' => 'select',
-                'sort_order' => 11,
+                'slug'         => 'power-source',
+                'type'         => 'select',
+                'sort_order'   => 11,
                 'translations' => [
                     'lt' => 'Maitinimo šaltinis',
                     'en' => 'Power Source',
@@ -124,9 +124,9 @@ final class AttributeSeeder extends Seeder
                 ],
             ],
             [
-                'slug' => 'tool-count',
-                'type' => 'number',
-                'sort_order' => 12,
+                'slug'         => 'tool-count',
+                'type'         => 'number',
+                'sort_order'   => 12,
                 'translations' => [
                     'lt' => 'Įrankių kiekis rinkinyje',
                     'en' => 'Tool Count',
@@ -134,9 +134,9 @@ final class AttributeSeeder extends Seeder
                 ],
             ],
             [
-                'slug' => 'lumens',
-                'type' => 'number',
-                'sort_order' => 13,
+                'slug'         => 'lumens',
+                'type'         => 'number',
+                'sort_order'   => 13,
                 'translations' => [
                     'lt' => 'Šviesos srautas (lm)',
                     'en' => 'Luminous Flux (lm)',
@@ -144,9 +144,9 @@ final class AttributeSeeder extends Seeder
                 ],
             ],
             [
-                'slug' => 'ip-rating',
-                'type' => 'text',
-                'sort_order' => 14,
+                'slug'         => 'ip-rating',
+                'type'         => 'text',
+                'sort_order'   => 14,
                 'translations' => [
                     'lt' => 'IP klasė',
                     'en' => 'IP Rating',
@@ -154,9 +154,9 @@ final class AttributeSeeder extends Seeder
                 ],
             ],
             [
-                'slug' => 'range',
-                'type' => 'text',
-                'sort_order' => 15,
+                'slug'         => 'range',
+                'type'         => 'text',
+                'sort_order'   => 15,
                 'translations' => [
                     'lt' => 'Darbo nuotolis',
                     'en' => 'Operating Range',
@@ -164,9 +164,9 @@ final class AttributeSeeder extends Seeder
                 ],
             ],
             [
-                'slug' => 'safety-rating',
-                'type' => 'text',
-                'sort_order' => 16,
+                'slug'         => 'safety-rating',
+                'type'         => 'text',
+                'sort_order'   => 16,
                 'translations' => [
                     'lt' => 'Saugos klasė',
                     'en' => 'Safety Rating',
@@ -179,13 +179,13 @@ final class AttributeSeeder extends Seeder
             $attribute = Attribute::query()->updateOrCreate(
                 ['slug' => $definition['slug']],
                 [
-                    'name' => $definition['translations']['en'],
-                    'type' => $definition['type'],
-                    'is_required' => false,
+                    'name'          => $definition['translations']['en'],
+                    'type'          => $definition['type'],
+                    'is_required'   => false,
                     'is_filterable' => true,
                     'is_searchable' => true,
-                    'is_enabled' => true,
-                    'sort_order' => $definition['sort_order'],
+                    'is_enabled'    => true,
+                    'sort_order'    => $definition['sort_order'],
                 ],
             );
 
@@ -193,7 +193,7 @@ final class AttributeSeeder extends Seeder
                 AttributeTranslation::query()->updateOrCreate(
                     [
                         'attribute_id' => $attribute->getKey(),
-                        'locale' => $locale,
+                        'locale'       => $locale,
                     ],
                     ['name' => $name],
                 );

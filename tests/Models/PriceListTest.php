@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Tests\Models;
 
@@ -23,7 +25,7 @@ final class PriceListTest extends TestCase
     public function test_price_list_has_expected_fillable_and_casts(): void
     {
         // Instantiate the model instance so we can safely inspect its configuration arrays.
-        $model = new PriceList();
+        $model = new PriceList;
 
         // Ensure the fillable definition protects against mass-assignment vulnerabilities.
         self::assertSame([
@@ -46,15 +48,15 @@ final class PriceListTest extends TestCase
         $casts = $model->getCasts();
 
         foreach ([
-            'is_enabled' => 'boolean',
-            'is_default' => 'boolean',
-            'auto_apply' => 'boolean',
-            'priority' => 'integer',
-            'starts_at' => 'datetime',
-            'ends_at' => 'datetime',
+            'is_enabled'       => 'boolean',
+            'is_default'       => 'boolean',
+            'auto_apply'       => 'boolean',
+            'priority'         => 'integer',
+            'starts_at'        => 'datetime',
+            'ends_at'          => 'datetime',
             'min_order_amount' => 'decimal:2',
             'max_order_amount' => 'decimal:2',
-            'metadata' => 'array',
+            'metadata'         => 'array',
         ] as $attribute => $expectedCast) {
             self::assertArrayHasKey($attribute, $casts);
             self::assertSame($expectedCast, $casts[$attribute]);
@@ -65,17 +67,17 @@ final class PriceListTest extends TestCase
     {
         // Ensure the necessary tables and columns exist before exercising the relationships.
         $this->requireTableColumns([
-            'price_lists' => ['name', 'currency_id'],
-            'price_list_items' => ['price_list_id', 'net_amount'],
-            'customer_groups' => ['name'],
-            'partners' => ['name'],
-            'group_price_list' => ['group_id', 'price_list_id'],
+            'price_lists'        => ['name', 'currency_id'],
+            'price_list_items'   => ['price_list_id', 'net_amount'],
+            'customer_groups'    => ['name'],
+            'partners'           => ['name'],
+            'group_price_list'   => ['group_id', 'price_list_id'],
             'partner_price_list' => ['partner_id', 'price_list_id'],
         ]);
 
         // Create the primary price list with a related currency and a couple of price list items.
         $priceList = $this->createPriceListRecord([
-            'name' => 'Relationship Matrix',
+            'name'        => 'Relationship Matrix',
             'currency_id' => Currency::factory()->eur()->create(),
         ]);
 
@@ -89,14 +91,14 @@ final class PriceListTest extends TestCase
         // Insert pivot records manually to accommodate legacy schemas that may not support attach().
         foreach ($customerGroups as $group) {
             DB::table('group_price_list')->insert([
-                'group_id' => $group->getKey(),
+                'group_id'      => $group->getKey(),
                 'price_list_id' => $priceList->getKey(),
             ]);
         }
 
         foreach ($partners as $partner) {
             DB::table('partner_price_list')->insert([
-                'partner_id' => $partner->getKey(),
+                'partner_id'    => $partner->getKey(),
                 'price_list_id' => $priceList->getKey(),
             ]);
         }
@@ -146,27 +148,27 @@ final class PriceListTest extends TestCase
         $records = collect();
 
         $enabled = $this->createPriceListRecord([
-            'name' => 'Alpha',
+            'name'       => 'Alpha',
             'is_enabled' => true,
-            'priority' => 10,
+            'priority'   => 10,
         ]);
         $records->push($enabled);
 
         $disabled = $this->createPriceListRecord([
-            'name' => 'Bravo',
+            'name'       => 'Bravo',
             'is_enabled' => false,
-            'priority' => 50,
+            'priority'   => 50,
         ]);
         $records->push($disabled);
 
         $default = null;
         if ($this->tableSupportsColumns('price_lists', ['is_default', 'auto_apply'])) {
             $default = $this->createPriceListRecord([
-                'name' => 'Charlie',
+                'name'       => 'Charlie',
                 'is_default' => true,
                 'auto_apply' => true,
                 'is_enabled' => true,
-                'priority' => 5,
+                'priority'   => 5,
             ]);
             $records->push($default);
         }
@@ -174,10 +176,10 @@ final class PriceListTest extends TestCase
         $byCurrency = null;
         if ($this->tableSupportsColumns('price_lists', ['currency_id'])) {
             $byCurrency = $this->createPriceListRecord([
-                'name' => 'Delta',
+                'name'        => 'Delta',
                 'currency_id' => Currency::factory()->create(),
-                'is_enabled' => true,
-                'priority' => 30,
+                'is_enabled'  => true,
+                'priority'    => 30,
             ]);
             $records->push($byCurrency);
         }
@@ -185,28 +187,28 @@ final class PriceListTest extends TestCase
         $active = $future = $expired = null;
         if ($this->tableSupportsColumns('price_lists', ['starts_at', 'ends_at'])) {
             $active = $this->createPriceListRecord([
-                'name' => 'Echo',
+                'name'       => 'Echo',
                 'is_enabled' => true,
-                'starts_at' => Carbon::now()->subDay(),
-                'ends_at' => Carbon::now()->addDay(),
-                'priority' => 20,
+                'starts_at'  => Carbon::now()->subDay(),
+                'ends_at'    => Carbon::now()->addDay(),
+                'priority'   => 20,
             ]);
             $records->push($active);
 
             $future = $this->createPriceListRecord([
-                'name' => 'Foxtrot',
+                'name'       => 'Foxtrot',
                 'is_enabled' => true,
-                'starts_at' => Carbon::now()->addDay(),
-                'priority' => 60,
+                'starts_at'  => Carbon::now()->addDay(),
+                'priority'   => 60,
             ]);
             $records->push($future);
 
             $expired = $this->createPriceListRecord([
-                'name' => 'Golf',
+                'name'       => 'Golf',
                 'is_enabled' => true,
-                'starts_at' => Carbon::now()->subDays(10),
-                'ends_at' => Carbon::now()->subDay(),
-                'priority' => 40,
+                'starts_at'  => Carbon::now()->subDays(10),
+                'ends_at'    => Carbon::now()->subDay(),
+                'priority'   => 40,
             ]);
             $records->push($expired);
         }
@@ -214,11 +216,11 @@ final class PriceListTest extends TestCase
         $amountLimited = null;
         if ($this->tableSupportsColumns('price_lists', ['min_order_amount', 'max_order_amount'])) {
             $amountLimited = $this->createPriceListRecord([
-                'name' => 'Hotel',
-                'is_enabled' => true,
+                'name'             => 'Hotel',
+                'is_enabled'       => true,
                 'min_order_amount' => 50.00,
                 'max_order_amount' => 150.00,
-                'priority' => 70,
+                'priority'         => 70,
             ]);
             $records->push($amountLimited);
         }
@@ -287,9 +289,9 @@ final class PriceListTest extends TestCase
     {
         // Ensure the necessary schema support exists for the helper method validation.
         $this->requireTableColumns([
-            'price_lists' => ['is_enabled', 'starts_at', 'ends_at', 'is_default', 'auto_apply'],
+            'price_lists'      => ['is_enabled', 'starts_at', 'ends_at', 'is_default', 'auto_apply'],
             'price_list_items' => ['price_list_id', 'product_id', 'variant_id', 'net_amount'],
-            'products' => ['name'],
+            'products'         => ['name'],
             'product_variants' => ['product_id'],
         ]);
 
@@ -299,8 +301,8 @@ final class PriceListTest extends TestCase
         // Create the base price list that should evaluate as active.
         $priceList = $this->createPriceListRecord([
             'is_enabled' => true,
-            'starts_at' => Carbon::now()->subDay(),
-            'ends_at' => Carbon::now()->addDay(),
+            'starts_at'  => Carbon::now()->subDay(),
+            'ends_at'    => Carbon::now()->addDay(),
             'is_default' => true,
             'auto_apply' => true,
         ]);
@@ -346,7 +348,7 @@ final class PriceListTest extends TestCase
     /**
      * Ensure the schema contains the required tables and columns or skip the test early.
      *
-     * @param  array<string, array<int, string>>  $requirements
+     * @param array<string, array<int, string>> $requirements
      */
     private function requireTableColumns(array $requirements): void
     {
@@ -366,7 +368,7 @@ final class PriceListTest extends TestCase
     /**
      * Check whether the provided table exposes every required column.
      *
-     * @param  array<int, string>  $columns
+     * @param array<int, string> $columns
      */
     private function tableSupportsColumns(string $table, array $columns): bool
     {
@@ -382,20 +384,20 @@ final class PriceListTest extends TestCase
     /**
      * Create a price list record with attributes filtered to match the current schema.
      *
-     * @param  array<string, mixed>  $overrides
+     * @param array<string, mixed> $overrides
      */
     private function createPriceListRecord(array $overrides = []): PriceList
     {
         $attributes = array_merge([
-            'name' => 'Test Price List',
-            'is_enabled' => true,
-            'priority' => 10,
-            'starts_at' => null,
-            'ends_at' => null,
-            'description' => 'Test price list description',
-            'metadata' => ['source' => 'test', 'segment' => 'unit'],
-            'is_default' => false,
-            'auto_apply' => false,
+            'name'             => 'Test Price List',
+            'is_enabled'       => true,
+            'priority'         => 10,
+            'starts_at'        => null,
+            'ends_at'          => null,
+            'description'      => 'Test price list description',
+            'metadata'         => ['source' => 'test', 'segment' => 'unit'],
+            'is_default'       => false,
+            'auto_apply'       => false,
             'min_order_amount' => null,
             'max_order_amount' => null,
         ], $overrides);
@@ -437,16 +439,16 @@ final class PriceListTest extends TestCase
     /**
      * Persist a price list item tailored to the current schema support.
      *
-     * @param  array<string, mixed>  $overrides
+     * @param array<string, mixed> $overrides
      */
     private function createPriceListItemRecord(PriceList $priceList, array $overrides = []): PriceListItem
     {
         $attributes = array_merge([
             'price_list_id' => $priceList->getKey(),
-            'net_amount' => 123.45,
-            'is_active' => true,
-            'product_id' => null,
-            'variant_id' => null,
+            'net_amount'    => 123.45,
+            'is_active'     => true,
+            'product_id'    => null,
+            'variant_id'    => null,
         ], $overrides);
 
         if (Schema::hasColumn('price_list_items', 'product_id')) {

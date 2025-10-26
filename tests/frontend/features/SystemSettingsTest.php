@@ -49,25 +49,25 @@ final class SystemSettingsTest extends TestCase
         $this->actingAs($this->adminUser);
 
         $settingData = [
-            'category_id' => $this->category->id,
-            'key' => 'test_setting',
-            'name' => 'Test Setting',
-            'value' => 'test_value',
-            'type' => 'string',
-            'group' => 'general',
-            'description' => 'Test description',
-            'is_public' => true,
-            'is_required' => false,
+            'category_id'  => $this->category->id,
+            'key'          => 'test_setting',
+            'name'         => 'Test Setting',
+            'value'        => 'test_value',
+            'type'         => 'string',
+            'group'        => 'general',
+            'description'  => 'Test description',
+            'is_public'    => true,
+            'is_required'  => false,
             'is_encrypted' => false,
-            'is_readonly' => false,
-            'is_active' => true,
+            'is_readonly'  => false,
+            'is_active'    => true,
         ];
 
         $response = $this->post(route('filament.admin.resources.system-settings.store'), $settingData);
 
         $this->assertDatabaseHas('system_settings', [
-            'key' => 'test_setting',
-            'name' => 'Test Setting',
+            'key'   => 'test_setting',
+            'name'  => 'Test Setting',
             'value' => 'test_value',
         ]);
     }
@@ -78,30 +78,30 @@ final class SystemSettingsTest extends TestCase
 
         $setting = SystemSetting::factory()->create([
             'category_id' => $this->category->id,
-            'key' => 'test_setting',
-            'name' => 'Test Setting',
-            'value' => 'old_value',
+            'key'         => 'test_setting',
+            'name'        => 'Test Setting',
+            'value'       => 'old_value',
         ]);
 
         $updateData = [
-            'category_id' => $this->category->id,
-            'key' => 'test_setting',
-            'name' => 'Updated Setting',
-            'value' => 'new_value',
-            'type' => 'string',
-            'group' => 'general',
-            'is_public' => true,
-            'is_required' => false,
+            'category_id'  => $this->category->id,
+            'key'          => 'test_setting',
+            'name'         => 'Updated Setting',
+            'value'        => 'new_value',
+            'type'         => 'string',
+            'group'        => 'general',
+            'is_public'    => true,
+            'is_required'  => false,
             'is_encrypted' => false,
-            'is_readonly' => false,
-            'is_active' => true,
+            'is_readonly'  => false,
+            'is_active'    => true,
         ];
 
         $response = $this->put(route('filament.admin.resources.system-settings.update', $setting), $updateData);
 
         $this->assertDatabaseHas('system_settings', [
-            'id' => $setting->id,
-            'name' => 'Updated Setting',
+            'id'    => $setting->id,
+            'name'  => 'Updated Setting',
             'value' => 'new_value',
         ]);
     }
@@ -112,7 +112,7 @@ final class SystemSettingsTest extends TestCase
 
         $setting = SystemSetting::factory()->create([
             'category_id' => $this->category->id,
-            'key' => 'test_setting',
+            'key'         => 'test_setting',
         ]);
 
         $response = $this->delete(route('filament.admin.resources.system-settings.destroy', $setting));
@@ -141,11 +141,11 @@ final class SystemSettingsTest extends TestCase
 
         $settingData = [
             'category_id' => $this->category->id,
-            'key' => 'duplicate_key',
-            'name' => 'Test Setting',
-            'value' => 'test_value',
-            'type' => 'string',
-            'group' => 'general',
+            'key'         => 'duplicate_key',
+            'name'        => 'Test Setting',
+            'value'       => 'test_value',
+            'type'        => 'string',
+            'group'       => 'general',
         ];
 
         $response = $this->post(route('filament.admin.resources.system-settings.store'), $settingData);
@@ -158,7 +158,7 @@ final class SystemSettingsTest extends TestCase
         $this->actingAs($this->adminUser);
 
         $setting = SystemSetting::factory()->create([
-            'type' => 'boolean',
+            'type'  => 'boolean',
             'value' => 'true',
         ]);
 
@@ -171,7 +171,7 @@ final class SystemSettingsTest extends TestCase
         $this->actingAs($this->adminUser);
 
         $setting = SystemSetting::factory()->create([
-            'type' => 'number',
+            'type'  => 'number',
             'value' => '42',
         ]);
 
@@ -184,7 +184,7 @@ final class SystemSettingsTest extends TestCase
         $this->actingAs($this->adminUser);
 
         $setting = SystemSetting::factory()->create([
-            'type' => 'array',
+            'type'  => 'array',
             'value' => '["item1", "item2"]',
         ]);
 
@@ -198,7 +198,7 @@ final class SystemSettingsTest extends TestCase
 
         $setting = SystemSetting::factory()->create([
             'is_encrypted' => true,
-            'value' => 'sensitive_data',
+            'value'        => 'sensitive_data',
         ]);
 
         $this->assertNotEquals('sensitive_data', $setting->getRawOriginal('value'));
@@ -208,15 +208,15 @@ final class SystemSettingsTest extends TestCase
     public function test_public_settings_are_accessible_via_api(): void
     {
         SystemSetting::factory()->create([
-            'key' => 'public_setting',
-            'value' => 'public_value',
+            'key'       => 'public_setting',
+            'value'     => 'public_value',
             'is_public' => true,
             'is_active' => true,
         ]);
 
         SystemSetting::factory()->create([
-            'key' => 'private_setting',
-            'value' => 'private_value',
+            'key'       => 'private_setting',
+            'value'     => 'private_value',
             'is_public' => false,
             'is_active' => true,
         ]);
@@ -226,7 +226,7 @@ final class SystemSettingsTest extends TestCase
         $response->assertStatus(200);
         $response->assertJsonCount(1, 'data');
         $response->assertJsonFragment([
-            'key' => 'public_setting',
+            'key'   => 'public_setting',
             'value' => 'public_value',
         ]);
     }
@@ -234,8 +234,8 @@ final class SystemSettingsTest extends TestCase
     public function test_frontend_can_view_system_settings(): void
     {
         SystemSetting::factory()->count(5)->create([
-            'is_public' => true,
-            'is_active' => true,
+            'is_public'   => true,
+            'is_active'   => true,
             'category_id' => $this->category->id,
         ]);
 
@@ -248,8 +248,8 @@ final class SystemSettingsTest extends TestCase
     public function test_frontend_can_view_single_system_setting(): void
     {
         $setting = SystemSetting::factory()->create([
-            'is_public' => true,
-            'is_active' => true,
+            'is_public'   => true,
+            'is_active'   => true,
             'category_id' => $this->category->id,
         ]);
 
@@ -292,14 +292,14 @@ final class SystemSettingsTest extends TestCase
 
         $setting1 = SystemSetting::factory()->create([
             'category_id' => $this->category->id,
-            'is_public' => true,
-            'is_active' => true,
+            'is_public'   => true,
+            'is_active'   => true,
         ]);
 
         $setting2 = SystemSetting::factory()->create([
             'category_id' => $category2->id,
-            'is_public' => true,
-            'is_active' => true,
+            'is_public'   => true,
+            'is_active'   => true,
         ]);
 
         $response = $this->get(route('frontend.system-settings.index', ['category' => $this->category->slug]));
@@ -312,13 +312,13 @@ final class SystemSettingsTest extends TestCase
     public function test_system_setting_can_be_filtered_by_group(): void
     {
         $setting1 = SystemSetting::factory()->create([
-            'group' => 'general',
+            'group'     => 'general',
             'is_public' => true,
             'is_active' => true,
         ]);
 
         $setting2 = SystemSetting::factory()->create([
-            'group' => 'ecommerce',
+            'group'     => 'ecommerce',
             'is_public' => true,
             'is_active' => true,
         ]);
@@ -333,13 +333,13 @@ final class SystemSettingsTest extends TestCase
     public function test_system_setting_can_be_searched(): void
     {
         $setting1 = SystemSetting::factory()->create([
-            'name' => 'Searchable Setting',
+            'name'      => 'Searchable Setting',
             'is_public' => true,
             'is_active' => true,
         ]);
 
         $setting2 = SystemSetting::factory()->create([
-            'name' => 'Other Setting',
+            'name'      => 'Other Setting',
             'is_public' => true,
             'is_active' => true,
         ]);
@@ -354,8 +354,8 @@ final class SystemSettingsTest extends TestCase
     public function test_api_can_get_setting_by_key(): void
     {
         $setting = SystemSetting::factory()->create([
-            'key' => 'api_test_setting',
-            'value' => 'api_value',
+            'key'       => 'api_test_setting',
+            'value'     => 'api_value',
             'is_public' => true,
             'is_active' => true,
         ]);
@@ -365,8 +365,8 @@ final class SystemSettingsTest extends TestCase
         $response->assertStatus(200);
         $response->assertJson([
             'success' => true,
-            'data' => [
-                'key' => 'api_test_setting',
+            'data'    => [
+                'key'   => 'api_test_setting',
                 'value' => 'api_value',
             ],
         ]);
@@ -397,7 +397,7 @@ final class SystemSettingsTest extends TestCase
 
         foreach ($settings as $setting) {
             $this->assertDatabaseHas('system_settings', [
-                'id' => $setting->id,
+                'id'        => $setting->id,
                 'is_active' => true,
             ]);
         }
@@ -419,7 +419,7 @@ final class SystemSettingsTest extends TestCase
     public function test_system_setting_can_get_formatted_value(): void
     {
         $setting = SystemSetting::factory()->create([
-            'type' => 'boolean',
+            'type'  => 'boolean',
             'value' => 'true',
         ]);
 

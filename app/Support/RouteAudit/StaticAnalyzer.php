@@ -29,7 +29,7 @@ final class StaticAnalyzer
     public function __construct(?Router $router = null, ?RouteFilter $routeFilter = null)
     {
         $this->router = $router ?? App::make(Router::class);
-        $this->routeFilter = $routeFilter ?? new RouteFilter();
+        $this->routeFilter = $routeFilter ?? new RouteFilter;
     }
 
     /**
@@ -100,9 +100,9 @@ final class StaticAnalyzer
     }
 
     /**
-     * @param array<string, class-string> $middlewareAliases
-     * @param array<string, array<int, string>> $middlewareGroups
-     * @param array<class-string, class-string> $policies
+     * @param  array<string, class-string>       $middlewareAliases
+     * @param  array<string, array<int, string>> $middlewareGroups
+     * @param  array<class-string, class-string> $policies
      * @return array<string, mixed>
      */
     private function inspectRoute(
@@ -163,20 +163,20 @@ final class StaticAnalyzer
         $authMiddleware = $middlewareInfo['authGuard'];
 
         $entry = [
-            'fingerprint'  => $fingerprint,
-            'uri'          => $route->uri(),
-            'methods'      => array_values(array_unique(array_filter($route->methods(), static fn ($method) => $method !== 'HEAD'))),
-            'name'         => $name,
-            'action'       => $actionString,
-            'controller'   => [
-                'class'          => $controller['class'],
-                'method'         => $controller['method'],
-                'isInvokable'    => $controller['isInvokable'],
-                'isClosure'      => $controller['isClosure'],
-                'formRequests'   => $controller['formRequests'],
-                'parameters'     => $parameterInfo['controllerParameters'],
+            'fingerprint' => $fingerprint,
+            'uri'         => $route->uri(),
+            'methods'     => array_values(array_unique(array_filter($route->methods(), static fn ($method) => $method !== 'HEAD'))),
+            'name'        => $name,
+            'action'      => $actionString,
+            'controller'  => [
+                'class'        => $controller['class'],
+                'method'       => $controller['method'],
+                'isInvokable'  => $controller['isInvokable'],
+                'isClosure'    => $controller['isClosure'],
+                'formRequests' => $controller['formRequests'],
+                'parameters'   => $parameterInfo['controllerParameters'],
             ],
-            'middlewares'  => [
+            'middlewares' => [
                 'declared' => $middlewareInfo['declared'],
                 'resolved' => $middlewareInfo['resolved'],
                 'auth'     => $authMiddleware,
@@ -328,7 +328,7 @@ final class StaticAnalyzer
     }
 
     /**
-     * @param array<string, class-string> $middlewareAliases
+     * @param array<string, class-string>       $middlewareAliases
      * @param array<string, array<int, string>> $middlewareGroups
      * @return array{
      *   declared: list<string>,
@@ -399,16 +399,16 @@ final class StaticAnalyzer
         }
 
         return [
-            'declared' => $declared,
-            'resolved' => array_values(array_unique($resolved)),
+            'declared'  => $declared,
+            'resolved'  => array_values(array_unique($resolved)),
             'authGuard' => $authGuard,
-            'throttle' => $throttle,
-            'issues'   => $issues,
+            'throttle'  => $throttle,
+            'issues'    => $issues,
         ];
     }
 
     /**
-     * @param array<string, class-string> $middlewareAliases
+     * @param array<string, class-string>       $middlewareAliases
      * @param array<string, array<int, string>> $middlewareGroups
      */
     private function middlewareExists(string $alias, array $middlewareAliases, array $middlewareGroups, array $resolved): bool
@@ -450,7 +450,7 @@ final class StaticAnalyzer
     }
 
     /**
-     * @param list<array<string, mixed>> $entries
+     * @param  list<array<string, mixed>> $entries
      * @return list<array<string, mixed>>
      */
     private function applyDuplicateNameChecks(array $entries): array
@@ -562,10 +562,10 @@ final class StaticAnalyzer
             $parameterName = $parameter->getName();
 
             $controllerParameters[$parameterName] = [
-                'type'      => null,
-                'allowsNull'=> $parameter->allowsNull(),
-                'isModel'   => false,
-                'binding'   => null,
+                'type'       => null,
+                'allowsNull' => $parameter->allowsNull(),
+                'isModel'    => false,
+                'binding'    => null,
             ];
 
             $type = $parameter->getType();
@@ -616,5 +616,4 @@ final class StaticAnalyzer
             'policyHints'          => $policyHints,
         ];
     }
-
 }

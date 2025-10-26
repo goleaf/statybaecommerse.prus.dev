@@ -34,11 +34,11 @@ final class NewsSeeder extends Seeder
         // Create 20 news items with different dates and relationships
         for ($i = 1; $i <= 20; $i++) {
             $news = News::factory()->create([
-                'is_visible' => fake()->boolean(80),  // 80% chance of being visible
-                'is_featured' => fake()->boolean(20),  // 20% chance of being featured
-                'is_breaking' => fake()->boolean(10),  // 10% chance of being breaking news
+                'is_visible'   => fake()->boolean(80),  // 80% chance of being visible
+                'is_featured'  => fake()->boolean(20),  // 20% chance of being featured
+                'is_breaking'  => fake()->boolean(10),  // 10% chance of being breaking news
                 'published_at' => fake()->boolean(70) ? now()->subDays(fake()->numberBetween(0, 30)) : null,
-                'view_count' => fake()->numberBetween(0, 1000),
+                'view_count'   => fake()->numberBetween(0, 1000),
             ]);
 
             // Create translations for each locale
@@ -48,19 +48,19 @@ final class NewsSeeder extends Seeder
                 $summary = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.';
                 $content = '<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus imperdiet, nulla et dictum interdum, nisi lorem egestas odio.</p><p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>';
 
-                $title = $locale === 'lt' ? "Demonstracinė naujiena {$i}" : ($locale === 'en' ? $titleBase : $titleBase." ({$locale})");
-                $slug = $locale === 'lt' ? str("Demonstracinė naujiena {$i}")->slug()->toString() : $slugBase.($locale === 'en' ? '' : "-{$locale}");
-                $slug = $slug."-{$news->id}";
+                $title = $locale === 'lt' ? "Demonstracinė naujiena {$i}" : ($locale === 'en' ? $titleBase : $titleBase . " ({$locale})");
+                $slug = $locale === 'lt' ? str("Demonstracinė naujiena {$i}")->slug()->toString() : $slugBase . ($locale === 'en' ? '' : "-{$locale}");
+                $slug = $slug . "-{$news->id}";
 
                 NewsTranslation::updateOrCreate([
                     'news_id' => $news->id,
-                    'locale' => $locale,
+                    'locale'  => $locale,
                 ], [
-                    'title' => $title,
-                    'slug' => $slug,
-                    'summary' => $summary,
-                    'content' => $content,
-                    'seo_title' => $title,
+                    'title'           => $title,
+                    'slug'            => $slug,
+                    'summary'         => $summary,
+                    'content'         => $content,
+                    'seo_title'       => $title,
                     'seo_description' => $summary,
                 ]);
             }
@@ -77,7 +77,7 @@ final class NewsSeeder extends Seeder
             $commentCount = fake()->numberBetween(0, 5);
             for ($j = 0; $j < $commentCount; $j++) {
                 NewsComment::factory()->create([
-                    'news_id' => $news->id,
+                    'news_id'     => $news->id,
                     'is_approved' => fake()->boolean(80),  // 80% approved
                 ]);
             }
@@ -86,7 +86,7 @@ final class NewsSeeder extends Seeder
             $imageCount = fake()->numberBetween(0, 3);
             for ($k = 0; $k < $imageCount; $k++) {
                 NewsImage::factory()->create([
-                    'news_id' => $news->id,
+                    'news_id'     => $news->id,
                     'is_featured' => $k === 0 && fake()->boolean(30),  // 30% chance first image is featured
                 ]);
             }
@@ -106,7 +106,7 @@ final class NewsSeeder extends Seeder
             $category = NewsCategory::factory()->create([
                 'is_visible' => true,
                 'sort_order' => $index + 1,
-                'color' => fake()->hexColor(),
+                'color'      => fake()->hexColor(),
             ]);
 
             foreach ($locales as $locale) {
@@ -115,14 +115,14 @@ final class NewsSeeder extends Seeder
                         'Politika', 'Švietimas', 'Kelionės', 'Maistas', 'Mada', 'Automobiliai'][$index]
                     : $name;
 
-                $slug = str($localizedName)->slug()->toString().'-'.$category->id;
+                $slug = str($localizedName)->slug()->toString() . '-' . $category->id;
 
                 NewsCategoryTranslation::updateOrCreate([
                     'news_category_id' => $category->id,
-                    'locale' => $locale,
+                    'locale'           => $locale,
                 ], [
-                    'name' => $localizedName,
-                    'slug' => $slug,
+                    'name'        => $localizedName,
+                    'slug'        => $slug,
                     'description' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
                 ]);
             }
@@ -145,7 +145,7 @@ final class NewsSeeder extends Seeder
         foreach ($tagNames as $name) {
             $tag = NewsTag::factory()->create([
                 'is_visible' => true,
-                'color' => fake()->hexColor(),
+                'color'      => fake()->hexColor(),
             ]);
 
             foreach ($locales as $locale) {
@@ -154,14 +154,14 @@ final class NewsSeeder extends Seeder
                         'Atnaujinimai', 'Pranešimai', 'Renginiai', 'Naujienos', 'Ataskaitos', 'Analizės'][array_search($name, $tagNames)]
                     : $name;
 
-                $slug = str($localizedName)->slug()->toString().'-'.$tag->id;
+                $slug = str($localizedName)->slug()->toString() . '-' . $tag->id;
 
                 NewsTagTranslation::updateOrCreate([
                     'news_tag_id' => $tag->id,
-                    'locale' => $locale,
+                    'locale'      => $locale,
                 ], [
-                    'name' => $localizedName,
-                    'slug' => $slug,
+                    'name'        => $localizedName,
+                    'slug'        => $slug,
                     'description' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
                 ]);
             }

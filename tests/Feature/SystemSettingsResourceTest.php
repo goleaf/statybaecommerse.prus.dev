@@ -26,7 +26,7 @@ final class SystemSettingsResourceTest extends TestCase
 
         $this->adminUser = User::factory()->create([
             'email' => 'admin@example.com',
-            'name' => 'Admin User',
+            'name'  => 'Admin User',
         ]);
 
         $this->category = SystemSettingCategory::factory()->create([
@@ -53,27 +53,27 @@ final class SystemSettingsResourceTest extends TestCase
 
         Livewire::test(SystemSettingsResource\Pages\CreateSystemSetting::class)
             ->fillForm([
-                'key' => 'test_setting',
-                'name' => 'Test Setting',
-                'description' => 'Test description',
-                'type' => 'string',
-                'category_id' => $this->category->id,
-                'group' => 'test',
-                'value' => 'test value',
-                'is_public' => true,
-                'is_required' => false,
+                'key'          => 'test_setting',
+                'name'         => 'Test Setting',
+                'description'  => 'Test description',
+                'type'         => 'string',
+                'category_id'  => $this->category->id,
+                'group'        => 'test',
+                'value'        => 'test value',
+                'is_public'    => true,
+                'is_required'  => false,
                 'is_encrypted' => false,
-                'is_readonly' => false,
-                'is_active' => true,
-                'sort_order' => 1,
+                'is_readonly'  => false,
+                'is_active'    => true,
+                'sort_order'   => 1,
             ])
             ->call('create')
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('system_settings', [
-            'key' => 'test_setting',
-            'name' => 'Test Setting',
-            'type' => 'string',
+            'key'         => 'test_setting',
+            'name'        => 'Test Setting',
+            'type'        => 'string',
             'category_id' => $this->category->id,
         ]);
     }
@@ -90,7 +90,7 @@ final class SystemSettingsResourceTest extends TestCase
             'record' => $setting->getKey(),
         ])
             ->assertFormSet([
-                'key' => $setting->key,
+                'key'  => $setting->key,
                 'name' => $setting->name,
                 'type' => $setting->type,
             ]);
@@ -100,7 +100,7 @@ final class SystemSettingsResourceTest extends TestCase
     {
         $setting = SystemSetting::factory()->create([
             'category_id' => $this->category->id,
-            'name' => 'Original Name',
+            'name'        => 'Original Name',
         ]);
 
         $this->actingAs($this->adminUser);
@@ -109,15 +109,15 @@ final class SystemSettingsResourceTest extends TestCase
             'record' => $setting->getKey(),
         ])
             ->fillForm([
-                'name' => 'Updated Name',
+                'name'        => 'Updated Name',
                 'description' => 'Updated description',
             ])
             ->call('save')
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('system_settings', [
-            'id' => $setting->id,
-            'name' => 'Updated Name',
+            'id'          => $setting->id,
+            'name'        => 'Updated Name',
             'description' => 'Updated description',
         ]);
     }
@@ -199,9 +199,9 @@ final class SystemSettingsResourceTest extends TestCase
     public function test_can_reset_setting_to_default(): void
     {
         $setting = SystemSetting::factory()->create([
-            'value' => 'current value',
+            'value'         => 'current value',
             'default_value' => 'default value',
-            'category_id' => $this->category->id,
+            'category_id'   => $this->category->id,
         ]);
 
         $this->actingAs($this->adminUser);
@@ -211,7 +211,7 @@ final class SystemSettingsResourceTest extends TestCase
             ->assertHasNoActionErrors();
 
         $this->assertDatabaseHas('system_settings', [
-            'id' => $setting->id,
+            'id'    => $setting->id,
             'value' => 'default value',
         ]);
     }
@@ -219,8 +219,8 @@ final class SystemSettingsResourceTest extends TestCase
     public function test_can_duplicate_system_setting(): void
     {
         $setting = SystemSetting::factory()->create([
-            'key' => 'original_setting',
-            'name' => 'Original Setting',
+            'key'         => 'original_setting',
+            'name'        => 'Original Setting',
             'category_id' => $this->category->id,
         ]);
 
@@ -231,7 +231,7 @@ final class SystemSettingsResourceTest extends TestCase
             ->assertHasNoActionErrors();
 
         $this->assertDatabaseHas('system_settings', [
-            'key' => 'original_setting_copy',
+            'key'  => 'original_setting_copy',
             'name' => 'Original Setting (Copy)',
         ]);
     }
@@ -268,8 +268,8 @@ final class SystemSettingsResourceTest extends TestCase
 
         Livewire::test(SystemSettingsResource\Pages\CreateSystemSetting::class)
             ->fillForm([
-                'name' => 'Test Setting',
-                'type' => 'string',
+                'name'        => 'Test Setting',
+                'type'        => 'string',
                 'category_id' => $this->category->id,
             ])
             ->call('create')
@@ -284,9 +284,9 @@ final class SystemSettingsResourceTest extends TestCase
 
         Livewire::test(SystemSettingsResource\Pages\CreateSystemSetting::class)
             ->fillForm([
-                'key' => 'existing_key',
-                'name' => 'Test Setting',
-                'type' => 'string',
+                'key'         => 'existing_key',
+                'name'        => 'Test Setting',
+                'type'        => 'string',
                 'category_id' => $this->category->id,
             ])
             ->call('create')
@@ -299,8 +299,8 @@ final class SystemSettingsResourceTest extends TestCase
 
         Livewire::test(SystemSettingsResource\Pages\CreateSystemSetting::class)
             ->fillForm([
-                'key' => 'test_setting',
-                'type' => 'string',
+                'key'         => 'test_setting',
+                'type'        => 'string',
                 'category_id' => $this->category->id,
             ])
             ->call('create')
@@ -313,8 +313,8 @@ final class SystemSettingsResourceTest extends TestCase
 
         Livewire::test(SystemSettingsResource\Pages\CreateSystemSetting::class)
             ->fillForm([
-                'key' => 'test_setting',
-                'name' => 'Test Setting',
+                'key'         => 'test_setting',
+                'name'        => 'Test Setting',
                 'category_id' => $this->category->id,
             ])
             ->call('create')
@@ -372,15 +372,15 @@ final class SystemSettingsResourceTest extends TestCase
 
         Livewire::test(SystemSettingsResource\Pages\CreateSystemSetting::class)
             ->fillForm([
-                'key' => 'test_setting',
-                'name' => 'Test Setting',
-                'type' => 'string',
+                'key'         => 'test_setting',
+                'name'        => 'Test Setting',
+                'type'        => 'string',
                 'category_id' => null,
             ])
             ->mountedTableAction('createOption', 'category_id')
             ->fillActionForm([
-                'name' => 'New Category',
-                'slug' => 'new-category',
+                'name'        => 'New Category',
+                'slug'        => 'new-category',
                 'description' => 'New category description',
             ])
             ->callAction('createOption')

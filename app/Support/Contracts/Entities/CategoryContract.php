@@ -33,7 +33,7 @@ final class CategoryContract
 
         return self::envelope([
             'category' => $categoryPayload,
-            'item' => $categoryPayload,
+            'item'     => $categoryPayload,
         ], $meta);
     }
 
@@ -45,15 +45,15 @@ final class CategoryContract
 
         $data = [
             'categories' => $mapped,
-            'items' => $mapped,
+            'items'      => $mapped,
         ];
 
         if ($paginator instanceof LengthAwarePaginator) {
             $data['pagination'] = [
                 'current_page' => $paginator->currentPage(),
-                'last_page' => $paginator->lastPage(),
-                'per_page' => $paginator->perPage(),
-                'total' => $paginator->total(),
+                'last_page'    => $paginator->lastPage(),
+                'per_page'     => $paginator->perPage(),
+                'total'        => $paginator->total(),
             ];
             $meta['total'] = $paginator->total();
         } else {
@@ -68,29 +68,29 @@ final class CategoryContract
         $category->loadMissing(['parent', 'children']);
 
         return [
-            'id' => $category->getKey(),
-            'slug' => (string) $category->slug,
-            'name' => (string) $category->name,
+            'id'          => $category->getKey(),
+            'slug'        => (string) $category->slug,
+            'name'        => (string) $category->name,
             'description' => $category->description,
-            'parent' => $category->parent?->exists ? [
-                'id' => $category->parent->getKey(),
+            'parent'      => $category->parent?->exists ? [
+                'id'   => $category->parent->getKey(),
                 'slug' => (string) $category->parent->slug,
                 'name' => (string) $category->parent->name,
             ] : null,
             'children' => $category->children->map(fn (Category $child): array => [
-                'id' => $child->getKey(),
-                'slug' => (string) $child->slug,
-                'name' => (string) $child->name,
+                'id'          => $child->getKey(),
+                'slug'        => (string) $child->slug,
+                'name'        => (string) $child->name,
                 'description' => $child->description,
-                'links' => [
+                'links'       => [
                     'self' => self::categoryLink((string) $child->slug),
                 ],
-                'parent' => null,
-                'children' => [],
+                'parent'        => null,
+                'children'      => [],
                 'product_count' => $child->products_count ?? null,
             ])->all(),
             'product_count' => $category->products_count ?? null,
-            'links' => [
+            'links'         => [
                 'self' => self::categoryLink((string) $category->slug),
             ],
         ];
@@ -102,7 +102,7 @@ final class CategoryContract
             return route('categories.show', $slug);
         }
 
-        return url('/categories/'.$slug);
+        return url('/categories/' . $slug);
     }
 
     private static function envelope(array $data, array $meta = []): array
@@ -113,9 +113,9 @@ final class CategoryContract
 
         return [
             'contract' => self::CONTRACT,
-            'version' => self::VERSION,
-            'data' => $data,
-            'meta' => $meta,
+            'version'  => self::VERSION,
+            'data'     => $data,
+            'meta'     => $meta,
         ];
     }
 }

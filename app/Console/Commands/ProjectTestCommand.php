@@ -107,8 +107,7 @@ final class ProjectTestCommand extends Command
     /**
      * Build the initial state structure so we do not remove previously stored data.
      *
-     * @param array<int, array<string, mixed>> $tests
-     *
+     * @param  array<int, array<string, mixed>> $tests
      * @return array<string, mixed>
      */
     private function initialiseState(array $tests): array
@@ -117,14 +116,14 @@ final class ProjectTestCommand extends Command
 
         $state['meta'] = array_merge(
             [
-                'created_at' => $state['meta']['created_at'] ?? now()->toIso8601String(),
-                'started_at' => now()->toIso8601String(),
-                'completed_at' => $state['meta']['completed_at'] ?? null,
-                'is_running' => true,
-                'current_test' => null,
-                'current_index' => 0,
+                'created_at'      => $state['meta']['created_at'] ?? now()->toIso8601String(),
+                'started_at'      => now()->toIso8601String(),
+                'completed_at'    => $state['meta']['completed_at'] ?? null,
+                'is_running'      => true,
+                'current_test'    => null,
+                'current_index'   => 0,
                 'completed_total' => $state['meta']['completed_total'] ?? 0,
-                'total' => count($tests),
+                'total'           => count($tests),
                 'last_updated_at' => now()->toIso8601String(),
             ],
             (array) ($state['meta'] ?? [])
@@ -147,8 +146,8 @@ final class ProjectTestCommand extends Command
             $state['tests'][$identifier] = array_merge(
                 $existing,
                 [
-                    'id' => $identifier,
-                    'hash' => md5($identifier),
+                    'id'     => $identifier,
+                    'hash'   => md5($identifier),
                     'groups' => array_values(array_filter((array) ($test['groups'] ?? []))),
                     'status' => $existing['status'] ?? 'pending',
                 ]
@@ -169,7 +168,7 @@ final class ProjectTestCommand extends Command
 
         if (File::exists($path) !== true) {
             return [
-                'meta' => [],
+                'meta'  => [],
                 'tests' => [],
                 'order' => [],
             ];
@@ -180,7 +179,7 @@ final class ProjectTestCommand extends Command
 
         if (is_array($decoded) !== true) {
             return [
-                'meta' => [],
+                'meta'  => [],
                 'tests' => [],
                 'order' => [],
             ];
@@ -235,11 +234,11 @@ final class ProjectTestCommand extends Command
         $duration = microtime(true) - $start;
 
         return [
-            'status' => $process->isSuccessful() ? 'passed' : 'failed',
-            'output' => trim($process->getOutput()),
+            'status'       => $process->isSuccessful() ? 'passed' : 'failed',
+            'output'       => trim($process->getOutput()),
             'error_output' => trim($process->getErrorOutput()),
-            'exit_code' => $process->getExitCode() ?? 1,
-            'duration' => $duration,
+            'exit_code'    => $process->getExitCode() ?? 1,
+            'duration'     => $duration,
         ];
     }
 
@@ -285,7 +284,7 @@ final class ProjectTestCommand extends Command
                 }
 
                 return [
-                    'id' => $identifier,
+                    'id'     => $identifier,
                     'groups' => array_values(array_filter((array) ($test['groups'] ?? []))),
                 ];
             },

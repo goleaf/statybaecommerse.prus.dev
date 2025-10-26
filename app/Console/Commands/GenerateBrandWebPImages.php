@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Console\Commands;
 
 use App\Models\Brand;
+use Exception;
 use Illuminate\Console\Command;
 use Spatie\Image\Enums\Fit;
 use Spatie\Image\Image;
@@ -79,7 +80,7 @@ final class GenerateBrandWebPImages extends Command
     private function generateWebPConversions($media, string $collection): void
     {
         $originalPath = $media->getPath();
-        $conversionsPath = dirname($originalPath).'/conversions';
+        $conversionsPath = dirname($originalPath) . '/conversions';
 
         // Ensure conversions directory exists
         if (! is_dir($conversionsPath)) {
@@ -116,8 +117,8 @@ final class GenerateBrandWebPImages extends Command
                     ->fit(Fit::Contain, $dimensions['width'], $dimensions['height'])
                     ->quality(85)
                     ->save($webpPath);
-            } catch (\Exception $e) {
-                $this->warn("Failed to generate {$size} WebP for {$media->name}: ".$e->getMessage());
+            } catch (Exception $e) {
+                $this->warn("Failed to generate {$size} WebP for {$media->name}: " . $e->getMessage());
             }
         }
     }

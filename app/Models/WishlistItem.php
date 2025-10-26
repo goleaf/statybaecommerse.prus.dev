@@ -70,7 +70,7 @@ final class WishlistItem extends Model
     {
         $name = $this->product?->name ?? '';
         if ($this->variant?->name) {
-            $name .= ($name !== '' ? ' - ' : '').$this->variant->name;
+            $name .= ($name !== '' ? ' - ' : '') . $this->variant->name;
         }
 
         return $name;

@@ -43,4 +43,3 @@ final class OrderRequestTest extends TestCase
         ])->assertStatus(422);
     }
 }
-

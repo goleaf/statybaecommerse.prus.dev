@@ -13,9 +13,9 @@ use Livewire\Component;
  *
  * Livewire component for SystemSettingsDisplay with reactive frontend functionality, real-time updates, and user interaction handling.
  *
- * @property string $group
- * @property bool $showPublicOnly
- * @property string $search
+ * @property string                              $group
+ * @property bool                                $showPublicOnly
+ * @property string                              $search
  * @property array<string, array<string, mixed>> $queryString
  */
 final class SystemSettingsDisplay extends Component
@@ -30,9 +30,9 @@ final class SystemSettingsDisplay extends Component
      * @var array<string, array<string, mixed>>
      */
     protected array $queryString = [
-        'group' => ['except' => 'general'],
+        'group'          => ['except' => 'general'],
         'showPublicOnly' => ['except' => false],
-        'search' => ['except' => ''],
+        'search'         => ['except' => ''],
     ];
 
     /**

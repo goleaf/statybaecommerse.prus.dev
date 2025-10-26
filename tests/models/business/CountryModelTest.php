@@ -7,6 +7,7 @@ namespace Tests\Unit;
 use App\Models\Country;
 use App\Models\Translations\CountryTranslation;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use ReflectionClass;
 use Tests\TestCase;
 
 final class CountryModelTest extends TestCase
@@ -80,7 +81,7 @@ final class CountryModelTest extends TestCase
     public function test_country_translation_model_property(): void
     {
         $country = new Country;
-        $reflection = new \ReflectionClass($country);
+        $reflection = new ReflectionClass($country);
         $property = $reflection->getProperty('translationModel');
         $property->setAccessible(true);
 
@@ -108,23 +109,23 @@ final class CountryModelTest extends TestCase
     public function test_country_translated_name_attribute_with_translation(): void
     {
         $country = Country::create([
-            'cca2' => 'LT',
-            'cca3' => 'LTU',
+            'cca2'               => 'LT',
+            'cca3'               => 'LTU',
             'phone_calling_code' => '370',
-            'flag' => '🇱🇹',
-            'region' => 'Europe',
-            'subregion' => 'Northern Europe',
-            'latitude' => 55.169438,
-            'longitude' => 23.881275,
-            'currencies' => ['EUR'],
-            'is_enabled' => true,
-            'sort_order' => 1,
+            'flag'               => '🇱🇹',
+            'region'             => 'Europe',
+            'subregion'          => 'Northern Europe',
+            'latitude'           => 55.169438,
+            'longitude'          => 23.881275,
+            'currencies'         => ['EUR'],
+            'is_enabled'         => true,
+            'sort_order'         => 1,
         ]);
 
         CountryTranslation::create([
-            'country_id' => $country->id,
-            'locale' => 'en',
-            'name' => 'Lithuania',
+            'country_id'    => $country->id,
+            'locale'        => 'en',
+            'name'          => 'Lithuania',
             'name_official' => 'Republic of Lithuania',
         ]);
 
@@ -153,23 +154,23 @@ final class CountryModelTest extends TestCase
     public function test_country_translated_official_name_attribute(): void
     {
         $country = Country::create([
-            'cca2' => 'LT',
-            'cca3' => 'LTU',
+            'cca2'               => 'LT',
+            'cca3'               => 'LTU',
             'phone_calling_code' => '370',
-            'flag' => '🇱🇹',
-            'region' => 'Europe',
-            'subregion' => 'Northern Europe',
-            'latitude' => 55.169438,
-            'longitude' => 23.881275,
-            'currencies' => ['EUR'],
-            'is_enabled' => true,
-            'sort_order' => 1,
+            'flag'               => '🇱🇹',
+            'region'             => 'Europe',
+            'subregion'          => 'Northern Europe',
+            'latitude'           => 55.169438,
+            'longitude'          => 23.881275,
+            'currencies'         => ['EUR'],
+            'is_enabled'         => true,
+            'sort_order'         => 1,
         ]);
 
         CountryTranslation::create([
-            'country_id' => $country->id,
-            'locale' => 'en',
-            'name' => 'Lithuania',
+            'country_id'    => $country->id,
+            'locale'        => 'en',
+            'name'          => 'Lithuania',
             'name_official' => 'Republic of Lithuania',
         ]);
 
@@ -182,23 +183,23 @@ final class CountryModelTest extends TestCase
     public function test_country_display_name_with_phone_code(): void
     {
         $country = Country::create([
-            'cca2' => 'LT',
-            'cca3' => 'LTU',
+            'cca2'               => 'LT',
+            'cca3'               => 'LTU',
             'phone_calling_code' => '370',
-            'flag' => '🇱🇹',
-            'region' => 'Europe',
-            'subregion' => 'Northern Europe',
-            'latitude' => 55.169438,
-            'longitude' => 23.881275,
-            'currencies' => ['EUR'],
-            'is_enabled' => true,
-            'sort_order' => 1,
+            'flag'               => '🇱🇹',
+            'region'             => 'Europe',
+            'subregion'          => 'Northern Europe',
+            'latitude'           => 55.169438,
+            'longitude'          => 23.881275,
+            'currencies'         => ['EUR'],
+            'is_enabled'         => true,
+            'sort_order'         => 1,
         ]);
 
         CountryTranslation::create([
-            'country_id' => $country->id,
-            'locale' => 'en',
-            'name' => 'Lithuania',
+            'country_id'    => $country->id,
+            'locale'        => 'en',
+            'name'          => 'Lithuania',
             'name_official' => 'Republic of Lithuania',
         ]);
 
@@ -211,22 +212,22 @@ final class CountryModelTest extends TestCase
     public function test_country_display_name_without_phone_code(): void
     {
         $country = Country::create([
-            'cca2' => 'LT',
-            'cca3' => 'LTU',
-            'flag' => '🇱🇹',
-            'region' => 'Europe',
-            'subregion' => 'Northern Europe',
-            'latitude' => 55.169438,
-            'longitude' => 23.881275,
+            'cca2'       => 'LT',
+            'cca3'       => 'LTU',
+            'flag'       => '🇱🇹',
+            'region'     => 'Europe',
+            'subregion'  => 'Northern Europe',
+            'latitude'   => 55.169438,
+            'longitude'  => 23.881275,
             'currencies' => ['EUR'],
             'is_enabled' => true,
             'sort_order' => 1,
         ]);
 
         CountryTranslation::create([
-            'country_id' => $country->id,
-            'locale' => 'en',
-            'name' => 'Lithuania',
+            'country_id'    => $country->id,
+            'locale'        => 'en',
+            'name'          => 'Lithuania',
             'name_official' => 'Republic of Lithuania',
         ]);
 
@@ -239,17 +240,17 @@ final class CountryModelTest extends TestCase
     public function test_country_currencies_cast_to_array(): void
     {
         $country = Country::create([
-            'cca2' => 'LT',
-            'cca3' => 'LTU',
+            'cca2'               => 'LT',
+            'cca3'               => 'LTU',
             'phone_calling_code' => '370',
-            'flag' => '🇱🇹',
-            'region' => 'Europe',
-            'subregion' => 'Northern Europe',
-            'latitude' => 55.169438,
-            'longitude' => 23.881275,
-            'currencies' => ['EUR', 'USD'],
-            'is_enabled' => true,
-            'sort_order' => 1,
+            'flag'               => '🇱🇹',
+            'region'             => 'Europe',
+            'subregion'          => 'Northern Europe',
+            'latitude'           => 55.169438,
+            'longitude'          => 23.881275,
+            'currencies'         => ['EUR', 'USD'],
+            'is_enabled'         => true,
+            'sort_order'         => 1,
         ]);
 
         $this->assertIsArray($country->currencies);
@@ -259,17 +260,17 @@ final class CountryModelTest extends TestCase
     public function test_country_coordinates_cast_to_decimal(): void
     {
         $country = Country::create([
-            'cca2' => 'LT',
-            'cca3' => 'LTU',
+            'cca2'               => 'LT',
+            'cca3'               => 'LTU',
             'phone_calling_code' => '370',
-            'flag' => '🇱🇹',
-            'region' => 'Europe',
-            'subregion' => 'Northern Europe',
-            'latitude' => 55.169438,
-            'longitude' => 23.881275,
-            'currencies' => ['EUR'],
-            'is_enabled' => true,
-            'sort_order' => 1,
+            'flag'               => '🇱🇹',
+            'region'             => 'Europe',
+            'subregion'          => 'Northern Europe',
+            'latitude'           => 55.169438,
+            'longitude'          => 23.881275,
+            'currencies'         => ['EUR'],
+            'is_enabled'         => true,
+            'sort_order'         => 1,
         ]);
 
         $this->assertEquals(55.169438, (float) $country->latitude);

@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Throwable;
 
 final class DiscountContextBuilder
 {
@@ -32,7 +33,7 @@ final class DiscountContextBuilder
     }
 
     /**
-     * @param  \Illuminate\Contracts\Auth\Authenticatable|null  $user
+     * @param  \Illuminate\Contracts\Auth\Authenticatable|null $user
      * @return array<string, mixed>
      */
     public function fromSession($user, ?string $code = null): array
@@ -41,8 +42,8 @@ final class DiscountContextBuilder
     }
 
     /**
-     * @param  \Illuminate\Contracts\Auth\Authenticatable|null  $user
-     * @param  array<string, mixed>  $cartPayload
+     * @param  \Illuminate\Contracts\Auth\Authenticatable|null $user
+     * @param  array<string, mixed>                            $cartPayload
      * @return array<string, mixed>
      */
     private function build($user, ?string $code, array $cartPayload, ?float $shippingBase = null): array
@@ -57,7 +58,7 @@ final class DiscountContextBuilder
                 return [
                     'product_id' => isset($item['product_id']) ? (int) $item['product_id'] : null,
                     'variant_id' => isset($item['variant_id']) ? (int) $item['variant_id'] : null,
-                    'quantity' => isset($item['quantity']) ? max(0, (int) $item['quantity']) : 0,
+                    'quantity'   => isset($item['quantity']) ? max(0, (int) $item['quantity']) : 0,
                     'unit_price' => isset($item['unit_price']) ? (float) $item['unit_price'] : 0.0,
                 ];
             }, (array) Arr::get($cartPayload, 'items', [])));
@@ -72,12 +73,12 @@ final class DiscountContextBuilder
                         $items[] = [
                             'product_id' => optional($item->associatedModel)->id,
                             'variant_id' => method_exists($item->associatedModel, 'getKey') ? $item->associatedModel->getKey() : null,
-                            'quantity' => (int) $item->quantity,
+                            'quantity'   => (int) $item->quantity,
                             'unit_price' => (float) $item->price,
                         ];
                     }
                     $subtotal = (float) \Darryldecode\Cart\Facades\CartFacade::session($this->session->getId())->getSubTotal();
-                } catch (\Throwable $e) {
+                } catch (Throwable $e) {
                     $items = [];
                     $subtotal = 0.0;
                 }
@@ -92,15 +93,15 @@ final class DiscountContextBuilder
 
         return [
             'currency_code' => current_currency(),
-            'channel_id' => config('app.channel_id') ?? config('app.url'),
-            'user_id' => $userId,
-            'group_ids' => $groupIds,
-            'partner_tier' => $partnerTier,
-            'now' => now(),
-            'code' => $code ? mb_strtoupper(trim($code)) : null,
-            'cart' => [
+            'channel_id'    => config('app.channel_id') ?? config('app.url'),
+            'user_id'       => $userId,
+            'group_ids'     => $groupIds,
+            'partner_tier'  => $partnerTier,
+            'now'           => now(),
+            'code'          => $code ? mb_strtoupper(trim($code)) : null,
+            'cart'          => [
                 'subtotal' => $subtotal,
-                'items' => $items,
+                'items'    => $items,
             ],
             'shipping' => [
                 'base_amount' => $shippingBase,
@@ -159,8 +160,8 @@ final class DiscountContextBuilder
             }
 
             try {
-                $tier = DB::table($pivot.' as pu')
-                    ->join($table.' as p', 'p.id', '=', 'pu.partner_id')
+                $tier = DB::table($pivot . ' as pu')
+                    ->join($table . ' as p', 'p.id', '=', 'pu.partner_id')
                     ->where('pu.user_id', $userId)
                     ->value('p.tier');
 
@@ -179,7 +180,7 @@ final class DiscountContextBuilder
     {
         try {
             return Schema::hasTable($table);
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             return false;
         }
     }

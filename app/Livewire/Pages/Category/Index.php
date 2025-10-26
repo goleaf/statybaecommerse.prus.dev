@@ -27,17 +27,17 @@ use Livewire\Component;
 /**
  * Category listing page with reactive filters, caching and schema-driven filters.
  *
- * @property string $search
+ * @property string          $search
  * @property array<int, int> $selectedBrandIds
  * @property array<int, int> $selectedCollectionIds
  * @property array<int, int> $selectedCategoryIds
- * @property float|null $priceMin
- * @property float|null $priceMax
- * @property bool $inStock
- * @property bool $onSale
- * @property bool $hasProducts
- * @property string $sort
- * @property bool $sidebarOpen
+ * @property float|null      $priceMin
+ * @property float|null      $priceMax
+ * @property bool            $inStock
+ * @property bool            $onSale
+ * @property bool            $hasProducts
+ * @property string          $sort
+ * @property bool            $sidebarOpen
  * @property-read EloquentCollection<int, Brand> $brands
  * @property-read EloquentCollection<int, Collection> $collections
  */
@@ -124,10 +124,10 @@ final class Index extends Component implements HasSchemas
             Select::make('sort')
                 ->label(__('Sort by'))
                 ->options([
-                    'name_asc' => __('Name (A–Z)'),
-                    'name_desc' => __('Name (Z–A)'),
+                    'name_asc'      => __('Name (A–Z)'),
+                    'name_desc'     => __('Name (Z–A)'),
                     'products_desc' => __('Most products'),
-                    'products_asc' => __('Fewest products'),
+                    'products_asc'  => __('Fewest products'),
                 ])
                 ->live(),
         ]);
@@ -222,8 +222,8 @@ final class Index extends Component implements HasSchemas
 
                 return $brands
                     ->map(static fn (Brand $brand): array => [
-                        'id' => (int) $brand->id,
-                        'name' => (string) $brand->name,
+                        'id'    => (int) $brand->id,
+                        'name'  => (string) $brand->name,
                         'count' => (int) ($countsByBrand[$brand->id] ?? 0),
                     ])
                     ->values()
@@ -262,8 +262,8 @@ final class Index extends Component implements HasSchemas
 
                 return $collections
                     ->map(static fn (Collection $collection): array => [
-                        'id' => (int) $collection->id,
-                        'name' => (string) $collection->name,
+                        'id'    => (int) $collection->id,
+                        'name'  => (string) $collection->name,
                         'count' => (int) ($countsByCollection[$collection->id] ?? 0),
                     ])
                     ->values()
@@ -302,8 +302,8 @@ final class Index extends Component implements HasSchemas
 
                 return $categories
                     ->map(static fn (Category $category): array => [
-                        'id' => (int) $category->id,
-                        'name' => (string) $category->name,
+                        'id'    => (int) $category->id,
+                        'name'  => (string) $category->name,
                         'count' => (int) ($countsByCategory[$category->id] ?? 0),
                     ])
                     ->values()
@@ -336,9 +336,9 @@ final class Index extends Component implements HasSchemas
             ->when($this->search !== '', function (Builder $q): void {
                 $q->where(function (Builder $inner): void {
                     $inner
-                        ->where('name', 'like', '%'.$this->search.'%')
-                        ->orWhere('description', 'like', '%'.$this->search.'%')
-                        ->orWhere('sku', 'like', '%'.$this->search.'%');
+                        ->where('name', 'like', '%' . $this->search . '%')
+                        ->orWhere('description', 'like', '%' . $this->search . '%')
+                        ->orWhere('sku', 'like', '%' . $this->search . '%');
                 });
             });
     }
@@ -383,8 +383,8 @@ final class Index extends Component implements HasSchemas
 
                 if ($this->search !== '') {
                     $query->where(function (Builder $q): void {
-                        $q->where('name', 'like', '%'.$this->search.'%')
-                            ->orWhere('description', 'like', '%'.$this->search.'%');
+                        $q->where('name', 'like', '%' . $this->search . '%')
+                            ->orWhere('description', 'like', '%' . $this->search . '%');
                     });
                 }
 
@@ -428,21 +428,21 @@ final class Index extends Component implements HasSchemas
     private function filtersForCache(): array
     {
         return [
-            'search' => $this->search,
-            'selectedBrandIds' => $this->normalizeIds($this->selectedBrandIds),
+            'search'                => $this->search,
+            'selectedBrandIds'      => $this->normalizeIds($this->selectedBrandIds),
             'selectedCollectionIds' => $this->normalizeIds($this->selectedCollectionIds),
-            'selectedCategoryIds' => $this->normalizeIds($this->selectedCategoryIds),
-            'priceMin' => $this->priceMin,
-            'priceMax' => $this->priceMax,
-            'inStock' => $this->inStock,
-            'onSale' => $this->onSale,
-            'hasProducts' => $this->hasProducts,
-            'sort' => $this->sort,
+            'selectedCategoryIds'   => $this->normalizeIds($this->selectedCategoryIds),
+            'priceMin'              => $this->priceMin,
+            'priceMax'              => $this->priceMax,
+            'inStock'               => $this->inStock,
+            'onSale'                => $this->onSale,
+            'hasProducts'           => $this->hasProducts,
+            'sort'                  => $this->sort,
         ];
     }
 
     /**
-     * @param  array<int, int|string>  $ids
+     * @param  array<int, int|string> $ids
      * @return array<int, int>
      */
     private function normalizeIds(array $ids): array
@@ -455,7 +455,7 @@ final class Index extends Component implements HasSchemas
     }
 
     /**
-     * @param  array<int, string>  $additional
+     * @param  array<int, string> $additional
      * @return array<int, string>
      */
     private function tagsForCategoryIndex(array $additional = []): array

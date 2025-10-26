@@ -17,8 +17,8 @@ use Livewire\WithPagination;
 
 /**
  * @property Category $category
- * @property string $sortBy
- * @property string $sortDirection
+ * @property string   $sortBy
+ * @property string   $sortDirection
  * @property-read LengthAwarePaginatorContract<int, Product> $products
  */
 final class Show extends Component
@@ -52,8 +52,8 @@ final class Show extends Component
         $page = request()->integer('page', 1);
 
         $cacheKey = CacheKeys::categoryShowProducts($this->category->id, $locale, [
-            'page' => $page,
-            'sortBy' => $this->sortBy,
+            'page'          => $page,
+            'sortBy'        => $this->sortBy,
             'sortDirection' => $this->sortDirection,
         ]);
 
@@ -87,7 +87,7 @@ final class Show extends Component
                 ])
                 ->withCount('reviews')
                 ->withAvg('reviews', 'rating')
-                ->orderBy('products.'.$this->sortBy, $this->sortDirection)
+                ->orderBy('products.' . $this->sortBy, $this->sortDirection)
                 ->paginate(12);
 
             return $paginator;

@@ -22,7 +22,7 @@ use Livewire\Component;
  * Livewire component for SingleProduct with reactive frontend functionality, real-time updates, and user interaction handling.
  *
  * @property Product $product
- * @property int $quantity
+ * @property int     $quantity
  */
 final class SingleProduct extends Component
 {
@@ -44,8 +44,8 @@ final class SingleProduct extends Component
      * @var array{current: float|null, compare: float|null, discount: float|null, currency: string|null}
      */
     public array $pricingSummary = [
-        'current' => null,
-        'compare' => null,
+        'current'  => null,
+        'compare'  => null,
         'discount' => null,
         'currency' => null,
     ];
@@ -56,7 +56,7 @@ final class SingleProduct extends Component
      * @var array{reserved: int|null, available: int|null}
      */
     public array $inventorySummary = [
-        'reserved' => null,
+        'reserved'  => null,
         'available' => null,
     ];
 
@@ -171,14 +171,14 @@ final class SingleProduct extends Component
             \App\Models\AnalyticsEvent::create([
                 'event_type' => 'product_view',
                 'event_data' => [
-                    'product_id' => $this->product->id,
-                    'product_name' => $this->product->name,
+                    'product_id'       => $this->product->id,
+                    'product_name'     => $this->product->name,
                     'product_category' => $this->product->categories->pluck('name')->join(', '),
-                    'user_id' => auth()->id(),
-                    'session_id' => session()->getId(),
-                    'referrer' => request()->header('referer'),
+                    'user_id'          => auth()->id(),
+                    'session_id'       => session()->getId(),
+                    'referrer'         => request()->header('referer'),
                 ],
-                'user_id' => auth()->id(),
+                'user_id'    => auth()->id(),
                 'session_id' => session()->getId(),
             ]);
         }
@@ -234,7 +234,7 @@ final class SingleProduct extends Component
 
             return;
         }
-        $this->validate(['quantity' => 'required|integer|min:1|max:'.$this->product->availableQuantity()]);
+        $this->validate(['quantity' => 'required|integer|min:1|max:' . $this->product->availableQuantity()]);
         // Check minimum quantity
         if ($this->quantity < $this->product->getMinimumQuantity()) {
             $this->addError('quantity', __('frontend.product.minimum_quantity_required', ['min' => $this->product->getMinimumQuantity()]));
@@ -300,10 +300,10 @@ final class SingleProduct extends Component
                         $attribute = $value->attribute;
 
                         return [
-                            'id' => $attribute?->id,
+                            'id'    => $attribute?->id,
                             'label' => $attribute?->trans('name') ?? $attribute?->name ?? $value->attribute_name,
                             'value' => $value->getLocalizedValue(),
-                            'icon' => $attribute?->icon,
+                            'icon'  => $attribute?->icon,
                             'color' => $attribute?->color,
                         ];
                     });
@@ -314,10 +314,10 @@ final class SingleProduct extends Component
                 $first = $group->first();
 
                 return [
-                    'id' => $first['id'],
+                    'id'    => $first['id'],
                     'label' => $first['label'],
                     'value' => $group->pluck('value')->filter()->unique()->implode(', '),
-                    'icon' => $first['icon'],
+                    'icon'  => $first['icon'],
                     'color' => $first['color'],
                 ];
             });
@@ -350,10 +350,10 @@ final class SingleProduct extends Component
                 }
 
                 return [
-                    'id' => $attribute->id,
+                    'id'    => $attribute->id,
                     'label' => $attribute->trans('name') ?? $attribute->name,
                     'value' => $value,
-                    'icon' => $icon,
+                    'icon'  => $icon,
                     'color' => $color,
                 ];
             })
@@ -402,21 +402,21 @@ final class SingleProduct extends Component
 
                         return [
                             'attribute' => $attribute?->trans('name') ?? $attribute?->name ?? $value->attribute_name,
-                            'value' => $value->getLocalizedValue(),
+                            'value'     => $value->getLocalizedValue(),
                         ];
                     })
                     ->values();
 
                 return [
-                    'id' => $variant->id,
-                    'name' => $variant->name,
-                    'sku' => $variant->sku,
-                    'price' => $priceFormatted,
-                    'compare_price' => $compareFormatted,
-                    'is_out_of_stock' => $variant->isOutOfStock(),
+                    'id'                 => $variant->id,
+                    'name'               => $variant->name,
+                    'sku'                => $variant->sku,
+                    'price'              => $priceFormatted,
+                    'compare_price'      => $compareFormatted,
+                    'is_out_of_stock'    => $variant->isOutOfStock(),
                     'available_quantity' => $variant->availableQuantity(),
-                    'thumbnail' => $thumbnail,
-                    'attributes' => $attributes,
+                    'thumbnail'          => $thumbnail,
+                    'attributes'         => $attributes,
                 ];
             })
             ->values();
@@ -515,8 +515,8 @@ final class SingleProduct extends Component
             }
 
             return [
-                'current' => $current,
-                'compare' => $compare,
+                'current'  => $current,
+                'compare'  => $compare,
                 'discount' => $discount,
                 'currency' => $currency,
             ];
@@ -532,8 +532,8 @@ final class SingleProduct extends Component
         }
 
         return [
-            'current' => $current,
-            'compare' => $compare,
+            'current'  => $current,
+            'compare'  => $compare,
             'discount' => $discount,
             'currency' => $currency,
         ];
@@ -543,13 +543,13 @@ final class SingleProduct extends Component
     {
         if ($variant) {
             return [
-                'reserved' => $variant->reservedQuantity(),
+                'reserved'  => $variant->reservedQuantity(),
                 'available' => $variant->availableQuantity(),
             ];
         }
 
         return [
-            'reserved' => method_exists($this->product, 'reservedQuantity') ? $this->product->reservedQuantity() : null,
+            'reserved'  => method_exists($this->product, 'reservedQuantity') ? $this->product->reservedQuantity() : null,
             'available' => method_exists($this->product, 'availableQuantity') ? $this->product->availableQuantity() : null,
         ];
     }
@@ -669,6 +669,6 @@ final class SingleProduct extends Component
 
         $formatted = rtrim(rtrim(number_format($numeric, 2, '.', ''), '0'), '.');
 
-        return trim($formatted.' '.($unit ?? '')) ?: null;
+        return trim($formatted . ' ' . ($unit ?? '')) ?: null;
     }
 }

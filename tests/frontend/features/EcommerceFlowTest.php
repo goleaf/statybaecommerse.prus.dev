@@ -40,7 +40,7 @@ it('can view category pages', function () {
 it('can view single product', function () {
     $product = Product::factory()->create([
         'is_visible' => true,
-        'slug' => 'test-product',
+        'slug'       => 'test-product',
     ]);
 
     $response = $this->get('/lt/products/test-product');

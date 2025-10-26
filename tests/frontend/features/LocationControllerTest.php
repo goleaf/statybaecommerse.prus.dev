@@ -111,13 +111,13 @@ final class LocationControllerTest extends TestCase
     {
         $country = Country::factory()->create(['cca2' => 'LT', 'name' => 'Lithuania']);
         $location = Location::factory()->create([
-            'is_enabled' => true,
-            'name' => 'Test Location',
+            'is_enabled'     => true,
+            'name'           => 'Test Location',
             'address_line_1' => '123 Test Street',
-            'city' => 'Test City',
-            'phone' => '+37012345678',
-            'email' => 'test@example.com',
-            'country_code' => 'LT',
+            'city'           => 'Test City',
+            'phone'          => '+37012345678',
+            'email'          => 'test@example.com',
+            'country_code'   => 'LT',
         ]);
 
         $response = $this->get(route('locations.show', $location));
@@ -134,26 +134,26 @@ final class LocationControllerTest extends TestCase
     {
         $mainLocation = Location::factory()->create([
             'is_enabled' => true,
-            'type' => 'warehouse',
-            'city' => 'Vilnius',
+            'type'       => 'warehouse',
+            'city'       => 'Vilnius',
         ]);
 
         $relatedLocation1 = Location::factory()->create([
             'is_enabled' => true,
-            'type' => 'warehouse',
-            'city' => 'Vilnius',
+            'type'       => 'warehouse',
+            'city'       => 'Vilnius',
         ]);
 
         $relatedLocation2 = Location::factory()->create([
             'is_enabled' => true,
-            'type' => 'store',
-            'city' => 'Vilnius',
+            'type'       => 'store',
+            'city'       => 'Vilnius',
         ]);
 
         $unrelatedLocation = Location::factory()->create([
             'is_enabled' => true,
-            'type' => 'warehouse',
-            'city' => 'Kaunas',
+            'type'       => 'warehouse',
+            'city'       => 'Kaunas',
         ]);
 
         $response = $this->get(route('locations.show', $mainLocation));
@@ -169,8 +169,8 @@ final class LocationControllerTest extends TestCase
         $location = Location::factory()->create(['is_enabled' => true]);
 
         $response = $this->post(route('locations.contact', $location), [
-            'name' => 'John Doe',
-            'email' => 'john@example.com',
+            'name'    => 'John Doe',
+            'email'   => 'john@example.com',
             'subject' => 'Test Subject',
             'message' => 'Test message content',
         ]);
@@ -184,8 +184,8 @@ final class LocationControllerTest extends TestCase
         $location = Location::factory()->create(['is_enabled' => true]);
 
         $response = $this->post(route('locations.contact', $location), [
-            'name' => '',
-            'email' => 'invalid-email',
+            'name'    => '',
+            'email'   => 'invalid-email',
             'subject' => '',
             'message' => '',
         ]);
@@ -198,8 +198,8 @@ final class LocationControllerTest extends TestCase
         $location = Location::factory()->create(['is_enabled' => true]);
 
         $response = $this->post(route('locations.contact', $location), [
-            'name' => 'John Doe',
-            'email' => 'not-an-email',
+            'name'    => 'John Doe',
+            'email'   => 'not-an-email',
             'subject' => 'Test Subject',
             'message' => 'Test message content',
         ]);
@@ -212,8 +212,8 @@ final class LocationControllerTest extends TestCase
         $location = Location::factory()->create(['is_enabled' => true]);
 
         $response = $this->post(route('locations.contact', $location), [
-            'name' => 'John Doe',
-            'email' => 'john@example.com',
+            'name'    => 'John Doe',
+            'email'   => 'john@example.com',
             'subject' => 'Test Subject',
             'message' => str_repeat('a', 1001), // Exceeds 1000 character limit
         ]);
@@ -251,7 +251,7 @@ final class LocationControllerTest extends TestCase
     public function test_locations_show_displays_opening_hours(): void
     {
         $location = Location::factory()->create([
-            'is_enabled' => true,
+            'is_enabled'    => true,
             'opening_hours' => [
                 ['day' => 'monday', 'open_time' => '09:00', 'close_time' => '17:00', 'is_closed' => false],
                 ['day' => 'sunday', 'open_time' => null, 'close_time' => null, 'is_closed' => true],
@@ -271,8 +271,8 @@ final class LocationControllerTest extends TestCase
     {
         $location = Location::factory()->create([
             'is_enabled' => true,
-            'latitude' => 54.6872,
-            'longitude' => 25.2797,
+            'latitude'   => 54.6872,
+            'longitude'  => 25.2797,
         ]);
 
         $response = $this->get(route('locations.show', $location));

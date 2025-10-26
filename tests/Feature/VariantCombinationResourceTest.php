@@ -13,8 +13,8 @@ use App\Models\VariantCombination;
 use App\Support\Nav;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Select;
-use Filament\Schemas\Schema;
 use Filament\Forms\Components\Toggle;
+use Filament\Schemas\Schema;
 
 // Note: we avoid RefreshDatabase here to use the shared TestingDatabase harness.
 
@@ -34,15 +34,15 @@ beforeEach(function () {
     );
 
     $this->product = Product::factory()->create([
-        'name' => 'Test Product',
+        'name'       => 'Test Product',
         'is_enabled' => true,
     ]);
 
     $this->variantCombination = VariantCombination::factory()->create([
-        'product_id' => $this->product->id,
+        'product_id'             => $this->product->id,
         'attribute_combinations' => [
             'color' => 'red',
-            'size' => 'large',
+            'size'  => 'large',
         ],
         'is_available' => true,
     ]);
@@ -86,10 +86,10 @@ describe('VariantCombinationResource', function () {
         $this->actingAs($this->adminUser);
 
         $newCombinationData = [
-            'product_id' => $this->product->id,
+            'product_id'             => $this->product->id,
             'attribute_combinations' => [
                 'color' => 'blue',
-                'size' => 'medium',
+                'size'  => 'medium',
             ],
             'is_available' => true,
         ];
@@ -100,7 +100,7 @@ describe('VariantCombinationResource', function () {
             ->assertNotified();
 
         $this->assertDatabaseHas('variant_combinations', [
-            'product_id' => $this->product->id,
+            'product_id'   => $this->product->id,
             'is_available' => true,
         ]);
     });
@@ -109,10 +109,10 @@ describe('VariantCombinationResource', function () {
         $this->actingAs($this->adminUser);
 
         $updatedData = [
-            'is_available' => false,
+            'is_available'           => false,
             'attribute_combinations' => [
                 'color' => 'green',
-                'size' => 'small',
+                'size'  => 'small',
             ],
         ];
 
@@ -124,7 +124,7 @@ describe('VariantCombinationResource', function () {
             ->assertNotified();
 
         $this->assertDatabaseHas('variant_combinations', [
-            'id' => $this->variantCombination->id,
+            'id'           => $this->variantCombination->id,
             'is_available' => false,
         ]);
     });
@@ -176,7 +176,7 @@ describe('VariantCombinationResource', function () {
         $this->actingAs($this->adminUser);
 
         $secondCombination = VariantCombination::factory()->create([
-            'product_id' => $this->product->id,
+            'product_id'   => $this->product->id,
             'is_available' => false,
         ]);
 
@@ -209,7 +209,7 @@ describe('VariantCombinationResource', function () {
         $this->actingAs($this->adminUser);
 
         $unavailableCombination = VariantCombination::factory()->create([
-            'product_id' => $this->product->id,
+            'product_id'   => $this->product->id,
             'is_available' => false,
         ]);
 
@@ -252,7 +252,7 @@ describe('VariantCombinationResource', function () {
         $this->actingAs($this->adminUser);
 
         $invalidCombination = VariantCombination::factory()->create([
-            'product_id' => $this->product->id,
+            'product_id'             => $this->product->id,
             'attribute_combinations' => [],
         ]);
 

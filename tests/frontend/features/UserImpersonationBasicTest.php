@@ -48,9 +48,9 @@ describe('User Impersonation Basic Tests', function () {
 
         // Test session structure
         $impersonateData = [
-            'original_user_id' => $admin->id,
+            'original_user_id'     => $admin->id,
             'impersonated_user_id' => $regularUser->id,
-            'started_at' => now()->toISOString(),
+            'started_at'           => now()->toISOString(),
         ];
 
         expect($impersonateData['original_user_id'])->toBe($admin->id);

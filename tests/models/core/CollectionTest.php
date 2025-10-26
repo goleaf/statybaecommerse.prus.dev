@@ -54,14 +54,14 @@ it('products relationship attaches and products_count counts only published', fu
 
     // Published product
     $p1 = Product::factory()->create([
-        'is_visible' => true,
-        'status' => 'published',
+        'is_visible'   => true,
+        'status'       => 'published',
         'published_at' => now()->subDay(),
     ]);
     // Draft product (not counted)
     $p2 = Product::factory()->create([
-        'is_visible' => true,
-        'status' => 'draft',
+        'is_visible'   => true,
+        'status'       => 'draft',
         'published_at' => null,
     ]);
 
@@ -98,15 +98,15 @@ it('trans returns translated field for locale or falls back to base', function (
     config()->set('app.locale', 'lt');
 
     $collection = Collection::factory()->create([
-        'name' => 'Base Name',
-        'slug' => 'base-slug',
+        'name'        => 'Base Name',
+        'slug'        => 'base-slug',
         'description' => 'Base Desc',
     ]);
 
     $collection->translations()->create([
-        'locale' => 'lt',
-        'name' => 'LT Pavadinimas',
-        'slug' => 'lt-slugas',
+        'locale'      => 'lt',
+        'name'        => 'LT Pavadinimas',
+        'slug'        => 'lt-slugas',
         'description' => 'LT aprašymas',
     ]);
 

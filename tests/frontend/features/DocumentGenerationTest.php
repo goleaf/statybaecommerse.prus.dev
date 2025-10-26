@@ -10,9 +10,9 @@ use App\Services\DocumentService;
 
 it('can create document template', function () {
     $template = DocumentTemplate::factory()->create([
-        'name' => 'Product Invoice',
-        'type' => 'invoice',
-        'content' => '<h1>Invoice for $PRODUCT_NAME</h1><p>Price: $PRODUCT_PRICE</p>',
+        'name'      => 'Product Invoice',
+        'type'      => 'invoice',
+        'content'   => '<h1>Invoice for $PRODUCT_NAME</h1><p>Price: $PRODUCT_PRICE</p>',
         'variables' => ['$PRODUCT_NAME', '$PRODUCT_PRICE'],
         'is_active' => true,
     ]);
@@ -24,15 +24,15 @@ it('can create document template', function () {
 
 it('can generate document from template', function () {
     $template = DocumentTemplate::factory()->create([
-        'name' => 'Product Document',
-        'content' => '<h1>Product: $PRODUCT_NAME</h1><p>SKU: $PRODUCT_SKU</p>',
+        'name'      => 'Product Document',
+        'content'   => '<h1>Product: $PRODUCT_NAME</h1><p>SKU: $PRODUCT_SKU</p>',
         'variables' => ['$PRODUCT_NAME', '$PRODUCT_SKU'],
         'is_active' => true,
     ]);
 
     $product = Product::factory()->create([
         'name' => 'Test Product',
-        'sku' => 'TEST-001',
+        'sku'  => 'TEST-001',
     ]);
 
     $user = User::factory()->create();
@@ -54,7 +54,7 @@ it('can generate document from template', function () {
 
 it('can process template variables through document generation', function () {
     $template = DocumentTemplate::factory()->create([
-        'content' => 'Hello $CUSTOMER_NAME, your order $ORDER_NUMBER is ready.',
+        'content'   => 'Hello $CUSTOMER_NAME, your order $ORDER_NUMBER is ready.',
         'variables' => ['$CUSTOMER_NAME', '$ORDER_NUMBER'],
     ]);
 
@@ -86,7 +86,7 @@ it('document has morphed relationship', function () {
     $product = Product::factory()->create();
     $document = Document::factory()->create([
         'documentable_type' => Product::class,
-        'documentable_id' => $product->id,
+        'documentable_id'   => $product->id,
     ]);
 
     expect($document->documentable)->toBeInstanceOf(Product::class);

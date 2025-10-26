@@ -54,7 +54,7 @@ return new class extends Migration
                 ->where('id', $dependency->id)
                 ->update([
                     'condition_operator' => $operator,
-                    'condition_value' => is_array($value) ? json_encode($value) : $value,
+                    'condition_value'    => is_array($value) ? json_encode($value) : $value,
                 ]);
         }
 
@@ -114,7 +114,7 @@ return new class extends Migration
 
                 $payload = json_encode([
                     'operator' => $operator,
-                    'value' => $value,
+                    'value'    => $value,
                 ]);
             }
 

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-$baseDir = __DIR__.'/../app/Filament/Resources';
+$baseDir = __DIR__ . '/../app/Filament/Resources';
 
 /**
  * @return array<string>
@@ -23,7 +23,7 @@ function listPhpFiles(string $dir): array
 $suspects = [];
 foreach (listPhpFiles($baseDir) as $path) {
     // Only check Pages
-    if (strpos($path, DIRECTORY_SEPARATOR.'Pages'.DIRECTORY_SEPARATOR) === false) {
+    if (strpos($path, DIRECTORY_SEPARATOR . 'Pages' . DIRECTORY_SEPARATOR) === false) {
         continue;
     }
     $code = file_get_contents($path);
@@ -46,5 +46,5 @@ foreach ($suspects as $file) {
     echo $file, "\n";
 }
 
-fwrite(STDERR, 'Total suspects: '.count($suspects)."\n");
+fwrite(STDERR, 'Total suspects: ' . count($suspects) . "\n");
 exit(count($suspects) === 0 ? 0 : 1);

@@ -16,8 +16,8 @@ final class CouponApplied
     use SerializesModels;
 
     /**
-     * @param  array<string, mixed>  $pricing
-     * @param  array<string, mixed>  $context
+     * @param array<string, mixed> $pricing
+     * @param array<string, mixed> $context
      */
     public function __construct(
         public Coupon $coupon,

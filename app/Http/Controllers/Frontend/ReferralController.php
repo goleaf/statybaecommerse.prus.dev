@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Referral;
 use App\Models\ReferralReward;
 use App\Models\User;
+use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -108,7 +109,7 @@ final class ReferralController extends Controller
             DB::commit();
 
             return redirect()->route('referrals.index')->with('success', __('referrals.referral_created'));
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             DB::rollBack();
 
             return redirect()->back()->with('error', __('referrals.referral_creation_failed'));
@@ -130,7 +131,7 @@ final class ReferralController extends Controller
             $user->update(['referral_code' => $code, 'referral_code_generated_at' => now()]);
 
             return response()->json(['success' => true, 'message' => __('referrals.code_generated'), 'code' => $code]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->json(['success' => false, 'message' => __('referrals.code_generation_failed')]);
         }
     }
@@ -169,7 +170,7 @@ final class ReferralController extends Controller
             DB::commit();
 
             return response()->json(['success' => true, 'message' => __('referrals.code_applied')]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             DB::rollBack();
 
             return response()->json(['success' => false, 'message' => __('referrals.code_application_failed')]);

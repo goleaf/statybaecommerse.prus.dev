@@ -18,23 +18,23 @@ use Livewire\Component;
  * Livewire component for EnhancedLiveSearch with reactive frontend functionality, real-time updates, and user interaction handling.
  *
  * @property string $query
- * @property array $results
- * @property array $suggestions
- * @property bool $showResults
- * @property bool $showSuggestions
- * @property int $maxResults
- * @property int $minQueryLength
- * @property bool $isSearching
- * @property array $searchTypes
- * @property bool $enableSuggestions
- * @property bool $enableRecentSearches
- * @property bool $enablePopularSearches
- * @property bool $enableAnalytics
+ * @property array  $results
+ * @property array  $suggestions
+ * @property bool   $showResults
+ * @property bool   $showSuggestions
+ * @property int    $maxResults
+ * @property int    $minQueryLength
+ * @property bool   $isSearching
+ * @property array  $searchTypes
+ * @property bool   $enableSuggestions
+ * @property bool   $enableRecentSearches
+ * @property bool   $enablePopularSearches
+ * @property bool   $enableAnalytics
  * @property string $selectedCategory
  * @property string $selectedBrand
- * @property float $minPrice
- * @property float $maxPrice
- * @property bool $inStockOnly
+ * @property float  $minPrice
+ * @property float  $maxPrice
+ * @property bool   $inStockOnly
  * @property string $sortBy
  */
 final class EnhancedLiveSearch extends Component
@@ -324,17 +324,17 @@ final class EnhancedLiveSearch extends Component
     /**
      * Handle quickFilter functionality with proper error handling.
      *
-     * @param  mixed  $value
+     * @param mixed $value
      */
     public function quickFilter(string $filter, $value): void
     {
         match ($filter) {
-            'category' => $this->selectedCategory = $value,
-            'brand' => $this->selectedBrand = $value,
+            'category'    => $this->selectedCategory = $value,
+            'brand'       => $this->selectedBrand = $value,
             'price_range' => $this->setPriceRange($value),
-            'stock' => $this->inStockOnly = $value === 'in_stock',
-            'sort' => $this->sortBy = $value,
-            default => null,
+            'stock'       => $this->inStockOnly = $value === 'in_stock',
+            'sort'        => $this->sortBy = $value,
+            default       => null,
         };
         if (! empty($this->query)) {
             $this->performSearch();
@@ -348,10 +348,10 @@ final class EnhancedLiveSearch extends Component
     {
         match ($range) {
             'under_50' => [$this->minPrice, $this->maxPrice] = [0, 50],
-            '50_100' => [$this->minPrice, $this->maxPrice] = [50, 100],
-            '100_500' => [$this->minPrice, $this->maxPrice] = [100, 500],
+            '50_100'   => [$this->minPrice, $this->maxPrice] = [50, 100],
+            '100_500'  => [$this->minPrice, $this->maxPrice] = [100, 500],
             'over_500' => [$this->minPrice, $this->maxPrice] = [500, 10000],
-            default => [$this->minPrice, $this->maxPrice] = [0, 10000],
+            default    => [$this->minPrice, $this->maxPrice] = [0, 10000],
         };
     }
 
@@ -360,7 +360,7 @@ final class EnhancedLiveSearch extends Component
      */
     private function generateCacheKey(): string
     {
-        return 'enhanced_search_'.md5(json_encode(['query' => $this->query, 'max_results' => $this->maxResults, 'search_types' => $this->searchTypes, 'category' => $this->selectedCategory, 'brand' => $this->selectedBrand, 'min_price' => $this->minPrice, 'max_price' => $this->maxPrice, 'in_stock_only' => $this->inStockOnly, 'sort_by' => $this->sortBy]));
+        return 'enhanced_search_' . md5(json_encode(['query' => $this->query, 'max_results' => $this->maxResults, 'search_types' => $this->searchTypes, 'category' => $this->selectedCategory, 'brand' => $this->selectedBrand, 'min_price' => $this->minPrice, 'max_price' => $this->maxPrice, 'in_stock_only' => $this->inStockOnly, 'sort_by' => $this->sortBy]));
     }
 
     /**

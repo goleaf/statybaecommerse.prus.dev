@@ -20,16 +20,16 @@ class ProductVariantTest extends TestCase
         $product = Product::factory()->create();
 
         $variant = ProductVariant::factory()->create([
-            'product_id' => $product->id,
-            'sku' => 'VARIANT-123',
-            'price' => 99.99,
+            'product_id'     => $product->id,
+            'sku'            => 'VARIANT-123',
+            'price'          => 99.99,
             'stock_quantity' => 50,
         ]);
 
         $this->assertDatabaseHas('product_variants', [
-            'product_id' => $product->id,
-            'sku' => 'VARIANT-123',
-            'price' => 99.99,
+            'product_id'     => $product->id,
+            'sku'            => 'VARIANT-123',
+            'price'          => 99.99,
             'stock_quantity' => 50,
         ]);
     }
@@ -58,13 +58,13 @@ class ProductVariantTest extends TestCase
     public function test_product_variant_casts_work_correctly(): void
     {
         $variant = ProductVariant::factory()->create([
-            'price' => 99.99,
-            'sale_price' => 79.99,
+            'price'          => 99.99,
+            'sale_price'     => 79.99,
             'stock_quantity' => 100,
-            'weight' => 1.5,
-            'is_active' => true,
-            'is_default' => false,
-            'created_at' => now(),
+            'weight'         => 1.5,
+            'is_active'      => true,
+            'is_default'     => false,
+            'created_at'     => now(),
         ]);
 
         $this->assertIsNumeric($variant->price);
@@ -139,7 +139,7 @@ class ProductVariantTest extends TestCase
     public function test_product_variant_can_calculate_discount_percentage(): void
     {
         $variant = ProductVariant::factory()->create([
-            'price' => 100.00,
+            'price'      => 100.00,
             'sale_price' => 80.00,
         ]);
 
@@ -151,12 +151,12 @@ class ProductVariantTest extends TestCase
     public function test_product_variant_can_get_effective_price(): void
     {
         $variantWithSale = ProductVariant::factory()->create([
-            'price' => 100.00,
+            'price'      => 100.00,
             'sale_price' => 80.00,
         ]);
 
         $variantWithoutSale = ProductVariant::factory()->create([
-            'price' => 100.00,
+            'price'      => 100.00,
             'sale_price' => null,
         ]);
 
@@ -186,7 +186,7 @@ class ProductVariantTest extends TestCase
     {
         $variant = ProductVariant::factory()->create([
             'length' => 10.5,
-            'width' => 8.0,
+            'width'  => 8.0,
             'height' => 2.5,
         ]);
 
@@ -221,8 +221,8 @@ class ProductVariantTest extends TestCase
     {
         $variant = ProductVariant::factory()->create([
             'custom_attributes' => [
-                'color' => 'red',
-                'size' => 'large',
+                'color'    => 'red',
+                'size'     => 'large',
                 'material' => 'cotton',
             ],
         ]);

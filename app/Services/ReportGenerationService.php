@@ -9,6 +9,7 @@ use App\Models\Product;
 use App\Models\Report;
 use App\Models\User;
 use App\Services\Pricing\PriceCalculator;
+use Exception;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -110,7 +111,7 @@ final class ReportGenerationService
 
             $operation->finish([
                 'processed_products' => $processedCount,
-                'timeout_reached' => now()->greaterThan($timeout),
+                'timeout_reached'    => now()->greaterThan($timeout),
             ]);
 
             return $result;
@@ -162,8 +163,8 @@ final class ReportGenerationService
 
             $operation->finish([
                 'processed_events' => $processedCount,
-                'unique_users' => count($userActivity),
-                'timeout_reached' => now()->greaterThan($timeout),
+                'unique_users'     => count($userActivity),
+                'timeout_reached'  => now()->greaterThan($timeout),
             ]);
 
             return $result;
@@ -197,10 +198,10 @@ final class ReportGenerationService
                 }
                 try {
                     $report['sections'][$sectionName] = $sectionGenerator();
-                } catch (\Exception $e) {
+                } catch (Exception $e) {
                     $this->logger->log('error', 'system_report_section_failed', [
                         'section' => $sectionName,
-                        'error' => $e->getMessage(),
+                        'error'   => $e->getMessage(),
                     ]);
                     $report['sections'][$sectionName] = ['error' => $e->getMessage()];
                 }
@@ -208,7 +209,7 @@ final class ReportGenerationService
 
             $operation->finish([
                 'sections_generated' => array_keys($report['sections']),
-                'timeout_reached' => now()->greaterThan($timeout),
+                'timeout_reached'    => now()->greaterThan($timeout),
             ]);
 
             return $report;

@@ -38,10 +38,10 @@ beforeEach(function () {
 
     $this->testCollectionRule = CollectionRule::factory()->create([
         'collection_id' => $this->testCollection->id,
-        'field' => 'name',
-        'operator' => 'contains',
-        'value' => 'test',
-        'position' => 1,
+        'field'         => 'name',
+        'operator'      => 'contains',
+        'value'         => 'test',
+        'position'      => 1,
     ]);
 });
 
@@ -59,20 +59,20 @@ it('can create a collection rule', function () {
         ->test(CollectionRuleResource\Pages\CreateCollectionRule::class)
         ->fillForm([
             'collection_id' => $collection->id,
-            'field' => 'price',
-            'operator' => 'greater_than',
-            'value' => '100',
-            'position' => 1,
+            'field'         => 'price',
+            'operator'      => 'greater_than',
+            'value'         => '100',
+            'position'      => 1,
         ])
         ->call('create')
         ->assertHasNoFormErrors();
 
     $this->assertDatabaseHas('collection_rules', [
         'collection_id' => $collection->id,
-        'field' => 'price',
-        'operator' => 'greater_than',
-        'value' => '100',
-        'position' => 1,
+        'field'         => 'price',
+        'operator'      => 'greater_than',
+        'value'         => '100',
+        'position'      => 1,
     ]);
 });
 
@@ -87,18 +87,18 @@ it('can edit a collection rule record', function () {
     Livewire::actingAs($this->adminUser)
         ->test(CollectionRuleResource\Pages\EditCollectionRule::class, ['record' => $this->testCollectionRule->id])
         ->fillForm([
-            'field' => 'updated_field',
+            'field'    => 'updated_field',
             'operator' => 'equals',
-            'value' => 'updated_value',
+            'value'    => 'updated_value',
         ])
         ->call('save')
         ->assertHasNoFormErrors();
 
     $this->assertDatabaseHas('collection_rules', [
-        'id' => $this->testCollectionRule->id,
-        'field' => 'updated_field',
+        'id'       => $this->testCollectionRule->id,
+        'field'    => 'updated_field',
         'operator' => 'equals',
-        'value' => 'updated_value',
+        'value'    => 'updated_value',
     ]);
 });
 
@@ -120,9 +120,9 @@ it('validates required fields', function () {
         ->test(CollectionRuleResource\Pages\CreateCollectionRule::class)
         ->fillForm([
             'collection_id' => '',
-            'field' => '',
-            'operator' => '',
-            'value' => '',
+            'field'         => '',
+            'operator'      => '',
+            'value'         => '',
         ])
         ->call('create')
         ->assertHasFormErrors(['collection_id', 'field', 'operator', 'value']);
@@ -156,7 +156,7 @@ it('can search collection rules by field', function () {
 
     $this
         ->actingAs($this->adminUser)
-        ->get(CollectionRuleResource::getUrl('index').'?search=special')
+        ->get(CollectionRuleResource::getUrl('index') . '?search=special')
         ->assertOk();
 });
 
@@ -165,7 +165,7 @@ it('can search collection rules by value', function () {
 
     $this
         ->actingAs($this->adminUser)
-        ->get(CollectionRuleResource::getUrl('index').'?search=special')
+        ->get(CollectionRuleResource::getUrl('index') . '?search=special')
         ->assertOk();
 });
 
@@ -175,14 +175,14 @@ it('can sort collection rules by position', function () {
 
     $this
         ->actingAs($this->adminUser)
-        ->get(CollectionRuleResource::getUrl('index').'?sort=position&direction=asc')
+        ->get(CollectionRuleResource::getUrl('index') . '?sort=position&direction=asc')
         ->assertOk();
 });
 
 it('can sort collection rules by created date', function () {
     $this
         ->actingAs($this->adminUser)
-        ->get(CollectionRuleResource::getUrl('index').'?sort=created_at&direction=desc')
+        ->get(CollectionRuleResource::getUrl('index') . '?sort=created_at&direction=desc')
         ->assertOk();
 });
 
@@ -264,10 +264,10 @@ it('validates position is numeric', function () {
         ->test(CollectionRuleResource\Pages\CreateCollectionRule::class)
         ->fillForm([
             'collection_id' => $this->testCollection->id,
-            'field' => 'test_field',
-            'operator' => 'equals',
-            'value' => 'test_value',
-            'position' => 'not_a_number',
+            'field'         => 'test_field',
+            'operator'      => 'equals',
+            'value'         => 'test_value',
+            'position'      => 'not_a_number',
         ])
         ->call('create')
         ->assertHasFormErrors(['position']);

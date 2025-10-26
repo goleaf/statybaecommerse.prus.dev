@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Tests\Unit;
 
@@ -14,7 +16,7 @@ final class SystemSettingDependencyConditionTest extends TestCase
     public function test_equals_condition_returns_true_when_values_match(): void
     {
         $dependsOnSetting = SystemSetting::factory()->create([
-            'key' => 'feature_enabled',
+            'key'   => 'feature_enabled',
             'value' => 'yes',
         ]);
 
@@ -30,7 +32,7 @@ final class SystemSettingDependencyConditionTest extends TestCase
     public function test_equals_condition_returns_false_when_values_dont_match(): void
     {
         $dependsOnSetting = SystemSetting::factory()->create([
-            'key' => 'feature_enabled',
+            'key'   => 'feature_enabled',
             'value' => 'no',
         ]);
 
@@ -46,7 +48,7 @@ final class SystemSettingDependencyConditionTest extends TestCase
     public function test_not_equals_condition_returns_true_when_values_differ(): void
     {
         $dependsOnSetting = SystemSetting::factory()->create([
-            'key' => 'feature_enabled',
+            'key'   => 'feature_enabled',
             'value' => 'yes',
         ]);
 
@@ -62,7 +64,7 @@ final class SystemSettingDependencyConditionTest extends TestCase
     public function test_not_equals_condition_returns_false_when_values_match(): void
     {
         $dependsOnSetting = SystemSetting::factory()->create([
-            'key' => 'feature_enabled',
+            'key'   => 'feature_enabled',
             'value' => 'yes',
         ]);
 
@@ -78,7 +80,7 @@ final class SystemSettingDependencyConditionTest extends TestCase
     public function test_greater_than_condition_with_numeric_values(): void
     {
         $dependsOnSetting = SystemSetting::factory()->create([
-            'key' => 'max_users',
+            'key'   => 'max_users',
             'value' => '100',
         ]);
 
@@ -94,7 +96,7 @@ final class SystemSettingDependencyConditionTest extends TestCase
     public function test_greater_than_condition_returns_false_when_equal(): void
     {
         $dependsOnSetting = SystemSetting::factory()->create([
-            'key' => 'max_users',
+            'key'   => 'max_users',
             'value' => '100',
         ]);
 
@@ -110,7 +112,7 @@ final class SystemSettingDependencyConditionTest extends TestCase
     public function test_less_than_condition_with_numeric_values(): void
     {
         $dependsOnSetting = SystemSetting::factory()->create([
-            'key' => 'min_users',
+            'key'   => 'min_users',
             'value' => '10',
         ]);
 
@@ -126,7 +128,7 @@ final class SystemSettingDependencyConditionTest extends TestCase
     public function test_less_than_condition_returns_false_when_equal(): void
     {
         $dependsOnSetting = SystemSetting::factory()->create([
-            'key' => 'min_users',
+            'key'   => 'min_users',
             'value' => '50',
         ]);
 
@@ -142,7 +144,7 @@ final class SystemSettingDependencyConditionTest extends TestCase
     public function test_contains_condition_returns_true_when_substring_found(): void
     {
         $dependsOnSetting = SystemSetting::factory()->create([
-            'key' => 'allowed_roles',
+            'key'   => 'allowed_roles',
             'value' => 'admin,editor,viewer',
         ]);
 
@@ -158,7 +160,7 @@ final class SystemSettingDependencyConditionTest extends TestCase
     public function test_contains_condition_returns_false_when_substring_not_found(): void
     {
         $dependsOnSetting = SystemSetting::factory()->create([
-            'key' => 'allowed_roles',
+            'key'   => 'allowed_roles',
             'value' => 'admin,viewer',
         ]);
 
@@ -174,7 +176,7 @@ final class SystemSettingDependencyConditionTest extends TestCase
     public function test_not_contains_condition_returns_true_when_substring_not_found(): void
     {
         $dependsOnSetting = SystemSetting::factory()->create([
-            'key' => 'allowed_roles',
+            'key'   => 'allowed_roles',
             'value' => 'admin,viewer',
         ]);
 
@@ -190,7 +192,7 @@ final class SystemSettingDependencyConditionTest extends TestCase
     public function test_is_empty_condition_returns_true_when_value_is_empty(): void
     {
         $dependsOnSetting = SystemSetting::factory()->create([
-            'key' => 'optional_field',
+            'key'   => 'optional_field',
             'value' => '',
         ]);
 
@@ -206,7 +208,7 @@ final class SystemSettingDependencyConditionTest extends TestCase
     public function test_is_empty_condition_returns_false_when_value_is_not_empty(): void
     {
         $dependsOnSetting = SystemSetting::factory()->create([
-            'key' => 'optional_field',
+            'key'   => 'optional_field',
             'value' => 'some_value',
         ]);
 
@@ -222,7 +224,7 @@ final class SystemSettingDependencyConditionTest extends TestCase
     public function test_is_not_empty_condition_returns_true_when_value_is_not_empty(): void
     {
         $dependsOnSetting = SystemSetting::factory()->create([
-            'key' => 'required_field',
+            'key'   => 'required_field',
             'value' => 'some_value',
         ]);
 
@@ -238,7 +240,7 @@ final class SystemSettingDependencyConditionTest extends TestCase
     public function test_is_not_empty_condition_returns_false_when_value_is_empty(): void
     {
         $dependsOnSetting = SystemSetting::factory()->create([
-            'key' => 'required_field',
+            'key'   => 'required_field',
             'value' => '',
         ]);
 
@@ -254,7 +256,7 @@ final class SystemSettingDependencyConditionTest extends TestCase
     public function test_is_true_condition_with_boolean_true(): void
     {
         $dependsOnSetting = SystemSetting::factory()->create([
-            'key' => 'feature_enabled',
+            'key'   => 'feature_enabled',
             'value' => 'true',
         ]);
 
@@ -270,7 +272,7 @@ final class SystemSettingDependencyConditionTest extends TestCase
     public function test_is_true_condition_with_numeric_one(): void
     {
         $dependsOnSetting = SystemSetting::factory()->create([
-            'key' => 'feature_enabled',
+            'key'   => 'feature_enabled',
             'value' => '1',
         ]);
 
@@ -286,7 +288,7 @@ final class SystemSettingDependencyConditionTest extends TestCase
     public function test_is_false_condition_with_boolean_false(): void
     {
         $dependsOnSetting = SystemSetting::factory()->create([
-            'key' => 'feature_disabled',
+            'key'   => 'feature_disabled',
             'value' => 'false',
         ]);
 
@@ -302,7 +304,7 @@ final class SystemSettingDependencyConditionTest extends TestCase
     public function test_is_false_condition_with_numeric_zero(): void
     {
         $dependsOnSetting = SystemSetting::factory()->create([
-            'key' => 'feature_disabled',
+            'key'   => 'feature_disabled',
             'value' => '0',
         ]);
 
@@ -327,14 +329,14 @@ final class SystemSettingDependencyConditionTest extends TestCase
     public function test_condition_returns_false_when_condition_is_empty(): void
     {
         $dependsOnSetting = SystemSetting::factory()->create([
-            'key' => 'test_setting',
+            'key'   => 'test_setting',
             'value' => 'test_value',
         ]);
 
         $dependency = SystemSettingDependency::factory()->create([
             'depends_on_setting_id' => $dependsOnSetting->id,
-            'condition' => '',
-            'condition_value' => 'test',
+            'condition'             => '',
+            'condition_value'       => 'test',
         ]);
 
         $dependency->load('dependsOnSettingRelation');
@@ -345,14 +347,14 @@ final class SystemSettingDependencyConditionTest extends TestCase
     public function test_condition_returns_false_when_required_value_is_missing(): void
     {
         $dependsOnSetting = SystemSetting::factory()->create([
-            'key' => 'test_setting',
+            'key'   => 'test_setting',
             'value' => 'test_value',
         ]);
 
         $dependency = SystemSettingDependency::factory()->create([
             'depends_on_setting_id' => $dependsOnSetting->id,
-            'condition' => 'equals',
-            'condition_value' => null,
+            'condition'             => 'equals',
+            'condition_value'       => null,
         ]);
 
         $dependency->load('dependsOnSettingRelation');
@@ -363,14 +365,14 @@ final class SystemSettingDependencyConditionTest extends TestCase
     public function test_starts_with_condition_returns_true_when_prefix_matches(): void
     {
         $dependsOnSetting = SystemSetting::factory()->create([
-            'key' => 'api_endpoint',
+            'key'   => 'api_endpoint',
             'value' => 'https://api.example.com',
         ]);
 
         $dependency = SystemSettingDependency::factory()->create([
             'depends_on_setting_id' => $dependsOnSetting->id,
-            'condition' => 'starts_with',
-            'condition_value' => 'https://',
+            'condition'             => 'starts_with',
+            'condition_value'       => 'https://',
         ]);
 
         $dependency->load('dependsOnSettingRelation');
@@ -381,14 +383,14 @@ final class SystemSettingDependencyConditionTest extends TestCase
     public function test_ends_with_condition_returns_true_when_suffix_matches(): void
     {
         $dependsOnSetting = SystemSetting::factory()->create([
-            'key' => 'email_address',
+            'key'   => 'email_address',
             'value' => 'admin@example.com',
         ]);
 
         $dependency = SystemSettingDependency::factory()->create([
             'depends_on_setting_id' => $dependsOnSetting->id,
-            'condition' => 'ends_with',
-            'condition_value' => '.com',
+            'condition'             => 'ends_with',
+            'condition_value'       => '.com',
         ]);
 
         $dependency->load('dependsOnSettingRelation');
@@ -399,14 +401,14 @@ final class SystemSettingDependencyConditionTest extends TestCase
     public function test_in_condition_returns_true_when_value_in_comma_separated_list(): void
     {
         $dependsOnSetting = SystemSetting::factory()->create([
-            'key' => 'selected_role',
+            'key'   => 'selected_role',
             'value' => 'editor',
         ]);
 
         $dependency = SystemSettingDependency::factory()->create([
             'depends_on_setting_id' => $dependsOnSetting->id,
-            'condition' => 'in',
-            'condition_value' => 'admin,editor,viewer',
+            'condition'             => 'in',
+            'condition_value'       => 'admin,editor,viewer',
         ]);
 
         $dependency->load('dependsOnSettingRelation');
@@ -417,14 +419,14 @@ final class SystemSettingDependencyConditionTest extends TestCase
     public function test_in_condition_returns_true_when_value_in_json_array(): void
     {
         $dependsOnSetting = SystemSetting::factory()->create([
-            'key' => 'selected_role',
+            'key'   => 'selected_role',
             'value' => 'editor',
         ]);
 
         $dependency = SystemSettingDependency::factory()->create([
             'depends_on_setting_id' => $dependsOnSetting->id,
-            'condition' => 'in',
-            'condition_value' => '["admin","editor","viewer"]',
+            'condition'             => 'in',
+            'condition_value'       => '["admin","editor","viewer"]',
         ]);
 
         $dependency->load('dependsOnSettingRelation');
@@ -435,14 +437,14 @@ final class SystemSettingDependencyConditionTest extends TestCase
     public function test_not_in_condition_returns_true_when_value_not_in_list(): void
     {
         $dependsOnSetting = SystemSetting::factory()->create([
-            'key' => 'selected_role',
+            'key'   => 'selected_role',
             'value' => 'guest',
         ]);
 
         $dependency = SystemSettingDependency::factory()->create([
             'depends_on_setting_id' => $dependsOnSetting->id,
-            'condition' => 'not_in',
-            'condition_value' => 'admin,editor,viewer',
+            'condition'             => 'not_in',
+            'condition_value'       => 'admin,editor,viewer',
         ]);
 
         $dependency->load('dependsOnSettingRelation');
@@ -453,14 +455,14 @@ final class SystemSettingDependencyConditionTest extends TestCase
     public function test_greater_or_equals_condition_returns_true_when_equal(): void
     {
         $dependsOnSetting = SystemSetting::factory()->create([
-            'key' => 'count',
+            'key'   => 'count',
             'value' => '100',
         ]);
 
         $dependency = SystemSettingDependency::factory()->create([
             'depends_on_setting_id' => $dependsOnSetting->id,
-            'condition' => 'greater_or_equals',
-            'condition_value' => '100',
+            'condition'             => 'greater_or_equals',
+            'condition_value'       => '100',
         ]);
 
         $dependency->load('dependsOnSettingRelation');
@@ -471,14 +473,14 @@ final class SystemSettingDependencyConditionTest extends TestCase
     public function test_less_or_equals_condition_returns_true_when_equal(): void
     {
         $dependsOnSetting = SystemSetting::factory()->create([
-            'key' => 'count',
+            'key'   => 'count',
             'value' => '50',
         ]);
 
         $dependency = SystemSettingDependency::factory()->create([
             'depends_on_setting_id' => $dependsOnSetting->id,
-            'condition' => 'less_or_equals',
-            'condition_value' => '50',
+            'condition'             => 'less_or_equals',
+            'condition_value'       => '50',
         ]);
 
         $dependency->load('dependsOnSettingRelation');

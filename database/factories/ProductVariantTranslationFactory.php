@@ -62,4 +62,3 @@ final class ProductVariantTranslationFactory extends Factory
             ->all();
     }
 }
-

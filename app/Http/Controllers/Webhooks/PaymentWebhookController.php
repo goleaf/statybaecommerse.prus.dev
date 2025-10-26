@@ -24,9 +24,7 @@ use Throwable;
  */
 final class PaymentWebhookController extends Controller
 {
-    public function __construct(private readonly PaymentWebhookService $webhookService)
-    {
-    }
+    public function __construct(private readonly PaymentWebhookService $webhookService) {}
 
     /**
      * Entry point for Stripe webhooks.
@@ -73,7 +71,7 @@ final class PaymentWebhookController extends Controller
         } catch (Throwable $exception) {
             Log::error('Unexpected webhook handling failure.', [
                 'provider' => $provider,
-                'message' => $exception->getMessage(),
+                'message'  => $exception->getMessage(),
             ]);
 
             return response()->json(['error' => 'internal_error'], 500);

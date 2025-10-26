@@ -46,8 +46,7 @@ final class SearchResultPayload
      * Legacy providers might still emit flat metadata, so we fall back to the raw `data`
      * bag whenever a nested payload is missing.
      *
-     * @param SearchResult|array{value: string, label?: string, data?: array<string, mixed>} $result Normalised DTO or Livewire array payload.
-     *
+     * @param  SearchResult|array{value: string, label?: string, data?: array<string, mixed>} $result Normalised DTO or Livewire array payload.
      * @return array{id: string, label: string, payload: array<string, mixed>}
      */
     public static function hydrate(SearchResult|array $result): array

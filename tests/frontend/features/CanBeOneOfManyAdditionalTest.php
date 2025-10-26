@@ -77,12 +77,12 @@ final class CanBeOneOfManyAdditionalTest extends TestCase
 
         // Create multiple referral codes
         $oldReferralCode = ReferralCode::factory()->create([
-            'user_id' => $user->id,
+            'user_id'    => $user->id,
             'created_at' => now()->subDays(5),
         ]);
 
         $latestReferralCode = ReferralCode::factory()->create([
-            'user_id' => $user->id,
+            'user_id'    => $user->id,
             'created_at' => now()->subDays(1),
         ]);
 
@@ -101,12 +101,12 @@ final class CanBeOneOfManyAdditionalTest extends TestCase
 
         // Create multiple referral rewards
         $oldReferralReward = ReferralReward::factory()->create([
-            'user_id' => $user->id,
+            'user_id'    => $user->id,
             'created_at' => now()->subDays(5),
         ]);
 
         $latestReferralReward = ReferralReward::factory()->create([
-            'user_id' => $user->id,
+            'user_id'    => $user->id,
             'created_at' => now()->subDays(1),
         ]);
 
@@ -127,12 +127,12 @@ final class CanBeOneOfManyAdditionalTest extends TestCase
 
         // Create multiple comments
         $oldComment = NewsComment::factory()->approved()->create([
-            'news_id' => $news->id,
+            'news_id'    => $news->id,
             'created_at' => now()->subDays(5),
         ]);
 
         $latestComment = NewsComment::factory()->approved()->create([
-            'news_id' => $news->id,
+            'news_id'    => $news->id,
             'created_at' => now()->subDays(1),
         ]);
 
@@ -151,12 +151,12 @@ final class CanBeOneOfManyAdditionalTest extends TestCase
 
         // Create multiple images
         $oldImage = NewsImage::factory()->create([
-            'news_id' => $news->id,
+            'news_id'    => $news->id,
             'created_at' => now()->subDays(5),
         ]);
 
         $latestImage = NewsImage::factory()->create([
-            'news_id' => $news->id,
+            'news_id'    => $news->id,
             'created_at' => now()->subDays(1),
         ]);
 

@@ -36,7 +36,7 @@ final class CustomerTest extends TestCase
             'metadata',
         ];
 
-        $customer = new Customer();
+        $customer = new Customer;
 
         // Validate that the fillable property matches the documented contract.
         $this->assertSame($expected, $customer->getFillable());
@@ -45,7 +45,7 @@ final class CustomerTest extends TestCase
     public function test_customer_casts_are_configured(): void
     {
         // Instantiate the model so we can read the attribute casting rules.
-        $customer = new Customer();
+        $customer = new Customer;
         $casts = $customer->getCasts();
 
         // Confirm boolean and array casts to protect data integrity.
@@ -56,7 +56,7 @@ final class CustomerTest extends TestCase
     public function test_customer_uses_expected_traits(): void
     {
         // Capture the traits currently applied to the model instance.
-        $traits = class_uses(new Customer());
+        $traits = class_uses(new Customer);
 
         // Verify both translation and soft delete behaviours remain active.
         $this->assertContains('App\\Traits\\HasTranslations', $traits);
@@ -66,7 +66,7 @@ final class CustomerTest extends TestCase
     public function test_city_relationship_definition(): void
     {
         // Resolve the relationship instance to ensure it is configured correctly.
-        $relationship = (new Customer())->city();
+        $relationship = (new Customer)->city();
 
         // Assert that the relationship matches the expected type and target model.
         $this->assertInstanceOf(BelongsTo::class, $relationship);
@@ -76,7 +76,7 @@ final class CustomerTest extends TestCase
     public function test_country_relationship_definition(): void
     {
         // Resolve the relationship instance to ensure it is configured correctly.
-        $relationship = (new Customer())->country();
+        $relationship = (new Customer)->country();
 
         // Assert that the relationship matches the expected type and target model.
         $this->assertInstanceOf(BelongsTo::class, $relationship);
@@ -86,7 +86,7 @@ final class CustomerTest extends TestCase
     public function test_company_relationship_definition(): void
     {
         // Resolve the relationship instance to ensure it is configured correctly.
-        $relationship = (new Customer())->company();
+        $relationship = (new Customer)->company();
 
         // Assert that the relationship matches the expected type and target model.
         $this->assertInstanceOf(BelongsTo::class, $relationship);
@@ -96,7 +96,7 @@ final class CustomerTest extends TestCase
     public function test_orders_relationship_definition(): void
     {
         // Resolve the relationship instance to ensure it is configured correctly.
-        $relationship = (new Customer())->orders();
+        $relationship = (new Customer)->orders();
 
         // Assert that the relationship matches the expected type and target model.
         $this->assertInstanceOf(HasMany::class, $relationship);
@@ -106,7 +106,7 @@ final class CustomerTest extends TestCase
     public function test_addresses_relationship_definition(): void
     {
         // Resolve the relationship instance to ensure it is configured correctly.
-        $relationship = (new Customer())->addresses();
+        $relationship = (new Customer)->addresses();
 
         // Assert that the relationship matches the expected type and target model.
         $this->assertInstanceOf(HasMany::class, $relationship);
@@ -116,7 +116,7 @@ final class CustomerTest extends TestCase
     public function test_reviews_relationship_definition(): void
     {
         // Resolve the relationship instance to ensure it is configured correctly.
-        $relationship = (new Customer())->reviews();
+        $relationship = (new Customer)->reviews();
 
         // Assert that the relationship matches the expected type and target model.
         $this->assertInstanceOf(HasMany::class, $relationship);

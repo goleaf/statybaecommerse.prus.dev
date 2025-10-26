@@ -59,7 +59,7 @@ final class ValidateContractCommand extends Command
 
         $this->error(sprintf('✘ %s payload has %d validation issue(s):', basename($payloadPath), count($errors)));
         foreach ($errors as $error) {
-            $this->line('  • '.$error);
+            $this->line('  • ' . $error);
         }
 
         return self::FAILURE;
@@ -71,12 +71,12 @@ final class ValidateContractCommand extends Command
     private function resolveContractClass(string $entity): string
     {
         return match ($entity) {
-            'product' => ProductContract::class,
+            'product'  => ProductContract::class,
             'category' => CategoryContract::class,
-            'brand' => BrandContract::class,
-            'order' => OrderContract::class,
-            'user' => UserContract::class,
-            default => throw new InvalidArgumentException(sprintf('Unsupported entity [%s].', $entity)),
+            'brand'    => BrandContract::class,
+            'order'    => OrderContract::class,
+            'user'     => UserContract::class,
+            default    => throw new InvalidArgumentException(sprintf('Unsupported entity [%s].', $entity)),
         };
     }
 }

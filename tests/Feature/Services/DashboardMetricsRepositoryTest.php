@@ -42,8 +42,8 @@ final class DashboardMetricsRepositoryTest extends TestCase
         User::factory()->create(['created_at' => CarbonImmutable::now()->subDay()]);
 
         Product::factory()->create([
-            'manage_stock' => true,
-            'stock_quantity' => 2,
+            'manage_stock'        => true,
+            'stock_quantity'      => 2,
             'low_stock_threshold' => 5,
         ]);
 

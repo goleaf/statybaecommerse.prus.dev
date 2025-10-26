@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
@@ -34,7 +36,7 @@ Route::prefix('admin/system-settings')->middleware(['web'])->group(function () {
             DB::table('system_settings')
                 ->where('key', $key)
                 ->update([
-                    'value' => $value,
+                    'value'      => $value,
                     'updated_at' => now(),
                 ]);
         }
@@ -50,19 +52,19 @@ Route::prefix('admin/system-settings')->middleware(['web'])->group(function () {
 
         $data = $settings->map(function ($setting) {
             return [
-                'key' => $setting->key,
-                'name' => $setting->name,
-                'value' => $setting->value,
-                'type' => $setting->type,
-                'group' => $setting->group,
-                'category' => $setting->category_name,
-                'description' => $setting->description,
-                'help_text' => $setting->help_text,
-                'is_public' => $setting->is_public,
-                'is_required' => $setting->is_required,
-                'is_encrypted' => $setting->is_encrypted,
-                'is_readonly' => $setting->is_readonly,
-                'options' => $setting->options,
+                'key'           => $setting->key,
+                'name'          => $setting->name,
+                'value'         => $setting->value,
+                'type'          => $setting->type,
+                'group'         => $setting->group,
+                'category'      => $setting->category_name,
+                'description'   => $setting->description,
+                'help_text'     => $setting->help_text,
+                'is_public'     => $setting->is_public,
+                'is_required'   => $setting->is_required,
+                'is_encrypted'  => $setting->is_encrypted,
+                'is_readonly'   => $setting->is_readonly,
+                'options'       => $setting->options,
                 'default_value' => $setting->default_value,
             ];
         });
@@ -72,12 +74,12 @@ Route::prefix('admin/system-settings')->middleware(['web'])->group(function () {
 
     Route::get('/stats', function () {
         $stats = [
-            'total_settings' => DB::table('system_settings')->count(),
-            'active_settings' => DB::table('system_settings')->where('is_active', true)->count(),
-            'public_settings' => DB::table('system_settings')->where('is_public', true)->count(),
+            'total_settings'     => DB::table('system_settings')->count(),
+            'active_settings'    => DB::table('system_settings')->where('is_active', true)->count(),
+            'public_settings'    => DB::table('system_settings')->where('is_public', true)->count(),
             'encrypted_settings' => DB::table('system_settings')->where('is_encrypted', true)->count(),
-            'categories' => DB::table('system_setting_categories')->where('is_active', true)->count(),
-            'by_type' => DB::table('system_settings')
+            'categories'         => DB::table('system_setting_categories')->where('is_active', true)->count(),
+            'by_type'            => DB::table('system_settings')
                 ->selectRaw('type, count(*) as count')
                 ->groupBy('type')
                 ->pluck('count', 'type'),
@@ -113,9 +115,9 @@ Route::get('/api/settings/{key}', function ($key) {
     }
 
     return response()->json([
-        'key' => $setting->key,
-        'value' => $setting->value,
-        'type' => $setting->type,
+        'key'       => $setting->key,
+        'value'     => $setting->value,
+        'type'      => $setting->type,
         'is_public' => $setting->is_public,
     ]);
 })->name('api.settings.get');

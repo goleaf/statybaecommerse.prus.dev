@@ -33,7 +33,7 @@ final class VariantInventoryTest extends TestCase
         $newLocation = Location::factory()->create();
 
         return VariantInventory::factory()->create(array_merge([
-            'variant_id' => $newVariant->id,
+            'variant_id'  => $newVariant->id,
             'location_id' => $newLocation->id,
         ], $attributes));
     }
@@ -52,12 +52,12 @@ final class VariantInventoryTest extends TestCase
         $this->location = Location::factory()->create();
         $this->supplier = Partner::factory()->create();
         $this->stockItem = VariantInventory::factory()->create([
-            'variant_id' => $this->variant->id,
-            'location_id' => $this->location->id,
-            'supplier_id' => $this->supplier->id,
-            'stock' => 100,
-            'reserved' => 10,
-            'threshold' => 20,
+            'variant_id'    => $this->variant->id,
+            'location_id'   => $this->location->id,
+            'supplier_id'   => $this->supplier->id,
+            'stock'         => 100,
+            'reserved'      => 10,
+            'threshold'     => 20,
             'reorder_point' => 15,
             'cost_per_unit' => 15.50,
         ]);
@@ -91,10 +91,10 @@ final class VariantInventoryTest extends TestCase
         $newVariant = ProductVariant::factory()->create(['product_id' => $this->product->id]);
         $newLocation = Location::factory()->create();
         $lowStockItem = VariantInventory::factory()->create([
-            'variant_id' => $newVariant->id,
+            'variant_id'  => $newVariant->id,
             'location_id' => $newLocation->id,
-            'stock' => 5,
-            'threshold' => 10,
+            'stock'       => 5,
+            'threshold'   => 10,
         ]);
 
         $this->assertTrue($lowStockItem->isLowStock());
@@ -106,9 +106,9 @@ final class VariantInventoryTest extends TestCase
         $newVariant = ProductVariant::factory()->create(['product_id' => $this->product->id]);
         $newLocation = Location::factory()->create();
         $outOfStockItem = VariantInventory::factory()->create([
-            'variant_id' => $newVariant->id,
+            'variant_id'  => $newVariant->id,
             'location_id' => $newLocation->id,
-            'stock' => 0,
+            'stock'       => 0,
         ]);
 
         $this->assertTrue($outOfStockItem->isOutOfStock());
@@ -120,9 +120,9 @@ final class VariantInventoryTest extends TestCase
         $newVariant = ProductVariant::factory()->create(['product_id' => $this->product->id]);
         $newLocation = Location::factory()->create();
         $needsReorderItem = VariantInventory::factory()->create([
-            'variant_id' => $newVariant->id,
-            'location_id' => $newLocation->id,
-            'stock' => 5,
+            'variant_id'    => $newVariant->id,
+            'location_id'   => $newLocation->id,
+            'stock'         => 5,
             'reorder_point' => 10,
         ]);
 
@@ -135,8 +135,8 @@ final class VariantInventoryTest extends TestCase
         $this->assertEquals('in_stock', $this->stockItem->stock_status);
 
         $lowStockItem = $this->createUniqueVariantInventory([
-            'stock' => 15,
-            'reserved' => 5,
+            'stock'     => 15,
+            'reserved'  => 5,
             'threshold' => 20,
         ]);
 
@@ -149,9 +149,9 @@ final class VariantInventoryTest extends TestCase
         $this->assertEquals('out_of_stock', $outOfStockItem->stock_status);
 
         $needsReorderItem = $this->createUniqueVariantInventory([
-            'stock' => 15,
-            'reserved' => 5,
-            'threshold' => 10, // stock (15) > threshold (10) so isLowStock() = false
+            'stock'         => 15,
+            'reserved'      => 5,
+            'threshold'     => 10, // stock (15) > threshold (10) so isLowStock() = false
             'reorder_point' => 20, // stock (15) <= reorder_point (20) so needsReorder() = true
         ]);
 
@@ -212,9 +212,9 @@ final class VariantInventoryTest extends TestCase
         // Check that stock movement was created
         $this->assertDatabaseHas('stock_movements', [
             'variant_inventory_id' => $this->stockItem->id,
-            'quantity' => $adjustmentQuantity,
-            'type' => 'in',
-            'reason' => 'manual_adjustment',
+            'quantity'             => $adjustmentQuantity,
+            'type'                 => 'in',
+            'reason'               => 'manual_adjustment',
         ]);
     }
 
@@ -231,9 +231,9 @@ final class VariantInventoryTest extends TestCase
         // Check that stock movement was created
         $this->assertDatabaseHas('stock_movements', [
             'variant_inventory_id' => $this->stockItem->id,
-            'quantity' => $adjustmentQuantity,
-            'type' => 'out',
-            'reason' => 'damage',
+            'quantity'             => $adjustmentQuantity,
+            'type'                 => 'out',
+            'reason'               => 'damage',
         ]);
     }
 
@@ -319,7 +319,7 @@ final class VariantInventoryTest extends TestCase
     public function test_can_scope_low_stock(): void
     {
         $lowStockItem = $this->createUniqueVariantInventory([
-            'stock' => 5,
+            'stock'     => 5,
             'threshold' => 10,
         ]);
 
@@ -344,7 +344,7 @@ final class VariantInventoryTest extends TestCase
     public function test_can_scope_needs_reorder(): void
     {
         $needsReorderItem = $this->createUniqueVariantInventory([
-            'stock' => 5,
+            'stock'         => 5,
             'reorder_point' => 10,
         ]);
 
@@ -387,7 +387,7 @@ final class VariantInventoryTest extends TestCase
     {
         $anotherLocation = Location::factory()->create();
         $anotherStockItem = VariantInventory::factory()->create([
-            'variant_id' => $this->variant->id,
+            'variant_id'  => $this->variant->id,
             'location_id' => $anotherLocation->id,
         ]);
 
@@ -401,7 +401,7 @@ final class VariantInventoryTest extends TestCase
     {
         $anotherVariant = ProductVariant::factory()->create(['product_id' => $this->product->id]);
         $anotherStockItem = VariantInventory::factory()->create([
-            'variant_id' => $anotherVariant->id,
+            'variant_id'  => $anotherVariant->id,
             'location_id' => $this->location->id,
         ]);
 

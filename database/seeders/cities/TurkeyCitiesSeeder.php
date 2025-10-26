@@ -38,8 +38,8 @@ final class TurkeyCitiesSeeder extends Seeder
                 ['code' => $cityData['code']],
                 array_merge($cityData, [
                     'country_id' => $country->id,
-                    'name' => $cityData['name']['en'],
-                    'slug' => $cityData['slug'],
+                    'name'       => $cityData['name']['en'],
+                    'slug'       => $cityData['slug'],
                     'is_enabled' => true,
                     'is_default' => false,
                 ])
@@ -49,9 +49,9 @@ final class TurkeyCitiesSeeder extends Seeder
             foreach (['lt', 'en'] as $locale) {
                 CityTranslation::updateOrCreate([
                     'city_id' => $city->id,
-                    'locale' => $locale,
+                    'locale'  => $locale,
                 ], [
-                    'name' => $cityData['name'][$locale] ?? $cityData['name']['en'],
+                    'name'        => $cityData['name'][$locale] ?? $cityData['name']['en'],
                     'description' => $cityData['description'][$locale] ?? '',
                 ]);
             }

@@ -8,8 +8,8 @@ use App\Data\Pricing\PriceBreakdown;
 use App\Models\CartItem;
 use App\Models\Order;
 use App\Models\OrderItem;
-use App\Services\Pricing\PriceCalculator;
 use App\Services\Cart\CartLifecycleService;
+use App\Services\Pricing\PriceCalculator;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
@@ -29,7 +29,7 @@ use Livewire\Component;
  * @property string $billingCity
  * @property string $billingPostalCode
  * @property string $billingCompany
- * @property bool $sameAsShipping
+ * @property bool   $sameAsShipping
  * @property string $shippingFirstName
  * @property string $shippingLastName
  * @property string $shippingAddress
@@ -37,7 +37,7 @@ use Livewire\Component;
  * @property string $shippingPostalCode
  * @property string $shippingCompany
  * @property string $notes
- * @property int $currentStep
+ * @property int    $currentStep
  */
 final class CheckoutProcess extends Component
 {
@@ -131,8 +131,8 @@ final class CheckoutProcess extends Component
     public function validateCurrentStep(): void
     {
         match ($this->currentStep) {
-            1 => $this->validate(['billingFirstName' => 'required|string|max:255', 'billingLastName' => 'required|string|max:255', 'billingEmail' => 'required|email|max:255', 'billingPhone' => 'required|string|max:255', 'billingAddress' => 'required|string|max:255', 'billingCity' => 'required|string|max:255', 'billingPostalCode' => 'required|string|max:10']),
-            2 => $this->sameAsShipping ? null : $this->validate(['shippingFirstName' => 'required|string|max:255', 'shippingLastName' => 'required|string|max:255', 'shippingAddress' => 'required|string|max:255', 'shippingCity' => 'required|string|max:255', 'shippingPostalCode' => 'required|string|max:10']),
+            1       => $this->validate(['billingFirstName' => 'required|string|max:255', 'billingLastName' => 'required|string|max:255', 'billingEmail' => 'required|email|max:255', 'billingPhone' => 'required|string|max:255', 'billingAddress' => 'required|string|max:255', 'billingCity' => 'required|string|max:255', 'billingPostalCode' => 'required|string|max:10']),
+            2       => $this->sameAsShipping ? null : $this->validate(['shippingFirstName' => 'required|string|max:255', 'shippingLastName' => 'required|string|max:255', 'shippingAddress' => 'required|string|max:255', 'shippingCity' => 'required|string|max:255', 'shippingPostalCode' => 'required|string|max:10']),
             default => null,
         };
     }
@@ -161,32 +161,32 @@ final class CheckoutProcess extends Component
     /**
      * Handle createOrder functionality with proper error handling.
      *
-     * @param  mixed  $cartItems
+     * @param mixed $cartItems
      */
     private function createOrder($cartItems): Order
     {
         $breakdown = $this->calculateBreakdown($cartItems);
 
         return Order::create([
-            'number' => 'LT-'.strtoupper(uniqid()),
-            'user_id' => auth()->id(),
-            'status' => 'pending',
-            'subtotal' => $breakdown->subtotal,
-            'tax_amount' => $breakdown->tax,
-            'shipping_amount' => $breakdown->shipping,
-            'discount_amount' => $breakdown->discount,
-            'total' => $breakdown->total,
-            'currency' => $breakdown->currency,
-            'billing_address' => $this->getBillingAddress(),
+            'number'           => 'LT-' . strtoupper(uniqid()),
+            'user_id'          => auth()->id(),
+            'status'           => 'pending',
+            'subtotal'         => $breakdown->subtotal,
+            'tax_amount'       => $breakdown->tax,
+            'shipping_amount'  => $breakdown->shipping,
+            'discount_amount'  => $breakdown->discount,
+            'total'            => $breakdown->total,
+            'currency'         => $breakdown->currency,
+            'billing_address'  => $this->getBillingAddress(),
             'shipping_address' => $this->getShippingAddress(),
-            'notes' => $this->notes,
+            'notes'            => $this->notes,
         ]);
     }
 
     /**
      * Handle createOrderItems functionality with proper error handling.
      *
-     * @param  mixed  $cartItems
+     * @param mixed $cartItems
      */
     private function createOrderItems(Order $order, $cartItems): void
     {
@@ -236,7 +236,7 @@ final class CheckoutProcess extends Component
 
         return view('livewire.pages.checkout-process', [
             'cartItems' => $items,
-            'summary' => $breakdown->toSummary(),
+            'summary'   => $breakdown->toSummary(),
         ]);
     }
 

@@ -44,7 +44,7 @@ final class RolesAndPermissionsSeeder extends Seeder
     }
 
     /**
-     * @param  array<int, string>  $abilities
+     * @param array<int, string> $abilities
      */
     private function expandAbilities(array $abilities, array $entities): Collection
     {

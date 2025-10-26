@@ -7,6 +7,7 @@ namespace App\Services\Recommendations;
 use App\Models\Product;
 use App\Models\User;
 use App\Models\UserProductInteraction;
+use Exception;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Arr;
 
@@ -88,8 +89,8 @@ final class CollaborativeFilteringRecommendation extends BaseRecommendation
             $similarity = $this->calculateUserSimilarity($userRatings, $interactions);
             if ($similarity >= $this->config['neighbor_threshold']) {
                 $neighbors->push([
-                    'user' => $interactions->first()?->user,
-                    'similarity' => $similarity,
+                    'user'         => $interactions->first()?->user,
+                    'similarity'   => $similarity,
                     'interactions' => $interactions->keyBy('product_id'),
                 ]);
             }
@@ -158,9 +159,9 @@ final class CollaborativeFilteringRecommendation extends BaseRecommendation
 
             return [
                 'product_id' => Arr::get($group->first(), 'product_id'),
-                'score' => $totalScore / $interactionCount,
+                'score'      => $totalScore / $interactionCount,
                 // Average score
-                'similarity' => $maxSimilarity,
+                'similarity'        => $maxSimilarity,
                 'interaction_count' => $interactionCount,
             ];
         });
@@ -184,9 +185,9 @@ final class CollaborativeFilteringRecommendation extends BaseRecommendation
         try {
             // Check if interaction already exists
             $existingInteraction = UserProductInteraction::where([
-                'user_id' => $user->id,
+                'user_id'    => $user->id,
                 'product_id' => $product->id,
-                'event' => $interactionType,
+                'event'      => $interactionType,
             ])->first();
             if ($existingInteraction) {
                 $existingInteraction->increment('count');
@@ -197,26 +198,26 @@ final class CollaborativeFilteringRecommendation extends BaseRecommendation
 
                 $existingInteraction->update([
                     'occurred_at' => $meta['last_interaction'],
-                    'meta' => $meta,
-                    'rating' => $meta['rating'],
+                    'meta'        => $meta,
+                    'rating'      => $meta['rating'],
                 ]);
             } else {
                 $timestamp = now();
 
                 UserProductInteraction::create([
-                    'user_id' => $user->id,
-                    'product_id' => $product->id,
-                    'event' => $interactionType,
+                    'user_id'     => $user->id,
+                    'product_id'  => $product->id,
+                    'event'       => $interactionType,
                     'occurred_at' => $timestamp,
-                    'meta' => [
-                        'rating' => $rating ?? $this->getDefaultRating($interactionType),
-                        'count' => 1,
+                    'meta'        => [
+                        'rating'            => $rating ?? $this->getDefaultRating($interactionType),
+                        'count'             => 1,
                         'first_interaction' => $timestamp,
-                        'last_interaction' => $timestamp,
+                        'last_interaction'  => $timestamp,
                     ],
                 ]);
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // Table might not exist yet, ignore
         }
     }
@@ -227,13 +228,13 @@ final class CollaborativeFilteringRecommendation extends BaseRecommendation
     private function getDefaultRating(string $interactionType): float
     {
         return match ($interactionType) {
-            'view' => 1.0,
-            'click' => 2.0,
-            'cart' => 3.0,
+            'view'     => 1.0,
+            'click'    => 2.0,
+            'cart'     => 3.0,
             'purchase' => 5.0,
             'wishlist' => 4.0,
-            'review' => 4.0,
-            default => 1.0,
+            'review'   => 4.0,
+            default    => 1.0,
         };
     }
 }

@@ -9,12 +9,12 @@ use App\Models\Zone;
 describe('Currency Model', function () {
     it('can create a currency', function () {
         $currency = Currency::factory()->create([
-            'name' => ['en' => 'US Dollar', 'lt' => 'JAV doleris'],
-            'code' => 'USD',
-            'symbol' => '$',
-            'exchange_rate' => 1.0,
-            'is_default' => true,
-            'is_enabled' => true,
+            'name'           => ['en' => 'US Dollar', 'lt' => 'JAV doleris'],
+            'code'           => 'USD',
+            'symbol'         => '$',
+            'exchange_rate'  => 1.0,
+            'is_default'     => true,
+            'is_enabled'     => true,
             'decimal_places' => 2,
         ]);
 
@@ -102,9 +102,9 @@ describe('Currency Model', function () {
 
     it('casts attributes correctly', function () {
         $currency = Currency::factory()->create([
-            'exchange_rate' => '1.234567',
-            'is_default' => 1,
-            'is_enabled' => 0,
+            'exchange_rate'  => '1.234567',
+            'is_default'     => 1,
+            'is_enabled'     => 0,
             'decimal_places' => '2',
         ]);
 

@@ -15,7 +15,7 @@ use Livewire\Component;
  * Livewire component for DeleteUserForm with reactive frontend functionality, real-time updates, and user interaction handling.
  *
  * @property string $password
- * @property bool $confirmUserDeletion
+ * @property bool   $confirmUserDeletion
  */
 final class DeleteUserForm extends Component
 {

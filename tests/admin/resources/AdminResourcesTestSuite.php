@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Admin;
 
+use Exception;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use ReflectionClass;
 use Tests\TestCase;
 
 /**
@@ -26,8 +28,8 @@ class AdminResourcesTestSuite extends TestCase
             try {
                 $resource = new $resourceClass;
                 $this->assertInstanceOf(\Filament\Resources\Resource::class, $resource);
-            } catch (\Exception $e) {
-                $this->fail("Resource {$resourceClass} could not be instantiated: ".$e->getMessage());
+            } catch (Exception $e) {
+                $this->fail("Resource {$resourceClass} could not be instantiated: " . $e->getMessage());
             }
         }
     }
@@ -55,8 +57,8 @@ class AdminResourcesTestSuite extends TestCase
                 // Just check that the form method exists and is callable
                 $this->assertTrue(method_exists($resource, 'form'));
                 $this->assertTrue(is_callable([$resource, 'form']));
-            } catch (\Exception $e) {
-                $this->fail("Resource {$resourceClass} form method failed: ".$e->getMessage());
+            } catch (Exception $e) {
+                $this->fail("Resource {$resourceClass} form method failed: " . $e->getMessage());
             }
         }
     }
@@ -72,8 +74,8 @@ class AdminResourcesTestSuite extends TestCase
                 // Just check that the table method exists and is callable
                 $this->assertTrue(method_exists($resource, 'table'));
                 $this->assertTrue(is_callable([$resource, 'table']));
-            } catch (\Exception $e) {
-                $this->fail("Resource {$resourceClass} table method failed: ".$e->getMessage());
+            } catch (Exception $e) {
+                $this->fail("Resource {$resourceClass} table method failed: " . $e->getMessage());
             }
         }
     }
@@ -105,8 +107,8 @@ class AdminResourcesTestSuite extends TestCase
                         $this->assertTrue(property_exists($page, 'page') || method_exists($page, 'getPage'), 'Page object should have page property or getPage method');
                     }
                 }
-            } catch (\Exception $e) {
-                $this->fail("Resource {$resourceClass} getPages method failed: ".$e->getMessage());
+            } catch (Exception $e) {
+                $this->fail("Resource {$resourceClass} getPages method failed: " . $e->getMessage());
             }
         }
     }
@@ -117,7 +119,7 @@ class AdminResourcesTestSuite extends TestCase
 
         foreach ($resourceClasses as $resourceClass) {
             $resource = new $resourceClass;
-            $reflection = new \ReflectionClass($resource);
+            $reflection = new ReflectionClass($resource);
             $navigationIconProperty = $reflection->getProperty('navigationIcon');
             $navigationIconProperty->setAccessible(true);
             $navigationIcon = $navigationIconProperty->getValue($resource);
@@ -137,7 +139,7 @@ class AdminResourcesTestSuite extends TestCase
 
         foreach ($resourceClasses as $resourceClass) {
             $resource = new $resourceClass;
-            $reflection = new \ReflectionClass($resource);
+            $reflection = new ReflectionClass($resource);
             $navigationGroupProperty = $reflection->getProperty('navigationGroup');
             $navigationGroupProperty->setAccessible(true);
             $navigationGroup = $navigationGroupProperty->getValue($resource);
@@ -166,8 +168,8 @@ class AdminResourcesTestSuite extends TestCase
                 } else {
                     $this->addToAssertionCount(1);  // Count as passed
                 }
-            } catch (\Exception $e) {
-                $this->fail("Resource {$resourceClass} getModel method failed: ".$e->getMessage());
+            } catch (Exception $e) {
+                $this->fail("Resource {$resourceClass} getModel method failed: " . $e->getMessage());
             }
         }
     }
@@ -199,8 +201,8 @@ class AdminResourcesTestSuite extends TestCase
                 if ($indexPage) {
                     $this->assertTrue(class_exists($indexPage), "Index page {$indexPage} does not exist");
                 }
-            } catch (\Exception $e) {
-                $this->fail("Resource {$resourceClass} index page test failed: ".$e->getMessage());
+            } catch (Exception $e) {
+                $this->fail("Resource {$resourceClass} index page test failed: " . $e->getMessage());
             }
         }
     }
@@ -227,8 +229,8 @@ class AdminResourcesTestSuite extends TestCase
                 // Check if model has proper relationships
                 $this->assertTrue(method_exists($modelInstance, 'getFillable'), "Model {$model} missing getFillable method");
                 $this->assertTrue(method_exists($modelInstance, 'getTable'), "Model {$model} missing getTable method");
-            } catch (\Exception $e) {
-                $this->fail("Resource {$resourceClass} model validation failed: ".$e->getMessage());
+            } catch (Exception $e) {
+                $this->fail("Resource {$resourceClass} model validation failed: " . $e->getMessage());
             }
         }
     }
@@ -247,8 +249,8 @@ class AdminResourcesTestSuite extends TestCase
                 $this->assertTrue(method_exists($resource, 'form'));
                 $this->assertTrue(is_callable([$resource, 'table']));
                 $this->assertTrue(is_callable([$resource, 'form']));
-            } catch (\Exception $e) {
-                $this->fail("Resource {$resourceClass} failed with empty database: ".$e->getMessage());
+            } catch (Exception $e) {
+                $this->fail("Resource {$resourceClass} failed with empty database: " . $e->getMessage());
             }
         }
     }

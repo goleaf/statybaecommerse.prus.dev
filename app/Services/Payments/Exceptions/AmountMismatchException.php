@@ -10,6 +10,4 @@ use RuntimeException;
  * Triggered when a webhook payload reports monetary values that differ from
  * the authoritative order totals stored in the application.
  */
-final class AmountMismatchException extends RuntimeException
-{
-}
+final class AmountMismatchException extends RuntimeException {}

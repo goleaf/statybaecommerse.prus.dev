@@ -30,16 +30,16 @@ final class NewsResourcePivotSyncTest extends TestCase
         $this->resolveAdminPanel();
 
         config([
-            'app.locale' => 'en',
-            'app.fallback_locale' => 'en',
-            'filament-language-tabs.default_locales' => ['en'],
+            'app.locale'                              => 'en',
+            'app.fallback_locale'                     => 'en',
+            'filament-language-tabs.default_locales'  => ['en'],
             'filament-language-tabs.required_locales' => ['en'],
-            'activitylog.enabled' => false,
+            'activitylog.enabled'                     => false,
         ]);
 
         app()->setLocale('en');
 
-        app()->singleton(CartService::class, fn () => new class()
+        app()->singleton(CartService::class, fn () => new class
         {
             public function getCount(?int $userId, ?string $sessionId): int
             {
@@ -60,7 +60,7 @@ final class NewsResourcePivotSyncTest extends TestCase
             }
         });
 
-        app()->singleton(CacheService::class, fn () => new class()
+        app()->singleton(CacheService::class, fn () => new class
         {
             public function rememberShort(string $key, callable $callback, ?int $ttl = null): mixed
             {
@@ -77,9 +77,7 @@ final class NewsResourcePivotSyncTest extends TestCase
                 return collect();
             }
 
-            public function forgetPattern(string $pattern): void
-            {
-            }
+            public function forgetPattern(string $pattern): void {}
 
             public function generateProductKey(int $productId, string $locale, string $currency): string
             {
@@ -106,17 +104,13 @@ final class NewsResourcePivotSyncTest extends TestCase
                 return '';
             }
 
-            public function invalidateProductCache(int $productId): void
-            {
-            }
+            public function invalidateProductCache(int $productId): void {}
 
-            public function invalidateCategoryCache(int $categoryId): void
-            {
-            }
+            public function invalidateCategoryCache(int $categoryId): void {}
         });
 
         $this->admin = User::factory()->create([
-            'email' => 'admin@example.com',
+            'email'    => 'admin@example.com',
             'is_admin' => true,
         ]);
 
@@ -130,8 +124,8 @@ final class NewsResourcePivotSyncTest extends TestCase
         foreach ($categories as $index => $category) {
             $category->translations()->create([
                 'locale' => 'en',
-                'name' => "Category {$index}",
-                'slug' => "category-{$index}",
+                'name'   => "Category {$index}",
+                'slug'   => "category-{$index}",
             ]);
 
             $category->forceFill([
@@ -145,8 +139,8 @@ final class NewsResourcePivotSyncTest extends TestCase
         foreach ($tags as $index => $tag) {
             $tag->translations()->create([
                 'locale' => 'en',
-                'name' => "Tag {$index}",
-                'slug' => "tag-{$index}",
+                'name'   => "Tag {$index}",
+                'slug'   => "tag-{$index}",
             ]);
 
             $tag->forceFill([
@@ -157,14 +151,14 @@ final class NewsResourcePivotSyncTest extends TestCase
 
         Livewire::test(CreateNews::class)
             ->fillForm([
-                'title' => ['en' => 'Integration Title'],
-                'slug' => ['en' => 'integration-title'],
-                'summary' => ['en' => 'Integration summary'],
-                'content' => ['en' => '<p>Integration content</p>'],
+                'title'        => ['en' => 'Integration Title'],
+                'slug'         => ['en' => 'integration-title'],
+                'summary'      => ['en' => 'Integration summary'],
+                'content'      => ['en' => '<p>Integration content</p>'],
                 'published_at' => now()->format('Y-m-d H:i:s'),
-                'author_name' => 'Integration Author',
-                'categories' => $categories->pluck('id')->all(),
-                'tags' => $tags->pluck('id')->all(),
+                'author_name'  => 'Integration Author',
+                'categories'   => $categories->pluck('id')->all(),
+                'tags'         => $tags->pluck('id')->all(),
             ])
             ->call('create')
             ->assertHasNoFormErrors();
@@ -185,14 +179,14 @@ final class NewsResourcePivotSyncTest extends TestCase
 
         foreach ($categories as $category) {
             $this->assertDatabaseHas('news_category_pivot', [
-                'news_id' => $news->getKey(),
+                'news_id'          => $news->getKey(),
                 'news_category_id' => $category->getKey(),
             ]);
         }
 
         foreach ($tags as $tag) {
             $this->assertDatabaseHas('news_tag_pivot', [
-                'news_id' => $news->getKey(),
+                'news_id'     => $news->getKey(),
                 'news_tag_id' => $tag->getKey(),
             ]);
         }

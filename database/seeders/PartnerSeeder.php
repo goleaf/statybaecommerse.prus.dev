@@ -52,21 +52,21 @@ final class PartnerSeeder extends Seeder
 
             if ($existingPartner) {
                 $existingPartner->update([
-                    'name' => $partnerData['name'],
-                    'tier_id' => $tier?->id,
-                    'contact_email' => $partnerData['code'].'@example.test',
-                    'is_enabled' => true,
+                    'name'          => $partnerData['name'],
+                    'tier_id'       => $tier?->id,
+                    'contact_email' => $partnerData['code'] . '@example.test',
+                    'is_enabled'    => true,
                 ]);
             } else {
                 Partner::factory()
                     ->for($tier, 'tier')
                     ->state([
-                        'name' => $partnerData['name'],
-                        'code' => $partnerData['code'],
-                        'contact_email' => $partnerData['code'].'@example.test',
-                        'contact_phone' => '+370600'.str_pad((string) random_int(100, 999), 3, '0', STR_PAD_LEFT),
-                        'is_enabled' => true,
-                        'discount_rate' => 0,
+                        'name'            => $partnerData['name'],
+                        'code'            => $partnerData['code'],
+                        'contact_email'   => $partnerData['code'] . '@example.test',
+                        'contact_phone'   => '+370600' . str_pad((string) random_int(100, 999), 3, '0', STR_PAD_LEFT),
+                        'is_enabled'      => true,
+                        'discount_rate'   => 0,
                         'commission_rate' => 0,
                     ])
                     ->create();

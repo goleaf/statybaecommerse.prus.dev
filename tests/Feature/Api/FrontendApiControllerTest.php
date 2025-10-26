@@ -84,7 +84,7 @@ final class FrontendApiControllerTest extends TestCase
         self::assertNotNull($wishlist);
 
         $this->assertDatabaseHas(WishlistItem::class, [
-            'product_id' => $product->getKey(),
+            'product_id'  => $product->getKey(),
             'wishlist_id' => $wishlist->getKey(),
         ]);
 

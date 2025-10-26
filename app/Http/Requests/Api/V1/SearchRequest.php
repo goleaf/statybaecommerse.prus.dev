@@ -33,16 +33,16 @@ final class SearchRequest extends FormRequest
     {
         return [
             // Require a minimum length so expensive empty/fuzzy lookups are avoided up front.
-            'query'    => ['required', 'string', 'min:3', 'max:200'],
-            'page'     => ['sometimes', 'integer', 'min:1'],
+            'query' => ['required', 'string', 'min:3', 'max:200'],
+            'page'  => ['sometimes', 'integer', 'min:1'],
             // Cap the requested page size at the DTO maximum to avoid unbounded scans.
             'per_page' => ['sometimes', 'integer', 'min:1', 'max:' . SearchQueryData::MAX_PER_PAGE],
             // Filters and sort inputs are optional but must match the allow-list handled server side.
-            'filters'  => ['sometimes', 'array'],
-            'filters.*'=> ['nullable'],
-            'sort'     => ['sometimes', 'string', Rule::in(SearchQueryData::ALLOWED_SORTS)],
+            'filters'   => ['sometimes', 'array'],
+            'filters.*' => ['nullable'],
+            'sort'      => ['sometimes', 'string', Rule::in(SearchQueryData::ALLOWED_SORTS)],
             // Aggregation buckets are managed server-side – ignore any client provided values.
-            'types'    => ['prohibited'],
+            'types' => ['prohibited'],
         ];
     }
 }

@@ -18,7 +18,7 @@ use Spatie\LivewireWizard\Components\StepComponent;
  * Livewire component for Payment with reactive frontend functionality, real-time updates, and user interaction handling.
  *
  * @property int|null $currentSelected
- * @property mixed $methods
+ * @property mixed    $methods
  */
 class Payment extends StepComponent
 {

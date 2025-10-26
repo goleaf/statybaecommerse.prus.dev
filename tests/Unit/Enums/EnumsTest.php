@@ -34,4 +34,3 @@ final class EnumsTest extends TestCase
         self::assertSame(AddressType::SHIPPING, $fromLabel);
     }
 }
-

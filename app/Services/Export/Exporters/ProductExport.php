@@ -24,17 +24,17 @@ final class ProductExport implements Exportable
     public function columns(): array
     {
         return [
-            'sku' => new ExportColumn('sku', __('products.fields.sku'), 'sku'),
-            'name' => new ExportColumn('name', __('products.fields.name'), 'name'),
+            'sku'   => new ExportColumn('sku', __('products.fields.sku'), 'sku'),
+            'name'  => new ExportColumn('name', __('products.fields.name'), 'name'),
             'price' => new ExportColumn(
                 'price',
                 __('products.fields.price'),
                 resolver: fn (Product $product): string => $this->priceCalculator->formatAmount((float) $product->price)
             ),
             'stock_quantity' => new ExportColumn('stock_quantity', __('products.fields.stock_quantity'), 'stock_quantity'),
-            'status' => new ExportColumn('status', __('products.fields.status'), 'status'),
-            'is_visible' => new ExportColumn('is_visible', __('products.fields.is_visible'), 'is_visible'),
-            'published_at' => new ExportColumn('published_at', __('products.fields.published_at'), 'published_at'),
+            'status'         => new ExportColumn('status', __('products.fields.status'), 'status'),
+            'is_visible'     => new ExportColumn('is_visible', __('products.fields.is_visible'), 'is_visible'),
+            'published_at'   => new ExportColumn('published_at', __('products.fields.published_at'), 'published_at'),
         ];
     }
 

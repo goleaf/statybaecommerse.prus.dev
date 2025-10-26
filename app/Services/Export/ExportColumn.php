@@ -5,14 +5,16 @@ declare(strict_types=1);
 namespace App\Services\Export;
 
 use Closure;
+use DateTimeInterface;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
+use InvalidArgumentException;
 use Stringable;
 
 final class ExportColumn
 {
     /**
-     * @param  Closure(Model): mixed|null  $resolver
+     * @param Closure(Model): mixed|null $resolver
      */
     public function __construct(
         public readonly string $key,
@@ -21,7 +23,7 @@ final class ExportColumn
         private readonly ?Closure $resolver = null,
     ) {
         if ($this->attribute === null && $this->resolver === null) {
-            throw new \InvalidArgumentException('Export columns require either an attribute path or a resolver.');
+            throw new InvalidArgumentException('Export columns require either an attribute path or a resolver.');
         }
     }
 
@@ -39,7 +41,7 @@ final class ExportColumn
             return $value->toIso8601String();
         }
 
-        if ($value instanceof \DateTimeInterface) {
+        if ($value instanceof DateTimeInterface) {
             return $value->format('c');
         }
 

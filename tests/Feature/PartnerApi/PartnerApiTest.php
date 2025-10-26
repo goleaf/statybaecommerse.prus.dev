@@ -21,7 +21,7 @@ final class PartnerApiTest extends TestCase
         parent::setUp();
 
         config([
-            'services.partner_api.rate_limit.max_attempts' => 3,
+            'services.partner_api.rate_limit.max_attempts'  => 3,
             'services.partner_api.rate_limit.decay_seconds' => 60,
         ]);
 
@@ -65,7 +65,7 @@ final class PartnerApiTest extends TestCase
         ]);
 
         $this->withHeaders([
-            'X-Partner-Key' => 'invalid-'.$apiKey->key,
+            'X-Partner-Key' => 'invalid-' . $apiKey->key,
         ])->getJson('/partner/api/inventory')
             ->assertStatus(401)
             ->assertJson(['message' => 'Unauthorized.']);
@@ -76,7 +76,7 @@ final class PartnerApiTest extends TestCase
         RateLimiter::fake();
 
         config([
-            'services.partner_api.rate_limit.max_attempts' => 1,
+            'services.partner_api.rate_limit.max_attempts'  => 1,
             'services.partner_api.rate_limit.decay_seconds' => 60,
         ]);
 

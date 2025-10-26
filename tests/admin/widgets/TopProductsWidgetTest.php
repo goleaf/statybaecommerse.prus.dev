@@ -114,17 +114,17 @@ it('calculates total sold correctly', function () {
     // Create completed order
     $completedOrder = Order::factory()->create(['status' => 'completed']);
     OrderItem::factory()->create([
-        'order_id' => $completedOrder->id,
+        'order_id'   => $completedOrder->id,
         'product_id' => $product->id,
-        'quantity' => 5,
+        'quantity'   => 5,
     ]);
 
     // Create pending order (should not count)
     $pendingOrder = Order::factory()->create(['status' => 'pending']);
     OrderItem::factory()->create([
-        'order_id' => $pendingOrder->id,
+        'order_id'   => $pendingOrder->id,
         'product_id' => $product->id,
-        'quantity' => 3,
+        'quantity'   => 3,
     ]);
 
     $table = $this->widget->table(new Table($this->widget));
@@ -148,9 +148,9 @@ it('orders products by combined score', function () {
 
     $order1 = Order::factory()->create(['status' => 'completed']);
     OrderItem::factory()->create([
-        'order_id' => $order1->id,
+        'order_id'   => $order1->id,
         'product_id' => $product1->id,
-        'quantity' => 1,
+        'quantity'   => 1,
     ]);
 
     // Product 2: 1 view + 3 sales = 4 total score (should be first)
@@ -162,9 +162,9 @@ it('orders products by combined score', function () {
 
     $order2 = Order::factory()->create(['status' => 'completed']);
     OrderItem::factory()->create([
-        'order_id' => $order2->id,
+        'order_id'   => $order2->id,
         'product_id' => $product2->id,
-        'quantity' => 3,
+        'quantity'   => 3,
     ]);
 
     $table = $this->widget->table(new Table($this->widget));

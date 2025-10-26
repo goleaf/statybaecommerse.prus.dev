@@ -19,7 +19,7 @@ class LegalResourceTest extends TestCase
         parent::setUp();
 
         $this->actingAs(User::factory()->create([
-            'email' => 'admin@example.com',
+            'email'    => 'admin@example.com',
             'is_admin' => true,
         ]));
     }
@@ -29,8 +29,8 @@ class LegalResourceTest extends TestCase
         $legal = Legal::factory()->create();
         LegalTranslation::factory()->create([
             'legal_id' => $legal->id,
-            'locale' => 'lt',
-            'title' => 'Test Legal Document',
+            'locale'   => 'lt',
+            'title'    => 'Test Legal Document',
         ]);
 
         $response = $this->get('/admin/legals');
@@ -49,25 +49,25 @@ class LegalResourceTest extends TestCase
     public function test_can_store_legal_document(): void
     {
         $data = [
-            'key' => 'privacy-policy',
-            'type' => 'privacy_policy',
-            'is_enabled' => true,
-            'is_required' => true,
-            'sort_order' => 1,
+            'key'          => 'privacy-policy',
+            'type'         => 'privacy_policy',
+            'is_enabled'   => true,
+            'is_required'  => true,
+            'sort_order'   => 1,
             'published_at' => now()->format('Y-m-d H:i:s'),
             'translations' => [
                 'lt' => [
-                    'title' => 'Privatumo politika',
-                    'slug' => 'privatumo-politika-lt',
-                    'content' => '<p>Privatumo politikos turinys...</p>',
-                    'seo_title' => 'Privatumo politika - SEO',
+                    'title'           => 'Privatumo politika',
+                    'slug'            => 'privatumo-politika-lt',
+                    'content'         => '<p>Privatumo politikos turinys...</p>',
+                    'seo_title'       => 'Privatumo politika - SEO',
                     'seo_description' => 'Privatumo politikos aprašymas',
                 ],
                 'en' => [
-                    'title' => 'Privacy Policy',
-                    'slug' => 'privacy-policy-en',
-                    'content' => '<p>Privacy policy content...</p>',
-                    'seo_title' => 'Privacy Policy - SEO',
+                    'title'           => 'Privacy Policy',
+                    'slug'            => 'privacy-policy-en',
+                    'content'         => '<p>Privacy policy content...</p>',
+                    'seo_title'       => 'Privacy Policy - SEO',
                     'seo_description' => 'Privacy policy description',
                 ],
             ],
@@ -78,22 +78,22 @@ class LegalResourceTest extends TestCase
         $response->assertRedirect('/admin/legals');
 
         $this->assertDatabaseHas('legals', [
-            'key' => 'privacy-policy',
-            'type' => 'privacy_policy',
-            'is_enabled' => true,
+            'key'         => 'privacy-policy',
+            'type'        => 'privacy_policy',
+            'is_enabled'  => true,
             'is_required' => true,
         ]);
 
         $this->assertDatabaseHas('legal_translations', [
             'locale' => 'lt',
-            'title' => 'Privatumo politika',
-            'slug' => 'privatumo-politika-lt',
+            'title'  => 'Privatumo politika',
+            'slug'   => 'privatumo-politika-lt',
         ]);
 
         $this->assertDatabaseHas('legal_translations', [
             'locale' => 'en',
-            'title' => 'Privacy Policy',
-            'slug' => 'privacy-policy-en',
+            'title'  => 'Privacy Policy',
+            'slug'   => 'privacy-policy-en',
         ]);
     }
 
@@ -102,8 +102,8 @@ class LegalResourceTest extends TestCase
         $legal = Legal::factory()->create();
         LegalTranslation::factory()->create([
             'legal_id' => $legal->id,
-            'locale' => 'lt',
-            'title' => 'Test Title',
+            'locale'   => 'lt',
+            'title'    => 'Test Title',
         ]);
 
         $response = $this->get("/admin/legals/{$legal->id}/edit");
@@ -117,22 +117,22 @@ class LegalResourceTest extends TestCase
         $legal = Legal::factory()->create();
         LegalTranslation::factory()->create([
             'legal_id' => $legal->id,
-            'locale' => 'lt',
-            'title' => 'Old Title',
+            'locale'   => 'lt',
+            'title'    => 'Old Title',
         ]);
 
         $data = [
-            'key' => 'updated-key',
-            'type' => 'terms_of_use',
-            'is_enabled' => false,
-            'is_required' => false,
-            'sort_order' => 5,
+            'key'          => 'updated-key',
+            'type'         => 'terms_of_use',
+            'is_enabled'   => false,
+            'is_required'  => false,
+            'sort_order'   => 5,
             'translations' => [
                 'lt' => [
-                    'title' => 'Updated Title',
-                    'slug' => 'updated-title-lt',
-                    'content' => '<p>Updated content...</p>',
-                    'seo_title' => 'Updated SEO Title',
+                    'title'           => 'Updated Title',
+                    'slug'            => 'updated-title-lt',
+                    'content'         => '<p>Updated content...</p>',
+                    'seo_title'       => 'Updated SEO Title',
                     'seo_description' => 'Updated SEO description',
                 ],
             ],
@@ -143,17 +143,17 @@ class LegalResourceTest extends TestCase
         $response->assertRedirect('/admin/legals');
 
         $this->assertDatabaseHas('legals', [
-            'id' => $legal->id,
-            'key' => 'updated-key',
-            'type' => 'terms_of_use',
-            'is_enabled' => false,
+            'id'          => $legal->id,
+            'key'         => 'updated-key',
+            'type'        => 'terms_of_use',
+            'is_enabled'  => false,
             'is_required' => false,
         ]);
 
         $this->assertDatabaseHas('legal_translations', [
             'legal_id' => $legal->id,
-            'locale' => 'lt',
-            'title' => 'Updated Title',
+            'locale'   => 'lt',
+            'title'    => 'Updated Title',
         ]);
     }
 
@@ -302,8 +302,8 @@ class LegalResourceTest extends TestCase
         $legal = Legal::factory()->create();
         LegalTranslation::factory()->create([
             'legal_id' => $legal->id,
-            'locale' => 'lt',
-            'title' => 'Privatumo politika',
+            'locale'   => 'lt',
+            'title'    => 'Privatumo politika',
         ]);
 
         $response = $this->get('/admin/legals?search=privatumo');
@@ -317,8 +317,8 @@ class LegalResourceTest extends TestCase
         $legal = Legal::factory()->enabled()->published()->create(['key' => 'privacy-policy']);
         LegalTranslation::factory()->create([
             'legal_id' => $legal->id,
-            'locale' => 'lt',
-            'title' => 'Privatumo politika',
+            'locale'   => 'lt',
+            'title'    => 'Privatumo politika',
         ]);
 
         $response = $this->get("/admin/legals/{$legal->id}/view");

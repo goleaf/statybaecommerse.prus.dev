@@ -12,6 +12,8 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use InvalidArgumentException;
+use RuntimeException;
 
 /**
  * GenerateReportsJob
@@ -28,7 +30,7 @@ final class GenerateReportsJob implements ShouldQueue
     public int $tries = 3;
 
     /**
-     * @param  array<string, mixed>  $filters
+     * @param array<string, mixed> $filters
      */
     public function __construct(
         private readonly string $type,
@@ -54,7 +56,7 @@ final class GenerateReportsJob implements ShouldQueue
      */
     public function tags(): array
     {
-        return ['reports', 'type:'.$this->type];
+        return ['reports', 'type:' . $this->type];
     }
 
     /**
@@ -67,18 +69,18 @@ final class GenerateReportsJob implements ShouldQueue
         }
 
         $generatedReports = match ($this->type) {
-            'sales' => [$this->generateSalesReport($reportService)],
+            'sales'    => [$this->generateSalesReport($reportService)],
             'products' => [$this->generateProductReport($reportService)],
-            'users' => [$this->generateUserReport($reportService)],
-            'system' => [$this->generateSystemReport($reportService)],
-            'all' => $this->generateAllReports($reportService),
-            default => throw new \InvalidArgumentException('Unknown report type: '.$this->type),
+            'users'    => [$this->generateUserReport($reportService)],
+            'system'   => [$this->generateSystemReport($reportService)],
+            'all'      => $this->generateAllReports($reportService),
+            default    => throw new InvalidArgumentException('Unknown report type: ' . $this->type),
         };
 
         Log::info('Reports generated', [
-            'type' => $this->type,
-            'format' => $this->format,
-            'output' => $this->outputDirectory,
+            'type'    => $this->type,
+            'format'  => $this->format,
+            'output'  => $this->outputDirectory,
             'reports' => $generatedReports,
         ]);
     }
@@ -89,7 +91,7 @@ final class GenerateReportsJob implements ShouldQueue
     private function generateSalesReport(ReportGenerationService $reportService): array
     {
         $data = $reportService->generateSalesReport($this->filters);
-        $filename = 'sales_report_'.now()->format('Y-m-d_H-i-s').'.'.$this->format;
+        $filename = 'sales_report_' . now()->format('Y-m-d_H-i-s') . '.' . $this->format;
 
         return $this->writeReport($filename, $data, fn (array $payload): string => $this->formatPayload($payload['daily_data']));
     }
@@ -100,7 +102,7 @@ final class GenerateReportsJob implements ShouldQueue
     private function generateProductReport(ReportGenerationService $reportService): array
     {
         $data = $reportService->generateProductAnalyticsReport($this->filters);
-        $filename = 'product_analytics_'.now()->format('Y-m-d_H-i-s').'.'.$this->format;
+        $filename = 'product_analytics_' . now()->format('Y-m-d_H-i-s') . '.' . $this->format;
 
         return $this->writeReport($filename, $data, fn (array $payload): string => $this->formatPayload($payload['products']));
     }
@@ -111,7 +113,7 @@ final class GenerateReportsJob implements ShouldQueue
     private function generateUserReport(ReportGenerationService $reportService): array
     {
         $data = $reportService->generateUserActivityReport($this->filters);
-        $filename = 'user_activity_'.now()->format('Y-m-d_H-i-s').'.'.$this->format;
+        $filename = 'user_activity_' . now()->format('Y-m-d_H-i-s') . '.' . $this->format;
 
         return $this->writeReport($filename, $data, fn (array $payload): string => $this->formatPayload($payload['user_activity']));
     }
@@ -122,7 +124,7 @@ final class GenerateReportsJob implements ShouldQueue
     private function generateSystemReport(ReportGenerationService $reportService): array
     {
         $data = $reportService->generateSystemReport();
-        $filename = 'system_report_'.now()->format('Y-m-d_H-i-s').'.'.$this->format;
+        $filename = 'system_report_' . now()->format('Y-m-d_H-i-s') . '.' . $this->format;
 
         return $this->writeReport($filename, $data, function (array $payload): string {
             if ($this->format === 'json') {
@@ -147,12 +149,12 @@ final class GenerateReportsJob implements ShouldQueue
     }
 
     /**
-     * @param  callable(array<string, mixed>):string  $formatter
+     * @param  callable(array<string, mixed>):string $formatter
      * @return array<string, mixed>
      */
     private function writeReport(string $filename, array $data, callable $formatter): array
     {
-        $filepath = $this->outputDirectory.'/'.$filename;
+        $filepath = $this->outputDirectory . '/' . $filename;
         $content = $this->format === 'json'
             ? json_encode($data, JSON_PRETTY_PRINT) ?: '{}'
             : $formatter($data);
@@ -168,7 +170,7 @@ final class GenerateReportsJob implements ShouldQueue
     }
 
     /**
-     * @param  array<int, array<string, mixed>>  $rows
+     * @param array<int, array<string, mixed>> $rows
      */
     private function formatPayload(array $rows): string
     {
@@ -178,7 +180,7 @@ final class GenerateReportsJob implements ShouldQueue
 
         $stream = fopen('php://temp', 'w+');
         if ($stream === false) {
-            throw new \RuntimeException('Unable to create temporary stream for report export.');
+            throw new RuntimeException('Unable to create temporary stream for report export.');
         }
 
         if ($rows !== []) {
@@ -196,7 +198,7 @@ final class GenerateReportsJob implements ShouldQueue
     }
 
     /**
-     * @param  array<string, mixed>  $report
+     * @param  array<string, mixed>             $report
      * @return array<int, array<string, mixed>>
      */
     private function flattenSystemReport(array $report): array

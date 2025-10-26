@@ -94,17 +94,17 @@ final class SharedComponentServiceProvider extends ServiceProvider
         // Share common data with all views
         view()->composer('*', function ($view): void {
             $view->with([
-                'currentLocale' => app()->getLocale(),
-                'currentCurrency' => current_currency(),
+                'currentLocale'    => app()->getLocale(),
+                'currentCurrency'  => current_currency(),
                 'supportedLocales' => config('shared.localization.supported_locales', ['lt', 'en']),
-                'cartCount' => $this->getCartCount(),
+                'cartCount'        => $this->getCartCount(),
             ]);
         });
 
         // Share navigation data
         view()->composer(['components.layouts.header', 'livewire.components.enhanced-navigation'], function ($view): void {
             $view->with([
-                'topCategories' => $this->getTopCategories(),
+                'topCategories'  => $this->getTopCategories(),
                 'featuredBrands' => $this->getFeaturedBrands(),
             ]);
         });
@@ -122,7 +122,7 @@ final class SharedComponentServiceProvider extends ServiceProvider
     private function getTopCategories(): mixed
     {
         return app(CacheService::class)->rememberLong(
-            'navigation.top_categories.'.app()->getLocale(),
+            'navigation.top_categories.' . app()->getLocale(),
             fn () => \App\Models\Category::query()
                 ->with(['translations' => function ($q): void {
                     $q->where('locale', app()->getLocale());
@@ -138,7 +138,7 @@ final class SharedComponentServiceProvider extends ServiceProvider
     private function getFeaturedBrands(): mixed
     {
         return app(CacheService::class)->rememberLong(
-            'navigation.featured_brands.'.app()->getLocale(),
+            'navigation.featured_brands.' . app()->getLocale(),
             fn () => \App\Models\Brand::query()
                 ->with(['translations' => function ($q): void {
                     $q->where('locale', app()->getLocale());

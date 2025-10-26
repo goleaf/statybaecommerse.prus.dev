@@ -24,28 +24,28 @@ final class ProductCatalogTest extends TestCase
 
         // Create a visible, published product that should survive the filter criteria.
         $includedProduct = Product::factory()->create([
-            'is_visible' => true,
-            'status' => 'published',
+            'is_visible'   => true,
+            'status'       => 'published',
             'published_at' => now()->subDay(),
-            'price' => 49,
+            'price'        => 49,
         ]);
         $includedProduct->categories()->attach($matchingCategory->getKey());
 
         // Create a product that is filtered out because of price and category.
         $excludedProduct = Product::factory()->create([
-            'is_visible' => true,
-            'status' => 'published',
+            'is_visible'   => true,
+            'status'       => 'published',
             'published_at' => now()->subDay(),
-            'price' => 199,
+            'price'        => 199,
         ]);
         $excludedProduct->categories()->attach($otherCategory->getKey());
 
         // Issue the index request with explicit filters to exercise the request object and enum sorting.
         $response = $this->getJson(route('api.products.index', [
-            'category' => $matchingCategory->slug,
+            'category'  => $matchingCategory->slug,
             'price_max' => 100,
-            'per_page' => 1,
-            'sort' => ProductSort::PRICE_ASC->value,
+            'per_page'  => 1,
+            'sort'      => ProductSort::PRICE_ASC->value,
         ]));
 
         $response->assertOk();
@@ -69,15 +69,15 @@ final class ProductCatalogTest extends TestCase
 
         // Set up a published product with a variant so nested resources are exercised.
         $product = Product::factory()->for($brand)->create([
-            'is_visible' => true,
-            'status' => 'published',
+            'is_visible'   => true,
+            'status'       => 'published',
             'published_at' => now()->subDay(),
-            'price' => 99,
+            'price'        => 99,
         ]);
         $product->categories()->attach($category->getKey());
         ProductVariant::factory()->for($product)->create([
             'is_default' => true,
-            'price' => 99,
+            'price'      => 99,
         ]);
 
         $response = $this->getJson(route('api.products.show', ['product' => $product]));

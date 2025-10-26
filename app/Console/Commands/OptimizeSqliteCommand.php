@@ -5,9 +5,12 @@ declare(strict_types=1);
 namespace App\Console\Commands;
 
 use App\Support\Logging\StructuredLogger;
+
+use function collect;
+
+use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
-use function collect;
 
 /**
  * Optimize SQLite Database Command
@@ -63,7 +66,7 @@ final class OptimizeSqliteCommand extends Command
     {
         $operation = $this->logger->operation('sqlite_check_settings', [
             'command' => 'sqlite:optimize',
-            'mode' => 'check',
+            'mode'    => 'check',
         ]);
 
         $this->info('Checking current SQLite settings...');
@@ -73,12 +76,12 @@ final class OptimizeSqliteCommand extends Command
             $settings = [
                 'journal_mode' => DB::connection('sqlite')->getPdo()->query('PRAGMA journal_mode')->fetchColumn(),
                 'busy_timeout' => DB::connection('sqlite')->getPdo()->query('PRAGMA busy_timeout')->fetchColumn(),
-                'cache_size' => DB::connection('sqlite')->getPdo()->query('PRAGMA cache_size')->fetchColumn(),
-                'temp_store' => DB::connection('sqlite')->getPdo()->query('PRAGMA temp_store')->fetchColumn(),
-                'mmap_size' => DB::connection('sqlite')->getPdo()->query('PRAGMA mmap_size')->fetchColumn(),
-                'page_size' => DB::connection('sqlite')->getPdo()->query('PRAGMA page_size')->fetchColumn(),
-                'auto_vacuum' => DB::connection('sqlite')->getPdo()->query('PRAGMA auto_vacuum')->fetchColumn(),
-                'synchronous' => DB::connection('sqlite')->getPdo()->query('PRAGMA synchronous')->fetchColumn(),
+                'cache_size'   => DB::connection('sqlite')->getPdo()->query('PRAGMA cache_size')->fetchColumn(),
+                'temp_store'   => DB::connection('sqlite')->getPdo()->query('PRAGMA temp_store')->fetchColumn(),
+                'mmap_size'    => DB::connection('sqlite')->getPdo()->query('PRAGMA mmap_size')->fetchColumn(),
+                'page_size'    => DB::connection('sqlite')->getPdo()->query('PRAGMA page_size')->fetchColumn(),
+                'auto_vacuum'  => DB::connection('sqlite')->getPdo()->query('PRAGMA auto_vacuum')->fetchColumn(),
+                'synchronous'  => DB::connection('sqlite')->getPdo()->query('PRAGMA synchronous')->fetchColumn(),
                 'foreign_keys' => DB::connection('sqlite')->getPdo()->query('PRAGMA foreign_keys')->fetchColumn(),
             ];
 
@@ -104,26 +107,26 @@ final class OptimizeSqliteCommand extends Command
                 ->map(static fn ($value, $key) => match ($key) {
                     'journal_mode' => $value === 'wal',
                     'busy_timeout' => $value == 10000,
-                    'cache_size' => $value == -64000,
-                    'temp_store' => $value == 2,
-                    'mmap_size' => $value == 268435456,
-                    'page_size' => $value == 4096,
-                    'auto_vacuum' => $value == 2,
-                    'synchronous' => $value == 1,
+                    'cache_size'   => $value == -64000,
+                    'temp_store'   => $value == 2,
+                    'mmap_size'    => $value == 268435456,
+                    'page_size'    => $value == 4096,
+                    'auto_vacuum'  => $value == 2,
+                    'synchronous'  => $value == 1,
                     'foreign_keys' => $value == 1,
-                    default => false,
+                    default        => false,
                 })
                 ->filter()
                 ->count();
 
             $operation->finish([
-                'settings_checked' => count($settings),
+                'settings_checked'   => count($settings),
                 'settings_optimized' => $optimized,
             ]);
 
             return 0;
-        } catch (\Exception $e) {
-            $this->error('Failed to check SQLite settings: '.$e->getMessage());
+        } catch (Exception $e) {
+            $this->error('Failed to check SQLite settings: ' . $e->getMessage());
 
             $operation->fail($e);
 
@@ -138,7 +141,7 @@ final class OptimizeSqliteCommand extends Command
     {
         $operation = $this->logger->operation('sqlite_apply_optimizations', [
             'command' => 'sqlite:optimize',
-            'mode' => 'apply',
+            'mode'    => 'apply',
         ]);
 
         $this->info('Applying SQLite optimizations...');
@@ -148,11 +151,11 @@ final class OptimizeSqliteCommand extends Command
             $optimizations = [
                 'journal_mode' => 'WAL',
                 'busy_timeout' => 10000,
-                'cache_size' => -64000,
-                'temp_store' => 2, // memory
-                'mmap_size' => 268435456,
-                'page_size' => 4096,
-                'synchronous' => 1, // normal
+                'cache_size'   => -64000,
+                'temp_store'   => 2, // memory
+                'mmap_size'    => 268435456,
+                'page_size'    => 4096,
+                'synchronous'  => 1, // normal
                 'foreign_keys' => 1, // on
             ];
 
@@ -182,13 +185,13 @@ final class OptimizeSqliteCommand extends Command
             $this->info('These optimizations will improve performance for production use.');
 
             $operation->finish([
-                'settings_applied' => count($optimizations),
+                'settings_applied'   => count($optimizations),
                 'auto_vacuum_status' => $autoVacuumResult,
             ]);
 
             return 0;
-        } catch (\Exception $e) {
-            $this->error('Failed to apply SQLite optimizations: '.$e->getMessage());
+        } catch (Exception $e) {
+            $this->error('Failed to apply SQLite optimizations: ' . $e->getMessage());
 
             $operation->fail($e);
 
@@ -203,7 +206,7 @@ final class OptimizeSqliteCommand extends Command
     {
         $operation = $this->logger->operation('sqlite_incremental_vacuum', [
             'command' => 'sqlite:optimize',
-            'mode' => 'vacuum',
+            'mode'    => 'vacuum',
         ]);
 
         $this->info('Running incremental vacuum...');
@@ -214,7 +217,7 @@ final class OptimizeSqliteCommand extends Command
 
             // Get database size before vacuum
             $sizeBefore = $pdo->query('SELECT page_count * page_size as size FROM pragma_page_count(), pragma_page_size()')->fetchColumn();
-            $this->line('Database size before vacuum: '.number_format($sizeBefore / 1024 / 1024, 2).' MB');
+            $this->line('Database size before vacuum: ' . number_format($sizeBefore / 1024 / 1024, 2) . ' MB');
 
             // Run incremental vacuum
             $pdo->exec('PRAGMA incremental_vacuum');
@@ -222,11 +225,11 @@ final class OptimizeSqliteCommand extends Command
 
             // Get database size after vacuum
             $sizeAfter = $pdo->query('SELECT page_count * page_size as size FROM pragma_page_count(), pragma_page_size()')->fetchColumn();
-            $this->line('Database size after vacuum: '.number_format($sizeAfter / 1024 / 1024, 2).' MB');
+            $this->line('Database size after vacuum: ' . number_format($sizeAfter / 1024 / 1024, 2) . ' MB');
 
             $spaceReclaimed = $sizeBefore - $sizeAfter;
             if ($spaceReclaimed > 0) {
-                $this->line('Space reclaimed: '.number_format($spaceReclaimed / 1024 / 1024, 2).' MB');
+                $this->line('Space reclaimed: ' . number_format($spaceReclaimed / 1024 / 1024, 2) . ' MB');
             } else {
                 $this->line('No space was reclaimed (database was already optimized)');
             }
@@ -236,13 +239,13 @@ final class OptimizeSqliteCommand extends Command
 
             $operation->finish([
                 'space_reclaimed_bytes' => $spaceReclaimed,
-                'size_before_bytes' => $sizeBefore,
-                'size_after_bytes' => $sizeAfter,
+                'size_before_bytes'     => $sizeBefore,
+                'size_after_bytes'      => $sizeAfter,
             ]);
 
             return 0;
-        } catch (\Exception $e) {
-            $this->error('Failed to run incremental vacuum: '.$e->getMessage());
+        } catch (Exception $e) {
+            $this->error('Failed to run incremental vacuum: ' . $e->getMessage());
 
             $operation->fail($e);
 

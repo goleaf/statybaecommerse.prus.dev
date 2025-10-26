@@ -20,11 +20,11 @@ final class ReferralRewardLogFactory extends Factory
     {
         return [
             'referral_reward_id' => ReferralReward::factory(),
-            'user_id' => User::factory(),
-            'action' => $this->faker->randomElement(ReferralRewardLog::ACTIONS),
-            'data' => [
-                'amount' => $this->faker->randomFloat(2, 1, 100),
-                'currency' => 'EUR',
+            'user_id'            => User::factory(),
+            'action'             => $this->faker->randomElement(ReferralRewardLog::ACTIONS),
+            'data'               => [
+                'amount'      => $this->faker->randomFloat(2, 1, 100),
+                'currency'    => 'EUR',
                 'reward_type' => $this->faker->randomElement(['discount', 'credit', 'points']),
             ],
             'ip_address' => $this->faker->ipv4(),
@@ -36,11 +36,11 @@ final class ReferralRewardLogFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'action' => ReferralRewardLog::ACTION_EARNED,
-            'data' => [
-                'amount' => $this->faker->randomFloat(2, 1, 100),
-                'currency' => 'EUR',
+            'data'   => [
+                'amount'      => $this->faker->randomFloat(2, 1, 100),
+                'currency'    => 'EUR',
                 'reward_type' => 'discount',
-                'earned_at' => now()->toISOString(),
+                'earned_at'   => now()->toISOString(),
             ],
         ]);
     }
@@ -49,11 +49,11 @@ final class ReferralRewardLogFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'action' => ReferralRewardLog::ACTION_EXPIRED,
-            'data' => [
-                'amount' => $this->faker->randomFloat(2, 1, 100),
-                'currency' => 'EUR',
+            'data'   => [
+                'amount'      => $this->faker->randomFloat(2, 1, 100),
+                'currency'    => 'EUR',
                 'reward_type' => 'credit',
-                'expired_at' => now()->toISOString(),
+                'expired_at'  => now()->toISOString(),
             ],
         ]);
     }
@@ -62,12 +62,12 @@ final class ReferralRewardLogFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'action' => ReferralRewardLog::ACTION_CANCELLED,
-            'data' => [
-                'amount' => $this->faker->randomFloat(2, 1, 100),
-                'currency' => 'EUR',
-                'reward_type' => 'points',
+            'data'   => [
+                'amount'       => $this->faker->randomFloat(2, 1, 100),
+                'currency'     => 'EUR',
+                'reward_type'  => 'points',
                 'cancelled_at' => now()->toISOString(),
-                'reason' => $this->faker->sentence(),
+                'reason'       => $this->faker->sentence(),
             ],
         ]);
     }
@@ -76,9 +76,9 @@ final class ReferralRewardLogFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'action' => ReferralRewardLog::ACTION_REDEEMED,
-            'data' => [
-                'amount' => $this->faker->randomFloat(2, 1, 100),
-                'currency' => 'EUR',
+            'data'   => [
+                'amount'      => $this->faker->randomFloat(2, 1, 100),
+                'currency'    => 'EUR',
                 'reward_type' => 'discount',
                 'redeemed_at' => now()->toISOString(),
             ],

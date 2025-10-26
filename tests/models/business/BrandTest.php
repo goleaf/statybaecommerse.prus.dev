@@ -16,11 +16,11 @@ final class BrandTest extends TestCase
     public function test_brand_can_be_created(): void
     {
         $brand = Brand::factory()->create([
-            'name' => 'Test Brand',
-            'slug' => 'test-brand',
+            'name'        => 'Test Brand',
+            'slug'        => 'test-brand',
             'description' => 'Test brand description',
-            'website' => 'https://testbrand.com',
-            'is_enabled' => true,
+            'website'     => 'https://testbrand.com',
+            'is_enabled'  => true,
         ]);
 
         $this->assertInstanceOf(Brand::class, $brand);
@@ -34,7 +34,7 @@ final class BrandTest extends TestCase
     public function test_brand_translation_methods(): void
     {
         $brand = Brand::factory()->create([
-            'name' => 'Original Name',
+            'name'        => 'Original Name',
             'description' => 'Original Description',
         ]);
 
@@ -87,8 +87,8 @@ final class BrandTest extends TestCase
     public function test_brand_helper_methods(): void
     {
         $brand = Brand::factory()->create([
-            'name' => 'Test Brand',
-            'website' => 'https://testbrand.com',
+            'name'       => 'Test Brand',
+            'website'    => 'https://testbrand.com',
             'is_enabled' => true,
         ]);
 
@@ -138,15 +138,15 @@ final class BrandTest extends TestCase
 
         // Create products for the brand - bypass global scopes for testing
         Product::factory()->count(2)->create([
-            'brand_id' => $brand->id,
-            'status' => 'draft',
-            'is_visible' => true,
+            'brand_id'     => $brand->id,
+            'status'       => 'draft',
+            'is_visible'   => true,
             'published_at' => null,
         ]);
         Product::factory()->create([
-            'brand_id' => $brand->id,
-            'status' => 'published',
-            'is_visible' => true,
+            'brand_id'     => $brand->id,
+            'status'       => 'published',
+            'is_visible'   => true,
             'published_at' => now()->subDay(),
         ]);
 
@@ -194,7 +194,7 @@ final class BrandTest extends TestCase
     public function test_brand_seo_methods(): void
     {
         $brand = Brand::factory()->create([
-            'seo_title' => 'SEO Title',
+            'seo_title'       => 'SEO Title',
             'seo_description' => 'SEO Description',
         ]);
 
@@ -211,7 +211,7 @@ final class BrandTest extends TestCase
     public function test_brand_translation_management(): void
     {
         $brand = Brand::factory()->create([
-            'name' => 'Original Name',
+            'name'        => 'Original Name',
             'description' => 'Original Description',
         ]);
 
@@ -228,7 +228,7 @@ final class BrandTest extends TestCase
 
         // Test update translation
         $this->assertTrue($brand->updateTranslation('en', [
-            'name' => 'English Name',
+            'name'        => 'English Name',
             'description' => 'English Description',
         ]));
 

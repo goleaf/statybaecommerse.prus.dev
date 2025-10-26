@@ -12,25 +12,25 @@ use function Pest\Livewire\livewire;
 beforeEach(function () {
     // Create test brands
     $this->brandWithProducts = Brand::factory()->create([
-        'name' => 'Apple',
+        'name'        => 'Apple',
         'description' => 'Technology company',
-        'is_enabled' => true,
+        'is_enabled'  => true,
     ]);
 
     $this->brandWithoutProducts = Brand::factory()->create([
-        'name' => 'Samsung',
+        'name'        => 'Samsung',
         'description' => 'Electronics manufacturer',
-        'is_enabled' => true,
+        'is_enabled'  => true,
     ]);
 
     $this->disabledBrand = Brand::factory()->create([
-        'name' => 'Disabled Brand',
+        'name'       => 'Disabled Brand',
         'is_enabled' => false,
     ]);
 
     // Create products for the first brand
     Product::factory()->count(5)->create([
-        'brand_id' => $this->brandWithProducts->id,
+        'brand_id'   => $this->brandWithProducts->id,
         'is_visible' => true,
     ]);
 });
@@ -83,7 +83,7 @@ it('sorts brands by product count', function () {
 it('sorts brands by creation date', function () {
     // Create a newer brand
     $newerBrand = Brand::factory()->create([
-        'name' => 'Newer Brand',
+        'name'       => 'Newer Brand',
         'is_enabled' => true,
         'created_at' => now()->addDay(),
     ]);

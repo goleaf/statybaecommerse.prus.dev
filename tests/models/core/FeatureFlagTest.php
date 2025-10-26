@@ -16,17 +16,17 @@ class FeatureFlagTest extends TestCase
     public function test_feature_flag_can_be_created(): void
     {
         $featureFlag = FeatureFlag::factory()->create([
-            'name' => 'new_checkout_flow',
-            'key' => 'new_checkout_flow',
+            'name'        => 'new_checkout_flow',
+            'key'         => 'new_checkout_flow',
             'description' => 'Enable new checkout flow',
-            'is_enabled' => true,
+            'is_enabled'  => true,
         ]);
 
         $this->assertDatabaseHas('feature_flags', [
-            'name' => 'new_checkout_flow',
-            'key' => 'new_checkout_flow',
+            'name'        => 'new_checkout_flow',
+            'key'         => 'new_checkout_flow',
             'description' => 'Enable new checkout flow',
-            'is_enabled' => true,
+            'is_enabled'  => true,
         ]);
     }
 
@@ -34,7 +34,7 @@ class FeatureFlagTest extends TestCase
     {
         $featureFlag = FeatureFlag::factory()->create([
             'is_enabled' => true,
-            'is_global' => false,
+            'is_global'  => false,
             'created_at' => now(),
         ]);
 
@@ -134,8 +134,8 @@ class FeatureFlagTest extends TestCase
         $featureFlag = FeatureFlag::factory()->create([
             'conditions' => [
                 'user_type' => 'premium',
-                'country' => 'LT',
-                'browser' => 'chrome',
+                'country'   => 'LT',
+                'browser'   => 'chrome',
             ],
         ]);
 
@@ -149,9 +149,9 @@ class FeatureFlagTest extends TestCase
     {
         $featureFlag = FeatureFlag::factory()->create([
             'metadata' => [
-                'owner' => 'development_team',
+                'owner'    => 'development_team',
                 'priority' => 'high',
-                'tags' => ['checkout', 'payment', 'ux'],
+                'tags'     => ['checkout', 'payment', 'ux'],
             ],
         ]);
 
@@ -237,8 +237,8 @@ class FeatureFlagTest extends TestCase
     {
         $featureFlag = FeatureFlag::factory()->create([
             'success_metrics' => [
-                'conversion_rate' => 'increase',
-                'checkout_time' => 'decrease',
+                'conversion_rate'   => 'increase',
+                'checkout_time'     => 'decrease',
                 'user_satisfaction' => 'increase',
             ],
         ]);
@@ -316,9 +316,9 @@ class FeatureFlagTest extends TestCase
     public function test_feature_flag_preserves_legacy_attribution_names(): void
     {
         $featureFlag = FeatureFlag::factory()->create([
-            'created_by' => null,
+            'created_by'      => null,
             'created_by_name' => 'legacy_admin',
-            'updated_by' => null,
+            'updated_by'      => null,
             'updated_by_name' => 'legacy_editor',
         ]);
 

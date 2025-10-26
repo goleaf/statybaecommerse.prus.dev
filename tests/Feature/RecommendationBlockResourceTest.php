@@ -23,7 +23,7 @@ class RecommendationBlockResourceTest extends TestCase
         parent::setUp();
 
         $this->actingAs(User::factory()->create([
-            'email' => 'admin@example.com',
+            'email'    => 'admin@example.com',
             'is_admin' => true,
         ]));
     }
@@ -42,20 +42,20 @@ class RecommendationBlockResourceTest extends TestCase
 
         Livewire::test(CreateRecommendationBlock::class)
             ->fillForm([
-                'name' => $newData->name,
-                'title' => $newData->title,
-                'description' => $newData->description,
-                'type' => 'featured',
-                'position' => 'top',
-                'is_active' => true,
+                'name'         => $newData->name,
+                'title'        => $newData->title,
+                'description'  => $newData->description,
+                'type'         => 'featured',
+                'position'     => 'top',
+                'is_active'    => true,
                 'max_products' => 10,
-                'sort_order' => 0,
+                'sort_order'   => 0,
             ])
             ->call('create')
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('recommendation_blocks', [
-            'name' => $newData->name,
+            'name'  => $newData->name,
             'title' => $newData->title,
         ]);
     }
@@ -68,15 +68,15 @@ class RecommendationBlockResourceTest extends TestCase
             'record' => $recommendationBlock->getRouteKey(),
         ])
             ->fillForm([
-                'name' => 'Updated Name',
+                'name'  => 'Updated Name',
                 'title' => 'Updated Title',
             ])
             ->call('save')
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('recommendation_blocks', [
-            'id' => $recommendationBlock->id,
-            'name' => 'Updated Name',
+            'id'    => $recommendationBlock->id,
+            'name'  => 'Updated Name',
             'title' => 'Updated Title',
         ]);
     }
@@ -166,7 +166,7 @@ class RecommendationBlockResourceTest extends TestCase
             ->assertHasNoActionErrors();
 
         $this->assertDatabaseHas('recommendation_blocks', [
-            'id' => $recommendationBlock->id,
+            'id'        => $recommendationBlock->id,
             'is_active' => true,
         ]);
     }
@@ -182,7 +182,7 @@ class RecommendationBlockResourceTest extends TestCase
             ->assertHasNoActionErrors();
 
         $this->assertDatabaseHas('recommendation_blocks', [
-            'id' => $recommendationBlock->id,
+            'id'         => $recommendationBlock->id,
             'is_default' => true,
         ]);
     }
@@ -191,7 +191,7 @@ class RecommendationBlockResourceTest extends TestCase
     {
         Livewire::test(CreateRecommendationBlock::class)
             ->fillForm([
-                'name' => '',
+                'name'  => '',
                 'title' => 'Test Title',
             ])
             ->call('create')
@@ -202,7 +202,7 @@ class RecommendationBlockResourceTest extends TestCase
     {
         Livewire::test(CreateRecommendationBlock::class)
             ->fillForm([
-                'name' => 'test-block',
+                'name'  => 'test-block',
                 'title' => '',
             ])
             ->call('create')
@@ -215,7 +215,7 @@ class RecommendationBlockResourceTest extends TestCase
 
         Livewire::test(CreateRecommendationBlock::class)
             ->fillForm([
-                'name' => 'existing-block',
+                'name'  => 'existing-block',
                 'title' => 'Test Title',
             ])
             ->call('create')
@@ -252,7 +252,7 @@ class RecommendationBlockResourceTest extends TestCase
 
         $this->assertDatabaseHas('recommendation_block_products', [
             'recommendation_block_id' => $recommendationBlock->id,
-            'product_id' => $products->first()->id,
+            'product_id'              => $products->first()->id,
         ]);
     }
 }

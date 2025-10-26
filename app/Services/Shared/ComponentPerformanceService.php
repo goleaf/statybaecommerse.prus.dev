@@ -21,9 +21,7 @@ final class ComponentPerformanceService
     private const METRICS_TTL = 3600;
 
     // 1 hour
-    public function __construct(private readonly TelemetryManager $telemetry)
-    {
-    }
+    public function __construct(private readonly TelemetryManager $telemetry) {}
 
     /**
      * Handle trackComponentRender functionality with proper error handling.

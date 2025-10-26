@@ -23,19 +23,19 @@ final class ReferralTest extends TestCase
         $referred = User::factory()->create();
 
         $referral = Referral::create([
-            'referrer_id' => $referrer->id,
-            'referred_id' => $referred->id,
+            'referrer_id'   => $referrer->id,
+            'referred_id'   => $referred->id,
             'referral_code' => 'TEST123',
-            'status' => 'pending',
-            'title' => ['en' => 'Test Referral', 'lt' => 'Testo Rekomendacija'],
-            'description' => ['en' => 'Test Description', 'lt' => 'Testo Aprašymas'],
+            'status'        => 'pending',
+            'title'         => ['en' => 'Test Referral', 'lt' => 'Testo Rekomendacija'],
+            'description'   => ['en' => 'Test Description', 'lt' => 'Testo Aprašymas'],
         ]);
 
         $this->assertDatabaseHas('referrals', [
-            'referrer_id' => $referrer->id,
-            'referred_id' => $referred->id,
+            'referrer_id'   => $referrer->id,
+            'referred_id'   => $referred->id,
             'referral_code' => 'TEST123',
-            'status' => 'pending',
+            'status'        => 'pending',
         ]);
 
         $this->assertEquals('Test Referral', $referral->getTranslation('title', 'en'));
@@ -88,11 +88,11 @@ final class ReferralTest extends TestCase
 
         $event1 = AnalyticsEvent::factory()->create([
             'trackable_type' => Referral::class,
-            'trackable_id' => $referral->id,
+            'trackable_id'   => $referral->id,
         ]);
         $event2 = AnalyticsEvent::factory()->create([
             'trackable_type' => Referral::class,
-            'trackable_id' => $referral->id,
+            'trackable_id'   => $referral->id,
         ]);
 
         $this->assertCount(2, $referral->analyticsEvents);
@@ -111,17 +111,17 @@ final class ReferralTest extends TestCase
         ]);
 
         $order1 = Order::factory()->create([
-            'user_id' => $referred->id,
-            'status' => 'pending',
+            'user_id'    => $referred->id,
+            'status'     => 'pending',
             'channel_id' => null,
-            'zone_id' => null,
+            'zone_id'    => null,
             'partner_id' => null,
         ]);
         $order2 = Order::factory()->create([
-            'user_id' => $referred->id,
-            'status' => 'completed',
+            'user_id'    => $referred->id,
+            'status'     => 'completed',
             'channel_id' => null,
-            'zone_id' => null,
+            'zone_id'    => null,
             'partner_id' => null,
         ]);
 
@@ -146,7 +146,7 @@ final class ReferralTest extends TestCase
     public function test_active_scope(): void
     {
         $activeReferral = Referral::factory()->create([
-            'status' => 'pending',
+            'status'     => 'pending',
             'expires_at' => now()->addDays(30),
         ]);
 
@@ -155,7 +155,7 @@ final class ReferralTest extends TestCase
         ]);
 
         $expiredByDateReferral = Referral::factory()->create([
-            'status' => 'pending',
+            'status'     => 'pending',
             'expires_at' => now()->subDays(1),
         ]);
 
@@ -183,11 +183,11 @@ final class ReferralTest extends TestCase
     {
         $expiredReferral = Referral::factory()->create(['status' => 'expired']);
         $expiredByDateReferral = Referral::factory()->create([
-            'status' => 'pending',
+            'status'     => 'pending',
             'expires_at' => now()->subDays(1),
         ]);
         $activeReferral = Referral::factory()->create([
-            'status' => 'pending',
+            'status'     => 'pending',
             'expires_at' => now()->addDays(30),
         ]);
 
@@ -202,12 +202,12 @@ final class ReferralTest extends TestCase
     public function test_is_valid_method(): void
     {
         $validReferral = Referral::factory()->create([
-            'status' => 'pending',
+            'status'     => 'pending',
             'expires_at' => now()->addDays(30),
         ]);
 
         $expiredReferral = Referral::factory()->create([
-            'status' => 'pending',
+            'status'     => 'pending',
             'expires_at' => now()->subDays(1),
         ]);
 
@@ -278,7 +278,7 @@ final class ReferralTest extends TestCase
             Referral::factory()->create([
                 'referrer_id' => $user->id,
                 'referred_id' => $referred->id,
-                'status' => 'pending',
+                'status'      => 'pending',
             ]);
         }
 
@@ -344,12 +344,12 @@ final class ReferralTest extends TestCase
 
         ReferralReward::factory()->create([
             'referral_id' => $referral->id,
-            'amount' => 10.50,
+            'amount'      => 10.50,
         ]);
 
         ReferralReward::factory()->create([
             'referral_id' => $referral->id,
-            'amount' => 5.25,
+            'amount'      => 5.25,
         ]);
 
         $this->assertEquals(15.75, $referral->total_rewards_amount);
@@ -438,7 +438,7 @@ final class ReferralTest extends TestCase
         $referral = Referral::createWithCode([
             'referrer_id' => $referrer->id,
             'referred_id' => $referred->id,
-            'status' => 'pending',
+            'status'      => 'pending',
         ]);
 
         $this->assertNotNull($referral->referral_code);
@@ -451,9 +451,9 @@ final class ReferralTest extends TestCase
         $referred = User::factory()->create();
 
         $referral = Referral::createWithCode([
-            'referrer_id' => $referrer->id,
-            'referred_id' => $referred->id,
-            'status' => 'pending',
+            'referrer_id'   => $referrer->id,
+            'referred_id'   => $referred->id,
+            'status'        => 'pending',
             'referral_code' => 'CUSTOM123',
         ]);
 
@@ -474,7 +474,7 @@ final class ReferralTest extends TestCase
     public function test_translatable_fields(): void
     {
         $referral = Referral::factory()->create([
-            'title' => ['en' => 'English Title', 'lt' => 'Lietuvių Pavadinimas'],
+            'title'       => ['en' => 'English Title', 'lt' => 'Lietuvių Pavadinimas'],
             'description' => ['en' => 'English Description', 'lt' => 'Lietuvių Aprašymas'],
         ]);
 

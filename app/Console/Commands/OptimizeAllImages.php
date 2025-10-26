@@ -6,6 +6,7 @@ namespace App\Console\Commands;
 
 use App\Services\Images\LocalImageGeneratorService;
 use App\Services\Images\WebPConversionService;
+use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
@@ -60,7 +61,7 @@ final class OptimizeAllImages extends Command
 
             return self::SUCCESS;
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->error("❌ Error during optimization: {$e->getMessage()}");
             Log::error('Image optimization failed', [
                 'error' => $e->getMessage(),
@@ -133,7 +134,7 @@ final class OptimizeAllImages extends Command
         ], [
             ['Total Images', $totalMedia],
             ['WebP Images', $webpMedia],
-            ['WebP Percentage', $totalMedia > 0 ? round(($webpMedia / $totalMedia) * 100, 2).'%' : '0%'],
+            ['WebP Percentage', $totalMedia > 0 ? round(($webpMedia / $totalMedia) * 100, 2) . '%' : '0%'],
             ['Collections', $collections->implode(', ')],
         ]);
 
@@ -151,7 +152,7 @@ final class OptimizeAllImages extends Command
                 $collection,
                 $count,
                 $webpCount,
-                $count > 0 ? round(($webpCount / $count) * 100, 2).'%' : '0%',
+                $count > 0 ? round(($webpCount / $count) * 100, 2) . '%' : '0%',
             ];
         }
 

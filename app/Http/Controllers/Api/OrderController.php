@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Support\Contracts\Entities\OrderContract;
 use App\Traits\HandlesContentNegotiation;
+use BackedEnum;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -36,7 +37,7 @@ final class OrderController extends Controller
             ->firstOrFail();
 
         $allowedStatuses = ['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'completed'];
-        $statusValue = $order->status instanceof \BackedEnum ? $order->status->value : (string) $order->status;
+        $statusValue = $order->status instanceof BackedEnum ? $order->status->value : (string) $order->status;
 
         if (! in_array($statusValue, $allowedStatuses, true)) {
             abort(404, 'Order is not available.');

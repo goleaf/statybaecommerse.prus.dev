@@ -16,10 +16,10 @@ final class DiscountControllerTest extends TestCase
     public function test_index_lists_active_discounts(): void
     {
         $discount = Discount::factory()->create([
-            'status' => 'active',
-            'priority' => 1,
+            'status'    => 'active',
+            'priority'  => 1,
             'starts_at' => now()->subDay(),
-            'ends_at' => now()->addDay(),
+            'ends_at'   => now()->addDay(),
         ]);
 
         $response = $this->get(route('frontend.discounts.index'));
@@ -32,11 +32,11 @@ final class DiscountControllerTest extends TestCase
     public function test_apply_coupon_sets_discount_in_session(): void
     {
         $coupon = Coupon::factory()->create([
-            'code' => 'SAVE10',
-            'type' => 'percentage',
-            'value' => 10,
-            'starts_at' => now()->subDay(),
-            'expires_at' => now()->addDay(),
+            'code'        => 'SAVE10',
+            'type'        => 'percentage',
+            'value'       => 10,
+            'starts_at'   => now()->subDay(),
+            'expires_at'  => now()->addDay(),
             'usage_limit' => null,
         ]);
 
@@ -61,11 +61,11 @@ final class DiscountControllerTest extends TestCase
     public function test_apply_coupon_requires_cart_items(): void
     {
         $coupon = Coupon::factory()->create([
-            'code' => 'SAVE',
-            'type' => 'fixed',
-            'value' => 5,
-            'starts_at' => now()->subDay(),
-            'expires_at' => now()->addDay(),
+            'code'        => 'SAVE',
+            'type'        => 'fixed',
+            'value'       => 5,
+            'starts_at'   => now()->subDay(),
+            'expires_at'  => now()->addDay(),
             'usage_limit' => null,
         ]);
 
@@ -78,7 +78,7 @@ final class DiscountControllerTest extends TestCase
     public function test_remove_coupon_clears_session(): void
     {
         $this->withSession([
-            'cart_discount' => 5,
+            'cart_discount'  => 5,
             'applied_coupon' => ['code' => 'SAVE10'],
         ])->post(route('frontend.discounts.remove-coupon'));
 

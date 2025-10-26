@@ -9,6 +9,7 @@ use App\Models\Slider;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
+use ReflectionClass;
 
 final class SliderViewsTimelineWidgetTest extends TestCase
 {
@@ -30,20 +31,20 @@ final class SliderViewsTimelineWidgetTest extends TestCase
     {
         // Create active sliders
         Slider::factory()->create([
-            'title' => 'Active Slider 1',
-            'is_active' => true,
+            'title'      => 'Active Slider 1',
+            'is_active'  => true,
             'created_at' => now()->subDays(5),
         ]);
 
         Slider::factory()->create([
-            'title' => 'Active Slider 2',
-            'is_active' => true,
+            'title'      => 'Active Slider 2',
+            'is_active'  => true,
             'created_at' => now()->subDays(3),
         ]);
 
         Slider::factory()->create([
-            'title' => 'Inactive Slider',
-            'is_active' => false,
+            'title'      => 'Inactive Slider',
+            'is_active'  => false,
             'created_at' => now()->subDays(1),
         ]);
     }
@@ -57,7 +58,7 @@ final class SliderViewsTimelineWidgetTest extends TestCase
     public function test_slider_views_timeline_widget_has_correct_heading(): void
     {
         $widget = new SliderViewsTimeline;
-        $reflection = new \ReflectionClass($widget);
+        $reflection = new ReflectionClass($widget);
         $headingProperty = $reflection->getProperty('heading');
         $headingProperty->setAccessible(true);
         $this->assertEquals('Slider Views Timeline', $headingProperty->getValue($widget));
@@ -65,7 +66,7 @@ final class SliderViewsTimelineWidgetTest extends TestCase
 
     public function test_slider_views_timeline_widget_has_correct_sort(): void
     {
-        $reflection = new \ReflectionClass(SliderViewsTimeline::class);
+        $reflection = new ReflectionClass(SliderViewsTimeline::class);
         $sortProperty = $reflection->getProperty('sort');
         $sortProperty->setAccessible(true);
         $this->assertEquals(6, $sortProperty->getValue());
@@ -74,7 +75,7 @@ final class SliderViewsTimelineWidgetTest extends TestCase
     public function test_slider_views_timeline_widget_has_correct_column_span(): void
     {
         $widget = new SliderViewsTimeline;
-        $reflection = new \ReflectionClass($widget);
+        $reflection = new ReflectionClass($widget);
         $columnSpanProperty = $reflection->getProperty('columnSpan');
         $columnSpanProperty->setAccessible(true);
         $this->assertEquals([

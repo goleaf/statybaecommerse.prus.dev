@@ -16,8 +16,8 @@ beforeEach(function () {
     $this->adminRole = Role::findByName('admin', 'web');
 
     $this->admin = User::factory()->create([
-        'name' => 'Test Admin',
-        'email' => 'test@admin.com',
+        'name'     => 'Test Admin',
+        'email'    => 'test@admin.com',
         'is_admin' => true,
     ]);
     $this->admin->assignRole($this->adminRole);

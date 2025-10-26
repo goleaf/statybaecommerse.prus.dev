@@ -24,8 +24,8 @@ beforeEach(function () {
     $adminRole->givePermissionTo($extraPermissions);
 
     $this->admin = User::factory()->create([
-        'name' => 'Test Admin',
-        'email' => 'admin@test.com',
+        'name'     => 'Test Admin',
+        'email'    => 'admin@test.com',
         'is_admin' => true,
     ]);
     $this->admin->assignRole($adminRole);

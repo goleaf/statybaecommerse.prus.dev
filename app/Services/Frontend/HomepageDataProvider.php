@@ -28,10 +28,10 @@ final class HomepageDataProvider
             CacheKeys::homeStats($locale),
             static function (): array {
                 return [
-                    'products' => Product::query()->where('is_visible', true)->count(),
-                    'categories' => Category::query()->where('is_visible', true)->count(),
-                    'brands' => Brand::query()->where('is_enabled', true)->count(),
-                    'reviews' => Review::query()->where('is_approved', true)->count(),
+                    'products'       => Product::query()->where('is_visible', true)->count(),
+                    'categories'     => Category::query()->where('is_visible', true)->count(),
+                    'brands'         => Brand::query()->where('is_enabled', true)->count(),
+                    'reviews'        => Review::query()->where('is_approved', true)->count(),
                     'average_rating' => (float) (Review::query()->where('is_approved', true)->avg('rating') ?? 0.0),
                 ];
             }

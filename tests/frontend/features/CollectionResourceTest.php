@@ -39,15 +39,15 @@ final class CollectionResourceTest extends TestCase
     public function test_collection_resource_can_create_collection(): void
     {
         $collectionData = [
-            'name' => 'Test Collection',
-            'slug' => 'test-collection',
-            'description' => 'Test description',
-            'is_visible' => true,
-            'is_automatic' => false,
-            'sort_order' => 1,
-            'display_type' => 'grid',
+            'name'              => 'Test Collection',
+            'slug'              => 'test-collection',
+            'description'       => 'Test description',
+            'is_visible'        => true,
+            'is_automatic'      => false,
+            'sort_order'        => 1,
+            'display_type'      => 'grid',
             'products_per_page' => 12,
-            'show_filters' => true,
+            'show_filters'      => true,
         ];
 
         $response = $this->post(route('filament.admin.resources.collections.store'), $collectionData);
@@ -55,27 +55,27 @@ final class CollectionResourceTest extends TestCase
         $response->assertRedirect();
 
         $this->assertDatabaseHas('collections', [
-            'name' => 'Test Collection',
-            'slug' => 'test-collection',
-            'description' => 'Test description',
-            'is_visible' => true,
-            'is_automatic' => false,
-            'sort_order' => 1,
-            'display_type' => 'grid',
+            'name'              => 'Test Collection',
+            'slug'              => 'test-collection',
+            'description'       => 'Test description',
+            'is_visible'        => true,
+            'is_automatic'      => false,
+            'sort_order'        => 1,
+            'display_type'      => 'grid',
             'products_per_page' => 12,
-            'show_filters' => true,
+            'show_filters'      => true,
         ]);
     }
 
     public function test_collection_resource_can_edit_collection(): void
     {
         $collection = Collection::factory()->create([
-            'name' => 'Original Name',
+            'name'        => 'Original Name',
             'description' => 'Original Description',
         ]);
 
         $updateData = [
-            'name' => 'Updated Name',
+            'name'        => 'Updated Name',
             'description' => 'Updated Description',
         ];
 
@@ -84,8 +84,8 @@ final class CollectionResourceTest extends TestCase
         $response->assertRedirect();
 
         $this->assertDatabaseHas('collections', [
-            'id' => $collection->id,
-            'name' => 'Updated Name',
+            'id'          => $collection->id,
+            'name'        => 'Updated Name',
             'description' => 'Updated Description',
         ]);
     }

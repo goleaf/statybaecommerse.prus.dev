@@ -15,11 +15,11 @@ use Livewire\Component;
  * Livewire component for AdvancedRelatedProducts with reactive frontend functionality, real-time updates, and user interaction handling.
  *
  * @property Product $product
- * @property int $limit
- * @property string $type
- * @property string $title
- * @property bool $showTitle
- * @property string $class
+ * @property int     $limit
+ * @property string  $type
+ * @property string  $title
+ * @property bool    $showTitle
+ * @property string  $class
  */
 final class AdvancedRelatedProducts extends Component
 {
@@ -57,9 +57,9 @@ final class AdvancedRelatedProducts extends Component
     {
         return match ($this->type) {
             'category' => $this->product->getRelatedProductsByCategory($this->limit),
-            'brand' => $this->product->getRelatedProductsByBrand($this->limit),
-            'price' => $this->product->getRelatedProductsByPriceRange(0.2, $this->limit),
-            default => $this->product->getRelatedProducts($this->limit),
+            'brand'    => $this->product->getRelatedProductsByBrand($this->limit),
+            'price'    => $this->product->getRelatedProductsByPriceRange(0.2, $this->limit),
+            default    => $this->product->getRelatedProducts($this->limit),
         };
     }
 
@@ -75,9 +75,9 @@ final class AdvancedRelatedProducts extends Component
 
         return match ($this->type) {
             'category' => __('ecommerce.similar_products'),
-            'brand' => __('ecommerce.you_might_also_like'),
-            'price' => __('ecommerce.recommended_for_you'),
-            default => __('ecommerce.related_products'),
+            'brand'    => __('ecommerce.you_might_also_like'),
+            'price'    => __('ecommerce.recommended_for_you'),
+            default    => __('ecommerce.related_products'),
         };
     }
 

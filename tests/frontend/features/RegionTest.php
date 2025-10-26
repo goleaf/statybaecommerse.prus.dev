@@ -21,27 +21,27 @@ final class RegionTest extends TestCase
         $zone = Zone::factory()->create();
 
         $regionData = [
-            'name' => 'Vilnius County',
-            'slug' => 'vilnius-county',
-            'code' => 'LT-VIL',
+            'name'        => 'Vilnius County',
+            'slug'        => 'vilnius-county',
+            'code'        => 'LT-VIL',
             'description' => 'Vilnius County in Lithuania',
-            'is_enabled' => true,
-            'is_default' => false,
-            'country_id' => $country->id,
-            'zone_id' => $zone->id,
-            'level' => 2,
-            'sort_order' => 1,
+            'is_enabled'  => true,
+            'is_default'  => false,
+            'country_id'  => $country->id,
+            'zone_id'     => $zone->id,
+            'level'       => 2,
+            'sort_order'  => 1,
         ];
 
         $region = Region::create($regionData);
 
         $this->assertDatabaseHas('regions', [
-            'name' => 'Vilnius County',
-            'slug' => 'vilnius-county',
-            'code' => 'LT-VIL',
+            'name'       => 'Vilnius County',
+            'slug'       => 'vilnius-county',
+            'code'       => 'LT-VIL',
             'country_id' => $country->id,
-            'zone_id' => $zone->id,
-            'level' => 2,
+            'zone_id'    => $zone->id,
+            'level'      => 2,
         ]);
 
         $this->assertEquals('Vilnius County', $region->name);
@@ -73,7 +73,7 @@ final class RegionTest extends TestCase
         $parentRegion = Region::factory()->create(['level' => 1]);
         $childRegion = Region::factory()->create([
             'parent_id' => $parentRegion->id,
-            'level' => 2,
+            'level'     => 2,
         ]);
 
         $this->assertInstanceOf(Region::class, $childRegion->parent);
@@ -87,16 +87,16 @@ final class RegionTest extends TestCase
         $region = Region::factory()->create();
 
         $translation = RegionTranslation::create([
-            'region_id' => $region->id,
-            'locale' => 'en',
-            'name' => 'Vilnius County',
+            'region_id'   => $region->id,
+            'locale'      => 'en',
+            'name'        => 'Vilnius County',
             'description' => 'Vilnius County in Lithuania',
         ]);
 
         $this->assertDatabaseHas('region_translations', [
             'region_id' => $region->id,
-            'locale' => 'en',
-            'name' => 'Vilnius County',
+            'locale'    => 'en',
+            'name'      => 'Vilnius County',
         ]);
 
         $this->assertTrue($region->translations->contains($translation));
@@ -109,8 +109,8 @@ final class RegionTest extends TestCase
         // Test with translation
         RegionTranslation::create([
             'region_id' => $region->id,
-            'locale' => 'en',
-            'name' => 'Vilnius County EN',
+            'locale'    => 'en',
+            'name'      => 'Vilnius County EN',
         ]);
 
         app()->setLocale('en');
@@ -125,14 +125,14 @@ final class RegionTest extends TestCase
     {
         $rootRegion = Region::factory()->create(['name' => 'Lithuania', 'level' => 0]);
         $stateRegion = Region::factory()->create([
-            'name' => 'Vilnius County',
+            'name'      => 'Vilnius County',
             'parent_id' => $rootRegion->id,
-            'level' => 1,
+            'level'     => 1,
         ]);
         $districtRegion = Region::factory()->create([
-            'name' => 'Vilnius District',
+            'name'      => 'Vilnius District',
             'parent_id' => $stateRegion->id,
-            'level' => 2,
+            'level'     => 2,
         ]);
 
         $this->assertEquals('Lithuania > Vilnius County > Vilnius District', $districtRegion->full_path);
@@ -142,14 +142,14 @@ final class RegionTest extends TestCase
     {
         $rootRegion = Region::factory()->create(['name' => 'Lithuania', 'level' => 0]);
         $stateRegion = Region::factory()->create([
-            'name' => 'Vilnius County',
+            'name'      => 'Vilnius County',
             'parent_id' => $rootRegion->id,
-            'level' => 1,
+            'level'     => 1,
         ]);
         $districtRegion = Region::factory()->create([
-            'name' => 'Vilnius District',
+            'name'      => 'Vilnius District',
             'parent_id' => $stateRegion->id,
-            'level' => 2,
+            'level'     => 2,
         ]);
 
         $ancestors = $districtRegion->ancestors;
@@ -162,19 +162,19 @@ final class RegionTest extends TestCase
     {
         $rootRegion = Region::factory()->create(['name' => 'Lithuania', 'level' => 0]);
         $stateRegion1 = Region::factory()->create([
-            'name' => 'Vilnius County',
+            'name'      => 'Vilnius County',
             'parent_id' => $rootRegion->id,
-            'level' => 1,
+            'level'     => 1,
         ]);
         $stateRegion2 = Region::factory()->create([
-            'name' => 'Kaunas County',
+            'name'      => 'Kaunas County',
             'parent_id' => $rootRegion->id,
-            'level' => 1,
+            'level'     => 1,
         ]);
         $districtRegion = Region::factory()->create([
-            'name' => 'Vilnius District',
+            'name'      => 'Vilnius District',
             'parent_id' => $stateRegion1->id,
-            'level' => 2,
+            'level'     => 2,
         ]);
 
         $descendants = $rootRegion->descendants;
@@ -294,14 +294,14 @@ final class RegionTest extends TestCase
     {
         $rootRegion = Region::factory()->create(['name' => 'Lithuania', 'level' => 0]);
         $stateRegion = Region::factory()->create([
-            'name' => 'Vilnius County',
+            'name'      => 'Vilnius County',
             'parent_id' => $rootRegion->id,
-            'level' => 1,
+            'level'     => 1,
         ]);
         $districtRegion = Region::factory()->create([
-            'name' => 'Vilnius District',
+            'name'      => 'Vilnius District',
             'parent_id' => $stateRegion->id,
-            'level' => 2,
+            'level'     => 2,
         ]);
 
         $breadcrumb = $districtRegion->breadcrumb;
@@ -315,14 +315,14 @@ final class RegionTest extends TestCase
     {
         $rootRegion = Region::factory()->create(['name' => 'Lithuania', 'level' => 0]);
         $stateRegion = Region::factory()->create([
-            'name' => 'Vilnius County',
+            'name'      => 'Vilnius County',
             'parent_id' => $rootRegion->id,
-            'level' => 1,
+            'level'     => 1,
         ]);
         $districtRegion = Region::factory()->create([
-            'name' => 'Vilnius District',
+            'name'      => 'Vilnius District',
             'parent_id' => $stateRegion->id,
-            'level' => 2,
+            'level'     => 2,
         ]);
 
         $this->assertEquals('Lithuania > Vilnius County > Vilnius District', $districtRegion->breadcrumb_string);

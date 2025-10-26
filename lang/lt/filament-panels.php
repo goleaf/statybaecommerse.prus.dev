@@ -5,7 +5,7 @@ declare(strict_types=1);
 return [
     'login' => [
         'heading' => 'Prisijunkite prie savo paskyros',
-        'form' => [
+        'form'    => [
             'email' => [
                 'label' => 'El. paštas',
             ],
@@ -28,7 +28,7 @@ return [
     'password_reset' => [
         'request' => [
             'heading' => 'Pamiršote slaptažodį?',
-            'form' => [
+            'form'    => [
                 'email' => [
                     'label' => 'El. paštas',
                 ],
@@ -44,18 +44,18 @@ return [
             'notifications' => [
                 'throttled' => [
                     'title' => 'Per daug bandymų',
-                    'body' => 'Bandykite dar kartą po :seconds sekundžių.',
+                    'body'  => 'Bandykite dar kartą po :seconds sekundžių.',
                 ],
             ],
         ],
         'reset' => [
             'heading' => 'Atstatyti slaptažodį',
-            'form' => [
+            'form'    => [
                 'email' => [
                     'label' => 'El. paštas',
                 ],
                 'password' => [
-                    'label' => 'Slaptažodis',
+                    'label'                => 'Slaptažodis',
                     'validation_attribute' => 'slaptažodis',
                 ],
                 'password_confirmation' => [
@@ -73,15 +73,15 @@ return [
             'notifications' => [
                 'throttled' => [
                     'title' => 'Per daug bandymų',
-                    'body' => 'Bandykite dar kartą po :seconds sekundžių.',
+                    'body'  => 'Bandykite dar kartą po :seconds sekundžių.',
                 ],
             ],
         ],
     ],
     'pages' => [
         'health_check' => [
-            'title' => 'Sistemos būklė',
-            'heading' => 'Sistemos būklė',
+            'title'            => 'Sistemos būklė',
+            'heading'          => 'Sistemos būklė',
             'navigation_label' => 'Sistemos būklė',
         ],
     ],
@@ -134,22 +134,22 @@ return [
     ],
     'pages' => [
         'dashboard' => [
-            'title' => 'Valdymo skydas',
-            'heading' => 'Valdymo skydas',
+            'title'            => 'Valdymo skydas',
+            'heading'          => 'Valdymo skydas',
             'navigation_label' => 'Valdymo skydas',
         ],
     ],
     'resources' => [
-        'label' => 'Ištekliai',
-        'plural_label' => 'Ištekliai',
+        'label'            => 'Ištekliai',
+        'plural_label'     => 'Ištekliai',
         'navigation_label' => 'Ištekliai',
         'navigation_group' => 'Ištekliai',
-        'pages' => [
+        'pages'            => [
             'create' => [
-                'title' => 'Sukurti :label',
-                'heading' => 'Sukurti :label',
+                'title'      => 'Sukurti :label',
+                'heading'    => 'Sukurti :label',
                 'breadcrumb' => 'Sukurti',
-                'form' => [
+                'form'       => [
                     'actions' => [
                         'create' => [
                             'label' => 'Sukurti',
@@ -164,10 +164,10 @@ return [
                 ],
             ],
             'edit' => [
-                'title' => 'Redaguoti :label',
-                'heading' => 'Redaguoti :label',
+                'title'      => 'Redaguoti :label',
+                'heading'    => 'Redaguoti :label',
                 'breadcrumb' => 'Redaguoti',
-                'form' => [
+                'form'       => [
                     'actions' => [
                         'save' => [
                             'label' => 'Išsaugoti pakeitimus',
@@ -179,8 +179,8 @@ return [
                 ],
             ],
             'list' => [
-                'title' => ':label',
-                'heading' => ':label',
+                'title'      => ':label',
+                'heading'    => ':label',
                 'breadcrumb' => 'Sąrašas',
             ],
         ],

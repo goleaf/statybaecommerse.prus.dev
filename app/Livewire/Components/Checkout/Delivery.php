@@ -15,7 +15,7 @@ use Spatie\LivewireWizard\Components\StepComponent;
  *
  * Livewire component for Delivery with reactive frontend functionality, real-time updates, and user interaction handling.
  *
- * @property mixed $options
+ * @property mixed    $options
  * @property int|null $currentSelected
  */
 class Delivery extends StepComponent

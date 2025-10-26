@@ -22,7 +22,7 @@ class ProductRequestResourceTest extends TestCase
         parent::setUp();
 
         $this->adminUser = User::factory()->create([
-            'email' => 'admin@example.com',
+            'email'    => 'admin@example.com',
             'is_admin' => true,
         ]);
 
@@ -32,8 +32,8 @@ class ProductRequestResourceTest extends TestCase
     private function makePublishedProduct(): Product
     {
         return Product::factory()->create([
-            'is_visible' => true,
-            'status' => 'published',
+            'is_visible'   => true,
+            'status'       => 'published',
             'published_at' => now(),
         ]);
     }
@@ -44,10 +44,10 @@ class ProductRequestResourceTest extends TestCase
 
         ProductRequest::factory()->create([
             'product_id' => $product->id,
-            'user_id' => $this->adminUser->id,
-            'name' => 'Test Request',
-            'email' => 'test@example.com',
-            'status' => 'pending',
+            'user_id'    => $this->adminUser->id,
+            'name'       => 'Test Request',
+            'email'      => 'test@example.com',
+            'status'     => 'pending',
         ]);
 
         Livewire::test(\App\Filament\Resources\ProductRequestResource\Pages\ListProductRequests::class)
@@ -60,22 +60,22 @@ class ProductRequestResourceTest extends TestCase
 
         Livewire::test(\App\Filament\Resources\ProductRequestResource\Pages\CreateProductRequest::class)
             ->fillForm([
-                'product_id' => $product->id,
-                'user_id' => $this->adminUser->id,
-                'name' => 'New Request',
-                'email' => 'new@example.com',
-                'phone' => '+37012345678',
-                'message' => 'Test message',
+                'product_id'         => $product->id,
+                'user_id'            => $this->adminUser->id,
+                'name'               => 'New Request',
+                'email'              => 'new@example.com',
+                'phone'              => '+37012345678',
+                'message'            => 'Test message',
                 'requested_quantity' => 2,
-                'status' => 'pending',
+                'status'             => 'pending',
             ])
             ->call('create')
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('product_requests', [
-            'name' => 'New Request',
-            'email' => 'new@example.com',
-            'status' => 'pending',
+            'name'    => 'New Request',
+            'email'   => 'new@example.com',
+            'status'  => 'pending',
             'user_id' => $this->adminUser->id,
         ]);
     }
@@ -86,24 +86,24 @@ class ProductRequestResourceTest extends TestCase
 
         $request = ProductRequest::factory()->create([
             'product_id' => $product->id,
-            'user_id' => $this->adminUser->id,
-            'status' => 'pending',
+            'user_id'    => $this->adminUser->id,
+            'status'     => 'pending',
         ]);
 
         Livewire::test(\App\Filament\Resources\ProductRequestResource\Pages\EditProductRequest::class, [
             'record' => $request->getRouteKey(),
         ])
             ->fillForm([
-                'status' => 'completed',
+                'status'      => 'completed',
                 'admin_notes' => 'Request completed successfully',
-                'phone' => '+37012345678',
+                'phone'       => '+37012345678',
             ])
             ->call('save')
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('product_requests', [
-            'id' => $request->id,
-            'status' => 'completed',
+            'id'          => $request->id,
+            'status'      => 'completed',
             'admin_notes' => 'Request completed successfully',
         ]);
     }
@@ -114,9 +114,9 @@ class ProductRequestResourceTest extends TestCase
 
         $request = ProductRequest::factory()->create([
             'product_id' => $product->id,
-            'user_id' => $this->adminUser->id,
-            'name' => 'Test Request',
-            'email' => 'test@example.com',
+            'user_id'    => $this->adminUser->id,
+            'name'       => 'Test Request',
+            'email'      => 'test@example.com',
         ]);
 
         Livewire::test(\App\Filament\Resources\ProductRequestResource\Pages\ViewProductRequest::class, [
@@ -131,14 +131,14 @@ class ProductRequestResourceTest extends TestCase
 
         ProductRequest::factory()->create([
             'product_id' => $product->id,
-            'user_id' => $this->adminUser->id,
-            'status' => 'pending',
+            'user_id'    => $this->adminUser->id,
+            'status'     => 'pending',
         ]);
 
         ProductRequest::factory()->create([
             'product_id' => $product->id,
-            'user_id' => $this->adminUser->id,
-            'status' => 'completed',
+            'user_id'    => $this->adminUser->id,
+            'status'     => 'completed',
         ]);
 
         Livewire::test(\App\Filament\Resources\ProductRequestResource\Pages\ListProductRequests::class)
@@ -154,12 +154,12 @@ class ProductRequestResourceTest extends TestCase
 
         ProductRequest::factory()->create([
             'product_id' => $product1->id,
-            'user_id' => $this->adminUser->id,
+            'user_id'    => $this->adminUser->id,
         ]);
 
         ProductRequest::factory()->create([
             'product_id' => $product2->id,
-            'user_id' => $this->adminUser->id,
+            'user_id'    => $this->adminUser->id,
         ]);
 
         Livewire::test(\App\Filament\Resources\ProductRequestResource\Pages\ListProductRequests::class)
@@ -174,9 +174,9 @@ class ProductRequestResourceTest extends TestCase
 
         ProductRequest::factory()->create([
             'product_id' => $product->id,
-            'user_id' => $this->adminUser->id,
-            'name' => 'Test Request',
-            'email' => 'test@example.com',
+            'user_id'    => $this->adminUser->id,
+            'name'       => 'Test Request',
+            'email'      => 'test@example.com',
         ]);
 
         Livewire::test(\App\Filament\Resources\ProductRequestResource\Pages\ListProductRequests::class)
@@ -190,7 +190,7 @@ class ProductRequestResourceTest extends TestCase
 
         $requests = ProductRequest::factory()->count(3)->create([
             'product_id' => $product->id,
-            'user_id' => $this->adminUser->id,
+            'user_id'    => $this->adminUser->id,
         ]);
 
         Livewire::test(\App\Filament\Resources\ProductRequestResource\Pages\ListProductRequests::class)

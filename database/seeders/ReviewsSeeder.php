@@ -9,6 +9,7 @@ use App\Models\Review;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Carbon;
+use Throwable;
 
 class ReviewsSeeder extends Seeder
 {
@@ -33,7 +34,7 @@ class ReviewsSeeder extends Seeder
         $customerQuery = User::query();
         try {
             $customerQuery->where('is_admin', false);
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             // Column may not exist yet in some environments
         }
 
@@ -71,7 +72,7 @@ class ReviewsSeeder extends Seeder
                         ->for($product)
                         ->for($customers->random())
                         ->create([
-                            'locale' => $locale,
+                            'locale'     => $locale,
                             'created_at' => $createdAt,
                             'updated_at' => $createdAt,
                         ]);
@@ -87,7 +88,7 @@ class ReviewsSeeder extends Seeder
                         ->for($product)
                         ->for($customers->random())
                         ->create([
-                            'locale' => $locale,
+                            'locale'     => $locale,
                             'created_at' => $createdAt,
                             'updated_at' => $createdAt,
                         ]);

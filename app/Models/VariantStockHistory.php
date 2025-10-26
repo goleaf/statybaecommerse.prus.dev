@@ -1,13 +1,15 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models;
 
+use Eloquent;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
-use Eloquent;
 
 /**
  * VariantStockHistory
@@ -65,8 +67,8 @@ final class VariantStockHistory extends Model
     protected function casts(): array
     {
         return [
-            'old_quantity' => 'integer',
-            'new_quantity' => 'integer',
+            'old_quantity'    => 'integer',
+            'new_quantity'    => 'integer',
             'quantity_change' => 'integer',
         ];
     }
@@ -207,15 +209,15 @@ final class VariantStockHistory extends Model
         ?int $referenceId = null
     ): self {
         return self::create([
-            'variant_id' => $variantId,
-            'old_quantity' => $oldQuantity,
-            'new_quantity' => $newQuantity,
+            'variant_id'      => $variantId,
+            'old_quantity'    => $oldQuantity,
+            'new_quantity'    => $newQuantity,
             'quantity_change' => $newQuantity - $oldQuantity,
-            'change_type' => $changeType,
-            'change_reason' => $changeReason,
-            'changed_by' => $changedBy,
-            'reference_type' => $referenceType,
-            'reference_id' => $referenceId,
+            'change_type'     => $changeType,
+            'change_reason'   => $changeReason,
+            'changed_by'      => $changedBy,
+            'reference_type'  => $referenceType,
+            'reference_id'    => $referenceId,
         ]);
     }
 }

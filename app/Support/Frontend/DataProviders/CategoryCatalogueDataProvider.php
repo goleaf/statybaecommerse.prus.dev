@@ -37,13 +37,13 @@ final class CategoryCatalogueDataProvider
         $products = $this->products->getProductsForCategory($category, $filters);
 
         return [
-            'category' => $category,
-            'products' => $products,
-            'availableSorts' => $this->products->sortOptions(),
-            'availableFilters' => $this->products->filterOptions(),
-            'activeSort' => $this->products->resolveSortKey($filters['sort'] ?? null),
-            'activeFilter' => $filters['filter'] ?? null,
-            'breadcrumbs' => $this->buildBreadcrumbs($category),
+            'category'          => $category,
+            'products'          => $products,
+            'availableSorts'    => $this->products->sortOptions(),
+            'availableFilters'  => $this->products->filterOptions(),
+            'activeSort'        => $this->products->resolveSortKey($filters['sort'] ?? null),
+            'activeFilter'      => $filters['filter'] ?? null,
+            'breadcrumbs'       => $this->buildBreadcrumbs($category),
             'relatedCategories' => $this->resolveRelatedCategories($category),
             'highlightedBrands' => $this->resolveCategoryBrands($category),
         ];

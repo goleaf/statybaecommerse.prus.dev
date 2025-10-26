@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Tests\Support;
 
@@ -73,7 +75,7 @@ final class TestingDatabase
 
         $directory = self::resolveDatabaseDirectory();
 
-        if (!is_dir($directory)) {
+        if (! is_dir($directory)) {
             mkdir($directory, 0755, true);
         }
 
@@ -106,7 +108,7 @@ final class TestingDatabase
             ?? getenv('TEST_TOKEN')
             ?? null;
 
-        if (!is_string($token) || $token === '') {
+        if (! is_string($token) || $token === '') {
             return null;
         }
 
@@ -124,11 +126,11 @@ final class TestingDatabase
         $databasePath = self::path();
         $directory = dirname($databasePath);
 
-        if (!is_dir($directory)) {
+        if (! is_dir($directory)) {
             mkdir($directory, 0755, true);
         }
 
-        if (!file_exists($databasePath)) {
+        if (! file_exists($databasePath)) {
             touch($databasePath);
         }
 
@@ -153,13 +155,13 @@ final class TestingDatabase
         Config::set('database.connections.sqlite.prefix', '');
         Config::set('telescope.storage.database.connection', 'sqlite');
         Config::set('database.connections.testing', [
-            'driver' => 'sqlite',
-            'database' => $databasePath,
-            'prefix' => '',
+            'driver'                  => 'sqlite',
+            'database'                => $databasePath,
+            'prefix'                  => '',
             'foreign_key_constraints' => true,
-            'journal_mode' => null,
-            'synchronous' => null,
-            'busy_timeout' => 60000,
+            'journal_mode'            => null,
+            'synchronous'             => null,
+            'busy_timeout'            => 60000,
         ]);
         // Force Telescope to use the same SQLite connection so its migrations run without reaching for MySQL.
         Config::set('telescope.storage.database.connection', 'sqlite');
@@ -225,18 +227,18 @@ final class TestingDatabase
             try {
                 Artisan::call('migrate:fresh', [
                     '--database' => 'sqlite',
-                    '--force' => true,
+                    '--force'    => true,
                 ]);
 
                 if (is_dir(base_path('tests/database/migrations'))) {
                     Artisan::call('migrate', [
                         '--database' => 'sqlite',
-                        '--path' => 'tests/database/migrations',
-                        '--force' => true,
+                        '--path'     => 'tests/database/migrations',
+                        '--force'    => true,
                     ]);
                 }
 
-                if (!Schema::connection('sqlite')->hasTable('users')) {
+                if (! Schema::connection('sqlite')->hasTable('users')) {
                     self::provisionFallbackSchema();
                 }
 
@@ -323,7 +325,7 @@ final class TestingDatabase
 
         $directory = $basePath . '/database';
 
-        if (!is_dir($directory)) {
+        if (! is_dir($directory)) {
             mkdir($directory, 0755, true);
         }
 
@@ -375,21 +377,21 @@ final class TestingDatabase
             try {
                 Artisan::call('migrate:fresh', [
                     '--database' => 'sqlite',
-                    '--force' => true,
+                    '--force'    => true,
                 ]);
 
                 if (is_dir(base_path('tests/database/migrations'))) {
                     Artisan::call('migrate', [
                         '--database' => 'sqlite',
-                        '--path' => 'tests/database/migrations',
-                        '--force' => true,
+                        '--path'     => 'tests/database/migrations',
+                        '--force'    => true,
                     ]);
                 }
             } catch (Throwable $exception) {
                 // Swallow migration exceptions so the manual schema fallback can run.
             }
 
-            if (!Schema::connection('sqlite')->hasTable('users')) {
+            if (! Schema::connection('sqlite')->hasTable('users')) {
                 self::provisionFallbackSchema();
             }
 
@@ -413,7 +415,7 @@ final class TestingDatabase
         $connection = config('database.default', 'sqlite');
         $schema = Schema::connection($connection);
 
-        if (!$schema->hasTable('shipping_options')) {
+        if (! $schema->hasTable('shipping_options')) {
             $schema->create('shipping_options', function (Blueprint $table): void {
                 $table->id();
                 $table->string('name');
@@ -444,7 +446,7 @@ final class TestingDatabase
             });
         }
 
-        if (!$schema->hasTable('customers')) {
+        if (! $schema->hasTable('customers')) {
             $schema->create('customers', function (Blueprint $table): void {
                 $table->id();
                 $table->string('name');
@@ -464,7 +466,7 @@ final class TestingDatabase
             });
         }
 
-        if (!$schema->hasTable('users')) {
+        if (! $schema->hasTable('users')) {
             $schema->create('users', function (Blueprint $table): void {
                 $table->id();
                 $table->string('name')->nullable();
@@ -479,7 +481,7 @@ final class TestingDatabase
             });
         }
 
-        if (!$schema->hasTable('system_setting_categories')) {
+        if (! $schema->hasTable('system_setting_categories')) {
             $schema->create('system_setting_categories', function (Blueprint $table): void {
                 $table->id();
                 $table->string('name');
@@ -498,7 +500,7 @@ final class TestingDatabase
             });
         }
 
-        if (!$schema->hasTable('system_settings')) {
+        if (! $schema->hasTable('system_settings')) {
             $schema->create('system_settings', function (Blueprint $table): void {
                 $table->id();
                 $table->unsignedBigInteger('category_id')->nullable();
@@ -547,7 +549,7 @@ final class TestingDatabase
             });
         }
 
-        if (!$schema->hasTable('system_setting_dependencies')) {
+        if (! $schema->hasTable('system_setting_dependencies')) {
             $schema->create('system_setting_dependencies', function (Blueprint $table): void {
                 $table->id();
                 $table->unsignedBigInteger('setting_id');
@@ -562,7 +564,7 @@ final class TestingDatabase
             });
         }
 
-        if (!$schema->hasTable('activity_log')) {
+        if (! $schema->hasTable('activity_log')) {
             $schema->create('activity_log', function (Blueprint $table): void {
                 $table->id();
                 $table->string('log_name')->nullable();
@@ -589,7 +591,7 @@ final class TestingDatabase
             });
         }
 
-        if (!$schema->hasTable('cart_items')) {
+        if (! $schema->hasTable('cart_items')) {
             $schema->create('cart_items', function (Blueprint $table): void {
                 $table->id();
                 $table->string('session_id')->nullable()->index();
@@ -604,7 +606,7 @@ final class TestingDatabase
             });
         }
 
-        if (!$schema->hasTable('products')) {
+        if (! $schema->hasTable('products')) {
             $schema->create('products', function (Blueprint $table): void {
                 $table->id();
                 $table->string('type')->default('simple');
@@ -631,7 +633,7 @@ final class TestingDatabase
             });
         }
 
-        if (!$schema->hasTable('product_variants')) {
+        if (! $schema->hasTable('product_variants')) {
             $schema->create('product_variants', function (Blueprint $table): void {
                 $table->id();
                 $table->foreignId('product_id')->constrained('products')->cascadeOnDelete();
@@ -646,7 +648,7 @@ final class TestingDatabase
             });
         }
 
-        if (!$schema->hasTable('variant_combinations')) {
+        if (! $schema->hasTable('variant_combinations')) {
             $schema->create('variant_combinations', function (Blueprint $table): void {
                 $table->id();
                 $table->foreignId('product_id')->constrained('products')->cascadeOnDelete();
@@ -660,7 +662,7 @@ final class TestingDatabase
             });
         }
 
-        if (!$schema->hasTable('variant_analytics')) {
+        if (! $schema->hasTable('variant_analytics')) {
             $schema->create('variant_analytics', function (Blueprint $table): void {
                 $table->id();
                 $table->foreignId('product_id')->constrained('products')->cascadeOnDelete();
@@ -678,7 +680,7 @@ final class TestingDatabase
             });
         }
 
-        if (!$schema->hasTable('variant_images')) {
+        if (! $schema->hasTable('variant_images')) {
             $schema->create('variant_images', function (Blueprint $table): void {
                 $table->id();
                 $table->foreignId('variant_id')->constrained('product_variants')->cascadeOnDelete();
@@ -698,7 +700,7 @@ final class TestingDatabase
             });
         }
 
-        if (!$schema->hasTable('user_preferences')) {
+        if (! $schema->hasTable('user_preferences')) {
             $schema->create('user_preferences', function (Blueprint $table): void {
                 $table->id();
                 $table->unsignedBigInteger('user_id');
@@ -714,7 +716,7 @@ final class TestingDatabase
             });
         }
 
-        if (!$schema->hasTable('user_product_interactions')) {
+        if (! $schema->hasTable('user_product_interactions')) {
             $schema->create('user_product_interactions', function (Blueprint $table): void {
                 $table->id();
                 $table->unsignedBigInteger('user_id');
@@ -735,7 +737,7 @@ final class TestingDatabase
             });
         }
 
-        if (!$schema->hasTable('orders')) {
+        if (! $schema->hasTable('orders')) {
             $schema->create('orders', function (Blueprint $table): void {
                 $table->id();
                 $table->string('number')->unique();
@@ -770,7 +772,7 @@ final class TestingDatabase
             });
         }
 
-        if (!$schema->hasTable('order_items')) {
+        if (! $schema->hasTable('order_items')) {
             $schema->create('order_items', function (Blueprint $table): void {
                 $table->id();
                 $table->foreignId('order_id')->constrained('orders')->cascadeOnDelete();
@@ -791,7 +793,7 @@ final class TestingDatabase
             });
         }
 
-        if (!$schema->hasTable('system_setting_categories')) {
+        if (! $schema->hasTable('system_setting_categories')) {
             $schema->create('system_setting_categories', function (Blueprint $table): void {
                 $table->id();
                 $table->string('name');
@@ -819,7 +821,7 @@ final class TestingDatabase
             });
         }
 
-        if (!$schema->hasTable('system_settings')) {
+        if (! $schema->hasTable('system_settings')) {
             $schema->create('system_settings', function (Blueprint $table): void {
                 $table->id();
                 $table->unsignedBigInteger('category_id')->nullable();
@@ -869,7 +871,7 @@ final class TestingDatabase
             });
         }
 
-        if (!$schema->hasTable('system_setting_translations')) {
+        if (! $schema->hasTable('system_setting_translations')) {
             $schema->create('system_setting_translations', function (Blueprint $table): void {
                 $table->id();
                 $table->foreignId('system_setting_id')->constrained('system_settings')->cascadeOnDelete();

@@ -255,7 +255,7 @@ final class EnumValidator
         $enumClass = self::getEnumClass($enumName);
         $enum = $enumClass::from((string) $value);
         foreach ($rules as $rule => $expected) {
-            $method = 'is'.ucfirst($rule);
+            $method = 'is' . ucfirst($rule);
             if (method_exists($enum, $method)) {
                 $actual = $enum->{$method}();
                 if ($actual !== $expected) {
@@ -278,7 +278,7 @@ final class EnumValidator
         $enumClass = self::getEnumClass($enumName);
         $enum = $enumClass::from((string) $value);
         foreach ($rules as $rule) {
-            $method = 'is'.ucfirst($rule);
+            $method = 'is' . ucfirst($rule);
             if (method_exists($enum, $method)) {
                 if (! $enum->{$method}()) {
                     return false;
@@ -300,7 +300,7 @@ final class EnumValidator
         $enumClass = self::getEnumClass($enumName);
         $enum = $enumClass::from((string) $value);
         foreach ($rules as $rule) {
-            $method = 'is'.ucfirst($rule);
+            $method = 'is' . ucfirst($rule);
             if (method_exists($enum, $method)) {
                 if ($enum->{$method}()) {
                     return true;
@@ -337,7 +337,7 @@ final class EnumValidator
         $enum = $enumClass::from((string) $value);
         foreach ($validation as $rule => $expected) {
             if (is_string($rule)) {
-                $method = 'is'.ucfirst($rule);
+                $method = 'is' . ucfirst($rule);
                 if (method_exists($enum, $method)) {
                     $actual = $enum->{$method}();
                     if ($actual !== $expected) {
@@ -345,7 +345,7 @@ final class EnumValidator
                     }
                 }
             } else {
-                $method = 'is'.ucfirst($rule);
+                $method = 'is' . ucfirst($rule);
                 if (method_exists($enum, $method)) {
                     if (! $enum->{$method}()) {
                         return false;
@@ -369,7 +369,7 @@ final class EnumValidator
         $enum = $enumClass::from((string) $value);
         foreach ($validationRules as $rule => $expected) {
             if (is_string($rule)) {
-                $method = 'is'.ucfirst($rule);
+                $method = 'is' . ucfirst($rule);
                 if (method_exists($enum, $method)) {
                     $actual = $enum->{$method}();
                     if ($actual !== $expected) {
@@ -377,7 +377,7 @@ final class EnumValidator
                     }
                 }
             } else {
-                $method = 'is'.ucfirst($rule);
+                $method = 'is' . ucfirst($rule);
                 if (method_exists($enum, $method)) {
                     if (! $enum->{$method}()) {
                         return false;
@@ -395,13 +395,13 @@ final class EnumValidator
     private static function getEnumClass(string $enumName): ?string
     {
         return match ($enumName) {
-            'address_type' => AddressType::class,
+            'address_type'     => AddressType::class,
             'navigation_group' => NavigationGroup::class,
-            'order_status' => OrderStatus::class,
-            'payment_type' => PaymentType::class,
-            'product_status' => ProductStatus::class,
-            'user_role' => UserRole::class,
-            default => null,
+            'order_status'     => OrderStatus::class,
+            'payment_type'     => PaymentType::class,
+            'product_status'   => ProductStatus::class,
+            'user_role'        => UserRole::class,
+            default            => null,
         };
     }
 
@@ -507,7 +507,7 @@ final class EnumValidator
      */
     public static function getLaravelValidationRulesNullable(string $enumName): string
     {
-        return 'nullable|'.self::getEnumValidationRules($enumName);
+        return 'nullable|' . self::getEnumValidationRules($enumName);
     }
 
     /**
@@ -515,7 +515,7 @@ final class EnumValidator
      */
     public static function getLaravelValidationRulesRequired(string $enumName): string
     {
-        return 'required|'.self::getEnumValidationRules($enumName);
+        return 'required|' . self::getEnumValidationRules($enumName);
     }
 
     /**
@@ -523,7 +523,7 @@ final class EnumValidator
      */
     public static function getLaravelValidationRulesSometimes(string $enumName): string
     {
-        return 'sometimes|'.self::getEnumValidationRules($enumName);
+        return 'sometimes|' . self::getEnumValidationRules($enumName);
     }
 
     /**
@@ -531,7 +531,7 @@ final class EnumValidator
      */
     public static function getLaravelValidationRulesPresent(string $enumName): string
     {
-        return 'present|'.self::getEnumValidationRules($enumName);
+        return 'present|' . self::getEnumValidationRules($enumName);
     }
 
     /**
@@ -539,7 +539,7 @@ final class EnumValidator
      */
     public static function getLaravelValidationRulesFilled(string $enumName): string
     {
-        return 'filled|'.self::getEnumValidationRules($enumName);
+        return 'filled|' . self::getEnumValidationRules($enumName);
     }
 
     /**
@@ -547,7 +547,7 @@ final class EnumValidator
      */
     public static function getLaravelValidationRulesRequiredIf(string $enumName, string $field, mixed $value): string
     {
-        return 'required_if:'.$field.','.$value.'|'.self::getEnumValidationRules($enumName);
+        return 'required_if:' . $field . ',' . $value . '|' . self::getEnumValidationRules($enumName);
     }
 
     /**
@@ -555,7 +555,7 @@ final class EnumValidator
      */
     public static function getLaravelValidationRulesRequiredUnless(string $enumName, string $field, mixed $value): string
     {
-        return 'required_unless:'.$field.','.$value.'|'.self::getEnumValidationRules($enumName);
+        return 'required_unless:' . $field . ',' . $value . '|' . self::getEnumValidationRules($enumName);
     }
 
     /**
@@ -563,7 +563,7 @@ final class EnumValidator
      */
     public static function getLaravelValidationRulesRequiredWith(string $enumName, string $field): string
     {
-        return 'required_with:'.$field.'|'.self::getEnumValidationRules($enumName);
+        return 'required_with:' . $field . '|' . self::getEnumValidationRules($enumName);
     }
 
     /**
@@ -571,7 +571,7 @@ final class EnumValidator
      */
     public static function getLaravelValidationRulesRequiredWithAll(string $enumName, array $fields): string
     {
-        return 'required_with_all:'.implode(',', $fields).'|'.self::getEnumValidationRules($enumName);
+        return 'required_with_all:' . implode(',', $fields) . '|' . self::getEnumValidationRules($enumName);
     }
 
     /**
@@ -579,7 +579,7 @@ final class EnumValidator
      */
     public static function getLaravelValidationRulesRequiredWithout(string $enumName, string $field): string
     {
-        return 'required_without:'.$field.'|'.self::getEnumValidationRules($enumName);
+        return 'required_without:' . $field . '|' . self::getEnumValidationRules($enumName);
     }
 
     /**
@@ -587,6 +587,6 @@ final class EnumValidator
      */
     public static function getLaravelValidationRulesRequiredWithoutAll(string $enumName, array $fields): string
     {
-        return 'required_without_all:'.implode(',', $fields).'|'.self::getEnumValidationRules($enumName);
+        return 'required_without_all:' . implode(',', $fields) . '|' . self::getEnumValidationRules($enumName);
     }
 }

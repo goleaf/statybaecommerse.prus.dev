@@ -23,11 +23,11 @@ final class SystemUserSeeder extends Seeder
         $user = User::query()->firstOrCreate(
             ['email' => $email],
             [
-                'name' => (string) Config::get('attribution.system_user_name', 'System User'),
-                'password' => Hash::make(Str::random(40)),
+                'name'              => (string) Config::get('attribution.system_user_name', 'System User'),
+                'password'          => Hash::make(Str::random(40)),
                 'email_verified_at' => now(),
-                'is_admin' => true,
-                'is_active' => true,
+                'is_admin'          => true,
+                'is_active'         => true,
             ]
         );
 

@@ -14,8 +14,8 @@ use Livewire\WithPagination;
  * Livewire component for NotificationCenter with reactive frontend functionality, real-time updates, and user interaction handling.
  *
  * @property string $filter
- * @property bool $showUnreadOnly
- * @property mixed $listeners
+ * @property bool   $showUnreadOnly
+ * @property mixed  $listeners
  */
 final class NotificationCenter extends Component
 {

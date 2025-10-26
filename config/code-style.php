@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 return [
     /*
      * |--------------------------------------------------------------------------
@@ -17,29 +19,29 @@ return [
         'App\\',
     ],
     'validation_rules' => [
-        'import_order' => true,
-        'union_type_spacing' => true,
-        'closure_spacing' => true,
+        'import_order'        => true,
+        'union_type_spacing'  => true,
+        'closure_spacing'     => true,
         'trailing_whitespace' => true,
-        'numeric_formatting' => true,
-        'final_newline' => true,
-        'indentation' => true,
+        'numeric_formatting'  => true,
+        'final_newline'       => true,
+        'indentation'         => true,
     ],
     'fixing_rules' => [
-        'import_order' => true,
-        'union_type_spacing' => true,
-        'closure_spacing' => true,
+        'import_order'        => true,
+        'union_type_spacing'  => true,
+        'closure_spacing'     => true,
         'trailing_whitespace' => true,
-        'numeric_formatting' => true,
-        'final_newline' => true,
-        'indentation' => true,
+        'numeric_formatting'  => true,
+        'final_newline'       => true,
+        'indentation'         => true,
     ],
     'patterns' => [
-        'union_type' => '/\|\s*([a-zA-Z\\\\]+)/',
-        'closure' => '/fn\s*\(\s*([^)]*)\s*\)/',
+        'union_type'          => '/\|\s*([a-zA-Z\\\\]+)/',
+        'closure'             => '/fn\s*\(\s*([^)]*)\s*\)/',
         'trailing_whitespace' => '/\s+$/m',
-        'numeric' => '/(\d+\.0+)(?![0-9])/',
-        'import' => '/^use\s+/',
+        'numeric'             => '/(\d+\.0+)(?![0-9])/',
+        'import'              => '/^use\s+/',
     ],
     'directories' => [
         'include' => [
@@ -59,18 +61,18 @@ return [
     ],
     'reporting' => [
         'enabled' => true,
-        'path' => storage_path('logs/code-style-reports'),
-        'format' => 'json',  // json, csv, html
+        'path'    => storage_path('logs/code-style-reports'),
+        'format'  => 'json',  // json, csv, html
     ],
     'auto_fix' => [
-        'enabled' => env('CODE_STYLE_AUTO_FIX', false),
-        'on_save' => env('CODE_STYLE_AUTO_FIX_ON_SAVE', false),
+        'enabled'   => env('CODE_STYLE_AUTO_FIX', false),
+        'on_save'   => env('CODE_STYLE_AUTO_FIX_ON_SAVE', false),
         'on_upload' => env('CODE_STYLE_AUTO_FIX_ON_UPLOAD', false),
     ],
     'watch' => [
-        'enabled' => env('CODE_STYLE_WATCH', false),
+        'enabled'  => env('CODE_STYLE_WATCH', false),
         'interval' => 1,  // seconds
-        'paths' => [
+        'paths'    => [
             'app/',
             'tests/',
         ],

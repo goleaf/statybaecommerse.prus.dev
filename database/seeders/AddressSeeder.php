@@ -54,12 +54,12 @@ final class AddressSeeder extends Seeder
                     $type = $types[$sequence] ?? AddressType::OTHER;
 
                     return [
-                        'type' => $type,
+                        'type'         => $type,
                         'country_code' => $countries[$sequence % count($countries)],
-                        'is_default' => $sequence === 0,
-                        'is_shipping' => in_array($type, [AddressType::SHIPPING, AddressType::HOME], true),
-                        'is_billing' => $type === AddressType::BILLING,
-                        'is_active' => $sequence !== 5,
+                        'is_default'   => $sequence === 0,
+                        'is_shipping'  => in_array($type, [AddressType::SHIPPING, AddressType::HOME], true),
+                        'is_billing'   => $type === AddressType::BILLING,
+                        'is_active'    => $sequence !== 5,
                     ];
                 })
                 ->for($user)

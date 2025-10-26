@@ -19,8 +19,8 @@ use Livewire\Component;
  *
  * @property int|null $productId
  * @property int|null $userId
- * @property string $type
- * @property int $limit
+ * @property string   $type
+ * @property int      $limit
  */
 final class ProductRecommendations extends Component
 {
@@ -50,15 +50,15 @@ final class ProductRecommendations extends Component
     public function recommendations(): Collection
     {
         return match ($this->type) {
-            'related' => $this->getRelatedProducts(),
-            'popular' => $this->getPopularProducts(),
-            'personalized' => $this->getPersonalizedRecommendations(),
-            'recently_viewed' => $this->getRecentlyViewedProducts(),
-            'cross_sell' => $this->getCrossSellProducts(),
-            'up_sell' => $this->getUpSellProducts(),
+            'related'               => $this->getRelatedProducts(),
+            'popular'               => $this->getPopularProducts(),
+            'personalized'          => $this->getPersonalizedRecommendations(),
+            'recently_viewed'       => $this->getRecentlyViewedProducts(),
+            'cross_sell'            => $this->getCrossSellProducts(),
+            'up_sell'               => $this->getUpSellProducts(),
             'customers_also_bought' => $this->getCustomersAlsoBoughtProducts(),
-            'trending' => $this->getTrendingProducts(),
-            default => $this->getRelatedProducts(),
+            'trending'              => $this->getTrendingProducts(),
+            default                 => $this->getRelatedProducts(),
         };
     }
 

@@ -14,4 +14,3 @@ final class VariantStockCheckAvailabilityRequestTest extends TestCase
             ->assertStatus(422);
     }
 }
-

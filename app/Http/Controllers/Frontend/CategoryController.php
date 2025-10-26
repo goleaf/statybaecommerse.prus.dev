@@ -6,10 +6,10 @@ namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
 use App\Models\Category;
-use App\Support\Frontend\DataProviders\ProductCatalogueDataProvider;
 use App\Support\Frontend\DataProviders\CategoryCatalogueDataProvider;
-use Illuminate\Database\Eloquent\Builder;
+use App\Support\Frontend\DataProviders\ProductCatalogueDataProvider;
 use Illuminate\Contracts\View\View;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 
 final class CategoryController extends Controller
@@ -28,8 +28,8 @@ final class CategoryController extends Controller
             ->withQueryString();
 
         return view('frontend.categories.index', [
-            'categories' => $categories,
-            'topCategories' => $this->productData->categoryHighlights(12),
+            'categories'       => $categories,
+            'topCategories'    => $this->productData->categoryHighlights(12),
             'featuredProducts' => $this->productData->featured(4),
         ]);
     }

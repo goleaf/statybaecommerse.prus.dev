@@ -9,9 +9,7 @@ use Throwable;
 
 final class StructuredLogger
 {
-    public function __construct(private readonly LogContext $context)
-    {
-    }
+    public function __construct(private readonly LogContext $context) {}
 
     /**
      * @param array<string, mixed> $context
@@ -21,9 +19,9 @@ final class StructuredLogger
         $operationLog = new OperationLog($this, $operation, $context, microtime(true));
 
         $this->log('info', 'operation_started', [
-            'event' => 'start',
+            'event'     => 'start',
             'operation' => $operation,
-            'context' => $context,
+            'context'   => $context,
         ]);
 
         return $operationLog;
@@ -34,10 +32,10 @@ final class StructuredLogger
         $durationMs = (int) round((microtime(true) - $operation->startedAt()) * 1000);
 
         $this->log('info', $message ?? 'operation_finished', [
-            'event' => 'finish',
-            'operation' => $operation->operation(),
-            'context' => $operation->context(),
-            'metrics' => $metrics,
+            'event'       => 'finish',
+            'operation'   => $operation->operation(),
+            'context'     => $operation->context(),
+            'metrics'     => $metrics,
             'duration_ms' => $durationMs,
         ]);
     }
@@ -47,13 +45,13 @@ final class StructuredLogger
         $durationMs = (int) round((microtime(true) - $operation->startedAt()) * 1000);
 
         $this->log('error', 'operation_failed', [
-            'event' => 'error',
-            'operation' => $operation->operation(),
-            'context' => $operation->context(),
-            'metrics' => $context,
+            'event'       => 'error',
+            'operation'   => $operation->operation(),
+            'context'     => $operation->context(),
+            'metrics'     => $context,
             'duration_ms' => $durationMs,
-            'exception' => $throwable::class,
-            'error' => $throwable->getMessage(),
+            'exception'   => $throwable::class,
+            'error'       => $throwable->getMessage(),
         ]);
     }
 

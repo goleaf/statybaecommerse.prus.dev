@@ -19,7 +19,7 @@ class CategoryResourceTest extends TestCase
         parent::setUp();
 
         $this->actingAs(User::factory()->create([
-            'email' => 'admin@test.com',
+            'email'     => 'admin@test.com',
             'is_active' => true,
         ]));
     }

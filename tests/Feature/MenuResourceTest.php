@@ -19,7 +19,7 @@ final class MenuResourceTest extends TestCase
         parent::setUp();
 
         $adminUser = User::factory()->create([
-            'email' => 'admin@example.com',
+            'email'    => 'admin@example.com',
             'is_admin' => true,
         ]);
 
@@ -40,11 +40,11 @@ final class MenuResourceTest extends TestCase
     {
         // Arrange
         $menuData = [
-            'name' => 'Test Menu',
-            'key' => 'test_menu',
-            'location' => 'header',
+            'name'        => 'Test Menu',
+            'key'         => 'test_menu',
+            'location'    => 'header',
             'description' => 'Test menu description',
-            'is_active' => true,
+            'is_active'   => true,
         ];
 
         // Act
@@ -55,9 +55,9 @@ final class MenuResourceTest extends TestCase
 
         // Assert
         $this->assertDatabaseHas('menus', [
-            'name' => 'Test Menu',
-            'key' => 'test_menu',
-            'location' => 'header',
+            'name'      => 'Test Menu',
+            'key'       => 'test_menu',
+            'location'  => 'header',
             'is_active' => true,
         ]);
     }
@@ -67,11 +67,11 @@ final class MenuResourceTest extends TestCase
         // Arrange
         $menu = Menu::factory()->create([
             'name' => 'Original Menu',
-            'key' => 'original_menu',
+            'key'  => 'original_menu',
         ]);
 
         $updatedData = [
-            'name' => 'Updated Menu',
+            'name'        => 'Updated Menu',
             'description' => 'Updated description',
         ];
 
@@ -85,8 +85,8 @@ final class MenuResourceTest extends TestCase
 
         // Assert
         $this->assertDatabaseHas('menus', [
-            'id' => $menu->id,
-            'name' => 'Updated Menu',
+            'id'          => $menu->id,
+            'name'        => 'Updated Menu',
             'description' => 'Updated description',
         ]);
     }
@@ -115,7 +115,7 @@ final class MenuResourceTest extends TestCase
 
         // Assert
         $this->assertDatabaseHas('menus', [
-            'id' => $menu->id,
+            'id'        => $menu->id,
             'is_active' => true,
         ]);
     }
@@ -125,7 +125,7 @@ final class MenuResourceTest extends TestCase
         // Arrange
         $menu = Menu::factory()->create([
             'name' => 'Original Menu',
-            'key' => 'original_menu',
+            'key'  => 'original_menu',
         ]);
 
         // Act
@@ -138,7 +138,7 @@ final class MenuResourceTest extends TestCase
         ]);
 
         $this->assertDatabaseHas('menus', [
-            'key' => 'original_menu_copy_'.time(),
+            'key' => 'original_menu_copy_' . time(),
         ]);
     }
 
@@ -180,7 +180,7 @@ final class MenuResourceTest extends TestCase
         // Assert
         foreach ($menus as $menu) {
             $this->assertDatabaseHas('menus', [
-                'id' => $menu->id,
+                'id'        => $menu->id,
                 'is_active' => true,
             ]);
         }
@@ -198,7 +198,7 @@ final class MenuResourceTest extends TestCase
         // Assert
         foreach ($menus as $menu) {
             $this->assertDatabaseHas('menus', [
-                'id' => $menu->id,
+                'id'        => $menu->id,
                 'is_active' => false,
             ]);
         }
@@ -209,7 +209,7 @@ final class MenuResourceTest extends TestCase
         // Act & Assert
         Livewire::test(\App\Filament\Resources\MenuResource\Pages\CreateMenu::class)
             ->fillForm([
-                'key' => 'test_menu',
+                'key'      => 'test_menu',
                 'location' => 'header',
             ])
             ->call('create')
@@ -221,7 +221,7 @@ final class MenuResourceTest extends TestCase
         // Act & Assert
         Livewire::test(\App\Filament\Resources\MenuResource\Pages\CreateMenu::class)
             ->fillForm([
-                'name' => 'Test Menu',
+                'name'     => 'Test Menu',
                 'location' => 'header',
             ])
             ->call('create')
@@ -234,7 +234,7 @@ final class MenuResourceTest extends TestCase
         Livewire::test(\App\Filament\Resources\MenuResource\Pages\CreateMenu::class)
             ->fillForm([
                 'name' => 'Test Menu',
-                'key' => 'test_menu',
+                'key'  => 'test_menu',
             ])
             ->call('create')
             ->assertHasFormErrors(['location']);
@@ -248,8 +248,8 @@ final class MenuResourceTest extends TestCase
         // Act & Assert
         Livewire::test(\App\Filament\Resources\MenuResource\Pages\CreateMenu::class)
             ->fillForm([
-                'name' => 'Test Menu',
-                'key' => 'existing_key',
+                'name'     => 'Test Menu',
+                'key'      => 'existing_key',
                 'location' => 'header',
             ])
             ->call('create')
@@ -260,9 +260,9 @@ final class MenuResourceTest extends TestCase
     {
         // Arrange
         $menu = Menu::factory()->create([
-            'name' => 'Test Menu',
-            'key' => 'test_menu',
-            'location' => 'header',
+            'name'        => 'Test Menu',
+            'key'         => 'test_menu',
+            'location'    => 'header',
             'description' => 'Test description',
         ]);
 
@@ -271,9 +271,9 @@ final class MenuResourceTest extends TestCase
             'record' => $menu->getRouteKey(),
         ])
             ->assertFormSet([
-                'name' => 'Test Menu',
-                'key' => 'test_menu',
-                'location' => 'header',
+                'name'        => 'Test Menu',
+                'key'         => 'test_menu',
+                'location'    => 'header',
                 'description' => 'Test description',
             ]);
     }

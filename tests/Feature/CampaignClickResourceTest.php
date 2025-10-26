@@ -45,20 +45,20 @@ final class CampaignClickResourceTest extends TestCase
 
         Livewire::test(\App\Filament\Resources\CampaignClickResource\Pages\CreateCampaignClick::class)
             ->fillForm([
-                'campaign_id' => $campaign->id,
-                'customer_id' => $user->id,
-                'session_id' => 'test-session-123',
-                'ip_address' => '192.168.1.1',
-                'user_agent' => 'Mozilla/5.0 Test Browser',
-                'clicked_url' => 'https://example.com/test',
-                'device_type' => 'desktop',
-                'browser' => 'chrome',
-                'os' => 'windows',
-                'country' => 'Lithuania',
-                'utm_source' => 'google',
-                'utm_medium' => 'cpc',
+                'campaign_id'  => $campaign->id,
+                'customer_id'  => $user->id,
+                'session_id'   => 'test-session-123',
+                'ip_address'   => '192.168.1.1',
+                'user_agent'   => 'Mozilla/5.0 Test Browser',
+                'clicked_url'  => 'https://example.com/test',
+                'device_type'  => 'desktop',
+                'browser'      => 'chrome',
+                'os'           => 'windows',
+                'country'      => 'Lithuania',
+                'utm_source'   => 'google',
+                'utm_medium'   => 'cpc',
                 'utm_campaign' => $campaign->name,
-                'clicked_at' => now(),
+                'clicked_at'   => now(),
                 'is_converted' => false,
             ])
             ->call('create')
@@ -67,8 +67,8 @@ final class CampaignClickResourceTest extends TestCase
         $this->assertDatabaseHas('campaign_clicks', [
             'campaign_id' => $campaign->id,
             'customer_id' => $user->id,
-            'session_id' => 'test-session-123',
-            'ip_address' => '192.168.1.1',
+            'session_id'  => 'test-session-123',
+            'ip_address'  => '192.168.1.1',
         ]);
     }
 
@@ -77,8 +77,8 @@ final class CampaignClickResourceTest extends TestCase
         $campaign = Campaign::factory()->create();
         $user = User::factory()->create();
         $click = CampaignClick::factory()->create([
-            'campaign_id' => $campaign->id,
-            'customer_id' => $user->id,
+            'campaign_id'  => $campaign->id,
+            'customer_id'  => $user->id,
             'is_converted' => false,
         ]);
 
@@ -86,7 +86,7 @@ final class CampaignClickResourceTest extends TestCase
             'record' => $click->id,
         ])
             ->fillForm([
-                'is_converted' => true,
+                'is_converted'     => true,
                 'conversion_value' => 99.99,
             ])
             ->call('save')
@@ -140,14 +140,14 @@ final class CampaignClickResourceTest extends TestCase
         $user = User::factory()->create();
 
         $convertedClick = CampaignClick::factory()->create([
-            'campaign_id' => $campaign->id,
-            'customer_id' => $user->id,
+            'campaign_id'  => $campaign->id,
+            'customer_id'  => $user->id,
             'is_converted' => true,
         ]);
 
         $nonConvertedClick = CampaignClick::factory()->create([
-            'campaign_id' => $campaign->id,
-            'customer_id' => $user->id,
+            'campaign_id'  => $campaign->id,
+            'customer_id'  => $user->id,
             'is_converted' => false,
         ]);
 
@@ -162,8 +162,8 @@ final class CampaignClickResourceTest extends TestCase
         $campaign = Campaign::factory()->create();
         $user = User::factory()->create();
         $click = CampaignClick::factory()->create([
-            'campaign_id' => $campaign->id,
-            'customer_id' => $user->id,
+            'campaign_id'  => $campaign->id,
+            'customer_id'  => $user->id,
             'is_converted' => false,
         ]);
 
@@ -180,8 +180,8 @@ final class CampaignClickResourceTest extends TestCase
         $campaign = Campaign::factory()->create();
         $user = User::factory()->create();
         $click = CampaignClick::factory()->create([
-            'campaign_id' => $campaign->id,
-            'customer_id' => $user->id,
+            'campaign_id'  => $campaign->id,
+            'customer_id'  => $user->id,
             'is_converted' => true,
         ]);
 
@@ -199,8 +199,8 @@ final class CampaignClickResourceTest extends TestCase
         $user = User::factory()->create();
 
         $clicks = CampaignClick::factory()->count(3)->create([
-            'campaign_id' => $campaign->id,
-            'customer_id' => $user->id,
+            'campaign_id'  => $campaign->id,
+            'customer_id'  => $user->id,
             'is_converted' => false,
         ]);
 
@@ -220,8 +220,8 @@ final class CampaignClickResourceTest extends TestCase
         $user = User::factory()->create();
 
         $clicks = CampaignClick::factory()->count(3)->create([
-            'campaign_id' => $campaign->id,
-            'customer_id' => $user->id,
+            'campaign_id'  => $campaign->id,
+            'customer_id'  => $user->id,
             'is_converted' => true,
         ]);
 
@@ -294,7 +294,7 @@ final class CampaignClickResourceTest extends TestCase
             ->fillForm([
                 'campaign_id' => $campaign->id,
                 'customer_id' => $user->id,
-                'ip_address' => '192.168.1.1',
+                'ip_address'  => '192.168.1.1',
             ])
             ->call('create')
             ->assertHasNoFormErrors();
@@ -309,7 +309,7 @@ final class CampaignClickResourceTest extends TestCase
             ->fillForm([
                 'campaign_id' => $campaign->id,
                 'customer_id' => $user->id,
-                'ip_address' => 'invalid-ip',
+                'ip_address'  => 'invalid-ip',
             ])
             ->call('create')
             ->assertHasFormErrors(['ip_address']);

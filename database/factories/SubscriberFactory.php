@@ -19,31 +19,31 @@ final class SubscriberFactory extends Factory
     {
         $firstName = fake('lt_LT')->firstName();
         $lastName = fake('lt_LT')->lastName();
-        $email = strtolower($firstName.'.'.$lastName.'@'.fake()->domainName());
+        $email = strtolower($firstName . '.' . $lastName . '@' . fake()->domainName());
 
         return [
-            'email' => $email,
+            'email'      => $email,
             'first_name' => $firstName,
-            'last_name' => $lastName,
-            'phone' => fake()->optional(0.7)->phoneNumber(),
-            'company' => fake()->optional(0.6)->company(),
-            'job_title' => fake()->optional(0.5)->jobTitle(),
-            'interests' => fake()->randomElements([
+            'last_name'  => $lastName,
+            'phone'      => fake()->optional(0.7)->phoneNumber(),
+            'company'    => fake()->optional(0.6)->company(),
+            'job_title'  => fake()->optional(0.5)->jobTitle(),
+            'interests'  => fake()->randomElements([
                 'products', 'news', 'promotions', 'events',
                 'blog', 'technical', 'business', 'support',
             ], fake()->numberBetween(1, 4)),
             'source' => fake()->randomElement([
                 'website', 'admin', 'import', 'api', 'social', 'referral', 'event', 'other',
             ]),
-            'status' => fake()->randomElement(['active', 'inactive', 'unsubscribed']),
-            'subscribed_at' => fake()->dateTimeBetween('-2 years', 'now'),
-            'unsubscribed_at' => null,
+            'status'             => fake()->randomElement(['active', 'inactive', 'unsubscribed']),
+            'subscribed_at'      => fake()->dateTimeBetween('-2 years', 'now'),
+            'unsubscribed_at'    => null,
             'last_email_sent_at' => fake()->optional(0.8)->dateTimeBetween('-6 months', 'now'),
-            'email_count' => fake()->numberBetween(0, 25),
-            'metadata' => [
+            'email_count'        => fake()->numberBetween(0, 25),
+            'metadata'           => [
                 'ip_address' => fake()->ipv4(),
                 'user_agent' => fake()->userAgent(),
-                'referrer' => fake()->optional(0.3)->url(),
+                'referrer'   => fake()->optional(0.3)->url(),
                 'utm_source' => fake()->optional(0.4)->randomElement([
                     'google', 'facebook', 'linkedin', 'direct',
                 ]),
@@ -57,7 +57,7 @@ final class SubscriberFactory extends Factory
     public function active(): static
     {
         return $this->state(fn (array $attributes) => [
-            'status' => 'active',
+            'status'          => 'active',
             'unsubscribed_at' => null,
         ]);
     }
@@ -65,7 +65,7 @@ final class SubscriberFactory extends Factory
     public function inactive(): static
     {
         return $this->state(fn (array $attributes) => [
-            'status' => 'inactive',
+            'status'          => 'inactive',
             'unsubscribed_at' => null,
         ]);
     }
@@ -73,7 +73,7 @@ final class SubscriberFactory extends Factory
     public function unsubscribed(): static
     {
         return $this->state(fn (array $attributes) => [
-            'status' => 'unsubscribed',
+            'status'          => 'unsubscribed',
             'unsubscribed_at' => fake()->dateTimeBetween($attributes['subscribed_at'], 'now'),
         ]);
     }
@@ -84,7 +84,7 @@ final class SubscriberFactory extends Factory
             return [
                 'user_id' => User::factory()->create([
                     'email' => $attributes['email'],
-                    'name' => $attributes['first_name'].' '.$attributes['last_name'],
+                    'name'  => $attributes['first_name'] . ' ' . $attributes['last_name'],
                 ])->id,
             ];
         });

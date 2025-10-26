@@ -22,27 +22,27 @@ class CampaignConversionTest extends TestCase
         $customer = User::factory()->create();
         $order = Order::factory()->create([
             'channel_id' => null,
-            'zone_id' => null,
+            'zone_id'    => null,
             'partner_id' => null,
         ]);
 
         $conversion = CampaignConversion::factory()->create([
-            'campaign_id' => $campaign->id,
-            'customer_id' => $customer->id,
-            'order_id' => $order->id,
-            'conversion_type' => 'purchase',
+            'campaign_id'      => $campaign->id,
+            'customer_id'      => $customer->id,
+            'order_id'         => $order->id,
+            'conversion_type'  => 'purchase',
             'conversion_value' => 150.50,
-            'status' => 'completed',
+            'status'           => 'completed',
         ]);
 
         $this->assertDatabaseHas('campaign_conversions', [
-            'id' => $conversion->id,
-            'campaign_id' => $campaign->id,
-            'customer_id' => $customer->id,
-            'order_id' => $order->id,
-            'conversion_type' => 'purchase',
+            'id'               => $conversion->id,
+            'campaign_id'      => $campaign->id,
+            'customer_id'      => $customer->id,
+            'order_id'         => $order->id,
+            'conversion_type'  => 'purchase',
             'conversion_value' => 150.50,
-            'status' => 'completed',
+            'status'           => 'completed',
         ]);
     }
 
@@ -68,7 +68,7 @@ class CampaignConversionTest extends TestCase
     {
         $order = Order::factory()->create([
             'channel_id' => null,
-            'zone_id' => null,
+            'zone_id'    => null,
             'partner_id' => null,
         ]);
         $conversion = CampaignConversion::factory()->create(['order_id' => $order->id]);
@@ -83,8 +83,8 @@ class CampaignConversionTest extends TestCase
 
         $translation = CampaignConversionTranslation::create([
             'campaign_conversion_id' => $conversion->id,
-            'locale' => 'lt',
-            'notes' => 'Test pastabos',
+            'locale'                 => 'lt',
+            'notes'                  => 'Test pastabos',
         ]);
 
         $this->assertInstanceOf(CampaignConversionTranslation::class, $conversion->translations->first());
@@ -97,14 +97,14 @@ class CampaignConversionTest extends TestCase
 
         $ltTranslation = CampaignConversionTranslation::create([
             'campaign_conversion_id' => $conversion->id,
-            'locale' => 'lt',
-            'notes' => 'Lietuviškos pastabos',
+            'locale'                 => 'lt',
+            'notes'                  => 'Lietuviškos pastabos',
         ]);
 
         $enTranslation = CampaignConversionTranslation::create([
             'campaign_conversion_id' => $conversion->id,
-            'locale' => 'en',
-            'notes' => 'English notes',
+            'locale'                 => 'en',
+            'notes'                  => 'English notes',
         ]);
 
         $this->assertEquals('Lietuviškos pastabos', $conversion->trans('notes', 'lt'));
@@ -116,23 +116,23 @@ class CampaignConversionTest extends TestCase
         $campaign = Campaign::factory()->create();
 
         CampaignConversion::factory()->create([
-            'campaign_id' => $campaign->id,
-            'conversion_type' => 'purchase',
-            'status' => 'completed',
+            'campaign_id'      => $campaign->id,
+            'conversion_type'  => 'purchase',
+            'status'           => 'completed',
             'conversion_value' => 200,
-            'device_type' => 'mobile',
-            'source' => 'google',
-            'medium' => 'cpc',
+            'device_type'      => 'mobile',
+            'source'           => 'google',
+            'medium'           => 'cpc',
         ]);
 
         CampaignConversion::factory()->create([
-            'campaign_id' => $campaign->id,
-            'conversion_type' => 'signup',
-            'status' => 'confirmed',
+            'campaign_id'      => $campaign->id,
+            'conversion_type'  => 'signup',
+            'status'           => 'confirmed',
             'conversion_value' => 50,
-            'device_type' => 'desktop',
-            'source' => 'facebook',
-            'medium' => 'social',
+            'device_type'      => 'desktop',
+            'source'           => 'facebook',
+            'medium'           => 'social',
         ]);
 
         // Test byCampaign scope
@@ -171,11 +171,11 @@ class CampaignConversionTest extends TestCase
     {
         $conversion = CampaignConversion::factory()->create([
             'conversion_value' => 150.75,
-            'roi' => 0.25,
-            'conversion_rate' => 0.05,
-            'device_type' => 'mobile',
-            'conversion_type' => 'purchase',
-            'status' => 'completed',
+            'roi'              => 0.25,
+            'conversion_rate'  => 0.05,
+            'device_type'      => 'mobile',
+            'conversion_type'  => 'purchase',
+            'status'           => 'completed',
         ]);
 
         $this->assertEquals('€150.75', $conversion->formatted_conversion_value);
@@ -229,13 +229,13 @@ class CampaignConversionTest extends TestCase
     public function test_campaign_conversion_get_attribution_value(): void
     {
         $conversion = CampaignConversion::factory()->create([
-            'conversion_value' => 100,
-            'last_click_attribution' => 80,
-            'first_click_attribution' => 60,
-            'linear_attribution' => 70,
-            'time_decay_attribution' => 75,
+            'conversion_value'           => 100,
+            'last_click_attribution'     => 80,
+            'first_click_attribution'    => 60,
+            'linear_attribution'         => 70,
+            'time_decay_attribution'     => 75,
             'position_based_attribution' => 85,
-            'data_driven_attribution' => 90,
+            'data_driven_attribution'    => 90,
         ]);
 
         $this->assertEquals(80, $conversion->getAttributionValue('last_click'));
@@ -250,16 +250,16 @@ class CampaignConversionTest extends TestCase
     public function test_campaign_conversion_casts_work(): void
     {
         $conversion = CampaignConversion::factory()->create([
-            'conversion_value' => '150.75',
-            'is_mobile' => '1',
-            'is_tablet' => '0',
-            'is_desktop' => '1',
+            'conversion_value'    => '150.75',
+            'is_mobile'           => '1',
+            'is_tablet'           => '0',
+            'is_desktop'          => '1',
             'conversion_duration' => '300',
-            'page_views' => '5',
-            'time_on_site' => '1200',
-            'bounce_rate' => '0.25',
-            'tags' => ['tag1', 'tag2'],
-            'custom_attributes' => ['key' => 'value'],
+            'page_views'          => '5',
+            'time_on_site'        => '1200',
+            'bounce_rate'         => '0.25',
+            'tags'                => ['tag1', 'tag2'],
+            'custom_attributes'   => ['key' => 'value'],
         ]);
 
         $this->assertIsString($conversion->conversion_value);

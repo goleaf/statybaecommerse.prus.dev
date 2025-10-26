@@ -120,12 +120,12 @@ class CategoryFactory extends Factory
     /**
      * Strip attributes that are unavailable on lightweight category tables used in isolated tests.
      *
-     * @param  array<string, mixed>  $attributes
+     * @param  array<string, mixed> $attributes
      * @return array<string, mixed>
      */
     private function guardForMissingColumns(array $attributes): array
     {
-        $table = (new Category())->getTable();
+        $table = (new Category)->getTable();
 
         if (! Schema::hasTable($table)) {
             return $attributes;

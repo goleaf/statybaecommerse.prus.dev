@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Illuminate\Support\Str;
 
 return [
@@ -153,7 +155,7 @@ return [
         $appName = env('APP_NAME', 'laravel');
         $baseName = is_string($appName) && $appName !== '' ? $appName : 'laravel';
 
-        return Str::slug($baseName).'-session';
+        return Str::slug($baseName) . '-session';
     }),
 
     /*
@@ -202,7 +204,7 @@ return [
     */
 
     'secure' => match ($secure = env('SESSION_SECURE_COOKIE')) {
-        null => null,
+        null    => null,
         default => filter_var((string) $secure, FILTER_VALIDATE_BOOLEAN),
     },
 

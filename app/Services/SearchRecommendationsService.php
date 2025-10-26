@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use Exception;
 use Illuminate\Support\Facades\Cache;
+use Log;
 
 /**
  * SearchRecommendationsService
@@ -25,36 +27,36 @@ final class SearchRecommendationsService
     public function getSearchRecommendations(string $query, array $context = []): array
     {
         try {
-            $cacheKey = self::CACHE_PREFIX.'recommendations_'.md5($query.serialize($context));
+            $cacheKey = self::CACHE_PREFIX . 'recommendations_' . md5($query . serialize($context));
 
             return Cache::remember($cacheKey, self::RECOMMENDATIONS_CACHE_TTL, function () use ($query, $context) {
                 return [
-                    'related_products' => $this->getRelatedProducts($query, $context),
-                    'similar_searches' => $this->getSimilarSearches($query),
-                    'trending_searches' => $this->getTrendingSearches($context),
+                    'related_products'             => $this->getRelatedProducts($query, $context),
+                    'similar_searches'             => $this->getSimilarSearches($query),
+                    'trending_searches'            => $this->getTrendingSearches($context),
                     'personalized_recommendations' => $this->getPersonalizedRecommendations($query, $context),
-                    'cross_sell_suggestions' => $this->getCrossSellSuggestions($query, $context),
-                    'upsell_suggestions' => $this->getUpsellSuggestions($query, $context),
-                    'category_recommendations' => $this->getCategoryRecommendations($query, $context),
-                    'brand_recommendations' => $this->getBrandRecommendations($query, $context),
-                    'price_recommendations' => $this->getPriceRecommendations($query, $context),
-                    'seasonal_recommendations' => $this->getSeasonalRecommendations($query, $context),
+                    'cross_sell_suggestions'       => $this->getCrossSellSuggestions($query, $context),
+                    'upsell_suggestions'           => $this->getUpsellSuggestions($query, $context),
+                    'category_recommendations'     => $this->getCategoryRecommendations($query, $context),
+                    'brand_recommendations'        => $this->getBrandRecommendations($query, $context),
+                    'price_recommendations'        => $this->getPriceRecommendations($query, $context),
+                    'seasonal_recommendations'     => $this->getSeasonalRecommendations($query, $context),
                 ];
             });
-        } catch (\Exception $e) {
-            \Log::warning('Search recommendations generation failed: '.$e->getMessage());
+        } catch (Exception $e) {
+            Log::warning('Search recommendations generation failed: ' . $e->getMessage());
 
             return [
-                'related_products' => [],
-                'similar_searches' => [],
-                'trending_searches' => [],
+                'related_products'             => [],
+                'similar_searches'             => [],
+                'trending_searches'            => [],
                 'personalized_recommendations' => [],
-                'cross_sell_suggestions' => [],
-                'upsell_suggestions' => [],
-                'category_recommendations' => [],
-                'brand_recommendations' => [],
-                'price_recommendations' => [],
-                'seasonal_recommendations' => [],
+                'cross_sell_suggestions'       => [],
+                'upsell_suggestions'           => [],
+                'category_recommendations'     => [],
+                'brand_recommendations'        => [],
+                'price_recommendations'        => [],
+                'seasonal_recommendations'     => [],
             ];
         }
     }
@@ -72,20 +74,20 @@ final class SearchRecommendationsService
             foreach ($results as $result) {
                 if ($result['type'] === 'product') {
                     $relatedProducts[] = [
-                        'id' => $result['id'],
-                        'title' => $result['title'],
-                        'price' => $result['formatted_price'] ?? null,
-                        'image' => $result['image'],
-                        'url' => $result['url'],
-                        'relevance_score' => $result['relevance_score'] ?? 0,
+                        'id'                => $result['id'],
+                        'title'             => $result['title'],
+                        'price'             => $result['formatted_price'] ?? null,
+                        'image'             => $result['image'],
+                        'url'               => $result['url'],
+                        'relevance_score'   => $result['relevance_score'] ?? 0,
                         'similarity_reason' => $this->getSimilarityReason($query, $result),
                     ];
                 }
             }
 
             return array_slice($relatedProducts, 0, 10);
-        } catch (\Exception $e) {
-            \Log::warning('Related products generation failed: '.$e->getMessage());
+        } catch (Exception $e) {
+            Log::warning('Related products generation failed: ' . $e->getMessage());
 
             return [];
         }
@@ -97,7 +99,7 @@ final class SearchRecommendationsService
     private function getSimilarSearches(string $query): array
     {
         try {
-            $cacheKey = self::CACHE_PREFIX.'similar_'.md5($query);
+            $cacheKey = self::CACHE_PREFIX . 'similar_' . md5($query);
 
             return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($query) {
                 $analyticsService = app(SearchAnalyticsService::class);
@@ -112,10 +114,10 @@ final class SearchRecommendationsService
 
                     if ($similarity > 0.4 && $search['query'] !== $query) {
                         $similarSearches[] = [
-                            'query' => $search['query'],
+                            'query'            => $search['query'],
                             'similarity_score' => $similarity,
-                            'search_count' => $search['count'],
-                            'trend_direction' => $this->getTrendDirection($search['query']),
+                            'search_count'     => $search['count'],
+                            'trend_direction'  => $this->getTrendDirection($search['query']),
                         ];
                     }
                 }
@@ -124,8 +126,8 @@ final class SearchRecommendationsService
 
                 return array_slice($similarSearches, 0, 8);
             });
-        } catch (\Exception $e) {
-            \Log::warning('Similar searches generation failed: '.$e->getMessage());
+        } catch (Exception $e) {
+            Log::warning('Similar searches generation failed: ' . $e->getMessage());
 
             return [];
         }
@@ -137,7 +139,7 @@ final class SearchRecommendationsService
     private function getTrendingSearches(array $context): array
     {
         try {
-            $cacheKey = self::CACHE_PREFIX.'trending_'.md5(serialize($context));
+            $cacheKey = self::CACHE_PREFIX . 'trending_' . md5(serialize($context));
 
             return Cache::remember($cacheKey, self::CACHE_TTL, function () {
                 $analyticsService = app(SearchAnalyticsService::class);
@@ -149,11 +151,11 @@ final class SearchRecommendationsService
 
                     if ($trendDirection === 'rising') {
                         $trendingSearches[] = [
-                            'query' => $search['query'],
-                            'search_count' => $search['count'],
+                            'query'           => $search['query'],
+                            'search_count'    => $search['count'],
                             'trend_direction' => $trendDirection,
-                            'growth_rate' => $this->getGrowthRate($search['query']),
-                            'category' => $this->getSearchCategory($search['query']),
+                            'growth_rate'     => $this->getGrowthRate($search['query']),
+                            'category'        => $this->getSearchCategory($search['query']),
                         ];
                     }
                 }
@@ -162,8 +164,8 @@ final class SearchRecommendationsService
 
                 return array_slice($trendingSearches, 0, 6);
             });
-        } catch (\Exception $e) {
-            \Log::warning('Trending searches generation failed: '.$e->getMessage());
+        } catch (Exception $e) {
+            Log::warning('Trending searches generation failed: ' . $e->getMessage());
 
             return [];
         }
@@ -181,7 +183,7 @@ final class SearchRecommendationsService
                 return [];
             }
 
-            $cacheKey = self::CACHE_PREFIX.'personalized_'.$userId.'_'.md5($query);
+            $cacheKey = self::CACHE_PREFIX . 'personalized_' . $userId . '_' . md5($query);
 
             return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($query, $userId) {
                 $userPreferences = $this->getUserPreferences($userId);
@@ -189,14 +191,14 @@ final class SearchRecommendationsService
                 $userPurchases = $this->getUserPurchaseHistory($userId);
 
                 return [
-                    'based_on_history' => $this->getRecommendationsBasedOnHistory($query, $userHistory),
-                    'based_on_preferences' => $this->getRecommendationsBasedOnPreferences($query, $userPreferences),
-                    'based_on_purchases' => $this->getRecommendationsBasedOnPurchases($query, $userPurchases),
+                    'based_on_history'        => $this->getRecommendationsBasedOnHistory($query, $userHistory),
+                    'based_on_preferences'    => $this->getRecommendationsBasedOnPreferences($query, $userPreferences),
+                    'based_on_purchases'      => $this->getRecommendationsBasedOnPurchases($query, $userPurchases),
                     'collaborative_filtering' => $this->getCollaborativeFilteringRecommendations($query, $userId),
                 ];
             });
-        } catch (\Exception $e) {
-            \Log::warning('Personalized recommendations generation failed: '.$e->getMessage());
+        } catch (Exception $e) {
+            Log::warning('Personalized recommendations generation failed: ' . $e->getMessage());
 
             return [];
         }
@@ -220,8 +222,8 @@ final class SearchRecommendationsService
             }
 
             return array_slice($crossSellSuggestions, 0, 8);
-        } catch (\Exception $e) {
-            \Log::warning('Cross-sell suggestions generation failed: '.$e->getMessage());
+        } catch (Exception $e) {
+            Log::warning('Cross-sell suggestions generation failed: ' . $e->getMessage());
 
             return [];
         }
@@ -245,8 +247,8 @@ final class SearchRecommendationsService
             }
 
             return array_slice($upsellSuggestions, 0, 6);
-        } catch (\Exception $e) {
-            \Log::warning('Upsell suggestions generation failed: '.$e->getMessage());
+        } catch (Exception $e) {
+            Log::warning('Upsell suggestions generation failed: ' . $e->getMessage());
 
             return [];
         }
@@ -265,19 +267,19 @@ final class SearchRecommendationsService
             foreach ($results as $result) {
                 if ($result['type'] === 'category') {
                     $categoryRecommendations[] = [
-                        'id' => $result['id'],
-                        'title' => $result['title'],
-                        'url' => $result['url'],
-                        'products_count' => $result['products_count'] ?? 0,
+                        'id'              => $result['id'],
+                        'title'           => $result['title'],
+                        'url'             => $result['url'],
+                        'products_count'  => $result['products_count'] ?? 0,
                         'relevance_score' => $result['relevance_score'] ?? 0,
-                        'subcategories' => $this->getSubcategories($result['id']),
+                        'subcategories'   => $this->getSubcategories($result['id']),
                     ];
                 }
             }
 
             return array_slice($categoryRecommendations, 0, 6);
-        } catch (\Exception $e) {
-            \Log::warning('Category recommendations generation failed: '.$e->getMessage());
+        } catch (Exception $e) {
+            Log::warning('Category recommendations generation failed: ' . $e->getMessage());
 
             return [];
         }
@@ -296,20 +298,20 @@ final class SearchRecommendationsService
             foreach ($results as $result) {
                 if ($result['type'] === 'brand') {
                     $brandRecommendations[] = [
-                        'id' => $result['id'],
-                        'title' => $result['title'],
-                        'url' => $result['url'],
-                        'products_count' => $result['products_count'] ?? 0,
-                        'relevance_score' => $result['relevance_score'] ?? 0,
-                        'country' => $result['subtitle'] ?? null,
+                        'id'               => $result['id'],
+                        'title'            => $result['title'],
+                        'url'              => $result['url'],
+                        'products_count'   => $result['products_count'] ?? 0,
+                        'relevance_score'  => $result['relevance_score'] ?? 0,
+                        'country'          => $result['subtitle'] ?? null,
                         'popularity_score' => $this->getBrandPopularityScore($result['id']),
                     ];
                 }
             }
 
             return array_slice($brandRecommendations, 0, 8);
-        } catch (\Exception $e) {
-            \Log::warning('Brand recommendations generation failed: '.$e->getMessage());
+        } catch (Exception $e) {
+            Log::warning('Brand recommendations generation failed: ' . $e->getMessage());
 
             return [];
         }
@@ -340,21 +342,21 @@ final class SearchRecommendationsService
 
             return [
                 'price_range' => [
-                    'min' => $prices[0],
-                    'max' => $prices[$count - 1],
+                    'min'     => $prices[0],
+                    'max'     => $prices[$count - 1],
                     'average' => array_sum($prices) / $count,
-                    'median' => $prices[intval($count / 2)],
+                    'median'  => $prices[intval($count / 2)],
                 ],
                 'price_segments' => [
-                    'budget' => ['min' => $prices[0], 'max' => $prices[intval($count * 0.33)]],
+                    'budget'    => ['min' => $prices[0], 'max' => $prices[intval($count * 0.33)]],
                     'mid_range' => ['min' => $prices[intval($count * 0.33)], 'max' => $prices[intval($count * 0.66)]],
-                    'premium' => ['min' => $prices[intval($count * 0.66)], 'max' => $prices[$count - 1]],
+                    'premium'   => ['min' => $prices[intval($count * 0.66)], 'max' => $prices[$count - 1]],
                 ],
-                'best_value' => $this->getBestValueProducts($results),
+                'best_value'   => $this->getBestValueProducts($results),
                 'price_alerts' => $this->getPriceAlerts($query, $prices),
             ];
-        } catch (\Exception $e) {
-            \Log::warning('Price recommendations generation failed: '.$e->getMessage());
+        } catch (Exception $e) {
+            Log::warning('Price recommendations generation failed: ' . $e->getMessage());
 
             return [];
         }
@@ -373,18 +375,18 @@ final class SearchRecommendationsService
             foreach ($seasonalKeywords as $keyword) {
                 if (stripos($query, $keyword) !== false) {
                     $seasonalRecommendations[] = [
-                        'keyword' => $keyword,
-                        'season' => $currentSeason,
-                        'relevance_score' => $this->calculateKeywordRelevance($query, $keyword),
+                        'keyword'           => $keyword,
+                        'season'            => $currentSeason,
+                        'relevance_score'   => $this->calculateKeywordRelevance($query, $keyword),
                         'trending_products' => $this->getTrendingProductsForKeyword($keyword),
-                        'seasonal_offers' => $this->getSeasonalOffers($keyword),
+                        'seasonal_offers'   => $this->getSeasonalOffers($keyword),
                     ];
                 }
             }
 
             return $seasonalRecommendations;
-        } catch (\Exception $e) {
-            \Log::warning('Seasonal recommendations generation failed: '.$e->getMessage());
+        } catch (Exception $e) {
+            Log::warning('Seasonal recommendations generation failed: ' . $e->getMessage());
 
             return [];
         }
@@ -402,7 +404,7 @@ final class SearchRecommendationsService
             $commonWords = array_intersect($queryWords, $titleWords);
 
             if (! empty($commonWords)) {
-                return 'Similar keywords: '.implode(', ', $commonWords);
+                return 'Similar keywords: ' . implode(', ', $commonWords);
             }
 
             if (isset($result['subtitle']) && stripos($result['subtitle'], $query) !== false) {
@@ -414,7 +416,7 @@ final class SearchRecommendationsService
             }
 
             return 'Category similarity';
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return 'General similarity';
         }
     }
@@ -444,7 +446,7 @@ final class SearchRecommendationsService
             $trends = ['rising', 'falling', 'stable'];
 
             return $trends[array_rand($trends)];
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return 'stable';
         }
     }
@@ -457,7 +459,7 @@ final class SearchRecommendationsService
         try {
             // This would typically calculate growth rate
             return rand(10, 100) / 10; // Random growth rate between 1% and 10%
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return 0.0;
         }
     }
@@ -481,7 +483,7 @@ final class SearchRecommendationsService
             }
 
             return 'general';
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return 'general';
         }
     }
@@ -496,11 +498,11 @@ final class SearchRecommendationsService
 
             return Cache::get($cacheKey, [
                 'preferred_categories' => ['electronics' => 40, 'clothing' => 30, 'books' => 20, 'home' => 10],
-                'preferred_brands' => ['apple' => 30, 'samsung' => 25, 'nike' => 20, 'adidas' => 15],
-                'price_range' => ['min' => 10, 'max' => 500],
-                'preferred_sellers' => ['amazon' => 40, 'ebay' => 30, 'local' => 30],
+                'preferred_brands'     => ['apple' => 30, 'samsung' => 25, 'nike' => 20, 'adidas' => 15],
+                'price_range'          => ['min' => 10, 'max' => 500],
+                'preferred_sellers'    => ['amazon' => 40, 'ebay' => 30, 'local' => 30],
             ]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return [];
         }
     }
@@ -514,7 +516,7 @@ final class SearchRecommendationsService
             $cacheKey = "user_search_history_{$userId}";
 
             return Cache::get($cacheKey, []);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return [];
         }
     }
@@ -528,7 +530,7 @@ final class SearchRecommendationsService
             $cacheKey = "user_purchase_history_{$userId}";
 
             return Cache::get($cacheKey, []);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return [];
         }
     }
@@ -542,10 +544,10 @@ final class SearchRecommendationsService
             // This would typically analyze user's search history
             return [
                 'frequently_searched' => ['laptop', 'phone', 'headphones'],
-                'recent_searches' => ['wireless mouse', 'keyboard', 'monitor'],
-                'saved_searches' => ['gaming laptop', 'mechanical keyboard'],
+                'recent_searches'     => ['wireless mouse', 'keyboard', 'monitor'],
+                'saved_searches'      => ['gaming laptop', 'mechanical keyboard'],
             ];
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return [];
         }
     }
@@ -559,10 +561,10 @@ final class SearchRecommendationsService
             // This would typically use user preferences to generate recommendations
             return [
                 'preferred_categories' => $userPreferences['preferred_categories'] ?? [],
-                'preferred_brands' => $userPreferences['preferred_brands'] ?? [],
-                'price_range' => $userPreferences['price_range'] ?? [],
+                'preferred_brands'     => $userPreferences['preferred_brands'] ?? [],
+                'price_range'          => $userPreferences['price_range'] ?? [],
             ];
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return [];
         }
     }
@@ -576,10 +578,10 @@ final class SearchRecommendationsService
             // This would typically analyze user's purchase history
             return [
                 'frequently_purchased' => ['electronics', 'clothing'],
-                'recent_purchases' => ['laptop', 'mouse', 'keyboard'],
-                'purchase_patterns' => ['weekend_shopper', 'brand_loyal'],
+                'recent_purchases'     => ['laptop', 'mouse', 'keyboard'],
+                'purchase_patterns'    => ['weekend_shopper', 'brand_loyal'],
             ];
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return [];
         }
     }
@@ -593,10 +595,10 @@ final class SearchRecommendationsService
             // This would typically use collaborative filtering algorithms
             return [
                 'users_who_searched_this_also_searched' => ['wireless mouse', 'keyboard', 'monitor'],
-                'users_who_bought_this_also_bought' => ['laptop stand', 'mouse pad', 'cable'],
-                'similar_users_recommendations' => ['gaming chair', 'desk lamp', 'webcam'],
+                'users_who_bought_this_also_bought'     => ['laptop stand', 'mouse pad', 'cable'],
+                'similar_users_recommendations'         => ['gaming chair', 'desk lamp', 'webcam'],
             ];
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return [];
         }
     }
@@ -610,23 +612,23 @@ final class SearchRecommendationsService
             // This would typically get cross-sell products from database
             return [
                 [
-                    'id' => $productId + 1,
-                    'title' => 'Related Product 1',
-                    'price' => '29.99',
-                    'image' => null,
-                    'url' => '#',
+                    'id'                => $productId + 1,
+                    'title'             => 'Related Product 1',
+                    'price'             => '29.99',
+                    'image'             => null,
+                    'url'               => '#',
                     'cross_sell_reason' => 'Frequently bought together',
                 ],
                 [
-                    'id' => $productId + 2,
-                    'title' => 'Related Product 2',
-                    'price' => '19.99',
-                    'image' => null,
-                    'url' => '#',
+                    'id'                => $productId + 2,
+                    'title'             => 'Related Product 2',
+                    'price'             => '19.99',
+                    'image'             => null,
+                    'url'               => '#',
                     'cross_sell_reason' => 'Customers also viewed',
                 ],
             ];
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return [];
         }
     }
@@ -640,23 +642,23 @@ final class SearchRecommendationsService
             // This would typically get upsell products from database
             return [
                 [
-                    'id' => $productId + 10,
-                    'title' => 'Premium Version',
-                    'price' => '99.99',
-                    'image' => null,
-                    'url' => '#',
+                    'id'            => $productId + 10,
+                    'title'         => 'Premium Version',
+                    'price'         => '99.99',
+                    'image'         => null,
+                    'url'           => '#',
                     'upsell_reason' => 'Premium features',
                 ],
                 [
-                    'id' => $productId + 11,
-                    'title' => 'Professional Version',
-                    'price' => '149.99',
-                    'image' => null,
-                    'url' => '#',
+                    'id'            => $productId + 11,
+                    'title'         => 'Professional Version',
+                    'price'         => '149.99',
+                    'image'         => null,
+                    'url'           => '#',
                     'upsell_reason' => 'Professional grade',
                 ],
             ];
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return [];
         }
     }
@@ -672,7 +674,7 @@ final class SearchRecommendationsService
                 ['id' => $categoryId + 1, 'title' => 'Subcategory 1', 'url' => '#'],
                 ['id' => $categoryId + 2, 'title' => 'Subcategory 2', 'url' => '#'],
             ];
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return [];
         }
     }
@@ -685,7 +687,7 @@ final class SearchRecommendationsService
         try {
             // This would typically calculate brand popularity score
             return rand(70, 100) / 10; // Random score between 7.0 and 10.0
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return 0.0;
         }
     }
@@ -705,10 +707,10 @@ final class SearchRecommendationsService
 
                     if ($rating > 4.0 && $price < 100) {
                         $bestValueProducts[] = [
-                            'id' => $result['id'],
-                            'title' => $result['title'],
-                            'price' => $result['formatted_price'],
-                            'rating' => $rating,
+                            'id'          => $result['id'],
+                            'title'       => $result['title'],
+                            'price'       => $result['formatted_price'],
+                            'rating'      => $rating,
                             'value_score' => $rating / ($price / 10),
                         ];
                     }
@@ -718,7 +720,7 @@ final class SearchRecommendationsService
             usort($bestValueProducts, fn ($a, $b) => $b['value_score'] <=> $a['value_score']);
 
             return array_slice($bestValueProducts, 0, 5);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return [];
         }
     }
@@ -734,12 +736,12 @@ final class SearchRecommendationsService
             $avgPrice = array_sum($prices) / count($prices);
 
             return [
-                'price_drop_alert' => $minPrice < $avgPrice * 0.8,
+                'price_drop_alert'     => $minPrice < $avgPrice * 0.8,
                 'price_increase_alert' => $maxPrice > $avgPrice * 1.2,
-                'best_price_ever' => $minPrice < $avgPrice * 0.7,
-                'price_trend' => $this->getPriceTrend($prices),
+                'best_price_ever'      => $minPrice < $avgPrice * 0.7,
+                'price_trend'          => $this->getPriceTrend($prices),
             ];
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return [];
         }
     }
@@ -770,7 +772,7 @@ final class SearchRecommendationsService
             'spring' => ['dress', 'shoes', 'jacket', 'umbrella', 'raincoat'],
             'summer' => ['shorts', 't-shirt', 'sandals', 'hat', 'sunglasses'],
             'autumn' => ['sweater', 'jeans', 'boots', 'jacket', 'coat'],
-            default => [],
+            default  => [],
         };
     }
 
@@ -793,7 +795,7 @@ final class SearchRecommendationsService
             $commonWords = array_intersect($queryWords, $keywordWords);
 
             return count($commonWords) / max(count($keywordWords), 1);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return 0.0;
         }
     }
@@ -807,19 +809,19 @@ final class SearchRecommendationsService
             // This would typically get trending products for the keyword
             return [
                 [
-                    'id' => 1,
-                    'title' => "Trending {$keyword} Product 1",
-                    'price' => '49.99',
+                    'id'          => 1,
+                    'title'       => "Trending {$keyword} Product 1",
+                    'price'       => '49.99',
                     'trend_score' => 0.9,
                 ],
                 [
-                    'id' => 2,
-                    'title' => "Trending {$keyword} Product 2",
-                    'price' => '79.99',
+                    'id'          => 2,
+                    'title'       => "Trending {$keyword} Product 2",
+                    'price'       => '79.99',
                     'trend_score' => 0.8,
                 ],
             ];
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return [];
         }
     }
@@ -833,17 +835,17 @@ final class SearchRecommendationsService
             // This would typically get seasonal offers for the keyword
             return [
                 [
-                    'title' => "Seasonal {$keyword} Sale",
-                    'discount' => '20%',
+                    'title'       => "Seasonal {$keyword} Sale",
+                    'discount'    => '20%',
                     'valid_until' => now()->addDays(30)->format('Y-m-d'),
                 ],
                 [
-                    'title' => "Limited Time {$keyword} Offer",
-                    'discount' => '15%',
+                    'title'       => "Limited Time {$keyword} Offer",
+                    'discount'    => '15%',
                     'valid_until' => now()->addDays(7)->format('Y-m-d'),
                 ],
             ];
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return [];
         }
     }
@@ -871,7 +873,7 @@ final class SearchRecommendationsService
             }
 
             return 'stable';
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return 'stable';
         }
     }

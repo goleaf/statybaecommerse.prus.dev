@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services\Debug;
 
 use Illuminate\Support\Facades\Log;
+use Throwable;
 
 /**
  * DiscountDebugCollector
@@ -23,7 +24,7 @@ class DiscountDebugCollector
         if (function_exists('debugbar') && app()->bound('debugbar')) {
             try {
                 app('debugbar')->addMessage($data, 'discount');
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
                 // ignore
             }
         }

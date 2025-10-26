@@ -22,7 +22,7 @@ class OrderResourceTest extends TestCase
 
         // Create test user with admin role
         $this->user = User::factory()->create([
-            'email' => 'admin@example.com',
+            'email'    => 'admin@example.com',
             'is_admin' => true,
         ]);
 
@@ -34,7 +34,7 @@ class OrderResourceTest extends TestCase
     public function test_can_list_orders(): void
     {
         $order = Order::factory()->create([
-            'user_id' => $this->user->id,
+            'user_id'    => $this->user->id,
             'channel_id' => $this->channel->id,
             'partner_id' => $this->partner->id,
         ]);
@@ -50,18 +50,18 @@ class OrderResourceTest extends TestCase
         $this->actingAs($this->user);
 
         $orderData = [
-            'number' => 'ORD-001',
-            'user_id' => $this->user->id,
-            'status' => 'pending',
-            'payment_status' => 'pending',
-            'payment_method' => 'credit_card',
-            'subtotal' => 100.0,
-            'tax_amount' => 21.0,
+            'number'          => 'ORD-001',
+            'user_id'         => $this->user->id,
+            'status'          => 'pending',
+            'payment_status'  => 'pending',
+            'payment_method'  => 'credit_card',
+            'subtotal'        => 100.0,
+            'tax_amount'      => 21.0,
             'shipping_amount' => 10.0,
             'discount_amount' => 0.0,
-            'total' => 131.0,
-            'channel_id' => $this->channel->id,
-            'partner_id' => $this->partner->id,
+            'total'           => 131.0,
+            'channel_id'      => $this->channel->id,
+            'partner_id'      => $this->partner->id,
         ];
 
         Livewire::test(\App\Filament\Resources\OrderResource\Pages\CreateOrder::class)
@@ -70,16 +70,16 @@ class OrderResourceTest extends TestCase
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('orders', [
-            'number' => 'ORD-001',
+            'number'  => 'ORD-001',
             'user_id' => $this->user->id,
-            'status' => 'pending',
+            'status'  => 'pending',
         ]);
     }
 
     public function test_can_view_order(): void
     {
         $order = Order::factory()->create([
-            'user_id' => $this->user->id,
+            'user_id'    => $this->user->id,
             'channel_id' => $this->channel->id,
             'partner_id' => $this->partner->id,
         ]);
@@ -93,25 +93,25 @@ class OrderResourceTest extends TestCase
     public function test_can_edit_order(): void
     {
         $order = Order::factory()->create([
-            'user_id' => $this->user->id,
+            'user_id'    => $this->user->id,
             'channel_id' => $this->channel->id,
             'partner_id' => $this->partner->id,
-            'status' => 'pending',
+            'status'     => 'pending',
         ]);
 
         $this->actingAs($this->user);
 
         Livewire::test(\App\Filament\Resources\OrderResource\Pages\EditOrder::class, ['record' => $order->id])
             ->fillForm([
-                'status' => 'processing',
+                'status'         => 'processing',
                 'payment_status' => 'paid',
             ])
             ->call('save')
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('orders', [
-            'id' => $order->id,
-            'status' => 'processing',
+            'id'             => $order->id,
+            'status'         => 'processing',
             'payment_status' => 'paid',
         ]);
     }
@@ -119,7 +119,7 @@ class OrderResourceTest extends TestCase
     public function test_can_delete_order(): void
     {
         $order = Order::factory()->create([
-            'user_id' => $this->user->id,
+            'user_id'    => $this->user->id,
             'channel_id' => $this->channel->id,
             'partner_id' => $this->partner->id,
         ]);
@@ -137,12 +137,12 @@ class OrderResourceTest extends TestCase
     {
         $pendingOrder = Order::factory()->create([
             'user_id' => $this->user->id,
-            'status' => 'pending',
+            'status'  => 'pending',
         ]);
 
         $processingOrder = Order::factory()->create([
             'user_id' => $this->user->id,
-            'status' => 'processing',
+            'status'  => 'processing',
         ]);
 
         $this->actingAs($this->user);
@@ -156,12 +156,12 @@ class OrderResourceTest extends TestCase
     public function test_can_filter_orders_by_payment_status(): void
     {
         $paidOrder = Order::factory()->create([
-            'user_id' => $this->user->id,
+            'user_id'        => $this->user->id,
             'payment_status' => 'paid',
         ]);
 
         $pendingOrder = Order::factory()->create([
-            'user_id' => $this->user->id,
+            'user_id'        => $this->user->id,
             'payment_status' => 'pending',
         ]);
 
@@ -177,12 +177,12 @@ class OrderResourceTest extends TestCase
     {
         $order1 = Order::factory()->create([
             'user_id' => $this->user->id,
-            'number' => 'ORD-001',
+            'number'  => 'ORD-001',
         ]);
 
         $order2 = Order::factory()->create([
             'user_id' => $this->user->id,
-            'number' => 'ORD-002',
+            'number'  => 'ORD-002',
         ]);
 
         $this->actingAs($this->user);
@@ -214,7 +214,7 @@ class OrderResourceTest extends TestCase
     {
         $order = Order::factory()->create([
             'user_id' => $this->user->id,
-            'status' => 'pending',
+            'status'  => 'pending',
         ]);
 
         $this->actingAs($this->user);
@@ -224,7 +224,7 @@ class OrderResourceTest extends TestCase
             ->assertHasNoTableActionErrors();
 
         $this->assertDatabaseHas('orders', [
-            'id' => $order->id,
+            'id'     => $order->id,
             'status' => 'processing',
         ]);
     }
@@ -233,7 +233,7 @@ class OrderResourceTest extends TestCase
     {
         $order = Order::factory()->create([
             'user_id' => $this->user->id,
-            'status' => 'processing',
+            'status'  => 'processing',
         ]);
 
         $this->actingAs($this->user);
@@ -243,7 +243,7 @@ class OrderResourceTest extends TestCase
             ->assertHasNoTableActionErrors();
 
         $this->assertDatabaseHas('orders', [
-            'id' => $order->id,
+            'id'     => $order->id,
             'status' => 'shipped',
         ]);
     }
@@ -252,7 +252,7 @@ class OrderResourceTest extends TestCase
     {
         $order = Order::factory()->create([
             'user_id' => $this->user->id,
-            'status' => 'shipped',
+            'status'  => 'shipped',
         ]);
 
         $this->actingAs($this->user);
@@ -262,7 +262,7 @@ class OrderResourceTest extends TestCase
             ->assertHasNoTableActionErrors();
 
         $this->assertDatabaseHas('orders', [
-            'id' => $order->id,
+            'id'     => $order->id,
             'status' => 'delivered',
         ]);
     }
@@ -271,7 +271,7 @@ class OrderResourceTest extends TestCase
     {
         $order = Order::factory()->create([
             'user_id' => $this->user->id,
-            'status' => 'pending',
+            'status'  => 'pending',
         ]);
 
         $this->actingAs($this->user);
@@ -281,7 +281,7 @@ class OrderResourceTest extends TestCase
             ->assertHasNoTableActionErrors();
 
         $this->assertDatabaseHas('orders', [
-            'id' => $order->id,
+            'id'     => $order->id,
             'status' => 'cancelled',
         ]);
     }
@@ -290,7 +290,7 @@ class OrderResourceTest extends TestCase
     {
         $order = Order::factory()->create([
             'user_id' => $this->user->id,
-            'status' => 'delivered',
+            'status'  => 'delivered',
         ]);
 
         $this->actingAs($this->user);
@@ -300,7 +300,7 @@ class OrderResourceTest extends TestCase
             ->assertHasNoTableActionErrors();
 
         $this->assertDatabaseHas('orders', [
-            'id' => $order->id,
+            'id'     => $order->id,
             'status' => 'refunded',
         ]);
     }
@@ -309,7 +309,7 @@ class OrderResourceTest extends TestCase
     {
         $orders = Order::factory()->count(3)->create([
             'user_id' => $this->user->id,
-            'status' => 'pending',
+            'status'  => 'pending',
         ]);
 
         $this->actingAs($this->user);
@@ -320,7 +320,7 @@ class OrderResourceTest extends TestCase
 
         foreach ($orders as $order) {
             $this->assertDatabaseHas('orders', [
-                'id' => $order->id,
+                'id'     => $order->id,
                 'status' => 'processing',
             ]);
         }
@@ -330,7 +330,7 @@ class OrderResourceTest extends TestCase
     {
         $orders = Order::factory()->count(3)->create([
             'user_id' => $this->user->id,
-            'status' => 'processing',
+            'status'  => 'processing',
         ]);
 
         $this->actingAs($this->user);
@@ -341,7 +341,7 @@ class OrderResourceTest extends TestCase
 
         foreach ($orders as $order) {
             $this->assertDatabaseHas('orders', [
-                'id' => $order->id,
+                'id'     => $order->id,
                 'status' => 'shipped',
             ]);
         }
@@ -351,7 +351,7 @@ class OrderResourceTest extends TestCase
     {
         $orders = Order::factory()->count(3)->create([
             'user_id' => $this->user->id,
-            'status' => 'shipped',
+            'status'  => 'shipped',
         ]);
 
         $this->actingAs($this->user);
@@ -362,7 +362,7 @@ class OrderResourceTest extends TestCase
 
         foreach ($orders as $order) {
             $this->assertDatabaseHas('orders', [
-                'id' => $order->id,
+                'id'     => $order->id,
                 'status' => 'delivered',
             ]);
         }
@@ -372,7 +372,7 @@ class OrderResourceTest extends TestCase
     {
         $orders = Order::factory()->count(3)->create([
             'user_id' => $this->user->id,
-            'status' => 'pending',
+            'status'  => 'pending',
         ]);
 
         $this->actingAs($this->user);
@@ -383,7 +383,7 @@ class OrderResourceTest extends TestCase
 
         foreach ($orders as $order) {
             $this->assertDatabaseHas('orders', [
-                'id' => $order->id,
+                'id'     => $order->id,
                 'status' => 'cancelled',
             ]);
         }

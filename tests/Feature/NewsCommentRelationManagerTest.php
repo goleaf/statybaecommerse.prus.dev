@@ -10,12 +10,7 @@ use App\Models\News;
 use App\Models\NewsComment;
 use App\Models\User;
 use Filament\Facades\Filament;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
-use Pest\Laravel\actingAs;
-
-use function Pest\Livewire\livewire;
-use function PHPUnit\Framework\assertCount;
 
 beforeEach(function (): void {
     config()->set('filament.testing.autodiscover_resources', false);
@@ -26,7 +21,7 @@ beforeEach(function (): void {
     Filament::setCurrentPanel('admin');
 
     $this->adminUser = User::factory()->create([
-        'email' => 'admin@example.com',
+        'email'    => 'admin@example.com',
         'is_admin' => true,
     ]);
 
@@ -44,7 +39,7 @@ it('displays comments table with existing records', function (): void {
 
     Livewire::test(CommentsRelationManager::class, [
         'ownerRecord' => $this->news,
-        'pageClass' => EditNews::class,
+        'pageClass'   => EditNews::class,
     ])
         ->assertCanSeeTableRecords($comments)
         ->assertTableColumnState('content', $comments->first(), fn (?string $state) => $state !== null);
@@ -53,16 +48,16 @@ it('displays comments table with existing records', function (): void {
 it('creates a comment through the relation manager', function (): void {
     $component = Livewire::test(CommentsRelationManager::class, [
         'ownerRecord' => $this->news,
-        'pageClass' => EditNews::class,
+        'pageClass'   => EditNews::class,
     ]);
 
     $component
         ->callTableAction('create', data: [
-            'author_name' => 'Jonas Jonaitis',
+            'author_name'  => 'Jonas Jonaitis',
             'author_email' => 'jonas@example.lt',
-            'content' => 'Puikus straipsnis apie technologijas.',
-            'is_approved' => true,
-            'is_visible' => true,
+            'content'      => 'Puikus straipsnis apie technologijas.',
+            'is_approved'  => true,
+            'is_visible'   => true,
         ])
         ->assertHasNoTableActionErrors();
 
@@ -71,18 +66,18 @@ it('creates a comment through the relation manager', function (): void {
 
 it('edits an existing comment', function (): void {
     $comment = NewsComment::factory()->create([
-        'news_id' => $this->news->id,
+        'news_id'     => $this->news->id,
         'author_name' => 'Pradinis Autorius',
     ]);
 
     Livewire::test(CommentsRelationManager::class, [
         'ownerRecord' => $this->news,
-        'pageClass' => EditNews::class,
+        'pageClass'   => EditNews::class,
     ])
         ->callTableAction('edit', $comment, [
             'author_name' => 'Atnaujintas Autorius',
-            'content' => 'Atnaujintas komentaras',
-            'is_visible' => false,
+            'content'     => 'Atnaujintas komentaras',
+            'is_visible'  => false,
         ])
         ->assertHasNoTableActionErrors();
 
@@ -99,7 +94,7 @@ it('deletes a comment via table action', function (): void {
 
     Livewire::test(CommentsRelationManager::class, [
         'ownerRecord' => $this->news,
-        'pageClass' => EditNews::class,
+        'pageClass'   => EditNews::class,
     ])
         ->callTableAction('delete', $comment)
         ->assertHasNoTableActionErrors();
@@ -114,13 +109,13 @@ it('creates nested replies', function (): void {
 
     Livewire::test(CommentsRelationManager::class, [
         'ownerRecord' => $this->news,
-        'pageClass' => EditNews::class,
+        'pageClass'   => EditNews::class,
     ])
         ->callTableAction('create', data: [
-            'author_name' => 'Atsakymo Autorius',
+            'author_name'  => 'Atsakymo Autorius',
             'author_email' => 'atsakymas@example.lt',
-            'content' => 'Tai atsakymas į komentarą.',
-            'parent_id' => $parent->id,
+            'content'      => 'Tai atsakymas į komentarą.',
+            'parent_id'    => $parent->id,
         ])
         ->assertHasNoTableActionErrors();
 
@@ -134,20 +129,20 @@ it('creates nested replies', function (): void {
 
 it('filters by approval and visibility', function (): void {
     $approved = NewsComment::factory()->create([
-        'news_id' => $this->news->id,
+        'news_id'     => $this->news->id,
         'is_approved' => true,
-        'is_visible' => true,
+        'is_visible'  => true,
     ]);
 
     $pending = NewsComment::factory()->create([
-        'news_id' => $this->news->id,
+        'news_id'     => $this->news->id,
         'is_approved' => false,
-        'is_visible' => false,
+        'is_visible'  => false,
     ]);
 
     $component = Livewire::test(CommentsRelationManager::class, [
         'ownerRecord' => $this->news,
-        'pageClass' => EditNews::class,
+        'pageClass'   => EditNews::class,
     ]);
 
     $component
@@ -163,20 +158,20 @@ it('filters by approval and visibility', function (): void {
 
 it('searches by author and content', function (): void {
     $matching = NewsComment::factory()->create([
-        'news_id' => $this->news->id,
+        'news_id'     => $this->news->id,
         'author_name' => 'Technologijų Guru',
-        'content' => 'Technologijų pažanga yra nuostabi.',
+        'content'     => 'Technologijų pažanga yra nuostabi.',
     ]);
 
     $other = NewsComment::factory()->create([
-        'news_id' => $this->news->id,
+        'news_id'     => $this->news->id,
         'author_name' => 'Sporto Fanatikas',
-        'content' => 'Šis komentaras apie sportą.',
+        'content'     => 'Šis komentaras apie sportą.',
     ]);
 
     Livewire::test(CommentsRelationManager::class, [
         'ownerRecord' => $this->news,
-        'pageClass' => EditNews::class,
+        'pageClass'   => EditNews::class,
     ])
         ->searchTable('technologijų')
         ->assertCanSeeTableRecords([$matching])
@@ -185,13 +180,13 @@ it('searches by author and content', function (): void {
 
 it('toggles approval status via custom action', function (): void {
     $comment = NewsComment::factory()->create([
-        'news_id' => $this->news->id,
+        'news_id'     => $this->news->id,
         'is_approved' => false,
     ]);
 
     Livewire::test(CommentsRelationManager::class, [
         'ownerRecord' => $this->news,
-        'pageClass' => EditNews::class,
+        'pageClass'   => EditNews::class,
     ])
         ->callTableAction('toggle_approval', $comment)
         ->assertHasNoTableActionErrors();
@@ -201,13 +196,13 @@ it('toggles approval status via custom action', function (): void {
 
 it('bulk approves and disapproves comments', function (): void {
     $records = NewsComment::factory()->count(3)->create([
-        'news_id' => $this->news->id,
+        'news_id'     => $this->news->id,
         'is_approved' => false,
     ]);
 
     $component = Livewire::test(CommentsRelationManager::class, [
         'ownerRecord' => $this->news,
-        'pageClass' => EditNews::class,
+        'pageClass'   => EditNews::class,
     ]);
 
     $component
@@ -230,30 +225,30 @@ it('bulk approves and disapproves comments', function (): void {
 it('validates required fields when creating a comment', function (): void {
     Livewire::test(CommentsRelationManager::class, [
         'ownerRecord' => $this->news,
-        'pageClass' => EditNews::class,
+        'pageClass'   => EditNews::class,
     ])
         ->callTableAction('create', data: [
-            'author_name' => null,
+            'author_name'  => null,
             'author_email' => 'neteisingas-el',
-            'content' => null,
+            'content'      => null,
         ])
         ->assertHasTableActionErrors([
-            'author_name' => ['validation.required'],
+            'author_name'  => ['validation.required'],
             'author_email' => ['validation.email'],
-            'content' => ['validation.required'],
+            'content'      => ['validation.required'],
         ]);
 });
 
 it('validates parent selection for nested replies', function (): void {
     Livewire::test(CommentsRelationManager::class, [
         'ownerRecord' => $this->news,
-        'pageClass' => EditNews::class,
+        'pageClass'   => EditNews::class,
     ])
         ->callTableAction('create', data: [
-            'author_name' => 'Komentatorius',
+            'author_name'  => 'Komentatorius',
             'author_email' => 'komentatorius@example.lt',
-            'content' => 'Sveiki!',
-            'parent_id' => 999999,
+            'content'      => 'Sveiki!',
+            'parent_id'    => 999999,
         ])
         ->assertHasTableActionErrors([
             'parent_id' => ['validation.exists'],

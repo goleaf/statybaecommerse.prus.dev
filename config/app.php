@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 return [
     /*
      * |--------------------------------------------------------------------------
@@ -71,9 +73,9 @@ return [
      * | set to any locale for which you plan to have translation strings.
      * |
      */
-    'locale' => env('APP_LOCALE', 'lt'),
+    'locale'          => env('APP_LOCALE', 'lt'),
     'fallback_locale' => env('APP_FALLBACK_LOCALE', 'en'),
-    'faker_locale' => env('APP_FAKER_LOCALE', 'en_US'),
+    'faker_locale'    => env('APP_FAKER_LOCALE', 'en_US'),
 
     /*
      * |--------------------------------------------------------------------------
@@ -117,8 +119,8 @@ return [
      * | are secure. You should do this prior to deploying the application.
      * |
      */
-    'cipher' => 'AES-256-CBC',
-    'key' => env('APP_KEY'),
+    'cipher'        => 'AES-256-CBC',
+    'key'           => env('APP_KEY'),
     'previous_keys' => [
         ...array_filter(
             explode(',', (string) env('APP_PREVIOUS_KEYS', '')),
@@ -140,6 +142,6 @@ return [
      */
     'maintenance' => [
         'driver' => env('APP_MAINTENANCE_DRIVER', 'file'),
-        'store' => env('APP_MAINTENANCE_STORE', 'database'),
+        'store'  => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 ];

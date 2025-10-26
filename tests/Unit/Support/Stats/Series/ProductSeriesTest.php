@@ -10,9 +10,9 @@ use App\Models\Product;
 use App\Support\Cache\CacheKeys;
 use App\Support\Stats\Series\ProductSeries;
 use Carbon\CarbonImmutable;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Tests\TestCase;
 
 final class ProductSeriesTest extends TestCase

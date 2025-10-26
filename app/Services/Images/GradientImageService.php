@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace App\Services\Images;
 
+use function function_exists;
+
+use RuntimeException;
+
 /**
  * GradientImageService
  *
@@ -16,8 +20,8 @@ final class GradientImageService
      */
     public function generateGradientPng(int $width = 800, int $height = 800, ?string $startHex = null, ?string $endHex = null): string
     {
-        if (! \function_exists('imagecreatetruecolor')) {
-            throw new \RuntimeException('GD extension is required to generate images.');
+        if (! function_exists('imagecreatetruecolor')) {
+            throw new RuntimeException('GD extension is required to generate images.');
         }
         // Reduce image size in testing environment to prevent memory issues
         if (app()->environment('testing')) {
@@ -28,7 +32,7 @@ final class GradientImageService
         $endHex = $endHex ?: $this->randomColor();
         $image = imagecreatetruecolor($width, $height);
         if ($image === false) {
-            throw new \RuntimeException('Failed to create image canvas.');
+            throw new RuntimeException('Failed to create image canvas.');
         }
         [$sr, $sg, $sb] = $this->hexToRgb($startHex);
         [$er, $eg, $eb] = $this->hexToRgb($endHex);
@@ -43,11 +47,11 @@ final class GradientImageService
             imageline($image, 0, $y, $width, $y, $color);
         }
         $tmpDir = sys_get_temp_dir();
-        $filename = 'gradient_'.uniqid('', true).'.png';
-        $path = rtrim($tmpDir, DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR.$filename;
+        $filename = 'gradient_' . uniqid('', true) . '.png';
+        $path = rtrim($tmpDir, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $filename;
         if (! imagepng($image, $path, 6)) {
             imagedestroy($image);
-            throw new \RuntimeException('Failed to save PNG image.');
+            throw new RuntimeException('Failed to save PNG image.');
         }
         imagedestroy($image);
 
@@ -61,7 +65,7 @@ final class GradientImageService
     {
         $hex = ltrim($hex, '#');
         if (strlen($hex) === 3) {
-            $hex = $hex[0].$hex[0].$hex[1].$hex[1].$hex[2].$hex[2];
+            $hex = $hex[0] . $hex[0] . $hex[1] . $hex[1] . $hex[2] . $hex[2];
         }
         $int = hexdec($hex);
 

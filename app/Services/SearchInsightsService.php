@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use DateTime;
+use Exception;
 use Illuminate\Support\Facades\Cache;
+use Log;
 
 /**
  * SearchInsightsService
@@ -25,30 +28,30 @@ final class SearchInsightsService
     public function getSearchInsights(string $query, array $context = []): array
     {
         try {
-            $cacheKey = self::CACHE_PREFIX.'insights_'.md5($query.serialize($context));
+            $cacheKey = self::CACHE_PREFIX . 'insights_' . md5($query . serialize($context));
 
             return Cache::remember($cacheKey, self::INSIGHTS_CACHE_TTL, function () use ($query, $context) {
                 return [
-                    'query_analysis' => $this->analyzeQuery($query),
-                    'search_trends' => $this->getSearchTrends($query),
-                    'user_behavior' => $this->getUserBehavior($query, $context),
+                    'query_analysis'      => $this->analyzeQuery($query),
+                    'search_trends'       => $this->getSearchTrends($query),
+                    'user_behavior'       => $this->getUserBehavior($query, $context),
                     'performance_metrics' => $this->getPerformanceMetrics($query),
-                    'recommendations' => $this->getRecommendations($query, $context),
-                    'related_searches' => $this->getRelatedSearches($query),
-                    'search_suggestions' => $this->getSearchSuggestions($query),
+                    'recommendations'     => $this->getRecommendations($query, $context),
+                    'related_searches'    => $this->getRelatedSearches($query),
+                    'search_suggestions'  => $this->getSearchSuggestions($query),
                 ];
             });
-        } catch (\Exception $e) {
-            \Log::warning('Search insights generation failed: '.$e->getMessage());
+        } catch (Exception $e) {
+            Log::warning('Search insights generation failed: ' . $e->getMessage());
 
             return [
-                'query_analysis' => [],
-                'search_trends' => [],
-                'user_behavior' => [],
+                'query_analysis'      => [],
+                'search_trends'       => [],
+                'user_behavior'       => [],
                 'performance_metrics' => [],
-                'recommendations' => [],
-                'related_searches' => [],
-                'search_suggestions' => [],
+                'recommendations'     => [],
+                'related_searches'    => [],
+                'search_suggestions'  => [],
             ];
         }
     }
@@ -64,17 +67,17 @@ final class SearchInsightsService
             $avgWordLength = $wordCount > 0 ? array_sum(array_map('strlen', $words)) / $wordCount : 0;
 
             return [
-                'word_count' => $wordCount,
-                'character_count' => strlen($query),
-                'average_word_length' => round($avgWordLength, 2),
-                'complexity_score' => $this->calculateComplexityScore($query),
-                'language_detection' => $this->detectLanguage($query),
+                'word_count'            => $wordCount,
+                'character_count'       => strlen($query),
+                'average_word_length'   => round($avgWordLength, 2),
+                'complexity_score'      => $this->calculateComplexityScore($query),
+                'language_detection'    => $this->detectLanguage($query),
                 'intent_classification' => $this->classifyIntent($query),
-                'entity_extraction' => $this->extractEntities($query),
-                'sentiment_analysis' => $this->analyzeSentiment($query),
+                'entity_extraction'     => $this->extractEntities($query),
+                'sentiment_analysis'    => $this->analyzeSentiment($query),
             ];
-        } catch (\Exception $e) {
-            \Log::warning('Query analysis failed: '.$e->getMessage());
+        } catch (Exception $e) {
+            Log::warning('Query analysis failed: ' . $e->getMessage());
 
             return [];
         }
@@ -90,17 +93,17 @@ final class SearchInsightsService
             $thirtyDaysAgo = now()->subDays(30);
 
             return [
-                'popularity_score' => $this->calculatePopularityScore($query),
-                'trend_direction' => $this->getTrendDirection($query),
-                'peak_hours' => $this->getPeakHours($query),
-                'seasonal_patterns' => $this->getSeasonalPatterns($query),
+                'popularity_score'        => $this->calculatePopularityScore($query),
+                'trend_direction'         => $this->getTrendDirection($query),
+                'peak_hours'              => $this->getPeakHours($query),
+                'seasonal_patterns'       => $this->getSeasonalPatterns($query),
                 'geographic_distribution' => $this->getGeographicDistribution($query),
-                'device_breakdown' => $this->getDeviceBreakdown($query),
-                'search_frequency' => $analyticsService->getTotalSearches($thirtyDaysAgo),
-                'unique_searches' => $analyticsService->getUniqueSearches($thirtyDaysAgo),
+                'device_breakdown'        => $this->getDeviceBreakdown($query),
+                'search_frequency'        => $analyticsService->getTotalSearches($thirtyDaysAgo),
+                'unique_searches'         => $analyticsService->getUniqueSearches($thirtyDaysAgo),
             ];
-        } catch (\Exception $e) {
-            \Log::warning('Search trends analysis failed: '.$e->getMessage());
+        } catch (Exception $e) {
+            Log::warning('Search trends analysis failed: ' . $e->getMessage());
 
             return [];
         }
@@ -115,17 +118,17 @@ final class SearchInsightsService
             $userId = $context['user_id'] ?? null;
 
             return [
-                'search_history' => $this->getUserSearchHistory($userId),
-                'click_through_rate' => $this->getClickThroughRate($query),
-                'conversion_rate' => $this->getConversionRate($query),
-                'bounce_rate' => $this->getBounceRate($query),
-                'session_duration' => $this->getSessionDuration($query),
-                'return_visitor_rate' => $this->getReturnVisitorRate($query),
+                'search_history'       => $this->getUserSearchHistory($userId),
+                'click_through_rate'   => $this->getClickThroughRate($query),
+                'conversion_rate'      => $this->getConversionRate($query),
+                'bounce_rate'          => $this->getBounceRate($query),
+                'session_duration'     => $this->getSessionDuration($query),
+                'return_visitor_rate'  => $this->getReturnVisitorRate($query),
                 'preferred_categories' => $this->getPreferredCategories($userId),
-                'search_patterns' => $this->getSearchPatterns($userId),
+                'search_patterns'      => $this->getSearchPatterns($userId),
             ];
-        } catch (\Exception $e) {
-            \Log::warning('User behavior analysis failed: '.$e->getMessage());
+        } catch (Exception $e) {
+            Log::warning('User behavior analysis failed: ' . $e->getMessage());
 
             return [];
         }
@@ -140,16 +143,16 @@ final class SearchInsightsService
             $performanceService = app(SearchPerformanceService::class);
 
             return [
-                'average_response_time' => $this->getAverageResponseTime($query),
-                'cache_hit_rate' => $this->getCacheHitRate($query),
-                'error_rate' => $this->getErrorRate($query),
-                'throughput' => $this->getThroughput($query),
-                'memory_usage' => $this->getMemoryUsage($query),
-                'database_queries' => $this->getDatabaseQueries($query),
+                'average_response_time'      => $this->getAverageResponseTime($query),
+                'cache_hit_rate'             => $this->getCacheHitRate($query),
+                'error_rate'                 => $this->getErrorRate($query),
+                'throughput'                 => $this->getThroughput($query),
+                'memory_usage'               => $this->getMemoryUsage($query),
+                'database_queries'           => $this->getDatabaseQueries($query),
                 'optimization_opportunities' => $this->getOptimizationOpportunities($query),
             ];
-        } catch (\Exception $e) {
-            \Log::warning('Performance metrics analysis failed: '.$e->getMessage());
+        } catch (Exception $e) {
+            Log::warning('Performance metrics analysis failed: ' . $e->getMessage());
 
             return [];
         }
@@ -162,15 +165,15 @@ final class SearchInsightsService
     {
         try {
             return [
-                'query_optimization' => $this->getQueryOptimizationRecommendations($query),
-                'content_suggestions' => $this->getContentSuggestions($query),
-                'feature_recommendations' => $this->getFeatureRecommendations($query, $context),
-                'performance_improvements' => $this->getPerformanceImprovements($query),
+                'query_optimization'           => $this->getQueryOptimizationRecommendations($query),
+                'content_suggestions'          => $this->getContentSuggestions($query),
+                'feature_recommendations'      => $this->getFeatureRecommendations($query, $context),
+                'performance_improvements'     => $this->getPerformanceImprovements($query),
                 'user_experience_enhancements' => $this->getUXEnhancements($query, $context),
-                'seo_recommendations' => $this->getSEORecommendations($query),
+                'seo_recommendations'          => $this->getSEORecommendations($query),
             ];
-        } catch (\Exception $e) {
-            \Log::warning('Recommendations generation failed: '.$e->getMessage());
+        } catch (Exception $e) {
+            Log::warning('Recommendations generation failed: ' . $e->getMessage());
 
             return [];
         }
@@ -182,7 +185,7 @@ final class SearchInsightsService
     private function getRelatedSearches(string $query): array
     {
         try {
-            $cacheKey = self::CACHE_PREFIX.'related_'.md5($query);
+            $cacheKey = self::CACHE_PREFIX . 'related_' . md5($query);
 
             return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($query) {
                 $analyticsService = app(SearchAnalyticsService::class);
@@ -197,9 +200,9 @@ final class SearchInsightsService
 
                     if ($similarity > 0.3 && $search['query'] !== $query) {
                         $related[] = [
-                            'query' => $search['query'],
+                            'query'            => $search['query'],
                             'similarity_score' => $similarity,
-                            'search_count' => $search['count'],
+                            'search_count'     => $search['count'],
                         ];
                     }
                 }
@@ -208,8 +211,8 @@ final class SearchInsightsService
 
                 return array_slice($related, 0, 10);
             });
-        } catch (\Exception $e) {
-            \Log::warning('Related searches generation failed: '.$e->getMessage());
+        } catch (Exception $e) {
+            Log::warning('Related searches generation failed: ' . $e->getMessage());
 
             return [];
         }
@@ -221,7 +224,7 @@ final class SearchInsightsService
     private function getSearchSuggestions(string $query): array
     {
         try {
-            $cacheKey = self::CACHE_PREFIX.'suggestions_'.md5($query);
+            $cacheKey = self::CACHE_PREFIX . 'suggestions_' . md5($query);
 
             return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($query) {
                 $autocompleteService = app(AutocompleteService::class);
@@ -248,8 +251,8 @@ final class SearchInsightsService
 
                 return array_slice(array_keys($wordCounts), 0, 10);
             });
-        } catch (\Exception $e) {
-            \Log::warning('Search suggestions generation failed: '.$e->getMessage());
+        } catch (Exception $e) {
+            Log::warning('Search suggestions generation failed: ' . $e->getMessage());
 
             return [];
         }
@@ -382,7 +385,7 @@ final class SearchInsightsService
             }
 
             return round(($querySearches / $totalSearches) * 100, 2);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return 0.0;
         }
     }
@@ -403,7 +406,7 @@ final class SearchInsightsService
             }
 
             return 'stable';
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return 'unknown';
         }
     }
@@ -417,11 +420,11 @@ final class SearchInsightsService
             // This would typically query the database for hourly search patterns
             // For now, return mock data
             return [
-                'peak_hour' => 14, // 2 PM
-                'peak_day' => 'Tuesday',
+                'peak_hour'           => 14, // 2 PM
+                'peak_day'            => 'Tuesday',
                 'hourly_distribution' => array_fill(0, 24, 0),
             ];
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return [];
         }
     }
@@ -435,10 +438,10 @@ final class SearchInsightsService
             // This would typically analyze seasonal search patterns
             return [
                 'seasonal_keywords' => $this->getSeasonalKeywords($query),
-                'peak_season' => $this->getPeakSeason($query),
-                'seasonal_trend' => $this->getSeasonalTrend($query),
+                'peak_season'       => $this->getPeakSeason($query),
+                'seasonal_trend'    => $this->getSeasonalTrend($query),
             ];
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return [];
         }
     }
@@ -451,11 +454,11 @@ final class SearchInsightsService
         try {
             // This would typically analyze geographic search patterns
             return [
-                'top_countries' => ['LT' => 45, 'LV' => 25, 'EE' => 20, 'PL' => 10],
-                'top_cities' => ['Vilnius' => 30, 'Kaunas' => 20, 'Klaipėda' => 15],
+                'top_countries'        => ['LT' => 45, 'LV' => 25, 'EE' => 20, 'PL' => 10],
+                'top_cities'           => ['Vilnius' => 30, 'Kaunas' => 20, 'Klaipėda' => 15],
                 'regional_preferences' => $this->getRegionalPreferences($query),
             ];
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return [];
         }
     }
@@ -468,11 +471,11 @@ final class SearchInsightsService
         try {
             // This would typically analyze device usage patterns
             return [
-                'mobile' => 60,
+                'mobile'  => 60,
                 'desktop' => 35,
-                'tablet' => 5,
+                'tablet'  => 5,
             ];
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return [];
         }
     }
@@ -490,7 +493,7 @@ final class SearchInsightsService
             $cacheKey = "user_search_history_{$userId}";
 
             return Cache::get($cacheKey, []);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return [];
         }
     }
@@ -503,7 +506,7 @@ final class SearchInsightsService
         try {
             // This would typically calculate CTR from analytics data
             return 0.15; // 15% CTR
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return 0.0;
         }
     }
@@ -516,7 +519,7 @@ final class SearchInsightsService
         try {
             // This would typically calculate conversion rate from analytics data
             return 0.03; // 3% conversion rate
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return 0.0;
         }
     }
@@ -529,7 +532,7 @@ final class SearchInsightsService
         try {
             // This would typically calculate bounce rate from analytics data
             return 0.45; // 45% bounce rate
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return 0.0;
         }
     }
@@ -542,7 +545,7 @@ final class SearchInsightsService
         try {
             // This would typically calculate average session duration
             return 120.5; // 2 minutes 0.5 seconds
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return 0.0;
         }
     }
@@ -555,7 +558,7 @@ final class SearchInsightsService
         try {
             // This would typically calculate return visitor rate
             return 0.25; // 25% return visitors
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return 0.0;
         }
     }
@@ -572,7 +575,7 @@ final class SearchInsightsService
 
             // This would typically analyze user's search and purchase history
             return ['electronics' => 40, 'clothing' => 30, 'books' => 20, 'home' => 10];
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return [];
         }
     }
@@ -589,10 +592,10 @@ final class SearchInsightsService
 
             return [
                 'average_queries_per_session' => 3.2,
-                'most_common_search_time' => '14:00',
-                'preferred_search_types' => ['products' => 70, 'categories' => 20, 'brands' => 10],
+                'most_common_search_time'     => '14:00',
+                'preferred_search_types'      => ['products' => 70, 'categories' => 20, 'brands' => 10],
             ];
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return [];
         }
     }
@@ -607,7 +610,7 @@ final class SearchInsightsService
 
             // This would typically get average response time from performance data
             return 0.25; // 250ms
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return 0.0;
         }
     }
@@ -620,7 +623,7 @@ final class SearchInsightsService
         try {
             // This would typically calculate cache hit rate
             return 0.85; // 85% cache hit rate
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return 0.0;
         }
     }
@@ -633,7 +636,7 @@ final class SearchInsightsService
         try {
             // This would typically calculate error rate
             return 0.02; // 2% error rate
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return 0.0;
         }
     }
@@ -646,7 +649,7 @@ final class SearchInsightsService
         try {
             // This would typically calculate queries per second
             return 150.0; // 150 QPS
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return 0.0;
         }
     }
@@ -659,7 +662,7 @@ final class SearchInsightsService
         try {
             // This would typically get memory usage in MB
             return 45.2; // 45.2 MB
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return 0.0;
         }
     }
@@ -672,7 +675,7 @@ final class SearchInsightsService
         try {
             // This would typically count database queries
             return 3; // 3 database queries
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return 0;
         }
     }
@@ -699,7 +702,7 @@ final class SearchInsightsService
             }
 
             return $opportunities;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return [];
         }
     }
@@ -725,7 +728,7 @@ final class SearchInsightsService
             }
 
             return $recommendations;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return [];
         }
     }
@@ -737,11 +740,11 @@ final class SearchInsightsService
     {
         try {
             return [
-                'missing_content' => $this->getMissingContent($query),
-                'content_gaps' => $this->getContentGaps($query),
+                'missing_content'            => $this->getMissingContent($query),
+                'content_gaps'               => $this->getContentGaps($query),
                 'optimization_opportunities' => $this->getContentOptimizationOpportunities($query),
             ];
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return [];
         }
     }
@@ -767,7 +770,7 @@ final class SearchInsightsService
             }
 
             return $recommendations;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return [];
         }
     }
@@ -789,7 +792,7 @@ final class SearchInsightsService
             }
 
             return $improvements;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return [];
         }
     }
@@ -811,7 +814,7 @@ final class SearchInsightsService
             }
 
             return $enhancements;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return [];
         }
     }
@@ -823,11 +826,11 @@ final class SearchInsightsService
     {
         try {
             return [
-                'meta_keywords' => $this->generateMetaKeywords($query),
-                'title_suggestions' => $this->generateTitleSuggestions($query),
+                'meta_keywords'           => $this->generateMetaKeywords($query),
+                'title_suggestions'       => $this->generateTitleSuggestions($query),
                 'description_suggestions' => $this->generateDescriptionSuggestions($query),
             ];
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return [];
         }
     }
@@ -850,12 +853,12 @@ final class SearchInsightsService
     /**
      * Handle getQuerySearchCount functionality with proper error handling.
      */
-    private function getQuerySearchCount(string $query, ?\DateTime $since = null, ?\DateTime $until = null): int
+    private function getQuerySearchCount(string $query, ?DateTime $since = null, ?DateTime $until = null): int
     {
         try {
             // This would typically query the database for search count
             return rand(10, 100); // Mock data
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return 0;
         }
     }
@@ -876,7 +879,7 @@ final class SearchInsightsService
             $currentSeason = $this->getCurrentSeason();
 
             return $seasonalKeywords[$currentSeason] ?? [];
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return [];
         }
     }
@@ -889,7 +892,7 @@ final class SearchInsightsService
         try {
             // This would typically analyze seasonal patterns
             return 'winter';
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return 'unknown';
         }
     }
@@ -902,7 +905,7 @@ final class SearchInsightsService
         try {
             // This would typically analyze seasonal trends
             return 'increasing';
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return 'stable';
         }
     }
@@ -918,7 +921,7 @@ final class SearchInsightsService
                 'currency_preferences' => ['EUR' => 80, 'USD' => 20],
                 'shipping_preferences' => ['local' => 70, 'international' => 30],
             ];
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return [];
         }
     }
@@ -930,11 +933,11 @@ final class SearchInsightsService
     {
         try {
             return [
-                'missing_products' => 5,
+                'missing_products'   => 5,
                 'missing_categories' => 2,
-                'missing_brands' => 1,
+                'missing_brands'     => 1,
             ];
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return [];
         }
     }
@@ -946,11 +949,11 @@ final class SearchInsightsService
     {
         try {
             return [
-                'description_gaps' => 3,
-                'image_gaps' => 2,
+                'description_gaps'   => 3,
+                'image_gaps'         => 2,
                 'specification_gaps' => 4,
             ];
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return [];
         }
     }
@@ -962,11 +965,11 @@ final class SearchInsightsService
     {
         try {
             return [
-                'seo_optimization' => 'Improve meta descriptions',
-                'content_expansion' => 'Add more detailed product descriptions',
+                'seo_optimization'   => 'Improve meta descriptions',
+                'content_expansion'  => 'Add more detailed product descriptions',
                 'image_optimization' => 'Add high-quality product images',
             ];
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return [];
         }
     }
@@ -981,7 +984,7 @@ final class SearchInsightsService
             $keywords = array_filter($words, fn ($word) => strlen($word) >= 3);
 
             return array_slice($keywords, 0, 10);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return [];
         }
     }
@@ -997,7 +1000,7 @@ final class SearchInsightsService
                 "Find {$query} - Best Deals & Reviews",
                 "{$query} - Shop Now with Free Shipping",
             ];
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return [];
         }
     }
@@ -1013,7 +1016,7 @@ final class SearchInsightsService
                 "Shop {$query} from top brands with customer reviews, specifications, and best deals.",
                 "Find high-quality {$query} products with detailed information and secure checkout.",
             ];
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return [];
         }
     }

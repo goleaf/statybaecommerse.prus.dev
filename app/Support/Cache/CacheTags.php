@@ -34,7 +34,7 @@ final class CacheTags
     }
 
     /**
-     * @param  array<int, int|string>  $ids
+     * @param  array<int, int|string> $ids
      * @return array<int, string>
      */
     public static function productIds(array $ids): array
@@ -48,7 +48,7 @@ final class CacheTags
     }
 
     /**
-     * @param  array<int, int|string>  $ids
+     * @param  array<int, int|string> $ids
      * @return array<int, string>
      */
     public static function categoryIds(array $ids): array
@@ -67,7 +67,7 @@ final class CacheTags
     }
 
     /**
-     * @param  array<int, int|string>  $ids
+     * @param  array<int, int|string> $ids
      * @return array<int, string>
      */
     public static function brandIds(array $ids): array
@@ -86,7 +86,7 @@ final class CacheTags
     }
 
     /**
-     * @param  array<int, int|string>  $ids
+     * @param  array<int, int|string> $ids
      * @return array<int, string>
      */
     public static function collectionIds(array $ids): array
@@ -113,7 +113,7 @@ final class CacheTags
      * Collapse identifiers into deterministic tag names while stripping
      * duplicates to avoid redundant cache tagging.
      *
-     * @param  array<int, int|string>  $ids
+     * @param  array<int, int|string> $ids
      * @return array<int, string>
      */
     private static function mapIds(string $prefix, array $ids): array

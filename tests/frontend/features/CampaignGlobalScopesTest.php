@@ -83,17 +83,17 @@ final class CampaignGlobalScopesTest extends TestCase
         // Create test campaign conversions
         $activeConversion = CampaignConversion::factory()->create([
             'is_active' => true,
-            'status' => 'completed',
+            'status'    => 'completed',
         ]);
 
         $inactiveConversion = CampaignConversion::factory()->create([
             'is_active' => false,
-            'status' => 'completed',
+            'status'    => 'completed',
         ]);
 
         $pendingConversion = CampaignConversion::factory()->create([
             'is_active' => true,
-            'status' => 'pending',
+            'status'    => 'pending',
         ]);
 
         // Test that only active conversions with allowed status are returned
@@ -227,17 +227,17 @@ final class CampaignGlobalScopesTest extends TestCase
         // Test different combinations of conversion scopes
         $conversion1 = CampaignConversion::factory()->create([
             'is_active' => true,
-            'status' => 'completed',
+            'status'    => 'completed',
         ]);
 
         $conversion2 = CampaignConversion::factory()->create([
             'is_active' => false,
-            'status' => 'completed',
+            'status'    => 'completed',
         ]);
 
         $conversion3 = CampaignConversion::factory()->create([
             'is_active' => true,
-            'status' => 'pending',
+            'status'    => 'pending',
         ]);
 
         // Test bypassing specific scopes

@@ -29,23 +29,23 @@ class VariantImageResourceTest extends TestCase
         // Create a test user
         $this->user = User::factory()->create([
             'email' => 'admin@example.com',
-            'name' => 'Admin User',
+            'name'  => 'Admin User',
         ]);
 
         // Create test product variant
         $this->productVariant = ProductVariant::factory()->create([
             'name' => 'Test Variant',
-            'sku' => 'TEST-SKU-001',
+            'sku'  => 'TEST-SKU-001',
         ]);
 
         // Create test variant image
         $this->variantImage = VariantImage::factory()->create([
             'variant_id' => $this->productVariant->id,
             'image_path' => 'test-image.jpg',
-            'alt_text' => 'Test Image',
+            'alt_text'   => 'Test Image',
             'sort_order' => 1,
             'is_primary' => true,
-            'is_active' => true,
+            'is_active'  => true,
         ]);
     }
 
@@ -73,23 +73,23 @@ class VariantImageResourceTest extends TestCase
 
         Livewire::test(CreateVariantImage::class)
             ->fillForm([
-                'variant_id' => $this->productVariant->id,
-                'image_path' => $imageFile,
-                'alt_text' => 'New Test Image',
+                'variant_id'  => $this->productVariant->id,
+                'image_path'  => $imageFile,
+                'alt_text'    => 'New Test Image',
                 'description' => 'Test description',
-                'sort_order' => 2,
-                'is_primary' => false,
-                'is_active' => true,
+                'sort_order'  => 2,
+                'is_primary'  => false,
+                'is_active'   => true,
             ])
             ->call('create')
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('variant_images', [
             'variant_id' => $this->productVariant->id,
-            'alt_text' => 'New Test Image',
+            'alt_text'   => 'New Test Image',
             'sort_order' => 2,
             'is_primary' => false,
-            'is_active' => true,
+            'is_active'  => true,
         ]);
     }
 
@@ -103,13 +103,13 @@ class VariantImageResourceTest extends TestCase
 
         Livewire::test(CreateVariantImage::class)
             ->fillForm([
-                'variant_id' => $this->productVariant->id,
-                'image_path' => $imageFile,
-                'alt_text' => 'Metadata Image',
+                'variant_id'  => $this->productVariant->id,
+                'image_path'  => $imageFile,
+                'alt_text'    => 'Metadata Image',
                 'description' => 'Image with metadata',
-                'sort_order' => 3,
-                'is_primary' => false,
-                'is_active' => true,
+                'sort_order'  => 3,
+                'is_primary'  => false,
+                'is_active'   => true,
             ])
             ->call('create')
             ->assertHasNoFormErrors();
@@ -130,21 +130,21 @@ class VariantImageResourceTest extends TestCase
 
         Livewire::test(EditVariantImage::class, ['record' => $this->variantImage->id])
             ->fillForm([
-                'alt_text' => 'Updated Alt Text',
+                'alt_text'    => 'Updated Alt Text',
                 'description' => 'Updated description',
-                'sort_order' => 5,
-                'is_primary' => false,
-                'is_active' => false,
+                'sort_order'  => 5,
+                'is_primary'  => false,
+                'is_active'   => false,
             ])
             ->call('save')
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('variant_images', [
-            'id' => $this->variantImage->id,
-            'alt_text' => 'Updated Alt Text',
+            'id'         => $this->variantImage->id,
+            'alt_text'   => 'Updated Alt Text',
             'sort_order' => 5,
             'is_primary' => false,
-            'is_active' => false,
+            'is_active'  => false,
         ]);
     }
 
@@ -183,13 +183,13 @@ class VariantImageResourceTest extends TestCase
 
         // Check that the new image is now primary
         $this->assertDatabaseHas('variant_images', [
-            'id' => $anotherImage->id,
+            'id'         => $anotherImage->id,
             'is_primary' => true,
         ]);
 
         // Check that the old primary image is no longer primary
         $this->assertDatabaseHas('variant_images', [
-            'id' => $this->variantImage->id,
+            'id'         => $this->variantImage->id,
             'is_primary' => false,
         ]);
     }
@@ -202,7 +202,7 @@ class VariantImageResourceTest extends TestCase
             ->callTableAction('toggle_active', $this->variantImage);
 
         $this->assertDatabaseHas('variant_images', [
-            'id' => $this->variantImage->id,
+            'id'        => $this->variantImage->id,
             'is_active' => false,
         ]);
     }
@@ -216,7 +216,7 @@ class VariantImageResourceTest extends TestCase
 
         $this->assertDatabaseHas('variant_images', [
             'variant_id' => $this->variantImage->variant_id,
-            'alt_text' => $this->variantImage->alt_text,
+            'alt_text'   => $this->variantImage->alt_text,
             'is_primary' => false, // Duplicated image should not be primary
         ]);
     }
@@ -260,7 +260,7 @@ class VariantImageResourceTest extends TestCase
         // Create an inactive image
         $inactiveImage = VariantImage::factory()->create([
             'variant_id' => $this->productVariant->id,
-            'is_active' => false,
+            'is_active'  => false,
         ]);
 
         Livewire::test(ListVariantImages::class)
@@ -276,7 +276,7 @@ class VariantImageResourceTest extends TestCase
         // Create inactive images
         $inactiveImages = VariantImage::factory()->count(3)->create([
             'variant_id' => $this->productVariant->id,
-            'is_active' => false,
+            'is_active'  => false,
         ]);
 
         Livewire::test(ListVariantImages::class)
@@ -284,7 +284,7 @@ class VariantImageResourceTest extends TestCase
 
         foreach ($inactiveImages as $image) {
             $this->assertDatabaseHas('variant_images', [
-                'id' => $image->id,
+                'id'        => $image->id,
                 'is_active' => true,
             ]);
         }
@@ -297,7 +297,7 @@ class VariantImageResourceTest extends TestCase
         // Create active images
         $activeImages = VariantImage::factory()->count(3)->create([
             'variant_id' => $this->productVariant->id,
-            'is_active' => true,
+            'is_active'  => true,
         ]);
 
         Livewire::test(ListVariantImages::class)
@@ -305,7 +305,7 @@ class VariantImageResourceTest extends TestCase
 
         foreach ($activeImages as $image) {
             $this->assertDatabaseHas('variant_images', [
-                'id' => $image->id,
+                'id'        => $image->id,
                 'is_active' => false,
             ]);
         }
@@ -349,7 +349,7 @@ class VariantImageResourceTest extends TestCase
 
         // Check that first image of each variant is now primary
         $this->assertDatabaseHas('variant_images', [
-            'id' => $images->first()->id,
+            'id'         => $images->first()->id,
             'is_primary' => true,
         ]);
     }

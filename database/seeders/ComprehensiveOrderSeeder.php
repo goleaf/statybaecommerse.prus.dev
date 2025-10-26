@@ -13,6 +13,7 @@ use App\Models\Product;
 use App\Models\User;
 use App\Models\Zone;
 use Carbon\Carbon;
+use Exception;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Log;
 
@@ -93,11 +94,11 @@ final class ComprehensiveOrderSeeder extends Seeder
         foreach ($currenciesData as $data) {
             if (! \App\Models\Currency::where('code', $data['code'])->exists()) {
                 \App\Models\Currency::factory()->create([
-                    'code' => $data['code'],
-                    'name' => $data['name'],
-                    'symbol' => $data['symbol'],
+                    'code'          => $data['code'],
+                    'name'          => $data['name'],
+                    'symbol'        => $data['symbol'],
                     'exchange_rate' => $data['exchange_rate'],
-                    'is_enabled' => true,
+                    'is_enabled'    => true,
                 ]);
             }
         }
@@ -114,8 +115,8 @@ final class ComprehensiveOrderSeeder extends Seeder
         foreach ($zonesData as $data) {
             if (! Zone::where('code', $data['code'])->exists()) {
                 Zone::factory()->create([
-                    'name' => $data['name'],
-                    'code' => $data['code'],
+                    'name'       => $data['name'],
+                    'code'       => $data['code'],
                     'is_enabled' => true,
                 ]);
             }
@@ -141,12 +142,12 @@ final class ComprehensiveOrderSeeder extends Seeder
             $order = Order::factory()
                 ->for($users->random())
                 ->state([
-                    'created_at' => $orderDate,
-                    'updated_at' => $orderDate->copy()->addMinutes(fake()->numberBetween(1, 1440)),
-                    'status' => fake()->randomElement($this->orderStatuses),
+                    'created_at'     => $orderDate,
+                    'updated_at'     => $orderDate->copy()->addMinutes(fake()->numberBetween(1, 1440)),
+                    'status'         => fake()->randomElement($this->orderStatuses),
                     'payment_method' => fake()->randomElement($this->paymentMethods),
-                    'currency' => 'EUR',
-                    'locale' => 'lt',
+                    'currency'       => 'EUR',
+                    'locale'         => 'lt',
                 ])
                 ->create();
 
@@ -174,7 +175,7 @@ final class ComprehensiveOrderSeeder extends Seeder
             $this->generateOrderDocuments($order, $invoiceTemplate, $receiptTemplate);
 
             if (($i + 1) % 50 === 0) {
-                $this->command->info('Generated '.($i + 1).' orders...');
+                $this->command->info('Generated ' . ($i + 1) . ' orders...');
             }
         }
     }
@@ -197,34 +198,34 @@ final class ComprehensiveOrderSeeder extends Seeder
         $total = $subtotal + $taxAmount + $shippingAmount - $discountAmount;
 
         $order = Order::create([
-            'number' => $this->generateOrderNumber(),
-            'user_id' => $users->random()->id,
-            'status' => $status,
-            'subtotal' => $subtotal,
-            'tax_amount' => $taxAmount,
-            'shipping_amount' => $shippingAmount,
-            'discount_amount' => $discountAmount,
-            'total' => $total,
-            'currency' => $currency,
-            'billing_address' => json_encode($this->generateAddress()),
+            'number'           => $this->generateOrderNumber(),
+            'user_id'          => $users->random()->id,
+            'status'           => $status,
+            'subtotal'         => $subtotal,
+            'tax_amount'       => $taxAmount,
+            'shipping_amount'  => $shippingAmount,
+            'discount_amount'  => $discountAmount,
+            'total'            => $total,
+            'currency'         => $currency,
+            'billing_address'  => json_encode($this->generateAddress()),
             'shipping_address' => fake()->boolean(80) ? json_encode($this->generateAddress()) : null,
-            'notes' => fake()->optional(0.3)->sentence(),
-            'shipped_at' => $this->getShippedDate($status, $orderDate),
-            'delivered_at' => $this->getDeliveredDate($status, $orderDate),
+            'notes'            => fake()->optional(0.3)->sentence(),
+            'shipped_at'       => $this->getShippedDate($status, $orderDate),
+            'delivered_at'     => $this->getDeliveredDate($status, $orderDate),
             // Temporarily avoid FK issues after sh_* table renames
-            'zone_id' => null,
-            'payment_status' => $paymentStatus,
-            'payment_method' => fake()->randomElement($this->paymentMethods),
-            'payment_reference' => fake()->optional(0.8)->uuid(),
-            'tracking_number' => $this->generateTrackingNumber('DPD'),
+            'zone_id'            => null,
+            'payment_status'     => $paymentStatus,
+            'payment_method'     => fake()->randomElement($this->paymentMethods),
+            'payment_reference'  => fake()->optional(0.8)->uuid(),
+            'tracking_number'    => $this->generateTrackingNumber('DPD'),
             'estimated_delivery' => $this->getShippedDate($status, $orderDate)?->addDays(fake()->numberBetween(1, 7)),
-            'priority' => fake()->randomElement(['low', 'normal', 'high', 'urgent']),
-            'metadata' => json_encode($this->generateTimeline($status, $orderDate)),
-            'locale' => 'lt',
-            'weight' => fake()->randomFloat(2, 0.5, 25.0),
+            'priority'           => fake()->randomElement(['low', 'normal', 'high', 'urgent']),
+            'metadata'           => json_encode($this->generateTimeline($status, $orderDate)),
+            'locale'             => 'lt',
+            'weight'             => fake()->randomFloat(2, 0.5, 25.0),
             'fulfillment_status' => $this->getFulfillmentStatus($status),
-            'created_at' => $orderDate,
-            'updated_at' => $orderDate->copy()->addMinutes(fake()->numberBetween(1, 1440)),
+            'created_at'         => $orderDate,
+            'updated_at'         => $orderDate->copy()->addMinutes(fake()->numberBetween(1, 1440)),
         ]);
 
         return $order;
@@ -248,14 +249,14 @@ final class ComprehensiveOrderSeeder extends Seeder
             $total = $quantity * $unitPrice;
 
             OrderItem::create([
-                'order_id' => $order->id,
-                'product_id' => $product->id,
+                'order_id'           => $order->id,
+                'product_id'         => $product->id,
                 'product_variant_id' => null,  // Assuming no variants for now
-                'name' => $product->name,
-                'sku' => $product->sku ?? fake()->unique()->bothify('SKU-####-????'),
-                'quantity' => $quantity,
-                'unit_price' => $unitPrice,
-                'total' => $total,
+                'name'               => $product->name,
+                'sku'                => $product->sku ?? fake()->unique()->bothify('SKU-####-????'),
+                'quantity'           => $quantity,
+                'unit_price'         => $unitPrice,
+                'total'              => $total,
             ]);
         }
     }
@@ -270,23 +271,23 @@ final class ComprehensiveOrderSeeder extends Seeder
         $service = fake()->randomElement($this->shippingServices);
 
         OrderShipping::create([
-            'order_id' => $order->id,
-            'carrier_name' => $carrier,
-            'service' => $service,
-            'tracking_number' => $this->generateTrackingNumber($carrier),
-            'tracking_url' => $this->generateTrackingUrl($carrier),
-            'shipped_at' => $order->shipped_at,
+            'order_id'           => $order->id,
+            'carrier_name'       => $carrier,
+            'service'            => $service,
+            'tracking_number'    => $this->generateTrackingNumber($carrier),
+            'tracking_url'       => $this->generateTrackingUrl($carrier),
+            'shipped_at'         => $order->shipped_at,
             'estimated_delivery' => $order->shipped_at?->addDays(fake()->numberBetween(1, 7)),
-            'delivered_at' => $order->delivered_at,
-            'weight' => fake()->randomFloat(3, 0.1, 10),
-            'dimensions' => [
+            'delivered_at'       => $order->delivered_at,
+            'weight'             => fake()->randomFloat(3, 0.1, 10),
+            'dimensions'         => [
                 'length' => fake()->numberBetween(10, 50),
-                'width' => fake()->numberBetween(10, 50),
+                'width'  => fake()->numberBetween(10, 50),
                 'height' => fake()->numberBetween(5, 30),
             ],
-            'cost' => floatval($order->shipping_amount ?? 0),
+            'cost'     => floatval($order->shipping_amount ?? 0),
             'metadata' => [
-                'pickup_location' => fake()->address(),
+                'pickup_location'       => fake()->address(),
                 'delivery_instructions' => fake()->optional(0.3)->sentence(),
             ],
         ]);
@@ -306,16 +307,16 @@ final class ComprehensiveOrderSeeder extends Seeder
                 Document::factory()
                     ->for($invoiceTemplate, 'documentTemplate')
                     ->state([
-                        'title' => "Sąskaita faktūra #{$order->number}",
-                        'content' => $this->processTemplate($invoiceTemplate->content, $invoiceVariables),
-                        'variables' => $invoiceVariables,
-                        'status' => 'published',
-                        'format' => 'pdf',
-                        'file_path' => "documents/invoices/invoice-{$order->number}.pdf",
+                        'title'             => "Sąskaita faktūra #{$order->number}",
+                        'content'           => $this->processTemplate($invoiceTemplate->content, $invoiceVariables),
+                        'variables'         => $invoiceVariables,
+                        'status'            => 'published',
+                        'format'            => 'pdf',
+                        'file_path'         => "documents/invoices/invoice-{$order->number}.pdf",
                         'documentable_type' => Order::class,
-                        'documentable_id' => $order->id,
-                        'created_by' => 1,
-                        'generated_at' => $order->created_at->addMinutes(fake()->numberBetween(5, 60)),
+                        'documentable_id'   => $order->id,
+                        'created_by'        => 1,
+                        'generated_at'      => $order->created_at->addMinutes(fake()->numberBetween(5, 60)),
                     ])
                     ->create();
             }
@@ -327,21 +328,21 @@ final class ComprehensiveOrderSeeder extends Seeder
                 Document::factory()
                     ->for($receiptTemplate, 'documentTemplate')
                     ->state([
-                        'title' => "Kvitas #{$order->number}",
-                        'content' => $this->processTemplate($receiptTemplate->content, $receiptVariables),
-                        'variables' => $receiptVariables,
-                        'status' => 'published',
-                        'format' => 'pdf',
-                        'file_path' => "documents/receipts/receipt-{$order->number}.pdf",
+                        'title'             => "Kvitas #{$order->number}",
+                        'content'           => $this->processTemplate($receiptTemplate->content, $receiptVariables),
+                        'variables'         => $receiptVariables,
+                        'status'            => 'published',
+                        'format'            => 'pdf',
+                        'file_path'         => "documents/receipts/receipt-{$order->number}.pdf",
                         'documentable_type' => Order::class,
-                        'documentable_id' => $order->id,
-                        'created_by' => 1,
-                        'generated_at' => $order->created_at->addMinutes(fake()->numberBetween(10, 120)),
+                        'documentable_id'   => $order->id,
+                        'created_by'        => 1,
+                        'generated_at'      => $order->created_at->addMinutes(fake()->numberBetween(10, 120)),
                     ])
                     ->create();
             }
-        } catch (\Exception $e) {
-            Log::warning("Failed to generate documents for order {$order->number}: ".$e->getMessage());
+        } catch (Exception $e) {
+            Log::warning("Failed to generate documents for order {$order->number}: " . $e->getMessage());
         }
     }
 
@@ -351,7 +352,7 @@ final class ComprehensiveOrderSeeder extends Seeder
         $counter++;
 
         do {
-            $number = 'ORD-'.date('Y').'-'.str_pad((string) (10000 + $counter), 5, '0', STR_PAD_LEFT);
+            $number = 'ORD-' . date('Y') . '-' . str_pad((string) (10000 + $counter), 5, '0', STR_PAD_LEFT);
         } while (Order::where('number', $number)->exists());
 
         return $number;
@@ -373,17 +374,17 @@ final class ComprehensiveOrderSeeder extends Seeder
         ];
 
         return [
-            'first_name' => fake('lt_LT')->firstName(),
-            'last_name' => fake('lt_LT')->lastName(),
-            'company' => fake()->optional(0.3)->company(),
+            'first_name'     => fake('lt_LT')->firstName(),
+            'last_name'      => fake('lt_LT')->lastName(),
+            'company'        => fake()->optional(0.3)->company(),
             'address_line_1' => fake('lt_LT')->streetAddress(),
             'address_line_2' => fake()->optional(0.2)->secondaryAddress(),
-            'city' => fake('lt_LT')->city(),
-            'state' => fake()->randomElement($lithuanianCounties),
-            'postal_code' => fake('lt_LT')->postcode(),
-            'country' => 'LT',
-            'phone' => fake('lt_LT')->phoneNumber(),
-            'email' => fake()->email(),
+            'city'           => fake('lt_LT')->city(),
+            'state'          => fake()->randomElement($lithuanianCounties),
+            'postal_code'    => fake('lt_LT')->postcode(),
+            'country'        => 'LT',
+            'phone'          => fake('lt_LT')->phoneNumber(),
+            'email'          => fake()->email(),
         ];
     }
 
@@ -393,19 +394,19 @@ final class ComprehensiveOrderSeeder extends Seeder
             'pending' => fake()->randomElement(['pending', 'failed']),
             'processing', 'shipped', 'delivered' => 'paid',
             'cancelled' => fake()->randomElement(['pending', 'failed', 'refunded']),
-            default => 'pending',
+            default     => 'pending',
         };
     }
 
     private function getFulfillmentStatus(string $orderStatus): string
     {
         return match ($orderStatus) {
-            'pending' => 'unfulfilled',
+            'pending'    => 'unfulfilled',
             'processing' => 'partial',
-            'shipped' => 'fulfilled',
-            'delivered' => 'fulfilled',
-            'cancelled' => 'unfulfilled',
-            default => 'unfulfilled',
+            'shipped'    => 'fulfilled',
+            'delivered'  => 'fulfilled',
+            'cancelled'  => 'unfulfilled',
+            default      => 'unfulfilled',
         };
     }
 
@@ -433,41 +434,41 @@ final class ComprehensiveOrderSeeder extends Seeder
     {
         $timeline = [
             [
-                'status' => 'pending',
+                'status'    => 'pending',
                 'timestamp' => $orderDate->toISOString(),
-                'note' => 'Užsakymas sukurtas',
+                'note'      => 'Užsakymas sukurtas',
             ],
         ];
 
         if (in_array($status, ['processing', 'shipped', 'delivered'])) {
             $timeline[] = [
-                'status' => 'processing',
+                'status'    => 'processing',
                 'timestamp' => $orderDate->copy()->addHours(fake()->numberBetween(1, 24))->toISOString(),
-                'note' => 'Užsakymas apdorojamas',
+                'note'      => 'Užsakymas apdorojamas',
             ];
         }
 
         if (in_array($status, ['shipped', 'delivered'])) {
             $timeline[] = [
-                'status' => 'shipped',
+                'status'    => 'shipped',
                 'timestamp' => $orderDate->copy()->addDays(fake()->numberBetween(1, 5))->toISOString(),
-                'note' => 'Užsakymas išsiųstas',
+                'note'      => 'Užsakymas išsiųstas',
             ];
         }
 
         if ($status === 'delivered') {
             $timeline[] = [
-                'status' => 'delivered',
+                'status'    => 'delivered',
                 'timestamp' => $orderDate->copy()->addDays(fake()->numberBetween(3, 10))->toISOString(),
-                'note' => 'Užsakymas pristatytas',
+                'note'      => 'Užsakymas pristatytas',
             ];
         }
 
         if ($status === 'cancelled') {
             $timeline[] = [
-                'status' => 'cancelled',
+                'status'    => 'cancelled',
                 'timestamp' => $orderDate->copy()->addHours(fake()->numberBetween(1, 48))->toISOString(),
-                'note' => 'Užsakymas atšauktas',
+                'note'      => 'Užsakymas atšauktas',
             ];
         }
 
@@ -477,13 +478,13 @@ final class ComprehensiveOrderSeeder extends Seeder
     private function generateTrackingNumber(string $carrier): string
     {
         return match ($carrier) {
-            'DPD' => fake()->numerify('##.###.###.##'),
-            'Omniva' => fake()->bothify('OM########LT'),
+            'DPD'        => fake()->numerify('##.###.###.##'),
+            'Omniva'     => fake()->bothify('OM########LT'),
             'LP Express' => fake()->numerify('LP########'),
-            'UPS' => fake()->bothify('1Z###A##########'),
-            'FedEx' => fake()->numerify('####.####.####'),
-            'DHL' => fake()->numerify('##########'),
-            default => fake()->bothify('TRK########'),
+            'UPS'        => fake()->bothify('1Z###A##########'),
+            'FedEx'      => fake()->numerify('####.####.####'),
+            'DHL'        => fake()->numerify('##########'),
+            default      => fake()->bothify('TRK########'),
         };
     }
 
@@ -492,13 +493,13 @@ final class ComprehensiveOrderSeeder extends Seeder
         $trackingNumber = fake()->bothify('########');
 
         return match ($carrier) {
-            'DPD' => "https://www.dpd.com/lt/tracking?trackingNumber={$trackingNumber}",
-            'Omniva' => "https://www.omniva.lt/tracking?id={$trackingNumber}",
+            'DPD'        => "https://www.dpd.com/lt/tracking?trackingNumber={$trackingNumber}",
+            'Omniva'     => "https://www.omniva.lt/tracking?id={$trackingNumber}",
             'LP Express' => "https://www.lpexpress.lt/tracking/{$trackingNumber}",
-            'UPS' => "https://www.ups.com/track?tracknum={$trackingNumber}",
-            'FedEx' => "https://www.fedex.com/tracking/?trknbr={$trackingNumber}",
-            'DHL' => "https://www.dhl.com/tracking/{$trackingNumber}",
-            default => "https://tracking.example.com/{$trackingNumber}",
+            'UPS'        => "https://www.ups.com/track?tracknum={$trackingNumber}",
+            'FedEx'      => "https://www.fedex.com/tracking/?trknbr={$trackingNumber}",
+            'DHL'        => "https://www.dhl.com/tracking/{$trackingNumber}",
+            default      => "https://tracking.example.com/{$trackingNumber}",
         };
     }
 
@@ -510,25 +511,25 @@ final class ComprehensiveOrderSeeder extends Seeder
         $shippingAddress = $shippingAddress ?? $billingAddress;
 
         $baseVariables = [
-            '$COMPANY_NAME' => 'Statyba E-commerce',
-            '$COMPANY_ADDRESS' => 'Vilniaus g. 123, Vilnius, Lietuva',
-            '$COMPANY_PHONE' => '+370 600 12345',
-            '$COMPANY_EMAIL' => 'info@statybaecommerce.lt',
-            '$COMPANY_WEBSITE' => 'https://statybaecommerce.lt',
-            '$ORDER_NUMBER' => $order->number,
-            '$ORDER_DATE' => $order->created_at->format('Y-m-d'),
-            '$ORDER_TOTAL' => number_format(floatval($order->total ?? 0), 2).' €',
-            '$ORDER_SUBTOTAL' => number_format(floatval($order->subtotal ?? 0), 2).' €',
-            '$ORDER_TAX' => number_format(floatval($order->tax_amount ?? 0), 2).' €',
-            '$ORDER_SHIPPING' => number_format(floatval($order->shipping_amount ?? 0), 2).' €',
-            '$ORDER_DISCOUNT' => number_format(floatval($order->discount_amount ?? 0), 2).' €',
-            '$CUSTOMER_NAME' => $user ? "{$user->first_name} {$user->last_name}" : 'Svečias',
-            '$CUSTOMER_EMAIL' => $user?->email ?? $billingAddress['email'] ?? '',
-            '$BILLING_ADDRESS' => $this->formatAddress($billingAddress),
+            '$COMPANY_NAME'     => 'Statyba E-commerce',
+            '$COMPANY_ADDRESS'  => 'Vilniaus g. 123, Vilnius, Lietuva',
+            '$COMPANY_PHONE'    => '+370 600 12345',
+            '$COMPANY_EMAIL'    => 'info@statybaecommerce.lt',
+            '$COMPANY_WEBSITE'  => 'https://statybaecommerce.lt',
+            '$ORDER_NUMBER'     => $order->number,
+            '$ORDER_DATE'       => $order->created_at->format('Y-m-d'),
+            '$ORDER_TOTAL'      => number_format(floatval($order->total ?? 0), 2) . ' €',
+            '$ORDER_SUBTOTAL'   => number_format(floatval($order->subtotal ?? 0), 2) . ' €',
+            '$ORDER_TAX'        => number_format(floatval($order->tax_amount ?? 0), 2) . ' €',
+            '$ORDER_SHIPPING'   => number_format(floatval($order->shipping_amount ?? 0), 2) . ' €',
+            '$ORDER_DISCOUNT'   => number_format(floatval($order->discount_amount ?? 0), 2) . ' €',
+            '$CUSTOMER_NAME'    => $user ? "{$user->first_name} {$user->last_name}" : 'Svečias',
+            '$CUSTOMER_EMAIL'   => $user?->email ?? $billingAddress['email'] ?? '',
+            '$BILLING_ADDRESS'  => $this->formatAddress($billingAddress),
             '$SHIPPING_ADDRESS' => $this->formatAddress($shippingAddress),
-            '$CURRENT_DATE' => now()->format('Y-m-d'),
-            '$PAYMENT_METHOD' => $this->translatePaymentMethod($order->payment_method),
-            '$PAYMENT_STATUS' => $this->translatePaymentStatus($order->payment_status),
+            '$CURRENT_DATE'     => now()->format('Y-m-d'),
+            '$PAYMENT_METHOD'   => $this->translatePaymentMethod($order->payment_method),
+            '$PAYMENT_STATUS'   => $this->translatePaymentStatus($order->payment_status),
         ];
 
         if ($documentType === 'invoice') {
@@ -551,7 +552,7 @@ final class ComprehensiveOrderSeeder extends Seeder
         $parts = [];
 
         if (! empty($address['first_name']) || ! empty($address['last_name'])) {
-            $parts[] = trim(($address['first_name'] ?? '').' '.($address['last_name'] ?? ''));
+            $parts[] = trim(($address['first_name'] ?? '') . ' ' . ($address['last_name'] ?? ''));
         }
 
         if (! empty($address['company'])) {
@@ -587,24 +588,24 @@ final class ComprehensiveOrderSeeder extends Seeder
     private function translatePaymentMethod(string $method): string
     {
         return match ($method) {
-            'credit_card' => 'Kredito kortelė',
-            'paypal' => 'PayPal',
-            'bank_transfer' => 'Banko pavedimas',
+            'credit_card'      => 'Kredito kortelė',
+            'paypal'           => 'PayPal',
+            'bank_transfer'    => 'Banko pavedimas',
             'cash_on_delivery' => 'Atsiskaitymas pristatymo metu',
-            'stripe' => 'Stripe',
-            'mollie' => 'Mollie',
-            default => ucfirst($method),
+            'stripe'           => 'Stripe',
+            'mollie'           => 'Mollie',
+            default            => ucfirst($method),
         };
     }
 
     private function translatePaymentStatus(string $status): string
     {
         return match ($status) {
-            'pending' => 'Laukiama apmokėjimo',
-            'paid' => 'Apmokėta',
-            'failed' => 'Apmokėjimas nepavyko',
+            'pending'  => 'Laukiama apmokėjimo',
+            'paid'     => 'Apmokėta',
+            'failed'   => 'Apmokėjimas nepavyko',
             'refunded' => 'Grąžinta',
-            default => ucfirst($status),
+            default    => ucfirst($status),
         };
     }
 

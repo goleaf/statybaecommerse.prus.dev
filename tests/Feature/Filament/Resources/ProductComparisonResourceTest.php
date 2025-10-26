@@ -32,14 +32,14 @@ final class ProductComparisonResourceTest extends TestCase
         app()->setLocale('en');
 
         $this->admin = User::factory()->create([
-            'email' => 'admin@example.com',
+            'email'    => 'admin@example.com',
             'is_admin' => true,
         ]);
 
         $this->product = Product::factory()->create([
-            'status' => 'published',
+            'status'       => 'published',
             'published_at' => now(),
-            'is_visible' => true,
+            'is_visible'   => true,
         ]);
 
         $this->actingAs($this->admin);
@@ -48,7 +48,7 @@ final class ProductComparisonResourceTest extends TestCase
     public function test_list_page_displays_product_comparisons(): void
     {
         $comparison = ProductComparison::factory()->create([
-            'user_id' => $this->admin->id,
+            'user_id'    => $this->admin->id,
             'product_id' => $this->product->id,
             'session_id' => 'session-visible',
         ]);
@@ -64,7 +64,7 @@ final class ProductComparisonResourceTest extends TestCase
     {
         Livewire::test(CreateProductComparison::class)
             ->fillForm([
-                'user_id' => $this->admin->id,
+                'user_id'    => $this->admin->id,
                 'product_id' => $this->product->id,
                 'session_id' => 'session-create',
             ])
@@ -72,7 +72,7 @@ final class ProductComparisonResourceTest extends TestCase
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('product_comparisons', [
-            'user_id' => $this->admin->id,
+            'user_id'    => $this->admin->id,
             'product_id' => $this->product->id,
             'session_id' => 'session-create',
         ]);
@@ -81,14 +81,14 @@ final class ProductComparisonResourceTest extends TestCase
     public function test_can_edit_product_comparison(): void
     {
         $comparison = ProductComparison::factory()->create([
-            'user_id' => $this->admin->id,
+            'user_id'    => $this->admin->id,
             'product_id' => $this->product->id,
             'session_id' => 'session-original',
         ]);
 
         Livewire::test(EditProductComparison::class, ['record' => $comparison->getRouteKey()])
             ->fillForm([
-                'user_id' => $this->admin->id,
+                'user_id'    => $this->admin->id,
                 'product_id' => $this->product->id,
                 'session_id' => 'session-updated',
             ])
@@ -96,7 +96,7 @@ final class ProductComparisonResourceTest extends TestCase
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('product_comparisons', [
-            'id' => $comparison->id,
+            'id'         => $comparison->id,
             'session_id' => 'session-updated',
         ]);
     }
@@ -105,11 +105,11 @@ final class ProductComparisonResourceTest extends TestCase
     {
         $comparisons = collect([
             ProductComparison::factory()->create([
-                'user_id' => $this->admin->id,
+                'user_id'    => $this->admin->id,
                 'product_id' => $this->product->id,
             ]),
             ProductComparison::factory()->create([
-                'user_id' => User::factory()->create()->id,
+                'user_id'    => User::factory()->create()->id,
                 'product_id' => $this->product->id,
             ]),
         ]);
@@ -128,19 +128,19 @@ final class ProductComparisonResourceTest extends TestCase
     {
         $otherUser = User::factory()->create();
         $otherProduct = Product::factory()->create([
-            'status' => 'published',
+            'status'       => 'published',
             'published_at' => now(),
-            'is_visible' => true,
+            'is_visible'   => true,
         ]);
 
         $matching = ProductComparison::factory()->create([
-            'user_id' => $this->admin->id,
+            'user_id'    => $this->admin->id,
             'product_id' => $this->product->id,
             'session_id' => 'match-session',
         ]);
 
         $other = ProductComparison::factory()->create([
-            'user_id' => $otherUser->id,
+            'user_id'    => $otherUser->id,
             'product_id' => $otherProduct->id,
             'session_id' => 'other-session',
         ]);
@@ -157,19 +157,19 @@ final class ProductComparisonResourceTest extends TestCase
     {
         $comparisons = collect([
             ProductComparison::factory()->create([
-                'user_id' => $this->admin->id,
+                'user_id'    => $this->admin->id,
                 'product_id' => $this->product->id,
             ]),
             ProductComparison::factory()->create([
-                'user_id' => User::factory()->create()->id,
+                'user_id'    => User::factory()->create()->id,
                 'product_id' => $this->product->id,
             ]),
             ProductComparison::factory()->create([
-                'user_id' => User::factory()->create()->id,
+                'user_id'    => User::factory()->create()->id,
                 'product_id' => Product::factory()->create([
-                    'status' => 'published',
+                    'status'       => 'published',
                     'published_at' => now(),
-                    'is_visible' => true,
+                    'is_visible'   => true,
                 ])->id,
             ]),
         ]);

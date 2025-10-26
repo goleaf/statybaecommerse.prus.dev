@@ -16,30 +16,30 @@ final class LocationTranslationFactory extends Factory
     {
         return [
             'location_id' => Location::factory(),
-            'locale' => fake()->randomElement(['en', 'lt']),
-            'name' => fake()->company().' Location',
+            'locale'      => fake()->randomElement(['en', 'lt']),
+            'name'        => fake()->company() . ' Location',
             'description' => fake()->paragraph(),
-            'slug' => fake()->slug(),
+            'slug'        => fake()->slug(),
         ];
     }
 
     public function english(): static
     {
         return $this->state(fn (array $attributes) => [
-            'locale' => 'en',
-            'name' => fake()->company().' Location',
+            'locale'      => 'en',
+            'name'        => fake()->company() . ' Location',
             'description' => fake()->paragraph(),
-            'slug' => fake()->slug(),
+            'slug'        => fake()->slug(),
         ]);
     }
 
     public function lithuanian(): static
     {
         return $this->state(fn (array $attributes) => [
-            'locale' => 'lt',
-            'name' => fake()->company().' Vieta',
+            'locale'      => 'lt',
+            'name'        => fake()->company() . ' Vieta',
             'description' => fake()->paragraph(),
-            'slug' => fake()->slug(),
+            'slug'        => fake()->slug(),
         ]);
     }
 }

@@ -19,18 +19,18 @@ final class SystemSettingDependencyTest extends TestCase
         $setting2 = SystemSetting::factory()->create(['key' => 'setting2']);
 
         $dependency = SystemSettingDependency::create([
-            'setting_id' => $setting1->id,
+            'setting_id'            => $setting1->id,
             'depends_on_setting_id' => $setting2->id,
-            'condition' => 'setting2.value == "enabled"',
-            'is_active' => true,
+            'condition'             => 'setting2.value == "enabled"',
+            'is_active'             => true,
         ]);
 
         $this->assertDatabaseHas('system_setting_dependencies', [
-            'id' => $dependency->id,
-            'setting_id' => $setting1->id,
+            'id'                    => $dependency->id,
+            'setting_id'            => $setting1->id,
             'depends_on_setting_id' => $setting2->id,
-            'condition' => 'setting2.value == "enabled"',
-            'is_active' => true,
+            'condition'             => 'setting2.value == "enabled"',
+            'is_active'             => true,
         ]);
     }
 
@@ -71,22 +71,22 @@ final class SystemSettingDependencyTest extends TestCase
         $setting2 = SystemSetting::factory()->create(['key' => 'setting2']);
 
         $dependency = SystemSettingDependency::factory()->create([
-            'setting_id' => $setting1->id,
+            'setting_id'            => $setting1->id,
             'depends_on_setting_id' => $setting2->id,
-            'condition' => 'setting2.value == "enabled"',
-            'is_active' => true,
+            'condition'             => 'setting2.value == "enabled"',
+            'is_active'             => true,
         ]);
 
         $replicated = $dependency->replicate();
-        $replicated->condition = $dependency->condition.' (Copy)';
+        $replicated->condition = $dependency->condition . ' (Copy)';
         $replicated->is_active = false;
         $replicated->save();
 
         $this->assertDatabaseHas('system_setting_dependencies', [
-            'setting_id' => $setting1->id,
+            'setting_id'            => $setting1->id,
             'depends_on_setting_id' => $setting2->id,
-            'condition' => 'setting2.value == "enabled" (Copy)',
-            'is_active' => false,
+            'condition'             => 'setting2.value == "enabled" (Copy)',
+            'is_active'             => false,
         ]);
     }
 
@@ -243,12 +243,12 @@ final class SystemSettingDependencyTest extends TestCase
 
         $dependency1 = SystemSettingDependency::factory()->create([
             'setting_id' => $setting1->id,
-            'condition' => 'setting1.value == "enabled"',
+            'condition'  => 'setting1.value == "enabled"',
         ]);
 
         $dependency2 = SystemSettingDependency::factory()->create([
             'setting_id' => $setting2->id,
-            'condition' => 'setting2.value == "disabled"',
+            'condition'  => 'setting2.value == "disabled"',
         ]);
 
         $searchResults = SystemSettingDependency::search('setting1')->get();

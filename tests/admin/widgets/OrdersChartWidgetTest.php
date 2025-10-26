@@ -52,14 +52,14 @@ class OrdersChartWidgetTest extends TestCase
     {
         // Create sample orders
         Order::factory()->create([
-            'total' => 100.0,
-            'status' => 'completed',
+            'total'      => 100.0,
+            'status'     => 'completed',
             'created_at' => now(),
         ]);
 
         Order::factory()->create([
-            'total' => 50.0,
-            'status' => 'pending',
+            'total'      => 50.0,
+            'status'     => 'pending',
             'created_at' => now()->subMonth(),
         ]);
 
@@ -161,14 +161,14 @@ class OrdersChartWidgetTest extends TestCase
     {
         // Create completed orders for revenue
         Order::factory()->create([
-            'total' => 100.0,
-            'status' => 'completed',
+            'total'      => 100.0,
+            'status'     => 'completed',
             'created_at' => now(),
         ]);
 
         Order::factory()->create([
-            'total' => 50.0,
-            'status' => 'completed',
+            'total'      => 50.0,
+            'status'     => 'completed',
             'created_at' => now()->subMonth(),
         ]);
 
@@ -182,8 +182,8 @@ class OrdersChartWidgetTest extends TestCase
     {
         // Create cancelled orders (should be excluded from revenue)
         Order::factory()->create([
-            'total' => 100.0,
-            'status' => 'cancelled',
+            'total'      => 100.0,
+            'status'     => 'cancelled',
             'created_at' => now(),
         ]);
 

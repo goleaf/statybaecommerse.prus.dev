@@ -35,6 +35,7 @@ final class ActivityLog extends Model
 {
     /** @phpstan-ignore-next-line missingType.generics */
     use HasFactory;
+
     use OrdersByName;
 
     /**

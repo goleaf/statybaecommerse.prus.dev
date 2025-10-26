@@ -14,12 +14,12 @@ use Illuminate\Database\Eloquent\Model;
  * Eloquent model for storing UI interface translations in the database.
  * Provides key-value translation storage for admin interface strings.
  *
- * @property int $id
- * @property string $key
- * @property string $locale
- * @property string $value
- * @property string|null $group
- * @property array|null $metadata
+ * @property int            $id
+ * @property string         $key
+ * @property string         $locale
+ * @property string         $value
+ * @property string|null    $group
+ * @property array|null     $metadata
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
  *

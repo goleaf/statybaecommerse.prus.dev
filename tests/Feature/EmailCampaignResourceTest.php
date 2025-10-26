@@ -34,14 +34,14 @@ class EmailCampaignResourceTest extends TestCase
     public function test_can_create_email_campaign(): void
     {
         $campaignData = [
-            'name' => 'Test Campaign',
-            'description' => 'Test campaign description',
-            'subject' => 'Test Subject',
-            'from_email' => 'test@example.com',
-            'from_name' => 'Test Sender',
-            'reply_to' => 'reply@example.com',
+            'name'         => 'Test Campaign',
+            'description'  => 'Test campaign description',
+            'subject'      => 'Test Subject',
+            'from_email'   => 'test@example.com',
+            'from_name'    => 'Test Sender',
+            'reply_to'     => 'reply@example.com',
             'scheduled_at' => now()->addDay(),
-            'is_active' => true,
+            'is_active'    => true,
         ];
 
         Livewire::test(\App\Filament\Resources\EmailCampaignResource\Pages\CreateEmailCampaign::class)
@@ -50,8 +50,8 @@ class EmailCampaignResourceTest extends TestCase
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('email_campaigns', [
-            'name' => 'Test Campaign',
-            'subject' => 'Test Subject',
+            'name'       => 'Test Campaign',
+            'subject'    => 'Test Subject',
             'from_email' => 'test@example.com',
         ]);
     }
@@ -64,15 +64,15 @@ class EmailCampaignResourceTest extends TestCase
             'record' => $campaign->id,
         ])
             ->fillForm([
-                'name' => 'Updated Campaign Name',
+                'name'    => 'Updated Campaign Name',
                 'subject' => 'Updated Subject',
             ])
             ->call('save')
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('email_campaigns', [
-            'id' => $campaign->id,
-            'name' => 'Updated Campaign Name',
+            'id'      => $campaign->id,
+            'name'    => 'Updated Campaign Name',
             'subject' => 'Updated Subject',
         ]);
     }
@@ -115,8 +115,8 @@ class EmailCampaignResourceTest extends TestCase
     {
         Livewire::test(\App\Filament\Resources\EmailCampaignResource\Pages\CreateEmailCampaign::class)
             ->fillForm([
-                'name' => '',  // Required field
-                'subject' => '',  // Required field
+                'name'       => '',  // Required field
+                'subject'    => '',  // Required field
                 'from_email' => 'invalid-email',  // Invalid email
             ])
             ->call('create')
@@ -199,20 +199,20 @@ class EmailCampaignResourceTest extends TestCase
     public function test_campaign_can_be_sent(): void
     {
         $activeScheduledCampaign = EmailCampaign::factory()->create([
-            'is_active' => true,
-            'status' => 'scheduled',
+            'is_active'    => true,
+            'status'       => 'scheduled',
             'scheduled_at' => now()->subHour(),
         ]);
 
         $inactiveCampaign = EmailCampaign::factory()->create([
-            'is_active' => false,
-            'status' => 'scheduled',
+            'is_active'    => false,
+            'status'       => 'scheduled',
             'scheduled_at' => now()->subHour(),
         ]);
 
         $futureCampaign = EmailCampaign::factory()->create([
-            'is_active' => true,
-            'status' => 'scheduled',
+            'is_active'    => true,
+            'status'       => 'scheduled',
             'scheduled_at' => now()->addHour(),
         ]);
 
@@ -225,10 +225,10 @@ class EmailCampaignResourceTest extends TestCase
     {
         $campaign = EmailCampaign::factory()->create([
             'scheduled_at' => '2024-01-01 10:00:00',
-            'sent_at' => '2024-01-01 11:00:00',
-            'is_active' => '1',
-            'settings' => ['key' => 'value'],
-            'metadata' => ['meta' => 'data'],
+            'sent_at'      => '2024-01-01 11:00:00',
+            'is_active'    => '1',
+            'settings'     => ['key' => 'value'],
+            'metadata'     => ['meta' => 'data'],
         ]);
 
         $this->assertInstanceOf(\Carbon\Carbon::class, $campaign->scheduled_at);
@@ -241,21 +241,21 @@ class EmailCampaignResourceTest extends TestCase
     public function test_campaign_fillable_attributes(): void
     {
         $data = [
-            'name' => 'Test Campaign',
-            'description' => 'Test description',
-            'subject' => 'Test Subject',
-            'content' => 'Test content',
-            'from_email' => 'test@example.com',
-            'from_name' => 'Test Sender',
-            'reply_to' => 'reply@example.com',
+            'name'         => 'Test Campaign',
+            'description'  => 'Test description',
+            'subject'      => 'Test Subject',
+            'content'      => 'Test content',
+            'from_email'   => 'test@example.com',
+            'from_name'    => 'Test Sender',
+            'reply_to'     => 'reply@example.com',
             'scheduled_at' => now(),
-            'sent_at' => now(),
-            'is_active' => true,
-            'status' => 'scheduled',
-            'template_id' => 1,
-            'created_by' => 1,
-            'settings' => ['key' => 'value'],
-            'metadata' => ['meta' => 'data'],
+            'sent_at'      => now(),
+            'is_active'    => true,
+            'status'       => 'scheduled',
+            'template_id'  => 1,
+            'created_by'   => 1,
+            'settings'     => ['key' => 'value'],
+            'metadata'     => ['meta' => 'data'],
         ];
 
         $campaign = EmailCampaign::create($data);

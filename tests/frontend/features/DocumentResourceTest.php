@@ -32,7 +32,7 @@ class DocumentResourceTest extends TestCase
         // Create admin user
         $this->adminUser = User::factory()->create([
             'email' => 'admin@test.com',
-            'name' => 'Admin User',
+            'name'  => 'Admin User',
         ]);
 
         // Ensure role exists and assign it
@@ -41,10 +41,10 @@ class DocumentResourceTest extends TestCase
 
         // Create document template
         $this->template = DocumentTemplate::factory()->create([
-            'name' => 'Invoice Template',
-            'type' => 'invoice',
+            'name'     => 'Invoice Template',
+            'type'     => 'invoice',
             'category' => 'sales',
-            'content' => '<h1>Invoice #$ORDER_NUMBER</h1><p>Customer: $CUSTOMER_NAME</p>',
+            'content'  => '<h1>Invoice #$ORDER_NUMBER</h1><p>Customer: $CUSTOMER_NAME</p>',
         ]);
 
         // Create an order for document association
@@ -68,7 +68,7 @@ class DocumentResourceTest extends TestCase
 
         $documents = Document::factory()->count(3)->create([
             'document_template_id' => $this->template->id,
-            'created_by' => $this->adminUser->id,
+            'created_by'           => $this->adminUser->id,
         ]);
 
         Livewire::test(DocumentResource\Pages\ListDocuments::class)
@@ -92,15 +92,15 @@ class DocumentResourceTest extends TestCase
 
         $newData = [
             'document_template_id' => $this->template->id,
-            'title' => 'Test Document',
-            'status' => 'draft',
-            'format' => 'html',
-            'variables' => [
-                'ORDER_NUMBER' => '12345',
+            'title'                => 'Test Document',
+            'status'               => 'draft',
+            'format'               => 'html',
+            'variables'            => [
+                'ORDER_NUMBER'  => '12345',
                 'CUSTOMER_NAME' => 'John Doe',
             ],
             'documentable_type' => Order::class,
-            'documentable_id' => $this->order->id,
+            'documentable_id'   => $this->order->id,
         ];
 
         Livewire::test(DocumentResource\Pages\CreateDocument::class)
@@ -109,9 +109,9 @@ class DocumentResourceTest extends TestCase
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('documents', [
-            'title' => 'Test Document',
-            'status' => 'draft',
-            'format' => 'html',
+            'title'      => 'Test Document',
+            'status'     => 'draft',
+            'format'     => 'html',
             'created_by' => $this->adminUser->id,
         ]);
     }
@@ -123,7 +123,7 @@ class DocumentResourceTest extends TestCase
 
         Livewire::test(DocumentResource\Pages\CreateDocument::class)
             ->fillForm([
-                'title' => '',
+                'title'                => '',
                 'document_template_id' => null,
             ])
             ->call('create')
@@ -137,7 +137,7 @@ class DocumentResourceTest extends TestCase
 
         $document = Document::factory()->create([
             'document_template_id' => $this->template->id,
-            'created_by' => $this->adminUser->id,
+            'created_by'           => $this->adminUser->id,
         ]);
 
         $response = $this->get(DocumentResource::getUrl('edit', [
@@ -154,17 +154,17 @@ class DocumentResourceTest extends TestCase
 
         $document = Document::factory()->create([
             'document_template_id' => $this->template->id,
-            'created_by' => $this->adminUser->id,
-            'title' => 'Original Document',
-            'status' => 'draft',
+            'created_by'           => $this->adminUser->id,
+            'title'                => 'Original Document',
+            'status'               => 'draft',
         ]);
 
         Livewire::test(DocumentResource\Pages\EditDocument::class, [
             'record' => $document->getRouteKey(),
         ])
             ->assertFormSet([
-                'title' => 'Original Document',
-                'status' => 'draft',
+                'title'                => 'Original Document',
+                'status'               => 'draft',
                 'document_template_id' => $this->template->id,
             ]);
     }
@@ -176,11 +176,11 @@ class DocumentResourceTest extends TestCase
 
         $document = Document::factory()->create([
             'document_template_id' => $this->template->id,
-            'created_by' => $this->adminUser->id,
+            'created_by'           => $this->adminUser->id,
         ]);
 
         $newData = [
-            'title' => 'Updated Document Title',
+            'title'  => 'Updated Document Title',
             'status' => 'published',
             'format' => 'pdf',
         ];
@@ -208,7 +208,7 @@ class DocumentResourceTest extends TestCase
 
         $document = Document::factory()->create([
             'document_template_id' => $this->template->id,
-            'created_by' => $this->adminUser->id,
+            'created_by'           => $this->adminUser->id,
         ]);
 
         Livewire::test(DocumentResource\Pages\EditDocument::class, [
@@ -227,8 +227,8 @@ class DocumentResourceTest extends TestCase
 
         $document = Document::factory()->create([
             'document_template_id' => $this->template->id,
-            'created_by' => $this->adminUser->id,
-            'title' => 'View Test Document',
+            'created_by'           => $this->adminUser->id,
+            'title'                => 'View Test Document',
         ]);
 
         $response = $this->get(DocumentResource::getUrl('view', [
@@ -250,12 +250,12 @@ class DocumentResourceTest extends TestCase
 
         $invoiceDocument = Document::factory()->create([
             'document_template_id' => $this->template->id,
-            'created_by' => $this->adminUser->id,
+            'created_by'           => $this->adminUser->id,
         ]);
 
         $receiptDocument = Document::factory()->create([
             'document_template_id' => $otherTemplate->id,
-            'created_by' => $this->adminUser->id,
+            'created_by'           => $this->adminUser->id,
         ]);
 
         Livewire::test(DocumentResource\Pages\ListDocuments::class)
@@ -271,14 +271,14 @@ class DocumentResourceTest extends TestCase
 
         $draftDocument = Document::factory()->create([
             'document_template_id' => $this->template->id,
-            'created_by' => $this->adminUser->id,
-            'status' => 'draft',
+            'created_by'           => $this->adminUser->id,
+            'status'               => 'draft',
         ]);
 
         $publishedDocument = Document::factory()->create([
             'document_template_id' => $this->template->id,
-            'created_by' => $this->adminUser->id,
-            'status' => 'published',
+            'created_by'           => $this->adminUser->id,
+            'status'               => 'published',
         ]);
 
         Livewire::test(DocumentResource\Pages\ListDocuments::class)
@@ -294,14 +294,14 @@ class DocumentResourceTest extends TestCase
 
         $searchableDocument = Document::factory()->create([
             'document_template_id' => $this->template->id,
-            'created_by' => $this->adminUser->id,
-            'title' => 'Unique Document Title',
+            'created_by'           => $this->adminUser->id,
+            'title'                => 'Unique Document Title',
         ]);
 
         $otherDocument = Document::factory()->create([
             'document_template_id' => $this->template->id,
-            'created_by' => $this->adminUser->id,
-            'title' => 'Different Title',
+            'created_by'           => $this->adminUser->id,
+            'title'                => 'Different Title',
         ]);
 
         Livewire::test(DocumentResource\Pages\ListDocuments::class)
@@ -317,7 +317,7 @@ class DocumentResourceTest extends TestCase
 
         $documents = Document::factory()->count(3)->create([
             'document_template_id' => $this->template->id,
-            'created_by' => $this->adminUser->id,
+            'created_by'           => $this->adminUser->id,
         ]);
 
         Livewire::test(DocumentResource\Pages\ListDocuments::class)
@@ -337,9 +337,9 @@ class DocumentResourceTest extends TestCase
 
         $document = Document::factory()->create([
             'document_template_id' => $this->template->id,
-            'created_by' => $this->adminUser->id,
-            'format' => 'html',
-            'content' => '<h1>Test PDF Content</h1>',
+            'created_by'           => $this->adminUser->id,
+            'format'               => 'html',
+            'content'              => '<h1>Test PDF Content</h1>',
         ]);
 
         Livewire::test(DocumentResource\Pages\ListDocuments::class)
@@ -357,9 +357,9 @@ class DocumentResourceTest extends TestCase
 
         $document = Document::factory()->create([
             'document_template_id' => $this->template->id,
-            'created_by' => $this->adminUser->id,
-            'format' => 'pdf',
-            'file_path' => 'documents/test.pdf',
+            'created_by'           => $this->adminUser->id,
+            'format'               => 'pdf',
+            'file_path'            => 'documents/test.pdf',
         ]);
 
         // Test that the download action is visible for PDF documents
@@ -374,9 +374,9 @@ class DocumentResourceTest extends TestCase
 
         Livewire::test(DocumentResource\Pages\CreateDocument::class)
             ->fillForm([
-                'title' => 'Test Document',
+                'title'                => 'Test Document',
                 'document_template_id' => $this->template->id,
-                'variables' => 'invalid-json-format',
+                'variables'            => 'invalid-json-format',
             ])
             ->call('create')
             ->assertHasFormErrors(['variables']);
@@ -389,8 +389,8 @@ class DocumentResourceTest extends TestCase
 
         $document = Document::factory()->create([
             'document_template_id' => $this->template->id,
-            'created_by' => $this->adminUser->id,
-            'status' => 'draft',
+            'created_by'           => $this->adminUser->id,
+            'status'               => 'draft',
         ]);
 
         Livewire::test(DocumentResource\Pages\EditDocument::class, [
@@ -410,11 +410,11 @@ class DocumentResourceTest extends TestCase
 
         $newData = [
             'document_template_id' => $this->template->id,
-            'title' => 'Associated Document',
-            'status' => 'draft',
-            'format' => 'html',
-            'documentable_type' => Order::class,
-            'documentable_id' => $this->order->id,
+            'title'                => 'Associated Document',
+            'status'               => 'draft',
+            'format'               => 'html',
+            'documentable_type'    => Order::class,
+            'documentable_id'      => $this->order->id,
         ];
 
         Livewire::test(DocumentResource\Pages\CreateDocument::class)

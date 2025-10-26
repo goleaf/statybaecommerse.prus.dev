@@ -6,17 +6,17 @@ use App\Models\Product;
 
 it('feature: returns displayable products from the search use case', function (): void {
     $matching = Product::factory()->create([
-        'name' => 'Profesionalus plaktukas',
-        'slug' => 'profesionalus-plaktukas',
+        'name'       => 'Profesionalus plaktukas',
+        'slug'       => 'profesionalus-plaktukas',
         'is_visible' => true,
-        'price' => 120.0,
+        'price'      => 120.0,
     ]);
 
     Product::factory()->create([
-        'name' => 'Paslėptas įrankis',
-        'slug' => 'pasleptas-irankis',
+        'name'       => 'Paslėptas įrankis',
+        'slug'       => 'pasleptas-irankis',
         'is_visible' => false,
-        'price' => 99.0,
+        'price'      => 99.0,
     ]);
 
     $response = $this->getJson('/api/products/search?q=plaktukas&limit=5');

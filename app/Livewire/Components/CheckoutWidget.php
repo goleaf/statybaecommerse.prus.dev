@@ -16,8 +16,8 @@ use Livewire\Component;
  *
  * Livewire component for CheckoutWidget with reactive frontend functionality, real-time updates, and user interaction handling.
  *
- * @property int $currentStep
- * @property int $totalSteps
+ * @property int    $currentStep
+ * @property int    $totalSteps
  * @property string $firstName
  * @property string $lastName
  * @property string $email
@@ -26,20 +26,20 @@ use Livewire\Component;
  * @property string $billingCity
  * @property string $billingPostalCode
  * @property string $billingCountry
- * @property bool $sameAsBilling
+ * @property bool   $sameAsBilling
  * @property string $shippingAddress
  * @property string $shippingCity
  * @property string $shippingPostalCode
  * @property string $shippingCountry
  * @property string $paymentMethod
- * @property bool $agreeToTerms
- * @property bool $subscribeNewsletter
- * @property array $cartItems
- * @property float $subtotal
- * @property float $taxAmount
- * @property float $shippingAmount
- * @property float $discountAmount
- * @property float $total
+ * @property bool   $agreeToTerms
+ * @property bool   $subscribeNewsletter
+ * @property array  $cartItems
+ * @property float  $subtotal
+ * @property float  $taxAmount
+ * @property float  $shippingAmount
+ * @property float  $discountAmount
+ * @property float  $total
  */
 final class CheckoutWidget extends Component
 {

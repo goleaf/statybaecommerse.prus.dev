@@ -17,7 +17,7 @@ final class NotificationSeeder extends Seeder
 
         if ($users->isEmpty()) {
             $users = collect([User::factory()->create([
-                'name' => 'Test User',
+                'name'  => 'Test User',
                 'email' => 'test@example.com',
             ])]);
         }
@@ -67,7 +67,7 @@ final class NotificationSeeder extends Seeder
             $this->createSupportNotifications($user);
         }
 
-        $this->command->info('Created '.Notification::count().' notifications for '.$users->count().' users.');
+        $this->command->info('Created ' . Notification::count() . ' notifications for ' . $users->count() . ' users.');
     }
 
     private function createOrderNotifications(User $user): void
@@ -83,7 +83,7 @@ final class NotificationSeeder extends Seeder
             Notification::factory()
                 ->for($user, 'notifiable')
                 ->state([
-                    'data' => $notificationData,
+                    'data'       => $notificationData,
                     'created_at' => fake()->dateTimeBetween('-30 days', 'now'),
                 ])
                 ->ofType('order')
@@ -103,7 +103,7 @@ final class NotificationSeeder extends Seeder
             Notification::factory()
                 ->for($user, 'notifiable')
                 ->state([
-                    'data' => $notificationData,
+                    'data'       => $notificationData,
                     'created_at' => fake()->dateTimeBetween('-30 days', 'now'),
                 ])
                 ->ofType('product')
@@ -122,7 +122,7 @@ final class NotificationSeeder extends Seeder
             Notification::factory()
                 ->for($user, 'notifiable')
                 ->state([
-                    'data' => $notificationData,
+                    'data'       => $notificationData,
                     'created_at' => fake()->dateTimeBetween('-30 days', 'now'),
                 ])
                 ->ofType('user')
@@ -142,7 +142,7 @@ final class NotificationSeeder extends Seeder
             Notification::factory()
                 ->for($user, 'notifiable')
                 ->state([
-                    'data' => $notificationData,
+                    'data'       => $notificationData,
                     'created_at' => fake()->dateTimeBetween('-30 days', 'now'),
                 ])
                 ->ofType('system')
@@ -162,7 +162,7 @@ final class NotificationSeeder extends Seeder
             Notification::factory()
                 ->for($user, 'notifiable')
                 ->state([
-                    'data' => $notificationData,
+                    'data'       => $notificationData,
                     'created_at' => fake()->dateTimeBetween('-30 days', 'now'),
                 ])
                 ->ofType('payment')
@@ -182,7 +182,7 @@ final class NotificationSeeder extends Seeder
             Notification::factory()
                 ->for($user, 'notifiable')
                 ->state([
-                    'data' => $notificationData,
+                    'data'       => $notificationData,
                     'created_at' => fake()->dateTimeBetween('-30 days', 'now'),
                 ])
                 ->ofType('shipping')
@@ -201,7 +201,7 @@ final class NotificationSeeder extends Seeder
             Notification::factory()
                 ->for($user, 'notifiable')
                 ->state([
-                    'data' => $notificationData,
+                    'data'       => $notificationData,
                     'created_at' => fake()->dateTimeBetween('-30 days', 'now'),
                 ])
                 ->ofType('review')
@@ -220,7 +220,7 @@ final class NotificationSeeder extends Seeder
             Notification::factory()
                 ->for($user, 'notifiable')
                 ->state([
-                    'data' => $notificationData,
+                    'data'       => $notificationData,
                     'created_at' => fake()->dateTimeBetween('-30 days', 'now'),
                 ])
                 ->ofType('promotion')
@@ -239,7 +239,7 @@ final class NotificationSeeder extends Seeder
             Notification::factory()
                 ->for($user, 'notifiable')
                 ->state([
-                    'data' => $notificationData,
+                    'data'       => $notificationData,
                     'created_at' => fake()->dateTimeBetween('-30 days', 'now'),
                 ])
                 ->ofType('newsletter')
@@ -258,7 +258,7 @@ final class NotificationSeeder extends Seeder
             Notification::factory()
                 ->for($user, 'notifiable')
                 ->state([
-                    'data' => $notificationData,
+                    'data'       => $notificationData,
                     'created_at' => fake()->dateTimeBetween('-30 days', 'now'),
                 ])
                 ->ofType('support')

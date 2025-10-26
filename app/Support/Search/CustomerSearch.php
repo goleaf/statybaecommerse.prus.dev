@@ -116,8 +116,7 @@ final class CustomerSearch
     }
 
     /**
-     * @param array<int, string> $columns
-     *
+     * @param  array<int, string> $columns
      * @return array<int, string>
      */
     private static function searchableColumns(array $columns): array

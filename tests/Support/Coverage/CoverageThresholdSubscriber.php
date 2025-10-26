@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace Tests\Support\Coverage;
 
+use function in_array;
+
 use PHPUnit\Event\TestRunner\ExecutionFinished;
 use PHPUnit\Event\TestRunner\ExecutionFinishedSubscriber;
 use PHPUnit\Runner\CodeCoverage as RunnerCodeCoverage;
 use RuntimeException;
 use SebastianBergmann\CodeCoverage\CodeCoverage as CoverageData;
 
-use function in_array;
 use function sprintf;
 
 final class CoverageThresholdSubscriber implements ExecutionFinishedSubscriber

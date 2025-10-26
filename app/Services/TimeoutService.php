@@ -6,6 +6,7 @@ namespace App\Services;
 
 use Illuminate\Support\Carbon;
 use Illuminate\Support\LazyCollection;
+use Log;
 
 /**
  * TimeoutService
@@ -102,6 +103,6 @@ final class TimeoutService
     {
         $remainingTime = self::getRemainingTime($timeout);
         $isTimeoutReached = self::isTimeoutReached($timeout);
-        \Log::info("Timeout Service - {$operation}", ['processed_count' => $processedCount, 'total_count' => $totalCount, 'remaining_seconds' => $remainingTime, 'timeout_reached' => $isTimeoutReached, 'completion_percentage' => $totalCount ? round($processedCount / $totalCount * 100, 2) : null]);
+        Log::info("Timeout Service - {$operation}", ['processed_count' => $processedCount, 'total_count' => $totalCount, 'remaining_seconds' => $remainingTime, 'timeout_reached' => $isTimeoutReached, 'completion_percentage' => $totalCount ? round($processedCount / $totalCount * 100, 2) : null]);
     }
 }

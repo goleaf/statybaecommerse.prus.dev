@@ -16,10 +16,10 @@ final class ExportWriterFactory
     public function make(ExportFormat $format): ExportWriter
     {
         return match ($format) {
-            ExportFormat::CSV => new CsvExportWriter(),
-            ExportFormat::XLSX => new XlsxExportWriter(),
-            ExportFormat::PDF => new PdfExportWriter(),
-            default => throw new InvalidArgumentException("Unsupported export format: {$format->value}"),
+            ExportFormat::CSV  => new CsvExportWriter,
+            ExportFormat::XLSX => new XlsxExportWriter,
+            ExportFormat::PDF  => new PdfExportWriter,
+            default            => throw new InvalidArgumentException("Unsupported export format: {$format->value}"),
         };
     }
 }

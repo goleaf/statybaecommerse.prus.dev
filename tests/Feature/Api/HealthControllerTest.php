@@ -22,15 +22,16 @@ it('returns ok health payload with cache-control headers', function (): void {
 });
 
 it('returns 503 when reporter indicates failure', function (): void {
-    $fake = new class implements HealthReporterContract {
+    $fake = new class implements HealthReporterContract
+    {
         public function report(bool $includeQueue = false): array
         {
             return [
                 'status' => 'error',
                 'checks' => [
                     'database' => ['status' => 'failed', 'latency_ms' => 0.12, 'message' => 'boom'],
-                    'cache' => ['status' => 'ok', 'latency_ms' => 0.01],
-                    'disk' => ['status' => 'ok', 'latency_ms' => 0.02],
+                    'cache'    => ['status' => 'ok', 'latency_ms' => 0.01],
+                    'disk'     => ['status' => 'ok', 'latency_ms' => 0.02],
                 ],
                 'timestamp' => now()->toIso8601String(),
             ];

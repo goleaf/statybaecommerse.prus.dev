@@ -22,7 +22,7 @@ final class DiscountConditionResourceTest extends TestCase
         parent::setUp();
 
         $this->adminUser = User::factory()->create([
-            'email' => 'admin@test.com',
+            'email'    => 'admin@test.com',
             'is_admin' => true,
         ]);
     }
@@ -50,23 +50,23 @@ final class DiscountConditionResourceTest extends TestCase
         $this->actingAs($this->adminUser)
             ->post('/admin/discount-conditions', [
                 'discount_id' => $discount->id,
-                'type' => 'cart_total',
-                'operator' => 'greater_than',
-                'value' => 100,
-                'position' => 1,
-                'is_active' => true,
-                'priority' => 5,
+                'type'        => 'cart_total',
+                'operator'    => 'greater_than',
+                'value'       => 100,
+                'position'    => 1,
+                'is_active'   => true,
+                'priority'    => 5,
             ])
             ->assertRedirect();
 
         $this->assertDatabaseHas('discount_conditions', [
             'discount_id' => $discount->id,
-            'type' => 'cart_total',
-            'operator' => 'greater_than',
-            'value' => json_encode(100),
-            'position' => 1,
-            'is_active' => true,
-            'priority' => 5,
+            'type'        => 'cart_total',
+            'operator'    => 'greater_than',
+            'value'       => json_encode(100),
+            'position'    => 1,
+            'is_active'   => true,
+            'priority'    => 5,
         ]);
     }
 
@@ -94,23 +94,23 @@ final class DiscountConditionResourceTest extends TestCase
         $this->actingAs($this->adminUser)
             ->put("/admin/discount-conditions/{$condition->id}", [
                 'discount_id' => $discount->id,
-                'type' => 'product',
-                'operator' => 'contains',
-                'value' => 'test',
-                'position' => 2,
-                'is_active' => false,
-                'priority' => 10,
+                'type'        => 'product',
+                'operator'    => 'contains',
+                'value'       => 'test',
+                'position'    => 2,
+                'is_active'   => false,
+                'priority'    => 10,
             ])
             ->assertRedirect();
 
         $this->assertDatabaseHas('discount_conditions', [
-            'id' => $condition->id,
-            'type' => 'product',
-            'operator' => 'contains',
-            'value' => json_encode('test'),
-            'position' => 2,
+            'id'        => $condition->id,
+            'type'      => 'product',
+            'operator'  => 'contains',
+            'value'     => json_encode('test'),
+            'position'  => 2,
             'is_active' => false,
-            'priority' => 10,
+            'priority'  => 10,
         ]);
     }
 
@@ -175,12 +175,12 @@ final class DiscountConditionResourceTest extends TestCase
             ->assertRedirect();
 
         $this->assertDatabaseHas('discount_conditions', [
-            'id' => $condition1->id,
+            'id'        => $condition1->id,
             'is_active' => true,
         ]);
 
         $this->assertDatabaseHas('discount_conditions', [
-            'id' => $condition2->id,
+            'id'        => $condition2->id,
             'is_active' => true,
         ]);
     }
@@ -197,12 +197,12 @@ final class DiscountConditionResourceTest extends TestCase
             ->assertRedirect();
 
         $this->assertDatabaseHas('discount_conditions', [
-            'id' => $condition1->id,
+            'id'        => $condition1->id,
             'is_active' => false,
         ]);
 
         $this->assertDatabaseHas('discount_conditions', [
-            'id' => $condition2->id,
+            'id'        => $condition2->id,
             'is_active' => false,
         ]);
     }
@@ -215,17 +215,17 @@ final class DiscountConditionResourceTest extends TestCase
         $this->actingAs($this->adminUser)
             ->post('/admin/discount-conditions/bulk-set-priority', [
                 'selectedItems' => [$condition1->id, $condition2->id],
-                'priority' => 10,
+                'priority'      => 10,
             ])
             ->assertRedirect();
 
         $this->assertDatabaseHas('discount_conditions', [
-            'id' => $condition1->id,
+            'id'       => $condition1->id,
             'priority' => 10,
         ]);
 
         $this->assertDatabaseHas('discount_conditions', [
-            'id' => $condition2->id,
+            'id'       => $condition2->id,
             'priority' => 10,
         ]);
     }
@@ -233,9 +233,9 @@ final class DiscountConditionResourceTest extends TestCase
     public function test_can_test_condition(): void
     {
         $condition = DiscountCondition::factory()->create([
-            'type' => 'cart_total',
-            'operator' => 'greater_than',
-            'value' => 100,
+            'type'      => 'cart_total',
+            'operator'  => 'greater_than',
+            'value'     => 100,
             'is_active' => true,
         ]);
 
@@ -245,7 +245,7 @@ final class DiscountConditionResourceTest extends TestCase
             ])
             ->assertOk()
             ->assertJson([
-                'matches' => true,
+                'matches'  => true,
                 'is_valid' => true,
             ]);
     }
@@ -256,22 +256,22 @@ final class DiscountConditionResourceTest extends TestCase
 
         $this->actingAs($this->adminUser)
             ->post('/admin/discount-conditions', [
-                'discount_id' => $discount->id,
-                'type' => 'cart_total',
-                'operator' => 'greater_than',
-                'value' => 100,
-                'position' => 1,
-                'is_active' => true,
-                'priority' => 5,
+                'discount_id'  => $discount->id,
+                'type'         => 'cart_total',
+                'operator'     => 'greater_than',
+                'value'        => 100,
+                'position'     => 1,
+                'is_active'    => true,
+                'priority'     => 5,
                 'translations' => [
                     [
-                        'locale' => 'lt',
-                        'name' => 'Krepšelio suma',
+                        'locale'      => 'lt',
+                        'name'        => 'Krepšelio suma',
                         'description' => 'Sąlyga krepšelio sumai',
                     ],
                     [
-                        'locale' => 'en',
-                        'name' => 'Cart Total',
+                        'locale'      => 'en',
+                        'name'        => 'Cart Total',
                         'description' => 'Condition for cart total',
                     ],
                 ],
@@ -282,14 +282,14 @@ final class DiscountConditionResourceTest extends TestCase
 
         $this->assertDatabaseHas('discount_condition_translations', [
             'discount_condition_id' => $condition->id,
-            'locale' => 'lt',
-            'name' => 'Krepšelio suma',
+            'locale'                => 'lt',
+            'name'                  => 'Krepšelio suma',
         ]);
 
         $this->assertDatabaseHas('discount_condition_translations', [
             'discount_condition_id' => $condition->id,
-            'locale' => 'en',
-            'name' => 'Cart Total',
+            'locale'                => 'en',
+            'name'                  => 'Cart Total',
         ]);
     }
 
@@ -300,23 +300,23 @@ final class DiscountConditionResourceTest extends TestCase
 
         DiscountConditionTranslation::factory()->create([
             'discount_condition_id' => $condition->id,
-            'locale' => 'lt',
-            'name' => 'Old Name',
+            'locale'                => 'lt',
+            'name'                  => 'Old Name',
         ]);
 
         $this->actingAs($this->adminUser)
             ->put("/admin/discount-conditions/{$condition->id}", [
-                'discount_id' => $discount->id,
-                'type' => 'cart_total',
-                'operator' => 'greater_than',
-                'value' => 100,
-                'position' => 1,
-                'is_active' => true,
-                'priority' => 5,
+                'discount_id'  => $discount->id,
+                'type'         => 'cart_total',
+                'operator'     => 'greater_than',
+                'value'        => 100,
+                'position'     => 1,
+                'is_active'    => true,
+                'priority'     => 5,
                 'translations' => [
                     [
-                        'locale' => 'lt',
-                        'name' => 'New Name',
+                        'locale'      => 'lt',
+                        'name'        => 'New Name',
                         'description' => 'New Description',
                     ],
                 ],
@@ -325,9 +325,9 @@ final class DiscountConditionResourceTest extends TestCase
 
         $this->assertDatabaseHas('discount_condition_translations', [
             'discount_condition_id' => $condition->id,
-            'locale' => 'lt',
-            'name' => 'New Name',
-            'description' => 'New Description',
+            'locale'                => 'lt',
+            'name'                  => 'New Name',
+            'description'           => 'New Description',
         ]);
     }
 
@@ -335,9 +335,9 @@ final class DiscountConditionResourceTest extends TestCase
     {
         $this->actingAs($this->adminUser)
             ->post('/admin/discount-conditions', [
-                'type' => 'cart_total',
+                'type'     => 'cart_total',
                 'operator' => 'greater_than',
-                'value' => 100,
+                'value'    => 100,
             ])
             ->assertSessionHasErrors(['discount_id']);
     }
@@ -349,8 +349,8 @@ final class DiscountConditionResourceTest extends TestCase
         $this->actingAs($this->adminUser)
             ->post('/admin/discount-conditions', [
                 'discount_id' => $discount->id,
-                'operator' => 'greater_than',
-                'value' => 100,
+                'operator'    => 'greater_than',
+                'value'       => 100,
             ])
             ->assertSessionHasErrors(['type']);
     }
@@ -362,8 +362,8 @@ final class DiscountConditionResourceTest extends TestCase
         $this->actingAs($this->adminUser)
             ->post('/admin/discount-conditions', [
                 'discount_id' => $discount->id,
-                'type' => 'cart_total',
-                'value' => 100,
+                'type'        => 'cart_total',
+                'value'       => 100,
             ])
             ->assertSessionHasErrors(['operator']);
     }
@@ -375,8 +375,8 @@ final class DiscountConditionResourceTest extends TestCase
         $this->actingAs($this->adminUser)
             ->post('/admin/discount-conditions', [
                 'discount_id' => $discount->id,
-                'type' => 'cart_total',
-                'operator' => 'greater_than',
+                'type'        => 'cart_total',
+                'operator'    => 'greater_than',
             ])
             ->assertSessionHasErrors(['value']);
     }

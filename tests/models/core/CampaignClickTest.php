@@ -183,11 +183,11 @@ class CampaignClickTest extends TestCase
     {
         $click = CampaignClick::factory()->create();
         CampaignConversion::factory()->create([
-            'click_id' => $click->id,
+            'click_id'         => $click->id,
             'conversion_value' => 100.50,
         ]);
         CampaignConversion::factory()->create([
-            'click_id' => $click->id,
+            'click_id'         => $click->id,
             'conversion_value' => 50.25,
         ]);
 
@@ -210,8 +210,8 @@ class CampaignClickTest extends TestCase
     public function test_campaign_click_get_location_info(): void
     {
         $click = CampaignClick::factory()->create([
-            'country' => 'Lithuania',
-            'city' => 'Vilnius',
+            'country'    => 'Lithuania',
+            'city'       => 'Vilnius',
             'ip_address' => '192.168.1.1',
         ]);
 
@@ -226,9 +226,9 @@ class CampaignClickTest extends TestCase
     {
         $click = CampaignClick::factory()->create([
             'device_type' => 'mobile',
-            'browser' => 'chrome',
-            'os' => 'android',
-            'user_agent' => 'Mozilla/5.0...',
+            'browser'     => 'chrome',
+            'os'          => 'android',
+            'user_agent'  => 'Mozilla/5.0...',
         ]);
 
         $deviceInfo = $click->getDeviceInfo();
@@ -242,10 +242,10 @@ class CampaignClickTest extends TestCase
     public function test_campaign_click_casts(): void
     {
         $click = CampaignClick::factory()->create([
-            'clicked_at' => '2024-01-01 12:00:00',
+            'clicked_at'       => '2024-01-01 12:00:00',
             'conversion_value' => '100.50',
-            'is_converted' => '1',
-            'conversion_data' => '{"key": "value"}',
+            'is_converted'     => '1',
+            'conversion_data'  => '{"key": "value"}',
         ]);
 
         $this->assertInstanceOf(\Carbon\Carbon::class, $click->clicked_at);

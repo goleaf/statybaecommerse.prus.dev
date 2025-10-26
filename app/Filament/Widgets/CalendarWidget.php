@@ -20,11 +20,11 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
-use Filament\Forms\Set;
 use Filament\Schemas\Components\Component as SchemaComponent;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
+use LogicException;
 use Saade\FilamentFullCalendar\Actions;
 use Saade\FilamentFullCalendar\Data\EventData;
 use Saade\FilamentFullCalendar\Widgets\FullCalendarWidget;
@@ -34,7 +34,7 @@ final class CalendarWidget extends FullCalendarWidget
     public Model|string|null $model = Campaign::class;
 
     /**
-     * @param array{start?: string, end?: string, timezone?: string} $fetchInfo
+     * @param  array{start?: string, end?: string, timezone?: string} $fetchInfo
      * @return array<int, array<string, mixed>>
      */
     public function fetchEvents(array $fetchInfo): array
@@ -74,7 +74,7 @@ final class CalendarWidget extends FullCalendarWidget
                 $key = $campaign->getKey();
 
                 if (! is_int($key) && ! is_string($key)) {
-                    throw new \LogicException('Campaign identifier must be a scalar value.');
+                    throw new LogicException('Campaign identifier must be a scalar value.');
                 }
 
                 $color = $this->resolveStatusColor($campaign->status);

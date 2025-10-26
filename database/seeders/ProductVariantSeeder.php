@@ -33,14 +33,14 @@ final class ProductVariantSeeder extends Seeder
         // Create size attribute using factory
         $sizeAttribute = Attribute::factory()
             ->state([
-                'slug' => 'size',
-                'name' => 'Size',
-                'type' => 'select',
-                'is_required' => true,
+                'slug'          => 'size',
+                'name'          => 'Size',
+                'type'          => 'select',
+                'is_required'   => true,
                 'is_filterable' => true,
                 'is_searchable' => false,
-                'is_enabled' => true,
-                'sort_order' => 1,
+                'is_enabled'    => true,
+                'sort_order'    => 1,
             ])
             ->create();
 
@@ -57,25 +57,25 @@ final class ProductVariantSeeder extends Seeder
             AttributeValue::factory()
                 ->for($sizeAttribute)
                 ->state([
-                    'value' => $size['value'],
-                    'slug' => Str::slug($size['value']),
+                    'value'         => $size['value'],
+                    'slug'          => Str::slug($size['value']),
                     'display_value' => $size['display'],
-                    'sort_order' => $size['sort_order'],
-                    'is_enabled' => true,
+                    'sort_order'    => $size['sort_order'],
+                    'is_enabled'    => true,
                 ])
                 ->create();
         }
 
         $colorAttribute = Attribute::factory()
             ->state([
-                'slug' => 'color',
-                'name' => 'Color',
-                'type' => 'select',
-                'is_required' => false,
+                'slug'          => 'color',
+                'name'          => 'Color',
+                'type'          => 'select',
+                'is_required'   => false,
                 'is_filterable' => true,
                 'is_searchable' => false,
-                'is_enabled' => true,
-                'sort_order' => 2,
+                'is_enabled'    => true,
+                'sort_order'    => 2,
             ])
             ->create();
 
@@ -94,9 +94,9 @@ final class ProductVariantSeeder extends Seeder
             AttributeValue::factory()
                 ->for($colorAttribute)
                 ->state([
-                    'value' => $color['value'],
-                    'slug' => Str::slug($color['value']),
-                    'hex_color' => $color['hex'],
+                    'value'      => $color['value'],
+                    'slug'       => Str::slug($color['value']),
+                    'hex_color'  => $color['hex'],
                     'sort_order' => $color['sort_order'],
                     'is_enabled' => true,
                 ])
@@ -105,14 +105,14 @@ final class ProductVariantSeeder extends Seeder
 
         $materialAttribute = Attribute::factory()
             ->state([
-                'slug' => 'material',
-                'name' => 'Material',
-                'type' => 'select',
-                'is_required' => false,
+                'slug'          => 'material',
+                'name'          => 'Material',
+                'type'          => 'select',
+                'is_required'   => false,
                 'is_filterable' => true,
                 'is_searchable' => false,
-                'is_enabled' => true,
-                'sort_order' => 3,
+                'is_enabled'    => true,
+                'sort_order'    => 3,
             ])
             ->create();
 
@@ -129,8 +129,8 @@ final class ProductVariantSeeder extends Seeder
             AttributeValue::factory()
                 ->for($materialAttribute)
                 ->state([
-                    'value' => $material['value'],
-                    'slug' => Str::slug($material['value']),
+                    'value'      => $material['value'],
+                    'slug'       => Str::slug($material['value']),
                     'sort_order' => $material['sort_order'],
                     'is_enabled' => true,
                 ])
@@ -153,10 +153,10 @@ final class ProductVariantSeeder extends Seeder
                 // Only create if no brands exist at all
                 $brand = Brand::factory()
                     ->state([
-                        'slug' => 'fashion-brand',
-                        'name' => 'Fashion Brand',
+                        'slug'        => 'fashion-brand',
+                        'name'        => 'Fashion Brand',
                         'description' => 'Premium fashion brand',
-                        'is_enabled' => true,
+                        'is_enabled'  => true,
                     ])
                     ->create();
             }
@@ -164,20 +164,20 @@ final class ProductVariantSeeder extends Seeder
 
         $category = Category::factory()
             ->state([
-                'slug' => 'clothing',
-                'name' => 'Clothing',
+                'slug'        => 'clothing',
+                'name'        => 'Clothing',
                 'description' => 'Clothing category',
-                'is_enabled' => true,
-                'is_visible' => true,
+                'is_enabled'  => true,
+                'is_visible'  => true,
             ])
             ->create();
 
         $products = [
             [
-                'name' => 'Premium T-Shirt',
+                'name'        => 'Premium T-Shirt',
                 'description' => 'High-quality cotton t-shirt with modern design',
-                'base_price' => 29.99,
-                'variants' => [
+                'base_price'  => 29.99,
+                'variants'    => [
                     ['size' => 'S', 'price_modifier' => 0, 'stock' => 50],
                     ['size' => 'M', 'price_modifier' => 0, 'stock' => 75],
                     ['size' => 'L', 'price_modifier' => 2.0, 'stock' => 60],
@@ -186,10 +186,10 @@ final class ProductVariantSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Designer Jeans',
+                'name'        => 'Designer Jeans',
                 'description' => 'Premium denim jeans with perfect fit',
-                'base_price' => 89.99,
-                'variants' => [
+                'base_price'  => 89.99,
+                'variants'    => [
                     ['size' => '28', 'price_modifier' => 0, 'stock' => 30],
                     ['size' => '30', 'price_modifier' => 0, 'stock' => 45],
                     ['size' => '32', 'price_modifier' => 0, 'stock' => 55],
@@ -199,10 +199,10 @@ final class ProductVariantSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Luxury Jacket',
+                'name'        => 'Luxury Jacket',
                 'description' => 'High-end leather jacket for all seasons',
-                'base_price' => 299.99,
-                'variants' => [
+                'base_price'  => 299.99,
+                'variants'    => [
                     ['size' => 'S', 'price_modifier' => 0, 'stock' => 20],
                     ['size' => 'M', 'price_modifier' => 0, 'stock' => 25],
                     ['size' => 'L', 'price_modifier' => 20.0, 'stock' => 20],
@@ -211,10 +211,10 @@ final class ProductVariantSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Sports Shoes',
+                'name'        => 'Sports Shoes',
                 'description' => 'Comfortable athletic shoes for running and training',
-                'base_price' => 129.99,
-                'variants' => [
+                'base_price'  => 129.99,
+                'variants'    => [
                     ['size' => '36', 'price_modifier' => 0, 'stock' => 40],
                     ['size' => '37', 'price_modifier' => 0, 'stock' => 45],
                     ['size' => '38', 'price_modifier' => 0, 'stock' => 50],
@@ -228,10 +228,10 @@ final class ProductVariantSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Elegant Dress',
+                'name'        => 'Elegant Dress',
                 'description' => 'Beautiful evening dress for special occasions',
-                'base_price' => 199.99,
-                'variants' => [
+                'base_price'  => 199.99,
+                'variants'    => [
                     ['size' => 'XS', 'price_modifier' => 0, 'stock' => 15],
                     ['size' => 'S', 'price_modifier' => 0, 'stock' => 20],
                     ['size' => 'M', 'price_modifier' => 0, 'stock' => 25],
@@ -247,19 +247,19 @@ final class ProductVariantSeeder extends Seeder
                 ->for($brand)
                 ->hasAttached($category)
                 ->state([
-                    'name' => $productData['name'],
-                    'slug' => Str::slug($productData['name']),
-                    'description' => $productData['description'],
+                    'name'              => $productData['name'],
+                    'slug'              => Str::slug($productData['name']),
+                    'description'       => $productData['description'],
                     'short_description' => substr($productData['description'], 0, 100),
-                    'price' => $productData['base_price'],
-                    'compare_price' => $productData['base_price'] * 1.2,
-                    'cost_price' => $productData['base_price'] * 0.6,
-                    'manage_stock' => true,
-                    'stock_quantity' => 0,
-                    'type' => 'variable',
-                    'is_visible' => true,
-                    'is_featured' => true,
-                    'published_at' => now(),
+                    'price'             => $productData['base_price'],
+                    'compare_price'     => $productData['base_price'] * 1.2,
+                    'cost_price'        => $productData['base_price'] * 0.6,
+                    'manage_stock'      => true,
+                    'stock_quantity'    => 0,
+                    'type'              => 'variable',
+                    'is_visible'        => true,
+                    'is_featured'       => true,
+                    'published_at'      => now(),
                 ])
                 ->create();
 
@@ -269,16 +269,16 @@ final class ProductVariantSeeder extends Seeder
                 $variant = ProductVariant::factory()
                     ->for($product)
                     ->state([
-                        'name' => $productData['name'].' - '.$variantData['size'],
-                        'sku' => $product->sku.'-'.$variantData['size'],
-                        'price' => $productData['base_price'] + $variantData['price_modifier'],
-                        'compare_price' => ($productData['base_price'] + $variantData['price_modifier']) * 1.2,
-                        'cost_price' => ($productData['base_price'] + $variantData['price_modifier']) * 0.6,
-                        'stock_quantity' => $variantData['stock'],
-                        'is_default' => $index === 0,
+                        'name'            => $productData['name'] . ' - ' . $variantData['size'],
+                        'sku'             => $product->sku . '-' . $variantData['size'],
+                        'price'           => $productData['base_price'] + $variantData['price_modifier'],
+                        'compare_price'   => ($productData['base_price'] + $variantData['price_modifier']) * 1.2,
+                        'cost_price'      => ($productData['base_price'] + $variantData['price_modifier']) * 0.6,
+                        'stock_quantity'  => $variantData['stock'],
+                        'is_default'      => $index === 0,
                         'track_inventory' => true,
-                        'is_enabled' => true,
-                        'attributes' => ['size' => $variantData['size']],
+                        'is_enabled'      => true,
+                        'attributes'      => ['size' => $variantData['size']],
                     ])
                     ->create();
 
@@ -291,7 +291,7 @@ final class ProductVariantSeeder extends Seeder
                         ?? $sizeAttribute->values->firstWhere(fn (AttributeValue $value) => strcasecmp($value->display_value ?? '', $variantData['size']) === 0);
 
                     if ($sizeValue) {
-                        $matrix['attribute_'.$sizeAttribute->getKey()] = $sizeValue->getKey();
+                        $matrix['attribute_' . $sizeAttribute->getKey()] = $sizeValue->getKey();
                         $product->attributes()->syncWithoutDetaching([
                             $sizeAttribute->getKey() => ['attribute_value_id' => $sizeValue->getKey()],
                         ]);
@@ -300,7 +300,7 @@ final class ProductVariantSeeder extends Seeder
 
                 if ($colorAttribute && $colorAttribute->values->isNotEmpty()) {
                     $colorValue = $colorAttribute->values->random();
-                    $matrix['attribute_'.$colorAttribute->getKey()] = $colorValue->getKey();
+                    $matrix['attribute_' . $colorAttribute->getKey()] = $colorValue->getKey();
                     $product->attributes()->syncWithoutDetaching([
                         $colorAttribute->getKey() => ['attribute_value_id' => $colorValue->getKey()],
                     ]);
@@ -314,11 +314,11 @@ final class ProductVariantSeeder extends Seeder
                 VariantInventory::factory()
                     ->for($variant)
                     ->state([
-                        'warehouse_code' => 'main',
-                        'stock' => $variantData['stock'],
-                        'reserved' => 0,
-                        'available' => $variantData['stock'],
-                        'reorder_point' => 10,
+                        'warehouse_code'   => 'main',
+                        'stock'            => $variantData['stock'],
+                        'reserved'         => 0,
+                        'available'        => $variantData['stock'],
+                        'reorder_point'    => 10,
                         'reorder_quantity' => 50,
                     ])
                     ->create();
@@ -335,41 +335,41 @@ final class ProductVariantSeeder extends Seeder
             VariantPricingRule::factory()
                 ->for($product)
                 ->state([
-                    'rule_name' => 'Large Size Premium',
-                    'rule_type' => 'size_based',
+                    'rule_name'  => 'Large Size Premium',
+                    'rule_type'  => 'size_based',
                     'conditions' => [
                         [
                             'attribute' => 'size',
-                            'operator' => 'greater_than',
-                            'value' => 'L',
+                            'operator'  => 'greater_than',
+                            'value'     => 'L',
                         ],
                     ],
                     'pricing_modifiers' => [
                         [
-                            'type' => 'percentage',
-                            'value' => 5,
+                            'type'       => 'percentage',
+                            'value'      => 5,
                             'conditions' => [
                                 [
                                     'attribute' => 'size',
-                                    'operator' => 'equals',
-                                    'value' => 'XL',
+                                    'operator'  => 'equals',
+                                    'value'     => 'XL',
                                 ],
                             ],
                         ],
                         [
-                            'type' => 'percentage',
-                            'value' => 10,
+                            'type'       => 'percentage',
+                            'value'      => 10,
                             'conditions' => [
                                 [
                                     'attribute' => 'size',
-                                    'operator' => 'equals',
-                                    'value' => 'XXL',
+                                    'operator'  => 'equals',
+                                    'value'     => 'XXL',
                                 ],
                             ],
                         ],
                     ],
                     'is_active' => true,
-                    'priority' => 1,
+                    'priority'  => 1,
                 ])
                 ->create();
 
@@ -377,23 +377,23 @@ final class ProductVariantSeeder extends Seeder
             VariantPricingRule::factory()
                 ->for($product)
                 ->state([
-                    'rule_name' => 'Bulk Discount',
-                    'rule_type' => 'quantity_based',
+                    'rule_name'  => 'Bulk Discount',
+                    'rule_type'  => 'quantity_based',
                     'conditions' => [
                         [
                             'attribute' => 'quantity',
-                            'operator' => 'greater_than',
-                            'value' => 10,
+                            'operator'  => 'greater_than',
+                            'value'     => 10,
                         ],
                     ],
                     'pricing_modifiers' => [
                         [
-                            'type' => 'percentage',
+                            'type'  => 'percentage',
                             'value' => -10,  // 10% discount
                         ],
                     ],
                     'is_active' => true,
-                    'priority' => 2,
+                    'priority'  => 2,
                 ])
                 ->create();
         }
@@ -409,11 +409,11 @@ final class ProductVariantSeeder extends Seeder
             VariantInventory::factory()
                 ->for($variant)
                 ->state([
-                    'warehouse_code' => 'secondary',
-                    'stock' => fake()->numberBetween(5, 25),
-                    'reserved' => 0,
-                    'available' => fake()->numberBetween(5, 25),
-                    'reorder_point' => 5,
+                    'warehouse_code'   => 'secondary',
+                    'stock'            => fake()->numberBetween(5, 25),
+                    'reserved'         => 0,
+                    'available'        => fake()->numberBetween(5, 25),
+                    'reorder_point'    => 5,
                     'reorder_quantity' => 25,
                 ])
                 ->create();
@@ -439,7 +439,7 @@ final class ProductVariantSeeder extends Seeder
                 ['locale' => $locale],
                 [
                     'name'              => $name,
-                    'slug'              => Str::slug($name.'-'.$locale),
+                    'slug'              => Str::slug($name . '-' . $locale),
                     'summary'           => $shortDescription,
                     'description'       => $description,
                     'short_description' => $shortDescription,

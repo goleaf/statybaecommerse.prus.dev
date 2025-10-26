@@ -18,12 +18,12 @@ final class CampaignScheduleTest extends TestCase
         $campaign = Campaign::factory()->create();
 
         $schedule = CampaignSchedule::factory()->create([
-            'campaign_id' => $campaign->id,
-            'schedule_type' => 'daily',
+            'campaign_id'     => $campaign->id,
+            'schedule_type'   => 'daily',
             'schedule_config' => ['time' => '09:00', 'timezone' => 'UTC'],
-            'next_run_at' => now()->addDay(),
-            'last_run_at' => now()->subDay(),
-            'is_active' => true,
+            'next_run_at'     => now()->addDay(),
+            'last_run_at'     => now()->subDay(),
+            'is_active'       => true,
         ]);
 
         $this->assertInstanceOf(CampaignSchedule::class, $schedule);
@@ -60,9 +60,9 @@ final class CampaignScheduleTest extends TestCase
     {
         $schedule = CampaignSchedule::factory()->create([
             'schedule_config' => ['test' => 'data'],
-            'next_run_at' => '2024-01-01 12:00:00',
-            'last_run_at' => '2024-01-01 10:00:00',
-            'is_active' => true,
+            'next_run_at'     => '2024-01-01 12:00:00',
+            'last_run_at'     => '2024-01-01 10:00:00',
+            'is_active'       => true,
         ]);
 
         $this->assertIsArray($schedule->schedule_config);
@@ -84,9 +84,9 @@ final class CampaignScheduleTest extends TestCase
     {
         $campaign = Campaign::factory()->create();
         $schedule = CampaignSchedule::factory()->create([
-            'campaign_id' => $campaign->id,
+            'campaign_id'   => $campaign->id,
             'schedule_type' => 'daily',
-            'is_active' => true,
+            'is_active'     => true,
         ]);
 
         // Test basic model functionality
@@ -100,9 +100,9 @@ final class CampaignScheduleTest extends TestCase
     {
         $schedule = CampaignSchedule::factory()->create([
             'schedule_config' => [
-                'time' => '09:00',
+                'time'     => '09:00',
                 'timezone' => 'UTC',
-                'days' => ['monday', 'tuesday'],
+                'days'     => ['monday', 'tuesday'],
             ],
         ]);
 

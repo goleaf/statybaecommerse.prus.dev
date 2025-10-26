@@ -29,7 +29,7 @@ return new class extends Migration
                 DB::table('variant_analytics')
                     ->where('id', $record->id)
                     ->update([
-                        'product_id' => $productId,
+                        'product_id'  => $productId,
                         'date_bucket' => sprintf('daily:%s', $bucketDate),
                     ]);
             });

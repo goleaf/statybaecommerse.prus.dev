@@ -19,8 +19,8 @@ class AdminPanelTest extends DuskTestCase
 
         // Create admin user for testing
         $this->admin = User::factory()->create([
-            'name' => 'Admin User',
-            'email' => 'admin@example.com',
+            'name'     => 'Admin User',
+            'email'    => 'admin@example.com',
             'is_admin' => true,
         ]);
     }

@@ -17,7 +17,7 @@ use Livewire\Component;
  *
  * Livewire component for BasePageComponent with reactive frontend functionality, real-time updates, and user interaction handling.
  *
- * @property CacheService $cacheService
+ * @property CacheService       $cacheService
  * @property TranslationService $translationService
  */
 #[Layout('components.layouts.base')]

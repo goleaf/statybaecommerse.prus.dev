@@ -17,9 +17,9 @@ final class SearchIndexCommandTest extends TestCase
     public function test_search_index_command_skips_when_scout_disabled(): void
     {
         config([
-            'search.driver' => 'database',
+            'search.driver'        => 'database',
             'search.scout.enabled' => false,
-            'scout.driver' => 'collection',
+            'scout.driver'         => 'collection',
         ]);
 
         $this->artisan('search:index')
@@ -30,28 +30,28 @@ final class SearchIndexCommandTest extends TestCase
     public function test_search_index_command_indexes_models(): void
     {
         config([
-            'search.driver' => 'scout',
+            'search.driver'        => 'scout',
             'search.scout.enabled' => true,
-            'scout.driver' => 'collection',
+            'scout.driver'         => 'collection',
         ]);
 
         $brand = Brand::factory()->create([
-            'name' => 'Command Brand',
+            'name'       => 'Command Brand',
             'is_enabled' => true,
         ]);
 
         $category = Category::factory()->create([
-            'name' => 'Command Category',
-            'slug' => 'command-category',
+            'name'       => 'Command Category',
+            'slug'       => 'command-category',
             'is_visible' => true,
         ]);
 
         $product = Product::factory()->create([
-            'name' => 'Command Drill',
-            'brand_id' => $brand->id,
-            'is_visible' => true,
+            'name'         => 'Command Drill',
+            'brand_id'     => $brand->id,
+            'is_visible'   => true,
             'published_at' => now()->subDay(),
-            'price' => 149.00,
+            'price'        => 149.00,
         ]);
 
         $category->products()->attach($product);

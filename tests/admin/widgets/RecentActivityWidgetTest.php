@@ -38,17 +38,17 @@ class RecentActivityWidgetTest extends TestCase
         $product = Product::factory()->create();
 
         $order = Order::factory()->create([
-            'user_id' => $user->id,
-            'total' => 100.0,
-            'status' => 'completed',
+            'user_id'    => $user->id,
+            'total'      => 100.0,
+            'status'     => 'completed',
             'created_at' => now(),
         ]);
 
         $review = Review::factory()->create([
-            'product_id' => $product->id,
-            'rating' => 5,
+            'product_id'  => $product->id,
+            'rating'      => 5,
             'is_approved' => true,
-            'created_at' => now(),
+            'created_at'  => now(),
         ]);
 
         $widget = new RecentActivityWidget;
@@ -85,7 +85,7 @@ class RecentActivityWidgetTest extends TestCase
         $product = Product::factory()->create(['created_at' => now()]);
         $order = Order::factory()->create(['created_at' => now()]);
         $review = Review::factory()->create([
-            'created_at' => now(),
+            'created_at'  => now(),
             'is_approved' => true,
         ]);
 
@@ -127,6 +127,6 @@ class RecentActivityWidgetTest extends TestCase
 
         // Check that old data is not included
         $orderIds = $results->where('type', 'Order')->pluck('title');
-        $this->assertStringContainsString('Order #'.$recentOrder->id, $orderIds->first());
+        $this->assertStringContainsString('Order #' . $recentOrder->id, $orderIds->first());
     }
 }

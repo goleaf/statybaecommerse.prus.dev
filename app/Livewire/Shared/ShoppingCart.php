@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Livewire\Shared;
 
+use App\Models\AttributeValue;
 use App\Models\CartItem;
 use App\Models\Product;
 use App\Models\ProductVariant;
-use App\Models\AttributeValue;
-use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Contracts\View\View;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Facades\Session;
 use Livewire\Attributes\On;
 use Livewire\Component;
@@ -70,9 +70,9 @@ final class ShoppingCart extends Component
             $newQuantity = $cartItem->quantity + $quantity;
 
             $cartItem->update([
-                'quantity' => $newQuantity,
-                'unit_price' => $unitPrice,
-                'price' => $unitPrice,
+                'quantity'    => $newQuantity,
+                'unit_price'  => $unitPrice,
+                'price'       => $unitPrice,
                 'total_price' => round($unitPrice * $newQuantity, 2),
             ]);
         } else {
@@ -100,17 +100,17 @@ final class ShoppingCart extends Component
                         })
                         ->toArray();
 
-                    $snapshotName .= ' ('.collect($variantAttributes)
+                    $snapshotName .= ' (' . collect($variantAttributes)
                         ->filter(static fn ($value, $key): bool => $key !== '' && $value !== null)
                         ->map(static fn ($value, $key): string => sprintf('%s: %s', (string) $key, (string) $value))
-                        ->implode(', ').')';
+                        ->implode(', ') . ')';
                 }
             }
 
             $productSnapshot = [
-                'name' => $snapshotName,
+                'name'  => $snapshotName,
                 'price' => $unitPrice,
-                'sku' => $variant?->sku ?? $product->sku ?? null,
+                'sku'   => $variant?->sku ?? $product->sku ?? null,
             ];
 
             if ($variant) {
@@ -122,16 +122,16 @@ final class ShoppingCart extends Component
             }
 
             CartItem::create([
-                'session_id' => $sessionId,
-                'user_id' => auth()->id(),
-                'product_id' => $productId,
-                'variant_id' => $variant?->id,
+                'session_id'         => $sessionId,
+                'user_id'            => auth()->id(),
+                'product_id'         => $productId,
+                'variant_id'         => $variant?->id,
                 'product_variant_id' => $variant?->id,
-                'quantity' => $quantity,
-                'unit_price' => $unitPrice,
-                'total_price' => round($unitPrice * $quantity, 2),
-                'price' => $unitPrice,
-                'product_snapshot' => $productSnapshot,
+                'quantity'           => $quantity,
+                'unit_price'         => $unitPrice,
+                'total_price'        => round($unitPrice * $quantity, 2),
+                'price'              => $unitPrice,
+                'product_snapshot'   => $productSnapshot,
             ]);
         }
 

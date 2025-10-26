@@ -44,11 +44,11 @@ final class Home extends Component
             now()->addSeconds(60),
             static function (): array {
                 return [
-                    'products_count' => Product::query()->where('is_visible', true)->count(),
+                    'products_count'   => Product::query()->where('is_visible', true)->count(),
                     'categories_count' => Category::query()->where('is_visible', true)->count(),
-                    'brands_count' => Brand::query()->where('is_enabled', true)->count(),
-                    'reviews_count' => Review::query()->where('is_approved', true)->count(),
-                    'avg_rating' => (float) (Review::query()->where('is_approved', true)->avg('rating') ?? 0),
+                    'brands_count'     => Brand::query()->where('is_enabled', true)->count(),
+                    'reviews_count'    => Review::query()->where('is_approved', true)->count(),
+                    'avg_rating'       => (float) (Review::query()->where('is_approved', true)->avg('rating') ?? 0),
                 ];
             },
             [
@@ -182,12 +182,12 @@ final class Home extends Component
         $appName = config('app.name');
 
         return view('livewire.pages.home', [
-            'stats' => $this->stats,
+            'stats'            => $this->stats,
             'featuredProducts' => $this->featuredProducts,
-            'latestProducts' => $this->latestProducts,
-            'latestReviews' => $this->latestReviews,
+            'latestProducts'   => $this->latestProducts,
+            'latestReviews'    => $this->latestReviews,
         ])->layout('components.layouts.base', [
-            'title' => __('frontend.navigation.home').' - '.(is_string($appName) ? $appName : ''),
+            'title' => __('frontend.navigation.home') . ' - ' . (is_string($appName) ? $appName : ''),
         ]);
     }
 }

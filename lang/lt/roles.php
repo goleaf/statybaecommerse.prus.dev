@@ -1,35 +1,37 @@
 <?php
 
+declare(strict_types=1);
+
 return [
-    'title' => 'Rolės',
-    'plural' => 'Rolės',
-    'single' => 'Rolė',
+    'title'      => 'Rolės',
+    'plural'     => 'Rolės',
+    'single'     => 'Rolė',
     'navigation' => 'Rolės',
-    'fields' => [
-        'name' => 'Pavadinimas',
-        'guard_name' => 'Sargyba',
+    'fields'     => [
+        'name'               => 'Pavadinimas',
+        'guard_name'         => 'Sargyba',
         'permissions_matrix' => 'Leidimai',
-        'permissions_count' => 'Leidimų skaičius',
+        'permissions_count'  => 'Leidimų skaičius',
     ],
     'sections' => [
-        'general' => 'Rolės informacija',
+        'general'     => 'Rolės informacija',
         'permissions' => 'Leidimų matrica',
     ],
     'modules' => [
-        'panel' => 'Administratoriaus skydelis',
-        'products' => 'Produktai',
+        'panel'      => 'Administratoriaus skydelis',
+        'products'   => 'Produktai',
         'categories' => 'Kategorijos',
-        'brands' => 'Prekių ženklai',
-        'orders' => 'Užsakymai',
-        'users' => 'Vartotojai',
-        'roles' => 'Rolės',
+        'brands'     => 'Prekių ženklai',
+        'orders'     => 'Užsakymai',
+        'users'      => 'Vartotojai',
+        'roles'      => 'Rolės',
     ],
     'abilities' => [
-        'access' => 'Prieiga',
+        'access'  => 'Prieiga',
         'viewAny' => 'Peržiūrėti visus',
-        'view' => 'Peržiūrėti',
-        'create' => 'Kurti',
-        'update' => 'Atnaujinti',
-        'delete' => 'Ištrinti',
+        'view'    => 'Peržiūrėti',
+        'create'  => 'Kurti',
+        'update'  => 'Atnaujinti',
+        'delete'  => 'Ištrinti',
     ],
 ];

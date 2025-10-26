@@ -47,7 +47,7 @@ final class Company extends Model
 
     // Attribute casting configuration ensures metadata remains structured and the active flag is always boolean.
     protected $casts = [
-        'metadata' => 'array',
+        'metadata'  => 'array',
         'is_active' => 'boolean',
     ];
     // Relationships

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Frontend;
 
-use App\Http\Controllers\Controller;
 use App\Enums\PaymentMethod;
+use App\Http\Controllers\Controller;
 use App\Models\CartItem;
 use App\Models\Order;
 use App\Models\OrderItem;
@@ -92,14 +92,14 @@ final class CheckoutController extends Controller
         $validated = $request->validated();
         $paymentMethod = PaymentMethod::tryFrom($validated['payment_method'] ?? '') ?? PaymentMethod::CREDIT_CARD;
         $contactAddress = array_filter([
-            'full_name' => $validated['full_name'] ?? null,
-            'email' => $validated['email'] ?? null,
-            'phone' => $validated['phone'] ?? null,
+            'full_name'      => $validated['full_name'] ?? null,
+            'email'          => $validated['email'] ?? null,
+            'phone'          => $validated['phone'] ?? null,
             'address_line_1' => $validated['address_line_1'] ?? null,
             'address_line_2' => $validated['address_line_2'] ?? null,
-            'city' => $validated['city'] ?? null,
-            'postal_code' => $validated['postal_code'] ?? null,
-            'country' => $validated['country'] ?? null,
+            'city'           => $validated['city'] ?? null,
+            'postal_code'    => $validated['postal_code'] ?? null,
+            'country'        => $validated['country'] ?? null,
         ], static fn ($value) => $value !== null && $value !== '');
         $subtotal = (float) $items->sum(fn (CartItem $item) => $item->calculateSubtotal());
         $breakdown = app(PriceCalculator::class)->breakdown($subtotal);
@@ -172,11 +172,11 @@ final class CheckoutController extends Controller
 
         if ($request->wantsJson()) {
             return response()->json([
-                'success' => true,
-                'message' => __('ecommerce.order_placed_successfully'),
+                'success'  => true,
+                'message'  => __('ecommerce.order_placed_successfully'),
                 'order_id' => $order->getKey(),
-                'order' => [
-                    'id' => $order->getKey(),
+                'order'    => [
+                    'id'     => $order->getKey(),
                     'number' => $order->number,
                 ],
             ], 201);
@@ -262,14 +262,14 @@ final class CheckoutController extends Controller
                 $quantity = (int) ($item['quantity'] ?? 0);
 
                 return CartItem::make([
-                    'product_id' => (int) $item['product_id'],
+                    'product_id'         => (int) $item['product_id'],
                     'product_variant_id' => isset($item['product_variant_id']) ? (int) $item['product_variant_id'] : null,
-                    'quantity' => $quantity > 0 ? $quantity : 1,
-                    'price' => $price,
-                    'unit_price' => $price,
-                    'product_snapshot' => [
-                        'name' => $item['name'] ?? null,
-                        'sku' => $item['sku'] ?? null,
+                    'quantity'           => $quantity > 0 ? $quantity : 1,
+                    'price'              => $price,
+                    'unit_price'         => $price,
+                    'product_snapshot'   => [
+                        'name'  => $item['name'] ?? null,
+                        'sku'   => $item['sku'] ?? null,
                         'image' => $item['image'] ?? null,
                     ],
                     'notes' => $item['notes'] ?? null,
@@ -279,7 +279,7 @@ final class CheckoutController extends Controller
     }
 
     /**
-     * @param  Collection<int, CartItem>  $items
+     * @param  Collection<int, CartItem>                                        $items
      * @return array{item_count:int, subtotal:float, formatted_subtotal:string}
      */
     private function summarize(Collection $items): array
@@ -296,7 +296,7 @@ final class CheckoutController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => $message,
-                'errors' => $errorKey !== null ? [$errorKey => [$message]] : [],
+                'errors'  => $errorKey !== null ? [$errorKey => [$message]] : [],
             ], $status);
         }
 
@@ -316,11 +316,11 @@ final class CheckoutController extends Controller
         $userId = $request->user()?->getAuthIdentifier();
 
         if (is_int($userId) || is_string($userId)) {
-            return 'checkout:user:'.$userId;
+            return 'checkout:user:' . $userId;
         }
 
         if ($userId instanceof Stringable) {
-            return 'checkout:user:'.$userId->__toString();
+            return 'checkout:user:' . $userId->__toString();
         }
 
         $sessionId = (string) $request->session()->getId();

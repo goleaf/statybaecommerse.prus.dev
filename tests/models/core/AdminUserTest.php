@@ -16,8 +16,8 @@ final class AdminUserTest extends TestCase
     public function test_admin_user_can_be_created(): void
     {
         $adminUser = AdminUser::factory()->create([
-            'name' => 'Admin User',
-            'email' => 'admin@example.com',
+            'name'     => 'Admin User',
+            'email'    => 'admin@example.com',
             'password' => 'password123',
         ]);
 
@@ -50,7 +50,7 @@ final class AdminUserTest extends TestCase
     {
         $adminUser = AdminUser::factory()->create([
             'email_verified_at' => now(),
-            'password' => 'password123',
+            'password'          => 'password123',
         ]);
 
         $this->assertInstanceOf(\Carbon\Carbon::class, $adminUser->email_verified_at);
@@ -135,7 +135,7 @@ final class AdminUserTest extends TestCase
     public function test_admin_user_authentication(): void
     {
         $adminUser = AdminUser::factory()->create([
-            'email' => 'admin@test.com',
+            'email'    => 'admin@test.com',
             'password' => 'password123',
         ]);
 

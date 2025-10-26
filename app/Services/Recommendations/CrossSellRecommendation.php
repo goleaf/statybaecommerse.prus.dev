@@ -23,14 +23,14 @@ final class CrossSellRecommendation extends BaseRecommendation
     {
         return [
             'max_results' => 10,
-            'min_score' => 0.1,
+            'min_score'   => 0.1,
             'time_window' => 90,
             // days
-            'min_co_purchase_count' => 2,
-            'co_purchase_weight' => 0.6,
+            'min_co_purchase_count'      => 2,
+            'co_purchase_weight'         => 0.6,
             'category_similarity_weight' => 0.3,
             'price_compatibility_weight' => 0.1,
-            'max_price_ratio' => 2.0,
+            'max_price_ratio'            => 2.0,
             // Max 2x the original price
             'min_price_ratio' => 0.5,
         ];

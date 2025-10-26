@@ -18,12 +18,12 @@ final class NewsCommentFactory extends Factory
     public function definition(): array
     {
         return [
-            'news_id' => News::factory(),
-            'author_name' => fake()->name(),
+            'news_id'      => News::factory(),
+            'author_name'  => fake()->name(),
             'author_email' => fake()->safeEmail(),
-            'content' => fake()->paragraph(),
-            'is_approved' => true,
-            'is_visible' => true,
+            'content'      => fake()->paragraph(),
+            'is_approved'  => true,
+            'is_visible'   => true,
         ];
     }
 
@@ -45,7 +45,7 @@ final class NewsCommentFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'parent_id' => $parent->id,
-            'news_id' => $parent->news_id,
+            'news_id'   => $parent->news_id,
         ]);
     }
 }

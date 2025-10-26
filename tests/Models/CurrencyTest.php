@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Collection;
+
 // Keep the database lifecycle consistent; the shared Pest bootstrap wires the Laravel TestCase automatically.
 uses(RefreshDatabase::class);
 

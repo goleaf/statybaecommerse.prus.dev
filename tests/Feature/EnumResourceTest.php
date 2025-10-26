@@ -20,7 +20,7 @@ final class EnumResourceTest extends TestCase
 
         $this->adminUser = User::factory()->create([
             'email' => 'admin@test.com',
-            'name' => 'Admin User',
+            'name'  => 'Admin User',
         ]);
 
         $this
@@ -42,14 +42,14 @@ final class EnumResourceTest extends TestCase
     public function test_admin_can_create_enum_value(): void
     {
         $enumData = [
-            'type' => 'order_status',
-            'key' => 'test_status',
-            'value' => 'Test Status',
-            'name' => 'Test Status',
+            'type'        => 'order_status',
+            'key'         => 'test_status',
+            'value'       => 'Test Status',
+            'name'        => 'Test Status',
             'description' => 'Test status description',
-            'sort_order' => 1,
-            'is_active' => true,
-            'is_default' => false,
+            'sort_order'  => 1,
+            'is_active'   => true,
+            'is_default'  => false,
         ];
 
         $this
@@ -58,8 +58,8 @@ final class EnumResourceTest extends TestCase
             ->assertRedirect();
 
         $this->assertDatabaseHas('enum_values', [
-            'type' => 'order_status',
-            'key' => 'test_status',
+            'type'  => 'order_status',
+            'key'   => 'test_status',
             'value' => 'Test Status',
         ]);
     }
@@ -67,14 +67,14 @@ final class EnumResourceTest extends TestCase
     public function test_admin_can_edit_enum_value(): void
     {
         $enumValue = EnumValue::factory()->create([
-            'type' => 'order_status',
-            'key' => 'test_status',
+            'type'  => 'order_status',
+            'key'   => 'test_status',
             'value' => 'Test Status',
         ]);
 
         $updatedData = [
-            'value' => 'Updated Status',
-            'name' => 'Updated Status',
+            'value'       => 'Updated Status',
+            'name'        => 'Updated Status',
             'description' => 'Updated description',
         ];
 
@@ -84,17 +84,17 @@ final class EnumResourceTest extends TestCase
             ->assertRedirect();
 
         $this->assertDatabaseHas('enum_values', [
-            'id' => $enumValue->id,
+            'id'    => $enumValue->id,
             'value' => 'Updated Status',
-            'name' => 'Updated Status',
+            'name'  => 'Updated Status',
         ]);
     }
 
     public function test_admin_can_view_enum_value_details(): void
     {
         $enumValue = EnumValue::factory()->create([
-            'type' => 'order_status',
-            'key' => 'test_status',
+            'type'  => 'order_status',
+            'key'   => 'test_status',
             'value' => 'Test Status',
         ]);
 
@@ -140,8 +140,8 @@ final class EnumResourceTest extends TestCase
     public function test_enum_value_model_relationships(): void
     {
         $enumValue = EnumValue::factory()->create([
-            'type' => 'order_status',
-            'key' => 'test_status',
+            'type'  => 'order_status',
+            'key'   => 'test_status',
             'value' => 'Test Status',
         ]);
 
@@ -166,8 +166,8 @@ final class EnumResourceTest extends TestCase
     public function test_enum_value_model_accessors(): void
     {
         $enumValue = EnumValue::factory()->create([
-            'type' => 'order_status',
-            'key' => 'test_status',
+            'type'  => 'order_status',
+            'key'   => 'test_status',
             'value' => 'Test Status',
         ]);
 
@@ -179,7 +179,7 @@ final class EnumResourceTest extends TestCase
     public function test_enum_value_model_methods(): void
     {
         $enumValue = EnumValue::factory()->create([
-            'is_active' => false,
+            'is_active'  => false,
             'is_default' => false,
         ]);
 
@@ -196,8 +196,8 @@ final class EnumResourceTest extends TestCase
     public function test_enum_value_duplicate_method(): void
     {
         $originalEnum = EnumValue::factory()->create([
-            'type' => 'order_status',
-            'key' => 'test_status',
+            'type'  => 'order_status',
+            'key'   => 'test_status',
             'value' => 'Test Status',
         ]);
 
@@ -215,8 +215,8 @@ final class EnumResourceTest extends TestCase
         $this->assertArrayHasKey('order_status', $types);
 
         EnumValue::factory()->create([
-            'type' => 'order_status',
-            'key' => 'pending',
+            'type'  => 'order_status',
+            'key'   => 'pending',
             'value' => 'Pending',
         ]);
 
@@ -232,14 +232,14 @@ final class EnumResourceTest extends TestCase
     {
         $unusedEnum = EnumValue::factory()->create([
             'created_at' => now()->subMonths(7),
-            'metadata' => [
+            'metadata'   => [
                 'usage_count' => 0,
             ],
         ]);
 
         $activeEnum = EnumValue::factory()->create([
             'created_at' => now()->subMonths(7),
-            'metadata' => [
+            'metadata'   => [
                 'usage_count' => 10,
             ],
         ]);
@@ -286,7 +286,7 @@ final class EnumResourceTest extends TestCase
     public function test_enum_value_set_default_action(): void
     {
         $enumValue = EnumValue::factory()->create([
-            'type' => 'order_status',
+            'type'       => 'order_status',
             'is_default' => false,
         ]);
 
@@ -301,8 +301,8 @@ final class EnumResourceTest extends TestCase
     public function test_enum_value_metadata_handling(): void
     {
         $metadata = [
-            'color' => 'blue',
-            'icon' => 'heroicon-o-star',
+            'color'    => 'blue',
+            'icon'     => 'heroicon-o-star',
             'category' => 'test',
         ];
 
@@ -319,8 +319,8 @@ final class EnumResourceTest extends TestCase
         $this
             ->actingAs($this->adminUser)
             ->post('/admin/enum-values', [
-                'type' => '',
-                'key' => '',
+                'type'  => '',
+                'key'   => '',
                 'value' => '',
             ])
             ->assertSessionHasErrors(['type', 'key', 'value']);
@@ -330,16 +330,16 @@ final class EnumResourceTest extends TestCase
     {
         EnumValue::factory()->create([
             'type' => 'order_status',
-            'key' => 'pending',
+            'key'  => 'pending',
         ]);
 
         $this
             ->actingAs($this->adminUser)
             ->post('/admin/enum-values', [
-                'type' => 'order_status',
-                'key' => 'pending',
+                'type'  => 'order_status',
+                'key'   => 'pending',
                 'value' => 'Pending',
-                'name' => 'Pending',
+                'name'  => 'Pending',
             ])
             ->assertSessionHasErrors(['key']);
     }

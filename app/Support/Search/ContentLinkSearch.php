@@ -102,6 +102,7 @@ final class ContentLinkSearch
 
         SearchableComponentHelper::apply($component, $result);
     }
+
     private static function resolveUrl(string $route, string $fallback): ?string
     {
         if (Route::has($route)) {

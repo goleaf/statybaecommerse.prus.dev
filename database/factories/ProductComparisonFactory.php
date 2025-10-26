@@ -25,7 +25,7 @@ final class ProductComparisonFactory extends Factory
     {
         return [
             'session_id' => $this->faker->unique()->uuid(),
-            'user_id' => User::factory(),
+            'user_id'    => User::factory(),
             'product_id' => Product::factory(),
         ];
     }
@@ -36,8 +36,8 @@ final class ProductComparisonFactory extends Factory
     public function anonymous(): static
     {
         return $this->state(fn (array $attributes) => [
-            'user_id' => null,
-            'session_id' => 'anon_'.$this->faker->uuid(),
+            'user_id'    => null,
+            'session_id' => 'anon_' . $this->faker->uuid(),
         ]);
     }
 
@@ -111,7 +111,7 @@ final class ProductComparisonFactory extends Factory
     public function withSessionPattern(string $pattern): static
     {
         return $this->state(fn (array $attributes) => [
-            'session_id' => $pattern.'_'.$this->faker->randomNumber(5),
+            'session_id' => $pattern . '_' . $this->faker->randomNumber(5),
         ]);
     }
 
@@ -121,7 +121,7 @@ final class ProductComparisonFactory extends Factory
     public function mobile(): static
     {
         return $this->state(fn (array $attributes) => [
-            'session_id' => 'mobile_'.$this->faker->uuid(),
+            'session_id' => 'mobile_' . $this->faker->uuid(),
         ]);
     }
 
@@ -131,7 +131,7 @@ final class ProductComparisonFactory extends Factory
     public function desktop(): static
     {
         return $this->state(fn (array $attributes) => [
-            'session_id' => 'desktop_'.$this->faker->uuid(),
+            'session_id' => 'desktop_' . $this->faker->uuid(),
         ]);
     }
 
@@ -141,7 +141,7 @@ final class ProductComparisonFactory extends Factory
     public function api(): static
     {
         return $this->state(fn (array $attributes) => [
-            'session_id' => 'api_'.$this->faker->uuid(),
+            'session_id' => 'api_' . $this->faker->uuid(),
         ]);
     }
 }

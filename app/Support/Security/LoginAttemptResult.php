@@ -14,8 +14,7 @@ final class LoginAttemptResult
     public function __construct(
         private readonly bool $requiresTwoFactor,
         private readonly ?User $user
-    ) {
-    }
+    ) {}
 
     /**
      * Build a successful result when the user is fully authenticated.

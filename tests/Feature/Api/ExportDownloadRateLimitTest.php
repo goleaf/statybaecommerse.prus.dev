@@ -54,9 +54,9 @@ final class ExportDownloadRateLimitTest extends TestCase
         Storage::fake('public');
 
         $export = Export::factory()->create([
-            'status' => ExportStatus::Completed,
-            'artifact_disk' => 'public',
-            'artifact_path' => 'exports/report.csv',
+            'status'            => ExportStatus::Completed,
+            'artifact_disk'     => 'public',
+            'artifact_path'     => 'exports/report.csv',
             'artifact_filename' => 'report.csv',
         ]);
 
@@ -74,9 +74,9 @@ final class ExportDownloadRateLimitTest extends TestCase
         Storage::fake('public');
 
         $export = Export::factory()->create([
-            'status' => ExportStatus::Completed,
-            'artifact_disk' => 'public',
-            'artifact_path' => 'exports/report.csv',
+            'status'            => ExportStatus::Completed,
+            'artifact_disk'     => 'public',
+            'artifact_path'     => 'exports/report.csv',
             'artifact_filename' => 'report.csv',
         ]);
 

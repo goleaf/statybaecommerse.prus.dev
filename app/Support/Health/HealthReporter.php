@@ -11,6 +11,11 @@ use Illuminate\Contracts\Queue\Factory as QueueFactory;
 use Illuminate\Database\DatabaseManager;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+
+use function in_array;
+use function is_string;
+
+use RuntimeException;
 use Throwable;
 
 final class HealthReporter implements HealthReporterContract
@@ -29,8 +34,8 @@ final class HealthReporter implements HealthReporterContract
     {
         $checks = [
             'database' => $this->checkDatabase(),
-            'cache' => $this->checkCache(),
-            'disk' => $this->checkDisk(),
+            'cache'    => $this->checkCache(),
+            'disk'     => $this->checkDisk(),
         ];
 
         if ($includeQueue) {
@@ -42,8 +47,8 @@ final class HealthReporter implements HealthReporterContract
         }
 
         return [
-            'status' => $this->evaluateStatus($checks),
-            'checks' => $checks,
+            'status'    => $this->evaluateStatus($checks),
+            'checks'    => $checks,
             'timestamp' => now()->toIso8601String(),
         ];
     }
@@ -72,7 +77,7 @@ final class HealthReporter implements HealthReporterContract
     {
         $startedAt = microtime(true);
         $repository = $this->cache->store();
-        $key = 'health-check-'.Str::uuid()->toString();
+        $key = 'health-check-' . Str::uuid()->toString();
 
         try {
             $repository->put($key, 'ok', 5);
@@ -91,13 +96,13 @@ final class HealthReporter implements HealthReporterContract
     {
         $defaultConnection = config('queue.default');
 
-        if (! \is_string($defaultConnection) || $defaultConnection === '') {
+        if (! is_string($defaultConnection) || $defaultConnection === '') {
             return null;
         }
 
-        $driver = Arr::get(config('queue.connections'), $defaultConnection.'.driver');
+        $driver = Arr::get(config('queue.connections'), $defaultConnection . '.driver');
 
-        if (! \is_string($driver) || \in_array($driver, ['sync', 'null'], true)) {
+        if (! is_string($driver) || in_array($driver, ['sync', 'null'], true)) {
             return null;
         }
 
@@ -112,12 +117,12 @@ final class HealthReporter implements HealthReporterContract
 
             return $this->formatResult($startedAt, null, [
                 'connection' => $defaultConnection,
-                'driver' => $driver,
+                'driver'     => $driver,
             ]);
         } catch (Throwable $exception) {
             return $this->formatResult($startedAt, $exception, [
                 'connection' => $defaultConnection,
-                'driver' => (string) $driver,
+                'driver'     => (string) $driver,
             ]);
         }
     }
@@ -131,31 +136,31 @@ final class HealthReporter implements HealthReporterContract
         $defaultDisk = config('filesystems.default');
 
         try {
-            if (! \is_string($defaultDisk) || $defaultDisk === '') {
-                throw new \RuntimeException('Default filesystem disk is not configured.');
+            if (! is_string($defaultDisk) || $defaultDisk === '') {
+                throw new RuntimeException('Default filesystem disk is not configured.');
             }
 
             $driver = config("filesystems.disks.{$defaultDisk}.driver");
             $disk = $this->filesystem->disk($defaultDisk);
-            $key = 'health-check/'.Str::uuid()->toString();
+            $key = 'health-check/' . Str::uuid()->toString();
 
             $disk->put($key, 'ok');
             $disk->delete($key);
 
             return $this->formatResult($startedAt, null, [
-                'disk' => $defaultDisk,
-                'driver' => \is_string($driver) ? $driver : null,
+                'disk'   => $defaultDisk,
+                'driver' => is_string($driver) ? $driver : null,
             ]);
         } catch (Throwable $exception) {
             return $this->formatResult($startedAt, $exception, [
-                'disk' => \is_string($defaultDisk) ? $defaultDisk : null,
-                'driver' => isset($driver) && \is_string($driver) ? $driver : null,
+                'disk'   => is_string($defaultDisk) ? $defaultDisk : null,
+                'driver' => isset($driver) && is_string($driver) ? $driver : null,
             ]);
         }
     }
 
     /**
-     * @param  array<string, array{status: string, latency_ms: float, message?: string}>  $checks
+     * @param array<string, array{status: string, latency_ms: float, message?: string}> $checks
      */
     private function evaluateStatus(array $checks): string
     {
@@ -169,14 +174,14 @@ final class HealthReporter implements HealthReporterContract
     }
 
     /**
-     * @param  float  $startedAt  microtime(true) value
-     * @param  array<string, mixed>|null  $meta
+     * @param  float                                                                                   $startedAt microtime(true) value
+     * @param  array<string, mixed>|null                                                               $meta
      * @return array{status: string, latency_ms: float, message?: string, meta?: array<string, mixed>}
      */
     private function formatResult(float $startedAt, ?Throwable $exception = null, ?array $meta = null): array
     {
         $result = [
-            'status' => $exception === null ? 'ok' : 'failed',
+            'status'     => $exception === null ? 'ok' : 'failed',
             'latency_ms' => $this->elapsedMilliseconds($startedAt),
         ];
 

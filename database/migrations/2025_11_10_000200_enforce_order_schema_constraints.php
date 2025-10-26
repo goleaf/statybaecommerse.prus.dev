@@ -508,9 +508,9 @@ return new class extends Migration
     {
         return collect(DB::select("PRAGMA foreign_key_list('{$table}')"))
             ->map(static fn ($foreignKey): array => [
-                'from' => $foreignKey->from ?? $foreignKey['from'] ?? null,
-                'table' => $foreignKey->table ?? $foreignKey['table'] ?? null,
-                'to' => $foreignKey->to ?? $foreignKey['to'] ?? null,
+                'from'      => $foreignKey->from ?? $foreignKey['from'] ?? null,
+                'table'     => $foreignKey->table ?? $foreignKey['table'] ?? null,
+                'to'        => $foreignKey->to ?? $foreignKey['to'] ?? null,
                 'on_delete' => strtoupper((string) ($foreignKey->on_delete ?? $foreignKey['on_delete'] ?? '')),
             ]);
     }
@@ -518,7 +518,7 @@ return new class extends Migration
     private function sqliteIndexes(string $table): Collection
     {
         return collect(DB::select("PRAGMA index_list('{$table}')"))
-            ->map(function ($index) use ($table): array {
+            ->map(function ($index): array {
                 $name = $index->name ?? $index['name'] ?? null;
 
                 if (! is_string($name) || $name === '') {
@@ -539,21 +539,21 @@ return new class extends Migration
     private function sqliteIndexesWithDetails(string $table): Collection
     {
         return collect(DB::select("PRAGMA index_list('{$table}')"))
-            ->map(function ($index) use ($table): array {
+            ->map(function ($index): array {
                 $name = $index->name ?? $index['name'] ?? null;
 
                 if (! is_string($name) || $name === '') {
                     return [
-                        'name' => null,
+                        'name'    => null,
                         'columns' => [],
-                        'unique' => false,
+                        'unique'  => false,
                     ];
                 }
 
                 $details = DB::select("PRAGMA index_info('{$name}')");
 
                 return [
-                    'name' => $name,
+                    'name'    => $name,
                     'columns' => array_values(array_filter(array_map(
                         static fn ($detail) => $detail->name ?? $detail['name'] ?? null,
                         $details,

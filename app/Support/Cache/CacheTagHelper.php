@@ -82,7 +82,7 @@ final class CacheTagHelper
     /**
      * Merge multiple tag groups, removing duplicates to keep the payload lean.
      *
-     * @param  array<int, string>  ...$groups
+     * @param  array<int, string> ...$groups
      * @return array<int, string>
      */
     public static function merge(array ...$groups): array

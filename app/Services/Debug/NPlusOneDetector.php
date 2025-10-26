@@ -9,6 +9,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use Throwable;
 
 final class NPlusOneDetector
 {
@@ -34,8 +35,8 @@ final class NPlusOneDetector
             $nextCount = $current + 1;
 
             $this->fingerprints[$fingerprint] = [
-                'count' => $nextCount,
-                'sql' => $event->sql,
+                'count'    => $nextCount,
+                'sql'      => $event->sql,
                 'location' => $this->resolveCaller(),
             ];
 
@@ -51,15 +52,15 @@ final class NPlusOneDetector
     }
 
     /**
-     * @param  array<int, mixed>  $bindings
+     * @param array<int, mixed> $bindings
      */
     private function fingerprint(string $sql, array $bindings): string
     {
-        return md5($sql.'|'.serialize(Arr::map($bindings, static fn ($binding) => is_scalar($binding) ? $binding : gettype($binding))));
+        return md5($sql . '|' . serialize(Arr::map($bindings, static fn ($binding) => is_scalar($binding) ? $binding : gettype($binding))));
     }
 
     /**
-     * @param  array{count:int, sql:string, location:string|null}  $payload
+     * @param array{count:int, sql:string, location:string|null} $payload
      */
     private function report(string $fingerprint, array $payload): void
     {
@@ -72,13 +73,13 @@ final class NPlusOneDetector
         $context = [
             'fingerprint' => $fingerprint,
             'occurrences' => $payload['count'],
-            'origin' => $payload['location'],
+            'origin'      => $payload['location'],
         ];
 
         if (function_exists('debugbar') && app()->bound('debugbar')) {
             try {
                 app('debugbar')->addMessage(array_merge(['message' => $message], $context), 'n+1');
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
                 // Ignore debugbar transport errors while still logging to disk.
             }
         }
@@ -92,7 +93,7 @@ final class NPlusOneDetector
 
         foreach ($trace as $frame) {
             $file = $frame['file'] ?? null;
-            if ($file !== null && str_contains($file, DIRECTORY_SEPARATOR.'app'.DIRECTORY_SEPARATOR)) {
+            if ($file !== null && str_contains($file, DIRECTORY_SEPARATOR . 'app' . DIRECTORY_SEPARATOR)) {
                 $line = $frame['line'] ?? null;
 
                 return $line === null ? $file : sprintf('%s:%s', $file, $line);

@@ -18,21 +18,21 @@ final class NewsImageFactory extends Factory
     public function definition(): array
     {
         return [
-            'news_id' => News::factory(),
-            'file_path' => 'news-images/'.$this->faker->uuid().'.jpg',
-            'alt_text' => $this->faker->sentence(6),
-            'caption' => $this->faker->sentence(10),
+            'news_id'     => News::factory(),
+            'file_path'   => 'news-images/' . $this->faker->uuid() . '.jpg',
+            'alt_text'    => $this->faker->sentence(6),
+            'caption'     => $this->faker->sentence(10),
             'is_featured' => $this->faker->boolean(30),  // 30% chance of being featured
-            'sort_order' => $this->faker->numberBetween(0, 100),
-            'file_size' => $this->faker->numberBetween(100000, 5000000),  // 100KB to 5MB
-            'mime_type' => $this->faker->randomElement([
+            'sort_order'  => $this->faker->numberBetween(0, 100),
+            'file_size'   => $this->faker->numberBetween(100000, 5000000),  // 100KB to 5MB
+            'mime_type'   => $this->faker->randomElement([
                 'image/jpeg',
                 'image/png',
                 'image/gif',
                 'image/webp',
             ]),
             'dimensions' => [
-                'width' => $this->faker->numberBetween(400, 2000),
+                'width'  => $this->faker->numberBetween(400, 2000),
                 'height' => $this->faker->numberBetween(300, 1500),
             ],
         ];
@@ -98,7 +98,7 @@ final class NewsImageFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'mime_type' => 'image/jpeg',
-            'file_path' => 'news-images/'.$this->faker->uuid().'.jpg',
+            'file_path' => 'news-images/' . $this->faker->uuid() . '.jpg',
         ]);
     }
 
@@ -106,7 +106,7 @@ final class NewsImageFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'mime_type' => 'image/png',
-            'file_path' => 'news-images/'.$this->faker->uuid().'.png',
+            'file_path' => 'news-images/' . $this->faker->uuid() . '.png',
         ]);
     }
 
@@ -114,7 +114,7 @@ final class NewsImageFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'mime_type' => 'image/gif',
-            'file_path' => 'news-images/'.$this->faker->uuid().'.gif',
+            'file_path' => 'news-images/' . $this->faker->uuid() . '.gif',
         ]);
     }
 
@@ -122,7 +122,7 @@ final class NewsImageFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'mime_type' => 'image/webp',
-            'file_path' => 'news-images/'.$this->faker->uuid().'.webp',
+            'file_path' => 'news-images/' . $this->faker->uuid() . '.webp',
         ]);
     }
 
@@ -130,7 +130,7 @@ final class NewsImageFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'dimensions' => [
-                'width' => $this->faker->numberBetween(1920, 4000),
+                'width'  => $this->faker->numberBetween(1920, 4000),
                 'height' => $this->faker->numberBetween(1080, 3000),
             ],
         ]);
@@ -140,7 +140,7 @@ final class NewsImageFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'dimensions' => [
-                'width' => $this->faker->numberBetween(100, 400),
+                'width'  => $this->faker->numberBetween(100, 400),
                 'height' => $this->faker->numberBetween(100, 300),
             ],
         ]);
@@ -152,7 +152,7 @@ final class NewsImageFactory extends Factory
 
         return $this->state(fn (array $attributes) => [
             'dimensions' => [
-                'width' => $size,
+                'width'  => $size,
                 'height' => $size,
             ],
         ]);
@@ -162,7 +162,7 @@ final class NewsImageFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'dimensions' => [
-                'width' => $this->faker->numberBetween(800, 2000),
+                'width'  => $this->faker->numberBetween(800, 2000),
                 'height' => $this->faker->numberBetween(400, 1000),
             ],
         ]);
@@ -172,7 +172,7 @@ final class NewsImageFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'dimensions' => [
-                'width' => $this->faker->numberBetween(400, 1000),
+                'width'  => $this->faker->numberBetween(400, 1000),
                 'height' => $this->faker->numberBetween(800, 2000),
             ],
         ]);

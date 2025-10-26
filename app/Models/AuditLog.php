@@ -46,9 +46,9 @@ final class AuditLog extends Model
     /**
      * Scope logs to a particular audited entity using either the model instance or morph alias.
      *
-     * @param  Builder<self>        $query
-     * @param  Model|string         $entity   The audited model instance or morph alias.
-     * @param  int|string|null      $entityId Optional identifier when resolving by alias.
+     * @param  Builder<self>   $query
+     * @param  Model|string    $entity   The audited model instance or morph alias.
+     * @param  int|string|null $entityId Optional identifier when resolving by alias.
      * @return Builder<self>
      */
     public function scopeForEntity(Builder $query, Model|string $entity, int|string|null $entityId = null): Builder
@@ -72,7 +72,6 @@ final class AuditLog extends Model
      * Restrict logs to a given audit action such as "created" or "updated".
      *
      * @param  Builder<self> $query
-     * @param  string        $action
      * @return Builder<self>
      */
     public function scopeForAction(Builder $query, string $action): Builder
@@ -84,8 +83,7 @@ final class AuditLog extends Model
     /**
      * Filter logs to those triggered by a specific user identifier.
      *
-     * @param  Builder<self>   $query
-     * @param  int|string|null $userId
+     * @param  Builder<self> $query
      * @return Builder<self>
      */
     public function scopeForUser(Builder $query, int|string|null $userId): Builder

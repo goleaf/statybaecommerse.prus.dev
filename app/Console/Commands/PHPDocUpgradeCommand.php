@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
+use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
 use PhpParser\Node;
@@ -11,6 +12,8 @@ use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitorAbstract;
 use PhpParser\ParserFactory;
 use PhpParser\PrettyPrinter\Standard;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
 
 class PHPDocUpgradeCommand extends Command
 {
@@ -91,28 +94,28 @@ class PHPDocUpgradeCommand extends Command
         }
 
         return [
-            'app/Models' => 'Eloquent Models',
-            'app/Http/Controllers' => 'HTTP Controllers',
-            'app/Services' => 'Service Classes',
+            'app/Models'             => 'Eloquent Models',
+            'app/Http/Controllers'   => 'HTTP Controllers',
+            'app/Services'           => 'Service Classes',
             'app/Filament/Resources' => 'Filament Resources',
-            'app/Filament/Pages' => 'Filament Pages',
-            'app/Filament/Widgets' => 'Filament Widgets',
-            'app/Livewire' => 'Livewire Components',
-            'app/Enums' => 'Enumerations',
-            'app/Traits' => 'Traits',
-            'app/Jobs' => 'Queue Jobs',
-            'app/Events' => 'Events',
-            'app/Listeners' => 'Event Listeners',
-            'app/Notifications' => 'Notifications',
-            'app/Mail' => 'Mailable Classes',
-            'app/Policies' => 'Authorization Policies',
-            'app/Observers' => 'Model Observers',
-            'app/Actions' => 'Action Classes',
-            'app/Data' => 'Data Transfer Objects',
-            'app/Collections' => 'Custom Collections',
-            'app/Contracts' => 'Interface Contracts',
-            'app/Exceptions' => 'Custom Exceptions',
-            'app/Validators' => 'Validation Classes',
+            'app/Filament/Pages'     => 'Filament Pages',
+            'app/Filament/Widgets'   => 'Filament Widgets',
+            'app/Livewire'           => 'Livewire Components',
+            'app/Enums'              => 'Enumerations',
+            'app/Traits'             => 'Traits',
+            'app/Jobs'               => 'Queue Jobs',
+            'app/Events'             => 'Events',
+            'app/Listeners'          => 'Event Listeners',
+            'app/Notifications'      => 'Notifications',
+            'app/Mail'               => 'Mailable Classes',
+            'app/Policies'           => 'Authorization Policies',
+            'app/Observers'          => 'Model Observers',
+            'app/Actions'            => 'Action Classes',
+            'app/Data'               => 'Data Transfer Objects',
+            'app/Collections'        => 'Custom Collections',
+            'app/Contracts'          => 'Interface Contracts',
+            'app/Exceptions'         => 'Custom Exceptions',
+            'app/Validators'         => 'Validation Classes',
         ];
     }
 
@@ -141,8 +144,8 @@ class PHPDocUpgradeCommand extends Command
     private function getPhpFiles(string $directory): array
     {
         $files = [];
-        $iterator = new \RecursiveIteratorIterator(
-            new \RecursiveDirectoryIterator($directory)
+        $iterator = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($directory)
         );
 
         foreach ($iterator as $file) {
@@ -159,7 +162,7 @@ class PHPDocUpgradeCommand extends Command
      */
     private function processFile(string $filePath, string $relativeDirectory): void
     {
-        $relativePath = str_replace(base_path().'/', '', $filePath);
+        $relativePath = str_replace(base_path() . '/', '', $filePath);
 
         try {
             $content = File::get($filePath);
@@ -168,7 +171,7 @@ class PHPDocUpgradeCommand extends Command
             $ast = $parser->parse($content);
 
             if ($ast === null) {
-                throw new \Exception("Could not parse file: {$filePath}");
+                throw new Exception("Could not parse file: {$filePath}");
             }
 
             $traverser = new NodeTraverser;
@@ -188,8 +191,8 @@ class PHPDocUpgradeCommand extends Command
                 $this->upgradedFiles++;
             }
 
-        } catch (\Exception $e) {
-            $this->errors[] = "Error processing {$relativePath}: ".$e->getMessage();
+        } catch (Exception $e) {
+            $this->errors[] = "Error processing {$relativePath}: " . $e->getMessage();
         }
     }
 
@@ -208,13 +211,13 @@ class PHPDocUpgradeCommand extends Command
 
         $this->line('📈 Statistics:');
         $this->line("  • Total Files Scanned: {$this->totalFiles}");
-        $this->line('  • Files '.($this->dryRun ? 'Would Be Upgraded' : 'Upgraded').": {$this->upgradedFiles}");
-        $this->line('  • Files Already Current: '.($this->totalFiles - $this->upgradedFiles - count($this->errors)));
-        $this->line('  • Errors: '.count($this->errors));
+        $this->line('  • Files ' . ($this->dryRun ? 'Would Be Upgraded' : 'Upgraded') . ": {$this->upgradedFiles}");
+        $this->line('  • Files Already Current: ' . ($this->totalFiles - $this->upgradedFiles - count($this->errors)));
+        $this->line('  • Errors: ' . count($this->errors));
 
         if (! empty($this->processedFiles)) {
             $this->newLine();
-            $this->info('✅ '.($this->dryRun ? 'Files that would be upgraded' : 'Upgraded Files').':');
+            $this->info('✅ ' . ($this->dryRun ? 'Files that would be upgraded' : 'Upgraded Files') . ':');
             foreach ($this->processedFiles as $file) {
                 $this->line("  - {$file}");
             }
@@ -249,6 +252,7 @@ class PHPDocUpgradeVisitor extends NodeVisitorAbstract
     private string $directory;
 
     private array $classInfo = [];
+
     public function enterNode(Node $node)
     {
         if ($node instanceof Node\Stmt\Class_) {
@@ -270,13 +274,13 @@ class PHPDocUpgradeVisitor extends NodeVisitorAbstract
 
         // Analyze class structure
         $this->classInfo = [
-            'name' => $className,
-            'type' => 'class',
-            'properties' => [],
-            'methods' => [],
+            'name'          => $className,
+            'type'          => 'class',
+            'properties'    => [],
+            'methods'       => [],
             'relationships' => [],
-            'extends' => $node->extends ? $node->extends->toString() : null,
-            'implements' => array_map(fn ($impl) => $impl->toString(), $node->implements),
+            'extends'       => $node->extends ? $node->extends->toString() : null,
+            'implements'    => array_map(fn ($impl) => $impl->toString(), $node->implements),
         ];
 
         foreach ($node->stmts as $stmt) {
@@ -317,10 +321,10 @@ class PHPDocUpgradeVisitor extends NodeVisitorAbstract
     {
         foreach ($property->props as $prop) {
             $this->classInfo['properties'][] = [
-                'name' => $prop->name->name,
-                'type' => $this->getPropertyType($property),
+                'name'       => $prop->name->name,
+                'type'       => $this->getPropertyType($property),
                 'visibility' => $this->getVisibility($property),
-                'static' => $property->isStatic(),
+                'static'     => $property->isStatic(),
             ];
         }
     }
@@ -328,9 +332,9 @@ class PHPDocUpgradeVisitor extends NodeVisitorAbstract
     private function analyzeMethod(Node\Stmt\ClassMethod $method): void
     {
         $this->classInfo['methods'][] = [
-            'name' => $method->name->name,
+            'name'       => $method->name->name,
             'visibility' => $this->getVisibility($method),
-            'static' => $method->isStatic(),
+            'static'     => $method->isStatic(),
             'parameters' => $this->getMethodParameters($method),
             'returnType' => $this->getReturnType($method),
         ];
@@ -511,22 +515,22 @@ class PHPDocUpgradeVisitor extends NodeVisitorAbstract
         // Common method descriptions
         $descriptions = [
             '__construct' => 'Initialize the class instance with required dependencies.',
-            'index' => 'Display a listing of the resource with pagination and filtering.',
-            'create' => 'Show the form for creating a new resource.',
-            'store' => 'Store a newly created resource in storage with validation.',
-            'show' => 'Display the specified resource with related data.',
-            'edit' => 'Show the form for editing the specified resource.',
-            'update' => 'Update the specified resource in storage with validation.',
-            'destroy' => 'Remove the specified resource from storage.',
-            'form' => 'Configure the Filament form schema with fields and validation.',
-            'table' => 'Configure the Filament table with columns, filters, and actions.',
-            'render' => 'Render the Livewire component view with current state.',
-            'mount' => 'Initialize the Livewire component with parameters.',
-            'boot' => 'Boot the service provider or trait functionality.',
-            'handle' => 'Handle the job, event, or request processing.',
-            'toArray' => 'Convert the instance to an array representation.',
-            'toJson' => 'Convert the instance to a JSON representation.',
-            'validate' => 'Validate the input data against defined rules.',
+            'index'       => 'Display a listing of the resource with pagination and filtering.',
+            'create'      => 'Show the form for creating a new resource.',
+            'store'       => 'Store a newly created resource in storage with validation.',
+            'show'        => 'Display the specified resource with related data.',
+            'edit'        => 'Show the form for editing the specified resource.',
+            'update'      => 'Update the specified resource in storage with validation.',
+            'destroy'     => 'Remove the specified resource from storage.',
+            'form'        => 'Configure the Filament form schema with fields and validation.',
+            'table'       => 'Configure the Filament table with columns, filters, and actions.',
+            'render'      => 'Render the Livewire component view with current state.',
+            'mount'       => 'Initialize the Livewire component with parameters.',
+            'boot'        => 'Boot the service provider or trait functionality.',
+            'handle'      => 'Handle the job, event, or request processing.',
+            'toArray'     => 'Convert the instance to an array representation.',
+            'toJson'      => 'Convert the instance to a JSON representation.',
+            'validate'    => 'Validate the input data against defined rules.',
         ];
 
         return $descriptions[$methodName] ?? "Handle {$methodName} functionality with proper error handling.";
@@ -563,7 +567,7 @@ class PHPDocUpgradeVisitor extends NodeVisitorAbstract
         } elseif ($type instanceof Node\Identifier) {
             return $type->name;
         } elseif ($type instanceof Node\NullableType) {
-            return $this->getTypeString($type->type).'|null';
+            return $this->getTypeString($type->type) . '|null';
         } elseif ($type instanceof Node\UnionType) {
             return implode('|', array_map([$this, 'getTypeString'], $type->types));
         }

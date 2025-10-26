@@ -7,6 +7,7 @@ namespace Tests\Unit\PHP;
 use ArrayObject;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use stdClass;
 
 final class NullSafetyTest extends TestCase
 {
@@ -23,13 +24,13 @@ final class NullSafetyTest extends TestCase
     public static function countSafetyProvider(): array
     {
         return [
-            'null' => [null, 0],
-            'int' => [123, 0],
-            'string' => ['abc', 0],
+            'null'        => [null, 0],
+            'int'         => [123, 0],
+            'string'      => ['abc', 0],
             'empty array' => [[], 0],
-            'array' => [[1, 2, 3], 3],
+            'array'       => [[1, 2, 3], 3],
             'ArrayObject' => [new ArrayObject([1, 2]), 2],
-            'object' => [new \stdClass(), 0],
+            'object'      => [new stdClass, 0],
         ];
     }
 
@@ -46,10 +47,10 @@ final class NullSafetyTest extends TestCase
     public static function strposProvider(): array
     {
         return [
-            'string match at start' => ['abc', 'a', 0],
+            'string match at start'  => ['abc', 'a', 0],
             'string match in middle' => ['abc', 'b', 1],
-            'int haystack' => [12345, '23', 1],
-            'null haystack' => [null, 'a', false],
+            'int haystack'           => [12345, '23', 1],
+            'null haystack'          => [null, 'a', false],
         ];
     }
 
@@ -67,8 +68,8 @@ final class NullSafetyTest extends TestCase
     {
         return [
             'normal string' => [',', 'a,b', ['a', 'b']],
-            'int value' => ['-', 12345, ['12345']],
-            'null value' => [',', null, ['']],
+            'int value'     => ['-', 12345, ['12345']],
+            'null value'    => [',', null, ['']],
         ];
     }
 
@@ -85,12 +86,12 @@ final class NullSafetyTest extends TestCase
     public static function jsonDecodeArrayProvider(): array
     {
         return [
-            'valid object' => ['{"a":1}', ['a' => 1]],
-            'valid array' => ['[]', []],
-            'empty string' => ['', []],
-            'null' => [null, []],
+            'valid object'  => ['{"a":1}', ['a' => 1]],
+            'valid array'   => ['[]', []],
+            'empty string'  => ['', []],
+            'null'          => [null, []],
             'already array' => [['a' => 1], ['a' => 1]],
-            'invalid json' => ['{not valid}', []],
+            'invalid json'  => ['{not valid}', []],
         ];
     }
 }

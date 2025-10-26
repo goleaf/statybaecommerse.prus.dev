@@ -33,12 +33,12 @@ class DocumentTemplateResourceTest extends TestCase
     public function test_can_create_document_template(): void
     {
         $templateData = [
-            'name' => 'Test Template',
+            'name'        => 'Test Template',
             'description' => 'Test template description',
-            'content' => 'Test template content',
-            'type' => 'invoice',
-            'category' => 'financial',
-            'is_active' => true,
+            'content'     => 'Test template content',
+            'type'        => 'invoice',
+            'category'    => 'financial',
+            'is_active'   => true,
         ];
 
         Livewire::test(\App\Filament\Resources\DocumentTemplateResource\Pages\CreateDocumentTemplate::class)
@@ -47,8 +47,8 @@ class DocumentTemplateResourceTest extends TestCase
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('document_templates', [
-            'name' => 'Test Template',
-            'type' => 'invoice',
+            'name'     => 'Test Template',
+            'type'     => 'invoice',
             'category' => 'financial',
         ]);
     }
@@ -61,15 +61,15 @@ class DocumentTemplateResourceTest extends TestCase
             'record' => $template->id,
         ])
             ->fillForm([
-                'name' => 'Updated Template Name',
+                'name'    => 'Updated Template Name',
                 'content' => 'Updated template content',
             ])
             ->call('save')
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('document_templates', [
-            'id' => $template->id,
-            'name' => 'Updated Template Name',
+            'id'      => $template->id,
+            'name'    => 'Updated Template Name',
             'content' => 'Updated template content',
         ]);
     }
@@ -134,8 +134,8 @@ class DocumentTemplateResourceTest extends TestCase
     {
         Livewire::test(\App\Filament\Resources\DocumentTemplateResource\Pages\CreateDocumentTemplate::class)
             ->fillForm([
-                'name' => '', // Required field
-                'type' => 'invalid_type', // Invalid type
+                'name'     => '', // Required field
+                'type'     => 'invalid_type', // Invalid type
                 'category' => 'invalid_category', // Invalid category
             ])
             ->call('create')
@@ -146,10 +146,10 @@ class DocumentTemplateResourceTest extends TestCase
     {
         Livewire::test(\App\Filament\Resources\DocumentTemplateResource\Pages\CreateDocumentTemplate::class)
             ->fillForm([
-                'name' => 'Test Template Name',
-                'type' => 'invoice',
+                'name'     => 'Test Template Name',
+                'type'     => 'invoice',
                 'category' => 'financial',
-                'content' => 'Test content',
+                'content'  => 'Test content',
             ])
             ->call('create')
             ->assertHasNoFormErrors();
@@ -206,7 +206,7 @@ class DocumentTemplateResourceTest extends TestCase
         ]);
 
         $variables = [
-            'name' => 'John Doe',
+            'name'     => 'John Doe',
             'order_id' => '12345',
         ];
 

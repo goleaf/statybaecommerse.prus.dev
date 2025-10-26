@@ -49,6 +49,7 @@ final class AttributionObserver
             $this->normalizeAttributes($after)
         );
     }
+
     public function deleted(Model $model): void
     {
         $original = $this->normalizeAttributes($model->getOriginal());
@@ -70,9 +71,10 @@ final class AttributionObserver
         $original = $this->normalizeAttributes($model->getOriginal());
         $this->storeAuditLog($model, 'deleted', $original, []);
     }
+
     /**
-     * @param  array<string, mixed>  $before
-     * @param  array<string, mixed>  $after
+     * @param array<string, mixed> $before
+     * @param array<string, mixed> $after
      */
     private function storeAuditLog(Model $model, string $action, array $before, array $after): void
     {
@@ -99,12 +101,12 @@ final class AttributionObserver
 
         AuditLog::query()->create([
             'entity_type' => $model->getMorphClass(),
-            'entity_id' => $entityId,
-            'action' => $action,
-            'user_id' => $this->resolveUserId($model),
-            'diff' => [
+            'entity_id'   => $entityId,
+            'action'      => $action,
+            'user_id'     => $this->resolveUserId($model),
+            'diff'        => [
                 'before' => $before,
-                'after' => $after,
+                'after'  => $after,
             ],
         ]);
     }
@@ -139,7 +141,7 @@ final class AttributionObserver
     }
 
     /**
-     * @param  array<string|int, mixed>  $attributes
+     * @param  array<string|int, mixed> $attributes
      * @return array<string, mixed>
      */
     private function normalizeAttributes(array $attributes): array
@@ -154,7 +156,7 @@ final class AttributionObserver
 
     private function normalizeValue(mixed $value): mixed
     {
-        if ($value instanceof \DateTimeInterface) {
+        if ($value instanceof DateTimeInterface) {
             return $value->format(DATE_ATOM);
         }
 

@@ -8,15 +8,15 @@ use Rector\ValueObject\PhpVersion;
 
 return RectorConfig::configure()
     ->withPaths([
-        __DIR__.'/app',
-        __DIR__.'/bootstrap',
-        __DIR__.'/config',
-        __DIR__.'/lang',
-        __DIR__.'/public',
-        __DIR__.'/resources',
-        __DIR__.'/routes',
-        __DIR__.'/scripts',
-        __DIR__.'/tests',
+        __DIR__ . '/app',
+        __DIR__ . '/bootstrap',
+        __DIR__ . '/config',
+        __DIR__ . '/lang',
+        __DIR__ . '/public',
+        __DIR__ . '/resources',
+        __DIR__ . '/routes',
+        __DIR__ . '/scripts',
+        __DIR__ . '/tests',
     ])
     // Ensure Rector mirrors our PHP 8.2 + Laravel 12 runtime expectations.
     ->withPhpVersion(PhpVersion::PHP_82)

@@ -15,8 +15,8 @@ final class TagAwareCache
     private static ?TagAwareCacheFake $fake = null;
 
     /**
-     * @param  callable(): mixed  $callback
-     * @param  array<int, Stringable|scalar|null>  $tags
+     * @param  callable(): mixed                  $callback
+     * @param  array<int, Stringable|scalar|null> $tags
      * @return mixed
      */
     public static function remember(string $key, DateInterval|DateTimeInterface|int $ttl, callable $callback, array $tags = [])
@@ -41,7 +41,7 @@ final class TagAwareCache
     /**
      * Flush caches for the given tag set.
      *
-     * @param  array<int, Stringable|scalar|null>  $tags
+     * @param array<int, Stringable|scalar|null> $tags
      */
     public static function flush(array $tags): void
     {
@@ -76,7 +76,7 @@ final class TagAwareCache
     }
 
     /**
-     * @param  array<int, Stringable|scalar|null>  $tags
+     * @param  array<int, Stringable|scalar|null> $tags
      * @return array<int, string>
      */
     private static function normalizeTags(array $tags): array

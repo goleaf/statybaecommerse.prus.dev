@@ -16,10 +16,10 @@ beforeEach(function () {
 
     // Create admin user
     $this->admin = User::factory()->create([
-        'name' => 'Test Admin',
-        'email' => 'test@admin.com',
+        'name'      => 'Test Admin',
+        'email'     => 'test@admin.com',
         'is_active' => true,
-        'is_admin' => true,
+        'is_admin'  => true,
     ]);
     $this->admin->assignRole($this->adminRole);
 });

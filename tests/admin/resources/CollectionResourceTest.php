@@ -38,15 +38,15 @@ class CollectionResourceTest extends TestCase
     public function test_can_create_collection(): void
     {
         $collectionData = [
-            'name' => 'Test Collection',
-            'slug' => 'test-collection',
-            'description' => 'Test description',
-            'is_visible' => true,
-            'is_automatic' => false,
-            'sort_order' => 1,
-            'display_type' => 'grid',
+            'name'              => 'Test Collection',
+            'slug'              => 'test-collection',
+            'description'       => 'Test description',
+            'is_visible'        => true,
+            'is_automatic'      => false,
+            'sort_order'        => 1,
+            'display_type'      => 'grid',
             'products_per_page' => 12,
-            'show_filters' => true,
+            'show_filters'      => true,
         ];
 
         $this->actingAs($this->adminUser)
@@ -54,9 +54,9 @@ class CollectionResourceTest extends TestCase
             ->assertRedirect();
 
         $this->assertDatabaseHas('collections', [
-            'name' => 'Test Collection',
-            'slug' => 'test-collection',
-            'is_visible' => true,
+            'name'         => 'Test Collection',
+            'slug'         => 'test-collection',
+            'is_visible'   => true,
             'is_automatic' => false,
         ]);
     }
@@ -78,8 +78,8 @@ class CollectionResourceTest extends TestCase
         ]);
 
         $updateData = [
-            'name' => 'Updated Name',
-            'slug' => 'updated-slug',
+            'name'        => 'Updated Name',
+            'slug'        => 'updated-slug',
             'description' => 'Updated description',
         ];
 
@@ -88,7 +88,7 @@ class CollectionResourceTest extends TestCase
             ->assertRedirect();
 
         $this->assertDatabaseHas('collections', [
-            'id' => $collection->id,
+            'id'   => $collection->id,
             'name' => 'Updated Name',
             'slug' => 'updated-slug',
         ]);
@@ -162,7 +162,7 @@ class CollectionResourceTest extends TestCase
             ->assertRedirect();
 
         $this->assertDatabaseHas('collections', [
-            'id' => $collection->id,
+            'id'         => $collection->id,
             'is_visible' => true,
         ]);
     }
@@ -206,12 +206,12 @@ class CollectionResourceTest extends TestCase
     public function test_collection_automatic_rules_validation(): void
     {
         $collectionData = [
-            'name' => 'Automatic Collection',
-            'slug' => 'automatic-collection',
+            'name'         => 'Automatic Collection',
+            'slug'         => 'automatic-collection',
             'is_automatic' => true,
-            'rules' => [
+            'rules'        => [
                 'category_id' => '1',
-                'price_min' => '10',
+                'price_min'   => '10',
             ],
         ];
 
@@ -220,7 +220,7 @@ class CollectionResourceTest extends TestCase
             ->assertRedirect();
 
         $this->assertDatabaseHas('collections', [
-            'name' => 'Automatic Collection',
+            'name'         => 'Automatic Collection',
             'is_automatic' => true,
         ]);
     }
@@ -228,11 +228,11 @@ class CollectionResourceTest extends TestCase
     public function test_collection_meta_fields(): void
     {
         $collectionData = [
-            'name' => 'SEO Collection',
-            'slug' => 'seo-collection',
-            'meta_title' => 'SEO Title',
+            'name'             => 'SEO Collection',
+            'slug'             => 'seo-collection',
+            'meta_title'       => 'SEO Title',
             'meta_description' => 'SEO Description',
-            'meta_keywords' => ['keyword1', 'keyword2'],
+            'meta_keywords'    => ['keyword1', 'keyword2'],
         ];
 
         $this->actingAs($this->adminUser)
@@ -240,8 +240,8 @@ class CollectionResourceTest extends TestCase
             ->assertRedirect();
 
         $this->assertDatabaseHas('collections', [
-            'name' => 'SEO Collection',
-            'meta_title' => 'SEO Title',
+            'name'             => 'SEO Collection',
+            'meta_title'       => 'SEO Title',
             'meta_description' => 'SEO Description',
         ]);
     }
@@ -249,11 +249,11 @@ class CollectionResourceTest extends TestCase
     public function test_collection_display_settings(): void
     {
         $collectionData = [
-            'name' => 'Display Collection',
-            'slug' => 'display-collection',
-            'display_type' => 'list',
+            'name'              => 'Display Collection',
+            'slug'              => 'display-collection',
+            'display_type'      => 'list',
             'products_per_page' => 24,
-            'show_filters' => false,
+            'show_filters'      => false,
         ];
 
         $this->actingAs($this->adminUser)
@@ -261,10 +261,10 @@ class CollectionResourceTest extends TestCase
             ->assertRedirect();
 
         $this->assertDatabaseHas('collections', [
-            'name' => 'Display Collection',
-            'display_type' => 'list',
+            'name'              => 'Display Collection',
+            'display_type'      => 'list',
             'products_per_page' => 24,
-            'show_filters' => false,
+            'show_filters'      => false,
         ]);
     }
 
@@ -274,14 +274,14 @@ class CollectionResourceTest extends TestCase
 
         $this->actingAs($this->adminUser)
             ->post('/admin/collections/bulk-actions', [
-                'action' => 'toggle_visibility',
+                'action'  => 'toggle_visibility',
                 'records' => $collections->pluck('id')->toArray(),
             ])
             ->assertRedirect();
 
         foreach ($collections as $collection) {
             $this->assertDatabaseHas('collections', [
-                'id' => $collection->id,
+                'id'         => $collection->id,
                 'is_visible' => true,
             ]);
         }
@@ -317,8 +317,8 @@ class CollectionResourceTest extends TestCase
         $collection = Collection::factory()->create();
 
         $translationData = [
-            'locale' => 'lt',
-            'name' => 'Test Kolekcija',
+            'locale'      => 'lt',
+            'name'        => 'Test Kolekcija',
             'description' => 'Test aprašymas',
         ];
 
@@ -328,8 +328,8 @@ class CollectionResourceTest extends TestCase
 
         $this->assertDatabaseHas('collection_translations', [
             'collection_id' => $collection->id,
-            'locale' => 'lt',
-            'name' => 'Test Kolekcija',
+            'locale'        => 'lt',
+            'name'          => 'Test Kolekcija',
         ]);
     }
 

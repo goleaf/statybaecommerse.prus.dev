@@ -9,10 +9,9 @@ use App\Models\AttributeValue;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Services\ProductVariantAttributeMatrixService;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Schema;
-use Tests\Unit\UnitTestCase;
 
 final class ProductVariantAttributeMatrixServiceTest extends UnitTestCase
 {

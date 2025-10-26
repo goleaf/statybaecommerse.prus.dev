@@ -35,6 +35,6 @@ final class RateLimiter extends BaseRateLimiter
 
     public function fake(?CacheRepository $repository = null): void
     {
-        $this->cache = $repository ?? new Repository(new ArrayStore());
+        $this->cache = $repository ?? new Repository(new ArrayStore);
     }
 }

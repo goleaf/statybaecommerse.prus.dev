@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 // Normalizes all $navigationGroup declarations across app/Filament/** to typed UnitEnum|string|null
 
-require_once __DIR__.'/../vendor/autoload.php';
+require_once __DIR__ . '/../vendor/autoload.php';
 
 use App\Support\Filament\Constants\NavigationGroupConstants;
 
 $root = dirname(__DIR__);
 $targets = [
-    $root.'/app/Filament/Resources',
-    $root.'/app/Filament/Pages',
-    $root.'/app/Filament/Widgets',
+    $root . '/app/Filament/Resources',
+    $root . '/app/Filament/Pages',
+    $root . '/app/Filament/Widgets',
 ];
 
 function getPhpFiles(string $dir): array
@@ -42,7 +42,7 @@ function normalizeFile(string $path): bool
     // Ensure import present
     if (strpos($content, NavigationGroupConstants::UNIT_ENUM_USE) === false) {
         $pattern = sprintf('/(use\s+[^;]+;\s*\n)(?!.*%s)/', NavigationGroupConstants::unitEnumImportPattern());
-        $content = preg_replace($pattern, "\$1".NavigationGroupConstants::UNIT_ENUM_USE."\n", $content, 1) ?? $content;
+        $content = preg_replace($pattern, '$1' . NavigationGroupConstants::UNIT_ENUM_USE . "\n", $content, 1) ?? $content;
     }
 
     // Remove any @var UnitEnum|string|null docblock directly above property and convert to typed property
@@ -87,7 +87,7 @@ function normalizeFile(string $path): bool
 
     if ($content !== $orig) {
         file_put_contents($path, $content);
-        echo 'Normalized: '.$path."\n";
+        echo 'Normalized: ' . $path . "\n";
 
         return true;
     }

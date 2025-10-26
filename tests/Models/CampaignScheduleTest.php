@@ -26,12 +26,12 @@ final class CampaignScheduleTest extends TestCase
 
         // Act: mass assign the payload so we know the fillable list is correct.
         $schedule = CampaignSchedule::create([
-            'campaign_id' => $campaign->id,
-            'schedule_type' => ScheduleType::DAILY,
+            'campaign_id'     => $campaign->id,
+            'schedule_type'   => ScheduleType::DAILY,
             'schedule_config' => ['time' => '08:30', 'timezone' => 'UTC'],
-            'next_run_at' => now()->addDay(),
-            'last_run_at' => now()->subDay(),
-            'is_active' => true,
+            'next_run_at'     => now()->addDay(),
+            'last_run_at'     => now()->subDay(),
+            'is_active'       => true,
         ]);
 
         // Assert: the model persisted and the enum cast remained intact.
@@ -44,10 +44,10 @@ final class CampaignScheduleTest extends TestCase
     {
         // Arrange: create a schedule with explicit values to interrogate casts.
         $schedule = CampaignSchedule::factory()->create([
-            'schedule_type' => ScheduleType::WEEKLY,
+            'schedule_type'   => ScheduleType::WEEKLY,
             'schedule_config' => ['time' => '12:00', 'timezone' => 'UTC'],
-            'next_run_at' => now()->addHour(),
-            'last_run_at' => now()->subHour(),
+            'next_run_at'     => now()->addHour(),
+            'last_run_at'     => now()->subHour(),
         ]);
 
         // Assert: the JSON field becomes an array and date fields are Carbon instances.

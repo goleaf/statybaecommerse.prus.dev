@@ -18,16 +18,16 @@ final class RegionFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => $this->faker->city().' Region',
-            'code' => $this->faker->unique()->lexify('REG???'),
-            'slug' => $this->faker->unique()->slug(2),
+            'name'        => $this->faker->city() . ' Region',
+            'code'        => $this->faker->unique()->lexify('REG???'),
+            'slug'        => $this->faker->unique()->slug(2),
             'description' => $this->faker->optional(0.8)->paragraph(),
-            'country_id' => Country::factory(),
-            'parent_id' => $this->faker->optional(0.3)->randomElement([Region::factory(), null]),
-            'level' => $this->faker->numberBetween(0, 5),
-            'is_enabled' => $this->faker->boolean(85),
-            'is_default' => $this->faker->boolean(10),
-            'sort_order' => $this->faker->numberBetween(0, 100),
+            'country_id'  => Country::factory(),
+            'parent_id'   => $this->faker->optional(0.3)->randomElement([Region::factory(), null]),
+            'level'       => $this->faker->numberBetween(0, 5),
+            'is_enabled'  => $this->faker->boolean(85),
+            'is_default'  => $this->faker->boolean(10),
+            'sort_order'  => $this->faker->numberBetween(0, 100),
         ];
     }
 
@@ -74,7 +74,6 @@ final class RegionFactory extends Factory
         ]);
     }
 
-
     public function withCode(string $code): static
     {
         return $this->state(fn (array $attributes) => [
@@ -92,35 +91,35 @@ final class RegionFactory extends Factory
     public function stateProvince(): static
     {
         return $this->level(1)->state(fn (array $attributes) => [
-            'name' => $this->faker->state().' State',
+            'name' => $this->faker->state() . ' State',
         ]);
     }
 
     public function county(): static
     {
         return $this->level(2)->state(fn (array $attributes) => [
-            'name' => $this->faker->city().' County',
+            'name' => $this->faker->city() . ' County',
         ]);
     }
 
     public function district(): static
     {
         return $this->level(3)->state(fn (array $attributes) => [
-            'name' => $this->faker->city().' District',
+            'name' => $this->faker->city() . ' District',
         ]);
     }
 
     public function municipality(): static
     {
         return $this->level(4)->state(fn (array $attributes) => [
-            'name' => $this->faker->city().' Municipality',
+            'name' => $this->faker->city() . ' Municipality',
         ]);
     }
 
     public function village(): static
     {
         return $this->level(5)->state(fn (array $attributes) => [
-            'name' => $this->faker->city().' Village',
+            'name' => $this->faker->city() . ' Village',
         ]);
     }
 }

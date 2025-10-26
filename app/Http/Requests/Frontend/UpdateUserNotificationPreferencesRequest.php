@@ -16,7 +16,7 @@ class UpdateUserNotificationPreferencesRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'notification_preferences' => ['nullable', 'array'],
+            'notification_preferences'   => ['nullable', 'array'],
             'notification_preferences.*' => ['boolean'],
         ];
     }

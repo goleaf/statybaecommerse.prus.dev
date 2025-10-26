@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Models\EmailCampaign;
 use App\Models\EmailCampaignRecipient;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+
 // Provide database refreshing while the central Pest configuration loads the Laravel TestCase scaffold.
 uses(RefreshDatabase::class);
 

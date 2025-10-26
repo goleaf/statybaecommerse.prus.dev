@@ -29,7 +29,7 @@ final class UnreserveStockRequest extends FormRequest
     {
         return [
             'quantity' => ['required', 'integer', 'min:1', 'max:' . $this->maxReserved],
-            'notes' => ['nullable', 'string', 'max:1000'],
+            'notes'    => ['nullable', 'string', 'max:1000'],
         ];
     }
 
@@ -52,4 +52,3 @@ final class UnreserveStockRequest extends FormRequest
         return VariantInventory::find((int) $stock);
     }
 }
-

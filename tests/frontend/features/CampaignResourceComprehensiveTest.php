@@ -50,30 +50,30 @@ it('can create a campaign with all fields', function (): void {
 
     Livewire::test(CreateCampaign::class)
         ->fillForm([
-            'name' => 'Summer Sale Campaign',
-            'slug' => 'summer-sale-campaign',
-            'description' => 'Amazing summer sale with great discounts',
-            'type' => 'banner',
-            'status' => 'active',
-            'start_date' => now()->format('Y-m-d H:i:s'),
-            'end_date' => now()->addDays(30)->format('Y-m-d H:i:s'),
-            'budget' => 5000.0,
-            'budget_limit' => 10000.0,
-            'target_audience' => 'all_customers',
-            'display_priority' => 10,
-            'is_featured' => true,
-            'subject' => 'Summer Sale Subject',
-            'content' => 'Summer sale content with amazing offers',
-            'cta_text' => 'Shop Now',
-            'cta_url' => 'https://example.com/shop',
-            'track_conversions' => true,
-            'send_notifications' => true,
-            'max_uses' => 1000,
-            'meta_title' => 'Summer Sale Meta Title',
-            'meta_description' => 'Summer sale meta description',
-            'social_media_ready' => true,
-            'auto_start' => false,
-            'auto_end' => true,
+            'name'                 => 'Summer Sale Campaign',
+            'slug'                 => 'summer-sale-campaign',
+            'description'          => 'Amazing summer sale with great discounts',
+            'type'                 => 'banner',
+            'status'               => 'active',
+            'start_date'           => now()->format('Y-m-d H:i:s'),
+            'end_date'             => now()->addDays(30)->format('Y-m-d H:i:s'),
+            'budget'               => 5000.0,
+            'budget_limit'         => 10000.0,
+            'target_audience'      => 'all_customers',
+            'display_priority'     => 10,
+            'is_featured'          => true,
+            'subject'              => 'Summer Sale Subject',
+            'content'              => 'Summer sale content with amazing offers',
+            'cta_text'             => 'Shop Now',
+            'cta_url'              => 'https://example.com/shop',
+            'track_conversions'    => true,
+            'send_notifications'   => true,
+            'max_uses'             => 1000,
+            'meta_title'           => 'Summer Sale Meta Title',
+            'meta_description'     => 'Summer sale meta description',
+            'social_media_ready'   => true,
+            'auto_start'           => false,
+            'auto_end'             => true,
             'auto_pause_on_budget' => true,
         ])
         ->call('create')
@@ -93,14 +93,14 @@ it('can create a campaign with relationships', function (): void {
 
     Livewire::test(CreateCampaign::class)
         ->fillForm([
-            'name' => 'Product Campaign',
-            'slug' => 'product-campaign',
-            'type' => 'email',
-            'status' => 'active',
-            'start_date' => now()->format('Y-m-d H:i:s'),
-            'end_date' => now()->addDays(7)->format('Y-m-d H:i:s'),
-            'target_categories' => [$this->category->id],
-            'target_products' => [$this->product->id],
+            'name'                   => 'Product Campaign',
+            'slug'                   => 'product-campaign',
+            'type'                   => 'email',
+            'status'                 => 'active',
+            'start_date'             => now()->format('Y-m-d H:i:s'),
+            'end_date'               => now()->addDays(7)->format('Y-m-d H:i:s'),
+            'target_categories'      => [$this->category->id],
+            'target_products'        => [$this->product->id],
             'target_customer_groups' => [$this->customerGroup->id],
         ])
         ->call('create')
@@ -115,8 +115,8 @@ it('can create a campaign with relationships', function (): void {
 
 it('can edit a campaign', function (): void {
     $campaign = Campaign::factory()->create([
-        'name' => 'Original Name',
-        'budget' => 1000.0,
+        'name'        => 'Original Name',
+        'budget'      => 1000.0,
         'is_featured' => false,
     ]);
 
@@ -124,8 +124,8 @@ it('can edit a campaign', function (): void {
 
     Livewire::test(EditCampaign::class, ['record' => $campaign->getKey()])
         ->fillForm([
-            'name' => 'Updated Name',
-            'budget' => 2000.0,
+            'name'        => 'Updated Name',
+            'budget'      => 2000.0,
             'is_featured' => true,
         ])
         ->call('save')
@@ -139,7 +139,7 @@ it('can edit a campaign', function (): void {
 
 it('can view a campaign', function (): void {
     $campaign = Campaign::factory()->create([
-        'name' => 'View Test Campaign',
+        'name'        => 'View Test Campaign',
         'description' => 'Test description',
     ]);
 
@@ -303,7 +303,7 @@ it('can filter campaigns by date range', function (): void {
         ->filterTable('created_at', [
             'range' => [
                 'start' => now()->subDays(5)->format('Y-m-d'),
-                'end' => now()->subDays(1)->format('Y-m-d'),
+                'end'   => now()->subDays(1)->format('Y-m-d'),
             ],
         ])
         ->assertCanSeeTableRecords([$recentCampaign])
@@ -411,9 +411,9 @@ it('validates required fields on create', function (): void {
 
     Livewire::test(CreateCampaign::class)
         ->fillForm([
-            'name' => '',
-            'slug' => '',
-            'type' => '',
+            'name'   => '',
+            'slug'   => '',
+            'type'   => '',
             'status' => '',
         ])
         ->call('create')
@@ -427,9 +427,9 @@ it('validates unique slug', function (): void {
 
     Livewire::test(CreateCampaign::class)
         ->fillForm([
-            'name' => 'Test Campaign',
-            'slug' => 'existing-slug',
-            'type' => 'banner',
+            'name'   => 'Test Campaign',
+            'slug'   => 'existing-slug',
+            'type'   => 'banner',
             'status' => 'active',
         ])
         ->call('create')
@@ -441,10 +441,10 @@ it('validates url format for cta_url', function (): void {
 
     Livewire::test(CreateCampaign::class)
         ->fillForm([
-            'name' => 'Test Campaign',
-            'slug' => 'test-campaign',
-            'type' => 'banner',
-            'status' => 'active',
+            'name'    => 'Test Campaign',
+            'slug'    => 'test-campaign',
+            'type'    => 'banner',
+            'status'  => 'active',
             'cta_url' => 'invalid-url',
         ])
         ->call('create')
@@ -456,11 +456,11 @@ it('validates numeric values for budget and budget_limit', function (): void {
 
     Livewire::test(CreateCampaign::class)
         ->fillForm([
-            'name' => 'Test Campaign',
-            'slug' => 'test-campaign',
-            'type' => 'banner',
-            'status' => 'active',
-            'budget' => 'not-a-number',
+            'name'         => 'Test Campaign',
+            'slug'         => 'test-campaign',
+            'type'         => 'banner',
+            'status'       => 'active',
+            'budget'       => 'not-a-number',
             'budget_limit' => 'also-not-a-number',
         ])
         ->call('create')
@@ -472,13 +472,13 @@ it('validates min value for numeric fields', function (): void {
 
     Livewire::test(CreateCampaign::class)
         ->fillForm([
-            'name' => 'Test Campaign',
-            'slug' => 'test-campaign',
-            'type' => 'banner',
-            'status' => 'active',
-            'budget' => -100,
+            'name'         => 'Test Campaign',
+            'slug'         => 'test-campaign',
+            'type'         => 'banner',
+            'status'       => 'active',
+            'budget'       => -100,
             'budget_limit' => -50,
-            'max_uses' => -10,
+            'max_uses'     => -10,
         ])
         ->call('create')
         ->assertHasFormErrors(['budget', 'budget_limit', 'max_uses']);
@@ -489,9 +489,9 @@ it('validates max length for text fields', function (): void {
 
     Livewire::test(CreateCampaign::class)
         ->fillForm([
-            'name' => str_repeat('a', 256),  // Exceeds 255 char limit
-            'slug' => str_repeat('a', 256),  // Exceeds 255 char limit
-            'type' => 'banner',
+            'name'   => str_repeat('a', 256),  // Exceeds 255 char limit
+            'slug'   => str_repeat('a', 256),  // Exceeds 255 char limit
+            'type'   => 'banner',
             'status' => 'active',
         ])
         ->call('create')
@@ -503,11 +503,11 @@ it('validates meta title and description length', function (): void {
 
     Livewire::test(CreateCampaign::class)
         ->fillForm([
-            'name' => 'Test Campaign',
-            'slug' => 'test-campaign',
-            'type' => 'banner',
-            'status' => 'active',
-            'meta_title' => str_repeat('a', 61),  // Exceeds 60 char limit
+            'name'             => 'Test Campaign',
+            'slug'             => 'test-campaign',
+            'type'             => 'banner',
+            'status'           => 'active',
+            'meta_title'       => str_repeat('a', 61),  // Exceeds 60 char limit
             'meta_description' => str_repeat('a', 161),  // Exceeds 160 char limit
         ])
         ->call('create')
@@ -521,9 +521,9 @@ it('can handle media uploads', function (): void {
     // For now, we'll test that the form accepts the media fields
     Livewire::test(CreateCampaign::class)
         ->fillForm([
-            'name' => 'Media Test Campaign',
-            'slug' => 'media-test-campaign',
-            'type' => 'banner',
+            'name'   => 'Media Test Campaign',
+            'slug'   => 'media-test-campaign',
+            'type'   => 'banner',
             'status' => 'active',
         ])
         ->call('create')
@@ -538,10 +538,10 @@ it('can handle conditional fields based on campaign type', function (): void {
     // Test email campaign with subject field
     Livewire::test(CreateCampaign::class)
         ->fillForm([
-            'name' => 'Email Campaign',
-            'slug' => 'email-campaign',
-            'type' => 'email',
-            'status' => 'active',
+            'name'    => 'Email Campaign',
+            'slug'    => 'email-campaign',
+            'type'    => 'email',
+            'status'  => 'active',
             'subject' => 'Email Subject',
         ])
         ->call('create')
@@ -550,10 +550,10 @@ it('can handle conditional fields based on campaign type', function (): void {
     // Test SMS campaign with subject field
     Livewire::test(CreateCampaign::class)
         ->fillForm([
-            'name' => 'SMS Campaign',
-            'slug' => 'sms-campaign',
-            'type' => 'sms',
-            'status' => 'active',
+            'name'    => 'SMS Campaign',
+            'slug'    => 'sms-campaign',
+            'type'    => 'sms',
+            'status'  => 'active',
             'subject' => 'SMS Subject',
         ])
         ->call('create')
@@ -562,9 +562,9 @@ it('can handle conditional fields based on campaign type', function (): void {
     // Test banner campaign without subject field
     Livewire::test(CreateCampaign::class)
         ->fillForm([
-            'name' => 'Banner Campaign',
-            'slug' => 'banner-campaign',
-            'type' => 'banner',
+            'name'   => 'Banner Campaign',
+            'slug'   => 'banner-campaign',
+            'type'   => 'banner',
             'status' => 'active',
         ])
         ->call('create')
@@ -583,12 +583,12 @@ it('can handle multiple target selections', function (): void {
 
     Livewire::test(CreateCampaign::class)
         ->fillForm([
-            'name' => 'Multi Target Campaign',
-            'slug' => 'multi-target-campaign',
-            'type' => 'banner',
-            'status' => 'active',
-            'target_categories' => [$category1->id, $category2->id],
-            'target_products' => [$product1->id, $product2->id],
+            'name'                   => 'Multi Target Campaign',
+            'slug'                   => 'multi-target-campaign',
+            'type'                   => 'banner',
+            'status'                 => 'active',
+            'target_categories'      => [$category1->id, $category2->id],
+            'target_products'        => [$product1->id, $product2->id],
             'target_customer_groups' => [$group1->id, $group2->id],
         ])
         ->call('create')
@@ -605,16 +605,16 @@ it('can handle campaign with all automation settings', function (): void {
 
     Livewire::test(CreateCampaign::class)
         ->fillForm([
-            'name' => 'Automated Campaign',
-            'slug' => 'automated-campaign',
-            'type' => 'email',
-            'status' => 'scheduled',
-            'start_date' => now()->addDay()->format('Y-m-d H:i:s'),
-            'end_date' => now()->addDays(30)->format('Y-m-d H:i:s'),
-            'auto_start' => true,
-            'auto_end' => true,
+            'name'                 => 'Automated Campaign',
+            'slug'                 => 'automated-campaign',
+            'type'                 => 'email',
+            'status'               => 'scheduled',
+            'start_date'           => now()->addDay()->format('Y-m-d H:i:s'),
+            'end_date'             => now()->addDays(30)->format('Y-m-d H:i:s'),
+            'auto_start'           => true,
+            'auto_end'             => true,
             'auto_pause_on_budget' => true,
-            'budget_limit' => 1000.0,
+            'budget_limit'         => 1000.0,
         ])
         ->call('create')
         ->assertHasNoFormErrors();
@@ -630,13 +630,13 @@ it('can handle campaign with all tracking settings', function (): void {
 
     Livewire::test(CreateCampaign::class)
         ->fillForm([
-            'name' => 'Tracking Campaign',
-            'slug' => 'tracking-campaign',
-            'type' => 'banner',
-            'status' => 'active',
-            'track_conversions' => true,
+            'name'               => 'Tracking Campaign',
+            'slug'               => 'tracking-campaign',
+            'type'               => 'banner',
+            'status'             => 'active',
+            'track_conversions'  => true,
             'send_notifications' => true,
-            'max_uses' => 500,
+            'max_uses'           => 500,
             'social_media_ready' => true,
         ])
         ->call('create')

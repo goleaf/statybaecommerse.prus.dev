@@ -22,12 +22,12 @@ final class NewsTranslationFactory extends Factory
             : fake('en_US')->sentence(3);
 
         return [
-            'locale' => $locale,
-            'title' => $title,
-            'slug' => str($title)->slug()->toString(),
-            'summary' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-            'content' => '<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>',
-            'seo_title' => $title,
+            'locale'          => $locale,
+            'title'           => $title,
+            'slug'            => str($title)->slug()->toString(),
+            'summary'         => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+            'content'         => '<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>',
+            'seo_title'       => $title,
             'seo_description' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
         ];
     }

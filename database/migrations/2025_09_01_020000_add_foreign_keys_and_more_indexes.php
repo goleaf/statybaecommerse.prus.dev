@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
@@ -48,7 +50,7 @@ return new class extends Migration
         try {
             $driver = DB::getDriverName();
             if ($driver === 'mysql') {
-                $cols = '`'.implode('`,`', $columns).'`';
+                $cols = '`' . implode('`,`', $columns) . '`';
                 DB::statement("CREATE INDEX IF NOT EXISTS `{$name}` ON `{$table}` ({$cols})");
             } else {
                 Schema::table($table, function (Blueprint $t) use ($columns, $name) {

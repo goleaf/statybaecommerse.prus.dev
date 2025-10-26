@@ -175,12 +175,12 @@ final class NewGlobalScopesTest extends TestCase
         $inactiveMenu = Menu::factory()->create(['is_active' => false]);
 
         $visibleItem = MenuItem::factory()->create([
-            'menu_id' => $activeMenu->id,
+            'menu_id'    => $activeMenu->id,
             'is_visible' => true,
         ]);
 
         $hiddenItem = MenuItem::factory()->create([
-            'menu_id' => $inactiveMenu->id,
+            'menu_id'    => $inactiveMenu->id,
             'is_visible' => false,
         ]);
 

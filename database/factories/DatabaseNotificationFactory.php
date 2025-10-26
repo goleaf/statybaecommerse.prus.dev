@@ -23,7 +23,7 @@ class DatabaseNotificationFactory extends Factory
     public function definition(): array
     {
         return [
-            'id' => $this->faker->uuid(),
+            'id'   => $this->faker->uuid(),
             'type' => $this->faker->randomElement([
                 'App\Notifications\OrderNotification',
                 'App\Notifications\ProductNotification',
@@ -37,16 +37,16 @@ class DatabaseNotificationFactory extends Factory
                 'App\Notifications\SupportNotification',
             ]),
             'notifiable_type' => User::class,
-            'notifiable_id' => User::factory(),
-            'data' => [
-                'title' => $this->faker->sentence(3),
+            'notifiable_id'   => User::factory(),
+            'data'            => [
+                'title'   => $this->faker->sentence(3),
                 'message' => $this->faker->paragraph(2),
-                'type' => $this->faker->randomElement([
+                'type'    => $this->faker->randomElement([
                     'order', 'product', 'user', 'system', 'payment',
                     'shipping', 'review', 'promotion', 'newsletter', 'support',
                 ]),
                 'action_url' => $this->faker->url(),
-                'icon' => $this->faker->randomElement([
+                'icon'       => $this->faker->randomElement([
                     'heroicon-o-bell',
                     'heroicon-o-shopping-bag',
                     'heroicon-o-cube',
@@ -54,7 +54,7 @@ class DatabaseNotificationFactory extends Factory
                     'heroicon-o-cog-6-tooth',
                 ]),
             ],
-            'read_at' => $this->faker->optional(0.3)->dateTimeBetween('-1 month', 'now'),
+            'read_at'    => $this->faker->optional(0.3)->dateTimeBetween('-1 month', 'now'),
             'created_at' => $this->faker->dateTimeBetween('-1 month', 'now'),
             'updated_at' => $this->faker->dateTimeBetween('-1 month', 'now'),
         ];
@@ -88,7 +88,7 @@ class DatabaseNotificationFactory extends Factory
         return $this->state(fn (array $attributes) => [
             'type' => 'App\Notifications\OrderNotification',
             'data' => array_merge($attributes['data'] ?? [], [
-                'type' => 'order',
+                'type'  => 'order',
                 'title' => $this->faker->randomElement([
                     'Order Confirmed',
                     'Order Shipped',
@@ -115,7 +115,7 @@ class DatabaseNotificationFactory extends Factory
         return $this->state(fn (array $attributes) => [
             'type' => 'App\Notifications\ProductNotification',
             'data' => array_merge($attributes['data'] ?? [], [
-                'type' => 'product',
+                'type'  => 'product',
                 'title' => $this->faker->randomElement([
                     'New Product Available',
                     'Product Back in Stock',
@@ -140,7 +140,7 @@ class DatabaseNotificationFactory extends Factory
         return $this->state(fn (array $attributes) => [
             'type' => 'App\Notifications\SystemNotification',
             'data' => array_merge($attributes['data'] ?? [], [
-                'type' => 'system',
+                'type'  => 'system',
                 'title' => $this->faker->randomElement([
                     'System Maintenance',
                     'Security Update',

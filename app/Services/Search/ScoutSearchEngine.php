@@ -32,20 +32,20 @@ final class ScoutSearchEngine
             $price = (float) ($product->price ?? 0);
 
             $payload[] = [
-                'id' => $product->getKey(),
-                'type' => 'product',
-                'title' => $product->name,
-                'subtitle' => $product->brand?->name,
-                'description' => $product->short_description ?: ($product->description ?: null),
-                'price' => $price,
+                'id'              => $product->getKey(),
+                'type'            => 'product',
+                'title'           => $product->name,
+                'subtitle'        => $product->brand?->name,
+                'description'     => $product->short_description ?: ($product->description ?: null),
+                'price'           => $price,
                 'formatted_price' => (string) Number::currency($price, current_currency(), app()->getLocale()),
-                'image' => $product->thumbnail ?? $product->main_image,
-                'url' => route('products.show', $product->slug),
+                'image'           => $product->thumbnail ?? $product->main_image,
+                'url'             => route('products.show', $product->slug),
                 'relevance_score' => 1.0,
-                'sales_count' => (int) ($product->sales_count ?? 0),
-                'reviews_count' => (int) ($product->reviews_count ?? 0),
-                'average_rating' => (float) ($product->average_rating ?? 0),
-                'is_featured' => (bool) $product->is_featured,
+                'sales_count'     => (int) ($product->sales_count ?? 0),
+                'reviews_count'   => (int) ($product->reviews_count ?? 0),
+                'average_rating'  => (float) ($product->average_rating ?? 0),
+                'is_featured'     => (bool) $product->is_featured,
             ];
         }
 
@@ -75,15 +75,15 @@ final class ScoutSearchEngine
             $childrenCount = $category->children()->count();
 
             $payload[] = [
-                'id' => $category->getKey(),
-                'type' => 'category',
-                'title' => $category->name,
-                'subtitle' => __('frontend.search.category_with_products', ['count' => $productsCount]),
-                'description' => $category->description ?: ($category->short_description ?? null),
-                'image' => null,
-                'url' => route('categories.show', $category->slug),
-                'products_count' => $productsCount,
-                'children_count' => $childrenCount,
+                'id'              => $category->getKey(),
+                'type'            => 'category',
+                'title'           => $category->name,
+                'subtitle'        => __('frontend.search.category_with_products', ['count' => $productsCount]),
+                'description'     => $category->description ?: ($category->short_description ?? null),
+                'image'           => null,
+                'url'             => route('categories.show', $category->slug),
+                'products_count'  => $productsCount,
+                'children_count'  => $childrenCount,
                 'relevance_score' => 1.0,
             ];
         }
@@ -113,14 +113,14 @@ final class ScoutSearchEngine
                 ->count();
 
             $payload[] = [
-                'id' => $brand->getKey(),
-                'type' => 'brand',
-                'title' => $brand->name,
-                'subtitle' => __('frontend.search.brand_with_products', ['count' => $productsCount]),
-                'description' => $brand->description,
-                'image' => $brand->logo,
-                'url' => route('brands.show', $brand->slug),
-                'products_count' => $productsCount,
+                'id'              => $brand->getKey(),
+                'type'            => 'brand',
+                'title'           => $brand->name,
+                'subtitle'        => __('frontend.search.brand_with_products', ['count' => $productsCount]),
+                'description'     => $brand->description,
+                'image'           => $brand->logo,
+                'url'             => route('brands.show', $brand->slug),
+                'products_count'  => $productsCount,
                 'relevance_score' => 1.0,
             ];
         }
@@ -129,7 +129,7 @@ final class ScoutSearchEngine
     }
 
     /**
-     * @param  class-string  $modelClass
+     * @param  class-string                                      $modelClass
      * @return ScoutBuilder<\Illuminate\Database\Eloquent\Model>
      */
     private function builderFor(string $modelClass, string $query, int $limit): ScoutBuilder

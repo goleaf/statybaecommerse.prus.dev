@@ -24,7 +24,7 @@ final class BrandController extends Controller
 
         return view('frontend.brands.index', array_merge($data, [
             'highlightedBrands' => $this->productData->brandHighlights(12),
-            'featuredProducts' => $this->productData->featured(4),
+            'featuredProducts'  => $this->productData->featured(4),
         ]));
     }
 

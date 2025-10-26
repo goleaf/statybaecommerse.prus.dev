@@ -20,13 +20,13 @@ class ContactControllerTest extends TestCase
     {
         Company::factory()->active()->create([
             'address' => 'Konstitucijos pr. 7, Vilnius',
-            'phone' => '+37060000000',
+            'phone'   => '+37060000000',
         ]);
 
         SystemSetting::factory()->active()->public()->create([
-            'key' => 'mail.support_email',
+            'key'   => 'mail.support_email',
             'value' => 'support@example.test',
-            'type' => 'email',
+            'type'  => 'email',
             'group' => 'email',
         ]);
 
@@ -42,11 +42,11 @@ class ContactControllerTest extends TestCase
         Queue::fake();
 
         $payload = [
-            'name' => 'John Doe',
-            'email' => 'john@example.com',
-            'subject' => 'Order question',
-            'message' => 'I would like to know more about my order.',
-            'phone' => '+37060000000',
+            'name'         => 'John Doe',
+            'email'        => 'john@example.com',
+            'subject'      => 'Order question',
+            'message'      => 'I would like to know more about my order.',
+            'phone'        => '+37060000000',
             'order_number' => 'ORD-1001',
         ];
 
@@ -56,8 +56,8 @@ class ContactControllerTest extends TestCase
         $response->assertSessionHas('success', __('frontend/contact.flash.success'));
 
         $this->assertDatabaseHas('contact_messages', [
-            'email' => 'john@example.com',
-            'subject' => 'Order question',
+            'email'        => 'john@example.com',
+            'subject'      => 'Order question',
             'order_number' => 'ORD-1001',
         ]);
 

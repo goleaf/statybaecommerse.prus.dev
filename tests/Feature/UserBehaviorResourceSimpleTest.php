@@ -27,7 +27,7 @@ final class UserBehaviorResourceSimpleTest extends TestCase
         parent::setUp();
 
         $this->adminUser = User::factory()->create([
-            'email' => 'admin@example.com',
+            'email'    => 'admin@example.com',
             'is_admin' => true,
         ]);
     }
@@ -40,23 +40,23 @@ final class UserBehaviorResourceSimpleTest extends TestCase
         $category = Category::factory()->create();
 
         $userBehavior = UserBehavior::create([
-            'user_id' => $this->adminUser->id,
+            'user_id'       => $this->adminUser->id,
             'behavior_type' => 'view',
-            'product_id' => $product->id,
-            'category_id' => $category->id,
-            'session_id' => 'test-session-123',
-            'referrer' => 'https://example.com',
-            'user_agent' => 'Mozilla/5.0 (Test Browser)',
-            'ip_address' => '192.168.1.1',
-            'metadata' => ['test_key' => 'test_value'],
+            'product_id'    => $product->id,
+            'category_id'   => $category->id,
+            'session_id'    => 'test-session-123',
+            'referrer'      => 'https://example.com',
+            'user_agent'    => 'Mozilla/5.0 (Test Browser)',
+            'ip_address'    => '192.168.1.1',
+            'metadata'      => ['test_key' => 'test_value'],
         ]);
 
         $this->assertDatabaseHas('user_behaviors', [
-            'id' => $userBehavior->id,
-            'user_id' => $this->adminUser->id,
+            'id'            => $userBehavior->id,
+            'user_id'       => $this->adminUser->id,
             'behavior_type' => 'view',
-            'product_id' => $product->id,
-            'category_id' => $category->id,
+            'product_id'    => $product->id,
+            'category_id'   => $category->id,
         ]);
 
         $this->assertEquals($this->adminUser->id, $userBehavior->user->id);
@@ -75,27 +75,27 @@ final class UserBehaviorResourceSimpleTest extends TestCase
 
         // Create behaviors with different types and dates
         UserBehavior::create([
-            'user_id' => $this->adminUser->id,
+            'user_id'       => $this->adminUser->id,
             'behavior_type' => 'view',
-            'product_id' => $product->id,
-            'category_id' => $category->id,
-            'created_at' => now()->subDays(5),
+            'product_id'    => $product->id,
+            'category_id'   => $category->id,
+            'created_at'    => now()->subDays(5),
         ]);
 
         UserBehavior::create([
-            'user_id' => $this->adminUser->id,
+            'user_id'       => $this->adminUser->id,
             'behavior_type' => 'click',
-            'product_id' => $product->id,
-            'category_id' => $category->id,
-            'created_at' => now()->subDays(10),
+            'product_id'    => $product->id,
+            'category_id'   => $category->id,
+            'created_at'    => now()->subDays(10),
         ]);
 
         UserBehavior::create([
-            'user_id' => $this->adminUser->id,
+            'user_id'       => $this->adminUser->id,
             'behavior_type' => 'purchase',
-            'product_id' => $product->id,
-            'category_id' => $category->id,
-            'created_at' => now()->subDays(35),
+            'product_id'    => $product->id,
+            'category_id'   => $category->id,
+            'created_at'    => now()->subDays(35),
         ]);
 
         // Test scopeRecent

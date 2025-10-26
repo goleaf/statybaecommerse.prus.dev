@@ -19,7 +19,7 @@ it('feature: persists the selected locale and updates the user preference', func
     $user = User::factory()->create(['preferred_locale' => 'lt']);
 
     $response = $this->actingAs($user)->post(route('locale.switch'), [
-        'locale' => 'en',
+        'locale'      => 'en',
         'redirect_to' => url('/en/products'),
     ]);
 
@@ -49,7 +49,7 @@ it('feature: falls back to the configured fallback locale when an unsupported lo
 
 it('feature: rejects unsafe redirect targets during locale switching', function (): void {
     $response = $this->post(route('locale.switch'), [
-        'locale' => 'en',
+        'locale'      => 'en',
         'redirect_to' => 'https://example.com/attack',
     ]);
 

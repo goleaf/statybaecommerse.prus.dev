@@ -13,8 +13,7 @@ final class CategoryObserver
     public function __construct(
         private readonly CacheInvalidator $cacheInvalidator,
         private readonly CacheInvalidationService $cacheInvalidationService,
-    ) {
-    }
+    ) {}
 
     public function saved(Category $category): void
     {

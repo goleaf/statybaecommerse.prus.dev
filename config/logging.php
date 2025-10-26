@@ -85,7 +85,7 @@ return [
             'driver'            => 'stack',
             'channels'          => $stackChannels,
             'ignore_exceptions' => false,
-            'tap' => [App\Logging\ConfigureContextProcessors::class],
+            'tap'               => [App\Logging\ConfigureContextProcessors::class],
         ],
 
         'production' => [
@@ -99,9 +99,9 @@ return [
             'path'                 => storage_path('logs/laravel.log'),
             'level'                => env('LOG_LEVEL', 'debug'),
             'replace_placeholders' => true,
-            'formatter' => JsonFormatter::class,
-            'formatter_with' => [
-                'batch_mode' => JsonFormatter::BATCH_MODE_JSON,
+            'formatter'            => JsonFormatter::class,
+            'formatter_with'       => [
+                'batch_mode'     => JsonFormatter::BATCH_MODE_JSON,
                 'append_newline' => true,
             ],
             'tap' => [App\Logging\ConfigureContextProcessors::class],
@@ -148,7 +148,7 @@ return [
                 'connectionString' => 'tls://' . env('PAPERTRAIL_URL') . ':' . env('PAPERTRAIL_PORT'),
             ],
             'processors' => [PsrLogMessageProcessor::class],
-            'tap' => [App\Logging\ConfigureContextProcessors::class],
+            'tap'        => [App\Logging\ConfigureContextProcessors::class],
         ],
 
         'stderr' => [
@@ -160,7 +160,7 @@ return [
             ],
             'formatter'  => env('LOG_STDERR_FORMATTER'),
             'processors' => [PsrLogMessageProcessor::class],
-            'tap' => [App\Logging\ConfigureContextProcessors::class],
+            'tap'        => [App\Logging\ConfigureContextProcessors::class],
         ],
 
         'sentry' => [
@@ -187,14 +187,14 @@ return [
         ],
 
         'maintenance' => [
-            'driver' => 'daily',
-            'path' => storage_path('logs/maintenance.log'),
-            'level' => env('LOG_MAINTENANCE_LEVEL', 'info'),
-            'days' => env('LOG_DAILY_DAYS', 14),
+            'driver'               => 'daily',
+            'path'                 => storage_path('logs/maintenance.log'),
+            'level'                => env('LOG_MAINTENANCE_LEVEL', 'info'),
+            'days'                 => env('LOG_DAILY_DAYS', 14),
             'replace_placeholders' => true,
-            'formatter' => JsonFormatter::class,
-            'formatter_with' => [
-                'batch_mode' => JsonFormatter::BATCH_MODE_JSON,
+            'formatter'            => JsonFormatter::class,
+            'formatter_with'       => [
+                'batch_mode'     => JsonFormatter::BATCH_MODE_JSON,
                 'append_newline' => true,
             ],
             'tap' => [App\Logging\ConfigureContextProcessors::class],

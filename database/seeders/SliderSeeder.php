@@ -6,10 +6,12 @@ namespace Database\Seeders;
 
 use App\Models\Slider;
 use App\Models\SliderTranslation;
-use Illuminate\Database\Seeder;
-use Illuminate\Support\Collection;
 
 use function collect;
+
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Collection;
+use Throwable;
 
 final class SliderSeeder extends Seeder
 {
@@ -67,222 +69,222 @@ final class SliderSeeder extends Seeder
     {
         return collect([
             [
-                'title' => 'Sveiki atvykę į Statybae Commerce',
-                'description' => 'Atraskite puikius statybos produktus ir paslaugas vienoje vietoje. Kokybė, patikimumas ir konkurencingi kainos.',
-                'button_text' => 'Pradėti apsipirkinėti',
-                'button_url' => '/products',
+                'title'            => 'Sveiki atvykę į Statybae Commerce',
+                'description'      => 'Atraskite puikius statybos produktus ir paslaugas vienoje vietoje. Kokybė, patikimumas ir konkurencingi kainos.',
+                'button_text'      => 'Pradėti apsipirkinėti',
+                'button_url'       => '/products',
                 'background_color' => '#f8fafc',
-                'text_color' => '#1e293b',
-                'sort_order' => 1,
-                'is_active' => true,
-                'settings' => [
+                'text_color'       => '#1e293b',
+                'sort_order'       => 1,
+                'is_active'        => true,
+                'settings'         => [
                     'animation' => 'fade',
-                    'duration' => 5000,
-                    'autoplay' => true,
+                    'duration'  => 5000,
+                    'autoplay'  => true,
                 ],
                 'translations' => [
                     'lt' => [
-                        'title' => 'Sveiki atvykę į Statybae Commerce',
+                        'title'       => 'Sveiki atvykę į Statybae Commerce',
                         'description' => 'Atraskite puikius statybos produktus ir paslaugas vienoje vietoje. Kokybė, patikimumas ir konkurencingi kainos.',
                         'button_text' => 'Pradėti apsipirkinėti',
                     ],
                     'en' => [
-                        'title' => 'Welcome to Statybae Commerce',
+                        'title'       => 'Welcome to Statybae Commerce',
                         'description' => 'Discover great construction products and services in one place. Quality, reliability and competitive prices.',
                         'button_text' => 'Start Shopping',
                     ],
                     'ru' => [
-                        'title' => 'Добро пожаловать в Statybae Commerce',
+                        'title'       => 'Добро пожаловать в Statybae Commerce',
                         'description' => 'Откройте лучшие строительные товары и услуги в одном месте. Качество, надежность и конкурентные цены.',
                         'button_text' => 'Начать покупки',
                     ],
                     'de' => [
-                        'title' => 'Willkommen bei Statybae Commerce',
+                        'title'       => 'Willkommen bei Statybae Commerce',
                         'description' => 'Entdecken Sie hochwertige Bauprodukte und Dienstleistungen an einem Ort. Qualität, Zuverlässigkeit und faire Preise.',
                         'button_text' => 'Einkauf starten',
                     ],
                 ],
             ],
             [
-                'title' => 'Kokybės garantija',
-                'description' => 'Visos prekės patikrintos ir sertifikuotos. Mes garantuojame aukščiausią kokybę ir ilgalaikį tarnavimą.',
-                'button_text' => 'Sužinoti daugiau',
-                'button_url' => '/about',
+                'title'            => 'Kokybės garantija',
+                'description'      => 'Visos prekės patikrintos ir sertifikuotos. Mes garantuojame aukščiausią kokybę ir ilgalaikį tarnavimą.',
+                'button_text'      => 'Sužinoti daugiau',
+                'button_url'       => '/about',
                 'background_color' => '#1e293b',
-                'text_color' => '#ffffff',
-                'sort_order' => 2,
-                'is_active' => true,
-                'settings' => [
+                'text_color'       => '#ffffff',
+                'sort_order'       => 2,
+                'is_active'        => true,
+                'settings'         => [
                     'animation' => 'slide',
-                    'duration' => 6000,
-                    'autoplay' => true,
+                    'duration'  => 6000,
+                    'autoplay'  => true,
                 ],
                 'translations' => [
                     'lt' => [
-                        'title' => 'Kokybės garantija',
+                        'title'       => 'Kokybės garantija',
                         'description' => 'Visos prekės patikrintos ir sertifikuotos. Mes garantuojame aukščiausią kokybę ir ilgalaikį tarnavimą.',
                         'button_text' => 'Sužinoti daugiau',
                     ],
                     'en' => [
-                        'title' => 'Quality Guarantee',
+                        'title'       => 'Quality Guarantee',
                         'description' => 'All products are tested and certified. We guarantee the highest quality and long-term service.',
                         'button_text' => 'Learn More',
                     ],
                     'ru' => [
-                        'title' => 'Гарантия качества',
+                        'title'       => 'Гарантия качества',
                         'description' => 'Все товары проверены и сертифицированы. Мы гарантируем высочайшее качество и долгий срок службы.',
                         'button_text' => 'Узнать больше',
                     ],
                     'de' => [
-                        'title' => 'Qualitätsgarantie',
+                        'title'       => 'Qualitätsgarantie',
                         'description' => 'Alle Produkte sind geprüft und zertifiziert. Wir garantieren höchste Qualität und lange Lebensdauer.',
                         'button_text' => 'Mehr erfahren',
                     ],
                 ],
             ],
             [
-                'title' => 'Specialūs pasiūlymai',
-                'description' => 'Nepraleiskite galimybės sutaupyti. Iki 50% nuolaida pasirinktoms prekėms!',
-                'button_text' => 'Žiūrėti akcijas',
-                'button_url' => '/sales',
+                'title'            => 'Specialūs pasiūlymai',
+                'description'      => 'Nepraleiskite galimybės sutaupyti. Iki 50% nuolaida pasirinktoms prekėms!',
+                'button_text'      => 'Žiūrėti akcijas',
+                'button_url'       => '/sales',
                 'background_color' => '#dc2626',
-                'text_color' => '#ffffff',
-                'sort_order' => 3,
-                'is_active' => true,
-                'settings' => [
+                'text_color'       => '#ffffff',
+                'sort_order'       => 3,
+                'is_active'        => true,
+                'settings'         => [
                     'animation' => 'zoom',
-                    'duration' => 4000,
-                    'autoplay' => true,
+                    'duration'  => 4000,
+                    'autoplay'  => true,
                 ],
                 'translations' => [
                     'lt' => [
-                        'title' => 'Specialūs pasiūlymai',
+                        'title'       => 'Specialūs pasiūlymai',
                         'description' => 'Nepraleiskite galimybės sutaupyti. Iki 50% nuolaida pasirinktoms prekėms!',
                         'button_text' => 'Žiūrėti akcijas',
                     ],
                     'en' => [
-                        'title' => 'Special Offers',
+                        'title'       => 'Special Offers',
                         'description' => "Don't miss the opportunity to save. Up to 50% discount on selected items!",
                         'button_text' => 'View Sales',
                     ],
                     'ru' => [
-                        'title' => 'Специальные предложения',
+                        'title'       => 'Специальные предложения',
                         'description' => 'Не упустите шанс сэкономить. Скидки до 50% на выбранные товары!',
                         'button_text' => 'Посмотреть акции',
                     ],
                     'de' => [
-                        'title' => 'Sonderangebote',
+                        'title'       => 'Sonderangebote',
                         'description' => 'Verpassen Sie nicht die Chance zu sparen. Bis zu 50 % Rabatt auf ausgewählte Artikel!',
                         'button_text' => 'Angebote ansehen',
                     ],
                 ],
             ],
             [
-                'title' => 'Profesionalūs įrankiai',
-                'description' => 'Aukščiausios kokybės statybos įrankiai profesionalams ir savininkams. Platus asortimentas, greitas pristatymas.',
-                'button_text' => 'Peržiūrėti įrankius',
-                'button_url' => '/products?category=tools',
+                'title'            => 'Profesionalūs įrankiai',
+                'description'      => 'Aukščiausios kokybės statybos įrankiai profesionalams ir savininkams. Platus asortimentas, greitas pristatymas.',
+                'button_text'      => 'Peržiūrėti įrankius',
+                'button_url'       => '/products?category=tools',
                 'background_color' => '#059669',
-                'text_color' => '#ffffff',
-                'sort_order' => 4,
-                'is_active' => true,
-                'settings' => [
+                'text_color'       => '#ffffff',
+                'sort_order'       => 4,
+                'is_active'        => true,
+                'settings'         => [
                     'animation' => 'fade',
-                    'duration' => 5500,
-                    'autoplay' => true,
+                    'duration'  => 5500,
+                    'autoplay'  => true,
                 ],
                 'translations' => [
                     'lt' => [
-                        'title' => 'Profesionalūs įrankiai',
+                        'title'       => 'Profesionalūs įrankiai',
                         'description' => 'Aukščiausios kokybės statybos įrankiai profesionalams ir savininkams. Platus asortimentas, greitas pristatymas.',
                         'button_text' => 'Peržiūrėti įrankius',
                     ],
                     'en' => [
-                        'title' => 'Professional Tools',
+                        'title'       => 'Professional Tools',
                         'description' => 'Highest quality construction tools for professionals and homeowners. Wide range, fast delivery.',
                         'button_text' => 'Browse Tools',
                     ],
                     'ru' => [
-                        'title' => 'Профессиональные инструменты',
+                        'title'       => 'Профессиональные инструменты',
                         'description' => 'Строительные инструменты высокого качества для профессионалов и домовладельцев. Широкий ассортимент и быстрая доставка.',
                         'button_text' => 'Смотреть инструменты',
                     ],
                     'de' => [
-                        'title' => 'Professionelle Werkzeuge',
+                        'title'       => 'Professionelle Werkzeuge',
                         'description' => 'Hochwertige Bauwerkzeuge für Profis und Hausbesitzer. Breites Sortiment, schnelle Lieferung.',
                         'button_text' => 'Werkzeuge ansehen',
                     ],
                 ],
             ],
             [
-                'title' => 'Nemokamas pristatymas',
-                'description' => 'Nemokamas pristatymas visoje Lietuvoje užsakymams virš 100€. Greitas ir saugus pristatymas.',
-                'button_text' => 'Sužinoti daugiau',
-                'button_url' => '/shipping',
+                'title'            => 'Nemokamas pristatymas',
+                'description'      => 'Nemokamas pristatymas visoje Lietuvoje užsakymams virš 100€. Greitas ir saugus pristatymas.',
+                'button_text'      => 'Sužinoti daugiau',
+                'button_url'       => '/shipping',
                 'background_color' => '#7c3aed',
-                'text_color' => '#ffffff',
-                'sort_order' => 5,
-                'is_active' => true,
-                'settings' => [
+                'text_color'       => '#ffffff',
+                'sort_order'       => 5,
+                'is_active'        => true,
+                'settings'         => [
                     'animation' => 'slide',
-                    'duration' => 7000,
-                    'autoplay' => true,
+                    'duration'  => 7000,
+                    'autoplay'  => true,
                 ],
                 'translations' => [
                     'lt' => [
-                        'title' => 'Nemokamas pristatymas',
+                        'title'       => 'Nemokamas pristatymas',
                         'description' => 'Nemokamas pristatymas visoje Lietuvoje užsakymams virš 100€.',
                         'button_text' => 'Sužinoti daugiau',
                     ],
                     'en' => [
-                        'title' => 'Free Delivery',
+                        'title'       => 'Free Delivery',
                         'description' => 'Free delivery throughout Lithuania for orders over €100. Fast and secure delivery.',
                         'button_text' => 'Learn More',
                     ],
                     'ru' => [
-                        'title' => 'Бесплатная доставка',
+                        'title'       => 'Бесплатная доставка',
                         'description' => 'Бесплатная доставка по всей Литве для заказов свыше 100 €. Быстрая и надежная доставка.',
                         'button_text' => 'Узнать больше',
                     ],
                     'de' => [
-                        'title' => 'Kostenlose Lieferung',
+                        'title'       => 'Kostenlose Lieferung',
                         'description' => 'Kostenlose Lieferung in ganz Litauen für Bestellungen über 100 €. Schnelle und sichere Zustellung.',
                         'button_text' => 'Mehr erfahren',
                     ],
                 ],
             ],
             [
-                'title' => 'Nauji produktai',
-                'description' => 'Atraskite naujausius statybos produktus ir technologijas. Būkite pirmieji, kurie išbandys naujoves.',
-                'button_text' => 'Peržiūrėti naujoves',
-                'button_url' => '/products?new=true',
+                'title'            => 'Nauji produktai',
+                'description'      => 'Atraskite naujausius statybos produktus ir technologijas. Būkite pirmieji, kurie išbandys naujoves.',
+                'button_text'      => 'Peržiūrėti naujoves',
+                'button_url'       => '/products?new=true',
                 'background_color' => '#ea580c',
-                'text_color' => '#ffffff',
-                'sort_order' => 6,
-                'is_active' => false,
-                'settings' => [
+                'text_color'       => '#ffffff',
+                'sort_order'       => 6,
+                'is_active'        => false,
+                'settings'         => [
                     'animation' => 'zoom',
-                    'duration' => 5000,
-                    'autoplay' => false,
+                    'duration'  => 5000,
+                    'autoplay'  => false,
                 ],
                 'translations' => [
                     'lt' => [
-                        'title' => 'Nauji produktai',
+                        'title'       => 'Nauji produktai',
                         'description' => 'Atraskite naujausius statybos produktus ir technologijas. Būkite pirmieji, kurie išbandys naujoves.',
                         'button_text' => 'Peržiūrėti naujoves',
                     ],
                     'en' => [
-                        'title' => 'New Products',
+                        'title'       => 'New Products',
                         'description' => 'Discover the latest construction products and technologies. Be the first to try new innovations.',
                         'button_text' => 'Browse New Items',
                     ],
                     'ru' => [
-                        'title' => 'Новые продукты',
+                        'title'       => 'Новые продукты',
                         'description' => 'Откройте самые последние строительные товары и технологии. Будьте первыми, кто попробует новинки.',
                         'button_text' => 'Посмотреть новинки',
                     ],
                     'de' => [
-                        'title' => 'Neue Produkte',
+                        'title'       => 'Neue Produkte',
                         'description' => 'Entdecken Sie die neuesten Bauprodukte und Technologien. Seien Sie die Ersten, die Innovationen ausprobieren.',
                         'button_text' => 'Neuheiten ansehen',
                     ],
@@ -295,7 +297,7 @@ final class SliderSeeder extends Seeder
     {
         return array_map(static function (string $locale) use ($translations, $sliderAttributes): array {
             $translation = $translations[$locale] ?? [
-                'title' => $sliderAttributes['title'],
+                'title'       => $sliderAttributes['title'],
                 'description' => $sliderAttributes['description'],
                 'button_text' => $sliderAttributes['button_text'],
             ];
@@ -386,7 +388,7 @@ final class SliderSeeder extends Seeder
                 $y = (int) ((600 - $textHeight) / 2);
                 imagestring($image, $font, $x, $y, $text, $textColor);
 
-                $tempPath = sys_get_temp_dir()."/slider-{$sortOrder}.jpg";
+                $tempPath = sys_get_temp_dir() . "/slider-{$sortOrder}.jpg";
                 imagejpeg($image, $tempPath, 90);
                 imagedestroy($image);
 
@@ -401,7 +403,7 @@ final class SliderSeeder extends Seeder
                 }
 
                 return;
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
                 // Fall through to static placeholder path below
             }
         }

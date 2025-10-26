@@ -279,7 +279,7 @@ final class CodeStyleService
                     $hasIndentationIssues = true;
                     $properSpaces = str_repeat(' ', floor($spaces / 4) * 4);
                     $properTabs = str_repeat("\t", $tabs);
-                    $line = $properTabs.$properSpaces.ltrim($line);
+                    $line = $properTabs . $properSpaces . ltrim($line);
                 }
             }
             $fixedLines[] = $line;
@@ -362,7 +362,7 @@ final class CodeStyleService
         $lines = explode("\n", $content);
         foreach ($lines as $lineNumber => $line) {
             if (preg_match(self::NUMERIC_PATTERN, $line, $matches)) {
-                $violations[] = ['type' => 'numeric_formatting', 'file' => $filePath, 'line' => $lineNumber + 1, 'message' => 'Numeric value should be formatted without unnecessary decimal places: '.$matches[1]];
+                $violations[] = ['type' => 'numeric_formatting', 'file' => $filePath, 'line' => $lineNumber + 1, 'message' => 'Numeric value should be formatted without unnecessary decimal places: ' . $matches[1]];
             }
         }
     }

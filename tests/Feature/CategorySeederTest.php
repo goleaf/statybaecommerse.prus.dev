@@ -195,7 +195,7 @@ final class CategorySeederTest extends TestCase
 
         foreach ($expectedMainCategories as $categoryName) {
             $this->assertDatabaseHas('categories', [
-                'name' => $categoryName,
+                'name'      => $categoryName,
                 'parent_id' => null,
             ]);
         }

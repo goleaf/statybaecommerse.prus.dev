@@ -14,7 +14,7 @@ function attachFakeFilamentContainer(SearchableInput $component): void
 {
     // Attach the component to a lightweight schema so the typed container/livewire
     // dependencies introduced in Filament v4 are initialised for unit testing.
-    $schema = Schema::make(new FakeFilamentComponent())
+    $schema = Schema::make(new FakeFilamentComponent)
         ->schema([
             $component,
         ]);

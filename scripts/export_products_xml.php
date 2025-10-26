@@ -9,8 +9,8 @@ ini_set('memory_limit', '512M');
 date_default_timezone_set('UTC');
 
 $projectRoot = dirname(__DIR__);
-$dbPath = $projectRoot.'/database/database.sqlite';
-$outputPath = $argv[1] ?? ($projectRoot.'/public/catalog-products.xml');
+$dbPath = $projectRoot . '/database/database.sqlite';
+$outputPath = $argv[1] ?? ($projectRoot . '/public/catalog-products.xml');
 
 if (! is_file($dbPath)) {
     fwrite(STDERR, "SQLite database not found: {$dbPath}\n");
@@ -18,12 +18,12 @@ if (! is_file($dbPath)) {
 }
 
 try {
-    $pdo = new PDO('sqlite:'.$dbPath, null, null, [
-        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+    $pdo = new PDO('sqlite:' . $dbPath, null, null, [
+        PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
     ]);
 } catch (Throwable $e) {
-    fwrite(STDERR, 'Failed to open database: '.$e->getMessage()."\n");
+    fwrite(STDERR, 'Failed to open database: ' . $e->getMessage() . "\n");
     exit(1);
 }
 
@@ -43,7 +43,7 @@ function appendIfNotNull(DOMDocument $doc, DOMElement $parent, string $name, ?st
 // Probe column existence safely
 function hasColumn(PDO $pdo, string $table, string $column): bool
 {
-    $stmt = $pdo->query('PRAGMA table_info('.$table.')');
+    $stmt = $pdo->query('PRAGMA table_info(' . $table . ')');
     $cols = $stmt ? $stmt->fetchAll() : [];
     foreach ($cols as $c) {
         if (isset($c['name']) && $c['name'] === $column) {
@@ -65,20 +65,20 @@ if ($hasIsVisible) {
 if ($hasPublishedAt) {
     $where[] = '(published_at IS NULL OR published_at <= CURRENT_TIMESTAMP)';
 }
-$whereSql = $where ? (' WHERE '.implode(' AND ', $where)) : '';
+$whereSql = $where ? (' WHERE ' . implode(' AND ', $where)) : '';
 
-$sqlProducts = 'SELECT * FROM products'.$whereSql.' ORDER BY id';
+$sqlProducts = 'SELECT * FROM products' . $whereSql . ' ORDER BY id';
 $stmtProducts = $pdo->query($sqlProducts);
 $products = $stmtProducts ? $stmtProducts->fetchAll() : [];
 
 // Prime relations
 $productIds = array_map(static fn ($p) => (int) $p['id'], $products);
-$in = $productIds ? ('('.implode(',', $productIds).')') : '(NULL)';
+$in = $productIds ? ('(' . implode(',', $productIds) . ')') : '(NULL)';
 
 // Translations
 $translations = [];
 if ($productIds) {
-    $stmt = $pdo->query('SELECT * FROM product_translations WHERE product_id IN '.$in);
+    $stmt = $pdo->query('SELECT * FROM product_translations WHERE product_id IN ' . $in);
     foreach ($stmt ?: [] as $row) {
         $pid = (int) $row['product_id'];
         $translations[$pid][] = $row;
@@ -88,7 +88,7 @@ if ($productIds) {
 // Categories by slug
 $categorySlugsByProductId = [];
 if ($productIds) {
-    $sql = 'SELECT pc.product_id, c.slug FROM product_categories pc JOIN categories c ON c.id = pc.category_id WHERE pc.product_id IN '.$in.' ORDER BY c.slug';
+    $sql = 'SELECT pc.product_id, c.slug FROM product_categories pc JOIN categories c ON c.id = pc.category_id WHERE pc.product_id IN ' . $in . ' ORDER BY c.slug';
     $stmt = $pdo->query($sql);
     foreach ($stmt ?: [] as $row) {
         $pid = (int) $row['product_id'];
@@ -99,7 +99,7 @@ if ($productIds) {
 // Images
 $imagesByProductId = [];
 if ($productIds) {
-    $stmt = $pdo->query('SELECT product_id, path, alt_text FROM product_images WHERE product_id IN '.$in.' ORDER BY sort_order');
+    $stmt = $pdo->query('SELECT product_id, path, alt_text FROM product_images WHERE product_id IN ' . $in . ' ORDER BY sort_order');
     foreach ($stmt ?: [] as $row) {
         $pid = (int) $row['product_id'];
         $imagesByProductId[$pid][] = $row;

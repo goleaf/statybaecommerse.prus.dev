@@ -21,11 +21,11 @@ final class ReferralRewardLogTest extends TestCase
 
         $log = ReferralRewardLog::factory()->create([
             'referral_reward_id' => $referralReward->id,
-            'user_id' => $user->id,
-            'action' => ReferralRewardLog::ACTION_EARNED,
-            'data' => ['amount' => 10.00, 'currency' => 'EUR'],
-            'ip_address' => '192.168.1.1',
-            'user_agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+            'user_id'            => $user->id,
+            'action'             => ReferralRewardLog::ACTION_EARNED,
+            'data'               => ['amount' => 10.00, 'currency' => 'EUR'],
+            'ip_address'         => '192.168.1.1',
+            'user_agent'         => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
         ]);
 
         $this->assertInstanceOf(ReferralRewardLog::class, $log);
@@ -93,11 +93,11 @@ final class ReferralRewardLogTest extends TestCase
 
         $log = ReferralRewardLog::factory()->create([
             'referral_reward_id' => $referralReward->id,
-            'user_id' => $user->id,
-            'action' => ReferralRewardLog::ACTION_EARNED,
-            'data' => ['amount' => 10.00, 'currency' => 'EUR'],
-            'ip_address' => '192.168.1.1',
-            'user_agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+            'user_id'            => $user->id,
+            'action'             => ReferralRewardLog::ACTION_EARNED,
+            'data'               => ['amount' => 10.00, 'currency' => 'EUR'],
+            'ip_address'         => '192.168.1.1',
+            'user_agent'         => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
         ]);
 
         // Test basic model functionality
@@ -113,8 +113,8 @@ final class ReferralRewardLogTest extends TestCase
     {
         $log = ReferralRewardLog::factory()->create([
             'data' => [
-                'amount' => 10.00,
-                'currency' => 'EUR',
+                'amount'      => 10.00,
+                'currency'    => 'EUR',
                 'reward_type' => 'discount',
             ],
         ]);

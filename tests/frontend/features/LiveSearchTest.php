@@ -35,8 +35,8 @@ final class LiveSearchTest extends TestCase
     public function test_live_search_performs_search_when_query_updated(): void
     {
         $product = Product::factory()->create([
-            'name' => 'Test Product',
-            'is_visible' => true,
+            'name'         => 'Test Product',
+            'is_visible'   => true,
             'published_at' => now()->subDay(),
         ]);
 
@@ -51,8 +51,8 @@ final class LiveSearchTest extends TestCase
     public function test_live_search_does_not_search_with_short_query(): void
     {
         Product::factory()->create([
-            'name' => 'Test Product',
-            'is_visible' => true,
+            'name'         => 'Test Product',
+            'is_visible'   => true,
             'published_at' => now()->subDay(),
         ]);
 
@@ -67,8 +67,8 @@ final class LiveSearchTest extends TestCase
     public function test_live_search_clears_results_when_query_cleared(): void
     {
         $product = Product::factory()->create([
-            'name' => 'Test Product',
-            'is_visible' => true,
+            'name'         => 'Test Product',
+            'is_visible'   => true,
             'published_at' => now()->subDay(),
         ]);
 
@@ -89,8 +89,8 @@ final class LiveSearchTest extends TestCase
     public function test_live_search_returns_products_in_results(): void
     {
         $product = Product::factory()->create([
-            'name' => 'Amazing Test Product',
-            'is_visible' => true,
+            'name'         => 'Amazing Test Product',
+            'is_visible'   => true,
             'published_at' => now()->subDay(),
         ]);
 
@@ -110,13 +110,13 @@ final class LiveSearchTest extends TestCase
     public function test_live_search_returns_categories_in_results(): void
     {
         $category = Category::factory()->create([
-            'name' => 'Amazing Test Category',
+            'name'       => 'Amazing Test Category',
             'is_visible' => true,
         ]);
 
         // Create a product in this category
         $product = Product::factory()->create([
-            'is_visible' => true,
+            'is_visible'   => true,
             'published_at' => now()->subDay(),
         ]);
         $category->products()->attach($product);
@@ -137,15 +137,15 @@ final class LiveSearchTest extends TestCase
     public function test_live_search_returns_brands_in_results(): void
     {
         $brand = Brand::factory()->create([
-            'name' => 'Amazing Test Brand',
+            'name'       => 'Amazing Test Brand',
             'is_enabled' => true,
         ]);
 
         // Create a product for this brand
         Product::factory()->create([
-            'name' => 'Brand Product',
-            'brand_id' => $brand->id,
-            'is_visible' => true,
+            'name'         => 'Brand Product',
+            'brand_id'     => $brand->id,
+            'is_visible'   => true,
             'published_at' => now()->subDay(),
         ]);
 
@@ -167,8 +167,8 @@ final class LiveSearchTest extends TestCase
         // Create more products than the max results limit
         for ($i = 1; $i <= 15; $i++) {
             Product::factory()->create([
-                'name' => "Test Product {$i}",
-                'is_visible' => true,
+                'name'         => "Test Product {$i}",
+                'is_visible'   => true,
                 'published_at' => now()->subDay(),
             ]);
         }
@@ -186,8 +186,8 @@ final class LiveSearchTest extends TestCase
         // Create products
         for ($i = 1; $i <= 5; $i++) {
             Product::factory()->create([
-                'name' => "Test Product {$i}",
-                'is_visible' => true,
+                'name'         => "Test Product {$i}",
+                'is_visible'   => true,
                 'published_at' => now()->subDay(),
             ]);
         }
@@ -204,8 +204,8 @@ final class LiveSearchTest extends TestCase
     public function test_live_search_can_be_configured_with_custom_min_query_length(): void
     {
         $product = Product::factory()->create([
-            'name' => 'Test Product',
-            'is_visible' => true,
+            'name'         => 'Test Product',
+            'is_visible'   => true,
             'published_at' => now()->subDay(),
         ]);
 
@@ -231,9 +231,9 @@ final class LiveSearchTest extends TestCase
     public function test_live_search_select_result_redirects_to_url(): void
     {
         $product = Product::factory()->create([
-            'name' => 'Test Product',
-            'slug' => 'test-product',
-            'is_visible' => true,
+            'name'         => 'Test Product',
+            'slug'         => 'test-product',
+            'is_visible'   => true,
             'published_at' => now()->subDay(),
         ]);
 
@@ -253,9 +253,9 @@ final class LiveSearchTest extends TestCase
     public function test_live_search_clears_results_when_select_result(): void
     {
         $product = Product::factory()->create([
-            'name' => 'Test Product',
-            'slug' => 'test-product',
-            'is_visible' => true,
+            'name'         => 'Test Product',
+            'slug'         => 'test-product',
+            'is_visible'   => true,
             'published_at' => now()->subDay(),
         ]);
 
@@ -286,8 +286,8 @@ final class LiveSearchTest extends TestCase
     public function test_live_search_handles_special_characters_in_query(): void
     {
         $product = Product::factory()->create([
-            'name' => 'Product with % special chars',
-            'is_visible' => true,
+            'name'         => 'Product with % special chars',
+            'is_visible'   => true,
             'published_at' => now()->subDay(),
         ]);
 

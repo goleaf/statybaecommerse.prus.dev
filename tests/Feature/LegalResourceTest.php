@@ -18,7 +18,7 @@ class LegalResourceTest extends TestCase
         parent::setUp();
 
         $this->actingAs(User::factory()->create([
-            'email' => 'admin@example.com',
+            'email'    => 'admin@example.com',
             'is_admin' => true,
         ]));
     }
@@ -26,9 +26,9 @@ class LegalResourceTest extends TestCase
     public function test_can_list_legal_documents(): void
     {
         $legal = Legal::factory()->create([
-            'key' => 'privacy-policy',
-            'type' => 'privacy_policy',
-            'is_enabled' => true,
+            'key'         => 'privacy-policy',
+            'type'        => 'privacy_policy',
+            'is_enabled'  => true,
             'is_required' => true,
         ]);
 
@@ -46,27 +46,27 @@ class LegalResourceTest extends TestCase
             ->assertOk();
 
         $this->post('/admin/legals', [
-            'key' => 'terms-of-use',
-            'type' => 'terms_of_use',
-            'is_enabled' => true,
-            'is_required' => false,
-            'sort_order' => 1,
+            'key'          => 'terms-of-use',
+            'type'         => 'terms_of_use',
+            'is_enabled'   => true,
+            'is_required'  => false,
+            'sort_order'   => 1,
             'published_at' => now(),
         ])->assertRedirect();
 
         $this->assertDatabaseHas('legals', [
-            'key' => 'terms-of-use',
-            'type' => 'terms_of_use',
-            'is_enabled' => true,
+            'key'         => 'terms-of-use',
+            'type'        => 'terms_of_use',
+            'is_enabled'  => true,
             'is_required' => false,
-            'sort_order' => 1,
+            'sort_order'  => 1,
         ]);
     }
 
     public function test_can_view_legal_document(): void
     {
         $legal = Legal::factory()->create([
-            'key' => 'privacy-policy',
+            'key'  => 'privacy-policy',
             'type' => 'privacy_policy',
         ]);
 
@@ -79,8 +79,8 @@ class LegalResourceTest extends TestCase
     public function test_can_edit_legal_document(): void
     {
         $legal = Legal::factory()->create([
-            'key' => 'privacy-policy',
-            'type' => 'privacy_policy',
+            'key'        => 'privacy-policy',
+            'type'       => 'privacy_policy',
             'is_enabled' => true,
         ]);
 
@@ -89,18 +89,18 @@ class LegalResourceTest extends TestCase
             ->assertOk();
 
         $this->put("/admin/legals/{$legal->id}", [
-            'key' => 'privacy-policy',
-            'type' => 'privacy_policy',
-            'is_enabled' => false,
+            'key'         => 'privacy-policy',
+            'type'        => 'privacy_policy',
+            'is_enabled'  => false,
             'is_required' => true,
-            'sort_order' => 2,
+            'sort_order'  => 2,
         ])->assertRedirect();
 
         $this->assertDatabaseHas('legals', [
-            'id' => $legal->id,
-            'is_enabled' => false,
+            'id'          => $legal->id,
+            'is_enabled'  => false,
             'is_required' => true,
-            'sort_order' => 2,
+            'sort_order'  => 2,
         ]);
     }
 
@@ -121,12 +121,12 @@ class LegalResourceTest extends TestCase
     {
         Legal::factory()->create([
             'type' => 'privacy_policy',
-            'key' => 'privacy-policy',
+            'key'  => 'privacy-policy',
         ]);
 
         Legal::factory()->create([
             'type' => 'terms_of_use',
-            'key' => 'terms-of-use',
+            'key'  => 'terms-of-use',
         ]);
 
         $this
@@ -140,12 +140,12 @@ class LegalResourceTest extends TestCase
     {
         Legal::factory()->create([
             'is_enabled' => true,
-            'key' => 'enabled-doc',
+            'key'        => 'enabled-doc',
         ]);
 
         Legal::factory()->create([
             'is_enabled' => false,
-            'key' => 'disabled-doc',
+            'key'        => 'disabled-doc',
         ]);
 
         $this
@@ -159,12 +159,12 @@ class LegalResourceTest extends TestCase
     {
         Legal::factory()->create([
             'is_required' => true,
-            'key' => 'required-doc',
+            'key'         => 'required-doc',
         ]);
 
         Legal::factory()->create([
             'is_required' => false,
-            'key' => 'optional-doc',
+            'key'         => 'optional-doc',
         ]);
 
         $this
@@ -178,12 +178,12 @@ class LegalResourceTest extends TestCase
     {
         Legal::factory()->create([
             'published_at' => now()->subDay(),
-            'key' => 'published-doc',
+            'key'          => 'published-doc',
         ]);
 
         Legal::factory()->create([
             'published_at' => null,
-            'key' => 'draft-doc',
+            'key'          => 'draft-doc',
         ]);
 
         $this
@@ -216,8 +216,8 @@ class LegalResourceTest extends TestCase
     public function test_can_get_legal_document_by_key(): void
     {
         $legal = Legal::factory()->create([
-            'key' => 'privacy-policy',
-            'is_enabled' => true,
+            'key'          => 'privacy-policy',
+            'is_enabled'   => true,
             'published_at' => now()->subDay(),
         ]);
 
@@ -230,17 +230,17 @@ class LegalResourceTest extends TestCase
     public function test_can_get_required_documents(): void
     {
         Legal::factory()->create([
-            'is_required' => true,
-            'is_enabled' => true,
+            'is_required'  => true,
+            'is_enabled'   => true,
             'published_at' => now()->subDay(),
-            'sort_order' => 1,
+            'sort_order'   => 1,
         ]);
 
         Legal::factory()->create([
-            'is_required' => false,
-            'is_enabled' => true,
+            'is_required'  => false,
+            'is_enabled'   => true,
             'published_at' => now()->subDay(),
-            'sort_order' => 2,
+            'sort_order'   => 2,
         ]);
 
         $required = Legal::getRequiredDocuments();
@@ -252,14 +252,14 @@ class LegalResourceTest extends TestCase
     public function test_can_get_documents_by_type(): void
     {
         Legal::factory()->create([
-            'type' => 'privacy_policy',
-            'is_enabled' => true,
+            'type'         => 'privacy_policy',
+            'is_enabled'   => true,
             'published_at' => now()->subDay(),
         ]);
 
         Legal::factory()->create([
-            'type' => 'terms_of_use',
-            'is_enabled' => true,
+            'type'         => 'terms_of_use',
+            'is_enabled'   => true,
             'published_at' => now()->subDay(),
         ]);
 
@@ -273,19 +273,19 @@ class LegalResourceTest extends TestCase
     {
         // Disabled document
         $disabled = Legal::factory()->create([
-            'is_enabled' => false,
+            'is_enabled'   => false,
             'published_at' => now()->subDay(),
         ]);
 
         // Draft document
         $draft = Legal::factory()->create([
-            'is_enabled' => true,
+            'is_enabled'   => true,
             'published_at' => null,
         ]);
 
         // Published document
         $published = Legal::factory()->create([
-            'is_enabled' => true,
+            'is_enabled'   => true,
             'published_at' => now()->subDay(),
         ]);
 

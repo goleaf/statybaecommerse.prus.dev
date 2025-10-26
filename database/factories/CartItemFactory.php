@@ -24,34 +24,34 @@ final class CartItemFactory extends Factory
         $totalPrice = $quantity * $unitPrice;
 
         return [
-            'session_id' => $this->faker->uuid(),
-            'user_id' => User::factory(),
-            'product_id' => Product::factory(),
-            'variant_id' => null,  // Will be set when needed
-            'quantity' => $quantity,
+            'session_id'       => $this->faker->uuid(),
+            'user_id'          => User::factory(),
+            'product_id'       => Product::factory(),
+            'variant_id'       => null,  // Will be set when needed
+            'quantity'         => $quantity,
             'minimum_quantity' => 1,
-            'unit_price' => $unitPrice,
+            'unit_price'       => $unitPrice,
             // Seed a nominal discount so calculations that rely on the column remain realistic.
-            'discount_amount' => 0.0,
-            'price' => $unitPrice,  // Add the missing price field
-            'total_price' => $totalPrice,
+            'discount_amount'  => 0.0,
+            'price'            => $unitPrice,  // Add the missing price field
+            'total_price'      => $totalPrice,
             'product_snapshot' => [
-                'name' => $this->faker->words(3, true),
-                'price' => $unitPrice,
-                'sku' => $this->faker->unique()->regexify('[A-Z]{3}-[0-9]{3}'),
+                'name'        => $this->faker->words(3, true),
+                'price'       => $unitPrice,
+                'sku'         => $this->faker->unique()->regexify('[A-Z]{3}-[0-9]{3}'),
                 'description' => $this->faker->sentence(),
-                'image' => $this->faker->imageUrl(300, 300, 'products'),
-                'attributes' => [
-                    'color' => $this->faker->safeColorName(),
-                    'size' => $this->faker->randomElement(['XS', 'S', 'M', 'L', 'XL', 'XXL']),
+                'image'       => $this->faker->imageUrl(300, 300, 'products'),
+                'attributes'  => [
+                    'color'    => $this->faker->safeColorName(),
+                    'size'     => $this->faker->randomElement(['XS', 'S', 'M', 'L', 'XL', 'XXL']),
                     'material' => $this->faker->randomElement(['Cotton', 'Polyester', 'Wool', 'Silk', 'Linen']),
                 ],
-                'category' => $this->faker->word(),
-                'brand' => $this->faker->company(),
-                'weight' => $this->faker->randomFloat(2, 0.1, 5.0),
+                'category'   => $this->faker->word(),
+                'brand'      => $this->faker->company(),
+                'weight'     => $this->faker->randomFloat(2, 0.1, 5.0),
                 'dimensions' => [
                     'length' => $this->faker->randomFloat(1, 10, 100),
-                    'width' => $this->faker->randomFloat(1, 10, 100),
+                    'width'  => $this->faker->randomFloat(1, 10, 100),
                     'height' => $this->faker->randomFloat(1, 1, 50),
                 ],
             ],
@@ -64,8 +64,8 @@ final class CartItemFactory extends Factory
     public function guest(): static
     {
         return $this->state(fn (array $attributes) => [
-            'user_id' => null,
-            'session_id' => 'guest-'.$this->faker->uuid(),
+            'user_id'    => null,
+            'session_id' => 'guest-' . $this->faker->uuid(),
         ]);
     }
 
@@ -80,9 +80,9 @@ final class CartItemFactory extends Factory
             ]);
 
             return [
-                'variant_id' => $variant->id,
-                'product_id' => $variant->product_id,
-                'unit_price' => $variant->price ?? $attributes['unit_price'],
+                'variant_id'  => $variant->id,
+                'product_id'  => $variant->product_id,
+                'unit_price'  => $variant->price ?? $attributes['unit_price'],
                 'total_price' => ($variant->price ?? $attributes['unit_price']) * $attributes['quantity'],
             ];
         });
@@ -97,7 +97,7 @@ final class CartItemFactory extends Factory
             $quantity = $this->faker->numberBetween(10, 50);
 
             return [
-                'quantity' => $quantity,
+                'quantity'    => $quantity,
                 'total_price' => $attributes['unit_price'] * $quantity,
             ];
         });
@@ -112,10 +112,10 @@ final class CartItemFactory extends Factory
             $unitPrice = $this->faker->randomFloat(2, 500, 2000);
 
             return [
-                'unit_price' => $unitPrice,
-                'total_price' => $unitPrice * $attributes['quantity'],
+                'unit_price'       => $unitPrice,
+                'total_price'      => $unitPrice * $attributes['quantity'],
                 'product_snapshot' => array_merge($attributes['product_snapshot'] ?? [], [
-                    'price' => $unitPrice,
+                    'price'    => $unitPrice,
                     'category' => 'Premium',
                 ]),
             ];
@@ -149,13 +149,13 @@ final class CartItemFactory extends Factory
     {
         return $this->state(function (array $attributes) use ($product) {
             return [
-                'product_id' => $product->id,
-                'unit_price' => $product->price ?? $attributes['unit_price'],
-                'total_price' => ($product->price ?? $attributes['unit_price']) * $attributes['quantity'],
+                'product_id'       => $product->id,
+                'unit_price'       => $product->price ?? $attributes['unit_price'],
+                'total_price'      => ($product->price ?? $attributes['unit_price']) * $attributes['quantity'],
                 'product_snapshot' => array_merge($attributes['product_snapshot'] ?? [], [
-                    'name' => $product->name,
-                    'price' => $product->price,
-                    'sku' => $product->sku,
+                    'name'        => $product->name,
+                    'price'       => $product->price,
+                    'sku'         => $product->sku,
                     'description' => $product->description,
                 ]),
             ];
@@ -191,9 +191,9 @@ final class CartItemFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'product_snapshot' => [
-                'name' => $this->faker->words(2, true),
+                'name'  => $this->faker->words(2, true),
                 'price' => $attributes['unit_price'],
-                'sku' => $this->faker->regexify('[A-Z]{3}-[0-9]{3}'),
+                'sku'   => $this->faker->regexify('[A-Z]{3}-[0-9]{3}'),
             ],
         ]);
     }

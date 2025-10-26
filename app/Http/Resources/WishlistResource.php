@@ -29,26 +29,26 @@ final class WishlistResource extends JsonResource
     /**
      * Transform the resource into an array.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  \Illuminate\Http\Request $request
      * @return array<string, mixed>
      */
     public function toArray($request): array
     {
         // Shape the wishlist attributes and include the paginated items payload.
         return [
-            'id' => $this->id,
-            'name' => $this->name,
+            'id'          => $this->id,
+            'name'        => $this->name,
             'description' => $this->description,
-            'is_public' => $this->is_public,
-            'is_default' => $this->is_default,
-            'items' => WishlistItemResource::collection($this->items->items()),
+            'is_public'   => $this->is_public,
+            'is_default'  => $this->is_default,
+            'items'       => WishlistItemResource::collection($this->items->items()),
         ];
     }
 
     /**
      * Provide pagination metadata and navigational links alongside the payload.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  \Illuminate\Http\Request $request
      * @return array<string, mixed>
      */
     public function with($request): array
@@ -58,17 +58,17 @@ final class WishlistResource extends JsonResource
             'meta' => [
                 'items_pagination' => [
                     'current_page' => $this->items->currentPage(),
-                    'last_page' => $this->items->lastPage(),
-                    'per_page' => $this->items->perPage(),
-                    'total' => $this->items->total(),
+                    'last_page'    => $this->items->lastPage(),
+                    'per_page'     => $this->items->perPage(),
+                    'total'        => $this->items->total(),
                 ],
             ],
             'links' => [
                 'items' => [
                     'first' => $this->items->url(1),
-                    'last' => $this->items->url($this->items->lastPage()),
-                    'prev' => $this->items->previousPageUrl(),
-                    'next' => $this->items->nextPageUrl(),
+                    'last'  => $this->items->url($this->items->lastPage()),
+                    'prev'  => $this->items->previousPageUrl(),
+                    'next'  => $this->items->nextPageUrl(),
                 ],
             ],
         ];

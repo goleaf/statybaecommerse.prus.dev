@@ -16,12 +16,12 @@ final class AutocompleteSearchRequest extends ApiRequest
     public function rules(): array
     {
         return [
-            'model_class' => ['required', 'string', new ModelClassRule()],
+            'model_class'  => ['required', 'string', new ModelClassRule],
             'search_field' => ['sometimes', 'string'],
             'search_query' => ['required', 'string'],
-            'value_field' => ['sometimes', 'string'],
-            'label_field' => ['sometimes', 'string'],
-            'limit' => ['sometimes', 'integer', 'min:1', 'max:100'],
+            'value_field'  => ['sometimes', 'string'],
+            'label_field'  => ['sometimes', 'string'],
+            'limit'        => ['sometimes', 'integer', 'min:1', 'max:100'],
         ];
     }
 }

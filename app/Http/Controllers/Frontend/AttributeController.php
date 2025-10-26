@@ -39,12 +39,12 @@ final class AttributeController extends Controller
         }
         // Search by name
         if ($request->has('search') && $request->search) {
-            $query->where('name', 'like', '%'.$request->search.'%');
+            $query->where('name', 'like', '%' . $request->search . '%');
         }
         $attributes = $query->paginate(20);
         // Get filter options
-        $types = Attribute::enabled()->distinct()->pluck('type')->mapWithKeys(fn ($type) => [$type => __('attributes.'.$type)]);
-        $groups = Attribute::enabled()->whereNotNull('group_name')->distinct()->pluck('group_name')->mapWithKeys(fn ($group) => [$group => __('attributes.'.$group)]);
+        $types = Attribute::enabled()->distinct()->pluck('type')->mapWithKeys(fn ($type) => [$type => __('attributes.' . $type)]);
+        $groups = Attribute::enabled()->whereNotNull('group_name')->distinct()->pluck('group_name')->mapWithKeys(fn ($group) => [$group => __('attributes.' . $group)]);
 
         return view('attributes.index', compact('attributes', 'types', 'groups'));
     }
@@ -99,7 +99,7 @@ final class AttributeController extends Controller
         // Apply search
         if ($request->has('search') && $request->search) {
             $query->where(function ($q) use ($request) {
-                $q->where('name', 'like', '%'.$request->search.'%')->orWhere('description', 'like', '%'.$request->search.'%')->orWhere('sku', 'like', '%'.$request->search.'%');
+                $q->where('name', 'like', '%' . $request->search . '%')->orWhere('description', 'like', '%' . $request->search . '%')->orWhere('sku', 'like', '%' . $request->search . '%');
             });
         }
         $products = $query->paginate(20);
@@ -154,7 +154,7 @@ final class AttributeController extends Controller
      */
     public function getAttributeGroups(Request $request)
     {
-        $groups = Attribute::enabled()->whereNotNull('group_name')->distinct()->pluck('group_name')->mapWithKeys(fn ($group) => [$group => ['name' => $group, 'label' => __('attributes.'.$group), 'count' => Attribute::where('group_name', $group)->count(), 'enabled_count' => Attribute::where('group_name', $group)->where('is_enabled', true)->count()]]);
+        $groups = Attribute::enabled()->whereNotNull('group_name')->distinct()->pluck('group_name')->mapWithKeys(fn ($group) => [$group => ['name' => $group, 'label' => __('attributes.' . $group), 'count' => Attribute::where('group_name', $group)->count(), 'enabled_count' => Attribute::where('group_name', $group)->where('is_enabled', true)->count()]]);
 
         return response()->json($groups);
     }
@@ -164,30 +164,30 @@ final class AttributeController extends Controller
      */
     public function getAttributeTypes(Request $request)
     {
-        $types = Attribute::enabled()->distinct()->pluck('type')->mapWithKeys(fn ($type) => [$type => ['name' => $type, 'label' => __('attributes.'.$type), 'count' => Attribute::where('type', $type)->count(), 'enabled_count' => Attribute::where('type', $type)->where('is_enabled', true)->count(), 'icon' => match ($type) {
-            'text' => 'heroicon-o-document-text',
-            'number' => 'heroicon-o-calculator',
-            'boolean' => 'heroicon-o-check-circle',
-            'select' => 'heroicon-o-list-bullet',
-            'multiselect' => 'heroicon-o-squares-2x2',
-            'color' => 'heroicon-o-swatch',
-            'date' => 'heroicon-o-calendar',
-            'textarea' => 'heroicon-o-document',
-            'file' => 'heroicon-o-paper-clip',
-            'image' => 'heroicon-o-photo',
-            default => 'heroicon-o-adjustments-horizontal',
+        $types = Attribute::enabled()->distinct()->pluck('type')->mapWithKeys(fn ($type) => [$type => ['name' => $type, 'label' => __('attributes.' . $type), 'count' => Attribute::where('type', $type)->count(), 'enabled_count' => Attribute::where('type', $type)->where('is_enabled', true)->count(), 'icon' => match ($type) {
+            'text'                                                                                            => 'heroicon-o-document-text',
+            'number'                                                                                          => 'heroicon-o-calculator',
+            'boolean'                                                                                         => 'heroicon-o-check-circle',
+            'select'                                                                                          => 'heroicon-o-list-bullet',
+            'multiselect'                                                                                     => 'heroicon-o-squares-2x2',
+            'color'                                                                                           => 'heroicon-o-swatch',
+            'date'                                                                                            => 'heroicon-o-calendar',
+            'textarea'                                                                                        => 'heroicon-o-document',
+            'file'                                                                                            => 'heroicon-o-paper-clip',
+            'image'                                                                                           => 'heroicon-o-photo',
+            default                                                                                           => 'heroicon-o-adjustments-horizontal',
         }, 'color' => match ($type) {
-            'text' => 'gray',
-            'number' => 'blue',
-            'boolean' => 'green',
-            'select' => 'yellow',
+            'text'        => 'gray',
+            'number'      => 'blue',
+            'boolean'     => 'green',
+            'select'      => 'yellow',
             'multiselect' => 'orange',
-            'color' => 'purple',
-            'date' => 'red',
-            'textarea' => 'indigo',
-            'file' => 'pink',
-            'image' => 'rose',
-            default => 'gray',
+            'color'       => 'purple',
+            'date'        => 'red',
+            'textarea'    => 'indigo',
+            'file'        => 'pink',
+            'image'       => 'rose',
+            default       => 'gray',
         }]]);
 
         return response()->json($types);
@@ -203,7 +203,7 @@ final class AttributeController extends Controller
         $group = $request->get('group');
         $category = $request->get('category');
         $attributes = Attribute::enabled()->visible()->when($query, function ($q) use ($query) {
-            $q->where('name', 'like', '%'.$query.'%')->orWhere('description', 'like', '%'.$query.'%');
+            $q->where('name', 'like', '%' . $query . '%')->orWhere('description', 'like', '%' . $query . '%');
         })->when($type, function ($q) use ($type) {
             $q->where('type', $type);
         })->when($group, function ($q) use ($group) {
@@ -213,7 +213,7 @@ final class AttributeController extends Controller
         })->with(['values' => function ($query) {
             $query->where('is_enabled', true)->orderBy('sort_order');
         }])->orderBy('sort_order')->limit(20)->get()->map(function ($attribute) {
-            return ['id' => $attribute->id, 'name' => $attribute->name, 'slug' => $attribute->slug, 'type' => $attribute->type, 'type_label' => __('attributes.'.$attribute->type), 'type_icon' => $attribute->type_icon, 'type_color' => $attribute->type_color, 'group_name' => $attribute->group_name, 'description' => $attribute->description, 'is_required' => $attribute->is_required, 'is_filterable' => $attribute->is_filterable, 'is_searchable' => $attribute->is_searchable, 'values_count' => $attribute->values->count(), 'values' => $attribute->values->map(function ($value) {
+            return ['id' => $attribute->id, 'name' => $attribute->name, 'slug' => $attribute->slug, 'type' => $attribute->type, 'type_label' => __('attributes.' . $attribute->type), 'type_icon' => $attribute->type_icon, 'type_color' => $attribute->type_color, 'group_name' => $attribute->group_name, 'description' => $attribute->description, 'is_required' => $attribute->is_required, 'is_filterable' => $attribute->is_filterable, 'is_searchable' => $attribute->is_searchable, 'values_count' => $attribute->values->count(), 'values' => $attribute->values->map(function ($value) {
                 return ['id' => $value->id, 'value' => $value->value, 'display_value' => $value->display_value ?: $value->value, 'color' => $value->color];
             })];
         });
@@ -231,7 +231,7 @@ final class AttributeController extends Controller
             return response()->json(['error' => 'At least 2 attribute IDs are required']);
         }
         $attributes = Attribute::whereIn('id', $attributeIds)->with(['values', 'products'])->get()->map(function ($attribute) {
-            return ['id' => $attribute->id, 'name' => $attribute->name, 'type' => $attribute->type, 'type_label' => __('attributes.'.$attribute->type), 'group_name' => $attribute->group_name, 'statistics' => $attribute->getStatistics(), 'values' => $attribute->values->map(function ($value) {
+            return ['id' => $attribute->id, 'name' => $attribute->name, 'type' => $attribute->type, 'type_label' => __('attributes.' . $attribute->type), 'group_name' => $attribute->group_name, 'statistics' => $attribute->getStatistics(), 'values' => $attribute->values->map(function ($value) {
                 return ['id' => $value->id, 'value' => $value->value, 'display_value' => $value->display_value ?: $value->value, 'usage_count' => $value->products()->count()];
             })];
         });

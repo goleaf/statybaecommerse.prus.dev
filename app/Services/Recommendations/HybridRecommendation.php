@@ -147,13 +147,13 @@ final class HybridRecommendation extends BaseRecommendation
     private function getAlgorithmRecommendations(string $algorithm, ?User $user = null, ?Product $product = null, array $context = []): Collection
     {
         return match ($algorithm) {
-            'popularity' => (new PopularityRecommendation)->getRecommendations($user, $product, $context),
-            'trending' => (new TrendingRecommendation)->getRecommendations($user, $product, $context),
+            'popularity'    => (new PopularityRecommendation)->getRecommendations($user, $product, $context),
+            'trending'      => (new TrendingRecommendation)->getRecommendations($user, $product, $context),
             'content_based' => (new ContentBasedRecommendation)->getRecommendations($user, $product, $context),
             'collaborative' => (new CollaborativeFilteringRecommendation)->getRecommendations($user, $product, $context),
-            'cross_sell' => (new CrossSellRecommendation)->getRecommendations($user, $product, $context),
-            'up_sell' => (new UpSellRecommendation)->getRecommendations($user, $product, $context),
-            default => collect(),
+            'cross_sell'    => (new CrossSellRecommendation)->getRecommendations($user, $product, $context),
+            'up_sell'       => (new UpSellRecommendation)->getRecommendations($user, $product, $context),
+            default         => collect(),
         };
     }
 

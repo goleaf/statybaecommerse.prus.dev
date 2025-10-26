@@ -10,4 +10,3 @@ it('unit: curator config uses string class names for optional package', function
     expect($config['model'])->toBeString();
     expect($config['resources']['resource'])->toBeString();
 });
-

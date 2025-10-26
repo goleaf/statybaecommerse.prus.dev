@@ -15,8 +15,7 @@ final class NotificationPageData
         private readonly array $items,
         private readonly array $meta,
         private readonly array $links,
-    ) {
-    }
+    ) {}
 
     /**
      * @param array<int, NotificationPayloadData> $items
@@ -29,7 +28,7 @@ final class NotificationPageData
         array $items = [],
     ): self {
         $meta = [
-            'query' => $pagination->queryMeta($filters, $search),
+            'query'      => $pagination->queryMeta($filters, $search),
             'pagination' => $pagination->paginationMeta($paginator),
         ];
 

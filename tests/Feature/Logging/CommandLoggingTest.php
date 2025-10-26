@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Logging;
 
+use function collect;
+
 use Illuminate\Log\Events\MessageLogged;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
-use function collect;
 
 final class CommandLoggingTest extends TestCase
 {
@@ -23,7 +24,7 @@ final class CommandLoggingTest extends TestCase
         });
 
         Artisan::call('reports:generate', [
-            '--type' => 'system',
+            '--type'   => 'system',
             '--output' => 'reports/test',
             '--format' => 'json',
         ]);

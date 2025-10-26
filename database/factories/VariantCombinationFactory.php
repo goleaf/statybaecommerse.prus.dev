@@ -19,27 +19,27 @@ class VariantCombinationFactory extends Factory
     {
         $combinations = [
             ['color' => 'red', 'size' => 'small'],
-            ['color' => 'red', 'size' => 'medium'],
-            ['color' => 'red', 'size' => 'large'],
-            ['color' => 'blue', 'size' => 'small'],
-            ['color' => 'blue', 'size' => 'medium'],
-            ['color' => 'blue', 'size' => 'large'],
-            ['color' => 'green', 'size' => 'small'],
-            ['color' => 'green', 'size' => 'medium'],
-            ['color' => 'green', 'size' => 'large'],
+            ['color'    => 'red', 'size' => 'medium'],
+            ['color'    => 'red', 'size' => 'large'],
+            ['color'    => 'blue', 'size' => 'small'],
+            ['color'    => 'blue', 'size' => 'medium'],
+            ['color'    => 'blue', 'size' => 'large'],
+            ['color'    => 'green', 'size' => 'small'],
+            ['color'    => 'green', 'size' => 'medium'],
+            ['color'    => 'green', 'size' => 'large'],
             ['material' => 'wood', 'finish' => 'natural'],
             ['material' => 'wood', 'finish' => 'stained'],
             ['material' => 'metal', 'finish' => 'painted'],
             ['material' => 'metal', 'finish' => 'galvanized'],
-            ['power' => '18V', 'battery' => 'Li-ion'],
-            ['power' => '24V', 'battery' => 'Li-ion'],
-            ['power' => '36V', 'battery' => 'Li-ion'],
+            ['power'    => '18V', 'battery' => 'Li-ion'],
+            ['power'    => '24V', 'battery' => 'Li-ion'],
+            ['power'    => '36V', 'battery' => 'Li-ion'],
         ];
 
         return [
-            'product_id' => Product::factory(),
+            'product_id'             => Product::factory(),
             'attribute_combinations' => $this->faker->randomElement($combinations),
-            'is_available' => $this->faker->boolean(85),  // 85% chance of being available
+            'is_available'           => $this->faker->boolean(85),  // 85% chance of being available
         ];
     }
 

@@ -10,8 +10,8 @@ uses(RefreshDatabase::class);
 function createAdminUser(): \App\Models\User
 {
     return \App\Models\User::query()->create([
-        'name' => 'Admin',
-        'email' => 'admin@example.com',
+        'name'     => 'Admin',
+        'email'    => 'admin@example.com',
         'password' => Hash::make('password'),
         'is_admin' => true,
     ]);
@@ -31,20 +31,20 @@ it('can create and edit a news item via admin endpoints', function (): void {
 
     // Create
     $create = $this->post('/admin/news', [
-        'is_visible' => true,
+        'is_visible'   => true,
         'published_at' => now()->toDateTimeString(),
-        'author_name' => 'Admin',
+        'author_name'  => 'Admin',
         'translations' => [
             [
-                'locale' => 'lt',
-                'title' => 'Pirmoji naujiena',
-                'slug' => 'pirmoji-naujiena',
+                'locale'  => 'lt',
+                'title'   => 'Pirmoji naujiena',
+                'slug'    => 'pirmoji-naujiena',
                 'summary' => 'Trumpas aprašymas',
             ],
             [
-                'locale' => 'en',
-                'title' => 'First news',
-                'slug' => 'first-news',
+                'locale'  => 'en',
+                'title'   => 'First news',
+                'slug'    => 'first-news',
                 'summary' => 'Short summary',
             ],
         ],
@@ -58,13 +58,13 @@ it('can create and edit a news item via admin endpoints', function (): void {
 
     // Update
     $update = $this->put("/admin/news/{$news->getKey()}", [
-        'author_name' => 'Content Editor',
-        'is_visible' => true,
+        'author_name'  => 'Content Editor',
+        'is_visible'   => true,
         'translations' => [
             [
                 'locale' => 'lt',
-                'title' => 'Atnaujinta naujiena',
-                'slug' => 'atnaujinta-naujiena',
+                'title'  => 'Atnaujinta naujiena',
+                'slug'   => 'atnaujinta-naujiena',
             ],
         ],
     ]);

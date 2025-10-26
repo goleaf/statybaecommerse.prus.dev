@@ -9,6 +9,7 @@ use App\Models\Country;
 use App\Models\Translations\CityTranslation;
 use App\Models\Zone;
 use Illuminate\Database\Seeder;
+use Str;
 
 final class SpainCitiesSeeder extends Seeder
 {
@@ -22,13 +23,13 @@ final class SpainCitiesSeeder extends Seeder
         $cities = [
             // Madrid
             [
-                'name' => 'Madrid',
-                'code' => 'ES-MD-MAD',
-                'is_capital' => true,
-                'is_default' => true,
-                'latitude' => 40.4168,
-                'longitude' => -3.7038,
-                'population' => 3223334,
+                'name'         => 'Madrid',
+                'code'         => 'ES-MD-MAD',
+                'is_capital'   => true,
+                'is_default'   => true,
+                'latitude'     => 40.4168,
+                'longitude'    => -3.7038,
+                'population'   => 3223334,
                 'postal_codes' => ['28001', '28002', '28003'],
                 'translations' => [
                     'lt' => ['name' => 'Madridas', 'description' => 'Ispanijos sostinė'],
@@ -36,11 +37,11 @@ final class SpainCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Alcalá de Henares',
-                'code' => 'ES-MD-ALC',
-                'latitude' => 40.4817,
-                'longitude' => -3.3642,
-                'population' => 196888,
+                'name'         => 'Alcalá de Henares',
+                'code'         => 'ES-MD-ALC',
+                'latitude'     => 40.4817,
+                'longitude'    => -3.3642,
+                'population'   => 196888,
                 'postal_codes' => ['28801'],
                 'translations' => [
                     'lt' => ['name' => 'Alkalá de Henares', 'description' => 'Universitetų miestas'],
@@ -49,11 +50,11 @@ final class SpainCitiesSeeder extends Seeder
             ],
             // Catalonia
             [
-                'name' => 'Barcelona',
-                'code' => 'ES-CT-BAR',
-                'latitude' => 41.3851,
-                'longitude' => 2.1734,
-                'population' => 1636762,
+                'name'         => 'Barcelona',
+                'code'         => 'ES-CT-BAR',
+                'latitude'     => 41.3851,
+                'longitude'    => 2.1734,
+                'population'   => 1636762,
                 'postal_codes' => ['08001', '08002', '08003'],
                 'translations' => [
                     'lt' => ['name' => 'Barselona', 'description' => 'Katalonijos sostinė'],
@@ -61,11 +62,11 @@ final class SpainCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => "L'Hospitalet de Llobregat",
-                'code' => 'ES-CT-HOS',
-                'latitude' => 41.3597,
-                'longitude' => 2.0997,
-                'population' => 264923,
+                'name'         => "L'Hospitalet de Llobregat",
+                'code'         => 'ES-CT-HOS',
+                'latitude'     => 41.3597,
+                'longitude'    => 2.0997,
+                'population'   => 264923,
                 'postal_codes' => ['08901'],
                 'translations' => [
                     'lt' => ['name' => "L'Hospitalet de Llobregat", 'description' => 'Barselonos priemiestis'],
@@ -73,11 +74,11 @@ final class SpainCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Badalona',
-                'code' => 'ES-CT-BAD',
-                'latitude' => 41.45,
-                'longitude' => 2.2472,
-                'population' => 223166,
+                'name'         => 'Badalona',
+                'code'         => 'ES-CT-BAD',
+                'latitude'     => 41.45,
+                'longitude'    => 2.2472,
+                'population'   => 223166,
                 'postal_codes' => ['08911'],
                 'translations' => [
                     'lt' => ['name' => 'Badalona', 'description' => 'Pajūrio miestas'],
@@ -85,11 +86,11 @@ final class SpainCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Sabadell',
-                'code' => 'ES-CT-SAB',
-                'latitude' => 41.5481,
-                'longitude' => 2.1075,
-                'population' => 216520,
+                'name'         => 'Sabadell',
+                'code'         => 'ES-CT-SAB',
+                'latitude'     => 41.5481,
+                'longitude'    => 2.1075,
+                'population'   => 216520,
                 'postal_codes' => ['08201'],
                 'translations' => [
                     'lt' => ['name' => 'Sabadell', 'description' => 'Tekstilės pramonės centras'],
@@ -97,11 +98,11 @@ final class SpainCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Terrassa',
-                'code' => 'ES-CT-TER',
-                'latitude' => 41.5667,
-                'longitude' => 2.0167,
-                'population' => 223011,
+                'name'         => 'Terrassa',
+                'code'         => 'ES-CT-TER',
+                'latitude'     => 41.5667,
+                'longitude'    => 2.0167,
+                'population'   => 223011,
                 'postal_codes' => ['08221'],
                 'translations' => [
                     'lt' => ['name' => 'Terrassa', 'description' => 'Pramonės miestas'],
@@ -109,11 +110,11 @@ final class SpainCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Lleida',
-                'code' => 'ES-CT-LLE',
-                'latitude' => 41.6167,
-                'longitude' => 0.6333,
-                'population' => 140797,
+                'name'         => 'Lleida',
+                'code'         => 'ES-CT-LLE',
+                'latitude'     => 41.6167,
+                'longitude'    => 0.6333,
+                'population'   => 140797,
                 'postal_codes' => ['25001'],
                 'translations' => [
                     'lt' => ['name' => 'Lleida', 'description' => 'Universitetų miestas'],
@@ -121,11 +122,11 @@ final class SpainCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Tarragona',
-                'code' => 'ES-CT-TAR',
-                'latitude' => 41.1167,
-                'longitude' => 1.25,
-                'population' => 140323,
+                'name'         => 'Tarragona',
+                'code'         => 'ES-CT-TAR',
+                'latitude'     => 41.1167,
+                'longitude'    => 1.25,
+                'population'   => 140323,
                 'postal_codes' => ['43001'],
                 'translations' => [
                     'lt' => ['name' => 'Tarragona', 'description' => 'Romėnų miestas'],
@@ -133,11 +134,11 @@ final class SpainCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Girona',
-                'code' => 'ES-CT-GIR',
-                'latitude' => 41.9833,
-                'longitude' => 2.8167,
-                'population' => 103369,
+                'name'         => 'Girona',
+                'code'         => 'ES-CT-GIR',
+                'latitude'     => 41.9833,
+                'longitude'    => 2.8167,
+                'population'   => 103369,
                 'postal_codes' => ['17001'],
                 'translations' => [
                     'lt' => ['name' => 'Girona', 'description' => 'Istorinis miestas'],
@@ -146,11 +147,11 @@ final class SpainCitiesSeeder extends Seeder
             ],
             // Andalusia
             [
-                'name' => 'Seville',
-                'code' => 'ES-AN-SEV',
-                'latitude' => 37.3891,
-                'longitude' => -5.9845,
-                'population' => 688711,
+                'name'         => 'Seville',
+                'code'         => 'ES-AN-SEV',
+                'latitude'     => 37.3891,
+                'longitude'    => -5.9845,
+                'population'   => 688711,
                 'postal_codes' => ['41001', '41002', '41003'],
                 'translations' => [
                     'lt' => ['name' => 'Sevilija', 'description' => 'Andalūzijos sostinė'],
@@ -158,11 +159,11 @@ final class SpainCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Málaga',
-                'code' => 'ES-AN-MAL',
-                'latitude' => 36.7213,
-                'longitude' => -4.4214,
-                'population' => 578460,
+                'name'         => 'Málaga',
+                'code'         => 'ES-AN-MAL',
+                'latitude'     => 36.7213,
+                'longitude'    => -4.4214,
+                'population'   => 578460,
                 'postal_codes' => ['29001', '29002', '29003'],
                 'translations' => [
                     'lt' => ['name' => 'Malaga', 'description' => 'Kurortinis miestas'],
@@ -170,11 +171,11 @@ final class SpainCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Córdoba',
-                'code' => 'ES-AN-COR',
-                'latitude' => 37.8882,
-                'longitude' => -4.7794,
-                'population' => 325708,
+                'name'         => 'Córdoba',
+                'code'         => 'ES-AN-COR',
+                'latitude'     => 37.8882,
+                'longitude'    => -4.7794,
+                'population'   => 325708,
                 'postal_codes' => ['14001'],
                 'translations' => [
                     'lt' => ['name' => 'Kordoba', 'description' => 'UNESCO miestas'],
@@ -182,11 +183,11 @@ final class SpainCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Granada',
-                'code' => 'ES-AN-GRA',
-                'latitude' => 37.1773,
-                'longitude' => -3.5986,
-                'population' => 232462,
+                'name'         => 'Granada',
+                'code'         => 'ES-AN-GRA',
+                'latitude'     => 37.1773,
+                'longitude'    => -3.5986,
+                'population'   => 232462,
                 'postal_codes' => ['18001'],
                 'translations' => [
                     'lt' => ['name' => 'Granada', 'description' => 'Alhambros miestas'],
@@ -194,11 +195,11 @@ final class SpainCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Jerez de la Frontera',
-                'code' => 'ES-AN-JER',
-                'latitude' => 36.686,
-                'longitude' => -6.136,
-                'population' => 212876,
+                'name'         => 'Jerez de la Frontera',
+                'code'         => 'ES-AN-JER',
+                'latitude'     => 36.686,
+                'longitude'    => -6.136,
+                'population'   => 212876,
                 'postal_codes' => ['11401'],
                 'translations' => [
                     'lt' => ['name' => 'Jerez de la Frontera', 'description' => 'Šerio miestas'],
@@ -206,11 +207,11 @@ final class SpainCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Almería',
-                'code' => 'ES-AN-ALM',
-                'latitude' => 36.8381,
-                'longitude' => -2.4597,
-                'population' => 200753,
+                'name'         => 'Almería',
+                'code'         => 'ES-AN-ALM',
+                'latitude'     => 36.8381,
+                'longitude'    => -2.4597,
+                'population'   => 200753,
                 'postal_codes' => ['04001'],
                 'translations' => [
                     'lt' => ['name' => 'Almerija', 'description' => 'Pajūrio miestas'],
@@ -218,11 +219,11 @@ final class SpainCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Huelva',
-                'code' => 'ES-AN-HUE',
-                'latitude' => 37.2583,
-                'longitude' => -6.9508,
-                'population' => 143837,
+                'name'         => 'Huelva',
+                'code'         => 'ES-AN-HUE',
+                'latitude'     => 37.2583,
+                'longitude'    => -6.9508,
+                'population'   => 143837,
                 'postal_codes' => ['21001'],
                 'translations' => [
                     'lt' => ['name' => 'Huelva', 'description' => 'Uostamiesčis'],
@@ -230,11 +231,11 @@ final class SpainCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Cádiz',
-                'code' => 'ES-AN-CAD',
-                'latitude' => 36.5298,
-                'longitude' => -6.2934,
-                'population' => 116979,
+                'name'         => 'Cádiz',
+                'code'         => 'ES-AN-CAD',
+                'latitude'     => 36.5298,
+                'longitude'    => -6.2934,
+                'population'   => 116979,
                 'postal_codes' => ['11001'],
                 'translations' => [
                     'lt' => ['name' => 'Kadisas', 'description' => 'Senovinis miestas'],
@@ -243,11 +244,11 @@ final class SpainCitiesSeeder extends Seeder
             ],
             // Valencia
             [
-                'name' => 'Valencia',
-                'code' => 'ES-VC-VAL',
-                'latitude' => 39.4699,
-                'longitude' => -0.3763,
-                'population' => 800215,
+                'name'         => 'Valencia',
+                'code'         => 'ES-VC-VAL',
+                'latitude'     => 39.4699,
+                'longitude'    => -0.3763,
+                'population'   => 800215,
                 'postal_codes' => ['46001', '46002', '46003'],
                 'translations' => [
                     'lt' => ['name' => 'Valensija', 'description' => 'Valensijos sostinė'],
@@ -255,11 +256,11 @@ final class SpainCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Alicante',
-                'code' => 'ES-VC-ALI',
-                'latitude' => 38.3452,
-                'longitude' => -0.481,
-                'population' => 337304,
+                'name'         => 'Alicante',
+                'code'         => 'ES-VC-ALI',
+                'latitude'     => 38.3452,
+                'longitude'    => -0.481,
+                'population'   => 337304,
                 'postal_codes' => ['03001'],
                 'translations' => [
                     'lt' => ['name' => 'Alicantė', 'description' => 'Kurortinis miestas'],
@@ -267,11 +268,11 @@ final class SpainCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Elche',
-                'code' => 'ES-VC-ELC',
-                'latitude' => 38.2622,
-                'longitude' => -0.7011,
-                'population' => 234765,
+                'name'         => 'Elche',
+                'code'         => 'ES-VC-ELC',
+                'latitude'     => 38.2622,
+                'longitude'    => -0.7011,
+                'population'   => 234765,
                 'postal_codes' => ['03201'],
                 'translations' => [
                     'lt' => ['name' => 'Elche', 'description' => 'Pramonės miestas'],
@@ -279,11 +280,11 @@ final class SpainCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Castellón de la Plana',
-                'code' => 'ES-VC-CAS',
-                'latitude' => 39.9861,
-                'longitude' => -0.0369,
-                'population' => 171728,
+                'name'         => 'Castellón de la Plana',
+                'code'         => 'ES-VC-CAS',
+                'latitude'     => 39.9861,
+                'longitude'    => -0.0369,
+                'population'   => 171728,
                 'postal_codes' => ['12001'],
                 'translations' => [
                     'lt' => ['name' => 'Castellón de la Plana', 'description' => 'Pajūrio miestas'],
@@ -292,11 +293,11 @@ final class SpainCitiesSeeder extends Seeder
             ],
             // Galicia
             [
-                'name' => 'Vigo',
-                'code' => 'ES-GA-VIG',
-                'latitude' => 42.2406,
-                'longitude' => -8.7206,
-                'population' => 293837,
+                'name'         => 'Vigo',
+                'code'         => 'ES-GA-VIG',
+                'latitude'     => 42.2406,
+                'longitude'    => -8.7206,
+                'population'   => 293837,
                 'postal_codes' => ['36201'],
                 'translations' => [
                     'lt' => ['name' => 'Vigo', 'description' => 'Uostamiesčis'],
@@ -304,11 +305,11 @@ final class SpainCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'A Coruña',
-                'code' => 'ES-GA-ACO',
-                'latitude' => 43.3713,
-                'longitude' => -8.396,
-                'population' => 245711,
+                'name'         => 'A Coruña',
+                'code'         => 'ES-GA-ACO',
+                'latitude'     => 43.3713,
+                'longitude'    => -8.396,
+                'population'   => 245711,
                 'postal_codes' => ['15001'],
                 'translations' => [
                     'lt' => ['name' => 'A Coruña', 'description' => 'Pajūrio miestas'],
@@ -316,11 +317,11 @@ final class SpainCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Santiago de Compostela',
-                'code' => 'ES-GA-SAN',
-                'latitude' => 42.8805,
-                'longitude' => -8.5456,
-                'population' => 97808,
+                'name'         => 'Santiago de Compostela',
+                'code'         => 'ES-GA-SAN',
+                'latitude'     => 42.8805,
+                'longitude'    => -8.5456,
+                'population'   => 97808,
                 'postal_codes' => ['15701'],
                 'translations' => [
                     'lt' => ['name' => 'Santiago de Compostela', 'description' => 'Pilgrimų miestas'],
@@ -328,11 +329,11 @@ final class SpainCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Lugo',
-                'code' => 'ES-GA-LUG',
-                'latitude' => 43.0121,
-                'longitude' => -7.5559,
-                'population' => 98225,
+                'name'         => 'Lugo',
+                'code'         => 'ES-GA-LUG',
+                'latitude'     => 43.0121,
+                'longitude'    => -7.5559,
+                'population'   => 98225,
                 'postal_codes' => ['27001'],
                 'translations' => [
                     'lt' => ['name' => 'Lugo', 'description' => 'Romėnų miestas'],
@@ -341,11 +342,11 @@ final class SpainCitiesSeeder extends Seeder
             ],
             // Castile and León
             [
-                'name' => 'Valladolid',
-                'code' => 'ES-CL-VAL',
-                'latitude' => 41.6523,
-                'longitude' => -4.7245,
-                'population' => 298412,
+                'name'         => 'Valladolid',
+                'code'         => 'ES-CL-VAL',
+                'latitude'     => 41.6523,
+                'longitude'    => -4.7245,
+                'population'   => 298412,
                 'postal_codes' => ['47001'],
                 'translations' => [
                     'lt' => ['name' => 'Valladolid', 'description' => 'Kastilijos ir Leono sostinė'],
@@ -353,11 +354,11 @@ final class SpainCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'León',
-                'code' => 'ES-CL-LEO',
-                'latitude' => 42.5987,
-                'longitude' => -5.5671,
-                'population' => 124303,
+                'name'         => 'León',
+                'code'         => 'ES-CL-LEO',
+                'latitude'     => 42.5987,
+                'longitude'    => -5.5671,
+                'population'   => 124303,
                 'postal_codes' => ['24001'],
                 'translations' => [
                     'lt' => ['name' => 'Leonas', 'description' => 'Istorinis miestas'],
@@ -365,11 +366,11 @@ final class SpainCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Burgos',
-                'code' => 'ES-CL-BUR',
-                'latitude' => 42.3409,
-                'longitude' => -3.6997,
-                'population' => 175623,
+                'name'         => 'Burgos',
+                'code'         => 'ES-CL-BUR',
+                'latitude'     => 42.3409,
+                'longitude'    => -3.6997,
+                'population'   => 175623,
                 'postal_codes' => ['09001'],
                 'translations' => [
                     'lt' => ['name' => 'Burgosas', 'description' => 'Katedros miestas'],
@@ -377,11 +378,11 @@ final class SpainCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Salamanca',
-                'code' => 'ES-CL-SAL',
-                'latitude' => 40.9701,
-                'longitude' => -5.6635,
-                'population' => 144436,
+                'name'         => 'Salamanca',
+                'code'         => 'ES-CL-SAL',
+                'latitude'     => 40.9701,
+                'longitude'    => -5.6635,
+                'population'   => 144436,
                 'postal_codes' => ['37001'],
                 'translations' => [
                     'lt' => ['name' => 'Salamanka', 'description' => 'Universitetų miestas'],
@@ -390,11 +391,11 @@ final class SpainCitiesSeeder extends Seeder
             ],
             // Basque Country
             [
-                'name' => 'Bilbao',
-                'code' => 'ES-PV-BIL',
-                'latitude' => 43.2627,
-                'longitude' => -2.9253,
-                'population' => 346405,
+                'name'         => 'Bilbao',
+                'code'         => 'ES-PV-BIL',
+                'latitude'     => 43.2627,
+                'longitude'    => -2.9253,
+                'population'   => 346405,
                 'postal_codes' => ['48001'],
                 'translations' => [
                     'lt' => ['name' => 'Bilbao', 'description' => 'Baskų šalies centras'],
@@ -402,11 +403,11 @@ final class SpainCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Vitoria-Gasteiz',
-                'code' => 'ES-PV-VIT',
-                'latitude' => 42.8467,
-                'longitude' => -2.6716,
-                'population' => 252571,
+                'name'         => 'Vitoria-Gasteiz',
+                'code'         => 'ES-PV-VIT',
+                'latitude'     => 42.8467,
+                'longitude'    => -2.6716,
+                'population'   => 252571,
                 'postal_codes' => ['01001'],
                 'translations' => [
                     'lt' => ['name' => 'Vitoria-Gasteiz', 'description' => 'Baskų šalies sostinė'],
@@ -414,11 +415,11 @@ final class SpainCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'San Sebastián',
-                'code' => 'ES-PV-SAN',
-                'latitude' => 43.3183,
-                'longitude' => -1.9812,
-                'population' => 188240,
+                'name'         => 'San Sebastián',
+                'code'         => 'ES-PV-SAN',
+                'latitude'     => 43.3183,
+                'longitude'    => -1.9812,
+                'population'   => 188240,
                 'postal_codes' => ['20001'],
                 'translations' => [
                     'lt' => ['name' => 'San Sebastianas', 'description' => 'Kurortinis miestas'],
@@ -427,11 +428,11 @@ final class SpainCitiesSeeder extends Seeder
             ],
             // Canary Islands
             [
-                'name' => 'Las Palmas de Gran Canaria',
-                'code' => 'ES-CN-LAS',
-                'latitude' => 28.1248,
-                'longitude' => -15.43,
-                'population' => 381123,
+                'name'         => 'Las Palmas de Gran Canaria',
+                'code'         => 'ES-CN-LAS',
+                'latitude'     => 28.1248,
+                'longitude'    => -15.43,
+                'population'   => 381123,
                 'postal_codes' => ['35001'],
                 'translations' => [
                     'lt' => ['name' => 'Las Palmas de Gran Canaria', 'description' => 'Kanarų salų sostinė'],
@@ -439,11 +440,11 @@ final class SpainCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Santa Cruz de Tenerife',
-                'code' => 'ES-CN-SAN',
-                'latitude' => 28.4698,
-                'longitude' => -16.2549,
-                'population' => 204856,
+                'name'         => 'Santa Cruz de Tenerife',
+                'code'         => 'ES-CN-SAN',
+                'latitude'     => 28.4698,
+                'longitude'    => -16.2549,
+                'population'   => 204856,
                 'postal_codes' => ['38001'],
                 'translations' => [
                     'lt' => ['name' => 'Santa Cruz de Tenerife', 'description' => 'Tenerifės sostinė'],
@@ -452,11 +453,11 @@ final class SpainCitiesSeeder extends Seeder
             ],
             // Castile-La Mancha
             [
-                'name' => 'Toledo',
-                'code' => 'ES-CM-TOL',
-                'latitude' => 39.8628,
-                'longitude' => -4.0273,
-                'population' => 85911,
+                'name'         => 'Toledo',
+                'code'         => 'ES-CM-TOL',
+                'latitude'     => 39.8628,
+                'longitude'    => -4.0273,
+                'population'   => 85911,
                 'postal_codes' => ['45001'],
                 'translations' => [
                     'lt' => ['name' => 'Toledo', 'description' => 'UNESCO miestas'],
@@ -464,11 +465,11 @@ final class SpainCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Albacete',
-                'code' => 'ES-CM-ALB',
-                'latitude' => 38.9977,
-                'longitude' => -1.8601,
-                'population' => 172722,
+                'name'         => 'Albacete',
+                'code'         => 'ES-CM-ALB',
+                'latitude'     => 38.9977,
+                'longitude'    => -1.8601,
+                'population'   => 172722,
                 'postal_codes' => ['02001'],
                 'translations' => [
                     'lt' => ['name' => 'Albacete', 'description' => 'Kastilijos-La Mančos sostinė'],
@@ -477,11 +478,11 @@ final class SpainCitiesSeeder extends Seeder
             ],
             // Murcia
             [
-                'name' => 'Murcia',
-                'code' => 'ES-MC-MUR',
-                'latitude' => 37.9922,
-                'longitude' => -1.1307,
-                'population' => 459403,
+                'name'         => 'Murcia',
+                'code'         => 'ES-MC-MUR',
+                'latitude'     => 37.9922,
+                'longitude'    => -1.1307,
+                'population'   => 459403,
                 'postal_codes' => ['30001'],
                 'translations' => [
                     'lt' => ['name' => 'Murcija', 'description' => 'Murcijos sostinė'],
@@ -490,11 +491,11 @@ final class SpainCitiesSeeder extends Seeder
             ],
             // Aragon
             [
-                'name' => 'Zaragoza',
-                'code' => 'ES-AR-ZAR',
-                'latitude' => 41.6488,
-                'longitude' => -0.8891,
-                'population' => 675301,
+                'name'         => 'Zaragoza',
+                'code'         => 'ES-AR-ZAR',
+                'latitude'     => 41.6488,
+                'longitude'    => -0.8891,
+                'population'   => 675301,
                 'postal_codes' => ['50001'],
                 'translations' => [
                     'lt' => ['name' => 'Saragosa', 'description' => 'Aragono sostinė'],
@@ -503,11 +504,11 @@ final class SpainCitiesSeeder extends Seeder
             ],
             // Extremadura
             [
-                'name' => 'Badajoz',
-                'code' => 'ES-EX-BAD',
-                'latitude' => 38.8794,
-                'longitude' => -6.9707,
-                'population' => 150610,
+                'name'         => 'Badajoz',
+                'code'         => 'ES-EX-BAD',
+                'latitude'     => 38.8794,
+                'longitude'    => -6.9707,
+                'population'   => 150610,
                 'postal_codes' => ['06001'],
                 'translations' => [
                     'lt' => ['name' => 'Badachosas', 'description' => 'Ekstremadūros sostinė'],
@@ -516,11 +517,11 @@ final class SpainCitiesSeeder extends Seeder
             ],
             // Balearic Islands
             [
-                'name' => 'Palma',
-                'code' => 'ES-IB-PAL',
-                'latitude' => 39.5696,
-                'longitude' => 2.6502,
-                'population' => 416065,
+                'name'         => 'Palma',
+                'code'         => 'ES-IB-PAL',
+                'latitude'     => 39.5696,
+                'longitude'    => 2.6502,
+                'population'   => 416065,
                 'postal_codes' => ['07001'],
                 'translations' => [
                     'lt' => ['name' => 'Palma', 'description' => 'Balearų salų sostinė'],
@@ -529,11 +530,11 @@ final class SpainCitiesSeeder extends Seeder
             ],
             // Asturias
             [
-                'name' => 'Oviedo',
-                'code' => 'ES-AS-OVI',
-                'latitude' => 43.3614,
-                'longitude' => -5.8593,
-                'population' => 220301,
+                'name'         => 'Oviedo',
+                'code'         => 'ES-AS-OVI',
+                'latitude'     => 43.3614,
+                'longitude'    => -5.8593,
+                'population'   => 220301,
                 'postal_codes' => ['33001'],
                 'translations' => [
                     'lt' => ['name' => 'Oviedas', 'description' => 'Astūrijos sostinė'],
@@ -542,11 +543,11 @@ final class SpainCitiesSeeder extends Seeder
             ],
             // Navarre
             [
-                'name' => 'Pamplona',
-                'code' => 'ES-NC-PAM',
-                'latitude' => 42.8182,
-                'longitude' => -1.6443,
-                'population' => 203081,
+                'name'         => 'Pamplona',
+                'code'         => 'ES-NC-PAM',
+                'latitude'     => 42.8182,
+                'longitude'    => -1.6443,
+                'population'   => 203081,
                 'postal_codes' => ['31001'],
                 'translations' => [
                     'lt' => ['name' => 'Pamplona', 'description' => 'Navaros sostinė'],
@@ -555,11 +556,11 @@ final class SpainCitiesSeeder extends Seeder
             ],
             // Cantabria
             [
-                'name' => 'Santander',
-                'code' => 'ES-CB-SAN',
-                'latitude' => 43.4623,
-                'longitude' => -3.8099,
-                'population' => 172044,
+                'name'         => 'Santander',
+                'code'         => 'ES-CB-SAN',
+                'latitude'     => 43.4623,
+                'longitude'    => -3.8099,
+                'population'   => 172044,
                 'postal_codes' => ['39001'],
                 'translations' => [
                     'lt' => ['name' => 'Santanderis', 'description' => 'Kantabrijos sostinė'],
@@ -568,11 +569,11 @@ final class SpainCitiesSeeder extends Seeder
             ],
             // La Rioja
             [
-                'name' => 'Logroño',
-                'code' => 'ES-RI-LOG',
-                'latitude' => 42.4627,
-                'longitude' => -2.4449,
-                'population' => 151113,
+                'name'         => 'Logroño',
+                'code'         => 'ES-RI-LOG',
+                'latitude'     => 42.4627,
+                'longitude'    => -2.4449,
+                'population'   => 151113,
                 'postal_codes' => ['26001'],
                 'translations' => [
                     'lt' => ['name' => 'Logronjas', 'description' => 'La Riochos sostinė'],
@@ -585,19 +586,19 @@ final class SpainCitiesSeeder extends Seeder
             $city = City::updateOrCreate(
                 ['code' => $cityData['code']],
                 [
-                    'name' => $cityData['name'],
-                    'slug' => \Str::slug($cityData['name'].'-'.$cityData['code']),
-                    'is_enabled' => true,
-                    'is_default' => $cityData['is_default'] ?? false,
-                    'is_capital' => $cityData['is_capital'] ?? false,
-                    'country_id' => $spain->id,
-                    'zone_id' => $euZone?->id,
-                    'level' => 1,
-                    'latitude' => $cityData['latitude'],
-                    'longitude' => $cityData['longitude'],
-                    'population' => $cityData['population'],
+                    'name'         => $cityData['name'],
+                    'slug'         => Str::slug($cityData['name'] . '-' . $cityData['code']),
+                    'is_enabled'   => true,
+                    'is_default'   => $cityData['is_default'] ?? false,
+                    'is_capital'   => $cityData['is_capital'] ?? false,
+                    'country_id'   => $spain->id,
+                    'zone_id'      => $euZone?->id,
+                    'level'        => 1,
+                    'latitude'     => $cityData['latitude'],
+                    'longitude'    => $cityData['longitude'],
+                    'population'   => $cityData['population'],
                     'postal_codes' => $cityData['postal_codes'],
-                    'sort_order' => 0,
+                    'sort_order'   => 0,
                 ]
             );
 
@@ -606,10 +607,10 @@ final class SpainCitiesSeeder extends Seeder
                 CityTranslation::updateOrCreate(
                     [
                         'city_id' => $city->id,
-                        'locale' => $locale,
+                        'locale'  => $locale,
                     ],
                     [
-                        'name' => $translation['name'],
+                        'name'        => $translation['name'],
                         'description' => $translation['description'],
                     ]
                 );

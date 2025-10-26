@@ -70,12 +70,12 @@ final class SystemSettingsWidgetsTest extends TestCase
         // Create settings for each category
         SystemSetting::factory()->count(5)->create([
             'category_id' => $this->category->id,
-            'is_active' => true,
+            'is_active'   => true,
         ]);
 
         SystemSetting::factory()->count(3)->create([
             'category_id' => $category2->id,
-            'is_active' => true,
+            'is_active'   => true,
         ]);
 
         $this->actingAs($this->adminUser);
@@ -91,17 +91,17 @@ final class SystemSettingsWidgetsTest extends TestCase
     public function test_system_settings_by_type_widget_displays_correct_data(): void
     {
         SystemSetting::factory()->count(3)->create([
-            'type' => 'string',
+            'type'      => 'string',
             'is_active' => true,
         ]);
 
         SystemSetting::factory()->count(2)->create([
-            'type' => 'boolean',
+            'type'      => 'boolean',
             'is_active' => true,
         ]);
 
         SystemSetting::factory()->count(1)->create([
-            'type' => 'number',
+            'type'      => 'number',
             'is_active' => true,
         ]);
 
@@ -117,17 +117,17 @@ final class SystemSettingsWidgetsTest extends TestCase
     public function test_system_settings_by_group_widget_displays_correct_data(): void
     {
         SystemSetting::factory()->count(4)->create([
-            'group' => 'general',
+            'group'     => 'general',
             'is_active' => true,
         ]);
 
         SystemSetting::factory()->count(2)->create([
-            'group' => 'ecommerce',
+            'group'     => 'ecommerce',
             'is_active' => true,
         ]);
 
         SystemSetting::factory()->count(1)->create([
-            'group' => 'security',
+            'group'     => 'security',
             'is_active' => true,
         ]);
 

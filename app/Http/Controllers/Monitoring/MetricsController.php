@@ -9,9 +9,7 @@ use Illuminate\Http\Response;
 
 final class MetricsController
 {
-    public function __construct(private readonly ApplicationMetrics $metrics)
-    {
-    }
+    public function __construct(private readonly ApplicationMetrics $metrics) {}
 
     public function __invoke(): Response
     {

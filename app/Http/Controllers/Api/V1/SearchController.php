@@ -21,10 +21,10 @@ final class SearchController extends Controller
         unset($payload['types']);
 
         $queryData = SearchQueryData::fromArray($payload, [
-            'ip' => $request->ip(),
-            'user_id' => $request->user()?->getKey(),
+            'ip'         => $request->ip(),
+            'user_id'    => $request->user()?->getKey(),
             'user_agent' => $request->userAgent(),
-            'locale' => app()->getLocale(),
+            'locale'     => app()->getLocale(),
         ]);
 
         $results = $service->search($queryData);

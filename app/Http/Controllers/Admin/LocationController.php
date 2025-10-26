@@ -7,13 +7,18 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Country;
 use App\Models\Location;
+
+use function collect;
+
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
-use function collect;
 use function in_array;
+
+use Log;
+
 use function strtolower;
 use function trim;
 
@@ -90,15 +95,15 @@ final class LocationController extends Controller
             ->paginate($perPage)
             ->through(static function (Location $location): array {
                 return [
-                    'id' => $location->id,
-                    'name' => $location->name,
-                    'code' => $location->code,
-                    'type' => $location->type,
-                    'country_code' => $location->country_code,
-                    'country_name' => $location->country?->name,
-                    'is_enabled' => (bool) $location->is_enabled,
-                    'is_default' => (bool) $location->is_default,
-                    'has_coordinates' => $location->hasCoordinates(),
+                    'id'                => $location->id,
+                    'name'              => $location->name,
+                    'code'              => $location->code,
+                    'type'              => $location->type,
+                    'country_code'      => $location->country_code,
+                    'country_name'      => $location->country?->name,
+                    'is_enabled'        => (bool) $location->is_enabled,
+                    'is_default'        => (bool) $location->is_default,
+                    'has_coordinates'   => $location->hasCoordinates(),
                     'has_opening_hours' => $location->hasOpeningHours(),
                 ];
             });
@@ -122,23 +127,23 @@ final class LocationController extends Controller
 
     public function show(int $location): JsonResponse
     {
-        \Log::debug('show route', ['location_id' => $location]);
+        Log::debug('show route', ['location_id' => $location]);
         $record = Location::withoutGlobalScopes()
             ->with('country')
             ->findOrFail($location);
 
         return response()->json([
             'data' => [
-                'id' => $record->id,
-                'name' => $record->name,
-                'code' => $record->code,
-                'type' => $record->type,
+                'id'           => $record->id,
+                'name'         => $record->name,
+                'code'         => $record->code,
+                'type'         => $record->type,
                 'country_code' => $record->country_code,
                 'country_name' => $record->country?->name,
-                'city' => $record->city,
+                'city'         => $record->city,
                 'full_address' => $record->full_address,
-                'is_enabled' => (bool) $record->is_enabled,
-                'is_default' => (bool) $record->is_default,
+                'is_enabled'   => (bool) $record->is_enabled,
+                'is_default'   => (bool) $record->is_default,
             ],
         ]);
     }
@@ -172,8 +177,8 @@ final class LocationController extends Controller
     public function bulkActions(Request $request): RedirectResponse
     {
         $data = $request->validate([
-            'action'  => ['required', Rule::in(['enable', 'disable'])],
-            'records' => ['required', 'array', 'min:1'],
+            'action'    => ['required', Rule::in(['enable', 'disable'])],
+            'records'   => ['required', 'array', 'min:1'],
             'records.*' => ['integer', 'exists:locations,id'],
         ]);
 
@@ -189,8 +194,8 @@ final class LocationController extends Controller
     public function reorder(Request $request): RedirectResponse
     {
         $data = $request->validate([
-            'items' => ['required', 'array', 'min:1'],
-            'items.*.id' => ['required', 'integer', 'exists:locations,id'],
+            'items'              => ['required', 'array', 'min:1'],
+            'items.*.id'         => ['required', 'integer', 'exists:locations,id'],
             'items.*.sort_order' => ['required', 'integer'],
         ]);
 
@@ -216,28 +221,28 @@ final class LocationController extends Controller
                     ->ignore($locationId)
                     ->whereNull('deleted_at'),
             ],
-            'name' => ['required', 'string', 'max:255'],
-            'description' => ['nullable', 'string'],
-            'type' => ['required', 'string', 'max:50'],
-            'address_line_1' => ['nullable', 'string', 'max:255'],
-            'address_line_2' => ['nullable', 'string', 'max:255'],
-            'city' => ['nullable', 'string', 'max:100'],
-            'state' => ['nullable', 'string', 'max:100'],
-            'postal_code' => ['nullable', 'string', 'max:20'],
-            'country_code' => ['nullable', 'string', 'max:3'],
-            'phone' => ['nullable', 'string', 'max:20'],
-            'email' => ['nullable', 'email', 'max:255'],
-            'latitude' => ['nullable', 'numeric', 'between:-90,90'],
-            'longitude' => ['nullable', 'numeric', 'between:-180,180'],
-            'opening_hours' => ['nullable', 'array'],
-            'opening_hours.*.day' => ['required_with:opening_hours', 'string'],
-            'opening_hours.*.open_time' => ['nullable', 'string'],
+            'name'                       => ['required', 'string', 'max:255'],
+            'description'                => ['nullable', 'string'],
+            'type'                       => ['required', 'string', 'max:50'],
+            'address_line_1'             => ['nullable', 'string', 'max:255'],
+            'address_line_2'             => ['nullable', 'string', 'max:255'],
+            'city'                       => ['nullable', 'string', 'max:100'],
+            'state'                      => ['nullable', 'string', 'max:100'],
+            'postal_code'                => ['nullable', 'string', 'max:20'],
+            'country_code'               => ['nullable', 'string', 'max:3'],
+            'phone'                      => ['nullable', 'string', 'max:20'],
+            'email'                      => ['nullable', 'email', 'max:255'],
+            'latitude'                   => ['nullable', 'numeric', 'between:-90,90'],
+            'longitude'                  => ['nullable', 'numeric', 'between:-180,180'],
+            'opening_hours'              => ['nullable', 'array'],
+            'opening_hours.*.day'        => ['required_with:opening_hours', 'string'],
+            'opening_hours.*.open_time'  => ['nullable', 'string'],
             'opening_hours.*.close_time' => ['nullable', 'string'],
-            'opening_hours.*.is_closed' => ['nullable', 'boolean'],
-            'contact_info' => ['nullable', 'array'],
-            'sort_order' => ['nullable', 'integer'],
-            'is_enabled' => ['nullable', 'boolean'],
-            'is_default' => ['nullable', 'boolean'],
+            'opening_hours.*.is_closed'  => ['nullable', 'boolean'],
+            'contact_info'               => ['nullable', 'array'],
+            'sort_order'                 => ['nullable', 'integer'],
+            'is_enabled'                 => ['nullable', 'boolean'],
+            'is_default'                 => ['nullable', 'boolean'],
         ];
 
         $validated = $request->validate($rules);

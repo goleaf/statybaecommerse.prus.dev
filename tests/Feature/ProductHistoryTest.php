@@ -28,17 +28,17 @@ final class ProductHistoryTest extends TestCase
 
         $history = ProductHistory::create([
             'product_id' => $product->id,
-            'user_id' => $user->id,
-            'action' => 'updated',
+            'user_id'    => $user->id,
+            'action'     => 'updated',
             'field_name' => 'price',
-            'old_value' => ['price' => '10.00'],
-            'new_value' => ['price' => '12.00'],
+            'old_value'  => ['price' => '10.00'],
+            'new_value'  => ['price' => '12.00'],
         ]);
 
         $this->assertDatabaseHas('product_histories', [
-            'id' => $history->id,
+            'id'         => $history->id,
             'product_id' => $product->id,
-            'action' => 'updated',
+            'action'     => 'updated',
         ]);
         $this->assertSame('price', $history->field_name);
         $this->assertSame(['price' => '10.00'], $history->old_value);
@@ -51,12 +51,12 @@ final class ProductHistoryTest extends TestCase
 
         ProductHistory::factory()->count(2)->create([
             'product_id' => $product->id,
-            'action' => 'updated',
+            'action'     => 'updated',
         ]);
 
         ProductHistory::factory()->create([
             'product_id' => $product->id,
-            'action' => 'created',
+            'action'     => 'created',
         ]);
 
         $filtered = ProductHistory::query()

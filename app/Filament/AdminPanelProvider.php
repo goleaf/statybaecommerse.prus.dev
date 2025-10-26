@@ -22,7 +22,6 @@ use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\Widget;
 use Illuminate\Contracts\Foundation\Application as ApplicationContract;
 use InvalidArgumentException;
-use LaraZeus\SpatieTranslatable\SpatieTranslatablePlugin;
 
 class AdminPanelProvider extends PanelProvider
 {

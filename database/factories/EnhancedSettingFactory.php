@@ -22,15 +22,15 @@ final class EnhancedSettingFactory extends Factory
         $type = $this->faker->randomElement($types);
 
         return [
-            'group' => $this->faker->randomElement($groups),
-            'key' => $this->faker->unique()->slug(2).'_'.$this->faker->word(),
-            'value' => $this->generateValueByType($type),
-            'type' => $type,
-            'description' => $this->faker->sentence(),
-            'is_public' => $this->faker->boolean(70),  // 70% chance of being public
-            'is_encrypted' => $this->faker->boolean(20),  // 20% chance of being encrypted
+            'group'            => $this->faker->randomElement($groups),
+            'key'              => $this->faker->unique()->slug(2) . '_' . $this->faker->word(),
+            'value'            => $this->generateValueByType($type),
+            'type'             => $type,
+            'description'      => $this->faker->sentence(),
+            'is_public'        => $this->faker->boolean(70),  // 70% chance of being public
+            'is_encrypted'     => $this->faker->boolean(20),  // 20% chance of being encrypted
             'validation_rules' => $this->faker->boolean(30) ? $this->generateValidationRules() : null,
-            'sort_order' => $this->faker->numberBetween(0, 100),
+            'sort_order'       => $this->faker->numberBetween(0, 100),
         ];
     }
 
@@ -40,21 +40,21 @@ final class EnhancedSettingFactory extends Factory
     private function generateValueByType(string $type): mixed
     {
         return match ($type) {
-            'text' => $this->faker->words(3, true),
+            'text'     => $this->faker->words(3, true),
             'textarea' => $this->faker->paragraph(),
-            'number' => $this->faker->numberBetween(1, 1000),
-            'boolean' => $this->faker->boolean(),
+            'number'   => $this->faker->numberBetween(1, 1000),
+            'boolean'  => $this->faker->boolean(),
             'json', 'array' => json_encode([
                 'setting1' => $this->faker->word(),
                 'setting2' => $this->faker->numberBetween(1, 100),
                 'setting3' => $this->faker->boolean(),
             ]),
-            'select' => $this->faker->randomElement(['option1', 'option2', 'option3']),
-            'file' => $this->faker->filePath(),
-            'color' => $this->faker->hexColor(),
-            'date' => $this->faker->date(),
+            'select'   => $this->faker->randomElement(['option1', 'option2', 'option3']),
+            'file'     => $this->faker->filePath(),
+            'color'    => $this->faker->hexColor(),
+            'date'     => $this->faker->date(),
             'datetime' => $this->faker->dateTime()->format('Y-m-d H:i:s'),
-            default => $this->faker->word(),
+            default    => $this->faker->word(),
         };
     }
 
@@ -131,7 +131,7 @@ final class EnhancedSettingFactory extends Factory
     public function text(): static
     {
         return $this->state(fn (array $attributes) => [
-            'type' => 'text',
+            'type'  => 'text',
             'value' => $this->faker->words(3, true),
         ]);
     }
@@ -142,7 +142,7 @@ final class EnhancedSettingFactory extends Factory
     public function boolean(): static
     {
         return $this->state(fn (array $attributes) => [
-            'type' => 'boolean',
+            'type'  => 'boolean',
             'value' => $this->faker->boolean(),
         ]);
     }
@@ -153,7 +153,7 @@ final class EnhancedSettingFactory extends Factory
     public function number(): static
     {
         return $this->state(fn (array $attributes) => [
-            'type' => 'number',
+            'type'  => 'number',
             'value' => $this->faker->numberBetween(1, 1000),
         ]);
     }
@@ -164,13 +164,13 @@ final class EnhancedSettingFactory extends Factory
     public function json(): static
     {
         return $this->state(fn (array $attributes) => [
-            'type' => 'json',
+            'type'  => 'json',
             'value' => json_encode([
                 'setting1' => $this->faker->word(),
                 'setting2' => $this->faker->numberBetween(1, 100),
                 'setting3' => $this->faker->boolean(),
-                'nested' => [
-                    'key' => $this->faker->word(),
+                'nested'   => [
+                    'key'   => $this->faker->word(),
                     'value' => $this->faker->sentence(),
                 ],
             ]),
@@ -183,7 +183,7 @@ final class EnhancedSettingFactory extends Factory
     public function color(): static
     {
         return $this->state(fn (array $attributes) => [
-            'type' => 'color',
+            'type'  => 'color',
             'value' => $this->faker->hexColor(),
         ]);
     }
@@ -234,8 +234,8 @@ final class EnhancedSettingFactory extends Factory
     public function multilingual(string $baseKey): static
     {
         return $this->state(fn (array $attributes) => [
-            'key' => $baseKey.'_'.$this->faker->randomElement(['lt', 'en']),
-            'description' => $this->faker->sentence().' (multilingual)',
+            'key'         => $baseKey . '_' . $this->faker->randomElement(['lt', 'en']),
+            'description' => $this->faker->sentence() . ' (multilingual)',
         ]);
     }
 }

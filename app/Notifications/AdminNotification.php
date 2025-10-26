@@ -46,7 +46,7 @@ final class AdminNotification extends Notification implements ShouldQueue
     public function toMail(object $notifiable): MailMessage
     {
         // Compose a short transactional email with a localized footer.
-        return (new MailMessage())
+        return (new MailMessage)
             ->subject($this->title)
             ->line($this->message)
             ->line(__('admin.notifications.admin_message_footer'));
@@ -61,9 +61,9 @@ final class AdminNotification extends Notification implements ShouldQueue
     {
         // Persist the structured payload so the notification center can render it consistently.
         return [
-            'title' => $this->title,
+            'title'   => $this->title,
             'message' => $this->message,
-            'type' => $this->type,
+            'type'    => $this->type,
             'sent_at' => now()->toIso8601String(),
         ];
     }
@@ -77,9 +77,9 @@ final class AdminNotification extends Notification implements ShouldQueue
     {
         // Mirror the database payload for API consumers.
         return [
-            'title' => $this->title,
+            'title'   => $this->title,
             'message' => $this->message,
-            'type' => $this->type,
+            'type'    => $this->type,
             'sent_at' => now()->toIso8601String(),
         ];
     }

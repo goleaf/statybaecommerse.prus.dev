@@ -105,13 +105,13 @@ final class CollectionController extends Controller
             return empty($collection->name) || ! $collection->is_visible || empty($collection->slug);
         })->map(function ($collection) {
             return [
-                'id' => $collection->id,
-                'name' => $collection->getTranslatedName(),
-                'slug' => $collection->slug,
-                'description' => $collection->getTranslatedDescription(),
-                'is_visible' => (bool) $collection->is_visible,
-                'is_automatic' => (bool) $collection->is_automatic,
-                'display_type' => $collection->display_type,
+                'id'             => $collection->id,
+                'name'           => $collection->getTranslatedName(),
+                'slug'           => $collection->slug,
+                'description'    => $collection->getTranslatedDescription(),
+                'is_visible'     => (bool) $collection->is_visible,
+                'is_automatic'   => (bool) $collection->is_automatic,
+                'display_type'   => $collection->display_type,
                 'products_count' => $collection->products_count ?? $collection->getProductsCountAttribute(),
             ];
         })]);
@@ -130,13 +130,13 @@ final class CollectionController extends Controller
             return empty($collection->name) || ! $collection->is_visible || empty($collection->slug);
         })->map(function ($collection) {
             return [
-                'id' => $collection->id,
-                'name' => $collection->getTranslatedName(),
-                'slug' => $collection->slug,
-                'description' => $collection->getTranslatedDescription(),
-                'is_visible' => (bool) $collection->is_visible,
-                'is_automatic' => (bool) $collection->is_automatic,
-                'display_type' => $collection->display_type,
+                'id'             => $collection->id,
+                'name'           => $collection->getTranslatedName(),
+                'slug'           => $collection->slug,
+                'description'    => $collection->getTranslatedDescription(),
+                'is_visible'     => (bool) $collection->is_visible,
+                'is_automatic'   => (bool) $collection->is_automatic,
+                'display_type'   => $collection->display_type,
                 'products_count' => $collection->products_count ?? $collection->getProductsCountAttribute(),
             ];
         })]);
@@ -154,13 +154,13 @@ final class CollectionController extends Controller
             return empty($collection->name) || ! $collection->is_visible || empty($collection->slug) || $collection->products_count <= 0;
         })->map(function ($collection) {
             return [
-                'id' => $collection->id,
-                'name' => $collection->getTranslatedName(),
-                'slug' => $collection->slug,
-                'description' => $collection->getTranslatedDescription(),
-                'is_visible' => (bool) $collection->is_visible,
-                'is_automatic' => (bool) $collection->is_automatic,
-                'display_type' => $collection->display_type,
+                'id'             => $collection->id,
+                'name'           => $collection->getTranslatedName(),
+                'slug'           => $collection->slug,
+                'description'    => $collection->getTranslatedDescription(),
+                'is_visible'     => (bool) $collection->is_visible,
+                'is_automatic'   => (bool) $collection->is_automatic,
+                'display_type'   => $collection->display_type,
                 'products_count' => $collection->products_count,
             ];
         })]);
@@ -178,13 +178,13 @@ final class CollectionController extends Controller
             return empty($collection->name) || ! $collection->is_visible || empty($collection->slug) || $collection->products_count <= 0;
         })->map(function ($collection) {
             return [
-                'id' => $collection->id,
-                'name' => $collection->getTranslatedName(),
-                'slug' => $collection->slug,
-                'description' => $collection->getTranslatedDescription(),
-                'is_visible' => (bool) $collection->is_visible,
-                'is_automatic' => (bool) $collection->is_automatic,
-                'display_type' => $collection->display_type,
+                'id'             => $collection->id,
+                'name'           => $collection->getTranslatedName(),
+                'slug'           => $collection->slug,
+                'description'    => $collection->getTranslatedDescription(),
+                'is_visible'     => (bool) $collection->is_visible,
+                'is_automatic'   => (bool) $collection->is_automatic,
+                'display_type'   => $collection->display_type,
                 'products_count' => $collection->products_count,
             ];
         })]);
@@ -207,11 +207,11 @@ final class CollectionController extends Controller
         $collectionsWithProducts = Collection::withoutGlobalScopes()->has('products')->count();
 
         return response()->json([
-            'total_collections' => $totalCollections,
-            'visible_collections' => $visibleCollections,
-            'automatic_collections' => $automaticCollections,
-            'manual_collections' => $manualCollections,
-            'collections_with_products' => $collectionsWithProducts,
+            'total_collections'            => $totalCollections,
+            'visible_collections'          => $visibleCollections,
+            'automatic_collections'        => $automaticCollections,
+            'manual_collections'           => $manualCollections,
+            'collections_with_products'    => $collectionsWithProducts,
             'collections_without_products' => $totalCollections - $collectionsWithProducts,
         ]);
     }
@@ -231,24 +231,24 @@ final class CollectionController extends Controller
 
         $data = collect($products->items())->map(function ($product) {
             return [
-                'id' => $product->id,
-                'name' => $product->name,
-                'slug' => $product->slug,
+                'id'          => $product->id,
+                'name'        => $product->name,
+                'slug'        => $product->slug,
                 'description' => $product->description,
-                'brand' => optional($product->brand)->name,
-                'categories' => $product->categories ? $product->categories->pluck('name')->all() : [],
-                'media' => [$product->getFirstMediaUrl('images')],
+                'brand'       => optional($product->brand)->name,
+                'categories'  => $product->categories ? $product->categories->pluck('name')->all() : [],
+                'media'       => [$product->getFirstMediaUrl('images')],
             ];
         });
 
         return response()->json([
-            'data' => $data,
+            'data'  => $data,
             'links' => [],
-            'meta' => [
+            'meta'  => [
                 'current_page' => $products->currentPage(),
-                'last_page' => $products->lastPage(),
-                'per_page' => $products->perPage(),
-                'total' => $products->total(),
+                'last_page'    => $products->lastPage(),
+                'per_page'     => $products->perPage(),
+                'total'        => $products->total(),
             ],
         ]);
     }

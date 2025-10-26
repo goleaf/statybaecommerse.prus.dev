@@ -6,8 +6,6 @@ use App\Filament\Resources\NotificationResource;
 use App\Models\Notification;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Filament\Tables\Filters\SelectFilter;
-use Filament\Tables\Filters\TernaryFilter;
 
 uses(RefreshDatabase::class);
 
@@ -188,9 +186,9 @@ describe('NotificationResource', function () {
         it('updates read state through row actions', function () {
             $notification = Notification::factory()->create([
                 'notifiable_type' => User::class,
-                'notifiable_id' => $this->adminUser->id,
-                'is_read' => false,
-                'read_at' => null,
+                'notifiable_id'   => $this->adminUser->id,
+                'is_read'         => false,
+                'read_at'         => null,
             ]);
 
             livewire(NotificationResource\Pages\ListNotifications::class)
@@ -213,9 +211,9 @@ describe('NotificationResource', function () {
         it('updates read state through bulk actions', function () {
             $notifications = Notification::factory()->count(2)->create([
                 'notifiable_type' => User::class,
-                'notifiable_id' => $this->adminUser->id,
-                'is_read' => false,
-                'read_at' => null,
+                'notifiable_id'   => $this->adminUser->id,
+                'is_read'         => false,
+                'read_at'         => null,
             ]);
 
             livewire(NotificationResource\Pages\ListNotifications::class)

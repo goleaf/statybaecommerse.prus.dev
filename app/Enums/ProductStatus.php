@@ -26,70 +26,70 @@ enum ProductStatus: string implements EnumInterface
     public function label(): string
     {
         return match ($this) {
-            self::DRAFT => __('translations.product_status_draft'),
-            self::ACTIVE => __('translations.product_status_active'),
-            self::INACTIVE => __('translations.product_status_inactive'),
-            self::OUT_OF_STOCK => __('translations.product_status_out_of_stock'),
-            self::DISCONTINUED => __('translations.product_status_discontinued'),
-            self::ARCHIVED => __('translations.product_status_archived'),
+            self::DRAFT          => __('translations.product_status_draft'),
+            self::ACTIVE         => __('translations.product_status_active'),
+            self::INACTIVE       => __('translations.product_status_inactive'),
+            self::OUT_OF_STOCK   => __('translations.product_status_out_of_stock'),
+            self::DISCONTINUED   => __('translations.product_status_discontinued'),
+            self::ARCHIVED       => __('translations.product_status_archived'),
             self::PENDING_REVIEW => __('translations.product_status_pending_review'),
-            self::REJECTED => __('translations.product_status_rejected'),
+            self::REJECTED       => __('translations.product_status_rejected'),
         };
     }
 
     public function description(): string
     {
         return match ($this) {
-            self::DRAFT => __('translations.product_status_draft_description'),
-            self::ACTIVE => __('translations.product_status_active_description'),
-            self::INACTIVE => __('translations.product_status_inactive_description'),
-            self::OUT_OF_STOCK => __('translations.product_status_out_of_stock_description'),
-            self::DISCONTINUED => __('translations.product_status_discontinued_description'),
-            self::ARCHIVED => __('translations.product_status_archived_description'),
+            self::DRAFT          => __('translations.product_status_draft_description'),
+            self::ACTIVE         => __('translations.product_status_active_description'),
+            self::INACTIVE       => __('translations.product_status_inactive_description'),
+            self::OUT_OF_STOCK   => __('translations.product_status_out_of_stock_description'),
+            self::DISCONTINUED   => __('translations.product_status_discontinued_description'),
+            self::ARCHIVED       => __('translations.product_status_archived_description'),
             self::PENDING_REVIEW => __('translations.product_status_pending_review_description'),
-            self::REJECTED => __('translations.product_status_rejected_description'),
+            self::REJECTED       => __('translations.product_status_rejected_description'),
         };
     }
 
     public function icon(): string
     {
         return match ($this) {
-            self::DRAFT => 'heroicon-o-document-text',
-            self::ACTIVE => 'heroicon-o-check-circle',
-            self::INACTIVE => 'heroicon-o-pause-circle',
-            self::OUT_OF_STOCK => 'heroicon-o-x-circle',
-            self::DISCONTINUED => 'heroicon-o-no-symbol',
-            self::ARCHIVED => 'heroicon-o-archive-box',
+            self::DRAFT          => 'heroicon-o-document-text',
+            self::ACTIVE         => 'heroicon-o-check-circle',
+            self::INACTIVE       => 'heroicon-o-pause-circle',
+            self::OUT_OF_STOCK   => 'heroicon-o-x-circle',
+            self::DISCONTINUED   => 'heroicon-o-no-symbol',
+            self::ARCHIVED       => 'heroicon-o-archive-box',
             self::PENDING_REVIEW => 'heroicon-o-clock',
-            self::REJECTED => 'heroicon-o-exclamation-triangle',
+            self::REJECTED       => 'heroicon-o-exclamation-triangle',
         };
     }
 
     public function color(): string
     {
         return match ($this) {
-            self::DRAFT => 'gray',
-            self::ACTIVE => 'green',
-            self::INACTIVE => 'yellow',
-            self::OUT_OF_STOCK => 'red',
-            self::DISCONTINUED => 'red',
-            self::ARCHIVED => 'gray',
+            self::DRAFT          => 'gray',
+            self::ACTIVE         => 'green',
+            self::INACTIVE       => 'yellow',
+            self::OUT_OF_STOCK   => 'red',
+            self::DISCONTINUED   => 'red',
+            self::ARCHIVED       => 'gray',
             self::PENDING_REVIEW => 'blue',
-            self::REJECTED => 'red',
+            self::REJECTED       => 'red',
         };
     }
 
     public function priority(): int
     {
         return match ($this) {
-            self::ACTIVE => 1,
+            self::ACTIVE         => 1,
             self::PENDING_REVIEW => 2,
-            self::OUT_OF_STOCK => 3,
-            self::INACTIVE => 4,
-            self::DRAFT => 5,
-            self::REJECTED => 6,
-            self::DISCONTINUED => 7,
-            self::ARCHIVED => 8,
+            self::OUT_OF_STOCK   => 3,
+            self::INACTIVE       => 4,
+            self::DRAFT          => 5,
+            self::REJECTED       => 6,
+            self::DISCONTINUED   => 7,
+            self::ARCHIVED       => 8,
         };
     }
 
@@ -97,7 +97,7 @@ enum ProductStatus: string implements EnumInterface
     {
         return match ($this) {
             self::ACTIVE => true,
-            default => false,
+            default      => false,
         };
     }
 
@@ -105,7 +105,7 @@ enum ProductStatus: string implements EnumInterface
     {
         return match ($this) {
             self::ACTIVE => true,
-            default => false,
+            default      => false,
         };
     }
 
@@ -145,7 +145,7 @@ enum ProductStatus: string implements EnumInterface
     {
         return match ($this) {
             self::PENDING_REVIEW => true,
-            default => false,
+            default              => false,
         };
     }
 
@@ -168,14 +168,14 @@ enum ProductStatus: string implements EnumInterface
     public function nextStatuses(): array
     {
         return match ($this) {
-            self::DRAFT => [self::PENDING_REVIEW, self::ACTIVE, self::ARCHIVED],
+            self::DRAFT          => [self::PENDING_REVIEW, self::ACTIVE, self::ARCHIVED],
             self::PENDING_REVIEW => [self::ACTIVE, self::REJECTED],
-            self::ACTIVE => [self::INACTIVE, self::OUT_OF_STOCK, self::DISCONTINUED],
-            self::INACTIVE => [self::ACTIVE, self::ARCHIVED],
-            self::OUT_OF_STOCK => [self::ACTIVE, self::DISCONTINUED],
-            self::REJECTED => [self::DRAFT, self::PENDING_REVIEW],
-            self::DISCONTINUED => [self::ARCHIVED],
-            self::ARCHIVED => [],
+            self::ACTIVE         => [self::INACTIVE, self::OUT_OF_STOCK, self::DISCONTINUED],
+            self::INACTIVE       => [self::ACTIVE, self::ARCHIVED],
+            self::OUT_OF_STOCK   => [self::ACTIVE, self::DISCONTINUED],
+            self::REJECTED       => [self::DRAFT, self::PENDING_REVIEW],
+            self::DISCONTINUED   => [self::ARCHIVED],
+            self::ARCHIVED       => [],
         };
     }
 
@@ -183,25 +183,25 @@ enum ProductStatus: string implements EnumInterface
     {
         return match ($this) {
             self::PENDING_REVIEW => [self::DRAFT, self::REJECTED],
-            self::ACTIVE => [self::DRAFT, self::PENDING_REVIEW, self::INACTIVE, self::OUT_OF_STOCK],
-            self::INACTIVE => [self::ACTIVE],
-            self::OUT_OF_STOCK => [self::ACTIVE],
-            self::REJECTED => [self::PENDING_REVIEW],
-            self::DISCONTINUED => [self::ACTIVE, self::OUT_OF_STOCK],
-            self::ARCHIVED => [self::DRAFT, self::INACTIVE, self::DISCONTINUED],
-            default => [],
+            self::ACTIVE         => [self::DRAFT, self::PENDING_REVIEW, self::INACTIVE, self::OUT_OF_STOCK],
+            self::INACTIVE       => [self::ACTIVE],
+            self::OUT_OF_STOCK   => [self::ACTIVE],
+            self::REJECTED       => [self::PENDING_REVIEW],
+            self::DISCONTINUED   => [self::ACTIVE, self::OUT_OF_STOCK],
+            self::ARCHIVED       => [self::DRAFT, self::INACTIVE, self::DISCONTINUED],
+            default              => [],
         };
     }
 
     public function seoImpact(): string
     {
         return match ($this) {
-            self::ACTIVE => 'positive',
+            self::ACTIVE       => 'positive',
             self::OUT_OF_STOCK => 'neutral',
-            self::INACTIVE => 'negative',
+            self::INACTIVE     => 'negative',
             self::DISCONTINUED => 'negative',
-            self::ARCHIVED => 'negative',
-            default => 'none',
+            self::ARCHIVED     => 'negative',
+            default            => 'none',
         };
     }
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Models\Report;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+
 // Register the RefreshDatabase trait while the shared Pest bootstrap handles the Laravel TestCase wiring.
 uses(RefreshDatabase::class);
 

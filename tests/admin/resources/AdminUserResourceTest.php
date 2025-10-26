@@ -32,7 +32,7 @@ beforeEach(function () {
 
     // Create test data
     $this->testAdminUser = AdminUser::factory()->create([
-        'name' => 'Test Admin',
+        'name'  => 'Test Admin',
         'email' => 'admin@test.com',
     ]);
 });
@@ -48,16 +48,16 @@ it('can create an admin user', function () {
     Livewire::actingAs($this->adminUser)
         ->test(AdminUserResource\Pages\CreateAdminUser::class)
         ->fillForm([
-            'name' => 'New Admin',
-            'email' => 'newadmin@test.com',
-            'password' => 'password123',
+            'name'                  => 'New Admin',
+            'email'                 => 'newadmin@test.com',
+            'password'              => 'password123',
             'password_confirmation' => 'password123',
         ])
         ->call('create')
         ->assertHasNoFormErrors();
 
     $this->assertDatabaseHas('admin_users', [
-        'name' => 'New Admin',
+        'name'  => 'New Admin',
         'email' => 'newadmin@test.com',
     ]);
 });
@@ -79,7 +79,7 @@ it('can edit an admin user record', function () {
         ->assertHasNoFormErrors();
 
     $this->assertDatabaseHas('admin_users', [
-        'id' => $this->testAdminUser->id,
+        'id'   => $this->testAdminUser->id,
         'name' => 'Updated Admin',
     ]);
 });
@@ -101,8 +101,8 @@ it('validates required fields', function () {
     Livewire::actingAs($this->adminUser)
         ->test(AdminUserResource\Pages\CreateAdminUser::class)
         ->fillForm([
-            'name' => '',
-            'email' => '',
+            'name'     => '',
+            'email'    => '',
             'password' => '',
         ])
         ->call('create')
@@ -113,9 +113,9 @@ it('validates email format', function () {
     Livewire::actingAs($this->adminUser)
         ->test(AdminUserResource\Pages\CreateAdminUser::class)
         ->fillForm([
-            'name' => 'Test Admin',
-            'email' => 'invalid-email',
-            'password' => 'password123',
+            'name'                  => 'Test Admin',
+            'email'                 => 'invalid-email',
+            'password'              => 'password123',
             'password_confirmation' => 'password123',
         ])
         ->call('create')
@@ -126,9 +126,9 @@ it('validates password confirmation', function () {
     Livewire::actingAs($this->adminUser)
         ->test(AdminUserResource\Pages\CreateAdminUser::class)
         ->fillForm([
-            'name' => 'Test Admin',
-            'email' => 'test@example.com',
-            'password' => 'password123',
+            'name'                  => 'Test Admin',
+            'email'                 => 'test@example.com',
+            'password'              => 'password123',
             'password_confirmation' => 'different-password',
         ])
         ->call('create')
@@ -141,9 +141,9 @@ it('validates unique email', function () {
     Livewire::actingAs($this->adminUser)
         ->test(AdminUserResource\Pages\CreateAdminUser::class)
         ->fillForm([
-            'name' => 'Test Admin',
-            'email' => 'existing@test.com',
-            'password' => 'password123',
+            'name'                  => 'Test Admin',
+            'email'                 => 'existing@test.com',
+            'password'              => 'password123',
             'password_confirmation' => 'password123',
         ])
         ->call('create')
@@ -165,7 +165,7 @@ it('can search admin users by name', function () {
 
     $this
         ->actingAs($this->adminUser)
-        ->get(AdminUserResource::getUrl('index').'?search=Special')
+        ->get(AdminUserResource::getUrl('index') . '?search=Special')
         ->assertOk();
 });
 
@@ -174,7 +174,7 @@ it('can search admin users by email', function () {
 
     $this
         ->actingAs($this->adminUser)
-        ->get(AdminUserResource::getUrl('index').'?search=special@example.com')
+        ->get(AdminUserResource::getUrl('index') . '?search=special@example.com')
         ->assertOk();
 });
 
@@ -184,14 +184,14 @@ it('can sort admin users by name', function () {
 
     $this
         ->actingAs($this->adminUser)
-        ->get(AdminUserResource::getUrl('index').'?sort=name&direction=asc')
+        ->get(AdminUserResource::getUrl('index') . '?sort=name&direction=asc')
         ->assertOk();
 });
 
 it('can sort admin users by created date', function () {
     $this
         ->actingAs($this->adminUser)
-        ->get(AdminUserResource::getUrl('index').'?sort=created_at&direction=desc')
+        ->get(AdminUserResource::getUrl('index') . '?sort=created_at&direction=desc')
         ->assertOk();
 });
 
@@ -253,9 +253,9 @@ it('validates password minimum length', function () {
     Livewire::actingAs($this->adminUser)
         ->test(AdminUserResource\Pages\CreateAdminUser::class)
         ->fillForm([
-            'name' => 'Test Admin',
-            'email' => 'test@example.com',
-            'password' => '123',
+            'name'                  => 'Test Admin',
+            'email'                 => 'test@example.com',
+            'password'              => '123',
             'password_confirmation' => '123',
         ])
         ->call('create')

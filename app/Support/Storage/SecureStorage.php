@@ -4,13 +4,12 @@ declare(strict_types=1);
 
 namespace App\Support\Storage;
 
+use DateTimeInterface;
 use Illuminate\Support\Facades\URL;
 
 final class SecureStorage
 {
-    private function __construct()
-    {
-    }
+    private function __construct() {}
 
     public static function disk(): string
     {
@@ -19,13 +18,13 @@ final class SecureStorage
         return is_string($disk) && $disk !== '' ? $disk : 'secure-media';
     }
 
-    public static function temporarySignedUrl(string $path, ?\DateTimeInterface $expiration = null, bool $download = false): string
+    public static function temporarySignedUrl(string $path, ?DateTimeInterface $expiration = null, bool $download = false): string
     {
         $expiresAt = $expiration ?? now()->addMinutes((int) config('media-security.url_lifetime', 30));
 
         return URL::temporarySignedRoute('media.secure-download', $expiresAt, array_filter([
             'encodedPath' => self::encodePath($path),
-            'download' => $download ? '1' : null,
+            'download'    => $download ? '1' : null,
         ]));
     }
 

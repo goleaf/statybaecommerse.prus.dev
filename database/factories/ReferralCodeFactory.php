@@ -23,14 +23,14 @@ final class ReferralCodeFactory extends Factory
     public function definition(): array
     {
         return [
-            'user_id' => User::factory(),
-            'code' => strtoupper($this->faker->unique()->lexify('??????')),
-            'is_active' => $this->faker->boolean(80),
+            'user_id'    => User::factory(),
+            'code'       => strtoupper($this->faker->unique()->lexify('??????')),
+            'is_active'  => $this->faker->boolean(80),
             'expires_at' => $this->faker->optional(0.3)->dateTimeBetween('now', '+1 year'),
-            'metadata' => $this->faker->optional(0.2)->randomElements([
+            'metadata'   => $this->faker->optional(0.2)->randomElements([
                 'generated_via' => $this->faker->randomElement(['manual', 'automatic', 'api']),
-                'usage_count' => $this->faker->numberBetween(0, 50),
-                'last_used_at' => $this->faker->optional(0.4)->dateTimeBetween('-6 months', 'now'),
+                'usage_count'   => $this->faker->numberBetween(0, 50),
+                'last_used_at'  => $this->faker->optional(0.4)->dateTimeBetween('-6 months', 'now'),
             ]),
         ];
     }

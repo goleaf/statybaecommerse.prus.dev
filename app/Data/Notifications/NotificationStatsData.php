@@ -11,8 +11,7 @@ final class NotificationStatsData
         private readonly int $read,
         private readonly int $unread,
         private readonly int $urgent,
-    ) {
-    }
+    ) {}
 
     public static function fromCounts(int $total, int $read, int $unread, int $urgent): self
     {
@@ -25,8 +24,8 @@ final class NotificationStatsData
     public function toArray(): array
     {
         return [
-            'total' => $this->total,
-            'read' => $this->read,
+            'total'  => $this->total,
+            'read'   => $this->read,
             'unread' => $this->unread,
             'urgent' => $this->urgent,
         ];

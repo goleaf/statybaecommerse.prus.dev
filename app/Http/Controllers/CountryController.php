@@ -48,7 +48,7 @@ final class CountryController extends Controller
                 $query->where('requires_vat', (bool) $filters['requires_vat']);
             })
             ->when(isset($filters['search']), static function ($query) use ($filters): void {
-                $query->where('name', 'like', '%'.$filters['search'].'%');
+                $query->where('name', 'like', '%' . $filters['search'] . '%');
             })
             ->whereNotNull('name')
             ->whereNotNull('cca2')
@@ -127,7 +127,7 @@ final class CountryController extends Controller
             ->enabled()
             ->with(['translations'])
             ->when(isset($filters['search']), static function ($query) use ($filters): void {
-                $query->where('name', 'like', '%'.$filters['search'].'%');
+                $query->where('name', 'like', '%' . $filters['search'] . '%');
             })
             ->when(isset($filters['region']), static function ($query) use ($filters): void {
                 $query->where('region', $filters['region']);
@@ -161,10 +161,10 @@ final class CountryController extends Controller
             ->active()
             ->enabled()
             ->where(static function ($query) use ($filters): void {
-                $query->where('name', 'like', '%'.$filters['q'].'%')
-                    ->orWhere('name_official', 'like', '%'.$filters['q'].'%')
-                    ->orWhere('cca2', 'like', '%'.$filters['q'].'%')
-                    ->orWhere('cca3', 'like', '%'.$filters['q'].'%');
+                $query->where('name', 'like', '%' . $filters['q'] . '%')
+                    ->orWhere('name_official', 'like', '%' . $filters['q'] . '%')
+                    ->orWhere('cca2', 'like', '%' . $filters['q'] . '%')
+                    ->orWhere('cca3', 'like', '%' . $filters['q'] . '%');
             })
             ->whereNotNull('name')
             ->whereNotNull('cca2')
@@ -223,12 +223,12 @@ final class CountryController extends Controller
 
         // Aggregate useful statistics for analytics dashboards.
         $stats = [
-            'total_countries' => Country::count(),
-            'active_countries' => Country::where('is_active', true)->count(),
-            'eu_members' => Country::where('is_eu_member', true)->count(),
+            'total_countries'    => Country::count(),
+            'active_countries'   => Country::where('is_active', true)->count(),
+            'eu_members'         => Country::where('is_eu_member', true)->count(),
             'countries_with_vat' => Country::where('requires_vat', true)->count(),
-            'average_vat_rate' => Country::where('requires_vat', true)->avg('vat_rate'),
-            'by_region' => Country::selectRaw('region, COUNT(*) as count')
+            'average_vat_rate'   => Country::where('requires_vat', true)->avg('vat_rate'),
+            'by_region'          => Country::selectRaw('region, COUNT(*) as count')
                 ->whereNotNull('region')
                 ->groupBy('region')
                 ->orderBy('count', 'desc')

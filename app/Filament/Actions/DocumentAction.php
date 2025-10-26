@@ -6,6 +6,7 @@ namespace App\Filament\Actions;
 
 use App\Contracts\DocumentServiceContract;
 use App\Models\DocumentTemplate;
+use DateTimeInterface;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -129,7 +130,7 @@ final class DocumentAction
             return null;
         }
 
-        if ($value instanceof \DateTimeInterface) {
+        if ($value instanceof DateTimeInterface) {
             // Normalise native \DateTimeInterface values via Carbon to honour application timezone settings.
             return Carbon::instance($value)->format('d/m/Y H:i');
         }

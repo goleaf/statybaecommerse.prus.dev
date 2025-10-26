@@ -16,11 +16,11 @@ final class SystemSettingCategoryTest extends TestCase
     public function test_system_setting_category_can_be_created(): void
     {
         $category = SystemSettingCategory::factory()->create([
-            'name' => 'Test Category',
-            'slug' => 'test-category',
+            'name'        => 'Test Category',
+            'slug'        => 'test-category',
             'description' => 'Test description',
-            'icon' => 'heroicon-o-folder',
-            'color' => 'blue',
+            'icon'        => 'heroicon-o-folder',
+            'color'       => 'blue',
         ]);
 
         $this->assertInstanceOf(SystemSettingCategory::class, $category);
@@ -92,8 +92,8 @@ final class SystemSettingCategoryTest extends TestCase
         $category = SystemSettingCategory::factory()->create();
         SystemSetting::factory()->create([
             'category_id' => $category->id,
-            'is_active' => true,
-            'is_public' => false,
+            'is_active'   => true,
+            'is_public'   => false,
         ]);
         SystemSetting::factory()->create(['category_id' => $category->id, 'is_active' => false]);
 
@@ -108,13 +108,13 @@ final class SystemSettingCategoryTest extends TestCase
         $category = SystemSettingCategory::factory()->create();
         SystemSetting::factory()->create([
             'category_id' => $category->id,
-            'is_active' => true,
-            'is_public' => false,
+            'is_active'   => true,
+            'is_public'   => false,
         ]);
         SystemSetting::factory()->create([
             'category_id' => $category->id,
-            'is_active' => true,
-            'is_public' => false,
+            'is_active'   => true,
+            'is_public'   => false,
         ]);
         SystemSetting::factory()->create(['category_id' => $category->id, 'is_active' => false]);
 
@@ -140,18 +140,18 @@ final class SystemSettingCategoryTest extends TestCase
         $category = SystemSettingCategory::factory()->create();
         SystemSetting::factory()->create([
             'category_id' => $category->id,
-            'is_active' => true,
-            'is_public' => true,
+            'is_active'   => true,
+            'is_public'   => true,
         ]);
         SystemSetting::factory()->create([
             'category_id' => $category->id,
-            'is_active' => true,
-            'is_public' => true,
+            'is_active'   => true,
+            'is_public'   => true,
         ]);
         SystemSetting::factory()->create([
             'category_id' => $category->id,
-            'is_active' => true,
-            'is_public' => false,
+            'is_active'   => true,
+            'is_public'   => false,
         ]);
 
         $count = $category->getPublicSettingsCount();
@@ -173,13 +173,13 @@ final class SystemSettingCategoryTest extends TestCase
         $category = SystemSettingCategory::factory()->create();
         SystemSetting::factory()->create([
             'category_id' => $category->id,
-            'is_active' => true,
-            'is_public' => true,
+            'is_active'   => true,
+            'is_public'   => true,
         ]);
         SystemSetting::factory()->create([
             'category_id' => $category->id,
-            'is_active' => true,
-            'is_public' => false,
+            'is_active'   => true,
+            'is_public'   => false,
         ]);
 
         $this->assertTrue($category->hasPublicSettings());
@@ -302,17 +302,17 @@ final class SystemSettingCategoryTest extends TestCase
     public function test_get_tree_structure(): void
     {
         $category = SystemSettingCategory::factory()->create([
-            'name' => 'Test Category',
-            'slug' => 'test-category',
+            'name'        => 'Test Category',
+            'slug'        => 'test-category',
             'description' => 'Test description',
-            'icon' => 'heroicon-o-folder',
-            'color' => 'blue',
+            'icon'        => 'heroicon-o-folder',
+            'color'       => 'blue',
         ]);
 
         SystemSetting::factory()->create([
             'category_id' => $category->id,
-            'is_active' => true,
-            'is_public' => false,
+            'is_active'   => true,
+            'is_public'   => false,
         ]);
         SystemSetting::factory()->create(['category_id' => $category->id, 'is_active' => true, 'is_public' => true]);
 
@@ -333,18 +333,18 @@ final class SystemSettingCategoryTest extends TestCase
         $category = SystemSettingCategory::factory()->create();
         SystemSetting::factory()->create([
             'category_id' => $category->id,
-            'group' => 'general',
-            'is_active' => true,
+            'group'       => 'general',
+            'is_active'   => true,
         ]);
         SystemSetting::factory()->create([
             'category_id' => $category->id,
-            'group' => 'ecommerce',
-            'is_active' => true,
+            'group'       => 'ecommerce',
+            'is_active'   => true,
         ]);
         SystemSetting::factory()->create([
             'category_id' => $category->id,
-            'group' => 'general',
-            'is_active' => true,
+            'group'       => 'general',
+            'is_active'   => true,
         ]);
 
         $settingsByGroup = $category->getSettingsByGroup();

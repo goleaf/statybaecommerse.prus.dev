@@ -40,7 +40,7 @@ class ProductComparisonResourceTest extends TestCase
         $product = Product::factory()->create();
 
         $comparisonData = [
-            'user_id' => $user->id,
+            'user_id'    => $user->id,
             'product_id' => $product->id,
             'session_id' => 'test-session-123',
         ];
@@ -80,7 +80,7 @@ class ProductComparisonResourceTest extends TestCase
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('product_comparisons', [
-            'id' => $comparison->id,
+            'id'         => $comparison->id,
             'product_id' => $newProduct->id,
             'session_id' => 'updated-session-456',
         ]);
@@ -121,11 +121,11 @@ class ProductComparisonResourceTest extends TestCase
         $product2 = Product::factory()->create();
 
         ProductComparison::factory()->create([
-            'user_id' => $currentUser->id,
+            'user_id'    => $currentUser->id,
             'product_id' => $product1->id,
         ]);
         ProductComparison::factory()->create([
-            'user_id' => $currentUser->id,
+            'user_id'    => $currentUser->id,
             'product_id' => $product2->id,
         ]);
 
@@ -141,11 +141,11 @@ class ProductComparisonResourceTest extends TestCase
         $currentUser = auth()->user();
 
         $oldComparison = ProductComparison::factory()->create([
-            'user_id' => $currentUser->id,
+            'user_id'    => $currentUser->id,
             'created_at' => now()->subDays(10),
         ]);
         $recentComparison = ProductComparison::factory()->create([
-            'user_id' => $currentUser->id,
+            'user_id'    => $currentUser->id,
             'created_at' => now()->subDays(2),
         ]);
 
@@ -153,7 +153,7 @@ class ProductComparisonResourceTest extends TestCase
             ->filterTable('created_at', [
                 'range' => [
                     'start' => now()->subDays(5)->format('Y-m-d'),
-                    'end' => now()->format('Y-m-d'),
+                    'end'   => now()->format('Y-m-d'),
                 ],
             ])
             ->assertCanSeeTableRecords([$recentComparison])
@@ -165,11 +165,11 @@ class ProductComparisonResourceTest extends TestCase
         $currentUser = auth()->user();
 
         ProductComparison::factory()->create([
-            'user_id' => $currentUser->id,
+            'user_id'    => $currentUser->id,
             'created_at' => now()->subDays(5),
         ]);
         ProductComparison::factory()->create([
-            'user_id' => $currentUser->id,
+            'user_id'    => $currentUser->id,
             'created_at' => today(),
         ]);
 
@@ -185,7 +185,7 @@ class ProductComparisonResourceTest extends TestCase
         $product = Product::factory()->create();
 
         $comparison = ProductComparison::factory()->create([
-            'user_id' => $user->id,
+            'user_id'    => $user->id,
             'product_id' => $product->id,
         ]);
 

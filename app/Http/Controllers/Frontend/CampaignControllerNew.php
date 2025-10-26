@@ -25,7 +25,7 @@ final class CampaignControllerNew extends Controller
      */
     public function index(Request $request): View
     {
-        $query = Campaign::active()->with(['targetCategories', 'targetProducts', 'targetCustomerGroups'])->when($request->filled('type'), fn ($q) => $q->where('type', $request->type))->when($request->filled('category'), fn ($q) => $q->whereHas('targetCategories', fn ($subQ) => $subQ->where('categories.id', $request->category)))->when($request->filled('product'), fn ($q) => $q->whereHas('targetProducts', fn ($subQ) => $subQ->where('products.id', $request->product)))->when($request->filled('customer_group'), fn ($q) => $q->whereHas('targetCustomerGroups', fn ($subQ) => $subQ->where('customer_groups.id', $request->customer_group)))->when($request->filled('search'), fn ($q) => $q->where('name', 'like', '%'.$request->search.'%'))->when($request->filled('featured'), fn ($q) => $q->featured())->when($request->filled('budget_min'), fn ($q) => $q->where('budget', '>=', $request->budget_min))->when($request->filled('budget_max'), fn ($q) => $q->where('budget', '<=', $request->budget_max));
+        $query = Campaign::active()->with(['targetCategories', 'targetProducts', 'targetCustomerGroups'])->when($request->filled('type'), fn ($q) => $q->where('type', $request->type))->when($request->filled('category'), fn ($q) => $q->whereHas('targetCategories', fn ($subQ) => $subQ->where('categories.id', $request->category)))->when($request->filled('product'), fn ($q) => $q->whereHas('targetProducts', fn ($subQ) => $subQ->where('products.id', $request->product)))->when($request->filled('customer_group'), fn ($q) => $q->whereHas('targetCustomerGroups', fn ($subQ) => $subQ->where('customer_groups.id', $request->customer_group)))->when($request->filled('search'), fn ($q) => $q->where('name', 'like', '%' . $request->search . '%'))->when($request->filled('featured'), fn ($q) => $q->featured())->when($request->filled('budget_min'), fn ($q) => $q->where('budget', '>=', $request->budget_min))->when($request->filled('budget_max'), fn ($q) => $q->where('budget', '<=', $request->budget_max));
         $campaigns = $query->orderBy('display_priority', 'desc')->orderBy('is_featured', 'desc')->orderBy('created_at', 'desc')->paginate(12);
         $categories = Category::whereHas('campaigns')->get();
         $products = Product::whereHas('campaigns')->get();
@@ -114,7 +114,7 @@ final class CampaignControllerNew extends Controller
             return redirect()->route('campaigns.index');
         }
         $campaigns = Campaign::active()->where(function ($q) use ($query) {
-            $q->where('name', 'like', '%'.$query.'%')->orWhere('description', 'like', '%'.$query.'%')->orWhere('content', 'like', '%'.$query.'%');
+            $q->where('name', 'like', '%' . $query . '%')->orWhere('description', 'like', '%' . $query . '%')->orWhere('content', 'like', '%' . $query . '%');
         })->with(['targetCategories', 'targetProducts'])->orderBy('display_priority', 'desc')->orderBy('created_at', 'desc')->paginate(12);
 
         return view('campaigns.search', compact('campaigns', 'query'));

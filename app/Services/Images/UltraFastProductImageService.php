@@ -6,6 +6,8 @@ namespace App\Services\Images;
 
 use App\Models\Product;
 use Illuminate\Support\Facades\Log;
+use RuntimeException;
+use Throwable;
 
 /**
  * UltraFastProductImageService
@@ -14,7 +16,7 @@ use Illuminate\Support\Facades\Log;
  *
  * @property array $colorPalettes
  * @property array $colorCache
- * @property int $imageCounter
+ * @property int   $imageCounter
  */
 final class UltraFastProductImageService
 {
@@ -59,12 +61,12 @@ final class UltraFastProductImageService
     public function generateProductImage(Product $product): string
     {
         if (! \function_exists('imagecreatetruecolor')) {
-            throw new \RuntimeException('GD extension is required to generate images.');
+            throw new RuntimeException('GD extension is required to generate images.');
         }
         // Create canvas with error handling
         $image = imagecreatetruecolor(self::IMAGE_WIDTH, self::IMAGE_HEIGHT);
         if ($image === false) {
-            throw new \RuntimeException('Failed to create image canvas.');
+            throw new RuntimeException('Failed to create image canvas.');
         }
         try {
             // Ultra-fast background generation
@@ -91,7 +93,7 @@ final class UltraFastProductImageService
                 if ($imagePath) {
                     $images[] = $imagePath;
                 }
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
                 Log::warning('Ultra-fast image generation failed', ['product_id' => $product->id, 'variant' => $i + 1, 'error' => $e->getMessage()]);
             }
         }
@@ -105,11 +107,11 @@ final class UltraFastProductImageService
     public function generateProductImageVariant(Product $product, int $variant): string
     {
         if (! \function_exists('imagecreatetruecolor')) {
-            throw new \RuntimeException('GD extension is required to generate images.');
+            throw new RuntimeException('GD extension is required to generate images.');
         }
         $image = imagecreatetruecolor(self::IMAGE_WIDTH, self::IMAGE_HEIGHT);
         if ($image === false) {
-            throw new \RuntimeException('Failed to create image canvas.');
+            throw new RuntimeException('Failed to create image canvas.');
         }
         try {
             // Use different color palette for each variant
@@ -126,7 +128,7 @@ final class UltraFastProductImageService
     /**
      * Handle createUltraFastBackground functionality with proper error handling.
      *
-     * @param  mixed  $image
+     * @param mixed $image
      */
     private function createUltraFastBackground($image): void
     {
@@ -141,7 +143,7 @@ final class UltraFastProductImageService
     /**
      * Handle createVariantBackground functionality with proper error handling.
      *
-     * @param  mixed  $image
+     * @param mixed $image
      */
     private function createVariantBackground($image, int $variant): void
     {
@@ -158,7 +160,7 @@ final class UltraFastProductImageService
     /**
      * Handle createSimpleGradient functionality with proper error handling.
      *
-     * @param  mixed  $image
+     * @param mixed $image
      */
     private function createSimpleGradient($image, array $startRgb, array $endRgb): void
     {
@@ -182,7 +184,7 @@ final class UltraFastProductImageService
     /**
      * Handle createHorizontalGradient functionality with proper error handling.
      *
-     * @param  mixed  $image
+     * @param mixed $image
      */
     private function createHorizontalGradient($image, array $startRgb, array $endRgb): void
     {
@@ -205,7 +207,7 @@ final class UltraFastProductImageService
     /**
      * Handle createDiagonalGradient functionality with proper error handling.
      *
-     * @param  mixed  $image
+     * @param mixed $image
      */
     private function createDiagonalGradient($image, array $startRgb, array $endRgb): void
     {
@@ -224,7 +226,7 @@ final class UltraFastProductImageService
     /**
      * Handle addUltraFastText functionality with proper error handling.
      *
-     * @param  mixed  $image
+     * @param mixed $image
      */
     private function addUltraFastText($image, string $productName): void
     {
@@ -247,7 +249,7 @@ final class UltraFastProductImageService
     /**
      * Handle addVariantText functionality with proper error handling.
      *
-     * @param  mixed  $image
+     * @param mixed $image
      */
     private function addVariantText($image, string $productName, int $variant): void
     {
@@ -270,26 +272,26 @@ final class UltraFastProductImageService
     /**
      * Handle saveUltraFastImage functionality with proper error handling.
      *
-     * @param  mixed  $image
+     * @param mixed $image
      */
     private function saveUltraFastImage($image, int $productId, ?int $variant = null): string
     {
         $suffix = $variant ? "_{$variant}" : '';
-        $filename = "product_{$productId}{$suffix}_".uniqid('', true);
+        $filename = "product_{$productId}{$suffix}_" . uniqid('', true);
         // Prefer WebP for smaller file size and faster processing
         if (function_exists('imagewebp')) {
             $filename .= '.webp';
-            $path = sys_get_temp_dir().DIRECTORY_SEPARATOR.$filename;
+            $path = sys_get_temp_dir() . DIRECTORY_SEPARATOR . $filename;
             if (! imagewebp($image, $path, 85)) {
                 // Balanced quality/speed
-                throw new \RuntimeException('Failed to save WebP image.');
+                throw new RuntimeException('Failed to save WebP image.');
             }
         } else {
             $filename .= '.png';
-            $path = sys_get_temp_dir().DIRECTORY_SEPARATOR.$filename;
+            $path = sys_get_temp_dir() . DIRECTORY_SEPARATOR . $filename;
             if (! imagepng($image, $path, 6)) {
                 // Fast compression
-                throw new \RuntimeException('Failed to save PNG image.');
+                throw new RuntimeException('Failed to save PNG image.');
             }
         }
 
@@ -299,7 +301,7 @@ final class UltraFastProductImageService
     /**
      * Handle getCachedColor functionality with proper error handling.
      *
-     * @param  mixed  $image
+     * @param mixed $image
      */
     private function getCachedColor($image, int $r, int $g, int $b): int
     {
@@ -330,25 +332,25 @@ final class UltraFastProductImageService
     public function convertToWebP(string $imagePath): string
     {
         if (! function_exists('imagewebp')) {
-            throw new \RuntimeException('WebP support is not available in GD extension.');
+            throw new RuntimeException('WebP support is not available in GD extension.');
         }
         $info = getimagesize($imagePath);
         if (! $info) {
-            throw new \RuntimeException('Invalid image file.');
+            throw new RuntimeException('Invalid image file.');
         }
         $image = match ($info[2]) {
             IMAGETYPE_JPEG => imagecreatefromjpeg($imagePath),
-            IMAGETYPE_PNG => imagecreatefrompng($imagePath),
-            IMAGETYPE_GIF => imagecreatefromgif($imagePath),
-            default => throw new \RuntimeException('Unsupported image format.'),
+            IMAGETYPE_PNG  => imagecreatefrompng($imagePath),
+            IMAGETYPE_GIF  => imagecreatefromgif($imagePath),
+            default        => throw new RuntimeException('Unsupported image format.'),
         };
         if (! $image) {
-            throw new \RuntimeException('Failed to create image from file.');
+            throw new RuntimeException('Failed to create image from file.');
         }
         $webpPath = preg_replace('/\.[^.]+$/', '.webp', $imagePath);
         if (! imagewebp($image, $webpPath, 85)) {
             imagedestroy($image);
-            throw new \RuntimeException('Failed to convert image to WebP.');
+            throw new RuntimeException('Failed to convert image to WebP.');
         }
         imagedestroy($image);
 

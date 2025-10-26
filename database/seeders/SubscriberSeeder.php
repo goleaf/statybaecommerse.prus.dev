@@ -6,10 +6,11 @@ namespace Database\Seeders;
 
 use App\Models\Subscriber;
 use App\Models\User;
-use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Hash;
 
 use function collect;
+
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 
 final class SubscriberSeeder extends Seeder
 {
@@ -41,23 +42,23 @@ final class SubscriberSeeder extends Seeder
 
             Subscriber::factory()
                 ->state([
-                    'email' => $email,
-                    'first_name' => "Prenumeratorius {$index}",
-                    'last_name' => 'Statyba',
-                    'phone' => sprintf('+370600%04d', $index),
-                    'company' => $companies->get(($index - 1) % $companies->count()),
-                    'job_title' => 'Projektų vadovas',
-                    'interests' => $this->determineInterests($index),
-                    'source' => $this->determineSource($index),
-                    'status' => $index % 5 === 0 ? 'inactive' : 'active',
-                    'subscribed_at' => now()->subDays($index * 2),
-                    'unsubscribed_at' => null,
+                    'email'              => $email,
+                    'first_name'         => "Prenumeratorius {$index}",
+                    'last_name'          => 'Statyba',
+                    'phone'              => sprintf('+370600%04d', $index),
+                    'company'            => $companies->get(($index - 1) % $companies->count()),
+                    'job_title'          => 'Projektų vadovas',
+                    'interests'          => $this->determineInterests($index),
+                    'source'             => $this->determineSource($index),
+                    'status'             => $index % 5 === 0 ? 'inactive' : 'active',
+                    'subscribed_at'      => now()->subDays($index * 2),
+                    'unsubscribed_at'    => null,
                     'last_email_sent_at' => now()->subDays($index),
-                    'email_count' => $index % 7,
-                    'metadata' => [
-                        'ip_address' => "192.168.1.{$index}",
-                        'user_agent' => 'Seeder/1.0',
-                        'utm_source' => $index % 3 === 0 ? 'google' : 'direct',
+                    'email_count'        => $index % 7,
+                    'metadata'           => [
+                        'ip_address'   => "192.168.1.{$index}",
+                        'user_agent'   => 'Seeder/1.0',
+                        'utm_source'   => $index % 3 === 0 ? 'google' : 'direct',
                         'utm_campaign' => $index % 4 === 0 ? 'summer_sale' : 'newsletter_signup',
                     ],
                 ])
@@ -79,24 +80,24 @@ final class SubscriberSeeder extends Seeder
 
             $user = User::factory()
                 ->create([
-                    'email' => $email,
-                    'name' => $firstName.' '.$lastName,
-                    'preferred_locale' => 'lt',
+                    'email'             => $email,
+                    'name'              => $firstName . ' ' . $lastName,
+                    'preferred_locale'  => 'lt',
                     'email_verified_at' => now(),
-                    'password' => $password,
+                    'password'          => $password,
                 ]);
 
             Subscriber::factory()
                 ->for($user)
                 ->state([
-                    'email' => $email,
-                    'first_name' => $firstName,
-                    'last_name' => $lastName,
-                    'company' => $companies->get(($index - 1) % $companies->count()),
-                    'status' => 'active',
-                    'interests' => ['business', 'products', 'support'],
+                    'email'         => $email,
+                    'first_name'    => $firstName,
+                    'last_name'     => $lastName,
+                    'company'       => $companies->get(($index - 1) % $companies->count()),
+                    'status'        => 'active',
+                    'interests'     => ['business', 'products', 'support'],
                     'subscribed_at' => now()->subDays($index),
-                    'metadata' => [
+                    'metadata'      => [
                         'ip_address' => "10.0.0.{$index}",
                         'user_agent' => 'Seeder/1.0',
                     ],
@@ -115,20 +116,20 @@ final class SubscriberSeeder extends Seeder
         $admin = User::factory()
             ->admin()
             ->create([
-                'email' => 'admin@example.com',
-                'name' => 'Super Administrator',
+                'email'    => 'admin@example.com',
+                'name'     => 'Super Administrator',
                 'password' => $password,
             ]);
 
         Subscriber::factory()
             ->for($admin)
             ->state([
-                'email' => 'admin@example.com',
-                'first_name' => 'Super',
-                'last_name' => 'Administrator',
-                'company' => $company,
-                'status' => 'active',
-                'interests' => ['business', 'support', 'promotions'],
+                'email'         => 'admin@example.com',
+                'first_name'    => 'Super',
+                'last_name'     => 'Administrator',
+                'company'       => $company,
+                'status'        => 'active',
+                'interests'     => ['business', 'support', 'promotions'],
                 'subscribed_at' => now(),
             ])
             ->create();
@@ -149,10 +150,10 @@ final class SubscriberSeeder extends Seeder
     private function determineSource(int $index): string
     {
         return match ($index % 5) {
-            0 => 'website',
-            1 => 'admin',
-            2 => 'api',
-            3 => 'social',
+            0       => 'website',
+            1       => 'admin',
+            2       => 'api',
+            3       => 'social',
             default => 'referral',
         };
     }

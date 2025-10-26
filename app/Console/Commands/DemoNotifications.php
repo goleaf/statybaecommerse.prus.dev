@@ -22,29 +22,29 @@ final class DemoNotifications extends Command
         // Create different types of notifications
         $notifications = [
             [
-                'title' => 'Naujas užsakymas',
+                'title'   => 'Naujas užsakymas',
                 'message' => 'Gautas naujas užsakymas #12345 už 125.50 €',
-                'type' => 'success',
+                'type'    => 'success',
             ],
             [
-                'title' => 'Mažos atsargos',
+                'title'   => 'Mažos atsargos',
                 'message' => 'Prekė "Samsung Galaxy S24" turi mažiau nei 10 vienetų atsargų',
-                'type' => 'warning',
+                'type'    => 'warning',
             ],
             [
-                'title' => 'Mokėjimo klaida',
+                'title'   => 'Mokėjimo klaida',
                 'message' => 'Nepavyko apdoroti mokėjimo už užsakymą #12344',
-                'type' => 'error',
+                'type'    => 'error',
             ],
             [
-                'title' => 'Sistemos atnaujinimas',
+                'title'   => 'Sistemos atnaujinimas',
                 'message' => 'Sistema bus atnaujinta šį vakarą nuo 23:00 iki 01:00',
-                'type' => 'info',
+                'type'    => 'info',
             ],
             [
-                'title' => 'Naujas klientas',
+                'title'   => 'Naujas klientas',
                 'message' => 'Registruotas naujas klientas: jonas.petras@example.com',
-                'type' => 'success',
+                'type'    => 'success',
             ],
         ];
 
@@ -56,7 +56,7 @@ final class DemoNotifications extends Command
             );
         }
 
-        $this->info('Created '.count($notifications).' demo notifications.');
+        $this->info('Created ' . count($notifications) . ' demo notifications.');
         $this->info('Check the notification bell icon in the admin panel!');
 
         return 0;

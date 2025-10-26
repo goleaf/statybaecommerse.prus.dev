@@ -16,7 +16,7 @@ final class SearchIndexRebuildCommand extends Command
     {
         return $this->call('search:index', [
             '--fresh' => true,
-            '--only' => $this->option('only'),
+            '--only'  => $this->option('only'),
         ]);
     }
 }

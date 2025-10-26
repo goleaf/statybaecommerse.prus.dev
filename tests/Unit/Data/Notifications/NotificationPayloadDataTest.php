@@ -6,8 +6,8 @@ namespace Tests\Unit\Data\Notifications;
 
 use App\Data\Notifications\NotificationPayloadData;
 use App\Models\Notification;
-use Illuminate\Support\Str;
 use Carbon\CarbonImmutable;
+use Illuminate\Support\Str;
 use Tests\TestCase;
 
 final class NotificationPayloadDataTest extends TestCase
@@ -15,20 +15,20 @@ final class NotificationPayloadDataTest extends TestCase
     public function test_payload_normalizes_meta_and_tags(): void
     {
         $now = CarbonImmutable::parse('2024-01-01T12:00:00Z');
-        $notification = new Notification();
+        $notification = new Notification;
         $notification->forceFill([
-            'id' => (string) Str::uuid(),
+            'id'   => (string) Str::uuid(),
             'type' => 'App\\Notifications\\OrderCreatedNotification',
             'data' => [
-                'type' => 'order',
-                'title' => 'Order created',
+                'type'    => 'order',
+                'title'   => 'Order created',
                 'message' => 'Order #123 created',
-                'urgent' => true,
-                'color' => 'blue',
-                'tags' => ['primary', '', ''],
-                'extra' => 'value',
+                'urgent'  => true,
+                'color'   => 'blue',
+                'tags'    => ['primary', '', ''],
+                'extra'   => 'value',
             ],
-            'read_at' => $now,
+            'read_at'    => $now,
             'created_at' => $now,
         ]);
 

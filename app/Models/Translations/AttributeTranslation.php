@@ -15,8 +15,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * Eloquent model representing the AttributeTranslation entity with comprehensive relationships, scopes, and business logic for the e-commerce system.
  *
  * @property string $factory
- * @property mixed $table
- * @property mixed $fillable
+ * @property mixed  $table
+ * @property mixed  $fillable
  *
  * @method static \Illuminate\Database\Eloquent\Builder|AttributeTranslation newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|AttributeTranslation newQuery()
@@ -54,7 +54,7 @@ final class AttributeTranslation extends Model
     /**
      * Handle scopeByLocale functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeByLocale($query, string $locale)
     {
@@ -64,7 +64,7 @@ final class AttributeTranslation extends Model
     /**
      * Handle scopeByAttribute functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeByAttribute($query, int $attributeId)
     {
@@ -74,7 +74,7 @@ final class AttributeTranslation extends Model
     /**
      * Handle scopeWithName functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeWithName($query)
     {

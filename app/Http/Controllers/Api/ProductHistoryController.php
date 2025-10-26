@@ -9,8 +9,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\ProductHistory;
 use App\Models\User;
-use App\Services\Export\ExportService;
 use App\Services\Export\Exporters\ProductHistoryExport;
+use App\Services\Export\ExportService;
 use App\Support\ListQuery\ListQueryValidator;
 use App\Support\ListQuery\ListResponse;
 use App\Support\ProductHistory\ProductHistoryListConfiguration;
@@ -64,10 +64,10 @@ final class ProductHistoryController extends Controller
 
         $payload = ListResponse::fromPaginator($histories, $listQuery, [
             'histories' => $histories->items(),
-            'product' => [
-                'id' => $product->getKey(),
+            'product'   => [
+                'id'   => $product->getKey(),
                 'name' => $product->name,
-                'sku' => $product->sku,
+                'sku'  => $product->sku,
             ],
         ]);
 
@@ -89,9 +89,9 @@ final class ProductHistoryController extends Controller
         $data = [
             'history' => $history,
             'product' => [
-                'id' => $product->getKey(),
+                'id'   => $product->getKey(),
                 'name' => $product->name,
-                'sku' => $product->sku,
+                'sku'  => $product->sku,
             ],
         ];
 
@@ -133,25 +133,25 @@ final class ProductHistoryController extends Controller
 
         $data = [
             'statistics' => [
-                'total_changes' => $totalChanges,
-                'recent_changes' => $recentChanges,
+                'total_changes'     => $totalChanges,
+                'recent_changes'    => $recentChanges,
                 'changes_by_action' => $changesByAction,
-                'changes_by_field' => $changesByField,
-                'recent_activity' => $recentActivity,
-                'summary' => [
-                    'price_changes' => $priceChanges,
-                    'stock_updates' => $stockUpdates,
+                'changes_by_field'  => $changesByField,
+                'recent_activity'   => $recentActivity,
+                'summary'           => [
+                    'price_changes'  => $priceChanges,
+                    'stock_updates'  => $stockUpdates,
                     'status_changes' => $statusChanges,
                 ],
-                'change_frequency' => $product->getChangeFrequency(30),
-                'last_price_change' => $product->getLastPriceChange()?->created_at,
-                'last_stock_update' => $product->getLastStockUpdate()?->created_at,
+                'change_frequency'   => $product->getChangeFrequency(30),
+                'last_price_change'  => $product->getLastPriceChange()?->created_at,
+                'last_stock_update'  => $product->getLastStockUpdate()?->created_at,
                 'last_status_change' => $product->getLastStatusChange()?->created_at,
             ],
             'product' => [
-                'id' => $product->getKey(),
+                'id'   => $product->getKey(),
                 'name' => $product->name,
-                'sku' => $product->sku,
+                'sku'  => $product->sku,
             ],
             'meta' => ListResponse::meta($listQuery),
         ];
@@ -180,9 +180,9 @@ final class ProductHistoryController extends Controller
             filters: array_merge($filters, ['product_id' => $product->getKey()]),
             userId: $user instanceof User ? $user->getKey() : null,
             meta: [
-                'product_id' => $product->getKey(),
+                'product_id'   => $product->getKey(),
                 'product_name' => $product->name,
-                'query' => [
+                'query'        => [
                     'filters' => $filters,
                 ],
             ],
@@ -202,10 +202,10 @@ final class ProductHistoryController extends Controller
         // export identifier immediately without waiting for the job to finish.
         return response()->stream(function () use ($export, $downloadUrl): void {
             $payload = [
-                'event' => 'queued',
-                'export_id' => $export->getKey(),
-                'uuid' => $export->uuid,
-                'status' => (string) $export->status,
+                'event'        => 'queued',
+                'export_id'    => $export->getKey(),
+                'uuid'         => $export->uuid,
+                'status'       => (string) $export->status,
                 'download_url' => $downloadUrl,
             ];
 
@@ -220,9 +220,9 @@ final class ProductHistoryController extends Controller
             }
             flush();
         }, 200, [
-            'Content-Type' => 'text/event-stream; charset=UTF-8',
-            'Cache-Control' => 'no-cache, no-transform',
-            'Connection' => 'keep-alive',
+            'Content-Type'      => 'text/event-stream; charset=UTF-8',
+            'Cache-Control'     => 'no-cache, no-transform',
+            'Connection'        => 'keep-alive',
             'X-Accel-Buffering' => 'no',
         ]);
     }
@@ -235,10 +235,10 @@ final class ProductHistoryController extends Controller
         $this->authorize('create', [ProductHistory::class, $product]);
 
         $validated = $request->validate([
-            'action' => ['required', 'string', 'max:255'],
-            'field_name' => ['nullable', 'string', 'max:255'],
-            'old_value' => ['nullable'],
-            'new_value' => ['nullable'],
+            'action'      => ['required', 'string', 'max:255'],
+            'field_name'  => ['nullable', 'string', 'max:255'],
+            'old_value'   => ['nullable'],
+            'new_value'   => ['nullable'],
             'description' => ['nullable', 'string', 'max:65535'],
         ]);
 
@@ -256,7 +256,7 @@ final class ProductHistoryController extends Controller
         $history->load(['user:id,name,email']);
 
         return response()->json([
-            'data' => $history,
+            'data'    => $history,
             'message' => 'History entry created successfully',
         ], 201);
     }

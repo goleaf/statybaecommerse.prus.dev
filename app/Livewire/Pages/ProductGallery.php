@@ -16,7 +16,7 @@ use Livewire\WithPagination;
  *
  * @property string $search
  * @property string $filter
- * @property mixed $queryString
+ * @property mixed  $queryString
  */
 final class ProductGallery extends Component
 {
@@ -52,7 +52,7 @@ final class ProductGallery extends Component
     public function products()
     {
         return Product::query()->with(['media', 'brand'])->where('is_visible', true)->when($this->search, function ($query) {
-            $query->where('name', 'like', '%'.$this->search.'%');
+            $query->where('name', 'like', '%' . $this->search . '%');
         })->when($this->filter === 'with_images', function ($query) {
             $query->whereHas('media', function ($q) {
                 $q->where('collection_name', 'images');

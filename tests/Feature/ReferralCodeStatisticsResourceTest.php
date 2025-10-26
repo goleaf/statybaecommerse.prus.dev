@@ -26,7 +26,7 @@ final class ReferralCodeStatisticsResourceTest extends TestCase
         parent::setUp();
 
         $this->adminUser = User::factory()->create([
-            'email' => 'admin@example.com',
+            'email'    => 'admin@example.com',
             'is_admin' => true,
         ]);
     }
@@ -47,25 +47,25 @@ final class ReferralCodeStatisticsResourceTest extends TestCase
         Livewire::actingAs($this->adminUser)
             ->test(CreateReferralCodeStatistics::class)
             ->fillForm([
-                'referral_code_id' => $referralCode->id,
-                'date' => now()->toDateString(),
-                'total_views' => 250,
-                'total_clicks' => 125,
-                'total_signups' => 60,
+                'referral_code_id'  => $referralCode->id,
+                'date'              => now()->toDateString(),
+                'total_views'       => 250,
+                'total_clicks'      => 125,
+                'total_signups'     => 60,
                 'total_conversions' => 30,
-                'total_revenue' => 450.75,
-                'metadata' => ['source' => 'newsletter'],
+                'total_revenue'     => 450.75,
+                'metadata'          => ['source' => 'newsletter'],
             ])
             ->call('create')
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('referral_code_statistics', [
-            'referral_code_id' => $referralCode->id,
-            'total_views' => 250,
-            'total_clicks' => 125,
-            'total_signups' => 60,
+            'referral_code_id'  => $referralCode->id,
+            'total_views'       => 250,
+            'total_clicks'      => 125,
+            'total_signups'     => 60,
             'total_conversions' => 30,
-            'total_revenue' => 450.75,
+            'total_revenue'     => 450.75,
         ]);
     }
 
@@ -90,24 +90,24 @@ final class ReferralCodeStatisticsResourceTest extends TestCase
         Livewire::actingAs($this->adminUser)
             ->test(EditReferralCodeStatistics::class, ['record' => $record->id])
             ->fillForm([
-                'referral_code_id' => (string) $record->referral_code_id,
-                'total_views' => 750,
-                'total_clicks' => 300,
-                'total_signups' => 140,
+                'referral_code_id'  => (string) $record->referral_code_id,
+                'total_views'       => 750,
+                'total_clicks'      => 300,
+                'total_signups'     => 140,
                 'total_conversions' => 70,
-                'total_revenue' => 980.25,
-                'metadata' => ['note' => 'updated'],
+                'total_revenue'     => 980.25,
+                'metadata'          => ['note' => 'updated'],
             ])
             ->call('save')
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('referral_code_statistics', [
-            'id' => $record->id,
-            'total_views' => 750,
-            'total_clicks' => 300,
-            'total_signups' => 140,
+            'id'                => $record->id,
+            'total_views'       => 750,
+            'total_clicks'      => 300,
+            'total_signups'     => 140,
             'total_conversions' => 70,
-            'total_revenue' => 980.25,
+            'total_revenue'     => 980.25,
         ]);
     }
 }

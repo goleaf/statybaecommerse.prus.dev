@@ -11,6 +11,7 @@ use App\Support\Cache\TagAwareCache;
 final class ProductRepository
 {
     private const SEARCH_CACHE_TTL_MINUTES = 5;
+
     private const SHOW_CACHE_TTL_MINUTES = 5;
 
     public function __construct(private readonly CacheRepository $cache)

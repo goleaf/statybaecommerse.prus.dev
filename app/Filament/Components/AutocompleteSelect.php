@@ -339,17 +339,17 @@ final class AutocompleteSelect extends Select
         }
 
         return [
-            'searchable'       => $this->getSearchable(),
-            'multiple'         => $this->getMultiple(),
-            'minSearchLength'  => $this->getMinSearchLength(),
-            'maxSearchResults' => $this->getMaxSearchResults(),
-            'searchField'      => $this->getSearchField(),
-            'valueField'       => $this->getValueField(),
-            'labelField'       => $this->getLabelField(),
-            'modelClass'       => $this->getModelClass(),
-            'searchResults'    => $shouldExposeResults ? $this->formatResultsForSelect($results) : [],
+            'searchable'        => $this->getSearchable(),
+            'multiple'          => $this->getMultiple(),
+            'minSearchLength'   => $this->getMinSearchLength(),
+            'maxSearchResults'  => $this->getMaxSearchResults(),
+            'searchField'       => $this->getSearchField(),
+            'valueField'        => $this->getValueField(),
+            'labelField'        => $this->getLabelField(),
+            'modelClass'        => $this->getModelClass(),
+            'searchResults'     => $shouldExposeResults ? $this->formatResultsForSelect($results) : [],
             'searchResultItems' => $shouldExposeResults ? $results->values()->all() : [],
-            'searchQuery' => $this->getSearchQuery(),
+            'searchQuery'       => $this->getSearchQuery(),
         ];
     }
 
@@ -391,7 +391,7 @@ final class AutocompleteSelect extends Select
     }
 
     /**
-     * @param Collection<int, array{value: string, label: string, data: array<string, mixed>}> $results
+     * @param  Collection<int, array{value: string, label: string, data: array<string, mixed>}> $results
      * @return array<string, string>
      */
     protected function formatResultsForSelect(Collection $results): array

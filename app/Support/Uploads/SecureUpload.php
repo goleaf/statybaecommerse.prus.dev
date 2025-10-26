@@ -20,14 +20,12 @@ final class SecureUpload
     /**
      * Block instantiation as this helper only exposes static behaviour.
      */
-    private function __construct()
-    {
-    }
+    private function __construct() {}
 
     /**
      * Determine the configured list of allowed MIME types.
      *
-     * @param  array<int, string>|null  $overrides
+     * @param  array<int, string>|null $overrides
      * @return array<int, string>
      */
     public static function allowedMimeTypes(?array $overrides = null): array
@@ -42,7 +40,7 @@ final class SecureUpload
     /**
      * Determine the configured list of allowed file extensions.
      *
-     * @param  array<int, string>|null  $overrides
+     * @param  array<int, string>|null $overrides
      * @return array<int, string>
      */
     public static function allowedExtensions(?array $overrides = null): array
@@ -59,8 +57,8 @@ final class SecureUpload
     /**
      * Build the `accept` attribute list for front-end file inputs.
      *
-     * @param  array<int, string>|null  $mime
-     * @param  array<int, string>|null  $extensions
+     * @param  array<int, string>|null $mime
+     * @param  array<int, string>|null $extensions
      * @return array<int, string>
      */
     public static function acceptedFileTypes(?array $mime = null, ?array $extensions = null): array

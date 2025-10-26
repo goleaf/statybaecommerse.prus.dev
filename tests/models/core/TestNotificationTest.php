@@ -64,8 +64,8 @@ final class TestNotificationTest extends TestCase
 
         $this->assertDatabaseHas('notifications', [
             'notifiable_type' => User::class,
-            'notifiable_id' => $user->id,
-            'type' => TestNotification::class,
+            'notifiable_id'   => $user->id,
+            'type'            => TestNotification::class,
         ]);
 
         $dbNotification = DatabaseNotification::where('notifiable_id', $user->id)->first();

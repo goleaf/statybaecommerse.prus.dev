@@ -316,7 +316,7 @@ final class VariantInventoryResource extends Resource
                             ->label(__('admin.variant_inventory.stock_status'))
                             ->content(fn (?VariantInventory $record): string => $record instanceof \App\Models\VariantInventory ? __('admin.variant_inventory.status_' . $record->stock_status) : '-'),
                     ])
-                    ->hidden(fn (?VariantInventory $record): bool => !$record instanceof \App\Models\VariantInventory),
+                    ->hidden(fn (?VariantInventory $record): bool => ! $record instanceof \App\Models\VariantInventory),
             ]);
     }
 

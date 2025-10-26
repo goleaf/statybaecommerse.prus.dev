@@ -9,9 +9,7 @@ use Monolog\LogRecord;
 
 final class LogContextProcessor
 {
-    public function __construct(private readonly LogContext $logContext)
-    {
-    }
+    public function __construct(private readonly LogContext $logContext) {}
 
     public function __invoke(LogRecord $record): LogRecord
     {

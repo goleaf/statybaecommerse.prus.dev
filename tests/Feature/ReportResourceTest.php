@@ -20,7 +20,7 @@ class ReportResourceTest extends TestCase
         parent::setUp();
 
         $this->actingAs(User::factory()->create([
-            'email' => 'admin@example.com',
+            'email'    => 'admin@example.com',
             'is_admin' => true,
         ]));
     }
@@ -43,9 +43,9 @@ class ReportResourceTest extends TestCase
                     'lt' => 'Test Report LT',
                     'en' => 'Test Report EN',
                 ],
-                'slug' => 'test-report',
-                'type' => 'sales',
-                'category' => 'sales',
+                'slug'        => 'test-report',
+                'type'        => 'sales',
+                'category'    => 'sales',
                 'description' => [
                     'lt' => 'Test Description LT',
                     'en' => 'Test Description EN',
@@ -54,19 +54,19 @@ class ReportResourceTest extends TestCase
                     'lt' => 'Test Content LT',
                     'en' => 'Test Content EN',
                 ],
-                'is_active' => true,
-                'is_public' => false,
+                'is_active'    => true,
+                'is_public'    => false,
                 'is_scheduled' => false,
             ])
             ->call('create')
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('reports', [
-            'slug' => 'test-report',
-            'type' => 'sales',
-            'category' => 'sales',
-            'is_active' => true,
-            'is_public' => false,
+            'slug'         => 'test-report',
+            'type'         => 'sales',
+            'category'     => 'sales',
+            'is_active'    => true,
+            'is_public'    => false,
             'is_scheduled' => false,
         ]);
 
@@ -88,9 +88,9 @@ class ReportResourceTest extends TestCase
             'record' => $report->getRouteKey(),
         ])
             ->fillForm([
-                'name' => 'Updated Report',
+                'name'        => 'Updated Report',
                 'description' => 'Updated Description',
-                'is_active' => false,
+                'is_active'   => false,
             ])
             ->call('save')
             ->assertHasNoFormErrors();
@@ -277,9 +277,9 @@ class ReportResourceTest extends TestCase
     {
         Livewire::test(\App\Filament\Resources\ReportResource\Pages\CreateReport::class)
             ->fillForm([
-                'name' => '',  // Required field
-                'slug' => '',  // Required field
-                'type' => '',  // Required field
+                'name'     => '',  // Required field
+                'slug'     => '',  // Required field
+                'type'     => '',  // Required field
                 'category' => '',  // Required field
             ])
             ->call('create')
@@ -290,8 +290,8 @@ class ReportResourceTest extends TestCase
     {
         Livewire::test(\App\Filament\Resources\ReportResource\Pages\CreateReport::class)
             ->fillForm([
-                'name' => 'Test Report Name',
-                'type' => 'sales',
+                'name'     => 'Test Report Name',
+                'type'     => 'sales',
                 'category' => 'sales',
             ])
             ->assertFormSet([
@@ -303,9 +303,9 @@ class ReportResourceTest extends TestCase
     {
         Livewire::test(\App\Filament\Resources\ReportResource\Pages\CreateReport::class)
             ->fillForm([
-                'name' => 'Test Report',
-                'type' => 'sales',
-                'category' => 'sales',
+                'name'         => 'Test Report',
+                'type'         => 'sales',
+                'category'     => 'sales',
                 'is_scheduled' => true,
             ])
             ->assertFormFieldExists('schedule_frequency');

@@ -22,7 +22,7 @@ class TestRunner extends TestCase
     public function test_admin_resources(): void
     {
         $this->artisan('test', [
-            '--filter' => 'Tests\\Feature\\Admin',
+            '--filter'          => 'Tests\\Feature\\Admin',
             '--stop-on-failure' => true,
         ])->assertExitCode(0);
     }
@@ -33,7 +33,7 @@ class TestRunner extends TestCase
     public function test_widgets(): void
     {
         $this->artisan('test', [
-            '--filter' => 'Tests\\Feature\\Widgets',
+            '--filter'          => 'Tests\\Feature\\Widgets',
             '--stop-on-failure' => true,
         ])->assertExitCode(0);
     }
@@ -44,7 +44,7 @@ class TestRunner extends TestCase
     public function test_api(): void
     {
         $this->artisan('test', [
-            '--filter' => 'Tests\\Feature\\API',
+            '--filter'          => 'Tests\\Feature\\API',
             '--stop-on-failure' => true,
         ])->assertExitCode(0);
     }
@@ -55,7 +55,7 @@ class TestRunner extends TestCase
     public function test_integration(): void
     {
         $this->artisan('test', [
-            '--filter' => 'Tests\\Feature\\Integration',
+            '--filter'          => 'Tests\\Feature\\Integration',
             '--stop-on-failure' => true,
         ])->assertExitCode(0);
     }
@@ -66,7 +66,7 @@ class TestRunner extends TestCase
     public function test_unit(): void
     {
         $this->artisan('test', [
-            '--filter' => 'Tests\\Feature\\Unit',
+            '--filter'          => 'Tests\\Feature\\Unit',
             '--stop-on-failure' => true,
         ])->assertExitCode(0);
     }
@@ -77,7 +77,7 @@ class TestRunner extends TestCase
     public function test_controllers(): void
     {
         $this->artisan('test', [
-            '--filter' => 'Tests\\Feature\\Controllers',
+            '--filter'          => 'Tests\\Feature\\Controllers',
             '--stop-on-failure' => true,
         ])->assertExitCode(0);
     }
@@ -88,7 +88,7 @@ class TestRunner extends TestCase
     public function test_models(): void
     {
         $this->artisan('test', [
-            '--filter' => 'Tests\\Feature\\Models',
+            '--filter'          => 'Tests\\Feature\\Models',
             '--stop-on-failure' => true,
         ])->assertExitCode(0);
     }
@@ -99,7 +99,7 @@ class TestRunner extends TestCase
     public function test_pages(): void
     {
         $this->artisan('test', [
-            '--filter' => 'Tests\\Feature\\Pages',
+            '--filter'          => 'Tests\\Feature\\Pages',
             '--stop-on-failure' => true,
         ])->assertExitCode(0);
     }

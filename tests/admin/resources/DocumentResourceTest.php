@@ -40,11 +40,11 @@ beforeEach(function () {
 
     $this->testDocument = Document::factory()->create([
         'document_template_id' => $this->testTemplate->id,
-        'title' => 'Test Document',
-        'status' => 'draft',
-        'format' => 'pdf',
-        'documentable_type' => 'App\\Models\\Order',
-        'documentable_id' => 1,
+        'title'                => 'Test Document',
+        'status'               => 'draft',
+        'format'               => 'pdf',
+        'documentable_type'    => 'App\\Models\\Order',
+        'documentable_id'      => 1,
     ]);
 });
 
@@ -61,23 +61,23 @@ it('can create a new document', function () {
         ->test(DocumentResource\Pages\CreateDocument::class)
         ->fillForm([
             'document_template_id' => $template->id,
-            'title' => 'New Document',
-            'status' => 'draft',
-            'format' => 'pdf',
-            'documentable_type' => 'App\\Models\\Order',
-            'documentable_id' => 1,
-            'variables' => json_encode(['key' => 'value']),
+            'title'                => 'New Document',
+            'status'               => 'draft',
+            'format'               => 'pdf',
+            'documentable_type'    => 'App\\Models\\Order',
+            'documentable_id'      => 1,
+            'variables'            => json_encode(['key' => 'value']),
         ])
         ->call('create')
         ->assertHasNoFormErrors();
 
     $this->assertDatabaseHas('documents', [
         'document_template_id' => $template->id,
-        'title' => 'New Document',
-        'status' => 'draft',
-        'format' => 'pdf',
-        'documentable_type' => 'App\\Models\\Order',
-        'documentable_id' => 1,
+        'title'                => 'New Document',
+        'status'               => 'draft',
+        'format'               => 'pdf',
+        'documentable_type'    => 'App\\Models\\Order',
+        'documentable_id'      => 1,
     ]);
 });
 
@@ -91,7 +91,7 @@ it('can edit a document', function () {
     Livewire::actingAs($this->adminUser)
         ->test(DocumentResource\Pages\EditDocument::class, ['record' => $this->testDocument->id])
         ->fillForm([
-            'title' => 'Updated Document',
+            'title'  => 'Updated Document',
             'status' => 'completed',
             'format' => 'html',
         ])
@@ -99,8 +99,8 @@ it('can edit a document', function () {
         ->assertHasNoFormErrors();
 
     $this->assertDatabaseHas('documents', [
-        'id' => $this->testDocument->id,
-        'title' => 'Updated Document',
+        'id'     => $this->testDocument->id,
+        'title'  => 'Updated Document',
         'status' => 'completed',
         'format' => 'html',
     ]);
@@ -124,11 +124,11 @@ it('validates required fields when creating document', function () {
         ->test(DocumentResource\Pages\CreateDocument::class)
         ->fillForm([
             'document_template_id' => null,
-            'title' => null,
-            'status' => null,
-            'format' => null,
-            'documentable_type' => null,
-            'documentable_id' => null,
+            'title'                => null,
+            'status'               => null,
+            'format'               => null,
+            'documentable_type'    => null,
+            'documentable_id'      => null,
         ])
         ->call('create')
         ->assertHasFormErrors(['document_template_id', 'title', 'status', 'format', 'documentable_type', 'documentable_id']);
@@ -141,11 +141,11 @@ it('validates document status values', function () {
         ->test(DocumentResource\Pages\CreateDocument::class)
         ->fillForm([
             'document_template_id' => $template->id,
-            'title' => 'Test Document',
-            'status' => 'invalid-status',
-            'format' => 'pdf',
-            'documentable_type' => 'App\\Models\\Order',
-            'documentable_id' => 1,
+            'title'                => 'Test Document',
+            'status'               => 'invalid-status',
+            'format'               => 'pdf',
+            'documentable_type'    => 'App\\Models\\Order',
+            'documentable_id'      => 1,
         ])
         ->call('create')
         ->assertHasFormErrors(['status']);
@@ -158,11 +158,11 @@ it('validates document format values', function () {
         ->test(DocumentResource\Pages\CreateDocument::class)
         ->fillForm([
             'document_template_id' => $template->id,
-            'title' => 'Test Document',
-            'status' => 'draft',
-            'format' => 'invalid-format',
-            'documentable_type' => 'App\\Models\\Order',
-            'documentable_id' => 1,
+            'title'                => 'Test Document',
+            'status'               => 'draft',
+            'format'               => 'invalid-format',
+            'documentable_type'    => 'App\\Models\\Order',
+            'documentable_id'      => 1,
         ])
         ->call('create')
         ->assertHasFormErrors(['format']);
@@ -197,13 +197,13 @@ it('shows correct document data in table', function () {
 
 it('handles document generation workflow', function () {
     $document = Document::factory()->create([
-        'status' => 'draft',
+        'status'    => 'draft',
         'file_path' => null,
     ]);
 
     // Simulate document generation
     $document->update([
-        'status' => 'generating',
+        'status'       => 'generating',
         'generated_at' => now(),
     ]);
 
@@ -231,7 +231,7 @@ it('handles bulk actions on documents', function () {
 
 it('can download completed documents', function () {
     $document = Document::factory()->create([
-        'status' => 'completed',
+        'status'    => 'completed',
         'file_path' => 'documents/test-document.pdf',
     ]);
 

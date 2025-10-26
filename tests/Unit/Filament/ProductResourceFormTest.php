@@ -27,4 +27,3 @@ it('product resource form returns a Schema instance and includes images field', 
 
     expect($hasImagesField)->toBeTrue();
 });
-

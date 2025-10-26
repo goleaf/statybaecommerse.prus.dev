@@ -66,7 +66,7 @@ final class HandleImpersonation
 
         // Always share the impersonation context so banners render on every request.
         view()->share('impersonating', [
-            'user' => $impersonatedUser,
+            'user'          => $impersonatedUser,
             'original_user' => $originalUser,
         ]);
 

@@ -32,9 +32,9 @@ final class CountryApiRequest extends FormRequest
     {
         // Guard the API search parameters to avoid unrestricted filtering or pagination.
         return [
-            'search' => ['nullable', 'string', 'max:255'],
-            'region' => ['nullable', 'string', 'max:255'],
-            'sort' => ['nullable', 'string', 'in:name,-name,sort_order,-sort_order'],
+            'search'   => ['nullable', 'string', 'max:255'],
+            'region'   => ['nullable', 'string', 'max:255'],
+            'sort'     => ['nullable', 'string', 'in:name,-name,sort_order,-sort_order'],
             'per_page' => ['nullable', 'integer', 'min:1', 'max:100'],
         ];
     }

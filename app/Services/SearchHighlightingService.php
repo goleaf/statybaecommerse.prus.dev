@@ -95,8 +95,8 @@ final class SearchHighlightingService
      */
     private function highlightTerm(string $text, string $term): string
     {
-        $pattern = '/\b('.preg_quote($term, '/').')\b/i';
-        $replacement = self::HIGHLIGHT_TAG.'$1'.self::HIGHLIGHT_TAG_CLOSE;
+        $pattern = '/\b(' . preg_quote($term, '/') . ')\b/i';
+        $replacement = self::HIGHLIGHT_TAG . '$1' . self::HIGHLIGHT_TAG_CLOSE;
 
         return preg_replace($pattern, $replacement, $text);
     }
@@ -116,10 +116,10 @@ final class SearchHighlightingService
         $snippet = substr($text, $start, $maxLength);
         // Add ellipsis if needed
         if ($start > 0) {
-            $snippet = '...'.$snippet;
+            $snippet = '...' . $snippet;
         }
         if ($start + $maxLength < strlen($text)) {
-            $snippet = $snippet.'...';
+            $snippet = $snippet . '...';
         }
 
         return $snippet;

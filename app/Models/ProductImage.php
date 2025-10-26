@@ -1,14 +1,16 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models;
 
 use App\Models\Concerns\OrdersByName;
 use App\Models\Scopes\ActiveScope;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\Storage;
 
 /**
@@ -44,6 +46,7 @@ final class ProductImage extends Model
 {
     /** @use HasFactory<\Database\Factories\ProductImageFactory> */
     use HasFactory;
+
     use OrdersByName;
 
     protected $table = 'product_images';
@@ -64,7 +67,7 @@ final class ProductImage extends Model
         return [
             'product_id' => 'integer',
             'sort_order' => 'integer',
-            'is_active' => 'boolean',
+            'is_active'  => 'boolean',
         ];
     }
 

@@ -36,8 +36,8 @@ final class CategoryBrowsingTest extends TestCase
         $brand = Brand::factory()->create();
 
         $product = $this->createPublishedProduct([
-            'name' => 'Impaktinis suktuvas',
-            'slug' => 'impaktinis-suktuvas',
+            'name'     => 'Impaktinis suktuvas',
+            'slug'     => 'impaktinis-suktuvas',
             'brand_id' => $brand->id,
         ]);
         $product->categories()->attach($category->id);
@@ -54,8 +54,8 @@ final class CategoryBrowsingTest extends TestCase
     public function test_category_show_returns_404_for_hidden_category(): void
     {
         $category = Category::withoutGlobalScopes()->create([
-            'name' => 'Paslėpta kategorija',
-            'slug' => 'paslepta-kategorija',
+            'name'       => 'Paslėpta kategorija',
+            'slug'       => 'paslepta-kategorija',
             'is_visible' => false,
         ]);
 
@@ -78,9 +78,9 @@ final class CategoryBrowsingTest extends TestCase
     private function createPublishedProduct(array $overrides = []): Product
     {
         return Product::factory()->create(array_merge([
-            'status' => 'published',
-            'is_visible' => true,
-            'is_enabled' => true,
+            'status'       => 'published',
+            'is_visible'   => true,
+            'is_enabled'   => true,
             'published_at' => Carbon::now()->subDay(),
         ], $overrides));
     }

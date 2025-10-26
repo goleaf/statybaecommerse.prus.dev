@@ -20,7 +20,7 @@ final class SystemSettingTranslationResourceTest extends TestCase
         parent::setUp();
 
         $this->actingAs(User::factory()->create([
-            'email' => 'admin@example.com',
+            'email'    => 'admin@example.com',
             'is_admin' => true,
         ]));
     }
@@ -43,20 +43,20 @@ final class SystemSettingTranslationResourceTest extends TestCase
         Livewire::test(\App\Filament\Resources\SystemSettingTranslationResource\Pages\CreateSystemSettingTranslation::class)
             ->fillForm([
                 'system_setting_id' => $systemSetting->id,
-                'locale' => 'en',
-                'name' => 'Test Translation',
-                'description' => 'Test Description',
-                'help_text' => 'Test Help Text',
+                'locale'            => 'en',
+                'name'              => 'Test Translation',
+                'description'       => 'Test Description',
+                'help_text'         => 'Test Help Text',
             ])
             ->call('create')
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('system_setting_translations', [
             'system_setting_id' => $systemSetting->id,
-            'locale' => 'en',
-            'name' => 'Test Translation',
-            'description' => 'Test Description',
-            'help_text' => 'Test Help Text',
+            'locale'            => 'en',
+            'name'              => 'Test Translation',
+            'description'       => 'Test Description',
+            'help_text'         => 'Test Help Text',
         ]);
     }
 
@@ -71,15 +71,15 @@ final class SystemSettingTranslationResourceTest extends TestCase
             'record' => $translation->id,
         ])
             ->fillForm([
-                'name' => 'Updated Translation',
+                'name'        => 'Updated Translation',
                 'description' => 'Updated Description',
             ])
             ->call('save')
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('system_setting_translations', [
-            'id' => $translation->id,
-            'name' => 'Updated Translation',
+            'id'          => $translation->id,
+            'name'        => 'Updated Translation',
             'description' => 'Updated Description',
         ]);
     }
@@ -89,8 +89,8 @@ final class SystemSettingTranslationResourceTest extends TestCase
         $systemSetting = SystemSetting::factory()->create();
         $translation = SystemSettingTranslation::factory()->create([
             'system_setting_id' => $systemSetting->id,
-            'name' => 'View Name',
-            'description' => 'View Description',
+            'name'              => 'View Name',
+            'description'       => 'View Description',
         ]);
 
         Livewire::test(\App\Filament\Resources\SystemSettingTranslationResource\Pages\ViewSystemSettingTranslation::class, [
@@ -120,8 +120,8 @@ final class SystemSettingTranslationResourceTest extends TestCase
         $systemSetting = SystemSetting::factory()->create();
         $translation = SystemSettingTranslation::factory()->create([
             'system_setting_id' => $systemSetting->id,
-            'locale' => 'lt',
-            'name' => 'Duplicate Name',
+            'locale'            => 'lt',
+            'name'              => 'Duplicate Name',
         ]);
 
         Livewire::test(\App\Filament\Resources\SystemSettingTranslationResource\Pages\ListSystemSettingTranslations::class)
@@ -130,8 +130,8 @@ final class SystemSettingTranslationResourceTest extends TestCase
 
         $this->assertDatabaseHas('system_setting_translations', [
             'system_setting_id' => $systemSetting->id,
-            'locale' => 'lt',
-            'name' => 'Duplicate Name (Copy)',
+            'locale'            => 'lt',
+            'name'              => 'Duplicate Name (Copy)',
         ]);
     }
 
@@ -140,11 +140,11 @@ final class SystemSettingTranslationResourceTest extends TestCase
         $systemSetting = SystemSetting::factory()->create();
         $englishTranslation = SystemSettingTranslation::factory()->create([
             'system_setting_id' => $systemSetting->id,
-            'locale' => 'en',
+            'locale'            => 'en',
         ]);
         $lithuanianTranslation = SystemSettingTranslation::factory()->create([
             'system_setting_id' => $systemSetting->id,
-            'locale' => 'lt',
+            'locale'            => 'lt',
         ]);
 
         Livewire::test(\App\Filament\Resources\SystemSettingTranslationResource\Pages\ListSystemSettingTranslations::class)
@@ -176,7 +176,7 @@ final class SystemSettingTranslationResourceTest extends TestCase
         $systemSetting = SystemSetting::factory()->create();
         $translations = SystemSettingTranslation::factory()->count(3)->create([
             'system_setting_id' => $systemSetting->id,
-            'is_active' => false,
+            'is_active'         => false,
         ]);
 
         Livewire::test(\App\Filament\Resources\SystemSettingTranslationResource\Pages\ListSystemSettingTranslations::class)
@@ -184,7 +184,7 @@ final class SystemSettingTranslationResourceTest extends TestCase
 
         foreach ($translations as $translation) {
             $this->assertDatabaseHas('system_setting_translations', [
-                'id' => $translation->id,
+                'id'        => $translation->id,
                 'is_active' => true,
             ]);
         }
@@ -195,7 +195,7 @@ final class SystemSettingTranslationResourceTest extends TestCase
         $systemSetting = SystemSetting::factory()->create();
         $translations = SystemSettingTranslation::factory()->count(3)->create([
             'system_setting_id' => $systemSetting->id,
-            'is_active' => true,
+            'is_active'         => true,
         ]);
 
         Livewire::test(\App\Filament\Resources\SystemSettingTranslationResource\Pages\ListSystemSettingTranslations::class)
@@ -203,7 +203,7 @@ final class SystemSettingTranslationResourceTest extends TestCase
 
         foreach ($translations as $translation) {
             $this->assertDatabaseHas('system_setting_translations', [
-                'id' => $translation->id,
+                'id'        => $translation->id,
                 'is_active' => false,
             ]);
         }
@@ -214,11 +214,11 @@ final class SystemSettingTranslationResourceTest extends TestCase
         $systemSetting = SystemSetting::factory()->create();
         $translation1 = SystemSettingTranslation::factory()->create([
             'system_setting_id' => $systemSetting->id,
-            'name' => 'Unique Name',
+            'name'              => 'Unique Name',
         ]);
         $translation2 = SystemSettingTranslation::factory()->create([
             'system_setting_id' => $systemSetting->id,
-            'name' => 'Different Name',
+            'name'              => 'Different Name',
         ]);
 
         Livewire::test(\App\Filament\Resources\SystemSettingTranslationResource\Pages\ListSystemSettingTranslations::class)
@@ -232,8 +232,8 @@ final class SystemSettingTranslationResourceTest extends TestCase
         Livewire::test(\App\Filament\Resources\SystemSettingTranslationResource\Pages\CreateSystemSettingTranslation::class)
             ->fillForm([
                 'system_setting_id' => null,
-                'locale' => '',
-                'name' => '',
+                'locale'            => '',
+                'name'              => '',
             ])
             ->call('create')
             ->assertHasFormErrors(['system_setting_id', 'locale', 'name']);

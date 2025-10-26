@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace App\Http\Middleware;
 
 use App\Support\Security\CspNonce;
+use Closure;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response as HttpResponse;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Str;
-use Closure;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -234,6 +234,7 @@ final class AddSecurityHeaders
 
                 if ($id === T_INLINE_HTML) {
                     $result .= $this->injectNonceIntoInlineHtml($text, $nonce);
+
                     continue;
                 }
 
@@ -267,7 +268,7 @@ final class AddSecurityHeaders
             '/(<style\b[^>]*)(?<!nonce=)(>)/i',
         ];
 
-        $replacement = static fn(array $matches): string => $matches[1] . ' nonce="' . e($nonce) . '"' . $matches[2];
+        $replacement = static fn (array $matches): string => $matches[1] . ' nonce="' . e($nonce) . '"' . $matches[2];
 
         foreach ($patterns as $pattern) {
             $html = preg_replace_callback($pattern, $replacement, $html) ?? $html;

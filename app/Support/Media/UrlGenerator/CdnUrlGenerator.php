@@ -66,7 +66,7 @@ final class CdnUrlGenerator extends BaseUrlGenerator
 
     public function getPath(): string
     {
-        return $this->getRootOfDisk().$this->getPathRelativeToRoot();
+        return $this->getRootOfDisk() . $this->getPathRelativeToRoot();
     }
 
     public function getResponsiveImagesDirectoryUrl(): string
@@ -144,6 +144,6 @@ final class CdnUrlGenerator extends BaseUrlGenerator
 
         $relativePath = ltrim($path, '/');
 
-        return $cdnBase.'/'.$relativePath;
+        return $cdnBase . '/' . $relativePath;
     }
 }

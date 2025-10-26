@@ -98,16 +98,16 @@ final class MenuRepository
     private function buildMenuPayload(Menu $menu): array
     {
         return [
-            'id' => $menu->id,
-            'key' => $menu->key,
-            'name' => $menu->name,
+            'id'       => $menu->id,
+            'key'      => $menu->key,
+            'name'     => $menu->name,
             'location' => $menu->location,
-            'items' => $this->buildTree($menu->allItems),
+            'items'    => $this->buildTree($menu->allItems),
         ];
     }
 
     /**
-     * @param  Collection<int, MenuItem>  $items
+     * @param Collection<int, MenuItem> $items
      */
     private function buildTree(Collection $items): array
     {
@@ -117,26 +117,26 @@ final class MenuRepository
     }
 
     /**
-     * @param  Collection<int, Collection<int, MenuItem>>  $grouped
+     * @param Collection<int, Collection<int, MenuItem>> $grouped
      */
     private function mapChildren(Collection $grouped, ?int $parentId): array
     {
         return $grouped->get($parentId, collect())->map(function (MenuItem $item) use ($grouped): array {
             return [
-                'id' => $item->id,
-                'label' => $item->label,
-                'url' => $item->url,
-                'route_name' => $item->route_name,
+                'id'           => $item->id,
+                'label'        => $item->label,
+                'url'          => $item->url,
+                'route_name'   => $item->route_name,
                 'route_params' => $item->route_params,
-                'icon' => $item->icon,
-                'sort_order' => $item->sort_order,
-                'children' => $this->mapChildren($grouped, $item->id),
+                'icon'         => $item->icon,
+                'sort_order'   => $item->sort_order,
+                'children'     => $this->mapChildren($grouped, $item->id),
             ];
         })->all();
     }
 
     /**
-     * @param  array<int, string>  $tags
+     * @param array<int, string> $tags
      */
     private function remember(string $key, int $ttlSeconds, callable $callback, array $tags = []): mixed
     {

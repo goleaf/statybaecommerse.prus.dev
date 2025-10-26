@@ -32,12 +32,12 @@ final class CategoryResourceTest extends TestCase
     public function test_can_create_category(): void
     {
         $categoryData = [
-            'name' => 'Test Category',
-            'slug' => 'test-category',
+            'name'        => 'Test Category',
+            'slug'        => 'test-category',
             'description' => 'Test description',
-            'is_active' => true,
-            'is_visible' => true,
-            'is_enabled' => true,
+            'is_active'   => true,
+            'is_visible'  => true,
+            'is_enabled'  => true,
         ];
 
         Livewire::test(\App\Filament\Resources\CategoryResource\Pages\CreateCategory::class)
@@ -59,14 +59,14 @@ final class CategoryResourceTest extends TestCase
             'record' => $category->getRouteKey(),
         ])
             ->fillForm([
-                'name' => 'Updated Category',
+                'name'        => 'Updated Category',
                 'description' => 'Updated description',
             ])
             ->call('save')
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('categories', [
-            'id' => $category->id,
+            'id'   => $category->id,
             'name' => 'Updated Category',
         ]);
     }
@@ -103,7 +103,7 @@ final class CategoryResourceTest extends TestCase
             ->assertHasNoTableActionErrors();
 
         $this->assertDatabaseHas('categories', [
-            'id' => $category->id,
+            'id'        => $category->id,
             'is_active' => true,
         ]);
     }
@@ -117,7 +117,7 @@ final class CategoryResourceTest extends TestCase
             ->assertHasNoTableActionErrors();
 
         $this->assertDatabaseHas('categories', [
-            'id' => $category->id,
+            'id'         => $category->id,
             'is_visible' => true,
         ]);
     }
@@ -132,7 +132,7 @@ final class CategoryResourceTest extends TestCase
 
         foreach ($categories as $category) {
             $this->assertDatabaseHas('categories', [
-                'id' => $category->id,
+                'id'        => $category->id,
                 'is_active' => true,
             ]);
         }
@@ -148,7 +148,7 @@ final class CategoryResourceTest extends TestCase
 
         foreach ($categories as $category) {
             $this->assertDatabaseHas('categories', [
-                'id' => $category->id,
+                'id'        => $category->id,
                 'is_active' => false,
             ]);
         }
@@ -273,7 +273,7 @@ final class CategoryResourceTest extends TestCase
     {
         $parentCategory = Category::factory()->create(['name' => 'Parent']);
         $childCategory = Category::factory()->create([
-            'name' => 'Child',
+            'name'      => 'Child',
             'parent_id' => $parentCategory->id,
         ]);
 

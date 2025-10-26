@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Tests\Unit;
 
@@ -52,8 +54,8 @@ final class VariantStockHistoryModelTest extends TestCase
     public function test_variant_stock_history_casts(): void
     {
         $stockHistory = VariantStockHistory::factory()->create([
-            'old_quantity' => '10',
-            'new_quantity' => '15',
+            'old_quantity'    => '10',
+            'new_quantity'    => '15',
             'quantity_change' => '5',
         ]);
 
@@ -189,17 +191,17 @@ final class VariantStockHistoryModelTest extends TestCase
     {
         VariantStockHistory::factory()->create([
             'reference_type' => 'order',
-            'reference_id' => 1,
+            'reference_id'   => 1,
         ]);
 
         VariantStockHistory::factory()->create([
             'reference_type' => 'order',
-            'reference_id' => 2,
+            'reference_id'   => 2,
         ]);
 
         VariantStockHistory::factory()->create([
             'reference_type' => 'return',
-            'reference_id' => 1,
+            'reference_id'   => 1,
         ]);
 
         $orderReference1 = VariantStockHistory::byReference('order', 1)->get();
@@ -355,7 +357,7 @@ final class VariantStockHistoryModelTest extends TestCase
     {
         $stockHistory = VariantStockHistory::factory()->create([
             'reference_type' => null,
-            'reference_id' => null,
+            'reference_id'   => null,
         ]);
 
         $this->assertNull($stockHistory->reference_type);

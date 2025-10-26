@@ -22,17 +22,17 @@ final class NotificationFactory extends Factory
         $notificationType = $this->faker->randomElement(['order', 'product', 'user', 'system', 'payment', 'shipping', 'review', 'promotion', 'newsletter', 'support']);
 
         return [
-            'id' => (string) Str::uuid(),
-            'type' => "App\\Notifications\\{$notificationType}Notification",
+            'id'              => (string) Str::uuid(),
+            'type'            => "App\\Notifications\\{$notificationType}Notification",
             'notifiable_type' => User::class,
-            'notifiable_id' => User::factory(),
-            'data' => [
-                'title' => $this->faker->sentence(),
-                'body' => $this->faker->paragraph(),
-                'type' => $type,
-                'urgent' => $this->faker->boolean(10),
-                'tags' => $this->faker->optional(0.3)->randomElements(['important', 'update', 'reminder', 'promotion'], 2),
-                'color' => $this->faker->optional(0.2)->randomElement(['blue', 'green', 'yellow', 'red', 'purple']),
+            'notifiable_id'   => User::factory(),
+            'data'            => [
+                'title'      => $this->faker->sentence(),
+                'body'       => $this->faker->paragraph(),
+                'type'       => $type,
+                'urgent'     => $this->faker->boolean(10),
+                'tags'       => $this->faker->optional(0.3)->randomElements(['important', 'update', 'reminder', 'promotion'], 2),
+                'color'      => $this->faker->optional(0.2)->randomElement(['blue', 'green', 'yellow', 'red', 'purple']),
                 'attachment' => $this->faker->optional(0.1)->url(),
             ],
             'read_at' => $this->faker->optional(0.3)->dateTimeBetween('-1 month', 'now'),
@@ -65,7 +65,7 @@ final class NotificationFactory extends Factory
     public function forUser(User $user): static
     {
         return $this->state(fn (array $attributes) => [
-            'notifiable_id' => $user->id,
+            'notifiable_id'   => $user->id,
             'notifiable_type' => User::class,
         ]);
     }

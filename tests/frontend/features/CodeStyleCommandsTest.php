@@ -83,7 +83,7 @@ final class TestClass
 
         $this
             ->artisan('code-style:fix', [
-                '--path' => $this->testFile,
+                '--path'    => $this->testFile,
                 '--dry-run' => true,
             ])
             ->expectsOutput('Running in dry-run mode - no files will be modified')
@@ -95,8 +95,8 @@ final class TestClass
 
     public function test_fix_code_style_command_fixes_directory(): void
     {
-        $file1 = $this->testDir.'/test1.php';
-        $file2 = $this->testDir.'/test2.php';
+        $file1 = $this->testDir . '/test1.php';
+        $file2 = $this->testDir . '/test2.php';
 
         File::put($file1, '<?php use App\Models\User; use Illuminate\Support\Facades\Hash;');
         File::put($file2, '<?php $value = 100.00;');
@@ -150,7 +150,7 @@ final class TestClass
 
         $this
             ->artisan('code-style:validate', [
-                '--path' => $this->testFile,
+                '--path'   => $this->testFile,
                 '--strict' => true,
             ])
             ->expectsOutput('🔍 Code Style Validator')
@@ -180,7 +180,7 @@ final class TestClass
 
         $this
             ->artisan('code-style:validate', [
-                '--path' => $this->testFile,
+                '--path'   => $this->testFile,
                 '--strict' => true,
             ])
             ->expectsOutput('🔍 Code Style Validator')
@@ -201,7 +201,7 @@ final class TestClass
 
         $this
             ->artisan('code-style:validate', [
-                '--path' => $this->testFile,
+                '--path'   => $this->testFile,
                 '--report' => true,
             ])
             ->expectsOutput('🔍 Code Style Validator')
@@ -229,7 +229,7 @@ final class TestClass
 
         $this
             ->artisan('code-style:fix', [
-                '--path' => $this->testFile,
+                '--path'   => $this->testFile,
                 '--report' => true,
             ])
             ->expectsOutput('🔧 Code Style Fixer')
@@ -250,26 +250,26 @@ final class TestClass
 
         $this
             ->artisan('code-style:fix', ['--path' => $nonExistentPath])
-            ->expectsOutput('Path does not exist: '.$nonExistentPath)
+            ->expectsOutput('Path does not exist: ' . $nonExistentPath)
             ->assertExitCode(1);
 
         $this
             ->artisan('code-style:validate', ['--path' => $nonExistentPath])
-            ->expectsOutput('Path does not exist: '.$nonExistentPath)
+            ->expectsOutput('Path does not exist: ' . $nonExistentPath)
             ->assertExitCode(1);
     }
 
     public function test_commands_handle_custom_extensions(): void
     {
-        $phpFile = $this->testDir.'/test.php';
-        $txtFile = $this->testDir.'/test.txt';
+        $phpFile = $this->testDir . '/test.php';
+        $txtFile = $this->testDir . '/test.txt';
 
         File::put($phpFile, '<?php $value = 100.00;');
         File::put($txtFile, 'This is a text file');
 
         $this
             ->artisan('code-style:fix', [
-                '--path' => $this->testDir,
+                '--path'       => $this->testDir,
                 '--extensions' => 'php,txt',
             ])
             ->expectsOutput('🔧 Code Style Fixer')

@@ -21,11 +21,11 @@ final class CartTest extends TestCase
 
         session()->put('cart', [
             1 => [
-                'id' => 1,
+                'id'         => 1,
                 'product_id' => 1,
-                'name' => 'Guest product',
-                'price' => 19.99,
-                'quantity' => 2,
+                'name'       => 'Guest product',
+                'price'      => 19.99,
+                'quantity'   => 2,
             ],
         ]);
         session()->put('cart_discount', 5);
@@ -35,8 +35,8 @@ final class CartTest extends TestCase
         $response = $this
             ->withHeader('X-CSRF-TOKEN', $token)
             ->withSession([
-                'cart' => session('cart', []),
-                'cart_discount' => session('cart_discount'),
+                'cart'            => session('cart', []),
+                'cart_discount'   => session('cart_discount'),
                 'cart_session_id' => $sessionId,
             ])
             ->withCookie(session()->getName(), $sessionId)
@@ -66,11 +66,11 @@ final class CartTest extends TestCase
 
         session()->put('cart', [
             1 => [
-                'id' => 1,
+                'id'         => 1,
                 'product_id' => 1,
-                'name' => 'User product',
-                'price' => 29.5,
-                'quantity' => 1,
+                'name'       => 'User product',
+                'price'      => 29.5,
+                'quantity'   => 1,
             ],
         ]);
 
@@ -80,7 +80,7 @@ final class CartTest extends TestCase
             ->actingAs($user)
             ->withHeader('X-CSRF-TOKEN', $token)
             ->withSession([
-                'cart' => session('cart', []),
+                'cart'          => session('cart', []),
                 'cart_discount' => session('cart_discount'),
             ])
             ->withCookie(session()->getName(), $sessionId)
