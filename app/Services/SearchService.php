@@ -48,18 +48,16 @@ final class SearchService
         }
 
         if ($sanitised['modified']) {
-            $queryData = SearchQueryData::fromArray([
-                'query'    => $normalizedQuery,
-                'page'     => $queryData->page(),
-                'per_page' => $queryData->perPage(),
-                'types'    => $queryData->types(),
-            ], $queryData->context());
+            // Swap in the sanitised query so downstream components only execute safe tokens.
+            $queryData = $queryData->withQuery($normalizedQuery);
         }
 
         $cachePayload = array_merge($queryData->context(), [
             'page' => $queryData->page(),
             'per_page' => $queryData->perPage(),
             'types' => $queryData->types(),
+            'filters' => $queryData->filters(),
+            'sort' => $queryData->sort(),
             'locale' => app()->getLocale(),
         ]);
         $cacheKey = $this->cacheService->generateCacheKey($queryData->query(), $cachePayload);
@@ -110,10 +108,17 @@ final class SearchService
                 'has_more' => ($offset + count($pageResults)) < $total,
                 'took_ms' => (int) round((microtime(true) - $started) * 1000),
                 'types' => $queryData->types(),
+                'filters' => $queryData->filters(),
+                'sort' => $queryData->sort(),
                 'cached' => false,
             ],
             'buckets' => $bucketCounts,
+            'correction' => null,
         ];
+
+        if ($total === 0) {
+            $payload['correction'] = $this->buildCorrectionPayload($originalQuery, $queryData->query());
+        }
 
         $this->cacheService->cacheSearchResults($cacheKey, $payload, $queryData->query(), $cachePayload);
 
@@ -250,11 +255,14 @@ final class SearchService
                 'has_more' => false,
                 'took_ms' => 0,
                 'types' => $queryData->types(),
+                'filters' => $queryData->filters(),
+                'sort' => $queryData->sort(),
                 'cached' => false,
                 'blocked' => true,
             ],
             'buckets' => $bucketCounts,
             'aggregations' => $this->groupResultsByType([], $bucketCounts),
+            'correction' => null,
         ];
     }
 
@@ -360,6 +368,51 @@ final class SearchService
                 'total' => $bucketCounts['brand'] ?? 0,
             ],
         ];
+    }
+
+    /**
+     * Derive a correction suggestion for zero-result searches so the client can offer a retry UX.
+     */
+    private function buildCorrectionPayload(string $originalQuery, string $normalizedQuery): ?array
+    {
+        $candidates = [];
+
+        if ($normalizedQuery !== '' && mb_strtolower($normalizedQuery) !== mb_strtolower($originalQuery)) {
+            $candidates[] = $normalizedQuery;
+        }
+
+        $fuzzy = $this->generateFuzzySuggestion($normalizedQuery);
+
+        if ($fuzzy !== null && ! in_array($fuzzy, $candidates, true) && mb_strtolower($fuzzy) !== mb_strtolower($originalQuery)) {
+            $candidates[] = $fuzzy;
+        }
+
+        if ($candidates === []) {
+            return null;
+        }
+
+        return [
+            'suggested_query' => $candidates[0],
+            'alternatives' => array_values(array_slice($candidates, 1)),
+            'applied' => false,
+            'reason' => 'no_results_fuzzy_match',
+        ];
+    }
+
+    /**
+     * Generate a simple fuzzy variant by removing diacritics and collapsing repeated characters.
+     */
+    private function generateFuzzySuggestion(string $query): ?string
+    {
+        $ascii = Str::ascii($query);
+        $deduped = preg_replace('/(.)\\1{2,}/u', '$1$1', $ascii ?? '') ?? '';
+        $collapsed = trim(preg_replace('/\s+/', ' ', $deduped) ?? '');
+
+        if ($collapsed === '' || mb_strtolower($collapsed) === mb_strtolower($query)) {
+            return null;
+        }
+
+        return $collapsed;
     }
 
     /**

@@ -32,16 +32,17 @@ final class SearchRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'query' => ['required', 'string', 'min:2', 'max:200'],
-            'page'  => ['sometimes', 'integer', 'min:1'],
-            // We intentionally skip an upper bound here so that callers exceeding the
-            // advertised maximum still receive a capped response instead of a 422
-            // validation error. SearchQueryData::fromArray() enforces MAX_PER_PAGE
-            // at the domain level which keeps behaviour consistent with legacy
-            // integrations that relied on soft capping.
-            'per_page' => ['sometimes', 'integer', 'min:1'],
-            'types'    => ['sometimes', 'array'],
-            'types.*'  => [Rule::in(['product', 'category', 'brand'])],
+            // Require a minimum length so expensive empty/fuzzy lookups are avoided up front.
+            'query'    => ['required', 'string', 'min:3', 'max:200'],
+            'page'     => ['sometimes', 'integer', 'min:1'],
+            // Cap the requested page size at the DTO maximum to avoid unbounded scans.
+            'per_page' => ['sometimes', 'integer', 'min:1', 'max:' . SearchQueryData::MAX_PER_PAGE],
+            // Filters and sort inputs are optional but must match the allow-list handled server side.
+            'filters'  => ['sometimes', 'array'],
+            'filters.*'=> ['nullable'],
+            'sort'     => ['sometimes', 'string', Rule::in(SearchQueryData::ALLOWED_SORTS)],
+            // Aggregation buckets are managed server-side – ignore any client provided values.
+            'types'    => ['prohibited'],
         ];
     }
 }

@@ -97,6 +97,18 @@ final class SearchEndpointTest extends TestCase
         $this->assertSame(SearchQueryData::MAX_PER_PAGE, $meta['max_per_page']);
     }
 
+    public function test_search_endpoint_rejects_empty_queries(): void
+    {
+        $this->getJson(route('api.v1.search', ['query' => '']))
+            ->assertStatus(422);
+    }
+
+    public function test_search_endpoint_rejects_overly_long_queries(): void
+    {
+        $this->getJson(route('api.v1.search', ['query' => str_repeat('x', 256)]))
+            ->assertStatus(422);
+    }
+
     public function test_product_repository_exposes_query_plan(): void
     {
         $repository = app(ProductSearchRepository::class);

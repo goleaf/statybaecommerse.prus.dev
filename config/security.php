@@ -115,6 +115,12 @@ return [
                 'per_user' => (int) env('API_RATE_LIMIT_AUTOCOMPLETE_PER_USER', (int) env('API_RATE_LIMIT_AUTOCOMPLETE', 30)),
                 'per_ip' => (int) env('API_RATE_LIMIT_AUTOCOMPLETE_PER_IP', (int) env('API_RATE_LIMIT_AUTOCOMPLETE', 30)),
             ],
+            'search' => [
+                'per_user' => env('API_RATE_LIMIT_SEARCH_PER_USER') !== null
+                    ? (int) env('API_RATE_LIMIT_SEARCH_PER_USER')
+                    : null,
+                'per_ip' => (int) env('API_RATE_LIMIT_SEARCH_PER_IP', (int) env('API_RATE_LIMIT_SEARCH', 30)),
+            ],
             'profile' => [
                 'per_user' => (int) env('API_RATE_LIMIT_PROFILE_PER_USER', (int) env('API_RATE_LIMIT_PROFILE', 60)),
                 'per_ip' => (int) env('API_RATE_LIMIT_PROFILE_PER_IP', (int) env('API_RATE_LIMIT_PROFILE', 60)),
