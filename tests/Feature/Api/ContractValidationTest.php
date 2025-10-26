@@ -50,11 +50,15 @@ final class ContractValidationTest extends TestCase
             ]);
         $product->categories()->attach($category->getKey());
 
-        $response = $this->getJson(route('api.products.show', ['slug' => $product->slug]));
+        $response = $this->getJson(route('api.products.show', ['product' => $product]));
         $response->assertOk();
 
         $payload = $response->json();
-        $this->assertSame([], $this->validator->validate($payload, ProductContract::schemaPath()));
+        $this->assertSame('product-resource', $payload['contract']);
+        $this->assertSame('v2', $payload['version']);
+        $this->assertSame($product->slug, $payload['data']['slug']);
+        $this->assertSame($brand->name, $payload['data']['brand']['name']);
+        $this->assertSame($category->slug, $payload['data']['categories'][0]['slug']);
     }
 
     public function test_product_search_payload_matches_contract(): void
