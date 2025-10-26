@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Tests\Feature\Frontend;
 
 use App\Models\Campaign;
+use App\Models\CampaignClick;
 use App\Models\CampaignConversion;
+use App\Models\CampaignView;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\User;
@@ -711,6 +713,27 @@ final class CampaignControllerTest extends TestCase
             ]);
         });
 
+        // Record supporting view and click telemetry so the analytics timeline has deterministic data points.
+        CampaignView::factory()->count(3)->create([
+            'campaign_id' => $campaignA->id,
+            'viewed_at'   => now()->subDay(),
+        ]);
+
+        CampaignView::factory()->count(2)->create([
+            'campaign_id' => $campaignB->id,
+            'viewed_at'   => now()->subDays(2),
+        ]);
+
+        CampaignClick::factory()->count(4)->create([
+            'campaign_id' => $campaignA->id,
+            'clicked_at'  => now()->subDay(),
+        ]);
+
+        CampaignClick::factory()->create([
+            'campaign_id' => $campaignB->id,
+            'clicked_at'  => now()->subHours(6),
+        ]);
+
         $response = $this->getJson(route('frontend.campaigns.api.analytics', ['period' => '7']));
 
         $response->assertOk();
@@ -722,6 +745,17 @@ final class CampaignControllerTest extends TestCase
         $this->assertSame('Last 7 days', $payload['period']['label']);
         $this->assertSame('2025-01-08', $payload['period']['start_date']);
         $this->assertSame('2025-01-15', $payload['period']['end_date']);
+        $this->assertSame('day', $payload['period']['granularity']);
+        $this->assertSame([
+            '2025-01-08',
+            '2025-01-09',
+            '2025-01-10',
+            '2025-01-11',
+            '2025-01-12',
+            '2025-01-13',
+            '2025-01-14',
+            '2025-01-15',
+        ], $payload['period']['normalized_dates']);
         $this->assertSame(180, $payload['insights']['views_clicks']['metrics']['total_views']);
         $this->assertSame(63, $payload['insights']['views_clicks']['metrics']['total_clicks']);
 
@@ -745,6 +779,29 @@ final class CampaignControllerTest extends TestCase
         $this->assertSame(1, $payload['insights']['a_b_testing']['metrics']['multi_variant_campaigns']);
         $this->assertNotEmpty($payload['insights']['a_b_testing']['metrics']['variant_performance']);
         $this->assertFalse(collect($payload['insights']['a_b_testing']['metrics']['variant_performance'])->pluck('campaign_name')->contains('Campaign #0'));
+
+        // Ensure the chart payload is normalized for each day of the requested period.
+        $engagementChart = $payload['charts']['engagement_trend'];
+        $this->assertSame([
+            '2025-01-08',
+            '2025-01-09',
+            '2025-01-10',
+            '2025-01-11',
+            '2025-01-12',
+            '2025-01-13',
+            '2025-01-14',
+            '2025-01-15',
+        ], $engagementChart['normalized_dates']);
+        $this->assertSame([0, 0, 0, 0, 0, 2, 3, 0], $engagementChart['datasets'][0]['data']);
+        $this->assertSame([0, 0, 0, 0, 0, 0, 4, 1], $engagementChart['datasets'][1]['data']);
+        $this->assertSame(5, $engagementChart['kpis']['total_views']);
+        $this->assertSame(5, $engagementChart['kpis']['total_clicks']);
+
+        $conversionChart = $payload['charts']['conversion_trend'];
+        $this->assertSame([0, 0, 0, 0, 0, 0, 1, 2], $conversionChart['datasets'][0]['data']);
+        $this->assertEquals([0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 320.0, 360.0], $conversionChart['datasets'][1]['data']);
+        $this->assertSame(3, $conversionChart['kpis']['total_conversions']);
+        $this->assertEquals(680.0, $conversionChart['kpis']['total_revenue']);
 
         Carbon::setTestNow();
     }
