@@ -57,12 +57,22 @@
             widgetTab: $wire.$entangle('activeWidgetTab'),
             toggleWidgetTab(tabKey) {
                 this.widgetTab = this.widgetTab === tabKey ? null : tabKey;
-                $wire.resetTable();
+                // Ask the Livewire component to refresh the table without discarding active filters.
+                $wire.refreshWidgetTabRecords();
             }
         }"
     >
         {{ \Filament\Support\Facades\FilamentView::renderHook(\Filament\View\PanelsRenderHook::RESOURCE_TABS_START, scopes: $renderHookScopes) }}
         {{ \Filament\Support\Facades\FilamentView::renderHook(\Filament\View\PanelsRenderHook::RESOURCE_PAGES_LIST_RECORDS_TABS_START, scopes: $renderHookScopes) }}
+
+        @php
+            $filterIndicators = [];
+
+            if (method_exists($this, 'getTable') && $this->shouldRenderWidgetTabFilterIndicators()) {
+                // Capture the active filter indicators so we can surface them as persistent chips beneath the tabs.
+                $filterIndicators = $this->getTable()->getFilterIndicators();
+            }
+        @endphp
 
         <div
             role="tablist"
@@ -137,6 +147,31 @@
                 </div>
             @endforeach
         </div>
+
+        @if ($filterIndicators !== [])
+            <div class="mt-4 flex flex-wrap gap-2">
+                @foreach ($filterIndicators as $indicator)
+                    @php
+                        $removeHandler = $indicator->getRemoveLivewireClickHandler();
+                        $isRemovable = $indicator->isRemovable();
+                    @endphp
+
+                    <span class="inline-flex items-center gap-2 rounded-full bg-primary-100 px-3 py-1 text-sm font-medium text-primary-700 dark:bg-primary-500\/10 dark:text-primary-300">
+                        {{ $indicator->getLabel() }}
+
+                        @if ($isRemovable && filled($removeHandler))
+                            <button
+                                type="button"
+                                wire:click="{{ $removeHandler }}"
+                                class="-mr-1 inline-flex h-5 w-5 items-center justify-center rounded-full transition hover:bg-primary-200 focus:outline-none focus:ring-2 focus:ring-primary-500 dark:hover:bg-primary-500\/20"
+                            >
+                                <x-filament::icon icon="heroicon-o-x-mark" class="h-4 w-4" />
+                            </button>
+                        @endif
+                    </span>
+                @endforeach
+            </div>
+        @endif
 
         {{ \Filament\Support\Facades\FilamentView::renderHook(\Filament\View\PanelsRenderHook::RESOURCE_TABS_END, scopes: $renderHookScopes) }}
         {{ \Filament\Support\Facades\FilamentView::renderHook(\Filament\View\PanelsRenderHook::RESOURCE_PAGES_LIST_RECORDS_TABS_END, scopes: $renderHookScopes) }}

@@ -34,6 +34,7 @@ use Filament\Schemas\Schema;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Enums\FiltersLayout;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
@@ -368,7 +369,7 @@ final class SeoDataResource extends Resource
                             WHEN structured_data IS NOT NULL THEN 5 ELSE 0 END
                         ) >= 80
                     ')),
-            ])
+            ], layout: FiltersLayout::AboveContent) // Surface active filters above the table so selections remain visible as chips.
             ->actions([
                 ViewAction::make(),
                 EditAction::make(),
@@ -425,6 +426,8 @@ final class SeoDataResource extends Resource
                         ->requiresConfirmation(),
                 ]),
             ])
+            ->paginated([10, 25, 50, 100]) // Offer consistent pagination steps so the query string captures the user's preferred page size.
+            ->queryStringIdentifier('seoData') // Namespacing the identifier keeps stored table state unique for the SEO explorer.
             ->defaultSort('created_at', 'desc');
     }
 
