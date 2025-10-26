@@ -20,4 +20,9 @@ return [
     'verify_email_button' => 'Verify Email Address',
     'verify_email_no_action' => 'If you did not create an account, no further action is required.',
     'contact_message_subject' => 'New contact message: :subject',
+    'contact_message_subject_fallback' => 'New enquiry',
+    'notification_subject' => ':title',
+    'notification_subject_urgent_prefix' => 'Urgent',
+    'notification_default_title' => 'Notification',
+    'notification_default_body' => 'You have received a new notification.',
 ];
