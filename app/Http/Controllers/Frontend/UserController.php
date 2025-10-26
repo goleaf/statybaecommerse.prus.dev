@@ -239,7 +239,20 @@ final class UserController extends Controller
     public function statistics(): JsonResponse
     {
         $user = Auth::user();
-        $statistics = ['orders' => ['total' => $user->orders()->count(), 'completed' => $user->orders()->where('status', 'completed')->count(), 'pending' => $user->orders()->where('status', 'pending')->count(), 'total_spent' => $user->total_spent, 'average_order_value' => $user->average_order_value], 'reviews' => ['total' => $user->reviews()->count(), 'average_rating' => $user->average_rating], 'wishlist' => ['total' => $user->wishlist()->count()], 'addresses' => ['total' => $user->addresses()->count()], 'documents' => ['total' => $user->documents()->count()]];
+        $statistics = [
+            'orders'     => [
+                'total'              => $user->orders()->count(),
+                // Count delivered orders while tolerating legacy "completed" rows for backwards compatibility.
+                'delivered'          => $user->orders()->whereIn('status', ['delivered', 'completed'])->count(),
+                'pending'            => $user->orders()->where('status', 'pending')->count(),
+                'total_spent'        => $user->total_spent,
+                'average_order_value' => $user->average_order_value,
+            ],
+            'reviews'   => ['total' => $user->reviews()->count(), 'average_rating' => $user->average_rating],
+            'wishlist'  => ['total' => $user->wishlist()->count()],
+            'addresses' => ['total' => $user->addresses()->count()],
+            'documents' => ['total' => $user->documents()->count()],
+        ];
 
         return response()->json(['success' => true, 'data' => $statistics]);
     }

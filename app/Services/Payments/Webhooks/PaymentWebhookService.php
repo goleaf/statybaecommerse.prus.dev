@@ -288,7 +288,8 @@ final class PaymentWebhookService
             case OrderPaymentState::FULFILLED:
                 $order->payment_status = PaymentStatus::PAID;
                 $order->fulfillment_status = 'fulfilled';
-                $order->status = OrderStatus::COMPLETED;
+                $order->status = OrderStatus::DELIVERED;
+                $order->delivered_at = $order->delivered_at ?? Carbon::now();
                 SendOrderFulfillmentEmail::dispatch($order->id);
                 break;
             case OrderPaymentState::PARTIALLY_REFUNDED:
