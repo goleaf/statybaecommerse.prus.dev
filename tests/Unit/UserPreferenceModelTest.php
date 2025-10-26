@@ -24,7 +24,7 @@ final class UserPreferenceModelTest extends TestCase
 
     public function test_user_preference_fillable_attributes(): void
     {
-        $fillable = ['user_id', 'preference_type', 'preference_key', 'preference_score', 'metadata', 'last_updated'];
+        $fillable = ['user_id', 'name', 'key', 'value', 'meta'];
 
         $userPreference = new UserPreference;
 
@@ -34,15 +34,15 @@ final class UserPreferenceModelTest extends TestCase
     public function test_user_preference_casts(): void
     {
         $userPreference = UserPreference::factory()->create([
-            'preference_score' => '0.85',
-            'metadata'         => ['source' => 'test'],
-            'last_updated'     => '2024-01-01 12:00:00',
+            'value'        => '0.85',
+            'meta'         => ['source' => 'test'],
+            'last_updated' => '2024-01-01 12:00:00',
         ]);
 
-        $this->assertIsFloat($userPreference->preference_score);
-        $this->assertEquals(0.85, $userPreference->preference_score);
-        $this->assertIsArray($userPreference->metadata);
-        $this->assertEquals(['source' => 'test'], $userPreference->metadata);
+        $this->assertIsFloat($userPreference->value);
+        $this->assertEquals(0.85, $userPreference->value);
+        $this->assertIsArray($userPreference->meta);
+        $this->assertEquals(['source' => 'test'], $userPreference->meta);
         $this->assertInstanceOf(\Carbon\Carbon::class, $userPreference->last_updated);
     }
 
