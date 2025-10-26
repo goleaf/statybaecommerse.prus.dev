@@ -6,7 +6,17 @@ namespace App\Http\Controllers;
 
 use App\Models\Post;
 use App\Services\PaginationService;
+
+use function collect;
+
+use const FILTER_NULL_ON_FAILURE;
+use const FILTER_VALIDATE_BOOL;
+
+use function filter_var;
+
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\View\View;
 
 /**
@@ -21,25 +31,50 @@ final class PostController extends Controller
      */
     public function index(Request $request): View
     {
-        $query = Post::published()->with('user')->latest('published_at');
-        // Filter by featured
-        if ($request->boolean('featured')) {
+        // Validate incoming filters so pagination and search behave predictably.
+        /** @var array{author?: int|string|null, featured?: bool|int|string|null, search?: string|null} $validated */
+        $validated = $request->validate([
+            'author'   => ['nullable', 'integer'],
+            'featured' => ['nullable', 'boolean'],
+            'search'   => ['nullable', 'string'],
+        ]);
+
+        // Build the base query including the author relationship for eager loading.
+        $query = Post::query()->with('user')->latest('published_at');
+
+        // Apply the featured filter when requested so highlighted posts float to the top.
+        $isFeatured = filter_var($validated['featured'] ?? null, FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE);
+        if ($isFeatured === true) {
             $query->featured();
         }
-        // Filter by author
-        if ($request->filled('author')) {
-            $query->byAuthor((int) $request->author);
+
+        // Narrow results to a specific author when the identifier is present.
+        $authorId = array_key_exists('author', $validated) && $validated['author'] !== null
+            ? (int) $validated['author']
+            : null;
+        if ($authorId !== null) {
+            $query->byAuthor($authorId);
         }
-        // Search
-        if ($request->filled('search')) {
-            $search = $request->search;
-            $query->where(function ($q) use ($search) {
-                $q->where('title', 'like', "%{$search}%")->orWhere('excerpt', 'like', "%{$search}%")->orWhere('content', 'like', "%{$search}%");
+
+        // Apply a simple search across title, excerpt, and content with safe bindings.
+        $searchTerm = isset($validated['search']) ? trim($validated['search']) : '';
+        if ($searchTerm !== '') {
+            $query->where(function (Builder $builder) use ($searchTerm): void {
+                // Use parameter bindings to avoid wildcard injection in LIKE queries.
+                $builder
+                    ->where('title', 'like', '%' . $searchTerm . '%')
+                    ->orWhere('excerpt', 'like', '%' . $searchTerm . '%')
+                    ->orWhere('content', 'like', '%' . $searchTerm . '%');
             });
         }
+
+        // Paginate with contextual settings so the view receives consistent pagination metadata.
         $posts = PaginationService::paginateWithContext($query, 'posts');
 
-        return view('posts.index', compact('posts'));
+        /** @var view-string $view */
+        $view = 'posts.index';
+
+        return view($view, ['posts' => $posts]);
     }
 
     /**
@@ -47,19 +82,34 @@ final class PostController extends Controller
      */
     public function show(Post $post): View
     {
-        // Only show published posts
-        if ($post->status !== 'published') {
+        // Abort early if the resolved post is not actually published (protects against manual unscoping).
+        if (! $post->isPublished()) {
             abort(404);
         }
-        // Increment views count
-        $post->increment('views_count');
-        // Get related posts
-        $relatedPosts = Post::published()->where('id', '!=', $post->id)->where('user_id', $post->user_id)->limit(3)->get()->skipWhile(function ($relatedPost) {
-            // Skip related posts that are not properly configured for display
-            return empty($relatedPost->title) || empty($relatedPost->slug) || $relatedPost->status !== 'published' || empty($relatedPost->excerpt);
-        });
 
-        return view('posts.show', compact('post', 'relatedPosts'));
+        // Atomically increment the view counter to capture the visit.
+        $post->increment('views_count');
+
+        // Load related posts for the same author while ensuring each candidate is display-ready.
+        $relatedPosts = Post::query()
+            ->with('user')
+            ->whereKeyNot($post->getKey())
+            ->where('user_id', $post->user_id)
+            ->whereNotNull('title')
+            ->where('title', '!=', '')
+            ->whereNotNull('slug')
+            ->where('slug', '!=', '')
+            ->whereNotNull('excerpt')
+            ->where('excerpt', '!=', '')
+            ->latest('published_at')
+            ->limit(3)
+            ->get()
+            ->values();
+
+        /** @var view-string $view */
+        $view = 'posts.show';
+
+        return view($view, ['post' => $post, 'relatedPosts' => $relatedPosts]);
     }
 
     /**
@@ -69,7 +119,10 @@ final class PostController extends Controller
     {
         $posts = PaginationService::paginateWithContext(Post::published()->featured()->with('user')->latest('published_at'), 'posts');
 
-        return view('posts.featured', compact('posts'));
+        /** @var view-string $view */
+        $view = 'posts.featured';
+
+        return view($view, ['posts' => $posts]);
     }
 
     /**
@@ -77,10 +130,21 @@ final class PostController extends Controller
      */
     public function byAuthor(Request $request, int $authorId): View
     {
-        $posts = Post::published()->byAuthor($authorId)->with('user')->latest('published_at')->paginate(12);
-        $author = $posts->first()?->user;
+        // Maintain parity with index pagination settings for the author listing.
+        $query = Post::query()->byAuthor($authorId)->with('user')->latest('published_at');
 
-        return view('posts.by-author', compact('posts', 'author'));
+        // Paginate using the shared pagination service for consistent metadata.
+        $posts = PaginationService::paginateWithContext($query, 'posts');
+
+        // Resolve the author record from the first page or fall back to a lazy lookup when empty.
+        /** @var Collection<int, Post> $pageItems */
+        $pageItems = collect($posts->items());
+        $author = $pageItems->first()?->user;
+
+        /** @var view-string $view */
+        $view = 'posts.by-author';
+
+        return view($view, ['posts' => $posts, 'author' => $author]);
     }
 
     /**
@@ -88,16 +152,37 @@ final class PostController extends Controller
      */
     public function search(Request $request): View
     {
-        $query = Post::published()->with('user')->latest('published_at');
-        if ($request->filled('q')) {
-            $search = $request->q;
-            $query->where(function ($q) use ($search) {
-                $q->where('title', 'like', "%{$search}%")->orWhere('excerpt', 'like', "%{$search}%")->orWhere('content', 'like', "%{$search}%")->orWhere('tags', 'like', "%{$search}%");
+        // Validate the search input to keep query construction predictable.
+        /** @var array{q?: string|null} $validated */
+        $validated = $request->validate([
+            'q' => ['nullable', 'string'],
+        ]);
+
+        // Establish the base query with eager loading for author details.
+        $query = Post::query()->with('user')->latest('published_at');
+
+        // Apply the sanitized search term across title, excerpt, content, and tags.
+        $searchTerm = isset($validated['q']) ? trim($validated['q']) : '';
+        if ($searchTerm !== '') {
+            $query->where(function (Builder $builder) use ($searchTerm): void {
+                // Chain the LIKE conditions with parameter bindings for safety.
+                $builder
+                    ->where('title', 'like', '%' . $searchTerm . '%')
+                    ->orWhere('excerpt', 'like', '%' . $searchTerm . '%')
+                    ->orWhere('content', 'like', '%' . $searchTerm . '%')
+                    ->orWhere('tags', 'like', '%' . $searchTerm . '%');
             });
         }
-        $posts = $query->paginate(12);
-        $searchTerm = $request->q;
 
-        return view('posts.search', compact('posts', 'searchTerm'));
+        // Paginate using the default settings for search results.
+        $posts = $query->paginate(12);
+
+        /** @var view-string $view */
+        $view = 'posts.search';
+
+        return view($view, [
+            'posts'      => $posts,
+            'searchTerm' => $searchTerm,
+        ]);
     }
 }
