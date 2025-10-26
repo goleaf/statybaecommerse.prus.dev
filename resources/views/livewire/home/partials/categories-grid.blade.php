@@ -1,4 +1,8 @@
 @php
+    use App\Data\Storefront\Home\CategoryShowcaseItemData;
+    use Illuminate\Support\Collection;
+
+    /** @var Collection<int, CategoryShowcaseItemData> $categories */
     $chunked = $categories->chunk(12);
 @endphp
 
@@ -7,7 +11,7 @@
         <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 lg:gap-6">
             @foreach ($chunk as $category)
                 @php
-                    $image = $category->getFirstMediaUrl('images', 'image-lg') ?: $category->getFirstMediaUrl('images');
+                    $image = $category->imageUrl;
                     $fallbackColor = match ($category->id % 6) {
                         0 => 'from-indigo-500/70 to-purple-500/70',
                         1 => 'from-blue-500/70 to-cyan-500/70',
@@ -17,7 +21,7 @@
                         default => 'from-slate-500/70 to-slate-700/70',
                     };
                 @endphp
-                <a href="{{ route('localized.categories.show', ['locale' => app()->getLocale(), 'category' => $category->slug ?? $category]) }}"
+                <a href="{{ $category->url }}"
                    class="group relative flex flex-col overflow-hidden rounded-3xl border border-white/10 bg-white/5 shadow-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl">
                     <div class="relative aspect-[4/3] overflow-hidden">
                         @if ($image)
@@ -26,7 +30,7 @@
                         @else
                             <div
                                  class="h-full w-full bg-gradient-to-br {{ $fallbackColor }} flex items-center justify-center text-white text-4xl font-semibold">
-                                {{ mb_substr($category->name, 0, 1) }}
+                                {{ $category->placeholder() }}
                             </div>
                         @endif
 
@@ -45,7 +49,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round"
                                               d="M3 7h18M3 12h18M3 17h18" />
                                     </svg>
-                                    {{ trans_choice('{0}Нет товаров|{1}1 товар|[2,*]:count товаров', $category->products_count, ['count' => $category->products_count]) }}
+                                    {{ trans_choice('{0}Нет товаров|{1}1 товар|[2,*]:count товаров', $category->productsCount, ['count' => $category->productsCount]) }}
                                 </span>
                                 <span class="inline-flex items-center gap-1 text-white/70">
                                     {{ __('Открыть') }}
@@ -58,9 +62,9 @@
                         </div>
                     </div>
 
-                    @if ($category->short_description)
+                    @if ($category->shortDescription)
                         <p class="px-6 pb-6 pt-4 text-sm text-white/70 line-clamp-2">
-                            {{ $category->short_description }}
+                            {{ $category->shortDescription }}
                         </p>
                     @endif
                 </a>
