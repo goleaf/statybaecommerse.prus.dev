@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Enums;
 
+use App\Contracts\EnumInterface;
 use Illuminate\Support\Collection;
 
 /**
@@ -11,7 +12,7 @@ use Illuminate\Support\Collection;
  *
  * Enumeration defining a set of named constants with type safety.
  */
-enum ProductStatus: string
+enum ProductStatus: string implements EnumInterface
 {
     case DRAFT = 'draft';
     case ACTIVE = 'active';
@@ -234,9 +235,17 @@ enum ProductStatus: string
         return collect(self::cases())->filter(fn ($case) => $case->isPublishable());
     }
 
+    /**
+     * Expose the enum cases as a collection for helper reuse.
+     */
+    public static function collection(): Collection
+    {
+        return collect(self::cases());
+    }
+
     public static function ordered(): Collection
     {
-        return collect(self::cases())->sortBy('priority');
+        return self::collection()->sortBy(fn (self $case): int => $case->priority())->values();
     }
 
     public static function fromLabel(string $label): ?self

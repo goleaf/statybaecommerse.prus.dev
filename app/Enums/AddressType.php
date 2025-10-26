@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Enums;
 
+use App\Contracts\EnumInterface;
 use Illuminate\Support\Collection;
 use Throwable;
 
@@ -12,7 +13,7 @@ use Throwable;
  *
  * Enumeration defining a set of named constants with type safety.
  */
-enum AddressType: string
+enum AddressType: string implements EnumInterface
 {
     case SHIPPING = 'shipping';
     case BILLING = 'billing';
@@ -154,6 +155,14 @@ enum AddressType: string
     public static function ordered(): Collection
     {
         return Collection::make(self::cases())->sortBy(fn (self $case): int => $case->priority());
+    }
+
+    /**
+     * Provide a collection wrapper for the enum cases to satisfy the shared contract.
+     */
+    public static function collection(): Collection
+    {
+        return Collection::make(self::cases());
     }
 
     public static function fromLabel(string $label): ?self

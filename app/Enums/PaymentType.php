@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Enums;
 
+use App\Contracts\EnumInterface;
 use Illuminate\Support\Collection;
 
 /**
@@ -11,7 +12,7 @@ use Illuminate\Support\Collection;
  *
  * Enumeration defining a set of named constants with type safety.
  */
-enum PaymentType: string
+enum PaymentType: string implements EnumInterface
 {
     case Stripe = 'stripe';
     case NotchPay = 'notch-pay';
@@ -198,6 +199,25 @@ enum PaymentType: string
         return collect(self::cases())->filter(fn ($case) => $case->isOnline() && $case->isEnabled());
     }
 
+    /**
+     * Deliver the enum cases as a collection for shared helper consumption.
+     */
+    public static function collection(): Collection
+    {
+        return collect(self::cases());
+    }
+
+    /**
+     * Present the enum cases ordered by their configured priority.
+     */
+    public static function ordered(): Collection
+    {
+        return self::collection()
+            ->filter(fn (self $case) => $case->isEnabled())
+            ->sortBy(fn (self $case) => $case->priority())
+            ->values();
+    }
+
     public static function offline(): Collection
     {
         return collect(self::cases())->filter(fn ($case) => $case->isOffline() && $case->isEnabled());
@@ -213,10 +233,6 @@ enum PaymentType: string
         return collect(self::cases())->filter(fn ($case) => $case->supportsRefunds() && $case->isEnabled());
     }
 
-    public static function ordered(): Collection
-    {
-        return collect(self::cases())->filter(fn ($case) => $case->isEnabled())->sortBy('priority');
-    }
 
     public static function fromLabel(string $label): ?self
     {
