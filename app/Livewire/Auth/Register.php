@@ -26,6 +26,27 @@ final class Register extends Component
         $this->redirect(route('account', absolute: false), navigate: true);
     }
 
+    /**
+     * React to field updates so Livewire can run validateOnly on the nested form state.
+     */
+    public function updated(string $property): void
+    {
+        if (! str_starts_with($property, 'registrationForm.')) {
+            // Ignore updates unrelated to the registration form payload.
+            return;
+        }
+
+        $parts = explode('.', $property, 2);
+        $field = $parts[1] ?? null;
+
+        if ($field === null || $field === '') {
+            // Bail out when Livewire reports an unexpected property structure.
+            return;
+        }
+
+        $this->registrationForm->validateField($field);
+    }
+
     public function render(): View
     {
         return view('livewire.auth.register');
