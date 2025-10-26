@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\AuditLogController;
 use App\Http\Controllers\Api\AuthenticatedUserController;
 use App\Http\Controllers\Api\AutocompleteSearchController;
 use App\Http\Controllers\Api\NotificationController;
+use App\Http\Controllers\Api\ReviewController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\ExportDownloadController;
 use App\Http\Controllers\Api\V1\HealthController;
@@ -39,6 +40,10 @@ Route::prefix('products')
         Route::get('search', [ProductController::class, 'search'])
             ->middleware('throttle:api.read')
             ->name('search');
+
+        Route::middleware(['auth:sanctum', 'throttle:api.write'])
+            ->post('{product}/reviews', [ReviewController::class, 'store'])
+            ->name('reviews.store');
 
         Route::get('catalog', [ProductController::class, 'catalog'])
             ->middleware('throttle:api.read')

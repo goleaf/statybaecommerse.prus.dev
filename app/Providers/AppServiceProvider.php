@@ -7,10 +7,12 @@ namespace App\Providers;
 use App\Console\Commands\ProfiledSeedCommand;
 use App\Contracts\DocumentServiceContract;
 use App\Contracts\HealthReporter as HealthReporterContract;
+use App\Events\ReviewSubmittedForModeration;
+use App\Infrastructure\Product\Repositories\EloquentProductRepository;
+use App\Listeners\QueueReviewForModeration;
 use App\Database\Connectors\GracefulSQLiteConnector;
 use App\Domain\Product\Repositories\ProductRepositoryInterface;
 use App\Filament\Components\LiveNotificationFeed;
-use App\Infrastructure\Product\Repositories\EloquentProductRepository;
 use App\Models\ApiKey;
 use App\Models\DiscountCode;
 use App\Models\DiscountRedemption;
@@ -69,6 +71,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Storage;
@@ -165,6 +168,8 @@ class AppServiceProvider extends ServiceProvider
         $this->registerCollectionTimeoutMacros();
 
         $this->registerQueueTracing();
+
+        $this->registerReviewModerationListener();
 
         $this->registerSearchableInputMacros();
 
@@ -612,6 +617,14 @@ class AppServiceProvider extends ServiceProvider
         } catch (Throwable) {
             // Silently ignore macro registration failures to keep queue dispatching resilient in limited environments.
         }
+    }
+
+    /**
+     * Register the event listener that queues review submissions for moderation.
+     */
+    private function registerReviewModerationListener(): void
+    {
+        Event::listen(ReviewSubmittedForModeration::class, QueueReviewForModeration::class);
     }
 
     /**

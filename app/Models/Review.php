@@ -68,7 +68,7 @@ final class Review extends Model
 
     protected $table = 'reviews';
 
-    protected $fillable = ['product_id', 'user_id', 'reviewer_name', 'reviewer_email', 'rating', 'title', 'content', 'is_approved', 'is_featured', 'locale', 'approved_at', 'rejected_at', 'metadata'];
+    protected $fillable = ['product_id', 'user_id', 'reviewer_name', 'reviewer_email', 'rating', 'title', 'content', 'is_approved', 'is_featured', 'is_verified_purchase', 'locale', 'approved_at', 'rejected_at', 'metadata'];
 
     protected string $translationModel = \App\Models\Translations\ReviewTranslation::class;
 
@@ -77,7 +77,7 @@ final class Review extends Model
      */
     protected function casts(): array
     {
-        return ['rating' => 'integer', 'is_approved' => 'boolean', 'is_featured' => 'boolean', 'approved_at' => 'datetime', 'rejected_at' => 'datetime', 'metadata' => 'array'];
+        return ['rating' => 'integer', 'is_approved' => 'boolean', 'is_featured' => 'boolean', 'is_verified_purchase' => 'boolean', 'approved_at' => 'datetime', 'rejected_at' => 'datetime', 'metadata' => 'array'];
     }
 
     /**
