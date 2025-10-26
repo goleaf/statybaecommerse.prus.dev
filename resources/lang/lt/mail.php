@@ -20,4 +20,9 @@ return [
     'verify_email_button' => 'Patvirtinti el. paštą',
     'verify_email_no_action' => 'Jei nekūrėte paskyros, jokio veiksmo nereikia.',
     'contact_message_subject' => 'Nauja užklausa: :subject',
+    'contact_message_subject_fallback' => 'Nauja užklausa',
+    'notification_subject' => ':title',
+    'notification_subject_urgent_prefix' => 'Skubu',
+    'notification_default_title' => 'Pranešimas',
+    'notification_default_body' => 'Gavote naują pranešimą.',
 ];
