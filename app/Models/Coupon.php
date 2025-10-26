@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Str;
 
 /**
  * Coupon
@@ -47,6 +48,20 @@ final class Coupon extends Model
     protected $fillable = ['code', 'name', 'description', 'type', 'value', 'minimum_amount', 'maximum_discount', 'usage_limit', 'usage_limit_per_user', 'used_count', 'is_active', 'is_public', 'is_auto_apply', 'is_stackable', 'is_first_time_only', 'customer_group_id', 'starts_at', 'expires_at', 'applicable_products', 'applicable_categories', 'meta'];
 
     protected $casts = ['value' => 'decimal:2', 'minimum_amount' => 'decimal:2', 'maximum_discount' => 'decimal:2', 'usage_limit' => 'integer', 'usage_limit_per_user' => 'integer', 'used_count' => 'integer', 'is_active' => 'boolean', 'is_public' => 'boolean', 'is_auto_apply' => 'boolean', 'is_stackable' => 'boolean', 'is_first_time_only' => 'boolean', 'customer_group_id' => 'integer', 'starts_at' => 'datetime', 'expires_at' => 'datetime', 'applicable_products' => 'array', 'applicable_categories' => 'array', 'meta' => 'array'];
+
+    /**
+     * Automatically hydrate missing codes using the unique generator so freshly
+     * created coupons always ship with a collision-free identifier.
+     */
+    protected static function booted(): void
+    {
+        self::creating(static function (self $coupon): void {
+            // Only attempt to backfill the code when one is not already provided.
+            if (! $coupon->code) {
+                $coupon->code = self::generateUniqueCode();
+            }
+        });
+    }
 
     // Relationships
 
@@ -277,5 +292,33 @@ final class Coupon extends Model
 
         // Clamp the remaining uses at zero so negative values are never exposed.
         return max(0, (int) ($this->usage_limit - $this->used_count));
+    }
+
+    /**
+     * Generate a unique coupon code while respecting database-level uniqueness.
+     */
+    public static function generateUniqueCode(int $length = 10): string
+    {
+        // Retry code generation a limited number of times to avoid an infinite loop
+        // should the random generator repeatedly collide with existing values.
+        $attempts = 0;
+        $maxAttempts = 25;
+
+        do {
+            $attempts++;
+            $code = Str::upper(Str::random($length));
+
+            // Leverage a case-insensitive lookup so codes remain unique regardless
+            // of how they are entered in the admin panel or during checkout.
+            $exists = self::query()->whereRaw('UPPER(code) = ?', [$code])->exists();
+        } while ($exists && $attempts < $maxAttempts);
+
+        // If the generator somehow exhausted the retry window, append a timestamp
+        // fragment to guarantee uniqueness before handing the code back to callers.
+        if ($exists) {
+            $code = $code . strtoupper(now()->format('His'));
+        }
+
+        return $code;
     }
 }
