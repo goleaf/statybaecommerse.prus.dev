@@ -85,6 +85,12 @@ final class CacheTags
         return 'collections';
     }
 
+    public static function sliders(): string
+    {
+        // Shared tag identifier for storefront slider payloads.
+        return 'sliders';
+    }
+
     /**
      * @param  array<int, int|string> $ids
      * @return array<int, string>
