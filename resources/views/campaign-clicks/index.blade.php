@@ -16,59 +16,67 @@
     </div>
 
     <!-- Statistics Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <div class="bg-white rounded-lg shadow p-6">
-            <div class="flex items-center">
-                <div class="p-2 bg-blue-100 rounded-lg">
-                    <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122"></path>
-                    </svg>
-                </div>
-                <div class="ml-4">
-                    <p class="text-sm font-medium text-gray-600">{{ __('campaign_clicks.total_clicks') }}</p>
-                    <p class="text-2xl font-semibold text-gray-900" id="total-clicks">-</p>
+    <p id="stats-period-label" class="mb-3 text-sm text-gray-500 text-right">
+        {{ __('campaign_clicks.all_time') }}
+    </p>
+    <div class="relative mb-8">
+        <div id="statistics-loading" class="absolute inset-0 z-10 hidden items-center justify-center rounded-lg bg-white/75">
+            <svg class="h-8 w-8 animate-spin text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+            </svg>
+        </div>
+        <div id="statistics-cards" class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center">
+                    <div class="p-2 bg-blue-100 rounded-lg">
+                        <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122"></path>
+                        </svg>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600">{{ __('campaign_clicks.total_clicks') }}</p>
+                        <p class="text-2xl font-semibold text-gray-900" id="total-clicks">-</p>
+                    </div>
                 </div>
             </div>
-        </div>
-
-        <div class="bg-white rounded-lg shadow p-6">
-            <div class="flex items-center">
-                <div class="p-2 bg-green-100 rounded-lg">
-                    <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                </div>
-                <div class="ml-4">
-                    <p class="text-sm font-medium text-gray-600">{{ __('campaign_clicks.converted_clicks') }}</p>
-                    <p class="text-2xl font-semibold text-gray-900" id="converted-clicks">-</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="bg-white rounded-lg shadow p-6">
-            <div class="flex items-center">
-                <div class="p-2 bg-yellow-100 rounded-lg">
-                    <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
-                    </svg>
-                </div>
-                <div class="ml-4">
-                    <p class="text-sm font-medium text-gray-600">{{ __('campaign_clicks.conversion_rate') }}</p>
-                    <p class="text-2xl font-semibold text-gray-900" id="conversion-rate">-</p>
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center">
+                    <div class="p-2 bg-green-100 rounded-lg">
+                        <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600">{{ __('campaign_clicks.converted_clicks') }}</p>
+                        <p class="text-2xl font-semibold text-gray-900" id="converted-clicks">-</p>
+                    </div>
                 </div>
             </div>
-        </div>
-
-        <div class="bg-white rounded-lg shadow p-6">
-            <div class="flex items-center">
-                <div class="p-2 bg-purple-100 rounded-lg">
-                    <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
-                    </svg>
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center">
+                    <div class="p-2 bg-yellow-100 rounded-lg">
+                        <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                        </svg>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600">{{ __('campaign_clicks.conversion_rate') }}</p>
+                        <p class="text-2xl font-semibold text-gray-900" id="conversion-rate">-</p>
+                    </div>
                 </div>
-                <div class="ml-4">
-                    <p class="text-sm font-medium text-gray-600">{{ __('campaign_clicks.conversion_value') }}</p>
-                    <p class="text-2xl font-semibold text-gray-900" id="conversion-value">-</p>
+            </div>
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="flex items-center">
+                    <div class="p-2 bg-purple-100 rounded-lg">
+                        <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+                        </svg>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm font-medium text-gray-600">{{ __('campaign_clicks.conversion_value') }}</p>
+                        <p class="text-2xl font-semibold text-gray-900" id="conversion-value">-</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -109,9 +117,9 @@
                 <label for="date_range" class="block text-sm font-medium text-gray-700">{{ __('campaign_clicks.date_range') }}</label>
                 <select id="date_range" name="date_range" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
                     <option value="">{{ __('campaign_clicks.all_time') }}</option>
-                    <option value="today">{{ __('campaign_clicks.today') }}</option>
-                    <option value="week">{{ __('campaign_clicks.this_week') }}</option>
-                    <option value="month">{{ __('campaign_clicks.this_month') }}</option>
+                    <option value="day">{{ __('campaign_clicks.day') }}</option>
+                    <option value="week">{{ __('campaign_clicks.week') }}</option>
+                    <option value="month">{{ __('campaign_clicks.month') }}</option>
                 </select>
             </div>
         </form>
@@ -153,23 +161,208 @@
 document.addEventListener('DOMContentLoaded', function() {
     loadStatistics();
     loadClicks();
-    
-    // Filter form submission
-    document.getElementById('filters-form').addEventListener('change', function() {
-        loadClicks();
-    });
+
+    const filtersForm = document.getElementById('filters-form');
+    if (filtersForm) {
+        const debouncedReload = debounce(function() {
+            loadStatistics();
+            loadClicks();
+        }, 250);
+
+        filtersForm.addEventListener('change', debouncedReload);
+    }
 });
 
+/**
+ * Lightweight debounce helper so timeframe changes do not spam API calls.
+ */
+function debounce(callback, delay) {
+    let timeoutId;
+
+    return function(...args) {
+        window.clearTimeout(timeoutId);
+        timeoutId = window.setTimeout(() => callback.apply(this, args), delay);
+    };
+}
+
+/**
+ * Fetch KPI buckets for the requested period and update the dashboard cards.
+ */
 function loadStatistics() {
-    fetch('/api/campaign-clicks/statistics')
+    const periodSelect = document.getElementById('date_range');
+    const rawPeriod = periodSelect && periodSelect.value ? periodSelect.value.toLowerCase() : 'day';
+    const period = rawPeriod || 'day';
+
+    const statsLoading = document.getElementById('statistics-loading');
+    const statsCards = document.getElementById('statistics-cards');
+
+    if (statsLoading && statsCards) {
+        statsLoading.classList.remove('hidden');
+        statsCards.classList.add('opacity-40');
+    }
+
+    const url = new URL('/api/campaign-clicks/statistics', window.location.origin);
+    url.searchParams.set('period', period);
+
+    fetch(url.toString())
         .then(response => response.json())
-        .then(data => {
-            document.getElementById('total-clicks').textContent = data.total_clicks;
-            document.getElementById('converted-clicks').textContent = data.converted_clicks;
-            document.getElementById('conversion-rate').textContent = data.conversion_rate + '%';
-            document.getElementById('conversion-value').textContent = '€' + data.total_conversion_value.toFixed(2);
+        .then(payload => {
+            const data = payload && typeof payload === 'object' ? (payload.data ?? payload) : {};
+            const normalizedBuckets = mapBuckets(data.buckets ?? {});
+            const periodLabels = extractPeriodLabels(periodSelect);
+
+            const activeBucket = normalizedBuckets[period] ?? Object.values(normalizedBuckets)[0] ?? null;
+            const activeMetrics = extractMetrics(activeBucket, data);
+
+            updateStatisticsCards(activeMetrics, periodLabels, period);
         })
-        .catch(error => console.error('Error loading statistics:', error));
+        .catch(error => console.error('Error loading statistics:', error))
+        .finally(() => {
+            if (statsLoading && statsCards) {
+                statsLoading.classList.add('hidden');
+                statsCards.classList.remove('opacity-40');
+            }
+        });
+}
+
+/**
+ * Normalise the bucket payload so we can safely address entries by key.
+ */
+function mapBuckets(buckets) {
+    const mapped = {};
+
+    if (Array.isArray(buckets)) {
+        buckets.forEach(bucket => {
+            const key = String(bucket?.period ?? bucket?.key ?? bucket?.name ?? '').toLowerCase();
+            if (key) {
+                mapped[key] = bucket;
+            }
+        });
+    } else if (buckets && typeof buckets === 'object') {
+        Object.entries(buckets).forEach(([key, value]) => {
+            mapped[String(key).toLowerCase()] = value;
+        });
+    }
+
+    return mapped;
+}
+
+/**
+ * Build a lookup for translated period labels directly from the select options.
+ */
+function extractPeriodLabels(selectElement) {
+    const fallback = {
+        day: 'Day',
+        week: 'Week',
+        month: 'Month',
+    };
+
+    if (!selectElement) {
+        return fallback;
+    }
+
+    return {
+        day: selectElement.querySelector('option[value="day"]')?.textContent?.trim() || fallback.day,
+        week: selectElement.querySelector('option[value="week"]')?.textContent?.trim() || fallback.week,
+        month: selectElement.querySelector('option[value="month"]')?.textContent?.trim() || fallback.month,
+    };
+}
+
+/**
+ * Merge bucket-level metrics with legacy totals so the UI stays resilient.
+ */
+function extractMetrics(bucket, data) {
+    if (!bucket) {
+        return { metrics: {}, label: null };
+    }
+
+    const metrics = bucket.metrics ?? bucket ?? {};
+    const totals = data?.totals ?? {};
+
+    return {
+        metrics,
+        totals,
+        label: bucket.label ?? bucket.title ?? bucket.period ?? null,
+    };
+}
+
+/**
+ * Update DOM nodes with the latest KPI values.
+ */
+function updateStatisticsCards(extracted, periodLabels, period) {
+    const { metrics, totals, label } = extracted;
+
+    const clicks = pickMetric(metrics, ['clicks', 'total_clicks', 'click_total', 'count'])
+        ?? pickMetric(totals, ['clicks', 'total_clicks']);
+    const converted = pickMetric(metrics, ['converted_clicks', 'conversions', 'converted', 'conversion_total'])
+        ?? pickMetric(totals, ['converted_clicks', 'conversions']);
+    const conversionRate = pickMetric(metrics, ['conversion_rate', 'ctr', 'click_through_rate'])
+        ?? pickMetric(totals, ['conversion_rate']);
+    const conversionValue = pickMetric(metrics, ['conversion_value', 'total_conversion_value', 'value', 'revenue'])
+        ?? pickMetric(totals, ['conversion_value', 'total_conversion_value']);
+
+    document.getElementById('total-clicks').textContent = formatNumber(clicks);
+    document.getElementById('converted-clicks').textContent = formatNumber(converted);
+    document.getElementById('conversion-rate').textContent = formatPercentage(conversionRate);
+    document.getElementById('conversion-value').textContent = formatCurrency(conversionValue);
+
+    const periodLabel = document.getElementById('stats-period-label');
+    if (periodLabel) {
+        periodLabel.textContent = label ?? periodLabels[period] ?? periodLabels.day;
+    }
+}
+
+/**
+ * Try multiple candidate keys and return the first numeric value.
+ */
+function pickMetric(source, candidates) {
+    if (!source || typeof source !== 'object') {
+        return null;
+    }
+
+    for (const key of candidates) {
+        if (Object.prototype.hasOwnProperty.call(source, key)) {
+            const value = Number(source[key]);
+            if (!Number.isNaN(value)) {
+                return value;
+            }
+        }
+    }
+
+    return null;
+}
+
+/**
+ * Format numeric values with locale-aware separators.
+ */
+function formatNumber(value) {
+    if (typeof value !== 'number' || Number.isNaN(value)) {
+        return '-';
+    }
+
+    return value.toLocaleString();
+}
+
+/**
+ * Format rates to two decimal places.
+ */
+function formatPercentage(value) {
+    if (typeof value !== 'number' || Number.isNaN(value)) {
+        return '-';
+    }
+
+    return `${value.toFixed(2)}%`;
+}
+
+/**
+ * Prefix conversion values with the euro sign while keeping thousands separators.
+ */
+function formatCurrency(value) {
+    if (typeof value !== 'number' || Number.isNaN(value)) {
+        return '€0.00';
+    }
+
+    return `€${value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 }
 
 function loadClicks(page = 1) {
