@@ -155,8 +155,9 @@
                             </div>
                         @else
                             <div class="flex space-x-2">
-                                <input 
-                                    wire:model="discountCode"
+                                <input
+                                    {{-- Defer syncing until blur to avoid noisy validation requests --}}
+                                    wire:model.lazy="discountCode"
                                     type="text" 
                                     placeholder="{{ __('translations.enter_discount_code') }}"
                                     class="flex-1 rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white shadow-sm focus:border-blue-500 focus:ring-blue-500 text-sm"
@@ -225,7 +226,9 @@
                         </button>
                         
                         <div class="flex space-x-2">
-                            <a 
+                            <a
+                                {{-- Use Livewire navigation so the cart drawer preserves state between steps --}}
+                                wire:navigate
                                 href="{{ route('cart.index', app()->getLocale()) }}"
                                 class="flex-1 bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-200 py-2 px-4 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors duration-200 text-center text-sm"
                             >

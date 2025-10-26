@@ -63,7 +63,9 @@
                     </div>
 
                     <div>
-                        <a href="{{ route('checkout.index', ['locale' => app()->getLocale()]) }}"
+                        <a wire:navigate
+                           {{-- Preserve cart state when jumping into the checkout wizard --}}
+                           href="{{ route('checkout.index', ['locale' => app()->getLocale()]) }}"
                            class="inline-flex items-center justify-center rounded-md bg-primary-600 px-4 py-3 text-white w-full disabled:opacity-50 {{ $items->isEmpty() ? 'pointer-events-none opacity-50' : '' }}"
                            @if($items->isEmpty()) aria-disabled="true" @endif>
                             {{ __('Proceed to checkout') }}

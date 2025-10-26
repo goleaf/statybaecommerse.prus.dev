@@ -187,7 +187,9 @@
 
             {{-- Action Buttons --}}
             <div class="mt-6 space-y-3">
-                <a href="{{ route('checkout.index', ['locale' => app()->getLocale()]) ?? '/checkout' }}"
+                <a wire:navigate
+                   {{-- Keep cart context alive by navigating via Livewire --}}
+                   href="{{ route('checkout.index', ['locale' => app()->getLocale()]) ?? '/checkout' }}"
                    class="w-full btn-gradient py-3 rounded-xl font-semibold text-center block">
                     {{ __('Proceed to Checkout') }}
                 </a>

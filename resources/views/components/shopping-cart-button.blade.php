@@ -70,11 +70,15 @@
                     </div>
 
                     <div class="flex gap-2">
-                        <a href="{{ route('cart.index', ['locale' => app()->getLocale()]) ?? '/cart' }}"
+                        <a wire:navigate
+                           {{-- Navigate via Livewire so drawer metrics remain hydrated --}}
+                           href="{{ route('cart.index', ['locale' => app()->getLocale()]) ?? '/cart' }}"
                            class="flex-1 bg-gray-100 text-gray-700 px-4 py-2 rounded-lg text-center font-medium hover:bg-gray-200 transition-colors duration-200">
                             {{ __('View Cart') }}
                         </a>
-                        <a href="{{ route('checkout.index', ['locale' => app()->getLocale()]) ?? '/checkout' }}"
+                        <a wire:navigate
+                           {{-- Preserve cart totals when moving straight into checkout --}}
+                           href="{{ route('checkout.index', ['locale' => app()->getLocale()]) ?? '/checkout' }}"
                            class="flex-1 btn-gradient px-4 py-2 rounded-lg text-center font-medium">
                             {{ __('Checkout') }}
                         </a>
