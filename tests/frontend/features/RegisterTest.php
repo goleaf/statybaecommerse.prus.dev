@@ -29,44 +29,41 @@ it('has a registration form', function () {
 
 it('validates required fields', function () {
     livewire(Register::class)
-        ->fillForm([])
         ->call('register')
         ->assertHasFormErrors([
-            'first_name' => 'required',
-            'last_name'  => 'required',
-            'email'      => 'required',
-            'password'   => 'required',
+            // Each key references the nested Livewire form property to mirror the frontend bindings.
+            'registrationForm.first_name' => 'required',
+            'registrationForm.last_name'  => 'required',
+            'registrationForm.email'      => 'required',
+            'registrationForm.password'   => 'required',
         ]);
 });
 
 it('validates email format', function () {
     livewire(Register::class)
-        ->fillForm([
-            'email' => 'invalid-email',
-        ])
+        // Provide an invalid email via the nested form property to trigger format validation.
+        ->set('registrationForm.email', 'invalid-email')
         ->call('register')
-        ->assertHasFormErrors(['email' => 'email']);
+        ->assertHasFormErrors(['registrationForm.email' => 'email']);
 });
 
 it('validates unique email', function () {
     User::factory()->create(['email' => 'test@example.com']);
 
     livewire(Register::class)
-        ->fillForm([
-            'email' => 'test@example.com',
-        ])
+        // Attempt to reuse the existing email on the same nested form binding.
+        ->set('registrationForm.email', 'test@example.com')
         ->call('register')
-        ->assertHasFormErrors(['email' => 'unique']);
+        ->assertHasFormErrors(['registrationForm.email' => 'unique']);
 });
 
 it('validates password confirmation', function () {
     livewire(Register::class)
-        ->fillForm([
-            'password'              => 'password123',
-            'password_confirmation' => 'different-password',
-        ])
+        // Provide mismatched passwords on the nested form to surface the confirmation rule.
+        ->set('registrationForm.password', 'password123')
+        ->set('registrationForm.password_confirmation', 'different-password')
         ->call('register')
-        ->assertHasFormErrors(['password' => 'same']);
+        ->assertHasFormErrors(['registrationForm.password' => 'same']);
 });
 
 it('registers a new user successfully', function () {
@@ -79,7 +76,12 @@ it('registers a new user successfully', function () {
     ];
 
     livewire(Register::class)
-        ->fillForm($userData)
+        // Populate the Livewire form using the nested keys so the component mirrors real interactions.
+        ->set('registrationForm.first_name', $userData['first_name'])
+        ->set('registrationForm.last_name', $userData['last_name'])
+        ->set('registrationForm.email', $userData['email'])
+        ->set('registrationForm.password', $userData['password'])
+        ->set('registrationForm.password_confirmation', $userData['password_confirmation'])
         ->call('register')
         ->assertHasNoFormErrors()
         ->assertRedirect(route('account'));
@@ -102,13 +104,12 @@ it('sets the preferred locale on registration', function () {
     app()->setLocale('lt');
 
     livewire(Register::class)
-        ->fillForm([
-            'first_name'            => 'Jonas',
-            'last_name'             => 'Jonaitis',
-            'email'                 => 'jonas@example.com',
-            'password'              => 'password123',
-            'password_confirmation' => 'password123',
-        ])
+        // Set every nested form field to ensure the component persists the locale alongside the profile data.
+        ->set('registrationForm.first_name', 'Jonas')
+        ->set('registrationForm.last_name', 'Jonaitis')
+        ->set('registrationForm.email', 'jonas@example.com')
+        ->set('registrationForm.password', 'password123')
+        ->set('registrationForm.password_confirmation', 'password123')
         ->call('register');
 
     assertDatabaseHas('users', [
@@ -119,11 +120,12 @@ it('sets the preferred locale on registration', function () {
 
 it('has proper form field attributes', function () {
     livewire(Register::class)
-        ->assertFormFieldExists('first_name')
-        ->assertFormFieldExists('last_name')
-        ->assertFormFieldExists('email')
-        ->assertFormFieldExists('password')
-        ->assertFormFieldExists('password_confirmation');
+        // Confirm the Livewire form exposes the nested keys expected by the frontend bindings.
+        ->assertFormFieldExists('registrationForm.first_name')
+        ->assertFormFieldExists('registrationForm.last_name')
+        ->assertFormFieldExists('registrationForm.email')
+        ->assertFormFieldExists('registrationForm.password')
+        ->assertFormFieldExists('registrationForm.password_confirmation');
 });
 
 it('displays meta information correctly', function () {
