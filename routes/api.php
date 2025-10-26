@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\AutocompleteSearchController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\ExportDownloadController;
+use App\Http\Controllers\Api\V1\DeterministicTotalsController;
 use App\Http\Controllers\Api\V1\HealthController;
 use App\Http\Controllers\Api\V1\SearchController;
 use Illuminate\Support\Facades\Route;
@@ -61,6 +62,9 @@ Route::prefix('v1')
 
         Route::get('/search', SearchController::class)
             ->name('search');
+
+        Route::post('/deterministic-totals', DeterministicTotalsController::class)
+            ->name('totals.deterministic');
 
         Route::middleware('auth:sanctum')->group(function (): void {
             Route::get('/user', AuthenticatedUserController::class)

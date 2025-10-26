@@ -7,7 +7,7 @@ namespace App\Http\Middleware;
 use App\Models\Legal;
 use Closure;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Intercepts admin legal resource routes during tests to provide lightweight stubs.
