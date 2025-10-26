@@ -8,6 +8,7 @@ use App\Models\Attribute;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Collection;
+use App\Models\Discount;
 use App\Models\DiscountCode;
 use App\Models\Product;
 use App\Models\Referral;
@@ -121,19 +122,56 @@ class ApiRoutesTest extends TestCase
      */
     public function test_discount_code_api_routes(): void
     {
-        $discountCode = DiscountCode::first();
+        $discount = Discount::factory()->create([
+            'type' => 'percentage',
+            'value' => 10,
+            'minimum_amount' => null,
+            'usage_limit' => null,
+            'usage_count' => 0,
+            'per_customer_limit' => null,
+            'starts_at' => now()->subDay(),
+            'ends_at' => now()->addDay(),
+            'status' => 'active',
+            'is_active' => true,
+            'is_enabled' => true,
+        ]);
+        $discountCode = DiscountCode::factory()->create([
+            'discount_id' => $discount->getKey(),
+            'code' => 'HONEST10',
+            'type' => 'percentage',
+            'value' => 10,
+            'minimum_amount' => 0,
+            'usage_limit' => null,
+            'usage_limit_per_user' => null,
+            'usage_count' => 0,
+            'starts_at' => now()->subDay(),
+            'expires_at' => now()->addDay(),
+            'status' => 'active',
+            'is_active' => true,
+            'is_stackable' => false,
+            'customer_group_id' => null,
+        ]);
+        $product = Product::first();
+        $cartPayload = [
+            'subtotal' => 100.0,
+            'items' => [[
+                'product_id' => $product?->getKey(),
+                'quantity' => 1,
+                'unit_price' => 100.0,
+            ]],
+        ];
 
         // Test validate discount code
         $response = $this->post('/api/discount-codes/validate', [
             'code' => $discountCode->code,
-            'amount' => 100.0,
         ]);
         $response->assertStatus(200);
 
         // Test apply discount code
         $response = $this->post('/api/discount-codes/apply', [
             'code' => $discountCode->code,
-            'amount' => 100.0,
+            'cart' => $cartPayload,
+            'shipping' => ['base_amount' => 0],
         ]);
         $response->assertStatus(200);
 
@@ -160,22 +198,20 @@ class ApiRoutesTest extends TestCase
         // Test validate with invalid code
         $response = $this->post('/api/discount-codes/validate', [
             'code' => 'INVALID_CODE',
-            'amount' => 100.0,
         ]);
-        $response->assertStatus(400);
+        $response->assertStatus(422);
 
         // Test apply with invalid code
         $response = $this->post('/api/discount-codes/apply', [
             'code' => 'INVALID_CODE',
-            'amount' => 100.0,
         ]);
-        $response->assertStatus(400);
+        $response->assertStatus(422);
 
         // Test remove with invalid code
         $response = $this->post('/api/discount-codes/remove', [
             'code' => 'INVALID_CODE',
         ]);
-        $response->assertStatus(400);
+        $response->assertStatus(422);
     }
 
     /**
