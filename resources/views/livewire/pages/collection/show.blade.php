@@ -167,7 +167,7 @@
                     @endif
                 @endforeach
                 @if (collect($selectedValues)->filter()->isNotEmpty())
-                    <button type="button" wire:click="clearAttributeFilters" 
+                    <button type="button" wire:click="clearAttributeFilters"
                             wire:confirm="{{ __('translations.confirm_clear_attribute_filters') }}"
                             class="text-xs underline">
                         {{ __('Clear all') }}

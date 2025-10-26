@@ -13,7 +13,7 @@
 
     @if($addresses->isNotEmpty())
         <form wire:submit="save" class="flex-1 space-y-3">
-            @error('shippingAddressId')
+            @error('shippingAddress.id')
             <div class="p-4 border-l-4 border-red-400 bg-red-50">
                 <div class="flex">
                     <div class="flex-shrink-0">
@@ -97,7 +97,7 @@
                             </label>
                         </div>
 
-                        @error('billingAddressId')
+                        @error('billingAddress.id')
                         <div class="p-4 border-l-4 border-red-400 bg-red-50">
                             <div class="flex">
                                 <div class="flex-shrink-0">

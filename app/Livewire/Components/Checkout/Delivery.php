@@ -44,6 +44,8 @@ class Delivery extends StepComponent
     #[Validate('required', message: 'You must select a delivery method')]
     public ?int $currentSelected = null;
 
+    public bool $isResolvingOptions = false;
+
     /**
      * Initialize the Livewire component with parameters.
      */
@@ -62,6 +64,7 @@ class Delivery extends StepComponent
     public function save(): void
     {
         $this->validate();
+
         session()->forget('checkout.shipping_option');
 
         // Retrieve the hydrated shipping payload that matches the current selection
@@ -105,7 +108,8 @@ class Delivery extends StepComponent
         if ($shippingDiscount > 0) {
             $option['price'] = max(0.0, $baseAmount - $shippingDiscount);
         }
-        session()->push('checkout.shipping_option', $option);
+
+        session()->push('checkout.shipping_option', $selectedOption);
         $this->dispatch('cart-price-update');
         $this->nextStep();
     }
@@ -158,6 +162,35 @@ class Delivery extends StepComponent
             'label'    => __('Delivery method'),
             'complete' => session()->exists('checkout') && data_get(session()->get('checkout'), 'shipping_option') !== null,
         ];
+    }
+
+    /**
+     * React to address updates so the shipping matrix can be recalculated.
+     */
+    #[On('shipping-address-selected')]
+    public function handleShippingAddressSelected(?int $addressId = null): void
+    {
+        $this->isResolvingOptions = true;
+
+        try {
+            $countryId = null;
+            if ($addressId !== null) {
+                $countryId = Address::query()->find($addressId)?->country_id;
+            }
+
+            $query = ShippingOption::query()->where('is_enabled', true)->orderBy('sort_order');
+
+            if ($countryId !== null) {
+                $query->where(static function ($builder) use ($countryId): void {
+                    $builder->whereNull('country_id')->orWhere('country_id', $countryId);
+                });
+            }
+
+            $this->options = $this->normaliseOptions($query->get());
+            $this->resetErrorBag('currentSelected');
+        } finally {
+            $this->isResolvingOptions = false;
+        }
     }
 
     /**

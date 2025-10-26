@@ -44,6 +44,14 @@
                         wire:target="handleCheckoutAddressUpdated,handleShippingAddressUpdated,resolveOptions"
                     >
                         @foreach($options as $option)
+                            @php
+                                // Ensure array access even when legacy collections slip through.
+                                $optionId = (int) data_get($option, 'id');
+                                $optionName = (string) data_get($option, 'name', '');
+                                $optionDescription = (string) data_get($option, 'description', '');
+                                $optionPrice = (float) data_get($option, 'price', 0);
+                                $formattedPrice = (string) data_get($option, 'formatted_price', \Illuminate\Support\Number::currency($optionPrice, current_currency(), app()->getLocale()));
+                            @endphp
                             <label
                                 wire:key="shipping-option-{{ $option['id'] }}"
                                 aria-label="{{ $option['name'] }}"

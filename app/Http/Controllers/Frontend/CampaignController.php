@@ -287,9 +287,8 @@ final class CampaignController extends Controller
     public function getCampaignAnalytics(Request $request): JsonResponse
     {
         // Normalise the requested window and clamp extremes to keep the query predictable.
-        $periodInput = $request->input('period', 30);
-        $period = (int) filter_var($periodInput, FILTER_VALIDATE_INT, ['options' => ['default' => 30]]);
-        $period = max(1, min(365, $period));
+        $periodPayload = $this->normalisePeriod($request->input('period', 30));
+        $period = $periodPayload['days'];
 
         $now = now();
         $startDate = $now->copy()->subDays($period);
@@ -406,15 +405,18 @@ final class CampaignController extends Controller
 
         // Summarise campaign engagement KPIs.
         $engagementCampaigns = $campaigns->map(static function (Campaign $campaign): array {
-            $views = (int) ($campaign->getOriginal('total_views') ?? data_get($campaign->metadata, 'total_views', 0));
-            $clicks = (int) ($campaign->getOriginal('total_clicks') ?? data_get($campaign->metadata, 'total_clicks', 0));
+            $views = (int) ($campaign->total_views ?? data_get($campaign->metadata, 'total_views', 0));
+            $clicks = (int) ($campaign->total_clicks ?? data_get($campaign->metadata, 'total_clicks', 0));
+            $ctr = method_exists($campaign, 'getClickThroughRate')
+                ? (float) $campaign->getClickThroughRate()
+                : ($views > 0 ? round($clicks / $views * 100, 2) : 0.0);
 
             return [
                 'id'                 => $campaign->getKey(),
                 'name'               => $campaign->name,
                 'views'              => $views,
                 'clicks'             => $clicks,
-                'click_through_rate' => $views > 0 ? round($clicks / $views * 100, 2) : 0.0,
+                'click_through_rate' => round($ctr, 2),
                 'status'             => $campaign->status,
             ];
         });
@@ -428,6 +430,72 @@ final class CampaignController extends Controller
         $topEngagementCampaigns = $engagementCampaigns
             ->sortByDesc('clicks')
             ->take(5)
+            ->values()
+            ->all();
+
+        // Aggregate campaign type breakdowns while honouring accessor-backed payloads.
+        $typeSegments = $campaigns->map(static function (Campaign $campaign): array {
+            $breakdown = $campaign->getAttribute('type_breakdown') ?? data_get($campaign->metadata, 'type_breakdown');
+
+            if (is_array($breakdown) && ! empty($breakdown)) {
+                if (array_is_list($breakdown)) {
+                    return collect($breakdown)->mapWithKeys(static function ($item): array {
+                        if (is_array($item)) {
+                            $key = (string) ($item['type'] ?? $item['key'] ?? $item['name'] ?? 'unknown');
+                            $count = (float) ($item['count'] ?? $item['value'] ?? 0.0);
+
+                            return [$key => $count > 0 ? $count : 0.0];
+                        }
+
+                        $key = (string) $item;
+
+                        return [$key => 1.0];
+                    })->all();
+                }
+
+                return collect($breakdown)->map(static fn ($value): float => (float) $value)->all();
+            }
+
+            $typeKey = (string) ($campaign->type ?? 'unknown');
+
+            return [$typeKey => 1.0];
+        });
+
+        $typeTotals = [];
+
+        foreach ($typeSegments as $segment) {
+            foreach ($segment as $typeKey => $count) {
+                $typeTotals[$typeKey] = ($typeTotals[$typeKey] ?? 0.0) + (float) $count;
+            }
+        }
+
+        $representatives = [];
+
+        foreach ($campaigns as $campaign) {
+            $typeKey = (string) ($campaign->type ?? 'unknown');
+
+            if (! array_key_exists($typeKey, $representatives)) {
+                $representatives[$typeKey] = $campaign;
+            }
+        }
+
+        $typeBreakdown = collect($typeTotals)
+            ->map(static function (float $count, string $typeKey) use ($representatives, $campaigns): array {
+                $representative = $representatives[$typeKey] ?? null;
+                $label = $representative?->type_label ?? Str::of($typeKey)->headline()->toString();
+                $icon = $representative?->type_icon ?? null;
+                $color = $representative?->type_color ?? null;
+                $totalCampaigns = max($campaigns->count(), 1);
+
+                return [
+                    'type'       => $typeKey,
+                    'label'      => $label,
+                    'count'      => (int) round($count),
+                    'percentage' => round($count / $totalCampaigns * 100, 2),
+                    'icon'       => $icon,
+                    'color'      => $color,
+                ];
+            })
             ->values()
             ->all();
 
@@ -590,8 +658,9 @@ final class CampaignController extends Controller
 
         $meta = [
             'period' => [
+                'requested'  => $periodPayload['raw'],
                 'days'       => $period,
-                'label'      => sprintf('Last %d days', $period),
+                'label'      => $periodPayload['label'],
                 'start_date' => $startDate->format('Y-m-d'),
                 'end_date'   => $now->format('Y-m-d'),
                 'granularity' => 'day',
@@ -679,6 +748,14 @@ final class CampaignController extends Controller
                         'variant_performance'     => $variantPerformance->take(10)->values()->all(),
                     ],
                 ],
+                'types' => [
+                    'title'       => 'Campaign Types',
+                    'description' => 'Channel mix distribution',
+                    'metrics'     => [
+                        'type_breakdown'       => $typeBreakdown,
+                        'legacy_type_breakdown' => $typeBreakdown,
+                    ],
+                ],
             ],
             'charts' => [
                 'engagement_trend' => [
@@ -745,6 +822,47 @@ final class CampaignController extends Controller
         ];
 
         return response()->json(['success' => true, 'data' => $data, 'meta' => $meta]);
+    }
+
+    /**
+     * Convert period request input into a clamped numeric window with helpful metadata.
+     *
+     * @return array{raw:string,days:int,label:string}
+     */
+    private function normalisePeriod(mixed $periodInput): array
+    {
+        $raw = is_scalar($periodInput) ? (string) $periodInput : '30';
+        $normalized = null;
+
+        if (is_numeric($periodInput)) {
+            $normalized = (int) $periodInput;
+        }
+
+        if ($normalized === null && is_string($raw)) {
+            if (preg_match('/(\d+)/', $raw, $matches) === 1) {
+                $normalized = (int) $matches[1];
+            } else {
+                $keyword = Str::of($raw)->lower()->value();
+
+                $normalized = match ($keyword) {
+                    'week', '7d', 'last-week'        => 7,
+                    'fortnight', '14d'               => 14,
+                    'month', '30d', 'last-month'     => 30,
+                    'quarter', '90d', 'last-quarter' => 90,
+                    'year', '365d', 'last-year'      => 365,
+                    default                          => 30,
+                };
+            }
+        }
+
+        $normalized ??= 30;
+        $normalized = max(1, min(365, $normalized));
+
+        return [
+            'raw'   => $raw,
+            'days'  => $normalized,
+            'label' => sprintf('Last %d days', $normalized),
+        ];
     }
 
     /**

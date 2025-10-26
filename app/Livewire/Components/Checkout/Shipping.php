@@ -9,7 +9,6 @@ use App\Models\User;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\On;
-use Livewire\Attributes\Validate;
 use Spatie\LivewireWizard\Components\StepComponent;
 
 /**
@@ -25,14 +24,17 @@ use Spatie\LivewireWizard\Components\StepComponent;
  */
 class Shipping extends StepComponent
 {
-    #[Validate('required', message: 'You need to select a delivery address')]
-    public ?int $shippingAddressId = null;
+    /**
+     * @var array{id:int|null}
+     */
+    public array $shippingAddress = ['id' => null];
 
-    #[Validate('boolean')]
     public bool $sameAsShipping = false;
 
-    #[Validate('required_if_declined:sameAsShipping', message: 'You must choose a billing address')]
-    public ?int $billingAddressId = null;
+    /**
+     * @var array{id:int|null}
+     */
+    public array $billingAddress = ['id' => null];
 
     /**
      * React when the customer selects a different shipping address so downstream
@@ -83,6 +85,11 @@ class Shipping extends StepComponent
         $this->shippingAddressId = is_numeric($storedShipping) ? (int) $storedShipping : null;
         $this->billingAddressId = is_numeric($storedBilling) ? (int) $storedBilling : null;
         $this->sameAsShipping = (bool) data_get($checkout, 'same_as_shipping');
+
+        if ($this->sameAsShipping && $this->billingAddress['id'] === null) {
+            // Ensure the billing selector mirrors shipping when "same as" is restored from the session.
+            $this->billingAddress['id'] = $this->shippingAddress['id'];
+        }
     }
 
     /**
@@ -91,6 +98,7 @@ class Shipping extends StepComponent
     public function save(): void
     {
         $this->validate();
+
         if (session()->exists('checkout')) {
             session()->forget('checkout');
         }
