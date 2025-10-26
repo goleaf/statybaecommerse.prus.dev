@@ -29,6 +29,8 @@ final class CacheTagHelper
 
     public const DASHBOARDS = 'dashboard';
 
+    public const SLIDERS = 'sliders';
+
     /**
      * @return array<int, string>
      */
@@ -59,6 +61,15 @@ final class CacheTagHelper
     public static function collections(): array
     {
         return [CacheTags::collections()];
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    public static function sliders(): array
+    {
+        // Slider widgets share a dedicated tag so storefront carousels are easy to purge.
+        return [CacheTags::sliders()];
     }
 
     /**

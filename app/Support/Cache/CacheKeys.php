@@ -157,6 +157,12 @@ final class CacheKeys
         return self::homeKey('sliders', $locale);
     }
 
+    public static function sliderAnalytics(): string
+    {
+        // Dedicated cache bucket for the Filament slider analytics dashboard payloads.
+        return 'slider_analytics_data';
+    }
+
     public static function homeShelf(string $preset, int $limit, string $locale): string
     {
         return self::homeKey(sprintf('shelf:%s:%d', $preset, $limit), $locale);
