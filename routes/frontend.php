@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\Frontend\Partner\OrderDashboardController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -81,6 +82,14 @@ Route::middleware(['web'])->group(function () {
         Route::post('/data/export', [App\Http\Controllers\Frontend\DataPrivacyController::class, 'export'])->name('data.export');
         Route::delete('/data', [App\Http\Controllers\Frontend\DataPrivacyController::class, 'destroy'])->name('data.destroy');
     });
+
+    Route::middleware(['auth'])
+        ->prefix('partner')
+        ->name('frontend.partner.')
+        ->group(function (): void {
+            // Serve the partner order dashboard that consumes the new contract payload shape.
+            Route::get('/orders', OrderDashboardController::class)->name('orders.index');
+        });
 
     // Legacy user profile routes maintained for backwards compatibility with
     // existing blade templates that reference the "users.*" namespace.
