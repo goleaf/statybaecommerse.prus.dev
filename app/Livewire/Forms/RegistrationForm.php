@@ -35,7 +35,7 @@ final class RegistrationForm extends Form
     #[Validate('required|string|lowercase|email|max:255|unique:users,email')]
     public string $email = '';
 
-    #[Validate('required|string|confirmed')]
+    #[Validate('required|string|same:password_confirmation')]
     public string $password = '';
 
     #[Validate('required|string')]
@@ -55,8 +55,10 @@ final class RegistrationForm extends Form
             'last_name' => ['required', 'string', 'max:255'],
             // Validate email uniqueness using the underlying table instead of the class string to avoid SQL errors.
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', Rule::unique(User::class, 'email')],
-            // Apply Laravel's default password requirements alongside confirmation checks.
-            'password' => ['required', 'string', 'confirmed', Password::defaults()],
+            // Apply Laravel's default password requirements and enforce manual confirmation matching.
+            'password' => ['required', 'string', 'same:password_confirmation', Password::defaults()],
+            // Explicitly validate the confirmation field so Livewire surfaces inline errors consistently.
+            'password_confirmation' => ['required', 'string'],
         ];
     }
 
