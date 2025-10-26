@@ -29,9 +29,11 @@
 
 ### 5. Data Transfer Object (DTO) Pattern
 **Implementation:** Type-safe data structures for complex operations
+- **Framework:** Spatie Laravel Data objects with attribute-based validation enforce schema guarantees across controllers, services, and jobs, keeping payloads consistent.
 - **AddressData:** Structured address information
 - **CountryByZoneData:** Geographic data relationships
 - **PriceData:** Pricing information structure
+- **ProductRequestData:** Example storefront payload that demonstrates attribute rules, casting, and transformation hooks before data reaches the application layer.
 
 ## Design Patterns
 
