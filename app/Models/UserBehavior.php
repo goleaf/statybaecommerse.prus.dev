@@ -40,12 +40,14 @@ final class UserBehavior extends Model
     use OrdersByName;
 
     /**
+     * Configure the OrdersByName trait to rely on the behaviour type column for ordering analytics records.
      * Configure the OrdersByName trait to rely on the behaviour type column when ordering analytics records.
      * Keeping this explicit prevents legacy `event` references from sneaking back in.
      */
     protected string $nameColumn = 'behavior_type';
 
     /**
+     * Allow mass assignment of the storefront tracking columns required for capturing behaviour snapshots.
      * Allow mass assignment of the comprehensive tracking columns required for the analytics feature set.
      */
     protected $fillable = [
