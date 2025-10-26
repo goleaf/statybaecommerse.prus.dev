@@ -61,52 +61,63 @@ final class ComponentShowcase extends Component
 
     /**
      * Handle featuredProducts functionality with proper error handling.
+     *
+     * @return \Illuminate\Database\Eloquent\Collection<int, Product>
      */
     #[Computed]
     public function featuredProducts(): EloquentCollection
     {
+        // Enforce showcase integrity by only surfacing products that are fully configured for the storefront widgets.
         return Product::query()
             ->with(['brand', 'media', 'prices'])
             ->where('is_visible', true)
             ->where('is_featured', true)
+            ->whereNotNull('name')
+            ->where('name', '!=', '')
+            ->whereNotNull('slug')
+            ->where('slug', '!=', '')
+            ->whereNotNull('price')
+            ->where('price', '>', 0)
             ->limit(4)
-            ->get()
-            ->skipWhile(static function (Product $product): bool {
-                // Skip products that are not properly configured for showcase display.
-                return empty($product->name) || ! $product->is_visible || ! $product->is_featured || ($product->price ?? 0) <= 0 || empty($product->slug);
-            });
+            ->get();
     }
 
     /**
      * Handle categories functionality with proper error handling.
+     *
+     * @return \Illuminate\Database\Eloquent\Collection<int, Category>
      */
     #[Computed]
     public function categories(): EloquentCollection
     {
+        // Filter categories aggressively so the UI never renders incomplete taxonomy data.
         return Category::query()
             ->where('is_visible', true)
+            ->whereNotNull('name')
+            ->where('name', '!=', '')
+            ->whereNotNull('slug')
+            ->where('slug', '!=', '')
             ->limit(3)
-            ->get()
-            ->skipWhile(static function (Category $category): bool {
-                // Skip categories that are not properly configured for showcase display.
-                return empty($category->name) || ! $category->is_visible || empty($category->slug);
-            });
+            ->get();
     }
 
     /**
      * Handle brands functionality with proper error handling.
+     *
+     * @return \Illuminate\Database\Eloquent\Collection<int, Brand>
      */
     #[Computed]
     public function brands(): EloquentCollection
     {
+        // Guarantee that only well-defined brands appear in the carousel widgets.
         return Brand::query()
             ->where('is_enabled', true)
+            ->whereNotNull('name')
+            ->where('name', '!=', '')
+            ->whereNotNull('slug')
+            ->where('slug', '!=', '')
             ->limit(3)
-            ->get()
-            ->skipWhile(static function (Brand $brand): bool {
-                // Skip brands that are not properly configured for showcase display.
-                return empty($brand->name) || ! $brand->is_enabled || empty($brand->slug);
-            });
+            ->get();
     }
 
     /**
