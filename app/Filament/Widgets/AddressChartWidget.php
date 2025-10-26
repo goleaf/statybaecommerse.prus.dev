@@ -60,8 +60,18 @@ final class AddressChartWidget extends ChartWidget
     /**
      * Get addresses per month data
      */
+    /**
+     * Build the chart payload with explicit array typing to satisfy static analysis.
+     *
+     * @return array{
+     *     labels: array<int, string>,
+     *     addresses: array<int, int>,
+     *     active_addresses: array<int, int>
+     * }
+     */
     private function getAddressesPerMonth(): array
     {
+        // Initialise typed collections so PHPStan understands the final structure.
         $months = [];
         $addresses = [];
         $activeAddresses = [];
