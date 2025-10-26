@@ -28,7 +28,8 @@ final class VariantBulkPriceUpdate extends Action
 
     public static function make(?string $name = null): static
     {
-        return parent::make('bulk_price_update')
+        // Respect a custom name when callers provide one while keeping the historical default intact.
+        return parent::make($name ?? 'bulk_price_update')
             ->label(__('product_variants.actions.bulk_price_update'))
             ->icon('heroicon-o-currency-euro')
             ->color('warning')
