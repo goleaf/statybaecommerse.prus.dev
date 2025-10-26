@@ -29,8 +29,10 @@ final class ReferralRewardController extends Controller
         if (! $user) {
             abort(401);
         }
-        $rewards = ReferralReward::forUser($user->id)->with(['referral', 'order'])->orderBy('created_at', 'desc')->paginate(15);
-        $stats = ['total_rewards' => ReferralReward::forUser($user->id)->count(), 'pending_rewards' => ReferralReward::forUser($user->id)->pending()->count(), 'applied_rewards' => ReferralReward::forUser($user->id)->applied()->count(), 'expired_rewards' => ReferralReward::forUser($user->id)->expired()->count(), 'total_amount' => ReferralReward::forUser($user->id)->sum('amount'), 'pending_amount' => ReferralReward::forUser($user->id)->pending()->sum('amount'), 'applied_amount' => ReferralReward::forUser($user->id)->applied()->sum('amount')];
+        $rewards = ReferralReward::query()->forUser($user->id)->with(['referral', 'order'])->orderBy('created_at', 'desc')->paginate(15);
+
+        // Gather all reward statistics in a single query to avoid repeated database work.
+        $stats = $this->buildStatsForUser($user->id);
 
         return view('referral-rewards.index', compact('rewards', 'stats'));
     }
@@ -72,7 +74,8 @@ final class ReferralRewardController extends Controller
         if (! $user) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
-        $stats = $this->aggregateStats($user->id);
+        // Reuse the shared statistics method for API consumers.
+        $stats = $this->buildStatsForUser($user->id);
 
         return response()->json(['success' => true, 'data' => $stats]);
     }
@@ -143,39 +146,6 @@ final class ReferralRewardController extends Controller
     }
 
     /**
-     * Build aggregated statistics without loading the full reward collection into memory.
-     */
-    private function aggregateStats(int $userId): array
-    {
-        $now = now();
-
-        $stats = ReferralReward::query()
-            ->forUser($userId)
-            ->selectRaw('COUNT(*) as total_rewards')
-            ->selectRaw("SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) as pending_rewards")
-            ->selectRaw("SUM(CASE WHEN status = 'applied' THEN 1 ELSE 0 END) as applied_rewards")
-            ->selectRaw("SUM(CASE WHEN status = 'expired' OR (expires_at IS NOT NULL AND expires_at <= ?) THEN 1 ELSE 0 END) as expired_rewards", [$now])
-            ->selectRaw('COALESCE(SUM(amount), 0) as total_amount')
-            ->selectRaw("COALESCE(SUM(CASE WHEN status = 'pending' THEN amount ELSE 0 END), 0) as pending_amount")
-            ->selectRaw("COALESCE(SUM(CASE WHEN status = 'applied' THEN amount ELSE 0 END), 0) as applied_amount")
-            ->selectRaw("SUM(CASE WHEN type = 'referrer_bonus' THEN 1 ELSE 0 END) as referrer_bonuses")
-            ->selectRaw("SUM(CASE WHEN type = 'referred_discount' THEN 1 ELSE 0 END) as referred_discounts")
-            ->first();
-
-        return [
-            'total_rewards' => (int) ($stats?->total_rewards ?? 0),
-            'pending_rewards' => (int) ($stats?->pending_rewards ?? 0),
-            'applied_rewards' => (int) ($stats?->applied_rewards ?? 0),
-            'expired_rewards' => (int) ($stats?->expired_rewards ?? 0),
-            'total_amount' => (float) ($stats?->total_amount ?? 0),
-            'pending_amount' => (float) ($stats?->pending_amount ?? 0),
-            'applied_amount' => (float) ($stats?->applied_amount ?? 0),
-            'referrer_bonuses' => (int) ($stats?->referrer_bonuses ?? 0),
-            'referred_discounts' => (int) ($stats?->referred_discounts ?? 0),
-        ];
-    }
-
-    /**
      * Paginate referral reward queries while transforming each item to the display data payload.
      */
     private function paginateRewards(Request $request, Builder $query, string $orderColumn = 'created_at', string $orderDirection = 'desc'): LengthAwarePaginator
@@ -217,5 +187,56 @@ final class ReferralRewardController extends Controller
 
         // Clamp the requested page size to defend against abusive values that could exhaust memory.
         return max(1, min($perPage, 100));
+    }
+
+    /**
+     * Hydrate aggregated reward statistics for the authenticated user.
+     */
+    private function buildStatsForUser(int $userId): array
+    {
+        // Pull every metric with conditional sums/counts so dashboards execute just one query.
+        $aggregates = ReferralReward::query()
+            ->forUser($userId)
+            ->selectRaw('COUNT(*) as total_rewards')
+            ->selectRaw("SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) as pending_rewards")
+            ->selectRaw("SUM(CASE WHEN status = 'applied' THEN 1 ELSE 0 END) as applied_rewards")
+            ->selectRaw(
+                "SUM(CASE WHEN status = 'expired' OR (expires_at IS NOT NULL AND expires_at <= ?) THEN 1 ELSE 0 END) as expired_rewards",
+                [now()]
+            )
+            ->selectRaw('COALESCE(SUM(amount), 0) as total_amount')
+            ->selectRaw("COALESCE(SUM(CASE WHEN status = 'pending' THEN amount ELSE 0 END), 0) as pending_amount")
+            ->selectRaw("COALESCE(SUM(CASE WHEN status = 'applied' THEN amount ELSE 0 END), 0) as applied_amount")
+            ->selectRaw("SUM(CASE WHEN type = 'referrer_bonus' THEN 1 ELSE 0 END) as referrer_bonuses")
+            ->selectRaw("SUM(CASE WHEN type = 'referred_discount' THEN 1 ELSE 0 END) as referred_discounts")
+            ->first();
+
+        if ($aggregates === null) {
+            // Safeguard against null responses by returning empty counters.
+            return [
+                'total_rewards' => 0,
+                'pending_rewards' => 0,
+                'applied_rewards' => 0,
+                'expired_rewards' => 0,
+                'total_amount' => 0.0,
+                'pending_amount' => 0.0,
+                'applied_amount' => 0.0,
+                'referrer_bonuses' => 0,
+                'referred_discounts' => 0,
+            ];
+        }
+
+        // Convert database scalars into the expected array structure with strict typing.
+        return [
+            'total_rewards' => (int) ($aggregates->total_rewards ?? 0),
+            'pending_rewards' => (int) ($aggregates->pending_rewards ?? 0),
+            'applied_rewards' => (int) ($aggregates->applied_rewards ?? 0),
+            'expired_rewards' => (int) ($aggregates->expired_rewards ?? 0),
+            'total_amount' => (float) ($aggregates->total_amount ?? 0.0),
+            'pending_amount' => (float) ($aggregates->pending_amount ?? 0.0),
+            'applied_amount' => (float) ($aggregates->applied_amount ?? 0.0),
+            'referrer_bonuses' => (int) ($aggregates->referrer_bonuses ?? 0),
+            'referred_discounts' => (int) ($aggregates->referred_discounts ?? 0),
+        ];
     }
 }
