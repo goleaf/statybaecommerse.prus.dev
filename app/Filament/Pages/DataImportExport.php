@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Pages;
 
-use BackedEnum;
 use Filament\Schemas\Schema;
 use App\Services\ImportExport\ProviderRegistry;
 use App\Support\Storage\SecureStorage;
@@ -22,9 +21,12 @@ final class DataImportExport extends Page
     protected string $view = 'filament.pages.data-import-export';
 
     /**
-     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
+     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations while conveying the
+     * accepted union types for maintainers via PHPDoc.
+     *
+     * @var string|\BackedEnum|null
      */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-arrow-down-tray';
+    protected static $navigationIcon = 'heroicon-o-arrow-down-tray';
 
     public ?string $provider = 'xml';
 

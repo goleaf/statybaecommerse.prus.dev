@@ -10,9 +10,12 @@ use Filament\Pages\Page;
 final class AdvancedReports extends Page
 {
     /**
-     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
+     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations while providing
+     * explicit PHPDoc for compatible union typing.
+     *
+     * @var string|\BackedEnum|null
      */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-chart-bar-square';
+    protected static $navigationIcon = 'heroicon-o-chart-bar-square';
 
     public static function getNavigationGroup(): BackedEnum|string|null
     {
