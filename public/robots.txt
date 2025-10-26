@@ -1,25 +1,32 @@
+# Robots.txt for Statyba eCommerce storefront - governs search engine access
+# Global directives: allow general crawling while keeping sensitive areas protected
 User-agent: *
 Allow: /
 
-# Sitemaps
-Sitemap: {{ url('/sitemap.xml') }}
+# Primary sitemap locations to help crawlers discover structured content
+Sitemap: https://statybaecommerse.prus.dev/sitemap.xml
+Sitemap: https://statybaecommerse.prus.dev/catalog-products.xml
 
-# Disallow admin areas
+# Administration interfaces and real-time endpoints should remain private
 Disallow: /admin/
 Disallow: /filament/
 Disallow: /livewire/
 Disallow: /_livewire/
+Disallow: /nova/
+Disallow: /telescope/
 
-# Disallow private areas
+# Prevent indexing of compiled assets and vendor storage that are not user-facing
 Disallow: /storage/
 Disallow: /vendor/
 Disallow: /node_modules/
+Disallow: /build/
 
-# Allow important files
+# Explicitly allow access to static asset directories required for rendering the storefront
 Allow: /css/
 Allow: /js/
 Allow: /images/
 Allow: /fonts/
+Allow: /site.webmanifest
 
-# Crawl delay (optional)
+# Respectful crawl rate to reduce load on the application servers
 Crawl-delay: 1
