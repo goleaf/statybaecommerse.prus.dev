@@ -29,7 +29,12 @@ final class LocationControllerTest extends TestCase
 
     public function test_locations_index_shows_only_enabled_locations(): void
     {
-        Location::factory()->create(['is_enabled' => true, 'name' => 'Enabled Location']);
+        Location::factory()->create([
+            'is_enabled' => true,
+            'name'       => 'Enabled Location',
+            'latitude'   => 54.6872,
+            'longitude'  => 25.2797,
+        ]);
         Location::factory()->create(['is_enabled' => false, 'name' => 'Disabled Location']);
 
         $response = $this->get(route('locations.index'));
@@ -41,8 +46,18 @@ final class LocationControllerTest extends TestCase
 
     public function test_locations_index_filters_by_type(): void
     {
-        Location::factory()->create(['type' => 'warehouse', 'name' => 'Warehouse Location']);
-        Location::factory()->create(['type' => 'store', 'name' => 'Store Location']);
+        Location::factory()->create([
+            'type'      => 'warehouse',
+            'name'      => 'Warehouse Location',
+            'latitude'  => 54.6872,
+            'longitude' => 25.2797,
+        ]);
+        Location::factory()->create([
+            'type'      => 'store',
+            'name'      => 'Store Location',
+            'latitude'  => 55.1739,
+            'longitude' => 24.2799,
+        ]);
 
         $response = $this->get(route('locations.index', ['type' => 'warehouse']));
 
@@ -53,8 +68,18 @@ final class LocationControllerTest extends TestCase
 
     public function test_locations_index_filters_by_city(): void
     {
-        Location::factory()->create(['city' => 'Vilnius', 'name' => 'Vilnius Location']);
-        Location::factory()->create(['city' => 'Kaunas', 'name' => 'Kaunas Location']);
+        Location::factory()->create([
+            'city'      => 'Vilnius',
+            'name'      => 'Vilnius Location',
+            'latitude'  => 54.6872,
+            'longitude' => 25.2797,
+        ]);
+        Location::factory()->create([
+            'city'      => 'Kaunas',
+            'name'      => 'Kaunas Location',
+            'latitude'  => 54.8985,
+            'longitude' => 23.9036,
+        ]);
 
         $response = $this->get(route('locations.index', ['city' => 'Vilnius']));
 
@@ -65,8 +90,16 @@ final class LocationControllerTest extends TestCase
 
     public function test_locations_index_searches_by_name(): void
     {
-        Location::factory()->create(['name' => 'Main Warehouse']);
-        Location::factory()->create(['name' => 'Secondary Store']);
+        Location::factory()->create([
+            'name'      => 'Main Warehouse',
+            'latitude'  => 54.6872,
+            'longitude' => 25.2797,
+        ]);
+        Location::factory()->create([
+            'name'      => 'Secondary Store',
+            'latitude'  => 55.1739,
+            'longitude' => 24.2799,
+        ]);
 
         $response = $this->get(route('locations.index', ['search' => 'Main']));
 
@@ -77,8 +110,16 @@ final class LocationControllerTest extends TestCase
 
     public function test_locations_index_searches_by_address(): void
     {
-        Location::factory()->create(['address_line_1' => '123 Main Street']);
-        Location::factory()->create(['address_line_1' => '456 Oak Avenue']);
+        Location::factory()->create([
+            'address_line_1' => '123 Main Street',
+            'latitude'       => 54.6872,
+            'longitude'      => 25.2797,
+        ]);
+        Location::factory()->create([
+            'address_line_1' => '456 Oak Avenue',
+            'latitude'       => 55.1739,
+            'longitude'      => 24.2799,
+        ]);
 
         $response = $this->get(route('locations.index', ['search' => 'Main']));
 
@@ -89,7 +130,11 @@ final class LocationControllerTest extends TestCase
 
     public function test_locations_show_page_loads(): void
     {
-        $location = Location::factory()->create(['is_enabled' => true]);
+        $location = Location::factory()->create([
+            'is_enabled' => true,
+            'latitude'   => 54.6872,
+            'longitude'  => 25.2797,
+        ]);
 
         $response = $this->get(route('locations.show', $location));
 
@@ -101,7 +146,11 @@ final class LocationControllerTest extends TestCase
 
     public function test_locations_show_returns_404_for_disabled_location(): void
     {
-        $location = Location::factory()->create(['is_enabled' => false]);
+        $location = Location::factory()->create([
+            'is_enabled' => false,
+            'latitude'   => 54.6872,
+            'longitude'  => 25.2797,
+        ]);
 
         $response = $this->get(route('locations.show', $location));
 
@@ -119,6 +168,8 @@ final class LocationControllerTest extends TestCase
             'phone'          => '+37012345678',
             'email'          => 'test@example.com',
             'country_code'   => 'LT',
+            'latitude'       => 54.6872,
+            'longitude'      => 25.2797,
         ]);
 
         $response = $this->get(route('locations.show', $location));
@@ -137,24 +188,32 @@ final class LocationControllerTest extends TestCase
             'is_enabled' => true,
             'type'       => 'warehouse',
             'city'       => 'Vilnius',
+            'latitude'   => 54.6872,
+            'longitude'  => 25.2797,
         ]);
 
         $relatedLocation1 = Location::factory()->create([
             'is_enabled' => true,
             'type'       => 'warehouse',
             'city'       => 'Vilnius',
+            'latitude'   => 54.6875,
+            'longitude'  => 25.2801,
         ]);
 
         $relatedLocation2 = Location::factory()->create([
             'is_enabled' => true,
             'type'       => 'store',
             'city'       => 'Vilnius',
+            'latitude'   => 54.688,
+            'longitude'  => 25.2805,
         ]);
 
         $unrelatedLocation = Location::factory()->create([
             'is_enabled' => true,
             'type'       => 'warehouse',
             'city'       => 'Kaunas',
+            'latitude'   => 54.8985,
+            'longitude'  => 23.9036,
         ]);
 
         $response = $this->get(route('locations.show', $mainLocation));
@@ -167,7 +226,11 @@ final class LocationControllerTest extends TestCase
 
     public function test_locations_contact_form_submission(): void
     {
-        $location = Location::factory()->create(['is_enabled' => true]);
+        $location = Location::factory()->create([
+            'is_enabled' => true,
+            'latitude'   => 54.6872,
+            'longitude'  => 25.2797,
+        ]);
 
         $response = $this->post(route('locations.contact', $location), [
             'name'    => 'John Doe',
@@ -182,7 +245,11 @@ final class LocationControllerTest extends TestCase
 
     public function test_locations_contact_form_validation(): void
     {
-        $location = Location::factory()->create(['is_enabled' => true]);
+        $location = Location::factory()->create([
+            'is_enabled' => true,
+            'latitude'   => 54.6872,
+            'longitude'  => 25.2797,
+        ]);
 
         $response = $this->post(route('locations.contact', $location), [
             'name'    => '',
@@ -196,7 +263,11 @@ final class LocationControllerTest extends TestCase
 
     public function test_locations_contact_form_requires_valid_email(): void
     {
-        $location = Location::factory()->create(['is_enabled' => true]);
+        $location = Location::factory()->create([
+            'is_enabled' => true,
+            'latitude'   => 54.6872,
+            'longitude'  => 25.2797,
+        ]);
 
         $response = $this->post(route('locations.contact', $location), [
             'name'    => 'John Doe',
@@ -210,7 +281,11 @@ final class LocationControllerTest extends TestCase
 
     public function test_locations_contact_form_limits_message_length(): void
     {
-        $location = Location::factory()->create(['is_enabled' => true]);
+        $location = Location::factory()->create([
+            'is_enabled' => true,
+            'latitude'   => 54.6872,
+            'longitude'  => 25.2797,
+        ]);
 
         $response = $this->post(route('locations.contact', $location), [
             'name'    => 'John Doe',
@@ -237,9 +312,24 @@ final class LocationControllerTest extends TestCase
 
     public function test_locations_index_preserves_filters_in_pagination(): void
     {
-        Location::factory()->create(['type' => 'warehouse', 'name' => 'Warehouse 1']);
-        Location::factory()->create(['type' => 'warehouse', 'name' => 'Warehouse 2']);
-        Location::factory()->create(['type' => 'store', 'name' => 'Store 1']);
+        Location::factory()->create([
+            'type'      => 'warehouse',
+            'name'      => 'Warehouse 1',
+            'latitude'  => 54.6872,
+            'longitude' => 25.2797,
+        ]);
+        Location::factory()->create([
+            'type'      => 'warehouse',
+            'name'      => 'Warehouse 2',
+            'latitude'  => 54.6882,
+            'longitude' => 25.2801,
+        ]);
+        Location::factory()->create([
+            'type'      => 'store',
+            'name'      => 'Store 1',
+            'latitude'  => 55.1739,
+            'longitude' => 24.2799,
+        ]);
 
         $response = $this->get(route('locations.index', ['type' => 'warehouse', 'page' => 1]));
 
@@ -292,6 +382,8 @@ final class LocationControllerTest extends TestCase
             'type'         => 'warehouse',
             'city'         => 'Vilnius',
             'country_code' => 'LT',
+            'latitude'     => 54.6872,
+            'longitude'    => 25.2797,
         ]);
 
         // Seed a location with missing metadata to ensure the controller filters it out.
@@ -301,6 +393,8 @@ final class LocationControllerTest extends TestCase
             'type'         => '',
             'city'         => 'Kaunas',
             'country_code' => 'LT',
+            'latitude'     => 54.8985,
+            'longitude'    => 23.9036,
         ]);
 
         $response = $this->getJson(route('locations.api.index'));
@@ -314,6 +408,29 @@ final class LocationControllerTest extends TestCase
                     ->where('name', 'Visible Depot')
                     ->etc()
                 )
+            );
+    }
+
+    public function test_locations_api_excludes_records_without_coordinates(): void
+    {
+        // Seed a location that would otherwise be visible but lacks coordinate data.
+        Location::factory()->create([
+            'is_enabled'   => true,
+            'name'         => 'Coordinate Missing Depot',
+            'type'         => 'warehouse',
+            'city'         => 'Vilnius',
+            'country_code' => 'LT',
+            'latitude'     => null,
+            'longitude'    => null,
+        ]);
+
+        $response = $this->getJson(route('locations.api.index'));
+
+        $response
+            ->assertOk()
+            ->assertJson(fn (AssertableJson $json) => $json
+                ->where('total', 0)
+                ->has('locations', 0)
             );
     }
 
