@@ -64,6 +64,8 @@ final class ComponentShowcase extends Component
 
     /**
      * Handle featuredProducts functionality with proper error handling.
+     *
+     * @return \Illuminate\Database\Eloquent\Collection<int, Product>
      */
     #[Computed]
     public function featuredProducts(): EloquentCollection
@@ -98,6 +100,8 @@ final class ComponentShowcase extends Component
 
     /**
      * Handle categories functionality with proper error handling.
+     *
+     * @return \Illuminate\Database\Eloquent\Collection<int, Category>
      */
     #[Computed]
     public function categories(): EloquentCollection
@@ -129,6 +133,8 @@ final class ComponentShowcase extends Component
 
     /**
      * Handle brands functionality with proper error handling.
+     *
+     * @return \Illuminate\Database\Eloquent\Collection<int, Brand>
      */
     #[Computed]
     public function brands(): EloquentCollection

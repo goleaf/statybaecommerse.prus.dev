@@ -16,7 +16,7 @@ use App\Support\Cache\CacheKeys;
 use App\Support\Cache\CacheTags;
 use App\Support\Cache\TagAwareCache;
 use Illuminate\Contracts\View\View;
-use Illuminate\Support\Collection;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 
@@ -40,15 +40,13 @@ final class Home extends Component
         $stats = TagAwareCache::remember(
             CacheKeys::homeStats($locale),
             now()->addSeconds(60),
-            static function (): array {
-                return [
-                    'products_count'   => Product::query()->where('is_visible', true)->count(),
-                    'categories_count' => Category::query()->where('is_visible', true)->count(),
-                    'brands_count'     => Brand::query()->where('is_enabled', true)->count(),
-                    'reviews_count'    => Review::query()->where('is_approved', true)->count(),
-                    'avg_rating'       => (float) (Review::query()->where('is_approved', true)->avg('rating') ?? 0),
-                ];
-            },
+            static fn (): array => [
+                'products_count'   => Product::query()->where('is_visible', true)->count(),
+                'categories_count' => Category::query()->where('is_visible', true)->count(),
+                'brands_count'     => Brand::query()->where('is_enabled', true)->count(),
+                'reviews_count'    => Review::query()->where('is_approved', true)->count(),
+                'avg_rating'       => (float) (Review::query()->where('is_approved', true)->avg('rating') ?? 0),
+            ],
             [
                 CacheTags::home(),
                 CacheTags::locale($locale),
@@ -64,26 +62,31 @@ final class Home extends Component
     }
 
     /**
-     * @return Collection<int, Product>
+     * @return \Illuminate\Database\Eloquent\Collection<int, Product>
      */
     #[Computed]
-    public function featuredProducts(): Collection
+    public function featuredProducts(): EloquentCollection
     {
         $locale = app()->getLocale();
 
-        /** @var Collection<int, Product> $products */
+        /** @var EloquentCollection<int, Product> $products */
         $products = TagAwareCache::remember(
             CacheKeys::homeFeaturedProducts($locale),
             now()->addSeconds(60),
-            static function (): Collection {
-                return Product::query()
+            static fn (): EloquentCollection => // Only highlight products that meet the minimum data quality bar for the storefront hero rail.
+                Product::query()
                     ->withoutGlobalScopes()
                     ->where('is_visible', true)
                     ->where('is_featured', true)
+                    ->whereNotNull('name')
+                    ->where('name', '!=', '')
+                    ->whereNotNull('slug')
+                    ->where('slug', '!=', '')
+                    ->whereNotNull('price')
+                    ->where('price', '>', 0)
                     ->latest('published_at')
                     ->limit(8)
-                    ->get();
-            },
+                    ->get(),
             [
                 CacheTags::home(),
                 CacheTags::locale($locale),
@@ -98,25 +101,30 @@ final class Home extends Component
     }
 
     /**
-     * @return Collection<int, Product>
+     * @return \Illuminate\Database\Eloquent\Collection<int, Product>
      */
     #[Computed]
-    public function latestProducts(): Collection
+    public function latestProducts(): EloquentCollection
     {
         $locale = app()->getLocale();
 
-        /** @var Collection<int, Product> $products */
+        /** @var EloquentCollection<int, Product> $products */
         $products = TagAwareCache::remember(
             CacheKeys::homeLatestProducts($locale),
             now()->addSeconds(60),
-            static function (): Collection {
-                return Product::query()
+            static fn (): EloquentCollection => // Keep the "New arrivals" carousel consistent by requiring basic merchandising fields.
+                Product::query()
                     ->withoutGlobalScopes()
                     ->where('is_visible', true)
+                    ->whereNotNull('name')
+                    ->where('name', '!=', '')
+                    ->whereNotNull('slug')
+                    ->where('slug', '!=', '')
+                    ->whereNotNull('price')
+                    ->where('price', '>', 0)
                     ->latest('published_at')
                     ->limit(8)
-                    ->get();
-            },
+                    ->get(),
             [
                 CacheTags::home(),
                 CacheTags::locale($locale),
@@ -131,25 +139,24 @@ final class Home extends Component
     }
 
     /**
-     * @return Collection<int, Review>
+     * @return \Illuminate\Database\Eloquent\Collection<int, Review>
      */
     #[Computed]
-    public function latestReviews(): Collection
+    public function latestReviews(): EloquentCollection
     {
         $locale = app()->getLocale();
 
-        /** @var Collection<int, Review> $reviews */
+        /** @var EloquentCollection<int, Review> $reviews */
         $reviews = TagAwareCache::remember(
             CacheKeys::homeLatestReviews($locale),
             now()->addSeconds(60),
-            static function (): Collection {
-                return Review::query()
+            static fn (): EloquentCollection => // Restrict reviews to those with a resolvable product relationship for consistent rendering.
+                Review::query()
                     ->where('is_approved', true)
-                    ->with(['product' => static fn ($query) => $query->select('id', 'name', 'slug')])
+                    ->with(['product:id,name,slug'])
                     ->latest('created_at')
                     ->limit(6)
-                    ->get();
-            },
+                    ->get(),
             [
                 CacheTags::home(),
                 CacheTags::locale($locale),
@@ -188,5 +195,8 @@ final class Home extends Component
         ])->layout('components.layouts.base', [
             'title' => __('frontend.navigation.home') . ' - ' . (is_string($appName) ? $appName : ''),
         ]);
+
+        // Return the typed view instance so PHPStan recognises the response contract.
+        return $view;
     }
 }
