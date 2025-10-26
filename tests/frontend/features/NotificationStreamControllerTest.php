@@ -28,7 +28,7 @@ final class NotificationStreamControllerTest extends TestCase
     public function test_stream_returns_server_sent_events_response(): void
     {
         $response = $this->actingAs($this->user)
-            ->get('/api/notifications/stream');
+            ->get("/api/users/{$this->user->getKey()}/notifications/stream");
 
         $response->assertStatus(200);
         $response->assertHeader('Content-Type', 'text/event-stream');
@@ -41,7 +41,7 @@ final class NotificationStreamControllerTest extends TestCase
     public function test_stream_returns_connection_confirmation(): void
     {
         $response = $this->actingAs($this->user)
-            ->get('/api/notifications/stream');
+            ->get("/api/users/{$this->user->getKey()}/notifications/stream");
 
         $response->assertStatus(200);
 
@@ -54,7 +54,7 @@ final class NotificationStreamControllerTest extends TestCase
     public function test_stream_returns_heartbeat_messages(): void
     {
         $response = $this->actingAs($this->user)
-            ->get('/api/notifications/stream');
+            ->get("/api/users/{$this->user->getKey()}/notifications/stream");
 
         $response->assertStatus(200);
 
@@ -79,7 +79,7 @@ final class NotificationStreamControllerTest extends TestCase
         ]);
 
         $response = $this->actingAs($this->user)
-            ->get('/api/notifications/stream');
+            ->get("/api/users/{$this->user->getKey()}/notifications/stream");
 
         $response->assertStatus(200);
 
@@ -118,7 +118,7 @@ final class NotificationStreamControllerTest extends TestCase
         ]);
 
         $response = $this->actingAs($this->user)
-            ->get('/api/notifications/stream');
+            ->get("/api/users/{$this->user->getKey()}/notifications/stream");
 
         $response->assertStatus(200);
 
@@ -131,9 +131,20 @@ final class NotificationStreamControllerTest extends TestCase
 
     public function test_stream_returns_401_for_unauthenticated_user(): void
     {
-        $response = $this->get('/api/notifications/stream');
+        $response = $this->get("/api/users/{$this->user->getKey()}/notifications/stream");
 
         $response->assertStatus(401);
+    }
+
+    public function test_stream_rejects_cross_user_requests(): void
+    {
+        $otherUser = User::factory()->create();
+
+        $response = $this->actingAs($this->user)
+            // Intentionally target a different user's stream to verify the controller scoping guard.
+            ->get("/api/users/{$otherUser->getKey()}/notifications/stream");
+
+        $response->assertStatus(403);
     }
 
     public function test_stream_includes_notification_timestamp(): void
@@ -151,7 +162,7 @@ final class NotificationStreamControllerTest extends TestCase
         ]);
 
         $response = $this->actingAs($this->user)
-            ->get('/api/notifications/stream');
+            ->get("/api/users/{$this->user->getKey()}/notifications/stream");
 
         $response->assertStatus(200);
 
@@ -170,7 +181,7 @@ final class NotificationStreamControllerTest extends TestCase
         ]);
 
         $response = $this->actingAs($this->user)
-            ->get('/api/notifications/stream');
+            ->get("/api/users/{$this->user->getKey()}/notifications/stream");
 
         $response->assertStatus(200);
 
@@ -196,7 +207,7 @@ final class NotificationStreamControllerTest extends TestCase
         ]);
 
         $response = $this->actingAs($this->user)
-            ->get('/api/notifications/stream');
+            ->get("/api/users/{$this->user->getKey()}/notifications/stream");
 
         $response->assertStatus(200);
 
@@ -207,7 +218,7 @@ final class NotificationStreamControllerTest extends TestCase
     public function test_stream_handles_no_notifications(): void
     {
         $response = $this->actingAs($this->user)
-            ->get('/api/notifications/stream');
+            ->get("/api/users/{$this->user->getKey()}/notifications/stream");
 
         $response->assertStatus(200);
 
