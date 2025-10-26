@@ -33,6 +33,7 @@ final class NotificationRateLimit
 
         RateLimiter::hit($key, $decayMinutes * 60);
 
+        /** @var Response $response */
         $response = $next($request);
 
         // Add rate limit headers
