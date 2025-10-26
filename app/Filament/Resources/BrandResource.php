@@ -18,6 +18,8 @@ use Filament\Actions\EditAction;
 use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -129,8 +131,13 @@ final class BrandResource extends Resource
      */
     public static function form(Schema $schema): Schema
     {
+        // Pre-compute the social platform select options so the form stays in sync with the model constant.
+        $platformOptions = collect(Brand::SOCIAL_LINK_PLATFORMS)->mapWithKeys(
+            fn (string $platform): array => [$platform => __('admin/brands.social.platforms.' . $platform)],
+        )->all();
+
         return $schema->components([
-            SchemaSection::make(__('brands.basic_information'))
+            SchemaSection::make(__('admin/brands.sections.basic_information'))
                 ->components([
                     LanguageTabs::make([
                         TextInput::make('name')
@@ -144,14 +151,13 @@ final class BrandResource extends Resource
                         Textarea::make('description')
                             ->label(__('brands.description'))
                             ->rows(3),
-                    ]),
+                    ])
+                        ->columnSpanFull(),
                     TextInput::make('website')
                         ->label(__('admin/brands.fields.website'))
+                        ->helperText(__('admin/brands.helpers.website'))
                         ->url()
-                        ->maxLength(255),
-                    Textarea::make('description')
-                        ->label(__('admin/brands.fields.description'))
-                        ->rows(3)
+                        ->maxLength(255)
                         ->columnSpanFull(),
                 ]),
             SchemaSection::make(__('admin/brands.sections.media'))
@@ -181,19 +187,45 @@ final class BrandResource extends Resource
                         ->preserveFilenames()
                         ->visibility('private'),
                 ]),
+            SchemaSection::make(__('admin/brands.sections.social'))
+                ->schema([
+                    Repeater::make('social_links')
+                        ->label(__('admin/brands.fields.social_links'))
+                        ->helperText(__('admin/brands.helpers.social_links'))
+                        ->default([])
+                        ->schema([
+                            Select::make('platform')
+                                ->label(__('admin/brands.fields.social_platform'))
+                                ->options($platformOptions)
+                                ->required()
+                                ->native(false),
+                            TextInput::make('url')
+                                ->label(__('admin/brands.fields.social_url'))
+                                ->required()
+                                ->url()
+                                ->maxLength(255),
+                        ])
+                        ->columnSpanFull()
+                        ->collapsible()
+                        ->createItemButtonLabel(__('admin/brands.actions.add_social_link'))
+                        ->reorderable(false),
+                ]),
             SchemaSection::make(__('admin/brands.sections.seo'))
                 ->schema([
-                    TextInput::make('seo_title')
-                        ->label(__('admin/brands.fields.seo_title'))
-                        ->maxLength(255),
-                    Textarea::make('seo_description')
-                        ->label(__('admin/brands.fields.seo_description'))
-                        ->rows(2)
-                        ->maxLength(500),
+                    LanguageTabs::make([
+                        TextInput::make('seo_title')
+                            ->label(__('admin/brands.fields.seo_title'))
+                            ->maxLength(255),
+                        Textarea::make('seo_description')
+                            ->label(__('admin/brands.fields.seo_description'))
+                            ->rows(2)
+                            ->maxLength(500),
+                    ])
+                        ->columnSpanFull(),
                 ]),
             SchemaSection::make(__('admin/brands.sections.settings'))
                 ->schema([
-                    SchemaGrid::make(3)
+                    SchemaGrid::make(4)
                         ->components([
                             Toggle::make('is_enabled')
                                 ->label(__('admin/brands.fields.is_enabled'))
@@ -205,6 +237,9 @@ final class BrandResource extends Resource
                                 ->label(__('admin/brands.fields.is_visible')),
                             Toggle::make('is_featured')
                                 ->label(__('admin/brands.fields.is_featured')),
+                            Toggle::make('is_premium')
+                                ->label(__('admin/brands.fields.is_premium'))
+                                ->helperText(__('admin/brands.helpers.is_premium')),
                         ]),
                 ]),
         ]);
@@ -249,6 +284,15 @@ final class BrandResource extends Resource
                 IconColumn::make('is_featured')
                     ->label(__('admin/brands.fields.is_featured'))
                     ->boolean(),
+                // Display the premium badge state alongside featured brands.
+                IconColumn::make('is_premium')
+                    ->label(__('admin/brands.fields.is_premium'))
+                    ->boolean(),
+                // Surface how many social profiles each brand exposes for quick audits.
+                TextColumn::make('social_links_count')
+                    ->label(__('admin/brands.fields.social_links'))
+                    ->state(fn (Brand $record): string => (string) count($record->social_links))
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('created_at')
                     ->label(__('admin/brands.fields.created_at'))
                     ->dateTime(),
@@ -267,6 +311,10 @@ final class BrandResource extends Resource
                 TernaryFilter::make('is_featured')
                     ->trueLabel(__('admin/brands.filters.featured_only'))
                     ->falseLabel(__('admin/brands.filters.not_featured'))
+                    ->native(false),
+                TernaryFilter::make('is_premium')
+                    ->trueLabel(__('admin/brands.filters.premium_only'))
+                    ->falseLabel(__('admin/brands.filters.not_premium'))
                     ->native(false),
                 TernaryFilter::make('is_visible')
                     ->trueLabel(__('admin/brands.filters.visible_only'))
@@ -316,6 +364,20 @@ final class BrandResource extends Resource
 
                         Notification::make()
                             ->title($record->is_featured ? __('admin/brands.notifications.featured_enabled') : __('admin/brands.notifications.featured_disabled'))
+                            ->success()
+                            ->send();
+                    })
+                    ->requiresConfirmation()
+                    ->visible(fn (): bool => AuthorizationMatrix::check('brands', 'update')),
+                Action::make('toggle_premium')
+                    ->label(fn (Brand $record): string => $record->isPremium() ? __('admin/brands.actions.unmark_premium') : __('admin/brands.actions.mark_premium'))
+                    ->icon('heroicon-o-sparkles')
+                    ->color(fn (Brand $record): string => $record->isPremium() ? 'warning' : 'success')
+                    ->action(function (Brand $record): void {
+                        $record->update(['is_premium' => ! $record->isPremium()]);
+
+                        Notification::make()
+                            ->title($record->isPremium() ? __('admin/brands.notifications.premium_enabled') : __('admin/brands.notifications.premium_disabled'))
                             ->success()
                             ->send();
                     })
@@ -381,6 +443,34 @@ final class BrandResource extends Resource
                             $records->each->update(['is_featured' => false]);
                             Notification::make()
                                 ->title(__('admin/brands.notifications.bulk_unfeatured'))
+                                ->success()
+                                ->send();
+                        })
+                        ->requiresConfirmation()
+                        ->visible(fn (): bool => AuthorizationMatrix::check('brands', 'update')),
+                    BulkAction::make('mark_premium')
+                        ->label(__('admin/brands.actions.mark_premium_selected'))
+                        ->icon('heroicon-o-sparkles')
+                        ->color('success')
+                        ->action(function (Collection $records): void {
+                            $records->each->update(['is_premium' => true]);
+
+                            Notification::make()
+                                ->title(__('admin/brands.notifications.bulk_premium_enabled'))
+                                ->success()
+                                ->send();
+                        })
+                        ->requiresConfirmation()
+                        ->visible(fn (): bool => AuthorizationMatrix::check('brands', 'update')),
+                    BulkAction::make('unmark_premium')
+                        ->label(__('admin/brands.actions.unmark_premium_selected'))
+                        ->icon('heroicon-o-sparkles')
+                        ->color('warning')
+                        ->action(function (Collection $records): void {
+                            $records->each->update(['is_premium' => false]);
+
+                            Notification::make()
+                                ->title(__('admin/brands.notifications.bulk_premium_disabled'))
                                 ->success()
                                 ->send();
                         })

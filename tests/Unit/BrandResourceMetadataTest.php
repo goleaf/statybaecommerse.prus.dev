@@ -6,6 +6,9 @@ namespace Tests\Unit;
 
 use App\Filament\Resources\BrandResource;
 use App\Models\Brand;
+use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\Toggle;
+use Filament\Schemas\Schema;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -40,5 +43,34 @@ final class BrandResourceMetadataTest extends TestCase
                 ->exists(),
             'Brands hidden by the default scopes should still appear in the Filament resource query.',
         );
+    }
+
+    /**
+     * Ensure the Filament form exposes the JSON-backed social links repeater.
+     */
+    public function test_form_registers_social_links_repeater(): void
+    {
+        $schema = BrandResource::form(Schema::make());
+
+        $hasRepeater = collect($schema->getComponents())
+            ->flatMap(fn ($component) => method_exists($component, 'getComponents') ? $component->getComponents() : [])
+            ->contains(fn ($component) => $component instanceof Repeater && $component->getName() === 'social_links');
+
+        $this->assertTrue($hasRepeater, 'The brand form should surface a social_links repeater component.');
+    }
+
+    /**
+     * Confirm the premium toggle stays part of the settings grid for featured placements.
+     */
+    public function test_form_includes_premium_toggle(): void
+    {
+        $schema = BrandResource::form(Schema::make());
+
+        $hasPremiumToggle = collect($schema->getComponents())
+            ->flatMap(fn ($component) => method_exists($component, 'getComponents') ? $component->getComponents() : [])
+            ->flatMap(fn ($component) => method_exists($component, 'getComponents') ? $component->getComponents() : [$component])
+            ->contains(fn ($component) => $component instanceof Toggle && $component->getName() === 'is_premium');
+
+        $this->assertTrue($hasPremiumToggle, 'The settings grid must include an is_premium toggle.');
     }
 }
