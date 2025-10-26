@@ -29,15 +29,8 @@ final class CampaignConversionController extends Controller
         $search = trim((string) $request->input('search', ''));
 
         if ($search !== '') {
-            // Search across the key descriptive fields required by the tests.
-            $query->where(static function (Builder $builder) use ($search): void {
-                $builder->where('campaign_name', 'like', "%{$search}%")
-                    ->orWhere('conversion_type', 'like', "%{$search}%")
-                    ->orWhere('status', 'like', "%{$search}%")
-                    ->orWhere('source', 'like', "%{$search}%")
-                    ->orWhere('medium', 'like', "%{$search}%")
-                    ->orWhere('country', 'like', "%{$search}%");
-            });
+            // Delegate to a shared helper so exports and listings remain aligned.
+            $query = $this->applySearchFilter($query, $search);
         }
 
         $allowedSorts = ['converted_at', 'conversion_value', 'campaign_name', 'status', 'conversion_type'];
@@ -236,9 +229,16 @@ final class CampaignConversionController extends Controller
      */
     public function export(Request $request): StreamedResponse
     {
-        $records = $this->applyFilters(CampaignConversion::query(), $request)
-            ->orderBy('converted_at', 'desc')
-            ->get();
+        $recordsQuery = $this->applyFilters(CampaignConversion::query(), $request);
+
+        $search = trim((string) $request->input('search', ''));
+
+        if ($search !== '') {
+            // Keep CSV output consistent with on-screen filtering logic.
+            $recordsQuery = $this->applySearchFilter($recordsQuery, $search);
+        }
+
+        $records = $recordsQuery->orderBy('converted_at', 'desc')->get();
 
         $headers = [
             'Content-Type'        => 'text/csv',
@@ -353,6 +353,24 @@ final class CampaignConversionController extends Controller
         if ($request->filled('is_desktop')) {
             $query->where('is_desktop', filter_var($request->input('is_desktop'), FILTER_VALIDATE_BOOLEAN));
         }
+
+        return $query;
+    }
+
+    /**
+     * Apply the reusable fuzzy search constraints across relevant fields.
+     */
+    private function applySearchFilter(Builder $query, string $search): Builder
+    {
+        // Group OR conditions to prevent them from leaking into surrounding filters.
+        $query->where(static function (Builder $builder) use ($search): void {
+            $builder->where('campaign_name', 'like', '%' . $search . '%')
+                ->orWhere('conversion_type', 'like', '%' . $search . '%')
+                ->orWhere('status', 'like', '%' . $search . '%')
+                ->orWhere('source', 'like', '%' . $search . '%')
+                ->orWhere('medium', 'like', '%' . $search . '%')
+                ->orWhere('country', 'like', '%' . $search . '%');
+        });
 
         return $query;
     }
