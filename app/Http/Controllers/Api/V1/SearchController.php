@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Api\V1;
 use App\Data\SearchQueryData;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\SearchRequest;
+use App\Http\Resources\SearchResultResource;
 use App\Services\SearchService;
 use Illuminate\Http\JsonResponse;
 
@@ -14,7 +15,12 @@ final class SearchController extends Controller
 {
     public function __invoke(SearchRequest $request, SearchService $service): JsonResponse
     {
-        $queryData = SearchQueryData::fromArray($request->validated(), [
+        $payload = $request->validated();
+
+        // Aggregation hints are calculated server-side; strip any stray client input.
+        unset($payload['types']);
+
+        $queryData = SearchQueryData::fromArray($payload, [
             'ip' => $request->ip(),
             'user_id' => $request->user()?->getKey(),
             'user_agent' => $request->userAgent(),
@@ -23,6 +29,7 @@ final class SearchController extends Controller
 
         $results = $service->search($queryData);
 
-        return response()->json($results);
+        // Normalise the payload via an API resource to keep response shape stable.
+        return SearchResultResource::make($results)->toResponse($request);
     }
 }
