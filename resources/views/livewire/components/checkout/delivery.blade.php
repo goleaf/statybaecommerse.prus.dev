@@ -50,25 +50,26 @@
                                 $optionName = (string) data_get($option, 'name', '');
                                 $optionDescription = (string) data_get($option, 'description', '');
                                 $optionPrice = (float) data_get($option, 'price', 0);
-                                $formattedPrice = (string) data_get($option, 'formatted_price', \Illuminate\Support\Number::currency($optionPrice, current_currency(), app()->getLocale()));
+                                $currencyCode = (string) data_get($option, 'currency_code', current_currency());
+                                $formattedPrice = (string) data_get($option, 'formatted_price', \Illuminate\Support\Number::currency($optionPrice, $currencyCode, app()->getLocale()));
                             @endphp
                             <label
-                                wire:key="shipping-option-{{ $option['id'] }}"
-                                aria-label="{{ $option['name'] }}"
-                                aria-description="{{ $option['description'] }}"
+                                wire:key="shipping-option-{{ $optionId }}"
+                                aria-label="{{ $optionName }}"
+                                aria-description="{{ $optionDescription }}"
                                 @class([
                                     'group relative flex items-start justify-between cursor-pointer border p-4 focus:outline-none',
-                                    'data-[checked]:z-10 data-[checked]:border-green-200 data-[checked]:bg-green-50 z-10 border-primary-200 bg-primary-50' => (int) $currentSelected === (int) $option['id'],
-                                    'border-gray-200' => (int) $currentSelected !== (int) $option['id'],
+                                    'data-[checked]:z-10 data-[checked]:border-green-200 data-[checked]:bg-green-50 z-10 border-primary-200 bg-primary-50' => (int) $currentSelected === $optionId,
+                                    'border-gray-200' => (int) $currentSelected !== $optionId,
                                 ])
                             >
                                 <span class="flex flex-1">
                                     <input
                                         type="radio"
                                         wire:model.live="currentSelected"
-                                        wire:click="selectOption({{ $option['id'] }})"
+                                        wire:click="selectOption({{ $optionId }})"
                                         name="shipping"
-                                        value="{{ $option['id'] }}"
+                                        value="{{ $optionId }}"
                                         class="mt-0.5 size-4 shrink-0 cursor-pointer border-gray-300 text-primary-500 focus:ring-primary-600 active:ring-2 active:ring-offset-2"
                                         wire:loading.attr="disabled"
                                         wire:target="save,handleCheckoutAddressUpdated,handleShippingAddressUpdated,resolveOptions"
@@ -77,26 +78,26 @@
                                         <span
                                             @class([
                                                 'block text-sm font-heading',
-                                                'text-primary-950 font-medium' => (int) $currentSelected === (int) $option['id'],
-                                                'text-gray-600' => (int) $currentSelected !== (int) $option['id'],
+                                                'text-primary-950 font-medium' => (int) $currentSelected === $optionId,
+                                                'text-gray-600' => (int) $currentSelected !== $optionId,
                                             ])
-                                        >{{ $option['name'] }}</span>
+                                        >{{ $optionName }}</span>
                                         <span
                                             @class([
                                                 'block text-sm',
-                                                'text-primary-700' => (int) $currentSelected === (int) $option['id'],
-                                                'text-gray-500' => (int) $currentSelected !== (int) $option['id'],
+                                                'text-primary-700' => (int) $currentSelected === $optionId,
+                                                'text-gray-500' => (int) $currentSelected !== $optionId,
                                             ])
-                                        >{{ $option['description'] }}</span>
-                                        @if(! empty($option['estimated_delivery']))
+                                        >{{ $optionDescription }}</span>
+                                        @if(! empty(data_get($option, 'estimated_delivery')))
                                             <span class="mt-1 text-xs text-gray-400">
-                                                {{ $option['estimated_delivery'] }}
+                                                {{ data_get($option, 'estimated_delivery') }}
                                             </span>
                                         @endif
                                     </span>
                                 </span>
                                 <span class="text-sm font-medium text-primary-950">
-                                    {{ $option['formatted_price'] ?? \Illuminate\Support\Number::currency($option['price'], $option['currency_code'], app()->getLocale()) }}
+                                    {{ $formattedPrice }}
                                 </span>
                             </label>
                         @endforeach
