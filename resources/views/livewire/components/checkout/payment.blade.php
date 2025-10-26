@@ -62,7 +62,13 @@
                       and you acknowledge that you have read our privacy policy.") }}
                 </p>
                 <div class="pt-6 border-t border-gray-200 sm:flex sm:items-center sm:justify-end">
-                    <x-buttons.primary type="submit" class="w-full px-8 py-2 text-sm sm:w-auto">
+                    <x-buttons.primary
+                        type="submit"
+                        class="w-full px-8 py-2 text-sm sm:w-auto"
+                        {{-- Keep the payment call-to-action inert while shipping data recalculates or submission runs. --}}
+                        wire:loading.attr="disabled"
+                        wire:target="save"
+                    >
                         <span class="absolute left-0 pl-2" wire:loading>
                             <x-loading-dots class="bg-white" aria-hidden="true" />
                         </span>
