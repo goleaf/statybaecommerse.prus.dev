@@ -45,7 +45,7 @@
                         @if($addresses->has('shipping') && $addresses->get('shipping')->isNotEmpty())
                             <fieldset aria-label="{{ __('Delivery addresses') }}" class="mt-3 divide-y divide-gray-200"
                                      wire:loading.attr="disabled"
-                                     wire:target="refreshShippingOptions,placeOrder">
+                                     wire:target="save,shippingAddressId,sameAsShipping,billingAddressId">
                                 {{-- Disable the delivery address list whenever checkout recalculations run. --}}
                                 @foreach($addresses->get('shipping') as $shippingAddress)
                                     <label
@@ -62,7 +62,7 @@
                                             value="{{ $shippingAddress->id }}"
                                             class="mt-0.5 size-4 shrink-0 cursor-pointer border-gray-300 text-primary-500 focus:ring-primary-600 active:ring-2 active:ring-offset-2"
                                             wire:loading.attr="disabled"
-                                            wire:target="refreshShippingOptions,placeOrder"
+                                            wire:target="save,shippingAddressId,sameAsShipping,billingAddressId"
                                         >
                                         <span class="flex flex-col space-y-0.5 text-sm text-gray-500">
                                         <span class="font-medium text-gray-900">{{ $shippingAddress->full_name }}</span>
@@ -118,7 +118,7 @@
                             @if($addresses->has('billing') && $addresses->get('billing')->isNotEmpty())
                                 <fieldset aria-label="{{ __('Billing addresses') }}" class="divide-y divide-gray-200"
                                          wire:loading.attr="disabled"
-                                         wire:target="refreshShippingOptions,placeOrder">
+                                         wire:target="save,shippingAddressId,sameAsShipping,billingAddressId">
                                     {{-- Mirror the shipping guard so billing choices stay in sync with the refreshed options. --}}
                                     @foreach($addresses->get('billing') as $billingAddress)
                                         <label
@@ -135,7 +135,7 @@
                                                 value="{{ $billingAddress->id }}"
                                                 class="mt-0.5 size-4 shrink-0 cursor-pointer border-gray-300 text-primary-500 focus:ring-primary-600 active:ring-2 active:ring-offset-2"
                                                 wire:loading.attr="disabled"
-                                                wire:target="refreshShippingOptions,placeOrder"
+                                                wire:target="save,shippingAddressId,sameAsShipping,billingAddressId"
                                             >
                                             <span class="flex flex-col space-y-0.5 text-sm text-gray-500">
                                                 <span class="font-medium text-gray-900">{{ $billingAddress->full_name }}</span>
