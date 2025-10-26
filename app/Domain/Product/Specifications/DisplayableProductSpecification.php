@@ -13,14 +13,11 @@ final class DisplayableProductSpecification
 {
     public function isSatisfiedBy(Product $product): bool
     {
-        if (! $product->isVisible()) {
+        if (! $product->isAvailableForPurchase()) {
             return false;
         }
 
-        if ($product->getPrice() <= 0.0) {
-            return false;
-        }
-
-        return $product->getName() !== '' && $product->getSlug() !== '';
+        // By reaching this branch the product has satisfied all visibility and pricing rules.
+        return true;
     }
 }

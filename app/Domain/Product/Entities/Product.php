@@ -83,6 +83,14 @@ final class Product
     }
 
     /**
+     * @return string|null Brand slug if present, otherwise null for anonymous brands.
+     */
+    public function getBrandSlug(): ?string
+    {
+        return Arr::get($this->brand, 'slug');
+    }
+
+    /**
      * @return array{id:int,name:string,slug:string}|null
      */
     public function getCategory(): ?array
@@ -93,6 +101,14 @@ final class Product
     public function getCategoryName(): ?string
     {
         return Arr::get($this->category, 'name');
+    }
+
+    /**
+     * @return string|null Category slug when a primary category exists.
+     */
+    public function getCategorySlug(): ?string
+    {
+        return Arr::get($this->category, 'slug');
     }
 
     public function isVisible(): bool
@@ -138,5 +154,61 @@ final class Product
     public function getShortDescription(): ?string
     {
         return $this->shortDescription;
+    }
+
+    /**
+     * Determine if the product currently has a valid sale price applied.
+     */
+    public function hasActiveSale(): bool
+    {
+        if ($this->salePrice === null) {
+            return false;
+        }
+
+        if ($this->salePrice <= 0.0) {
+            return false;
+        }
+
+        return $this->salePrice < $this->price;
+    }
+
+    /**
+     * Provide the price that should be shown to customers, preferring sale amounts.
+     */
+    public function getEffectivePrice(): float
+    {
+        return $this->hasActiveSale() ? $this->salePrice : $this->price;
+    }
+
+    /**
+     * Check aggregate state to decide if the product can be listed for purchase.
+     */
+    public function isAvailableForPurchase(): bool
+    {
+        if (! $this->isVisible()) {
+            return false;
+        }
+
+        if ($this->getEffectivePrice() <= 0.0) {
+            return false;
+        }
+
+        if ($this->name === '' || $this->slug === '') {
+            return false;
+        }
+
+        if ($this->managesStock() && ! $this->isInStock()) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Surface the leading image which acts as the default thumbnail for listings.
+     */
+    public function getPrimaryImage(): ?ProductImage
+    {
+        return $this->images->first();
     }
 }
