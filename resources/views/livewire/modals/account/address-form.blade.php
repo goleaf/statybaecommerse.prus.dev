@@ -9,8 +9,9 @@
                 <label for="first_name" class="block text-sm font-medium text-gray-700">
                     {{ __('First name') }} <span class="text-red-500">*</span>
                 </label>
-                <input 
-                    wire:model="first_name" 
+                {{-- Debounced model binding keeps the UI responsive while editing names. --}}
+                <input
+                    wire:model.lazy="first_name"
                     id="first_name" 
                     name="first_name" 
                     type="text"
@@ -25,8 +26,9 @@
                 <label for="last_name" class="block text-sm font-medium text-gray-700">
                     {{ __('Last name') }} <span class="text-red-500">*</span>
                 </label>
-                <input 
-                    wire:model="last_name" 
+                {{-- Debounced model binding keeps the UI responsive while editing surnames. --}}
+                <input
+                    wire:model.lazy="last_name"
                     id="last_name" 
                     name="last_name" 
                     type="text"
@@ -42,8 +44,9 @@
             <label for="street_address" class="block text-sm font-medium text-gray-700">
                 {{ __('Street Address') }} <span class="text-red-500">*</span>
             </label>
+            {{-- Debounced model binding for the primary address line avoids chatty updates. --}}
             <input
-                wire:model="street_address"
+                wire:model.lazy="street_address"
                 id="street_address"
                 placeholder="{{ __('Enter street address') }}"
                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -59,8 +62,9 @@
             <label for="street_address_plus" class="block text-sm font-medium text-gray-700">
                 {{ __('Apartment, suite, etc.') }}
             </label>
+            {{-- Debounced model binding for optional address info mirrors the primary field. --}}
             <input
-                wire:model="street_address_plus"
+                wire:model.lazy="street_address_plus"
                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 id="street_address_plus"
                 name="street_address_plus"
@@ -77,8 +81,9 @@
                 <label for="city" class="block text-sm font-medium text-gray-700">
                     {{ __('City') }} <span class="text-red-500">*</span>
                 </label>
-                <input 
-                    wire:model="city" 
+                {{-- Debounced model binding for locality reduces noisy Livewire requests. --}}
+                <input
+                    wire:model.lazy="city"
                     id="city" 
                     name="city" 
                     type="text"
@@ -93,8 +98,9 @@
                 <label for="postal_code" class="block text-sm font-medium text-gray-700">
                     {{ __('Postal / Zip code') }} <span class="text-red-500">*</span>
                 </label>
-                <input 
-                    wire:model="postal_code" 
+                {{-- Debounced model binding keeps postal code edits from firing every keystroke. --}}
+                <input
+                    wire:model.lazy="postal_code"
                     id="postal_code" 
                     name="postal_code" 
                     type="text"
@@ -110,8 +116,9 @@
             <label for="country_code" class="block text-sm font-medium text-gray-700">
                 {{ __('Country') }} <span class="text-red-500">*</span>
             </label>
-            <select 
-                wire:model="country_code" 
+            {{-- Debounced select binding settles the chosen country before resolving shipping. --}}
+            <select
+                wire:model.lazy="country_code"
                 id="country_code" 
                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
@@ -129,8 +136,9 @@
             <label for="phone_number" class="block text-sm font-medium text-gray-700">
                 {{ __('Phone Number') }}
             </label>
-            <input 
-                wire:model="phone_number" 
+            {{-- Debounced phone binding prevents rapid fire updates while typing. --}}
+            <input
+                wire:model.lazy="phone_number"
                 class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
                 id="phone_number" 
                 name="phone_number" 
