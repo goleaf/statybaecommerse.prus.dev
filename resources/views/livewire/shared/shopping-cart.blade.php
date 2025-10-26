@@ -23,16 +23,16 @@
                     <div class="space-y-3 max-h-64 overflow-y-auto">
                         @foreach ($this->cartItems as $item)
                             <div class="flex items-center space-x-3 border-b border-gray-100 pb-3">
-                                @if ($item->product->getFirstMedia())
-                                    <img src="{{ $item->product->getFirstMediaUrl() }}" 
-                                         alt="{{ $item->product->name }}" 
+                                @if ($item->imageUrl)
+                                    <img src="{{ $item->imageUrl }}"
+                                         alt="{{ $item->name }}"
                                          class="w-12 h-12 object-cover rounded">
                                 @endif
-                                
+
                                 <div class="flex-1">
-                                    <h4 class="text-sm font-medium">{{ $item->product->name }}</h4>
-                                    <p class="text-xs text-gray-500">{{ format_currency($item->price) }}</p>
-                                    
+                                    <h4 class="text-sm font-medium">{{ $item->name }}</h4>
+                                    <p class="text-xs text-gray-500">{{ format_currency($item->unitPrice) }}</p>
+
                                     <div class="flex items-center space-x-2 mt-1">
                                         <button wire:click="updateQuantity({{ $item->id }}, {{ $item->quantity - 1 }})"
                                                 class="text-gray-400 hover:text-gray-600">

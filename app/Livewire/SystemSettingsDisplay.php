@@ -4,8 +4,13 @@ declare(strict_types=1);
 
 namespace App\Livewire;
 
+use App\Data\Storefront\System\SystemSettingEntryData;
 use App\Services\SystemSettingsService;
+use App\Support\Cache\CacheKeys;
+use App\Support\Cache\CacheTags;
+use App\Support\Cache\TagAwareCache;
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\Str;
 use Livewire\Component;
 
 /**
@@ -41,26 +46,51 @@ final class SystemSettingsDisplay extends Component
     public function render(): View
     {
         $settingsService = app(SystemSettingsService::class);
-        $settings = $this->showPublicOnly
-            ? $settingsService->getPublicSettings()
-            : $settingsService->getSettingsByGroup($this->group);
 
-        $searchTerm = $this->search;
+        /** @var array<int, array{key:string, value:mixed}> $payload */
+        $payload = TagAwareCache::remember(
+            CacheKeys::systemSettingsGroup($this->group, $this->showPublicOnly),
+            now()->addMinutes(5),
+            function () use ($settingsService): array {
+                $source = $this->showPublicOnly
+                    ? $settingsService->getPublicSettings()
+                    : $settingsService->getSettingsByGroup($this->group);
+
+                if ($source instanceof \Traversable) {
+                    $source = iterator_to_array($source);
+                }
+
+                if (! is_array($source)) {
+                    $source = [];
+                }
+
+                return collect($source)
+                    ->map(static fn ($value, string $key): array => (new SystemSettingEntryData($key, $value))->toArray())
+                    ->values()
+                    ->all();
+            },
+            [CacheTags::settings()]
+        );
+
+        $entries = array_map(
+            static fn (array $entry): SystemSettingEntryData => SystemSettingEntryData::fromArray($entry),
+            $payload,
+        );
+
+        $searchTerm = trim($this->search);
 
         if ($searchTerm !== '') {
-            $settings = array_filter(
-                $settings,
-                static function ($value, string $key) use ($searchTerm): bool {
-                    $normalizedKey = stripos((string) $key, $searchTerm) !== false;
-                    $normalizedValue = is_scalar($value) && stripos((string) $value, $searchTerm) !== false;
-
-                    return $normalizedKey || $normalizedValue;
-                },
-                ARRAY_FILTER_USE_BOTH
-            );
+            $needle = Str::lower($searchTerm);
+            $entries = array_values(array_filter(
+                $entries,
+                fn (SystemSettingEntryData $entry): bool => $this->entryMatchesSearch($entry, $needle)
+            ));
         }
 
-        return view('livewire.system-settings-display', ['settings' => $settings, 'groups' => $this->getAvailableGroups()]);
+        return view('livewire.system-settings-display', [
+            'settings' => $entries,
+            'groups'   => $this->getAvailableGroups(),
+        ]);
     }
 
     /**
@@ -96,5 +126,57 @@ final class SystemSettingsDisplay extends Component
     private function getAvailableGroups(): array
     {
         return ['general' => __('system_settings.general'), 'ecommerce' => __('system_settings.ecommerce'), 'email' => __('system_settings.email'), 'payment' => __('system_settings.payment'), 'shipping' => __('system_settings.shipping'), 'seo' => __('system_settings.seo'), 'security' => __('system_settings.security'), 'api' => __('system_settings.api'), 'appearance' => __('system_settings.appearance'), 'notifications' => __('system_settings.notifications')];
+    }
+
+    /**
+     * Normalise mixed setting values for display within the Blade template.
+     */
+    public function formatValue(mixed $value): string
+    {
+        if (is_bool($value)) {
+            return $value ? 'true' : 'false';
+        }
+
+        if (is_array($value) || is_object($value)) {
+            try {
+                return (string) json_encode($value, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+            } catch (\JsonException) {
+                return '[]';
+            }
+        }
+
+        if ($value === null) {
+            return 'null';
+        }
+
+        return (string) $value;
+    }
+
+    /**
+     * Determine if the provided setting entry should be visible when a search term is applied.
+     */
+    private function entryMatchesSearch(SystemSettingEntryData $entry, string $needle): bool
+    {
+        if ($needle === '') {
+            return true;
+        }
+
+        if (Str::contains(Str::lower($entry->key), $needle)) {
+            return true;
+        }
+
+        $value = $entry->value;
+
+        if (is_scalar($value) || $value === null) {
+            return Str::contains(Str::lower((string) ($value ?? '')), $needle);
+        }
+
+        try {
+            $encoded = json_encode($value, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE);
+        } catch (\JsonException) {
+            $encoded = '';
+        }
+
+        return Str::contains(Str::lower($encoded), $needle);
     }
 }

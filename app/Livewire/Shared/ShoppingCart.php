@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace App\Livewire\Shared;
 
+use App\Data\Storefront\Shared\CartItemData;
 use App\Models\AttributeValue;
 use App\Models\CartItem;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use Illuminate\Contracts\View\View;
-use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Session;
 use Livewire\Attributes\On;
 use Livewire\Component;
@@ -20,7 +21,7 @@ use Livewire\Component;
  * Livewire component for ShoppingCart with reactive frontend functionality, real-time updates, and user interaction handling.
  *
  * @property bool $isOpen
- * @property-read EloquentCollection<int, CartItem> $cartItems
+ * @property-read Collection<int, CartItemData> $cartItems
  */
 final class ShoppingCart extends Component
 {
@@ -191,16 +192,14 @@ final class ShoppingCart extends Component
      * Handle getCartItemsProperty functionality with proper error handling.
      */
     /**
-     * @return EloquentCollection<int, CartItem>
+     * @return Collection<int, CartItemData>
      */
-    public function getCartItemsProperty(): EloquentCollection
+    public function getCartItemsProperty(): Collection
     {
-        /** @var EloquentCollection<int, CartItem> $items */
-        $items = CartItem::with(['product', 'product.media'])
+        return CartItem::with(['product', 'product.media'])
             ->where('session_id', Session::getId())
-            ->get();
-
-        return $items;
+            ->get()
+            ->map(static fn (CartItem $item): CartItemData => CartItemData::fromModel($item));
     }
 
     /**
@@ -208,8 +207,8 @@ final class ShoppingCart extends Component
      */
     public function getCartTotalProperty(): float
     {
-        return $this->cartItems->sum(static function (CartItem $item): float {
-            return (float) $item->total_price;
+        return $this->cartItems->sum(static function (CartItemData $item): float {
+            return $item->totalPrice;
         });
     }
 
@@ -218,7 +217,9 @@ final class ShoppingCart extends Component
      */
     public function getCartCountProperty(): int
     {
-        return (int) $this->cartItems->sum('quantity');
+        return (int) $this->cartItems->sum(static function (CartItemData $item): int {
+            return $item->quantity;
+        });
     }
 
     /**
