@@ -120,9 +120,9 @@ final class NewsController extends Controller
      */
     public function show(string $slug): View
     {
-        $news = News::published()->whereHas('translations', function ($query) use ($slug) {
+        $news = News::published()->whereHas('translations', function ($query) use ($slug): void {
             $query->where('slug', $slug)->where('locale', app()->getLocale());
-        })->with(['categories', 'tags', 'images', 'comments' => function ($query) {
+        })->with(['categories', 'tags', 'images', 'comments' => function ($query): void {
             $query->approved()->visible()->topLevel()->with('replies');
         }])->firstOrFail();
         // Increment view count
@@ -142,7 +142,14 @@ final class NewsController extends Controller
             })
             ->values();
 
-        return view('news.show', compact('news', 'relatedNews'));
+                return $candidate->title !== ''
+                    && $candidate->slug !== ''
+                    && $candidate->is_published
+                    && $hasFeaturedImage;
+            })
+            ->values(); // Preserve contiguous indexes for predictable carousel rendering.
+
+        return view('news.show', ['news' => $news, 'relatedNews' => $relatedNews]);
     }
 
     /**
@@ -150,14 +157,14 @@ final class NewsController extends Controller
      */
     public function category(string $slug): View
     {
-        $category = NewsCategory::visible()->whereHas('translations', function ($query) use ($slug) {
+        $category = NewsCategory::visible()->whereHas('translations', function ($query) use ($slug): void {
             $query->where('slug', $slug)->where('locale', app()->getLocale());
         })->firstOrFail();
         $news = News::published()->byCategory($category->id)->with(['categories', 'tags', 'images'])->orderBy('published_at', 'desc')->paginate(12);
         $categories = NewsCategory::visible()->with('translations')->get();
         $tags = NewsTag::visible()->with('translations')->get();
 
-        return view('news.category', compact('news', 'category', 'categories', 'tags'));
+        return view('news.category', ['news' => $news, 'category' => $category, 'categories' => $categories, 'tags' => $tags]);
     }
 
     /**
@@ -165,13 +172,13 @@ final class NewsController extends Controller
      */
     public function tag(string $slug): View
     {
-        $tag = NewsTag::visible()->whereHas('translations', function ($query) use ($slug) {
+        $tag = NewsTag::visible()->whereHas('translations', function ($query) use ($slug): void {
             $query->where('slug', $slug)->where('locale', app()->getLocale());
         })->firstOrFail();
         $news = News::published()->byTag($tag->id)->with(['categories', 'tags', 'images'])->orderBy('published_at', 'desc')->paginate(12);
         $categories = NewsCategory::visible()->with('translations')->get();
         $tags = NewsTag::visible()->with('translations')->get();
 
-        return view('news.tag', compact('news', 'tag', 'categories', 'tags'));
+        return view('news.tag', ['news' => $news, 'tag' => $tag, 'categories' => $categories, 'tags' => $tags]);
     }
 }
