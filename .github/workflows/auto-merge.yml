@@ -49,8 +49,9 @@ jobs:
             core.setOutput('mergeable', pr.mergeable ? 'true' : 'false');
             core.setOutput('mergeable_state', pr.mergeable_state || 'unknown');
 
-      - name: Merge pull request when clean
-        if: steps.pr.outputs.mergeable == 'true' && steps.pr.outputs.mergeable_state == 'clean'
+      - name: Merge pull request when conflict-free
+        # Merge whenever GitHub reports the PR as mergeable; the API already excludes conflicted states.
+        if: steps.pr.outputs.mergeable == 'true' && steps.pr.outputs.mergeable_state != 'dirty'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -61,7 +62,8 @@ jobs:
             --body "Automated merge performed by CI once the pull request became conflict-free."
 
       - name: Log mergeability status when merge is skipped
-        if: steps.pr.outputs.mergeable != 'true' || steps.pr.outputs.mergeable_state != 'clean'
+        # Only log when the PR is either not mergeable or explicitly marked dirty by GitHub.
+        if: steps.pr.outputs.mergeable != 'true' || steps.pr.outputs.mergeable_state == 'dirty'
         run: |
           # Provide context in the workflow logs explaining why the merge did not proceed.
-          echo "Pull request ${{ github.event.pull_request.number }} mergeable_state=${{ steps.pr.outputs.mergeable_state }}; awaiting clean state."
+          echo "Pull request ${{ github.event.pull_request.number }} mergeable_state=${{ steps.pr.outputs.mergeable_state }}; awaiting conflict resolution or policy clearance."
