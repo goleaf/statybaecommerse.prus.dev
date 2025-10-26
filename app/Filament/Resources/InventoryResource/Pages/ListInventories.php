@@ -9,6 +9,8 @@ use App\Filament\Resources\InventoryResource;
 use App\Filament\WidgetTabs\Components\WidgetTab;
 use App\Filament\WidgetTabs\Concerns\HasWidgetTabs;
 use Filament\Actions;
+use Illuminate\Contracts\Pagination\CursorPaginator;
+use Illuminate\Contracts\Pagination\Paginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 
@@ -85,6 +87,22 @@ class ListInventories extends BaseListRecords
         }
 
         return $this->applyWidgetTabFilters($query);
+    }
+
+    /**
+     * Ensure pagination links include all active filter parameters for consistent navigation.
+     */
+    protected function paginateTableQuery(Builder $query): Paginator|CursorPaginator
+    {
+        // Leverage Filament's default pagination behaviour, then append the current query string parameters.
+        $paginator = parent::paginateTableQuery($query);
+
+        // Preserve filters such as product, location, and stock status when navigating between pages.
+        if (method_exists($paginator, 'withQueryString')) {
+            return $paginator->withQueryString();
+        }
+
+        return $paginator;
     }
 
     public function getWidgetTabs(): array
