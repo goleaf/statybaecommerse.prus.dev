@@ -39,6 +39,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Lang;
+use UnitEnum;
 
 final class CampaignProductTargetResource extends Resource
 {
@@ -54,7 +55,7 @@ final class CampaignProductTargetResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'target_type';
 
-    public static function getNavigationGroup(): \UnitEnum|string|null
+    public static function getNavigationGroup(): UnitEnum|string|null
     {
         return 'Marketing';
     }

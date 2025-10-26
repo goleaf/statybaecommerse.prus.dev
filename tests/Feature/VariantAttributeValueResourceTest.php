@@ -26,7 +26,7 @@ class VariantAttributeValueResourceTest extends TestCase
 
         // Create a test user
         $this->user = User::factory()->admin()->create([
-            'email' => 'admin@example.com',
+            'email'    => 'admin@example.com',
             'password' => bcrypt('password'),
         ]);
 
@@ -39,7 +39,7 @@ class VariantAttributeValueResourceTest extends TestCase
         $variant = ProductVariant::factory()->create();
         $attribute = Attribute::factory()->create();
         $variantAttributeValue = VariantAttributeValue::factory()->create([
-            'variant_id' => $variant->id,
+            'variant_id'   => $variant->id,
             'attribute_id' => $attribute->id,
         ]);
 
@@ -60,31 +60,31 @@ class VariantAttributeValueResourceTest extends TestCase
 
         Livewire::test(VariantAttributeValueResource\Pages\CreateVariantAttributeValue::class)
             ->fillForm([
-                'variant_id' => $variant->id,
-                'attribute_id' => $attribute->id,
-                'attribute_value' => 'Test Value',
+                'variant_id'              => $variant->id,
+                'attribute_id'            => $attribute->id,
+                'attribute_value'         => 'Test Value',
                 'attribute_value_display' => 'Test Display Value',
-                'attribute_value_lt' => 'Test Value LT',
-                'attribute_value_en' => 'Test Value EN',
-                'attribute_value_slug' => 'test-value',
-                'sort_order' => 1,
-                'is_filterable' => true,
-                'is_searchable' => true,
+                'attribute_value_lt'      => 'Test Value LT',
+                'attribute_value_en'      => 'Test Value EN',
+                'attribute_value_slug'    => 'test-value',
+                'sort_order'              => 1,
+                'is_filterable'           => true,
+                'is_searchable'           => true,
             ])
             ->call('create')
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('variant_attribute_values', [
-            'variant_id' => $variant->id,
-            'attribute_id' => $attribute->id,
-            'attribute_value' => 'Test Value',
+            'variant_id'              => $variant->id,
+            'attribute_id'            => $attribute->id,
+            'attribute_value'         => 'Test Value',
             'attribute_value_display' => 'Test Display Value',
-            'attribute_value_lt' => 'Test Value LT',
-            'attribute_value_en' => 'Test Value EN',
-            'attribute_value_slug' => 'test-value',
-            'sort_order' => 1,
-            'is_filterable' => true,
-            'is_searchable' => true,
+            'attribute_value_lt'      => 'Test Value LT',
+            'attribute_value_en'      => 'Test Value EN',
+            'attribute_value_slug'    => 'test-value',
+            'sort_order'              => 1,
+            'is_filterable'           => true,
+            'is_searchable'           => true,
         ]);
     }
 
@@ -93,7 +93,7 @@ class VariantAttributeValueResourceTest extends TestCase
         $variant = ProductVariant::factory()->create();
         $attribute = Attribute::factory()->create();
         $variantAttributeValue = VariantAttributeValue::factory()->create([
-            'variant_id' => $variant->id,
+            'variant_id'   => $variant->id,
             'attribute_id' => $attribute->id,
         ]);
 
@@ -101,22 +101,22 @@ class VariantAttributeValueResourceTest extends TestCase
             'record' => $variantAttributeValue->getRouteKey(),
         ])
             ->fillForm([
-                'attribute_value' => 'Updated Value',
+                'attribute_value'         => 'Updated Value',
                 'attribute_value_display' => 'Updated Display Value',
-                'sort_order' => 5,
-                'is_filterable' => false,
-                'is_searchable' => false,
+                'sort_order'              => 5,
+                'is_filterable'           => false,
+                'is_searchable'           => false,
             ])
             ->call('save')
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('variant_attribute_values', [
-            'id' => $variantAttributeValue->id,
-            'attribute_value' => 'Updated Value',
+            'id'                      => $variantAttributeValue->id,
+            'attribute_value'         => 'Updated Value',
             'attribute_value_display' => 'Updated Display Value',
-            'sort_order' => 5,
-            'is_filterable' => false,
-            'is_searchable' => false,
+            'sort_order'              => 5,
+            'is_filterable'           => false,
+            'is_searchable'           => false,
         ]);
     }
 
@@ -125,7 +125,7 @@ class VariantAttributeValueResourceTest extends TestCase
         $variant = ProductVariant::factory()->create();
         $attribute = Attribute::factory()->create();
         $variantAttributeValue = VariantAttributeValue::factory()->create([
-            'variant_id' => $variant->id,
+            'variant_id'   => $variant->id,
             'attribute_id' => $attribute->id,
         ]);
 
@@ -138,7 +138,7 @@ class VariantAttributeValueResourceTest extends TestCase
         $variant = ProductVariant::factory()->create();
         $attribute = Attribute::factory()->create();
         $variantAttributeValue = VariantAttributeValue::factory()->create([
-            'variant_id' => $variant->id,
+            'variant_id'   => $variant->id,
             'attribute_id' => $attribute->id,
         ]);
 
@@ -155,8 +155,8 @@ class VariantAttributeValueResourceTest extends TestCase
         $variant = ProductVariant::factory()->create();
         $attribute = Attribute::factory()->create();
         $variantAttributeValue = VariantAttributeValue::factory()->create([
-            'variant_id' => $variant->id,
-            'attribute_id' => $attribute->id,
+            'variant_id'    => $variant->id,
+            'attribute_id'  => $attribute->id,
             'is_filterable' => true,
         ]);
 
@@ -164,7 +164,7 @@ class VariantAttributeValueResourceTest extends TestCase
             ->callTableAction('toggle_filterable', $variantAttributeValue);
 
         $this->assertDatabaseHas('variant_attribute_values', [
-            'id' => $variantAttributeValue->id,
+            'id'            => $variantAttributeValue->id,
             'is_filterable' => false,
         ]);
     }
@@ -174,8 +174,8 @@ class VariantAttributeValueResourceTest extends TestCase
         $variant = ProductVariant::factory()->create();
         $attribute = Attribute::factory()->create();
         $variantAttributeValue = VariantAttributeValue::factory()->create([
-            'variant_id' => $variant->id,
-            'attribute_id' => $attribute->id,
+            'variant_id'    => $variant->id,
+            'attribute_id'  => $attribute->id,
             'is_searchable' => true,
         ]);
 
@@ -183,7 +183,7 @@ class VariantAttributeValueResourceTest extends TestCase
             ->callTableAction('toggle_searchable', $variantAttributeValue);
 
         $this->assertDatabaseHas('variant_attribute_values', [
-            'id' => $variantAttributeValue->id,
+            'id'            => $variantAttributeValue->id,
             'is_searchable' => false,
         ]);
     }
@@ -193,8 +193,8 @@ class VariantAttributeValueResourceTest extends TestCase
         $variant = ProductVariant::factory()->create();
         $attribute = Attribute::factory()->create();
         $variantAttributeValue = VariantAttributeValue::factory()->create([
-            'variant_id' => $variant->id,
-            'attribute_id' => $attribute->id,
+            'variant_id'      => $variant->id,
+            'attribute_id'    => $attribute->id,
             'attribute_value' => 'Original Value',
         ]);
 
@@ -202,8 +202,8 @@ class VariantAttributeValueResourceTest extends TestCase
             ->callTableAction('duplicate', $variantAttributeValue);
 
         $this->assertDatabaseHas('variant_attribute_values', [
-            'variant_id' => $variant->id,
-            'attribute_id' => $attribute->id,
+            'variant_id'      => $variant->id,
+            'attribute_id'    => $attribute->id,
             'attribute_value' => 'Original Value (Copy)',
         ]);
     }
@@ -215,11 +215,11 @@ class VariantAttributeValueResourceTest extends TestCase
         $attribute = Attribute::factory()->create();
 
         $variantAttributeValue1 = VariantAttributeValue::factory()->create([
-            'variant_id' => $variant1->id,
+            'variant_id'   => $variant1->id,
             'attribute_id' => $attribute->id,
         ]);
         $variantAttributeValue2 = VariantAttributeValue::factory()->create([
-            'variant_id' => $variant2->id,
+            'variant_id'   => $variant2->id,
             'attribute_id' => $attribute->id,
         ]);
 
@@ -236,11 +236,11 @@ class VariantAttributeValueResourceTest extends TestCase
         $attribute2 = Attribute::factory()->create(['name' => 'Attribute 2']);
 
         $variantAttributeValue1 = VariantAttributeValue::factory()->create([
-            'variant_id' => $variant->id,
+            'variant_id'   => $variant->id,
             'attribute_id' => $attribute1->id,
         ]);
         $variantAttributeValue2 = VariantAttributeValue::factory()->create([
-            'variant_id' => $variant->id,
+            'variant_id'   => $variant->id,
             'attribute_id' => $attribute2->id,
         ]);
 
@@ -256,13 +256,13 @@ class VariantAttributeValueResourceTest extends TestCase
         $attribute = Attribute::factory()->create();
 
         $filterableValue = VariantAttributeValue::factory()->create([
-            'variant_id' => $variant->id,
-            'attribute_id' => $attribute->id,
+            'variant_id'    => $variant->id,
+            'attribute_id'  => $attribute->id,
             'is_filterable' => true,
         ]);
         $nonFilterableValue = VariantAttributeValue::factory()->create([
-            'variant_id' => $variant->id,
-            'attribute_id' => $attribute->id,
+            'variant_id'    => $variant->id,
+            'attribute_id'  => $attribute->id,
             'is_filterable' => false,
         ]);
 
@@ -278,13 +278,13 @@ class VariantAttributeValueResourceTest extends TestCase
         $attribute = Attribute::factory()->create();
 
         $searchableValue = VariantAttributeValue::factory()->create([
-            'variant_id' => $variant->id,
-            'attribute_id' => $attribute->id,
+            'variant_id'    => $variant->id,
+            'attribute_id'  => $attribute->id,
             'is_searchable' => true,
         ]);
         $nonSearchableValue = VariantAttributeValue::factory()->create([
-            'variant_id' => $variant->id,
-            'attribute_id' => $attribute->id,
+            'variant_id'    => $variant->id,
+            'attribute_id'  => $attribute->id,
             'is_searchable' => false,
         ]);
 
@@ -300,13 +300,13 @@ class VariantAttributeValueResourceTest extends TestCase
         $attribute = Attribute::factory()->create();
 
         $variantAttributeValue1 = VariantAttributeValue::factory()->create([
-            'variant_id' => $variant->id,
-            'attribute_id' => $attribute->id,
+            'variant_id'    => $variant->id,
+            'attribute_id'  => $attribute->id,
             'is_filterable' => false,
         ]);
         $variantAttributeValue2 = VariantAttributeValue::factory()->create([
-            'variant_id' => $variant->id,
-            'attribute_id' => $attribute->id,
+            'variant_id'    => $variant->id,
+            'attribute_id'  => $attribute->id,
             'is_filterable' => false,
         ]);
 
@@ -314,11 +314,11 @@ class VariantAttributeValueResourceTest extends TestCase
             ->callTableBulkAction('make_filterable', [$variantAttributeValue1, $variantAttributeValue2]);
 
         $this->assertDatabaseHas('variant_attribute_values', [
-            'id' => $variantAttributeValue1->id,
+            'id'            => $variantAttributeValue1->id,
             'is_filterable' => true,
         ]);
         $this->assertDatabaseHas('variant_attribute_values', [
-            'id' => $variantAttributeValue2->id,
+            'id'            => $variantAttributeValue2->id,
             'is_filterable' => true,
         ]);
     }
@@ -329,13 +329,13 @@ class VariantAttributeValueResourceTest extends TestCase
         $attribute = Attribute::factory()->create();
 
         $variantAttributeValue1 = VariantAttributeValue::factory()->create([
-            'variant_id' => $variant->id,
-            'attribute_id' => $attribute->id,
+            'variant_id'    => $variant->id,
+            'attribute_id'  => $attribute->id,
             'is_searchable' => false,
         ]);
         $variantAttributeValue2 = VariantAttributeValue::factory()->create([
-            'variant_id' => $variant->id,
-            'attribute_id' => $attribute->id,
+            'variant_id'    => $variant->id,
+            'attribute_id'  => $attribute->id,
             'is_searchable' => false,
         ]);
 
@@ -343,11 +343,11 @@ class VariantAttributeValueResourceTest extends TestCase
             ->callTableBulkAction('make_searchable', [$variantAttributeValue1, $variantAttributeValue2]);
 
         $this->assertDatabaseHas('variant_attribute_values', [
-            'id' => $variantAttributeValue1->id,
+            'id'            => $variantAttributeValue1->id,
             'is_searchable' => true,
         ]);
         $this->assertDatabaseHas('variant_attribute_values', [
-            'id' => $variantAttributeValue2->id,
+            'id'            => $variantAttributeValue2->id,
             'is_searchable' => true,
         ]);
     }
@@ -358,14 +358,14 @@ class VariantAttributeValueResourceTest extends TestCase
         $attribute = Attribute::factory()->create();
 
         $variantAttributeValue1 = VariantAttributeValue::factory()->create([
-            'variant_id' => $variant->id,
+            'variant_id'   => $variant->id,
             'attribute_id' => $attribute->id,
-            'sort_order' => 1,
+            'sort_order'   => 1,
         ]);
         $variantAttributeValue2 = VariantAttributeValue::factory()->create([
-            'variant_id' => $variant->id,
+            'variant_id'   => $variant->id,
             'attribute_id' => $attribute->id,
-            'sort_order' => 2,
+            'sort_order'   => 2,
         ]);
 
         Livewire::test(VariantAttributeValueResource\Pages\ListVariantAttributeValues::class)
@@ -374,11 +374,11 @@ class VariantAttributeValueResourceTest extends TestCase
             ]);
 
         $this->assertDatabaseHas('variant_attribute_values', [
-            'id' => $variantAttributeValue1->id,
+            'id'         => $variantAttributeValue1->id,
             'sort_order' => 10,
         ]);
         $this->assertDatabaseHas('variant_attribute_values', [
-            'id' => $variantAttributeValue2->id,
+            'id'         => $variantAttributeValue2->id,
             'sort_order' => 10,
         ]);
     }
@@ -389,13 +389,13 @@ class VariantAttributeValueResourceTest extends TestCase
         $attribute = Attribute::factory()->create();
 
         $variantAttributeValue1 = VariantAttributeValue::factory()->create([
-            'variant_id' => $variant->id,
-            'attribute_id' => $attribute->id,
+            'variant_id'      => $variant->id,
+            'attribute_id'    => $attribute->id,
             'attribute_value' => 'Searchable Value',
         ]);
         $variantAttributeValue2 = VariantAttributeValue::factory()->create([
-            'variant_id' => $variant->id,
-            'attribute_id' => $attribute->id,
+            'variant_id'      => $variant->id,
+            'attribute_id'    => $attribute->id,
             'attribute_value' => 'Different Value',
         ]);
 
@@ -411,19 +411,19 @@ class VariantAttributeValueResourceTest extends TestCase
         $attribute = Attribute::factory()->create();
 
         $variantAttributeValue1 = VariantAttributeValue::factory()->create([
-            'variant_id' => $variant->id,
+            'variant_id'   => $variant->id,
             'attribute_id' => $attribute->id,
-            'sort_order' => 3,
+            'sort_order'   => 3,
         ]);
         $variantAttributeValue2 = VariantAttributeValue::factory()->create([
-            'variant_id' => $variant->id,
+            'variant_id'   => $variant->id,
             'attribute_id' => $attribute->id,
-            'sort_order' => 1,
+            'sort_order'   => 1,
         ]);
         $variantAttributeValue3 = VariantAttributeValue::factory()->create([
-            'variant_id' => $variant->id,
+            'variant_id'   => $variant->id,
             'attribute_id' => $attribute->id,
-            'sort_order' => 2,
+            'sort_order'   => 2,
         ]);
 
         Livewire::test(VariantAttributeValueResource\Pages\ListVariantAttributeValues::class)
@@ -435,8 +435,8 @@ class VariantAttributeValueResourceTest extends TestCase
     {
         Livewire::test(VariantAttributeValueResource\Pages\CreateVariantAttributeValue::class)
             ->fillForm([
-                'variant_id' => null,
-                'attribute_id' => null,
+                'variant_id'      => null,
+                'attribute_id'    => null,
                 'attribute_value' => '',
             ])
             ->call('create')
@@ -450,11 +450,11 @@ class VariantAttributeValueResourceTest extends TestCase
         $attribute = Attribute::factory()->create();
 
         $variantAttributeValue1 = VariantAttributeValue::factory()->create([
-            'variant_id' => $variant1->id,
+            'variant_id'   => $variant1->id,
             'attribute_id' => $attribute->id,
         ]);
         $variantAttributeValue2 = VariantAttributeValue::factory()->create([
-            'variant_id' => $variant2->id,
+            'variant_id'   => $variant2->id,
             'attribute_id' => $attribute->id,
         ]);
 
@@ -469,11 +469,11 @@ class VariantAttributeValueResourceTest extends TestCase
         $attribute2 = Attribute::factory()->create(['name' => 'Attribute 2']);
 
         $variantAttributeValue1 = VariantAttributeValue::factory()->create([
-            'variant_id' => $variant->id,
+            'variant_id'   => $variant->id,
             'attribute_id' => $attribute1->id,
         ]);
         $variantAttributeValue2 = VariantAttributeValue::factory()->create([
-            'variant_id' => $variant->id,
+            'variant_id'   => $variant->id,
             'attribute_id' => $attribute2->id,
         ]);
 

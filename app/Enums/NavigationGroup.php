@@ -251,7 +251,7 @@ enum NavigationGroup: string implements EnumInterface
         return collect(self::cases());
     }
 
-    public static function fromLabel(string $label): ?self
+    public static function fromLabel(string $label): ?static
     {
         return collect(self::cases())->first(fn ($case) => $case->label() === $label);
     }
