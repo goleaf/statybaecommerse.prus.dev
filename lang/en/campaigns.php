@@ -74,6 +74,7 @@ return [
         'banner' => 'Banner',
         'popup'  => 'Popup',
         'social' => 'Social Media',
+        'unknown' => 'Unknown', // Provide a readable label for legacy or undefined types.
     ],
     // Status
     'status' => [
