@@ -234,9 +234,23 @@ final class CampaignController extends Controller
     )]
     public function getCampaignPerformance(): JsonResponse
     {
-        $performance = ['high_performing' => Campaign::where('conversion_rate', '>', 5)->count(), 'medium_performing' => Campaign::whereBetween('conversion_rate', [2, 5])->count(), 'low_performing' => Campaign::where('conversion_rate', '<', 2)->count(), 'needs_attention' => Campaign::where(function ($query): void {
-            $query->where('conversion_rate', '<', 2)->orWhere('total_views', '>', 0)->whereRaw('(total_clicks / total_views) < 0.01');
-        })->count()];
+        // Recalculate the "needs attention" bucket with grouped conditions so we do not accidentally
+        // apply the click-through constraint to every record and to safely handle zero-view campaigns.
+        $needsAttentionCount = Campaign::query()
+            ->where(static function (Builder $query): void {
+                $query
+                    // Flag campaigns with a very low conversion rate regardless of click metrics.
+                    ->where('conversion_rate', '<', 2)
+                    // Also capture campaigns that receive traffic but fail to generate clicks.
+                    ->orWhere(static function (Builder $subQuery): void {
+                        $subQuery
+                            ->where('total_views', '>', 0)
+                            ->whereRaw('(total_clicks / NULLIF(total_views, 0)) < ?', [0.01]);
+                    });
+            })
+            ->count();
+
+        $performance = ['high_performing' => Campaign::where('conversion_rate', '>', 5)->count(), 'medium_performing' => Campaign::whereBetween('conversion_rate', [2, 5])->count(), 'low_performing' => Campaign::where('conversion_rate', '<', 2)->count(), 'needs_attention' => $needsAttentionCount];
 
         return response()->json(['success' => true, 'data' => $performance]);
     }
