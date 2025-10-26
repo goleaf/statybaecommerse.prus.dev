@@ -2,15 +2,20 @@
 
 declare(strict_types=1);
 
+use App\Models\Category;
+use App\Models\Customer;
+use App\Models\Product;
 use App\Services\Discounts\DiscountEngine;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Tests\TestCase;
 
-uses()->group('engine');
+uses(TestCase::class)->group('engine');
 
 beforeEach(function () {
     // Run the package/app migrations to ensure tables exist
-    $this->artisan('migrate', ['--force' => true]);
+    Artisan::call('migrate', ['--force' => true]);
 
     // Clean up any existing data - disable foreign key checks for SQLite
     DB::statement('PRAGMA foreign_keys=OFF');
@@ -23,6 +28,9 @@ beforeEach(function () {
     }
     if (Schema::hasTable('orders')) {
         DB::table('orders')->delete();
+    }
+    if (Schema::hasTable('discount_redemptions')) {
+        DB::table('discount_redemptions')->delete();
     }
 
     // Re-enable foreign key checks
@@ -119,16 +127,16 @@ beforeEach(function () {
             $table->timestamps();
         });
     }
-    if (! Schema::hasTable('category_product')) {
-        Schema::create('category_product', function ($table) {
-            $table->unsignedBigInteger('category_id');
+    if (! Schema::hasTable('product_categories')) {
+        Schema::create('product_categories', function ($table) {
             $table->unsignedBigInteger('product_id');
+            $table->unsignedBigInteger('category_id');
         });
     }
-    if (! Schema::hasTable('collection_product')) {
-        Schema::create('collection_product', function ($table) {
-            $table->unsignedBigInteger('collection_id');
+    if (! Schema::hasTable('product_collections')) {
+        Schema::create('product_collections', function ($table) {
             $table->unsignedBigInteger('product_id');
+            $table->unsignedBigInteger('collection_id');
         });
     }
     if (! Schema::hasTable('users')) {
@@ -171,14 +179,26 @@ it('applies percentage cart discount with code', function () {
         $data['ends_at'] = now()->addDay();
     }
     $discountId = DB::table('discounts')->insertGetId($data);
-    DB::table('discount_codes')->insert([
+    $codeColumns = Schema::getColumnListing('discount_codes');
+    $codePayload = [
         'discount_id' => $discountId,
         'code'        => 'TEST10',
-        'max_uses'    => 10,
-        'usage_count' => 0,
         'created_at'  => now(),
         'updated_at'  => now(),
-    ]);
+    ];
+    if (in_array('usage_limit', $codeColumns, true)) {
+        $codePayload['usage_limit'] = 10;
+    }
+    if (in_array('usage_count', $codeColumns, true)) {
+        $codePayload['usage_count'] = 0;
+    }
+    if (in_array('status', $codeColumns, true)) {
+        $codePayload['status'] = 'active';
+    }
+    if (in_array('is_active', $codeColumns, true)) {
+        $codePayload['is_active'] = true;
+    }
+    DB::table('discount_codes')->insert($codePayload);
 
     $engine = app(DiscountEngine::class);
     $result = $engine->evaluate([
@@ -204,6 +224,11 @@ it('respects first order only flag', function () {
         $userInsert['last_name'] = 'B';
     }
     $uid = DB::table('users')->insertGetId($userInsert);
+    $customerId = $uid;
+    if (class_exists(Customer::class) && Schema::hasTable('customers') && Schema::hasColumn('customers', 'user_id')) {
+        $customer = Customer::factory()->create(['user_id' => $uid]);
+        $customerId = $customer->id;
+    }
     $data2 = [
         'name'             => 'First Order Discount',
         'type'             => 'fixed',
@@ -236,7 +261,238 @@ it('respects first order only flag', function () {
     $r1 = $engine->evaluate(['user_id' => $uid, 'currency_code' => 'EUR', 'zone_id' => 1, 'now' => now(), 'cart' => ['subtotal' => 20, 'items' => []]]);
     expect($r1['discount_total_amount'])->toBe(5.0);
     // Simulate order
-    DB::table('orders')->insert(['user_id' => $uid, 'status' => 'completed', 'currency' => 'EUR', 'subtotal' => 0, 'discount_amount' => 0, 'tax_amount' => 0, 'shipping_amount' => 0, 'total' => 0, 'number' => 'X', 'created_at' => now(), 'updated_at' => now()]);
+    $orderColumns = Schema::getColumnListing('orders');
+    $orderInsert = [
+        'status'     => 'completed',
+        'number'     => 'X',
+        'created_at' => now(),
+        'updated_at' => now(),
+    ];
+    if (in_array('customer_id', $orderColumns, true)) {
+        $orderInsert['customer_id'] = $customerId;
+    }
+    if (in_array('user_id', $orderColumns, true)) {
+        $orderInsert['user_id'] = $uid;
+    }
+    if (in_array('currency_code', $orderColumns, true)) {
+        $orderInsert['currency_code'] = 'EUR';
+    } elseif (in_array('currency', $orderColumns, true)) {
+        $orderInsert['currency'] = 'EUR';
+    }
+    if (in_array('subtotal_amount', $orderColumns, true)) {
+        $orderInsert['subtotal_amount'] = 0;
+    } elseif (in_array('subtotal', $orderColumns, true)) {
+        $orderInsert['subtotal'] = 0;
+    }
+    if (in_array('discount_total_amount', $orderColumns, true)) {
+        $orderInsert['discount_total_amount'] = 0;
+    } elseif (in_array('discount_amount', $orderColumns, true)) {
+        $orderInsert['discount_amount'] = 0;
+    }
+    if (in_array('tax_total_amount', $orderColumns, true)) {
+        $orderInsert['tax_total_amount'] = 0;
+    } elseif (in_array('tax_amount', $orderColumns, true)) {
+        $orderInsert['tax_amount'] = 0;
+    }
+    if (in_array('shipping_total_amount', $orderColumns, true)) {
+        $orderInsert['shipping_total_amount'] = 0;
+    } elseif (in_array('shipping_amount', $orderColumns, true)) {
+        $orderInsert['shipping_amount'] = 0;
+    }
+    if (in_array('grand_total_amount', $orderColumns, true)) {
+        $orderInsert['grand_total_amount'] = 0;
+    } elseif (in_array('total', $orderColumns, true)) {
+        $orderInsert['total'] = 0;
+    }
+    DB::statement('PRAGMA foreign_keys=OFF');
+    DB::table('orders')->insert($orderInsert);
+    DB::statement('PRAGMA foreign_keys=ON');
     $r2 = $engine->evaluate(['user_id' => $uid, 'currency_code' => 'EUR', 'zone_id' => 1, 'now' => now(), 'cart' => ['subtotal' => 20, 'items' => []]]);
     expect($r2['discount_total_amount'])->toBe(0.0);
+});
+
+it('applies category scoped minimum amount discount', function () {
+    // Prepare a product that belongs to a qualifying category for the condition.
+    $category = Category::factory()->create();
+    $product = Product::factory()->create(['brand_id' => null]);
+    DB::table('product_categories')->insert(['product_id' => $product->id, 'category_id' => $category->id]);
+
+    // Provision the discount with a minimum amount threshold and category scope condition.
+    $discountData = [
+        'name'            => 'Category Boost 20%',
+        'type'            => 'percentage',
+        'value'           => 20,
+        'status'          => 'active',
+        'stacking_policy' => 'stack',
+        'priority'        => 10,
+        'created_at'      => now(),
+        'updated_at'      => now(),
+    ];
+    if (Schema::hasColumn('discounts', 'minimum_amount')) {
+        $discountData['minimum_amount'] = 50;
+    }
+    if (Schema::hasColumn('discounts', 'min_required')) {
+        $discountData['min_required'] = 50;
+    }
+    $discountId = DB::table('discounts')->insertGetId($discountData);
+
+    DB::table('discount_conditions')->insert([
+        'discount_id' => $discountId,
+        'type'        => 'category',
+        'operator'    => 'in_array',
+        'value'       => json_encode([$category->id]),
+        'position'    => 0,
+        'created_at'  => now(),
+        'updated_at'  => now(),
+    ]);
+
+    $engine = app(DiscountEngine::class);
+    $result = $engine->evaluate([
+        'currency_code' => 'EUR',
+        'now'           => now(),
+        'cart'          => [
+            'subtotal' => 80.0,
+            'items'    => [
+                ['product_id' => $product->id, 'variant_id' => null, 'quantity' => 2, 'unit_price' => 40.0],
+            ],
+        ],
+    ]);
+
+    expect($result['discount_total_amount'])->toBe(16.0);
+});
+
+it('applies free shipping discount type to shipping total', function () {
+    // Seed a standalone free shipping discount that becomes eligible immediately.
+    $discountData = [
+        'name'            => 'Logistics Holiday',
+        'type'            => 'free_shipping',
+        'value'           => 0,
+        'status'          => 'active',
+        'stacking_policy' => 'stack',
+        'free_shipping'   => true,
+        'created_at'      => now(),
+        'updated_at'      => now(),
+    ];
+    if (Schema::hasColumn('discounts', 'minimum_amount')) {
+        $discountData['minimum_amount'] = 0;
+    }
+    if (Schema::hasColumn('discounts', 'min_required')) {
+        $discountData['min_required'] = 0;
+    }
+    $discountId = DB::table('discounts')->insertGetId($discountData);
+
+    $engine = app(DiscountEngine::class);
+    $result = $engine->evaluate([
+        'currency_code' => 'EUR',
+        'now'           => now(),
+        'cart'          => [
+            'subtotal' => 40.0,
+            'items'    => [],
+        ],
+        'shipping' => [
+            'base_amount' => 9.99,
+        ],
+    ]);
+
+    expect($result['discount_total_amount'])->toBe(0.0)
+        ->and($result['shipping']['discount_amount'])->toBe(9.99);
+});
+
+it('blocks discount codes when global or per-user usage limits are exceeded', function () {
+    // Create a customer to exercise per-user limit logic.
+    $userInsert = ['email' => 'usage-' . uniqid() . '@test.dev', 'password' => bcrypt('secret'), 'created_at' => now(), 'updated_at' => now()];
+    if (Schema::hasColumn('users', 'name')) {
+        $userInsert['name'] = 'Limit Tester';
+    } else {
+        $userInsert['first_name'] = 'Limit';
+        $userInsert['last_name'] = 'Tester';
+    }
+    $userId = DB::table('users')->insertGetId($userInsert);
+
+    // Register a simple fixed discount paired with a code.
+    $discountId = DB::table('discounts')->insertGetId([
+        'name'            => 'Limit Sensitive',
+        'type'            => 'fixed',
+        'value'           => 15,
+        'status'          => 'active',
+        'stacking_policy' => 'single_best',
+        'created_at'      => now(),
+        'updated_at'      => now(),
+    ]);
+
+    $codeColumns = Schema::getColumnListing('discount_codes');
+    $codeData = [
+        'discount_id' => $discountId,
+        'code'        => 'LIMITED',
+        'created_at'  => now(),
+        'updated_at'  => now(),
+    ];
+    if (in_array('usage_limit', $codeColumns, true)) {
+        $codeData['usage_limit'] = 1;
+    }
+    if (in_array('usage_limit_per_user', $codeColumns, true)) {
+        $codeData['usage_limit_per_user'] = 1;
+    }
+    if (in_array('usage_count', $codeColumns, true)) {
+        $codeData['usage_count'] = 1;
+    }
+    if (in_array('status', $codeColumns, true)) {
+        $codeData['status'] = 'active';
+    }
+    if (in_array('is_active', $codeColumns, true)) {
+        $codeData['is_active'] = true;
+    }
+    $codeId = DB::table('discount_codes')->insertGetId($codeData);
+
+    $engine = app(DiscountEngine::class);
+    $baseContext = [
+        'currency_code' => 'EUR',
+        'code'          => 'LIMITED',
+        'now'           => now(),
+        'cart'          => [
+            'subtotal' => 100.0,
+            'items'    => [],
+        ],
+    ];
+
+    // Usage limit already consumed => expect no discount amount.
+    $result1 = $engine->evaluate($baseContext);
+    expect($result1['discount_total_amount'])->toBe(0.0);
+
+    // Reset global counter but log a redemption for the same user to trigger per-user limit.
+    $updateColumns = [];
+    if (in_array('usage_limit', $codeColumns, true)) {
+        $updateColumns['usage_limit'] = 5;
+    }
+    if (in_array('usage_count', $codeColumns, true)) {
+        $updateColumns['usage_count'] = 0;
+    }
+    DB::table('discount_codes')->where('id', $codeId)->update($updateColumns);
+    DB::table('discount_redemptions')->insert([
+        'discount_id'   => $discountId,
+        'code_id'       => $codeId,
+        'user_id'       => $userId,
+        'amount_saved'  => 15,
+        'currency_code' => 'EUR',
+        'status'        => 'redeemed',
+        'redeemed_at'   => now()->subDay(),
+        'created_at'    => now()->subDay(),
+        'updated_at'    => now()->subDay(),
+    ]);
+
+    $result2 = $engine->evaluate($baseContext + ['user_id' => $userId]);
+    expect($result2['discount_total_amount'])->toBe(0.0);
+
+    // Alternate user should be able to redeem once limits reset.
+    $otherUserInsert = ['email' => 'usage-' . uniqid() . '@other.dev', 'password' => bcrypt('secret'), 'created_at' => now(), 'updated_at' => now()];
+    if (Schema::hasColumn('users', 'name')) {
+        $otherUserInsert['name'] = 'Alt Tester';
+    } else {
+        $otherUserInsert['first_name'] = 'Alt';
+        $otherUserInsert['last_name'] = 'Tester';
+    }
+    $otherUserId = DB::table('users')->insertGetId($otherUserInsert);
+
+    $result3 = $engine->evaluate($baseContext + ['user_id' => $otherUserId]);
+    expect($result3['discount_total_amount'])->toBe(15.0);
 });

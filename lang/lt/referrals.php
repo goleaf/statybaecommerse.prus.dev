@@ -25,6 +25,17 @@ return [
         'referred_discount' => 'Referralo nuolaida',
     ],
 
+    'categories' => [
+        'discount' => 'Nuolaidos',
+        'credit'   => 'Parduotuvės kreditas',
+        'points'   => 'Taškai',
+    ],
+
+    'share' => [
+        'subject' => 'Prisijunk ir gauk nuolaidą pirmajam užsakymui',
+        'body'    => 'Pasinaudok mano nuoroda ir gauk papildomų naudų:',
+    ],
+
     // Navigation and Labels
     'navigation_label'   => 'Rekomendacijos',
     'model_label'        => 'Rekomendacija',

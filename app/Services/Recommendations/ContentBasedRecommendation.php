@@ -7,8 +7,10 @@ namespace App\Services\Recommendations;
 use App\Models\Product;
 use App\Models\ProductSimilarity;
 use App\Models\User;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use JsonException;
 
 /**
  * ContentBasedRecommendation
@@ -28,7 +30,7 @@ final class ContentBasedRecommendation extends BaseRecommendation
     /**
      * Handle getRecommendations functionality with proper error handling.
      */
-    public function getRecommendations(?User $user = null, ?Product $product = null, array $context = []): Collection
+    public function getRecommendations(?User $user = null, ?Product $product = null, array $context = []): EloquentCollection
     {
         $startTime = microtime(true);
         if (! $product) {
@@ -37,11 +39,28 @@ final class ContentBasedRecommendation extends BaseRecommendation
         $cacheKey = $this->generateCacheKey('content_based', $user, $product, $context);
         $cached = $this->getCachedResult($cacheKey);
         if ($cached) {
-            return $cached;
+            $collection = (new Product)->newCollection(
+                $cached
+                    ->pluck('similarProduct')
+                    ->filter(fn ($p) => $p instanceof Product && $p->is_visible)
+                    ->all()
+            );
+
+            $collection->each(static fn (Product $item) => $item->unsetRelation('brand'));
+
+            return $collection;
         }
         $recommendations = $this->calculateContentBasedRecommendations($product, $user);
+        $recommendations->each(static fn (Product $item) => $item->unsetRelation('brand'));
         $this->logPerformance('content_based', microtime(true) - $startTime, $recommendations->count());
-        $this->trackRecommendation('content_based', $user, $product, $recommendations->toArray());
+        $this->trackRecommendation(
+            'content_based',
+            $user,
+            $product,
+            $recommendations
+                ->map(static fn (Product $item) => ['id' => $item->getKey()])
+                ->all()
+        );
 
         return $this->cacheResult($cacheKey, $recommendations, $this->config['cache_ttl'] ?? 3600);
     }
@@ -49,22 +68,41 @@ final class ContentBasedRecommendation extends BaseRecommendation
     /**
      * Handle calculateContentBasedRecommendations functionality with proper error handling.
      */
-    private function calculateContentBasedRecommendations(Product $product, ?User $user = null): Collection
+    private function calculateContentBasedRecommendations(Product $product, ?User $user = null): EloquentCollection
     {
         // Check if we have recent cached similarities
         if ($this->config['use_cached_similarities']) {
             $cachedSimilarities = ProductSimilarity::where('product_id', $product->id)->byAlgorithm('content_based')->recent($this->config['recalculate_threshold'])->withMinScore($this->minScore)->orderedBySimilarity()->with('similarProduct')->limit($this->maxResults)->get();
             if ($cachedSimilarities->isNotEmpty()) {
-                return $cachedSimilarities->pluck('similarProduct')->filter(fn ($p) => $p && $p->is_visible);
+                $collection = (new Product)->newCollection(
+                    $cachedSimilarities
+                        ->pluck('similarProduct')
+                        ->filter(fn ($p) => $p instanceof Product && $p->is_visible)
+                        ->all()
+                );
+
+                $collection->each(static fn (Product $item) => $item->unsetRelation('brand'));
+
+                return $collection;
             }
         }
         // Calculate similarities on the fly
         $productFeatures = $this->getProductFeatures($product);
         $similarities = $this->calculateProductSimilarities($product, $productFeatures);
-        // Cache the calculated similarities
+        // Persist the scored pairs before we strip the similarity metadata for
+        // the response so the recommendation history always reflects the real
+        // calculated score instead of a synthetic placeholder.
         $this->cacheSimilarities($product->id, $similarities);
 
-        return $similarities->take($this->maxResults);
+        $products = $similarities
+            ->take($this->maxResults)
+            ->pluck('product')
+            ->filter(fn ($candidate) => $candidate instanceof Product);
+
+        $collection = (new Product)->newCollection($products->all());
+        $collection->each(static fn (Product $item) => $item->unsetRelation('brand'));
+
+        return $collection;
     }
 
     /**
@@ -74,8 +112,10 @@ final class ContentBasedRecommendation extends BaseRecommendation
     {
         $categoryIds = $product->categories->pluck('id')->toArray();
         $brandId = $product->brand_id;
-        $priceRange = $this->getPriceRange($product->price);
-        $query = Product::query()->with(['media', 'brand', 'categories'])->where('is_visible', true)->where('id', '!=', $product->id);
+        // Prices are stored as decimal strings, so normalise them to float
+        // before deriving the price-range bucket used in scoring.
+        $priceRange = $this->getPriceRange((float) $product->price);
+        $query = Product::query()->with(['media', 'categories'])->where('is_visible', true)->where('id', '!=', $product->id);
         // Apply filters
         $query = $this->applyFilters($query);
         $products = $query->get();
@@ -87,7 +127,10 @@ final class ContentBasedRecommendation extends BaseRecommendation
             }
         }
 
-        return $similarities->sortByDesc('similarity')->pluck('product');
+        return $similarities
+            // Sort by score so the highest matches are cached and returned first.
+            ->sortByDesc('similarity')
+            ->values();
     }
 
     /**
@@ -193,17 +236,37 @@ final class ContentBasedRecommendation extends BaseRecommendation
     private function cacheSimilarities(int $productId, Collection $similarities): void
     {
         $similarityData = [];
-        foreach ($similarities as $index => $similarProduct) {
+        foreach ($similarities->take($this->maxResults) as $entry) {
+            // Each entry includes both the product instance and its computed
+            // similarity value so cached records can surface the exact score
+            // that powered the recommendation carousel.
+            $similarProduct = $entry['product'] ?? null;
+            $score = $entry['similarity'] ?? null;
+
+            if (! $similarProduct instanceof Product || $score === null) {
+                continue;
+            }
+
+            try {
+                $encodedMetadata = json_encode([
+                    'calculated_at'   => now(),
+                    'feature_weights' => $this->config['feature_weights'],
+                ], JSON_THROW_ON_ERROR);
+            } catch (JsonException) {
+                // Skip invalid payloads rather than crashing the recommendation
+                // pipeline so other similarity rows can still be cached.
+                continue;
+            }
+
             $similarityData[] = [
                 'product_id'         => $productId,
                 'similar_product_id' => $similarProduct->id,
                 'algorithm_type'     => 'content_based',
-                'similarity_score'   => 1.0 - $index * 0.1,
-                // Approximate score based on position
-                'calculation_data' => ['calculated_at' => now(), 'feature_weights' => $this->config['feature_weights']],
-                'calculated_at'    => now(),
-                'created_at'       => now(),
-                'updated_at'       => now(),
+                'similarity_score'   => $score,
+                'calculation_data'   => $encodedMetadata,
+                'calculated_at'      => now(),
+                'created_at'         => now(),
+                'updated_at'         => now(),
             ];
         }
         if (! empty($similarityData)) {

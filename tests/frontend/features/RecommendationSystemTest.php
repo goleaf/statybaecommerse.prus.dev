@@ -27,10 +27,10 @@ final class RecommendationSystemTest extends TestCase
         $this->seed(RecommendationSystemSeeder::class);
     }
 
-    public function test_can_get_related_products_recommendations(): void
+    public function test_can_get_similar_products_recommendations(): void
     {
-        // Create test data
-        $user = User::factory()->create();
+        // Reuse a seeded user to benefit from generated preference data.
+        $user = User::first();
         $category = Category::factory()->create();
 
         $product1 = Product::factory()->create(['is_visible' => true]);
@@ -55,33 +55,25 @@ final class RecommendationSystemTest extends TestCase
         $this->assertFalse($recommendations->contains('id', $product1->id));
     }
 
-    public function test_can_get_popular_products_recommendations(): void
+    public function test_can_get_frequently_bought_together_recommendations(): void
     {
-        // Create test data
-        $user = User::factory()->create();
+        $user = User::first();
+        $product = Product::factory()->create(['is_visible' => true]);
 
-        $product1 = Product::factory()->create(['is_visible' => true]);
-        $product2 = Product::factory()->create(['is_visible' => true]);
-        $product3 = Product::factory()->create(['is_visible' => true]);
-
-        // Test recommendations
         $recommendations = $this->recommendationService->getRecommendations(
-            'popular_products',
+            'frequently_bought_together',
             $user,
-            null
+            $product
         );
 
         $this->assertInstanceOf(\Illuminate\Database\Eloquent\Collection::class, $recommendations);
-        $this->assertLessThanOrEqual(8, $recommendations->count());
+        $this->assertLessThanOrEqual(4, $recommendations->count());
     }
 
     public function test_can_get_trending_products_recommendations(): void
     {
         // Create test data
-        $user = User::factory()->create();
-
-        $product1 = Product::factory()->create(['is_visible' => true]);
-        $product2 = Product::factory()->create(['is_visible' => true]);
+        $user = User::first();
 
         // Test recommendations
         $recommendations = $this->recommendationService->getRecommendations(
@@ -92,6 +84,39 @@ final class RecommendationSystemTest extends TestCase
 
         $this->assertInstanceOf(\Illuminate\Database\Eloquent\Collection::class, $recommendations);
         $this->assertLessThanOrEqual(6, $recommendations->count());
+    }
+
+    public function test_can_get_personalized_recommendations(): void
+    {
+        $user = User::first();
+        $product = Product::factory()->create(['is_visible' => true]);
+
+        $recommendations = $this->recommendationService->getRecommendations(
+            'personalized_recommendations',
+            $user,
+            $product
+        );
+
+        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Collection::class, $recommendations);
+        $this->assertLessThanOrEqual(6, $recommendations->count());
+    }
+
+    public function test_can_get_category_based_recommendations(): void
+    {
+        $user = User::first();
+        $category = Category::factory()->create();
+        $product = Product::factory()->create(['is_visible' => true]);
+        $product->categories()->attach($category->id);
+
+        $recommendations = $this->recommendationService->getRecommendations(
+            'category_based_recommendations',
+            $user,
+            $product,
+            ['category_id' => $category->id]
+        );
+
+        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Collection::class, $recommendations);
+        $this->assertLessThanOrEqual(5, $recommendations->count());
     }
 
     public function test_can_track_user_interaction(): void
@@ -123,8 +148,8 @@ final class RecommendationSystemTest extends TestCase
         // Check for common blocks
         $blockNames = $blocks->pluck('name')->toArray();
         $this->assertContains('related_products', $blockNames);
-        $this->assertContains('you_might_also_like', $blockNames);
-        $this->assertContains('similar_products', $blockNames);
+        $this->assertContains('frequently_bought_together', $blockNames);
+        $this->assertContains('category_based_recommendations', $blockNames);
     }
 
     public function test_can_clear_cache(): void

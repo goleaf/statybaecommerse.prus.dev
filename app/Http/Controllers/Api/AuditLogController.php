@@ -13,13 +13,59 @@ use App\Support\ListQuery\ListResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
+/**
+ * AuditLogController
+ *
+ * Responsible for exposing a paginated, filterable list of audit log entries
+ * for administrative interfaces, while ensuring the request only honours
+ * allow-listed query parameters.
+ */
 final class AuditLogController extends Controller
 {
+    /**
+     * Display a paginated collection of audit logs with filtering and sorting.
+     */
     public function index(Request $request): AnonymousResourceCollection
     {
         $this->authorize('viewAny', AuditLog::class);
 
-        $definition = new ListQueryDefinition(
+        $listQuery = ListQueryValidator::fromRequest($request, $this->auditLogListDefinition());
+
+        $query = AuditLog::query()
+            ->with('user');
+
+        // Apply the sanitized filters and sort directives surfaced from the list
+        // query helper to ensure only allow-listed query parameters take effect.
+        $listQuery->applyFilters($query);
+        $listQuery->applySorts($query);
+
+        if (! $listQuery->hasSort('created_at')) {
+            // Enforce a recency based tiebreaker whenever a different sort has
+            // been requested so that pagination remains deterministic.
+            $query->orderByDesc('audit_logs.created_at');
+        }
+
+        // Always add the identifier sort as the final tiebreaker to avoid
+        // duplicate ordering when multiple rows share the same timestamp.
+        $query->orderByDesc('audit_logs.id');
+
+        $paginator = $query->paginate($listQuery->perPage(), ['*'], 'page', $listQuery->page());
+
+        return AuditLogResource::collection($paginator)
+            ->additional([
+                'meta'  => ListResponse::meta($listQuery, $paginator),
+                'links' => ListResponse::links($paginator),
+            ]);
+    }
+
+    /**
+     * Build the list query definition describing allowed filters and sorts.
+     */
+    private function auditLogListDefinition(): ListQueryDefinition
+    {
+        // Centralise the list configuration so any future changes stay in sync
+        // with the validator and the documentation.
+        return new ListQueryDefinition(
             filters: [
                 'entity_type' => [
                     'type'     => 'string',
@@ -52,29 +98,5 @@ final class AuditLogController extends Controller
             maxPerPage: 100,
             minPerPage: 1,
         );
-
-        $listQuery = ListQueryValidator::fromRequest($request, $definition);
-
-        $query = AuditLog::query()
-            ->with('user');
-
-        // Apply the sanitized filters and sort directives surfaced from the list
-        // query helper to ensure only allow-listed query parameters take effect.
-        $listQuery->applyFilters($query);
-        $listQuery->applySorts($query);
-
-        if (! $listQuery->hasSort('created_at')) {
-            $query->orderByDesc('audit_logs.created_at');
-        }
-
-        $query->orderByDesc('audit_logs.id');
-
-        $paginator = $query->paginate($listQuery->perPage(), ['*'], 'page', $listQuery->page());
-
-        return AuditLogResource::collection($paginator)
-            ->additional([
-                'meta'  => ListResponse::meta($listQuery, $paginator),
-                'links' => ListResponse::links($paginator),
-            ]);
     }
 }

@@ -211,6 +211,23 @@ final class ReferralRewardController extends Controller
             ->selectRaw("SUM(CASE WHEN type = 'referred_discount' THEN 1 ELSE 0 END) as referred_discounts")
             ->first();
 
+        // Pull reward category aggregates (discount / credit / points) so the
+        // dashboard can highlight how advocates are compensated without extra
+        // per-request queries.
+        $categoryBreakdown = ReferralReward::query()
+            ->forUser($userId)
+            ->selectRaw(
+                "COALESCE(JSON_UNQUOTE(JSON_EXTRACT(reward_data, '$.category')), CASE WHEN type = 'referred_discount' THEN 'discount' ELSE 'credit' END) as category"
+            )
+            ->selectRaw('COUNT(*) as reward_count')
+            ->selectRaw('COALESCE(SUM(amount), 0) as reward_amount')
+            ->groupBy('category')
+            ->get()
+            ->mapWithKeys(static function ($row): array {
+                return [$row->category => ['count' => (int) $row->reward_count, 'amount' => (float) $row->reward_amount]];
+            })
+            ->toArray();
+
         if ($aggregates === null) {
             // Safeguard against null responses by returning empty counters.
             return [
@@ -223,6 +240,7 @@ final class ReferralRewardController extends Controller
                 'applied_amount'     => 0.0,
                 'referrer_bonuses'   => 0,
                 'referred_discounts' => 0,
+                'categories'         => $categoryBreakdown,
             ];
         }
 
@@ -237,6 +255,7 @@ final class ReferralRewardController extends Controller
             'applied_amount'     => (float) ($aggregates->applied_amount ?? 0.0),
             'referrer_bonuses'   => (int) ($aggregates->referrer_bonuses ?? 0),
             'referred_discounts' => (int) ($aggregates->referred_discounts ?? 0),
+            'categories'         => $categoryBreakdown,
         ];
     }
 }

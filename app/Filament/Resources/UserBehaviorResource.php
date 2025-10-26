@@ -50,6 +50,11 @@ final class UserBehaviorResource extends Resource
 
     protected static ?int $navigationSort = 5;
 
+    /**
+     * Provide a translated label map for each supported behaviour type.
+     *
+     * @return array<string, string>
+     */
     private static function behaviorTypeOptions(): array
     {
         return [
@@ -212,6 +217,10 @@ final class UserBehaviorResource extends Resource
                     ->tooltip(function (TextColumn $column): ?string {
                         $state = $column->getState();
 
+                        if (! is_string($state)) {
+                            return null;
+                        }
+
                         return strlen($state) > 30 ? $state : null;
                     }),
                 TextColumn::make('ip_address')
@@ -258,28 +267,42 @@ final class UserBehaviorResource extends Resource
                     ->preload(),
                 TernaryFilter::make('has_product')
                     ->label(__('admin.user_behaviors.has_product'))
-                    ->queries([
-                        true  => fn (Builder $query): Builder => $query->whereNotNull('product_id'),
-                        false => fn (Builder $query): Builder => $query->whereNull('product_id'),
-                        null  => fn (Builder $query): Builder => $query,
-                    ]),
+                    // Filament v4 expects named closures instead of an array payload when configuring ternary queries.
+                    ->queries(
+                        true: fn (Builder $query): Builder => $query->whereNotNull('product_id'),
+                        false: fn (Builder $query): Builder => $query->whereNull('product_id'),
+                        blank: fn (Builder $query): Builder => $query,
+                    ),
                 TernaryFilter::make('has_category')
                     ->label(__('admin.user_behaviors.has_category'))
-                    ->queries([
-                        true  => fn (Builder $query): Builder => $query->whereNotNull('category_id'),
-                        false => fn (Builder $query): Builder => $query->whereNull('category_id'),
-                        null  => fn (Builder $query): Builder => $query,
-                    ]),
+                    // Provide explicit named callbacks so the filter works across all three ternary states.
+                    ->queries(
+                        true: fn (Builder $query): Builder => $query->whereNotNull('category_id'),
+                        false: fn (Builder $query): Builder => $query->whereNull('category_id'),
+                        blank: fn (Builder $query): Builder => $query,
+                    ),
                 Filter::make('created_at')
                     ->label(__('admin.user_behaviors.created_at'))
                     ->form([
                         SupportFlatpickr::makeRange('range', displayFormat: 'Y-m-d', format: 'Y-m-d'),
                     ])
-                    ->query(fn (Builder $query, array $data): Builder => DateRangeFilter::apply(
-                        $query,
-                        $data['range'] ?? null,
-                        'created_at',
-                    )),
+                    ->query(function (Builder $query, array $data): Builder {
+                        $range = null;
+
+                        if (isset($data['range']) && is_array($data['range'])) {
+                            $range = [
+                                'start' => $data['range']['start'] ?? null,
+                                'end'   => $data['range']['end'] ?? null,
+                            ];
+                        }
+
+                        /** @var array{start?: string|null, end?: string|null}|null $range */
+                        return DateRangeFilter::apply(
+                            $query,
+                            $range,
+                            'created_at',
+                        );
+                    }),
                 Filter::make('recent_behaviors')
                     ->label(__('admin.user_behaviors.recent_behaviors'))
                     ->query(fn (Builder $query): Builder => $query->where('created_at', '>=', now()->subDays(7))),

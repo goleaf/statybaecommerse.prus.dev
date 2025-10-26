@@ -631,7 +631,24 @@ final class VariantInventoryResource extends Resource
                         $record = $livewire->getMountedTableActionRecord();
                         $quantity = (int) ($data['quantity'] ?? 0);
 
-                        if ($record->reserveStock($quantity)) {
+                        $reason = trim((string) ($data['reason'] ?? '')) ?: 'manual_reservation';
+                        $actorId = Auth::id();
+                        $referenceId = Str::uuid()->toString();
+
+                        // Persist an auditable reservation row so stock holds are traceable from the Filament panel.
+                        $reservation = $record->reserveStock(
+                            $quantity,
+                            null,
+                            [
+                                'reason'    => $reason,
+                                'actor_id'  => $actorId,
+                                'source'    => 'filament_table_action',
+                            ],
+                            'filament_table_action',
+                            $referenceId,
+                        );
+
+                        if ($reservation !== null) {
                             Notification::make()->title(__('admin.variant_inventory.stock_reserved_successfully'))->success()->send();
                         } else {
                             Notification::make()->title(__('admin.variant_inventory.insufficient_stock'))->danger()->send();

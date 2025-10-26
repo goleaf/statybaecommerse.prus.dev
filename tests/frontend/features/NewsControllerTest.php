@@ -6,6 +6,7 @@ use App\Models\News;
 use App\Models\NewsCategory;
 use App\Models\NewsComment;
 use App\Models\NewsTag;
+use App\Models\NewsImage;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
@@ -25,19 +26,30 @@ beforeEach(function (): void {
         'content' => 'Test news content',
     ]);
 
-    $this->category = NewsCategory::factory()->create();
-    $this->category->translations()->create([
-        'locale' => 'lt',
-        'name'   => 'Test Category',
-        'slug'   => 'test-category',
+    NewsImage::factory()->create([
+        'news_id'     => $this->news->id,
+        'is_featured' => true,
+        'sort_order'  => 0,
+        'file_path'   => 'news-images/test-news.jpg',
     ]);
 
+    $this->category = NewsCategory::factory()->create();
+    $this->category->translations()->updateOrCreate(
+        ['locale' => 'lt'],
+        [
+            'name' => 'Test Category',
+            'slug' => 'test-category',
+        ],
+    );
+
     $this->tag = NewsTag::factory()->create();
-    $this->tag->translations()->create([
-        'locale' => 'lt',
-        'name'   => 'Test Tag',
-        'slug'   => 'test-tag',
-    ]);
+    $this->tag->translations()->updateOrCreate(
+        ['locale' => 'lt'],
+        [
+            'name' => 'Test Tag',
+            'slug' => 'test-tag',
+        ],
+    );
 });
 
 it('can display news index page', function (): void {
@@ -115,10 +127,63 @@ it('can filter featured news', function (): void {
         'content' => 'Featured news content',
     ]);
 
+    NewsImage::factory()->create([
+        'news_id'     => $featuredNews->id,
+        'is_featured' => true,
+        'sort_order'  => 0,
+        'file_path'   => 'news-images/featured-news.jpg',
+    ]);
+
     $response = $this->get(route('news.index', ['featured' => '1']));
 
     $response->assertStatus(200);
     $response->assertSee('Featured News');
+});
+
+it('filters imageless featured news from curated results', function (): void {
+    // Seed a featured article with imagery that should survive the filtering pass.
+    $withImage = News::factory()->create([
+        'is_visible'   => true,
+        'is_featured'  => true,
+        'published_at' => now()->subHours(2),
+    ]);
+
+    $withImage->translations()->create([
+        'locale'  => 'lt',
+        'title'   => 'Curated Featured News',
+        'slug'    => 'curated-featured-news',
+        'summary' => 'Curated summary',
+        'content' => 'Curated content',
+    ]);
+
+    NewsImage::factory()->create([
+        'news_id'     => $withImage->id,
+        'is_featured' => true,
+        'sort_order'  => 0,
+        'file_path'   => 'news-images/curated-featured.jpg',
+    ]);
+
+    $imageless = News::factory()->create([
+        'is_visible'   => true,
+        'is_featured'  => true,
+        'published_at' => now()->subDay(),
+    ]);
+
+    $imageless->translations()->create([
+        'locale'  => 'lt',
+        'title'   => 'Imageless Featured News',
+        'slug'    => 'imageless-featured-news',
+        'summary' => 'Imageless summary',
+        'content' => 'Imageless content',
+    ]);
+
+    $response = $this->get(route('news.index'));
+
+    $response->assertStatus(200);
+    $response->assertViewHas('featuredNews', function ($collection) use ($imageless, $withImage) {
+        return $collection->contains(fn (News $news): bool => $news->id === $withImage->id)
+            && $collection->doesntContain(fn (News $news): bool => $news->id === $imageless->id);
+    });
 });
 
 it('can display news by category', function (): void {
@@ -157,6 +222,13 @@ it('shows related news on news detail page', function (): void {
         'content' => 'Related news content',
     ]);
 
+    NewsImage::factory()->create([
+        'news_id'     => $relatedNews->id,
+        'is_featured' => true,
+        'sort_order'  => 0,
+        'file_path'   => 'news-images/related-news.jpg',
+    ]);
+
     $this->news->categories()->attach($this->category->id);
     $relatedNews->categories()->attach($this->category->id);
 
@@ -164,6 +236,30 @@ it('shows related news on news detail page', function (): void {
 
     $response->assertStatus(200);
     $response->assertSee('Related News');
+});
+
+it('skips related news entries that are missing images', function (): void {
+    // Create a related article that intentionally lacks imagery so it should be excluded.
+    $imagelessRelated = News::factory()->create([
+        'is_visible'   => true,
+        'published_at' => now()->subDay(),
+    ]);
+
+    $imagelessRelated->translations()->create([
+        'locale'  => 'lt',
+        'title'   => 'Imageless Related News',
+        'slug'    => 'imageless-related-news',
+        'summary' => 'Imageless summary',
+        'content' => 'Imageless content',
+    ]);
+
+    $this->news->categories()->attach($this->category->id);
+    $imagelessRelated->categories()->attach($this->category->id);
+
+    $response = $this->get(route('news.show', $this->news->slug));
+
+    $response->assertStatus(200);
+    $response->assertDontSee('Imageless Related News');
 });
 
 it('displays comments on news detail page', function (): void {

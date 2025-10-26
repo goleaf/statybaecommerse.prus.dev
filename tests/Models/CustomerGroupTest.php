@@ -102,6 +102,7 @@ final class CustomerGroupTest extends TestCase
 
         // Fetch ordered results and map the translated names for assertion clarity.
         $orderedNames = CustomerGroup::query()
+            ->withoutGlobalScopes()
             ->orderedByName('en')
             ->get()
             ->map(fn (CustomerGroup $group) => $group->getTranslation('name', 'en'))
