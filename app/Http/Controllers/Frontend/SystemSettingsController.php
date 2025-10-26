@@ -146,11 +146,23 @@ final class SystemSettingsController extends Controller
      */
     public function groups(): JsonResponse
     {
-        $groups = SystemSetting::select('group')->where('is_active', true)->where('is_public', true)->distinct()->orderBy('group')->get()->map(function ($setting) {
-            $count = SystemSetting::where('group', $setting->group)->where('is_active', true)->where('is_public', true)->count();
-
-            return ['name' => $setting->group, 'label' => __('admin.system_settings.'.$setting->group), 'count' => $count];
-        });
+        $groups = SystemSetting::query()
+            // Pre-calculate the number of public, active settings per group to avoid an N+1 query problem.
+            ->select('group')
+            ->selectRaw('COUNT(*) as settings_count')
+            ->where('is_active', true)
+            ->where('is_public', true)
+            ->groupBy('group')
+            ->orderBy('group')
+            ->get()
+            ->map(function ($setting) {
+                // Return the localized group label alongside the aggregated count for the API response.
+                return [
+                    'name' => $setting->group,
+                    'label' => __('admin.system_settings.'.$setting->group),
+                    'count' => (int) $setting->settings_count,
+                ];
+            });
 
         return response()->json(['success' => true, 'data' => $groups]);
     }
