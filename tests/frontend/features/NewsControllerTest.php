@@ -121,6 +121,64 @@ it('can filter featured news', function (): void {
     $response->assertSee('Featured News');
 });
 
+it('excludes incomplete featured news entries regardless of ordering', function (): void {
+    // Pin the locale so translation lookups align with the metadata we attach in the test records.
+    app()->setLocale('lt');
+
+    // Create a fully configured featured article with Lithuanian content and a highlighted image.
+    $completeFeatured = News::factory()->create([
+        'is_visible'   => true,
+        'is_featured'  => true,
+        'published_at' => now()->subHours(6),
+    ]);
+    $completeFeatured->translations()->create([
+        'locale'  => 'lt',
+        'title'   => 'Localized Featured',
+        'slug'    => 'localized-featured',
+        'summary' => 'Localized featured summary',
+        'content' => 'Localized featured content',
+    ]);
+    $completeFeatured->images()->create([
+        'file_path'   => 'news-images/complete-featured.jpg',
+        'alt_text'    => 'Complete featured image',
+        'caption'     => 'Complete featured caption',
+        'is_featured' => true,
+        'sort_order'  => 1,
+    ]);
+
+    // Seed a second featured article that lacks localized metadata so it should be hidden from the featured rail.
+    $incompleteFeatured = News::factory()->create([
+        'is_visible'   => true,
+        'is_featured'  => true,
+        'published_at' => now()->subHours(3),
+    ]);
+    $incompleteFeatured->translations()->create([
+        'locale'  => 'lt',
+        'title'   => '',
+        'slug'    => '',
+        'summary' => 'Fallback summary',
+        'content' => 'Fallback content',
+    ]);
+    $incompleteFeatured->images()->create([
+        'file_path'   => 'news-images/incomplete-featured.jpg',
+        'alt_text'    => 'Incomplete featured image',
+        'caption'     => 'Incomplete featured caption',
+        'is_featured' => true,
+        'sort_order'  => 2,
+    ]);
+
+    $response = $this->get(route('news.index'));
+
+    $response->assertOk();
+
+    /** @var \Illuminate\Support\Collection<int, News> $featuredNews */
+    $featuredNews = $response->viewData('featuredNews');
+
+    // Confirm the complete article survives the filter while the incomplete one is removed.
+    expect($featuredNews->pluck('id'))->toContain($completeFeatured->id)
+        ->and($featuredNews->pluck('id'))->not->toContain($incompleteFeatured->id);
+});
+
 it('can display news by category', function (): void {
     $this->news->categories()->attach($this->category->id);
 
@@ -164,6 +222,73 @@ it('shows related news on news detail page', function (): void {
 
     $response->assertStatus(200);
     $response->assertSee('Related News');
+});
+
+it('filters related news that are missing localized details', function (): void {
+    // Ensure lookups use Lithuanian so empty translations trigger the guard clause in the controller.
+    app()->setLocale('lt');
+
+    // Attach a category to the primary article so related queries have a matching pivot.
+    $primaryCategory = NewsCategory::factory()->create();
+    $primaryCategory->translations()->create([
+        'locale' => 'lt',
+        'name'   => 'Primary Category',
+        'slug'   => 'primary-category',
+    ]);
+    $this->news->categories()->attach($primaryCategory->id);
+
+    // Build a valid related article that should appear in the related news carousel.
+    $validRelated = News::factory()->create([
+        'is_visible'   => true,
+        'published_at' => now()->subHours(8),
+    ]);
+    $validRelated->translations()->create([
+        'locale'  => 'lt',
+        'title'   => 'Valid Related',
+        'slug'    => 'valid-related',
+        'summary' => 'Valid related summary',
+        'content' => 'Valid related content',
+    ]);
+    $validRelated->images()->create([
+        'file_path'   => 'news-images/valid-related.jpg',
+        'alt_text'    => 'Valid related image',
+        'caption'     => 'Valid related caption',
+        'is_featured' => true,
+        'sort_order'  => 1,
+    ]);
+    $validRelated->categories()->attach($primaryCategory->id);
+
+    // Create an incomplete related article with empty localized strings that should be filtered out.
+    $invalidRelated = News::factory()->create([
+        'is_visible'   => true,
+        'published_at' => now()->subHours(7),
+    ]);
+    $invalidRelated->translations()->create([
+        'locale'  => 'lt',
+        'title'   => '',
+        'slug'    => '',
+        'summary' => 'Invalid summary',
+        'content' => 'Invalid content',
+    ]);
+    $invalidRelated->images()->create([
+        'file_path'   => 'news-images/invalid-related.jpg',
+        'alt_text'    => 'Invalid related image',
+        'caption'     => 'Invalid related caption',
+        'is_featured' => true,
+        'sort_order'  => 2,
+    ]);
+    $invalidRelated->categories()->attach($primaryCategory->id);
+
+    $response = $this->get(route('news.show', $this->news->slug));
+
+    $response->assertOk();
+
+    /** @var \Illuminate\Support\Collection<int, News> $relatedNews */
+    $relatedNews = $response->viewData('relatedNews');
+
+    // Validate that only the complete related article remains after filtering.
+    expect($relatedNews->pluck('id'))->toContain($validRelated->id)
+        ->and($relatedNews->pluck('id'))->not->toContain($invalidRelated->id);
 });
 
 it('displays comments on news detail page', function (): void {
