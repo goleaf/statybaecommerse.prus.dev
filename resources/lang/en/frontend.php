@@ -68,6 +68,11 @@ return [
         'gift_message'     => 'Gift Message',
         'create_account'   => 'Create Account',
         'guest_checkout'   => 'Guest Checkout',
+        'fill_billing_address'   => 'Fill in your billing address.',
+        'select_shipping_address' => 'Provide a shipping address for delivery.',
+        'estimated_delivery'      => 'Review delivery options and estimated arrival times.',
+        'choose_payment_method'   => 'Select your preferred payment method.',
+        'no_shipping_available'   => 'No shipping options are available for your address.',
     ],
     'account' => [
         'title'            => 'My Account',
