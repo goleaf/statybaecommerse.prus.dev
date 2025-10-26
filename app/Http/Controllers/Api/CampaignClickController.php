@@ -297,19 +297,33 @@ final class CampaignClickController extends Controller
      */
     public function statistics(): JsonResponse
     {
-        $query = CampaignClick::query();
-        // For authenticated users, show only their statistics
-        if (Auth::check()) {
-            $query->where('customer_id', Auth::id());
-        }
-        $totalClicks = $query->count();
-        $convertedClicks = $query->where('is_converted', true)->count();
-        $conversionRate = $totalClicks > 0 ? round($convertedClicks / $totalClicks * 100, 2) : 0;
-        $totalConversionValue = $query->where('is_converted', true)->sum('conversion_value');
-        $todayClicks = $query->whereDate('clicked_at', today())->count();
-        $thisWeekClicks = $query->whereBetween('clicked_at', [now()->startOfWeek(), now()->endOfWeek()])->count();
+        // Build a base query that already respects the current caller's scope.
+        $baseQuery = CampaignClick::query();
 
-        return response()->json(['total_clicks' => $totalClicks, 'converted_clicks' => $convertedClicks, 'conversion_rate' => $conversionRate, 'total_conversion_value' => $totalConversionValue, 'today_clicks' => $todayClicks, 'this_week_clicks' => $thisWeekClicks]);
+        // For authenticated users, make sure we only aggregate their clicks.
+        if (Auth::check()) {
+            $baseQuery->where('customer_id', Auth::id());
+        }
+
+        // Clone the base query for each aggregation to avoid query state leakage.
+        $totalClicks = (clone $baseQuery)->count();
+        $convertedClicksQuery = (clone $baseQuery)->where('is_converted', true);
+        $convertedClicks = $convertedClicksQuery->count();
+        $conversionRate = $totalClicks > 0 ? round(($convertedClicks / $totalClicks) * 100, 2) : 0.0;
+        $totalConversionValue = (clone $convertedClicksQuery)->sum('conversion_value');
+        $todayClicks = (clone $baseQuery)->whereDate('clicked_at', today())->count();
+        $thisWeekClicks = (clone $baseQuery)
+            ->whereBetween('clicked_at', [now()->startOfWeek(), now()->endOfWeek()])
+            ->count();
+
+        return response()->json([
+            'total_clicks'           => $totalClicks,
+            'converted_clicks'       => $convertedClicks,
+            'conversion_rate'        => $conversionRate,
+            'total_conversion_value' => $totalConversionValue,
+            'today_clicks'           => $todayClicks,
+            'this_week_clicks'       => $thisWeekClicks,
+        ]);
     }
 
     #[OA\Get(
@@ -338,25 +352,65 @@ final class CampaignClickController extends Controller
      */
     public function analytics(Request $request): JsonResponse
     {
-        $days = $request->get('days', 30);
-        $query = CampaignClick::query();
-        // For authenticated users, show only their analytics
-        if (Auth::check()) {
-            $query->where('customer_id', Auth::id());
-        }
-        $query->where('clicked_at', '>=', now()->subDays($days));
-        // Clicks over time
-        $clicksOverTime = $query->select(DB::raw('DATE(clicked_at) as date'), DB::raw('COUNT(*) as count'))->groupBy('date')->orderBy('date')->get();
-        // Device types
-        $deviceTypes = $query->select('device_type', DB::raw('COUNT(*) as count'))->whereNotNull('device_type')->groupBy('device_type')->get();
-        // Browsers
-        $browsers = $query->select('browser', DB::raw('COUNT(*) as count'))->whereNotNull('browser')->groupBy('browser')->orderByDesc('count')->limit(10)->get();
-        // Countries
-        $countries = $query->select('country', DB::raw('COUNT(*) as count'))->whereNotNull('country')->groupBy('country')->orderByDesc('count')->limit(10)->get();
-        // UTM sources
-        $utmSources = $query->select('utm_source', DB::raw('COUNT(*) as count'))->whereNotNull('utm_source')->groupBy('utm_source')->orderByDesc('count')->limit(10)->get();
+        // Ensure the requested window is a positive integer and clamp it to a sensible upper bound.
+        $days = (int) $request->get('days', 30);
+        $days = max(1, min($days, 365));
 
-        return response()->json(['clicks_over_time' => $clicksOverTime, 'device_types' => $deviceTypes, 'browsers' => $browsers, 'countries' => $countries, 'utm_sources' => $utmSources]);
+        // Build a shared query that applies the caller scope and trailing-day filter.
+        $baseQuery = CampaignClick::query();
+
+        // For authenticated users, only include their own click telemetry in analytics.
+        if (Auth::check()) {
+            $baseQuery->where('customer_id', Auth::id());
+        }
+
+        $baseQuery->where('clicked_at', '>=', now()->subDays($days));
+
+        // Prepare independent aggregations using cloned builders to avoid leaking select/group clauses.
+        $clicksOverTime = (clone $baseQuery)
+            ->select(DB::raw('DATE(clicked_at) as date'), DB::raw('COUNT(*) as count'))
+            ->groupBy('date')
+            ->orderBy('date')
+            ->get();
+
+        $deviceTypes = (clone $baseQuery)
+            ->select('device_type', DB::raw('COUNT(*) as count'))
+            ->whereNotNull('device_type')
+            ->groupBy('device_type')
+            ->orderByDesc('count')
+            ->get();
+
+        $browsers = (clone $baseQuery)
+            ->select('browser', DB::raw('COUNT(*) as count'))
+            ->whereNotNull('browser')
+            ->groupBy('browser')
+            ->orderByDesc('count')
+            ->limit(10)
+            ->get();
+
+        $countries = (clone $baseQuery)
+            ->select('country', DB::raw('COUNT(*) as count'))
+            ->whereNotNull('country')
+            ->groupBy('country')
+            ->orderByDesc('count')
+            ->limit(10)
+            ->get();
+
+        $utmSources = (clone $baseQuery)
+            ->select('utm_source', DB::raw('COUNT(*) as count'))
+            ->whereNotNull('utm_source')
+            ->groupBy('utm_source')
+            ->orderByDesc('count')
+            ->limit(10)
+            ->get();
+
+        return response()->json([
+            'clicks_over_time' => $clicksOverTime,
+            'device_types'     => $deviceTypes,
+            'browsers'         => $browsers,
+            'countries'        => $countries,
+            'utm_sources'      => $utmSources,
+        ]);
     }
 
     #[OA\Get(
