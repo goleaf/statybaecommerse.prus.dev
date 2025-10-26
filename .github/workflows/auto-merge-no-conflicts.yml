@@ -59,6 +59,16 @@ jobs:
               return;
             }
 
+            // Capture the mergeable state so we only merge when GitHub confirms there are no conflicts in the diff.
+            const mergeableState = prDetails.data.mergeable_state;
+            const allowedStates = new Set(['clean', 'unstable', 'has_hooks']);
+
+            // Stop execution when GitHub explicitly reports conflicts or branch protection blocks the merge.
+            if (!allowedStates.has(mergeableState)) {
+              core.setFailed(`Pull request merge blocked because mergeable_state is "${mergeableState}".`);
+              return;
+            }
+
             // Merge the pull request using the default method to keep parity with manual merges.
             await github.rest.pulls.merge({
               owner: context.repo.owner,
