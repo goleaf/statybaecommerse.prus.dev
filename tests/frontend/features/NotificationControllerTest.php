@@ -6,6 +6,7 @@ namespace Tests\Feature;
 
 use App\Models\User;
 use App\Notifications\TestNotification;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Notifications\DatabaseNotification;
 use Tests\TestCase;
@@ -56,6 +57,45 @@ final class NotificationControllerTest extends TestCase
 
         $notification->refresh();
         $this->assertNotNull($notification->read_at);
+    }
+
+    public function test_mark_notification_as_read_with_morph_alias_success(): void
+    {
+        $originalMorphMap = Relation::morphMap();
+
+        // Register a temporary morph map alias to emulate polymorphic notification storage customisation.
+        Relation::morphMap([
+            'frontend-user' => User::class,
+        ], false);
+
+        try {
+            $notification = DatabaseNotification::create([
+                'id'              => 'test-notification-alias',
+                'type'            => TestNotification::class,
+                'notifiable_type' => 'frontend-user',
+                'notifiable_id'   => $this->user->id,
+                'data'            => ['title' => 'Test', 'message' => 'Test message'],
+            ]);
+
+            $response = $this->actingAs($this->user)
+                ->postJson("/notifications/{$notification->id}/read");
+
+            $response->assertOk()
+                ->assertJson([
+                    'success' => true,
+                    'message' => __('Notification marked as read'),
+                ]);
+
+            $notification->refresh();
+            $this->assertNotNull($notification->read_at);
+        } finally {
+            // Reset the morph map to avoid leaking state into subsequent tests.
+            if ($originalMorphMap === []) {
+                Relation::morphMap([], false);
+            } else {
+                Relation::morphMap($originalMorphMap, false);
+            }
+        }
     }
 
     public function test_mark_notification_as_read_not_found(): void
@@ -166,6 +206,8 @@ final class NotificationControllerTest extends TestCase
             'data'            => ['title' => 'Test 2', 'message' => 'Test message 2'],
         ]);
 
+        $this->user->refresh();
+
         $this->assertEquals(2, $this->user->unreadNotifications()->count());
 
         $response = $this->actingAs($this->user)
@@ -265,6 +307,8 @@ final class NotificationControllerTest extends TestCase
             'data'            => ['title' => 'Test 2', 'message' => 'Test message 2'],
         ]);
 
+        $this->user->refresh();
+
         $this->assertEquals(2, $this->user->notifications()->count());
 
         $response = $this->actingAs($this->user)
@@ -320,7 +364,7 @@ final class NotificationControllerTest extends TestCase
     public function test_get_recent_notifications(): void
     {
         // Create notifications with different timestamps
-        $notification1 = DatabaseNotification::create([
+        DatabaseNotification::create([
             'id'              => 'test-notification-recent-1',
             'type'            => TestNotification::class,
             'notifiable_type' => User::class,
@@ -329,7 +373,7 @@ final class NotificationControllerTest extends TestCase
             'created_at'      => now()->subMinutes(1),
         ]);
 
-        $notification2 = DatabaseNotification::create([
+        DatabaseNotification::create([
             'id'              => 'test-notification-recent-2',
             'type'            => TestNotification::class,
             'notifiable_type' => User::class,
@@ -338,7 +382,7 @@ final class NotificationControllerTest extends TestCase
             'created_at'      => now()->subMinutes(2),
         ]);
 
-        $notification3 = DatabaseNotification::create([
+        DatabaseNotification::create([
             'id'              => 'test-notification-recent-3',
             'type'            => TestNotification::class,
             'notifiable_type' => User::class,
@@ -364,6 +408,7 @@ final class NotificationControllerTest extends TestCase
                 ],
             ]);
 
+        /** @var array<int, array<string, mixed>> $notifications */
         $notifications = $response->json('notifications');
         $this->assertCount(3, $notifications);
 
@@ -391,6 +436,7 @@ final class NotificationControllerTest extends TestCase
             ->getJson('/notifications/recent');
 
         $response->assertOk();
+        /** @var array<int, array<string, mixed>> $notifications */
         $notifications = $response->json('notifications');
         $this->assertCount(5, $notifications);
     }
