@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Livewire;
 
 use App\Services\SystemSettingsService;
+use Illuminate\Contracts\View\View;
 use Livewire\Component;
 
 /**
@@ -15,7 +16,7 @@ use Livewire\Component;
  * @property string $group
  * @property bool $showPublicOnly
  * @property string $search
- * @property mixed $queryString
+ * @property array<string, array<string, mixed>> $queryString
  */
 final class SystemSettingsDisplay extends Component
 {
@@ -25,20 +26,38 @@ final class SystemSettingsDisplay extends Component
 
     public string $search = '';
 
-    protected $queryString = ['group' => ['except' => 'general'], 'showPublicOnly' => ['except' => false], 'search' => ['except' => '']];
+    /**
+     * @var array<string, array<string, mixed>>
+     */
+    protected array $queryString = [
+        'group' => ['except' => 'general'],
+        'showPublicOnly' => ['except' => false],
+        'search' => ['except' => ''],
+    ];
 
     /**
      * Render the Livewire component view with current state.
      */
-    public function render()
+    public function render(): View
     {
         $settingsService = app(SystemSettingsService::class);
-        $settings = $this->showPublicOnly ? $settingsService->getPublicSettings() : $settingsService->getSettingsByGroup($this->group);
-        // Filter by search if provided
-        if ($this->search) {
-            $settings = array_filter($settings, function ($value, $key) {
-                return stripos($key, $this->search) !== false || stripos($value, $this->search) !== false;
-            }, ARRAY_FILTER_USE_BOTH);
+        $settings = $this->showPublicOnly
+            ? $settingsService->getPublicSettings()
+            : $settingsService->getSettingsByGroup($this->group);
+
+        $searchTerm = $this->search;
+
+        if ($searchTerm !== '') {
+            $settings = array_filter(
+                $settings,
+                static function ($value, string $key) use ($searchTerm): bool {
+                    $normalizedKey = stripos((string) $key, $searchTerm) !== false;
+                    $normalizedValue = is_scalar($value) && stripos((string) $value, $searchTerm) !== false;
+
+                    return $normalizedKey || $normalizedValue;
+                },
+                ARRAY_FILTER_USE_BOTH
+            );
         }
 
         return view('livewire.system-settings-display', ['settings' => $settings, 'groups' => $this->getAvailableGroups()]);
@@ -47,7 +66,7 @@ final class SystemSettingsDisplay extends Component
     /**
      * Handle updatedGroup functionality with proper error handling.
      */
-    public function updatedGroup()
+    public function updatedGroup(): void
     {
         $this->reset('search');
     }
@@ -55,7 +74,7 @@ final class SystemSettingsDisplay extends Component
     /**
      * Handle updatedShowPublicOnly functionality with proper error handling.
      */
-    public function updatedShowPublicOnly()
+    public function updatedShowPublicOnly(): void
     {
         $this->reset('search');
     }
@@ -63,13 +82,16 @@ final class SystemSettingsDisplay extends Component
     /**
      * Handle updatedSearch functionality with proper error handling.
      */
-    public function updatedSearch()
+    public function updatedSearch(): void
     {
         // Search is handled in render method
     }
 
     /**
      * Handle getAvailableGroups functionality with proper error handling.
+     */
+    /**
+     * @return array<string, string>
      */
     private function getAvailableGroups(): array
     {
