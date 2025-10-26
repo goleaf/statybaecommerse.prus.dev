@@ -44,9 +44,27 @@ final class AutocompleteController extends Controller
         }
 
         $validated = $validator->validated();
-        $query = (string) $validated['q'];
+
+        // Trim the query to prevent "space only" searches that would otherwise pass validation.
+        $query = trim((string) $validated['q']);
+
+        if ($query === '') {
+            // Provide an early return if trimming removed all characters so clients receive a clear error message.
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed.',
+                'errors'  => ['q' => ['The search query must contain at least one non-space character.']],
+            ], 422);
+        }
+
+        // Fallback to the default limit when it is not supplied.
         $limit = isset($validated['limit']) ? (int) $validated['limit'] : 10;
-        $types = $validated['types'] ?? [];
+
+        // Normalise the types array by trimming, lower-casing and removing duplicates.
+        $types = array_values(array_unique(array_filter(array_map(
+            static fn (string $type): string => strtolower(trim($type)),
+            $validated['types'] ?? []
+        ), static fn (string $type): bool => $type !== '')));
 
         try {
             $results = $this->autocompleteService->search($query, $limit, $types);
@@ -115,7 +133,20 @@ final class AutocompleteController extends Controller
         }
 
         $validated = $validator->validated();
-        $query = (string) $validated['q'];
+
+        // Trim the query to avoid accidental empty strings when users only submit spaces.
+        $query = trim((string) $validated['q']);
+
+        if ($query === '') {
+            // Return a validation style error when the trimmed query is empty.
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed.',
+                'errors'  => ['q' => ['The search query must contain at least one non-space character.']],
+            ], 422);
+        }
+
+        // Default to a sensible limit when none is provided.
         $limit = isset($validated['limit']) ? (int) $validated['limit'] : 10;
 
         try {
