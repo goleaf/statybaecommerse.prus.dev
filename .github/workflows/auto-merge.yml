@@ -2,13 +2,16 @@ name: CI + Auto Merge
 
 on:
   pull_request:
-    # Listen to review-related events so automerge re-evaluates when status changes.
+    # Monitor events that can change mergeability (status updates, reviews, labels, etc.).
     types:
       - opened
       - synchronize
       - reopened
       - ready_for_review
       - labeled
+      - unlabeled
+      - review_requested
+      - review_request_removed
     branches:
       - main
       - master
@@ -21,16 +24,44 @@ jobs:
   automerge:
     name: Auto-merge PR (squash) and delete branch
     runs-on: ubuntu-latest
-    # Require the explicit auto-merge label so only trusted flows are merged automatically.
-    if: github.event.pull_request.draft == false && contains(github.event.pull_request.labels.*.name, 'auto-merge')
+    # Skip draft pull requests and contributions from forks for safety.
+    if: >-
+      github.event.pull_request.draft == false &&
+      github.event.pull_request.head.repo.full_name == github.repository
     steps:
-      - name: Automerge
-        uses: pascalgn/automerge-action@v0.15.6
+      - name: Check mergeability via GitHub API
+        id: pr
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            // Fetch the freshest pull request data to avoid stale mergeability flags.
+            const prNumber = context.payload.pull_request.number;
+            const { data: pr } = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: prNumber,
+            });
+
+            core.info(`PR #${prNumber} mergeable: ${pr.mergeable}; state: ${pr.mergeable_state}`);
+
+            // Expose mergeability details for subsequent steps.
+            core.setOutput('mergeable', pr.mergeable ? 'true' : 'false');
+            core.setOutput('mergeable_state', pr.mergeable_state || 'unknown');
+
+      - name: Merge pull request when clean
+        if: steps.pr.outputs.mergeable == 'true' && steps.pr.outputs.mergeable_state == 'clean'
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          MERGE_METHOD: squash
-          MERGE_DELETE_BRANCH: true
-          MERGE_FORKS: false
-          MERGE_RETRIES: 10
-          MERGE_RETRY_SLEEP: 10000
-          MERGE_LABELS: "auto-merge"
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Squash-merge the pull request, close it, and delete the source branch when no conflicts exist.
+          gh pr merge ${{ github.event.pull_request.number }} \
+            --squash \
+            --delete-branch \
+            --body "Automated merge performed by CI once the pull request became conflict-free."
+
+      - name: Log mergeability status when merge is skipped
+        if: steps.pr.outputs.mergeable != 'true' || steps.pr.outputs.mergeable_state != 'clean'
+        run: |
+          # Provide context in the workflow logs explaining why the merge did not proceed.
+          echo "Pull request ${{ github.event.pull_request.number }} mergeable_state=${{ steps.pr.outputs.mergeable_state }}; awaiting clean state."
