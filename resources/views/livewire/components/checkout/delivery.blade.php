@@ -63,7 +63,7 @@
                                         value="{{ $option['id'] }}"
                                         class="mt-0.5 size-4 shrink-0 cursor-pointer border-gray-300 text-primary-500 focus:ring-primary-600 active:ring-2 active:ring-offset-2"
                                         wire:loading.attr="disabled"
-                                        wire:target="refreshShippingOptions,placeOrder"
+                                        wire:target="save,handleCheckoutAddressUpdated,handleShippingAddressUpdated,resolveOptions"
                                     >
                                     <span class="flex flex-col ml-3">
                                         <span
