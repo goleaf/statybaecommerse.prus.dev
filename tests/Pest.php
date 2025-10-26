@@ -9,12 +9,11 @@ use Spatie\Permission\Models\Role;
 use Spatie\Permission\PermissionRegistrar;
 use Tests\Support\TestingDatabase;
 
-<<<<<<< HEAD
 uses(Tests\TestCase::class)->in('Feature', 'Unit', 'admin', 'frontend', 'Performance');
 // Register the base TestCase for dedicated model quality suites introduced under tests/Models.
 uses(Tests\TestCase::class)->in('Models');
 
-beforeAll(function () {
+beforeAll(function (): void {
     $testingDatabasePath = TestingDatabase::path();
     TestingDatabase::ensureExists();
 
@@ -61,7 +60,7 @@ beforeAll(function () {
 
     // Stub missing Filament resource routes referenced by navigation during tests
     if (! Route::has('filament.admin.resources.system-settings.index')) {
-        Route::get('/__stub/system-settings', fn () => 'ok')
+        Route::get('/__stub/system-settings', fn (): string => 'ok')
             ->name('filament.admin.resources.system-settings.index');
     }
 
@@ -75,7 +74,7 @@ beforeAll(function () {
     foreach ($variantAttributeValueRoutes as $name => $uri) {
         $routeName = 'filament.admin.resources.variant-attribute-values.' . $name;
         if (! Route::has($routeName)) {
-            Route::get($uri, fn () => 'ok')->name($routeName);
+            Route::get($uri, fn (): string => 'ok')->name($routeName);
         }
     }
 
@@ -86,7 +85,7 @@ beforeAll(function () {
         'campaign-product-targets'   => 'Campaign Product Targets',
     ];
 
-    foreach ($filamentResourceStubs as $slug => $label) {
+    foreach (array_keys($filamentResourceStubs) as $slug) {
         $routes = [
             'index'  => "/__stub/{$slug}",
             'create' => "/__stub/{$slug}/create",
@@ -101,12 +100,12 @@ beforeAll(function () {
                 continue;
             }
 
-            Route::get($uri, fn () => 'ok')->name($routeName);
+            Route::get($uri, fn (): string => 'ok')->name($routeName);
         }
     }
 });
 
-beforeEach(function () {
+beforeEach(function (): void {
     if (! getenv('SKIP_FILAMENT_BOOT')) {
         Filament::setCurrentPanel('admin');
 
