@@ -20,6 +20,7 @@ return [
         'media'             => 'Media',
         'seo'               => 'SEO Settings',
         'settings'          => 'Settings',
+        'social'            => 'Social Profiles',
         'translations'      => 'Translations',
     ],
 
@@ -33,10 +34,14 @@ return [
         'is_active'          => 'Active',
         'is_visible'         => 'Visible',
         'is_featured'        => 'Featured',
+        'is_premium'         => 'Premium',
         'logo'               => 'Logo',
         'banner'             => 'Banner',
         'seo_title'          => 'SEO Title',
         'seo_description'    => 'SEO Description',
+        'social_links'       => 'Social Links',
+        'social_platform'    => 'Platform',
+        'social_url'         => 'Profile URL',
         'translations'       => 'Translations',
         'locale'             => 'Language',
         'translations_count' => 'Translations',
@@ -50,6 +55,9 @@ return [
         'enabled'         => 'Whether this brand is active and visible',
         'seo_title'       => 'Recommended length: 50-60 characters',
         'seo_description' => 'Recommended length: 150-160 characters',
+        'website'         => 'Public URL pointing to the official brand website',
+        'social_links'    => 'Add verified social media profiles that will be stored as JSON',
+        'is_premium'      => 'Premium brands receive highlighted placement on landing pages',
     ],
 
     // Placeholders
@@ -70,6 +78,11 @@ return [
         'unfeature'           => 'Unfeature',
         'feature_selected'    => 'Feature Selected',
         'unfeature_selected'  => 'Unfeature Selected',
+        'mark_premium'        => 'Mark as Premium',
+        'unmark_premium'      => 'Remove Premium',
+        'mark_premium_selected'   => 'Mark Premium (Selected)',
+        'unmark_premium_selected' => 'Remove Premium (Selected)',
+        'add_social_link'         => 'Add Social Link',
         'manage_translations' => 'Manage Translations',
         'bulk_actions'        => 'Bulk Actions',
     ],
@@ -79,6 +92,8 @@ return [
         'enabled_only'       => 'Enabled Only',
         'featured_only'      => 'Featured Only',
         'not_featured'       => 'Not Featured',
+        'premium_only'       => 'Premium Only',
+        'not_premium'        => 'Not Premium',
         'visible_only'       => 'Visible Only',
         'hidden_only'        => 'Hidden Only',
         'with_products'      => 'With Products',
@@ -100,6 +115,10 @@ return [
         'bulk_disabled'     => 'Selected brands disabled successfully',
         'bulk_featured'     => 'Selected brands featured successfully',
         'bulk_unfeatured'   => 'Selected brands unfeatured successfully',
+        'premium_enabled'   => 'Brand marked as premium',
+        'premium_disabled'  => 'Brand removed from premium list',
+        'bulk_premium_enabled'  => 'Selected brands marked as premium',
+        'bulk_premium_disabled' => 'Selected brands removed from premium list',
     ],
 
     // Statistics
@@ -149,5 +168,20 @@ return [
         'website_max'         => 'Website must not exceed 255 characters',
         'seo_title_max'       => 'SEO title must not exceed 60 characters',
         'seo_description_max' => 'SEO description must not exceed 160 characters',
+    ],
+
+    // Social platform labels
+    'social' => [
+        'platforms' => [
+            'facebook'  => 'Facebook',
+            'instagram' => 'Instagram',
+            'linkedin'  => 'LinkedIn',
+            'tiktok'    => 'TikTok',
+            'twitter'   => 'Twitter',
+            'youtube'   => 'YouTube',
+            'pinterest' => 'Pinterest',
+            'github'    => 'GitHub',
+            'website'   => 'Website',
+        ],
     ],
 ];
