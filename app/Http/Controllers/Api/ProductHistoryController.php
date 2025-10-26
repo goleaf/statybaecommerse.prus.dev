@@ -4,18 +4,23 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api;
 
+use App\Data\ExportRequestData;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\ProductHistory;
-use App\Support\ListQuery\ListQueryDefinition;
+use App\Models\User;
+use App\Services\Export\ExportService;
+use App\Services\Export\Exporters\ProductHistoryExport;
 use App\Support\ListQuery\ListQueryValidator;
 use App\Support\ListQuery\ListResponse;
+use App\Support\ProductHistory\ProductHistoryListConfiguration;
 use App\Traits\HandlesContentNegotiation;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\URL;
 use Illuminate\View\View;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
  * ProductHistoryController
@@ -26,42 +31,24 @@ final class ProductHistoryController extends Controller
 {
     use HandlesContentNegotiation;
 
+    public function __construct(private readonly ExportService $exportService) {}
+
     /**
      * Display a listing of the resource with pagination and filtering.
      */
     public function index(Request $request, Product $product): JsonResponse|View|Response
     {
-        $definition = new ListQueryDefinition(
-            filters: [
-                'action' => ['type' => 'string', 'column' => 'product_histories.action'],
-                'field_name' => ['type' => 'string', 'column' => 'product_histories.field_name'],
-                'user_id' => ['type' => 'int', 'column' => 'product_histories.user_id'],
-                'date_from' => ['type' => 'datetime', 'column' => 'product_histories.created_at', 'operator' => '>='],
-                'date_to' => ['type' => 'datetime', 'column' => 'product_histories.created_at', 'operator' => '<='],
-                'search' => [
-                    'type' => 'string',
-                    'callback' => static function (Builder $builder, string $search): void {
-                        $builder->where(function (Builder $query) use ($search): void {
-                            $query->where('description', 'like', "%{$search}%")
-                                ->orWhere('action', 'like', "%{$search}%")
-                                ->orWhere('field_name', 'like', "%{$search}%");
-                        });
-                    },
-                ],
-            ],
-            sortable: [
-                'created_at' => ['column' => 'product_histories.created_at', 'default_direction' => 'desc'],
-                'action' => ['column' => 'product_histories.action'],
-            ],
-            defaultSort: 'created_at',
-            defaultDirection: 'desc',
-            defaultPerPage: 15,
-            maxPerPage: 100,
-        );
+        $this->authorize('viewAny', [ProductHistory::class, $product]);
 
+        $definition = ProductHistoryListConfiguration::definition();
         $listQuery = ListQueryValidator::fromRequest($request, $definition);
 
-        $query = $product->histories()->with(['user:id,name,email']);
+        $query = $product
+            ->histories()
+            ->with(['user:id,name,email']);
+
+        // Apply the allow-listed filters and sorts so callers cannot project
+        // arbitrary columns or SQL snippets into the query builder.
         $listQuery->applyFilters($query);
         $listQuery->applySorts($query);
 
@@ -69,12 +56,16 @@ final class ProductHistoryController extends Controller
             $query->orderByDesc('product_histories.created_at');
         }
 
+        // Always fall back to a deterministic secondary ordering to stabilise
+        // pagination windows when multiple history records share timestamps.
+        $query->orderByDesc('product_histories.id');
+
         $histories = $query->paginate($listQuery->perPage(), ['*'], 'page', $listQuery->page());
 
         $payload = ListResponse::fromPaginator($histories, $listQuery, [
             'histories' => $histories->items(),
             'product' => [
-                'id' => $product->id,
+                'id' => $product->getKey(),
                 'name' => $product->name,
                 'sku' => $product->sku,
             ],
@@ -88,11 +79,21 @@ final class ProductHistoryController extends Controller
      */
     public function show(Request $request, Product $product, ProductHistory $history): JsonResponse|View|Response
     {
-        if ($history->product_id !== $product->id) {
+        if ($history->product_id !== $product->getKey()) {
             return response()->json(['error' => 'History not found for this product'], 404);
         }
+
+        $this->authorize('view', [$history, $product]);
+
         $history->load(['user:id,name,email', 'product:id,name,sku']);
-        $data = ['history' => $history, 'product' => ['id' => $product->id, 'name' => $product->name, 'sku' => $product->sku]];
+        $data = [
+            'history' => $history,
+            'product' => [
+                'id' => $product->getKey(),
+                'name' => $product->name,
+                'sku' => $product->sku,
+            ],
+        ];
 
         return $this->handleContentNegotiation($request, $data);
     }
@@ -102,15 +103,58 @@ final class ProductHistoryController extends Controller
      */
     public function statistics(Request $request, Product $product): JsonResponse|View|Response
     {
-        $totalChanges = $product->histories()->count();
-        $recentChanges = $product->histories()->recent(7)->count();
-        $changesByAction = $product->histories()->selectRaw('action, COUNT(*) as count')->groupBy('action')->pluck('count', 'action');
-        $changesByField = $product->histories()->selectRaw('field_name, COUNT(*) as count')->whereNotNull('field_name')->groupBy('field_name')->pluck('count', 'field_name');
-        $recentActivity = $product->histories()->with(['user:id,name'])->recent(7)->limit(5)->get(['id', 'action', 'field_name', 'description', 'created_at', 'user_id']);
-        $priceChanges = $product->priceHistories()->count();
-        $stockUpdates = $product->stockHistories()->count();
-        $statusChanges = $product->statusHistories()->count();
-        $data = ['statistics' => ['total_changes' => $totalChanges, 'recent_changes' => $recentChanges, 'changes_by_action' => $changesByAction, 'changes_by_field' => $changesByField, 'recent_activity' => $recentActivity, 'summary' => ['price_changes' => $priceChanges, 'stock_updates' => $stockUpdates, 'status_changes' => $statusChanges], 'change_frequency' => $product->getChangeFrequency(30), 'last_price_change' => $product->getLastPriceChange()?->created_at, 'last_stock_update' => $product->getLastStockUpdate()?->created_at, 'last_status_change' => $product->getLastStatusChange()?->created_at], 'product' => ['id' => $product->id, 'name' => $product->name, 'sku' => $product->sku]];
+        $this->authorize('statistics', [ProductHistory::class, $product]);
+
+        $definition = ProductHistoryListConfiguration::definition();
+        $listQuery = ListQueryValidator::fromRequest($request, $definition);
+
+        $baseQuery = ProductHistory::query()->where('product_id', $product->getKey());
+        $listQuery->applyFilters($baseQuery);
+
+        $totalChanges = (clone $baseQuery)->count();
+        $recentChanges = (clone $baseQuery)->where('created_at', '>=', now()->subDays(7))->count();
+        $changesByAction = (clone $baseQuery)
+            ->selectRaw('action, COUNT(*) as count')
+            ->groupBy('action')
+            ->pluck('count', 'action');
+        $changesByField = (clone $baseQuery)
+            ->selectRaw('field_name, COUNT(*) as count')
+            ->whereNotNull('field_name')
+            ->groupBy('field_name')
+            ->pluck('count', 'field_name');
+        $recentActivity = (clone $baseQuery)
+            ->with(['user:id,name'])
+            ->orderByDesc('created_at')
+            ->limit(5)
+            ->get(['id', 'action', 'field_name', 'description', 'created_at', 'user_id']);
+        $priceChanges = (clone $baseQuery)->where('field_name', 'price')->count();
+        $stockUpdates = (clone $baseQuery)->where('field_name', 'stock_quantity')->count();
+        $statusChanges = (clone $baseQuery)->where('field_name', 'status')->count();
+
+        $data = [
+            'statistics' => [
+                'total_changes' => $totalChanges,
+                'recent_changes' => $recentChanges,
+                'changes_by_action' => $changesByAction,
+                'changes_by_field' => $changesByField,
+                'recent_activity' => $recentActivity,
+                'summary' => [
+                    'price_changes' => $priceChanges,
+                    'stock_updates' => $stockUpdates,
+                    'status_changes' => $statusChanges,
+                ],
+                'change_frequency' => $product->getChangeFrequency(30),
+                'last_price_change' => $product->getLastPriceChange()?->created_at,
+                'last_stock_update' => $product->getLastStockUpdate()?->created_at,
+                'last_status_change' => $product->getLastStatusChange()?->created_at,
+            ],
+            'product' => [
+                'id' => $product->getKey(),
+                'name' => $product->name,
+                'sku' => $product->sku,
+            ],
+            'meta' => ListResponse::meta($listQuery),
+        ];
 
         return $this->handleContentNegotiation($request, $data);
     }
@@ -118,73 +162,130 @@ final class ProductHistoryController extends Controller
     /**
      * Handle export functionality with proper error handling.
      */
-    public function export(Request $request, Product $product): Response
+    public function export(Request $request, Product $product): StreamedResponse
     {
-        $query = $product->histories()->with(['user:id,name,email'])->latest();
-        // Apply same filters as index
-        if ($request->has('action')) {
-            $query->byAction($request->get('action'));
-        }
-        if ($request->has('field_name')) {
-            $query->byField($request->get('field_name'));
-        }
-        if ($request->has('date_from')) {
-            $query->where('created_at', '>=', $request->get('date_from'));
-        }
-        if ($request->has('date_to')) {
-            $query->where('created_at', '<=', $request->get('date_to'));
-        }
-        $histories = $query->get();
-        $csvData = "Date,Action,Field,Old Value,New Value,Description,User,IP Address\n";
-        foreach ($histories as $history) {
-            $csvData .= sprintf("%s,%s,%s,%s,%s,%s,%s,%s\n", $history->created_at->format('Y-m-d H:i:s'), $history->action, $history->field_name ?? 'N/A', is_array($history->old_value) ? json_encode($history->old_value) : $history->old_value ?? 'N/A', is_array($history->new_value) ? json_encode($history->new_value) : $history->new_value ?? 'N/A', str_replace(["\r", "\n"], ' ', $history->description ?? ''), $history->user?->name ?? 'System', $history->ip_address ?? 'N/A');
-        }
-        $filename = "product_history_{$product->sku}_".now()->format('Y-m-d_H-i-s').'.csv';
+        $this->authorize('export', [ProductHistory::class, $product]);
 
-        return response($csvData)->header('Content-Type', 'text/csv; charset=UTF-8')->header('Content-Disposition', "attachment; filename=\"{$filename}\"");
+        $definition = ProductHistoryListConfiguration::definition();
+        $listQuery = ListQueryValidator::fromRequest($request, $definition);
+
+        $filters = $listQuery->filters();
+        $user = $request->user();
+
+        $exportRequest = new ExportRequestData(
+            name: sprintf('product-history-%s', $product->sku ?? $product->getKey()),
+            exportable: ProductHistoryExport::class,
+            format: (string) $request->input('format', 'csv'),
+            columns: $this->resolveExportColumns($request),
+            filters: array_merge($filters, ['product_id' => $product->getKey()]),
+            userId: $user instanceof User ? $user->getKey() : null,
+            meta: [
+                'product_id' => $product->getKey(),
+                'product_name' => $product->name,
+                'query' => [
+                    'filters' => $filters,
+                ],
+            ],
+        );
+
+        $export = $user instanceof User
+            ? $this->exportService->queueExport($exportRequest, $user)
+            : $this->exportService->queue($exportRequest);
+
+        $downloadUrl = URL::temporarySignedRoute(
+            'api.exports.download',
+            now()->addMinutes(5),
+            ['export' => $export->uuid]
+        );
+
+        // Stream a single server-sent event so the caller receives the queued
+        // export identifier immediately without waiting for the job to finish.
+        return response()->stream(function () use ($export, $downloadUrl): void {
+            $payload = [
+                'event' => 'queued',
+                'export_id' => $export->getKey(),
+                'uuid' => $export->uuid,
+                'status' => (string) $export->status,
+                'download_url' => $downloadUrl,
+            ];
+
+            $encoded = json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+            if ($encoded === false) {
+                $encoded = json_encode(['event' => 'queued'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?: '{"event":"queued"}';
+            }
+
+            echo 'data: ' . $encoded . "\n\n";
+            if (function_exists('ob_flush')) {
+                @ob_flush();
+            }
+            flush();
+        }, 200, [
+            'Content-Type' => 'text/event-stream; charset=UTF-8',
+            'Cache-Control' => 'no-cache, no-transform',
+            'Connection' => 'keep-alive',
+            'X-Accel-Buffering' => 'no',
+        ]);
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Store a newly created resource in storage.
      */
-    public function create(Request $request, Product $product): JsonResponse
+    public function store(Request $request, Product $product): JsonResponse
     {
-        $request->validate(['action' => 'required|string|max:255', 'field_name' => 'nullable|string|max:255', 'old_value' => 'nullable', 'new_value' => 'nullable', 'description' => 'nullable|string|max:65535']);
-        $history = ProductHistory::createHistoryEntry(product: $product, action: $request->get('action'), fieldName: $request->get('field_name'), oldValue: $request->get('old_value'), newValue: $request->get('new_value'), description: $request->get('description'), user: auth()->user());
+        $this->authorize('create', [ProductHistory::class, $product]);
+
+        $validated = $request->validate([
+            'action' => ['required', 'string', 'max:255'],
+            'field_name' => ['nullable', 'string', 'max:255'],
+            'old_value' => ['nullable'],
+            'new_value' => ['nullable'],
+            'description' => ['nullable', 'string', 'max:65535'],
+        ]);
+
+        $actor = $request->user();
+        $history = ProductHistory::createHistoryEntry(
+            product: $product,
+            action: $validated['action'],
+            fieldName: $validated['field_name'] ?? null,
+            oldValue: $validated['old_value'] ?? null,
+            newValue: $validated['new_value'] ?? null,
+            description: $validated['description'] ?? null,
+            user: $actor instanceof User ? $actor : null,
+        );
+
         $history->load(['user:id,name,email']);
 
-        return response()->json(['data' => $history, 'message' => 'History entry created successfully'], 201);
-}
+        return response()->json([
+            'data' => $history,
+            'message' => 'History entry created successfully',
+        ], 201);
+    }
 
-    private function productHistoryListDefinition(): ListQueryDefinition
+    /**
+     * Normalise the requested export columns against the allow-listed set.
+     *
+     * @return array<int, string>
+     */
+    private function resolveExportColumns(Request $request): array
     {
-        return ListQueryDefinition::make()
-            ->defaultPerPage(15)
-            ->maxPerPage(100)
-            ->defaultSort('created_at', 'desc')
-            ->allowedSorts([
-                'created_at' => ['column' => 'created_at'],
-                'action' => ['column' => ['action', 'id']],
-                'field_name' => ['column' => ['field_name', 'id']],
-                'user' => ['column' => 'user_id'],
-            ])
-            ->filters([
-                'action' => ['type' => 'string', 'nullable' => true, 'scope' => 'byAction'],
-                'field_name' => ['type' => 'string', 'nullable' => true, 'scope' => 'byField'],
-                'user_id' => ['type' => 'int', 'nullable' => true, 'scope' => 'byUser'],
-                'date_from' => ['type' => 'date', 'column' => 'created_at', 'operator' => '>='],
-                'date_to' => ['type' => 'date', 'column' => 'created_at', 'operator' => '<='],
-                'search' => [
-                    'type' => 'string',
-                    'nullable' => true,
-                    'callback' => static function (Builder $builder, string $search): void {
-                        $builder->where(static function (Builder $query) use ($search): void {
-                            $query->where('description', 'like', '%'.$search.'%')
-                                ->orWhere('action', 'like', '%'.$search.'%')
-                                ->orWhere('field_name', 'like', '%'.$search.'%');
-                        });
-                    },
-                ],
-            ]);
+        $requested = $request->input('columns', []);
+        $columns = [];
+        $allowed = ProductHistoryExport::allowedColumnKeys();
+
+        foreach ((array) $requested as $column) {
+            if (! is_string($column)) {
+                continue;
+            }
+
+            $column = trim($column);
+
+            if ($column === '' || ! in_array($column, $allowed, true)) {
+                continue;
+            }
+
+            $columns[] = $column;
+        }
+
+        return $columns;
     }
 }
