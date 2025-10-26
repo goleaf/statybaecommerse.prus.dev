@@ -1,8 +1,10 @@
 <?php declare(strict_types=1);
 
 $passwordResetRateLimit = [
+    // Use a conservative default of five password reset emails per minute to block spray attacks
+    // while keeping the UX acceptable for legitimate users.
     'max_attempts' => (int) env('AUTH_RATE_LIMIT_PASSWORD_RESET_ATTEMPTS', 5),
-    'decay_seconds' => (int) env('AUTH_RATE_LIMIT_PASSWORD_RESET_DECAY', 300),
+    'decay_seconds' => (int) env('AUTH_RATE_LIMIT_PASSWORD_RESET_DECAY', 60),
 ];
 
 return [
@@ -139,6 +141,12 @@ return [
                 'decay_seconds' => (int) env('AUTH_RATE_LIMIT_LOGIN_DECAY', 60),
             ],
             'password_reset' => $passwordResetRateLimit,
+            // Apply the same guardrails to two-factor verification attempts so brute forcing
+            // recovery codes or TOTPs is rate limited to five per minute by default.
+            'two_factor' => [
+                'max_attempts' => (int) env('AUTH_RATE_LIMIT_TWO_FACTOR_ATTEMPTS', 5),
+                'decay_seconds' => (int) env('AUTH_RATE_LIMIT_TWO_FACTOR_DECAY', 60),
+            ],
         ],
     ],
     'captcha' => [
