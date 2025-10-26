@@ -108,8 +108,8 @@ class Show extends Component
 
         $query->with(['brand:id,slug,name', 'media', 'prices.currency:id,code']);
 
-        $query->with(['prices' => static function (Builder $priceQuery): void {
-            // Only eager load prices for the active currency to avoid leaking unused rows.
+        $query->with(['prices' => static function (Builder|Relation $priceQuery): void {
+            // Accept both Builder and Relation instances because morph relations surface Relation types here.
             $priceQuery->whereRelation('currency', 'code', current_currency());
         }]);
 
@@ -390,7 +390,7 @@ class Show extends Component
      */
     private function applyCollectionScope(Builder $query, ?CollectionModel $collection): void
     {
-        if ($collection === null) {
+        if (! $collection instanceof \App\Models\Collection) {
             return;
         }
 
@@ -434,13 +434,11 @@ class Show extends Component
             ->where('is_active', true)
             ->orderBy('position')
             ->get(['field', 'operator', 'value'])
-            ->map(static function (CollectionRule $rule): array {
-                return [
-                    'field'    => (string) $rule->field,
-                    'operator' => (string) $rule->operator,
-                    'value'    => $rule->value,
-                ];
-            });
+            ->map(static fn (CollectionRule $rule): array => [
+                'field'    => (string) $rule->field,
+                'operator' => (string) $rule->operator,
+                'value'    => $rule->value,
+            ]);
     }
 
     /**

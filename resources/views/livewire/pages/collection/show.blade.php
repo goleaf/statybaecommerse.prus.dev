@@ -1,6 +1,9 @@
 @section('meta')
-    @php($ogImage = $collection->getFirstMediaUrl(config('media.storage.collection_name'), 'large') ?: $collection->getFirstMediaUrl(config('media.storage.collection_name')))
     @php
+        // Resolve Open Graph imagery once to avoid repeated media lookups in the component tree.
+        $ogImage = $collection->getFirstMediaUrl(config('media.storage.collection_name'), 'large')
+            ?: $collection->getFirstMediaUrl(config('media.storage.collection_name'));
+
         $firstProduct = $products->first();
         $cname = config('media.storage.collection_name');
         $preSmall = $firstProduct?->getFirstMediaUrl($cname, 'small');
@@ -81,7 +84,10 @@
         <h2 class="text-xl font-semibold mb-2">{{ __('Filter by brand') }}</h2>
         <div class="flex flex-wrap items-center gap-2 mb-2">
             @foreach (collect($brandIds)->filter() as $bid)
-                @php($b = $this->availableBrands->firstWhere('id', (int) $bid))
+                @php
+                    // Resolve the brand model once per iteration to avoid repeated collection scans.
+                    $b = $this->availableBrands->firstWhere('id', (int) $bid);
+                @endphp
                 @if ($b)
                     <button type="button" wire:click="removeBrandFilter({{ (int) $bid }})"
                             wire:confirm="{{ __('translations.confirm_remove_brand_filter') }}"
