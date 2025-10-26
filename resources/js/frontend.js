@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', function () {
     initializeSearchEnhancements();
     initializeLoadingStates();
     initializeThemeSystem();
+    initializeLocationDataClients();
     initializeImageLazyLoading();
     initializeProductQuickView();
     initializeWishlist();
@@ -635,3 +636,65 @@ function formatCurrency(amount, currency = 'EUR', locale = 'en') {
 window.smoothScrollTo = smoothScrollTo;
 window.createNotification = createNotification;
 window.formatCurrency = formatCurrency;
+// Fetch and broadcast location data for widgets listening to the store locator API.
+function initializeLocationDataClients() {
+    const containers = document.querySelectorAll('[data-locations-endpoint]');
+
+    if (containers.length === 0) return;
+
+    containers.forEach((container) => {
+        const endpoint = container.getAttribute('data-locations-endpoint');
+
+        if (!endpoint) {
+            return;
+        }
+
+        // Surface the bootstrap payload (if present) before requesting fresh data.
+        const bootstrapPayload = container.getAttribute('data-locations-bootstrap');
+
+        if (bootstrapPayload) {
+            try {
+                const parsed = JSON.parse(bootstrapPayload);
+
+                container.dispatchEvent(
+                    new CustomEvent('locations:bootstrap', {
+                        detail: { locations: parsed },
+                    }),
+                );
+            } catch (error) {
+                console.error('Failed to parse bootstrap locations payload:', error);
+            }
+        }
+
+        fetch(endpoint, {
+            headers: {
+                Accept: 'application/json',
+            },
+        })
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error(`Request failed with status ${response.status}`);
+                }
+
+                return response.json();
+            })
+            .then((payload) => {
+                container.dispatchEvent(
+                    new CustomEvent('locations:loaded', {
+                        detail: payload,
+                    }),
+                );
+            })
+            .catch((error) => {
+                // Propagate the error so progressive enhancement hooks can react.
+                container.dispatchEvent(
+                    new CustomEvent('locations:error', {
+                        detail: { error },
+                    }),
+                );
+
+                console.error('Unable to load locations from the API:', error);
+            });
+    });
+}
+
