@@ -38,6 +38,9 @@ final class NotificationDropdown extends Component
     public function loadNotifications(): void
     {
         if (! auth()->check()) {
+            // Reset the public properties so the dropdown renders an empty state for guests.
+            $this->unreadCount = 0;
+            $this->recentNotifications = [];
             return;
         }
         $this->unreadCount = auth()->user()->unreadNotifications->count();
@@ -51,6 +54,9 @@ final class NotificationDropdown extends Component
      */
     public function markAsRead(string $notificationId): void
     {
+        if (! auth()->check()) {
+            return;
+        }
         $notification = DatabaseNotification::find($notificationId);
         if ($notification && $notification->notifiable_id === auth()->id()) {
             $notification->markAsRead();
@@ -63,6 +69,9 @@ final class NotificationDropdown extends Component
      */
     public function markAllAsRead(): void
     {
+        if (! auth()->check()) {
+            return;
+        }
         auth()->user()->unreadNotifications->markAsRead();
         $this->loadNotifications();
     }

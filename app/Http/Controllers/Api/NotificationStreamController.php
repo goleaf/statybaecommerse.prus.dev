@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use DateTimeInterface;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Http\Request;
@@ -24,13 +25,23 @@ final class NotificationStreamController extends Controller
     /**
      * Handle stream functionality with proper error handling.
      */
-    public function stream(Request $request): StreamedResponse
+    public function stream(Request $request, User $user): StreamedResponse
     {
-        $user = $request->user();
+        /**
+         * Resolve the authenticated user so we can verify the scoped identifier before streaming.
+         * This helps prevent session fixation or cache poisoning where one visitor could receive
+         * another user's notification payload.
+         */
+        $authenticatedUser = $request->user();
 
-        if ($user === null) {
+        if ($authenticatedUser === null) {
             // Abort with HTTP 401 when the user is not authenticated.
             abort(401, 'Unauthorized');
+        }
+
+        // Reject attempts to stream notifications for any user other than the authenticated account.
+        if ((string) $authenticatedUser->getAuthIdentifier() !== (string) $user->getAuthIdentifier()) {
+            abort(403, 'Forbidden');
         }
 
         // Establish configuration values that control the stream timing behaviour.
