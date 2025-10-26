@@ -85,7 +85,9 @@ final class PartnerApiTest extends TestCase
             ->withHeader($headerName, $credentials['plain_text'])
             ->getJson(route('api.partner.orders.index'));
 
-        $firstResponse->assertOk();
+        $firstResponse->assertOk()
+            // Ensure we expose rate limit metadata for successful partner requests.
+            ->assertHeader('X-RateLimit-Reset');
 
         $secondResponse = $this
             ->withHeader($headerName, $credentials['plain_text'])
@@ -95,6 +97,8 @@ final class PartnerApiTest extends TestCase
             ->assertJson([
                 'message' => 'Partner API rate limit exceeded.',
             ])
-            ->assertHeader('Retry-After');
+            // Confirm rate limit error responses surface both retry guidance and reset timing.
+            ->assertHeader('Retry-After')
+            ->assertHeader('X-RateLimit-Reset');
     }
 }
