@@ -137,29 +137,36 @@ final class CountryControllerTest extends TestCase
 
     public function test_countries_api_endpoint(): void
     {
+        // Seed multiple active countries to exercise the paginated resource structure.
         Country::factory()->count(3)->create(['is_active' => true, 'is_enabled' => true]);
 
         $response = $this->get(route('countries.api.search'));
 
         $response->assertStatus(200);
         $response->assertJsonStructure([
-            'countries' => [
+            'data' => [
                 '*' => [
                     'id',
                     'name',
+                    'name_official',
                     'cca2',
                     'cca3',
+                    'flag',
                     'region',
                     'currency_code',
-                    'flag',
+                    'vat_rate',
+                    'is_eu_member',
+                    'requires_vat',
                 ],
             ],
-            'total',
+            'links' => ['first', 'last', 'prev', 'next'],
+            'meta' => ['current_page', 'from', 'last_page', 'path', 'per_page', 'to', 'total'],
         ]);
     }
 
     public function test_countries_api_endpoint_with_search(): void
     {
+        // Build two similarly named records to verify the search filter narrows the results.
         Country::factory()->create(['name' => 'Lithuania', 'is_active' => true, 'is_enabled' => true]);
         Country::factory()->create(['name' => 'Latvia', 'is_active' => true, 'is_enabled' => true]);
 
@@ -168,12 +175,13 @@ final class CountryControllerTest extends TestCase
         $response->assertStatus(200);
 
         $data = $response->json();
-        $this->assertEquals(1, $data['total']);
-        $this->assertEquals('Lithuania', $data['countries'][0]['name']);
+        $this->assertEquals(1, $data['meta']['total']);
+        $this->assertEquals('Lithuania', $data['data'][0]['name']);
     }
 
     public function test_countries_api_endpoint_with_region_filter(): void
     {
+        // Create countries in different regions to confirm filtering applies.
         Country::factory()->create(['region' => 'Europe', 'is_active' => true, 'is_enabled' => true]);
         Country::factory()->create(['region' => 'Asia', 'is_active' => true, 'is_enabled' => true]);
 
@@ -182,8 +190,8 @@ final class CountryControllerTest extends TestCase
         $response->assertStatus(200);
 
         $data = $response->json();
-        $this->assertEquals(1, $data['total']);
-        $this->assertEquals('Europe', $data['countries'][0]['region']);
+        $this->assertEquals(1, $data['meta']['total']);
+        $this->assertEquals('Europe', $data['data'][0]['region']);
     }
 
     public function test_countries_statistics_api_endpoint(): void
@@ -196,14 +204,18 @@ final class CountryControllerTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertJsonStructure([
-            'total_countries',
-            'active_countries',
-            'eu_members',
-            'countries_with_vat',
-            'average_vat_rate',
+            'data' => [
+                'total_countries',
+                'active_countries',
+                'eu_members',
+                'countries_with_vat',
+                'average_vat_rate',
+                'by_region',
+                'by_currency',
+            ],
         ]);
 
-        $data = $response->json();
+        $data = $response->json('data');
         $this->assertEquals(3, $data['total_countries']);
         $this->assertEquals(1, $data['active_countries']);
         $this->assertEquals(1, $data['eu_members']);

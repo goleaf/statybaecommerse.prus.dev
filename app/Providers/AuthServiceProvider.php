@@ -8,6 +8,7 @@ use App\Models\Address;
 use App\Models\AdminUser;
 use App\Models\Brand;
 use App\Models\Category;
+use App\Models\Country;
 use App\Models\Customer;
 use App\Models\Export;
 use App\Models\Legal;
@@ -22,6 +23,7 @@ use App\Models\User;
 use App\Policies\AddressPolicy;
 use App\Policies\BrandPolicy;
 use App\Policies\CategoryPolicy;
+use App\Policies\CountryPolicy;
 use App\Policies\CustomerPolicy;
 use App\Policies\ExportPolicy;
 use App\Policies\LegalPolicy;
@@ -49,6 +51,7 @@ final class AuthServiceProvider extends ServiceProvider
         Address::class => AddressPolicy::class,
         Brand::class => BrandPolicy::class,
         Category::class => CategoryPolicy::class,
+        Country::class => CountryPolicy::class,
         Customer::class => CustomerPolicy::class,
         Export::class => ExportPolicy::class,
         Legal::class => LegalPolicy::class,
