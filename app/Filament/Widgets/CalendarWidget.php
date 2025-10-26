@@ -6,6 +6,7 @@ namespace App\Filament\Widgets;
 
 use App\Filament\Resources\CampaignResource;
 use App\Models\Campaign;
+use App\Models\Channel;
 use App\Models\Scopes\ActiveCampaignScope;
 use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\StatusScope;
@@ -13,12 +14,14 @@ use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
 use Carbon\Carbon;
 use Carbon\CarbonInterface;
 use DateTimeInterface;
+use Filament\Actions\Action;
 use Filament\Forms;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Schemas\Schema;
+use Filament\Forms\Form;
 use Filament\Forms\Set;
+use Filament\Schemas\Components\Component as SchemaComponent;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
@@ -30,10 +33,23 @@ final class CalendarWidget extends FullCalendarWidget
 {
     public Model|string|null $model = Campaign::class;
 
+    /**
+     * @param array{start?: string, end?: string, timezone?: string} $fetchInfo
+     * @return array<int, array<string, mixed>>
+     */
     public function fetchEvents(array $fetchInfo): array
     {
-        $start = isset($fetchInfo['start']) ? Carbon::parse($fetchInfo['start']) : now()->startOfMonth();
-        $end = isset($fetchInfo['end']) ? Carbon::parse($fetchInfo['end']) : now()->endOfMonth();
+        // Normalise the incoming date strings before passing them to the query builder.
+        $startValue = $fetchInfo['start'] ?? null;
+        $endValue = $fetchInfo['end'] ?? null;
+
+        $start = is_string($startValue) && $startValue !== ''
+            ? Carbon::parse($startValue)
+            : now()->startOfMonth();
+
+        $end = is_string($endValue) && $endValue !== ''
+            ? Carbon::parse($endValue)
+            : now()->endOfMonth();
 
         $campaigns = Campaign::query()
             ->withoutGlobalScopes([
@@ -52,25 +68,48 @@ final class CalendarWidget extends FullCalendarWidget
             ->orderBy('starts_at')
             ->get();
 
-        return $campaigns
+        $events = $campaigns
             ->map(function (Campaign $campaign): array {
+                // Resolve the key early and guard against non-scalar identifiers.
+                $key = $campaign->getKey();
+
+                if (! is_int($key) && ! is_string($key)) {
+                    throw new \LogicException('Campaign identifier must be a scalar value.');
+                }
+
                 $color = $this->resolveStatusColor($campaign->status);
 
+                $title = $campaign->name ?? $campaign->slug ?? (string) $key;
+
+                $channel = $campaign->channel;
+                $channelName = $channel instanceof Channel ? $channel->name : null;
+
+                /** @var CarbonInterface|null $startAt */
+                $startAt = $campaign->starts_at;
+
+                if (! $startAt instanceof CarbonInterface) {
+                    // The column is nullable, but the widget requires a valid value, so default to now.
+                    $startAt = now();
+                }
+
                 $event = EventData::make()
-                    ->id($campaign->getKey())
-                    ->title($campaign->name ?? $campaign->slug)
-                    ->start(optional($campaign->starts_at)->toIso8601String())
+                    ->id($key)
+                    ->title($title)
+                    ->start($startAt)
                     ->url(CampaignResource::getUrl('view', ['record' => $campaign]))
                     ->extendedProps([
                         'status'    => $campaign->status,
                         'is_active' => (bool) $campaign->is_active,
-                        'channel'   => $campaign->channel?->name,
+                        'channel'   => $channelName,
                         'color'     => $color,
                         'tooltip'   => $this->buildTooltip($campaign),
                     ]);
 
-                if ($campaign->ends_at) {
-                    $event->end($campaign->ends_at->toIso8601String());
+                /** @var CarbonInterface|null $endAt */
+                $endAt = $campaign->ends_at;
+
+                if ($endAt instanceof CarbonInterface) {
+                    $event->end($endAt);
                 }
 
                 if ($color) {
@@ -81,9 +120,16 @@ final class CalendarWidget extends FullCalendarWidget
 
                 return $event->toArray();
             })
+            ->values()
             ->all();
+
+        /** @var array<int, array<string, mixed>> $events */
+        return $events;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function config(): array
     {
         return [
@@ -121,6 +167,9 @@ final class CalendarWidget extends FullCalendarWidget
         ];
     }
 
+    /**
+     * @return array<int, SchemaComponent>
+     */
     public function getFormSchema(): array
     {
         return [
@@ -130,9 +179,12 @@ final class CalendarWidget extends FullCalendarWidget
                 ->maxLength(255)
                 ->live(onBlur: true)
                 ->afterStateUpdated(function (string $operation, $state, Forms\Set $set): void {
-                    if ($operation === 'create') {
-                        $set('slug', Str::slug((string) $state));
+                    if ($operation !== 'create' || ! is_string($state)) {
+                        return;
                     }
+
+                    // Update the slug while the user is typing the name to improve UX.
+                    $set('slug', Str::slug($state));
                 }),
             TextInput::make('slug')
                 ->label($this->translate('campaigns.fields.slug', 'Slug'))
@@ -171,6 +223,9 @@ final class CalendarWidget extends FullCalendarWidget
         ];
     }
 
+    /**
+     * @return array<int, Action>
+     */
     protected function headerActions(): array
     {
         return [
@@ -196,10 +251,16 @@ final class CalendarWidget extends FullCalendarWidget
 
                     $schema->fill($state);
                 })
-                ->mutateFormDataUsing(fn (array $data): array => $this->ensureSlug($data)),
+                ->mutateFormDataUsing(function (array $data): array {
+                    /** @var array<string, mixed> $data */
+                    return $this->ensureSlug($data);
+                }),
         ];
     }
 
+    /**
+     * @return array<int, Action>
+     */
     protected function modalActions(): array
     {
         return [
@@ -224,7 +285,10 @@ final class CalendarWidget extends FullCalendarWidget
 
                     $schema->fill($state);
                 })
-                ->mutateFormDataUsing(fn (array $data): array => $this->ensureSlug($data)),
+                ->mutateFormDataUsing(function (array $data): array {
+                    /** @var array<string, mixed> $data */
+                    return $this->ensureSlug($data);
+                }),
             Actions\DeleteAction::make(),
         ];
     }
@@ -269,16 +333,31 @@ final class CalendarWidget extends FullCalendarWidget
         return $state;
     }
 
-    private function extractEventDate(array $arguments, string $key): mixed
+    /**
+     * @param array{event?: mixed} $arguments
+     */
+    private function extractEventDate(array $arguments, string $key): ?string
     {
-        return $arguments['event'][$key] ?? $arguments['event'][sprintf('%sStr', $key)] ?? null;
+        $event = $arguments['event'] ?? null;
+
+        if (! is_array($event)) {
+            return null;
+        }
+
+        $value = $event[$key] ?? $event[sprintf('%sStr', $key)] ?? null;
+
+        return is_string($value) ? $value : null;
     }
 
+    /**
+     * @param array{event?: mixed} $arguments
+     */
     private function eventHasEndDate(array $arguments): bool
     {
-        $event = $arguments['event'] ?? [];
+        $event = $arguments['event'] ?? null;
 
-        return array_key_exists('end', $event) || array_key_exists('endStr', $event);
+        return is_array($event)
+            && (array_key_exists('end', $event) || array_key_exists('endStr', $event));
     }
 
     private function normaliseArgumentDate(mixed $value): ?string
@@ -295,7 +374,7 @@ final class CalendarWidget extends FullCalendarWidget
             return Carbon::parse($value)->toDateTimeString();
         }
 
-        if (is_array($value) && isset($value['date'])) {
+        if (is_array($value) && isset($value['date']) && is_string($value['date'])) {
             return Carbon::parse($value['date'])->toDateTimeString();
         }
 
@@ -309,11 +388,20 @@ final class CalendarWidget extends FullCalendarWidget
     {
         $state = $schema->getRawState();
 
+        /** @var array<mixed>|Arrayable<array-key, mixed> $state */
+        $state = $state;
+
         if ($state instanceof Arrayable) {
             $state = $state->toArray();
         }
 
-        return is_array($state) ? $state : [];
+        // @phpstan-ignore-next-line The runtime may hand back scalars when the form is pristine.
+        if (! is_array($state)) {
+            $state = [];
+        }
+
+        /** @var array<string, mixed> $state */
+        return $state;
     }
 
     /**
@@ -322,8 +410,10 @@ final class CalendarWidget extends FullCalendarWidget
      */
     private function ensureSlug(array $data): array
     {
-        if (blank($data['slug'] ?? null) && filled($data['name'] ?? null)) {
-            $data['slug'] = Str::slug((string) $data['name']);
+        $name = $data['name'] ?? null;
+
+        if (blank($data['slug'] ?? null) && is_string($name) && $name !== '') {
+            $data['slug'] = Str::slug($name);
         }
 
         return $data;
@@ -331,8 +421,13 @@ final class CalendarWidget extends FullCalendarWidget
 
     private function buildTooltip(Campaign $campaign): string
     {
-        $start = optional($campaign->starts_at)?->format('Y-m-d H:i');
-        $end = optional($campaign->ends_at)?->format('Y-m-d H:i');
+        /** @var CarbonInterface|null $startsAt */
+        $startsAt = $campaign->starts_at;
+        /** @var CarbonInterface|null $endsAt */
+        $endsAt = $campaign->ends_at;
+
+        $start = $startsAt?->format('Y-m-d H:i');
+        $end = $endsAt?->format('Y-m-d H:i');
         $status = $this->translate("campaigns.status.{$campaign->status}", Str::headline($campaign->status ?? ''));
 
         return collect([
