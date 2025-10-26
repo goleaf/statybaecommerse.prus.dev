@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
+use App\Enums\NavigationGroup;
 use App\Filament\Resources\EmailCampaignResource\Pages;
 use App\Models\EmailCampaign;
 use App\Support\Concerns\HasNav;
@@ -37,7 +38,10 @@ final class EmailCampaignResource extends Resource
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-envelope';
 
-    protected static UnitEnum|string|null $navigationGroup = 'Campaigns';
+    /**
+     * Group the resource under the campaign navigation cluster for consistency.
+     */
+    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Campaigns;
 
     public static function getNavigationLabel(): string
     {
