@@ -9,7 +9,7 @@ use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Contracts\View\View;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
@@ -22,6 +22,9 @@ use Livewire\Component;
  * @property string $testInput
  * @property string $testSelect
  * @property bool $showModal
+ * @property-read EloquentCollection<int, Product> $featuredProducts
+ * @property-read EloquentCollection<int, Category> $categories
+ * @property-read EloquentCollection<int, Brand> $brands
  */
 #[Layout('components.layouts.base')]
 final class ComponentShowcase extends Component
@@ -44,6 +47,7 @@ final class ComponentShowcase extends Component
             'error' => $this->notifyError('Error notification!', 'Error'),
             'warning' => $this->notifyWarning('Warning notification!', 'Warning'),
             'info' => $this->notifyInfo('Info notification!', 'Info'),
+            default => $this->notifyInfo('Info notification!', 'Info'),
         };
     }
 
@@ -59,36 +63,50 @@ final class ComponentShowcase extends Component
      * Handle featuredProducts functionality with proper error handling.
      */
     #[Computed]
-    public function featuredProducts(): Collection
+    public function featuredProducts(): EloquentCollection
     {
-        return Product::query()->with(['brand', 'media', 'prices'])->where('is_visible', true)->where('is_featured', true)->limit(4)->get()->skipWhile(function ($product) {
-            // Skip products that are not properly configured for showcase display
-            return empty($product->name) || ! $product->is_visible || ! $product->is_featured || $product->price <= 0 || empty($product->slug);
-        });
+        return Product::query()
+            ->with(['brand', 'media', 'prices'])
+            ->where('is_visible', true)
+            ->where('is_featured', true)
+            ->limit(4)
+            ->get()
+            ->skipWhile(static function (Product $product): bool {
+                // Skip products that are not properly configured for showcase display.
+                return empty($product->name) || ! $product->is_visible || ! $product->is_featured || ($product->price ?? 0) <= 0 || empty($product->slug);
+            });
     }
 
     /**
      * Handle categories functionality with proper error handling.
      */
     #[Computed]
-    public function categories(): Collection
+    public function categories(): EloquentCollection
     {
-        return Category::query()->where('is_visible', true)->limit(3)->get()->skipWhile(function ($category) {
-            // Skip categories that are not properly configured for showcase display
-            return empty($category->name) || ! $category->is_visible || empty($category->slug);
-        });
+        return Category::query()
+            ->where('is_visible', true)
+            ->limit(3)
+            ->get()
+            ->skipWhile(static function (Category $category): bool {
+                // Skip categories that are not properly configured for showcase display.
+                return empty($category->name) || ! $category->is_visible || empty($category->slug);
+            });
     }
 
     /**
      * Handle brands functionality with proper error handling.
      */
     #[Computed]
-    public function brands(): Collection
+    public function brands(): EloquentCollection
     {
-        return Brand::query()->where('is_enabled', true)->limit(3)->get()->skipWhile(function ($brand) {
-            // Skip brands that are not properly configured for showcase display
-            return empty($brand->name) || ! $brand->is_enabled || empty($brand->slug);
-        });
+        return Brand::query()
+            ->where('is_enabled', true)
+            ->limit(3)
+            ->get()
+            ->skipWhile(static function (Brand $brand): bool {
+                // Skip brands that are not properly configured for showcase display.
+                return empty($brand->name) || ! $brand->is_enabled || empty($brand->slug);
+            });
     }
 
     /**

@@ -12,15 +12,15 @@ uses(RefreshDatabase::class);
 
 test('slider can have translations', function () {
     $slider = Slider::factory()->create([
-        'title' => 'Original Title',
+        'title'       => 'Original Title',
         'description' => 'Original Description',
         'button_text' => 'Original Button',
     ]);
 
     $translation = SliderTranslation::create([
-        'slider_id' => $slider->id,
-        'locale' => 'en',
-        'title' => 'English Title',
+        'slider_id'   => $slider->id,
+        'locale'      => 'en',
+        'title'       => 'English Title',
         'description' => 'English Description',
         'button_text' => 'English Button',
     ]);
@@ -34,15 +34,15 @@ test('slider returns translated content for current locale', function () {
     app()->setLocale('en');
 
     $slider = Slider::factory()->create([
-        'title' => 'Lithuanian Title',
+        'title'       => 'Lithuanian Title',
         'description' => 'Lithuanian Description',
         'button_text' => 'Lithuanian Button',
     ]);
 
     SliderTranslation::create([
-        'slider_id' => $slider->id,
-        'locale' => 'en',
-        'title' => 'English Title',
+        'slider_id'   => $slider->id,
+        'locale'      => 'en',
+        'title'       => 'English Title',
         'description' => 'English Description',
         'button_text' => 'English Button',
     ]);
@@ -56,7 +56,7 @@ test('slider falls back to original content when translation missing', function 
     app()->setLocale('en');
 
     $slider = Slider::factory()->create([
-        'title' => 'Lithuanian Title',
+        'title'       => 'Lithuanian Title',
         'description' => 'Lithuanian Description',
         'button_text' => 'Lithuanian Button',
     ]);
@@ -83,8 +83,8 @@ test('slider translation belongs to slider', function () {
     $slider = Slider::factory()->create();
     $translation = SliderTranslation::create([
         'slider_id' => $slider->id,
-        'locale' => 'en',
-        'title' => 'English Title',
+        'locale'    => 'en',
+        'title'     => 'English Title',
     ]);
 
     expect($translation->slider)->toBeInstanceOf(Slider::class);
@@ -95,14 +95,14 @@ test('home slider component loads with translations', function () {
     app()->setLocale('en');
 
     $slider = Slider::factory()->create([
-        'title' => 'Lithuanian Title',
+        'title'     => 'Lithuanian Title',
         'is_active' => true,
     ]);
 
     SliderTranslation::create([
         'slider_id' => $slider->id,
-        'locale' => 'en',
-        'title' => 'English Title',
+        'locale'    => 'en',
+        'title'     => 'English Title',
     ]);
 
     Livewire::test(HomeSlider::class)
@@ -114,10 +114,48 @@ test('slider translation factory creates valid translation', function () {
     $slider = Slider::factory()->create();
     $translation = SliderTranslation::factory()->create([
         'slider_id' => $slider->id,
-        'locale' => 'en',
+        'locale'    => 'en',
     ]);
 
     expect($translation->title)->not->toBeEmpty();
     expect($translation->locale)->toBe('en');
     expect($translation->slider_id)->toBe($slider->id);
+});
+
+test('slider translations can be ordered alphabetically by title', function () {
+    $slider = Slider::factory()->create();
+
+    SliderTranslation::factory()->create([
+        'slider_id' => $slider->id,
+        'locale'    => 'en',
+        'title'     => 'Zeta Slide',
+    ]);
+
+    SliderTranslation::factory()->create([
+        'slider_id' => $slider->id,
+        'locale'    => 'lt',
+        'title'     => 'Alpha Slide',
+    ]);
+
+    SliderTranslation::factory()->create([
+        'slider_id' => $slider->id,
+        'locale'    => 'lv',
+        'title'     => 'Mega Slide',
+    ]);
+
+    expect(
+        SliderTranslation::query()->orderedByName()->pluck('title')->all()
+    )->toBe([
+        'Alpha Slide',
+        'Mega Slide',
+        'Zeta Slide',
+    ]);
+
+    expect(
+        SliderTranslation::query()->orderedByName('desc')->pluck('title')->all()
+    )->toBe([
+        'Zeta Slide',
+        'Mega Slide',
+        'Alpha Slide',
+    ]);
 });

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\OrdersByName;
 use App\Models\Scopes\ActiveScope;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Builder;
@@ -31,6 +32,13 @@ use Illuminate\Support\Carbon;
 final class EmailCampaign extends Model
 {
     use HasFactory;
+    use OrdersByName;
+
+    /**
+     * Configure the OrdersByName trait to fall back to the campaign name when a
+     * dedicated title column is absent, keeping list screens predictable.
+     */
+    protected string $nameColumn = 'name';
 
     /**
      * Provide explicit hints for the shared ActiveScope helper so schema
@@ -88,6 +96,7 @@ final class EmailCampaign extends Model
         'created_by',
         'settings',
         'metadata',
+        'meta',
         'target_audience',
         'total_recipients',
         'sent_count',
@@ -99,32 +108,33 @@ final class EmailCampaign extends Model
 
     /** @var array<string, string> */
     protected $casts = [
-        'scheduled_at' => 'datetime',
-        'sent_at' => 'datetime',
-        'completed_at' => 'datetime',
-        'is_active' => 'boolean',
-        'total_recipients' => 'integer',
-        'sent_count' => 'integer',
-        'delivered_count' => 'integer',
-        'opened_count' => 'integer',
-        'clicked_count' => 'integer',
+        'scheduled_at'       => 'datetime',
+        'sent_at'            => 'datetime',
+        'completed_at'       => 'datetime',
+        'is_active'          => 'boolean',
+        'total_recipients'   => 'integer',
+        'sent_count'         => 'integer',
+        'delivered_count'    => 'integer',
+        'opened_count'       => 'integer',
+        'clicked_count'      => 'integer',
         'unsubscribed_count' => 'integer',
-        'target_audience' => 'array',
-        'settings' => 'array',
-        'metadata' => 'array',
+        'target_audience'    => 'array',
+        'settings'           => 'array',
+        'metadata'           => 'array',
+        'meta'               => 'array',
     ];
 
     /**
      * Ensure sensible defaults so aggregate helpers stay predictable.
      */
     protected $attributes = [
-        'status' => self::STATUS_DRAFT,
-        'is_active' => true,
-        'total_recipients' => 0,
-        'sent_count' => 0,
-        'delivered_count' => 0,
-        'opened_count' => 0,
-        'clicked_count' => 0,
+        'status'             => self::STATUS_DRAFT,
+        'is_active'          => true,
+        'total_recipients'   => 0,
+        'sent_count'         => 0,
+        'delivered_count'    => 0,
+        'opened_count'       => 0,
+        'clicked_count'      => 0,
         'unsubscribed_count' => 0,
     ];
 
@@ -169,6 +179,15 @@ final class EmailCampaign extends Model
     }
 
     /**
+     * Quickly fetch draft campaigns so editors can manage unpublished content
+     * without repeating status checks across controllers.
+     */
+    public function scopeDraft(Builder $query): Builder
+    {
+        return $query->where('status', self::STATUS_DRAFT);
+    }
+
+    /**
      * Handle scopeSent functionality with proper error handling.
      */
     public function scopeSent(Builder $query): Builder
@@ -179,11 +198,6 @@ final class EmailCampaign extends Model
     /**
      * Handle scopeOrderedByName functionality with proper error handling.
      */
-    public function scopeOrderedByName(Builder $query, string $direction = 'asc'): Builder
-    {
-        return $query->orderBy('name', $direction);
-    }
-
     /**
      * Handle scopeWithStatus functionality with proper error handling.
      */

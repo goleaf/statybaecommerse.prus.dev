@@ -50,4 +50,45 @@ final class InteractsWithTranslationTabsTest extends TestCase
         self::assertSame('vardas', $mutated['slug']);
         self::assertTrue($mutated['is_active']);
     }
+
+    public function test_backfills_default_locale_when_missing_from_payload(): void
+    {
+        $handler = new class
+        {
+            use InteractsWithTranslationTabs {
+                extractTranslationsFromForm as public traitExtractTranslationsFromForm;
+                mutateMainDataWithDefaultLocale as public traitMutateMainDataWithDefaultLocale;
+            }
+
+            protected function getTranslatableFields(): array
+            {
+                return ['name'];
+            }
+
+            protected function getAvailableLocales(): array
+            {
+                return ['lt', 'en'];
+            }
+
+            protected function getDefaultLocale(): string
+            {
+                return 'lt';
+            }
+        };
+
+        [$data, $translations] = $handler->traitExtractTranslationsFromForm([
+            'name' => ['en' => 'Translated Name'],
+        ]);
+
+        // Make sure the translation array mirrors the provided value into the default locale to keep the model column updated.
+        self::assertSame('Translated Name', $translations['lt']['name']);
+
+        // Confirm the originally provided locale entry stays untouched after the fallback runs.
+        self::assertSame('Translated Name', $translations['en']['name']);
+
+        $mutated = $handler->traitMutateMainDataWithDefaultLocale($data, $translations);
+
+        // Verify that the base dataset regains the translated value for validation and fillable synchronisation.
+        self::assertSame('Translated Name', $mutated['name']);
+    }
 }

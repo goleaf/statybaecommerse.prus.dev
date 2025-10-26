@@ -6,8 +6,10 @@ namespace App\Livewire\Shared;
 
 use App\Models\Country;
 use App\Models\Currency;
+use App\Models\Setting;
 use App\Support\Cache\CacheKeys;
-use Illuminate\Support\Arr;
+use Illuminate\Contracts\View\View;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Schema;
 use Livewire\Component;
 
@@ -16,11 +18,14 @@ use Livewire\Component;
  *
  * Livewire component for CurrencySelector with reactive frontend functionality, real-time updates, and user interaction handling.
  *
- * @property array $currencies
+ * @property array<int, array{id:int, code:string, symbol:string}> $currencies
  * @property string|null $activeCurrencyCode
  */
 class CurrencySelector extends Component
 {
+    /**
+     * @var array<int, array{id:int, code:string, symbol:string}>
+     */
     public array $currencies = [];
 
     public ?string $activeCurrencyCode = null;
@@ -30,63 +35,142 @@ class CurrencySelector extends Component
      */
     public function mount(): void
     {
-        // Load enabled currencies (cached) with safe fallback if table is missing during tests
-        $this->currencies = app()->environment('testing') ? [['id' => 1, 'code' => (string) config('app.currency', 'EUR'), 'symbol' => '€']] : \Cache::remember(CacheKeys::currencyEnabledList(), now()->addHours(6), function () {
-            try {
-                if (Schema::hasTable('currencies')) {
-                    return Arr::from(Currency::query()->where('is_enabled', true)->orderBy('code')->get(['id', 'code', 'symbol'])->map(fn ($c) => ['id' => (int) $c->id, 'code' => (string) $c->code, 'symbol' => (string) $c->symbol]));
-                }
-            } catch (\Throwable $e) {
-                // ignore and fallback
-            }
-
-            return [['id' => 1, 'code' => (string) config('app.currency', 'EUR'), 'symbol' => '€']];
-        });
-        // Determine active from settings if available
-        $defaultCurrencyCode = app()->environment('testing') ? (string) config('app.currency', 'EUR') : \Cache::remember(CacheKeys::currencyDefaultCode(), now()->addMinutes(30), function () {
-            try {
-                if (function_exists('setting')) {
-                    $id = optional(setting('default_currency_id'))->value ?? null;
-                    if ($id && Schema::hasTable('currencies')) {
-                        return Currency::query()->whereKey($id)->value('code');
-                    }
-                }
-            } catch (\Throwable $e) {
-                // ignore
-            }
-
-            return (string) config('app.currency', 'EUR');
-        });
-        $this->activeCurrencyCode = $defaultCurrencyCode ?: $this->currencies[0]['code'] ?? null;
+        $this->currencies = $this->loadCurrencies();
+        $this->activeCurrencyCode = $this->resolveActiveCurrencyCode($this->currencies);
     }
 
     /**
      * Render the Livewire component view with current state.
      */
-    public function render()
+    public function render(): View
     {
         return view('livewire.shared.currency-selector');
     }
 
     /**
-     * Handle getCountryFlagProperty functionality with proper error handling.
+     * Expose the configured country flag, if any, for display next to the selector.
      */
     public function getCountryFlagProperty(): ?string
     {
         try {
-            try {
-                $countryId = \App\Models\Setting::where('key', 'country_id')->value('value');
-                if (! empty($countryId)) {
-                    return Country::query()->find($countryId)?->svg_flag;
-                }
-            } catch (\Throwable $e) {
-                // Fallback to default
+            if (! Schema::hasTable('settings')) {
                 return null;
             }
-        } catch (\Throwable $e) {
+
+            $countryId = Setting::query()->where('key', 'country_id')->value('value');
+
+            if ($countryId === null) {
+                return null;
+            }
+
+            /** @var Country|null $country */
+            $country = Country::query()->find($countryId);
+
+            return $country?->svg_flag;
+        } catch (\Throwable $exception) {
+            // In the event of a transient database error we silently fall back to no flag.
             return null;
         }
+    }
 
-        return null;
+    /**
+     * Load the list of enabled currencies from cache or storage.
+     *
+     * @return array<int, array{id:int, code:string, symbol:string}>
+     */
+    private function loadCurrencies(): array
+    {
+        $defaultCode = (string) config('app.currency', 'EUR');
+
+        if (app()->environment('testing')) {
+            return [$this->defaultCurrencyEntry($defaultCode)];
+        }
+
+        /** @var array<int, array{id:int, code:string, symbol:string}> $currencies */
+        $currencies = Cache::remember(
+            CacheKeys::currencyEnabledList(),
+            now()->addHours(6),
+            function (): array {
+                $fallbackCode = (string) config('app.currency', 'EUR');
+
+                if (! Schema::hasTable('currencies')) {
+                    return [$this->defaultCurrencyEntry($fallbackCode)];
+                }
+
+                return Currency::query()
+                    ->where('is_enabled', true)
+                    ->orderBy('code')
+                    ->get(['id', 'code', 'symbol'])
+                    ->map(static function (Currency $currency): array {
+                        return [
+                            'id' => (int) $currency->id,
+                            'code' => (string) $currency->code,
+                            'symbol' => (string) $currency->symbol,
+                        ];
+                    })
+                    ->values()
+                    ->all();
+            }
+        );
+
+        return $currencies;
+    }
+
+    /**
+     * Determine which currency code should be considered active.
+     *
+     * @param  array<int, array{id:int, code:string, symbol:string}>  $currencies
+     */
+    private function resolveActiveCurrencyCode(array $currencies): ?string
+    {
+        $fallbackCode = $currencies[0]['code'] ?? (string) config('app.currency', 'EUR');
+
+        if (app()->environment('testing')) {
+            return $fallbackCode;
+        }
+
+        /** @var string $activeCode */
+        $activeCode = Cache::remember(
+            CacheKeys::currencyDefaultCode(),
+            now()->addMinutes(30),
+            function () use ($fallbackCode): string {
+                if (! function_exists('setting')) {
+                    return $fallbackCode;
+                }
+
+                try {
+                    $setting = setting('default_currency_id');
+                    $currencyId = is_object($setting) && property_exists($setting, 'value') ? $setting->value : $setting;
+
+                    if ($currencyId && Schema::hasTable('currencies')) {
+                        $code = Currency::query()->whereKey($currencyId)->value('code');
+
+                        if (is_string($code) && $code !== '') {
+                            return $code;
+                        }
+                    }
+                } catch (\Throwable $exception) {
+                    // Ignore and fall back to the configured default code.
+                }
+
+                return $fallbackCode;
+            }
+        );
+
+        return $activeCode;
+    }
+
+    /**
+     * Build a deterministic currency entry structure for fallback usage.
+     *
+     * @return array{id:int, code:string, symbol:string}
+     */
+    private function defaultCurrencyEntry(string $code): array
+    {
+        return [
+            'id' => 1,
+            'code' => $code,
+            'symbol' => (string) config('app.currency_symbol', '€'),
+        ];
     }
 }

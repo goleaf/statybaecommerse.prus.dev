@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\OrdersByName;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -25,7 +26,14 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 final class SystemSettingTranslation extends Model
 {
     use HasFactory;
+    use OrdersByName;
     use SoftDeletes;
+
+    /**
+     * Sort translations by their name value to keep locale selectors intuitive
+     * across the administration experience.
+     */
+    protected string $nameColumn = 'name';
 
     /**
      * Keep the fillable list intentionally minimal to match the public API requirements
@@ -38,10 +46,12 @@ final class SystemSettingTranslation extends Model
         'name',
         'description',
         'help_text',
+        'meta',
     ];
 
     protected $casts = [
         'metadata'    => 'array',
+        'meta'        => 'array',
         'tags'        => 'array',
         'attachments' => 'array',
         'is_active'   => 'boolean',

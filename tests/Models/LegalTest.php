@@ -8,10 +8,8 @@ use App\Services\Security\HtmlContentSanitizer;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Str;
-use Tests\TestCase;
-
-// Leverage the base TestCase to bootstrap Laravel and provide database refresh utilities.
-uses(TestCase::class, RefreshDatabase::class);
+// Leverage the shared RefreshDatabase trait while the global Pest configuration boots the Laravel TestCase.
+uses(RefreshDatabase::class);
 
 beforeEach(function (): void {
     // Ensure the framework resolves content translations against a predictable locale.
@@ -31,8 +29,8 @@ it('returns sanitized translated content for the requested locale', function ():
     $originalContent = '<script>alert(1)</script><p>Safe</p>';
     LegalTranslation::factory()->create([
         'legal_id' => $legal->id,
-        'locale' => 'en',
-        'content' => $originalContent,
+        'locale'   => 'en',
+        'content'  => $originalContent,
     ]);
 
     // Arrange: resolve the sanitizer directly to calculate the expected cleaned output.
@@ -71,7 +69,7 @@ it('detects existing translations and can create defaults when missing', functio
     // Assert: the translation exists with sensible default values derived from the document key.
     expect($createdTranslation->exists)->toBeTrue();
     expect($createdTranslation->title)->toBe('privacy-policy');
-    expect($createdTranslation->slug)->toBe(Str::slug('privacy-policy').'-lt');
+    expect($createdTranslation->slug)->toBe(Str::slug('privacy-policy') . '-lt');
     expect($legal->hasTranslationFor('lt'))->toBeTrue();
 });
 
@@ -80,7 +78,7 @@ it('updates an existing translation through the helper', function (): void {
     $legal = Legal::factory()->create();
     $translation = LegalTranslation::factory()->english()->create([
         'legal_id' => $legal->id,
-        'title' => 'Original title',
+        'title'    => 'Original title',
     ]);
 
     // Act: update the translation payload using the dedicated helper method.

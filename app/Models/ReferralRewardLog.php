@@ -32,8 +32,11 @@ final class ReferralRewardLog extends Model
      * Canonical referral reward lifecycle actions aligned with product requirements.
      */
     public const ACTION_EARNED = 'earned';
+
     public const ACTION_REDEEMED = 'redeemed';
+
     public const ACTION_EXPIRED = 'expired';
+
     public const ACTION_CANCELLED = 'cancelled';
 
     public const ACTIONS = [
@@ -43,14 +46,14 @@ final class ReferralRewardLog extends Model
         self::ACTION_CANCELLED,
     ];
 
-    protected $fillable = ['referral_reward_id', 'user_id', 'action', 'data', 'ip_address', 'user_agent'];
+    protected $fillable = ['referral_reward_id', 'user_id', 'action', 'data', 'ip_address', 'user_agent', 'meta'];
 
     /**
      * Handle casts functionality with proper error handling.
      */
     protected function casts(): array
     {
-        return ['data' => 'array'];
+        return ['data' => 'array', 'meta' => 'array'];
     }
 
     /**

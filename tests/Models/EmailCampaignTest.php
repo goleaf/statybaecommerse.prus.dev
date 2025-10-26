@@ -19,7 +19,7 @@ final class EmailCampaignTest extends TestCase
     public function test_fillable_configuration_matches_expected_columns(): void
     {
         // Arrange: instantiate the model to inspect its fillable metadata.
-        $campaign = new EmailCampaign();
+        $campaign = new EmailCampaign;
 
         // Act: grab the fillable fields defined on the model.
         $fillable = $campaign->getFillable();
@@ -43,6 +43,7 @@ final class EmailCampaignTest extends TestCase
             'created_by',
             'settings',
             'metadata',
+            'meta',
             'target_audience',
             'total_recipients',
             'sent_count',
@@ -56,7 +57,7 @@ final class EmailCampaignTest extends TestCase
     public function test_casts_configuration_covers_temporal_and_json_columns(): void
     {
         // Arrange: instantiate the model to inspect cast definitions.
-        $campaign = new EmailCampaign();
+        $campaign = new EmailCampaign;
 
         // Act: retrieve configured casts from the model.
         $casts = $campaign->getCasts();
@@ -75,18 +76,19 @@ final class EmailCampaignTest extends TestCase
         $this->assertSame('array', $casts['target_audience']);
         $this->assertSame('array', $casts['settings']);
         $this->assertSame('array', $casts['metadata']);
+        $this->assertSame('array', $casts['meta']);
     }
 
     public function test_scopes_filter_records_by_activity_and_status(): void
     {
         // Arrange: prepare campaigns for each relevant scenario.
         $activeScheduled = EmailCampaign::factory()->scheduled()->create([
-            'is_active' => true,
+            'is_active'    => true,
             'scheduled_at' => Carbon::now()->addHour(),
         ]);
 
         $inactiveScheduled = EmailCampaign::factory()->scheduled()->create([
-            'is_active' => false,
+            'is_active'    => false,
             'scheduled_at' => Carbon::now()->addHours(2),
         ]);
 
@@ -189,17 +191,17 @@ final class EmailCampaignTest extends TestCase
     {
         // Arrange: craft variations covering active, inactive, and future scheduling cases.
         $sendable = EmailCampaign::factory()->scheduled()->create([
-            'is_active' => true,
+            'is_active'    => true,
             'scheduled_at' => Carbon::now()->subMinute(),
         ]);
 
         $inactive = EmailCampaign::factory()->scheduled()->create([
-            'is_active' => false,
+            'is_active'    => false,
             'scheduled_at' => Carbon::now()->subMinute(),
         ]);
 
         $future = EmailCampaign::factory()->scheduled()->create([
-            'is_active' => true,
+            'is_active'    => true,
             'scheduled_at' => Carbon::now()->addMinute(),
         ]);
 
@@ -222,4 +224,3 @@ final class EmailCampaignTest extends TestCase
         ], EmailCampaign::STATUSES);
     }
 }
-

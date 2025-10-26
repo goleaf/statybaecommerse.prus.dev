@@ -10,9 +10,12 @@ use Filament\Pages\Dashboard as BaseDashboard;
 class AdminDashboard extends BaseDashboard
 {
     /**
-     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
+     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations while
+     * retaining compatibility with Filament's expected PHPDoc union typing convention.
+     *
+     * @var string|\BackedEnum|null
      */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-home';
+    protected static $navigationIcon = 'heroicon-o-home';
 
     protected string $view = 'filament.pages.admin-dashboard';
 

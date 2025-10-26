@@ -6,6 +6,7 @@ namespace App\Models;
 
 use App\Models\Scopes\UserOwnedScope;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -29,9 +30,9 @@ final class RecommendationAnalytics extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['block_id', 'config_id', 'user_id', 'product_id', 'action', 'ctr', 'conversion_rate', 'metrics', 'date'];
+    protected $fillable = ['block_id', 'config_id', 'user_id', 'product_id', 'action', 'ctr', 'conversion_rate', 'metrics', 'date', 'meta'];
 
-    protected $casts = ['ctr' => 'decimal:4', 'conversion_rate' => 'decimal:4', 'metrics' => 'array', 'date' => 'date'];
+    protected $casts = ['ctr' => 'decimal:4', 'conversion_rate' => 'decimal:4', 'metrics' => 'array', 'date' => 'date', 'meta' => 'array'];
 
     /**
      * Handle block functionality with proper error handling.
@@ -68,9 +69,9 @@ final class RecommendationAnalytics extends Model
     /**
      * Handle scopeByDate functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
-    public function scopeByDate($query, string $date)
+    public function scopeByDate(Builder $query, string $date): Builder
     {
         return $query->where('date', $date);
     }
@@ -78,9 +79,9 @@ final class RecommendationAnalytics extends Model
     /**
      * Handle scopeByDateRange functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
-    public function scopeByDateRange($query, string $startDate, string $endDate)
+    public function scopeByDateRange(Builder $query, string $startDate, string $endDate): Builder
     {
         return $query->whereBetween('date', [$startDate, $endDate]);
     }
@@ -88,9 +89,9 @@ final class RecommendationAnalytics extends Model
     /**
      * Handle scopeByAction functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
-    public function scopeByAction($query, string $action)
+    public function scopeByAction(Builder $query, string $action): Builder
     {
         return $query->where('action', $action);
     }
@@ -98,9 +99,9 @@ final class RecommendationAnalytics extends Model
     /**
      * Handle scopeByBlock functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
-    public function scopeByBlock($query, int $blockId)
+    public function scopeByBlock(Builder $query, int $blockId): Builder
     {
         return $query->where('block_id', $blockId);
     }
@@ -108,9 +109,9 @@ final class RecommendationAnalytics extends Model
     /**
      * Handle scopeByConfig functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
-    public function scopeByConfig($query, int $configId)
+    public function scopeByConfig(Builder $query, int $configId): Builder
     {
         return $query->where('config_id', $configId);
     }

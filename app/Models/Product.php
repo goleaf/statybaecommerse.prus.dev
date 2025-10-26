@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Contracts\TranslatableRecord;
+use App\Models\Concerns\OrdersByName;
 use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\PublishedScope;
 use App\Models\Scopes\VisibleScope;
@@ -75,7 +76,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
 #[ScopedBy([ActiveScope::class, PublishedScope::class, VisibleScope::class])]
 final class Product extends Model implements HasMedia, TranslatableRecord
 {
-    use HasFactory, Searchable, SoftDeletes;
+    use HasFactory, OrdersByName, Searchable, SoftDeletes;
     use HasProductPricing;
     use HasTranslations;
     use InteractsWithMedia;
@@ -1064,16 +1065,7 @@ final class Product extends Model implements HasMedia, TranslatableRecord
         return $query->where('is_visible', true);
     }
 
-    /**
-     * Handle scopeOrderedByName functionality with proper error handling.
-     */
-    public function scopeOrderedByName(Builder $query, string $direction = 'asc'): Builder
-    {
-        // Normalise the direction to guarantee deterministic ordering without exposing raw input.
-        $direction = strtolower($direction) === 'desc' ? 'desc' : 'asc';
-
-        return $query->orderBy('name', $direction);
-    }
+    // orderedByName scope provided by OrdersByName trait for consistent sanitisation.
 
     public function scopeReadyForCatalog(Builder $query): Builder
     {

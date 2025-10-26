@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Http\Middleware;
 
-use App\Services\TranslationService;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
@@ -13,7 +12,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 final class SetLocale
 {
-    public function handle(Request $request, Closure $next): mixed
+    public function handle(Request $request, Closure $next): Response
     {
         // Resolve the list of supported locales declared in configuration.
         $supportedConfig = config('app.supported_locales', ['lt', 'en']);
@@ -128,6 +127,7 @@ final class SetLocale
         $response = $next($request);
 
         if (! $response->headers->has('Content-Language')) {
+            // Ensure downstream responses advertise the language we resolved for this request.
             $response->headers->set('Content-Language', $locale);
         }
 

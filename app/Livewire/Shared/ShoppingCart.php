@@ -7,6 +7,8 @@ namespace App\Livewire\Shared;
 use App\Models\CartItem;
 use App\Models\Product;
 use App\Models\ProductVariant;
+use App\Models\AttributeValue;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Session;
 use Livewire\Attributes\On;
@@ -18,6 +20,7 @@ use Livewire\Component;
  * Livewire component for ShoppingCart with reactive frontend functionality, real-time updates, and user interaction handling.
  *
  * @property bool $isOpen
+ * @property-read EloquentCollection<int, CartItem> $cartItems
  */
 final class ShoppingCart extends Component
 {
@@ -79,17 +82,27 @@ final class ShoppingCart extends Component
             if ($variant) {
                 $snapshotName = $variant->name ?? $product->name;
 
+                /** @var EloquentCollection<int, AttributeValue> $attributeValues */
                 $attributeValues = $variant->attributes()->with('attribute')->get();
 
                 if ($attributeValues->isNotEmpty()) {
                     $variantAttributes = $attributeValues
-                        ->mapWithKeys(fn ($value): array => [
-                            $value->attribute->name => $value->value,
-                        ])
+                        ->mapWithKeys(static function (AttributeValue $value): array {
+                            $attribute = $value->attribute;
+
+                            if ($attribute === null || $attribute->name === null) {
+                                return [];
+                            }
+
+                            return [
+                                (string) $attribute->name => (string) $value->value,
+                            ];
+                        })
                         ->toArray();
 
                     $snapshotName .= ' ('.collect($variantAttributes)
-                        ->map(fn ($value, $key) => sprintf('%s: %s', $key, $value))
+                        ->filter(static fn ($value, $key): bool => $key !== '' && $value !== null)
+                        ->map(static fn ($value, $key): string => sprintf('%s: %s', (string) $key, (string) $value))
                         ->implode(', ').')';
                 }
             }
@@ -177,9 +190,17 @@ final class ShoppingCart extends Component
     /**
      * Handle getCartItemsProperty functionality with proper error handling.
      */
-    public function getCartItemsProperty()
+    /**
+     * @return EloquentCollection<int, CartItem>
+     */
+    public function getCartItemsProperty(): EloquentCollection
     {
-        return CartItem::with(['product', 'product.media'])->where('session_id', Session::getId())->get();
+        /** @var EloquentCollection<int, CartItem> $items */
+        $items = CartItem::with(['product', 'product.media'])
+            ->where('session_id', Session::getId())
+            ->get();
+
+        return $items;
     }
 
     /**
@@ -187,7 +208,7 @@ final class ShoppingCart extends Component
      */
     public function getCartTotalProperty(): float
     {
-        return $this->cartItems->sum(function (CartItem $item) {
+        return $this->cartItems->sum(static function (CartItem $item): float {
             return (float) $item->total_price;
         });
     }
@@ -197,7 +218,7 @@ final class ShoppingCart extends Component
      */
     public function getCartCountProperty(): int
     {
-        return $this->cartItems->sum('quantity');
+        return (int) $this->cartItems->sum('quantity');
     }
 
     /**
