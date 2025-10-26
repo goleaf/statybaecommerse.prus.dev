@@ -29,9 +29,20 @@
 
             <div class="max-w-lg mx-auto lg:max-w-none">
                 <fieldset aria-label="{{ __('Delivery method') }}">
-                    <div class="-space-y-px bg-white">
+                    {{-- Show a quick skeleton while Livewire calculates quotes --}}
+                    <div
+                        wire:loading.flex
+                        class="items-center gap-2 p-3 mb-2 text-sm text-gray-500 bg-gray-50 border border-dashed border-gray-200 rounded"
+                    >
+                        <x-loading-dots class="text-primary-600" aria-hidden="true" />
+                        <span>{{ __('Loading delivery options...') }}</span>
+                    </div>
+
+                    <div class="-space-y-px bg-white" wire:loading.remove>
                         @foreach($options as $option)
                             <label
+                                {{-- Provide a deterministic key so DOM morphing stays stable --}}
+                                wire:key="delivery-option-{{ $option->id }}"
                                 aria-label="{{ $option->name }}"
                                 aria-description="{{ $option->description }}"
                                 @class([
