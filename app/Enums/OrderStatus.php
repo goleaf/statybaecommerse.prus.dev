@@ -223,7 +223,7 @@ enum OrderStatus: string implements EnumInterface
             ->toArray();
     }
 
-    public static function fromLabel(string $label): ?self
+    public static function fromLabel(string $label): ?static
     {
         return self::collection()->first(fn (self $case): bool => $case->label() === $label);
     }

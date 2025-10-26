@@ -248,7 +248,7 @@ enum ProductStatus: string implements EnumInterface
         return self::collection()->sortBy(fn (self $case): int => $case->priority())->values();
     }
 
-    public static function fromLabel(string $label): ?self
+    public static function fromLabel(string $label): ?static
     {
         return collect(self::cases())->first(fn ($case) => $case->label() === $label);
     }
