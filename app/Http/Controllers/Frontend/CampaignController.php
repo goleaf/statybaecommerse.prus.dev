@@ -6,10 +6,14 @@ namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
 use App\Models\Campaign;
+use App\Models\CampaignClick;
 use App\Models\CampaignConversion;
+use App\Models\CampaignView;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Collection;
 use Illuminate\View\View;
 use OpenApi\Attributes as OA;
 
@@ -266,6 +270,17 @@ final class CampaignController extends Controller
         $now = now();
         $startDate = $now->copy()->subDays($period);
 
+        // Build a normalized list of consecutive days so the chart axis remains
+        // stable regardless of gaps in underlying campaign activity.
+        $normalizedTimeline = Collection::make();
+        $cursor = $startDate->copy()->startOfDay();
+        $periodEnd = $now->copy()->startOfDay();
+
+        while ($cursor->lte($periodEnd)) {
+            $normalizedTimeline->push($cursor->copy());
+            $cursor->addDay();
+        }
+
         // Load campaign activity without global scopes so archived/scheduled records contribute to the audit.
         $campaigns = Campaign::query()
             ->withoutGlobalScopes()
@@ -312,7 +327,58 @@ final class CampaignController extends Controller
                 'cost_per_conversion',
                 'page_views',
                 'time_on_site',
+                'converted_at',
             ]);
+
+        // Aggregate raw view and click telemetry by day to power timeline charts.
+        $viewsByDate = CampaignView::query()
+            ->withoutGlobalScopes()
+            ->whereBetween('viewed_at', [$startDate->copy()->startOfDay(), $now])
+            ->selectRaw('DATE(viewed_at) as date, COUNT(*) as total')
+            ->groupBy('date')
+            ->pluck('total', 'date');
+
+        $clicksByDate = CampaignClick::query()
+            ->withoutGlobalScopes()
+            ->whereBetween('clicked_at', [$startDate->copy()->startOfDay(), $now])
+            ->selectRaw('DATE(clicked_at) as date, COUNT(*) as total')
+            ->groupBy('date')
+            ->pluck('total', 'date');
+
+        // Derive daily conversion totals and revenue directly from the hydrated collection.
+        $conversionCountByDate = [];
+        $conversionValueByDate = [];
+
+        $conversions
+            ->filter(static fn (CampaignConversion $conversion): bool => $conversion->converted_at instanceof Carbon)
+            ->groupBy(static fn (CampaignConversion $conversion): string => $conversion->converted_at->format('Y-m-d'))
+            ->each(static function ($group, string $date) use (&$conversionCountByDate, &$conversionValueByDate): void {
+                $conversionCountByDate[$date] = $group->count();
+                $conversionValueByDate[$date] = (float) $group->sum(static fn (CampaignConversion $conversion): float => (float) ($conversion->conversion_value ?? 0));
+            });
+
+        // Normalize the datasets so each day in the requested period contains a value, even when no activity occurred.
+        $timelineSeries = $normalizedTimeline->map(static function (Carbon $date) use ($viewsByDate, $clicksByDate, $conversionCountByDate, $conversionValueByDate): array {
+            $dateKey = $date->toDateString();
+
+            return [
+                'date'        => $dateKey,
+                'views'       => (int) ($viewsByDate[$dateKey] ?? 0),
+                'clicks'      => (int) ($clicksByDate[$dateKey] ?? 0),
+                'conversions' => (int) ($conversionCountByDate[$dateKey] ?? 0),
+                'revenue'     => round((float) ($conversionValueByDate[$dateKey] ?? 0.0), 2),
+            ];
+        });
+
+        $timelineTotals = [
+            'views'       => (int) $timelineSeries->sum('views'),
+            'clicks'      => (int) $timelineSeries->sum('clicks'),
+            'conversions' => (int) $timelineSeries->sum('conversions'),
+            'revenue'     => round((float) $timelineSeries->sum('revenue'), 2),
+        ];
+
+        $timelineLabels = $normalizedTimeline->map(static fn (Carbon $date): string => $date->format('M d'));
+        $timelineDates = $normalizedTimeline->map(static fn (Carbon $date): string => $date->toDateString());
 
         // Summarise campaign engagement KPIs.
         $engagementCampaigns = $campaigns->map(static function (Campaign $campaign): array {
@@ -462,6 +528,8 @@ final class CampaignController extends Controller
                 'label'      => sprintf('Last %d days', $period),
                 'start_date' => $startDate->format('Y-m-d'),
                 'end_date'   => $now->format('Y-m-d'),
+                'granularity' => 'day',
+                'normalized_dates' => $timelineDates->all(),
             ],
             'totals' => [
                 'campaigns_created' => $campaigns->count(),
@@ -546,6 +614,68 @@ final class CampaignController extends Controller
                         'multi_variant_campaigns' => $multiVariantCampaigns,
                         'winning_variant'         => $winningVariant,
                         'variant_performance'     => $variantPerformance->take(10)->values()->all(),
+                    ],
+                ],
+            ],
+            'charts' => [
+                'engagement_trend' => [
+                    'title'             => 'Engagement trend',
+                    'description'       => 'Daily views and clicks',
+                    'labels'            => $timelineLabels->all(),
+                    'normalized_dates'  => $timelineDates->all(),
+                    'kpis'              => [
+                        'total_views'                => $timelineTotals['views'],
+                        'total_clicks'               => $timelineTotals['clicks'],
+                        'average_click_through_rate' => $timelineTotals['views'] > 0
+                            ? round($timelineTotals['clicks'] / $timelineTotals['views'] * 100, 2)
+                            : 0.0,
+                    ],
+                    'datasets'          => [
+                        [
+                            'label'           => 'Views',
+                            'data'            => $timelineSeries->pluck('views')->all(),
+                            'borderColor'     => '#3B82F6',
+                            'backgroundColor' => 'rgba(59, 130, 246, 0.15)',
+                            'fill'            => true,
+                            'tension'         => 0.3,
+                        ],
+                        [
+                            'label'           => 'Clicks',
+                            'data'            => $timelineSeries->pluck('clicks')->all(),
+                            'borderColor'     => '#10B981',
+                            'backgroundColor' => 'rgba(16, 185, 129, 0.15)',
+                            'fill'            => true,
+                            'tension'         => 0.3,
+                        ],
+                    ],
+                ],
+                'conversion_trend' => [
+                    'title'             => 'Conversion trend',
+                    'description'       => 'Daily conversions and revenue',
+                    'labels'            => $timelineLabels->all(),
+                    'normalized_dates'  => $timelineDates->all(),
+                    'kpis'              => [
+                        'total_conversions' => $timelineTotals['conversions'],
+                        'total_revenue'     => $timelineTotals['revenue'],
+                        'average_conversion_rate' => round($averageConversionRate, 2),
+                    ],
+                    'datasets'          => [
+                        [
+                            'label'           => 'Conversions',
+                            'data'            => $timelineSeries->pluck('conversions')->all(),
+                            'borderColor'     => '#F59E0B',
+                            'backgroundColor' => 'rgba(245, 158, 11, 0.15)',
+                            'fill'            => true,
+                            'tension'         => 0.3,
+                        ],
+                        [
+                            'label'           => 'Revenue',
+                            'data'            => $timelineSeries->pluck('revenue')->all(),
+                            'borderColor'     => '#8B5CF6',
+                            'backgroundColor' => 'rgba(139, 92, 246, 0.15)',
+                            'fill'            => true,
+                            'tension'         => 0.3,
+                        ],
                     ],
                 ],
             ],
