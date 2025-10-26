@@ -1,0 +1,87 @@
+# Automatically merge pull requests targeting main when they are conflict-free.
+name: Auto merge conflict-free pull requests
+
+on:
+  pull_request_target:
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - ready_for_review
+
+jobs:
+  merge:
+    name: Merge conflict-free pull request
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    if: >-
+      github.event.pull_request.draft == false &&
+      github.event.pull_request.base.ref == 'main'
+    steps:
+      - name: Merge pull request when no conflicts remain
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            // Extract the pull request number from the event payload for lookup.
+            const pullNumber = context.payload.pull_request?.number;
+            if (!pullNumber) {
+              core.setFailed('Pull request context is unavailable.');
+              return;
+            }
+
+            // Define a helper that pauses execution so GitHub can compute mergeability.
+            const pause = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+            // Poll GitHub for the latest pull request details until mergeability is known.
+            let prDetails = null;
+            for (let attempt = 1; attempt <= 10; attempt += 1) {
+              prDetails = await github.rest.pulls.get({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: pullNumber,
+              });
+
+              if (prDetails.data.mergeable !== null) {
+                core.info(`Mergeability resolved on attempt ${attempt}.`);
+                break;
+              }
+
+              core.info(`Mergeability unknown on attempt ${attempt}; waiting for GitHub to finish checks.`);
+              await pause(5000);
+            }
+
+            // Abort early when GitHub reports conflicts, blocked status, or an unknown mergeable state.
+            if (!prDetails || prDetails.data.mergeable !== true) {
+              core.setFailed('Pull request is not mergeable without conflicts.');
+              return;
+            }
+
+            // Merge the pull request using the default method to keep parity with manual merges.
+            await github.rest.pulls.merge({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: pullNumber,
+              merge_method: 'merge',
+            });
+
+            // Remove the source branch when it originates from the same repository.
+            if (
+              prDetails.data.head?.repo?.full_name === `${context.repo.owner}/${context.repo.repo}` &&
+              prDetails.data.head?.ref
+            ) {
+              try {
+                await github.rest.git.deleteRef({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  ref: `heads/${prDetails.data.head.ref}`,
+                });
+                core.info(`Deleted branch ${prDetails.data.head.ref} after successful merge.`);
+              } catch (error) {
+                core.warning(`Branch deletion skipped: ${error.message}`);
+              }
+            } else {
+              core.info('Branch deletion skipped because the source is a fork.');
+            }
