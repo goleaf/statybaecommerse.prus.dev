@@ -1,5 +1,5 @@
 {{--
-    Checkout process view responsible for presenting the four-step wizard
+    Checkout process view responsible for presenting the four-step checkout wizard
     (addresses → delivery → payment → review) alongside a live order summary.
     Each section delegates heavy logic to specialised Livewire components so
     recalculations propagate automatically via events.
@@ -7,7 +7,7 @@
 <div class="mx-auto max-w-6xl px-4 py-10 lg:px-0">
     {{-- Top-of-page step indicator keeps shoppers oriented within the wizard. --}}
     <x-steps
-        :current="$step"
+        :current="$currentStep"
         :labels="[
             __('Addresses'),
             __('Delivery'),
@@ -19,7 +19,7 @@
     <div class="mt-10 grid gap-10 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] lg:items-start">
         {{-- Main column renders the active checkout step. --}}
         <section class="space-y-8">
-            @if ($step === 1)
+            @if ($currentStep === 1)
                 {{-- Addresses step hosts the billing/shipping form component. --}}
                 <livewire:components.checkout.addresses />
 
@@ -28,7 +28,7 @@
                         {{ __('Continue to delivery') }}
                     </x-buttons.primary>
                 </div>
-            @elseif ($step === 2)
+            @elseif ($currentStep === 2)
                 {{-- Delivery step handles shipping method selection and pricing events. --}}
                 <livewire:components.checkout.delivery />
 
@@ -40,7 +40,7 @@
                         {{ __('Continue to payment') }}
                     </x-buttons.primary>
                 </div>
-            @elseif ($step === 3)
+            @elseif ($currentStep === 3)
                 {{-- Payment step surfaces the available payment providers. --}}
                 <livewire:components.checkout.payment />
 

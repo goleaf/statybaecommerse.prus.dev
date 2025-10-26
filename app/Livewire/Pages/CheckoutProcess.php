@@ -110,6 +110,23 @@ final class CheckoutProcess extends Component
      */
     public function toStep(int $targetStep): void
     {
+        // Validate current step before advancing
+        if ($this->currentStep === 1) {
+            // Persist address data for authenticated shoppers and refresh the available shipping matrix.
+            $this->persistAuthenticatedAddresses();
+            $this->refreshShippingOptions();
+        }
+
+        if ($this->currentStep === 2) {
+            // Lock in the shipping selection before moving to the payment stage.
+            $this->ensureShippingSelection();
+        }
+
+        if ($this->currentStep === 3) {
+            // Drop lingering payment validation errors before rendering the confirmation step.
+            $this->resetErrorBag('selectedPaymentMethod');
+        }
+
         // Clamp the target step so we never render beyond the wizard bounds.
         $this->currentStep = max(1, min(4, $targetStep));
 
@@ -147,6 +164,7 @@ final class CheckoutProcess extends Component
     public function validateCurrentStep(): void
     {
         match ($this->currentStep) {
+<<<<<<< HEAD
             1 => $this->validate([
                 'billing.first_name'  => 'required|string|max:255',
                 'billing.last_name'   => 'required|string|max:255',
@@ -158,6 +176,10 @@ final class CheckoutProcess extends Component
                 'billing.country'     => 'required|string|size:2',
             ]),
             2       => $this->validate($this->shippingStepRules()),
+=======
+            1       => $this->validate($this->addressStepRules()),
+            2       => $this->validate($this->deliveryStepRules()),
+>>>>>>> origin/codex/replace-placeholder-with-livewire-multi-step-ui
             3       => $this->validate(['selectedPaymentMethod' => ['required', Rule::in(array_keys($this->paymentMethods))]]),
             default => null,
         };
@@ -168,6 +190,13 @@ final class CheckoutProcess extends Component
      */
     public function placeOrder(): void
     {
+        if ($this->currentStep < 4) {
+            // Force customers through the review screen before completing the checkout.
+            $this->currentStep = 4;
+
+            return;
+        }
+
         $this->validate($this->rules());
         $cartItems = $this->getCartItems();
         if ($cartItems->isEmpty()) {
@@ -495,14 +524,27 @@ final class CheckoutProcess extends Component
 
         $this->availableShippingOptions = $options
             // Preserve manual casting to stabilise Livewire hydration when shipping selections change.
+<<<<<<< HEAD
             ->map(static fn ($option): array => $option instanceof ShippingOptionData ? $option->toArray() : (array) $option)
             ->map(static function (array $option): array {
                 // Cast identifiers and monetary values to predictable scalar types for Livewire hydration.
                 $option['id'] = (int) $option['id'];
                 $option['price'] = (float) $option['price'];
+=======
+            ->map(
+                /**
+                 * @param  array{id:int|string,name:string,price:float|int|string,formatted_price:string,estimated_delivery:string,currency?:string|null,eta?:string|null} $option
+                 * @return array{id:int,name:string,price:float,formatted_price:string,estimated_delivery:string,currency?:string|null,eta?:string|null}
+                 */
+                static function (array $option): array {
+                    // Cast identifiers and monetary values to predictable scalar types for Livewire hydration.
+                    $option['id'] = (int) $option['id'];
+                    $option['price'] = (float) $option['price'];
+>>>>>>> origin/codex/replace-placeholder-with-livewire-multi-step-ui
 
-                return $option;
-            })
+                    return $option;
+                }
+            )
             ->values()
             ->all();
 
@@ -647,6 +689,7 @@ final class CheckoutProcess extends Component
      */
     protected function rules(): array
     {
+<<<<<<< HEAD
         return [
             'billing.first_name'     => 'required|string|max:255',
             'billing.last_name'      => 'required|string|max:255',
@@ -662,31 +705,62 @@ final class CheckoutProcess extends Component
             'shipping.city'          => $this->sameAsShipping ? 'nullable|string|max:255' : 'required|string|max:255',
             'shipping.postal_code'   => $this->sameAsShipping ? 'nullable|string|max:10' : 'required|string|max:10',
             'shipping.country'       => 'required|string|size:2',
+=======
+        return $this->addressStepRules() + [
+>>>>>>> origin/codex/replace-placeholder-with-livewire-multi-step-ui
             'selectedShippingOption' => ['required', 'integer', Rule::in($this->shippingOptionIds())],
             'selectedPaymentMethod'  => ['required', Rule::in(array_keys($this->paymentMethods))],
         ];
     }
 
     /**
-     * Return validation rules that are specific to the shipping step of the wizard.
+     * Provide validation constraints for the combined billing and shipping address step.
      *
      * @return array<string, mixed>
      */
-    private function shippingStepRules(): array
+    private function addressStepRules(): array
     {
-        if ($this->sameAsShipping) {
-            return [
-                'selectedShippingOption' => ['required', 'integer', Rule::in($this->shippingOptionIds())],
-            ];
+        $rules = [
+            'billingFirstName'    => 'required|string|max:255',
+            'billingLastName'     => 'required|string|max:255',
+            'billingEmail'        => 'required|email|max:255',
+            'billingPhone'        => 'required|string|max:255',
+            'billingAddress'      => 'required|string|max:255',
+            'billingCity'         => 'required|string|max:255',
+            'billingPostalCode'   => 'required|string|max:10',
+            'billingCountryCode'  => 'required|string|size:2',
+            'shippingCountryCode' => 'required|string|size:2',
+        ];
+
+        if (! $this->sameAsShipping) {
+            // Require explicit recipient details whenever the parcel ships to a different address.
+            $rules['shippingFirstName'] = 'required|string|max:255';
+            $rules['shippingLastName'] = 'required|string|max:255';
+            $rules['shippingAddress'] = 'required|string|max:255';
+            $rules['shippingCity'] = 'required|string|max:255';
+            $rules['shippingPostalCode'] = 'required|string|max:10';
         }
 
+        return $rules;
+    }
+
+    /**
+     * Return validation rules that are specific to the delivery selection step of the wizard.
+     *
+     * @return array<string, mixed>
+     */
+    private function deliveryStepRules(): array
+    {
         return [
+<<<<<<< HEAD
             'shipping.first_name'    => 'required|string|max:255',
             'shipping.last_name'     => 'required|string|max:255',
             'shipping.address'       => 'required|string|max:255',
             'shipping.city'          => 'required|string|max:255',
             'shipping.postal_code'   => 'required|string|max:10',
             'shipping.country'       => 'required|string|size:2',
+=======
+>>>>>>> origin/codex/replace-placeholder-with-livewire-multi-step-ui
             'selectedShippingOption' => ['required', 'integer', Rule::in($this->shippingOptionIds())],
         ];
     }
