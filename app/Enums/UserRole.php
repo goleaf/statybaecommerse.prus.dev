@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Enums;
 
+use App\Contracts\EnumInterface;
 use Illuminate\Support\Collection;
 
 /**
@@ -11,7 +12,7 @@ use Illuminate\Support\Collection;
  *
  * Enumeration defining a set of named constants with type safety.
  */
-enum UserRole: string
+enum UserRole: string implements EnumInterface
 {
     case SUPER_ADMIN = 'super_admin';
     case ADMIN = 'admin';
@@ -271,9 +272,17 @@ enum UserRole: string
         return collect(self::cases())->filter(fn ($case) => $case->canAccessAdmin());
     }
 
+    /**
+     * Offer a collection wrapper for the enum cases to support shared helpers.
+     */
+    public static function collection(): Collection
+    {
+        return collect(self::cases());
+    }
+
     public static function ordered(): Collection
     {
-        return collect(self::cases())->sortBy('priority');
+        return self::collection()->sortBy(fn (self $case) => $case->priority())->values();
     }
 
     public static function fromLabel(string $label): ?self
