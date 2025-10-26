@@ -267,4 +267,20 @@ final class CouponTest extends TestCase
 
         $this->assertTrue($coupon->isValid());
     }
+
+    public function test_generate_unique_code_avoids_collisions(): void
+    {
+        // Seed an existing code to verify the generator respects case-insensitive uniqueness.
+        Coupon::factory()->create(['code' => 'WINTER20']);
+
+        $generated = Coupon::generateUniqueCode(8);
+
+        $this->assertSame(8, strlen($generated));
+        $this->assertSame(strtoupper($generated), $generated);
+        $this->assertNotSame('WINTER20', $generated);
+        $this->assertFalse(
+            Coupon::query()->whereRaw('UPPER(code) = ?', [$generated])->exists(),
+            'Generated code should not collide with existing entries.',
+        );
+    }
 }
