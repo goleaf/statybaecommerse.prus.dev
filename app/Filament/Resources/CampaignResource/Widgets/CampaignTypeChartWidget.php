@@ -6,7 +6,6 @@ namespace App\Filament\Resources\CampaignResource\Widgets;
 
 use App\Models\Campaign;
 use Filament\Widgets\ChartWidget;
-use Illuminate\Support\Facades\DB;
 
 final class CampaignTypeChartWidget extends ChartWidget
 {
@@ -14,16 +13,41 @@ final class CampaignTypeChartWidget extends ChartWidget
 
     protected function getData(): array
     {
-        $data = Campaign::select('type', DB::raw('count(*) as count'))
-            ->groupBy('type')
-            ->orderBy('count', 'desc')
+        // Hydrate campaign models so the accessor-derived type (with metadata fallback) is honoured.
+        $campaigns = Campaign::query()
+            ->select(['id', 'type', 'metadata'])
             ->get();
+
+        // Aggregate counts by resolved type while collapsing null or empty strings into an "unknown" bucket.
+        $typeCounts = $campaigns
+            ->map(static function (Campaign $campaign): string {
+                $resolvedType = $campaign->type ?? data_get($campaign->metadata, 'type');
+
+                if (is_string($resolvedType) && $resolvedType !== '') {
+                    return $resolvedType;
+                }
+
+                return 'unknown';
+            })
+            ->countBy()
+            ->sortDesc();
+
+        // Produce translated labels with a graceful fallback for unfamiliar type codes.
+        $labels = $typeCounts
+            ->keys()
+            ->map(static function (string $type): string {
+                $translationKey = "campaigns.types.{$type}";
+                $label = __($translationKey);
+
+                return $label === $translationKey ? __('campaigns.types.unknown') : $label;
+            })
+            ->toArray();
 
         return [
             'datasets' => [
                 [
                     'label'           => __('campaigns.charts.campaigns_by_type'),
-                    'data'            => $data->pluck('count')->toArray(),
+                    'data'            => $typeCounts->values()->toArray(),
                     'backgroundColor' => [
                         '#3B82F6', // blue
                         '#10B981', // emerald
@@ -38,7 +62,7 @@ final class CampaignTypeChartWidget extends ChartWidget
                     ],
                 ],
             ],
-            'labels' => $data->pluck('type')->map(fn ($type) => __("campaigns.types.{$type}"))->toArray(),
+            'labels' => $labels,
         ];
     }
 

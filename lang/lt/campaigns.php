@@ -65,6 +65,7 @@ return [
         'banner' => 'Baneris',
         'popup'  => 'Iššokantis langas',
         'social' => 'Socialiniai tinklai',
+        'unknown' => 'Nežinoma', // Užtikrina, kad neapibrėžti tipai turėtų lokalizuotą etiketę.
     ],
     // Status
     'status' => [

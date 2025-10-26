@@ -20,7 +20,7 @@ final class CampaignTest extends TestCase
 
     public function test_campaign_index_page_loads(): void
     {
-        $campaigns = Campaign::factory()->count(3)->active()->create();
+        Campaign::factory()->count(3)->active()->create();
 
         $response = $this->get(route('frontend.campaigns.index'));
 
@@ -31,8 +31,8 @@ final class CampaignTest extends TestCase
 
     public function test_campaign_index_page_filters_by_type(): void
     {
-        $emailCampaigns = Campaign::factory()->count(2)->email()->active()->create();
-        $bannerCampaigns = Campaign::factory()->count(2)->banner()->active()->create();
+        Campaign::factory()->count(2)->email()->active()->create();
+        Campaign::factory()->count(2)->banner()->active()->create();
 
         $response = $this->get(route('frontend.campaigns.index', ['type' => 'email']));
 
@@ -54,7 +54,7 @@ final class CampaignTest extends TestCase
 
     public function test_campaign_index_page_searches_by_name(): void
     {
-        $campaign = Campaign::factory()->create(['name' => 'Special Campaign']);
+        Campaign::factory()->create(['name' => 'Special Campaign']);
         Campaign::factory()->count(2)->create(['name' => 'Regular Campaign']);
 
         $response = $this->get(route('frontend.campaigns.index', ['search' => 'Special']));
@@ -121,7 +121,7 @@ final class CampaignTest extends TestCase
 
     public function test_campaign_featured_page_loads(): void
     {
-        $featuredCampaigns = Campaign::factory()->count(3)->featured()->active()->create();
+        Campaign::factory()->count(3)->featured()->active()->create();
 
         $response = $this->get(route('frontend.campaigns.featured'));
 
@@ -132,7 +132,7 @@ final class CampaignTest extends TestCase
 
     public function test_campaign_by_type_page_loads(): void
     {
-        $emailCampaigns = Campaign::factory()->count(3)->email()->active()->create();
+        Campaign::factory()->count(3)->email()->active()->create();
 
         $response = $this->get(route('frontend.campaigns.by-type', 'email'));
 
@@ -144,7 +144,7 @@ final class CampaignTest extends TestCase
 
     public function test_campaign_search_page_loads(): void
     {
-        $campaigns = Campaign::factory()->count(3)->active()->create();
+        Campaign::factory()->count(3)->active()->create();
 
         $response = $this->get(route('frontend.campaigns.search', ['q' => 'test']));
 
