@@ -39,9 +39,9 @@ final class ReferralController extends Controller
         // Aggregate once to avoid multiple trips to the database when the
         // dashboard polls this endpoint for analytics tiles.
         $stats = [
-            'total_codes' => ReferralCode::count(),
-            'active_codes' => ReferralCode::where('is_active', true)->count(),
-            'total_usage' => (int) ReferralCode::sum('usage_count'),
+            'total_codes'   => ReferralCode::count(),
+            'active_codes'  => ReferralCode::where('is_active', true)->count(),
+            'total_usage'   => (int) ReferralCode::sum('usage_count'),
             'total_rewards' => (float) ReferralCode::sum('total_rewards'),
         ];
 
@@ -102,23 +102,23 @@ final class ReferralController extends Controller
             ->first();
 
         $stats = [
-            'total_referrals' => (int) ($referralCounters->total ?? 0),
+            'total_referrals'     => (int) ($referralCounters->total ?? 0),
             'completed_referrals' => (int) ($referralCounters->completed ?? 0),
-            'pending_referrals' => (int) ($referralCounters->pending ?? 0),
-            'total_rewards' => (float) $user->referralRewards()->sum('amount'),
-            'pending_rewards' => (float) $user->referralRewards()->pending()->sum('amount'),
+            'pending_referrals'   => (int) ($referralCounters->pending ?? 0),
+            'total_rewards'       => (float) $user->referralRewards()->sum('amount'),
+            'pending_rewards'     => (float) $user->referralRewards()->pending()->sum('amount'),
         ];
         $referralCode = $user->activeReferralCode();
 
         return view('referrals.index', [
-            'referrals' => $referrals,
-            'stats' => $stats,
-            'referralCode' => $referralCode,
-            'totalReferrals' => $stats['total_referrals'],
+            'referrals'          => $referrals,
+            'stats'              => $stats,
+            'referralCode'       => $referralCode,
+            'totalReferrals'     => $stats['total_referrals'],
             'completedReferrals' => $stats['completed_referrals'],
-            'pendingReferrals' => $stats['pending_referrals'],
-            'totalRewards' => $stats['total_rewards'],
-            'pendingRewards' => $stats['pending_rewards'],
+            'pendingReferrals'   => $stats['pending_referrals'],
+            'totalRewards'       => $stats['total_rewards'],
+            'pendingRewards'     => $stats['pending_rewards'],
         ]);
     }
 
@@ -175,19 +175,19 @@ final class ReferralController extends Controller
             DB::beginTransaction();
 
             $referral = Referral::createWithCode([
-                'referrer_id' => $user->id,
-                'referred_id' => $referredUser->id,
-                'source' => $request->get('source', 'website'),
-                'campaign' => $request->get('campaign'),
-                'utm_source' => $request->get('utm_source'),
-                'utm_medium' => $request->get('utm_medium'),
+                'referrer_id'  => $user->id,
+                'referred_id'  => $referredUser->id,
+                'source'       => $request->get('source', 'website'),
+                'campaign'     => $request->get('campaign'),
+                'utm_source'   => $request->get('utm_source'),
+                'utm_medium'   => $request->get('utm_medium'),
                 'utm_campaign' => $request->get('utm_campaign'),
-                'ip_address' => $request->ip(),
-                'user_agent' => $request->userAgent(),
-                'title' => ['en' => $title, 'lt' => $titleLt],
-                'description' => ['en' => $description, 'lt' => $descriptionLt],
-                'metadata' => [
-                    'message' => $validated['message'] ?? null,
+                'ip_address'   => $request->ip(),
+                'user_agent'   => $request->userAgent(),
+                'title'        => ['en' => $title, 'lt' => $titleLt],
+                'description'  => ['en' => $description, 'lt' => $descriptionLt],
+                'metadata'     => [
+                    'message'     => $validated['message'] ?? null,
                     'created_via' => 'manual',
                 ],
             ]);
@@ -250,10 +250,10 @@ final class ReferralController extends Controller
         $shareText = __('referrals.share_text', ['code' => $referralCode->code, 'url' => $shareUrl]);
 
         return view('referrals.share', [
-            'user' => $user,
+            'user'         => $user,
             'referralCode' => $referralCode,
-            'shareUrl' => $shareUrl,
-            'shareText' => $shareText,
+            'shareUrl'     => $shareUrl,
+            'shareText'    => $shareText,
         ]);
     }
 
@@ -318,12 +318,12 @@ final class ReferralController extends Controller
     {
         // Track analytics event
         AnalyticsEvent::create([
-            'user_id' => $referralCode->user_id,
+            'user_id'    => $referralCode->user_id,
             'event_type' => 'referral_click',
             'session_id' => $request->session()->getId(),
             'ip_address' => $request->ip(),
             'user_agent' => $request->userAgent(),
-            'referrer' => $request->header('referer'),
+            'referrer'   => $request->header('referer'),
             'properties' => ['referral_code' => $referralCode->code],
         ]);
     }

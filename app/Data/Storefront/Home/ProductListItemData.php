@@ -7,10 +7,13 @@ namespace App\Data\Storefront\Home;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
+
+use function collect;
+
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
-use function collect;
+
 use function route;
 
 /**
@@ -210,21 +213,21 @@ final class ProductListItemData implements Arrayable
     public function toArray(): array
     {
         return [
-            'id'                   => $this->id,
-            'name'                 => $this->name,
-            'slug'                 => $this->slug,
-            'detail_url'           => $this->detailUrl,
-            'brand_name'           => $this->brandName,
-            'category_labels'      => $this->categoryLabels,
-            'price'                => $this->price,
-            'sale_price'           => $this->salePrice,
-            'compare_price'        => $this->comparePrice,
-            'average_rating'       => $this->averageRating,
-            'reviews_count'        => $this->reviewsCount,
-            'stock_quantity'       => $this->stockQuantity,
-            'discount_percentage'  => $this->discountPercentage,
-            'image_url'            => $this->imageUrl,
-            'initials'             => $this->initials,
+            'id'                  => $this->id,
+            'name'                => $this->name,
+            'slug'                => $this->slug,
+            'detail_url'          => $this->detailUrl,
+            'brand_name'          => $this->brandName,
+            'category_labels'     => $this->categoryLabels,
+            'price'               => $this->price,
+            'sale_price'          => $this->salePrice,
+            'compare_price'       => $this->comparePrice,
+            'average_rating'      => $this->averageRating,
+            'reviews_count'       => $this->reviewsCount,
+            'stock_quantity'      => $this->stockQuantity,
+            'discount_percentage' => $this->discountPercentage,
+            'image_url'           => $this->imageUrl,
+            'initials'            => $this->initials,
         ];
     }
 }

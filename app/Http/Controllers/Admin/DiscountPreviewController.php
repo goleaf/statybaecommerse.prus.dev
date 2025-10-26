@@ -7,16 +7,19 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Services\Discounts\DiscountContextBuilder;
 use App\Services\Discounts\DiscountEngine;
+
+use function array_key_exists;
+use function data_get;
+
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\ValidationException;
-use Throwable;
 
-use function array_key_exists;
-use function data_get;
 use function max;
 use function round;
+
+use Throwable;
 
 /**
  * DiscountPreviewController
@@ -32,8 +35,7 @@ final class DiscountPreviewController extends Controller
     public function __construct(
         private readonly DiscountContextBuilder $contextBuilder,
         private readonly DiscountEngine $discountEngine,
-    ) {
-    }
+    ) {}
 
     /**
      * Generate a preview for discount effects based on the provided payload.
@@ -45,16 +47,16 @@ final class DiscountPreviewController extends Controller
 
         // Validate the preview payload so only well-formed data flows into the engine.
         $validated = $request->validate([
-            'code'                      => ['nullable', 'string', 'max:255'],
-            'cart'                      => ['nullable', 'array'],
-            'cart.subtotal'             => ['nullable', 'numeric', 'min:0'],
-            'cart.items'                => ['nullable', 'array'],
-            'cart.items.*.product_id'   => ['nullable', 'integer', 'min:1'],
-            'cart.items.*.variant_id'   => ['nullable', 'integer', 'min:1'],
-            'cart.items.*.quantity'     => ['nullable', 'integer', 'min:0'],
-            'cart.items.*.unit_price'   => ['nullable', 'numeric', 'min:0'],
-            'shipping'                  => ['nullable', 'array'],
-            'shipping.base_amount'      => ['nullable', 'numeric', 'min:0'],
+            'code'                    => ['nullable', 'string', 'max:255'],
+            'cart'                    => ['nullable', 'array'],
+            'cart.subtotal'           => ['nullable', 'numeric', 'min:0'],
+            'cart.items'              => ['nullable', 'array'],
+            'cart.items.*.product_id' => ['nullable', 'integer', 'min:1'],
+            'cart.items.*.variant_id' => ['nullable', 'integer', 'min:1'],
+            'cart.items.*.quantity'   => ['nullable', 'integer', 'min:0'],
+            'cart.items.*.unit_price' => ['nullable', 'numeric', 'min:0'],
+            'shipping'                => ['nullable', 'array'],
+            'shipping.base_amount'    => ['nullable', 'numeric', 'min:0'],
         ]);
 
         // Build a sanitized input array so the downstream builder only receives trusted values.
@@ -116,11 +118,11 @@ final class DiscountPreviewController extends Controller
             'context' => $context,
             'result'  => $result,
             'summary' => [
-                'subtotal'           => round($subtotal, 2),
-                'shipping'           => round($shippingBase, 2),
-                'discount'           => round($discountAmount, 2),
-                'shipping_discount'  => round($shippingDiscount, 2),
-                'total'              => round($total, 2),
+                'subtotal'          => round($subtotal, 2),
+                'shipping'          => round($shippingBase, 2),
+                'discount'          => round($discountAmount, 2),
+                'shipping_discount' => round($shippingDiscount, 2),
+                'total'             => round($total, 2),
             ],
         ]);
     }

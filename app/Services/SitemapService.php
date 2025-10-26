@@ -119,7 +119,7 @@ final class SitemapService
     {
         // Skip category lookups entirely if the backing table is unavailable in
         // the current test scenario or tenant setup.
-        if (! $this->tableExists((new Category())->getTable())) {
+        if (! $this->tableExists((new Category)->getTable())) {
             return;
         }
 
@@ -161,7 +161,7 @@ final class SitemapService
     {
         // Collections may not exist in minimal installations, so guard lookups
         // to keep sitemap generation resilient during migrations and tests.
-        if (! $this->tableExists((new Collection())->getTable())) {
+        if (! $this->tableExists((new Collection)->getTable())) {
             return;
         }
 
@@ -202,7 +202,7 @@ final class SitemapService
     {
         // Bail out quickly if product tables are missing to avoid SQL errors in
         // lightweight testing databases.
-        if (! $this->tableExists((new Product())->getTable())) {
+        if (! $this->tableExists((new Product)->getTable())) {
             return;
         }
 
@@ -245,7 +245,7 @@ final class SitemapService
     {
         // Guard against running brand queries when the table does not exist,
         // which can happen in mocked integrations.
-        if (! $this->tableExists((new Brand())->getTable())) {
+        if (! $this->tableExists((new Brand)->getTable())) {
             return;
         }
 
@@ -287,7 +287,7 @@ final class SitemapService
     {
         // Legal documents are optional in smaller storefront installs, so do
         // nothing when the expected table has not been provisioned yet.
-        if (! $this->tableExists((new Legal())->getTable())) {
+        if (! $this->tableExists((new Legal)->getTable())) {
             return;
         }
 

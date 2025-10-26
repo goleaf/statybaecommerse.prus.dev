@@ -71,9 +71,9 @@ it('requires password confirmation when submitting a password', function () {
         ->fillForm([
             // Provide the minimum required payload except the confirmation to isolate the failure.
             'first_name' => 'Test',
-            'last_name' => 'User',
-            'email' => 'no-confirm@example.com',
-            'password' => 'password123',
+            'last_name'  => 'User',
+            'email'      => 'no-confirm@example.com',
+            'password'   => 'password123',
         ])
         ->call('register')
         ->assertHasFormErrors(['password_confirmation' => 'required']);

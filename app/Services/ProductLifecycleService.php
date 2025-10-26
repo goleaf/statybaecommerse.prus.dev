@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Models\Product;
-use App\Services\CacheInvalidationService;
 use App\Services\Images\GradientImageService;
 use App\UseCases\Cache\InvalidateProductCache;
 use Illuminate\Support\Facades\Log;
@@ -59,7 +58,7 @@ final class ProductLifecycleService
             // Never block product creation on placeholder issues; emit a warning for later diagnostics.
             Log::warning('Failed to attach placeholder image for product', [
                 'product_id' => $product->id,
-                'error' => $exception->getMessage(),
+                'error'      => $exception->getMessage(),
             ]);
         }
 

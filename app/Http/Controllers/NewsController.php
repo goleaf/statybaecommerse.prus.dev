@@ -142,13 +142,6 @@ final class NewsController extends Controller
             })
             ->values();
 
-                return $candidate->title !== ''
-                    && $candidate->slug !== ''
-                    && $candidate->is_published
-                    && $hasFeaturedImage;
-            })
-            ->values(); // Preserve contiguous indexes for predictable carousel rendering.
-
         return view('news.show', ['news' => $news, 'relatedNews' => $relatedNews]);
     }
 

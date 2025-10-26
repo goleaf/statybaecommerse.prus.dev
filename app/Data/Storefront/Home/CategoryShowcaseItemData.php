@@ -7,6 +7,7 @@ namespace App\Data\Storefront\Home;
 use App\Models\Category;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Str;
+
 use function route;
 
 /**

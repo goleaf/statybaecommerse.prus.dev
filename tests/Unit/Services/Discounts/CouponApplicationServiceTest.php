@@ -76,9 +76,9 @@ final class CouponApplicationServiceTest extends TestCase
         Order::factory()->create(['user_id' => $user->id]);
 
         $coupon = Coupon::factory()->create([
-            'is_public'           => true,
-            'is_first_time_only'  => true,
-            'usage_limit_per_user'=> null,
+            'is_public'            => true,
+            'is_first_time_only'   => true,
+            'usage_limit_per_user' => null,
         ]);
 
         $context = [

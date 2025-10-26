@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers\Api;
 
+use App\Enums\OrderStatus;
 use App\Http\Controllers\OrderController as BaseOrderController;
 use App\Support\Contracts\Entities\OrderContract;
 use App\Traits\HandlesContentNegotiation;
@@ -24,7 +25,7 @@ final class OrderController extends BaseOrderController
      *
      * @var array<int, string>
      */
-    private const VIEWABLE_STATUS_VALUES = [
+    protected const VIEWABLE_STATUS_VALUES = [
         OrderStatus::PENDING->value,
         OrderStatus::PROCESSING->value,
         OrderStatus::SHIPPED->value,

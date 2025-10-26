@@ -94,16 +94,16 @@ final class RecommendationConfig extends Model
     public function getAlgorithmClass(): string
     {
         return match ($this->type) {
-            'content_based' => \App\Services\Recommendations\ContentBasedRecommendation::class,
-            'collaborative' => \App\Services\Recommendations\CollaborativeFilteringRecommendation::class,
-            'hybrid'        => \App\Services\Recommendations\HybridRecommendation::class,
-            'popularity'    => \App\Services\Recommendations\PopularityRecommendation::class,
-            'trending'      => \App\Services\Recommendations\TrendingRecommendation::class,
-            'personalized'  => \App\Services\Recommendations\PersonalizedRecommendation::class,
-            'category_based'=> \App\Services\Recommendations\CategoryBasedRecommendation::class,
-            'cross_sell'    => \App\Services\Recommendations\CrossSellRecommendation::class,
-            'up_sell'       => \App\Services\Recommendations\UpSellRecommendation::class,
-            default         => \App\Services\Recommendations\ContentBasedRecommendation::class,
+            'content_based'  => \App\Services\Recommendations\ContentBasedRecommendation::class,
+            'collaborative'  => \App\Services\Recommendations\CollaborativeFilteringRecommendation::class,
+            'hybrid'         => \App\Services\Recommendations\HybridRecommendation::class,
+            'popularity'     => \App\Services\Recommendations\PopularityRecommendation::class,
+            'trending'       => \App\Services\Recommendations\TrendingRecommendation::class,
+            'personalized'   => \App\Services\Recommendations\PersonalizedRecommendation::class,
+            'category_based' => \App\Services\Recommendations\CategoryBasedRecommendation::class,
+            'cross_sell'     => \App\Services\Recommendations\CrossSellRecommendation::class,
+            'up_sell'        => \App\Services\Recommendations\UpSellRecommendation::class,
+            default          => \App\Services\Recommendations\ContentBasedRecommendation::class,
         };
     }
 }

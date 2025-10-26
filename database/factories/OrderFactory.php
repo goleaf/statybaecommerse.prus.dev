@@ -35,12 +35,12 @@ class OrderFactory extends Factory
         $total = $subtotal + $taxAmount + $shippingAmount - $discountAmount;
 
         return [
-            'number'            => 'ORD-' . strtoupper($this->faker->unique()->bothify('######')),
-            'user_id'           => null,
-            'channel_id'        => null,
-            'country_id'        => null,
-            'partner_id'        => null,
-            'status'            => $this->faker->randomElement(OrderStatus::values()),
+            'number'     => 'ORD-' . strtoupper($this->faker->unique()->bothify('######')),
+            'user_id'    => null,
+            'channel_id' => null,
+            'country_id' => null,
+            'partner_id' => null,
+            'status'     => $this->faker->randomElement(OrderStatus::values()),
             // Keep payment statuses aligned with the enum so factories exercise every supported lifecycle case.
             'payment_status'    => $this->faker->randomElement(collect(PaymentStatus::cases())->map(fn (PaymentStatus $status): string => $status->value)->all()),
             'payment_state'     => OrderPaymentState::CREATED->value,

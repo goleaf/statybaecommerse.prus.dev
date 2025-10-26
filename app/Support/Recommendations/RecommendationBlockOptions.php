@@ -26,11 +26,11 @@ final class RecommendationBlockOptions
             'personalized'               => __('recommendation_blocks.types.personalized'),
             'category_based'             => __('recommendation_blocks.types.category_based'),
             // Legacy identifiers remain for backwards compatibility with existing fixtures.
-            'featured'                   => __('recommendation_blocks.types.featured'),
-            'related'                    => __('recommendation_blocks.types.related'),
-            'similar'                    => __('recommendation_blocks.types.similar'),
-            'trending'                   => __('recommendation_blocks.types.trending'),
-            'recent'                     => __('recommendation_blocks.types.recent'),
+            'featured' => __('recommendation_blocks.types.featured'),
+            'related'  => __('recommendation_blocks.types.related'),
+            'similar'  => __('recommendation_blocks.types.similar'),
+            'trending' => __('recommendation_blocks.types.trending'),
+            'recent'   => __('recommendation_blocks.types.recent'),
         ];
     }
 

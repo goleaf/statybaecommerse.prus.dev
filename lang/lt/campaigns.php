@@ -59,12 +59,12 @@ return [
     ],
     // Types
     'types' => [
-        'email'  => 'El. paštas',
-        'sms'    => 'SMS',
-        'push'   => 'Push pranešimas',
-        'banner' => 'Baneris',
-        'popup'  => 'Iššokantis langas',
-        'social' => 'Socialiniai tinklai',
+        'email'   => 'El. paštas',
+        'sms'     => 'SMS',
+        'push'    => 'Push pranešimas',
+        'banner'  => 'Baneris',
+        'popup'   => 'Iššokantis langas',
+        'social'  => 'Socialiniai tinklai',
         'unknown' => 'Nežinoma', // Užtikrina, kad neapibrėžti tipai turėtų lokalizuotą etiketę.
     ],
     // Status

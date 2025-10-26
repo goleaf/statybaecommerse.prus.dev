@@ -8,8 +8,8 @@ use App\Http\Controllers\Controller;
 use App\Support\Discounts\DiscountPresetRepository;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\View\View;
 use Illuminate\Validation\Rule;
+use Illuminate\View\View;
 
 /**
  * DiscountPresetController

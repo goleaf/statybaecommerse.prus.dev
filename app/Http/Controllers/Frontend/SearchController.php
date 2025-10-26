@@ -59,10 +59,10 @@ final class SearchController extends Controller
         $categories = Category::where('is_active', true)->get();
 
         return view('frontend.search.index', [
-            'products'          => $products,
-            'query'             => $query,
-            'categories'        => $categories,
-            'selectedCategory'  => $selectedCategory,
+            'products'         => $products,
+            'query'            => $query,
+            'categories'       => $categories,
+            'selectedCategory' => $selectedCategory,
         ]);
     }
 

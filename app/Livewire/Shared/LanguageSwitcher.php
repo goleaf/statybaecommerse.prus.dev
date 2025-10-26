@@ -7,14 +7,15 @@ namespace App\Livewire\Shared;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Str;
 use Livewire\Component;
+use Throwable;
 
 /**
  * LanguageSwitcher
  *
  * Livewire component for LanguageSwitcher with reactive frontend functionality, real-time updates, and user interaction handling.
  *
- * @property array<int, string>    $locales
- * @property string                $current
+ * @property array<int, string>                                                      $locales
+ * @property string                                                                  $current
  * @property array<string, array{locale:string,label:string,url:string,active:bool}> $links
  */
 class LanguageSwitcher extends Component
@@ -74,7 +75,7 @@ class LanguageSwitcher extends Component
                         $routeName,
                         ['locale' => $locale] + $routeParameters,
                     );
-                } catch (\Throwable) {
+                } catch (Throwable) {
                     $target = null;
                 }
             }
@@ -91,8 +92,8 @@ class LanguageSwitcher extends Component
 
             $links[$locale] = [
                 'locale' => $locale,
-                'label' => Str::upper($locale),
-                'url' => $target,
+                'label'  => Str::upper($locale),
+                'url'    => $target,
                 'active' => $locale === $this->current,
             ];
         }

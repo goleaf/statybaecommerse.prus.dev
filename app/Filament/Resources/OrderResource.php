@@ -1258,10 +1258,10 @@ final class OrderResource extends Resource implements DefinesExportColumns
             PaymentStatus::AUTHORIZED->value,
             PaymentStatus::CAPTURED->value,
             PaymentStatus::SETTLED->value => 'success',
-            PaymentStatus::FAILED->value => 'danger',
+            PaymentStatus::FAILED->value  => 'danger',
             PaymentStatus::REFUNDED->value,
             PaymentStatus::PARTIALLY_REFUNDED->value => 'secondary',
-            default => 'warning',
+            default                                  => 'warning',
         };
 
         return [

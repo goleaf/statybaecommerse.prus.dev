@@ -291,7 +291,7 @@ final class EnumFactory
     /**
      * Register an enum mapping at runtime so seeds, tests, or packages can plug in custom enumerations.
      *
-     * @param  class-string<EnumInterface>  $enumClass
+     * @param class-string<EnumInterface> $enumClass
      */
     public static function register(string $enumName, string $enumClass, bool $override = true): void
     {
@@ -311,7 +311,7 @@ final class EnumFactory
     /**
      * Register multiple enum mappings in a single call to keep test setup tidy.
      *
-     * @param  array<string, class-string<EnumInterface>>  $enumMap
+     * @param array<string, class-string<EnumInterface>> $enumMap
      */
     public static function registerMany(array $enumMap, bool $override = true): void
     {

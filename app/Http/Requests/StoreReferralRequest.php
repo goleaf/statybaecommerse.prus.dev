@@ -34,7 +34,7 @@ class StoreReferralRequest extends FormRequest
             'message' => ['nullable', 'string', 'max:500'],
             // Accept optional marketing copy so referrers can personalise
             // the invitation that accompanies the referral.
-            'title' => ['nullable', 'string', 'max:255'],
+            'title'       => ['nullable', 'string', 'max:255'],
             'description' => ['nullable', 'string', 'max:1000'],
         ];
     }

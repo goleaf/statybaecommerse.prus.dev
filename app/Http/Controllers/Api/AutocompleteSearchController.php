@@ -89,8 +89,8 @@ final class AutocompleteSearchController extends Controller
                 // Map the failing column back to the most relevant request attribute for better feedback.
                 $messageKey = match ($column) {
                     $searchField => 'search_field',
-                    $valueField => 'value_field',
-                    default => 'label_field',
+                    $valueField  => 'value_field',
+                    default      => 'label_field',
                 };
 
                 throw ValidationException::withMessages([
@@ -113,7 +113,7 @@ final class AutocompleteSearchController extends Controller
             'value' => $item->getAttribute($valueField),
             'label' => $item->getAttribute($labelField),
             // Expose only the selected columns to the consumer to avoid leaking sensitive attributes.
-            'data'  => $item->only($columnsToSelect),
+            'data' => $item->only($columnsToSelect),
         ]);
 
         return response()->json([

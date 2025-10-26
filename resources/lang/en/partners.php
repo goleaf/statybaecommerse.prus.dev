@@ -66,21 +66,21 @@ return [
             'shipped'   => 'Shipped',
             'cancelled' => 'Cancelled',
         ],
-        'table'        => [
-            'order'         => 'Order',
-            'status'        => 'Status',
-            'payment_status'=> 'Payment',
-            'items'         => 'Items',
-            'items_count'   => '{0}No items|{1}1 item|[2,*]:count items',
-            'total'         => 'Total',
-            'placed_at'     => 'Placed on',
+        'table' => [
+            'order'          => 'Order',
+            'status'         => 'Status',
+            'payment_status' => 'Payment',
+            'items'          => 'Items',
+            'items_count'    => '{0}No items|{1}1 item|[2,*]:count items',
+            'total'          => 'Total',
+            'placed_at'      => 'Placed on',
         ],
-        'empty'        => [
+        'empty' => [
             'title'       => 'No orders match this filter yet',
             'description' => 'Adjust the status filter or check back once new partner orders arrive.',
         ],
-        'errors'       => [
-            'forbidden'    => [
+        'errors' => [
+            'forbidden' => [
                 'title'       => 'Partner access required',
                 'description' => 'Your account is not linked to an active partner. Contact support to request access.',
             ],

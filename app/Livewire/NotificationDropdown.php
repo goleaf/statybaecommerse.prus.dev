@@ -41,6 +41,7 @@ final class NotificationDropdown extends Component
             // Reset the public properties so the dropdown renders an empty state for guests.
             $this->unreadCount = 0;
             $this->recentNotifications = [];
+
             return;
         }
         $this->unreadCount = auth()->user()->unreadNotifications->count();

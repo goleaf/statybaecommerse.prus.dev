@@ -369,12 +369,12 @@ final class ReferralSystemTest extends TestCase
     public function it_records_referral_attribution_context(): void
     {
         $context = [
-            'source'      => 'newsletter',
-            'campaign'    => 'spring_launch',
-            'utm_source'  => 'email',
-            'utm_medium'  => 'campaign',
-            'utm_campaign'=> 'spring2025',
-            'metadata'    => ['landing_page' => '/promo'],
+            'source'       => 'newsletter',
+            'campaign'     => 'spring_launch',
+            'utm_source'   => 'email',
+            'utm_medium'   => 'campaign',
+            'utm_campaign' => 'spring2025',
+            'metadata'     => ['landing_page' => '/promo'],
         ];
 
         $referral = $this->referralService->createReferral($this->referrer->id, $this->referred->id, null, $context);

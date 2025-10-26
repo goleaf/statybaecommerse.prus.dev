@@ -13,7 +13,7 @@ use Illuminate\Support\Collection;
 final class CollectionFilterGroupData implements Arrayable
 {
     /**
-     * @param  Collection<int, CollectionFilterValueData>  $values
+     * @param Collection<int, CollectionFilterValueData> $values
      */
     public function __construct(
         public readonly CollectionFilterAttributeData $attribute,
@@ -40,7 +40,7 @@ final class CollectionFilterGroupData implements Arrayable
     /**
      * Hydrate the group from a cached array payload so the data class remains the single source of truth.
      *
-     * @param  array{attribute:array{id:int,name:string}, values:array<int, array{id:int,label:string,selected?:bool}>} $payload
+     * @param array{attribute:array{id:int,name:string}, values:array<int, array{id:int,label:string,selected?:bool}>} $payload
      */
     public static function fromArray(array $payload): self
     {
@@ -57,7 +57,7 @@ final class CollectionFilterGroupData implements Arrayable
     /**
      * Clone the filter group while updating which values are marked as selected.
      *
-     * @param  array<int, int> $selectedIds
+     * @param array<int, int> $selectedIds
      */
     public function withSelected(array $selectedIds): self
     {

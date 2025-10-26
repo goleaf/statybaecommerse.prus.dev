@@ -12,8 +12,8 @@ use App\Support\Nav;
 use Filament\Forms\Form;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use ReflectionClass;
-use Tests\TestCase;
 use Tests\Support\Filament\FakeFormComponent;
+use Tests\TestCase;
 
 class CollectionResourceComprehensiveTest extends TestCase
 {

@@ -12,8 +12,8 @@ use App\Models\CampaignView;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 use OpenApi\Attributes as OA;
 
@@ -617,10 +617,10 @@ final class CampaignController extends Controller
         $data = [
             'summary' => [
                 'engagement' => [
-                    'total_views'        => $totalViews,
-                    'total_clicks'       => $totalClicks,
-                    'average_ctr'        => round((float) $averageCtr, 2),
-                    'top_campaigns'      => $topEngagementCampaigns,
+                    'total_views'   => $totalViews,
+                    'total_clicks'  => $totalClicks,
+                    'average_ctr'   => round((float) $averageCtr, 2),
+                    'top_campaigns' => $topEngagementCampaigns,
                 ],
                 'conversion' => [
                     'total_conversions'         => $totalConversions,
@@ -658,17 +658,17 @@ final class CampaignController extends Controller
 
         $meta = [
             'period' => [
-                'requested'  => $periodPayload['raw'],
-                'days'       => $period,
-                'label'      => $periodPayload['label'],
-                'start_date' => $startDate->format('Y-m-d'),
-                'end_date'   => $now->format('Y-m-d'),
-                'granularity' => 'day',
+                'requested'        => $periodPayload['raw'],
+                'days'             => $period,
+                'label'            => $periodPayload['label'],
+                'start_date'       => $startDate->format('Y-m-d'),
+                'end_date'         => $now->format('Y-m-d'),
+                'granularity'      => 'day',
                 'normalized_dates' => $timelineDates->all(),
             ],
             'counters' => [
-                'campaigns_created'  => $campaigns->count(),
-                'campaigns_started'  => Campaign::query()
+                'campaigns_created' => $campaigns->count(),
+                'campaigns_started' => Campaign::query()
                     ->withoutGlobalScopes()
                     ->whereBetween('starts_at', [$startDate, $now])
                     ->count(),
@@ -677,7 +677,7 @@ final class CampaignController extends Controller
                     ->whereBetween('ends_at', [$startDate, $now])
                     ->where('status', 'completed')
                     ->count(),
-                'active_campaigns'    => Campaign::query()
+                'active_campaigns' => Campaign::query()
                     ->withoutGlobalScopes()
                     ->where('status', 'active')
                     ->where(function ($query) use ($now): void {
@@ -752,25 +752,25 @@ final class CampaignController extends Controller
                     'title'       => 'Campaign Types',
                     'description' => 'Channel mix distribution',
                     'metrics'     => [
-                        'type_breakdown'       => $typeBreakdown,
+                        'type_breakdown'        => $typeBreakdown,
                         'legacy_type_breakdown' => $typeBreakdown,
                     ],
                 ],
             ],
             'charts' => [
                 'engagement_trend' => [
-                    'title'             => 'Engagement trend',
-                    'description'       => 'Daily views and clicks',
-                    'labels'            => $timelineLabels->all(),
-                    'normalized_dates'  => $timelineDates->all(),
-                    'kpis'              => [
+                    'title'            => 'Engagement trend',
+                    'description'      => 'Daily views and clicks',
+                    'labels'           => $timelineLabels->all(),
+                    'normalized_dates' => $timelineDates->all(),
+                    'kpis'             => [
                         'total_views'                => $timelineTotals['views'],
                         'total_clicks'               => $timelineTotals['clicks'],
                         'average_click_through_rate' => $timelineTotals['views'] > 0
                             ? round($timelineTotals['clicks'] / $timelineTotals['views'] * 100, 2)
                             : 0.0,
                     ],
-                    'datasets'          => [
+                    'datasets' => [
                         [
                             'label'           => 'Views',
                             'data'            => $timelineSeries->pluck('views')->all(),
@@ -790,16 +790,16 @@ final class CampaignController extends Controller
                     ],
                 ],
                 'conversion_trend' => [
-                    'title'             => 'Conversion trend',
-                    'description'       => 'Daily conversions and revenue',
-                    'labels'            => $timelineLabels->all(),
-                    'normalized_dates'  => $timelineDates->all(),
-                    'kpis'              => [
-                        'total_conversions' => $timelineTotals['conversions'],
-                        'total_revenue'     => $timelineTotals['revenue'],
+                    'title'            => 'Conversion trend',
+                    'description'      => 'Daily conversions and revenue',
+                    'labels'           => $timelineLabels->all(),
+                    'normalized_dates' => $timelineDates->all(),
+                    'kpis'             => [
+                        'total_conversions'       => $timelineTotals['conversions'],
+                        'total_revenue'           => $timelineTotals['revenue'],
                         'average_conversion_rate' => round($averageConversionRate, 2),
                     ],
-                    'datasets'          => [
+                    'datasets' => [
                         [
                             'label'           => 'Conversions',
                             'data'            => $timelineSeries->pluck('conversions')->all(),
@@ -845,12 +845,12 @@ final class CampaignController extends Controller
                 $keyword = Str::of($raw)->lower()->value();
 
                 $normalized = match ($keyword) {
-                    'week', '7d', 'last-week'        => 7,
-                    'fortnight', '14d'               => 14,
-                    'month', '30d', 'last-month'     => 30,
+                    'week', '7d', 'last-week' => 7,
+                    'fortnight', '14d' => 14,
+                    'month', '30d', 'last-month' => 30,
                     'quarter', '90d', 'last-quarter' => 90,
-                    'year', '365d', 'last-year'      => 365,
-                    default                          => 30,
+                    'year', '365d', 'last-year' => 365,
+                    default => 30,
                 };
             }
         }

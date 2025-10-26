@@ -103,7 +103,7 @@ final class AuthServiceProvider extends ServiceProvider
                 return true;
             }
 
-            if (!$user instanceof \Illuminate\Contracts\Auth\Authenticatable) {
+            if (! $user instanceof \Illuminate\Contracts\Auth\Authenticatable) {
                 return false;
             }
 

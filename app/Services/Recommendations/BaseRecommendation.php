@@ -113,17 +113,17 @@ abstract class BaseRecommendation
             // so cache hits can be re-hydrated with the same eager-loaded associations.
             if ($firstItem instanceof Model) {
                 $modelClass = $firstItem::class;
-                $keyName = (new $modelClass())->getKeyName();
+                $keyName = (new $modelClass)->getKeyName();
 
                 $payload = [
-                    'type'       => 'model_collection',
-                    'model'      => $modelClass,
-                    'key_name'   => $keyName,
-                    'ids'        => $result->map(static function (Model $model) use ($keyName): int|string|null {
+                    'type'     => 'model_collection',
+                    'model'    => $modelClass,
+                    'key_name' => $keyName,
+                    'ids'      => $result->map(static function (Model $model) use ($keyName): int|string|null {
                         // Capture the model key for deterministic ordering after cache retrieval.
                         return $model->getAttribute($keyName);
                     })->filter()->values()->all(),
-                    'relations'  => array_keys($firstItem->getRelations()),
+                    'relations' => array_keys($firstItem->getRelations()),
                 ];
             } else {
                 // Fallback to storing the raw array data for non-model collections.
@@ -150,7 +150,7 @@ abstract class BaseRecommendation
 
         if (Arr::get($cached, 'type') === 'empty') {
             // Respect cached empty results to avoid redundant database work.
-            return new Collection();
+            return new Collection;
         }
 
         // Handle hydrated model collections by re-querying the database with eager-loaded relations.
@@ -160,7 +160,7 @@ abstract class BaseRecommendation
             $keyName = Arr::get($cached, 'key_name');
 
             if (! $modelClass || empty($ids) || ! is_subclass_of($modelClass, Model::class)) {
-                return new Collection();
+                return new Collection;
             }
 
             $query = $modelClass::query();

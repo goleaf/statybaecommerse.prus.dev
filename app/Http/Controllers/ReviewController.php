@@ -244,8 +244,7 @@ final class ReviewController extends Controller
     /**
      * Ensure helpful/report feedback arrays remain unique and optionally capture a reason payload.
      *
-     * @param array{reasonKey?: string, reason?: string}|null $options
-     *
+     * @param  array{reasonKey?: string, reason?: string}|null                      $options
      * @return array{metadata: array<int|string, mixed>, already: bool, total: int}
      */
     private function syncInteractionMetadata(Review $review, string $interactionKey, int $userId, ?array $options = null): array

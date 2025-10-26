@@ -68,12 +68,12 @@ return [
     ],
     // Types
     'types' => [
-        'email'  => 'Email',
-        'sms'    => 'SMS',
-        'push'   => 'Push Notification',
-        'banner' => 'Banner',
-        'popup'  => 'Popup',
-        'social' => 'Social Media',
+        'email'   => 'Email',
+        'sms'     => 'SMS',
+        'push'    => 'Push Notification',
+        'banner'  => 'Banner',
+        'popup'   => 'Popup',
+        'social'  => 'Social Media',
         'unknown' => 'Unknown', // Provide a readable label for legacy or undefined types.
     ],
     // Status

@@ -7,15 +7,17 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\Translations\ProductTranslation;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Str;
 
 use function array_filter;
 use function array_map;
 use function array_unique;
 use function explode;
+
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Str;
+
 use function in_array;
 use function is_array;
 use function strtolower;
@@ -62,16 +64,16 @@ final class ProductTranslationController extends Controller
 
         // Validate incoming data to prevent mass-assignment vulnerabilities and ensure data quality.
         $validated = $request->validate([
-            'name'               => ['required', 'string', 'max:255'],
-            'slug'               => ['nullable', 'string', 'max:255'],
-            'summary'            => ['nullable', 'string'],
-            'description'        => ['nullable', 'string'],
-            'short_description'  => ['nullable', 'string'],
-            'seo_title'          => ['nullable', 'string', 'max:255'],
-            'seo_description'    => ['nullable', 'string'],
-            'meta_keywords'      => ['nullable', 'array'],
-            'meta_keywords.*'    => ['nullable', 'string'],
-            'alt_text'           => ['nullable', 'string', 'max:255'],
+            'name'              => ['required', 'string', 'max:255'],
+            'slug'              => ['nullable', 'string', 'max:255'],
+            'summary'           => ['nullable', 'string'],
+            'description'       => ['nullable', 'string'],
+            'short_description' => ['nullable', 'string'],
+            'seo_title'         => ['nullable', 'string', 'max:255'],
+            'seo_description'   => ['nullable', 'string'],
+            'meta_keywords'     => ['nullable', 'array'],
+            'meta_keywords.*'   => ['nullable', 'string'],
+            'alt_text'          => ['nullable', 'string', 'max:255'],
         ]);
 
         // Trim the required name field once more so UI level trimming discrepancies never persist to storage.
