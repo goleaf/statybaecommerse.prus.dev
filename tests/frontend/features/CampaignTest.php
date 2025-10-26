@@ -20,7 +20,7 @@ final class CampaignTest extends TestCase
 
     public function test_campaign_index_page_loads(): void
     {
-        $campaigns = Campaign::factory()->count(3)->active()->create();
+        Campaign::factory()->count(3)->active()->create();
 
         $response = $this->get(route('frontend.campaigns.index'));
 
@@ -31,8 +31,8 @@ final class CampaignTest extends TestCase
 
     public function test_campaign_index_page_filters_by_type(): void
     {
-        $emailCampaigns = Campaign::factory()->count(2)->email()->active()->create();
-        $bannerCampaigns = Campaign::factory()->count(2)->banner()->active()->create();
+        Campaign::factory()->count(2)->email()->active()->create();
+        Campaign::factory()->count(2)->banner()->active()->create();
 
         $response = $this->get(route('frontend.campaigns.index', ['type' => 'email']));
 
@@ -54,7 +54,7 @@ final class CampaignTest extends TestCase
 
     public function test_campaign_index_page_searches_by_name(): void
     {
-        $campaign = Campaign::factory()->create(['name' => 'Special Campaign']);
+        Campaign::factory()->create(['name' => 'Special Campaign']);
         Campaign::factory()->count(2)->create(['name' => 'Regular Campaign']);
 
         $response = $this->get(route('frontend.campaigns.index', ['search' => 'Special']));
@@ -121,7 +121,7 @@ final class CampaignTest extends TestCase
 
     public function test_campaign_featured_page_loads(): void
     {
-        $featuredCampaigns = Campaign::factory()->count(3)->featured()->active()->create();
+        Campaign::factory()->count(3)->featured()->active()->create();
 
         $response = $this->get(route('frontend.campaigns.featured'));
 
@@ -132,7 +132,7 @@ final class CampaignTest extends TestCase
 
     public function test_campaign_by_type_page_loads(): void
     {
-        $emailCampaigns = Campaign::factory()->count(3)->email()->active()->create();
+        Campaign::factory()->count(3)->email()->active()->create();
 
         $response = $this->get(route('frontend.campaigns.by-type', 'email'));
 
@@ -144,7 +144,7 @@ final class CampaignTest extends TestCase
 
     public function test_campaign_search_page_loads(): void
     {
-        $campaigns = Campaign::factory()->count(3)->active()->create();
+        Campaign::factory()->count(3)->active()->create();
 
         $response = $this->get(route('frontend.campaigns.search', ['q' => 'test']));
 
@@ -232,21 +232,74 @@ final class CampaignTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertJson(['success' => true]);
+        // Assert the nested analytics payload reflects the normalized period contract and grouped insights.
         $response->assertJsonStructure([
             'success',
             'data' => [
-                'period',
-                'start_date',
-                'end_date',
-                'campaigns_created',
-                'campaigns_started',
-                'campaigns_completed',
-                'total_views',
-                'total_clicks',
-                'total_conversions',
-                'total_revenue',
-                'top_performing_campaigns',
-                'campaign_types_breakdown',
+                'period' => [
+                    'days',
+                    'label',
+                    'start_date',
+                    'end_date',
+                ],
+                'totals' => [
+                    'campaigns_created',
+                    'campaigns_started',
+                    'campaigns_completed',
+                    'active_campaigns',
+                ],
+                'insights' => [
+                    'views_clicks' => [
+                        'title',
+                        'description',
+                        'metrics' => [
+                            'total_views',
+                            'total_clicks',
+                            'average_click_through_rate',
+                            'top_campaigns',
+                        ],
+                    ],
+                    'conversions' => [
+                        'title',
+                        'description',
+                        'metrics' => [
+                            'total_conversions',
+                            'average_conversion_rate',
+                            'verified_conversions',
+                            'attributed_conversions',
+                            'assisted_conversion_value',
+                        ],
+                    ],
+                    'roi_tracking' => [
+                        'title',
+                        'description',
+                        'metrics' => [
+                            'total_revenue',
+                            'total_budget',
+                            'roi_percentage',
+                            'roas',
+                        ],
+                    ],
+                    'customer_journey' => [
+                        'title',
+                        'description',
+                        'metrics' => [
+                            'average_touchpoints',
+                            'average_time_on_site',
+                            'average_page_views',
+                            'funnel_breakdown',
+                        ],
+                    ],
+                    'a_b_testing' => [
+                        'title',
+                        'description',
+                        'metrics' => [
+                            'multi_variant_campaigns',
+                            'winning_variant',
+                            'variant_performance',
+                        ],
+                    ],
+                ],
             ],
         ]);
     }
