@@ -35,10 +35,17 @@ final class SystemSettingController extends Controller
             $query->where('group', $request->group);
         })->when($request->filled('search'), function ($query) use ($request): void {
             $query->searchable($request->search);
-        })->ordered()->get()->skipWhile(function ($setting) {
-            // Skip system settings that are not properly configured for display
-            return empty($setting->key) || ! $setting->is_active || ! $setting->is_public || empty($setting->group) || empty($setting->name);
-        })->paginate(20);
+        })->whereNotNull('key')
+            // Ensure the pagination query excludes settings missing a key
+            ->where('key', '!=', '')
+            // Ensure the pagination query excludes settings missing a group
+            ->whereNotNull('group')
+            ->where('group', '!=', '')
+            // Ensure the pagination query excludes settings missing a name
+            ->whereNotNull('name')
+            ->where('name', '!=', '')
+            ->ordered()
+            ->paginate(20);
 
         return view('system-settings.index', compact('categories', 'settings'));
     }
@@ -66,10 +73,18 @@ final class SystemSettingController extends Controller
     public function category(string $slug): View
     {
         $category = SystemSettingCategory::where('slug', $slug)->active()->firstOrFail();
-        $settings = $category->settings()->active()->public()->ordered()->get()->skipWhile(function ($setting) {
-            // Skip system settings that are not properly configured for display
-            return empty($setting->key) || ! $setting->is_active || ! $setting->is_public || empty($setting->group) || empty($setting->name);
-        })->paginate(20);
+        $settings = $category->settings()->active()->public()
+            ->whereNotNull('key')
+            // Ensure the pagination query excludes settings missing a key
+            ->where('key', '!=', '')
+            // Ensure the pagination query excludes settings missing a group
+            ->whereNotNull('group')
+            ->where('group', '!=', '')
+            // Ensure the pagination query excludes settings missing a name
+            ->whereNotNull('name')
+            ->where('name', '!=', '')
+            ->ordered()
+            ->paginate(20);
         $relatedCategories = SystemSettingCategory::active()->where('id', '!=', $category->id)->limit(5)->get();
 
         return view('system-settings.category', compact('category', 'settings', 'relatedCategories'));
@@ -80,10 +95,15 @@ final class SystemSettingController extends Controller
      */
     public function group(string $group): View
     {
-        $settings = SystemSetting::active()->public()->where('group', $group)->ordered()->get()->skipWhile(function ($setting) {
-            // Skip system settings that are not properly configured for display
-            return empty($setting->key) || ! $setting->is_active || ! $setting->is_public || empty($setting->group) || empty($setting->name);
-        })->paginate(20);
+        $settings = SystemSetting::active()->public()->where('group', $group)
+            ->whereNotNull('key')
+            // Ensure the pagination query excludes settings missing a key
+            ->where('key', '!=', '')
+            // Ensure the pagination query excludes settings missing a name
+            ->whereNotNull('name')
+            ->where('name', '!=', '')
+            ->ordered()
+            ->paginate(20);
         $categories = SystemSettingCategory::active()->withCount(['settings' => function ($query) use ($group): void {
             $query->where('group', $group)->active()->public();
         }])->having('settings_count', '>', 0)->get();
