@@ -43,7 +43,12 @@ final class ViewChannel extends ViewRecord implements HasTable
     {
         return $table
             // Present only the bound record so Livewire assertions and the UI stay in sync.
-            ->query(fn (): Builder => Channel::query()->whereKey($this->record))
+            ->query(
+                fn (): Builder => Channel::query()
+                    // Skip global scopes so archived or disabled channels remain reviewable in detail view.
+                    ->withoutGlobalScopes()
+                    ->whereKey($this->record),
+            )
             ->columns([
                 TextColumn::make('name')
                     ->label(__('admin.channels.name')),
@@ -51,6 +56,10 @@ final class ViewChannel extends ViewRecord implements HasTable
                     ->label(__('admin.channels.code')),
                 TextColumn::make('type')
                     ->label(__('admin.channels.type')),
+                TextColumn::make('timezone')
+                    ->label(__('admin.channels.timezone'))
+                    // Exposing timezone assists support teams diagnosing scheduling mismatches.
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('domain')
                     ->label(__('admin.channels.domain'))
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -60,8 +69,22 @@ final class ViewChannel extends ViewRecord implements HasTable
                 IconColumn::make('is_active')
                     ->label(__('admin.channels.is_active'))
                     ->boolean(),
+                IconColumn::make('ssl_enabled')
+                    ->label(__('admin.channels.ssl_enabled'))
+                    // Keeping SSL visibility ensures storefront security states are obvious on inspection.
+                    ->boolean()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                IconColumn::make('analytics_enabled')
+                    ->label(__('admin.channels.analytics_enabled'))
+                    // Allow toggling analytics visibility without overwhelming the default summary.
+                    ->boolean()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('sort_order')
                     ->label(__('admin.channels.sort_order')),
+                TextColumn::make('currency_code')
+                    ->label(__('admin.channels.currency_code'))
+                    // Matching the list view helps ensure the embedded table stays consistent.
+                    ->badge(),
             ])
             ->paginated(false);
     }
