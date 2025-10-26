@@ -10,14 +10,16 @@ use App\Models\Location;
 
 use function collect;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Validation\Rule;
 
 use function in_array;
 
-use Log;
+use Illuminate\Support\Facades\Log;
 
 use function strtolower;
 use function trim;
@@ -58,7 +60,8 @@ final class LocationController extends Controller
             if (in_array($value, ['yes', '1', 'true'], true)) {
                 $query->whereNotNull('latitude')->whereNotNull('longitude');
             } elseif (in_array($value, ['no', '0', 'false'], true)) {
-                $query->where(function ($builder): void {
+                $query->where(function (Builder $builder): void {
+                    // Ensure we capture records with at least one missing coordinate to satisfy the "no" filter.
                     $builder->whereNull('latitude')->orWhereNull('longitude');
                 });
             }
@@ -76,7 +79,8 @@ final class LocationController extends Controller
         if ($request->filled('search')) {
             $search = trim((string) $request->query('search'));
             if ($search !== '') {
-                $query->where(function ($builder) use ($search): void {
+                $query->where(function (Builder $builder) use ($search): void {
+                    // Apply the search filter across multiple columns to improve discoverability.
                     $builder
                         ->where('name', 'like', "%{$search}%")
                         ->orWhere('code', 'like', "%{$search}%")
@@ -111,8 +115,9 @@ final class LocationController extends Controller
         return response()->json($locations);
     }
 
-    public function create(): \Illuminate\Http\Response
+    public function create(): Response
     {
+        // Returning a simple placeholder response until a dedicated view is introduced.
         return response('Create Location Page');
     }
 
@@ -148,10 +153,11 @@ final class LocationController extends Controller
         ]);
     }
 
-    public function edit(int $location): \Illuminate\Http\Response
+    public function edit(int $location): Response
     {
         $record = Location::withoutGlobalScopes()->findOrFail($location);
 
+        // Provide a placeholder response that at least confirms which record was loaded for editing.
         return response("Edit Location: {$record->name}");
     }
 

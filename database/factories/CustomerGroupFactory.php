@@ -29,7 +29,12 @@ final class CustomerGroupFactory extends Factory
             'slug'                => $this->faker->slug(),
             'discount_percentage' => $this->faker->randomFloat(2, 0, 50),
             'is_enabled'          => $this->faker->boolean(80),
-            'conditions'          => [],
+            // Provide sensible B2B defaults so credit limits and terms based
+            // assertions in tests have data to interact with out of the box.
+            'minimum_order_amount' => $this->faker->randomFloat(2, 0, 500),
+            'credit_limit'         => $this->faker->randomFloat(2, 0, 10000),
+            'payment_terms'        => $this->faker->randomElement(['net_30', 'net_45', 'net_60']),
+            'conditions'           => [],
         ];
 
         // Only include the JSON metadata payload when the backing table exposes the column to

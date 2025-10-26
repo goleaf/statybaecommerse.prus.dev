@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services\Discounts;
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -26,7 +27,7 @@ class DiscountEngine
         $now = $context['now'] ?? now();
         $candidateDiscounts = $this->collectCandidates($context, $now);
         $eligibleDiscounts = $this->filterEligibility($candidateDiscounts, $context, $now);
-        $calculated = $this->computeEffects($eligibleDiscounts, $context);
+        $calculated = $this->computeEffects($eligibleDiscounts, $context, $now);
         $final = $this->applyStackingAndPriority($calculated, $context);
         // Debug logging
         if (app()->bound('debugbar.discount')) {
@@ -59,13 +60,11 @@ class DiscountEngine
                 app('debugbar.discount')->logCacheOperation($cacheKey, $isHit, $cached);
             }
 
-            return Cache::tags(['discounts'])->remember($cacheKey, now()->addMinutes(3), function () use ($now) {
-                return collect(DB::table('discounts')->where('status', 'active')->where(function ($q) use ($now) {
-                    $q->whereNull('starts_at')->orWhere('starts_at', '<=', $now);
-                })->where(function ($q) use ($now) {
-                    $q->whereNull('ends_at')->orWhere('ends_at', '>=', $now);
-                })->orderBy('priority')->get());
-            });
+            return Cache::tags(['discounts'])->remember($cacheKey, now()->addMinutes(3), fn (): \Illuminate\Support\Collection => collect(DB::table('discounts')->where('status', 'active')->where(function ($q) use ($now): void {
+                $q->whereNull('starts_at')->orWhere('starts_at', '<=', $now);
+            })->where(function ($q) use ($now): void {
+                $q->whereNull('ends_at')->orWhere('ends_at', '>=', $now);
+            })->orderBy('priority')->get()));
         } else {
             // Fallback for cache stores that don't support tagging
             $cached = Cache::get($cacheKey);
@@ -75,13 +74,11 @@ class DiscountEngine
                 app('debugbar.discount')->logCacheOperation($cacheKey, $isHit, $cached);
             }
 
-            return Cache::remember($cacheKey, now()->addMinutes(3), function () use ($now) {
-                return collect(DB::table('discounts')->where('status', 'active')->where(function ($q) use ($now) {
-                    $q->whereNull('starts_at')->orWhere('starts_at', '<=', $now);
-                })->where(function ($q) use ($now) {
-                    $q->whereNull('ends_at')->orWhere('ends_at', '>=', $now);
-                })->orderBy('priority')->get());
-            });
+            return Cache::remember($cacheKey, now()->addMinutes(3), fn (): \Illuminate\Support\Collection => collect(DB::table('discounts')->where('status', 'active')->where(function ($q) use ($now): void {
+                $q->whereNull('starts_at')->orWhere('starts_at', '<=', $now);
+            })->where(function ($q) use ($now): void {
+                $q->whereNull('ends_at')->orWhere('ends_at', '>=', $now);
+            })->orderBy('priority')->get()));
         }
     }
 
@@ -95,7 +92,7 @@ class DiscountEngine
         $currency = data_get($context, 'currency_code');
         $channelId = data_get($context, 'channel_id');
         $userId = data_get($context, 'user_id');
-        $groupIds = collect(data_get($context, 'group_ids', []))->map(fn ($v) => (int) $v)->filter()->values();
+        $groupIds = collect(data_get($context, 'group_ids', []))->map(fn ($v): int => (int) $v)->filter()->values();
         if ($groupIds->isEmpty() && $userId) {
             $groupIds = DB::table('customer_group_user')->where('user_id', $userId)->pluck('group_id');
         }
@@ -105,9 +102,26 @@ class DiscountEngine
         }
 
         // Honor weekday/time windows, currency/channel restrictions; first order; customer groups; per-day limit
-        return $discounts->filter(function ($d) use ($now, $currency, $channelId, $userId, $groupIds, $partnerTier) {
+        return $discounts->filter(function ($d) use ($now, $currency, $channelId, $userId, $groupIds, $partnerTier): bool {
+            // Guard against exhausted global usage limits before performing heavier checks.
+            if (isset($d->usage_limit, $d->usage_count) && $d->usage_limit !== null && (int) $d->usage_count >= (int) $d->usage_limit) {
+                return false;
+            }
+
+            // Enforce per customer usage caps leveraging the redemption history table.
+            if ($userId && ! empty($d->per_customer_limit)) {
+                $alreadyUsed = DB::table('discount_redemptions')
+                    ->where('discount_id', $d->id)
+                    ->where('user_id', $userId)
+                    ->count();
+
+                if ($alreadyUsed >= (int) $d->per_customer_limit) {
+                    return false;
+                }
+            }
+
             if (! empty($d->weekday_mask)) {
-                $allowed = collect(explode(',', $d->weekday_mask))->filter()->map(fn ($v) => (int) $v);
+                $allowed = collect(explode(',', (string) $d->weekday_mask))->filter()->map(fn ($v): int => (int) $v);
                 if (! $allowed->contains((int) $now->dayOfWeekIso)) {
                     return false;
                 }
@@ -156,7 +170,7 @@ class DiscountEngine
                 $allowed = collect($values)->map(function ($v) {
                     $arr = is_string($v) ? json_decode($v, true) : (array) $v;
 
-                    return collect($arr)->map(fn ($x) => (int) $x);
+                    return collect($arr)->map(fn ($x): int => (int) $x);
                 })->flatten()->filter()->values();
                 if ($allowed->isNotEmpty() && $groupIds->intersect($allowed)->isEmpty()) {
                     return false;
@@ -169,7 +183,7 @@ class DiscountEngine
                 $allowedUserIds = collect($values)->map(function ($v) {
                     $arr = is_string($v) ? json_decode($v, true) : (array) $v;
 
-                    return collect($arr)->map(fn ($x) => (int) $x);
+                    return collect($arr)->map(fn ($x): int => (int) $x);
                 })->flatten()->filter()->values();
                 if ($allowedUserIds->isNotEmpty() && ! $allowedUserIds->contains((int) $userId)) {
                     return false;
@@ -182,8 +196,8 @@ class DiscountEngine
                 $allowedTiers = collect($values)->map(function ($v) {
                     $arr = is_string($v) ? json_decode($v, true) : (array) $v;
 
-                    return collect($arr)->map(fn ($x) => (string) $x);
-                })->flatten()->filter()->values()->map(fn ($v) => strtolower($v));
+                    return collect($arr)->map(fn ($x): string => (string) $x);
+                })->flatten()->filter()->values()->map(strtolower(...));
                 if ($allowedTiers->isNotEmpty() && strtolower((string) $partnerTier) !== '' && ! $allowedTiers->contains(strtolower((string) $partnerTier))) {
                     return false;
                 }
@@ -196,11 +210,12 @@ class DiscountEngine
     /**
      * Handle computeEffects functionality with proper error handling.
      */
-    protected function computeEffects(Collection $eligible, array $context): array
+    protected function computeEffects(Collection $eligible, array $context, $now): array
     {
         $subtotal = (float) data_get($context, 'cart.subtotal', 0);
         $shippingBase = (float) data_get($context, 'shipping.base_amount', 0);
         $code = strtoupper((string) data_get($context, 'code'));
+        $userId = (int) data_get($context, 'user_id', 0);
         $items = collect(data_get($context, 'cart.items', []));
         // Preload product attributes for scoping
         $productIds = $items->pluck('product_id')->filter()->unique()->values();
@@ -213,9 +228,9 @@ class DiscountEngine
         $cartDiscounts = [];
         foreach ($eligible as $d) {
             // If a code is provided, require a matching code record for this discount
-            if ($code) {
-                $hasCode = DB::table('discount_codes')->where('discount_id', $d->id)->whereRaw('UPPER(code) = ?', [$code])->exists();
-                if (! $hasCode) {
+            if ($code !== '' && $code !== '0') {
+                $codeRow = $this->findUsableCode($d->id, $code, $now, $userId);
+                if (! $codeRow) {
                     continue;
                 }
             }
@@ -225,6 +240,10 @@ class DiscountEngine
             $hasLineScope = $conditions->whereIn('type', $lineScopeTypes)->isNotEmpty();
             $cartTotalCond = $conditions->firstWhere('type', 'cart_total');
             $itemQtyCond = $conditions->firstWhere('type', 'item_qty');
+            $minimumAmount = $this->extractNumericValue($d->minimum_amount ?? $d->min_required ?? null);
+            if ($minimumAmount !== null && $subtotal < $minimumAmount) {
+                continue;
+            }
             // Threshold checks
             if ($cartTotalCond && ! $this->compareOperator($subtotal, $cartTotalCond->operator, $cartTotalCond->value)) {
                 continue;
@@ -250,6 +269,9 @@ class DiscountEngine
                     } elseif ($d->type === 'fixed') {
                         // fixed per line total, capped
                         $lineAmount = min($lineTotal, (float) $d->value);
+                    } elseif ($d->type === 'free_shipping') {
+                        // Free-shipping codes do not touch line totals directly.
+                        $lineAmount = 0.0;
                     } elseif ($d->type === 'bogo') {
                         // BOGO handled after scanning all matched items; skip here
                         $lineAmount = 0.0;
@@ -277,7 +299,7 @@ class DiscountEngine
                             $unitPrices[] = (float) $it['unit_price'];
                         }
                     }
-                    if (! empty($unitPrices)) {
+                    if ($unitPrices !== []) {
                         sort($unitPrices);
                         // ascending for cheapest free
                         $setSize = $buyQty + $getQty;
@@ -302,6 +324,9 @@ class DiscountEngine
                     $amount = round($subtotal * ((float) $d->value / 100), 2);
                 } elseif ($d->type === 'fixed') {
                     $amount = (float) $d->value;
+                } elseif ($d->type === 'free_shipping') {
+                    // Free shipping discounts only influence the shipping charge.
+                    $amount = 0.0;
                 } elseif ($d->type === 'bogo') {
                     // If no line scope, consider entire cart for BOGO
                     $meta = is_string($d->metadata ?? null) ? json_decode($d->metadata, true) : (array) ($d->metadata ?? []);
@@ -315,7 +340,7 @@ class DiscountEngine
                             $unitPrices[] = (float) $it['unit_price'];
                         }
                     }
-                    if (! empty($unitPrices)) {
+                    if ($unitPrices !== []) {
                         sort($unitPrices);
                         $freeUnits = intdiv(count($unitPrices), $buyQty + $getQty) * $getQty;
                         $bogoAmount = 0.0;
@@ -333,11 +358,11 @@ class DiscountEngine
                 $discountAmount += $amount;
                 $applied[] = ['id' => $d->id, 'amount' => $amount];
             }
-            if (! empty($d->free_shipping) || ! empty($d->applies_to_shipping)) {
+            if ($d->type === 'free_shipping' || ! empty($d->free_shipping) || ! empty($d->applies_to_shipping)) {
                 // Optional cap from metadata: {"shipping_cap_amount": 4.99}
                 $meta = is_string($d->metadata ?? null) ? json_decode($d->metadata, true) : (array) ($d->metadata ?? []);
                 $cap = isset($meta['shipping_cap_amount']) ? (float) $meta['shipping_cap_amount'] : null;
-                if (! empty($d->free_shipping)) {
+                if ($d->type === 'free_shipping' || ! empty($d->free_shipping)) {
                     $shippingDiscount = max($shippingDiscount, $shippingBase);
                 } elseif ($cap !== null) {
                     // Cap shipping to a fixed amount when base is higher
@@ -363,16 +388,103 @@ class DiscountEngine
      */
     protected function compareOperator($left, string $operator, $rawValue): bool
     {
-        $value = is_numeric($rawValue) ? Number::parseFloat($rawValue) : Number::parseFloat(is_string($rawValue) ? json_decode($rawValue, true) : $rawValue);
+        // Normalise the raw condition payload into a comparable float when possible.
+        $value = $this->extractNumericValue($rawValue);
+        if ($value === null) {
+            return true;
+        }
 
         return match ($operator) {
-            'equals_to'     => (float) $left == $value,
-            'not_equals_to' => (float) $left != $value,
-            'less_than'     => (float) $left < $value,
-            'greater_than'  => (float) $left > $value,
+            'equals_to'             => (float) $left === $value,
+            'not_equals_to'         => (float) $left !== $value,
+            'less_than'             => (float) $left < $value,
+            'less_than_or_equal'    => (float) $left <= $value,
+            'greater_than'          => (float) $left > $value,
+            'greater_than_or_equal' => (float) $left >= $value,
             'starts_with', 'ends_with', 'contains', 'not_contains' => true,
             default => true,
         };
+    }
+
+    /**
+     * Attempt to resolve a usable discount code taking global and per-user limits into account.
+     */
+    protected function findUsableCode(int $discountId, string $code, $now, int $userId = 0): ?object
+    {
+        // Fetch the candidate code row using a case-insensitive comparison for safety.
+        $codeRow = DB::table('discount_codes')
+            ->where('discount_id', $discountId)
+            ->whereRaw('UPPER(code) = ?', [$code])
+            ->first();
+
+        if (! $codeRow) {
+            return null;
+        }
+
+        // Respect activation flags and lifecycle windows before counting usage.
+        if (property_exists($codeRow, 'is_active') && ! $codeRow->is_active) {
+            return null;
+        }
+        if (property_exists($codeRow, 'status') && $codeRow->status !== 'active') {
+            return null;
+        }
+        if (! empty($codeRow->starts_at) && $now->lt($codeRow->starts_at)) {
+            return null;
+        }
+        if (! empty($codeRow->expires_at) && $now->gt($codeRow->expires_at)) {
+            return null;
+        }
+
+        // Honour global usage limits stored either as usage_limit or legacy max_uses columns.
+        $usageLimit = $codeRow->usage_limit ?? $codeRow->max_uses ?? null;
+        $usageCount = $codeRow->usage_count ?? 0;
+        if ($usageLimit !== null && (int) $usageCount >= (int) $usageLimit) {
+            return null;
+        }
+
+        // Enforce per-user limits if a user is present.
+        $perUserLimit = $codeRow->usage_limit_per_user ?? null;
+        if ($userId > 0 && $perUserLimit) {
+            $perUserUsage = DB::table('discount_redemptions')
+                ->where('code_id', $codeRow->id)
+                ->where('user_id', $userId)
+                ->count();
+
+            if ($perUserUsage >= (int) $perUserLimit) {
+                return null;
+            }
+        }
+
+        return $codeRow;
+    }
+
+    /**
+     * Convert mixed condition payloads into a float while keeping backwards compatibility.
+     */
+    protected function extractNumericValue($raw): ?float
+    {
+        // Decode JSON strings that may wrap numeric payloads (e.g., stored arrays).
+        if (is_string($raw)) {
+            $decoded = json_decode($raw, true);
+            if (json_last_error() === JSON_ERROR_NONE) {
+                $raw = $decoded;
+            }
+        }
+
+        if (is_array($raw)) {
+            // Pull common keys first then fall back to the first scalar value.
+            $raw = Arr::get($raw, 'amount', Arr::get($raw, 'value', Arr::first(Arr::where($raw, is_scalar(...)))));
+        }
+
+        if ($raw === null || $raw === '') {
+            return null;
+        }
+
+        if (! is_numeric($raw)) {
+            return null;
+        }
+
+        return Number::parseFloat((string) $raw);
     }
 
     /**
@@ -386,7 +498,7 @@ class DiscountEngine
         // Evaluate basic ANY semantics across provided scope conditions
         $productId = (int) ($item['product_id'] ?? 0);
         $brandId = (int) ($productToBrand[$productId] ?? 0);
-        $categoryIds = collect($productToCategories[$productId] ?? [])->map(fn ($v) => (int) $v);
+        $categoryIds = collect($productToCategories[$productId] ?? [])->map(fn ($v): int => (int) $v);
         foreach ($conditions as $cond) {
             $values = is_string($cond->value) ? json_decode($cond->value, true) : (array) $cond->value;
             switch ($cond->type) {
@@ -401,7 +513,7 @@ class DiscountEngine
                     }
                     break;
                 case 'category':
-                    if ($categoryIds->intersect(collect($values)->map(fn ($v) => (int) $v))->isNotEmpty()) {
+                    if ($categoryIds->intersect(collect($values)->map(fn ($v): int => (int) $v))->isNotEmpty()) {
                         return true;
                     }
                     break;
@@ -433,7 +545,7 @@ class DiscountEngine
         }
         // If any exclusive discount applied, keep only that one with max amount
         // (requires discount record; re-fetch minimal info)
-        $appliedWithFlags = $applied->map(function ($a) {
+        $appliedWithFlags = $applied->map(function (array $a): array {
             $d = DB::table('discounts')->select('id', 'exclusive', 'stacking_policy')->where('id', (int) $a['id'])->first();
 
             return array_merge($a, ['exclusive' => (bool) data_get($d, 'exclusive', false), 'stacking_policy' => data_get($d, 'stacking_policy', 'stack')]);
@@ -447,7 +559,7 @@ class DiscountEngine
             return $calculated;
         }
         // If single_best policy anywhere, keep only max amount
-        if ($appliedWithFlags->contains(fn ($a) => ($a['stacking_policy'] ?? 'stack') === 'single_best')) {
+        if ($appliedWithFlags->contains(fn ($a): bool => ($a['stacking_policy'] ?? 'stack') === 'single_best')) {
             $best = $appliedWithFlags->sortByDesc('amount')->first();
             $calculated['applied'] = [$best];
             $calculated['discount_total_amount'] = round((float) $best['amount'], 2);

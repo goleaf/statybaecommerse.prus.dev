@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Models\Discount;
-use App\Models\Order;
 use App\Models\Referral;
 use App\Models\ReferralCode;
 use App\Models\ReferralStatistics;
@@ -29,12 +27,15 @@ final class ReferralService
     /**
      * Handle createReferral functionality with proper error handling.
      */
-    public function createReferral(int $referrerId, int $referredId, ?string $referralCode = null): ?Referral
+    public function createReferral(int $referrerId, int $referredId, ?string $referralCode = null, array $context = []): ?Referral
     {
         try {
             // Validate users exist
             $referrer = User::findOrFail($referrerId);
             $referred = User::findOrFail($referredId);
+            if (config('referral.prevent_self_referral', true) && $referrer->id === $referred->id) {
+                throw new Exception('Users cannot refer themselves');
+            }
             // Check if user was already referred
             if (Referral::userAlreadyReferred($referredId)) {
                 throw new Exception('User has already been referred');
@@ -43,15 +44,19 @@ final class ReferralService
             if (! Referral::canUserRefer($referrerId)) {
                 throw new Exception('Referrer has reached referral limit');
             }
-            // Generate referral code if not provided
-            if (! $referralCode) {
-                $referralCode = $this->referralCodeService->generateUniqueCode();
-            }
+            // Resolve the referral code so every referral is tied to the
+            // referrer's reusable unique code record.
+            $code = $this->resolveReferralCode($referrer, $referralCode);
+            // Prepare attribution payload with campaign metadata and tracking.
+            $attributes = array_merge(
+                ['referrer_id' => $referrerId, 'referred_id' => $referredId, 'referral_code' => $code->code, 'status' => 'pending', 'expires_at' => now()->addDays((int) config('referral.referral_expiration_days', 30))],
+                $this->extractAttributionContext($context)
+            );
             // Create referral
-            $referral = Referral::create(['referrer_id' => $referrerId, 'referred_id' => $referredId, 'referral_code' => $referralCode, 'status' => 'pending', 'expires_at' => now()->addDays(30)]);
+            $referral = Referral::create($attributes);
             // Update statistics
             $this->updateReferralStatistics($referrerId, 'increment_referrals');
-            Log::info('Referral created', ['referral_id' => $referral->id, 'referrer_id' => $referrerId, 'referred_id' => $referredId, 'referral_code' => $referralCode]);
+            Log::info('Referral created', ['referral_id' => $referral->id, 'referrer_id' => $referrerId, 'referred_id' => $referredId, 'referral_code' => $code->code]);
 
             return $referral;
         } catch (Exception $e) {
@@ -96,12 +101,26 @@ final class ReferralService
      */
     private function createReferralRewards(Referral $referral, int $orderId): void
     {
-        // Create 5% discount for referred user (first order only)
-        $this->referralRewardService->createReferredDiscount($referral->id, $referral->referred_id, $orderId, 5.0);
-        // Create bonus for referrer (optional - can be configured)
-        $referrerBonus = config('referral.referrer_bonus_amount', 0);
+        // Create discount for referred user (first order only) using the configured percentage.
+        $discountPercentage = (float) config('referral.referred_discount_percentage', 5.0);
+        $referredReward = $this->referralRewardService->createReferredDiscount($referral->id, $referral->referred_id, $orderId, $discountPercentage);
+        if ($referredReward) {
+            $this->updateReferralStatistics($referral->referrer_id, 'add_discount', (float) $referredReward->amount);
+        }
+
+        // Promote the referrer into the tiered reward ladder and persist the bonus.
+        $tierReward = $this->referralRewardService->createTieredReferrerReward($referral);
+        if ($tierReward) {
+            $this->updateReferralStatistics($referral->referrer_id, 'add_reward', (float) $tierReward->amount);
+        }
+
+        // Maintain backward compatibility with fixed bonus configuration when supplied.
+        $referrerBonus = (float) config('referral.referrer_bonus_amount', 0);
         if ($referrerBonus > 0) {
-            $this->referralRewardService->createReferrerBonus($referral->id, $referral->referrer_id, $referrerBonus);
+            $manualReward = $this->referralRewardService->createReferrerBonus($referral->id, $referral->referrer_id, $referrerBonus, ['category' => 'credit', 'currency' => config('referral.referrer_bonus_currency', 'EUR')]);
+            if ($manualReward) {
+                $this->updateReferralStatistics($referral->referrer_id, 'add_reward', (float) $manualReward->amount);
+            }
         }
     }
 
@@ -149,7 +168,7 @@ final class ReferralService
     /**
      * Handle updateReferralStatistics functionality with proper error handling.
      */
-    private function updateReferralStatistics(int $userId, string $action): void
+    private function updateReferralStatistics(int $userId, string $action, float $value = 0.0): void
     {
         $today = now()->toDateString();
         try {
@@ -157,14 +176,56 @@ final class ReferralService
             match ($action) {
                 'increment_referrals' => $stats->incrementReferrals(),
                 'complete_referral'   => $stats->completeReferral(),
-                'add_reward'          => $stats->addRewardEarned(0),
-                // Amount will be set separately
-                'add_discount' => $stats->addDiscountGiven(0),
+                'add_reward'          => $value > 0 ? $stats->addRewardEarned($value) : null,
+                'add_discount'        => $value > 0 ? $stats->addDiscountGiven($value) : null,
             };
         } catch (Exception $e) {
             // Log the error but don't fail the referral completion
             Log::warning('Failed to update referral statistics', ['user_id' => $userId, 'action' => $action, 'error' => $e->getMessage()]);
         }
+    }
+
+    /**
+     * Resolve a reusable referral code for the given referrer, ensuring we never
+     * create orphaned codes and that provided codes belong to the user.
+     */
+    private function resolveReferralCode(User $referrer, ?string $referralCode): ReferralCode
+    {
+        if ($referralCode) {
+            $code = ReferralCode::findByCode($referralCode);
+            if (! $code || $code->user_id !== $referrer->id || ! $code->isValid()) {
+                throw new Exception('Invalid referral code provided');
+            }
+
+            return $code;
+        }
+
+        $generated = $this->generateReferralCodeForUser($referrer->id);
+        if (! $generated) {
+            throw new Exception('Unable to generate referral code for user');
+        }
+
+        return $generated;
+    }
+
+    /**
+     * Extract attribution metadata from the incoming context payload, limiting
+     * persisted fields to the columns supported by the referrals table.
+     */
+    private function extractAttributionContext(array $context): array
+    {
+        $allowedKeys = ['source', 'campaign', 'utm_source', 'utm_medium', 'utm_campaign', 'ip_address', 'user_agent'];
+        $attributes = [];
+        foreach ($allowedKeys as $key) {
+            if (array_key_exists($key, $context) && $context[$key] !== null) {
+                $attributes[$key] = $context[$key];
+            }
+        }
+        if (isset($context['metadata']) && is_array($context['metadata'])) {
+            $attributes['metadata'] = $context['metadata'];
+        }
+
+        return $attributes;
     }
 
     /**

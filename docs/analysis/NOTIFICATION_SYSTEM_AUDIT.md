@@ -1,0 +1,18 @@
+# Notification System Audit
+
+## Summary
+- Notification payloads now surface canonical category metadata that aligns with system requirements while preserving legacy keys for backward compatibility.【F:config/notifications.php†L1-L28】【F:app/Data/Notifications/NotificationPayloadData.php†L16-L77】
+- A dedicated resolver harmonises disparate notification hints (payload fields and class names) into the standard categories for analytics and filtering.【F:app/Support/Notifications/NotificationCategoryResolver.php†L7-L86】
+- Unit coverage verifies canonical category resolution and ensures existing context/metadata accessors continue to behave as expected.【F:tests/Unit/Data/Notifications/NotificationPayloadDataTest.php†L13-L54】【F:tests/Unit/Notifications/NotificationDataTest.php†L15-L57】
+
+## Category Normalisation
+- The new `config/notifications.php` map defines the six primary categories—System Notifications, User Notifications, Email Campaigns, Newsletter, Order Updates, and Stock Alerts—each with descriptive text and alias support so legacy payloads (e.g., `order`, `stock`) resolve consistently.【F:config/notifications.php†L4-L27】
+- `NotificationCategoryResolver::resolve()` first checks explicit payload hints (`type`, `category`, `notification_type`) before analysing the notification class name, returning a canonical key, label, and description for downstream consumers.【F:app/Support/Notifications/NotificationCategoryResolver.php†L19-L56】
+
+## Payload Enhancements
+- `NotificationPayloadData::fromModel()` trims noise from persisted metadata, hydrates readable timestamps, and now records both the original legacy type and the canonical category tuple in the serialized payload.【F:app/Data/Notifications/NotificationPayloadData.php†L32-L75】【F:app/Data/Notifications/NotificationPayloadData.php†L83-L105】
+- `toArray()` exposes `notification_type`, `category_key`, and human-readable labels while retaining the original `type`/`category` fields for existing UI widgets and API clients; metadata duplicates are removed to keep `meta` lean.【F:app/Data/Notifications/NotificationPayloadData.php†L43-L105】
+
+## Verification
+- Tests confirm that order notifications map to `order_updates` with the expected labels/descriptions and that legacy metadata/tags remain intact.【F:tests/Unit/Data/Notifications/NotificationPayloadDataTest.php†L16-L42】
+- Additional coverage ensures class-name inference works when payloads omit an explicit type and that the broader notification data DTO continues to serialise context fields correctly.【F:tests/Unit/Data/Notifications/NotificationPayloadDataTest.php†L44-L54】【F:tests/Unit/Notifications/NotificationDataTest.php†L35-L57】

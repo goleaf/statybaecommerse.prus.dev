@@ -3,6 +3,10 @@
 @section('title', __('seo_data.title'))
 
 @section('content')
+@php
+    // Normalise the expected filter payload so the view can safely reference each value.
+    $activeFilters = array_merge(['search' => null, 'locale' => null, 'type' => null], $filters ?? []);
+@endphp
 <div class="container mx-auto px-4 py-8">
     <div class="mb-8">
         <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">
@@ -20,10 +24,10 @@
                 <label for="search" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     {{ __('seo_data.search') }}
                 </label>
-                <input type="text" 
-                       id="search" 
-                       name="search" 
-                       value="{{ request('search') }}"
+                <input type="text"
+                       id="search"
+                       name="search"
+                       value="{{ $activeFilters['search'] ?? '' }}"
                        class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
                        placeholder="{{ __('seo_data.search_placeholder') }}">
             </div>
@@ -32,12 +36,12 @@
                 <label for="locale" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     {{ __('seo_data.locale') }}
                 </label>
-                <select id="locale" 
-                        name="locale" 
+                <select id="locale"
+                        name="locale"
                         class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white">
                     <option value="">{{ __('seo_data.all_locales') }}</option>
-                    <option value="lt" {{ request('locale') === 'lt' ? 'selected' : '' }}>{{ __('seo_data.lithuanian') }}</option>
-                    <option value="en" {{ request('locale') === 'en' ? 'selected' : '' }}>{{ __('seo_data.english') }}</option>
+                    <option value="lt" {{ ($activeFilters['locale'] ?? null) === 'lt' ? 'selected' : '' }}>{{ __('seo_data.lithuanian') }}</option>
+                    <option value="en" {{ ($activeFilters['locale'] ?? null) === 'en' ? 'selected' : '' }}>{{ __('seo_data.english') }}</option>
                 </select>
             </div>
 
@@ -45,13 +49,13 @@
                 <label for="type" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     {{ __('seo_data.type') }}
                 </label>
-                <select id="type" 
-                        name="type" 
+                <select id="type"
+                        name="type"
                         class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white">
                     <option value="">{{ __('seo_data.all_types') }}</option>
-                    <option value="App\Models\Product" {{ request('type') === 'App\Models\Product' ? 'selected' : '' }}>{{ __('seo_data.products') }}</option>
-                    <option value="App\Models\Category" {{ request('type') === 'App\Models\Category' ? 'selected' : '' }}>{{ __('seo_data.categories') }}</option>
-                    <option value="App\Models\Brand" {{ request('type') === 'App\Models\Brand' ? 'selected' : '' }}>{{ __('seo_data.brands') }}</option>
+                    <option value="App\Models\Product" {{ ($activeFilters['type'] ?? null) === 'App\Models\Product' ? 'selected' : '' }}>{{ __('seo_data.products') }}</option>
+                    <option value="App\Models\Category" {{ ($activeFilters['type'] ?? null) === 'App\Models\Category' ? 'selected' : '' }}>{{ __('seo_data.categories') }}</option>
+                    <option value="App\Models\Brand" {{ ($activeFilters['type'] ?? null) === 'App\Models\Brand' ? 'selected' : '' }}>{{ __('seo_data.brands') }}</option>
                 </select>
             </div>
 

@@ -37,13 +37,13 @@
     @else
         <div class="bg-white shadow overflow-hidden sm:rounded-md">
             <ul class="divide-y divide-gray-200">
-                @foreach($settings as $key => $value)
+                @foreach($settings as $entry)
                     <li class="px-6 py-4">
                         <div class="flex items-center justify-between">
                             <div class="flex-1 min-w-0">
                                 <div class="flex items-center justify-between">
                                     <p class="text-sm font-medium text-gray-900 truncate">
-                                        {{ $key }}
+                                        {{ $entry->key }}
                                     </p>
                                     <div class="ml-2 flex-shrink-0 flex">
                                         @if($showPublicOnly)
@@ -55,7 +55,7 @@
                                 </div>
                                 <div class="mt-1">
                                     <p class="text-sm text-gray-500">
-                                        {{ $this->formatValue($value) }}
+                                        {{ $this->formatValue($entry->value) }}
                                     </p>
                                 </div>
                             </div>

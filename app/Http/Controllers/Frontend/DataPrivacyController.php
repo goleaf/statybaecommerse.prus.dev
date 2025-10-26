@@ -13,6 +13,7 @@ use App\Models\Review;
 use App\Models\User;
 use App\Models\UserWishlist;
 use App\Models\WishlistItem;
+use App\Support\Audit\AdminActivityLogger;
 use Illuminate\Contracts\Auth\StatefulGuard;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\RedirectResponse;
@@ -23,6 +24,12 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 final class DataPrivacyController extends Controller
 {
+    /**
+     * Inject the audit logger so GDPR flows automatically register activity
+     * trail entries across both the bespoke admin logs and Spatie activity log.
+     */
+    public function __construct(private readonly AdminActivityLogger $activityLogger) {}
+
     public function export(Request $request): StreamedResponse
     {
         $user = $request->user();
@@ -251,6 +258,27 @@ final class DataPrivacyController extends Controller
         $fileKey = is_scalar($userKey) ? (string) $userKey : '';
         $fileName = sprintf('personal-data-%s-%s.json', $fileKey, now()->format('YmdHis'));
 
+        // Persist an audit record summarising the export operation so privacy
+        // reviews can trace which datasets were shared with the requester.
+        $this->activityLogger->log(
+            $user,
+            'gdpr_data_export',
+            $user,
+            [],
+            [
+                'exported_records' => [
+                    'addresses' => $addresses->count(),
+                    'orders'    => $orders->count(),
+                    'reviews'   => $reviews->count(),
+                    'wishlist'  => $wishlistProducts->count(),
+                ],
+            ],
+            [
+                'channel' => 'frontend',
+                'locale'  => app()->getLocale(),
+            ]
+        );
+
         return response()->streamDownload(static function () use ($payload): void {
             echo json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
         }, $fileName, ['Content-Type' => 'application/json']);
@@ -259,6 +287,14 @@ final class DataPrivacyController extends Controller
     public function destroy(DeleteAccountRequest $request): RedirectResponse
     {
         $user = $request->user();
+
+        // Capture the pre-anonymisation profile to document what changed during
+        // the deletion process for compliance reviews.
+        $originalSnapshot = [
+            'name'             => $user?->getAttribute('name'),
+            'email'            => $user?->getAttribute('email'),
+            'privacy_settings' => (array) $user?->getAttribute('privacy_settings'),
+        ];
 
         DB::transaction(static function () use ($user): void {
             /** @var User $account */
@@ -296,6 +332,29 @@ final class DataPrivacyController extends Controller
 
             $account->delete();
         });
+
+        $user?->refresh();
+
+        // Record the anonymisation event before tearing down the session so
+        // staff can audit who initiated the deletion and what data changed.
+        if ($user instanceof User) {
+            $this->activityLogger->log(
+                $user,
+                'gdpr_account_deletion',
+                $user,
+                ['profile' => $originalSnapshot],
+                [
+                    'profile' => [
+                        'name'             => $user->getAttribute('name'),
+                        'email'            => $user->getAttribute('email'),
+                        'privacy_settings' => (array) $user->getAttribute('privacy_settings'),
+                    ],
+                ],
+                [
+                    'channel' => 'frontend',
+                ]
+            );
+        }
 
         /** @var StatefulGuard $guard */
         $guard = Auth::guard();

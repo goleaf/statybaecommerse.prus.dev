@@ -14,5 +14,6 @@ return [
         'numeric' => 'The :attribute may not be greater than :max.',
     ],
     'unique'     => 'The :attribute has already been taken.',
+    'exists'     => 'The selected :attribute is invalid.',
     'attributes' => [],
 ];

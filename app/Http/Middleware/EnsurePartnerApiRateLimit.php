@@ -52,8 +52,11 @@ final class EnsurePartnerApiRateLimit
         $response = $next($request);
 
         $remaining = RateLimiter::remaining($rateLimiterKey, $limit);
+
+        // Surface limit metadata so clients can gracefully throttle subsequent requests.
         $response->headers->set('X-RateLimit-Limit', (string) $limit);
         $response->headers->set('X-RateLimit-Remaining', (string) max(0, $remaining));
+        $response->headers->set('X-RateLimit-Reset', (string) $this->rateLimitResetTimestamp($rateLimiterKey, $decaySeconds));
 
         return $response;
     }
@@ -93,8 +96,11 @@ final class EnsurePartnerApiRateLimit
         $response = $next($request);
 
         $remaining = RateLimiter::remaining($signature, $maxAttempts);
+
+        // Align legacy responses with the modern contract so headers remain consistent across pipelines.
         $response->headers->set('X-RateLimit-Limit', (string) $maxAttempts);
         $response->headers->set('X-RateLimit-Remaining', (string) max(0, $remaining));
+        $response->headers->set('X-RateLimit-Reset', (string) $this->rateLimitResetTimestamp($signature, $decaySeconds));
 
         return $response;
     }
@@ -119,8 +125,24 @@ final class EnsurePartnerApiRateLimit
         $response->headers->set('Retry-After', (string) max(1, $retryAfter));
         $response->headers->set('X-RateLimit-Limit', (string) $limit);
         $response->headers->set('X-RateLimit-Remaining', '0');
+        $response->headers->set('X-RateLimit-Reset', (string) now()->addSeconds(max(1, $retryAfter))->timestamp);
 
         // Return the response directly so Laravel does not treat it as an unhandled exception.
         return $response;
+    }
+
+    /**
+     * Determine the epoch timestamp when the current rate limiting window expires.
+     */
+    private function rateLimitResetTimestamp(string $signature, int $decaySeconds): int
+    {
+        // Resolve the remaining window duration and ensure we never emit an already-expired timestamp.
+        $secondsUntilReset = RateLimiter::availableIn($signature);
+
+        if ($secondsUntilReset <= 0) {
+            $secondsUntilReset = $decaySeconds;
+        }
+
+        return now()->addSeconds($secondsUntilReset)->timestamp;
     }
 }

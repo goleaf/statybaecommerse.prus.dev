@@ -12,7 +12,7 @@ return [
     'recent_orders'          => 'Recent Orders',
     'active_users'           => 'Active Users',
     'published_products'     => 'Published Products',
-    'completed_orders'       => 'Completed Orders',
+    'completed_orders'       => 'Delivered Orders',
     'users_description'      => 'Total registered users',
     'products_description'   => 'Total products in catalog',
     'orders_description'     => 'Total orders placed',

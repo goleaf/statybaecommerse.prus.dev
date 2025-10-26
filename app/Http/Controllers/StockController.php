@@ -9,6 +9,7 @@ use App\Models\Location;
 use App\Models\Partner;
 use App\Models\VariantInventory;
 use Exception;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -31,11 +32,20 @@ final class StockController extends Controller
         $query = VariantInventory::with(['variant.product', 'location', 'supplier']);
         // Apply filters
         if ($request->filled('search')) {
-            $search = $request->get('search');
-            $query->whereHas('variant.product', function ($q) use ($search): void {
-                $q->where('name', 'like', "%{$search}%");
-            })->orWhereHas('variant', function ($q) use ($search): void {
-                $q->where('sku', 'like', "%{$search}%")->orWhere('name', 'like', "%{$search}%");
+            $search = $request->string('search')->toString();
+
+            $query->where(function (Builder $builder) use ($search): void {
+                // Group the search constraints so that downstream filters (like location or status)
+                // are not bypassed by OR clauses that would otherwise short-circuit the query.
+                $builder
+                    ->whereHas('variant.product', function (Builder $productQuery) use ($search): void {
+                        $productQuery->where('name', 'like', "%{$search}%");
+                    })
+                    ->orWhereHas('variant', function (Builder $variantQuery) use ($search): void {
+                        $variantQuery
+                            ->where('sku', 'like', "%{$search}%")
+                            ->orWhere('name', 'like', "%{$search}%");
+                    });
             });
         }
         if ($request->filled('location_id')) {
@@ -58,15 +68,43 @@ final class StockController extends Controller
             };
         }
         // Apply sorting
-        $sortBy = $request->get('sort_by', 'created_at');
-        $sortDirection = $request->get('sort_direction', 'desc');
-        $query->orderBy($sortBy, $sortDirection);
+        $allowedSorts = [
+            // Map external sort keys to fully-qualified columns to prevent SQL injection.
+            'created_at'       => 'variant_inventories.created_at',
+            'stock'            => 'variant_inventories.stock',
+            'reserved'         => 'variant_inventories.reserved',
+            'available'        => 'variant_inventories.available',
+            'reorder_point'    => 'variant_inventories.reorder_point',
+            'reorder_quantity' => 'variant_inventories.reorder_quantity',
+            'status'           => 'variant_inventories.status',
+        ];
+
+        $requestedSort = $request->get('sort_by', 'created_at');
+        if (! is_string($requestedSort) || ! array_key_exists($requestedSort, $allowedSorts)) {
+            // Fall back to the default when the client submits an unknown sort key.
+            $requestedSort = 'created_at';
+        }
+        $sortColumn = $allowedSorts[$requestedSort];
+
+        $sortDirectionInput = $request->get('sort_direction', 'desc');
+        $sortDirection = is_string($sortDirectionInput)
+            ? strtolower($sortDirectionInput)
+            : 'desc';
+        if (! in_array($sortDirection, ['asc', 'desc'], true)) {
+            // Default to descending order whenever an unexpected direction is provided.
+            $sortDirection = 'desc';
+        }
+
+        $query->orderBy($sortColumn, $sortDirection);
         $stockItems = $query->paginate(20)->withQueryString();
         // Get filter options
         $locations = Location::enabled()->get();
         $suppliers = Partner::enabled()->get();
 
-        return view('stock.index', ['stockItems' => $stockItems, 'locations' => $locations, 'suppliers' => $suppliers]);
+        /** @var view-string $indexView */
+        $indexView = 'stock.index';
+
+        return view($indexView, ['stockItems' => $stockItems, 'locations' => $locations, 'suppliers' => $suppliers]);
     }
 
     /**
@@ -76,7 +114,10 @@ final class StockController extends Controller
     {
         $stock = VariantInventory::with(['variant.product', 'location', 'supplier', 'stockMovements.user'])->findOrFail($stockId);
 
-        return view('stock.show', ['stock' => $stock]);
+        /** @var view-string $showView */
+        $showView = 'stock.show';
+
+        return view($showView, ['stock' => $stock]);
     }
 
     /**
@@ -85,20 +126,27 @@ final class StockController extends Controller
     public function adjustStock(\App\Http\Requests\Stock\AdjustStockRequest $request, int $stockId): JsonResponse
     {
         $stock = VariantInventory::findOrFail($stockId);
+        /** @var array{quantity:int|string, reason:string, notes?:string|null} $validated */
         $validated = $request->validated();
         try {
             $actorId = Auth::id();
+            if (is_string($actorId)) {
+                // Support guards that surface the user identifier as a string.
+                $actorId = (int) $actorId;
+            }
             $correlationId = Str::uuid()->toString();
-            $notes = $validated['notes'] ?? null;
+            $notes = isset($validated['notes']) ? (string) $validated['notes'] : null;
+            $quantity = (int) $validated['quantity'];
+            $reason = (string) $validated['reason'];
 
             // Trigger an atomic adjustment that also records an audit row.
-            $adjusted = $stock->adjustStock((int) $validated['quantity'], $validated['reason'], $actorId, $correlationId, null, $notes);
+            $adjusted = $stock->adjustStock($quantity, $reason, $actorId, $correlationId, null, $notes);
 
             if (! $adjusted) {
                 return response()->json(['success' => false, 'message' => __('inventory.adjustment_failed')], 400);
             }
 
-            $fresh = $stock->fresh();
+            $fresh = $stock->fresh() ?? $stock;
 
             return response()->json(['success' => true, 'message' => __('inventory.stock_adjusted'), 'data' => ['new_stock' => $fresh->stock, 'available_stock' => $fresh->available_stock, 'correlation_id' => $correlationId]]);
         } catch (Exception $e) {
@@ -112,10 +160,16 @@ final class StockController extends Controller
     public function reserveStock(\App\Http\Requests\Stock\ReserveStockRequest $request, int $stockId): JsonResponse
     {
         $stock = VariantInventory::findOrFail($stockId);
+        /** @var array{quantity:int|string} $validated */
         $validated = $request->validated();
         try {
-            if ($stock->reserve($validated['quantity'])) {
-                return response()->json(['success' => true, 'message' => __('inventory.stock_reserved'), 'data' => ['reserved' => $stock->fresh()->reserved, 'available_stock' => $stock->fresh()->available_stock]]);
+            $quantity = (int) $validated['quantity'];
+
+            if ($stock->reserve($quantity)) {
+                // Refresh the model once so we return consistent post-reservation values.
+                $freshStock = $stock->fresh() ?? $stock;
+
+                return response()->json(['success' => true, 'message' => __('inventory.stock_reserved'), 'data' => ['reserved' => $freshStock->reserved, 'available_stock' => $freshStock->available_stock]]);
             } else {
                 return response()->json(['success' => false, 'message' => __('inventory.reserve_failed_message')], 400);
             }
@@ -130,11 +184,16 @@ final class StockController extends Controller
     public function unreserveStock(\App\Http\Requests\Stock\UnreserveStockRequest $request, int $stockId): JsonResponse
     {
         $stock = VariantInventory::findOrFail($stockId);
+        /** @var array{quantity:int|string} $validated */
         $validated = $request->validated();
         try {
-            $stock->unreserve($validated['quantity']);
+            $quantity = (int) $validated['quantity'];
+            $stock->unreserve($quantity);
 
-            return response()->json(['success' => true, 'message' => __('inventory.stock_unreserved'), 'data' => ['reserved' => $stock->fresh()->reserved, 'available_stock' => $stock->fresh()->available_stock]]);
+            // Refresh once so the response mirrors the persisted inventory state.
+            $freshStock = $stock->fresh() ?? $stock;
+
+            return response()->json(['success' => true, 'message' => __('inventory.stock_unreserved'), 'data' => ['reserved' => $freshStock->reserved, 'available_stock' => $freshStock->available_stock]]);
         } catch (Exception $e) {
             return response()->json(['success' => false, 'message' => __('inventory.unreserve_failed'), 'error' => $e->getMessage()], 500);
         }
@@ -173,14 +232,17 @@ final class StockController extends Controller
         }
         $stockItems = $query->get();
         // Calculate summary statistics
-        $summary = ['total_items' => $stockItems->count(), 'total_stock_value' => $stockItems->sum('stock_value'), 'total_reserved_value' => $stockItems->sum('reserved_value'), 'low_stock_items' => $stockItems->filter(fn ($item) => $item->isLowStock())->count(), 'out_of_stock_items' => $stockItems->filter(fn ($item) => $item->isOutOfStock())->count(), 'needs_reorder_items' => $stockItems->filter(fn ($item) => $item->needsReorder())->count()];
+        $summary = ['total_items' => $stockItems->count(), 'total_stock_value' => $stockItems->sum('stock_value'), 'total_reserved_value' => $stockItems->sum('reserved_value'), 'low_stock_items' => $stockItems->filter(fn (VariantInventory $item): bool => $item->is_low_stock)->count(), 'out_of_stock_items' => $stockItems->filter(fn (VariantInventory $item): bool => $item->is_out_of_stock)->count(), 'needs_reorder_items' => $stockItems->filter(fn (VariantInventory $item): bool => $item->needs_reorder)->count()];
         // Group by location
-        $byLocation = $stockItems->groupBy('location.name')->map(fn ($items): array => ['count' => $items->count(), 'total_value' => $items->sum('stock_value'), 'reserved_value' => $items->sum('reserved_value'), 'low_stock' => $items->filter(fn ($item) => $item->isLowStock())->count(), 'out_of_stock' => $items->filter(fn ($item) => $item->isOutOfStock())->count()]);
+        $byLocation = $stockItems->groupBy('location.name')->map(fn ($items): array => ['count' => $items->count(), 'total_value' => $items->sum('stock_value'), 'reserved_value' => $items->sum('reserved_value'), 'low_stock' => $items->filter(fn (VariantInventory $item): bool => $item->is_low_stock)->count(), 'out_of_stock' => $items->filter(fn (VariantInventory $item): bool => $item->is_out_of_stock)->count()]);
         // Group by supplier
-        $bySupplier = $stockItems->groupBy('supplier.name')->map(fn ($items): array => ['count' => $items->count(), 'total_value' => $items->sum('stock_value'), 'reserved_value' => $items->sum('reserved_value'), 'low_stock' => $items->filter(fn ($item) => $item->isLowStock())->count(), 'out_of_stock' => $items->filter(fn ($item) => $item->isOutOfStock())->count()]);
+        $bySupplier = $stockItems->groupBy('supplier.name')->map(fn ($items): array => ['count' => $items->count(), 'total_value' => $items->sum('stock_value'), 'reserved_value' => $items->sum('reserved_value'), 'low_stock' => $items->filter(fn (VariantInventory $item): bool => $item->is_low_stock)->count(), 'out_of_stock' => $items->filter(fn (VariantInventory $item): bool => $item->is_out_of_stock)->count()]);
         $locations = Location::enabled()->get();
 
-        return view('stock.report', ['stockItems' => $stockItems, 'summary' => $summary, 'byLocation' => $byLocation, 'bySupplier' => $bySupplier, 'locations' => $locations]);
+        /** @var view-string $reportView */
+        $reportView = 'stock.report';
+
+        return view($reportView, ['stockItems' => $stockItems, 'summary' => $summary, 'byLocation' => $byLocation, 'bySupplier' => $bySupplier, 'locations' => $locations]);
     }
 
     /**
@@ -188,6 +250,7 @@ final class StockController extends Controller
      */
     public function exportStock(Request $request): RedirectResponse
     {
+        /** @var array<string, mixed> $filters */
         $filters = $request->only(['location_id', 'supplier_id', 'status', 'stock_status', 'search']);
         GenerateStockExport::dispatch($filters, $request->user()?->id);
 

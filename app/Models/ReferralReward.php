@@ -275,6 +275,22 @@ final class ReferralReward extends Model
     }
 
     /**
+     * Surface the logical reward category (discount, credit, points) sourced
+     * from metadata so analytics and API clients can differentiate payouts.
+     */
+    public function getRewardCategoryAttribute(): string
+    {
+        $category = $this->reward_data['category'] ?? null;
+        if (is_string($category) && $category !== '') {
+            return $category;
+        }
+
+        // Provide a sensible fallback that mirrors the legacy type column so
+        // existing consumers continue to behave correctly.
+        return $this->isReferredDiscount() ? 'discount' : 'credit';
+    }
+
+    /**
      * Handle meetsConditions functionality with proper error handling.
      */
     public function meetsConditions(array $context = []): bool
@@ -322,7 +338,7 @@ final class ReferralReward extends Model
      */
     public function getDisplayDataAttribute(): array
     {
-        return ['id' => $this->id, 'title' => $this->localized_title, 'description' => $this->localized_description, 'type' => $this->type, 'amount' => $this->amount, 'currency' => $this->currency_code, 'status' => $this->status, 'formatted_amount' => $this->formatted_amount, 'is_valid' => $this->isValid(), 'expires_at' => $this->expires_at?->format('Y-m-d H:i:s'), 'applied_at' => $this->applied_at?->format('Y-m-d H:i:s')];
+        return ['id' => $this->id, 'title' => $this->localized_title, 'description' => $this->localized_description, 'type' => $this->type, 'category' => $this->reward_category, 'amount' => $this->amount, 'currency' => $this->currency_code, 'status' => $this->status, 'formatted_amount' => $this->formatted_amount, 'is_valid' => $this->isValid(), 'expires_at' => $this->expires_at?->format('Y-m-d H:i:s'), 'applied_at' => $this->applied_at?->format('Y-m-d H:i:s')];
     }
 
     /**

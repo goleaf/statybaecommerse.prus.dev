@@ -15,11 +15,16 @@ return [
     'position'          => 'Pozicija',
 
     'types' => [
-        'featured' => 'Išskirtiniai',
-        'related'  => 'Susiję',
-        'similar'  => 'Panašūs',
-        'trending' => 'Populiarūs',
-        'recent'   => 'Naujausi',
+        'similar_products'           => 'Panašūs produktai',
+        'frequently_bought_together' => 'Dažnai perkama kartu',
+        'trending_products'          => 'Populiarūs produktai',
+        'personalized'               => 'Personalizuota',
+        'category_based'             => 'Pagal kategoriją',
+        'featured'                   => 'Išskirtiniai',
+        'related'                    => 'Susiję',
+        'similar'                    => 'Panašūs',
+        'trending'                   => 'Populiarūs',
+        'recent'                     => 'Naujausi',
     ],
 
     'positions' => [
@@ -48,13 +53,18 @@ return [
     ],
 
     'tabs' => [
-        'all'      => 'Visi',
-        'active'   => 'Aktyvūs',
-        'featured' => 'Išskirtiniai',
-        'related'  => 'Susiję',
-        'similar'  => 'Panašūs',
-        'trending' => 'Populiarūs',
-        'recent'   => 'Naujausi',
+        'all'                        => 'Visi blokai',
+        'active'                     => 'Aktyvūs blokai',
+        'similar_products'           => 'Panašūs produktai',
+        'frequently_bought_together' => 'Dažnai perkama kartu',
+        'trending_products'          => 'Populiarūs produktai',
+        'personalized'               => 'Personalizuota',
+        'category_based'             => 'Pagal kategoriją',
+        'featured'                   => 'Išskirtiniai',
+        'related'                    => 'Susiję',
+        'similar'                    => 'Panašūs',
+        'trending'                   => 'Populiarūs',
+        'recent'                     => 'Naujausi',
     ],
 
     'actions' => [
@@ -71,13 +81,4 @@ return [
         'deactivate_selected'         => 'Deaktyvuoti pasirinktus',
     ],
 
-    'tabs' => [
-        'all'      => 'Visi blokai',
-        'active'   => 'Aktyvūs blokai',
-        'featured' => 'Išskirtiniai',
-        'related'  => 'Susiję',
-        'similar'  => 'Panašūs',
-        'trending' => 'Populiarūs',
-        'recent'   => 'Naujausi',
-    ],
 ];

@@ -12,14 +12,19 @@ use App\Support\Contracts\Entities\UserContract;
 use App\Support\ErrorCodes;
 use App\Traits\HandlesContentNegotiation;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Log;
+use Illuminate\View\View;
 use Throwable;
 
 final class AuthenticatedUserController extends Controller
 {
     use HandlesContentNegotiation;
 
-    public function __invoke(ShowAuthenticatedUserRequest $request): JsonResponse
+    /**
+     * Return the contract representation of the authenticated user, respecting content negotiation.
+     */
+    public function __invoke(ShowAuthenticatedUserRequest $request): JsonResponse|Response
     {
         $user = $request->user();
 
@@ -45,11 +50,21 @@ final class AuthenticatedUserController extends Controller
             $user->refresh();
             $payload = UserContract::forUser($user);
 
+            // Let the reusable trait negotiate the preferred representation for the response payload.
             $response = $this->respondWithContract($request, $payload);
 
-            return $response instanceof JsonResponse
-                ? $response
-                : response()->json($payload);
+            if ($response instanceof JsonResponse || $response instanceof Response) {
+                // JSON, XML, CSV and other negotiated responses are returned directly.
+                return $response;
+            }
+
+            if ($response instanceof View) {
+                // Convert negotiated view responses into HTTP responses while preserving their rendered output.
+                return response($response->render(), 200, ['Content-Type' => 'text/html; charset=utf-8']);
+            }
+
+            // Default to a JSON response when no negotiated representation matches the request.
+            return response()->json($payload);
         } catch (Throwable $exception) {
             Log::warning('Fell back to minimal authenticated user payload.', [
                 'exception' => $exception,

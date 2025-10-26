@@ -559,8 +559,14 @@ class RouteTest extends TestCase
         $response->assertSee('Discount Presets');
 
         // Test discount presets store
-        $response = $this->post('/admin/discounts/presets', []);
-        $response->assertRedirect();
+        $response = $this->post('/admin/discounts/presets', [
+            'name'        => 'Flash Sale',
+            'description' => 'Limited time flash sale.',
+            'type'        => 'percentage',
+            'value'       => 5,
+            'conditions'  => "applies_to:flash",
+        ]);
+        $response->assertRedirect(route('admin.discounts.presets'));
     }
 
     /**

@@ -27,10 +27,15 @@ class StoreReferralRequest extends FormRequest
     public function rules(): array
     {
         return [
-            // Require a properly formatted email that is not already registered.
-            'referred_email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:users,email'],
+            // Ensure the referred email belongs to an existing account so the
+            // downstream controller can safely attach the relationship.
+            'referred_email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'exists:users,email'],
             // Allow the referrer to include a short optional note.
             'message' => ['nullable', 'string', 'max:500'],
+            // Accept optional marketing copy so referrers can personalise
+            // the invitation that accompanies the referral.
+            'title' => ['nullable', 'string', 'max:255'],
+            'description' => ['nullable', 'string', 'max:1000'],
         ];
     }
 

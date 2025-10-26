@@ -4,9 +4,14 @@ declare(strict_types=1);
 
 namespace App\Livewire\Components\Checkout;
 
+use App\Models\Address;
+use App\Models\CartItem;
 use App\Models\ShippingOption;
+use App\Services\Shipping\ShippingOptionResolver;
 use Illuminate\Contracts\View\View;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Session;
+use Livewire\Attributes\On;
 use Livewire\Attributes\Validate;
 use Spatie\LivewireWizard\Components\StepComponent;
 
@@ -21,9 +26,11 @@ use Spatie\LivewireWizard\Components\StepComponent;
 class Delivery extends StepComponent
 {
     /**
-     * @var array|Collection
+     * Normalised shipping options resolved for the current checkout context.
+     *
+     * @var array<int, array{id:int,name:string,price:float,formatted_price:string,estimated_delivery:string}>
      */
-    public $options = [];
+    public array $options = [];
 
     #[Validate('required', message: 'You must select a delivery method')]
     public ?int $currentSelected = null;
@@ -33,9 +40,22 @@ class Delivery extends StepComponent
      */
     public function mount(): void
     {
-        $countryId = data_get(session()->get('checkout'), 'shipping_address.country_id');
-        $this->currentSelected = data_get(session()->get('checkout'), 'shipping_option') ? data_get(session()->get('checkout'), 'shipping_option')[0]['id'] : null;
-        $this->options = ShippingOption::query()->where('is_enabled', true)->get();
+        // Seed the initially selected option from the persisted checkout state.
+        $this->currentSelected = data_get(session()->get('checkout'), 'shipping_option')
+            ? data_get(session()->get('checkout'), 'shipping_option')[0]['id']
+            : null;
+
+        // Resolve shipping options immediately so the delivery step starts hydrated.
+        $this->recalculateOptions(data_get(session()->get('checkout'), 'shipping_address.id'));
+    }
+
+    /**
+     * Refresh shipping options whenever the shipping address changes upstream.
+     */
+    #[On('shipping-address-updated')]
+    public function handleShippingAddressUpdated(?int $shippingAddressId = null): void
+    {
+        $this->recalculateOptions($shippingAddressId);
     }
 
     /**
@@ -73,5 +93,51 @@ class Delivery extends StepComponent
     public function render(): View
     {
         return view('livewire.components.checkout.delivery');
+    }
+
+    /**
+     * Pull fresh options from the resolver so shipping reflects the latest address data.
+     */
+    private function recalculateOptions(?int $shippingAddressId = null): void
+    {
+        // Forget previously stored shipping option whenever the address changes.
+        session()->forget('checkout.shipping_option');
+
+        $countryCode = $this->resolveCountryCode($shippingAddressId);
+
+        $cartItems = CartItem::with('product')
+            ->where('session_id', Session::getId())
+            ->get();
+
+        $resolver = app(ShippingOptionResolver::class);
+
+        $resolved = $resolver->resolve($cartItems, $countryCode)->toArray();
+
+        $this->options = $resolved;
+
+        $availableIds = collect($resolved)->pluck('id')->all();
+
+        if (! in_array($this->currentSelected, $availableIds, true)) {
+            // Default to the first available option to keep the UI interactive.
+            $this->currentSelected = $resolved[0]['id'] ?? null;
+        }
+    }
+
+    /**
+     * Determine the correct country code from either the supplied address id or session cache.
+     */
+    private function resolveCountryCode(?int $shippingAddressId = null): ?string
+    {
+        if ($shippingAddressId !== null) {
+            $address = Address::query()
+                ->where('user_id', Auth::id())
+                ->find($shippingAddressId);
+
+            if ($address !== null) {
+                return $address->country_code;
+            }
+        }
+
+        return data_get(session()->get('checkout'), 'shipping_address.country_code');
     }
 }

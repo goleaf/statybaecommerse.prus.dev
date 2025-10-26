@@ -6,6 +6,7 @@ namespace App\Http\Controllers;
 
 use App\Services\SitemapService;
 use Illuminate\Http\Response;
+use Illuminate\Support\Str;
 use InvalidArgumentException;
 
 /**
@@ -36,14 +37,29 @@ final class SitemapController extends Controller
      */
     public function locale(string $locale): Response
     {
+        // Normalize the provided locale to a safe slug that matches the
+        // supported configuration while preventing path traversal attempts.
+        $normalizedLocale = (string) Str::of($locale)
+            ->trim()
+            ->lower()
+            ->replaceMatches('/[^a-z0-9\-_]+/', '');
+
+        if ($normalizedLocale === '') {
+            abort(404);
+        }
+
         try {
-            $urls = $this->sitemapService->getLocaleUrls($locale);
+            // Delegate to the sitemap service using the sanitized locale so we
+            // avoid cache fragmentation from mixed-case or malformed inputs.
+            $urls = $this->sitemapService->getLocaleUrls($normalizedLocale);
         } catch (InvalidArgumentException $exception) {
-            abort(404, $exception->getMessage());
+            // Hide the underlying error message to keep 404 responses concise
+            // while signalling the requested locale is not available.
+            abort(404);
         }
 
         return response()
-            ->view('sitemap.locale', ['urls' => $urls, 'locale' => $locale])
+            ->view('sitemap.locale', ['urls' => $urls, 'locale' => $normalizedLocale])
             ->header('Content-Type', 'application/xml; charset=utf-8');
     }
 }

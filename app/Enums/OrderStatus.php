@@ -15,22 +15,18 @@ use Illuminate\Support\Collection;
 enum OrderStatus: string implements EnumInterface
 {
     case PENDING = 'pending';
-    case CONFIRMED = 'confirmed';
     case PROCESSING = 'processing';
     case SHIPPED = 'shipped';
     case DELIVERED = 'delivered';
-    case COMPLETED = 'completed';
     case CANCELLED = 'cancelled';
     case REFUNDED = 'refunded';
     case RETURNED = 'returned';
 
     private const LABEL_DEFAULTS = [
         'pending'    => 'Pending',
-        'confirmed'  => 'Confirmed',
         'processing' => 'Processing',
         'shipped'    => 'Shipped',
         'delivered'  => 'Delivered',
-        'completed'  => 'Completed',
         'cancelled'  => 'Cancelled',
         'refunded'   => 'Refunded',
         'returned'   => 'Returned',
@@ -38,11 +34,9 @@ enum OrderStatus: string implements EnumInterface
 
     private const DESCRIPTION_DEFAULTS = [
         'pending'    => 'Order received and awaiting confirmation.',
-        'confirmed'  => 'Order confirmed and preparing for processing.',
         'processing' => 'Order is being prepared for shipment.',
         'shipped'    => 'Order has left the warehouse and is in transit.',
         'delivered'  => 'Order successfully delivered to the customer.',
-        'completed'  => 'Order completed including any post-delivery checks.',
         'cancelled'  => 'Order cancelled before fulfillment.',
         'refunded'   => 'Order refunded to the customer.',
         'returned'   => 'Order returned by the customer.',
@@ -50,11 +44,9 @@ enum OrderStatus: string implements EnumInterface
 
     private const ICON_MAP = [
         'pending'    => 'heroicon-o-clock',
-        'confirmed'  => 'heroicon-o-check-circle',
         'processing' => 'heroicon-o-cog-6-tooth',
         'shipped'    => 'heroicon-o-truck',
         'delivered'  => 'heroicon-o-check-badge',
-        'completed'  => 'heroicon-o-flag',
         'cancelled'  => 'heroicon-o-x-circle',
         'refunded'   => 'heroicon-o-arrow-uturn-left',
         'returned'   => 'heroicon-o-arrow-uturn-right',
@@ -62,11 +54,9 @@ enum OrderStatus: string implements EnumInterface
 
     private const COLOR_MAP = [
         'pending'    => 'warning',
-        'confirmed'  => 'info',
         'processing' => 'primary',
         'shipped'    => 'success',
         'delivered'  => 'success',
-        'completed'  => 'success',
         'cancelled'  => 'danger',
         'refunded'   => 'secondary',
         'returned'   => 'warning',
@@ -74,14 +64,12 @@ enum OrderStatus: string implements EnumInterface
 
     private const PRIORITY_MAP = [
         'pending'    => 1,
-        'confirmed'  => 2,
-        'processing' => 3,
-        'shipped'    => 4,
-        'delivered'  => 5,
-        'completed'  => 6,
-        'cancelled'  => 7,
-        'refunded'   => 8,
-        'returned'   => 9,
+        'processing' => 2,
+        'shipped'    => 3,
+        'delivered'  => 4,
+        'cancelled'  => 5,
+        'refunded'   => 6,
+        'returned'   => 7,
     ];
 
     /**

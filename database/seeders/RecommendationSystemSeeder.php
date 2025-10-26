@@ -55,13 +55,13 @@ class RecommendationSystemSeeder extends Seeder
             $this->command->info('Using existing ' . $products->count() . ' products');
         }
 
-        // Create recommendation blocks
-        $this->createRecommendationBlocks();
-        $this->command->info('Created recommendation blocks');
-
         // Create recommendation configs
         $this->createRecommendationConfigs();
         $this->command->info('Created recommendation configs');
+
+        // Create recommendation blocks
+        $this->createRecommendationBlocks();
+        $this->command->info('Created recommendation blocks');
 
         // Create recommendation configs simple
         $this->createRecommendationConfigsSimple();
@@ -100,65 +100,81 @@ class RecommendationSystemSeeder extends Seeder
 
     private function createRecommendationBlocks(): void
     {
+        $configIdsByType = RecommendationConfig::query()->pluck('id', 'type');
+
         $blocks = [
             [
-                'name'           => 'featured_products',
-                'title'          => 'Featured Products',
-                'description'    => 'Showcase featured products on homepage',
-                'type'           => 'featured',
-                'position'       => 'top',
-                'is_active'      => true,
-                'max_products'   => 6,
-                'cache_duration' => 3600,
-                'sort_order'     => 1,
-            ],
-            [
+                // Maintain backwards-compatible name while aligning the type to content-based similarity.
                 'name'           => 'related_products',
-                'title'          => 'Related Products',
-                'description'    => 'Show related products on product pages',
-                'type'           => 'related',
-                'position'       => 'bottom',
+                'title'          => 'Similar Products',
+                'description'    => 'Surface similar products based on shared attributes',
+                'type'           => 'similar_products',
+                'position'       => 'sidebar',
                 'is_active'      => true,
                 'max_products'   => 4,
                 'cache_duration' => 1800,
-                'sort_order'     => 2,
+                'sort_order'     => 1,
+                'config_ids'     => [$configIdsByType['content_based'] ?? null],
             ],
             [
-                'name'           => 'similar_products',
-                'title'          => 'Similar Products',
-                'description'    => 'Show similar products based on content',
-                'type'           => 'similar',
-                'position'       => 'sidebar',
+                'name'           => 'frequently_bought_together',
+                'title'          => 'Frequently Bought Together',
+                'description'    => 'Highlight items that are often purchased together',
+                'type'           => 'frequently_bought_together',
+                'position'       => 'bottom',
                 'is_active'      => true,
-                'max_products'   => 3,
-                'cache_duration' => 1800,
-                'sort_order'     => 3,
+                'max_products'   => 4,
+                'cache_duration' => 2400,
+                'sort_order'     => 2,
+                'config_ids'     => [$configIdsByType['collaborative'] ?? null],
             ],
             [
                 'name'           => 'trending_products',
                 'title'          => 'Trending Products',
-                'description'    => 'Show trending products based on popularity',
-                'type'           => 'trending',
+                'description'    => 'Display products gaining momentum across the store',
+                'type'           => 'trending_products',
                 'position'       => 'inline',
                 'is_active'      => true,
                 'max_products'   => 5,
                 'cache_duration' => 3600,
-                'sort_order'     => 4,
+                'sort_order'     => 3,
+                'config_ids'     => array_filter([
+                    $configIdsByType['trending'] ?? null,
+                    $configIdsByType['popularity'] ?? null,
+                ]),
             ],
             [
-                'name'           => 'recent_products',
-                'title'          => 'Recently Viewed',
-                'description'    => 'Show recently viewed products',
-                'type'           => 'recent',
+                'name'           => 'personalized_recommendations',
+                'title'          => 'Personalized Picks',
+                'description'    => 'Tailor results to the shopper using behavioural insights',
+                'type'           => 'personalized',
+                'position'       => 'top',
+                'is_active'      => true,
+                'max_products'   => 6,
+                'cache_duration' => 1800,
+                'sort_order'     => 4,
+                'config_ids'     => array_filter([
+                    $configIdsByType['personalized'] ?? null,
+                    $configIdsByType['collaborative'] ?? null,
+                ]),
+            ],
+            [
+                'name'           => 'category_based_recommendations',
+                'title'          => 'More From This Category',
+                'description'    => 'Promote additional products within the active category',
+                'type'           => 'category_based',
                 'position'       => 'sidebar',
                 'is_active'      => true,
-                'max_products'   => 4,
-                'cache_duration' => 900,
+                'max_products'   => 5,
+                'cache_duration' => 2700,
                 'sort_order'     => 5,
+                'config_ids'     => [$configIdsByType['category_based'] ?? null],
             ],
         ];
 
         foreach ($blocks as $blockData) {
+            $blockData['config_ids'] = array_values(array_filter($blockData['config_ids'] ?? []));
+
             RecommendationBlock::factory()
                 ->state($blockData)
                 ->create();
@@ -227,6 +243,38 @@ class RecommendationSystemSeeder extends Seeder
                 'cache_ttl'   => 1800,
                 'is_default'  => false,
                 'sort_order'  => 5,
+            ],
+            [
+                'name'        => 'Personalized Behaviour-Based',
+                'type'        => 'personalized',
+                'description' => 'Recommend products tailored to user behaviour signals',
+                'is_active'   => true,
+                'priority'    => 88,
+                'max_results' => 10,
+                'min_score'   => 0.2,
+                'cache_ttl'   => 1800,
+                'is_default'  => false,
+                'sort_order'  => 6,
+                'config'      => [
+                    'preference_weights' => ['category' => 0.5, 'brand' => 0.25, 'price' => 0.1, 'behavior' => 0.15],
+                ],
+            ],
+            [
+                'name'        => 'Category Context',
+                'type'        => 'category_based',
+                'description' => 'Highlight products within the active browsing category',
+                'is_active'   => true,
+                'priority'    => 82,
+                'max_results' => 6,
+                'min_score'   => 0.1,
+                'cache_ttl'   => 2400,
+                'is_default'  => false,
+                'sort_order'  => 7,
+                'config'      => [
+                    'include_parent'  => true,
+                    'order_by'        => 'relevance_score',
+                    'order_direction' => 'desc',
+                ],
             ],
         ];
 
