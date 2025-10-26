@@ -116,14 +116,14 @@
                     @endif
 
                     @auth
-                        <form method="POST" action="{{ route('reports.generate', $report) }}" class="inline">
+                        <form method="POST" action="{{ route('reports.generate', $report) }}" class="inline" id="report-generate-form">
                             @csrf
-                            <button type="submit" 
+                            <button type="submit"
                                     class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition duration-200 flex items-center">
                                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1m4 0h1m-6 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                 </svg>
-                                {{ __('reports.actions.generate') }}
+                                <span class="generate-button-label">{{ __('reports.actions.generate') }}</span>
                             </button>
                         </form>
                     @endauth
@@ -239,4 +239,42 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+    <script nonce="{{ csp_nonce() }}">
+        document.addEventListener('DOMContentLoaded', () => {
+            // Guard against duplicate submissions by locking the generate button until the request resolves.
+            const generateForm = document.getElementById('report-generate-form');
+
+            if (!generateForm) {
+                return;
+            }
+
+            const submitButton = generateForm.querySelector('button[type="submit"]');
+            const labelSpan = submitButton?.querySelector('.generate-button-label');
+
+            generateForm.addEventListener('submit', () => {
+                if (!submitButton) {
+                    return;
+                }
+
+                submitButton.disabled = true;
+                submitButton.classList.add('opacity-75', 'cursor-not-allowed');
+
+                if (labelSpan) {
+                    // Provide inline feedback so admins know the export request is processing.
+                    labelSpan.textContent = '{{ __('Generating…') }}';
+                }
+
+                // Inject a lightweight spinner for extra visual reassurance.
+                if (!submitButton.querySelector('.inline-spinner')) {
+                    const spinner = document.createElement('span');
+                    spinner.className = 'inline-spinner mr-2 inline-flex h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent';
+                    spinner.setAttribute('aria-hidden', 'true');
+                    submitButton.prepend(spinner);
+                }
+            }, { once: true });
+        });
+    </script>
+@endpush
 

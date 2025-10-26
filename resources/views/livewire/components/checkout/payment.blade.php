@@ -62,17 +62,23 @@
                       and you acknowledge that you have read our privacy policy.") }}
                 </p>
                 <div class="pt-6 border-t border-gray-200 sm:flex sm:items-center sm:justify-end">
+                    @php
+                        // Flag used to surface the disabled state while delivery recalculations are happening upstream.
+                        $ctaIsLocked = $shippingOptionsRefreshing ?? false;
+                    @endphp
                     <x-buttons.primary
                         type="submit"
-                        class="w-full px-8 py-2 text-sm sm:w-auto"
+                        class="w-full px-8 py-2 text-sm sm:w-auto {{ $ctaIsLocked ? 'opacity-70 cursor-not-allowed' : '' }}"
                         {{-- Keep the payment call-to-action inert while shipping data recalculates or submission runs. --}}
                         wire:loading.attr="disabled"
                         wire:target="save"
+                        @disabled($ctaIsLocked)
+                        data-loading-guard="{{ $ctaIsLocked ? 'true' : 'false' }}"
                     >
                         <span class="absolute left-0 pl-2" wire:loading>
                             <x-loading-dots class="bg-white" aria-hidden="true" />
                         </span>
-                        {{ __('Place my order') }}
+                        {{ $ctaIsLocked ? __('Recalculating shipping…') : __('Place my order') }}
                     </x-buttons.primary>
                 </div>
             </div>
