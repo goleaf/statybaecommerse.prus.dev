@@ -47,6 +47,34 @@ final class OrderPolicy
         return $order->user_id === $user->getKey();
     }
 
+    /**
+     * Determine whether the given user can cancel the provided order record.
+     */
+    public function cancel(AdminUser|User $user, Order $order): bool
+    {
+        if ($user instanceof AdminUser) {
+            return AuthorizationMatrix::check('orders', 'cancel', $user);
+        }
+
+        if (AuthorizationMatrix::check('orders', 'cancel', $user)) {
+            return true;
+        }
+
+        return $order->user_id === $user->getKey();
+    }
+
+    /**
+     * Determine whether the given user can refund the provided order record.
+     */
+    public function refund(AdminUser|User $user, Order $order): bool
+    {
+        if ($user instanceof AdminUser) {
+            return AuthorizationMatrix::check('orders', 'refund', $user);
+        }
+
+        return AuthorizationMatrix::check('orders', 'refund', $user);
+    }
+
     public function delete(AdminUser|User $user, Order $order): bool
     {
         return AuthorizationMatrix::check('orders', 'delete', $user);

@@ -5,9 +5,10 @@ declare(strict_types=1);
 use App\Http\Controllers\Api\AuditLogController;
 use App\Http\Controllers\Api\AuthenticatedUserController;
 use App\Http\Controllers\Api\AutocompleteSearchController;
-use App\Http\Controllers\Api\NotificationController;
-use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\ExportDownloadController;
+use App\Http\Controllers\Api\NotificationController;
+use App\Http\Controllers\Api\OrderLifecycleController;
+use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\V1\HealthController;
 use App\Http\Controllers\Api\V1\SearchController;
 use Illuminate\Support\Facades\Route;
@@ -77,6 +78,26 @@ Route::prefix('v1')
                 ->name('autocomplete.search');
 
             require __DIR__ . '/api/notifications.php';
+
+            Route::prefix('orders')->name('orders.')->group(function (): void {
+                Route::get('/', [OrderLifecycleController::class, 'index'])
+                    ->name('index');
+
+                Route::get('/{order}', [OrderLifecycleController::class, 'show'])
+                    ->name('show');
+
+                Route::put('/{order}', [OrderLifecycleController::class, 'update'])
+                    ->name('update');
+
+                Route::delete('/{order}', [OrderLifecycleController::class, 'destroy'])
+                    ->name('destroy');
+
+                Route::post('/{order}/cancel', [OrderLifecycleController::class, 'cancel'])
+                    ->name('cancel');
+
+                Route::post('/{order}/refund', [OrderLifecycleController::class, 'refund'])
+                    ->name('refund');
+            });
         });
     });
 

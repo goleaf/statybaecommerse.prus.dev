@@ -43,6 +43,8 @@ return [
             'create'  => 'orders.create',
             'update'  => 'orders.update',
             'delete'  => 'orders.delete',
+            'cancel'  => 'orders.cancel',
+            'refund'  => 'orders.refund',
         ],
         'users' => [
             'viewAny' => 'users.viewAny',
@@ -68,6 +70,7 @@ return [
             'categories.viewAny', 'categories.view', 'categories.create', 'categories.update', 'categories.delete',
             'brands.viewAny', 'brands.view', 'brands.create', 'brands.update', 'brands.delete',
             'orders.viewAny', 'orders.view', 'orders.create', 'orders.update', 'orders.delete',
+            'orders.cancel', 'orders.refund',
             'users.viewAny', 'users.view', 'users.create', 'users.update', 'users.delete',
             'roles.viewAny', 'roles.view', 'roles.create', 'roles.update', 'roles.delete',
         ],
@@ -77,6 +80,7 @@ return [
             'categories.viewAny', 'categories.view', 'categories.create', 'categories.update', 'categories.delete',
             'brands.viewAny', 'brands.view', 'brands.create', 'brands.update', 'brands.delete',
             'orders.viewAny', 'orders.view', 'orders.create', 'orders.update', 'orders.delete',
+            'orders.cancel', 'orders.refund',
             'users.viewAny', 'users.view', 'users.create', 'users.update', 'users.delete',
             'roles.viewAny', 'roles.view', 'roles.create', 'roles.update', 'roles.delete',
         ],
@@ -85,7 +89,7 @@ return [
             'view_products', 'create_products', 'edit_products',
             'categories.viewAny', 'categories.view', 'categories.create', 'categories.update',
             'brands.viewAny', 'brands.view', 'brands.update',
-            'orders.viewAny', 'orders.view', 'orders.update',
+            'orders.viewAny', 'orders.view', 'orders.update', 'orders.cancel', 'orders.refund',
             'users.viewAny', 'users.view',
         ],
         'editor' => [
@@ -96,7 +100,7 @@ return [
         ],
         'support' => [
             'panel.access.admin',
-            'orders.viewAny', 'orders.view', 'orders.update',
+            'orders.viewAny', 'orders.view', 'orders.update', 'orders.cancel',
             'users.viewAny', 'users.view', 'users.update',
         ],
         'viewer' => [
