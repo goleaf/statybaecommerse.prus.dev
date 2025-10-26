@@ -8,13 +8,13 @@ use App\Filament\Resources\ChannelResource\Pages;
 use App\Models\Channel;
 use App\Support\Concerns\HasNav;
 use App\Support\Forms\MatrixFactory;
-use BackedEnum;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms;
+use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -28,7 +28,6 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Str;
 
 /**
@@ -46,7 +45,7 @@ final class ChannelResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
+    public static function getNavigationIcon(): string
     {
         return 'heroicon-o-rectangle-stack';
     }
@@ -80,7 +79,14 @@ final class ChannelResource extends Resource
                                     ->maxLength(255)
                                     ->live(onBlur: true)
                                     // Keep the slug synchronised with the name when creating new channels.
-                                    ->afterStateUpdated(fn (string $operation, $state, Forms\Set $set) => $operation === 'create' ? $set('slug', Str::slug($state)) : null),
+                                    ->afterStateUpdated(function (string $operation, mixed $state, Forms\Set $set): void {
+                                        if ($operation !== 'create' || ! is_string($state)) {
+                                            return;
+                                        }
+
+                                        // Mirror the old auto-slug behaviour while ensuring we avoid casting non-string values.
+                                        $set('slug', Str::slug($state));
+                                    }),
                                 TextInput::make('slug')
                                     ->label(__('admin.channels.slug'))
                                     ->required()
@@ -143,6 +149,30 @@ final class ChannelResource extends Resource
                                     ->default('after'),
                             ]),
                     ]),
+                SchemaSection::make(__('admin.channels.advanced_settings'))
+                    ->schema([
+                        SchemaGrid::make(2)
+                            ->schema([
+                                KeyValue::make('metadata')
+                                    ->label(__('admin.channels.metadata'))
+                                    ->keyLabel(__('admin.channels.metadata_key'))
+                                    ->valueLabel(__('admin.channels.metadata_value'))
+                                    ->addButtonLabel(__('admin.channels.add_metadata'))
+                                    // Storing JSON pairs keeps integration hooks flexible without custom column migrations.
+                                    ->columnSpan(1)
+                                    ->reorderable(),
+                                KeyValue::make('configuration')
+                                    ->label(__('admin.channels.configuration_pairs'))
+                                    ->keyLabel(__('admin.channels.configuration_key'))
+                                    ->valueLabel(__('admin.channels.configuration_value'))
+                                    ->addButtonLabel(__('admin.channels.add_configuration'))
+                                    // Allow administrators to persist bespoke configuration flags alongside metadata.
+                                    ->columnSpan(1)
+                                    ->reorderable(),
+                            ])
+                            ->columns(2),
+                    ])
+                    ->columns(1),
                 SchemaSection::make(__('admin.channels.payment_matrix_section'))
                     ->schema([
                         MatrixFactory::checkboxGrid(
@@ -159,8 +189,8 @@ final class ChannelResource extends Resource
                                 'pos'         => __('admin.channels.payment_columns.pos'),
                                 'marketplace' => __('admin.channels.payment_columns.marketplace'),
                             ],
-                            __('admin.channels.payment_matrix_label'),
                         )
+                            ->label(__('admin.channels.payment_matrix_label'))
                             ->helperText(__('admin.channels.payment_matrix_help'))
                             ->columnSpanFull()
                             ->live(),
@@ -217,6 +247,11 @@ final class ChannelResource extends Resource
                         'pos'    => 'danger',
                         default  => 'gray',
                     }),
+                TextColumn::make('timezone')
+                    ->label(__('admin.channels.timezone'))
+                    // Keeping the timezone visible helps troubleshoot locale-specific scheduling issues.
+                    ->toggleable(isToggledHiddenByDefault: true)
+                    ->sortable(),
                 TextColumn::make('url')
                     ->label(__('admin.channels.url'))
                     ->limit(30)
@@ -229,6 +264,11 @@ final class ChannelResource extends Resource
 
                         return strlen($state) > 30 ? $state : null;
                     }),
+                TextColumn::make('currency_code')
+                    ->label(__('admin.channels.currency_code'))
+                    // Surfacing the currency code allows quick auditing when multiple regions are configured.
+                    ->badge()
+                    ->sortable(),
                 IconColumn::make('is_enabled')
                     ->label(__('admin.channels.is_enabled'))
                     ->boolean(),
@@ -238,6 +278,16 @@ final class ChannelResource extends Resource
                 IconColumn::make('is_active')
                     ->label(__('admin.channels.is_active'))
                     ->boolean(),
+                IconColumn::make('ssl_enabled')
+                    ->label(__('admin.channels.ssl_enabled'))
+                    // Showing SSL state informs reviewers whether secure storefront routes are enforced.
+                    ->boolean()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                IconColumn::make('analytics_enabled')
+                    ->label(__('admin.channels.analytics_enabled'))
+                    // Analytics toggles are optional, so keep them available via the column toggles menu.
+                    ->boolean()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('created_at')
                     ->label(__('admin.common.created_at'))
                     ->dateTime()
