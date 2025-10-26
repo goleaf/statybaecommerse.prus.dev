@@ -287,31 +287,61 @@ final class VariantInventory extends Model
         array $meta = [],
         ?string $referenceType = null,
         ?string $referenceId = null
-    ): bool {
+    ): ?StockReservation {
         if ($quantity <= 0) {
-            return false;
+            // Guard against invalid reservations where the requested quantity is not positive.
+            return null;
         }
 
-        $reserved = DB::transaction(function () use ($quantity): bool {
-            // Use an atomic update with a stock guard to prevent overselling in concurrent requests.
-            $affected = self::newUnlockedQuery()
+        $reservation = DB::transaction(function () use ($quantity, $expiresAt, $meta, $referenceType, $referenceId): ?StockReservation {
+            /** @var self|null $inventory */
+            $inventory = self::newUnlockedQuery()
                 ->whereKey($this->getKey())
-                ->whereRaw('(stock - reserved) >= ?', [$quantity])
-                ->update([
-                    'reserved'  => DB::raw('reserved + ' . (int) $quantity),
-                    'available' => DB::raw('CASE WHEN (stock - reserved - ' . (int) $quantity . ') > 0 THEN (stock - reserved - ' . (int) $quantity . ') ELSE 0 END'),
-                ]);
+                ->lockForUpdate()
+                ->first();
 
-            if ($affected !== 1) {
-                return false;
+            if ($inventory === null) {
+                // Bail out if the inventory record cannot be located while the lock is held.
+                return null;
             }
 
-            $this->refresh();
+            $availableBeforeReservation = (int) $inventory->stock - (int) $inventory->reserved;
 
-            return true;
+            if ($availableBeforeReservation < $quantity) {
+                // Prevent overselling by declining the reservation when there is not enough free stock.
+                return null;
+            }
+
+            // Increment the reserved counter and recalculate the available quantity while the row remains locked.
+            $inventory->forceFill([
+                'reserved'  => (int) $inventory->reserved + $quantity,
+                'available' => max(0, (int) $inventory->stock - ((int) $inventory->reserved + $quantity)),
+            ])->save();
+
+            // Ensure the related variant is available so we can populate the product reference for downstream reporting.
+            $inventory->loadMissing('variant');
+
+            return $inventory->stockReservations()->create([
+                'product_id'     => $inventory->variant?->product_id,
+                'quantity'       => $quantity,
+                'status'         => StockReservation::STATUS_RESERVED,
+                'reserved_at'    => now(),
+                'expires_at'     => $expiresAt,
+                'meta'           => $meta !== [] ? $meta : null,
+                'reference_type' => $referenceType,
+                'reference_id'   => $referenceId,
+            ]);
         });
 
-        return (bool) $reserved;
+        if ($reservation === null) {
+            // Leave the current instance untouched when the reservation could not be persisted.
+            return null;
+        }
+
+        // Refresh the in-memory model so callers see the updated reserved and available values.
+        $this->refresh();
+
+        return $reservation;
     }
 
     /**
@@ -448,7 +478,8 @@ final class VariantInventory extends Model
 
     public function reserve(int $quantity): bool
     {
-        return $this->reserveStock($quantity);
+        // Treat the helper as a convenience wrapper that only cares about success or failure.
+        return $this->reserveStock($quantity) !== null;
     }
 
     public function unreserve(int $quantity): bool
