@@ -152,6 +152,16 @@ final class CacheKeys
         return self::homeKey('collections', $locale);
     }
 
+    public static function collectionFilterOptions(int $collectionId, string $locale): string
+    {
+        return sprintf('collection:%d:filters:%s', $collectionId, $locale);
+    }
+
+    public static function collectionAvailableBrands(int $collectionId, string $locale): string
+    {
+        return sprintf('collection:%d:brands:%s', $collectionId, $locale);
+    }
+
     public static function homeSliders(string $locale): string
     {
         return self::homeKey('sliders', $locale);
@@ -196,6 +206,21 @@ final class CacheKeys
     public static function navigationCategories(int $limit, string $locale): string
     {
         return sprintf('navigation:categories:%d:%s', $limit, $locale);
+    }
+
+    public static function componentShowcaseFeaturedProducts(string $locale): string
+    {
+        return sprintf('component-showcase:featured-products:%s', $locale);
+    }
+
+    public static function componentShowcaseCategories(string $locale): string
+    {
+        return sprintf('component-showcase:categories:%s', $locale);
+    }
+
+    public static function componentShowcaseBrands(string $locale): string
+    {
+        return sprintf('component-showcase:brands:%s', $locale);
     }
 
     public static function navigationFeaturedBrands(string $locale): string
@@ -293,6 +318,11 @@ final class CacheKeys
         return sprintf('category:show:%d:products:%s:%s', $categoryId, $locale, self::hashFromArray($options));
     }
 
+    public static function languageSwitcherLinks(string $locale, string $pathHash): string
+    {
+        return sprintf('language-switcher:%s:%s', $locale, $pathHash);
+    }
+
     public static function currencyEnabledList(): string
     {
         return 'currency:enabled:list';
@@ -301,6 +331,16 @@ final class CacheKeys
     public static function currencyDefaultCode(): string
     {
         return 'currency:default:code';
+    }
+
+    public static function systemSettingsGroup(string $group, bool $publicOnly): string
+    {
+        return sprintf('system-settings:%s:%s', $group, $publicOnly ? 'public' : 'all');
+    }
+
+    public static function testResultsPayload(): string
+    {
+        return 'testing:results:payload';
     }
 
     /**

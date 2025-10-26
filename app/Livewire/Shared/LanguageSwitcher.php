@@ -4,7 +4,12 @@ declare(strict_types=1);
 
 namespace App\Livewire\Shared;
 
+use App\Data\Storefront\Shared\LanguageLinkData;
+use App\Support\Cache\CacheKeys;
+use App\Support\Cache\CacheTags;
+use App\Support\Cache\TagAwareCache;
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\Str;
 use Livewire\Component;
 
 /**
@@ -14,7 +19,7 @@ use Livewire\Component;
  *
  * @property array<int, string>    $locales
  * @property string                $current
- * @property array<string, string> $links
+ * @property array<string, LanguageLinkData> $links
  */
 class LanguageSwitcher extends Component
 {
@@ -26,7 +31,7 @@ class LanguageSwitcher extends Component
     public string $current;
 
     /**
-     * @var array<string, string>
+     * @var array<string, LanguageLinkData>
      */
     public array $links = [];
 
@@ -42,21 +47,50 @@ class LanguageSwitcher extends Component
             $rawLocales
         ), static fn (string $locale): bool => $locale !== ''));
         $this->current = app()->getLocale();
+
         $full = url()->full();
-        $path = parse_url($full, PHP_URL_PATH);
-        $path = is_string($path) ? $path : '/';
-        $qs = parse_url($full, PHP_URL_QUERY);
-        $query = $qs ? '?' . $qs : '';
+        $path = (string) (parse_url($full, PHP_URL_PATH) ?? '/');
+        $query = parse_url($full, PHP_URL_QUERY);
+        $queryString = $query ? '?' . $query : '';
+
         $parts = explode('/', ltrim($path, '/'));
         if ($parts !== [] && $parts[0] !== '' && in_array($parts[0], $this->locales, true)) {
             array_shift($parts);
         }
         $rest = trim(implode('/', $parts), '/');
-        $this->links = [];
-        foreach ($this->locales as $loc) {
-            $href = $rest === '' ? url('/' . $loc) : url('/' . $loc . '/' . $rest);
-            $this->links[$loc] = $href . $query;
-        }
+
+        $signature = hash('sha256', $rest . '|' . $queryString . '|' . implode(',', $this->locales));
+
+        /** @var array<string, array{locale:string,label:string,url:string,active:bool}> $payload */
+        $payload = TagAwareCache::remember(
+            CacheKeys::languageSwitcherLinks($this->current, $signature),
+            now()->addMinutes(5),
+            function () use ($rest, $queryString): array {
+                $links = [];
+
+                foreach ($this->locales as $locale) {
+                    $href = $rest === '' ? url('/' . $locale) : url('/' . $locale . '/' . $rest);
+
+                    $links[$locale] = (new LanguageLinkData(
+                        $locale,
+                        Str::upper($locale),
+                        $href . $queryString,
+                        $locale === $this->current,
+                    ))->toArray();
+                }
+
+                return $links;
+            },
+            [
+                CacheTags::locale($this->current),
+                CacheTags::settings(),
+            ]
+        );
+
+        $this->links = array_map(
+            static fn (array $entry): LanguageLinkData => LanguageLinkData::fromArray($entry),
+            $payload,
+        );
     }
 
     /**

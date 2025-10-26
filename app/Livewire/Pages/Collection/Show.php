@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Livewire\Pages\Collection;
 
-use App\Models\AttributeValue;
+use App\Data\Storefront\Collection\CollectionFilterGroupData;
+use App\Data\Storefront\Collection\CollectionFilterValueData;
+use App\Models\Brand;
 use App\Models\Collection as CollectionModel;
 use App\Models\CollectionRule;
 use App\Models\Product;
@@ -15,6 +17,9 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Collection;
+use App\Support\Cache\CacheKeys;
+use App\Support\Cache\CacheTags;
+use App\Support\Cache\TagAwareCache;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Url;
@@ -32,7 +37,8 @@ use Livewire\Component;
  * @property string|null            $sort
  * @property array<int, int|string> $selectedValues
  * @property-read LengthAwarePaginator<int, Product> $products
- * @property-read Collection<int, array{attribute_id:int, attribute_name:string, values:Collection<int, array{id:int, name:string, selected:bool}>}> $availableOptions
+ * @property-read Collection<int, CollectionFilterGroupData> $availableOptions
+ * @property-read Collection<int, CollectionFilterValueData> $filterValueLookup
  * @property-read Collection<int, \App\Models\Brand> $availableBrands
  */
 #[Layout('components.layouts.base')]
@@ -151,66 +157,109 @@ class Show extends Component
     {
         $collection = $this->collection;
 
-        $builder = Product::query()
-            ->where('is_visible', true)
-            ->whereNotNull('published_at')
-            ->where('published_at', '<=', now());
+        if ($collection === null) {
+            return collect();
+        }
 
-        $this->applyCollectionScope($builder, $collection);
+        $locale = app()->getLocale();
 
-        /** @var EloquentCollection<int, Product> $products */
-        $products = $builder->with(['variants.values.attribute'])->get();
+        /** @var array<int, array{attribute:array{id:int,name:string}, values:array<int, array{id:int,label:string,selected:bool}>}> $cached */
+        $cached = TagAwareCache::remember(
+            CacheKeys::collectionFilterOptions($collection->id, $locale),
+            now()->addMinutes(10),
+            function () use ($collection): array {
+                $builder = Product::query()
+                    ->where('is_visible', true)
+                    ->whereNotNull('published_at')
+                    ->where('published_at', '<=', now());
+
+                $this->applyCollectionScope($builder, $collection);
+
+                /** @var EloquentCollection<int, Product> $products */
+                $products = $builder->with(['variants.values.attribute'])->get();
+
+                $options = [];
+
+                foreach ($products as $product) {
+                    /** @var EloquentCollection<int, ProductVariant> $variants */
+                    $variants = $product->variants;
+
+                    foreach ($variants as $variant) {
+                        foreach ($variant->values as $value) {
+                            $attribute = $value->attribute;
+
+                            if ($attribute === null) {
+                                continue;
+                            }
+
+                            $attributeId = (int) $value->attribute_id;
+
+                            if (! array_key_exists($attributeId, $options)) {
+                                // Initialize the attribute bucket the first time we encounter the attribute.
+                                $options[$attributeId] = [
+                                    'attribute' => [
+                                        'id'   => $attributeId,
+                                        'name' => (string) $attribute->name,
+                                    ],
+                                    'values'    => [],
+                                ];
+                            }
+
+                            $options[$attributeId]['values'][$value->id] = [
+                                'id'       => (int) $value->id,
+                                'label'    => (string) $value->name,
+                                'selected' => false,
+                            ];
+                        }
+                    }
+                }
+
+                return collect($options)
+                    ->map(static function (array $option): array {
+                        $values = collect($option['values'] ?? [])
+                            ->map(static fn (array $value): array => $value)
+                            ->sortBy('label')
+                            ->values()
+                            ->all();
+
+                        return [
+                            'attribute' => $option['attribute'],
+                            'values'    => $values,
+                        ];
+                    })
+                    ->values()
+                    ->all();
+            },
+            [
+                CacheTags::collections(),
+                CacheTags::products(),
+                CacheTags::locale($locale),
+            ]
+        );
 
         $selectedValues = collect($this->selectedValues)
             ->map(static fn (mixed $value): int => (int) $value)
             ->filter()
+            ->values()
+            ->all();
+
+        return collect($cached)
+            ->map(static fn (array $payload): CollectionFilterGroupData => CollectionFilterGroupData::fromArray($payload))
+            ->map(static fn (CollectionFilterGroupData $group): CollectionFilterGroupData => $group->withSelected($selectedValues))
             ->values();
+    }
 
-        $options = [];
-
-        foreach ($products as $product) {
-            /** @var EloquentCollection<int, ProductVariant> $variants */
-            $variants = $product->variants;
-
-            foreach ($variants as $variant) {
-                /** @var EloquentCollection<int, AttributeValue> $values */
-                $values = $variant->values;
-
-                foreach ($values as $value) {
-                    $attribute = $value->attribute;
-
-                    if ($attribute === null) {
-                        continue;
-                    }
-
-                    $attributeId = (int) $value->attribute_id;
-
-                    if (! array_key_exists($attributeId, $options)) {
-                        // Lazily build the option container for the attribute the first time we encounter it.
-                        $options[$attributeId] = [
-                            'attribute_id'   => $attributeId,
-                            'attribute_name' => (string) $attribute->name,
-                            'values'         => [],
-                        ];
-                    }
-
-                    $options[$attributeId]['values'][$value->id] = [
-                        'id'       => (int) $value->id,
-                        'name'     => (string) $value->name,
-                        'selected' => $selectedValues->contains((int) $value->id),
-                    ];
-                }
-            }
-        }
-
-        return collect($options)
-            ->map(static function (array $option): array {
-                // Normalize nested values to sequential collections for predictable rendering.
-                $option['values'] = collect($option['values'])->values();
-
-                return $option;
-            })
-            ->values();
+    /**
+     * Provide a lookup map of filter values keyed by their identifier for quick access within the Blade view.
+     *
+     * @return Collection<int, CollectionFilterValueData>
+     */
+    #[Computed]
+    public function getFilterValueLookupProperty(): Collection
+    {
+        return $this->availableOptions
+            ->flatMap(static fn (CollectionFilterGroupData $group): Collection => $group->values)
+            ->keyBy(static fn (CollectionFilterValueData $value): int => $value->id);
     }
 
     /**
@@ -223,23 +272,51 @@ class Show extends Component
     {
         $collection = $this->collection;
 
-        $builder = Product::query()
-            ->select(['id', 'brand_id'])
-            ->with(['brand:id,name'])
-            ->where('is_visible', true)
-            ->whereNotNull('published_at')
-            ->where('published_at', '<=', now());
+        if ($collection === null) {
+            return collect();
+        }
 
-        $this->applyCollectionScope($builder, $collection);
+        $locale = app()->getLocale();
 
-        return $builder
-            ->whereNotNull('brand_id')
-            ->with('brand')
+        /** @var array<int, int> $brandIds */
+        $brandIds = TagAwareCache::remember(
+            CacheKeys::collectionAvailableBrands($collection->id, $locale),
+            now()->addMinutes(10),
+            function () use ($collection): array {
+                $builder = Product::query()
+                    ->select(['id', 'brand_id'])
+                    ->where('is_visible', true)
+                    ->whereNotNull('published_at')
+                    ->where('published_at', '<=', now());
+
+                $this->applyCollectionScope($builder, $collection);
+
+                return $builder
+                    ->whereNotNull('brand_id')
+                    ->pluck('brand_id')
+                    ->filter()
+                    ->unique()
+                    ->sort()
+                    ->values()
+                    ->map(static fn (mixed $id): int => (int) $id)
+                    ->all();
+            },
+            [
+                CacheTags::collections(),
+                CacheTags::products(),
+                CacheTags::brands(),
+                CacheTags::locale($locale),
+            ]
+        );
+
+        if ($brandIds === []) {
+            return collect();
+        }
+
+        return \App\Models\Brand::query()
+            ->whereIn('id', $brandIds)
+            ->orderBy('name')
             ->get()
-            ->pluck('brand')
-            ->filter()
-            ->unique('id')
-            ->sortBy('name')
             ->values();
     }
 
