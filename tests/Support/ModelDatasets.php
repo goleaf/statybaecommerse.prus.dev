@@ -84,7 +84,8 @@ dataset('ordered_by_name_models', function (): array {
         [SystemSettingDependency::class, ['condition', 'key', 'name']],
         [SystemSettingTranslation::class, ['name', 'key', 'title']],
         [UiTranslation::class, ['key']],
-        [UserBehavior::class, ['event', 'name']],
+        // UserBehavior orders by behaviour_type instead of the legacy event/name pairing.
+        [UserBehavior::class, ['behavior_type']],
         [UserPreference::class, ['key', 'name', 'preference_key', 'preference_type']],
         [UserProductInteraction::class, ['event', 'action', 'name']],
         [VariantInventory::class, ['sku', 'name']],
