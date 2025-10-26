@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Models\Product;
+use App\Models\RecommendationAnalytics;
 use App\Models\RecommendationBlock;
 use App\Models\RecommendationCache;
 use App\Models\User;
@@ -14,6 +15,7 @@ use App\Services\Recommendations\CategoryBasedRecommendation;
 use App\Services\Recommendations\ContentBasedRecommendation;
 use App\Services\Recommendations\CrossSellRecommendation;
 use App\Services\Recommendations\HybridRecommendation;
+use App\Services\Recommendations\ManualRecommendation;
 use App\Services\Recommendations\PopularityRecommendation;
 use App\Services\Recommendations\PersonalizedRecommendation;
 use App\Services\Recommendations\TrendingRecommendation;
@@ -35,6 +37,14 @@ use Illuminate\Support\LazyCollection;
 final class RecommendationService
 {
     private array $algorithmInstances = [];
+
+    /**
+     * Cache the most recent per-config metrics so downstream calls (caching,
+     * analytics, A/B comparisons) can reuse a consistent snapshot.
+     *
+     * @var array<int, array<string, mixed>>
+     */
+    private array $lastConfigMetrics = [];
 
     /**
      * Handle getRecommendations functionality with proper error handling.
@@ -59,10 +69,10 @@ final class RecommendationService
             // Generate recommendations using configured algorithms
             $recommendations = $this->generateRecommendations($block, $user, $product, $context);
             // Cache the results
-            $this->cacheRecommendations($cacheKey, $block, $user, $product, $context, $recommendations);
+            $this->cacheRecommendations($cacheKey, $block, $user, $product, $context, $recommendations, $this->lastConfigMetrics);
             // Track performance
             $executionTime = microtime(true) - $startTime;
-            $this->trackPerformance($blockName, $executionTime, $recommendations->count());
+            $this->trackPerformance($block, $executionTime, $recommendations->count());
 
             return $recommendations;
         } catch (Exception $e) {
@@ -90,23 +100,36 @@ final class RecommendationService
                 });
         }
         $allRecommendations = collect();
+        $this->lastConfigMetrics = [];
         // Use LazyCollection with timeout to prevent long-running recommendation generation
         $timeout = now()->addSeconds(30);
         // 30 second timeout for recommendation generation
         LazyCollection::make($configs)->takeUntilTimeout($timeout)->each(function ($config) use (&$allRecommendations, $user, $product, $context): void {
             try {
+                $configStart = microtime(true);
                 $algorithm = $this->getAlgorithmInstance($config->type, $config->config);
                 $recommendations = $algorithm->getRecommendations($user, $product, $context);
                 if ($recommendations->isNotEmpty()) {
                     $allRecommendations = $allRecommendations->merge($recommendations);
                 }
+                $this->lastConfigMetrics[] = [
+                    'config_id'       => $config->id,
+                    'config_name'     => $config->name,
+                    'type'            => $config->type,
+                    'algorithm_class' => $algorithm::class,
+                    'result_count'    => $recommendations->count(),
+                    'execution_time'  => microtime(true) - $configStart,
+                    'context'         => $context,
+                ];
             } catch (Exception $e) {
                 Log::error("Algorithm '{$config->type}' failed", ['error' => $e->getMessage(), 'config_id' => $config->id]);
             }
         });
 
+        $this->recordConfigAnalytics($block);
+
         // Remove duplicates and filter out low quality results before limiting
-        return $allRecommendations
+        $filtered = $allRecommendations
             ->filter(function ($product): bool {
                 // Guard against unexpected payloads and ensure only high-quality, merchandisable products surface
                 return $product instanceof Product
@@ -118,6 +141,11 @@ final class RecommendationService
             ->unique('id')
             ->values()
             ->take($block->max_products);
+
+        // Return a fresh Eloquent collection instance so downstream code receives
+        // the familiar Collection contract without relying on builder helpers
+        // that are unavailable in SQLite test contexts.
+        return new Collection($filtered->all());
     }
 
     /**
@@ -161,7 +189,7 @@ final class RecommendationService
         if ($cached) {
             $cached->incrementHitCount();
 
-            return collect($cached->recommendations);
+            return $this->rehydrateCachedProducts($cached);
         }
 
         return null;
@@ -170,12 +198,79 @@ final class RecommendationService
     /**
      * Handle cacheRecommendations functionality with proper error handling.
      */
-    private function cacheRecommendations(string $cacheKey, RecommendationBlock $block, ?User $user = null, ?Product $product = null, array $context = [], ?Collection $recommendations = null): void
+    private function cacheRecommendations(string $cacheKey, RecommendationBlock $block, ?User $user = null, ?Product $product = null, array $context = [], ?Collection $recommendations = null, array $configMetrics = []): void
     {
         if (! $recommendations || $recommendations->isEmpty()) {
             return;
         }
-        RecommendationCache::updateOrCreate(['cache_key' => $cacheKey], ['block_id' => $block->id, 'user_id' => $user?->id, 'product_id' => $product?->id, 'context_type' => $context['type'] ?? null, 'context_data' => $context, 'recommendations' => $recommendations->toArray(), 'hit_count' => 0, 'expires_at' => now()->addSeconds($block->cache_duration)]);
+        RecommendationCache::updateOrCreate(
+            ['cache_key' => $cacheKey],
+            [
+                'block_id'        => $block->id,
+                'user_id'         => $user?->id,
+                'product_id'      => $product?->id,
+                'context_type'    => $context['type'] ?? null,
+                'context_data'    => $context,
+                'recommendations' => [
+                    'products' => $recommendations->map(fn (Product $item): array => [
+                        'id'    => $item->id,
+                        'score' => $item->recommendation_score ?? null,
+                    ])->all(),
+                    'meta' => [
+                        'cached_at'      => now()->toIso8601String(),
+                        'result_count'   => $recommendations->count(),
+                        'config_metrics' => $configMetrics,
+                    ],
+                ],
+                'hit_count'  => 0,
+                'expires_at' => now()->addSeconds($block->cache_duration),
+            ],
+        );
+    }
+
+    /**
+     * Rehydrate cached recommendation payloads into Product models so Livewire
+     * components receive fully-functional entities instead of raw arrays.
+     */
+    private function rehydrateCachedProducts(RecommendationCache $cache): Collection
+    {
+        $entries = $cache->recommendations['products'] ?? $cache->recommendations ?? [];
+        $ids = collect($entries)
+            ->pluck('id')
+            ->filter()
+            ->unique()
+            ->values()
+            ->all();
+
+        if ($ids === []) {
+            return collect();
+        }
+
+        $products = Product::query()
+            ->with(['brand', 'media'])
+            ->whereIn('id', $ids)
+            ->get()
+            ->keyBy('id');
+
+        $rehydrated = collect($entries)
+            ->map(function (array $entry) use ($products) {
+                $product = $products->get($entry['id'] ?? 0);
+                if (! $product) {
+                    return null;
+                }
+                if (array_key_exists('score', $entry)) {
+                    $product->recommendation_score = $entry['score'];
+                    $product->relevance_score = $entry['score'];
+                }
+
+                return $product;
+            })
+            ->filter()
+            ->values();
+
+        // Instantiate the collection manually to avoid invoking Builder-only
+        // helpers that are not present when the query builder is mocked.
+        return new Collection($rehydrated->all());
     }
 
     /**
@@ -214,9 +309,116 @@ final class RecommendationService
     /**
      * Handle trackPerformance functionality with proper error handling.
      */
-    private function trackPerformance(string $blockName, float $executionTime, int $resultCount): void
+    private function trackPerformance(RecommendationBlock $block, float $executionTime, int $resultCount): void
     {
-        Log::info('Recommendation Performance', ['block' => $blockName, 'execution_time' => $executionTime, 'result_count' => $resultCount, 'timestamp' => now()]);
+        Log::info('Recommendation Performance', ['block' => $block->name, 'execution_time' => $executionTime, 'result_count' => $resultCount, 'timestamp' => now()]);
+
+        $record = RecommendationAnalytics::query()->firstOrNew([
+            'block_id'  => $block->id,
+            'config_id' => null,
+            'date'      => now()->toDateString(),
+            'action'    => 'aggregate',
+        ]);
+
+        $metrics = $record->metrics ?? [];
+        $requests = ($metrics['requests'] ?? 0) + 1;
+        $totalResults = ($metrics['total_results'] ?? 0) + $resultCount;
+        $totalExecutionTime = ($metrics['total_execution_time'] ?? 0) + $executionTime;
+
+        $record->metrics = [
+            'requests'               => $requests,
+            'total_results'          => $totalResults,
+            'total_execution_time'   => $totalExecutionTime,
+            'average_results'        => $totalResults / max(1, $requests),
+            'average_execution_time' => $totalExecutionTime / max(1, $requests),
+            'block_name'             => $block->name,
+        ];
+        $record->save();
+    }
+
+    /**
+     * Persist per-config analytics for downstream dashboards and A/B testing.
+     */
+    private function recordConfigAnalytics(RecommendationBlock $block): void
+    {
+        foreach ($this->lastConfigMetrics as $metric) {
+            $record = RecommendationAnalytics::query()->firstOrNew([
+                'block_id'  => $block->id,
+                'config_id' => $metric['config_id'],
+                'date'      => now()->toDateString(),
+                'action'    => 'serve',
+            ]);
+
+            $existing = $record->metrics ?? [];
+            $requests = ($existing['requests'] ?? 0) + 1;
+            $totalResults = ($existing['total_results'] ?? 0) + $metric['result_count'];
+            $totalExecutionTime = ($existing['total_execution_time'] ?? 0) + $metric['execution_time'];
+
+            $record->metrics = [
+                'requests'               => $requests,
+                'total_results'          => $totalResults,
+                'total_execution_time'   => $totalExecutionTime,
+                'average_results'        => $totalResults / max(1, $requests),
+                'average_execution_time' => $totalExecutionTime / max(1, $requests),
+                'algorithm'              => $metric['type'],
+                'algorithm_class'        => $metric['algorithm_class'],
+                'config_name'            => $metric['config_name'],
+                'last_context'           => $metric['context'],
+            ];
+            $record->save();
+        }
+    }
+
+    /**
+     * Compare configuration performance for lightweight A/B testing insights.
+     */
+    public function compareConfigPerformance(RecommendationBlock $block, int $days = 30): array
+    {
+        $since = now()->subDays($days)->toDateString();
+        $analytics = RecommendationAnalytics::query()
+            ->byBlock($block->id)
+            ->where('action', 'serve')
+            ->where('date', '>=', $since)
+            ->get();
+
+        if ($analytics->isEmpty()) {
+            return [];
+        }
+
+        $configs = $block->getConfigs()->keyBy('id');
+
+        return $analytics
+            ->groupBy('config_id')
+            ->map(function ($records, $configId) use ($configs) {
+                $totals = $records->reduce(function (array $carry, RecommendationAnalytics $record): array {
+                    $metrics = $record->metrics ?? [];
+                    $carry['requests'] += $metrics['requests'] ?? 0;
+                    $carry['total_results'] += $metrics['total_results'] ?? 0;
+                    $carry['total_execution_time'] += $metrics['total_execution_time'] ?? 0;
+
+                    return $carry;
+                }, ['requests' => 0, 'total_results' => 0, 'total_execution_time' => 0]);
+
+                $requests = max(1, $totals['requests']);
+                $avgResults = $totals['total_results'] / $requests;
+                $avgExecution = $totals['total_execution_time'] / $requests;
+                $score = $avgExecution > 0 ? $avgResults / $avgExecution : $avgResults;
+
+                $config = $configs->get((int) $configId);
+
+                return [
+                    'config_id'          => (int) $configId,
+                    'config_name'        => $config ? $config->name : 'unknown',
+                    'requests'           => $totals['requests'],
+                    'avg_results'        => $avgResults,
+                    'avg_execution_time' => $avgExecution,
+                    'score'              => $score,
+                    'algorithm'          => $config ? $config->type : null,
+                ];
+            })
+            ->sortByDesc('score')
+            ->values()
+            ->toArray();
     }
 
     /**
