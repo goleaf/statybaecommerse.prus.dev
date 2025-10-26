@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Pages;
 
 use App\Models\Slider;
+use App\Services\CacheInvalidationService;
 use App\Support\DateRange;
 use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
 use BackedEnum;
@@ -152,8 +153,8 @@ class SliderAnalytics extends BaseDashboard
 
     protected function refreshData(): void
     {
-        // Clear any cached data
-        cache()->forget('slider_analytics_data');
+        // Delegate cache invalidation to the shared service so all slider caches stay consistent.
+        app(CacheInvalidationService::class)->flushSliders();
 
         $this->notify('success', 'Analytics data refreshed successfully');
     }
