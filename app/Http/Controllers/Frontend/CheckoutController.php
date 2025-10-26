@@ -220,6 +220,8 @@ final class CheckoutController extends Controller
         $userId = $request->user()?->getAuthIdentifier();
 
         $items = CartItem::query()
+            // Eager-load related product data so each cart item does not issue an extra query.
+            ->with(['product', 'productVariant', 'variant'])
             ->where(function ($query) use ($sessionId, $userId): void {
                 $hasCondition = false;
 
