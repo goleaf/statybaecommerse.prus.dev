@@ -81,11 +81,14 @@ final class LocationController extends Controller
             }
         }
 
+        $perPage = (int) $request->integer('per_page', 50);
+        $perPage = max(1, min($perPage, 200)); // Cap the per-page value to avoid excessive payloads.
+
         $locations = $query
             ->orderBy('sort_order')
             ->orderBy('name')
-            ->get()
-            ->map(function (Location $location) {
+            ->paginate($perPage)
+            ->through(static function (Location $location): array {
                 return [
                     'id' => $location->id,
                     'name' => $location->name,
@@ -100,9 +103,7 @@ final class LocationController extends Controller
                 ];
             });
 
-        return response()->json([
-            'data' => $locations,
-        ]);
+        return response()->json($locations);
     }
 
     public function create(): \Illuminate\Http\Response
