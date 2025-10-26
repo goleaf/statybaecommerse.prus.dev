@@ -26,7 +26,7 @@ jobs:
       fail-fast: false
       matrix:
         php-version:
-          - '8.2'
+          # Run the pipeline solely on PHP 8.3, aligning with the supported runtime target.
           - '8.3'
     steps:
       - name: Checkout

@@ -16,7 +16,8 @@ jobs:
       # Ensure every PHP version in the matrix executes even if an earlier run fails.
       fail-fast: false
       matrix:
-        php: ["8.2", "8.3"]
+        # Focus the matrix on the actively supported PHP runtime for this project.
+        php: ["8.3"]
     env:
       # Configure Laravel to rely on lightweight, file-based services for CI speed and determinism.
       APP_ENV: testing
