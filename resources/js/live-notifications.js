@@ -10,22 +10,33 @@ class LiveNotifications {
         this.reconnectAttempts = 0;
         this.maxReconnectAttempts = 5;
         this.reconnectDelay = 1000; // 1 second
+        this.streamAnchor = null;
+        this.streamUrl = null;
         this.init();
     }
 
     init() {
+        // Resolve the DOM anchor that carries the per-user stream URL. When the attribute is
+        // missing (such as on guest sessions) we skip the SSE setup entirely to avoid noisy errors.
+        this.streamAnchor = document.querySelector('[data-notification-stream-url]');
+        this.streamUrl = this.streamAnchor?.dataset?.notificationStreamUrl ?? null;
+
+        if (! this.streamUrl) {
+            return;
+        }
+
         this.connect();
         this.setupEventListeners();
     }
 
     connect() {
-        if (this.isConnected) {
+        if (this.isConnected || ! this.streamUrl) {
             return;
         }
 
         try {
             // Create Server-Sent Events connection
-            this.eventSource = new EventSource('/api/notifications/stream');
+            this.eventSource = new EventSource(this.streamUrl);
 
             this.eventSource.onopen = () => {
                 console.log('Live notifications connected');
@@ -54,6 +65,10 @@ class LiveNotifications {
     }
 
     handleReconnect() {
+        if (! this.streamUrl) {
+            return;
+        }
+
         if (this.reconnectAttempts >= this.maxReconnectAttempts) {
             console.error('Max reconnection attempts reached');
             return;
