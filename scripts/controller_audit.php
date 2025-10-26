@@ -247,6 +247,65 @@ if ($basePath === false) {
 }
 
 $files = listControllerFiles($controllerDir);
+
+// Allow callers to optionally pass a list of specific controller paths so the
+// audit can focus on a subset of files. Each argument is resolved relative to
+// the repository root, and we bail out if nothing matches to surface mistakes.
+$requestedPaths = array_slice($argv ?? [], 1);
+
+if (! empty($requestedPaths)) {
+    $filteredFiles = [];
+
+    foreach ($requestedPaths as $inputPath) {
+        // Resolve both absolute and relative paths to ensure consistent
+        // comparisons when we later filter the discovered controller files.
+        $candidate = realpath($inputPath);
+
+        if ($candidate === false) {
+            $candidate = realpath($basePath . DIRECTORY_SEPARATOR . ltrim($inputPath, DIRECTORY_SEPARATOR));
+        }
+
+        if ($candidate === false) {
+            fwrite(STDERR, 'Warning: Unable to resolve controller path: ' . $inputPath . PHP_EOL);
+
+            continue;
+        }
+
+        if (is_dir($candidate)) {
+            // Include every controller nested inside the requested directory so
+            // teams can audit entire namespaces with one command.
+            $filteredFiles = array_merge(
+                $filteredFiles,
+                array_filter(
+                    $files,
+                    static fn (string $file): bool => str_starts_with($file, $candidate . DIRECTORY_SEPARATOR)
+                )
+            );
+
+            continue;
+        }
+
+        if (! str_starts_with($candidate, $controllerDir . DIRECTORY_SEPARATOR)) {
+            fwrite(STDERR, 'Warning: Skipping non-controller path: ' . $inputPath . PHP_EOL);
+
+            continue;
+        }
+
+        if (is_file($candidate)) {
+            $filteredFiles[] = $candidate;
+        }
+    }
+
+    $filteredFiles = array_values(array_unique($filteredFiles));
+
+    if (empty($filteredFiles)) {
+        fwrite(STDERR, 'No matching controller files found for supplied arguments.' . PHP_EOL);
+        exit(1);
+    }
+
+    $files = $filteredFiles;
+}
+
 $rows = [];
 
 foreach ($files as $file) {
