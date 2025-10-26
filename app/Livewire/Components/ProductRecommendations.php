@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Livewire\Components;
 
-use App\Models\Order;
 use App\Livewire\Concerns\WithCart;
 use App\Livewire\Concerns\WithNotifications;
+use App\Models\Order;
 use App\Models\Product;
 use App\Models\User;
 use Illuminate\Contracts\View\View;
@@ -30,6 +30,7 @@ final class ProductRecommendations extends Component
         addToCart as performAddToCart;
     }
     use WithNotifications;
+
     public ?int $productId = null;
 
     public ?int $userId = null;

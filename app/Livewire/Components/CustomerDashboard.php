@@ -27,7 +27,6 @@ final class CustomerDashboard extends Component
         addToCart as performAddToCart;
     }
     use WithNotifications;
-
     use WithPagination;
 
     public User $user;
@@ -47,7 +46,7 @@ final class CustomerDashboard extends Component
     public function stats(): array
     {
         return [
-            'total_orders'     => $this->user->orders()->count(),
+            'total_orders' => $this->user->orders()->count(),
             // Treat legacy "completed" records as delivered so dashboards remain accurate during migration.
             'completed_orders' => $this->user->orders()->whereIn('status', ['delivered', 'completed'])->count(),
             'pending_orders'   => $this->user->orders()->where('status', 'pending')->count(),

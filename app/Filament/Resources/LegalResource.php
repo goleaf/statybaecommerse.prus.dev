@@ -23,8 +23,8 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
-use UnitEnum;
 use Pixelpeter\FilamentLanguageTabs\Forms\Components\LanguageTabs;
+use UnitEnum;
 
 final class LegalResource extends Resource
 {

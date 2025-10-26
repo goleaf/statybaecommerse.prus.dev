@@ -11,7 +11,9 @@ use App\Support\Cache\CacheTags;
 use App\Support\Cache\TagAwareCache;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Str;
+use JsonException;
 use Livewire\Component;
+use Traversable;
 
 /**
  * SystemSettingsDisplay
@@ -56,7 +58,7 @@ final class SystemSettingsDisplay extends Component
                     ? $settingsService->getPublicSettings()
                     : $settingsService->getSettingsByGroup($this->group);
 
-                if ($source instanceof \Traversable) {
+                if ($source instanceof Traversable) {
                     $source = iterator_to_array($source);
                 }
 
@@ -140,7 +142,7 @@ final class SystemSettingsDisplay extends Component
         if (is_array($value) || is_object($value)) {
             try {
                 return (string) json_encode($value, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
-            } catch (\JsonException) {
+            } catch (JsonException) {
                 return '[]';
             }
         }
@@ -173,7 +175,7 @@ final class SystemSettingsDisplay extends Component
 
         try {
             $encoded = json_encode($value, JSON_THROW_ON_ERROR | JSON_UNESCAPED_UNICODE);
-        } catch (\JsonException) {
+        } catch (JsonException) {
             $encoded = '';
         }
 

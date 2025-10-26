@@ -10,7 +10,7 @@ return [
      */
     'allowed_countries' => array_values(array_filter(array_map(
         static fn (string $code): string => strtoupper(trim($code)),
-        explode(',', env('ADDRESS_ALLOWED_COUNTRIES', 'LT'))
+        explode(',', (string) env('ADDRESS_ALLOWED_COUNTRIES', 'LT'))
     ))),
 
     /*

@@ -26,8 +26,8 @@ final class PersonalizedRecommendation extends BaseRecommendation
     {
         return [
             // Prioritise a modest list of products to keep the widget focused.
-            'max_results'        => 10,
-            'min_score'          => 0.15,
+            'max_results' => 10,
+            'min_score'   => 0.15,
             // Weighting that favours strong user preferences while still factoring in recency.
             'preference_weights' => [
                 'category' => 0.45,
@@ -36,9 +36,9 @@ final class PersonalizedRecommendation extends BaseRecommendation
                 'behavior' => 0.2,
             ],
             // Respect fresh interactions more strongly while still retaining historical context.
-            'recent_days'        => 30,
-            'cache_ttl'          => 1800,
-            'filters'            => [
+            'recent_days' => 30,
+            'cache_ttl'   => 1800,
+            'filters'     => [
                 ['type' => 'where', 'field' => 'is_visible', 'value' => true],
             ],
         ];
@@ -171,7 +171,7 @@ final class PersonalizedRecommendation extends BaseRecommendation
     /**
      * Handle aggregateVectorScore functionality with proper error handling.
      *
-     * @param list<string>              $keys
+     * @param list<string>             $keys
      * @param array<string, float|int> $vector
      */
     private function aggregateVectorScore(array $keys, array $vector): float

@@ -50,31 +50,31 @@ final class OrderSummaryControllerTest extends TestCase
 
         // Seed two recent orders for the authenticated partner with deterministic totals.
         Order::factory()->create([
-            'partner_id' => $partner->getKey(),
-            'status'     => 'completed',
+            'partner_id'     => $partner->getKey(),
+            'status'         => 'completed',
             'payment_status' => 'paid',
-            'total'      => 150.00,
-            'currency'   => 'EUR',
-            'created_at' => now()->subDays(2),
+            'total'          => 150.00,
+            'currency'       => 'EUR',
+            'created_at'     => now()->subDays(2),
         ]);
 
         Order::factory()->create([
-            'partner_id' => $partner->getKey(),
-            'status'     => 'pending',
+            'partner_id'     => $partner->getKey(),
+            'status'         => 'pending',
             'payment_status' => 'pending',
-            'total'      => 50.00,
-            'currency'   => 'USD',
-            'created_at' => now()->subDay(),
+            'total'          => 50.00,
+            'currency'       => 'USD',
+            'created_at'     => now()->subDay(),
         ]);
 
         // Insert a control order that should be excluded because it belongs to another partner.
         Order::factory()->create([
-            'partner_id' => Partner::factory()->create()->getKey(),
-            'status'     => 'completed',
+            'partner_id'     => Partner::factory()->create()->getKey(),
+            'status'         => 'completed',
             'payment_status' => 'paid',
-            'total'      => 999.00,
-            'currency'   => 'EUR',
-            'created_at' => now()->subDay(),
+            'total'          => 999.00,
+            'currency'       => 'EUR',
+            'created_at'     => now()->subDay(),
         ]);
 
         $response = $this->withHeaders([
@@ -110,22 +110,22 @@ final class OrderSummaryControllerTest extends TestCase
 
         // Recent order should be counted in the summary window.
         Order::factory()->create([
-            'partner_id' => $partner->getKey(),
-            'status'     => 'processing',
+            'partner_id'     => $partner->getKey(),
+            'status'         => 'processing',
             'payment_status' => 'paid',
-            'total'      => 80.00,
-            'currency'   => 'EUR',
-            'created_at' => now()->subDays(5),
+            'total'          => 80.00,
+            'currency'       => 'EUR',
+            'created_at'     => now()->subDays(5),
         ]);
 
         // Historical order outside the 30-day window must be ignored by default.
         Order::factory()->create([
-            'partner_id' => $partner->getKey(),
-            'status'     => 'completed',
+            'partner_id'     => $partner->getKey(),
+            'status'         => 'completed',
             'payment_status' => 'paid',
-            'total'      => 120.00,
-            'currency'   => 'EUR',
-            'created_at' => now()->subDays(60),
+            'total'          => 120.00,
+            'currency'       => 'EUR',
+            'created_at'     => now()->subDays(60),
         ]);
 
         $response = $this->withHeaders([

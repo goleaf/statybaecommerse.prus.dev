@@ -263,12 +263,12 @@ final class UserController extends Controller
     {
         $user = Auth::user();
         $statistics = [
-            'orders'     => [
-                'total'              => $user->orders()->count(),
+            'orders' => [
+                'total' => $user->orders()->count(),
                 // Count delivered orders while tolerating legacy "completed" rows for backwards compatibility.
-                'delivered'          => $user->orders()->whereIn('status', ['delivered', 'completed'])->count(),
-                'pending'            => $user->orders()->where('status', 'pending')->count(),
-                'total_spent'        => $user->total_spent,
+                'delivered'           => $user->orders()->whereIn('status', ['delivered', 'completed'])->count(),
+                'pending'             => $user->orders()->where('status', 'pending')->count(),
+                'total_spent'         => $user->total_spent,
                 'average_order_value' => $user->average_order_value,
             ],
             'reviews'   => ['total' => $user->reviews()->count(), 'average_rating' => $user->average_rating],

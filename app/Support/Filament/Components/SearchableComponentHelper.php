@@ -200,6 +200,7 @@ final class SearchableComponentHelper
      * Hydrate a SearchableInput component by resolving a model lazily.
      *
      * @template TModel of Model
+     *
      * @param callable(int): (TModel|null) $finder        Retrieve the model from a persisted store.
      * @param callable(TModel): string     $labelResolver Resolve the label for the hydrated option.
      */
@@ -266,12 +267,18 @@ final class SearchableComponentHelper
         string $lookupField,
         string $payloadField,
         ?string $state,
+        Closure $finder,
         Closure $payloadResolver,
+        ?Closure $labelResolver = null,
+        array $emptyPayload = [],
+        ?SearchableInput $component = null,
     ): void {
         $identifier = self::normaliseIdentifier($state);
 
         if ($identifier === null) {
-            self::clear($component);
+            if ($component !== null) {
+                self::clear($component);
+            }
             $set($payloadField, $emptyPayload);
 
             return;
@@ -280,8 +287,15 @@ final class SearchableComponentHelper
         $model = $finder($identifier);
 
         if (! $model instanceof Model) {
-            self::clear($component);
+            if ($component !== null) {
+                self::clear($component);
+            }
             $set($payloadField, $emptyPayload);
+
+            return;
+        }
+
+        $payload = $payloadResolver($model);
 
         if ($payload === null) {
             return;
@@ -294,13 +308,13 @@ final class SearchableComponentHelper
             $label = is_string($resolved) && $resolved !== '' ? $resolved : null;
         }
 
-        $payload = $payloadResolver($model);
-
-        self::applyComponentState($component, [
-            'value'   => $identifier,
-            'label'   => $label ?? ($component->getOptions()[(string) $identifier] ?? ''),
-            'payload' => $payload,
-        ]);
+        if ($component !== null) {
+            self::applyComponentState($component, [
+                'value'   => $identifier,
+                'label'   => $label ?? ($component->getOptions()[(string) $identifier] ?? ''),
+                'payload' => $payload,
+            ]);
+        }
 
         $set($payloadField, is_array($payload) ? $payload : (array) $payload);
     }

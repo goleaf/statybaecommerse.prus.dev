@@ -24,17 +24,17 @@ final class CategoryBasedRecommendation extends BaseRecommendation
     {
         return [
             // By default recommend up to eight items that share the active category context.
-            'max_results'          => 8,
-            'min_score'            => 0.1,
+            'max_results' => 8,
+            'min_score'   => 0.1,
             // Allow configuring how far up the category tree we should look when broadening matches.
-            'include_parent'       => true,
+            'include_parent' => true,
             // Let integrators override the ordering column for deterministic storefront output.
-            'order_by'             => 'relevance_score',
-            'order_direction'      => 'desc',
+            'order_by'        => 'relevance_score',
+            'order_direction' => 'desc',
             // Provide a TTL that mirrors the default block cache duration.
-            'cache_ttl'            => 1800,
+            'cache_ttl' => 1800,
             // Keep a sane default filter set so results remain purchasable.
-            'filters'              => [
+            'filters' => [
                 ['type' => 'where', 'field' => 'is_visible', 'value' => true],
             ],
         ];
@@ -68,7 +68,7 @@ final class CategoryBasedRecommendation extends BaseRecommendation
     /**
      * Handle resolveCategoryIds functionality with proper error handling.
      *
-     * @param array<string, mixed> $context
+     * @param  array<string, mixed> $context
      * @return list<int>
      */
     private function resolveCategoryIds(?Product $product, array $context): array

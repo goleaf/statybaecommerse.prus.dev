@@ -93,7 +93,7 @@ return [
         // Orders at or above this subtotal qualify for free delivery.
         'free_threshold' => 50.0,
         // Flat-rate fallback applied below the free shipping threshold.
-        'flat_rate'      => 5.99,
+        'flat_rate' => 5.99,
     ],
 
     'validation' => [

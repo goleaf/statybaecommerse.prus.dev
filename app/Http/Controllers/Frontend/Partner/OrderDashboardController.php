@@ -22,8 +22,8 @@ final class OrderDashboardController extends Controller
      * @var array<string, list<OrderStatus>>
      */
     private const STATUS_SEGMENTS = [
-        'open' => [OrderStatus::PENDING, OrderStatus::PROCESSING],
-        'shipped' => [OrderStatus::SHIPPED, OrderStatus::DELIVERED],
+        'open'      => [OrderStatus::PENDING, OrderStatus::PROCESSING],
+        'shipped'   => [OrderStatus::SHIPPED, OrderStatus::DELIVERED],
         'cancelled' => [OrderStatus::CANCELLED, OrderStatus::REFUNDED, OrderStatus::RETURNED],
     ];
 
@@ -39,9 +39,9 @@ final class OrderDashboardController extends Controller
         if ($user === null) {
             return response()->view('frontend.partner.orders', [
                 'orderPayload' => null,
-                'paginator' => null,
+                'paginator'    => null,
                 'activeStatus' => 'open',
-                'errorCode' => Response::HTTP_UNAUTHORIZED,
+                'errorCode'    => Response::HTTP_UNAUTHORIZED,
             ], Response::HTTP_UNAUTHORIZED);
         }
 
@@ -52,9 +52,9 @@ final class OrderDashboardController extends Controller
         if (! $partner instanceof Partner) {
             return response()->view('frontend.partner.orders', [
                 'orderPayload' => null,
-                'paginator' => null,
+                'paginator'    => null,
                 'activeStatus' => 'open',
-                'errorCode' => Response::HTTP_FORBIDDEN,
+                'errorCode'    => Response::HTTP_FORBIDDEN,
             ], Response::HTTP_FORBIDDEN);
         }
 
@@ -86,7 +86,7 @@ final class OrderDashboardController extends Controller
         // Repackage the paginator collection using the public contract so the Blade view works with the new response shape.
         $payload = OrderContract::forCollection($paginator->getCollection(), [
             'partner' => [
-                'id' => $partner->getKey(),
+                'id'   => $partner->getKey(),
                 'code' => $partner->getAttribute('code'),
                 'name' => $partner->getAttribute('name'),
             ],
@@ -94,18 +94,18 @@ final class OrderDashboardController extends Controller
                 'status_segment' => $segment,
             ],
             'pagination' => [
-                'total' => $paginator->total(),
-                'per_page' => $paginator->perPage(),
+                'total'        => $paginator->total(),
+                'per_page'     => $paginator->perPage(),
                 'current_page' => $paginator->currentPage(),
-                'last_page' => $paginator->lastPage(),
+                'last_page'    => $paginator->lastPage(),
             ],
         ]);
 
         return response()->view('frontend.partner.orders', [
             'orderPayload' => $payload,
-            'paginator' => $paginator,
+            'paginator'    => $paginator,
             'activeStatus' => $segment,
-            'errorCode' => null,
+            'errorCode'    => null,
         ]);
     }
 }

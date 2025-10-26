@@ -10,10 +10,10 @@ use Livewire\Livewire;
 
 beforeEach(function () {
     $this->product = Product::factory()->create([
-        'name'       => 'Test Product Detailed',
-        'price'      => 199.99,
-        'status'     => 'published',
-        'is_visible' => true,
+        'name'           => 'Test Product Detailed',
+        'price'          => 199.99,
+        'status'         => 'published',
+        'is_visible'     => true,
         'stock_quantity' => 25,
     ]);
 });

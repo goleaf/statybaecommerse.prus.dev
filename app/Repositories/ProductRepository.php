@@ -168,8 +168,9 @@ final class ProductRepository
      * Centralised cache helper so repository queries share the same TTL logic.
      *
      * @template TValue
-     * @param callable(): TValue $callback
-     * @param array<int, string> $tags
+     *
+     * @param  callable(): TValue $callback
+     * @param  array<int, string> $tags
      * @return TValue
      */
     private function remember(string $key, int $ttlSeconds, callable $callback, array $tags = [])

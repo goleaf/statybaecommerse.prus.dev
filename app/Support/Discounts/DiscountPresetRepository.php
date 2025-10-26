@@ -46,8 +46,7 @@ final class DiscountPresetRepository
     /**
      * Persist a new preset to the storage layer.
      *
-     * @param array<string, mixed> $attributes
-     *
+     * @param  array<string, mixed> $attributes
      * @return array<string, mixed>
      */
     public function create(array $attributes): array

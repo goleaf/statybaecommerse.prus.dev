@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Http\Controllers\Api\Partner\InventoryController;
 use App\Http\Controllers\Api\Partner\OrdersIndexController;
+use App\Http\Controllers\Api\Partner\OrderSummaryController;
 use App\Http\Controllers\Api\Partner\PingController;
 use Illuminate\Support\Facades\Route;
 

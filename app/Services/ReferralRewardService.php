@@ -8,9 +8,11 @@ use App\Models\Discount;
 use App\Models\Order;
 use App\Models\Referral;
 use App\Models\ReferralReward;
+
+use function collect;
+
 use Exception;
 use Illuminate\Support\Facades\Log;
-use function collect;
 
 /**
  * ReferralRewardService

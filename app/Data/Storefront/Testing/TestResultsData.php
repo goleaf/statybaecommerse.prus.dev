@@ -12,8 +12,8 @@ use Illuminate\Contracts\Support\Arrayable;
 final class TestResultsData implements Arrayable
 {
     /**
-     * @param  array<int, array<string, mixed>> $tests
-     * @param  array<int, string> $errors
+     * @param array<int, array<string, mixed>> $tests
+     * @param array<int, string>               $errors
      */
     public function __construct(
         public readonly string $status,
@@ -30,7 +30,7 @@ final class TestResultsData implements Arrayable
     }
 
     /**
-     * @param  array<string, mixed> $payload
+     * @param array<string, mixed> $payload
      */
     public static function fromArray(array $payload): self
     {

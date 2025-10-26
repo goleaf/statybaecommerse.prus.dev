@@ -23,7 +23,7 @@ final class LanguageLinkData implements Arrayable
     /**
      * Rehydrate a DTO instance from cached array data.
      *
-     * @param  array{locale:string, label:string, url:string, active:bool} $payload
+     * @param array{locale:string, label:string, url:string, active:bool} $payload
      */
     public static function fromArray(array $payload): self
     {

@@ -24,7 +24,7 @@ final class HomeStatsData implements Arrayable
     /**
      * Convenience constructor for array payloads sourced from cached values.
      *
-     * @param  array{products_count?:int|float|string, categories_count?:int|float|string, brands_count?:int|float|string, reviews_count?:int|float|string, avg_rating?:int|float|string} $payload
+     * @param array{products_count?:int|float|string, categories_count?:int|float|string, brands_count?:int|float|string, reviews_count?:int|float|string, avg_rating?:int|float|string} $payload
      */
     public static function fromArray(array $payload): self
     {

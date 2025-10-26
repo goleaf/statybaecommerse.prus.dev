@@ -163,6 +163,7 @@ final class ReferralCodeService
         foreach ($shareTargets as $channel => $template) {
             if ($channel === 'email') {
                 $links[$channel] = sprintf($template, $subject, $body);
+
                 continue;
             }
 

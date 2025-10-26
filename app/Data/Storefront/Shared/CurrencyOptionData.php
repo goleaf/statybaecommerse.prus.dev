@@ -22,7 +22,7 @@ final class CurrencyOptionData implements Arrayable
     /**
      * Hydrate the DTO from primitive arrays (used when loading cached data).
      *
-     * @param  array{id:int, code:string, symbol:string} $payload
+     * @param array{id:int, code:string, symbol:string} $payload
      */
     public static function fromArray(array $payload): self
     {

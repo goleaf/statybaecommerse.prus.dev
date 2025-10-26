@@ -61,8 +61,8 @@ final class LanguageController extends Controller
         // Log unsupported locale attempts to aid in debugging while keeping user experience consistent.
         if (! $isSupported && $requestedLocale !== '') {
             Log::warning('Attempt to switch to unsupported locale.', [
-                'requested_locale' => $requestedLocale,
-                'resolved_locale'  => $resolvedLocale,
+                'requested_locale'  => $requestedLocale,
+                'resolved_locale'   => $resolvedLocale,
                 'supported_locales' => $supportedLocales,
             ]);
         }
