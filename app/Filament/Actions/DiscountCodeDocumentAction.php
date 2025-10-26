@@ -26,7 +26,14 @@ final class DiscountCodeDocumentAction
             ->form([
                 Select::make('template_id')
                     ->label(__('admin.fields.template'))
-                    ->relationship('template', 'name')
+                    ->options(static function (): array {
+                        // Mirror the generic document action and limit choices to active templates only.
+                        return DocumentTemplate::query()
+                            ->active()
+                            ->orderBy('name')
+                            ->pluck('name', 'id')
+                            ->all();
+                    })
                     ->searchable()
                     ->preload()
                     ->required(),
@@ -47,7 +54,10 @@ final class DiscountCodeDocumentAction
             ])
             ->action(function (DiscountCode $record, array $data, DocumentServiceContract $documentService): RedirectResponse|Response {
                 try {
-                    $template = DocumentTemplate::query()->findOrFail($data['template_id']);
+                    // Double-check the template is active when resolving the selected option from the request payload.
+                    $template = DocumentTemplate::query()
+                        ->active()
+                        ->findOrFail($data['template_id']);
 
                     $document = $documentService->generateDocument(
                         template: $template,
