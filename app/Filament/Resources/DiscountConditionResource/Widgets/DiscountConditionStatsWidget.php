@@ -7,8 +7,6 @@ namespace App\Filament\Resources\DiscountConditionResource\Widgets;
 use App\Models\DiscountCondition;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 
 final class DiscountConditionStatsWidget extends BaseWidget
 {

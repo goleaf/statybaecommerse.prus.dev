@@ -9,7 +9,6 @@ use App\Models\DocumentTemplate;
 use Filament\Actions;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\EditRecord;
-use Illuminate\Http\RedirectResponse;
 
 class EditDocumentTemplate extends EditRecord
 {

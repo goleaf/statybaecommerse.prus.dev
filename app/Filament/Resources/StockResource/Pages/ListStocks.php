@@ -10,7 +10,6 @@ use Filament\Actions;
 
 class ListStocks extends BaseListRecords
 {
-    
     protected static string $resource = StockResource::class;
 
     protected function getHeaderActions(): array

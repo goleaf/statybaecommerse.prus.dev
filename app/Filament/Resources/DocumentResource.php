@@ -38,17 +38,17 @@ use UnitEnum;
 final class DocumentResource extends Resource
 {
     private const STATUS_OPTIONS = [
-        'draft' => 'Draft',
+        'draft'     => 'Draft',
         'generated' => 'Generated',
-        'sent' => 'Sent',
+        'sent'      => 'Sent',
         'published' => 'Published',
-        'archived' => 'Archived',
+        'archived'  => 'Archived',
     ];
 
     private const FORMAT_OPTIONS = [
-        'pdf' => 'PDF',
-        'html' => 'HTML',
-        'docx' => 'DOCX',
+        'pdf'      => 'PDF',
+        'html'     => 'HTML',
+        'docx'     => 'DOCX',
         'markdown' => 'Markdown',
     ];
 
@@ -67,7 +67,7 @@ final class DocumentResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'title';
 
-    public static function getNavigationGroup(): \UnitEnum|string|null
+    public static function getNavigationGroup(): UnitEnum|string|null
     {
         return 'System';
     }
@@ -220,11 +220,11 @@ final class DocumentResource extends Resource
                     ->label(self::translateWithFallback('admin.documents.form.fields.status', 'Status'))
                     ->badge()
                     ->colors([
-                        'draft' => 'gray',
+                        'draft'     => 'gray',
                         'generated' => 'info',
-                        'sent' => 'warning',
+                        'sent'      => 'warning',
                         'published' => 'success',
-                        'archived' => 'danger',
+                        'archived'  => 'danger',
                     ])
                     ->sortable(),
                 TextColumn::make('format')
@@ -308,7 +308,7 @@ final class DocumentResource extends Resource
                     ->visible(fn (Document $record): bool => $record->status === 'draft')
                     ->action(function (Document $record): void {
                         $record->update([
-                            'status' => 'generated',
+                            'status'       => 'generated',
                             'generated_at' => now(),
                         ]);
 
@@ -357,7 +357,7 @@ final class DocumentResource extends Resource
                         ->action(function (Collection $records): void {
                             $records->each(static function (Document $record): void {
                                 $record->update([
-                                    'status' => 'generated',
+                                    'status'       => 'generated',
                                     'generated_at' => now(),
                                 ]);
                             });

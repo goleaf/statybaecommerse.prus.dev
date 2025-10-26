@@ -10,7 +10,6 @@ use Filament\Actions\CreateAction;
 
 class ListShippingOptions extends BaseListRecords
 {
-    
     protected static string $resource = ShippingOptionResource::class;
 
     protected function getHeaderActions(): array

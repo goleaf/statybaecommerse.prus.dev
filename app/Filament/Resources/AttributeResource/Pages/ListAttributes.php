@@ -10,7 +10,6 @@ use Filament\Actions;
 
 final class ListAttributes extends BaseListRecords
 {
-    
     protected static string $resource = AttributeResource::class;
 
     protected function getHeaderActions(): array

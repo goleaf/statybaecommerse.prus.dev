@@ -14,7 +14,7 @@ use Illuminate\Database\Eloquent\Builder;
 
 final class ListRecommendationBlocks extends BaseListRecords
 {
-        use HasWidgetTabs;
+    use HasWidgetTabs;
 
     protected static string $resource = RecommendationBlockResource::class;
 

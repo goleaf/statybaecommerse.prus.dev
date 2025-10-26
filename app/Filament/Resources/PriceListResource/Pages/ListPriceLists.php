@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Builder;
 
 final class ListPriceLists extends BaseListRecords
 {
-        use HasWidgetTabs;
+    use HasWidgetTabs;
 
     protected static string $resource = PriceListResource::class;
 

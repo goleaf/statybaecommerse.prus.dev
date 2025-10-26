@@ -17,7 +17,7 @@ final class RecentRedemptionsWidget extends BaseWidget
 
     protected int|string|array $columnSpan = 'full';
 
-    public function table(Table $table): Table   
+    public function table(Table $table): Table
     {
         // Configure the relation manager table to satisfy Filament v4's return type requirements.
         return $table
@@ -44,17 +44,17 @@ final class RecentRedemptionsWidget extends BaseWidget
                     ->label('Amount Saved')
                     ->sortable()
                     ->formatStateUsing(fn ($state, DiscountRedemption $record): string => $state === null
-                        ? '-' : number_format((float) $state, 2).' '.($record->currency_code ?? 'EUR'))
+                        ? '-' : number_format((float) $state, 2) . ' ' . ($record->currency_code ?? 'EUR'))
                     ->color('success'),
                 Tables\Columns\TextColumn::make('status')
                     ->label('Status')
                     ->badge()
                     ->colors([
-                        'warning' => 'pending',
-                        'success' => 'redeemed',
+                        'warning'   => 'pending',
+                        'success'   => 'redeemed',
                         'secondary' => 'refunded',
-                        'danger' => 'cancelled',
-                        'gray' => 'expired',
+                        'danger'    => 'cancelled',
+                        'gray'      => 'expired',
                     ]),
                 Tables\Columns\TextColumn::make('redeemed_at')
                     ->label('Redeemed At')

@@ -4,29 +4,28 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use Filament\Schemas\Schema;
 use App\Filament\Resources\CollectionRuleResource\Pages;
 use App\Models\CollectionRule;
+use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
 use BackedEnum;
+use Filament\Actions\Action;
+use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Placeholder;
-use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Forms\Components\Select;
-use Filament\Schemas\Components\Tabs as SchemaTabs;
-use Filament\Schemas\Components\Tabs\Tab as SchemaTab;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification as FilamentNotification;
 use Filament\Resources\Resource;
-use Filament\Actions\Action;
-use Filament\Actions\BulkAction;
+use Filament\Schemas\Components\Grid as SchemaGrid;
+use Filament\Schemas\Components\Section as SchemaSection;
+use Filament\Schemas\Components\Tabs as SchemaTabs;
+use Filament\Schemas\Components\Tabs\Tab as SchemaTab;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\TextColumn;
-use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
@@ -38,7 +37,7 @@ use UnitEnum;
 final class CollectionRuleResource extends Resource
 {
     /**
-     * @var string|\BackedEnum|null Use the documented property approach so Filament can resolve the navigation icon reliably.
+     * @var string|BackedEnum|null Use the documented property approach so Filament can resolve the navigation icon reliably.
      */
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-cog-6-tooth';
 
@@ -50,7 +49,7 @@ final class CollectionRuleResource extends Resource
         return 'heroicon-o-cog-6-tooth';
     }
 
-    public static function getNavigationGroup(): \UnitEnum|string|null
+    public static function getNavigationGroup(): UnitEnum|string|null
     {
         // Keep the resource collocated with product configuration utilities for quicker discovery.
         return 'Products';
@@ -77,7 +76,7 @@ final class CollectionRuleResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Schema $schema): Schema   
+    public static function form(Schema $schema): Schema
     {
         // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
         // Expose the schema via the Filament v4 `Form` instance to drop the deprecated array fallback.
@@ -161,7 +160,7 @@ final class CollectionRuleResource extends Resource
     /**
      * Configure the Filament table with columns, filters, and actions.
      */
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         // Configure the table definition for the streamlined Filament v4 return type.
         // Publish the full table definition through the Filament v4 `Table` signature for consistency.

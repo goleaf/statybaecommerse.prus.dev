@@ -3,15 +3,13 @@
 declare(strict_types=1);
 
 namespace App\Filament\Resources\NewsImages;
-use App\Support\Concerns\HasNav;
 
-
-use Filament\Schemas\Schema;
 use App\Filament\Resources\NewsImages\Pages\CreateNewsImage;
 use App\Filament\Resources\NewsImages\Pages\EditNewsImage;
 use App\Filament\Resources\NewsImages\Pages\ListNewsImages;
 use App\Models\News;
 use App\Models\NewsImage;
+use App\Support\Concerns\HasNav;
 use App\Support\Storage\SecureStorage;
 use BackedEnum;
 use Filament\Actions\Action;
@@ -23,13 +21,13 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\FileUpload;
-use Filament\Schemas\Components\Grid as SchemaGrid;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
-use Filament\Tables\Columns\BadgeColumn;
+use Filament\Schemas\Components\Grid as SchemaGrid;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
@@ -52,7 +50,7 @@ class NewsImageResource extends Resource
 
     protected static ?int $navigationSort = 1;
 
-    public static function form(Schema $schema): Schema   
+    public static function form(Schema $schema): Schema
     {
         return $schema
             ->schema([
@@ -113,7 +111,7 @@ class NewsImageResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         // Configure the table definition for the streamlined Filament v4 return type.
         return $table

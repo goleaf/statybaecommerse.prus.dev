@@ -10,7 +10,6 @@ use Filament\Actions\CreateAction;
 
 final class ListSystemSettingDependencies extends BaseListRecords
 {
-    
     protected static string $resource = SystemSettingDependencyResource::class;
 
     protected function getHeaderActions(): array

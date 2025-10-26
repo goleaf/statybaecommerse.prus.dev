@@ -4,11 +4,8 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use Filament\Schemas\Schema;
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\ProductFeatureResource\Pages;
-use App\Models\ProductFeature;
 use BackedEnum;
 use Filament\Actions\BulkActionGroup as TablesBulkActionGroup;
 use Filament\Actions\DeleteAction as TablesDeleteAction;
@@ -16,6 +13,7 @@ use Filament\Actions\DeleteBulkAction as TablesDeleteBulkAction;
 use Filament\Actions\EditAction as TablesEditAction;
 use Filament\Forms;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 use UnitEnum;
@@ -27,10 +25,10 @@ final class ProductFeatureResource extends Resource
      */
     private const FEATURE_TYPE_OPTIONS = [
         'specification' => 'Specification',
-        'benefit' => 'Benefit',
-        'feature' => 'Feature',
-        'technical' => 'Technical',
-        'performance' => 'Performance',
+        'benefit'       => 'Benefit',
+        'feature'       => 'Feature',
+        'technical'     => 'Technical',
+        'performance'   => 'Performance',
     ];
 
     /**
@@ -41,11 +39,11 @@ final class ProductFeatureResource extends Resource
     /**
      * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
      */
-    protected static \UnitEnum|string|null $navigationGroup = NavigationGroup::Products->value;
+    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Products->value;
 
     protected static ?int $navigationSort = 17;
 
-    public static function form(Schema $schema): Schema   
+    public static function form(Schema $schema): Schema
     {
         return $schema->schema([
             Forms\Components\Select::make('product_id')
@@ -83,7 +81,7 @@ final class ProductFeatureResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         // Configure the table definition for the streamlined Filament v4 return type.
         return $table

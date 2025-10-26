@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\DocumentTemplateResource\RelationManagers;
 
-
 use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
@@ -20,12 +19,12 @@ final class DocumentsRelationManager extends BaseRelationManager
 
     protected static ?string $title = 'admin/documents.plural';
 
-    public function form(Schema $schema): Schema   
+    public function form(Schema $schema): Schema
     {
         return $schema->schema([]);
     }
 
-    public function table(Table $table): Table   
+    public function table(Table $table): Table
     {
         return $table
             ->recordTitleAttribute('name')
@@ -80,4 +79,3 @@ final class DocumentsRelationManager extends BaseRelationManager
             ->bulkActions([]);
     }
 }
-

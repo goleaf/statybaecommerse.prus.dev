@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use Filament\Schemas\Schema;
 use App\Data\ExportRequestData;
 use App\Filament\Resources\UserResource\Pages;
 use App\Models\User;
@@ -22,14 +20,15 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\FileUpload;
-use Filament\Schemas\Components\Grid as SchemaGrid;
-use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Grid as SchemaGrid;
+use Filament\Schemas\Components\Section as SchemaSection;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -41,6 +40,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Hash;
 use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable as SpatieTranslatableResource;
+use UnitEnum;
 
 /**
  * UserResource
@@ -60,7 +60,7 @@ final class UserResource extends Resource implements DefinesExportColumns
     /**
      * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
      */
-    protected static \UnitEnum|string|null $navigationGroup = 'Users';
+    protected static UnitEnum|string|null $navigationGroup = 'Users';
 
     public static function shouldRegisterNavigation(): bool
     {
@@ -131,7 +131,7 @@ final class UserResource extends Resource implements DefinesExportColumns
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Schema $schema): Schema   
+    public static function form(Schema $schema): Schema
     {
         $permissionModuleLabels = [
             'products'   => __('users.permissions.rows.products'),
@@ -226,7 +226,7 @@ final class UserResource extends Resource implements DefinesExportColumns
     /**
      * Configure the Filament table with columns, filters, and actions.
      */
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         // Configure the table definition for the streamlined Filament v4 return type.
         return $table
@@ -359,18 +359,19 @@ final class UserResource extends Resource implements DefinesExportColumns
             ])
             ->defaultSort('created_at', 'desc');
     }
+
     /**
      * @return array<string, ExportColumn>
      */
     public static function availableExportColumns(): array
     {
         return [
-            'name' => new ExportColumn('name', __('users.fields.name'), fn (User $user): string => (string) $user->name),
-            'email' => new ExportColumn('email', __('users.fields.email'), fn (User $user): string => (string) $user->email),
-            'is_active' => new ExportColumn('is_active', __('users.fields.is_active'), fn (User $user): string => $user->is_active ? __('exports.boolean.yes') : __('exports.boolean.no')),
+            'name'        => new ExportColumn('name', __('users.fields.name'), fn (User $user): string => (string) $user->name),
+            'email'       => new ExportColumn('email', __('users.fields.email'), fn (User $user): string => (string) $user->email),
+            'is_active'   => new ExportColumn('is_active', __('users.fields.is_active'), fn (User $user): string => $user->is_active ? __('exports.boolean.yes') : __('exports.boolean.no')),
             'is_verified' => new ExportColumn('is_verified', __('users.fields.is_verified'), fn (User $user): string => $user->is_verified ? __('exports.boolean.yes') : __('exports.boolean.no')),
-            'roles' => new ExportColumn('roles', __('users.fields.roles'), fn (User $user): string => (string) $user->roles_label),
-            'created_at' => new ExportColumn('created_at', __('users.fields.created_at'), fn (User $user): string => optional($user->created_at)->toDateTimeString() ?? ''),
+            'roles'       => new ExportColumn('roles', __('users.fields.roles'), fn (User $user): string => (string) $user->roles_label),
+            'created_at'  => new ExportColumn('created_at', __('users.fields.created_at'), fn (User $user): string => optional($user->created_at)->toDateTimeString() ?? ''),
         ];
     }
 

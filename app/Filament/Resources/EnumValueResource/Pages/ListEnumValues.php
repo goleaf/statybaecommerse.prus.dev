@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Builder;
 
 class ListEnumValues extends BaseListRecords
 {
-        use HasWidgetTabs;
+    use HasWidgetTabs;
 
     protected static string $resource = EnumValueResource::class;
 

@@ -10,7 +10,6 @@ use Filament\Actions\CreateAction;
 
 final class ListSystemSettingCategoryTranslations extends BaseListRecords
 {
-    
     protected static string $resource = SystemSettingCategoryTranslationResource::class;
 
     protected function getHeaderActions(): array

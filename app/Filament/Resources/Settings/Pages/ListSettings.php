@@ -10,7 +10,6 @@ use Filament\Actions\CreateAction;
 
 class ListSettings extends BaseListRecords
 {
-    
     protected static string $resource = SettingResource::class;
 
     protected function getHeaderActions(): array

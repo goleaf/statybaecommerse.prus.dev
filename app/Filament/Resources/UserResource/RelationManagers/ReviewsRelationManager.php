@@ -9,7 +9,6 @@ use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
-use Filament\Schemas\Schema;
 
 class ReviewsRelationManager extends BaseRelationManager
 {
@@ -21,7 +20,7 @@ class ReviewsRelationManager extends BaseRelationManager
 
     protected static ?string $pluralModelLabel = 'Reviews';
 
-    public function table(Table $table): Table   
+    public function table(Table $table): Table
     {
         // Configure the relation manager table to satisfy Filament v4's return type requirements.
         return $table

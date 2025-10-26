@@ -10,7 +10,6 @@ use Filament\Actions\CreateAction;
 
 class ListNewsTags extends BaseListRecords
 {
-    
     protected static string $resource = NewsTagResource::class;
 
     protected function getHeaderActions(): array

@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace App\Filament\Resources\RecommendationCaches\Schemas;
 
 use App\Models\RecommendationCache;
-use Filament\Schemas\Components\Grid as SchemaGrid;
+use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
 use Filament\Forms\Components\KeyValue;
-use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Components\Grid as SchemaGrid;
+use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Schemas\Schema;
-use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
 
 final class RecommendationCacheForm
 {

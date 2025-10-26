@@ -3,20 +3,19 @@
 declare(strict_types=1);
 
 namespace App\Filament\Resources\RecommendationAnalytics;
-use App\Support\Concerns\HasNav;
 
-
-use Filament\Schemas\Schema;
 use App\Filament\Resources\RecommendationAnalytics\Pages\CreateRecommendationAnalytics;
 use App\Filament\Resources\RecommendationAnalytics\Pages\EditRecommendationAnalytics;
 use App\Filament\Resources\RecommendationAnalytics\Pages\ListRecommendationAnalytics;
 use App\Filament\Resources\RecommendationAnalytics\Pages\ViewRecommendationAnalytics;
 use App\Filament\Resources\RecommendationAnalytics\Schemas\RecommendationAnalyticsForm;
 use App\Filament\Resources\RecommendationAnalytics\Tables\RecommendationAnalyticsTable;
-use App\Models\RecommendationAnalytics;
+use App\Support\Concerns\HasNav;
 use BackedEnum;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables\Table;
+use UnitEnum;
 
 final class RecommendationAnalyticsResource extends Resource
 {
@@ -31,7 +30,7 @@ final class RecommendationAnalyticsResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'action';
 
-    public static function getNavigationGroup(): \UnitEnum|string|null
+    public static function getNavigationGroup(): UnitEnum|string|null
     {
         return 'Analytics';
     }
@@ -51,12 +50,12 @@ final class RecommendationAnalyticsResource extends Resource
         return __('recommendation_analytics.model_label');
     }
 
-    public static function form(Schema $schema): Schema   
+    public static function form(Schema $schema): Schema
     {
         return RecommendationAnalyticsForm::configure($schema);
     }
 
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         // Configure the table definition for the streamlined Filament v4 return type.
         return RecommendationAnalyticsTable::configure($table);

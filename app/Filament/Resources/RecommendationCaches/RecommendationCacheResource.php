@@ -3,19 +3,17 @@
 declare(strict_types=1);
 
 namespace App\Filament\Resources\RecommendationCaches;
-use App\Support\Concerns\HasNav;
 
-
-use Filament\Schemas\Schema;
 use App\Filament\Resources\RecommendationCaches\Pages\CreateRecommendationCache;
 use App\Filament\Resources\RecommendationCaches\Pages\EditRecommendationCache;
 use App\Filament\Resources\RecommendationCaches\Pages\ListRecommendationCaches;
 use App\Filament\Resources\RecommendationCaches\Pages\ViewRecommendationCache;
 use App\Filament\Resources\RecommendationCaches\Schemas\RecommendationCacheForm;
 use App\Filament\Resources\RecommendationCaches\Tables\RecommendationCachesTable;
-use App\Models\RecommendationCache;
+use App\Support\Concerns\HasNav;
 use BackedEnum;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use UnitEnum;
@@ -33,7 +31,7 @@ final class RecommendationCacheResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'cache_key';
 
-    public static function getNavigationGroup(): \UnitEnum|string|null
+    public static function getNavigationGroup(): UnitEnum|string|null
     {
         // Translate enum driven grouping for the Filament sidebar.
         $group = self::$navigationGroup;
@@ -56,12 +54,12 @@ final class RecommendationCacheResource extends Resource
         return __('admin.recommendation_caches.model_label');
     }
 
-    public static function form(Schema $schema): Schema   
+    public static function form(Schema $schema): Schema
     {
         return RecommendationCacheForm::configure($schema);
     }
 
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         // Configure the table definition for the streamlined Filament v4 return type.
         return RecommendationCachesTable::configure($table);

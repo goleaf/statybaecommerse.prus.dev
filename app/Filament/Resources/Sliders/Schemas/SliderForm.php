@@ -6,17 +6,12 @@ namespace App\Filament\Resources\Sliders\Schemas;
 
 use App\Support\Filament\SearchableInputHelper;
 use App\Support\Search\ContentLinkSearch;
-use App\Support\Search\SearchResultPayload;
-
-use function collect;
-
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
-use Filament\Forms\Components\FileUpload;
-use Filament\Schemas\Components\Grid as SchemaGrid;
-use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Schemas\Components\Grid as SchemaGrid;
+use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Schemas\Schema;
 
 final class SliderForm

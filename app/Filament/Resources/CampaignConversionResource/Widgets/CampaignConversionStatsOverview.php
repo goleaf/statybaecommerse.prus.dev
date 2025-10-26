@@ -24,10 +24,10 @@ final class CampaignConversionStatsOverview extends BaseWidget
             Stat::make(__('campaign_conversions.widgets.total_conversions'), number_format($totalConversions))
                 ->description(__('campaign_conversions.widgets.total_conversions_description'))
                 ->color('primary'),
-            Stat::make(__('campaign_conversions.widgets.total_value'), '€'.number_format($totalValue, 2))
+            Stat::make(__('campaign_conversions.widgets.total_value'), '€' . number_format($totalValue, 2))
                 ->description(__('campaign_conversions.widgets.total_value_description'))
                 ->color('success'),
-            Stat::make(__('campaign_conversions.widgets.average_value'), '€'.number_format($averageValue, 2))
+            Stat::make(__('campaign_conversions.widgets.average_value'), '€' . number_format($averageValue, 2))
                 ->description(__('campaign_conversions.widgets.average_value_description'))
                 ->color('info'),
             Stat::make(__('campaign_conversions.widgets.recent_conversions'), number_format($recentConversions))

@@ -10,7 +10,6 @@ use Filament\Actions\CreateAction;
 
 class ListUserProductInteractions extends BaseListRecords
 {
-    
     protected static string $resource = UserProductInteractionResource::class;
 
     protected function getHeaderActions(): array

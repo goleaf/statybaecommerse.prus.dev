@@ -7,7 +7,6 @@ namespace App\Filament\Resources\ReferralRewardLogs\Schemas;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Schemas\Schema;
 
 class ReferralRewardLogForm
 {
@@ -25,9 +24,9 @@ class ReferralRewardLogForm
                     ->nullable(),
                 Select::make('action')
                     ->options([
-                        'earned' => 'Earned',
-                        'redeemed' => 'Redeemed',
-                        'expired' => 'Expired',
+                        'earned'    => 'Earned',
+                        'redeemed'  => 'Redeemed',
+                        'expired'   => 'Expired',
                         'cancelled' => 'Cancelled',
                     ])
                     ->default('earned')

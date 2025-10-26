@@ -10,7 +10,6 @@ use Filament\Actions;
 
 final class ListRecommendationConfigs extends BaseListRecords
 {
-    
     protected static string $resource = RecommendationConfigResource::class;
 
     protected function getHeaderActions(): array

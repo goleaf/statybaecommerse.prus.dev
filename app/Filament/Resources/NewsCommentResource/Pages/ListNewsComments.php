@@ -10,7 +10,6 @@ use Filament\Actions;
 
 class ListNewsComments extends BaseListRecords
 {
-    
     protected static string $resource = NewsCommentResource::class;
 
     protected function getHeaderActions(): array

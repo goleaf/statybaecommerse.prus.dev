@@ -9,6 +9,5 @@ use App\Filament\Resources\EnumManagementResource;
 
 final class ListEnums extends BaseListRecords
 {
-    
     protected static string $resource = EnumManagementResource::class;
 }

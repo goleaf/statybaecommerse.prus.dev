@@ -10,7 +10,6 @@ use Filament\Actions\CreateAction;
 
 class ListNewsImages extends BaseListRecords
 {
-    
     protected static string $resource = NewsImageResource::class;
 
     protected function getHeaderActions(): array

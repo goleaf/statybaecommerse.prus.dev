@@ -10,7 +10,6 @@ use Filament\Actions;
 
 final class ListNormalSettingTranslations extends BaseListRecords
 {
-    
     protected static string $resource = NormalSettingTranslationResource::class;
 
     protected function getHeaderActions(): array

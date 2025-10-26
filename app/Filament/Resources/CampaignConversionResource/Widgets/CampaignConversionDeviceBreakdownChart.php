@@ -49,7 +49,7 @@ final class CampaignConversionDeviceBreakdownChart extends ChartWidget
         return [
             'datasets' => [
                 [
-                    'data' => $data,
+                    'data'            => $data,
                     'backgroundColor' => [
                         'rgba(59, 130, 246, 0.7)',
                         'rgba(234, 179, 8, 0.7)',

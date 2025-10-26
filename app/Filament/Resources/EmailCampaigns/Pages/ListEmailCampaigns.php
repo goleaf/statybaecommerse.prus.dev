@@ -10,7 +10,6 @@ use Filament\Actions\CreateAction;
 
 class ListEmailCampaigns extends BaseListRecords
 {
-    
     protected static string $resource = EmailCampaignResource::class;
 
     protected function getHeaderActions(): array

@@ -10,7 +10,6 @@ use Filament\Actions;
 
 final class ListCities extends BaseListRecords
 {
-    
     protected static string $resource = CityResource::class;
 
     protected function getHeaderActions(): array

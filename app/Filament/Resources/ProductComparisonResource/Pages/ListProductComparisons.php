@@ -10,7 +10,6 @@ use Filament\Actions;
 
 final class ListProductComparisons extends BaseListRecords
 {
-    
     protected static string $resource = ProductComparisonResource::class;
 
     protected function getHeaderActions(): array

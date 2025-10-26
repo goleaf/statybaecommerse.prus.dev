@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Support\Concerns\HasNav;
-
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\SeoDataResource\Pages;
 use App\Models\Brand;
@@ -16,7 +14,6 @@ use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
-use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms;
@@ -32,9 +29,9 @@ use Filament\Infolists\Components\TextEntry;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section as SchemaSection;
-use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
+use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
@@ -44,6 +41,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable as SpatieTranslatableResource;
+use UnitEnum;
 
 final class SeoDataResource extends Resource
 {
@@ -55,7 +53,7 @@ final class SeoDataResource extends Resource
      * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
      */
     /** @var \Filament\Navigation\NavigationGroup|array|string|null */
-    protected static \UnitEnum|string|null $navigationGroup = NavigationGroup::Content->value;
+    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Content->value;
 
     public static function getNavigationLabel(): string
     {
@@ -72,7 +70,7 @@ final class SeoDataResource extends Resource
         return __('seo_data.single');
     }
 
-    public static function form(Schema $schema): Schema   
+    public static function form(Schema $schema): Schema
     {
         // Configure the Filament resource form schema using the v4 Schema API.
         return $schema
@@ -230,7 +228,7 @@ final class SeoDataResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         // Configure the table definition for the streamlined Filament v4 return type.
         return $table
@@ -430,7 +428,7 @@ final class SeoDataResource extends Resource
             ->defaultSort('created_at', 'desc');
     }
 
-    public static function infolist(Schema $schema): Schema   
+    public static function infolist(Schema $schema): Schema
     {
         // Provide the infolist schema using the Filament v4 return type.
         return $schema

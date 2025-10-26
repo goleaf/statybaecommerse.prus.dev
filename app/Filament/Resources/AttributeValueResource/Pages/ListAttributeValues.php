@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Builder;
 
 final class ListAttributeValues extends BaseListRecords
 {
-        use HasWidgetTabs;
+    use HasWidgetTabs;
 
     protected static string $resource = AttributeValueResource::class;
 

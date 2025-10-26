@@ -10,7 +10,6 @@ use Filament\Actions;
 
 class ListWishlistItems extends BaseListRecords
 {
-    
     protected static string $resource = WishlistItemResource::class;
 
     protected function getHeaderActions(): array

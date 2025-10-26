@@ -60,7 +60,7 @@ final class CategoryResource extends Resource
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-tag';
 
     /** Align the resource under the Products navigation section. */
-    protected static \UnitEnum|string|null $navigationGroup = NavigationGroup::Products->value;
+    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Products->value;
 
     protected static ?int $navigationSort = 3;
 
@@ -442,8 +442,8 @@ final class CategoryResource extends Resource
 
         if (is_int($value)) {
             return match ($value) {
-                1 => true,
-                0 => false,
+                1       => true,
+                0       => false,
                 default => null,
             };
         }
@@ -452,9 +452,9 @@ final class CategoryResource extends Resource
             $normalised = strtolower(trim($value));
 
             return match ($normalised) {
-                '1', 'true', 'yes', 'on'   => true,
+                '1', 'true', 'yes', 'on' => true,
                 '0', 'false', 'no', 'off' => false,
-                default                   => null,
+                default => null,
             };
         }
 

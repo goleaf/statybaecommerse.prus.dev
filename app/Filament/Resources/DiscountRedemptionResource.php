@@ -13,23 +13,23 @@ use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
 use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
+use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid as SchemaGrid;
 use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Schemas\Schema;
-use Filament\Actions\BulkActionGroup;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Carbon;
@@ -39,7 +39,7 @@ final class DiscountRedemptionResource extends Resource
 {
     protected static ?string $model = DiscountRedemption::class;
 
-    protected static \UnitEnum|string|null $navigationGroup = 'Discounts';
+    protected static UnitEnum|string|null $navigationGroup = 'Discounts';
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-receipt-percent';
 
@@ -158,12 +158,12 @@ final class DiscountRedemptionResource extends Resource
                     ->sortable(),
                 TextColumn::make('order.id')
                     ->label(__('admin.discount_redemptions.table.order'))
-                    ->formatStateUsing(fn (?int $state): string => $state !== null ? '#'.$state : '-')
+                    ->formatStateUsing(fn (?int $state): string => $state !== null ? '#' . $state : '-')
                     ->sortable(),
                 TextColumn::make('amount_saved')
                     ->label(__('admin.discount_redemptions.table.discount_amount'))
                     ->formatStateUsing(
-                        fn (DiscountRedemption $record): string => number_format((float) $record->amount_saved, 2).' '.($record->currency_code ?? 'EUR')
+                        fn (DiscountRedemption $record): string => number_format((float) $record->amount_saved, 2) . ' ' . ($record->currency_code ?? 'EUR')
                     )
                     ->sortable(),
                 TextColumn::make('status')
@@ -278,10 +278,10 @@ final class DiscountRedemptionResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListDiscountRedemptions::route('/'),
+            'index'  => Pages\ListDiscountRedemptions::route('/'),
             'create' => Pages\CreateDiscountRedemption::route('/create'),
-            'view' => Pages\ViewDiscountRedemption::route('/{record}'),
-            'edit' => Pages\EditDiscountRedemption::route('/{record}/edit'),
+            'view'   => Pages\ViewDiscountRedemption::route('/{record}'),
+            'edit'   => Pages\EditDiscountRedemption::route('/{record}/edit'),
         ];
     }
 }

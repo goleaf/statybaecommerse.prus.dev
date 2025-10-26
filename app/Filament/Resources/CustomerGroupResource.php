@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
@@ -240,9 +242,9 @@ final class CustomerGroupResource extends Resource
                 SelectFilter::make('type')
                     ->label(__('customer_groups.type'))
                     ->options(self::typeOptions())
-                    ->query(fn(Builder $query, $value): Builder => $query->when(
+                    ->query(fn (Builder $query, $value): Builder => $query->when(
                         filled($value),
-                        fn(Builder $q) => $q->where('type', $value)
+                        fn (Builder $q) => $q->where('type', $value)
                     )),
             ])
             ->actions([
@@ -257,15 +259,15 @@ final class CustomerGroupResource extends Resource
 
                         return __('customer_groups.activate');
                     })
-                    ->icon(fn(?CustomerGroup $record): string => $record?->is_active ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
-                    ->color(fn(?CustomerGroup $record): string => $record?->is_active ? 'warning' : 'success')
-                    ->visible(fn(?CustomerGroup $record): bool => $record !== null)
+                    ->icon(fn (?CustomerGroup $record): string => $record?->is_active ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
+                    ->color(fn (?CustomerGroup $record): string => $record?->is_active ? 'warning' : 'success')
+                    ->visible(fn (?CustomerGroup $record): bool => $record !== null)
                     ->action(function (?CustomerGroup $record): void {
-                        if (!$record instanceof CustomerGroup) {
+                        if (! $record instanceof CustomerGroup) {
                             return;
                         }
 
-                        $record->update(['is_active' => !$record->is_active]);
+                        $record->update(['is_active' => ! $record->is_active]);
 
                         Notification::make()
                             ->title($record->is_active ? __('customer_groups.activated_successfully') : __('customer_groups.deactivated_successfully'))
@@ -277,7 +279,7 @@ final class CustomerGroupResource extends Resource
                     ->label(__('customer_groups.set_default'))
                     ->icon('heroicon-o-star')
                     ->color('primary')
-                    ->visible(fn(?CustomerGroup $record): bool => $record?->is_default === false)
+                    ->visible(fn (?CustomerGroup $record): bool => $record?->is_default === false)
                     ->action(function (CustomerGroup $record): void {
                         CustomerGroup::query()
                             ->whereKeyNot($record->getKey())
@@ -285,7 +287,7 @@ final class CustomerGroupResource extends Resource
 
                         $record->update([
                             'is_default' => true,
-                            'is_active' => true,
+                            'is_active'  => true,
                         ]);
 
                         Notification::make()
@@ -293,7 +295,7 @@ final class CustomerGroupResource extends Resource
                             ->success()
                             ->send();
                     })
-                    ->visible(fn(?CustomerGroup $record): bool => $record instanceof CustomerGroup)
+                    ->visible(fn (?CustomerGroup $record): bool => $record instanceof CustomerGroup)
                     ->requiresConfirmation(),
             ])
             ->bulkActions([
@@ -305,7 +307,7 @@ final class CustomerGroupResource extends Resource
                         ->color('success')
                         ->action(function (Collection $records): void {
                             $records
-                                ->filter(fn(?CustomerGroup $group): bool => $group instanceof CustomerGroup)
+                                ->filter(fn (?CustomerGroup $group): bool => $group instanceof CustomerGroup)
                                 ->each(static function (CustomerGroup $group): void {
                                     $group->update(['is_active' => true]);
                                 });
@@ -322,7 +324,7 @@ final class CustomerGroupResource extends Resource
                         ->color('warning')
                         ->action(function (Collection $records): void {
                             $records
-                                ->filter(fn(?CustomerGroup $group): bool => $group instanceof CustomerGroup)
+                                ->filter(fn (?CustomerGroup $group): bool => $group instanceof CustomerGroup)
                                 ->each(static function (CustomerGroup $group): void {
                                     $group->update(['is_active' => false]);
                                 });
@@ -345,10 +347,10 @@ final class CustomerGroupResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListCustomerGroups::route('/'),
+            'index'  => Pages\ListCustomerGroups::route('/'),
             'create' => Pages\CreateCustomerGroup::route('/create'),
-            'view' => Pages\ViewCustomerGroup::route('/{record}'),
-            'edit' => Pages\EditCustomerGroup::route('/{record}/edit'),
+            'view'   => Pages\ViewCustomerGroup::route('/{record}'),
+            'edit'   => Pages\EditCustomerGroup::route('/{record}/edit'),
         ];
     }
 
@@ -358,10 +360,10 @@ final class CustomerGroupResource extends Resource
     private static function typeOptions(): array
     {
         return [
-            'regular' => __('customer_groups.type_regular'),
-            'vip' => __('customer_groups.type_vip'),
+            'regular'   => __('customer_groups.type_regular'),
+            'vip'       => __('customer_groups.type_vip'),
             'wholesale' => __('customer_groups.type_wholesale'),
-            'retail' => __('customer_groups.type_retail'),
+            'retail'    => __('customer_groups.type_retail'),
             'corporate' => __('customer_groups.type_corporate'),
         ];
     }
@@ -406,7 +408,7 @@ final class CustomerGroupResource extends Resource
         $normalized = $data;
 
         foreach (['name', 'description'] as $attribute) {
-            if (!array_key_exists($attribute, $normalized)) {
+            if (! array_key_exists($attribute, $normalized)) {
                 continue;
             }
 

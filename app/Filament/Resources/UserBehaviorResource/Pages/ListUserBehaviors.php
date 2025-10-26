@@ -10,7 +10,6 @@ use Filament\Actions;
 
 final class ListUserBehaviors extends BaseListRecords
 {
-    
     protected static string $resource = UserBehaviorResource::class;
 
     protected function getHeaderActions(): array

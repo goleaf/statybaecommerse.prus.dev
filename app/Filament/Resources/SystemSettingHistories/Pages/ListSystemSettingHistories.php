@@ -10,7 +10,6 @@ use Filament\Actions\CreateAction;
 
 class ListSystemSettingHistories extends BaseListRecords
 {
-    
     protected static string $resource = SystemSettingHistoryResource::class;
 
     protected function getHeaderActions(): array

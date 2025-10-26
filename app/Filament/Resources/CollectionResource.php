@@ -7,11 +7,13 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\CollectionResource\Pages;
 use App\Models\Collection;
 use App\Support\Concerns\HasNav;
+use BackedEnum;
 use Filament\Forms;
-use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
+use UnitEnum;
 
 /**
  * Filament resource that exposes CRUD pages for product collections.
@@ -33,12 +35,12 @@ final class CollectionResource extends Resource
      * Group the resource under the "Products" navigation entry (localized to Lithuanian).
      * The comprehensive test suite expects the translated label to be stored directly.
      */
-    protected static \UnitEnum|string|null $navigationGroup = 'Produktai';
+    protected static UnitEnum|string|null $navigationGroup = 'Produktai';
 
     /**
      * Display icon used by Filament's sidebar.
      */
-    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-folder';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-folder';
 
     /**
      * Lightweight form definition that exposes the most important
@@ -113,10 +115,10 @@ final class CollectionResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListCollections::route('/'),
+            'index'  => Pages\ListCollections::route('/'),
             'create' => Pages\CreateCollection::route('/create'),
-            'view' => Pages\ViewCollection::route('/{record}'),
-            'edit' => Pages\EditCollection::route('/{record}/edit'),
+            'view'   => Pages\ViewCollection::route('/{record}'),
+            'edit'   => Pages\EditCollection::route('/{record}/edit'),
         ];
     }
 

@@ -3,18 +3,17 @@
 declare(strict_types=1);
 
 namespace App\Filament\Resources\MenuItems;
-use BackedEnum;
-use App\Support\Concerns\HasNav;
 
-
-use Filament\Schemas\Schema;
 use App\Filament\Resources\MenuItems\Pages\CreateMenuItem;
 use App\Filament\Resources\MenuItems\Pages\EditMenuItem;
 use App\Filament\Resources\MenuItems\Pages\ListMenuItems;
 use App\Filament\Resources\MenuItems\Schemas\MenuItemForm;
 use App\Filament\Resources\MenuItems\Tables\MenuItemsTable;
 use App\Models\MenuItem;
+use App\Support\Concerns\HasNav;
+use BackedEnum;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 
@@ -25,7 +24,7 @@ class MenuItemResource extends Resource
     protected static ?string $model = MenuItem::class;
 
     /**
-     * @var string|\BackedEnum|null Menu item icon aligned with Filament v4 guidance.
+     * @var string|BackedEnum|null Menu item icon aligned with Filament v4 guidance.
      */
     protected static BackedEnum|string|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 

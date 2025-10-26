@@ -1,12 +1,15 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\MenuResource\RelationManagers\MenuItemsRelationManager;
 use App\Filament\Resources\MenuResource\Pages;
-use App\Models\Scopes\ActiveScope;
+use App\Filament\Resources\MenuResource\RelationManagers\MenuItemsRelationManager;
 use App\Models\Menu;
+use App\Models\Scopes\ActiveScope;
 use App\Support\Concerns\HasNav;
+use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
@@ -30,7 +33,7 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use BackedEnum;
+use UnitEnum;
 
 final class MenuResource extends Resource
 {
@@ -44,7 +47,7 @@ final class MenuResource extends Resource
     /**
      * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
      */
-    protected static \UnitEnum|string|null $navigationGroup = 'Content';
+    protected static UnitEnum|string|null $navigationGroup = 'Content';
 
     /**
      * Handle getPluralModelLabel functionality with proper error handling.
@@ -69,10 +72,10 @@ final class MenuResource extends Resource
     {
         // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
         $locationOptions = [
-            'header' => __('menus.locations.header'),
-            'footer' => __('menus.locations.footer'),
+            'header'  => __('menus.locations.header'),
+            'footer'  => __('menus.locations.footer'),
             'sidebar' => __('menus.locations.sidebar'),
-            'mobile' => __('menus.locations.mobile'),
+            'mobile'  => __('menus.locations.mobile'),
         ];
 
         return $schema->schema([
@@ -132,12 +135,12 @@ final class MenuResource extends Resource
                 TextColumn::make('location')
                     ->label(__('menus.location'))
                     ->badge()
-                    ->formatStateUsing(static fn(?string $state): ?string => match ($state) {
-                        'header' => __('menus.locations.header'),
-                        'footer' => __('menus.locations.footer'),
+                    ->formatStateUsing(static fn (?string $state): ?string => match ($state) {
+                        'header'  => __('menus.locations.header'),
+                        'footer'  => __('menus.locations.footer'),
                         'sidebar' => __('menus.locations.sidebar'),
-                        'mobile' => __('menus.locations.mobile'),
-                        default => $state,
+                        'mobile'  => __('menus.locations.mobile'),
+                        default   => $state,
                     })
                     ->sortable(),
                 TextColumn::make('description')
@@ -171,10 +174,10 @@ final class MenuResource extends Resource
                     ->label(__('menus.location'))
                     ->multiple()
                     ->options([
-                        'header' => __('menus.locations.header'),
-                        'footer' => __('menus.locations.footer'),
+                        'header'  => __('menus.locations.header'),
+                        'footer'  => __('menus.locations.footer'),
                         'sidebar' => __('menus.locations.sidebar'),
-                        'mobile' => __('menus.locations.mobile'),
+                        'mobile'  => __('menus.locations.mobile'),
                     ]),
             ])
             ->actions([
@@ -182,15 +185,15 @@ final class MenuResource extends Resource
                 EditAction::make(),
                 DeleteAction::make(),
                 Action::make('toggle_active')
-                    ->label(fn(Menu $record): string => $record->is_active ? __('menus.deactivate') : __('menus.activate'))
-                    ->icon(fn(Menu $record): string => $record->is_active ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
-                    ->color(fn(Menu $record): string => $record->is_active ? 'warning' : 'success')
+                    ->label(fn (Menu $record): string => $record->is_active ? __('menus.deactivate') : __('menus.activate'))
+                    ->icon(fn (Menu $record): string => $record->is_active ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
+                    ->color(fn (Menu $record): string => $record->is_active ? 'warning' : 'success')
                     ->requiresConfirmation()
                     ->action(function (Menu $record): void {
                         // Flip the active flag before Filament resolves the success notification payload.
-                        $record->update(['is_active' => !$record->is_active]);
+                        $record->update(['is_active' => ! $record->is_active]);
                     })
-                    ->successNotificationTitle(static fn(Menu $record): string => $record->is_active
+                    ->successNotificationTitle(static fn (Menu $record): string => $record->is_active
                         ? __('menus.activated_successfully')
                         : __('menus.deactivated_successfully')),
                 Action::make('duplicate')
@@ -266,10 +269,10 @@ final class MenuResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListMenus::route('/'),
+            'index'  => Pages\ListMenus::route('/'),
             'create' => Pages\CreateMenu::route('/create'),
-            'view' => Pages\ViewMenu::route('/{record}'),
-            'edit' => Pages\EditMenu::route('/{record}/edit'),
+            'view'   => Pages\ViewMenu::route('/{record}'),
+            'edit'   => Pages\EditMenu::route('/{record}/edit'),
         ];
     }
 

@@ -10,7 +10,6 @@ use Filament\Actions\CreateAction;
 
 class ListFeatureFlags extends BaseListRecords
 {
-    
     protected static string $resource = FeatureFlagResource::class;
 
     protected function getHeaderActions(): array

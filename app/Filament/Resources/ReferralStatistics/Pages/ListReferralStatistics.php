@@ -10,7 +10,6 @@ use Filament\Actions\CreateAction;
 
 class ListReferralStatistics extends BaseListRecords
 {
-    
     protected static string $resource = ReferralStatisticsResource::class;
 
     protected function getHeaderActions(): array

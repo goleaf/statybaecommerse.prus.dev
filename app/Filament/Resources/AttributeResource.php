@@ -16,9 +16,9 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Schemas\Schema;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -29,6 +29,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Str;
 use JsonException;
 use Stringable;
+use UnitEnum;
 
 final class AttributeResource extends Resource
 {
@@ -39,7 +40,7 @@ final class AttributeResource extends Resource
      */
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-tag';
 
-    public static function getNavigationGroup(): \UnitEnum|string|null
+    public static function getNavigationGroup(): UnitEnum|string|null
     {
         // Return a descriptive group label while allowing Filament to accept richer group definitions when required.
         $label = __('navigation.groups.products');

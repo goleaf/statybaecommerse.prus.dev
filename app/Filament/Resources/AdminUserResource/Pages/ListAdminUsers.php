@@ -10,7 +10,6 @@ use Filament\Actions;
 
 class ListAdminUsers extends BaseListRecords
 {
-    
     protected static string $resource = AdminUserResource::class;
 
     protected function getHeaderActions(): array

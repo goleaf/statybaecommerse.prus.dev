@@ -10,7 +10,6 @@ use Filament\Actions;
 
 final class ListVariantCombinations extends BaseListRecords
 {
-    
     protected static string $resource = VariantCombinationResource::class;
 
     protected function getHeaderActions(): array

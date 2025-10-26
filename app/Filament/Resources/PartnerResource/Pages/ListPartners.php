@@ -10,7 +10,6 @@ use Filament\Actions;
 
 final class ListPartners extends BaseListRecords
 {
-    
     protected static string $resource = PartnerResource::class;
 
     protected function getHeaderActions(): array

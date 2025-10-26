@@ -66,7 +66,7 @@ final class EditCustomer extends EditRecord
 
         $notificationPreferences = [
             'newsletter_subscription' => (bool) ($incomingNotification['newsletter_subscription'] ?? ($existingNotification['newsletter_subscription'] ?? false)),
-            'sms_notifications' => (bool) ($incomingNotification['sms_notifications'] ?? ($existingNotification['sms_notifications'] ?? false)),
+            'sms_notifications'       => (bool) ($incomingNotification['sms_notifications'] ?? ($existingNotification['sms_notifications'] ?? false)),
         ];
 
         $data['notification_preferences'] = json_encode($notificationPreferences, JSON_THROW_ON_ERROR);

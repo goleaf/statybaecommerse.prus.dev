@@ -10,7 +10,6 @@ use Filament\Actions\CreateAction;
 
 final class ListRecommendationCaches extends BaseListRecords
 {
-    
     protected static string $resource = RecommendationCacheResource::class;
 
     protected function getHeaderActions(): array
