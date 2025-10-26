@@ -25,10 +25,11 @@ final class BrandController extends Controller
         $brands = Brand::query()
             ->visible()
             ->withCount('products')
-            ->when($search !== '', function ($query) use ($search) {
+            ->when($search !== '', function ($query) use ($search): void {
                 $query->where('name', 'like', "%{$search}%");
             })
-            ->orderBy('name')
+            // Lean on the shared OrdersByName scope so API payloads stay alphabetically deterministic.
+            ->orderedByName()
             ->paginate($perPage);
 
         $payload = BrandContract::forCollection($brands, [

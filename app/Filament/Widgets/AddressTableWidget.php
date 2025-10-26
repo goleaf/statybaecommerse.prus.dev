@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Widgets;
 
+use App\Enums\AddressType;
 use App\Models\Address;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -45,16 +46,35 @@ final class AddressTableWidget extends BaseWidget
                     ->searchable(['first_name', 'last_name', 'company_name']),
                 TextColumn::make('type')
                     ->label(__('translations.type'))
-                    ->formatStateUsing(fn ($state) => $state->label())
+                    ->formatStateUsing(
+                        /**
+                         * Provide precise typing so PHPStan understands the enum instance.
+                         */
+                        static function (?AddressType $state): string {
+                            // Gracefully fall back to a human readable string when the enum is missing.
+                            if ($state instanceof AddressType) {
+                                return $state->label();
+                            }
+
+                            $fallback = __('translations.unknown');
+
+                            return $fallback === 'translations.unknown' ? __('Unknown') : $fallback;
+                        }
+                    )
                     ->badge()
-                    ->color(fn ($state) => match ($state) {
-                        \App\Enums\AddressType::SHIPPING => 'primary',
-                        \App\Enums\AddressType::BILLING  => 'success',
-                        \App\Enums\AddressType::HOME     => 'warning',
-                        \App\Enums\AddressType::WORK     => 'info',
-                        \App\Enums\AddressType::OTHER    => 'secondary',
-                        default                          => 'gray',
-                    }),
+                    ->color(
+                        /**
+                         * Map the enum to Filament colour names with a clear fallback for unexpected values.
+                         */
+                        fn (?AddressType $state): string => match ($state) {
+                            AddressType::SHIPPING => 'primary',
+                            AddressType::BILLING  => 'success',
+                            AddressType::HOME     => 'warning',
+                            AddressType::WORK     => 'info',
+                            AddressType::OTHER    => 'secondary',
+                            default               => 'gray',
+                        }
+                    ),
                 TextColumn::make('city')
                     ->label(__('translations.city'))
                     ->sortable()

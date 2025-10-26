@@ -4,24 +4,20 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use App\Support\Concerns\HasNav;
-use Filament\Schemas\Schema;
 use App\Filament\Resources\BrandResource\Pages;
 use App\Models\Brand;
 use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\EnabledScope;
 use App\Support\Authorization\AuthorizationMatrix;
+use App\Support\Concerns\HasNav;
 use Filament\Actions;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
-use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
-use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
-use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -29,6 +25,9 @@ use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid as SchemaGrid;
 use Filament\Schemas\Components\Section as SchemaSection;
+use Filament\Schemas\Schema;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -128,7 +127,7 @@ final class BrandResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Schema $schema): Schema   
+    public static function form(Schema $schema): Schema
     {
         return $schema->components([
             SchemaSection::make(__('brands.basic_information'))
@@ -214,10 +213,12 @@ final class BrandResource extends Resource
     /**
      * Configure the Filament table with columns, filters, and actions.
      */
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         // Configure the table definition for the streamlined Filament v4 return type.
         return $table
+            // Centralise alphabetical ordering so Filament aligns with the OrdersByName model scope.
+            ->modifyQueryUsing(static fn (Builder $query): Builder => $query->orderedByName())
             ->columns([
                 ImageColumn::make('logo')
                     ->label(__('admin/brands.fields.logo'))
@@ -287,11 +288,11 @@ final class BrandResource extends Resource
             ])
             ->actions([
                 Actions\ViewAction::make()
-                    ->visible(fn () => AuthorizationMatrix::check('brands', 'view')),
+                    ->visible(fn (): bool => AuthorizationMatrix::check('brands', 'view')),
                 EditAction::make()
-                    ->visible(fn () => AuthorizationMatrix::check('brands', 'update')),
+                    ->visible(fn (): bool => AuthorizationMatrix::check('brands', 'update')),
                 DeleteAction::make()
-                    ->visible(fn () => AuthorizationMatrix::check('brands', 'delete')),
+                    ->visible(fn (): bool => AuthorizationMatrix::check('brands', 'delete')),
                 Action::make('toggle_active')
                     ->label(fn (Brand $record): string => $record->is_active ? __('admin/brands.actions.deactivate') : __('admin/brands.actions.activate'))
                     ->icon(fn (Brand $record): string => $record->is_active ? 'heroicon-o-eye-slash' : 'heroicon-o-eye')
@@ -305,7 +306,7 @@ final class BrandResource extends Resource
                             ->send();
                     })
                     ->requiresConfirmation()
-                    ->visible(fn () => AuthorizationMatrix::check('brands', 'update')),
+                    ->visible(fn (): bool => AuthorizationMatrix::check('brands', 'update')),
                 Action::make('toggle_featured')
                     ->label(fn (Brand $record): string => $record->is_featured ? __('admin/brands.actions.unfeature') : __('admin/brands.actions.feature'))
                     ->icon(fn (Brand $record): string => $record->is_featured ? 'heroicon-o-star' : 'heroicon-o-star')
@@ -319,16 +320,16 @@ final class BrandResource extends Resource
                             ->send();
                     })
                     ->requiresConfirmation()
-                    ->visible(fn () => AuthorizationMatrix::check('brands', 'update')),
+                    ->visible(fn (): bool => AuthorizationMatrix::check('brands', 'update')),
             ])
             ->bulkActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make()
-                        ->visible(fn () => AuthorizationMatrix::check('brands', 'delete')),
+                        ->visible(fn (): bool => AuthorizationMatrix::check('brands', 'delete')),
                     RestoreBulkAction::make()
-                        ->visible(fn () => AuthorizationMatrix::check('brands', 'update')),
+                        ->visible(fn (): bool => AuthorizationMatrix::check('brands', 'update')),
                     ForceDeleteBulkAction::make()
-                        ->visible(fn () => AuthorizationMatrix::check('brands', 'delete')),
+                        ->visible(fn (): bool => AuthorizationMatrix::check('brands', 'delete')),
                     BulkAction::make('enable')
                         ->label(__('admin/brands.actions.enable_selected'))
                         ->icon('heroicon-o-check')
@@ -343,7 +344,7 @@ final class BrandResource extends Resource
                                 ->success()
                                 ->send();
                         })
-                        ->visible(fn () => AuthorizationMatrix::check('brands', 'update')),
+                        ->visible(fn (): bool => AuthorizationMatrix::check('brands', 'update')),
                     BulkAction::make('disable')
                         ->label(__('admin/brands.actions.disable_selected'))
                         ->icon('heroicon-o-x-mark')
@@ -358,7 +359,7 @@ final class BrandResource extends Resource
                                 ->success()
                                 ->send();
                         })
-                        ->visible(fn () => AuthorizationMatrix::check('brands', 'update')),
+                        ->visible(fn (): bool => AuthorizationMatrix::check('brands', 'update')),
                     BulkAction::make('feature')
                         ->label(__('admin/brands.actions.feature_selected'))
                         ->icon('heroicon-o-star')
@@ -371,7 +372,7 @@ final class BrandResource extends Resource
                                 ->send();
                         })
                         ->requiresConfirmation()
-                        ->visible(fn () => AuthorizationMatrix::check('brands', 'update')),
+                        ->visible(fn (): bool => AuthorizationMatrix::check('brands', 'update')),
                     BulkAction::make('unfeature')
                         ->label(__('admin/brands.actions.unfeature_selected'))
                         ->icon('heroicon-o-star')
@@ -384,10 +385,9 @@ final class BrandResource extends Resource
                                 ->send();
                         })
                         ->requiresConfirmation()
-                        ->visible(fn () => AuthorizationMatrix::check('brands', 'update')),
+                        ->visible(fn (): bool => AuthorizationMatrix::check('brands', 'update')),
                 ]),
-            ])
-            ->defaultSort('name');
+            ]);
     }
 
     /**
