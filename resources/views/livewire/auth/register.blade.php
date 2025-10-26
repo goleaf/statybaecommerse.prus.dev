@@ -87,6 +87,7 @@
             </div>
         </div>
 
+        {{-- Use Livewire's live model binding so the nested registration form state stays in sync with user input. --}}
         <form wire:submit="register" class="space-y-7">
             <div class="grid gap-5 sm:grid-cols-2">
                 <div class="space-y-2">
@@ -94,7 +95,8 @@
                     <x-forms.input
                         id="first_name"
                         type="text"
-                        wire:model.defer="registrationForm.first_name"
+                        {{-- Bind directly to the Livewire form object so validation targets the correct nested key. --}}
+                        wire:model.live="registrationForm.first_name"
                         autocomplete="given-name"
                         class="rounded-xl border border-slate-200 bg-white/90 px-4 py-3 text-base shadow-sm transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
                         placeholder="{{ __('Jane') }}"
@@ -107,7 +109,8 @@
                     <x-forms.input
                         id="last_name"
                         type="text"
-                        wire:model.defer="registrationForm.last_name"
+                        {{-- Provide real-time updates for the nested last name attribute. --}}
+                        wire:model.live="registrationForm.last_name"
                         autocomplete="family-name"
                         class="rounded-xl border border-slate-200 bg-white/90 px-4 py-3 text-base shadow-sm transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
                         placeholder="{{ __('Doe') }}"
@@ -121,7 +124,8 @@
                 <x-forms.input
                     id="email"
                     type="email"
-                    wire:model.defer="registrationForm.email"
+                    {{-- Keep the email field synced so unique validation feedback appears instantly. --}}
+                    wire:model.live="registrationForm.email"
                     autocomplete="email"
                     class="rounded-xl border border-slate-200 bg-white/90 px-4 py-3 text-base shadow-sm transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
                     placeholder="{{ __('you@example.com') }}"
@@ -135,7 +139,8 @@
                     <x-forms.input
                         id="password"
                         type="password"
-                        wire:model.defer="registrationForm.password"
+                        {{-- Ensure the password value flows through the Livewire form for confirmation checks. --}}
+                        wire:model.live="registrationForm.password"
                         autocomplete="new-password"
                         class="rounded-xl border border-slate-200 bg-white/90 px-4 py-3 text-base shadow-sm transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
                         placeholder="••••••••"
@@ -151,7 +156,8 @@
                     <x-forms.input
                         id="password_confirmation"
                         type="password"
-                        wire:model.defer="registrationForm.password_confirmation"
+                        {{-- Bind to the confirmation attribute so matching logic remains accurate. --}}
+                        wire:model.live="registrationForm.password_confirmation"
                         autocomplete="new-password"
                         class="rounded-xl border border-slate-200 bg-white/90 px-4 py-3 text-base shadow-sm transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
                         placeholder="••••••••"
