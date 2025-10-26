@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Livewire\Components;
 
+use App\Livewire\Concerns\WithCart;
+use App\Livewire\Concerns\WithNotifications;
 use App\Models\Product;
 use App\Models\User;
 use Illuminate\Contracts\View\View;
@@ -21,6 +23,11 @@ use Livewire\WithPagination;
  */
 final class CustomerDashboard extends Component
 {
+    use WithCart {
+        addToCart as performAddToCart;
+    }
+    use WithNotifications;
+
     use WithPagination;
 
     public User $user;
@@ -99,11 +106,7 @@ final class CustomerDashboard extends Component
      */
     public function addToCart(int $productId): void
     {
-        $product = Product::findOrFail($productId);
-        // Add to cart logic here
-        session()->push('cart', ['id' => $product->id, 'name' => $product->name, 'price' => $product->price, 'quantity' => 1]);
-        $this->dispatch('cart-updated');
-        $this->dispatch('notify', ['type' => 'success', 'message' => __('ecommerce.added_to_cart')]);
+        $this->performAddToCart($productId, 1, __('ecommerce.added_to_cart'));
     }
 
     /**

@@ -702,6 +702,7 @@ GET  /about                          - About page
 GET  /contact                        - Contact form
 GET  /search                         - Search results
 ```
+- Home Livewire component exposes computed state keys (`stats`, `featuredProducts`, `latestProducts`, `latestReviews`) cached with locale-aware cache tags to prevent stale storefront totals.
 
 #### Product Browsing
 ```
@@ -2101,4 +2102,3 @@ Run `php artisan list` for complete command list
 ---
 
 **END OF REQUIREMENTS DOCUMENT**
-

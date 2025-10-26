@@ -25,7 +25,10 @@ use Livewire\Component;
  */
 final class ProductQuickView extends Component
 {
-    use WithCart, WithNotifications;
+    use WithCart {
+        addToCart as performAddToCart;
+    }
+    use WithNotifications;
 
     public ?Product $product = null;
 
@@ -84,14 +87,20 @@ final class ProductQuickView extends Component
 
             return;
         }
-        $success = $this->addProductToCart($this->product->id, $this->quantity, $this->selectedVariantId);
-        if ($success) {
-            $this->notifySuccess(__('ecommerce.added_to_cart'));
-            $this->dispatch('cart-updated');
-            $this->closeModal();
-        } else {
-            $this->notifyError(__('ecommerce.failed_to_add_to_cart'));
+        $added = $this->performAddToCart($this->product->id, $this->quantity, __('ecommerce.added_to_cart'));
+
+        if (! $added) {
+            return;
         }
+
+        $this->dispatch(
+            'add-to-cart',
+            productId: (int) $this->product->getKey(),
+            quantity: $this->quantity,
+            variantId: $this->selectedVariantId !== null ? (int) $this->selectedVariantId : null
+        );
+
+        $this->closeModal();
     }
 
     /**

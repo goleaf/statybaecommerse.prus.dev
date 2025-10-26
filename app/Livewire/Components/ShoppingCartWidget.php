@@ -89,6 +89,7 @@ final class ShoppingCartWidget extends Component
             CartItem::create(['session_id' => $sessionId, 'user_id' => auth()->id(), 'product_id' => $productId, 'quantity' => $quantity, 'price' => $product->sale_price ?? $product->price, 'options' => $options]);
         }
         $this->calculateCartSummary();
+        $this->dispatch('add-to-cart', productId: (int) $productId, quantity: $quantity);
         $this->dispatch('cart-updated');
         $this->dispatch('notify', ['type' => 'success', 'message' => __('translations.product_added_to_cart')]);
     }

@@ -4,10 +4,6 @@ declare(strict_types=1);
 
 namespace App\Livewire\Shared;
 
-use App\Data\Storefront\Shared\LanguageLinkData;
-use App\Support\Cache\CacheKeys;
-use App\Support\Cache\CacheTags;
-use App\Support\Cache\TagAwareCache;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Str;
 use Livewire\Component;
@@ -19,7 +15,7 @@ use Livewire\Component;
  *
  * @property array<int, string>    $locales
  * @property string                $current
- * @property array<string, LanguageLinkData> $links
+ * @property array<string, array{locale:string,label:string,url:string,active:bool}> $links
  */
 class LanguageSwitcher extends Component
 {
@@ -31,7 +27,7 @@ class LanguageSwitcher extends Component
     public string $current;
 
     /**
-     * @var array<string, LanguageLinkData>
+     * @var array<string, array{locale:string,label:string,url:string,active:bool}>
      */
     public array $links = [];
 
@@ -42,55 +38,66 @@ class LanguageSwitcher extends Component
     {
         $supported = config('app.supported_locales', ['en']);
         $rawLocales = is_array($supported) ? $supported : explode(',', (string) $supported);
-        $this->locales = array_values(array_filter(array_map(
+
+        $this->locales = array_values(array_unique(array_filter(array_map(
             static fn ($locale): string => trim((string) $locale),
-            $rawLocales
-        ), static fn (string $locale): bool => $locale !== ''));
+            $rawLocales,
+        ), static fn (string $locale): bool => $locale !== '')));
+
         $this->current = app()->getLocale();
 
-        $full = url()->full();
-        $path = (string) (parse_url($full, PHP_URL_PATH) ?? '/');
-        $query = parse_url($full, PHP_URL_QUERY);
+        $fullUrl = url()->full();
+        $path = (string) (parse_url($fullUrl, PHP_URL_PATH) ?? '/');
+        $query = parse_url($fullUrl, PHP_URL_QUERY);
         $queryString = $query ? '?' . $query : '';
 
-        $parts = explode('/', ltrim($path, '/'));
-        if ($parts !== [] && $parts[0] !== '' && in_array($parts[0], $this->locales, true)) {
-            array_shift($parts);
+        $segments = $path === '/' ? [] : explode('/', trim($path, '/'));
+        if ($segments !== [] && in_array($segments[0], $this->locales, true)) {
+            array_shift($segments);
         }
-        $rest = trim(implode('/', $parts), '/');
+        $canonicalPath = implode('/', $segments);
+        $canonicalPath = trim($canonicalPath, '/');
 
-        $signature = hash('sha256', $rest . '|' . $queryString . '|' . implode(',', $this->locales));
+        $route = request()->route();
+        $routeName = $route?->getName();
+        $routeParameters = $route?->parameters() ?? [];
 
-        /** @var array<string, array{locale:string,label:string,url:string,active:bool}> $payload */
-        $payload = TagAwareCache::remember(
-            CacheKeys::languageSwitcherLinks($this->current, $signature),
-            now()->addMinutes(5),
-            function () use ($rest, $queryString): array {
-                $links = [];
+        unset($routeParameters['locale']);
 
-                foreach ($this->locales as $locale) {
-                    $href = $rest === '' ? url('/' . $locale) : url('/' . $locale . '/' . $rest);
+        $links = [];
+        foreach ($this->locales as $locale) {
+            $target = null;
 
-                    $links[$locale] = (new LanguageLinkData(
-                        $locale,
-                        Str::upper($locale),
-                        $href . $queryString,
-                        $locale === $this->current,
-                    ))->toArray();
+            if ($routeName && str_starts_with($routeName, 'localized.')) {
+                try {
+                    $target = route(
+                        $routeName,
+                        ['locale' => $locale] + $routeParameters,
+                    );
+                } catch (\Throwable) {
+                    $target = null;
                 }
+            }
 
-                return $links;
-            },
-            [
-                CacheTags::locale($this->current),
-                CacheTags::settings(),
-            ]
-        );
+            if ($target === null) {
+                $base = $canonicalPath === '' ? '' : '/' . $canonicalPath;
+                $target = url('/' . $locale . $base);
+            }
 
-        $this->links = array_map(
-            static fn (array $entry): LanguageLinkData => LanguageLinkData::fromArray($entry),
-            $payload,
-        );
+            if ($queryString !== '') {
+                $glue = str_contains($target, '?') ? '&' : '?';
+                $target .= $glue . ltrim($queryString, '?');
+            }
+
+            $links[$locale] = [
+                'locale' => $locale,
+                'label' => Str::upper($locale),
+                'url' => $target,
+                'active' => $locale === $this->current,
+            ];
+        }
+
+        $this->links = $links;
     }
 
     /**

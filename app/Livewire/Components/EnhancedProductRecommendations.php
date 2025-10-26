@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Livewire\Components;
 
+use App\Livewire\Concerns\WithCart;
+use App\Livewire\Concerns\WithNotifications;
 use App\Models\Product;
 use App\Models\User;
 use App\Services\RecommendationService;
@@ -31,6 +33,11 @@ use Log;
  */
 final class EnhancedProductRecommendations extends Component
 {
+    use WithCart {
+        addToCart as performAddToCart;
+    }
+    use WithNotifications;
+
     public ?int $productId = null;
 
     public ?int $userId = null;
@@ -92,28 +99,24 @@ final class EnhancedProductRecommendations extends Component
     {
         try {
             $product = Product::findOrFail($productId);
-            if ($product->shouldHideAddToCart()) {
-                $this->addError('cart', __('frontend.product.cannot_add_to_cart'));
+            $added = $this->performAddToCart($productId, 1, __('frontend.cart.product_added'));
+
+            if (! $added) {
+                if ($product->shouldHideAddToCart()) {
+                    $this->addError('cart', __('frontend.product.cannot_add_to_cart'));
+                } else {
+                    $this->addError('cart', __('frontend.product.not_enough_stock'));
+                }
 
                 return;
             }
-            if ($product->availableQuantity() < 1) {
-                $this->addError('cart', __('frontend.product.not_enough_stock'));
 
-                return;
-            }
-            // Create or update cart item in database
-            $cartItem = \App\Models\CartItem::updateOrCreate(['session_id' => session()->getId(), 'product_id' => $productId], ['quantity' => \App\Models\CartItem::where('session_id', session()->getId())->where('product_id', $productId)->sum('quantity') + 1, 'minimum_quantity' => $product->getMinimumQuantity(), 'unit_price' => $product->price, 'total_price' => $product->price, 'product_snapshot' => ['name' => $product->name, 'sku' => $product->sku, 'image' => $product->getMainImage()]]);
-            $cartItem->updateTotalPrice();
-            // Track recommendation interaction
             if ($this->trackInteractions && $this->userId) {
                 $user = User::find($this->userId);
                 if ($user) {
                     $this->recommendationService->trackUserInteraction($user, $product, 'add_to_cart');
                 }
             }
-            $this->dispatch('cart-updated');
-            $this->dispatch('show-success-message', message: __('frontend.cart.product_added'));
         } catch (Exception $e) {
             $this->addError('cart', __('frontend.product.add_to_cart_error'));
         }

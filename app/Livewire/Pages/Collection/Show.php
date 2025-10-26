@@ -16,13 +16,11 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use App\Support\Cache\CacheKeys;
 use App\Support\Cache\CacheTags;
 use App\Support\Cache\TagAwareCache;
 use Illuminate\Support\Collection;
-use App\Support\Cache\CacheKeys;
-use App\Support\Cache\CacheTags;
-use App\Support\Cache\TagAwareCache;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Url;
@@ -210,7 +208,7 @@ class Show extends Component
 
                             $options[$attributeId]['values'][$value->id] = [
                                 'id'       => (int) $value->id,
-                                'label'    => (string) $value->name,
+                                'label'    => (string) ($value->display_value ?: $value->value ?: ''),
                                 'selected' => false,
                             ];
                         }
