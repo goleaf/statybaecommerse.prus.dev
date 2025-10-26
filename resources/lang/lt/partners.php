@@ -56,4 +56,38 @@ return [
     'commission_rate_help' => 'Komisijos procentas (0-100)',
     'logo_help'            => 'Partnerio logotipas',
     'banner_help'          => 'Partnerio baneris',
+
+    'dashboard' => [
+        'title'        => 'Partnerių užsakymai',
+        'subtitle'     => 'Stebėkite partnerių užsakymų būsenas ir apyvartą vienoje vietoje.',
+        'result_count' => 'Iš viso :count užsakymų',
+        'tabs'         => [
+            'open'      => 'Atviri',
+            'shipped'   => 'Išsiųsti',
+            'cancelled' => 'Atšaukti',
+        ],
+        'table'        => [
+            'order'         => 'Užsakymas',
+            'status'        => 'Būsena',
+            'payment_status'=> 'Mokėjimas',
+            'items'         => 'Pozicijos',
+            'items_count'   => '{0}Pozicijų nėra|{1}:count pozicija|[2,*]:count pozicijos',
+            'total'         => 'Suma',
+            'placed_at'     => 'Sukurta',
+        ],
+        'empty'        => [
+            'title'       => 'Pagal pasirinktą filtrą užsakymų nėra',
+            'description' => 'Pakoreguokite būsenos filtrą arba patikrinkite vėliau, kai atsiras naujų partnerių užsakymų.',
+        ],
+        'errors'       => [
+            'forbidden'    => [
+                'title'       => 'Reikalinga partnerio prieiga',
+                'description' => 'Jūsų paskyra nesusieta su aktyviu partneriu. Susisiekite su palaikymo komanda, kad gautumėte prieigą.',
+            ],
+            'unauthorized' => [
+                'title'       => 'Prisijunkite',
+                'description' => 'Prisijunkite partnerio paskyra, kad matytumėte partnerių užsakymus.',
+            ],
+        ],
+    ],
 ];
