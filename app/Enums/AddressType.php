@@ -165,7 +165,7 @@ enum AddressType: string implements EnumInterface
         return Collection::make(self::cases());
     }
 
-    public static function fromLabel(string $label): ?self
+    public static function fromLabel(string $label): ?static
     {
         return Collection::make(self::cases())->first(static fn (self $case): bool => $case->label() === $label);
     }
