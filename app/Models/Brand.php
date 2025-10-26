@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Contracts\TranslatableRecord;
+use App\Models\Concerns\OrdersByName;
 use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\EnabledScope;
 use App\Observers\BrandObserver;
@@ -30,17 +31,17 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  *
  * Eloquent model representing the Brand entity with comprehensive relationships, scopes, and business logic for the e-commerce system.
  *
- * @property mixed  $fillable
- * @property mixed  $appends
- * @property mixed  $table
- * @property string $translationModel
- * @property mixed $translatable
- * @property int $id
- * @property string $name
+ * @property mixed       $fillable
+ * @property mixed       $appends
+ * @property mixed       $table
+ * @property string      $translationModel
+ * @property mixed       $translatable
+ * @property int         $id
+ * @property string      $name
  * @property string|null $slug
  * @property string|null $description
- * @property bool $is_enabled
- * @property bool $is_visible
+ * @property bool        $is_enabled
+ * @property bool        $is_visible
  * @property-read int|null $products_count
  * @property-read string|null $logo
  *
@@ -59,10 +60,18 @@ final class Brand extends Model implements HasMedia, TranslatableRecord
     use HasTranslations;
     use InteractsWithMedia;
     use LogsActivity;
+
+    // Keep alphabetical listings predictable by piping queries through the shared OrdersByName scope.
+    use OrdersByName;
     use Searchable;
     use SoftDeletes;
 
     protected $fillable = ['name', 'slug', 'description', 'website', 'is_enabled', 'is_active', 'is_visible', 'is_featured', 'seo_title', 'seo_description'];
+
+    /**
+     * Point the shared OrdersByName trait at the human readable column exposed in storefront UIs.
+     */
+    protected string $nameColumn = 'name';
 
     /**
      * Handle casts functionality with proper error handling.
@@ -118,15 +127,15 @@ final class Brand extends Model implements HasMedia, TranslatableRecord
         $locale = app()->getLocale();
 
         return [
-            'id' => $this->getKey(),
-            'type' => 'brand',
-            'name' => $this->name,
-            'slug' => $this->slug,
-            'description' => $this->description,
-            'translated_name' => $this->trans('name', $locale),
+            'id'                     => $this->getKey(),
+            'type'                   => 'brand',
+            'name'                   => $this->name,
+            'slug'                   => $this->slug,
+            'description'            => $this->description,
+            'translated_name'        => $this->trans('name', $locale),
             'translated_description' => $this->trans('description', $locale),
-            'products_count' => (int) ($this->products_count ?? 0),
-            'is_enabled' => (bool) $this->is_enabled,
+            'products_count'         => (int) ($this->products_count ?? 0),
+            'is_enabled'             => (bool) $this->is_enabled,
         ];
     }
 
@@ -165,7 +174,7 @@ final class Brand extends Model implements HasMedia, TranslatableRecord
      */
     public function getActivitylogOptions(): LogOptions
     {
-        return LogOptions::defaults()->logOnly(['name', 'slug', 'description', 'website', 'is_enabled', 'is_visible'])->logOnlyDirty()->dontSubmitEmptyLogs()->setDescriptionForEvent(fn (string $eventName) => "Brand {$eventName}")->useLogName('brand');
+        return LogOptions::defaults()->logOnly(['name', 'slug', 'description', 'website', 'is_enabled', 'is_visible'])->logOnlyDirty()->dontSubmitEmptyLogs()->setDescriptionForEvent(fn (string $eventName): string => "Brand {$eventName}")->useLogName('brand');
     }
 
     /**
@@ -173,7 +182,7 @@ final class Brand extends Model implements HasMedia, TranslatableRecord
      */
     public static function flushCaches(): void
     {
-        $locales = collect(config('app.supported_locales', 'en'))->when(fn ($v) => is_string($v), fn ($c) => collect(explode(',', (string) $c)))->map(fn ($v) => trim((string) $v))->filter()->values();
+        $locales = collect(config('app.supported_locales', 'en'))->when(is_string(...), fn ($c): \Illuminate\Support\Collection => collect(explode(',', (string) $c)))->map(fn ($v): string => trim((string) $v))->filter()->values();
         foreach ($locales as $loc) {
             Cache::forget("sitemap:urls:{$loc}");
         }
@@ -339,8 +348,6 @@ final class Brand extends Model implements HasMedia, TranslatableRecord
 
     /**
      * Handle getOrCreateTranslation functionality with proper error handling.
-     *
-     * @return App\Models\Translations\BrandTranslation
      */
     public function getOrCreateTranslation(string $locale): \App\Models\Translations\BrandTranslation
     {
