@@ -24,7 +24,6 @@ use App\Support\RequestContext;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Auth;
 use InvalidArgumentException;
 
 final class NotificationController extends Controller
@@ -33,7 +32,7 @@ final class NotificationController extends Controller
 
     public function index(NotificationIndexRequest $request): JsonResponse
     {
-        $user = Auth::user();
+        $user = $this->requireUser($request); // Ensure the request resolves a concrete authenticated user instance.
         $input = $request->validated();
 
         try {
@@ -66,11 +65,11 @@ final class NotificationController extends Controller
 
     public function markAsRead(NotificationMutationRequest $request, Notification $notification): JsonResponse
     {
-        $user = Auth::user();
+        $user = $this->requireUser($request); // Guarantee ownership checks operate on a real authenticated user.
 
         try {
             $payload = $this->notificationService->markAsReadForUser($user, $notification);
-        } catch (ModelNotFoundException $exception) {
+        } catch (ModelNotFoundException) {
             return $this->notFoundResponse();
         }
 
@@ -83,11 +82,11 @@ final class NotificationController extends Controller
 
     public function markAsUnread(NotificationMutationRequest $request, Notification $notification): JsonResponse
     {
-        $user = Auth::user();
+        $user = $this->requireUser($request); // Prevent null-auth scenarios when toggling read status.
 
         try {
             $payload = $this->notificationService->markAsUnreadForUser($user, $notification);
-        } catch (ModelNotFoundException $exception) {
+        } catch (ModelNotFoundException) {
             return $this->notFoundResponse();
         }
 
@@ -124,11 +123,11 @@ final class NotificationController extends Controller
 
     public function show(NotificationShowRequest $request, Notification $notification): JsonResponse
     {
-        $user = Auth::user();
+        $user = $this->requireUser($request); // Validate the authenticated context before showing notifications.
 
         try {
             $payload = $this->notificationService->show($user, $notification);
-        } catch (ModelNotFoundException $exception) {
+        } catch (ModelNotFoundException) {
             return $this->notFoundResponse();
         }
 
@@ -140,11 +139,11 @@ final class NotificationController extends Controller
 
     public function destroy(NotificationMutationRequest $request, Notification $notification): JsonResponse
     {
-        $user = Auth::user();
+        $user = $this->requireUser($request); // Confirm deletion operates against the authenticated principal.
 
         try {
             $this->notificationService->deleteForUser($user, $notification);
-        } catch (ModelNotFoundException $exception) {
+        } catch (ModelNotFoundException) {
             return $this->notFoundResponse();
         }
 
@@ -156,7 +155,7 @@ final class NotificationController extends Controller
 
     public function search(NotificationSearchRequest $request): JsonResponse
     {
-        $user = Auth::user();
+        $user = $this->requireUser($request); // Ensure search runs with a fully authenticated user reference.
         $input = $request->validated();
 
         try {
@@ -216,6 +215,12 @@ final class NotificationController extends Controller
         );
 
         $payload = $response->getData(true);
+
+        if (! is_array($payload)) {
+            $payload = []; // Normalize the response payload to an array for predictable mutation semantics.
+        }
+
+        /** @var array<string, mixed> $payload */
         $payload['message'] = $detail;
         $payload['errors'] = $errors;
 

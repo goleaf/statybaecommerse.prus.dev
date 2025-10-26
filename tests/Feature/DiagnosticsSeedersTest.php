@@ -51,7 +51,7 @@ final class DiagnosticsSeedersTest extends TestCase
     {
         Artisan::call('db:seed', ['--class' => PartnerSeeder::class, '--no-interaction' => true]);
 
-        $this->assertGreaterThanOrEqual(3, PartnerTier::query()->count(), 'Expected partner tiers to be seeded.');
+        $this->assertGreaterThanOrEqual(4, PartnerTier::query()->count(), 'Expected partner tiers to be seeded.');
         $this->assertGreaterThan(0, Partner::query()->count(), 'Expected partner records to be seeded.');
     }
 }

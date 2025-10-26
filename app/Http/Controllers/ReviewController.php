@@ -8,6 +8,7 @@ use App\Data\ReviewData;
 use App\Http\Requests\ReportReviewRequest;
 use App\Models\Product;
 use App\Models\Review;
+use App\Models\Scopes\ApprovedScope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -46,9 +47,13 @@ final class ReviewController extends Controller
     /**
      * Display the specified resource with related data.
      */
-    public function show(Review $review): View
+    public function show(string $reviewId): View
     {
-        if (! $review->is_approved) {
+        $review = Review::withoutGlobalScope(ApprovedScope::class)->findOrFail($reviewId);
+
+        // Allow review owners to preview their own pending submissions while still hiding unapproved
+        // entries from the public catalogue.
+        if (! $review->is_approved && Auth::id() !== $review->user_id) {
             abort(404);
         }
         $review->load(['user', 'product']);
@@ -75,6 +80,11 @@ final class ReviewController extends Controller
      */
     public function store(ReviewData $data): RedirectResponse
     {
+        if (! Auth::check()) {
+            // Halt orphaned submissions created by unauthenticated visitors to maintain ownership integrity.
+            abort(401, (string) __('auth.unauthenticated'));
+        }
+
         $review = Review::create(['product_id' => $data->product_id, 'user_id' => Auth::id(), 'rating' => $data->rating, 'title' => $data->title, 'content' => $data->content, 'reviewer_name' => $data->reviewer_name, 'reviewer_email' => $data->reviewer_email, 'locale' => app()->getLocale(), 'is_approved' => false]);
 
         return redirect()->route('reviews.show', $review)->with('success', __('reviews.review_submitted_successfully'));
@@ -97,6 +107,10 @@ final class ReviewController extends Controller
      */
     public function update(Request $request, Review $review): RedirectResponse
     {
+        if (! Auth::check()) {
+            // A guest reaching this branch indicates a CSRF or automation attempt, so stop early.
+            abort(401, (string) __('auth.unauthenticated'));
+        }
         if (Auth::id() !== $review->user_id) {
             abort(403);
         }
@@ -114,6 +128,10 @@ final class ReviewController extends Controller
      */
     public function destroy(Review $review): RedirectResponse
     {
+        if (! Auth::check()) {
+            // Prevent background requests from deleting reviews without an authenticated owner.
+            abort(401, (string) __('auth.unauthenticated'));
+        }
         if (Auth::id() !== $review->user_id) {
             abort(403);
         }
@@ -132,23 +150,37 @@ final class ReviewController extends Controller
         }
 
         $userId = (int) Auth::id();
-        $metadata = $review->metadata ?? [];
-        $likedBy = collect($metadata['liked_by'] ?? []);
+        $metadata = $this->normaliseMetadata($review);
+        $likedByRaw = $metadata['liked_by'] ?? [];
+        if (! is_array($likedByRaw)) {
+            $likedByRaw = [];
+        }
+        // Normalise the "liked_by" metadata into an integer array to avoid duplicate or malformed entries.
+        $likedBy = [];
+        foreach ($likedByRaw as $value) {
+            if (! is_int($value) && ! is_string($value) && ! is_float($value)) {
+                continue;
+            }
 
-        if ($likedBy->contains($userId)) {
+            $likedBy[] = (int) $value;
+        }
+        $likedBy = array_values(array_unique($likedBy));
+
+        if (in_array($userId, $likedBy, true)) {
             return response()->json([
                 'message'        => __('You have already marked this review as helpful.'),
-                'helpful_count'  => (int) ($review->helpful_count ?? $likedBy->count()),
+                'helpful_count'  => (int) ($review->helpful_count ?? count($likedBy)),
                 'reported_count' => (int) ($review->reported_count ?? 0),
             ]);
         }
 
-        $likedBy = $likedBy->push($userId)->unique()->values();
-        $metadata['liked_by'] = $likedBy->all();
+        $likedBy[] = $userId;
+        $likedBy = array_values(array_unique($likedBy));
+        $metadata['liked_by'] = $likedBy;
 
         DB::transaction(function () use ($review, $metadata, $likedBy): void {
-            $review->metadata = $metadata;
-            $review->helpful_count = $likedBy->count();
+            $review->setAttribute('metadata', $metadata);
+            $review->setAttribute('helpful_count', count($likedBy));
             $review->save();
         });
 
@@ -156,7 +188,7 @@ final class ReviewController extends Controller
 
         return response()->json([
             'message'        => __('Thanks for your feedback!'),
-            'helpful_count'  => (int) ($review->helpful_count ?? $likedBy->count()),
+            'helpful_count'  => (int) ($review->helpful_count ?? count($likedBy)),
             'reported_count' => (int) ($review->reported_count ?? 0),
         ]);
     }
@@ -173,29 +205,46 @@ final class ReviewController extends Controller
         $validated = $request->validated();
 
         $userId = (int) Auth::id();
-        $metadata = $review->metadata ?? [];
-        $reportedBy = collect($metadata['reported_by'] ?? []);
+        $metadata = $this->normaliseMetadata($review);
+        $reportedByRaw = $metadata['reported_by'] ?? [];
+        if (! is_array($reportedByRaw)) {
+            $reportedByRaw = [];
+        }
+        // Normalise the "reported_by" metadata into an integer array for consistent counting.
+        $reportedBy = [];
+        foreach ($reportedByRaw as $value) {
+            if (! is_int($value) && ! is_string($value) && ! is_float($value)) {
+                continue;
+            }
 
-        if ($reportedBy->contains($userId)) {
+            $reportedBy[] = (int) $value;
+        }
+        $reportedBy = array_values(array_unique($reportedBy));
+
+        if (in_array($userId, $reportedBy, true)) {
             return response()->json([
                 'message'        => __('You have already reported this review.'),
                 'helpful_count'  => (int) ($review->helpful_count ?? 0),
-                'reported_count' => (int) ($review->reported_count ?? $reportedBy->count()),
+                'reported_count' => (int) ($review->reported_count ?? count($reportedBy)),
             ]);
         }
 
-        $reportedBy = $reportedBy->push($userId)->unique()->values();
-        $metadata['reported_by'] = $reportedBy->all();
+        $reportedBy[] = $userId;
+        $reportedBy = array_values(array_unique($reportedBy));
+        $metadata['reported_by'] = $reportedBy;
 
         if (($validated['reason'] ?? null) !== null && $validated['reason'] !== '') {
             $reasons = $metadata['reported_reasons'] ?? [];
+            if (! is_array($reasons)) {
+                $reasons = [];
+            }
             $reasons[(string) $userId] = $validated['reason'];
             $metadata['reported_reasons'] = $reasons;
         }
 
         DB::transaction(function () use ($review, $metadata, $reportedBy): void {
-            $review->metadata = $metadata;
-            $review->reported_count = $reportedBy->count();
+            $review->setAttribute('metadata', $metadata);
+            $review->setAttribute('reported_count', count($reportedBy));
             $review->save();
         });
 
@@ -204,8 +253,30 @@ final class ReviewController extends Controller
         return response()->json([
             'message'        => __('Thanks for letting us know.'),
             'helpful_count'  => (int) ($review->helpful_count ?? 0),
-            'reported_count' => (int) ($review->reported_count ?? $reportedBy->count()),
+            'reported_count' => (int) ($review->reported_count ?? count($reportedBy)),
         ]);
+    }
+
+    /**
+     * Ensure metadata stored on the review model is always returned as an associative array.
+     *
+     * @return array<int|string, mixed>
+     */
+    private function normaliseMetadata(Review $review): array
+    {
+        $metadata = $review->getAttribute('metadata');
+
+        if (is_array($metadata)) {
+            return $metadata;
+        }
+
+        if (! is_string($metadata)) {
+            return [];
+        }
+
+        $decoded = json_decode($metadata, true);
+
+        return is_array($decoded) ? (array) $decoded : [];
     }
 
     /**

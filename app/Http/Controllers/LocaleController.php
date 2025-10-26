@@ -17,8 +17,11 @@ final class LocaleController
 {
     public function __invoke(Request $request, ?string $locale = null): RedirectResponse
     {
+        // Collect the requested locale from either the route wildcard or the submitted payload.
         $requestedRaw = $locale ?? $request->input('locale');
         $requested = is_string($requestedRaw) ? $requestedRaw : null;
+
+        // Resolve the configured list of supported locales and map the request to the best match.
         $supported = $this->supportedLocales();
         $resolved = $this->resolveLocale($requested, $supported);
 
@@ -34,6 +37,7 @@ final class LocaleController
         $mapping = is_array($mappingConfig) ? $mappingConfig : [];
         $localeMapping = $mapping[$resolved] ?? null;
         if (is_array($localeMapping)) {
+            // Persist the locale-linked currency selection when one is configured.
             $currency = $localeMapping['currency'] ?? null;
             if (is_string($currency) && $currency !== '') {
                 Session::put('forced_currency', $currency);
@@ -61,7 +65,8 @@ final class LocaleController
         $configured = config('app.supported_locales', []);
 
         if (is_string($configured)) {
-            $configured = array_map('trim', explode(',', $configured));
+            // Allow comma separated configuration strings while preserving order.
+            $configured = array_map(trim(...), explode(',', $configured));
         }
 
         if (! is_array($configured)) {
@@ -80,10 +85,12 @@ final class LocaleController
                 continue;
             }
 
+            // Keep the original casing to avoid breaking route constraints while ensuring uniqueness.
             $locales[] = $trimmed;
         }
 
-        return $locales;
+        // Ensure downstream lookups operate on unique values without disturbing the configured precedence.
+        return array_values(array_unique($locales));
     }
 
     /**
@@ -92,11 +99,33 @@ final class LocaleController
     private function resolveLocale(?string $candidate, array $supported): string
     {
         if (is_string($candidate)) {
+            // Normalise whitespace to avoid rejecting values that only differ by stray spaces.
             $candidate = trim($candidate);
         }
 
-        if (is_string($candidate) && $candidate !== '' && in_array($candidate, $supported, true)) {
-            return $candidate;
+        if ($candidate !== null && $candidate !== '') {
+            if (in_array($candidate, $supported, true)) {
+                return $candidate;
+            }
+
+            // Accept regional variants (e.g., en-GB) by comparing their primary segments.
+            $normalisedCandidate = strtolower(str_replace('_', '-', $candidate));
+            foreach ($supported as $supportedLocale) {
+                $normalisedSupported = strtolower(str_replace('_', '-', $supportedLocale));
+                if ($normalisedSupported === $normalisedCandidate) {
+                    return $supportedLocale;
+                }
+
+                // Extract the language segments while tolerating locales without regional suffixes.
+                $supportedParts = explode('-', $normalisedSupported);
+                $candidateParts = explode('-', $normalisedCandidate);
+                $supportedSegment = (string) $supportedParts[0];
+                $candidateSegment = (string) $candidateParts[0];
+
+                if ($candidateSegment !== '' && $candidateSegment === $supportedSegment) {
+                    return $supportedLocale;
+                }
+            }
         }
 
         $fallback = $this->preferredFallbackLocale($supported);
@@ -168,18 +197,32 @@ final class LocaleController
         if (Str::startsWith($target, ['http://', 'https://'])) {
             $targetHost = parse_url($target, PHP_URL_HOST);
             $targetScheme = parse_url($target, PHP_URL_SCHEME);
+            $targetPort = parse_url($target, PHP_URL_PORT);
 
             if ($targetHost === null || $targetScheme === null) {
                 return false;
             }
 
-            return $targetHost === $request->getHost() && $targetScheme === $request->getScheme();
+            // Explicitly match the current host, scheme, and port to avoid open redirect exploits.
+            if ($targetHost !== $request->getHost()) {
+                return false;
+            }
+
+            if (strtolower((string) $targetScheme) !== strtolower($request->getScheme())) {
+                return false;
+            }
+
+            $currentPort = $request->getPort();
+            $normalisedTargetPort = $targetPort ?? ($targetScheme === 'https' ? 443 : 80);
+
+            return $currentPort === $normalisedTargetPort;
         }
 
         if (Str::startsWith($target, ['//', 'javascript:', 'data:'])) {
             return false;
         }
 
+        // Relative paths that begin with a forward slash stay within the application scope and are therefore safe.
         return Str::startsWith($target, '/');
     }
 }

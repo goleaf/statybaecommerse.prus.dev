@@ -6,7 +6,9 @@ use App\Filament\Resources\VariantCombinationResource\Pages\CreateVariantCombina
 use App\Filament\Resources\VariantCombinationResource\Pages\EditVariantCombination;
 use App\Filament\Resources\VariantCombinationResource\Pages\ListVariantCombinations;
 use App\Filament\Resources\VariantCombinationResource\Pages\ViewVariantCombination;
+use App\Http\Controllers\Admin\AttributeValueTranslationController;
 use App\Http\Controllers\Admin\CampaignConversionController;
+use App\Http\Controllers\Admin\DiscountPresetController;
 use App\Http\Controllers\Admin\LocationController as AdminLocationController;
 use App\Models\Inventory;
 use App\Models\NewsImage;
@@ -33,6 +35,23 @@ Route::middleware('auth')->group(function (): void {
 
     Route::get('/admin/variant-combinations/{record}/edit', EditVariantCombination::class)
         ->name('filament.admin.resources.variant-combinations.edit');
+
+    Route::prefix('/admin/attribute-values/{attributeValue}/translations')
+        ->name('admin.attribute-values.translations.')
+        ->group(function (): void {
+            // Surface translation CRUD endpoints for Filament widgets and inline editors.
+            Route::get('/', [AttributeValueTranslationController::class, 'index'])
+                ->name('index');
+
+            Route::post('/', [AttributeValueTranslationController::class, 'store'])
+                ->name('store');
+
+            Route::match(['put', 'patch'], '/{attributeValueTranslation}', [AttributeValueTranslationController::class, 'update'])
+                ->name('update');
+
+            Route::delete('/{attributeValueTranslation}', [AttributeValueTranslationController::class, 'destroy'])
+                ->name('destroy');
+        });
 
     Route::get('/admin/news-image-resources', function (Request $request) {
         $forwarded = Request::create('/admin/news-images', 'GET', $request->query());
@@ -415,12 +434,11 @@ Route::middleware('auth')->group(function (): void {
         return $placeholder('Observability')();
     })->name('filament.admin.pages.observability');
 
-    // Discount Presets placeholder routes (auth required)
-    Route::get('/admin/discounts/presets', $placeholder('Discount Presets'))
+    // Discount Preset management routes handled by the controller implementation.
+    Route::get('/admin/discounts/presets', [DiscountPresetController::class, 'index'])
         ->name('admin.discounts.presets');
-    Route::post('/admin/discounts/presets', function () {
-        return redirect('/admin/discounts');
-    })->name('admin.discounts.presets.store');
+    Route::post('/admin/discounts/presets', [DiscountPresetController::class, 'store'])
+        ->name('admin.discounts.presets.store');
 });
 
 Route::middleware('auth')->prefix('admin')->group(function (): void {

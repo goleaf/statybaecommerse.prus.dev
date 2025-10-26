@@ -10,10 +10,12 @@ use App\Models\RecommendationCache;
 use App\Models\User;
 use App\Services\Recommendations\BaseRecommendation;
 use App\Services\Recommendations\CollaborativeFilteringRecommendation;
+use App\Services\Recommendations\CategoryBasedRecommendation;
 use App\Services\Recommendations\ContentBasedRecommendation;
 use App\Services\Recommendations\CrossSellRecommendation;
 use App\Services\Recommendations\HybridRecommendation;
 use App\Services\Recommendations\PopularityRecommendation;
+use App\Services\Recommendations\PersonalizedRecommendation;
 use App\Services\Recommendations\TrendingRecommendation;
 use App\Services\Recommendations\UpSellRecommendation;
 use Exception;
@@ -76,6 +78,17 @@ final class RecommendationService
     private function generateRecommendations(RecommendationBlock $block, ?User $user = null, ?Product $product = null, array $context = []): Collection
     {
         $configs = $block->getConfigs();
+        if ($configs->isEmpty()) {
+            // When no explicit configuration is attached fall back to the default algorithm map per block type.
+            $configs = collect($this->resolveDefaultAlgorithms($block->type))
+                ->map(function (string $algorithm): object {
+                    return (object) [
+                        'type'   => $algorithm,
+                        'config' => [],
+                        'id'     => null,
+                    ];
+                });
+        }
         $allRecommendations = collect();
         // Use LazyCollection with timeout to prevent long-running recommendation generation
         $timeout = now()->addSeconds(30);
@@ -120,6 +133,8 @@ final class RecommendationService
                 'hybrid'        => new HybridRecommendation($config),
                 'popularity'    => new PopularityRecommendation($config),
                 'trending'      => new TrendingRecommendation($config),
+                'personalized'  => new PersonalizedRecommendation($config),
+                'category_based'=> new CategoryBasedRecommendation($config),
                 'cross_sell'    => new CrossSellRecommendation($config),
                 'up_sell'       => new UpSellRecommendation($config),
                 default         => new PopularityRecommendation($config),
@@ -172,6 +187,28 @@ final class RecommendationService
         $fallbackAlgorithm = new PopularityRecommendation;
 
         return $fallbackAlgorithm->getRecommendations($user, $product, $context);
+    }
+
+    /**
+     * Resolve the default algorithm stack for a recommendation block type.
+     *
+     * @return list<string>
+     */
+    private function resolveDefaultAlgorithms(?string $blockType): array
+    {
+        return match ($blockType) {
+            // Similar product widgets prioritise feature-based comparisons.
+            'similar_products', 'related' => ['content_based'],
+            // Collaborative suggestions thrive on co-purchase behaviour.
+            'frequently_bought_together'  => ['collaborative'],
+            // Trending sections can use the dedicated trending scorer with a popularity fallback.
+            'trending_products', 'trending' => ['trending', 'popularity'],
+            // Personalised blocks first lean on behaviour then reuse collaborative signals if needed.
+            'personalized'               => ['personalized', 'collaborative'],
+            // Within-category blocks surface contextual alternatives.
+            'category_based', 'featured' => ['category_based', 'content_based'],
+            default                      => ['popularity'],
+        };
     }
 
     /**

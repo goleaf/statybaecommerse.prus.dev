@@ -4,9 +4,16 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use App\Http\Controllers\ReportController;
 use App\Models\Report;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
+use Illuminate\View\View;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\PermissionRegistrar;
 use Tests\TestCase;
 
 final class ReportTest extends TestCase
@@ -15,18 +22,18 @@ final class ReportTest extends TestCase
 
     public function test_can_view_reports_index(): void
     {
-        Report::factory()->count(5)->create();
+        Report::factory()->count(5)->active()->public()->create();
 
-        $response = $this->get(route('reports.index'));
+        $response = app(ReportController::class)->index(Request::create('/reports', 'GET'));
 
-        $response->assertStatus(200);
-        $response->assertViewIs('reports.index');
-        $response->assertViewHas('reports');
+        $this->assertInstanceOf(View::class, $response);
+        $this->assertSame('reports.index', $response->name());
+        $this->assertArrayHasKey('reports', $response->getData());
     }
 
     public function test_can_view_public_report(): void
     {
-        $report = Report::factory()->public()->create();
+        $report = Report::factory()->public()->active()->create();
 
         $response = $this->get(route('reports.show', $report));
 
@@ -46,7 +53,7 @@ final class ReportTest extends TestCase
 
     public function test_authenticated_user_can_view_private_report(): void
     {
-        $user = User::factory()->create();
+        $user = $this->createUserWithReportPermission();
         $report = Report::factory()->create(['is_public' => false]);
 
         $response = $this->actingAs($user)->get(route('reports.show', $report));
@@ -57,7 +64,7 @@ final class ReportTest extends TestCase
 
     public function test_can_download_public_report(): void
     {
-        $report = Report::factory()->public()->create();
+        $report = Report::factory()->public()->active()->create();
 
         $response = $this->get(route('reports.download', $report));
 
@@ -76,7 +83,7 @@ final class ReportTest extends TestCase
 
     public function test_authenticated_user_can_generate_report(): void
     {
-        $user = User::factory()->create();
+        $user = $this->createUserWithReportPermission();
         $report = Report::factory()->create();
 
         $response = $this->actingAs($user)
@@ -97,52 +104,86 @@ final class ReportTest extends TestCase
 
         $response = $this->post(route('reports.generate', $report));
 
+        $response->assertRedirect();
+        $this->assertStringContainsString('/login', $response->headers->get('Location'));
+    }
+
+    public function test_authenticated_user_without_permission_cannot_view_private_report(): void
+    {
+        $user = User::factory()->create();
+        $report = Report::factory()->create(['is_public' => false]);
+
+        $response = $this->actingAs($user)->get(route('reports.show', $report));
+
+        $response->assertStatus(403);
+    }
+
+    public function test_authenticated_user_without_permission_cannot_generate_report(): void
+    {
+        $user = User::factory()->create();
+        $report = Report::factory()->create();
+
+        $response = $this->actingAs($user)
+            ->post(route('reports.generate', $report));
+
         $response->assertStatus(403);
     }
 
     public function test_reports_index_filters_by_type(): void
     {
-        Report::factory()->create(['type' => 'sales']);
-        Report::factory()->create(['type' => 'products']);
+        Report::factory()->active()->public()->create(['type' => 'sales']);
+        Report::factory()->active()->public()->create(['type' => 'products']);
 
-        $response = $this->get(route('reports.index', ['type' => 'sales']));
+        $response = app(ReportController::class)->index(Request::create('/reports', 'GET', ['type' => 'sales']));
 
-        $response->assertStatus(200);
-        $reports = $response->viewData('reports');
+        $this->assertInstanceOf(View::class, $response);
+        $reports = $response->getData()['reports'];
         $this->assertCount(1, $reports);
     }
 
     public function test_reports_index_filters_by_category(): void
     {
-        Report::factory()->create(['category' => 'sales']);
-        Report::factory()->create(['category' => 'marketing']);
+        Report::factory()->active()->public()->create(['category' => 'sales']);
+        Report::factory()->active()->public()->create(['category' => 'marketing']);
 
-        $response = $this->get(route('reports.index', ['category' => 'sales']));
+        $response = app(ReportController::class)->index(Request::create('/reports', 'GET', ['report_category' => 'sales']));
 
-        $response->assertStatus(200);
-        $reports = $response->viewData('reports');
+        $this->assertInstanceOf(View::class, $response);
+        $reports = $response->getData()['reports'];
         $this->assertCount(1, $reports);
+    }
+
+    public function test_reports_index_redirects_legacy_category_parameter(): void
+    {
+        Report::factory()->active()->public()->create(['category' => 'sales']);
+
+        $response = app(ReportController::class)->index(Request::create('/reports', 'GET', ['category' => 'sales']));
+
+        $this->assertInstanceOf(RedirectResponse::class, $response);
+        $this->assertSame(route('reports.index', ['report_category' => 'sales']), $response->getTargetUrl());
     }
 
     public function test_reports_index_searches_by_name(): void
     {
-        Report::factory()->create([
+        app()->setLocale('en');
+
+        Report::factory()->active()->public()->create([
             'name' => ['lt' => 'Pardavimų ataskaita', 'en' => 'Sales Report'],
         ]);
-        Report::factory()->create([
+        Report::factory()->active()->public()->create([
             'name' => ['lt' => 'Produktų ataskaita', 'en' => 'Product Report'],
         ]);
 
-        $response = $this->get(route('reports.index', ['search' => 'Pardavimų']));
+        $response = app(ReportController::class)->index(Request::create('/reports', 'GET', ['search' => 'Sales']));
 
-        $response->assertStatus(200);
-        $reports = $response->viewData('reports');
+        $this->assertInstanceOf(View::class, $response);
+        $reports = $response->getData()['reports'];
         $this->assertCount(1, $reports);
     }
 
     public function test_view_count_increments_when_viewing_report(): void
     {
-        $report = Report::factory()->public()->create(['view_count' => 0]);
+        $report = Report::factory()->public()->active()->create(['view_count' => 0]);
 
         $this->get(route('reports.show', $report));
 
@@ -152,11 +193,48 @@ final class ReportTest extends TestCase
 
     public function test_download_count_increments_when_downloading_report(): void
     {
-        $report = Report::factory()->public()->create(['download_count' => 0]);
+        $report = Report::factory()->public()->active()->create(['download_count' => 0]);
 
         $this->get(route('reports.download', $report));
 
         $report->refresh();
         $this->assertEquals(1, $report->download_count);
+    }
+
+    public function test_download_returns_pdf_payload(): void
+    {
+        $report = Report::factory()->public()->active()->create();
+
+        $response = $this->get(route('reports.download', $report));
+
+        $response->assertOk();
+        $this->assertTrue(str_starts_with($response->getContent(), '%PDF'));
+    }
+
+    public function test_index_rejects_invalid_sorting_payload(): void
+    {
+        $this->expectException(ValidationException::class);
+
+        app(ReportController::class)->index(Request::create('/reports', 'GET', [
+            'sort'      => 'invalid',
+            'direction' => 'sideways',
+        ]));
+    }
+
+    /**
+     * Create a user primed with the view_reports permission for private access flows.
+     */
+    private function createUserWithReportPermission(): User
+    {
+        // Ensure the permission cache is flushed before attaching new permissions.
+        app(PermissionRegistrar::class)->forgetCachedPermissions();
+
+        // Lazily create the permission so tests remain isolated from seeders.
+        Permission::findOrCreate('view_reports');
+
+        $user = User::factory()->create();
+        $user->givePermissionTo('view_reports');
+
+        return $user;
     }
 }

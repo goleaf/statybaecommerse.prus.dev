@@ -14,9 +14,9 @@ use App\Support\Seo\LocaleUrlGenerator;
 use Awcodes\BadgeableColumn\Components\Badge;
 use Awcodes\BadgeableColumn\Components\BadgeableColumn;
 use BackedEnum;
+use App\Models\Scopes\PublishedScope;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
 use Filament\Forms;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
@@ -31,6 +31,9 @@ use Filament\Schemas\Components\Grid as SchemaGrid;
 use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Schemas\Schema;
 use Filament\Tables;
+use Filament\Tables\Actions\Action as TableAction;
+use Filament\Tables\Actions\DeleteAction as TableDeleteAction;
+use Filament\Tables\Actions\EditAction as TableEditAction;
 use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ViewColumn;
@@ -114,6 +117,7 @@ final class PostResource extends Resource
                                 ->maxLength(255)
                                 ->live()
                                 ->afterStateUpdated(function (Forms\Get $get, Forms\Set $set, ?string $state): void {
+                                    // Keep the slug synchronised with the active locale only when the slug is empty so manual overrides stay intact.
                                     if (! $get('slug') && filled($state)) {
                                         $set('slug', Str::slug($state));
                                     }
@@ -126,19 +130,10 @@ final class PostResource extends Resource
                                 ->label(__('posts.fields.content'))
                                 ->required()
                                 ->columnSpanFull(),
-                        ]),
+                        ])
+                            ->columnSpanFull(),
                         SchemaGrid::make(2)
                             ->schema([
-                                TextInput::make('title')
-                                    ->label(__('posts.fields.title'))
-                                    ->required()
-                                    ->maxLength(255)
-                                    ->live()
-                                    ->afterStateUpdated(function (Forms\Get $get, Forms\Set $set, ?string $state): void {
-                                        if (! $get('slug') && filled($state)) {
-                                            $set('slug', Str::slug($state));
-                                        }
-                                    }),
                                 TextInput::make('slug')
                                     ->label(__('posts.fields.slug'))
                                     ->required()
@@ -158,7 +153,8 @@ final class PostResource extends Resource
                             ->label(__('posts.fields.images'))
                             ->collection('images')
                             ->image()
-                            ->singleFile(),
+                            // Disable multi-upload so the cover image behaves like a single hero asset in Filament v4.
+                            ->multiple(false),
                         SpatieMediaLibraryFileUpload::make('gallery')
                             ->label(__('posts.fields.gallery'))
                             ->collection('gallery')
@@ -414,7 +410,7 @@ final class PostResource extends Resource
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
-                EditAction::make(),
+                TableEditAction::make(),
                 TableAction::make('submit_for_review')
                     ->label(__('moderation.actions.submit_for_review'))
                     ->icon('heroicon-o-paper-airplane')
@@ -661,7 +657,7 @@ final class PostResource extends Resource
                             ->info()
                             ->send();
                     }),
-                DeleteAction::make(),
+                TableDeleteAction::make(),
             ])
             ->bulkActions([
                 BulkActionGroup::make([
@@ -687,7 +683,10 @@ final class PostResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()->with(['user:id,name']);
+        return parent::getEloquentQuery()
+            // Remove the published scope so editors can manage drafts and archived articles inside Filament.
+            ->withoutGlobalScopes([PublishedScope::class])
+            ->with(['user:id,name']);
     }
 
     /**

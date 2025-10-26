@@ -5,10 +5,16 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Models\AnalyticsEvent;
+use App\Models\OrderItem;
 use App\Models\Product;
+use App\Models\ProductVariant;
 use App\Models\Report;
+use App\Models\Scopes\UserOwnedScope;
 use App\Models\User;
+use App\Models\UserProductInteraction;
+use App\Models\WishlistItem;
 use App\Services\Pricing\PriceCalculator;
+use App\Support\Logging\StructuredLogger;
 use Exception;
 use Illuminate\Support\Facades\Log;
 
@@ -19,7 +25,10 @@ use Illuminate\Support\Facades\Log;
  */
 final class ReportGenerationService
 {
-    public function __construct(private readonly PriceCalculator $priceCalculator) {}
+    public function __construct(
+        private readonly PriceCalculator $priceCalculator,
+        private readonly StructuredLogger $logger,
+    ) {}
 
     /**
      * Handle generateSalesReport functionality with proper error handling.
@@ -101,13 +110,172 @@ final class ReportGenerationService
             if (isset($filters['price_max'])) {
                 $query->where('price', '<=', $filters['price_max']);
             }
-            $productData = [];
-            $processedCount = 0;
-            $query->cursor()->takeUntilTimeout($timeout)->each(function ($product) use (&$productData, &$processedCount) {
-                $processedCount++;
-                $productData[] = ['id' => $product->id, 'name' => $product->name, 'sku' => $product->sku, 'price' => $product->price, 'stock_quantity' => $product->stock_quantity, 'brand' => $product->brand?->name, 'categories' => $product->categories->pluck('name')->toArray(), 'has_images' => $product->media->isNotEmpty(), 'is_featured' => $product->is_featured, 'created_at' => $product->created_at->format('Y-m-d H:i:s')];
+
+            $productSnapshots = [];
+            $productIds = [];
+
+            $query->cursor()->takeUntilTimeout($timeout)->each(function ($product) use (&$productSnapshots, &$productIds): void {
+                $productIds[] = $product->id;
+
+                // Capture the static attributes we want to return before enriching the
+                // payload with behavioural metrics.
+                $productSnapshots[$product->id] = [
+                    'id'             => $product->id,
+                    'name'           => $product->name,
+                    'sku'            => $product->sku,
+                    'price'          => $product->price,
+                    'stock_quantity' => $product->stock_quantity,
+                    'brand'          => $product->brand?->name,
+                    'categories'     => $product->categories->pluck('name')->toArray(),
+                    'has_images'     => $product->media->isNotEmpty(),
+                    'is_featured'    => $product->is_featured,
+                    'created_at'     => optional($product->created_at)->format('Y-m-d H:i:s'),
+                    'analytics'      => [
+                        'view_tracking'     => ['total_views' => 0, 'unique_viewers' => 0],
+                        'engagement'        => ['cart_additions' => 0, 'purchases' => 0, 'orders' => 0],
+                        'conversion_rates'  => ['cart_to_view_rate' => 0.0, 'purchase_to_view_rate' => 0.0],
+                        'wishlist'          => ['wishlist_additions' => 0],
+                        'variant_analytics' => ['total_variants' => 0, 'top_variants' => []],
+                    ],
+                ];
             });
-            $result = ['summary' => ['total_products' => $processedCount, 'processed_products' => $processedCount], 'products' => $productData];
+
+            $processedCount = count($productIds);
+
+            if ($productIds !== []) {
+                $interactionMetrics = UserProductInteraction::query()
+                    ->selectRaw('product_id, event, SUM(count) as total_count, COUNT(*) as interactions, COUNT(DISTINCT user_id) as unique_users')
+                    ->whereIn('product_id', $productIds)
+                    ->groupBy('product_id', 'event')
+                    ->get()
+                    ->groupBy('product_id');
+
+                $orderMetrics = OrderItem::query()
+                    ->withoutGlobalScopes([UserOwnedScope::class])
+                    ->selectRaw('product_id, SUM(quantity) as purchased_quantity, COUNT(*) as line_items, COUNT(DISTINCT order_id) as orders')
+                    ->whereIn('product_id', $productIds)
+                    ->groupBy('product_id')
+                    ->get()
+                    ->keyBy('product_id');
+
+                $wishlistMetrics = WishlistItem::query()
+                    ->withoutGlobalScopes([UserOwnedScope::class])
+                    ->selectRaw('product_id, COUNT(*) as wishlist_additions')
+                    ->whereIn('product_id', $productIds)
+                    ->groupBy('product_id')
+                    ->pluck('wishlist_additions', 'product_id');
+
+                $variantMetrics = ProductVariant::query()
+                    ->select(['id', 'product_id', 'name', 'sku', 'views_count', 'sold_quantity', 'conversion_rate'])
+                    ->whereIn('product_id', $productIds)
+                    ->get()
+                    ->groupBy('product_id');
+
+                $totalViews = 0;
+                $totalCartAdditions = 0;
+                $totalPurchases = 0;
+                $totalWishlistAdditions = 0;
+                $cartRateSum = 0.0;
+                $purchaseRateSum = 0.0;
+                $cartRateProducts = 0;
+                $purchaseRateProducts = 0;
+
+                foreach ($productIds as $productId) {
+                    $analytics = $productSnapshots[$productId]['analytics'];
+                    $interactionGroup = $interactionMetrics->get($productId, collect());
+
+                    $views = (int) ($interactionGroup->firstWhere('event', 'view')['total_count'] ?? 0);
+                    $uniqueViewers = (int) ($interactionGroup->firstWhere('event', 'view')['unique_users'] ?? 0);
+                    $cartAdditions = (int) ($interactionGroup->firstWhere('event', 'add_to_cart')['total_count'] ?? 0);
+                    $wishlistAdditions = (int) ($wishlistMetrics[$productId] ?? 0);
+
+                    $orderStat = $orderMetrics->get($productId);
+                    $purchasedQuantity = (int) ($orderStat->purchased_quantity ?? 0);
+                    $ordersCount = (int) ($orderStat->orders ?? 0);
+
+                    $analytics['view_tracking'] = [
+                        'total_views'    => $views,
+                        'unique_viewers' => $uniqueViewers,
+                    ];
+
+                    $analytics['engagement'] = [
+                        'cart_additions' => $cartAdditions,
+                        'purchases'      => $purchasedQuantity,
+                        'orders'         => $ordersCount,
+                    ];
+
+                    $purchaseRate = 0.0;
+                    $cartRate = 0.0;
+                    if ($views > 0) {
+                        $cartRate = ($cartAdditions / $views) * 100;
+                        $purchaseRate = ($purchasedQuantity / $views) * 100;
+                        $cartRateSum += $cartRate;
+                        $purchaseRateSum += $purchaseRate;
+                        $cartRateProducts++;
+                        $purchaseRateProducts++;
+                    }
+
+                    $analytics['conversion_rates'] = [
+                        'cart_to_view_rate'     => round($cartRate, 2),
+                        'purchase_to_view_rate' => round($purchaseRate, 2),
+                    ];
+
+                    $analytics['wishlist'] = [
+                        'wishlist_additions' => $wishlistAdditions,
+                    ];
+
+                    $variants = $variantMetrics->get($productId, collect());
+                    $analytics['variant_analytics'] = [
+                        'total_variants' => $variants->count(),
+                        'top_variants'   => $variants
+                            ->sortByDesc(fn (ProductVariant $variant): int => (int) ($variant->sold_quantity ?? 0))
+                            ->take(3)
+                            ->map(static function (ProductVariant $variant): array {
+                                return [
+                                    'id'              => $variant->id,
+                                    'name'            => $variant->name,
+                                    'sku'             => $variant->sku,
+                                    'views_count'     => (int) ($variant->views_count ?? 0),
+                                    'sold_quantity'   => (int) ($variant->sold_quantity ?? 0),
+                                    'conversion_rate' => round((float) ($variant->conversion_rate ?? 0.0), 2),
+                                ];
+                            })
+                            ->values()
+                            ->all(),
+                    ];
+
+                    $productSnapshots[$productId]['analytics'] = $analytics;
+
+                    $totalViews += $views;
+                    $totalCartAdditions += $cartAdditions;
+                    $totalPurchases += $purchasedQuantity;
+                    $totalWishlistAdditions += $wishlistAdditions;
+                }
+
+                $summary = [
+                    'total_products'     => $processedCount,
+                    'processed_products' => $processedCount,
+                    'totals'             => [
+                        'views'              => $totalViews,
+                        'cart_additions'     => $totalCartAdditions,
+                        'purchases'          => $totalPurchases,
+                        'wishlist_additions' => $totalWishlistAdditions,
+                    ],
+                    'average_conversion_rates' => [
+                        'cart_to_view'     => $cartRateProducts > 0 ? round($cartRateSum / $cartRateProducts, 2) : 0.0,
+                        'purchase_to_view' => $purchaseRateProducts > 0 ? round($purchaseRateSum / $purchaseRateProducts, 2) : 0.0,
+                    ],
+                ];
+            } else {
+                $summary = [
+                    'total_products'           => 0,
+                    'processed_products'       => 0,
+                    'totals'                   => ['views' => 0, 'cart_additions' => 0, 'purchases' => 0, 'wishlist_additions' => 0],
+                    'average_conversion_rates' => ['cart_to_view' => 0.0, 'purchase_to_view' => 0.0],
+                ];
+            }
+
+            $result = ['summary' => $summary, 'products' => array_values($productSnapshots)];
 
             $operation->finish([
                 'processed_products' => $processedCount,

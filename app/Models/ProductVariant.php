@@ -11,9 +11,11 @@ use App\Models\Scopes\EnabledScope;
 use App\Models\Scopes\StatusScope;
 use App\Observers\ProductVariantObserver;
 use App\Traits\HasProductPricing;
+use App\Services\Pricing\VariantPriceService;
 use App\Traits\HasTranslations;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -332,7 +334,16 @@ final class ProductVariant extends Model implements HasMedia, TranslatableRecord
      */
     public function pricingRules(): HasMany
     {
-        return $this->hasMany(VariantPricingRule::class, 'product_id', 'product_id');
+        /**
+         * @var HasMany<VariantPricingRule> $relation
+         */
+        $relation = $this->hasMany(VariantPricingRule::class, 'product_id', 'product_id');
+
+        // Extend the relationship so it captures variant-specific overrides alongside product-level rules.
+        return $relation->where(function (Builder $query): void {
+            $query->where('product_id', $this->product_id)
+                ->orWhere('product_variant_id', $this->getKey());
+        });
     }
 
     /**
@@ -340,20 +351,12 @@ final class ProductVariant extends Model implements HasMedia, TranslatableRecord
      */
     public function getFinalPriceAttribute(): float
     {
-        $basePrice = $this->price;
-        $sizeModifier = $this->size_price_modifier ?? 0;
+        /** @var VariantPriceService $service */
+        $service = app(VariantPriceService::class);
 
-        // Apply size-based pricing modifier
-        $finalPrice = $basePrice + $sizeModifier;
-
-        // Apply dynamic pricing rules
-        $pricingRules = $this->pricingRules()->active()->orderedByPriority()->get();
-        foreach ($pricingRules as $rule) {
-            $modifier = $rule->calculatePriceModifier($this);
-            $finalPrice += $modifier;
-        }
-
-        return max(0, $finalPrice);
+        // Defer to the dedicated pricing service so all contextual rules (price lists, currency, history)
+        // are consistently honoured across the application.
+        return $service->calculate($this)->finalPrice;
     }
 
     /**

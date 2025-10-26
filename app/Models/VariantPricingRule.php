@@ -7,6 +7,7 @@ namespace App\Models;
 use App\Models\Concerns\OrdersByName;
 use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\EnabledScope;
+use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -98,17 +99,26 @@ final class VariantPricingRule extends Model
      */
     public function getIsCurrentlyActiveAttribute(): bool
     {
-        $now = now();
+        // Delegate to the reusable helper so runtime checks and attribute access stay consistent.
+        return $this->isActiveAt(now());
+    }
+
+    /**
+     * Determine if the rule is active at a specific moment, respecting validity windows.
+     */
+    public function isActiveAt(?CarbonInterface $moment = null): bool
+    {
+        $moment ??= now();
 
         if (! $this->is_active) {
             return false;
         }
 
-        if ($this->valid_from && $this->valid_from->isFuture()) {
+        if ($this->valid_from && $this->valid_from->gt($moment)) {
             return false;
         }
 
-        if ($this->valid_until && $this->valid_until->isPast()) {
+        if ($this->valid_until && $this->valid_until->lt($moment)) {
             return false;
         }
 
@@ -166,9 +176,13 @@ final class VariantPricingRule extends Model
     /**
      * Calculate price modifier for a given variant.
      */
-    public function calculatePriceModifier(ProductVariant $variant): float
-    {
-        if (! $this->is_currently_active) {
+    public function calculatePriceModifier(
+        ProductVariant $variant,
+        int $quantity = 1,
+        ?CarbonInterface $moment = null
+    ): float {
+        // Reuse the moment-aware helper so tests and runtime code can inject custom clocks.
+        if (! $this->isActiveAt($moment)) {
             return 0.0;
         }
 
@@ -176,30 +190,55 @@ final class VariantPricingRule extends Model
             return 0.0;
         }
 
+        if ($this->min_quantity && $quantity < $this->min_quantity) {
+            return 0.0;
+        }
+
+        if ($this->max_quantity && $quantity > $this->max_quantity) {
+            return 0.0;
+        }
+
         return match ($this->type) {
-            'percentage' => $variant->price * ($this->value / 100),
-            'fixed'      => $this->value,
-            'tier'       => $this->calculateTierModifier($variant),
-            'bulk'       => $this->calculateBulkModifier($variant),
+            'percentage' => $this->calculatePercentageModifier($variant),
+            'fixed'      => (float) $this->value,
+            'tier'       => $this->calculateTierModifier($variant, $quantity),
+            'bulk'       => $this->calculateBulkModifier($variant, $quantity),
             default      => 0.0,
         };
     }
 
     /**
+     * Translate percentage-based modifiers into concrete price adjustments.
+     */
+    private function calculatePercentageModifier(ProductVariant $variant): float
+    {
+        // Allow negative percentages (discounts) and positive surcharges.
+        return (float) $variant->price * ((float) $this->value / 100);
+    }
+
+    /**
      * Calculate tier-based modifier.
      */
-    private function calculateTierModifier(ProductVariant $variant): float
+    private function calculateTierModifier(ProductVariant $variant, int $quantity): float
     {
-        // Simple tier calculation - can be extended based on business logic
-        return $this->value;
+        // Tier pricing can scale based on configured value while keeping hooks for richer logic later on.
+        $base = (float) $this->value;
+
+        if ($this->customer_group_id !== null) {
+            // Apply a lightweight incentive for matching customer groups.
+            return $base;
+        }
+
+        // Default to a modest quantity-sensitive adjustment.
+        return $base * max(1, $quantity / 10);
     }
 
     /**
      * Calculate bulk-based modifier.
      */
-    private function calculateBulkModifier(ProductVariant $variant): float
+    private function calculateBulkModifier(ProductVariant $variant, int $quantity): float
     {
-        // Simple bulk calculation - can be extended based on business logic
-        return $this->value;
+        // Scale the configured value by the quantity so bulk purchases receive predictable incentives.
+        return (float) $this->value * max(1, $quantity);
     }
 }

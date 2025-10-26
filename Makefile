@@ -1,4 +1,15 @@
-.PHONY: setup migrate seed test analyse format serve dev build clean
+.PHONY: setup migrate seed test analyse format serve dev build clean audit
+
+# When invoking `make audit path/to/controller.php`, mark the additional
+# arguments as phony targets and give them a trivial recipe so GNU Make does not
+# attempt to rebuild the actual files. This avoids noisy "is up to date"
+# messages while keeping normal targets unchanged.
+ifeq ($(firstword $(MAKECMDGOALS)),audit)
+AUDIT_ARGS := $(filter-out audit,$(MAKECMDGOALS))
+.PHONY: $(AUDIT_ARGS)
+$(AUDIT_ARGS):
+	@:
+endif
 
 setup:
 	composer install
@@ -44,3 +55,15 @@ clean:
 	rm -f database/database.sqlite
 	rm -f public/storage
 	rm -f .env
+
+# The audit target proxies to the PHP controller audit script, forwarding any
+# additional positional arguments provided to `make` so developers can inspect
+# specific controllers without scanning the entire tree.
+audit:
+	@targets="$(filter-out $@,$(MAKECMDGOALS))"; \
+	if [ -n "$$targets" ]; then \
+		php scripts/controller_audit.php $$targets; \
+	else \
+		php scripts/controller_audit.php; \
+	fi
+

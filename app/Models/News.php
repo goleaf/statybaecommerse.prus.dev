@@ -180,7 +180,12 @@ final class News extends Model implements TranslatableRecord
      */
     public function images(): HasMany
     {
-        return $this->hasMany(NewsImage::class);
+        // Always order the related images so featured assets float to the top of the collection.
+        return $this
+            ->hasMany(NewsImage::class)
+            ->orderByDesc('is_featured')
+            ->orderBy('sort_order')
+            ->orderBy('id');
     }
 
     /**
@@ -189,6 +194,53 @@ final class News extends Model implements TranslatableRecord
     public function latestImage(): HasOne
     {
         return $this->images()->one()->latestOfMany();
+    }
+
+    /**
+     * Resolve the primary image record prioritising featured assets and deterministic ordering.
+     */
+    public function primaryImage(): ?NewsImage
+    {
+        // Use the in-memory relationship when it is already eager-loaded to avoid extra queries.
+        $images = $this->relationLoaded('images') ? $this->images : $this->images()->get();
+
+        // Returning the first ordered item is enough because the relation sorts by feature flag and sort order.
+        return $images->first();
+    }
+
+    /**
+     * Retrieve the URL for the primary image, optionally returning the generated thumbnail variant.
+     */
+    public function getPrimaryImageUrl(bool $thumbnail = false): ?string
+    {
+        $image = $this->primaryImage();
+
+        if ($image === null) {
+            return null;
+        }
+
+        // Delegate to the accessor on the related model so storage URL generation stays centralised.
+        return $thumbnail ? $image->thumbnail_url : $image->url;
+    }
+
+    /**
+     * Determine if the article has at least one image suitable for storefront rendering.
+     */
+    public function hasPrimaryImage(): bool
+    {
+        return $this->primaryImage() !== null;
+    }
+
+    /**
+     * Confirm the record has all of the content, metadata, and publishing state required for display.
+     */
+    public function isReadyForFrontend(): bool
+    {
+        // Leverage the existing accessors so locale-aware translations and moderation checks stay consistent.
+        return $this->isPublished()
+            && filled($this->title)
+            && filled($this->slug)
+            && $this->hasPrimaryImage();
     }
 
     /**

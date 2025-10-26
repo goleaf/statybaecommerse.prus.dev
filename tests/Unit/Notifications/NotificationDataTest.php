@@ -60,6 +60,8 @@ final class NotificationDataTest extends TestCase
         $serialized = $payload->toArray();
 
         self::assertSame('App\\Notifications\\TestNotification', $serialized['notification_class']);
+        self::assertSame('info', $serialized['notification_type']);
+        self::assertSame('info', $serialized['category_key']);
         self::assertSame(['alpha', 'beta'], $serialized['tags']);
         self::assertTrue($serialized['is_read']);
         self::assertSame(['order_id' => 42], $serialized['context']);
