@@ -132,7 +132,34 @@ class UserController extends Controller
     public function statistics(Request $request): JsonResponse
     {
         $this->authorize('viewAny', User::class);
-        $stats = ['total_users' => User::count(), 'active_users' => User::where('is_active', true)->count(), 'inactive_users' => User::where('is_active', false)->count(), 'verified_users' => User::whereNotNull('email_verified_at')->count(), 'admin_users' => User::where('is_admin', true)->count(), 'users_with_orders' => User::has('orders')->count(), 'users_without_orders' => User::doesntHave('orders')->count(), 'recent_users' => User::where('created_at', '>=', now()->subDays(30))->count(), 'users_by_locale' => User::selectRaw('preferred_locale, count(*) as count')->groupBy('preferred_locale')->pluck('count', 'preferred_locale'), 'users_by_gender' => User::selectRaw('gender, count(*) as count')->whereNotNull('gender')->groupBy('gender')->pluck('count', 'gender')];
+        $thirtyDaysAgo = now()->subDays(30);
+        // Aggregate key metrics in a single query so the statistics endpoint scales under high load.
+        $aggregate = User::query()
+            ->selectRaw('COUNT(*) as total_users')
+            ->selectRaw('SUM(CASE WHEN is_active = 1 THEN 1 ELSE 0 END) as active_users')
+            ->selectRaw('SUM(CASE WHEN is_active = 0 THEN 1 ELSE 0 END) as inactive_users')
+            ->selectRaw('SUM(CASE WHEN email_verified_at IS NOT NULL THEN 1 ELSE 0 END) as verified_users')
+            ->selectRaw('SUM(CASE WHEN is_admin = 1 THEN 1 ELSE 0 END) as admin_users')
+            ->selectRaw('SUM(CASE WHEN EXISTS (SELECT 1 FROM orders WHERE orders.user_id = users.id) THEN 1 ELSE 0 END) as users_with_orders')
+            ->selectRaw('SUM(CASE WHEN created_at >= ? THEN 1 ELSE 0 END) as recent_users', [$thirtyDaysAgo])
+            ->first();
+
+        $usersWithOrders = (int) ($aggregate?->users_with_orders ?? 0);
+        $totalUsers = (int) ($aggregate?->total_users ?? 0);
+
+        $stats = [
+            'total_users' => $totalUsers,
+            'active_users' => (int) ($aggregate?->active_users ?? 0),
+            'inactive_users' => (int) ($aggregate?->inactive_users ?? 0),
+            'verified_users' => (int) ($aggregate?->verified_users ?? 0),
+            'admin_users' => (int) ($aggregate?->admin_users ?? 0),
+            'users_with_orders' => $usersWithOrders,
+            'users_without_orders' => max($totalUsers - $usersWithOrders, 0),
+            'recent_users' => (int) ($aggregate?->recent_users ?? 0),
+            // Locale and gender breakdowns remain separate grouped queries for clarity and caching friendliness.
+            'users_by_locale' => User::selectRaw('preferred_locale, count(*) as count')->groupBy('preferred_locale')->pluck('count', 'preferred_locale'),
+            'users_by_gender' => User::selectRaw('gender, count(*) as count')->whereNotNull('gender')->groupBy('gender')->pluck('count', 'gender'),
+        ];
 
         return response()->json(['success' => true, 'data' => $stats, 'timestamp' => now()->toISOString()]);
     }
@@ -143,7 +170,27 @@ class UserController extends Controller
     public function activity(Request $request, User $user): JsonResponse
     {
         $this->authorize('view', $user);
-        $activity = ['user_id' => $user->id, 'user_name' => $user->name, 'last_login_at' => $user->last_login_at?->toISOString(), 'last_activity_at' => $user->last_activity_at?->toISOString(), 'login_count' => $user->login_count, 'orders_count' => $user->orders()->count(), 'reviews_count' => $user->reviews()->count(), 'wishlist_count' => $user->wishlist()->count(), 'addresses_count' => $user->addresses()->count(), 'total_spent' => $user->total_spent, 'average_order_value' => $user->average_order_value, 'last_order_date' => $user->last_order_date, 'is_on_trial' => $user->isOnTrial(), 'has_active_subscription' => $user->hasActiveSubscription(), 'subscription_status' => $user->subscription_status, 'referral_stats' => $user->referral_stats];
+        // Warm the relation counters so activity payload generation hits the database just once.
+        $user->loadCount(['orders', 'reviews', 'wishlist', 'addresses']);
+
+        $activity = [
+            'user_id' => $user->id,
+            'user_name' => $user->name,
+            'last_login_at' => $user->last_login_at?->toISOString(),
+            'last_activity_at' => $user->last_activity_at?->toISOString(),
+            'login_count' => $user->login_count,
+            'orders_count' => $user->orders_count,
+            'reviews_count' => $user->reviews_count,
+            'wishlist_count' => $user->wishlist_count,
+            'addresses_count' => $user->addresses_count,
+            'total_spent' => $user->total_spent,
+            'average_order_value' => $user->average_order_value,
+            'last_order_date' => $user->last_order_date,
+            'is_on_trial' => $user->isOnTrial(),
+            'has_active_subscription' => $user->hasActiveSubscription(),
+            'subscription_status' => $user->subscription_status,
+            'referral_stats' => $user->referral_stats,
+        ];
 
         return response()->json(['success' => true, 'data' => $activity, 'timestamp' => now()->toISOString()]);
 }

@@ -47,9 +47,18 @@ final class UserController extends Controller
      */
     public function dashboard(): View
     {
+        /** @var User $user */
         $user = Auth::user();
-        // Get user statistics
-        $stats = ['orders_count' => $user->orders()->count(), 'total_spent' => $user->total_spent, 'reviews_count' => $user->reviews()->count(), 'wishlist_count' => $user->wishlist()->count(), 'addresses_count' => $user->addresses()->count()];
+        // Preload the frequently accessed relation counts so the dashboard avoids triggering N+1 queries.
+        $user->loadCount(['orders', 'reviews', 'wishlist', 'addresses']);
+        // Get user statistics using the eager loaded counts to minimize repeated database round-trips.
+        $stats = [
+            'orders_count' => $user->orders_count,
+            'total_spent' => $user->total_spent,
+            'reviews_count' => $user->reviews_count,
+            'wishlist_count' => $user->wishlist_count,
+            'addresses_count' => $user->addresses_count,
+        ];
         // Get recent orders
         $recentOrders = $user->orders()->with(['items.product'])->latest()->limit(5)->get()->skipWhile(function ($order) {
             // Skip orders that are not properly configured for display
