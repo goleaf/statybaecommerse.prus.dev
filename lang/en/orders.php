@@ -58,6 +58,9 @@ return [
     // Payment statuses
     'payment_statuses' => [
         'pending'            => 'Pending',
+        'authorized'         => 'Authorized',
+        'captured'           => 'Captured',
+        'settled'            => 'Settled',
         'paid'               => 'Paid',
         'failed'             => 'Failed',
         'refunded'           => 'Refunded',

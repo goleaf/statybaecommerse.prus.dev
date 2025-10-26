@@ -58,6 +58,9 @@ return [
     // Payment statuses
     'payment_statuses' => [
         'pending'            => 'Laukiantis',
+        'authorized'         => 'Autorizuotas',
+        'captured'           => 'Nuskaičiuotas',
+        'settled'            => 'Užskaitytas',
         'paid'               => 'Apmokėtas',
         'failed'             => 'Nepavyko',
         'refunded'           => 'Grąžintas',
