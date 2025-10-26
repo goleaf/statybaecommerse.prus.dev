@@ -29,11 +29,28 @@ final class ReferralController extends Controller
     public function index(): View
     {
         $user = Auth::user();
-        $referrals = Referral::where('referrer_id', $user->id)->with(['referred', 'rewards'])->orderBy('created_at', 'desc')->paginate(10);
-        $totalReferrals = Referral::where('referrer_id', $user->id)->count();
-        $completedReferrals = Referral::where('referrer_id', $user->id)->completed()->count();
-        $totalRewards = ReferralReward::where('user_id', $user->id)->sum('amount');
-        $pendingRewards = ReferralReward::where('user_id', $user->id)->pending()->sum('amount');
+        // Build the base referral query once so pagination and aggregates reuse the same constraint.
+        $referralQuery = Referral::query()->where('referrer_id', $user->id);
+
+        // Paginate the referral list with eager loaded relations for UI rendering.
+        $referrals = (clone $referralQuery)->with(['referred', 'rewards'])->orderBy('created_at', 'desc')->paginate(10);
+
+        // Fetch referral aggregate counts in a single query to avoid repeated full scans per request.
+        $referralStats = (clone $referralQuery)
+            ->selectRaw('COUNT(*) as total_referrals')
+            ->selectRaw("SUM(CASE WHEN status = 'completed' THEN 1 ELSE 0 END) as completed_referrals")
+            ->first();
+        $totalReferrals = (int) ($referralStats->total_referrals ?? 0);
+        $completedReferrals = (int) ($referralStats->completed_referrals ?? 0);
+
+        // Calculate reward aggregates with conditional sums so we only touch the rewards table once.
+        $rewardStats = ReferralReward::query()
+            ->where('user_id', $user->id)
+            ->selectRaw('COALESCE(SUM(amount), 0) as total_rewards')
+            ->selectRaw("COALESCE(SUM(CASE WHEN status = 'pending' THEN amount ELSE 0 END), 0) as pending_rewards")
+            ->first();
+        $totalRewards = (float) ($rewardStats->total_rewards ?? 0);
+        $pendingRewards = (float) ($rewardStats->pending_rewards ?? 0);
 
         return view('referrals.index', compact('referrals', 'totalReferrals', 'completedReferrals', 'totalRewards', 'pendingRewards'));
     }
