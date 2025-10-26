@@ -2,6 +2,8 @@
 
 @section('title', __('frontend.search.results'))
 
+@include('components.scripts.debounced-search-form')
+
 @section('content')
     <div class="container mx-auto px-4 py-8">
         <div class="max-w-7xl mx-auto space-y-8">
@@ -15,12 +17,28 @@
                             {{ __('frontend.search.help') }}
                         </p>
                     </div>
-                    <form method="GET" action="{{ route('frontend.search.index') }}" class="flex w-full md:w-auto gap-2">
+                    <form
+                        method="GET"
+                        action="{{ route('frontend.search.index') }}"
+                        class="flex w-full md:w-auto gap-2"
+                        x-data="debouncedSearchForm({
+                            initialQuery: @js($query),
+                            delay: 400,
+                            minLength: 2,
+                            maxLength: 120,
+                            autoSubmit: true,
+                            allowEmptyManualSubmit: true,
+                        })"
+                        @submit.prevent="manualSubmit()"
+                    >
                         <label for="search-query" class="sr-only">{{ __('frontend.search.placeholder') }}</label>
                         <input
                             id="search-query"
                             type="search"
                             name="q"
+                            x-ref="queryField"
+                            x-model="term"
+                            @input="handleInput()"
                             value="{{ old('q', $query) }}"
                             placeholder="{{ __('frontend.search.placeholder') }}"
                             class="flex-1 md:w-72 rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white focus:border-blue-500 focus:ring-blue-500"
@@ -38,7 +56,7 @@
             <div class="grid grid-cols-1 lg:grid-cols-[280px_minmax(0,1fr)] gap-6">
                 @include('frontend.search.partials._filters', [
                     'categories' => $categories,
-                    'selectedCategory' => request('category'),
+                    'selectedCategory' => $selectedCategory,
                     'query' => $query,
                 ])
 
