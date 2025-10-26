@@ -33,7 +33,6 @@ return [
     ],
     'order_status' => [
         'pending'    => 'Pending',
-        'confirmed'  => 'Confirmed',
         'processing' => 'Processing',
         'shipped'    => 'Shipped',
         'delivered'  => 'Delivered',

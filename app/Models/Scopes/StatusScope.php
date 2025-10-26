@@ -45,7 +45,7 @@ final class StatusScope implements Scope
 
         return match ($modelClass) {
             \App\Models\ProductRequest::class => ['pending', 'in_progress', 'completed'],
-            \App\Models\Order::class          => ['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'completed'],
+            \App\Models\Order::class          => ['pending', 'processing', 'shipped', 'delivered', 'completed'], // Retain "completed" for historical rows while the lifecycle migrates to delivered.
             \App\Models\Campaign::class       => ['active', 'running', 'published'],
             \App\Models\Channel::class        => ['active', 'enabled'],
             // Ensure discount redemption records remain queryable across Filament resources and tests.

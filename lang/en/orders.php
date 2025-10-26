@@ -182,7 +182,7 @@ return [
         'processing_orders'    => 'Processing Orders',
         'shipped_orders'       => 'Shipped Orders',
         'delivered_orders'     => 'Delivered Orders',
-        'completed_orders'     => 'Completed Orders',
+        'completed_orders'     => 'Delivered Orders',
         'cancelled_orders'     => 'Cancelled Orders',
         'total_revenue'        => 'Total Revenue',
         'average_order_value'  => 'Average Order Value',
