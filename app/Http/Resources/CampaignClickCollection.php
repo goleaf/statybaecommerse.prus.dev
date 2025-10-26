@@ -17,8 +17,13 @@ class CampaignClickCollection extends ResourceCollection
      */
     private array $additionalMeta = [];
 
+    /**
+     * Attach the resolved list query so consumers know which filters were applied.
+     */
     public function withListQuery(ListQuery $query, array $meta = []): self
     {
+        // Persist both the query context and any extra metadata so we can merge
+        // it into the serialized payload during the `toArray` call.
         $this->listQuery = $query;
         $this->additionalMeta = $meta;
 
@@ -27,6 +32,8 @@ class CampaignClickCollection extends ResourceCollection
 
     public function toArray(Request $request): array
     {
+        // Build the core pagination payload before augmenting it with the
+        // optional list query context.
         $payload = [
             'data' => $this->collection,
             'meta' => [
@@ -48,6 +55,7 @@ class CampaignClickCollection extends ResourceCollection
         if ($this->listQuery !== null) {
             $payload['meta'] = array_merge($payload['meta'], [
                 'query' => [
+                    // Surface the exact pagination, sorting, and filter inputs used.
                     'page' => $this->listQuery->page(),
                     'per_page' => $this->listQuery->perPage(),
                     'sort' => $this->listQuery->sorts(),
@@ -55,6 +63,7 @@ class CampaignClickCollection extends ResourceCollection
                 ],
             ], $this->additionalMeta);
         } elseif ($this->additionalMeta !== []) {
+            // When only loose metadata is provided, append it without the query envelope.
             $payload['meta'] = array_merge($payload['meta'], $this->additionalMeta);
         }
 
