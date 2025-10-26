@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\OrdersByName;
 use App\Models\Scopes\UserOwnedScope;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -29,6 +30,13 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 final class UserBehavior extends Model
 {
     use HasFactory;
+    use OrdersByName;
+
+    /**
+     * Order analytics records by the behavior_type descriptor through the
+     * shared OrdersByName scope.
+     */
+    protected string $nameColumn = 'behavior_type';
 
     protected $fillable = ['user_id', 'session_id', 'product_id', 'category_id', 'behavior_type', 'metadata', 'referrer', 'user_agent', 'ip_address', 'created_at'];
 

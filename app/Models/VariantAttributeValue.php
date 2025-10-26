@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\OrdersByName;
 use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\EnabledScope;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
@@ -20,6 +21,13 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 final class VariantAttributeValue extends Model
 {
     use HasFactory;
+    use OrdersByName;
+
+    /**
+     * Order attribute values by the display string to keep variant forms
+     * predictable in dropdowns.
+     */
+    protected string $nameColumn = 'attribute_value_display';
 
     protected $fillable = [
         'variant_id',
@@ -40,7 +48,7 @@ final class VariantAttributeValue extends Model
         return [
             'is_filterable' => 'boolean',
             'is_searchable' => 'boolean',
-            'sort_order' => 'integer',
+            'sort_order'    => 'integer',
         ];
     }
 
@@ -68,8 +76,8 @@ final class VariantAttributeValue extends Model
         $locale = $locale ?: app()->getLocale();
 
         return match ($locale) {
-            'lt' => $this->attribute_value_lt ?: $this->attribute_value_display ?: $this->attribute_value,
-            'en' => $this->attribute_value_en ?: $this->attribute_value_display ?: $this->attribute_value,
+            'lt'    => $this->attribute_value_lt ?: $this->attribute_value_display ?: $this->attribute_value,
+            'en'    => $this->attribute_value_en ?: $this->attribute_value_display ?: $this->attribute_value,
             default => $this->attribute_value_display ?: $this->attribute_value,
         };
     }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\OrdersByName;
 use App\Models\Scopes\ActiveScope;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -27,6 +28,13 @@ use Illuminate\Database\Eloquent\Model;
 final class Setting extends Model
 {
     use HasFactory;
+    use OrdersByName;
+
+    /**
+     * Order generic settings by their key value within the shared trait-driven
+     * scope.
+     */
+    protected string $nameColumn = 'key';
 
     protected $fillable = ['key', 'value', 'type', 'group', 'description', 'display_name', 'is_public', 'is_required', 'is_encrypted'];
 
@@ -35,7 +43,7 @@ final class Setting extends Model
     /**
      * Handle getValueAttribute functionality with proper error handling.
      *
-     * @param  mixed  $value
+     * @param mixed $value
      */
     public function getValueAttribute($value)
     {
@@ -55,7 +63,7 @@ final class Setting extends Model
     /**
      * Handle setValueAttribute functionality with proper error handling.
      *
-     * @param  mixed  $value
+     * @param mixed $value
      */
     public function setValueAttribute($value): void
     {
@@ -73,7 +81,7 @@ final class Setting extends Model
     /**
      * Handle get functionality with proper error handling.
      *
-     * @param  mixed  $default
+     * @param mixed $default
      */
     public static function get(string $key, $default = null)
     {
@@ -85,7 +93,7 @@ final class Setting extends Model
     /**
      * Handle set functionality with proper error handling.
      *
-     * @param  mixed  $value
+     * @param mixed $value
      */
     public static function set(string $key, $value, string $type = 'string', ?string $description = null): void
     {
@@ -95,7 +103,7 @@ final class Setting extends Model
     /**
      * Handle getPublic functionality with proper error handling.
      *
-     * @param  mixed  $default
+     * @param mixed $default
      */
     public static function getPublic(string $key, $default = null)
     {

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\OrdersByName;
 use App\Models\Scopes\ActiveScope;
 use Database\Factories\DocumentTemplateFactory;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
@@ -33,6 +34,14 @@ final class DocumentTemplate extends Model
 {
     /** @use HasFactory<DocumentTemplateFactory> */
     use HasFactory;
+
+    use OrdersByName;
+
+    /**
+     * Steer the shared OrdersByName scope towards the template name column so
+     * admin pickers surface entries alphabetically.
+     */
+    protected string $nameColumn = 'name';
 
     protected $fillable = ['name', 'slug', 'description', 'content', 'variables', 'type', 'category', 'settings', 'is_active'];
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\OrdersByName;
 use App\Models\Scopes\UserOwnedScope;
 use Database\Factories\ProductComparisonFactory;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
@@ -38,6 +39,14 @@ final class ProductComparison extends Model
 {
     /** @use HasFactory<ProductComparisonFactory> */
     use HasFactory;
+
+    use OrdersByName;
+
+    /**
+     * Ensure alphabetical ordering groups comparisons by their session
+     * identifier whenever orderedByName is invoked.
+     */
+    protected string $nameColumn = 'session_id';
 
     /**
      * @var list<string>

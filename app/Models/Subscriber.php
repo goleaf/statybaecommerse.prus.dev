@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\OrdersByName;
 use App\Models\Scopes\ActiveScope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -27,7 +28,13 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  */
 final class Subscriber extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, OrdersByName, SoftDeletes;
+
+    /**
+     * Sort subscribers by email address through the reusable OrdersByName trait
+     * so newsletter exports remain predictable.
+     */
+    protected string $nameColumn = 'email';
 
     protected $fillable = [
         'user_id',
@@ -52,14 +59,14 @@ final class Subscriber extends Model
     ];
 
     protected $casts = [
-        'interests' => 'array',
-        'metadata' => 'array',
-        'subscribed_at' => 'datetime',
-        'unsubscribed_at' => 'datetime',
-        'last_email_sent_at' => 'datetime',
-        'email_count' => 'integer',
-        'is_verified' => 'boolean',
-        'accepts_marketing' => 'boolean',
+        'interests'               => 'array',
+        'metadata'                => 'array',
+        'subscribed_at'           => 'datetime',
+        'unsubscribed_at'         => 'datetime',
+        'last_email_sent_at'      => 'datetime',
+        'email_count'             => 'integer',
+        'is_verified'             => 'boolean',
+        'accepts_marketing'       => 'boolean',
         'newsletter_subscription' => 'boolean',
     ];
 
@@ -141,7 +148,7 @@ final class Subscriber extends Model
      */
     protected function fullName(): Attribute
     {
-        return Attribute::make(get: fn () => trim($this->first_name.' '.$this->last_name));
+        return Attribute::make(get: fn () => trim($this->first_name . ' ' . $this->last_name));
     }
 
     /**

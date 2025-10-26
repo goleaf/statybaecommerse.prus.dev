@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\OrdersByName;
 use App\Models\Scopes\StatusScope;
 use App\Models\Scopes\UserOwnedScope;
 use Database\Factories\ProductRequestFactory;
@@ -38,6 +39,7 @@ final class ProductRequest extends Model
     use HasFactory;
 
     use LogsActivity;
+    use OrdersByName;
     use SoftDeletes;
 
     /**
@@ -50,6 +52,12 @@ final class ProductRequest extends Model
     public const STATUS_COMPLETED = 'completed';
 
     public const STATUS_CANCELLED = 'cancelled';
+
+    /**
+     * Default alphabetical ordering should leverage the requester name so the
+     * shared OrdersByName trait can keep admin grids tidy.
+     */
+    protected string $nameColumn = 'name';
 
     /**
      * The attributes that are mass assignable in order to protect against accidental overrides.

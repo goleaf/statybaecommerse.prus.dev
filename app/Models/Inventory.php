@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\OrdersByName;
 use App\Models\Scopes\ActiveScope;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Builder;
@@ -29,6 +30,16 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 final class Inventory extends Model
 {
     use HasFactory;
+    use OrdersByName {
+        getNameColumn as protected resolveNameColumnForOrdering;
+        scopeOrderedByName as protected scopeOrderedByNameFromTrait;
+    }
+
+    /**
+     * Flag the sku-focused ordering preference so administrative listings can
+     * surface stock records predictably through the shared OrdersByName scope.
+     */
+    protected string $nameColumn = 'sku';
 
     /**
      * Explicitly define the table name so future refactors keep factory alignment.
@@ -87,7 +98,7 @@ final class Inventory extends Model
     /**
      * Handle scopeTracked functionality with proper error handling.
      *
-     * @param  Builder<Inventory>  $query
+     * @param Builder<Inventory> $query
      */
     public function scopeTracked(Builder $query): Builder
     {
@@ -97,7 +108,7 @@ final class Inventory extends Model
     /**
      * Handle scopeLowStock functionality with proper error handling.
      *
-     * @param  Builder<Inventory>  $query
+     * @param Builder<Inventory> $query
      */
     public function scopeLowStock(Builder $query): Builder
     {
@@ -105,6 +116,34 @@ final class Inventory extends Model
         return $query
             ->whereColumn('quantity', '>', 'reserved')
             ->whereRaw('(quantity - reserved) <= threshold');
+    }
+
+    /**
+     * Provide alphabetical ordering by the related product SKU while falling
+     * back to the trait implementation if the configured column changes.
+     */
+    public function scopeOrderedByName(Builder $query, string $direction = 'asc'): Builder
+    {
+        $direction = strtolower($direction) === 'desc' ? 'desc' : 'asc';
+
+        if ($this->resolveNameColumnForOrdering() !== 'sku') {
+            return $this->scopeOrderedByNameFromTrait($query, $direction);
+        }
+
+        $productTable = (new Product)->getTable();
+        $expression = sprintf(
+            'COALESCE(NULLIF(%1$s.sku, \'\'), %1$s.name)',
+            $productTable,
+        );
+
+        $skuSelector = Product::query()
+            ->selectRaw($expression)
+            ->whereColumn("{$productTable}.id", $this->qualifyColumn('product_id'))
+            ->limit(1);
+
+        return $query
+            ->orderBy($skuSelector, $direction)
+            ->orderBy($this->qualifyColumn($this->getKeyName()));
     }
 
     /**

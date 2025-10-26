@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\OrdersByName;
 use App\Models\Scopes\StatusScope;
 use App\Observers\AttributionObserver;
 use App\Support\Storage\SecureStorage;
@@ -21,10 +22,10 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  *
  * Eloquent model representing the Document entity with comprehensive relationships, scopes, and business logic for the e-commerce system.
  *
- * @property mixed $fillable
- * @property mixed $casts
- * @property bool  $is_public
- * @property bool  $is_downloadable
+ * @property mixed       $fillable
+ * @property mixed       $casts
+ * @property bool        $is_public
+ * @property bool        $is_downloadable
  * @property string|null $name
  *
  * @phpstan-use HasFactory<\Database\Factories\DocumentFactory>
@@ -40,6 +41,11 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 #[ScopedBy([StatusScope::class])]
 final class Document extends Model
 {
+    use OrdersByName {
+        getNameColumn as protected resolveNameColumnForOrdering;
+        scopeOrderedByName as protected scopeOrderedByNameFromTrait;
+    }
+
     /**
      * Status constants keep business logic decoupled from raw string literals.
      */
@@ -62,6 +68,12 @@ final class Document extends Model
 
     /** @use HasFactory<\Database\Factories\DocumentFactory> */
     use HasFactory;
+
+    /**
+     * Point the shared OrdersByName helper at the primary name column so we
+     * can layer additional fallbacks while still opting into the trait.
+     */
+    protected string $nameColumn = 'name';
 
     protected $fillable = [
         'document_template_id',
@@ -105,7 +117,7 @@ final class Document extends Model
      */
     protected $attributes = [
         // Keep boolean flags predictable for newly instantiated models.
-        'is_public' => false,
+        'is_public'       => false,
         'is_downloadable' => true,
     ];
 
@@ -307,11 +319,25 @@ final class Document extends Model
      * @param  Builder<Document> $query
      * @return Builder<Document>
      */
-    public function scopeOrderedByName(Builder $query): Builder
+    public function scopeOrderedByName(Builder $query, string $direction = 'asc'): Builder
     {
+        // Normalise the direction input so callers cannot sneak untrusted SQL
+        // fragments into the raw ordering expression defined below.
+        $direction = strtolower($direction) === 'desc' ? 'desc' : 'asc';
+
+        // When additional fallbacks are unnecessary we defer to the shared
+        // trait implementation to keep behaviour aligned across the codebase.
+        if ($this->resolveNameColumnForOrdering() !== 'name') {
+            return $this->scopeOrderedByNameFromTrait($query, $direction);
+        }
+
+        $nameColumn = $this->qualifyColumn('name');
+        $titleColumn = $this->qualifyColumn('title');
+        $expression = sprintf("COALESCE(NULLIF(%s, ''), %s)", $nameColumn, $titleColumn);
+
         return $query
             // Prefer the custom name when present but gracefully fall back to the title.
-            ->orderByRaw("COALESCE(NULLIF(name, ''), title) ASC")
+            ->orderByRaw("{$expression} {$direction}")
             // A deterministic second sort keeps pagination stable across inserts.
             ->orderBy($this->qualifyColumn($this->getKeyName()));
     }

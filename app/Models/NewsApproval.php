@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\OrdersByName;
 use Carbon\Carbon;
 use DateTimeInterface;
 use Illuminate\Database\Eloquent\Builder;
@@ -32,6 +33,14 @@ final class NewsApproval extends Model
 {
     /** @use HasFactory<\Database\Factories\NewsApprovalFactory> */
     use HasFactory;
+
+    use OrdersByName;
+
+    /**
+     * Order approval records by their decision string so moderation exports
+     * group together similar statuses.
+     */
+    protected string $nameColumn = 'decision';
 
     /**
      * Canonical decision labels used throughout moderation tooling.

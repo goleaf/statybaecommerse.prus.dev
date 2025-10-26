@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\OrdersByName;
 use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\UserOwnedScope;
 use Illuminate\Container\Container;
@@ -38,6 +39,13 @@ use Throwable;
 final class AnalyticsEvent extends Model
 {
     use HasFactory;
+    use OrdersByName;
+
+    /**
+     * Hint the shared OrdersByName trait to use the event_name attribute so
+     * chronological feeds remain predictable when sorted alphabetically.
+     */
+    protected string $nameColumn = 'event_name';
 
     protected $attributes = [
         'conversion_currency' => 'EUR',

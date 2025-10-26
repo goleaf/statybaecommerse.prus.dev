@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\OrdersByName;
 use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\ApprovedScope;
 use App\Models\Scopes\VisibleScope;
@@ -32,6 +33,13 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 final class NewsComment extends Model
 {
     use HasFactory;
+    use OrdersByName;
+
+    /**
+     * Ordering should mirror the author name column so moderation queues stay
+     * predictable.
+     */
+    protected string $nameColumn = 'author_name';
 
     protected $table = 'news_comments';
 
@@ -105,14 +113,8 @@ final class NewsComment extends Model
         return $query->whereNull('parent_id');
     }
 
-    /**
-     * Handle scopeOrderedByName functionality with proper error handling.
-     */
-    public function scopeOrderedByName(Builder $query): Builder
-    {
-        // Order the query results by the author name to provide consistent sorting for listings.
-        return $query->orderBy('author_name');
-    }
+    // The shared OrdersByName trait now powers alphabetical ordering by the
+    // author name so we can centralise direction sanitisation.
 
     /**
      * Handle isReply functionality with proper error handling.

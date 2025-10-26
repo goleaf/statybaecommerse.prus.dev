@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\OrdersByName;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -25,6 +27,16 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 final class SystemSettingHistory extends Model
 {
     use HasFactory;
+    use OrdersByName {
+        getNameColumn as protected resolveNameColumnForOrdering;
+        scopeOrderedByName as protected scopeOrderedByNameFromTrait;
+    }
+
+    /**
+     * Sort history entries by the related system setting key via the shared
+     * OrdersByName scope.
+     */
+    protected string $nameColumn = 'key';
 
     protected $fillable = ['system_setting_id', 'old_value', 'new_value', 'changed_by', 'change_reason', 'ip_address', 'user_agent', 'meta'];
 
@@ -74,5 +86,28 @@ final class SystemSettingHistory extends Model
         }
 
         return (string) $value;
+    }
+
+    /**
+     * Order change records by the owning setting key with deterministic
+     * tiebreakers.
+     */
+    public function scopeOrderedByName(Builder $query, string $direction = 'asc'): Builder
+    {
+        $direction = strtolower($direction) === 'desc' ? 'desc' : 'asc';
+
+        if ($this->resolveNameColumnForOrdering() !== 'key') {
+            return $this->scopeOrderedByNameFromTrait($query, $direction);
+        }
+
+        $settingsTable = (new SystemSetting)->getTable();
+        $keySelector = SystemSetting::query()
+            ->select('key')
+            ->whereColumn("{$settingsTable}.id", $this->qualifyColumn('system_setting_id'))
+            ->limit(1);
+
+        return $query
+            ->orderBy($keySelector, $direction)
+            ->orderBy($this->qualifyColumn($this->getKeyName()));
     }
 }

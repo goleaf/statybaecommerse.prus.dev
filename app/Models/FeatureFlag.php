@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\OrdersByName;
 use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\EnabledScope;
 use App\Observers\AttributionObserver;
@@ -35,6 +36,13 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 final class FeatureFlag extends Model
 {
     use HasFactory;
+    use OrdersByName;
+
+    /**
+     * Surface feature flags alphabetically by name whenever the shared
+     * orderedByName scope is applied throughout the application.
+     */
+    protected string $nameColumn = 'name';
 
     protected $with = ['creator', 'updater'];
 

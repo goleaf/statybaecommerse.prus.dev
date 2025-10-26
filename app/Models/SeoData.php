@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\OrdersByName;
 use App\Models\Scopes\ActiveScope;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Builder;
@@ -30,7 +31,13 @@ use Spatie\Translatable\HasTranslations;
 #[ScopedBy([ActiveScope::class])]
 final class SeoData extends Model
 {
-    use HasFactory, HasTranslations, SoftDeletes;
+    use HasFactory, HasTranslations, OrdersByName, SoftDeletes;
+
+    /**
+     * Sort SEO entries by the title translation by default when orderedByName
+     * is used.
+     */
+    protected string $nameColumn = 'title';
 
     protected $fillable = ['seoable_type', 'seoable_id', 'locale', 'title', 'description', 'keywords', 'canonical_url', 'meta_tags', 'structured_data', 'no_index', 'no_follow'];
 
@@ -184,18 +191,18 @@ final class SeoData extends Model
     {
         $html = '';
         if ($this->title) {
-            $html .= '<title>'.e($this->title).'</title>'.PHP_EOL;
-            $html .= '<meta property="og:title" content="'.e($this->title).'">'.PHP_EOL;
+            $html .= '<title>' . e($this->title) . '</title>' . PHP_EOL;
+            $html .= '<meta property="og:title" content="' . e($this->title) . '">' . PHP_EOL;
         }
         if ($this->description) {
-            $html .= '<meta name="description" content="'.e($this->description).'">'.PHP_EOL;
-            $html .= '<meta property="og:description" content="'.e($this->description).'">'.PHP_EOL;
+            $html .= '<meta name="description" content="' . e($this->description) . '">' . PHP_EOL;
+            $html .= '<meta property="og:description" content="' . e($this->description) . '">' . PHP_EOL;
         }
         if ($this->keywords) {
-            $html .= '<meta name="keywords" content="'.e($this->keywords).'">'.PHP_EOL;
+            $html .= '<meta name="keywords" content="' . e($this->keywords) . '">' . PHP_EOL;
         }
         if ($this->canonical_url) {
-            $html .= '<link rel="canonical" href="'.e($this->canonical_url).'">'.PHP_EOL;
+            $html .= '<link rel="canonical" href="' . e($this->canonical_url) . '">' . PHP_EOL;
         }
         if ($this->no_index || $this->no_follow) {
             $robots = [];
@@ -205,11 +212,11 @@ final class SeoData extends Model
             if ($this->no_follow) {
                 $robots[] = 'nofollow';
             }
-            $html .= '<meta name="robots" content="'.implode(', ', $robots).'">'.PHP_EOL;
+            $html .= '<meta name="robots" content="' . implode(', ', $robots) . '">' . PHP_EOL;
         }
         if ($this->meta_tags) {
             foreach ($this->meta_tags as $name => $content) {
-                $html .= '<meta name="'.e($name).'" content="'.e($content).'">'.PHP_EOL;
+                $html .= '<meta name="' . e($name) . '" content="' . e($content) . '">' . PHP_EOL;
             }
         }
 
@@ -242,10 +249,10 @@ final class SeoData extends Model
     public function getSeoableTypeNameAttribute(): string
     {
         return match ($this->seoable_type) {
-            Product::class => 'Product',
+            Product::class  => 'Product',
             Category::class => 'Category',
-            Brand::class => 'Brand',
-            default => class_basename($this->seoable_type),
+            Brand::class    => 'Brand',
+            default         => class_basename($this->seoable_type),
         };
     }
 
@@ -255,8 +262,8 @@ final class SeoData extends Model
     public function getLocaleNameAttribute(): string
     {
         return match ($this->locale) {
-            'lt' => 'Lietuvių',
-            'en' => 'English',
+            'lt'    => 'Lietuvių',
+            'en'    => 'English',
             default => strtoupper($this->locale),
         };
     }
@@ -378,7 +385,7 @@ final class SeoData extends Model
         return match (true) {
             $this->seo_score >= 80 => 'success',
             $this->seo_score >= 60 => 'warning',
-            default => 'danger',
+            default                => 'danger',
         };
     }
 }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\OrdersByName;
 use App\Support\Storage\SecureStorage;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -26,7 +27,13 @@ final class VariantImage extends Model implements HasMedia
 {
     use HasFactory;
     use InteractsWithMedia;
+    use OrdersByName;
     use SoftDeletes;
+
+    /**
+     * Order variant images by their alt text label via the shared trait.
+     */
+    protected string $nameColumn = 'alt_text';
 
     /**
      * The database table associated with the model.

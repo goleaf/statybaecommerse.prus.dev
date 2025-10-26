@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\OrdersByName;
 use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\EnabledScope;
 use App\Models\Translations\LocationTranslation;
 use App\Traits\HasTranslations;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -24,8 +25,8 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * Eloquent model representing the Location entity with comprehensive relationships, scopes, and business logic for the e-commerce system.
  *
  * @property string $translationModel
- * @property mixed $table
- * @property mixed $fillable
+ * @property mixed  $table
+ * @property mixed  $fillable
  *
  * @method static \Illuminate\Database\Eloquent\Builder|Location newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Location newQuery()
@@ -36,7 +37,13 @@ use Spatie\Activitylog\Traits\LogsActivity;
 #[ScopedBy([ActiveScope::class, EnabledScope::class])]
 final class Location extends Model
 {
-    use HasFactory, HasTranslations, LogsActivity, SoftDeletes;
+    use HasFactory, HasTranslations, LogsActivity, OrdersByName, SoftDeletes;
+
+    /**
+     * Keep alphabetical ordering centred on the location name field across
+     * shared trait consumers.
+     */
+    protected string $nameColumn = 'name';
 
     protected string $translationModel = LocationTranslation::class;
 
@@ -74,13 +81,13 @@ final class Location extends Model
     protected function casts(): array
     {
         return [
-            'is_enabled' => 'boolean',
-            'is_default' => 'boolean',
-            'latitude' => 'float',
-            'longitude' => 'float',
+            'is_enabled'    => 'boolean',
+            'is_default'    => 'boolean',
+            'latitude'      => 'float',
+            'longitude'     => 'float',
             'opening_hours' => 'array',
-            'contact_info' => 'array',
-            'sort_order' => 'integer',
+            'contact_info'  => 'array',
+            'sort_order'    => 'integer',
         ];
     }
 
@@ -148,14 +155,8 @@ final class Location extends Model
         return $query->where('type', $type);
     }
 
-    /**
-     * Scope a query to consistently order locations by their human-readable name.
-     */
-    public function scopeOrderedByName(Builder $query): Builder
-    {
-        // Perform a case-insensitive alphabetical ordering so back-office lists remain predictable.
-        return $query->orderByRaw('LOWER(name) asc');
-    }
+    // Ordering now flows through the shared OrdersByName trait which enforces
+    // consistent alphabetical sorting and direction sanitisation for us.
 
     /**
      * Handle getFullAddressAttribute functionality with proper error handling.
@@ -205,12 +206,12 @@ final class Location extends Model
     public function getTypeLabelAttribute(): string
     {
         return match ($this->type) {
-            'warehouse' => __('locations.type_warehouse'),
-            'store' => __('locations.type_store'),
-            'office' => __('locations.type_office'),
+            'warehouse'    => __('locations.type_warehouse'),
+            'store'        => __('locations.type_store'),
+            'office'       => __('locations.type_office'),
             'pickup_point' => __('locations.type_pickup_point'),
-            'other' => __('locations.type_other'),
-            default => $this->type,
+            'other'        => __('locations.type_other'),
+            default        => $this->type,
         };
     }
 

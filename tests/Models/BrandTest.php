@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 use App\Models\Brand;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 
-uses(RefreshDatabase::class);
+// Boot Laravel's testing kernel for these Pest tests so factories and query
+// scopes operate on a real database connection.
+uses(TestCase::class, RefreshDatabase::class);
 
 it('orders brands alphabetically by default', function (): void {
     // Create a small dataset with deliberately shuffled brand names.

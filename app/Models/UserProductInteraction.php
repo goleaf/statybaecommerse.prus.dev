@@ -17,6 +17,7 @@ namespace {
 
 namespace App\Models {
 
+    use App\Models\Concerns\OrdersByName;
     use App\Models\Scopes\ActiveScope;
     use App\Models\Scopes\PublishedScope;
     use App\Models\Scopes\UserOwnedScope;
@@ -44,6 +45,13 @@ namespace App\Models {
     final class UserProductInteraction extends Model
     {
         use \HasFactory;
+        use OrdersByName;
+
+        /**
+         * Order interactions by their type descriptor when using the shared
+         * OrdersByName scope for analytics listings.
+         */
+        protected string $nameColumn = 'interaction_type';
 
         // Maintain parity with the domain test expectations by only exposing
         // the core attributes that represent how a user interacts with a

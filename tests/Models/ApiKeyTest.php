@@ -7,8 +7,11 @@ use App\Models\ApiKey;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
+use Tests\TestCase;
 
-uses(RefreshDatabase::class);
+// Ensure Laravel's application kernel boots for every test while reusing the
+// RefreshDatabase trait so factories, facades, and helpers remain available.
+uses(TestCase::class, RefreshDatabase::class);
 
 it('generates credentials with hashed values', function (): void {
     // Act: generate a new set of credentials for an API key.
@@ -34,7 +37,7 @@ it('normalizes rate limit values consistently', function (): void {
 it('merges scopes and permissions without duplicates', function (): void {
     // Arrange: create an API key with overlapping scopes and permissions.
     $apiKey = ApiKey::factory()->create([
-        'scopes' => [ApiKeyScope::OrdersRead->value, '*'],
+        'scopes'      => [ApiKeyScope::OrdersRead->value, '*'],
         'permissions' => ['orders.read', 'orders.write'],
     ]);
 
@@ -122,4 +125,3 @@ it('masks hashed keys safely for display', function (): void {
         ->toEndWith(substr($apiKey->key, -4))
         ->toHaveLength(strlen($apiKey->key));
 });
-

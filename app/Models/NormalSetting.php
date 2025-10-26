@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\OrdersByName;
 use Database\Factories\NormalSettingFactory;
 use Exception;
 use Illuminate\Contracts\Support\Arrayable;
@@ -52,6 +53,14 @@ final class NormalSetting extends Model
 {
     /** @phpstan-ignore-next-line We rely on Laravel's built-in HasFactory trait despite its unbounded generic signature. */
     use HasFactory;
+
+    use OrdersByName;
+
+    /**
+     * Order configuration records by their key column when leveraging the
+     * shared OrdersByName scope.
+     */
+    protected string $nameColumn = 'key';
 
     /**
      * @var string|null

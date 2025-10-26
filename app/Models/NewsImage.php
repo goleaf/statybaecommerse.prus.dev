@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\OrdersByName;
 use App\Models\Scopes\ActiveScope;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Builder;
@@ -29,6 +30,13 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 final class NewsImage extends Model
 {
     use HasFactory;
+    use OrdersByName;
+
+    /**
+     * Alphabetical ordering should rely on the caption text administrators see
+     * in the UI.
+     */
+    protected string $nameColumn = 'caption';
 
     protected $table = 'news_images';
 
@@ -66,17 +74,8 @@ final class NewsImage extends Model
         return $query->orderBy('sort_order')->orderBy('id');
     }
 
-    /**
-     * Handle scopeOrderedByName functionality with proper error handling.
-     *
-     * Ordering by caption keeps the listing predictable for administrators
-     * who browse image records alphabetically, while falling back to the id
-     * provides deterministic ordering for identical captions.
-     */
-    public function scopeOrderedByName(Builder $query): Builder
-    {
-        return $query->orderBy('caption')->orderBy('id');
-    }
+    // Alphabetical ordering is now handled by the shared OrdersByName trait
+    // which ensures consistent direction normalisation across the codebase.
 
     /**
      * Handle getUrlAttribute functionality with proper error handling.

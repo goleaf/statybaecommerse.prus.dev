@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\OrdersByName;
 use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\DateRangeScope;
 use Database\Factories\PriceListItemFactory;
@@ -60,6 +61,15 @@ final class PriceListItem extends Model
     use HasFactory;
 
     use HasTranslations;
+    use OrdersByName {
+        getNameColumn as protected resolveNameColumnForOrdering;
+        scopeOrderedByName as protected scopeOrderedByNameFromTrait;
+    }
+
+    /**
+     * Default alphabetical ordering to the translatable name field.
+     */
+    protected string $nameColumn = 'name';
 
     /**
      * @var string|null

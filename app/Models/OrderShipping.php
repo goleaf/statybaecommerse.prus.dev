@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\OrdersByName;
 use App\Models\Scopes\UserOwnedScope;
 use Database\Factories\OrderShippingFactory;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
@@ -35,6 +36,14 @@ final class OrderShipping extends Model
 {
     /** @phpstan-ignore-next-line */
     use HasFactory;
+
+    use OrdersByName;
+
+    /**
+     * Sort shipping records by carrier_name by default when orderedByName is
+     * invoked so carriers group alphabetically.
+     */
+    protected string $nameColumn = 'carrier_name';
 
     protected $table = 'order_shippings';
 
@@ -132,19 +141,8 @@ final class OrderShipping extends Model
         return $query->where('carrier_name', $carrier);
     }
 
-    /**
-     * Handle scopeOrderedByName functionality with proper error handling.
-     *
-     * @param  Builder<OrderShipping> $query
-     * @return Builder<OrderShipping>
-     */
-    public function scopeOrderedByName(Builder $query): Builder
-    {
-        // Order shipping records by carrier name to provide consistent listings in admin tables.
-        return $query
-            ->orderBy('carrier_name')
-            ->orderBy('carrier');
-    }
+    // Alphabetical ordering is now provided by the reusable OrdersByName trait
+    // which ensures direction arguments are normalised consistently.
 
     /**
      * Handle isShipped functionality with proper error handling.
