@@ -50,11 +50,22 @@ final class ChildrenRelationManager extends BaseRelationManager
 
     public function form(Schema $schema): Schema
     {
-        return $schema->schema([
+        // Delegate to a reusable builder so modal quick-edit schemas stay in sync with the full form.
+        return $schema->components($this->getFormComponents());
+    }
+
+    /**
+     * Expose the components so both the primary form and the quick-edit modal share the exact same layout.
+     *
+     * @return array<int, SchemaSection>
+     */
+    private function getFormComponents(): array
+    {
+        return [
             SchemaSection::make(__('categories.basic_information'))
-                ->schema([
+                ->components([
                     SchemaGrid::make(2)
-                        ->schema([
+                        ->components([
                             TextInput::make('name')
                                 ->label(__('categories.name'))
                                 ->required()
@@ -84,9 +95,9 @@ final class ChildrenRelationManager extends BaseRelationManager
                         ->columnSpanFull(),
                 ]),
             SchemaSection::make(__('categories.appearance'))
-                ->schema([
+                ->components([
                     SchemaGrid::make(3)
-                        ->schema([
+                        ->components([
                             ColorPicker::make('color')
                                 ->label(__('categories.color'))
                                 ->hex(),
@@ -104,9 +115,9 @@ final class ChildrenRelationManager extends BaseRelationManager
                         ]),
                 ]),
             SchemaSection::make(__('categories.settings'))
-                ->schema([
+                ->components([
                     SchemaGrid::make(3)
-                        ->schema([
+                        ->components([
                             Toggle::make('is_active')
                                 ->label(__('categories.is_active'))
                                 ->default(true),
@@ -118,7 +129,7 @@ final class ChildrenRelationManager extends BaseRelationManager
                                 ->default(true),
                         ]),
                     SchemaGrid::make(2)
-                        ->schema([
+                        ->components([
                             Toggle::make('is_featured')
                                 ->label(__('categories.is_featured')),
                             Toggle::make('show_in_menu')
@@ -126,7 +137,7 @@ final class ChildrenRelationManager extends BaseRelationManager
                                 ->default(true),
                         ]),
                 ]),
-        ]);
+        ];
     }
 
     public function table(Table $table): Table
@@ -240,5 +251,16 @@ final class ChildrenRelationManager extends BaseRelationManager
             ])
             ->defaultSort('sort_order')
             ->reorderable('sort_order');
+    }
+
+    /**
+     * Keep the quick-edit modal consistent with the primary form layout.
+     *
+     * @return array<int, Component|Action|ActionGroup|Closure|Htmlable|string>
+     */
+    protected function getQuickEditSchema(): array
+    {
+        // Share the same component list so administrators see identical validation and helper text in both contexts.
+        return $this->getFormComponents();
     }
 }

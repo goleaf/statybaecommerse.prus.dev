@@ -35,11 +35,11 @@ final class TranslationsRelationManager extends BaseRelationManager
 
     public function form(Schema $schema): Schema
     {
-        return $schema->schema([
+        return $schema->components([
             SchemaSection::make(__('translations.basic_information'))
-                ->schema([
+                ->components([
                     SchemaGrid::make(2)
-                        ->schema([
+                        ->components([
                             Select::make('locale')
                                 ->label(__('translations.locale'))
                                 ->options([
@@ -64,7 +64,7 @@ final class TranslationsRelationManager extends BaseRelationManager
                         ->columnSpanFull(),
                 ]),
             SchemaSection::make(__('translations.seo'))
-                ->schema([
+                ->components([
                     TextInput::make('seo_title')
                         ->label(__('translations.seo_title'))
                         ->maxLength(255),

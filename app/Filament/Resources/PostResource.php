@@ -15,8 +15,6 @@ use Awcodes\BadgeableColumn\Components\Badge;
 use Awcodes\BadgeableColumn\Components\BadgeableColumn;
 use BackedEnum;
 use App\Models\Scopes\PublishedScope;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
 use Filament\Forms;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
@@ -31,9 +29,12 @@ use Filament\Schemas\Components\Grid as SchemaGrid;
 use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Schemas\Schema;
 use Filament\Tables;
-use Filament\Tables\Actions\Action as TableAction;
-use Filament\Tables\Actions\DeleteAction as TableDeleteAction;
-use Filament\Tables\Actions\EditAction as TableEditAction;
+use Filament\Tables\Actions\Action;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Actions\ViewAction;
 use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ViewColumn;
@@ -409,9 +410,9 @@ final class PostResource extends Resource
                     }),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
-                TableEditAction::make(),
-                TableAction::make('submit_for_review')
+                ViewAction::make(),
+                EditAction::make(),
+                Action::make('submit_for_review')
                     ->label(__('moderation.actions.submit_for_review'))
                     ->icon('heroicon-o-paper-airplane')
                     ->color('info')
@@ -435,7 +436,7 @@ final class PostResource extends Resource
                             ->success()
                             ->send();
                     }),
-                TableAction::make('approve')
+                Action::make('approve')
                     ->label(__('moderation.actions.approve'))
                     ->icon('heroicon-o-check-circle')
                     ->color('success')
@@ -483,7 +484,7 @@ final class PostResource extends Resource
                             ->success()
                             ->send();
                     }),
-                TableAction::make('request_changes')
+                Action::make('request_changes')
                     ->label(__('moderation.actions.return_to_draft'))
                     ->icon('heroicon-o-arrow-uturn-left')
                     ->color('warning')
@@ -531,7 +532,7 @@ final class PostResource extends Resource
                             ->warning()
                             ->send();
                     }),
-                TableAction::make('publish')
+                Action::make('publish')
                     ->label(__('posts.actions.publish'))
                     ->icon('heroicon-o-megaphone')
                     ->color('success')
@@ -560,7 +561,7 @@ final class PostResource extends Resource
                             ->success()
                             ->send();
                     }),
-                TableAction::make('unpublish')
+                Action::make('unpublish')
                     ->label(__('posts.actions.unpublish'))
                     ->icon('heroicon-o-eye-slash')
                     ->color('warning')
@@ -587,7 +588,7 @@ final class PostResource extends Resource
                             ->warning()
                             ->send();
                     }),
-                TableAction::make('archive')
+                Action::make('archive')
                     ->label(__('posts.actions.archive'))
                     ->icon('heroicon-o-archive-box')
                     ->color('danger')
@@ -613,7 +614,7 @@ final class PostResource extends Resource
                             ->success()
                             ->send();
                     }),
-                TableAction::make('feature')
+                Action::make('feature')
                     ->label(__('posts.actions.feature'))
                     ->icon('heroicon-o-star')
                     ->color('warning')
@@ -635,7 +636,7 @@ final class PostResource extends Resource
                             ->success()
                             ->send();
                     }),
-                TableAction::make('unfeature')
+                Action::make('unfeature')
                     ->label(__('posts.actions.unfeature'))
                     ->icon('heroicon-o-star')
                     ->color('gray')
@@ -657,7 +658,7 @@ final class PostResource extends Resource
                             ->info()
                             ->send();
                     }),
-                TableDeleteAction::make(),
+                DeleteAction::make(),
             ])
             ->bulkActions([
                 BulkActionGroup::make([
