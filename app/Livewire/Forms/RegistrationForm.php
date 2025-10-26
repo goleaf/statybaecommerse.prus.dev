@@ -49,14 +49,14 @@ final class RegistrationForm extends Form
     public function rules(): array
     {
         return [
-            // Ensure the first name stays concise and free from invalid characters.
-            'first_name' => ['required', 'string', 'max:255'],
-            // Guard the last name field with the same strictness for consistency.
-            'last_name' => ['required', 'string', 'max:255'],
-            // Validate email uniqueness using the underlying table instead of the class string to avoid SQL errors.
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', Rule::unique(User::class, 'email')],
-            // Apply Laravel's default password requirements alongside confirmation checks.
-            'password' => ['required', 'string', 'confirmed', Password::defaults()],
+            // Ensure the first name stays concise and free from invalid characters while matching the nested Livewire form key.
+            'registrationForm.first_name' => ['required', 'string', 'max:255'],
+            // Guard the last name field with the same strictness for consistency using the scoped validation key.
+            'registrationForm.last_name' => ['required', 'string', 'max:255'],
+            // Validate email uniqueness on the nested form payload so Rule::unique attaches errors to registrationForm.email.
+            'registrationForm.email' => ['required', 'string', 'lowercase', 'email', 'max:255', Rule::unique(User::class, 'email')],
+            // Apply Laravel's default password requirements alongside confirmation checks within the form namespace.
+            'registrationForm.password' => ['required', 'string', 'confirmed', Password::defaults()],
         ];
     }
 
