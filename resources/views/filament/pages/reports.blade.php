@@ -11,7 +11,6 @@
                 @php
                     $salesData = $this->getSalesData(); // Pull the enriched sales payload once so we can safely read normalized keys.
                 @endphp
-
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <x-filament::card>
                         <div class="text-center">
@@ -48,7 +47,6 @@
                 @php
                     $productData = $this->getProductData(); // Capture the normalized product stats so repeated lookups stay consistent.
                 @endphp
-
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <x-filament::card>
                         <h3 class="text-lg font-semibold mb-4">{{ __('admin.reports.top_selling_products') }}</h3>
@@ -90,7 +88,6 @@
                 @php
                     $customerData = $this->getCustomerData(); // Snapshot customer metrics with defaults to guard against missing keys.
                 @endphp
-
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <x-filament::card>
                         <h3 class="text-lg font-semibold mb-4">{{ __('admin.reports.new_customers') }}</h3>

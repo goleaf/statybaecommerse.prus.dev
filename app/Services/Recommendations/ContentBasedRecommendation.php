@@ -38,7 +38,6 @@ final class ContentBasedRecommendation extends BaseRecommendation
         }
         $cacheKey = $this->generateCacheKey('content_based', $user, $product, $context);
         if ($cached = $this->getCachedResult($cacheKey)) {
-            // Resolve the identifiers back into hydrated models so downstream consumers keep working with Product instances.
             $products = Product::query()
                 ->whereKey($cached->pluck('product_id')->filter()->all())
                 ->get()
