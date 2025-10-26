@@ -152,6 +152,12 @@
                 @foreach (collect($selectedValues)->filter() as $valId)
                     @php($val = $this->filterValueLookup->get((int) $valId))
                     @if ($val)
+                        @php
+                            // Extract a human-readable label, checking array keys first and then falling back to object properties.
+                            $valueLabel = is_array($val)
+                                ? ($val['label'] ?? $val['name'] ?? $val['value'] ?? '')
+                                : ($val->label ?? $val->name ?? $val->value ?? '');
+                        @endphp
                         <button type="button" wire:click="removeAttributeFilter({{ (int) $valId }})"
                                 wire:confirm="{{ __('translations.confirm_remove_attribute_filter') }}"
                                 class="inline-flex items-center gap-1 text-xs bg-gray-100 rounded-full px-2 py-1">
