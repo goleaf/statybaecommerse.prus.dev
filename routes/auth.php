@@ -13,6 +13,9 @@ Route::middleware('guest')->group(function (): void {
     Route::get('login', \App\Livewire\Auth\Login::class)
         ->middleware('throttle:auth.login')
         ->name('login');
+    Route::get('two-factor-challenge', \App\Livewire\Auth\TwoFactorChallenge::class)
+        ->middleware('throttle:auth.two-factor')
+        ->name('two-factor.challenge');
     Route::get('forgot-password', \App\Livewire\Pages\Auth\ForgotPassword::class)
         ->middleware('throttle:auth.password-reset')
         ->name('password.request');
