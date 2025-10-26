@@ -9,6 +9,7 @@
 
 ## Multiple Carrier Support
 - `ShippingOption` exposes `carrier_name`, `service_type`, and relations to `zones`, countries, and cities so administrators can register each carrier’s availability footprint while still reusing shared UI sorting and filters.【F:app/Models/ShippingOption.php†L41-L201】
+- Geographic scoping persists `zone_id`, `country_id`, and `city_id` alongside the JSON-backed `shipping_matrix`, letting one carrier split offerings across national, municipal, or fulfilment-zone boundaries without duplicating records.【F:app/Models/ShippingOption.php†L41-L201】【F:database/migrations/2025_09_19_145445_create_shipping_options_table.php†L16-L43】
 - Factory seeds random carrier/service combinations to ensure test fixtures represent the mix of DHL, FedEx, UPS, and regional couriers expected in production.【F:database/factories/ShippingOptionFactory.php†L22-L53】
 - Order-level shipment records duplicate carrier identifiers and shipping-method labels so fulfilment updates stay linked to the originating partner even after price promotions or manual edits.【F:app/Models/OrderShipping.php†L41-L183】
 
