@@ -8,10 +8,21 @@
     <meta name="color-scheme" content="light dark">
 
     @php
+        /**
+         * Determine the meta information for the minimal layout using the
+         * explicitly provided data or fallback to the yielded sections.
+         */
         $sectionTitle = trim($__env->yieldContent('title'));
         $resolvedTitle = $title ?? ($sectionTitle !== '' ? $sectionTitle : config('app.name'));
+
+        // Resolve the meta description with graceful fallback handling.
         $sectionDescription = trim($__env->yieldContent('description'));
         $resolvedDescription = $description ?? ($sectionDescription !== '' ? $sectionDescription : null);
+
+        // Resolve the meta keywords to support SEO customization per page.
+        $sectionKeywords = trim($__env->yieldContent('keywords'));
+        $resolvedKeywords = $keywords ?? ($sectionKeywords !== '' ? $sectionKeywords : null);
+
         $canonicalLink = $canonicalUrl ?? null;
     @endphp
 
@@ -19,6 +30,10 @@
 
     @isset($resolvedDescription)
         <meta name="description" content="{{ $resolvedDescription }}">
+    @endisset
+
+    @isset($resolvedKeywords)
+        <meta name="keywords" content="{{ $resolvedKeywords }}">
     @endisset
 
     @if ($canonicalLink)
