@@ -51,7 +51,7 @@
                                     >
                                         <input
                                             type="radio"
-                                            wire:model="shippingAddressId"
+                                            wire:model.live.debounce.400ms="shippingAddressId"
                                             id="shipping-address-{{ $shippingAddress->id }}"
                                             name="shipping"
                                             value="{{ $shippingAddress->id }}"
@@ -115,7 +115,7 @@
                                         >
                                             <input
                                                 type="radio"
-                                                wire:model="billingAddressId"
+                                                wire:model.live.debounce.400ms="billingAddressId"
                                                 id="billing-address-{{ $billingAddress->id }}"
                                                 name="billing"
                                                 value="{{ $billingAddress->id }}"
