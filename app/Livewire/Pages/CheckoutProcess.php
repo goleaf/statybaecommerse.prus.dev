@@ -167,7 +167,12 @@ final class CheckoutProcess extends Component
             $this->ensureShippingSelection();
         }
 
-        if ($this->currentStep < 3) {
+        if ($this->currentStep === 3) {
+            // Drop lingering payment validation errors before rendering the confirmation step.
+            $this->resetErrorBag('selectedPaymentMethod');
+        }
+
+        if ($this->currentStep < 4) {
             $this->currentStep++;
         }
     }
@@ -188,8 +193,8 @@ final class CheckoutProcess extends Component
     public function validateCurrentStep(): void
     {
         match ($this->currentStep) {
-            1       => $this->validate(['billingFirstName' => 'required|string|max:255', 'billingLastName' => 'required|string|max:255', 'billingEmail' => 'required|email|max:255', 'billingPhone' => 'required|string|max:255', 'billingAddress' => 'required|string|max:255', 'billingCity' => 'required|string|max:255', 'billingPostalCode' => 'required|string|max:10']),
-            2       => $this->validate($this->shippingStepRules()),
+            1       => $this->validate($this->addressStepRules()),
+            2       => $this->validate($this->deliveryStepRules()),
             3       => $this->validate(['selectedPaymentMethod' => ['required', Rule::in(array_keys($this->paymentMethods))]]),
             default => null,
         };
@@ -200,6 +205,13 @@ final class CheckoutProcess extends Component
      */
     public function placeOrder(): void
     {
+        if ($this->currentStep < 4) {
+            // Force customers through the review screen before completing the checkout.
+            $this->currentStep = 4;
+
+            return;
+        }
+
         $this->validate($this->rules());
         $cartItems = $this->getCartItems();
         if ($cartItems->isEmpty()) {
@@ -499,13 +511,19 @@ final class CheckoutProcess extends Component
 
         $this->availableShippingOptions = $options
             // Preserve manual casting to stabilise Livewire hydration when shipping selections change.
-            ->map(static function (array $option): array {
-                // Cast identifiers and monetary values to predictable scalar types for Livewire hydration.
-                $option['id'] = (int) $option['id'];
-                $option['price'] = (float) $option['price'];
+            ->map(
+                /**
+                 * @param  array{id:int|string,name:string,price:float|int|string,formatted_price:string,estimated_delivery:string,currency?:string|null,eta?:string|null} $option
+                 * @return array{id:int,name:string,price:float,formatted_price:string,estimated_delivery:string,currency?:string|null,eta?:string|null}
+                 */
+                static function (array $option): array {
+                    // Cast identifiers and monetary values to predictable scalar types for Livewire hydration.
+                    $option['id'] = (int) $option['id'];
+                    $option['price'] = (float) $option['price'];
 
-                return $option;
-            })
+                    return $option;
+                }
+            )
             ->values()
             ->all();
 
@@ -646,46 +664,51 @@ final class CheckoutProcess extends Component
      */
     protected function rules(): array
     {
-        return [
-            'billingFirstName'       => 'required|string|max:255',
-            'billingLastName'        => 'required|string|max:255',
-            'billingEmail'           => 'required|email|max:255',
-            'billingPhone'           => 'required|string|max:255',
-            'billingAddress'         => 'required|string|max:255',
-            'billingCity'            => 'required|string|max:255',
-            'billingPostalCode'      => 'required|string|max:10',
-            'billingCountryCode'     => 'required|string|size:2',
-            'shippingFirstName'      => $this->sameAsShipping ? 'nullable|string|max:255' : 'required|string|max:255',
-            'shippingLastName'       => $this->sameAsShipping ? 'nullable|string|max:255' : 'required|string|max:255',
-            'shippingAddress'        => $this->sameAsShipping ? 'nullable|string|max:255' : 'required|string|max:255',
-            'shippingCity'           => $this->sameAsShipping ? 'nullable|string|max:255' : 'required|string|max:255',
-            'shippingPostalCode'     => $this->sameAsShipping ? 'nullable|string|max:10' : 'required|string|max:10',
-            'shippingCountryCode'    => 'required|string|size:2',
+        return $this->addressStepRules() + [
             'selectedShippingOption' => ['required', 'integer', Rule::in($this->shippingOptionIds())],
             'selectedPaymentMethod'  => ['required', Rule::in(array_keys($this->paymentMethods))],
         ];
     }
 
     /**
-     * Return validation rules that are specific to the shipping step of the wizard.
+     * Provide validation constraints for the combined billing and shipping address step.
      *
      * @return array<string, mixed>
      */
-    private function shippingStepRules(): array
+    private function addressStepRules(): array
     {
-        if ($this->sameAsShipping) {
-            return [
-                'selectedShippingOption' => ['required', 'integer', Rule::in($this->shippingOptionIds())],
-            ];
+        $rules = [
+            'billingFirstName'    => 'required|string|max:255',
+            'billingLastName'     => 'required|string|max:255',
+            'billingEmail'        => 'required|email|max:255',
+            'billingPhone'        => 'required|string|max:255',
+            'billingAddress'      => 'required|string|max:255',
+            'billingCity'         => 'required|string|max:255',
+            'billingPostalCode'   => 'required|string|max:10',
+            'billingCountryCode'  => 'required|string|size:2',
+            'shippingCountryCode' => 'required|string|size:2',
+        ];
+
+        if (! $this->sameAsShipping) {
+            // Require explicit recipient details whenever the parcel ships to a different address.
+            $rules['shippingFirstName'] = 'required|string|max:255';
+            $rules['shippingLastName'] = 'required|string|max:255';
+            $rules['shippingAddress'] = 'required|string|max:255';
+            $rules['shippingCity'] = 'required|string|max:255';
+            $rules['shippingPostalCode'] = 'required|string|max:10';
         }
 
+        return $rules;
+    }
+
+    /**
+     * Return validation rules that are specific to the delivery selection step of the wizard.
+     *
+     * @return array<string, mixed>
+     */
+    private function deliveryStepRules(): array
+    {
         return [
-            'shippingFirstName'      => 'required|string|max:255',
-            'shippingLastName'       => 'required|string|max:255',
-            'shippingAddress'        => 'required|string|max:255',
-            'shippingCity'           => 'required|string|max:255',
-            'shippingPostalCode'     => 'required|string|max:10',
-            'shippingCountryCode'    => 'required|string|size:2',
             'selectedShippingOption' => ['required', 'integer', Rule::in($this->shippingOptionIds())],
         ];
     }
