@@ -32,7 +32,8 @@ describe('ProductVariantSelector', function (): void {
             ->assertSet('selectedVariant.id', $selectedVariant->id)
             ->assertSet('selectedAttributes', [])
             ->assertSet('showVariantDetails', true)
-            ->assertSet('quantity', 1);
+            ->assertSet('quantity', 1)
+            ->assertSet('selectedVariantPricing.final', (float) $selectedVariant->price);
 
         $component->dispatch('variantSelected', null);
 
@@ -40,6 +41,7 @@ describe('ProductVariantSelector', function (): void {
             ->assertSet('selectedVariant', null)
             ->assertSet('selectedAttributes', [])
             ->assertSet('showVariantDetails', false)
-            ->assertSet('quantity', 1);
+            ->assertSet('quantity', 1)
+            ->assertSet('selectedVariantPricing.final', null);
     });
 });

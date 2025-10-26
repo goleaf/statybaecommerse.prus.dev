@@ -7,6 +7,7 @@ namespace App\Livewire;
 use App\Models\Attribute;
 use App\Models\Product;
 use App\Models\ProductVariant;
+use App\Services\Pricing\VariantPriceService;
 use Illuminate\Support\Collection;
 use Livewire\Component;
 
@@ -25,6 +26,20 @@ final class ProductVariantSelector extends Component
     public int $quantity = 1;
 
     public bool $showVariantDetails = false;
+
+    /**
+     * Cached pricing snapshot for the currently selected variant so Blade can read the server-computed amounts.
+     *
+     * @var array{final: float|null, compare: float|null, regular: float|null, sale: float|null, price_list: float|null, currency: string|null}
+     */
+    public array $selectedVariantPricing = [
+        'final'      => null,
+        'compare'    => null,
+        'regular'    => null,
+        'sale'       => null,
+        'price_list' => null,
+        'currency'   => null,
+    ];
 
     protected $listeners = ['variantSelected' => 'onVariantSelected'];
 
@@ -77,6 +92,7 @@ final class ProductVariantSelector extends Component
 
             $this->selectedVariant = $defaultVariant;
             $this->selectedAttributes = $this->getVariantAttributes($defaultVariant);
+            $this->refreshSelectedVariantPricing($defaultVariant);
 
             if ($defaultVariant->id !== $previousVariantId) {
                 $this->dispatch('variant.selected', variantId: $defaultVariant->id);
@@ -116,6 +132,7 @@ final class ProductVariantSelector extends Component
 
         $this->selectedVariant = $matchingVariant;
         $this->showVariantDetails = $matchingVariant !== null;
+        $this->refreshSelectedVariantPricing($matchingVariant);
 
         if ($matchingVariant && $matchingVariant->id !== $previousVariantId) {
             $this->dispatch('variant.selected', variantId: $matchingVariant->id);
@@ -142,6 +159,7 @@ final class ProductVariantSelector extends Component
         $this->selectedAttributes = $this->getVariantAttributes($variant);
         $this->showVariantDetails = true;
         $this->quantity = 1;
+        $this->refreshSelectedVariantPricing($variant);
 
         $this->recordVariantClick();
     }
@@ -152,6 +170,14 @@ final class ProductVariantSelector extends Component
         $this->selectedAttributes = [];
         $this->showVariantDetails = false;
         $this->quantity = 1;
+        $this->selectedVariantPricing = [
+            'final'      => null,
+            'compare'    => null,
+            'regular'    => null,
+            'sale'       => null,
+            'price_list' => null,
+            'currency'   => function_exists('current_currency') ? current_currency() : null,
+        ];
     }
 
     public function getVariantAttributes(ProductVariant $variant): array
@@ -228,6 +254,7 @@ final class ProductVariantSelector extends Component
     {
         if ($this->selectedVariant && $this->quantity < $this->selectedVariant->availableQuantity()) {
             $this->quantity++;
+            $this->refreshSelectedVariantPricing($this->selectedVariant);
         }
     }
 
@@ -235,7 +262,21 @@ final class ProductVariantSelector extends Component
     {
         if ($this->quantity > 1) {
             $this->quantity--;
+            $this->refreshSelectedVariantPricing($this->selectedVariant);
         }
+    }
+
+    public function updatedQuantity($value): void
+    {
+        // Normalise manual quantity edits so pricing recalculations always receive a sane, positive integer.
+        $sanitised = max(1, (int) $value);
+
+        if ($this->selectedVariant) {
+            $sanitised = min($sanitised, $this->selectedVariant->availableQuantity());
+        }
+
+        $this->quantity = $sanitised;
+        $this->refreshSelectedVariantPricing($this->selectedVariant);
     }
 
     public function addToCart(): void
@@ -274,28 +315,40 @@ final class ProductVariantSelector extends Component
 
     public function getVariantPrice(): float
     {
-        return $this->selectedVariant ? (float) $this->selectedVariant->getCurrentPrice() : 0.0;
+        return (float) ($this->selectedVariantPricing['final'] ?? 0.0);
     }
 
     public function getVariantOriginalPrice(): float
     {
-        return $this->selectedVariant ? (float) $this->selectedVariant->price : 0.0;
+        if ($this->selectedVariantPricing['compare'] !== null) {
+            return (float) $this->selectedVariantPricing['compare'];
+        }
+
+        return (float) ($this->selectedVariantPricing['regular'] ?? 0.0);
     }
 
     public function getVariantPromotionalPrice(): ?float
     {
-        if (! $this->selectedVariant || ! $this->selectedVariant->isCurrentlyOnSale()) {
-            return null;
+        $pricing = $this->selectedVariantPricing;
+        $current = $pricing['final'];
+
+        if ($pricing['sale'] !== null && $current !== null && $pricing['sale'] > ($current + 0.0001)) {
+            return (float) $pricing['sale'];
         }
 
-        $promotionalPrice = $this->selectedVariant->promotional_price;
+        if ($pricing['price_list'] !== null && $current !== null && $pricing['price_list'] > ($current + 0.0001)) {
+            return (float) $pricing['price_list'];
+        }
 
-        return $promotionalPrice !== null ? (float) $promotionalPrice : null;
+        return $pricing['compare'] !== null ? (float) $pricing['compare'] : null;
     }
 
     public function isVariantOnSale(): bool
     {
-        return $this->selectedVariant ? $this->selectedVariant->isCurrentlyOnSale() : false;
+        $current = $this->selectedVariantPricing['final'];
+        $compare = $this->selectedVariantPricing['compare'];
+
+        return $current !== null && $compare !== null && $compare > ($current + 0.0001);
     }
 
     public function getVariantLocalizedName(?string $locale = null): string
@@ -417,7 +470,7 @@ final class ProductVariantSelector extends Component
      */
     public function getVariantDiscountPercentage(): ?float
     {
-        if (! $this->selectedVariant || ! $this->isVariantOnSale()) {
+        if ($this->selectedVariantPricing['final'] === null || ! $this->isVariantOnSale()) {
             return null;
         }
 
@@ -429,6 +482,59 @@ final class ProductVariantSelector extends Component
         }
 
         return round((($originalPrice - $currentPrice) / $originalPrice) * 100, 0);
+    }
+
+    /**
+     * Recalculate the pricing snapshot for the active variant using the central pricing service.
+     */
+    private function refreshSelectedVariantPricing(?ProductVariant $variant): void
+    {
+        if (! $variant) {
+            $this->selectedVariantPricing = [
+                'final'      => null,
+                'compare'    => null,
+                'regular'    => null,
+                'sale'       => null,
+                'price_list' => null,
+                'currency'   => function_exists('current_currency') ? current_currency() : null,
+            ];
+
+            return;
+        }
+
+        /** @var VariantPriceService $priceService */
+        $priceService = app(VariantPriceService::class);
+
+        $context = ['quantity' => $this->quantity];
+
+        if (function_exists('current_currency')) {
+            $context['currency'] = current_currency();
+        }
+
+        $result = $priceService->calculate($variant, $context);
+
+        $compare = $result->compareAtPrice;
+
+        if ($compare === null) {
+            $fallbackAnchors = array_filter([
+                $result->regularPrice,
+                $result->salePrice,
+                $result->priceListPrice,
+            ], static fn (?float $amount) => $amount !== null && $amount > ($result->finalPrice + 0.0001));
+
+            if ($fallbackAnchors !== []) {
+                $compare = max($fallbackAnchors);
+            }
+        }
+
+        $this->selectedVariantPricing = [
+            'final'      => (float) $result->finalPrice,
+            'compare'    => $compare !== null ? (float) $compare : null,
+            'regular'    => (float) $result->regularPrice,
+            'sale'       => $result->salePrice !== null ? (float) $result->salePrice : null,
+            'price_list' => $result->priceListPrice !== null ? (float) $result->priceListPrice : null,
+            'currency'   => $result->currency,
+        ];
     }
 
     public function render()
