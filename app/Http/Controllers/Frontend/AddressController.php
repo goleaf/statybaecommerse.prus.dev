@@ -12,6 +12,7 @@ use App\Http\Requests\Frontend\UpdateAddressRequest;
 use App\Models\Address;
 use App\Models\City;
 use App\Models\Country;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -43,7 +44,7 @@ final class AddressController extends Controller
      */
     public function create(): View
     {
-        $countries = Country::orderBy('name')->get();
+        $countries = $this->allowedCountriesQuery()->orderBy('name')->get();
         $addressTypes = AddressType::options();
 
         return view('addresses.create', compact('countries', 'addressTypes'));
@@ -55,13 +56,17 @@ final class AddressController extends Controller
     public function store(StoreAddressRequest $request): RedirectResponse
     {
         $data = $request->validated();
-        $data['user_id'] = Auth::id();
-        $data['is_active'] = true;
+
+        $address = new Address($data);
+        $address->user()->associate(Auth::user());
+        $address->is_active = $address->is_active ?? true;
+
         // Ensure only one default address per user
-        if ($data['is_default'] ?? false) {
+        if ($address->is_default) {
             Address::where('user_id', Auth::id())->update(['is_default' => false]);
         }
-        $address = Address::create($data);
+
+        $address->save();
 
         return redirect()->route('frontend.addresses.index')->with('success', __('translations.address_created_successfully'));
     }
@@ -82,7 +87,7 @@ final class AddressController extends Controller
     public function edit(Address $address): View
     {
         $this->authorize('update', $address);
-        $countries = Country::orderBy('name')->get();
+        $countries = $this->allowedCountriesQuery()->orderBy('name')->get();
         $addressTypes = AddressType::options();
 
         return view('addresses.edit', compact('address', 'countries', 'addressTypes'));
@@ -95,11 +100,14 @@ final class AddressController extends Controller
     {
         $this->authorize('update', $address);
         $data = $request->validated();
+
         // Ensure only one default address per user
         if ($data['is_default'] ?? false) {
             Address::where('user_id', Auth::id())->where('id', '!=', $address->id)->update(['is_default' => false]);
         }
-        $address->update($data);
+
+        $address->fill($data);
+        $address->save();
 
         return redirect()->route('frontend.addresses.index')->with('success', __('translations.address_updated_successfully'));
     }
@@ -144,7 +152,7 @@ final class AddressController extends Controller
      */
     public function getCountries(): JsonResponse
     {
-        $countries = Country::orderBy('name')->get(['id', 'name', 'cca2']);
+        $countries = $this->allowedCountriesQuery()->orderBy('name')->get(['id', 'name', 'cca2']);
 
         return response()->json($countries);
     }
@@ -160,5 +168,17 @@ final class AddressController extends Controller
         $cities = City::where('country_id', $validated['country_id'])->orderBy('name')->get(['id', 'name']);
 
         return response()->json($cities);
+}
+
+    /**
+     * Build a query for countries restricted to the configured allow-list.
+     */
+    private function allowedCountriesQuery(): Builder
+    {
+        $allowed = config('addresses.allowed_countries', []);
+
+        return Country::query()
+            ->where('is_active', true)
+            ->when($allowed !== [], fn ($query) => $query->whereIn('cca2', $allowed));
     }
 }
