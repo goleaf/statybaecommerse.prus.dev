@@ -22,7 +22,7 @@ use Throwable;
  * Livewire component for CurrencySelector with reactive frontend functionality, real-time updates, and user interaction handling.
  *
  * @property array<int, CurrencyOptionData> $currencies
- * @property string|null                                           $activeCurrencyCode
+ * @property string|null                    $activeCurrencyCode
  */
 class CurrencySelector extends Component
 {
@@ -158,8 +158,6 @@ class CurrencySelector extends Component
 
     /**
      * Build a deterministic currency entry structure for fallback usage.
-     *
-     * @return CurrencyOptionData
      */
     private function defaultCurrencyEntry(string $code): CurrencyOptionData
     {

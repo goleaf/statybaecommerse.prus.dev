@@ -11,15 +11,15 @@ use App\Models\Collection as CollectionModel;
 use App\Models\CollectionRule;
 use App\Models\Product;
 use App\Models\ProductVariant;
+use App\Support\Cache\CacheKeys;
+use App\Support\Cache\CacheTags;
+use App\Support\Cache\TagAwareCache;
 use BackedEnum;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Collection;
-use App\Support\Cache\CacheKeys;
-use App\Support\Cache\CacheTags;
-use App\Support\Cache\TagAwareCache;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Url;
@@ -201,7 +201,7 @@ class Show extends Component
                                         'id'   => $attributeId,
                                         'name' => (string) $attribute->name,
                                     ],
-                                    'values'    => [],
+                                    'values' => [],
                                 ];
                             }
 

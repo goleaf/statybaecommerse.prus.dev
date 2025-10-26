@@ -7,14 +7,16 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Collection;
 use App\Models\Translations\CollectionTranslation;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Config;
 
 use function array_filter;
 use function array_map;
 use function array_unique;
 use function explode;
+
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Config;
+
 use function in_array;
 use function is_array;
 use function strtolower;

@@ -80,8 +80,8 @@ final class RedemptionController extends Controller
         $stats = $this->buildStats($baseQuery);
 
         return response()->json([
-            'data'  => $paginated->items(),
-            'meta'  => [
+            'data' => $paginated->items(),
+            'meta' => [
                 'current_page' => $paginated->currentPage(),
                 'last_page'    => $paginated->lastPage(),
                 'per_page'     => $paginated->perPage(),
@@ -182,22 +182,22 @@ final class RedemptionController extends Controller
     private function transformRedemption(DiscountRedemption $redemption): array
     {
         return [
-            'id'            => $redemption->id,
-            'status'        => $redemption->status,
-            'discount'      => [
+            'id'       => $redemption->id,
+            'status'   => $redemption->status,
+            'discount' => [
                 'id'   => $redemption->discount?->id,
                 'name' => $redemption->discount?->name,
             ],
-            'code'          => [
+            'code' => [
                 'id'   => $redemption->code?->id,
                 'code' => $redemption->code?->code,
             ],
-            'user'          => [
+            'user' => [
                 'id'    => $redemption->user?->id,
                 'name'  => $redemption->user?->name,
                 'email' => $redemption->user?->email,
             ],
-            'order'         => [
+            'order' => [
                 'id' => $redemption->order?->id,
             ],
             'amount_saved'  => (float) $redemption->amount_saved,

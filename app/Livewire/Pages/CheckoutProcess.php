@@ -34,39 +34,39 @@ use Livewire\Component;
  * Livewire component for CheckoutProcess with reactive frontend functionality, real-time updates, and user interaction handling.
  *
  * @property array{first_name:string,last_name:string,email:string,phone:string,address:string,city:string,postal_code:string,company:?string,country:string,region:?string} $billing
- * @property bool   $sameAsShipping
- * @property array{first_name:string,last_name:string,address:string,city:string,postal_code:string,company:?string,country:string,region:?string} $shipping
- * @property string $notes
- * @property int    $currentStep
+ * @property bool                                                                                                                                                            $sameAsShipping
+ * @property array{first_name:string,last_name:string,address:string,city:string,postal_code:string,company:?string,country:string,region:?string}                           $shipping
+ * @property string                                                                                                                                                          $notes
+ * @property int                                                                                                                                                             $currentStep
  */
 final class CheckoutProcess extends Component
 {
     #[Validate('required|array')]
     public array $billing = [
-        'first_name'   => '',
-        'last_name'    => '',
-        'email'        => '',
-        'phone'        => '',
-        'address'      => '',
-        'city'         => '',
-        'postal_code'  => '',
-        'company'      => '',
-        'country'      => 'LT',
-        'region'       => '',
+        'first_name'  => '',
+        'last_name'   => '',
+        'email'       => '',
+        'phone'       => '',
+        'address'     => '',
+        'city'        => '',
+        'postal_code' => '',
+        'company'     => '',
+        'country'     => 'LT',
+        'region'      => '',
     ];
 
     public bool $sameAsShipping = true;
 
     #[Validate('required|array')]
     public array $shipping = [
-        'first_name'   => '',
-        'last_name'    => '',
-        'address'      => '',
-        'city'         => '',
-        'postal_code'  => '',
-        'company'      => '',
-        'country'      => 'LT',
-        'region'       => '',
+        'first_name'  => '',
+        'last_name'   => '',
+        'address'     => '',
+        'city'        => '',
+        'postal_code' => '',
+        'company'     => '',
+        'country'     => 'LT',
+        'region'      => '',
     ];
 
     #[Validate('nullable|string')]
@@ -155,7 +155,7 @@ final class CheckoutProcess extends Component
     public function validateCurrentStep(): void
     {
         match ($this->currentStep) {
-            1       => $this->validate([
+            1 => $this->validate([
                 'billing.first_name'  => 'required|string|max:255',
                 'billing.last_name'   => 'required|string|max:255',
                 'billing.email'       => 'required|email|max:255',
@@ -656,22 +656,22 @@ final class CheckoutProcess extends Component
     protected function rules(): array
     {
         return [
-            'billing.first_name'       => 'required|string|max:255',
-            'billing.last_name'        => 'required|string|max:255',
-            'billing.email'            => 'required|email|max:255',
-            'billing.phone'            => 'required|string|max:255',
-            'billing.address'          => 'required|string|max:255',
-            'billing.city'             => 'required|string|max:255',
-            'billing.postal_code'      => 'required|string|max:10',
-            'billing.country'          => 'required|string|size:2',
-            'shipping.first_name'      => $this->sameAsShipping ? 'nullable|string|max:255' : 'required|string|max:255',
-            'shipping.last_name'       => $this->sameAsShipping ? 'nullable|string|max:255' : 'required|string|max:255',
-            'shipping.address'         => $this->sameAsShipping ? 'nullable|string|max:255' : 'required|string|max:255',
-            'shipping.city'            => $this->sameAsShipping ? 'nullable|string|max:255' : 'required|string|max:255',
-            'shipping.postal_code'     => $this->sameAsShipping ? 'nullable|string|max:10' : 'required|string|max:10',
-            'shipping.country'         => 'required|string|size:2',
-            'selectedShippingOption'   => ['required', 'integer', Rule::in($this->shippingOptionIds())],
-            'selectedPaymentMethod'    => ['required', Rule::in(array_keys($this->paymentMethods))],
+            'billing.first_name'     => 'required|string|max:255',
+            'billing.last_name'      => 'required|string|max:255',
+            'billing.email'          => 'required|email|max:255',
+            'billing.phone'          => 'required|string|max:255',
+            'billing.address'        => 'required|string|max:255',
+            'billing.city'           => 'required|string|max:255',
+            'billing.postal_code'    => 'required|string|max:10',
+            'billing.country'        => 'required|string|size:2',
+            'shipping.first_name'    => $this->sameAsShipping ? 'nullable|string|max:255' : 'required|string|max:255',
+            'shipping.last_name'     => $this->sameAsShipping ? 'nullable|string|max:255' : 'required|string|max:255',
+            'shipping.address'       => $this->sameAsShipping ? 'nullable|string|max:255' : 'required|string|max:255',
+            'shipping.city'          => $this->sameAsShipping ? 'nullable|string|max:255' : 'required|string|max:255',
+            'shipping.postal_code'   => $this->sameAsShipping ? 'nullable|string|max:10' : 'required|string|max:10',
+            'shipping.country'       => 'required|string|size:2',
+            'selectedShippingOption' => ['required', 'integer', Rule::in($this->shippingOptionIds())],
+            'selectedPaymentMethod'  => ['required', Rule::in(array_keys($this->paymentMethods))],
         ];
     }
 
@@ -689,13 +689,13 @@ final class CheckoutProcess extends Component
         }
 
         return [
-            'shipping.first_name'      => 'required|string|max:255',
-            'shipping.last_name'       => 'required|string|max:255',
-            'shipping.address'         => 'required|string|max:255',
-            'shipping.city'            => 'required|string|max:255',
-            'shipping.postal_code'     => 'required|string|max:10',
-            'shipping.country'         => 'required|string|size:2',
-            'selectedShippingOption'   => ['required', 'integer', Rule::in($this->shippingOptionIds())],
+            'shipping.first_name'    => 'required|string|max:255',
+            'shipping.last_name'     => 'required|string|max:255',
+            'shipping.address'       => 'required|string|max:255',
+            'shipping.city'          => 'required|string|max:255',
+            'shipping.postal_code'   => 'required|string|max:10',
+            'shipping.country'       => 'required|string|size:2',
+            'selectedShippingOption' => ['required', 'integer', Rule::in($this->shippingOptionIds())],
         ];
     }
 

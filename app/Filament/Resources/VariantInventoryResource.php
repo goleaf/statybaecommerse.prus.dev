@@ -640,9 +640,9 @@ final class VariantInventoryResource extends Resource
                             $quantity,
                             null,
                             [
-                                'reason'    => $reason,
-                                'actor_id'  => $actorId,
-                                'source'    => 'filament_table_action',
+                                'reason'   => $reason,
+                                'actor_id' => $actorId,
+                                'source'   => 'filament_table_action',
                             ],
                             'filament_table_action',
                             $referenceId,

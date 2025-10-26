@@ -37,7 +37,7 @@ final class ManualRecommendation extends BaseRecommendation
         if ($ids === []) {
             // Surface an empty Eloquent collection without touching the builder so
             // tests running against SQLite avoid missing helper exceptions.
-            return new Collection();
+            return new Collection;
         }
 
         $products = Product::query()

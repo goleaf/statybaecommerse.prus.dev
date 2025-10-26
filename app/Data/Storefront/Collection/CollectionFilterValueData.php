@@ -22,7 +22,7 @@ final class CollectionFilterValueData implements Arrayable
     /**
      * Factory helper that normalizes primitive arrays (for example cached payloads) into typed values.
      *
-     * @param  array{id:int, label:string, selected?:bool} $payload
+     * @param array{id:int, label:string, selected?:bool} $payload
      */
     public static function fromArray(array $payload): self
     {

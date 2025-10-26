@@ -66,21 +66,21 @@ return [
             'shipped'   => 'Išsiųsti',
             'cancelled' => 'Atšaukti',
         ],
-        'table'        => [
-            'order'         => 'Užsakymas',
-            'status'        => 'Būsena',
-            'payment_status'=> 'Mokėjimas',
-            'items'         => 'Pozicijos',
-            'items_count'   => '{0}Pozicijų nėra|{1}:count pozicija|[2,*]:count pozicijos',
-            'total'         => 'Suma',
-            'placed_at'     => 'Sukurta',
+        'table' => [
+            'order'          => 'Užsakymas',
+            'status'         => 'Būsena',
+            'payment_status' => 'Mokėjimas',
+            'items'          => 'Pozicijos',
+            'items_count'    => '{0}Pozicijų nėra|{1}:count pozicija|[2,*]:count pozicijos',
+            'total'          => 'Suma',
+            'placed_at'      => 'Sukurta',
         ],
-        'empty'        => [
+        'empty' => [
             'title'       => 'Pagal pasirinktą filtrą užsakymų nėra',
             'description' => 'Pakoreguokite būsenos filtrą arba patikrinkite vėliau, kai atsiras naujų partnerių užsakymų.',
         ],
-        'errors'       => [
-            'forbidden'    => [
+        'errors' => [
+            'forbidden' => [
                 'title'       => 'Reikalinga partnerio prieiga',
                 'description' => 'Jūsų paskyra nesusieta su aktyviu partneriu. Susisiekite su palaikymo komanda, kad gautumėte prieigą.',
             ],

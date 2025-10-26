@@ -23,7 +23,7 @@ final class ShippingOptionResolver
     /**
      * Resolve the shipping options that are valid for the provided cart state.
      *
-     * @param  BaseCollection<int, CartItem>|EloquentCollection<int, CartItem>                                             $cartItems
+     * @param  BaseCollection<int, CartItem>|EloquentCollection<int, CartItem>                                                                                  $cartItems
      * @return BaseCollection<int, array{id:int,name:string,price:float,currency:string|null,eta:string|null,formatted_price:string,estimated_delivery:string}>
      */
     public function resolve(BaseCollection|EloquentCollection $cartItems, ?string $countryCode = null): BaseCollection
@@ -77,8 +77,7 @@ final class ShippingOptionResolver
     /**
      * Resolve shipping options for the active cart session and destination data.
      *
-     * @param  Authenticatable|null         $user
-     * @param  array<string, mixed>         $destination
+     * @param  array<string, mixed>             $destination
      * @return array<int, array<string, mixed>>
      */
     public function forCart(?Authenticatable $user = null, array $destination = []): array

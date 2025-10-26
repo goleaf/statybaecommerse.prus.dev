@@ -18,29 +18,29 @@ it('builds summaries from persistent cart items including variant metadata and d
     $product = Product::factory()->create();
     $variant = ProductVariant::factory()->create([
         'product_id' => $product->getKey(),
-        'price' => 60.00,
+        'price'      => 60.00,
     ]);
 
     $sessionId = 'sess-db-summary';
 
     // Seed a persisted cart row that carries explicit variant metadata and attribute payloads.
     CartItem::factory()->create([
-        'session_id' => $sessionId,
-        'user_id' => $user->getKey(),
-        'product_id' => $product->getKey(),
-        'variant_id' => $variant->getKey(),
+        'session_id'         => $sessionId,
+        'user_id'            => $user->getKey(),
+        'product_id'         => $product->getKey(),
+        'variant_id'         => $variant->getKey(),
         'product_variant_id' => $variant->getKey(),
-        'quantity' => 1,
-        'unit_price' => 60.00,
-        'price' => 60.00,
-        'total_price' => 60.00,
-        'attributes' => [
-            'size' => 'L',
+        'quantity'           => 1,
+        'unit_price'         => 60.00,
+        'price'              => 60.00,
+        'total_price'        => 60.00,
+        'attributes'         => [
+            'size'       => 'L',
             'variant_id' => $variant->getKey(),
-            'custom' => 'engraving',
+            'custom'     => 'engraving',
         ],
         'product_snapshot' => [
-            'name' => $product->name,
+            'name'  => $product->name,
             'image' => 'https://example.com/image.jpg',
         ],
     ]);
@@ -53,7 +53,7 @@ it('builds summaries from persistent cart items including variant metadata and d
         ->and($summary['items'][0]['variant_id'])->toBe($variant->getKey())
         // Variant identifiers should be lifted into the dedicated key and removed from the attribute bag.
         ->and($summary['items'][0]['attributes'])->toMatchArray([
-            'size' => 'L',
+            'size'   => 'L',
             'custom' => 'engraving',
         ])
         ->and($summary['subtotal'])->toBe(60.0)
@@ -76,17 +76,17 @@ it('normalizes session cart payloads within configured quantity limits and clamp
         [
             'product_id' => 101,
             'variant_id' => 202,
-            'name' => 'Example Item',
-            'price' => 10.0,
-            'quantity' => -3,
+            'name'       => 'Example Item',
+            'price'      => 10.0,
+            'quantity'   => -3,
             'attributes' => ['color' => 'Red'],
         ],
         [
             'product_id' => 102,
             'variant_id' => 203,
-            'name' => 'Bulk Item',
-            'price' => 2.5,
-            'quantity' => 99,
+            'name'       => 'Bulk Item',
+            'price'      => 2.5,
+            'quantity'   => 99,
             'attributes' => ['size' => 'XL'],
         ],
     ]);

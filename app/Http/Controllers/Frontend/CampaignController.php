@@ -12,8 +12,8 @@ use App\Models\CampaignView;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 use OpenApi\Attributes as OA;
 
@@ -524,11 +524,11 @@ final class CampaignController extends Controller
         // Assemble the final analytics payload grouping insights by marketing theme.
         $analytics = [
             'period' => [
-                'days'       => $period,
-                'label'      => sprintf('Last %d days', $period),
-                'start_date' => $startDate->format('Y-m-d'),
-                'end_date'   => $now->format('Y-m-d'),
-                'granularity' => 'day',
+                'days'             => $period,
+                'label'            => sprintf('Last %d days', $period),
+                'start_date'       => $startDate->format('Y-m-d'),
+                'end_date'         => $now->format('Y-m-d'),
+                'granularity'      => 'day',
                 'normalized_dates' => $timelineDates->all(),
             ],
             'totals' => [
@@ -619,18 +619,18 @@ final class CampaignController extends Controller
             ],
             'charts' => [
                 'engagement_trend' => [
-                    'title'             => 'Engagement trend',
-                    'description'       => 'Daily views and clicks',
-                    'labels'            => $timelineLabels->all(),
-                    'normalized_dates'  => $timelineDates->all(),
-                    'kpis'              => [
+                    'title'            => 'Engagement trend',
+                    'description'      => 'Daily views and clicks',
+                    'labels'           => $timelineLabels->all(),
+                    'normalized_dates' => $timelineDates->all(),
+                    'kpis'             => [
                         'total_views'                => $timelineTotals['views'],
                         'total_clicks'               => $timelineTotals['clicks'],
                         'average_click_through_rate' => $timelineTotals['views'] > 0
                             ? round($timelineTotals['clicks'] / $timelineTotals['views'] * 100, 2)
                             : 0.0,
                     ],
-                    'datasets'          => [
+                    'datasets' => [
                         [
                             'label'           => 'Views',
                             'data'            => $timelineSeries->pluck('views')->all(),
@@ -650,16 +650,16 @@ final class CampaignController extends Controller
                     ],
                 ],
                 'conversion_trend' => [
-                    'title'             => 'Conversion trend',
-                    'description'       => 'Daily conversions and revenue',
-                    'labels'            => $timelineLabels->all(),
-                    'normalized_dates'  => $timelineDates->all(),
-                    'kpis'              => [
-                        'total_conversions' => $timelineTotals['conversions'],
-                        'total_revenue'     => $timelineTotals['revenue'],
+                    'title'            => 'Conversion trend',
+                    'description'      => 'Daily conversions and revenue',
+                    'labels'           => $timelineLabels->all(),
+                    'normalized_dates' => $timelineDates->all(),
+                    'kpis'             => [
+                        'total_conversions'       => $timelineTotals['conversions'],
+                        'total_revenue'           => $timelineTotals['revenue'],
                         'average_conversion_rate' => round($averageConversionRate, 2),
                     ],
-                    'datasets'          => [
+                    'datasets' => [
                         [
                             'label'           => 'Conversions',
                             'data'            => $timelineSeries->pluck('conversions')->all(),

@@ -41,18 +41,18 @@ final class VariantPriceResult implements Arrayable
     public function toArray(): array
     {
         return [
-            'regular_price'        => $this->regularPrice,
-            'sale_price'           => $this->salePrice,
-            'price_list_price'     => $this->priceListPrice,
-            'variant_modifiers'    => $this->variantModifiers,
-            'dynamic_adjustments'  => $this->dynamicAdjustments,
-            'final_price'          => $this->finalPrice,
-            'currency'             => $this->currency,
-            'price_list_id'        => $this->priceListId,
-            'applied_rule_ids'     => $this->appliedRuleIds,
-            'compare_at_price'     => $this->compareAtPrice,
-            'cost_price'           => $this->costPrice,
-            'history_recorded'     => $this->historyRecorded,
+            'regular_price'       => $this->regularPrice,
+            'sale_price'          => $this->salePrice,
+            'price_list_price'    => $this->priceListPrice,
+            'variant_modifiers'   => $this->variantModifiers,
+            'dynamic_adjustments' => $this->dynamicAdjustments,
+            'final_price'         => $this->finalPrice,
+            'currency'            => $this->currency,
+            'price_list_id'       => $this->priceListId,
+            'applied_rule_ids'    => $this->appliedRuleIds,
+            'compare_at_price'    => $this->compareAtPrice,
+            'cost_price'          => $this->costPrice,
+            'history_recorded'    => $this->historyRecorded,
         ];
     }
 }

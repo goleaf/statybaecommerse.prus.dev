@@ -98,13 +98,13 @@ final class OrderSummaryController
                 $status = OrderStatus::tryFrom($order->getAttribute('status'));
 
                 return [
-                    'id'         => $order->getKey(),
-                    'number'     => (string) $order->getAttribute('number'),
-                    'status'     => (string) $order->getAttribute('status'),
+                    'id'          => $order->getKey(),
+                    'number'      => (string) $order->getAttribute('number'),
+                    'status'      => (string) $order->getAttribute('status'),
                     'statusLabel' => $status?->label(),
-                    'total'      => round((float) $order->getAttribute('total'), 2),
-                    'currency'   => (string) $order->getAttribute('currency'),
-                    'createdAt'  => $order->getAttribute('created_at')?->toISOString(),
+                    'total'       => round((float) $order->getAttribute('total'), 2),
+                    'currency'    => (string) $order->getAttribute('currency'),
+                    'createdAt'   => $order->getAttribute('created_at')?->toISOString(),
                 ];
             })
             ->all();
@@ -122,11 +122,11 @@ final class OrderSummaryController
                     'revenue'             => round($revenue, 2),
                     'average_order_value' => $averageOrderValue,
                 ],
-                'status_breakdown'        => $statusBreakdown,
-                'payment_statuses'        => $paymentStatusBreakdown,
-                'currency_breakdown'      => $currencyBreakdown,
-                'recent_orders'           => $recentOrders,
-                'filters'                 => [
+                'status_breakdown'   => $statusBreakdown,
+                'payment_statuses'   => $paymentStatusBreakdown,
+                'currency_breakdown' => $currencyBreakdown,
+                'recent_orders'      => $recentOrders,
+                'filters'            => [
                     'partner_id' => $partnerId,
                 ],
             ],

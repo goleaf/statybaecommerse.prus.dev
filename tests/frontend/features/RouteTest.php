@@ -564,7 +564,7 @@ class RouteTest extends TestCase
             'description' => 'Limited time flash sale.',
             'type'        => 'percentage',
             'value'       => 5,
-            'conditions'  => "applies_to:flash",
+            'conditions'  => 'applies_to:flash',
         ]);
         $response->assertRedirect(route('admin.discounts.presets'));
     }

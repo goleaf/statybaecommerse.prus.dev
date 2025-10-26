@@ -72,7 +72,7 @@ final class Order extends Model
     protected static function booted(): void
     {
         // Automatically assign a human friendly unique identifier whenever an order is created.
-        static::creating(function (Order $order): void {
+        self::creating(function (Order $order): void {
             if (! is_string($order->number) || trim($order->number) === '') {
                 $order->number = self::generateUniqueNumber();
             }
@@ -658,7 +658,7 @@ final class Order extends Model
         $normalized = match ($status) {
             'confirmed' => OrderStatus::PROCESSING,
             'completed' => OrderStatus::DELIVERED,
-            default      => null,
+            default     => null,
         };
 
         if ($normalized instanceof OrderStatus) {

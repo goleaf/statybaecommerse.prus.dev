@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Services\Cart;
 
 use App\Models\CartItem;
-use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Session\Session as SessionStore;
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
