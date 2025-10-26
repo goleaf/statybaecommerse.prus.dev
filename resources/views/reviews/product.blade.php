@@ -11,10 +11,20 @@
                 <span>›</span>
                 <span>{{ __('reviews_reviews') }}</span>
             </div>
-            
+
             <h1 class="text-3xl font-bold text-gray-900 mb-4">
                 {{ __('reviews_reviews_for') }} {{ $product->name }}
             </h1>
+
+            @guest
+                {{-- Provide guests with a gentle reminder that sign-in is required before writing a review. --}}
+                <div class="rounded-lg border border-blue-200 bg-blue-50 p-4 text-sm text-blue-700">
+                    {{ __('translations.login_to_review') }}
+                    <a href="{{ route('login') }}" class="font-semibold underline decoration-blue-500">
+                        {{ __('auth.login') }}
+                    </a>
+                </div>
+            @endguest
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -56,10 +66,19 @@
                     </div>
 
                     <div class="mt-6">
-                        <a href="{{ route('reviews.create', ['product_id' => $product->id]) }}" 
-                           class="w-full bg-blue-600 text-white text-center py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 font-medium block">
-                            {{ __('reviews_write_review') }}
-                        </a>
+                        @auth
+                            {{-- Authenticated users can jump straight into the review editor. --}}
+                            <a href="{{ route('reviews.create', ['product_id' => $product->id]) }}"
+                               class="w-full bg-blue-600 text-white text-center py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 font-medium block">
+                                {{ __('reviews_write_review') }}
+                            </a>
+                        @else
+                            {{-- Guests receive a friendly prompt to login before reviewing. --}}
+                            <a href="{{ route('login') }}"
+                               class="w-full bg-blue-600 text-white text-center py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 font-medium block">
+                                {{ __('translations.login_to_review') }}
+                            </a>
+                        @endauth
                     </div>
                 </div>
             </div>
@@ -131,10 +150,19 @@
                         <h3 class="mt-2 text-sm font-medium text-gray-900">{{ __('reviews_no_reviews_for_product') }}</h3>
                         <p class="mt-1 text-sm text-gray-500">{{ __('reviews_be_first_to_review') }}</p>
                         <div class="mt-6">
-                            <a href="{{ route('reviews.create', ['product_id' => $product->id]) }}" 
-                               class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                                {{ __('reviews_write_review') }}
-                            </a>
+                            @auth
+                                {{-- Authenticated shoppers can open the editor right away. --}}
+                                <a href="{{ route('reviews.create', ['product_id' => $product->id]) }}"
+                                   class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                    {{ __('reviews_write_review') }}
+                                </a>
+                            @else
+                                {{-- Guests are nudged toward authentication to start their first review. --}}
+                                <a href="{{ route('login') }}"
+                                   class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                    {{ __('translations.login_to_review') }}
+                                </a>
+                            @endauth
                         </div>
                     </div>
                 @endif
