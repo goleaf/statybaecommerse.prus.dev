@@ -59,6 +59,8 @@ class BrandFactory extends Factory
         $hasTable = $schema->hasTable($table);
         $hasIsVisible = $hasTable && $schema->hasColumn($table, 'is_visible');
         $hasIsActive = $hasTable && $schema->hasColumn($table, 'is_active');
+        $hasIsPremium = $hasTable && $schema->hasColumn($table, 'is_premium');
+        $hasSocialLinks = $hasTable && $schema->hasColumn($table, 'social_links');
 
         $lithuanianBrands = [
             'Makita Tools LT',
@@ -110,6 +112,16 @@ class BrandFactory extends Factory
             $attributes['is_active'] = true;
         }
 
+        if ($hasIsPremium) {
+            // Randomise premium status lightly so fixtures cover both badge states.
+            $attributes['is_premium'] = $this->faker->boolean(15);
+        }
+
+        if ($hasSocialLinks) {
+            // Seed a small collection of social profiles to exercise JSON casting.
+            $attributes['social_links'] = $this->generateSocialLinks();
+        }
+
         return $attributes;
     }
 
@@ -124,6 +136,24 @@ class BrandFactory extends Factory
         ];
 
         return Arr::random($descriptions);
+    }
+
+    /**
+     * Produce a realistic slice of social profiles for seeded brands.
+     *
+     * @return array<int, array<string, string>>
+     */
+    private function generateSocialLinks(): array
+    {
+        return collect(Brand::SOCIAL_LINK_PLATFORMS)
+            ->shuffle()
+            ->take($this->faker->numberBetween(1, 3))
+            ->map(fn (string $platform): array => [
+                'platform' => $platform,
+                'url'      => sprintf('https://%s.com/%s', $platform === 'website' ? 'www' : $platform, Str::slug($this->faker->company())),
+            ])
+            ->values()
+            ->all();
     }
 
     public function configure(): static

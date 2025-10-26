@@ -1,0 +1,65 @@
+<?php
+
+declare(strict_types=1);
+
+return [
+    // Navigacijos ir etikečių vertimai kanalų valdymui.
+    'navigation_label'     => 'Kanalai',
+    'plural_model_label'   => 'Kanalai',
+    'model_label'          => 'Kanalas',
+    'basic_information'    => 'Pagrindinė informacija',
+    'name'                 => 'Pavadinimas',
+    'slug'                 => 'URL pabaiga',
+    'code'                 => 'Kodas',
+    'type'                 => 'Tipas',
+    'types'                => [
+        'web'    => 'Internetas',
+        'mobile' => 'Mobilusis',
+        'api'    => 'API',
+        'pos'    => 'Kasos terminalas',
+    ],
+    'description'          => 'Aprašymas',
+    'configuration'        => 'Konfigūracija',
+    'url'                  => 'Nuoroda',
+    'domain'               => 'Domenas',
+    'timezone'             => 'Laiko zona',
+    'currency_code'        => 'Valiutos kodas',
+    'currency_symbol'      => 'Valiutos simbolis',
+    'currency_position'    => 'Simbolio vieta',
+    'currency_positions'   => [
+        'before' => 'Prieš sumą',
+        'after'  => 'Po sumos',
+    ],
+    'advanced_settings'    => 'Išplėstiniai nustatymai',
+    'metadata'             => 'Metaduomenys',
+    'metadata_key'         => 'Metaduomenų raktas',
+    'metadata_value'       => 'Metaduomenų reikšmė',
+    'add_metadata'         => 'Pridėti metaduomenis',
+    'configuration_pairs'  => 'Papildomi nustatymai',
+    'configuration_key'    => 'Nustatymo raktas',
+    'configuration_value'  => 'Nustatymo reikšmė',
+    'add_configuration'    => 'Pridėti nustatymą',
+    'payment_matrix_section' => 'Mokėjimų prieinamumas',
+    'payment_rows'         => [
+        'lt' => 'Lietuva',
+        'lv' => 'Latvija',
+        'ee' => 'Estija',
+        'pl' => 'Lenkija',
+        'eu' => 'Europos Sąjunga',
+    ],
+    'payment_columns'      => [
+        'web'         => 'Internetas',
+        'pos'         => 'POS',
+        'marketplace' => 'Turgavietė',
+    ],
+    'payment_matrix_label' => 'Įjunkite galimus mokėjimus',
+    'payment_matrix_help'  => 'Pažymėkite kokie mokėjimai prieinami kiekviename regione.',
+    'status'               => 'Būsena',
+    'is_enabled'           => 'Įjungtas',
+    'is_default'           => 'Numatytasis',
+    'is_active'            => 'Aktyvus',
+    'ssl_enabled'          => 'SSL įjungtas',
+    'analytics_enabled'    => 'Analitika įjungta',
+    'sort_order'           => 'Rikiavimo eilė',
+];
+

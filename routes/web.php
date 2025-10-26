@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 use App\Http\Controllers\Admin\AttributeTranslationController;
 use App\Http\Controllers\Admin\ProductTranslationController;
+use App\Http\Controllers\Admin\LegalTranslationController;
+use App\Http\Controllers\Admin\CollectionTranslationController;
 use App\Http\Controllers\Api\V1\HealthController;
 use App\Http\Controllers\ApiDocsController;
 use App\Http\Controllers\Frontend\UserController;
@@ -741,6 +743,17 @@ Route::middleware('auth')->group(function (): void {
         ->name('exports.download');
 });
 
+// Locations API endpoints (defined ahead of the slug route to avoid conflicts)
+Route::prefix('locations/api')->name('locations.api.')->group(function () {
+    // Expose a read-only JSON API so the storefront and mobile clients can reuse the same dataset.
+    Route::get('/', [App\Http\Controllers\LocationController::class, 'api'])->name('index');
+    Route::get('/by-type/{type}', [App\Http\Controllers\LocationController::class, 'byType'])->name('by-type');
+    Route::get('/by-country/{country}', [App\Http\Controllers\LocationController::class, 'byCountry'])->name('by-country');
+    Route::get('/by-city/{city}', [App\Http\Controllers\LocationController::class, 'byCity'])->name('by-city');
+    Route::get('/nearby', [App\Http\Controllers\LocationController::class, 'nearby'])->name('nearby');
+    Route::get('/statistics', [App\Http\Controllers\LocationController::class, 'statistics'])->name('statistics');
+});
+
 // Locations pages
 Route::get('/locations', function () {
     return redirect('/' . app()->getLocale() . '/locations');
@@ -943,13 +956,13 @@ Route::middleware('auth')->group(function (): void {
 
 // --- Admin translation save helpers expected by tests ---
 Route::middleware('auth')->group(function (): void {
-    Route::put('/admin/{locale}/legal/{id}/translations/{lang}', fn () => back())
+    Route::put('/admin/{locale}/legal/{id}/translations/{lang}', [LegalTranslationController::class, 'update'])
         ->name('admin.legal.translations.save');
     Route::put('/admin/{locale}/brands/{id}/translations/{lang}', fn () => back())
         ->name('admin.brands.translations.save');
     Route::put('/admin/{locale}/categories/{id}/translations/{lang}', fn () => back())
         ->name('admin.categories.translations.save');
-    Route::put('/admin/{locale}/collections/{id}/translations/{lang}', fn () => back())
+    Route::put('/admin/{locale}/collections/{id}/translations/{lang}', [CollectionTranslationController::class, 'update'])
         ->name('admin.collections.translations.save');
     Route::put('/admin/{locale}/products/{id}/translations/{lang}', [ProductTranslationController::class, 'update'])
         ->name('admin.products.translations.save');
@@ -1118,7 +1131,7 @@ Route::middleware('auth')->group(function (): void {
 
 // --- Admin translation save helpers expected by tests ---
 Route::middleware('auth')->group(function (): void {
-    Route::put('/admin/{locale}/legal/{id}/translations/{lang}', fn () => back())
+    Route::put('/admin/{locale}/legal/{id}/translations/{lang}', [LegalTranslationController::class, 'update'])
         ->name('admin.legal.translations.save');
     Route::put('/admin/{locale}/brands/{id}/translations/{lang}', fn () => back())
         ->name('admin.brands.translations.save');

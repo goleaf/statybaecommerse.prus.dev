@@ -106,3 +106,48 @@ it('unit: rejects hidden or non priced products', function (): void {
         ->and($specification->isSatisfiedBy($free))->toBeFalse()
         ->and($specification->isSatisfiedBy($nameless))->toBeFalse();
 });
+
+it('unit: rejects out of stock managed inventory but accepts discounted product', function (): void {
+    // Discounted product remains displayable when sale logic is valid.
+    $discounted = new Product(
+        id: 5,
+        name: 'Discounted Product',
+        slug: 'discounted-product',
+        sku: 'SKU-005',
+        price: 100.0,
+        salePrice: 80.0,
+        brand: null,
+        category: null,
+        isVisible: true,
+        isFeatured: false,
+        manageStock: false,
+        isInStock: true,
+        stockQuantity: 10,
+        images: new ProductImageCollection,
+        variants: new ProductVariantCollection,
+    );
+
+    // Managed inventory that is out of stock should be filtered out.
+    $outOfStock = new Product(
+        id: 6,
+        name: 'Out Of Stock',
+        slug: 'out-of-stock',
+        sku: 'SKU-006',
+        price: 50.0,
+        salePrice: null,
+        brand: null,
+        category: null,
+        isVisible: true,
+        isFeatured: false,
+        manageStock: true,
+        isInStock: false,
+        stockQuantity: 0,
+        images: new ProductImageCollection,
+        variants: new ProductVariantCollection,
+    );
+
+    $specification = new DisplayableProductSpecification;
+
+    expect($specification->isSatisfiedBy($discounted))->toBeTrue()
+        ->and($specification->isSatisfiedBy($outOfStock))->toBeFalse();
+});

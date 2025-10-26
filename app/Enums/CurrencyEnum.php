@@ -23,6 +23,7 @@ enum CurrencyEnum: string
     case RON = 'RON';
     case BGN = 'BGN';
     case HRK = 'HRK';
+    case KRW = 'KRW';
     case RSD = 'RSD';
     case UAH = 'UAH';
     case RUB = 'RUB';
@@ -47,6 +48,7 @@ enum CurrencyEnum: string
             self::RON => 'Romanian Leu (lei)',
             self::BGN => 'Bulgarian Lev (лв)',
             self::HRK => 'Croatian Kuna (kn)',
+            self::KRW => 'South Korean Won (₩)',
             self::RSD => 'Serbian Dinar (дин)',
             self::UAH => 'Ukrainian Hryvnia (₴)',
             self::RUB => 'Russian Ruble (₽)',
@@ -73,6 +75,7 @@ enum CurrencyEnum: string
             self::RON => 'lei',
             self::BGN => 'лв',
             self::HRK => 'kn',
+            self::KRW => '₩',
             self::RSD => 'дин',
             self::UAH => '₴',
             self::RUB => '₽',
@@ -81,9 +84,14 @@ enum CurrencyEnum: string
 
     public function getDecimalPlaces(): int
     {
-        return match ($this) {
-            self::JPY, self::KRW => 0,
-            default => 2,
-        };
+        // Resolve the feature toggle service lazily to avoid coupling the enum
+        // directly to configuration lookups when the container is unavailable.
+        $featureToggleService = app(\App\Services\FeatureToggleService::class);
+
+        // Zero-decimal currencies are defined by configuration and feature flags,
+        // enabling gradual rollout without affecting every currency instantly.
+        $zeroDecimalCurrencies = $featureToggleService->getZeroDecimalCurrencies();
+
+        return in_array($this->value, $zeroDecimalCurrencies, true) ? 0 : 2;
     }
 }

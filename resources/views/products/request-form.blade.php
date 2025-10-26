@@ -120,7 +120,14 @@
                 </div>
 
                 <div class="flex items-center justify-between pt-6 border-t">
-                    <a href="{{ route('products.show', $product) }}" 
+                    @php
+                        // Determine the correct product show route, gracefully falling back to the frontend alias when the
+                        // non-localized route name is unavailable in the current routing configuration.
+                        $productShowRoute = Route::has('products.show')
+                            ? route('products.show', $product)
+                            : route('frontend.products.show', $product);
+                    @endphp
+                    <a href="{{ $productShowRoute }}"
                        class="text-gray-600 hover:text-gray-800 transition-colors">
                         {{ __('translations.back_to_product') }}
                     </a>

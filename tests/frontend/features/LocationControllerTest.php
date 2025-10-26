@@ -7,6 +7,7 @@ namespace Tests\Feature;
 use App\Models\Country;
 use App\Models\Location;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Testing\Fluent\AssertableJson;
 use Tests\TestCase;
 
 final class LocationControllerTest extends TestCase
@@ -280,5 +281,91 @@ final class LocationControllerTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee('https://www.google.com/maps?q=54.6872,25.2797');
         $response->assertSee(__('locations.get_directions'));
+    }
+
+    public function test_locations_api_filters_incomplete_records(): void
+    {
+        // Create a fully populated location that should appear in the API response.
+        $visibleLocation = Location::factory()->create([
+            'is_enabled'   => true,
+            'name'         => 'Visible Depot',
+            'type'         => 'warehouse',
+            'city'         => 'Vilnius',
+            'country_code' => 'LT',
+        ]);
+
+        // Seed a location with missing metadata to ensure the controller filters it out.
+        Location::factory()->create([
+            'is_enabled'   => true,
+            'name'         => 'Incomplete Hub',
+            'type'         => '',
+            'city'         => 'Kaunas',
+            'country_code' => 'LT',
+        ]);
+
+        $response = $this->getJson(route('locations.api.index'));
+
+        $response
+            ->assertOk()
+            ->assertJson(fn (AssertableJson $json) => $json
+                ->where('total', 1)
+                ->has('locations', 1, fn (AssertableJson $locationJson) => $locationJson
+                    ->where('id', $visibleLocation->id)
+                    ->where('name', 'Visible Depot')
+                    ->etc()
+                )
+            );
+    }
+
+    public function test_locations_statistics_counts_enabled_and_disabled_locations(): void
+    {
+        // Seed a mixture of enabled and disabled locations to verify aggregate accuracy.
+        Location::factory()->create([
+            'is_enabled'   => true,
+            'is_default'   => true,
+            'type'         => 'warehouse',
+            'country_code' => 'LT',
+        ]);
+        Location::factory()->create([
+            'is_enabled'   => true,
+            'is_default'   => false,
+            'type'         => 'store',
+            'country_code' => 'LV',
+        ]);
+        Location::factory()->create([
+            'is_enabled'   => false,
+            'is_default'   => false,
+            'type'         => 'warehouse',
+            'country_code' => 'LT',
+        ]);
+
+        $response = $this->getJson(route('locations.api.statistics'));
+
+        $response
+            ->assertOk()
+            ->assertJson(fn (AssertableJson $json) => $json
+                ->where('total_locations', 3)
+                ->where('enabled_locations', 2)
+                ->where('disabled_locations', 1)
+                ->where('default_locations', 1)
+                ->has('by_type', fn (AssertableJson $types) => $types
+                    ->where('Warehouse', 2)
+                    ->where('Store', 1)
+                )
+                ->has('by_country', fn (AssertableJson $countries) => $countries
+                    ->where('LT', 2)
+                    ->where('LV', 1)
+                )
+            );
+    }
+
+    public function test_locations_nearby_requires_coordinates(): void
+    {
+        // Calling the endpoint without coordinates should trigger the validation guardrail.
+        $response = $this->getJson(route('locations.api.nearby'));
+
+        $response
+            ->assertStatus(400)
+            ->assertJson(fn (AssertableJson $json) => $json->where('error', 'Latitude and longitude are required'));
     }
 }

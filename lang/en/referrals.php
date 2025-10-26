@@ -25,6 +25,17 @@ return [
         'referred_discount' => 'Referred Discount',
     ],
 
+    'categories' => [
+        'discount' => 'Discounts',
+        'credit'   => 'Store Credit',
+        'points'   => 'Reward Points',
+    ],
+
+    'share' => [
+        'subject' => 'Join me and save on your first order',
+        'body'    => 'Use my referral link to unlock exclusive rewards:',
+    ],
+
     // Navigation and Labels
     'navigation_label'   => 'Referrals',
     'model_label'        => 'Referral',

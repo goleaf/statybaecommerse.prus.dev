@@ -331,7 +331,7 @@ return [
         'search_orders'      => 'Search Orders',
         'recent_orders'      => 'Recent Orders',
         'pending_orders'     => 'Pending Orders',
-        'completed_orders'   => 'Completed Orders',
+        'completed_orders'   => 'Delivered Orders',
         'cancelled_orders'   => 'Cancelled Orders',
         'order_details'      => 'Order Details',
         'order_items'        => 'Order Items',

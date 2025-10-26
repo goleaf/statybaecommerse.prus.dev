@@ -46,10 +46,17 @@ final class NewsController extends Controller
         $news = $news->appends($request->except('page'));
         $categories = NewsCategory::visible()->with('translations')->get();
         $tags = NewsTag::visible()->with('translations')->get();
-        $featuredNews = News::published()->featured()->with(['categories', 'tags', 'images'])->orderBy('published_at', 'desc')->limit(3)->get()->skipWhile(function ($news) {
-            // Skip news items that are not properly configured for display
-            return empty($news->title) || empty($news->slug) || ! $news->is_published || empty($news->getFirstMediaUrl('images'));
-        });
+        $featuredNews = News::published()
+            ->featured()
+            ->with(['categories', 'tags', 'images'])
+            ->orderBy('published_at', 'desc')
+            ->limit(3)
+            ->get()
+            ->filter(function (News $news): bool {
+                // Ensure carousel items expose localized content, moderation approval, and imagery.
+                return $news->isReadyForFrontend();
+            })
+            ->values();
 
         if ($request->wantsJson()) {
             $itemsView = view('news.partials.grid-items', ['newsItems' => $news])->render();
@@ -83,12 +90,19 @@ final class NewsController extends Controller
         // Increment view count
         $news->incrementViewCount();
         // Get related news
-        $relatedNews = News::published()->where('id', '!=', $news->id)->whereHas('categories', function ($query) use ($news) {
-            $query->whereIn('news_category_id', $news->categories->pluck('id'));
-        })->with(['categories', 'tags', 'images'])->limit(4)->get()->skipWhile(function ($relatedNews) {
-            // Skip related news items that are not properly configured for display
-            return empty($relatedNews->title) || empty($relatedNews->slug) || ! $relatedNews->is_published || empty($relatedNews->getFirstMediaUrl('images'));
-        });
+        $relatedNews = News::published()
+            ->where('id', '!=', $news->id)
+            ->whereHas('categories', function ($query) use ($news): void {
+                $query->whereIn('news_category_id', $news->categories->pluck('id'));
+            })
+            ->with(['categories', 'tags', 'images'])
+            ->limit(4)
+            ->get()
+            ->filter(function (News $related): bool {
+                // Avoid surfacing drafts or entries missing the assets required for the recommendation rail.
+                return $related->isReadyForFrontend();
+            })
+            ->values();
 
         return view('news.show', compact('news', 'relatedNews'));
     }

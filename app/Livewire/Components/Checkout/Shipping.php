@@ -32,6 +32,44 @@ class Shipping extends StepComponent
     public ?int $billingAddressId = null;
 
     /**
+     * React when the customer selects a different shipping address so downstream
+     * delivery options can be recalculated in real time.
+     */
+    public function updatedShippingAddressId(?int $value): void
+    {
+        // Dispatch a recalculation event any time the shipping address changes.
+        $this->dispatchShippingRecalculation();
+
+        if ($this->sameAsShipping) {
+            // Keep the billing selection aligned when using the shipping address for billing.
+            $this->billingAddressId = $value;
+        }
+    }
+
+    /**
+     * Sync billing address selection when the "same as shipping" toggle flips
+     * so totals remain coherent and shipping recalculations stay accurate.
+     */
+    public function updatedSameAsShipping(bool $value): void
+    {
+        if ($value) {
+            $this->billingAddressId = $this->shippingAddressId;
+        }
+
+        // Ensure shipping options recompute when toggling billing state.
+        $this->dispatchShippingRecalculation();
+    }
+
+    /**
+     * Centralised helper to emit the event consumed by the delivery step when
+     * shipping related state changes.
+     */
+    private function dispatchShippingRecalculation(): void
+    {
+        $this->dispatch('shipping-address-updated', shippingAddressId: $this->shippingAddressId);
+    }
+
+    /**
      * Initialize the Livewire component with parameters.
      */
     public function mount(): void

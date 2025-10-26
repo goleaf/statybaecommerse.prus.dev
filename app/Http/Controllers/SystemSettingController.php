@@ -55,14 +55,41 @@ final class SystemSettingController extends Controller
      */
     public function show(string $key): View
     {
-        $setting = SystemSetting::where('key', $key)->active()->public()->firstOrFail();
+        $setting = SystemSetting::with('category')
+            ->where('key', $key)
+            ->active()
+            ->public()
+            ->whereHas('category', function ($query): void {
+                // Ensure the associated category exists and is active so the Blade view does not crash when accessing it.
+                $query->active();
+            })
+            ->firstOrFail();
+
+        if ($setting->category === null) {
+            // Provide a lightweight fallback category so the view can still render even when the original has been removed.
+            $setting->setRelation('category', SystemSettingCategory::make([
+                'slug' => 'uncategorized',
+                'name' => 'Uncategorized',
+            ]));
+        }
         // Update access count and last accessed time
         $setting->increment('access_count');
         $setting->update(['last_accessed_at' => now()]);
-        $relatedSettings = SystemSetting::active()->public()->where('group', $setting->group)->where('id', '!=', $setting->id)->limit(5)->get()->skipWhile(function ($relatedSetting) {
-            // Skip related system settings that are not properly configured for display
-            return empty($relatedSetting->key) || ! $relatedSetting->is_active || ! $relatedSetting->is_public || empty($relatedSetting->group) || empty($relatedSetting->name);
-        });
+        $relatedSettings = SystemSetting::active()
+            ->public()
+            ->where('group', $setting->group)
+            ->where('id', '!=', $setting->id)
+            ->limit(5)
+            ->get()
+            ->filter(function ($relatedSetting) {
+                // Filter out any related settings that are missing mandatory metadata before presenting them.
+                return filled($relatedSetting->key)
+                    && $relatedSetting->is_active
+                    && $relatedSetting->is_public
+                    && filled($relatedSetting->group)
+                    && filled($relatedSetting->name);
+            })
+            ->values();
 
         return view('system-settings.show', compact('setting', 'relatedSettings'));
     }
@@ -183,8 +210,21 @@ final class SystemSettingController extends Controller
                 $q->where('slug', $request->category);
             });
         })->when($request->filled('keys'), function ($query) use ($request): void {
-            $keys = explode(',', $request->keys);
-            $query->whereIn('key', $keys);
+            $keys = collect(explode(',', (string) $request->keys))
+                ->map(static function (string $key): string {
+                    // Trim each requested key to avoid mismatches caused by whitespace in the query string.
+                    return trim($key);
+                })
+                ->filter(static function (string $key): bool {
+                    // Only keep keys that still contain data after trimming to prevent querying for empty strings.
+                    return $key !== '';
+                })
+                ->unique()
+                ->all();
+
+            if ($keys !== []) {
+                $query->whereIn('key', $keys);
+            }
         })->get()->mapWithKeys(function ($setting) {
             return [$setting->key => $setting->value];
         });
@@ -304,9 +344,28 @@ final class SystemSettingController extends Controller
     )]
     public function groups(): JsonResponse
     {
-        $groups = SystemSetting::active()->public()->select('group')->selectRaw('count(*) as settings_count')->groupBy('group')->orderBy('settings_count', 'desc')->get()->map(function ($group) {
-            return ['name' => $group->group, 'label' => ucfirst($group->group), 'settings_count' => $group->settings_count];
-        });
+        $groups = SystemSetting::active()
+            ->public()
+            ->select('group')
+            ->selectRaw('count(*) as settings_count')
+            ->groupBy('group')
+            ->orderBy('settings_count', 'desc')
+            ->get()
+            ->filter(static function ($group): bool {
+                // Normalise the stored group value and discard any records that collapse to an empty string.
+                return filled(trim((string) $group->group));
+            })
+            ->map(static function ($group): array {
+                $normalizedGroup = trim((string) $group->group);
+
+                return [
+                    'name' => $normalizedGroup,
+                    // Provide a simple human-readable label for the group list while keeping formatting predictable.
+                    'label'          => ucfirst($normalizedGroup),
+                    'settings_count' => $group->settings_count,
+                ];
+            })
+            ->values();
 
         return response()->json($groups);
     }

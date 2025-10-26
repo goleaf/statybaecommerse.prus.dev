@@ -36,8 +36,8 @@
                     <label for="type" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         {{ __('reports.filters.type') }}
                     </label>
-                    <select id="type" 
-                            name="type" 
+                    <select id="type"
+                            name="type"
                             class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white">
                         <option value="">{{ __('reports.filters.all_types') }}</option>
                         @foreach($types as $key => $label)
@@ -50,15 +50,15 @@
 
                 <!-- Category Filter -->
                 <div>
-                    <label for="category" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    <label for="report_category" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                         {{ __('reports.filters.category') }}
                     </label>
-                    <select id="category" 
-                            name="category" 
+                    <select id="report_category"
+                            name="report_category"
                             class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white">
                         <option value="">{{ __('reports.filters.all_categories') }}</option>
                         @foreach($categories as $key => $label)
-                            <option value="{{ $key }}" {{ request('category') == $key ? 'selected' : '' }}>
+                            <option value="{{ $key }}" {{ request('report_category') == $key ? 'selected' : '' }}>
                                 {{ $label }}
                             </option>
                         @endforeach

@@ -9,6 +9,7 @@ use App\Models\Partner;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Models\StockMovement;
+use App\Models\StockReservation;
 use App\Models\VariantInventory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -176,6 +177,35 @@ final class VariantInventoryTest extends TestCase
         $this->assertEquals($initialReserved + $reserveQuantity, $this->stockItem->reserved);
     }
 
+    public function test_reserve_stock_creates_auditable_reservation(): void
+    {
+        $expiresAt = now()->addMinutes(45);
+        $referenceId = 'unit-test-' . uniqid();
+
+        // Exercise the reservation workflow with metadata so we can assert audit details are captured.
+        $reservation = $this->stockItem->reserveStock(
+            4,
+            $expiresAt,
+            ['channel' => 'unit-test'],
+            'unit_test',
+            $referenceId,
+        );
+
+        $this->assertInstanceOf(StockReservation::class, $reservation);
+        $this->assertSame($this->stockItem->getKey(), $reservation->variant_inventory_id);
+        $this->assertSame('unit-test', $reservation->meta['channel']);
+        $this->assertSame(
+            $expiresAt->format('Y-m-d H:i:s'),
+            $reservation->expires_at?->format('Y-m-d H:i:s'),
+        );
+
+        $this->assertDatabaseHas('stock_reservations', [
+            'variant_inventory_id' => $this->stockItem->getKey(),
+            'reference_id'         => $referenceId,
+            'status'               => StockReservation::STATUS_RESERVED,
+        ]);
+    }
+
     public function test_cannot_reserve_more_than_available(): void
     {
         $availableStock = $this->stockItem->available_stock;
@@ -186,6 +216,12 @@ final class VariantInventoryTest extends TestCase
         $this->assertFalse($result);
         $this->stockItem->refresh();
         $this->assertEquals(10, $this->stockItem->reserved); // Should remain unchanged
+
+        // Confirm that the failed attempt did not produce a phantom reservation record.
+        $this->assertDatabaseMissing('stock_reservations', [
+            'variant_inventory_id' => $this->stockItem->getKey(),
+            'quantity'             => $reserveQuantity,
+        ]);
     }
 
     public function test_can_unreserve_stock(): void

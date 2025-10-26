@@ -46,39 +46,24 @@ final class CategoryController extends Controller
      */
     public function index(Request $request): JsonResponse|View|Response
     {
-        $definition = new ListQueryDefinition(
-            filters: [
-                'search' => [
-                    'type'     => 'string',
-                    'callback' => static function (Builder $builder, string $term): void {
-                        $builder->where(function (Builder $query) use ($term): void {
-                            $query->where('name', 'like', "%{$term}%")
-                                ->orWhere('description', 'like', "%{$term}%");
-                        });
-                    },
-                ],
-            ],
-            sortable: [
-                'name'       => ['column' => 'categories.name'],
-                'sort_order' => ['column' => 'categories.sort_order'],
-            ],
-            defaultSort: 'sort_order',
-            defaultDirection: 'asc',
-            defaultPerPage: 20,
-            maxPerPage: 100,
-        );
+        $definition = $this->categoryListDefinition();
 
         $listQuery = ListQueryValidator::fromRequest($request, $definition);
 
-        $query = Category::query()->where('is_visible', true)->withCount('products');
+        $query = Category::query()
+            ->where('is_visible', true)
+            // Track the number of products for each category so the API can expose and sort by it.
+            ->withCount('products');
         $listQuery->applyFilters($query);
         $listQuery->applySorts($query);
 
         if (! $listQuery->hasSort('sort_order')) {
+            // Ensure a predictable default order when no explicit sort order is provided by the consumer.
             $query->orderBy('sort_order');
         }
 
         if (! $listQuery->hasSort('name')) {
+            // Secondary ordering keeps alphabetic grouping stable for repeated pagination requests.
             $query->orderBy('name');
         }
 
@@ -102,26 +87,31 @@ final class CategoryController extends Controller
 
     private function categoryListDefinition(): ListQueryDefinition
     {
-        return ListQueryDefinition::make()
-            ->defaultPerPage(20)
-            ->maxPerPage(100)
-            ->defaultSort('sort_order', 'asc')
-            ->allowedSorts([
-                'name'          => ['column' => ['name', 'id']],
-                'sort_order'    => ['column' => ['sort_order', 'name']],
-                'product_count' => ['column' => 'products_count'],
-            ])
-            ->filters([
+        return new ListQueryDefinition(
+            filters: [
                 'search' => [
                     'type'     => 'string',
-                    'nullable' => true,
-                    'callback' => static function (Builder $builder, string $search): void {
-                        $builder->where(static function (Builder $query) use ($search): void {
-                            $query->where('name', 'like', '%' . $search . '%')
-                                ->orWhere('description', 'like', '%' . $search . '%');
+                    // Allow searching the category name and description using a LIKE match.
+                    'callback' => static function (Builder $builder, string $term): void {
+                        $builder->where(function (Builder $query) use ($term): void {
+                            $query->where('name', 'like', "%{$term}%")
+                                ->orWhere('description', 'like', "%{$term}%");
                         });
                     },
                 ],
-            ]);
+            ],
+            sortable: [
+                // Sort alphabetically by the translated category name when requested.
+                'name'          => ['column' => 'categories.name'],
+                // Maintain the configured manual order for navigation contexts.
+                'sort_order'    => ['column' => 'categories.sort_order'],
+                // Expose product counts so consumers can prioritise fuller categories.
+                'product_count' => ['column' => 'products_count'],
+            ],
+            defaultSort: 'sort_order',
+            defaultDirection: 'asc',
+            defaultPerPage: 20,
+            maxPerPage: 100,
+        );
     }
 }
