@@ -3,6 +3,23 @@
 @section('title', __('inventory.stock_management'))
 
 @section('content')
+@php
+    // Normalise incoming filter values so they align with the strict comparisons used by the controller layer.
+    $rawSearch = request()->query('search');
+    $normalizedSearch = is_string($rawSearch) ? strtolower(trim($rawSearch)) : '';
+
+    $rawLocationId = request()->query('location_id');
+    $normalizedLocationId = is_numeric($rawLocationId) ? (string) (int) $rawLocationId : '';
+
+    $rawSupplierId = request()->query('supplier_id');
+    $normalizedSupplierId = is_numeric($rawSupplierId) ? (string) (int) $rawSupplierId : '';
+
+    $rawStockStatus = request()->query('stock_status');
+    $allowedStatuses = ['low_stock', 'out_of_stock', 'needs_reorder', 'expiring_soon'];
+    $normalizedStockStatus = is_string($rawStockStatus) ? strtolower(trim($rawStockStatus)) : '';
+    $normalizedStockStatus = in_array($normalizedStockStatus, $allowedStatuses, true) ? $normalizedStockStatus : '';
+@endphp
+
 <div class="container mx-auto px-4 py-8">
     <div class="flex justify-between items-center mb-8">
         <div>
@@ -43,10 +60,10 @@
                 <label for="search" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     {{ __('inventory.search') }}
                 </label>
-                <input type="text" 
-                       id="search" 
-                       name="search" 
-                       value="{{ request('search') }}"
+                <input type="text"
+                       id="search"
+                       name="search"
+                       value="{{ $normalizedSearch }}"
                        placeholder="{{ __('inventory.search_placeholder') }}"
                        class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white">
             </div>
@@ -60,7 +77,7 @@
                         class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white">
                     <option value="">{{ __('inventory.all_locations') }}</option>
                     @foreach($locations as $location)
-                        <option value="{{ $location->id }}" {{ request('location_id') == $location->id ? 'selected' : '' }}>
+                        <option value="{{ $location->id }}" {{ $normalizedLocationId === (string) $location->id ? 'selected' : '' }}>
                             {{ $location->name }}
                         </option>
                     @endforeach
@@ -76,7 +93,7 @@
                         class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white">
                     <option value="">{{ __('inventory.all_suppliers') }}</option>
                     @foreach($suppliers as $supplier)
-                        <option value="{{ $supplier->id }}" {{ request('supplier_id') == $supplier->id ? 'selected' : '' }}>
+                        <option value="{{ $supplier->id }}" {{ $normalizedSupplierId === (string) $supplier->id ? 'selected' : '' }}>
                             {{ $supplier->name }}
                         </option>
                     @endforeach
@@ -91,16 +108,16 @@
                         name="stock_status"
                         class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white">
                     <option value="">{{ __('inventory.all_statuses') }}</option>
-                    <option value="low_stock" {{ request('stock_status') == 'low_stock' ? 'selected' : '' }}>
+                    <option value="low_stock" {{ $normalizedStockStatus === 'low_stock' ? 'selected' : '' }}>
                         {{ __('inventory.low_stock') }}
                     </option>
-                    <option value="out_of_stock" {{ request('stock_status') == 'out_of_stock' ? 'selected' : '' }}>
+                    <option value="out_of_stock" {{ $normalizedStockStatus === 'out_of_stock' ? 'selected' : '' }}>
                         {{ __('inventory.out_of_stock') }}
                     </option>
-                    <option value="needs_reorder" {{ request('stock_status') == 'needs_reorder' ? 'selected' : '' }}>
+                    <option value="needs_reorder" {{ $normalizedStockStatus === 'needs_reorder' ? 'selected' : '' }}>
                         {{ __('inventory.needs_reorder') }}
                     </option>
-                    <option value="expiring_soon" {{ request('stock_status') == 'expiring_soon' ? 'selected' : '' }}>
+                    <option value="expiring_soon" {{ $normalizedStockStatus === 'expiring_soon' ? 'selected' : '' }}>
                         {{ __('inventory.expiring_soon') }}
                     </option>
                 </select>
