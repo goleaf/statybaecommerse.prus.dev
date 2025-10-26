@@ -67,4 +67,23 @@ final class ListSeoData extends BaseListRecords
                 ->value(fn () => $this->getResource()::getEloquentQuery()->where('is_canonical', true)->count()),
         ];
     }
+
+    protected function getTableQueryStringIdentifier(): ?string
+    {
+        // Namespace the query-string keys so pagination and filters survive navigation without clashing with other tables.
+        return 'seoData';
+    }
+
+    protected function shouldRenderWidgetTabFilterIndicators(): bool
+    {
+        // Expose filter chips beneath the tab bar so analysts can see active constraints while exploring SEO data.
+        return true;
+    }
+
+    public function refreshWidgetTabRecords(): void
+    {
+        // Reset only the pagination cursor and cached records so switching tabs preserves the selected filters.
+        $this->resetPage();
+        $this->flushCachedTableRecords();
+    }
 }

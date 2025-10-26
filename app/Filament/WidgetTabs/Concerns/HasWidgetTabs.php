@@ -167,6 +167,18 @@ trait HasWidgetTabs
         return $this->modifyQueryWithActiveWidgetTab($query);
     }
 
+    protected function shouldRenderWidgetTabFilterIndicators(): bool
+    {
+        // Default to Filament's native behaviour unless a page explicitly opts into rendering filter chips.
+        return false;
+    }
+
+    public function refreshWidgetTabRecords(): void
+    {
+        // Preserve the original tab switching behaviour for components that have not overridden the refresh hook.
+        $this->resetTable();
+    }
+
     public function updatedActiveWidgetTab(string|int|null $tab): void
     {
         // Keep the alias property synchronised without triggering unnecessary Livewire updates.
