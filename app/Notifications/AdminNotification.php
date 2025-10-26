@@ -21,13 +21,22 @@ final class AdminNotification extends Notification implements ShouldQueue
     /**
      * Initialize the class instance with required dependencies.
      */
-    public function __construct(public readonly string $title, public readonly string $message, public readonly string $type = 'info') {}
+    public function __construct(
+        public readonly string $title,
+        public readonly string $message,
+        public readonly string $type = 'info',
+    ) {
+        // The constructor stores the payload for later channel formatting.
+    }
 
     /**
      * Handle via functionality with proper error handling.
+     *
+     * @return list<string>
      */
     public function via(object $notifiable): array
     {
+        // Deliver the notification to the database and inbox for maximum visibility.
         return ['database', 'mail'];
     }
 
@@ -36,22 +45,42 @@ final class AdminNotification extends Notification implements ShouldQueue
      */
     public function toMail(object $notifiable): MailMessage
     {
-        return (new MailMessage)->subject($this->title)->line($this->message)->line(__('admin.notifications.admin_message_footer'));
+        // Compose a short transactional email with a localized footer.
+        return (new MailMessage())
+            ->subject($this->title)
+            ->line($this->message)
+            ->line(__('admin.notifications.admin_message_footer'));
     }
 
     /**
      * Handle toDatabase functionality with proper error handling.
+     *
+     * @return array<string, mixed>
      */
     public function toDatabase(object $notifiable): array
     {
-        return ['title' => $this->title, 'message' => $this->message, 'type' => $this->type, 'sent_at' => now()->toISOString()];
+        // Persist the structured payload so the notification center can render it consistently.
+        return [
+            'title' => $this->title,
+            'message' => $this->message,
+            'type' => $this->type,
+            'sent_at' => now()->toIso8601String(),
+        ];
     }
 
     /**
      * Convert the instance to an array representation.
+     *
+     * @return array<string, mixed>
      */
     public function toArray(object $notifiable): array
     {
-        return ['title' => $this->title, 'message' => $this->message, 'type' => $this->type, 'sent_at' => now()->toISOString()];
+        // Mirror the database payload for API consumers.
+        return [
+            'title' => $this->title,
+            'message' => $this->message,
+            'type' => $this->type,
+            'sent_at' => now()->toIso8601String(),
+        ];
     }
 }

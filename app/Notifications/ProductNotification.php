@@ -21,37 +21,47 @@ final class ProductNotification extends Notification implements ShouldQueue
     /**
      * Initialize the class instance with required dependencies.
      */
-    public function __construct(public array $data) {}
+    public function __construct(public array $data)
+    {
+        // Carry the raw product data so it is available for every channel.
+    }
 
     /**
      * Handle via functionality with proper error handling.
      *
-     * @param  mixed  $notifiable
+     * @return list<string>
      */
-    public function via($notifiable): array
+    public function via(object $notifiable): array
     {
+        // Default to the database notification channel.
         return ['database'];
     }
 
     /**
      * Handle toDatabase functionality with proper error handling.
      *
-     * @param  mixed  $notifiable
+     * @return array<string, mixed>
      */
-    public function toDatabase($notifiable): array
+    public function toDatabase(object $notifiable): array
     {
+        // Return the prepared payload directly for flexible rendering.
         return $this->data;
     }
 
     /**
      * Handle toMail functionality with proper error handling.
-     *
-     * @param  mixed  $notifiable
      */
-    public function toMail($notifiable): MailMessage
+    public function toMail(object $notifiable): MailMessage
     {
-        return (new MailMessage)->subject($this->data['title'])->line($this->data['message'])->when(isset($this->data['product_name']), function ($mail) {
-            return $mail->line('Produktas: '.$this->data['product_name']);
-        });
+        // Provide a brief summary email describing the product event.
+        $mail = (new MailMessage())
+            ->subject($this->data['title'])
+            ->line($this->data['message']);
+
+        if (isset($this->data['product_name'])) {
+            $mail->line(__('Product: :name', ['name' => $this->data['product_name']]));
+        }
+
+        return $mail;
     }
 }
