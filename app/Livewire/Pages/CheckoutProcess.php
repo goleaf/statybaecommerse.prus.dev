@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Livewire\Pages;
 
 use App\Data\Pricing\PriceBreakdown;
+use App\Data\Shipping\ShippingOptionData;
 use App\Enums\AddressType;
 use App\Enums\PaymentMethod;
 use App\Mail\OrderConfirmationMail;
@@ -499,6 +500,7 @@ final class CheckoutProcess extends Component
 
         $this->availableShippingOptions = $options
             // Preserve manual casting to stabilise Livewire hydration when shipping selections change.
+            ->map(static fn ($option): array => $option instanceof ShippingOptionData ? $option->toArray() : (array) $option)
             ->map(static function (array $option): array {
                 // Cast identifiers and monetary values to predictable scalar types for Livewire hydration.
                 $option['id'] = (int) $option['id'];
