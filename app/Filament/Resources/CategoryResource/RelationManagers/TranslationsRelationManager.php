@@ -10,6 +10,8 @@ use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+// Pull in the grid schema helper so multilingual fields can be arranged responsively.
+use Filament\Schemas\Components\Grid as SchemaGrid;
 use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Schemas\Schema;
 use Filament\Tables\Actions\CreateAction;
@@ -101,7 +103,12 @@ final class TranslationsRelationManager extends BaseRelationManager
                     ->label(__('translations.description'))
                     ->limit(50)
                     ->tooltip(static function (TextColumn $column): ?string {
+                        // Avoid calling strlen on null states while still surfacing truncated copy.
                         $state = $column->getState();
+
+                        if (! is_string($state)) {
+                            return null;
+                        }
 
                         return strlen($state) > 50 ? $state : null;
                     })
@@ -110,7 +117,12 @@ final class TranslationsRelationManager extends BaseRelationManager
                     ->label(__('translations.short_description'))
                     ->limit(30)
                     ->tooltip(static function (TextColumn $column): ?string {
+                        // Safely handle empty translations before evaluating tooltip visibility.
                         $state = $column->getState();
+
+                        if (! is_string($state)) {
+                            return null;
+                        }
 
                         return strlen($state) > 30 ? $state : null;
                     })
@@ -119,7 +131,12 @@ final class TranslationsRelationManager extends BaseRelationManager
                     ->label(__('translations.seo_title'))
                     ->limit(30)
                     ->tooltip(static function (TextColumn $column): ?string {
+                        // Prevent strlen warnings when optional SEO fields are blank.
                         $state = $column->getState();
+
+                        if (! is_string($state)) {
+                            return null;
+                        }
 
                         return strlen($state) > 30 ? $state : null;
                     })
