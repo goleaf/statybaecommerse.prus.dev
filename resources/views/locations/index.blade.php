@@ -4,7 +4,31 @@
 @section('description', __('locations.subtitle'))
 
 @section('content')
-<div class="container mx-auto px-4 py-8">
+@php
+    // Prepare a lightweight JSON payload so JavaScript clients can reuse the
+    // public locations API without waiting for an additional round-trip on
+    // initial page load.
+    $locationsBootstrapPayload = $locations->getCollection()->map(function ($location) {
+        return [
+            'id'             => $location->id,
+            'name'           => $location->display_name ?? $location->name,
+            'code'           => $location->code,
+            'type'           => $location->type,
+            'city'           => $location->city,
+            'country_code'   => $location->country_code,
+            'latitude'       => $location->latitude,
+            'longitude'      => $location->longitude,
+            'has_coordinates' => $location->hasCoordinates(),
+        ];
+    })->values();
+
+    $locationsBootstrapJson = $locationsBootstrapPayload->toJson(JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP);
+@endphp
+
+{{-- Provide metadata so map widgets know which API endpoint to query. --}}
+<div class="container mx-auto px-4 py-8"
+     data-locations-endpoint="{{ route('locations.api.index') }}"
+     data-locations-bootstrap="{{ $locationsBootstrapJson }}">
     <!-- Header -->
     <div class="mb-8">
         <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2">
