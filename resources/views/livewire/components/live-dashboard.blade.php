@@ -91,9 +91,21 @@
     </div>
 
     <!-- Metrics Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <div
+        wire:loading.flex
+        class="items-center justify-center p-6 mb-4 text-sm text-gray-500 bg-gray-50 border border-dashed border-gray-200 rounded-lg"
+    >
+        {{-- Communicate that analytics widgets are refreshing --}}
+        <x-loading-dots class="text-primary-600" aria-hidden="true" />
+        <span>{{ __('Loading analytics...') }}</span>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8" wire:loading.remove>
         @if(in_array('products', $selectedMetrics))
-            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow duration-200">
+            <div
+                wire:key="analytics-products"
+                class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow duration-200"
+            >
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-gray-600">{{ __('translations.products') }}</p>
@@ -125,7 +137,10 @@
         @endif
 
         @if(in_array('orders', $selectedMetrics))
-            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow duration-200">
+            <div
+                wire:key="analytics-orders"
+                class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow duration-200"
+            >
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-gray-600">{{ __('translations.orders') }}</p>
@@ -157,7 +172,10 @@
         @endif
 
         @if(in_array('users', $selectedMetrics))
-            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow duration-200">
+            <div
+                wire:key="analytics-users"
+                class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow duration-200"
+            >
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-gray-600">{{ __('translations.users') }}</p>
@@ -189,7 +207,10 @@
         @endif
 
         @if(in_array('reviews', $selectedMetrics))
-            <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow duration-200">
+            <div
+                wire:key="analytics-reviews"
+                class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow duration-200"
+            >
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-gray-600">{{ __('translations.reviews') }}</p>

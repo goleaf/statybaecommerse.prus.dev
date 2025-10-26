@@ -28,6 +28,7 @@
 
                         @if($addresses->has('shipping') && $addresses->get('shipping')->isNotEmpty())
                             <fieldset aria-label="{{ __('Delivery addresses') }}" class="mt-3 divide-y divide-gray-200">
+                                {{-- Assign a stable key for each delivery address row --}}
                                 @foreach($addresses->get('shipping') as $shippingAddress)
                                     <label
                                         wire:key="shipping-address-{{ $shippingAddress->id }}"
@@ -87,6 +88,7 @@
                         @if(! $sameAsShipping)
                             @if($addresses->has('billing') && $addresses->get('billing')->isNotEmpty())
                                 <fieldset aria-label="{{ __('Billing addresses') }}" class="divide-y divide-gray-200">
+                                    {{-- Mirror the key usage for billing addresses to avoid DOM diff churn --}}
                                     @foreach($addresses->get('billing') as $billingAddress)
                                         <label
                                             wire:key="billing-address-{{ $billingAddress->id }}"
