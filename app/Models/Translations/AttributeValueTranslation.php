@@ -1,8 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models\Translations;
 
 use App\Models\AttributeValue;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -23,7 +27,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  *
  * @mixin \Eloquent
  */
-class AttributeValueTranslation extends Model
+final class AttributeValueTranslation extends Model
 {
     use HasFactory;
 
@@ -33,54 +37,57 @@ class AttributeValueTranslation extends Model
 
     public $timestamps = true;
 
-    protected $casts = ['meta_data' => 'array'];
+    /** @var array<string, string> */
+    protected $casts = [
+        'meta_data' => 'array',
+    ];
 
     /**
      * Handle attributeValue functionality with proper error handling.
      */
     public function attributeValue(): BelongsTo
     {
-        return $this->belongsTo(AttributeValue::class);
+        // Explicitly type the relation for IDE auto-completion.
+        /** @var BelongsTo<AttributeValue, self> $relation */
+        $relation = $this->belongsTo(AttributeValue::class);
+
+        return $relation;
     }
 
     // Scopes
     /**
      * Handle scopeByLocale functionality with proper error handling.
-     *
-     * @param  mixed  $query
      */
-    public function scopeByLocale($query, string $locale)
+    public function scopeByLocale(Builder $query, string $locale): Builder
     {
+        // Constrain query by a specific locale value.
         return $query->where('locale', $locale);
     }
 
     /**
      * Handle scopeByAttributeValue functionality with proper error handling.
-     *
-     * @param  mixed  $query
      */
-    public function scopeByAttributeValue($query, int $attributeValueId)
+    public function scopeByAttributeValue(Builder $query, int $attributeValueId): Builder
     {
+        // Filter translations that belong to a particular attribute value.
         return $query->where('attribute_value_id', $attributeValueId);
     }
 
     /**
      * Handle scopeWithValue functionality with proper error handling.
-     *
-     * @param  mixed  $query
      */
-    public function scopeWithValue($query)
+    public function scopeWithValue(Builder $query): Builder
     {
+        // Keep only rows that have a non-empty value field.
         return $query->whereNotNull('value')->where('value', '!=', '');
     }
 
     /**
      * Handle scopeWithDescription functionality with proper error handling.
-     *
-     * @param  mixed  $query
      */
-    public function scopeWithDescription($query)
+    public function scopeWithDescription(Builder $query): Builder
     {
+        // Keep only rows that have a non-empty description field.
         return $query->whereNotNull('description')->where('description', '!=', '');
     }
 
@@ -103,9 +110,12 @@ class AttributeValueTranslation extends Model
 
     /**
      * Handle getMetaDataArrayAttribute functionality with proper error handling.
+     *
+     * @return array<string, mixed>
      */
     public function getMetaDataArrayAttribute(): array
     {
+        // Cast the optional JSON column to a predictable array.
         return $this->meta_data ?? [];
     }
 
@@ -156,7 +166,9 @@ class AttributeValueTranslation extends Model
      */
     public static function getByAttributeValueAndLocale(int $attributeValueId, string $locale): ?self
     {
-        return self::where('attribute_value_id', $attributeValueId)->where('locale', $locale)->first();
+        return self::where('attribute_value_id', $attributeValueId)
+            ->where('locale', $locale)
+            ->first();
     }
 
     /**
@@ -164,21 +176,24 @@ class AttributeValueTranslation extends Model
      */
     public static function getOrCreateForAttributeValueAndLocale(int $attributeValueId, string $locale): self
     {
-        return self::firstOrCreate(['attribute_value_id' => $attributeValueId, 'locale' => $locale], ['value' => '', 'description' => null, 'meta_data' => null]);
+        return self::firstOrCreate(
+            ['attribute_value_id' => $attributeValueId, 'locale' => $locale],
+            ['value' => '', 'description' => null, 'meta_data' => null],
+        );
     }
 
     /**
      * Handle getTranslationsForAttributeValue functionality with proper error handling.
-     *
-     * @return Illuminate\Database\Eloquent\Collection
      */
-    public static function getTranslationsForAttributeValue(int $attributeValueId): \Illuminate\Database\Eloquent\Collection
+    public static function getTranslationsForAttributeValue(int $attributeValueId): EloquentCollection
     {
         return self::where('attribute_value_id', $attributeValueId)->get();
     }
 
     /**
      * Handle getAvailableLocalesForAttributeValue functionality with proper error handling.
+     *
+     * @return array<int, string>
      */
     public static function getAvailableLocalesForAttributeValue(int $attributeValueId): array
     {
@@ -187,6 +202,9 @@ class AttributeValueTranslation extends Model
 
     /**
      * Handle getMissingLocalesForAttributeValue functionality with proper error handling.
+     *
+     * @param  array<int, string>  $supportedLocales
+     * @return array<int, string>
      */
     public static function getMissingLocalesForAttributeValue(int $attributeValueId, array $supportedLocales): array
     {
