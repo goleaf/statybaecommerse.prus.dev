@@ -531,7 +531,7 @@ return [
         'search_orders'      => 'Ieškoti užsakymų',
         'recent_orders'      => 'Paskutiniai užsakymai',
         'pending_orders'     => 'Laukiantys užsakymai',
-        'completed_orders'   => 'Užbaigti užsakymai',
+        'completed_orders'   => 'Pristatyti užsakymai',
         'cancelled_orders'   => 'Atšaukti užsakymai',
         'order_details'      => 'Užsakymo detalės',
         'order_items'        => 'Užsakymo prekės',

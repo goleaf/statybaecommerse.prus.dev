@@ -716,7 +716,7 @@ final class DemoStoreSeeder extends Seeder
             [
                 'number'         => 'ORD-100001',
                 'user'           => $customers['greta'],
-                'status'         => OrderStatus::COMPLETED->value,
+                'status'         => OrderStatus::DELIVERED->value,
                 'payment_status' => 'paid',
                 'items'          => [
                     ['product' => $featured['rotaryHammer'], 'quantity' => 1],
@@ -742,7 +742,7 @@ final class DemoStoreSeeder extends Seeder
             [
                 'number'         => 'ORD-100003',
                 'user'           => $customers['ruta'],
-                'status'         => OrderStatus::COMPLETED->value,
+                'status'         => OrderStatus::DELIVERED->value,
                 'payment_status' => 'paid',
                 'items'          => [
                     ['product' => $auxiliaryB, 'quantity' => 1],
@@ -820,7 +820,7 @@ final class DemoStoreSeeder extends Seeder
         $now = now();
 
         return match ($status) {
-            OrderStatus::COMPLETED->value => [
+            OrderStatus::DELIVERED->value => [
                 'shipped_at'   => $shippingDays !== null ? $now->copy()->subDays($shippingDays) : $now->copy()->subDays(2),
                 'delivered_at' => $now->copy()->subDay(),
             ],

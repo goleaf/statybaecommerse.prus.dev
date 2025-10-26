@@ -958,7 +958,7 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
      */
     public function getTotalSpentAttribute(): float
     {
-        return $this->orders()->where('status', 'completed')->sum('total') ?? 0;
+        return $this->orders()->whereIn('status', ['delivered', 'completed'])->sum('total') ?? 0;
     }
 
     /**
@@ -966,7 +966,7 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
      */
     public function getAverageOrderValueAttribute(): float
     {
-        $completedOrders = $this->orders()->where('status', 'completed');
+        $completedOrders = $this->orders()->whereIn('status', ['delivered', 'completed']);
 
         return $completedOrders->count() > 0 ? $completedOrders->avg('total') : 0;
     }
