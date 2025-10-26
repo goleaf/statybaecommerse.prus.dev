@@ -17,6 +17,25 @@ use ValueError;
 final class EnumFactory
 {
     /**
+     * @var array<string, class-string<EnumInterface>>
+     */
+    private const DEFAULT_ENUM_MAP = [
+        'address_type'     => AddressType::class,
+        'navigation_group' => NavigationGroup::class,
+        'order_status'     => OrderStatus::class,
+        'payment_type'     => PaymentType::class,
+        'product_status'   => ProductStatus::class,
+        'user_role'        => UserRole::class,
+    ];
+
+    /**
+     * Keep a mutable map of enum identifiers so tests and runtime code can extend the factory without directly mutating the class internals.
+     *
+     * @var array<string, class-string<EnumInterface>>
+     */
+    private static array $enumMap = self::DEFAULT_ENUM_MAP;
+
+    /**
      * Create enum instance by name and value
      */
     public static function create(string $enumName, string $value): EnumInterface
@@ -270,19 +289,61 @@ final class EnumFactory
     }
 
     /**
+     * Register an enum mapping at runtime so seeds, tests, or packages can plug in custom enumerations.
+     *
+     * @param  class-string<EnumInterface>  $enumClass
+     */
+    public static function register(string $enumName, string $enumClass, bool $override = true): void
+    {
+        // Guard against accidental registration of classes that do not implement the expected enum contract.
+        if (! is_subclass_of($enumClass, EnumInterface::class)) {
+            throw new InvalidArgumentException("Enum class '{$enumClass}' must implement " . EnumInterface::class);
+        }
+
+        // Skip overriding an existing mapping when the caller opts out to preserve existing behaviour.
+        if ($override === false && isset(self::$enumMap[$enumName])) {
+            return;
+        }
+
+        self::$enumMap[$enumName] = $enumClass;
+    }
+
+    /**
+     * Register multiple enum mappings in a single call to keep test setup tidy.
+     *
+     * @param  array<string, class-string<EnumInterface>>  $enumMap
+     */
+    public static function registerMany(array $enumMap, bool $override = true): void
+    {
+        // Loop through supplied mappings so we can reuse the validation logic from the single register method.
+        foreach ($enumMap as $name => $class) {
+            self::register((string) $name, $class, $override);
+        }
+    }
+
+    /**
+     * Forget a previously registered enum mapping which keeps global state predictable across tests.
+     */
+    public static function forget(string $enumName): void
+    {
+        unset(self::$enumMap[$enumName]);
+    }
+
+    /**
+     * Reset the enum map to the original defaults after temporary modifications.
+     */
+    public static function reset(): void
+    {
+        self::$enumMap = self::DEFAULT_ENUM_MAP;
+    }
+
+    /**
      * Get enum class by name
      */
     private static function getEnumClass(string $enumName): ?string
     {
-        return match ($enumName) {
-            'address_type'     => AddressType::class,
-            'navigation_group' => NavigationGroup::class,
-            'order_status'     => OrderStatus::class,
-            'payment_type'     => PaymentType::class,
-            'product_status'   => ProductStatus::class,
-            'user_role'        => UserRole::class,
-            default            => null,
-        };
+        // Defer to the mutable map so registered enums are discovered immediately.
+        return self::$enumMap[$enumName] ?? null;
     }
 
     /**
@@ -290,14 +351,8 @@ final class EnumFactory
      */
     public static function getAvailableEnums(): array
     {
-        return [
-            'address_type',
-            'navigation_group',
-            'order_status',
-            'payment_type',
-            'product_status',
-            'user_role',
-        ];
+        // Return the keys directly from the map to reflect any runtime additions.
+        return array_keys(self::$enumMap);
     }
 
     /**
