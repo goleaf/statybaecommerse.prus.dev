@@ -8,6 +8,7 @@ use App\Http\Requests\StoreReferralRequest;
 use App\Models\Referral;
 use App\Models\ReferralCode;
 use App\Models\User;
+use App\Services\PaginationService;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -73,7 +74,16 @@ final class ReferralController extends Controller
             ->whereNotNull('referrals.status')
             ->latest();
 
-        $referrals = $referralsQuery->paginate(10); // Paginate the cleaned query so large histories stay memory friendly.
+        $referrals = PaginationService::paginateQueryWithSkipWhile(
+            clone $referralsQuery,
+            static function (Referral $referral): bool {
+                // Skip any leading referrals missing critical associations before paginating.
+                return $referral->referred === null
+                    || $referral->referrer_id === null
+                    || empty($referral->status);
+            },
+            10
+        );
         $stats = ['total_referrals' => $user->referrals()->count(), 'completed_referrals' => $user->referrals()->completed()->count(), 'pending_referrals' => $user->referrals()->where('status', 'pending')->count(), 'total_rewards' => $user->referralRewards()->sum('amount')];
         $referralCode = $user->activeReferralCode();
 
