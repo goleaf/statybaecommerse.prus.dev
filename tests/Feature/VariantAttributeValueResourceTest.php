@@ -21,8 +21,12 @@ class VariantAttributeValueResourceTest extends TestCase
     {
         parent::setUp();
 
+        // Ensure Filament's admin panel routes and middleware are bootstrapped for HTTP assertions.
+        $this->resolveAdminPanel();
+
         // Create a test user
-        $this->user = User::factory()->create([
+        $this->user = User::factory()->admin()->create([
+            'email' => 'admin@example.com',
             'password' => bcrypt('password'),
         ]);
 

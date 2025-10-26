@@ -15,7 +15,6 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\KeyValue;
-// Import the schema grid helper to avoid runtime resolution issues during form rendering.
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -37,6 +36,7 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Lang;
 
@@ -61,30 +61,29 @@ final class CampaignProductTargetResource extends Resource
 
     public static function getNavigationLabel(): string
     {
-        // Resolve the label from the nested translation key first so newer
-        // language files can supply an explicit navigation label while still
-        // honouring the legacy flat key when upgrading older installations.
-        $label = __('campaign_product_targets.navigation.label');
+        // Normalise the translation structure because historical language files return an array with
+        // the actual label nested beneath a `label` key, while the latest files use a plain string.
+        $label = Lang::get('campaign_product_targets.navigation');
 
-        if (is_array($label) || ! is_string($label) || $label === '') {
-            // Fallback to the legacy translation entry that returned a plain
-            // string before the nested structure existed.
-            $label = __('campaign_product_targets.navigation');
+        if (is_array($label)) {
+            return (string) ($label['label'] ?? Arr::first($label) ?? 'Campaign Targets');
         }
 
-        // Provide a hard-coded default as a final guard so Filament can still
-        // render the navigation item without breaking localisation loaders.
-        return is_string($label) && $label !== '' ? $label : 'Campaign Targets';
+        return (string) $label;
     }
 
     public static function getPluralModelLabel(): string
     {
-        return __('campaign_product_targets.plural');
+        $pluralLabel = Lang::get('campaign_product_targets.models.plural');
+
+        return is_array($pluralLabel) ? (string) Arr::first($pluralLabel) : (string) $pluralLabel;
     }
 
     public static function getModelLabel(): string
     {
-        return __('campaign_product_targets.single');
+        $singularLabel = Lang::get('campaign_product_targets.models.singular');
+
+        return is_array($singularLabel) ? (string) Arr::first($singularLabel) : (string) $singularLabel;
     }
 
     /**

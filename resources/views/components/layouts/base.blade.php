@@ -59,19 +59,19 @@
 
     <!-- Scripts -->
     @php
-        // Load Vite assets only when a manifest is available and the test suite is not running.
-        $shouldLoadViteAssets = false;
+        // Decide whether to include compiled Vite assets; during tests the manifest can be empty which
+        // would otherwise trigger rendering errors when Laravel attempts to resolve missing entries.
+        $viteEntries = ['resources/css/app.scss', 'resources/js/app.js'];
+        $shouldLoadViteAssets = ! app()->runningUnitTests();
 
-        if (! app()->runningUnitTests()) {
+        if (! $shouldLoadViteAssets) {
             $manifestPath = public_path('build/manifest.json');
 
-            if (is_file($manifestPath) && is_readable($manifestPath)) {
-                $manifestContents = file_get_contents($manifestPath);
+            if (file_exists($manifestPath)) {
+                $manifest = json_decode(file_get_contents($manifestPath), true);
 
-                if ($manifestContents !== false) {
-                    $manifestData = json_decode($manifestContents, true);
-                    $shouldLoadViteAssets = is_array($manifestData) && $manifestData !== [];
-                }
+                $shouldLoadViteAssets = is_array($manifest)
+                    && collect($viteEntries)->every(static fn (string $entry): bool => array_key_exists($entry, $manifest));
             }
         }
     @endphp
