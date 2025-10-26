@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Livewire\Components;
 
 use App\Models\Order;
+use App\Livewire\Concerns\WithCart;
+use App\Livewire\Concerns\WithNotifications;
 use App\Models\Product;
 use App\Models\User;
 use Illuminate\Contracts\View\View;
@@ -24,6 +26,10 @@ use Livewire\Component;
  */
 final class ProductRecommendations extends Component
 {
+    use WithCart {
+        addToCart as performAddToCart;
+    }
+    use WithNotifications;
     public ?int $productId = null;
 
     public ?int $userId = null;
@@ -228,24 +234,20 @@ final class ProductRecommendations extends Component
      */
     public function addToCart(int $productId): void
     {
-        $product = Product::findOrFail($productId);
-        if ($product->shouldHideAddToCart()) {
-            $this->addError('cart', __('frontend.product.cannot_add_to_cart'));
+        $product = Product::find($productId);
+        $added = $this->performAddToCart($productId, 1, __('frontend.cart.product_added'));
+
+        if (! $added) {
+            if ($product === null || $product->shouldHideAddToCart()) {
+                $this->addError('cart', __('frontend.product.cannot_add_to_cart'));
+            } else {
+                $this->addError('cart', __('frontend.product.not_enough_stock'));
+            }
 
             return;
         }
-        if ($product->availableQuantity() < 1) {
-            $this->addError('cart', __('frontend.product.not_enough_stock'));
 
-            return;
-        }
-        // Create or update cart item in database
-        $cartItem = \App\Models\CartItem::updateOrCreate(['session_id' => session()->getId(), 'product_id' => $productId], ['quantity' => \App\Models\CartItem::where('session_id', session()->getId())->where('product_id', $productId)->sum('quantity') + 1, 'minimum_quantity' => $product->getMinimumQuantity(), 'unit_price' => $product->price, 'total_price' => $product->price, 'product_snapshot' => ['name' => $product->name, 'sku' => $product->sku, 'image' => $product->getMainImage()]]);
-        $cartItem->updateTotalPrice();
-        // Track recommendation click
         $this->trackRecommendationClick($productId, 'add_to_cart');
-        $this->dispatch('cart-updated');
-        $this->dispatch('show-success-message', message: __('frontend.cart.product_added'));
     }
 
     /**

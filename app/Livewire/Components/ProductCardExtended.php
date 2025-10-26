@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Livewire\Components;
 
+use App\Livewire\Concerns\WithCart;
+use App\Livewire\Concerns\WithNotifications;
 use App\Models\AnalyticsEvent;
 use App\Models\Product;
 use App\Models\ProductComparison;
@@ -27,6 +29,11 @@ use Livewire\Component;
  */
 final class ProductCardExtended extends Component
 {
+    use WithCart {
+        addToCart as performAddToCart;
+    }
+    use WithNotifications;
+
     public Product $product;
 
     public bool $showQuickView = false;
@@ -56,10 +63,17 @@ final class ProductCardExtended extends Component
      */
     public function addToCart(): void
     {
-        $this->dispatch('add-to-cart', productId: $this->product->id, quantity: 1);
-        // Track analytics
-        AnalyticsEvent::track('add_to_cart', ['product_id' => $this->product->id, 'product_name' => $this->product->name, 'product_price' => $this->product->price]);
-        $this->dispatch('notify', ['type' => 'success', 'message' => __('translations.product_added_to_cart', ['name' => $this->product->name])]);
+        $added = $this->performAddToCart($this->product->id);
+
+        if (! $added) {
+            return;
+        }
+
+        AnalyticsEvent::track('add_to_cart', [
+            'product_id'    => $this->product->id,
+            'product_name'  => $this->product->name,
+            'product_price' => $this->product->price,
+        ]);
     }
 
     /**

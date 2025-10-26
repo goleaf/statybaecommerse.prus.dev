@@ -14,6 +14,7 @@ beforeEach(function () {
         'price'      => 199.99,
         'status'     => 'published',
         'is_visible' => true,
+        'stock_quantity' => 25,
     ]);
 });
 

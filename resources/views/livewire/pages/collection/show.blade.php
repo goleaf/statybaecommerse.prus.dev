@@ -156,7 +156,9 @@
                 {{-- Collapse the nested filter groups so we can resolve labels for chips quickly. --}}
                 @php($flatValues = $options->flatMap(fn ($group) => $group->values))
                 @foreach (collect($selectedValues)->filter() as $valId)
-                    @php($val = $this->filterValueLookup->get((int) $valId))
+                    @php
+                        $val = $this->filterValueLookup->get((int) $valId);
+                    @endphp
                     @if ($val)
                         @php
                             // Extract a human-readable label, checking array keys first and then falling back to object properties.
