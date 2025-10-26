@@ -21,13 +21,39 @@ final class LocationController extends Controller
      */
     public function index(Request $request): View
     {
-        $locations = Location::query()->enabled()->with(['country', 'inventories'])->when($request->has('type'), fn ($query) => $query->where('type', $request->get('type')))->when($request->has('country'), fn ($query) => $query->where('country_code', $request->get('country')))->when($request->has('city'), fn ($query) => $query->where('city', $request->get('city')))->when($request->has('has_coordinates'), fn ($query) => $query->whereNotNull('latitude')->whereNotNull('longitude'))->when($request->has('has_opening_hours'), fn ($query) => $query->whereNotNull('opening_hours'))->when($request->has('is_open_now'), fn ($query) => $query->where('is_enabled', true))->when($request->has('search'), fn ($query) => $query->where(function ($q) use ($request) {
-            $search = $request->get('search');
-            $q->where('name', 'like', "%{$search}%")->orWhere('code', 'like', "%{$search}%")->orWhere('city', 'like', "%{$search}%")->orWhere('address_line_1', 'like', "%{$search}%");
-        }))->orderBy('sort_order')->orderBy('name')->get()->skipWhile(function ($location) {
-            // Skip locations that are not properly configured for display
-            return empty($location->name) || ! $location->is_enabled || empty($location->type) || empty($location->city) || empty($location->country_code);
-        })->paginate(24);
+        $locationsQuery = Location::query()
+            ->enabled()
+            ->with(['country', 'inventories'])
+            ->when($request->has('type'), fn ($query) => $query->where('type', $request->get('type')))
+            ->when($request->has('country'), fn ($query) => $query->where('country_code', $request->get('country')))
+            ->when($request->has('city'), fn ($query) => $query->where('city', $request->get('city')))
+            ->when($request->has('has_coordinates'), fn ($query) => $query->whereNotNull('latitude')->whereNotNull('longitude'))
+            ->when($request->has('has_opening_hours'), fn ($query) => $query->whereNotNull('opening_hours'))
+            ->when($request->has('is_open_now'), fn ($query) => $query->where('is_enabled', true))
+            ->when($request->has('search'), function ($query) use ($request) {
+                $search = $request->get('search');
+
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%")
+                        ->orWhere('code', 'like', "%{$search}%")
+                        ->orWhere('city', 'like', "%{$search}%")
+                        ->orWhere('address_line_1', 'like', "%{$search}%");
+                });
+            });
+
+        // Guard against incomplete records before pagination so the paginator always operates on the query builder
+        $locations = $locationsQuery
+            ->whereNotNull('name')
+            ->where('name', '<>', '')
+            ->whereNotNull('type')
+            ->where('type', '<>', '')
+            ->whereNotNull('city')
+            ->where('city', '<>', '')
+            ->whereNotNull('country_code')
+            ->where('country_code', '<>', '')
+            ->orderBy('sort_order')
+            ->orderBy('name')
+            ->paginate(24);
         $types = Location::distinct()->pluck('type')->filter()->sort()->values();
         $countries = Location::distinct()->pluck('country_code')->filter()->sort()->values();
         $cities = Location::distinct()->pluck('city')->filter()->sort()->values();
@@ -122,12 +148,12 @@ final class LocationController extends Controller
     {
         return response()->json(['total_locations' => Location::count(), 'enabled_locations' => Location::enabled()->count(), 'disabled_locations' => Location::where('is_enabled', false)->count(), 'default_locations' => Location::default()->count(), 'by_type' => Location::selectRaw('type, COUNT(*) as count')->groupBy('type')->get()->mapWithKeys(function ($item) {
             $typeLabel = match ($item->type) {
-                'warehouse' => 'Warehouse',
-                'store' => 'Store',
-                'office' => 'Office',
+                'warehouse'    => 'Warehouse',
+                'store'        => 'Store',
+                'office'       => 'Office',
                 'pickup_point' => 'Pickup Point',
-                'other' => 'Other',
-                default => $item->type,
+                'other'        => 'Other',
+                default        => $item->type,
             };
 
             return [$typeLabel => $item->count];
