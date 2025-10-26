@@ -196,15 +196,37 @@ final class ReferralController extends Controller
     public function statistics(): View
     {
         $user = Auth::user();
-        $referrals = Referral::where('referrer_id', $user->id)->with(['referred', 'rewards'])->get();
-        $totalReferrals = $referrals->count();
-        $completedReferrals = $referrals->where('status', 'completed')->count();
-        $pendingReferrals = $referrals->where('status', 'pending')->count();
-        $expiredReferrals = $referrals->where('status', 'expired')->count();
-        $totalRewards = ReferralReward::where('user_id', $user->id)->sum('amount');
-        $pendingRewards = ReferralReward::where('user_id', $user->id)->pending()->sum('amount');
-        $appliedRewards = ReferralReward::where('user_id', $user->id)->applied()->sum('amount');
+        // Gather overall referral counts in a single aggregated query to avoid loading all rows into memory.
+        $referralStats = Referral::where('referrer_id', $user->id)
+            ->selectRaw(
+                'COUNT(*) as total,
+                COALESCE(SUM(CASE WHEN status = ? THEN 1 ELSE 0 END), 0) as completed,
+                COALESCE(SUM(CASE WHEN status = ? THEN 1 ELSE 0 END), 0) as pending,
+                COALESCE(SUM(CASE WHEN status = ? THEN 1 ELSE 0 END), 0) as expired',
+                ['completed', 'pending', 'expired']
+            )
+            ->first();
+
+        // Collect reward totals in a single pass so we do not execute separate queries per status.
+        $rewardStats = ReferralReward::where('user_id', $user->id)
+            ->selectRaw(
+                'COALESCE(SUM(amount), 0) as total,
+                COALESCE(SUM(CASE WHEN status = ? THEN amount ELSE 0 END), 0) as pending,
+                COALESCE(SUM(CASE WHEN status = ? THEN amount ELSE 0 END), 0) as applied',
+                ['pending', 'applied']
+            )
+            ->first();
+
+        // Safely cast the aggregated results, defaulting to zero when no statistics are present.
+        $totalReferrals = (int) ($referralStats->total ?? 0);
+        $completedReferrals = (int) ($referralStats->completed ?? 0);
+        $pendingReferrals = (int) ($referralStats->pending ?? 0);
+        $expiredReferrals = (int) ($referralStats->expired ?? 0);
+        $totalRewards = (float) ($rewardStats->total ?? 0);
+        $pendingRewards = (float) ($rewardStats->pending ?? 0);
+        $appliedRewards = (float) ($rewardStats->applied ?? 0);
         $conversionRate = $totalReferrals > 0 ? round($completedReferrals / $totalReferrals * 100, 1) : 0;
+
         // Monthly statistics
         $monthlyStats = Referral::where('referrer_id', $user->id)->selectRaw('YEAR(created_at) as year, MONTH(created_at) as month, COUNT(*) as count')->groupBy('year', 'month')->orderBy('year', 'desc')->orderBy('month', 'desc')->limit(12)->get();
 
