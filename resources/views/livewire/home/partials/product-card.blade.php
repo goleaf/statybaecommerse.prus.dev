@@ -1,35 +1,19 @@
 @php
+    use App\Data\Storefront\Home\ProductListItemData;
+    use Closure;
     use Illuminate\View\ComponentAttributeBag;
 
-    // Avoid repeated media queries: prefer preloaded relations or cached accessors
-    $image = method_exists($product, 'getMainImage')
-        ? $product->getMainImage('image-lg') ?? $product->getMainImage()
-        : ($product->getFirstMediaUrl('images', 'image-lg') ?:
-        $product->getFirstMediaUrl('images'));
-    $productName = $product->trans('name') ?? $product->name;
-    $brandName = optional($product->brand)?->trans('name') ?? optional($product->brand)->name;
-    $currentPrice =
-        $product->sale_price && $product->sale_price < $product->price ? $product->sale_price : $product->price;
-    $hasDiscount =
-        ($product->sale_price && $product->sale_price < $product->price) ||
-        ($product->compare_price && $product->compare_price > $product->price);
-    $comparePrice =
-        $product->compare_price && $product->compare_price > $currentPrice
-            ? $product->compare_price
-            : ($product->sale_price && $product->sale_price < $product->price
-                ? $product->price
-                : null);
+    /** @var ProductListItemData $product */
     $cardPreset = $preset ?? 'featured';
     $attributes = ($attributes ?? new ComponentAttributeBag())->merge([
-        'class' =>
-            'group relative flex h-full flex-col overflow-hidden rounded-3xl border border-gray-200 bg-white shadow',
+        'class' => 'group relative flex h-full flex-col overflow-hidden rounded-3xl border border-gray-200 bg-white shadow',
     ]);
 
     foreach ($attributes->getAttributes() as $attributeKey => $attributeValue) {
-        if ($attributeValue instanceof \Closure) {
+        if ($attributeValue instanceof Closure) {
             \Log::error('Closure attribute detected on product card.', [
-                'attribute' => $attributeKey,
-                'product_id' => $product->id ?? null,
+                'attribute'  => $attributeKey,
+                'product_id' => $product->id,
             ]);
         }
     }
@@ -37,25 +21,25 @@
 
 <article {{ $attributes }} aria-labelledby="product-title-{{ $product->id }}">
     <div class="relative aspect-[4/3] overflow-hidden">
-        @if ($image)
-            <img src="{{ $image }}" alt="{{ $productName }}"
+        @if ($product->imageUrl)
+            <img src="{{ $product->imageUrl }}" alt="{{ $product->name }}"
                  class="h-full w-full object-cover" loading="lazy">
         @else
             <div
                  class="flex h-full w-full items-center justify-center bg-gradient-to-br from-indigo-500/40 to-purple-500/40 text-3xl font-semibold text-white">
-                {{ mb_substr($productName, 0, 2) }}
+                {{ $product->initials }}
             </div>
         @endif
 
         <div class="absolute inset-0 bg-gradient-to-t from-gray-900/20 via-transparent to-transparent"></div>
 
         <div class="absolute top-4 left-4 flex flex-wrap gap-2">
-            @if ($hasDiscount)
+            @if ($product->hasDiscount())
                 <span
                       class="inline-flex items-center gap-1 rounded-full bg-rose-500 px-3 py-1 text-xs font-semibold text-white shadow-lg">
                     {{ __('frontend/home.products.badges.sale') }}
-                    @if ($product->discount_percentage > 0)
-                        <span>−{{ (int) round($product->discount_percentage) }}%</span>
+                    @if ($product->discountBadge())
+                        <span>−{{ $product->discountBadge() }}%</span>
                     @endif
                 </span>
             @elseif($cardPreset === 'latest')
@@ -71,10 +55,10 @@
             @endif
         </div>
 
-        @if ($product->brand)
+        @if ($product->hasBrand())
             <span
                   class="absolute top-4 right-4 rounded-full bg-white/90 px-3 py-1 text-xs font-medium text-gray-800 backdrop-blur">
-                {{ $brandName }}
+                {{ $product->brandName }}
             </span>
         @endif
     </div>
@@ -83,19 +67,19 @@
         <div class="space-y-2">
             <h3 id="product-title-{{ $product->id }}"
                 class="text-lg font-semibold leading-tight text-gray-900 line-clamp-2">
-                <a href="{{ route('localized.products.show', ['locale' => app()->getLocale(), 'product' => $product->slug ?? $product]) }}"
+                <a href="{{ $product->detailUrl }}"
                    class="transition hover:text-indigo-600">
-                    {{ $productName }}
+                    {{ $product->name }}
                 </a>
             </h3>
             <div class="flex flex-wrap items-center gap-3 text-sm text-gray-600">
-                @foreach ($product->categories->take(2) as $category)
+                @foreach (array_slice($product->categoryLabels, 0, 2) as $categoryLabel)
                     <span class="inline-flex items-center gap-1 rounded-full bg-gray-100 px-3 py-0.5 text-gray-700">
                         <svg class="h-3 w-3" fill="none" stroke="currentColor" stroke-width="1.5"
                              viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M3 7h18M3 12h18M3 17h18" />
                         </svg>
-                        {{ $category->trans('name') ?? $category->name }}
+                        {{ $categoryLabel }}
                     </span>
                 @endforeach
             </div>
@@ -104,11 +88,11 @@
         <div class="space-y-2">
             <div class="flex items-baseline gap-3">
                 <span class="text-2xl font-bold text-gray-900">
-                    {{ \Illuminate\Support\Number::currency($currentPrice, current_currency(), app()->getLocale()) }}
+                    {{ \Illuminate\Support\Number::currency($product->currentPrice(), current_currency(), app()->getLocale()) }}
                 </span>
-                @if ($comparePrice)
+                @if ($product->compareAtPrice())
                     <span class="text-sm text-gray-500 line-through">
-                        {{ \Illuminate\Support\Number::currency($comparePrice, current_currency(), app()->getLocale()) }}
+                        {{ \Illuminate\Support\Number::currency($product->compareAtPrice(), current_currency(), app()->getLocale()) }}
                     </span>
                 @endif
             </div>
@@ -119,25 +103,25 @@
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3" />
                         <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                    {{ $product->stock_quantity > 0 ? __('frontend/home.products.stock.in') : __('frontend/home.products.stock.out') }}
+                    {{ $product->inStock() ? __('frontend/home.products.stock.in') : __('frontend/home.products.stock.out') }}
                 </span>
-                @if ($product->reviews_count > 0)
+                @if ($product->averageRating !== null && $product->reviewsCount > 0)
                     <span class="inline-flex items-center gap-1"
-                          aria-label="{{ number_format((float) $product->average_rating, 1) }} {{ __('frontend/home.products.rating_out_of_5') }}">
+                          aria-label="{{ number_format((float) $product->averageRating, 1) }} {{ __('frontend/home.products.rating_out_of_5') }}">
                         <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="1.5"
                              viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round"
                                   d="M11.48 3.499a.562.562 0 011.04 0l2.01 4.073 4.495.654a.563.563 0 01.311.96l-3.25 3.166.768 4.477a.563.563 0 01-.817.593L12 15.347l-4.037 2.125a.563.563 0 01-.817-.593l.768-4.477-3.25-3.165a.563.563 0 01.311-.96l4.495-.654 2.01-4.073z" />
                         </svg>
-                        {{ number_format((float) $product->average_rating, 1) }}
-                        <span class="text-gray-400">({{ $product->reviews_count }})</span>
+                        {{ number_format((float) $product->averageRating, 1) }}
+                        <span class="text-gray-400">({{ $product->reviewsCount }})</span>
                     </span>
                 @endif
             </div>
         </div>
 
         <div class="mt-auto flex items-center justify-between gap-3">
-            <a href="{{ route('localized.products.show', ['locale' => app()->getLocale(), 'product' => $product->slug ?? $product]) }}"
+            <a href="{{ $product->detailUrl }}"
                class="inline-flex items-center gap-2 rounded-full border border-gray-300 bg-gray-50 px-4 py-2 text-xs font-semibold text-gray-700">
                 {{ __('frontend/home.products.actions.details') }}
                 <svg class="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" fill="none"
