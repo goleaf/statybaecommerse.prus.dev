@@ -64,6 +64,8 @@ Route::prefix('v1')
             ->name('ready');
 
         Route::get('/search', SearchController::class)
+            ->middleware('throttle:api.search')
+            ->withoutMiddleware('throttle:api.read')
             ->name('search');
 
         Route::middleware('auth:sanctum')->group(function (): void {

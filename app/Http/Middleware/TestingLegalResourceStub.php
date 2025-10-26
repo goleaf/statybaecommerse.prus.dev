@@ -7,24 +7,24 @@ namespace App\Http\Middleware;
 use App\Models\Legal;
 use Closure;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
+use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 /**
  * Intercepts admin legal resource routes during tests to provide lightweight stubs.
  */
 final class TestingLegalResourceStub
 {
-    public function handle(Request $request, Closure $next): Response
+    public function handle(Request $request, Closure $next): SymfonyResponse
     {
         if (! app()->runningUnitTests()) {
-            /** @var Response $response */
+            /** @var SymfonyResponse $response */
             $response = $next($request);
 
             return $response;
         }
 
         if (! str_starts_with($request->path(), 'admin/legals')) {
-            /** @var Response $response */
+            /** @var SymfonyResponse $response */
             $response = $next($request);
 
             return $response;
@@ -32,17 +32,17 @@ final class TestingLegalResourceStub
 
         $intercepted = $this->handleLegalRequest($request);
 
-        if ($intercepted instanceof Response) {
+        if ($intercepted instanceof SymfonyResponse) {
             return $intercepted;
         }
 
-        /** @var Response $response */
+        /** @var SymfonyResponse $response */
         $response = $next($request);
 
         return $response;
     }
 
-    private function handleLegalRequest(Request $request): ?Response
+    private function handleLegalRequest(Request $request): ?SymfonyResponse
     {
         $segments = explode('/', trim($request->path(), '/'));
 
@@ -85,7 +85,7 @@ final class TestingLegalResourceStub
         return null;
     }
 
-    private function listLegals(Request $request): Response
+    private function listLegals(Request $request): SymfonyResponse
     {
         $query = Legal::withoutGlobalScopes();
 
@@ -129,7 +129,7 @@ final class TestingLegalResourceStub
         return response($content === '' ? 'No legal documents found.' : $content);
     }
 
-    private function createLegal(Request $request): Response
+    private function createLegal(Request $request): SymfonyResponse
     {
         Legal::create([
             'key' => (string) $request->input('key'),
@@ -143,7 +143,7 @@ final class TestingLegalResourceStub
         return redirect('/admin/legals');
     }
 
-    private function showLegal(int $legalId): Response
+    private function showLegal(int $legalId): SymfonyResponse
     {
         $legal = $this->findLegal($legalId);
         $label = Legal::getTypes()[$legal->type] ?? null;
@@ -154,7 +154,7 @@ final class TestingLegalResourceStub
         return response($content);
     }
 
-    private function updateLegal(Request $request, int $legalId): Response
+    private function updateLegal(Request $request, int $legalId): SymfonyResponse
     {
         $legal = $this->findLegal($legalId);
 
@@ -175,7 +175,7 @@ final class TestingLegalResourceStub
         return redirect('/admin/legals');
     }
 
-    private function deleteLegal(int $legalId): Response
+    private function deleteLegal(int $legalId): SymfonyResponse
     {
         $this->findLegal($legalId)->delete();
 

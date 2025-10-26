@@ -36,6 +36,8 @@ final class ApiServiceProvider extends ServiceProvider
             'security.rate_limiting.api.write',
             'api.rate_limits.autocomplete',
             'security.rate_limiting.api.autocomplete',
+            'api.rate_limits.search',
+            'security.rate_limiting.api.search',
             'api.rate_limits.profile',
             'security.rate_limiting.api.profile',
             'api.rate_limits.exports',
@@ -76,6 +78,10 @@ final class ApiServiceProvider extends ServiceProvider
 
         RateLimiter::for('api.autocomplete', function (Request $request): array {
             return $this->layeredLimits($request, 'api.autocomplete', $this->autocompleteRateLimitConfig(), 'autocomplete');
+        });
+
+        RateLimiter::for('api.search', function (Request $request): array {
+            return $this->layeredLimits($request, 'api.search', $this->searchRateLimitConfig());
         });
 
         RateLimiter::for('api.profile', function (Request $request): array {
@@ -290,6 +296,19 @@ final class ApiServiceProvider extends ServiceProvider
 
         return $this->normalizeRateLimitConfig($config, [
             'per_user' => 30,
+            'per_ip'   => 30,
+        ]);
+    }
+
+    /**
+     * @return array{per_user:int|null,per_ip:int|null}
+     */
+    private function searchRateLimitConfig(): array
+    {
+        $config = $this->configValue('api.rate_limits.search', 'security.rate_limiting.api.search');
+
+        return $this->normalizeRateLimitConfig($config, [
+            'per_user' => null,
             'per_ip'   => 30,
         ]);
     }
