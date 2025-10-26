@@ -7,9 +7,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Collection;
-use Tests\TestCase;
-
-uses(TestCase::class, RefreshDatabase::class);
+// Keep the database lifecycle consistent; the shared Pest bootstrap wires the Laravel TestCase automatically.
+uses(RefreshDatabase::class);
 
 it('exposes expected fillable attributes for mass assignment', function (): void {
     // Instantiate the model to inspect its fillable configuration without hitting the database.

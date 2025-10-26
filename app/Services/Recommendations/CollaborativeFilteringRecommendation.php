@@ -144,7 +144,7 @@ final class CollaborativeFilteringRecommendation extends BaseRecommendation
                 if (in_array($productId, $userProductIds)) {
                     continue;
                 }
-                $weightedScore = $interaction->rating * $similarity * ($this->config['interaction_weights'][$interaction->interaction_type] ?? 1.0);
+                $weightedScore = $interaction->rating * $similarity * ($this->config['interaction_weights'][$interaction->event] ?? 1.0);
                 if ($weightedScore >= $this->minScore) {
                     $recommendations->push(['product_id' => $productId, 'score' => $weightedScore, 'similarity' => $similarity, 'interaction' => $interaction]);
                 }
@@ -183,12 +183,38 @@ final class CollaborativeFilteringRecommendation extends BaseRecommendation
     {
         try {
             // Check if interaction already exists
-            $existingInteraction = UserProductInteraction::where(['user_id' => $user->id, 'product_id' => $product->id, 'interaction_type' => $interactionType])->first();
+            $existingInteraction = UserProductInteraction::where([
+                'user_id' => $user->id,
+                'product_id' => $product->id,
+                'event' => $interactionType,
+            ])->first();
             if ($existingInteraction) {
                 $existingInteraction->increment('count');
-                $existingInteraction->update(['rating' => $rating ?? $this->getDefaultRating($interactionType), 'last_interaction' => now()]);
+
+                $meta = $existingInteraction->meta;
+                $meta['rating'] = $rating ?? $this->getDefaultRating($interactionType);
+                $meta['last_interaction'] = now();
+
+                $existingInteraction->update([
+                    'occurred_at' => $meta['last_interaction'],
+                    'meta' => $meta,
+                    'rating' => $meta['rating'],
+                ]);
             } else {
-                UserProductInteraction::create(['user_id' => $user->id, 'product_id' => $product->id, 'interaction_type' => $interactionType, 'rating' => $rating ?? $this->getDefaultRating($interactionType), 'count' => 1, 'first_interaction' => now(), 'last_interaction' => now()]);
+                $timestamp = now();
+
+                UserProductInteraction::create([
+                    'user_id' => $user->id,
+                    'product_id' => $product->id,
+                    'event' => $interactionType,
+                    'occurred_at' => $timestamp,
+                    'meta' => [
+                        'rating' => $rating ?? $this->getDefaultRating($interactionType),
+                        'count' => 1,
+                        'first_interaction' => $timestamp,
+                        'last_interaction' => $timestamp,
+                    ],
+                ]);
             }
         } catch (\Exception $e) {
             // Table might not exist yet, ignore

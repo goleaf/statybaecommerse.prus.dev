@@ -25,8 +25,8 @@ final class UserProductInteractionFactory extends Factory
     {
         $interactionTypes = ['click', 'add_to_cart', 'purchase', 'review', 'share', 'favorite', 'compare'];
         // Rotate through the type list so repeated factory calls for the same
-        // user/product pair stay unique even when the test does not override
-        // `interaction_type`, keeping the SQLite unique index satisfied.
+        // user/product pair stay unique even when a test does not override
+        // the `event` attribute, keeping the SQLite unique index satisfied.
         static $typePointer = 0;
         $interactionType = $interactionTypes[$typePointer % count($interactionTypes)];
         $typePointer++;
@@ -36,14 +36,21 @@ final class UserProductInteractionFactory extends Factory
         $firstInteraction = fake()->dateTimeBetween('-30 days', '-1 day');
         $lastInteraction = fake()->dateTimeBetween('-1 day', 'now');
 
+        $rating = $interactionType === 'review' ? fake()->randomFloat(1, 1, 5) : null;
+        $count = fake()->numberBetween(1, 20);
+
         return [
-            'user_id'           => User::factory(),
-            'product_id'        => Product::factory(),
-            'interaction_type'  => $interactionType,
-            'rating'            => $interactionType === 'review' ? fake()->randomFloat(1, 1, 5) : null,
-            'count'             => fake()->numberBetween(1, 20),
-            'first_interaction' => $firstInteraction,
-            'last_interaction'  => $lastInteraction,
+            'user_id'            => User::factory(),
+            'product_id'         => Product::factory(),
+            'product_variant_id' => null,
+            'event'              => $interactionType,
+            'occurred_at'        => $lastInteraction,
+            'meta'               => [
+                'rating'            => $rating,
+                'count'             => $count,
+                'first_interaction' => $firstInteraction,
+                'last_interaction'  => $lastInteraction,
+            ],
         ];
     }
 
@@ -53,9 +60,11 @@ final class UserProductInteractionFactory extends Factory
     public function view(): static
     {
         return $this->state(fn (array $attributes) => [
-            'interaction_type' => 'view',
-            'rating'           => null,
-            'count'            => fake()->numberBetween(1, 50),
+            'event' => 'view',
+            'meta'  => array_merge($attributes['meta'] ?? [], [
+                'rating' => null,
+                'count'  => fake()->numberBetween(1, 50),
+            ]),
         ]);
     }
 
@@ -65,9 +74,11 @@ final class UserProductInteractionFactory extends Factory
     public function click(): static
     {
         return $this->state(fn (array $attributes) => [
-            'interaction_type' => 'click',
-            'rating'           => null,
-            'count'            => fake()->numberBetween(1, 10),
+            'event' => 'click',
+            'meta'  => array_merge($attributes['meta'] ?? [], [
+                'rating' => null,
+                'count'  => fake()->numberBetween(1, 10),
+            ]),
         ]);
     }
 
@@ -77,9 +88,11 @@ final class UserProductInteractionFactory extends Factory
     public function addToCart(): static
     {
         return $this->state(fn (array $attributes) => [
-            'interaction_type' => 'add_to_cart',
-            'rating'           => null,
-            'count'            => fake()->numberBetween(1, 5),
+            'event' => 'add_to_cart',
+            'meta'  => array_merge($attributes['meta'] ?? [], [
+                'rating' => null,
+                'count'  => fake()->numberBetween(1, 5),
+            ]),
         ]);
     }
 
@@ -89,9 +102,11 @@ final class UserProductInteractionFactory extends Factory
     public function purchase(): static
     {
         return $this->state(fn (array $attributes) => [
-            'interaction_type' => 'purchase',
-            'rating'           => null,
-            'count'            => fake()->numberBetween(1, 3),
+            'event' => 'purchase',
+            'meta'  => array_merge($attributes['meta'] ?? [], [
+                'rating' => null,
+                'count'  => fake()->numberBetween(1, 3),
+            ]),
         ]);
     }
 
@@ -101,9 +116,11 @@ final class UserProductInteractionFactory extends Factory
     public function review(): static
     {
         return $this->state(fn (array $attributes) => [
-            'interaction_type' => 'review',
-            'rating'           => fake()->randomFloat(1, 1, 5),
-            'count'            => 1,
+            'event' => 'review',
+            'meta'  => array_merge($attributes['meta'] ?? [], [
+                'rating' => fake()->randomFloat(1, 1, 5),
+                'count'  => 1,
+            ]),
         ]);
     }
 
@@ -113,9 +130,11 @@ final class UserProductInteractionFactory extends Factory
     public function share(): static
     {
         return $this->state(fn (array $attributes) => [
-            'interaction_type' => 'share',
-            'rating'           => null,
-            'count'            => fake()->numberBetween(1, 5),
+            'event' => 'share',
+            'meta'  => array_merge($attributes['meta'] ?? [], [
+                'rating' => null,
+                'count'  => fake()->numberBetween(1, 5),
+            ]),
         ]);
     }
 
@@ -125,7 +144,9 @@ final class UserProductInteractionFactory extends Factory
     public function highRated(): static
     {
         return $this->state(fn (array $attributes) => [
-            'rating' => fake()->randomFloat(1, 4, 5),
+            'meta' => array_merge($attributes['meta'] ?? [], [
+                'rating' => fake()->randomFloat(1, 4, 5),
+            ]),
         ]);
     }
 
@@ -135,7 +156,9 @@ final class UserProductInteractionFactory extends Factory
     public function lowRated(): static
     {
         return $this->state(fn (array $attributes) => [
-            'rating' => fake()->randomFloat(1, 1, 3),
+            'meta' => array_merge($attributes['meta'] ?? [], [
+                'rating' => fake()->randomFloat(1, 1, 3),
+            ]),
         ]);
     }
 
@@ -146,10 +169,18 @@ final class UserProductInteractionFactory extends Factory
     {
         $now = now();
 
-        return $this->state(fn (array $attributes) => [
-            'first_interaction' => fake()->dateTimeBetween('-7 days', '-1 day'),
-            'last_interaction'  => fake()->dateTimeBetween('-1 day', $now),
-        ]);
+        return $this->state(function (array $attributes) use ($now) {
+            $first = fake()->dateTimeBetween('-7 days', '-1 day');
+            $last = fake()->dateTimeBetween('-1 day', $now);
+
+            return [
+                'occurred_at' => $last,
+                'meta'        => array_merge($attributes['meta'] ?? [], [
+                    'first_interaction' => $first,
+                    'last_interaction'  => $last,
+                ]),
+            ];
+        });
     }
 
     /**
@@ -157,10 +188,18 @@ final class UserProductInteractionFactory extends Factory
      */
     public function old(): static
     {
-        return $this->state(fn (array $attributes) => [
-            'first_interaction' => fake()->dateTimeBetween('-1 year', '-6 months'),
-            'last_interaction'  => fake()->dateTimeBetween('-6 months', '-1 month'),
-        ]);
+        return $this->state(function (array $attributes) {
+            $first = fake()->dateTimeBetween('-1 year', '-6 months');
+            $last = fake()->dateTimeBetween('-6 months', '-1 month');
+
+            return [
+                'occurred_at' => $last,
+                'meta'        => array_merge($attributes['meta'] ?? [], [
+                    'first_interaction' => $first,
+                    'last_interaction'  => $last,
+                ]),
+            ];
+        });
     }
 
     /**
@@ -169,7 +208,9 @@ final class UserProductInteractionFactory extends Factory
     public function frequent(): static
     {
         return $this->state(fn (array $attributes) => [
-            'count' => fake()->numberBetween(20, 100),
+            'meta' => array_merge($attributes['meta'] ?? [], [
+                'count' => fake()->numberBetween(20, 100),
+            ]),
         ]);
     }
 
@@ -179,7 +220,9 @@ final class UserProductInteractionFactory extends Factory
     public function rare(): static
     {
         return $this->state(fn (array $attributes) => [
-            'count' => 1,
+            'meta' => array_merge($attributes['meta'] ?? [], [
+                'count' => 1,
+            ]),
         ]);
     }
 }
