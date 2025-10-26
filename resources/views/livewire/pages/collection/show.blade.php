@@ -110,22 +110,66 @@
     </div>
 
     @if (isset($options) && $options->isNotEmpty())
+        @php
+            // Normalise the option payload so both legacy (object-based) and the new
+            // array-shaped groups expose a consistent structure for rendering.
+            $normalizedOptions = $options->map(function ($group) {
+                $attributeName = data_get($group, 'attribute_name')
+                    ?? data_get($group, 'attribute.name')
+                    ?? (is_object(data_get($group, 'attribute')) ? data_get($group, 'attribute')->name : null)
+                    ?? data_get($group, 'name')
+                    ?? __('Attribute');
+
+                $rawValues = collect(data_get($group, 'values', []));
+
+                $values = $rawValues->map(function ($value) {
+                    if (is_array($value)) {
+                        // Array entries may already contain friendly keys; prefer
+                        // labelled/value fields while providing sensible fallbacks.
+                        $id = (int) ($value['id'] ?? $value['value_id'] ?? 0);
+                        $label = (string) ($value['label'] ?? $value['name'] ?? $value['value'] ?? '');
+
+                        return ['id' => $id, 'label' => $label];
+                    }
+
+                    if (is_object($value)) {
+                        // Legacy models expose `id`, `name`, and/or `value` properties.
+                        $id = (int) ($value->id ?? 0);
+                        $label = (string) ($value->name ?? $value->value ?? '');
+
+                        return ['id' => $id, 'label' => $label];
+                    }
+
+                    // Fallback to scalar support when the upstream payload is a list of IDs.
+                    return ['id' => (int) $value, 'label' => (string) $value];
+                })->filter(fn (array $item): bool => $item['id'] !== 0)->values();
+
+                return [
+                    'attribute' => $attributeName,
+                    'values'    => $values,
+                ];
+            });
+
+            $valueLookup = $normalizedOptions
+                ->flatMap(fn (array $group) => $group['values']->mapWithKeys(fn (array $value) => [$value['id'] => $value['label']]))
+                ->all();
+        @endphp
         <div class="mb-6">
             <h2 class="text-xl font-semibold mb-2">{{ __('Filter by') }}</h2>
             <div class="flex flex-wrap items-center gap-2 mb-2">
                 @foreach (collect($selectedValues)->filter() as $valId)
-                    @php($val = $options->flatten(1)->firstWhere('id', (int) $valId) ?? null)
-                    @if ($val)
+                    @php($valLabel = $valueLookup[(int) $valId] ?? null)
+                    @if ($valLabel)
                         <button type="button" wire:click="removeAttributeFilter({{ (int) $valId }})"
                                 wire:confirm="{{ __('translations.confirm_remove_attribute_filter') }}"
                                 class="inline-flex items-center gap-1 text-xs bg-gray-100 rounded-full px-2 py-1">
-                            <span>{{ $val->value }}</span>
+                            <span>{{ $valLabel }}</span>
                             <span aria-hidden="true">×</span>
                         </button>
                     @endif
                 @endforeach
                 @if (collect($selectedValues)->filter()->isNotEmpty())
-                    <button type="button" wire:click="clearAttributeFilters" 
+                    <button type="button" wire:click="clearAttributeFilters"
                             wire:confirm="{{ __('translations.confirm_clear_attribute_filters') }}"
                             class="text-xs underline">
                         {{ __('Clear all') }}
@@ -133,15 +177,15 @@
                 @endif
             </div>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                @foreach ($options as $group)
+                @foreach ($normalizedOptions as $group)
                     <div>
-                        <div class="text-sm font-medium mb-2">{{ $group['attribute']->name }}</div>
+                        <div class="text-sm font-medium mb-2">{{ $group['attribute'] }}</div>
                         <div class="flex flex-wrap gap-2">
                             @foreach ($group['values'] as $val)
                                 <label class="inline-flex items-center gap-1 text-sm">
                                     <input type="checkbox" wire:model.live="selectedValues"
-                                           value="{{ $val->id }}" />
-                                    <span>{{ $val->value }}</span>
+                                           value="{{ $val['id'] }}" />
+                                    <span>{{ $val['label'] }}</span>
                                 </label>
                             @endforeach
                         </div>

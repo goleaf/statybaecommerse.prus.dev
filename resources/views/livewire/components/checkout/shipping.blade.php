@@ -13,7 +13,7 @@
 
     @if($addresses->isNotEmpty())
         <form wire:submit="save" class="flex-1 space-y-3">
-            @error('shippingAddressId')
+            @error('shippingAddress.id')
             <div class="p-4 border-l-4 border-red-400 bg-red-50">
                 <div class="flex">
                     <div class="flex-shrink-0">
@@ -51,7 +51,7 @@
                                     >
                                         <input
                                             type="radio"
-                                            wire:model="shippingAddressId"
+                                            wire:model.live="shippingAddress.id"
                                             id="shipping-address-{{ $shippingAddress->id }}"
                                             name="shipping"
                                             value="{{ $shippingAddress->id }}"
@@ -88,7 +88,7 @@
                             </label>
                         </div>
 
-                        @error('billingAddressId')
+                        @error('billingAddress.id')
                         <div class="p-4 border-l-4 border-red-400 bg-red-50">
                             <div class="flex">
                                 <div class="flex-shrink-0">
@@ -115,7 +115,7 @@
                                         >
                                             <input
                                                 type="radio"
-                                                wire:model="billingAddressId"
+                                                wire:model.live="billingAddress.id"
                                                 id="billing-address-{{ $billingAddress->id }}"
                                                 name="billing"
                                                 value="{{ $billingAddress->id }}"
@@ -143,6 +143,7 @@
                         :title="__('Continue')"
                         class="w-full px-8 py-2 text-sm sm:w-auto"
                         wire:loading.attr="data-loading"
+                        wire:target="save,shippingAddress.id,billingAddress.id,sameAsShipping"
                     />
                 </div>
             </div>
