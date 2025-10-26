@@ -105,12 +105,19 @@ final class ReferralSystemTest extends TestCase
 
         // Check rewards were created
         $rewards = ReferralReward::where('referral_id', $referral->id)->get();
-        $this->assertCount(1, $rewards); // Only referred discount (referrer bonus disabled by default)
+        $this->assertCount(2, $rewards); // Discount for referred user + tiered credit for referrer
 
-        $discountReward = $rewards->first();
+        $discountReward = $rewards->firstWhere('type', 'referred_discount');
         $this->assertEquals('referred_discount', $discountReward->type);
         $this->assertEquals(5.0, $discountReward->amount);
         $this->assertEquals('applied', $discountReward->status);
+        $this->assertEquals('discount', $discountReward->reward_category);
+
+        $tierReward = $rewards->firstWhere('type', 'referrer_bonus');
+        $this->assertNotNull($tierReward);
+        $this->assertEquals('credit', $tierReward->reward_category);
+        $this->assertEquals(5.0, $tierReward->amount);
+        $this->assertEquals('pending', $tierReward->status);
     }
 
     #[Test]
@@ -218,6 +225,7 @@ final class ReferralSystemTest extends TestCase
         $this->assertEquals('referred_discount', $discountReward->type);
         $this->assertEquals(5.0, $discountReward->amount);
         $this->assertEquals('applied', $discountReward->status);
+        $this->assertEquals('discount', $discountReward->reward_category);
     }
 
     #[Test]
@@ -249,6 +257,20 @@ final class ReferralSystemTest extends TestCase
 
         $this->assertStringContainsString('ref=TEST1234', $url);
         $this->assertStringContainsString('/register', $url);
+    }
+
+    #[Test]
+    public function it_can_generate_social_share_links(): void
+    {
+        $code = 'TESTCODE';
+        $links = $this->referralCodeService->getShareLinks($code, 'Join me');
+
+        $this->assertArrayHasKey('facebook', $links);
+        $this->assertArrayHasKey('twitter', $links);
+        $this->assertArrayHasKey('linkedin', $links);
+        $this->assertArrayHasKey('email', $links);
+        $this->assertStringContainsString(urlencode('Join me'), $links['email']);
+        $this->assertStringContainsString(urlencode($this->referralCodeService->getReferralUrl($code)), $links['facebook']);
     }
 
     #[Test]
@@ -326,6 +348,64 @@ final class ReferralSystemTest extends TestCase
 
         // Now user can use referral discount
         $this->assertTrue($this->referralRewardService->canUserUseReferralDiscount($this->referred->id));
+    }
+
+    #[Test]
+    public function it_reuses_referral_codes_for_multiple_referrals(): void
+    {
+        $code = $this->referralService->generateReferralCodeForUser($this->referrer->id);
+
+        $firstReferral = $this->referralService->createReferral($this->referrer->id, $this->referred->id, $code->code);
+        $secondReferred = User::factory()->create();
+        $secondReferral = $this->referralService->createReferral($this->referrer->id, $secondReferred->id, $code->code);
+
+        $this->assertNotNull($firstReferral);
+        $this->assertNotNull($secondReferral);
+        $this->assertEquals($code->code, $firstReferral->referral_code);
+        $this->assertEquals($code->code, $secondReferral->referral_code);
+    }
+
+    #[Test]
+    public function it_records_referral_attribution_context(): void
+    {
+        $context = [
+            'source'      => 'newsletter',
+            'campaign'    => 'spring_launch',
+            'utm_source'  => 'email',
+            'utm_medium'  => 'campaign',
+            'utm_campaign'=> 'spring2025',
+            'metadata'    => ['landing_page' => '/promo'],
+        ];
+
+        $referral = $this->referralService->createReferral($this->referrer->id, $this->referred->id, null, $context);
+
+        $this->assertEquals('newsletter', $referral->source);
+        $this->assertEquals('spring_launch', $referral->campaign);
+        $this->assertEquals('email', $referral->utm_source);
+        $this->assertEquals('campaign', $referral->utm_medium);
+        $this->assertEquals('spring2025', $referral->utm_campaign);
+        $this->assertEquals(['landing_page' => '/promo'], $referral->metadata);
+    }
+
+    #[Test]
+    public function it_grants_tiered_rewards_as_referrals_complete(): void
+    {
+        $code = $this->referralService->generateReferralCodeForUser($this->referrer->id);
+        $totalReferrals = 6;
+        for ($i = 0; $i < $totalReferrals; $i++) {
+            $newUser = User::factory()->create();
+            $referral = $this->referralService->createReferral($this->referrer->id, $newUser->id, $code->code);
+            $order = Order::factory()->create(['user_id' => $newUser->id]);
+            $this->referralService->processReferralCompletion($newUser->id, $order->id);
+        }
+
+        $rewards = ReferralReward::where('user_id', $this->referrer->id)->referrerBonus()->get();
+
+        $this->assertNotEmpty($rewards);
+        $latestReward = $rewards->last();
+        $this->assertEquals('credit', $latestReward->reward_category);
+        $this->assertEquals(10.0, $latestReward->amount); // Tier after 5 completions
+        $this->assertEquals(5, $latestReward->reward_data['tier_threshold']);
     }
 
     #[Test]
