@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 use Livewire\Livewire;
 use Tests\TestCase;
 
@@ -44,11 +45,21 @@ final class LoginRateLimitingTest extends TestCase
         $attempt();
         $attempt();
 
-        Livewire::test(Login::class)
-            ->set('loginForm.email', $user->email)
-            ->set('loginForm.password', 'invalid-password')
-            ->call('login')
-            ->assertHasErrors(['loginForm.email']);
+        // Capture the limiter response so we can assert the correct HTTP status code is propagated.
+        $finalException = null;
+
+        try {
+            Livewire::test(Login::class)
+                ->set('loginForm.email', $user->email)
+                ->set('loginForm.password', 'invalid-password')
+                ->call('login');
+        } catch (ValidationException $exception) {
+            $finalException = $exception;
+        }
+
+        $this->assertInstanceOf(ValidationException::class, $finalException);
+        $this->assertSame(429, $finalException?->status);
+        $this->assertArrayHasKey('loginForm.email', $finalException?->errors() ?? []);
 
         $key = Str::transliterate(Str::lower($user->email).'|127.0.0.1');
 
@@ -88,11 +99,12 @@ final class LoginRateLimitingTest extends TestCase
 
         try {
             $rateLimitedAttempt->call('sendPasswordResetLink');
-        } catch (\Illuminate\Validation\ValidationException $exception) {
+        } catch (ValidationException $exception) {
             $thrown = $exception;
         }
 
-        $this->assertInstanceOf(\Illuminate\Validation\ValidationException::class, $thrown);
+        $this->assertInstanceOf(ValidationException::class, $thrown);
+        $this->assertSame(429, $thrown?->status);
         $this->assertIsArray($thrown->errors());
         $this->assertArrayHasKey('email', $thrown->errors());
 

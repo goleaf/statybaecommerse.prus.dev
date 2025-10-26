@@ -31,6 +31,15 @@ final class SecurityServiceProvider extends ServiceProvider
                 max(1, (int) ($config['max_attempts'] ?? 5))
             )->by($this->passwordResetIdentifier($request));
         });
+
+        RateLimiter::for('auth.two-factor', function (Request $request): Limit {
+            $config = (array) config('security.rate_limiting.auth.two_factor');
+
+            return Limit::perMinutes(
+                $this->asMinutes((int) ($config['decay_seconds'] ?? 60)),
+                max(1, (int) ($config['max_attempts'] ?? 5))
+            )->by($this->twoFactorIdentifier($request));
+        });
     }
 
     private function asMinutes(int $decaySeconds): int
@@ -52,6 +61,16 @@ final class SecurityServiceProvider extends ServiceProvider
         $email = Str::of((string) $request->input('email', ''))->lower()->value();
 
         return Str::transliterate('password-reset|'.$email.'|'.$ip);
+    }
+
+    private function twoFactorIdentifier(Request $request): string
+    {
+        // Couple the pending authentication session with the requester IP so the
+        // limiter remains effective even if multiple users share a browser instance.
+        $ip = $this->ipAddress($request);
+        $userId = (string) $request->session()->get('auth.two_factor.id', 'guest');
+
+        return Str::transliterate('two-factor|'.$userId.'|'.$ip);
     }
 
     private function ipAddress(Request $request): string
