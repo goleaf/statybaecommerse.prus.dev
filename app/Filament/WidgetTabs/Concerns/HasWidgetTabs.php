@@ -17,11 +17,6 @@ trait HasWidgetTabs
     public ?string $activeWidgetTab = null;
 
     /**
-     * Mirror the widget tab selection for legacy callers and tests that refer to the property as `activeTab`.
-     */
-    public ?string $activeTab = null;
-
-    /**
      * @var array<string|int, WidgetTab>
      */
     protected array $cachedWidgetTabs;
@@ -37,7 +32,17 @@ trait HasWidgetTabs
 
     public function mount(): void
     {
-        parent::mount();
+        // Call the parent's mount implementation when it exists so we don't break
+        // any Livewire lifecycle hooks that upstream pages rely on.
+        if (method_exists(parent::class, 'mount')) {
+            $parentMount = new \ReflectionMethod(parent::class, 'mount');
+
+            // Only invoke the parent mount if it doesn't expect required parameters to
+            // avoid triggering argument count errors on components with custom mounts.
+            if ($parentMount->getNumberOfRequiredParameters() === 0) {
+                parent::mount();
+            }
+        }
 
         if ($this->shouldLoadDefaultActiveWidgetTab()) {
             $this->loadDefaultActiveWidgetTab();
@@ -63,21 +68,41 @@ trait HasWidgetTabs
 
     protected function synchroniseActiveTabAliases(): void
     {
+        if (! $this->hasLegacyActiveTabProperty()) {
+            return;
+        }
+
         if ($this->activeWidgetTab === $this->activeTab) {
             return;
         }
 
+        // Mirror the widget tab selection on the legacy `activeTab` property provided by Filament.
         $this->activeTab = $this->activeWidgetTab;
     }
 
     protected function getActiveWidgetTabValue(): string|int|null
     {
-        return $this->activeWidgetTab ?? $this->activeTab;
+        if ($this->activeWidgetTab !== null) {
+            return $this->activeWidgetTab;
+        }
+
+        if (! $this->hasLegacyActiveTabProperty()) {
+            return null;
+        }
+
+        return $this->activeTab;
     }
 
     protected function setActiveWidgetTab(string|int|null $tab): void
     {
+        // Normalise the tab key to a string so URL parameters and Livewire data stay in sync.
         $this->activeWidgetTab = $tab === null ? null : (string) $tab;
+
+        if (! $this->hasLegacyActiveTabProperty()) {
+            return;
+        }
+
+        // Keep the built-in Filament `activeTab` property updated for compatibility with existing code paths.
         $this->activeTab = $this->activeWidgetTab;
     }
 
@@ -144,6 +169,10 @@ trait HasWidgetTabs
     public function updatedActiveWidgetTab(string|int|null $tab): void
     {
         // Keep the alias property synchronised without triggering unnecessary Livewire updates.
+        if (! $this->hasLegacyActiveTabProperty()) {
+            return;
+        }
+
         if ($this->activeTab === ($tab === null ? null : (string) $tab)) {
             return;
         }
@@ -153,6 +182,10 @@ trait HasWidgetTabs
 
     public function updatedActiveTab(): void
     {
+        if (! $this->hasLegacyActiveTabProperty()) {
+            return;
+        }
+
         // Ensure direct mutations to `activeTab` update the canonical widget tab property too.
         $normalisedTab = $this->activeTab === null ? null : (string) $this->activeTab;
 
@@ -166,5 +199,13 @@ trait HasWidgetTabs
     protected function getTableQuery(): Builder
     {
         return $this->applyWidgetTabFilters(parent::getTableQuery());
+    }
+
+    protected function hasLegacyActiveTabProperty(): bool
+    {
+        // The base Filament ListRecords class exposes the `activeTab` property, but we
+        // defensively check for its presence so the trait fails gracefully if reused
+        // on a component that doesn't ship with the legacy attribute.
+        return property_exists($this, 'activeTab');
     }
 }
