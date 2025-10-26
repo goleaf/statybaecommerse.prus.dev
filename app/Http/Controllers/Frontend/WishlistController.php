@@ -9,6 +9,7 @@ use App\Models\ProductVariant;
 use App\Models\User;
 use App\Models\UserWishlist;
 use App\Models\WishlistItem;
+use App\Http\Resources\WishlistResource;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -20,17 +21,24 @@ final class WishlistController extends Controller
     {
         /** @var User $user */
         $user = $request->user();
-        $wishlist = $this->resolveDefaultWishlist($user);
+        $wishlistId = $request->integer('wishlist_id');
+        $wishlist = $this->resolveWishlist($user, $wishlistId, createIfMissing: $wishlistId === null);
 
         if (! $wishlist instanceof UserWishlist) {
-            abort(404);
+            abort($wishlistId !== null ? 403 : 404);
         }
+
+        $perPage = max(1, (int) $request->integer('per_page', 12));
 
         $wishlistItems = $wishlist
             ->items()
             ->with(['product.media', 'product.brand', 'variant'])
             ->latest()
-            ->paginate(12);
+            ->paginate($perPage);
+
+        if ($request->expectsJson()) {
+            return new WishlistResource($wishlist, $wishlistItems);
+        }
 
         return view('frontend.wishlist.index', [
             'wishlist' => $wishlist,
@@ -41,6 +49,7 @@ final class WishlistController extends Controller
     public function add(Request $request): JsonResponse|RedirectResponse
     {
         $data = $request->validate([
+            'wishlist_id' => ['nullable', 'integer'],
             'product_id' => ['required', 'integer', 'exists:products,id'],
             'variant_id' => ['nullable', 'integer', 'exists:product_variants,id'],
             'quantity' => ['nullable', 'integer', 'min:1'],
@@ -49,7 +58,19 @@ final class WishlistController extends Controller
 
         /** @var User $user */
         $user = $request->user();
-        $wishlist = $this->resolveDefaultWishlist($user);
+        $wishlist = $this->resolveWishlist($user, $data['wishlist_id'] ?? null);
+
+        if (! $wishlist instanceof UserWishlist) {
+            return $this->respond(
+                $request,
+                [
+                    'status' => 'error',
+                    'message' => __('You are not allowed to update this wishlist.'),
+                ],
+                __('You are not allowed to update this wishlist.'),
+                403
+            );
+        }
 
         $variantId = $data['variant_id'] ?? null;
 
@@ -115,13 +136,14 @@ final class WishlistController extends Controller
     public function remove(Request $request): JsonResponse|RedirectResponse
     {
         $data = $request->validate([
+            'wishlist_id' => ['nullable', 'integer'],
             'product_id' => ['required', 'integer', 'exists:products,id'],
             'variant_id' => ['nullable', 'integer', 'exists:product_variants,id'],
         ]);
 
         /** @var User $user */
         $user = $request->user();
-        $wishlist = $this->resolveDefaultWishlist($user, createIfMissing: false);
+        $wishlist = $this->resolveWishlist($user, $data['wishlist_id'] ?? null, createIfMissing: false);
 
         if (! $wishlist instanceof UserWishlist) {
             return $this->respond(
@@ -176,7 +198,8 @@ final class WishlistController extends Controller
     {
         /** @var User $user */
         $user = $request->user();
-        $wishlist = $this->resolveDefaultWishlist($user, createIfMissing: false);
+        $wishlistId = $request->integer('wishlist_id');
+        $wishlist = $this->resolveWishlist($user, $wishlistId, createIfMissing: false);
 
         if (! $wishlist instanceof UserWishlist) {
             return $this->respond(
@@ -199,6 +222,23 @@ final class WishlistController extends Controller
         ];
 
         return $this->respond($request, $payload, __('Your wishlist has been cleared.'));
+    }
+
+    private function resolveWishlist(?User $user, ?int $wishlistId, bool $createIfMissing = true): ?UserWishlist
+    {
+        // Guard clause: deny access when no authenticated user is available.
+        if (! $user instanceof User) {
+            return null;
+        }
+
+        if ($wishlistId !== null) {
+            return $user
+                ->wishlists()
+                ->whereKey($wishlistId)
+                ->first();
+        }
+
+        return $this->resolveDefaultWishlist($user, $createIfMissing);
     }
 
     private function resolveDefaultWishlist(?User $user, bool $createIfMissing = true): ?UserWishlist
