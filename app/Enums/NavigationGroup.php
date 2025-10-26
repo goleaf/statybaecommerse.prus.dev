@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Enums;
 
+use App\Contracts\EnumInterface;
 use Illuminate\Support\Collection;
 
 /**
@@ -11,7 +12,7 @@ use Illuminate\Support\Collection;
  *
  * Enumeration defining a set of named constants with type safety.
  */
-enum NavigationGroup: string
+enum NavigationGroup: string implements EnumInterface
 {
     case Referral = 'Referral System';
     case Products = 'Products';
@@ -240,6 +241,14 @@ enum NavigationGroup: string
             // Sort explicitly by the computed priority for deterministic ordering.
             ->sortBy(fn (self $case) => $case->priority())
             ->values();
+    }
+
+    /**
+     * Expose the enum cases as a collection to align with EnumInterface expectations.
+     */
+    public static function collection(): Collection
+    {
+        return collect(self::cases());
     }
 
     public static function fromLabel(string $label): ?self
