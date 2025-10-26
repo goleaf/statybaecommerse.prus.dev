@@ -7,6 +7,7 @@ use App\Filament\Resources\VariantCombinationResource\Pages\EditVariantCombinati
 use App\Filament\Resources\VariantCombinationResource\Pages\ListVariantCombinations;
 use App\Filament\Resources\VariantCombinationResource\Pages\ViewVariantCombination;
 use App\Http\Controllers\Admin\CampaignConversionController;
+use App\Http\Controllers\Admin\DiscountPresetController;
 use App\Http\Controllers\Admin\LocationController as AdminLocationController;
 use App\Models\Inventory;
 use App\Models\NewsImage;
@@ -415,12 +416,11 @@ Route::middleware('auth')->group(function (): void {
         return $placeholder('Observability')();
     })->name('filament.admin.pages.observability');
 
-    // Discount Presets placeholder routes (auth required)
-    Route::get('/admin/discounts/presets', $placeholder('Discount Presets'))
+    // Discount Preset management routes handled by the controller implementation.
+    Route::get('/admin/discounts/presets', [DiscountPresetController::class, 'index'])
         ->name('admin.discounts.presets');
-    Route::post('/admin/discounts/presets', function () {
-        return redirect('/admin/discounts');
-    })->name('admin.discounts.presets.store');
+    Route::post('/admin/discounts/presets', [DiscountPresetController::class, 'store'])
+        ->name('admin.discounts.presets.store');
 });
 
 Route::middleware('auth')->prefix('admin')->group(function (): void {
