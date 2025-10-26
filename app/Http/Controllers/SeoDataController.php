@@ -40,7 +40,7 @@ final class SeoDataController extends Controller
         // Search in title, description, and keywords using a grouped LIKE query.
         $search = $request->input('search');
         if (is_string($search) && $search !== '') {
-            $like = '%'.$search.'%';
+            $like = '%' . $search . '%';
             $query->where(function (Builder $builder) use ($like): void {
                 $builder
                     ->where('title', 'like', $like)
@@ -65,7 +65,7 @@ final class SeoDataController extends Controller
         /** @var view-string $view */
         $view = 'seo-data.index';
 
-        return view($view, compact('seoData'));
+        return view($view, ['seoData' => $seoData]);
     }
 
     /**
@@ -75,7 +75,7 @@ final class SeoDataController extends Controller
     {
         $seoData->load('seoable');
 
-        return view('seo-data.show', compact('seoData'));
+        return view('seo-data.show', ['seoData' => $seoData]);
     }
 
     /**
@@ -97,7 +97,7 @@ final class SeoDataController extends Controller
         // Apply the text search filter in a dedicated grouped condition.
         $search = $request->input('search');
         if (is_string($search) && $search !== '') {
-            $like = '%'.$search.'%';
+            $like = '%' . $search . '%';
             $query->where(function (Builder $builder) use ($like): void {
                 $builder
                     ->where('title', 'like', $like)
@@ -120,7 +120,7 @@ final class SeoDataController extends Controller
         /** @var view-string $view */
         $view = 'seo-data.by-type';
 
-        return view($view, compact('seoData', 'type'));
+        return view($view, ['seoData' => $seoData, 'type' => $type]);
     }
 
     /**
@@ -128,10 +128,10 @@ final class SeoDataController extends Controller
      */
     public function analytics(): View
     {
-        $stats = ['total' => SeoData::count(), 'by_locale' => SeoData::selectRaw('locale, COUNT(*) as count')->groupBy('locale')->pluck('count', 'locale'), 'by_type' => SeoData::selectRaw('seoable_type, COUNT(*) as count')->groupBy('seoable_type')->pluck('count', 'seoable_type'), 'avg_score' => SeoData::avg('seo_score') ?? 0, 'complete_seo' => SeoData::whereNotNull('title')->whereNotNull('description')->whereNotNull('keywords')->count(), 'needs_optimization' => SeoData::where(function ($q) {
+        $stats = ['total' => SeoData::count(), 'by_locale' => SeoData::selectRaw('locale, COUNT(*) as count')->groupBy('locale')->pluck('count', 'locale'), 'by_type' => SeoData::selectRaw('seoable_type, COUNT(*) as count')->groupBy('seoable_type')->pluck('count', 'seoable_type'), 'avg_score' => SeoData::avg('seo_score') ?? 0, 'complete_seo' => SeoData::whereNotNull('title')->whereNotNull('description')->whereNotNull('keywords')->count(), 'needs_optimization' => SeoData::where(function ($q): void {
             $q->whereNull('title')->orWhereNull('description')->orWhereNull('keywords');
         })->count()];
 
-        return view('seo-data.analytics', compact('stats'));
+        return view('seo-data.analytics', ['stats' => $stats]);
     }
 }

@@ -9,9 +9,9 @@ use App\Models\Referral;
 use App\Models\ReferralCode;
 use App\Models\User;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
@@ -27,8 +27,6 @@ final class ReferralController extends Controller
 
     /**
      * Handle codeStatistics functionality with proper error handling.
-     *
-     * @return Illuminate\Http\JsonResponse
      */
     public function codeStatistics(): JsonResponse
     {
@@ -39,8 +37,6 @@ final class ReferralController extends Controller
 
     /**
      * Handle getReferralUrl functionality with proper error handling.
-     *
-     * @return Illuminate\Http\JsonResponse
      */
     public function getReferralUrl(): JsonResponse
     {
@@ -49,11 +45,7 @@ final class ReferralController extends Controller
             return response()->json(['url' => null]);
         }
         $referralCode = $user->activeReferralCode();
-        if ($referralCode) {
-            $url = route('referrals.track', ['code' => $referralCode->code]);
-        } else {
-            $url = null;
-        }
+        $url = $referralCode ? route('referrals.track', ['code' => $referralCode->code]) : null;
 
         return response()->json(['url' => $url]);
     }
@@ -64,14 +56,12 @@ final class ReferralController extends Controller
     public function index(): View
     {
         $user = Auth::user();
-        $referrals = $user->referrals()->with(['referred', 'rewards'])->latest()->get()->skipWhile(function ($referral) {
-            // Skip referrals that are not properly configured for display
-            return empty($referral->referred) || empty($referral->referred_id) || empty($referral->referrer_id) || empty($referral->status);
-        })->paginate(10);
+        $referrals = $user->referrals()->with(['referred', 'rewards'])->latest()->get()->skipWhile(fn ($referral): bool => // Skip referrals that are not properly configured for display
+            empty($referral->referred) || empty($referral->referred_id) || empty($referral->referrer_id) || empty($referral->status))->paginate(10);
         $stats = ['total_referrals' => $user->referrals()->count(), 'completed_referrals' => $user->referrals()->completed()->count(), 'pending_referrals' => $user->referrals()->where('status', 'pending')->count(), 'total_rewards' => $user->referralRewards()->sum('amount')];
         $referralCode = $user->activeReferralCode();
 
-        return view('referrals.index', compact('referrals', 'stats', 'referralCode'));
+        return view('referrals.index', ['referrals' => $referrals, 'stats' => $stats, 'referralCode' => $referralCode]);
     }
 
     /**
@@ -85,7 +75,7 @@ final class ReferralController extends Controller
         }
         $referralCode = $user->activeReferralCode();
 
-        return view('referrals.create', compact('referralCode'));
+        return view('referrals.create', ['referralCode' => $referralCode]);
     }
 
     /**
@@ -120,7 +110,7 @@ final class ReferralController extends Controller
         $this->authorize('view', $referral);
         $referral->load(['referrer', 'referred', 'rewards', 'analyticsEvents']);
 
-        return view('referrals.show', compact('referral'));
+        return view('referrals.show', ['referral' => $referral]);
     }
 
     /**
@@ -153,7 +143,7 @@ final class ReferralController extends Controller
         $shareUrl = $referralCode->referral_url;
         $shareText = __('referrals.share_text', ['code' => $referralCode->code, 'url' => $shareUrl]);
 
-        return view('referrals.share', compact('referralCode', 'shareUrl', 'shareText'));
+        return view('referrals.share', ['referralCode' => $referralCode, 'shareUrl' => $shareUrl, 'shareText' => $shareText]);
     }
 
     /**
@@ -182,7 +172,7 @@ final class ReferralController extends Controller
         $rewards = $user->referralRewards()->with(['referral.referred'])->latest()->paginate(10);
         $stats = ['total_rewards' => $user->referralRewards()->sum('amount'), 'pending_rewards' => $user->referralRewards()->pending()->sum('amount'), 'applied_rewards' => $user->referralRewards()->applied()->sum('amount')];
 
-        return view('referrals.rewards', compact('rewards', 'stats'));
+        return view('referrals.rewards', ['rewards' => $rewards, 'stats' => $stats]);
     }
 
     /**
@@ -193,12 +183,10 @@ final class ReferralController extends Controller
         $user = Auth::user();
         $stats = $user->referral_statistics;
         // Get monthly data for chart
-        $monthlyData = DB::table('referral_statistics')->where('user_id', $user->id)->where('date', '>=', now()->subMonths(12))->orderBy('date')->get()->skipWhile(function ($stat) {
-            // Skip statistics that are not properly configured for display
-            return empty($stat->date) || empty($stat->user_id) || $stat->referrals_count < 0 || $stat->rewards_amount < 0;
-        });
+        $monthlyData = DB::table('referral_statistics')->where('user_id', $user->id)->where('date', '>=', now()->subMonths(12))->orderBy('date')->get()->skipWhile(fn ($stat): bool => // Skip statistics that are not properly configured for display
+            empty($stat->date) || empty($stat->user_id) || $stat->referrals_count < 0 || $stat->rewards_amount < 0);
 
-        return view('referrals.statistics', compact('stats', 'monthlyData'));
+        return view('referrals.statistics', ['stats' => $stats, 'monthlyData' => $monthlyData]);
     }
 
     /**

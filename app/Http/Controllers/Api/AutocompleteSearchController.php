@@ -23,16 +23,16 @@ final class AutocompleteSearchController extends Controller
         requestBody: new OA\RequestBody(
             required: true,
             content: new OA\JsonContent(
-                type: 'object',
                 required: ['model_class', 'search_query'],
                 properties: [
-                    new OA\Property(property: 'model_class', type: 'string', description: 'Fully qualified model class to query.'),
-                    new OA\Property(property: 'search_query', type: 'string', description: 'Query string to search for.'),
+                    new OA\Property(property: 'model_class', description: 'Fully qualified model class to query.', type: 'string'),
+                    new OA\Property(property: 'search_query', description: 'Query string to search for.', type: 'string'),
                     new OA\Property(property: 'search_field', type: 'string', nullable: true),
                     new OA\Property(property: 'label_field', type: 'string', nullable: true),
                     new OA\Property(property: 'value_field', type: 'string', nullable: true),
-                    new OA\Property(property: 'limit', type: 'integer', minimum: 1, maximum: 100, nullable: true),
-                ]
+                    new OA\Property(property: 'limit', type: 'integer', maximum: 100, minimum: 1, nullable: true),
+                ],
+                type: 'object'
             )
         ),
         responses: [

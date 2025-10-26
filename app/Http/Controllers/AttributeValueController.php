@@ -36,8 +36,8 @@ final class AttributeValueController extends Controller
         // Filter by search term
         if ($request->has('search') && $request->search) {
             $search = $request->search;
-            $query->where(function ($q) use ($search) {
-                $q->where('value', 'like', "%{$search}%")->orWhere('description', 'like', "%{$search}%")->orWhereHas('attribute', function ($attrQuery) use ($search) {
+            $query->where(function ($q) use ($search): void {
+                $q->where('value', 'like', "%{$search}%")->orWhere('description', 'like', "%{$search}%")->orWhereHas('attribute', function ($attrQuery) use ($search): void {
                     $attrQuery->where('name', 'like', "%{$search}%");
                 });
             });
@@ -58,7 +58,7 @@ final class AttributeValueController extends Controller
         $attributeValues->appends($request->query());
         $attributes = Attribute::enabled()->ordered()->get();
 
-        return view('attribute-values.index', compact('attributeValues', 'attributes'));
+        return view('attribute-values.index', ['attributeValues' => $attributeValues, 'attributes' => $attributes]);
     }
 
     /**
@@ -68,7 +68,7 @@ final class AttributeValueController extends Controller
     {
         $attributeValue->load(['attribute', 'products', 'variants', 'translations']);
 
-        return view('attribute-values.show', compact('attributeValue'));
+        return view('attribute-values.show', ['attributeValue' => $attributeValue]);
     }
 
     /**
@@ -83,7 +83,7 @@ final class AttributeValueController extends Controller
         $attributeValues = PaginationService::paginateWithOnEachSide($attributeValuesQuery, 20);
         $attributeValues->appends(request()->query());
 
-        return view('attribute-values.by-attribute', compact('attribute', 'attributeValues'));
+        return view('attribute-values.by-attribute', ['attribute' => $attribute, 'attributeValues' => $attributeValues]);
     }
 
     /**
@@ -99,18 +99,14 @@ final class AttributeValueController extends Controller
         // Filter by search term
         if ($request->has('search') && $request->search) {
             $search = $request->search;
-            $query->where(function ($q) use ($search) {
-                $q->where('value', 'like', "%{$search}%")->orWhere('description', 'like', "%{$search}%")->orWhereHas('attribute', function ($attrQuery) use ($search) {
+            $query->where(function ($q) use ($search): void {
+                $q->where('value', 'like', "%{$search}%")->orWhere('description', 'like', "%{$search}%")->orWhereHas('attribute', function ($attrQuery) use ($search): void {
                     $attrQuery->where('name', 'like', "%{$search}%");
                 });
             });
         }
-        $attributeValues = $query->get()->skipWhile(function ($attributeValue) {
-            // Skip attribute values that are not properly configured for API response
-            return empty($attributeValue->value) || ! $attributeValue->is_enabled || empty($attributeValue->attribute) || empty($attributeValue->attribute_id);
-        })->map(function ($attributeValue) {
-            return ['id' => $attributeValue->id, 'value' => $attributeValue->getDisplayValue(), 'description' => $attributeValue->getDisplayDescription(), 'color_code' => $attributeValue->color_code, 'attribute' => ['id' => $attributeValue->attribute->id, 'name' => $attributeValue->attribute->getDisplayName()], 'products_count' => $attributeValue->products()->count(), 'variants_count' => $attributeValue->variants()->count()];
-        });
+        $attributeValues = $query->get()->skipWhile(fn ($attributeValue): bool => // Skip attribute values that are not properly configured for API response
+            empty($attributeValue->value) || ! $attributeValue->is_enabled || empty($attributeValue->attribute) || empty($attributeValue->attribute_id))->map(fn ($attributeValue): array => ['id' => $attributeValue->id, 'value' => $attributeValue->getDisplayValue(), 'description' => $attributeValue->getDisplayDescription(), 'color_code' => $attributeValue->color_code, 'attribute' => ['id' => $attributeValue->attribute->id, 'name' => $attributeValue->attribute->getDisplayName()], 'products_count' => $attributeValue->products()->count(), 'variants_count' => $attributeValue->variants()->count()]);
 
         return response()->json(['data' => $attributeValues, 'meta' => ['total' => $attributeValues->count()]]);
     }
@@ -125,11 +121,7 @@ final class AttributeValueController extends Controller
         if (empty($query)) {
             return response()->json(['data' => []]);
         }
-        $attributeValues = AttributeValue::with(['attribute', 'translations'])->enabled()->where('value', 'like', "%{$query}%")->when($attributeId, function ($q) use ($attributeId) {
-            return $q->forAttribute((int) $attributeId);
-        })->limit(10)->get()->map(function ($attributeValue) {
-            return ['id' => $attributeValue->id, 'value' => $attributeValue->getDisplayValue(), 'attribute_name' => $attributeValue->attribute->getDisplayName()];
-        });
+        $attributeValues = AttributeValue::with(['attribute', 'translations'])->enabled()->where('value', 'like', "%{$query}%")->when($attributeId, fn ($q) => $q->forAttribute((int) $attributeId))->limit(10)->get()->map(fn ($attributeValue): array => ['id' => $attributeValue->id, 'value' => $attributeValue->getDisplayValue(), 'attribute_name' => $attributeValue->attribute->getDisplayName()]);
 
         return response()->json(['data' => $attributeValues]);
     }

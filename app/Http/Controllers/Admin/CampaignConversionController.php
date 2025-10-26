@@ -70,18 +70,18 @@ final class CampaignConversionController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $validated = $request->validate([
-            'campaign_id' => ['required', 'integer', 'exists:discount_campaigns,id'],
-            'customer_id' => ['required', 'integer', 'exists:users,id'],
-            'conversion_type' => ['required', 'string', 'max:255'],
-            'conversion_value' => ['required', 'numeric', 'min:0'],
-            'status' => ['required', 'string', 'max:255'],
-            'converted_at' => ['required', 'date'],
-            'source' => ['nullable', 'string', 'max:255'],
-            'medium' => ['nullable', 'string', 'max:255'],
-            'device_type' => ['nullable', 'string', 'max:255'],
-            'country' => ['nullable', 'string', 'max:255'],
-            'conversion_data' => ['nullable', 'array'],
-            'tags' => ['nullable', 'array'],
+            'campaign_id'       => ['required', 'integer', 'exists:discount_campaigns,id'],
+            'customer_id'       => ['required', 'integer', 'exists:users,id'],
+            'conversion_type'   => ['required', 'string', 'max:255'],
+            'conversion_value'  => ['required', 'numeric', 'min:0'],
+            'status'            => ['required', 'string', 'max:255'],
+            'converted_at'      => ['required', 'date'],
+            'source'            => ['nullable', 'string', 'max:255'],
+            'medium'            => ['nullable', 'string', 'max:255'],
+            'device_type'       => ['nullable', 'string', 'max:255'],
+            'country'           => ['nullable', 'string', 'max:255'],
+            'conversion_data'   => ['nullable', 'array'],
+            'tags'              => ['nullable', 'array'],
             'custom_attributes' => ['nullable', 'array'],
         ]);
 
@@ -99,19 +99,19 @@ final class CampaignConversionController extends Controller
     public function update(Request $request, int $campaignConversion): RedirectResponse
     {
         $validated = $request->validate([
-            'campaign_id' => ['sometimes', 'integer', 'exists:discount_campaigns,id'],
-            'customer_id' => ['sometimes', 'integer', 'exists:users,id'],
-            'conversion_type' => ['sometimes', 'string', 'max:255'],
-            'conversion_value' => ['sometimes', 'numeric', 'min:0'],
-            'status' => ['sometimes', 'string', 'max:255'],
-            'converted_at' => ['sometimes', 'date'],
-            'source' => ['sometimes', 'string', 'max:255'],
-            'medium' => ['sometimes', 'string', 'max:255'],
-            'device_type' => ['sometimes', 'string', 'max:255'],
-            'country' => ['sometimes', 'string', 'max:255'],
+            'campaign_id'       => ['sometimes', 'integer', 'exists:discount_campaigns,id'],
+            'customer_id'       => ['sometimes', 'integer', 'exists:users,id'],
+            'conversion_type'   => ['sometimes', 'string', 'max:255'],
+            'conversion_value'  => ['sometimes', 'numeric', 'min:0'],
+            'status'            => ['sometimes', 'string', 'max:255'],
+            'converted_at'      => ['sometimes', 'date'],
+            'source'            => ['sometimes', 'string', 'max:255'],
+            'medium'            => ['sometimes', 'string', 'max:255'],
+            'device_type'       => ['sometimes', 'string', 'max:255'],
+            'country'           => ['sometimes', 'string', 'max:255'],
             'attribution_model' => ['sometimes', 'string', 'max:255'],
-            'conversion_data' => ['sometimes', 'array'],
-            'tags' => ['sometimes', 'array'],
+            'conversion_data'   => ['sometimes', 'array'],
+            'tags'              => ['sometimes', 'array'],
             'custom_attributes' => ['sometimes', 'array'],
         ]);
 
@@ -241,7 +241,7 @@ final class CampaignConversionController extends Controller
             ->get();
 
         $headers = [
-            'Content-Type' => 'text/csv',
+            'Content-Type'        => 'text/csv',
             'Content-Disposition' => 'attachment; filename="campaign_conversions.csv"',
         ];
 
@@ -365,11 +365,11 @@ final class CampaignConversionController extends Controller
     private function validatedIds(Request $request): array
     {
         $validated = $request->validate([
-            'ids' => ['required', 'array', 'min:1'],
+            'ids'   => ['required', 'array', 'min:1'],
             'ids.*' => ['integer', 'exists:campaign_conversions,id'],
         ]);
 
-        return array_values(array_unique(array_map('intval', $validated['ids'])));
+        return array_values(array_unique(array_map(static fn ($id): int => (int) $id, $validated['ids'])));
     }
 
     /**
@@ -387,9 +387,7 @@ final class CampaignConversionController extends Controller
      */
     private function htmlResponse(string $title, Collection $conversions): Response
     {
-        $items = $conversions->map(function (CampaignConversion $conversion): string {
-            return '<li>' . e($conversion->campaign_name ?? '—') . ' | ' . e((string) $conversion->status) . ' | ' . e((string) $conversion->conversion_type) . '</li>';
-        })->implode('');
+        $items = $conversions->map(fn (CampaignConversion $conversion): string => '<li>' . e($conversion->campaign_name ?? '—') . ' | ' . e((string) $conversion->status) . ' | ' . e((string) $conversion->conversion_type) . '</li>')->implode('');
 
         $html = '<!doctype html><html lang="en"><head><meta charset="utf-8"><title>' . e($title) . '</title></head><body>' .
             '<h1>' . e($title) . '</h1><ul>' . $items . '</ul></body></html>';

@@ -8,8 +8,9 @@ use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\ProductVariant;
-use App\Traits\HandlesContentNegotiation;
 use App\Services\Pricing\PriceCalculator;
+use App\Traits\HandlesContentNegotiation;
+use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -42,7 +43,7 @@ final class OrderController extends Controller
         }
         if ($request->filled('search')) {
             $search = $request->search;
-            $query->where(function ($q) use ($search) {
+            $query->where(function ($q) use ($search): void {
                 $q->where('number', 'like', "%{$search}%")->orWhere('notes', 'like', "%{$search}%");
             });
         }
@@ -64,7 +65,7 @@ final class OrderController extends Controller
             $order->load(['items.product', 'items.productVariant', 'shipping', 'documents']);
         }
 
-        return view('orders.show', compact('order'));
+        return view('orders.show', ['order' => $order]);
     }
 
     /**
@@ -73,14 +74,12 @@ final class OrderController extends Controller
     public function create(): View
     {
         $this->authorize('create', Order::class);
-        $user = Auth::user();
+        Auth::user();
 
-        $products = Product::with('variants')->where('is_visible', true)->get()->skipWhile(function (Product $product) {
-            // Skip products that are not properly configured for order creation
-            return empty($product->name) || ! $product->is_visible || $product->price <= 0 || empty($product->slug) || $product->stock_quantity <= 0;
-        });
+        $products = Product::with('variants')->where('is_visible', true)->get()->skipWhile(fn (Product $product): bool => // Skip products that are not properly configured for order creation
+            empty($product->name) || ! $product->is_visible || $product->price <= 0 || empty($product->slug) || $product->stock_quantity <= 0);
 
-        return view('orders.create', compact('products'));
+        return view('orders.create', ['products' => $products]);
     }
 
     /**
@@ -109,20 +108,20 @@ final class OrderController extends Controller
 
             // Create order
             $order = Order::create([
-                'number' => 'ORD-'.strtoupper(uniqid()),
-                'user_id' => $user->id,
-                'status' => 'pending',
-                'subtotal' => $breakdown->subtotal,
-                'tax_amount' => $breakdown->tax,
-                'shipping_amount' => $breakdown->shipping,
-                'discount_amount' => $breakdown->discount,
-                'total' => $breakdown->total,
-                'currency' => $breakdown->currency,
-                'billing_address' => $validated['billing_address'],
+                'number'           => 'ORD-' . strtoupper(uniqid()),
+                'user_id'          => $user->id,
+                'status'           => 'pending',
+                'subtotal'         => $breakdown->subtotal,
+                'tax_amount'       => $breakdown->tax,
+                'shipping_amount'  => $breakdown->shipping,
+                'discount_amount'  => $breakdown->discount,
+                'total'            => $breakdown->total,
+                'currency'         => $breakdown->currency,
+                'billing_address'  => $validated['billing_address'],
                 'shipping_address' => $validated['shipping_address'],
-                'notes' => $validated['notes'],
-                'payment_method' => $validated['payment_method'],
-                'payment_status' => 'pending',
+                'notes'            => $validated['notes'],
+                'payment_method'   => $validated['payment_method'],
+                'payment_status'   => 'pending',
             ]);
             // Create order items
             foreach ($items as $item) {
@@ -131,7 +130,7 @@ final class OrderController extends Controller
             DB::commit();
 
             return redirect()->route('frontend.orders.show', $order)->with('success', __('orders.messages.created_successfully'));
-        } catch (\Exception $e) {
+        } catch (Exception) {
             DB::rollBack();
 
             return back()->withInput()->with('error', __('orders.messages.creation_failed'));
@@ -154,7 +153,7 @@ final class OrderController extends Controller
         }
         $products = Product::with('variants')->where('is_visible', true)->get();
 
-        return view('orders.edit', compact('order', 'products'));
+        return view('orders.edit', ['order' => $order, 'products' => $products]);
     }
 
     /**
@@ -187,16 +186,16 @@ final class OrderController extends Controller
             $breakdown = app(PriceCalculator::class)->breakdown($subtotal);
 
             $order->update([
-                'subtotal' => $breakdown->subtotal,
-                'tax_amount' => $breakdown->tax,
-                'shipping_amount' => $breakdown->shipping,
-                'discount_amount' => $breakdown->discount,
-                'total' => $breakdown->total,
-                'currency' => $breakdown->currency,
-                'billing_address' => $validated['billing_address'],
+                'subtotal'         => $breakdown->subtotal,
+                'tax_amount'       => $breakdown->tax,
+                'shipping_amount'  => $breakdown->shipping,
+                'discount_amount'  => $breakdown->discount,
+                'total'            => $breakdown->total,
+                'currency'         => $breakdown->currency,
+                'billing_address'  => $validated['billing_address'],
                 'shipping_address' => $validated['shipping_address'],
-                'notes' => $validated['notes'],
-                'payment_method' => $validated['payment_method'],
+                'notes'            => $validated['notes'],
+                'payment_method'   => $validated['payment_method'],
             ]);
             // Create new order items
             foreach ($items as $item) {
@@ -205,7 +204,7 @@ final class OrderController extends Controller
             DB::commit();
 
             return redirect()->route('frontend.orders.show', $order)->with('success', __('orders.messages.updated_successfully'));
-        } catch (\Exception $e) {
+        } catch (Exception) {
             DB::rollBack();
 
             return back()->withInput()->with('error', __('orders.messages.update_failed'));

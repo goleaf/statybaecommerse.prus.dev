@@ -27,7 +27,7 @@ abstract class Controller
      */
     protected function applyPreferredLocale(): void
     {
-        $supported = collect(is_array(config('app.supported_locales')) ? config('app.supported_locales') : explode(',', (string) config('app.supported_locales', 'en')))->map(fn ($l) => trim((string) $l))->filter()->values();
+        $supported = collect(is_array(config('app.supported_locales')) ? config('app.supported_locales') : explode(',', (string) config('app.supported_locales', 'en')))->map(fn ($l): string => trim((string) $l))->filter()->values();
         $preferred = ((Request::user()?->preferred_locale ?: Request::route('locale')) ?: Request::get('locale')) ?: substr((string) Request::header('Accept-Language', ''), 0, 2);
         if (is_string($preferred) && $preferred !== '' && $supported->contains($preferred)) {
             App::setLocale($preferred);

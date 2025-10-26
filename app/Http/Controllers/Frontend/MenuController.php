@@ -32,7 +32,7 @@ final class MenuController extends Controller
 
         return response()->json([
             'success' => true,
-            'data' => $menus->map(fn (array $menu): array => $this->transformMenu($menu))->all(),
+            'data'    => $menus->map($this->transformMenu(...))->all(),
         ]);
     }
 
@@ -70,11 +70,11 @@ final class MenuController extends Controller
     private function transformMenu(array $menu): array
     {
         return [
-            'id' => $menu['id'],
-            'key' => $menu['key'],
-            'name' => $menu['name'],
+            'id'       => $menu['id'],
+            'key'      => $menu['key'],
+            'name'     => $menu['name'],
             'location' => $menu['location'],
-            'items' => $menu['items'],
+            'items'    => $menu['items'],
         ];
     }
 }

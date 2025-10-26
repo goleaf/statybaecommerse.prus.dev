@@ -24,8 +24,10 @@ final class LanguageController extends Controller
         $locale = $request->input('locale');
         // Validate locale using configured supported locales
         $supported = config('app.supported_locales', ['lt', 'en']);
-        $supportedLocales = is_array($supported) ? $supported : array_filter(array_map('trim', explode(',', (string) $supported)));
-        $supportedLocales = array_map('trim', $supportedLocales);
+        $supportedLocales = is_array($supported)
+            ? $supported
+            : array_filter(array_map(static fn ($locale): string => trim((string) $locale), explode(',', (string) $supported)));
+        $supportedLocales = array_map(static fn ($locale): string => trim((string) $locale), $supportedLocales);
         if (! in_array($locale, $supportedLocales, true)) {
             $locale = (string) config('app.locale', 'lt');
         }

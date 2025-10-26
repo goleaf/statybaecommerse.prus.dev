@@ -50,7 +50,7 @@ final class CampaignClickController extends Controller
         }
         $clicks = $query->orderBy('clicked_at', 'desc')->paginate(15);
 
-        return view('campaign-clicks.index', compact('clicks'));
+        return view('campaign-clicks.index', ['clicks' => $clicks]);
     }
 
     /**
@@ -64,6 +64,6 @@ final class CampaignClickController extends Controller
         }
         $campaignClick->load(['campaign', 'customer', 'conversions']);
 
-        return view('campaign-clicks.show', compact('campaignClick'));
+        return view('campaign-clicks.show', ['campaignClick' => $campaignClick]);
     }
 }

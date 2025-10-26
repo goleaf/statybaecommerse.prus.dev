@@ -34,16 +34,14 @@ final class AttributeController extends Controller
         }
         if ($request->filled('search')) {
             $search = $request->get('search');
-            $query->where(function ($q) use ($search) {
+            $query->where(function ($q) use ($search): void {
                 $q->where('name', 'like', "%{$search}%")->orWhere('description', 'like', "%{$search}%")->orWhere('slug', 'like', "%{$search}%");
             });
         }
-        $attributes = $query->get()->skipWhile(function ($attribute) {
-            // Skip attributes that are not properly configured for display
-            return empty($attribute->name) || ! $attribute->is_enabled || empty($attribute->type) || empty($attribute->group_name) || empty($attribute->slug);
-        })->paginate(12);
+        $attributes = $query->get()->skipWhile(fn ($attribute): bool => // Skip attributes that are not properly configured for display
+            empty($attribute->name) || ! $attribute->is_enabled || empty($attribute->type) || empty($attribute->group_name) || empty($attribute->slug))->paginate(12);
 
-        return view('attributes.index', compact('attributes'));
+        return view('attributes.index', ['attributes' => $attributes]);
     }
 
     /**
@@ -51,15 +49,13 @@ final class AttributeController extends Controller
      */
     public function show(Attribute $attribute): View
     {
-        $attribute->load(['values' => function ($query) {
+        $attribute->load(['values' => function ($query): void {
             $query->enabled()->ordered();
         }]);
-        $relatedAttributes = Attribute::withTranslations()->enabled()->where('id', '!=', $attribute->id)->where('group_name', $attribute->group_name)->limit(4)->get()->skipWhile(function ($relatedAttribute) {
-            // Skip related attributes that are not properly configured for display
-            return empty($relatedAttribute->name) || ! $relatedAttribute->is_enabled || empty($relatedAttribute->type) || empty($relatedAttribute->group_name) || empty($relatedAttribute->slug);
-        });
+        $relatedAttributes = Attribute::withTranslations()->enabled()->where('id', '!=', $attribute->id)->where('group_name', $attribute->group_name)->limit(4)->get()->skipWhile(fn ($relatedAttribute): bool => // Skip related attributes that are not properly configured for display
+            empty($relatedAttribute->name) || ! $relatedAttribute->is_enabled || empty($relatedAttribute->type) || empty($relatedAttribute->group_name) || empty($relatedAttribute->slug));
 
-        return view('attributes.show', compact('attribute', 'relatedAttributes'));
+        return view('attributes.show', ['attribute' => $attribute, 'relatedAttributes' => $relatedAttributes]);
     }
 
     // API Endpoints
@@ -71,18 +67,14 @@ final class AttributeController extends Controller
         $query = Attribute::withTranslations()->enabled();
         if ($request->filled('search')) {
             $search = $request->get('search');
-            $query->where(function ($q) use ($search) {
+            $query->where(function ($q) use ($search): void {
                 $q->where('name', 'like', "%{$search}%")->orWhere('description', 'like', "%{$search}%")->orWhere('slug', 'like', "%{$search}%");
             });
         }
-        $attributes = $query->limit(20)->get()->skipWhile(function ($attribute) {
-            // Skip attributes that are not properly configured for API response
-            return empty($attribute->name) || ! $attribute->is_enabled || empty($attribute->type) || empty($attribute->group_name) || empty($attribute->slug);
-        });
+        $attributes = $query->limit(20)->get()->skipWhile(fn ($attribute): bool => // Skip attributes that are not properly configured for API response
+            empty($attribute->name) || ! $attribute->is_enabled || empty($attribute->type) || empty($attribute->group_name) || empty($attribute->slug));
 
-        return response()->json(['attributes' => $attributes->map(function ($attribute) {
-            return ['id' => $attribute->id, 'name' => $attribute->getTranslatedName(), 'slug' => $attribute->slug, 'type' => $attribute->type, 'description' => $attribute->getTranslatedDescription(), 'group_name' => $attribute->group_name, 'is_required' => $attribute->is_required, 'is_filterable' => $attribute->is_filterable, 'is_searchable' => $attribute->is_searchable, 'values_count' => $attribute->getValuesCount(), 'usage_count' => $attribute->getUsageCount()];
-        })]);
+        return response()->json(['attributes' => $attributes->map(fn ($attribute): array => ['id' => $attribute->id, 'name' => $attribute->getTranslatedName(), 'slug' => $attribute->slug, 'type' => $attribute->type, 'description' => $attribute->getTranslatedDescription(), 'group_name' => $attribute->group_name, 'is_required' => $attribute->is_required, 'is_filterable' => $attribute->is_filterable, 'is_searchable' => $attribute->is_searchable, 'values_count' => $attribute->getValuesCount(), 'usage_count' => $attribute->getUsageCount()])]);
     }
 
     /**
@@ -92,9 +84,7 @@ final class AttributeController extends Controller
     {
         $attributes = Attribute::withTranslations()->enabled()->byType($type)->orderBy('sort_order')->get();
 
-        return response()->json(['attributes' => $attributes->map(function ($attribute) {
-            return ['id' => $attribute->id, 'name' => $attribute->getTranslatedName(), 'slug' => $attribute->slug, 'type' => $attribute->type, 'description' => $attribute->getTranslatedDescription(), 'group_name' => $attribute->group_name, 'values_count' => $attribute->getValuesCount(), 'usage_count' => $attribute->getUsageCount()];
-        })]);
+        return response()->json(['attributes' => $attributes->map(fn ($attribute): array => ['id' => $attribute->id, 'name' => $attribute->getTranslatedName(), 'slug' => $attribute->slug, 'type' => $attribute->type, 'description' => $attribute->getTranslatedDescription(), 'group_name' => $attribute->group_name, 'values_count' => $attribute->getValuesCount(), 'usage_count' => $attribute->getUsageCount()])]);
     }
 
     /**
@@ -104,9 +94,7 @@ final class AttributeController extends Controller
     {
         $attributes = Attribute::withTranslations()->enabled()->byGroup($group)->orderBy('sort_order')->get();
 
-        return response()->json(['attributes' => $attributes->map(function ($attribute) {
-            return ['id' => $attribute->id, 'name' => $attribute->getTranslatedName(), 'slug' => $attribute->slug, 'type' => $attribute->type, 'description' => $attribute->getTranslatedDescription(), 'group_name' => $attribute->group_name, 'values_count' => $attribute->getValuesCount(), 'usage_count' => $attribute->getUsageCount()];
-        })]);
+        return response()->json(['attributes' => $attributes->map(fn ($attribute): array => ['id' => $attribute->id, 'name' => $attribute->getTranslatedName(), 'slug' => $attribute->slug, 'type' => $attribute->type, 'description' => $attribute->getTranslatedDescription(), 'group_name' => $attribute->group_name, 'values_count' => $attribute->getValuesCount(), 'usage_count' => $attribute->getUsageCount()])]);
     }
 
     /**
@@ -116,9 +104,7 @@ final class AttributeController extends Controller
     {
         $attributes = Attribute::withTranslations()->enabled()->filterable()->orderBy('sort_order')->get();
 
-        return response()->json(['attributes' => $attributes->map(function ($attribute) {
-            return ['id' => $attribute->id, 'name' => $attribute->getTranslatedName(), 'slug' => $attribute->slug, 'type' => $attribute->type, 'description' => $attribute->getTranslatedDescription(), 'group_name' => $attribute->group_name, 'values_count' => $attribute->getValuesCount()];
-        })]);
+        return response()->json(['attributes' => $attributes->map(fn ($attribute): array => ['id' => $attribute->id, 'name' => $attribute->getTranslatedName(), 'slug' => $attribute->slug, 'type' => $attribute->type, 'description' => $attribute->getTranslatedDescription(), 'group_name' => $attribute->group_name, 'values_count' => $attribute->getValuesCount()])]);
     }
 
     /**
@@ -128,9 +114,7 @@ final class AttributeController extends Controller
     {
         $attributes = Attribute::withTranslations()->enabled()->required()->orderBy('sort_order')->get();
 
-        return response()->json(['attributes' => $attributes->map(function ($attribute) {
-            return ['id' => $attribute->id, 'name' => $attribute->getTranslatedName(), 'slug' => $attribute->slug, 'type' => $attribute->type, 'description' => $attribute->getTranslatedDescription(), 'group_name' => $attribute->group_name, 'values_count' => $attribute->getValuesCount(), 'usage_count' => $attribute->getUsageCount()];
-        })]);
+        return response()->json(['attributes' => $attributes->map(fn ($attribute): array => ['id' => $attribute->id, 'name' => $attribute->getTranslatedName(), 'slug' => $attribute->slug, 'type' => $attribute->type, 'description' => $attribute->getTranslatedDescription(), 'group_name' => $attribute->group_name, 'values_count' => $attribute->getValuesCount(), 'usage_count' => $attribute->getUsageCount()])]);
     }
 
     /**

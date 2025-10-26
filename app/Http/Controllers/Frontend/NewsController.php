@@ -32,14 +32,14 @@ final class NewsController extends Controller
         // Category filter
         if ($request->filled('category')) {
             $category = $request->get('category');
-            $query->whereHas('categories', function ($q) use ($category) {
+            $query->whereHas('categories', function ($q) use ($category): void {
                 $q->where('slug', $category);
             });
         }
         // Tag filter
         if ($request->filled('tag')) {
             $tag = $request->get('tag');
-            $query->whereHas('tags', function ($q) use ($tag) {
+            $query->whereHas('tags', function ($q) use ($tag): void {
                 $q->where('slug', $tag);
             });
         }
@@ -66,7 +66,7 @@ final class NewsController extends Controller
      */
     public function show(string $slug): JsonResponse
     {
-        $news = News::published()->where('slug', $slug)->with(['categories', 'tags', 'images', 'comments' => function ($query) {
+        $news = News::published()->where('slug', $slug)->with(['categories', 'tags', 'images', 'comments' => function ($query): void {
             $query->approved()->with('user');
         }])->withCount('comments')->first();
         if (! $news) {
@@ -75,15 +75,7 @@ final class NewsController extends Controller
         // Increment view count
         $news->increment('views_count');
 
-        return response()->json(['success' => true, 'data' => ['id' => $news->id, 'title' => $news->title, 'slug' => $news->slug, 'excerpt' => $news->excerpt, 'content' => $news->content, 'featured_image' => $news->featured_image, 'author' => $news->author, 'published_at' => $news->published_at, 'views_count' => $news->views_count, 'comments_count' => $news->comments_count, 'categories' => $news->categories->map(function ($category) {
-            return ['id' => $category->id, 'name' => $category->name, 'slug' => $category->slug];
-        }), 'tags' => $news->tags->map(function ($tag) {
-            return ['id' => $tag->id, 'name' => $tag->name, 'slug' => $tag->slug];
-        }), 'images' => $news->images->map(function ($image) {
-            return ['id' => $image->id, 'url' => $image->getUrl(), 'alt' => $image->alt_text, 'caption' => $image->caption];
-        }), 'comments' => $news->comments->map(function ($comment) {
-            return ['id' => $comment->id, 'content' => $comment->content, 'author' => $comment->user->name, 'created_at' => $comment->created_at];
-        })]]);
+        return response()->json(['success' => true, 'data' => ['id' => $news->id, 'title' => $news->title, 'slug' => $news->slug, 'excerpt' => $news->excerpt, 'content' => $news->content, 'featured_image' => $news->featured_image, 'author' => $news->author, 'published_at' => $news->published_at, 'views_count' => $news->views_count, 'comments_count' => $news->comments_count, 'categories' => $news->categories->map(fn ($category): array => ['id' => $category->id, 'name' => $category->name, 'slug' => $category->slug]), 'tags' => $news->tags->map(fn ($tag): array => ['id' => $tag->id, 'name' => $tag->name, 'slug' => $tag->slug]), 'images' => $news->images->map(fn ($image): array => ['id' => $image->id, 'url' => $image->getUrl(), 'alt' => $image->alt_text, 'caption' => $image->caption]), 'comments' => $news->comments->map(fn ($comment): array => ['id' => $comment->id, 'content' => $comment->content, 'author' => $comment->user->name, 'created_at' => $comment->created_at])]]);
     }
 
     /**
@@ -94,14 +86,10 @@ final class NewsController extends Controller
         $limit = min((int) $request->get('limit', 5), 10);
         $timeout = now()->addSeconds(10);
         // 10 second timeout for featured news
-        $featuredNews = News::published()->where('is_featured', true)->with(['categories', 'tags'])->orderBy('published_at', 'desc')->limit($limit)->cursor()->takeUntilTimeout($timeout)->collect()->skipWhile(function ($news) {
-            // Skip news items that are not properly configured for display
-            return empty($news->title) || empty($news->slug) || ! $news->is_published || empty($news->excerpt);
-        });
+        $featuredNews = News::published()->where('is_featured', true)->with(['categories', 'tags'])->orderBy('published_at', 'desc')->limit($limit)->cursor()->takeUntilTimeout($timeout)->collect()->skipWhile(fn ($news): bool => // Skip news items that are not properly configured for display
+            empty($news->title) || empty($news->slug) || ! $news->is_published || empty($news->excerpt));
 
-        return response()->json(['success' => true, 'data' => $featuredNews->map(function ($news) {
-            return ['id' => $news->id, 'title' => $news->title, 'slug' => $news->slug, 'excerpt' => $news->excerpt, 'featured_image' => $news->featured_image, 'published_at' => $news->published_at, 'categories' => $news->categories->pluck('name')];
-        })]);
+        return response()->json(['success' => true, 'data' => $featuredNews->map(fn ($news): array => ['id' => $news->id, 'title' => $news->title, 'slug' => $news->slug, 'excerpt' => $news->excerpt, 'featured_image' => $news->featured_image, 'published_at' => $news->published_at, 'categories' => $news->categories->pluck('name')])]);
     }
 
     /**
@@ -109,14 +97,10 @@ final class NewsController extends Controller
      */
     public function categories(): JsonResponse
     {
-        $categories = NewsCategory::active()->withCount('news')->orderBy('name')->get()->skipWhile(function ($category) {
-            // Skip categories that are not properly configured for display
-            return empty($category->name) || empty($category->slug) || ! $category->is_active || $category->news_count <= 0;
-        });
+        $categories = NewsCategory::active()->withCount('news')->orderBy('name')->get()->skipWhile(fn ($category): bool => // Skip categories that are not properly configured for display
+            empty($category->name) || empty($category->slug) || ! $category->is_active || $category->news_count <= 0);
 
-        return response()->json(['success' => true, 'data' => $categories->map(function ($category) {
-            return ['id' => $category->id, 'name' => $category->name, 'slug' => $category->slug, 'description' => $category->description, 'news_count' => $category->news_count];
-        })]);
+        return response()->json(['success' => true, 'data' => $categories->map(fn ($category): array => ['id' => $category->id, 'name' => $category->name, 'slug' => $category->slug, 'description' => $category->description, 'news_count' => $category->news_count])]);
     }
 
     /**
@@ -124,14 +108,10 @@ final class NewsController extends Controller
      */
     public function tags(): JsonResponse
     {
-        $tags = NewsTag::active()->withCount('news')->orderBy('name')->get()->skipWhile(function ($tag) {
-            // Skip tags that are not properly configured for display
-            return empty($tag->name) || empty($tag->slug) || ! $tag->is_active || $tag->news_count <= 0;
-        });
+        $tags = NewsTag::active()->withCount('news')->orderBy('name')->get()->skipWhile(fn ($tag): bool => // Skip tags that are not properly configured for display
+            empty($tag->name) || empty($tag->slug) || ! $tag->is_active || $tag->news_count <= 0);
 
-        return response()->json(['success' => true, 'data' => $tags->map(function ($tag) {
-            return ['id' => $tag->id, 'name' => $tag->name, 'slug' => $tag->slug, 'news_count' => $tag->news_count];
-        })]);
+        return response()->json(['success' => true, 'data' => $tags->map(fn ($tag): array => ['id' => $tag->id, 'name' => $tag->name, 'slug' => $tag->slug, 'news_count' => $tag->news_count])]);
     }
 
     /**
@@ -145,15 +125,11 @@ final class NewsController extends Controller
             return response()->json(['success' => false, 'message' => __('api.news_not_found')], 404);
         }
         $categoryIds = $news->categories->pluck('id');
-        $relatedNews = News::published()->where('id', '!=', $news->id)->whereHas('categories', function ($query) use ($categoryIds) {
+        $relatedNews = News::published()->where('id', '!=', $news->id)->whereHas('categories', function ($query) use ($categoryIds): void {
             $query->whereIn('id', $categoryIds);
-        })->with(['categories'])->orderBy('published_at', 'desc')->limit($limit)->get()->skipWhile(function ($related) {
-            // Skip related news items that are not properly configured for display
-            return empty($related->title) || empty($related->slug) || ! $related->is_published || empty($related->excerpt);
-        });
+        })->with(['categories'])->orderBy('published_at', 'desc')->limit($limit)->get()->skipWhile(fn ($related): bool => // Skip related news items that are not properly configured for display
+            empty($related->title) || empty($related->slug) || ! $related->is_published || empty($related->excerpt));
 
-        return response()->json(['success' => true, 'data' => $relatedNews->map(function ($related) {
-            return ['id' => $related->id, 'title' => $related->title, 'slug' => $related->slug, 'excerpt' => $related->excerpt, 'featured_image' => $related->featured_image, 'published_at' => $related->published_at, 'categories' => $related->categories->pluck('name')];
-        })]);
+        return response()->json(['success' => true, 'data' => $relatedNews->map(fn ($related): array => ['id' => $related->id, 'title' => $related->title, 'slug' => $related->slug, 'excerpt' => $related->excerpt, 'featured_image' => $related->featured_image, 'published_at' => $related->published_at, 'categories' => $related->categories->pluck('name')])]);
     }
 }

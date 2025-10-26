@@ -15,6 +15,8 @@ use Illuminate\Http\Response;
 use Illuminate\Mail\Mailable;
 use Illuminate\Support\Str;
 
+use function in_array;
+
 final class MailPreviewController
 {
     public function index(Request $request): View
@@ -26,14 +28,14 @@ final class MailPreviewController
 
         foreach ($definitions as $slug => $definition) {
             $previews[] = [
-                'slug' => $slug,
+                'slug'  => $slug,
                 'label' => $definition['label']($locale),
             ];
         }
 
         return view('mail.previews.index', [
-            'previews' => $previews,
-            'selectedLocale' => $locale,
+            'previews'         => $previews,
+            'selectedLocale'   => $locale,
             'availableLocales' => $this->previewLocales(),
         ]);
     }
@@ -54,9 +56,9 @@ final class MailPreviewController
         $subject = $mailable->subject;
 
         return new Response($html, 200, array_filter([
-            'Content-Type' => 'text/html; charset=UTF-8',
+            'Content-Type'   => 'text/html; charset=UTF-8',
             'X-Mail-Preview' => $mail,
-            'X-Mail-Locale' => $locale,
+            'X-Mail-Locale'  => $locale,
             'X-Mail-Subject' => $subject,
         ]));
     }
@@ -69,7 +71,7 @@ final class MailPreviewController
         return [
             'order-confirmation' => [
                 'label' => static fn (string $locale): string => __('mail.order_confirmation_title', [], $locale),
-                'make' => function (string $locale): Mailable {
+                'make'  => function (string $locale): Mailable {
                     $order = $this->fakeOrder($locale);
 
                     return new OrderConfirmationMail($order);
@@ -77,20 +79,20 @@ final class MailPreviewController
             ],
             'password-reset' => [
                 'label' => static fn (string $locale): string => __('mail.reset_password_title', [], $locale),
-                'make' => function (string $locale): Mailable {
+                'make'  => function (string $locale): Mailable {
                     $passwordBroker = config('auth.defaults.passwords', 'users');
                     $passwordBroker = is_string($passwordBroker) && $passwordBroker !== '' ? $passwordBroker : 'users';
                     $expireConfig = config("auth.passwords.{$passwordBroker}.expire", 60);
                     $minutes = is_int($expireConfig) ? $expireConfig : (is_numeric($expireConfig) ? (int) $expireConfig : 60);
-                    $url = url('reset-password/'.Str::random(32).'?email='.urlencode('customer@example.test'));
+                    $url = url('reset-password/' . Str::random(32) . '?email=' . urlencode('customer@example.test'));
 
                     return new PasswordResetMail($url, $minutes, $locale);
                 },
             ],
             'verify-email' => [
                 'label' => static fn (string $locale): string => __('mail.verify_email_title', [], $locale),
-                'make' => function (string $locale): Mailable {
-                    $url = url('verify-email/'.Str::random(32).'/'.Str::random(64));
+                'make'  => function (string $locale): Mailable {
+                    $url = url('verify-email/' . Str::random(32) . '/' . Str::random(64));
 
                     return new VerifyEmailMail($url, $locale);
                 },
@@ -103,7 +105,7 @@ final class MailPreviewController
         $locales = $this->previewLocales();
         $requested = (string) $request->query('locale', app()->getLocale());
 
-        if ($requested !== '' && \in_array($requested, $locales, true)) {
+        if ($requested !== '' && in_array($requested, $locales, true)) {
             return $requested;
         }
 
@@ -117,7 +119,7 @@ final class MailPreviewController
     {
         $configuredRaw = config('app.supported_locales', 'en');
         $configured = is_string($configuredRaw) && $configuredRaw !== '' ? $configuredRaw : 'en';
-        $locales = array_filter(array_map('trim', explode(',', $configured)));
+        $locales = array_filter(array_map(static fn ($locale): string => trim((string) $locale), explode(',', $configured)));
 
         if ($locales === []) {
             $locales = [app()->getLocale()];

@@ -15,10 +15,10 @@ final class SearchController extends Controller
     public function __invoke(SearchRequest $request, SearchService $service): JsonResponse
     {
         $queryData = SearchQueryData::fromArray($request->validated(), [
-            'ip' => $request->ip(),
-            'user_id' => $request->user()?->getKey(),
+            'ip'         => $request->ip(),
+            'user_id'    => $request->user()?->getKey(),
             'user_agent' => $request->userAgent(),
-            'locale' => app()->getLocale(),
+            'locale'     => app()->getLocale(),
         ]);
 
         $results = $service->search($queryData);

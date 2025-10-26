@@ -23,13 +23,13 @@ final class InventoryController extends Controller
         $query = Product::with(['brand', 'categories'])->where('is_visible', true)->published();
         // Apply filters
         if ($request->filled('stock_status')) {
-            $query->where(function ($q) use ($request) {
+            $query->where(function ($q) use ($request): void {
                 match ($request->stock_status) {
-                    'in_stock' => $q->where('manage_stock', true)->whereRaw('stock_quantity > low_stock_threshold'),
-                    'low_stock' => $q->where('manage_stock', true)->where('stock_quantity', '>', 0)->whereRaw('stock_quantity <= low_stock_threshold'),
+                    'in_stock'     => $q->where('manage_stock', true)->whereRaw('stock_quantity > low_stock_threshold'),
+                    'low_stock'    => $q->where('manage_stock', true)->where('stock_quantity', '>', 0)->whereRaw('stock_quantity <= low_stock_threshold'),
                     'out_of_stock' => $q->where('manage_stock', true)->where('stock_quantity', '<=', 0),
-                    'not_tracked' => $q->where('manage_stock', false),
-                    default => null,
+                    'not_tracked'  => $q->where('manage_stock', false),
+                    default        => null,
                 };
             });
         }
@@ -37,13 +37,13 @@ final class InventoryController extends Controller
             $query->where('brand_id', $request->brand);
         }
         if ($request->filled('category')) {
-            $query->whereHas('categories', function ($q) use ($request) {
+            $query->whereHas('categories', function ($q) use ($request): void {
                 $q->where('category_id', $request->category);
             });
         }
         if ($request->filled('search')) {
             $search = $request->search;
-            $query->where(function ($q) use ($search) {
+            $query->where(function ($q) use ($search): void {
                 $q->where('name', 'like', "%{$search}%")->orWhere('sku', 'like', "%{$search}%")->orWhere('description', 'like', "%{$search}%");
             });
         }
@@ -58,7 +58,7 @@ final class InventoryController extends Controller
         }
         $products = $query->paginate(20)->withQueryString();
 
-        return view('inventory', compact('products'));
+        return view('inventory', ['products' => $products]);
     }
 
     /**
@@ -68,6 +68,6 @@ final class InventoryController extends Controller
     {
         $product->load(['brand', 'categories', 'reviews', 'variants']);
 
-        return view('products.show', compact('product'));
+        return view('products.show', ['product' => $product]);
     }
 }

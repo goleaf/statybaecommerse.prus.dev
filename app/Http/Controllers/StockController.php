@@ -8,6 +8,7 @@ use App\Jobs\GenerateStockExport;
 use App\Models\Location;
 use App\Models\Partner;
 use App\Models\VariantInventory;
+use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -29,9 +30,9 @@ final class StockController extends Controller
         // Apply filters
         if ($request->filled('search')) {
             $search = $request->get('search');
-            $query->whereHas('variant.product', function ($q) use ($search) {
+            $query->whereHas('variant.product', function ($q) use ($search): void {
                 $q->where('name', 'like', "%{$search}%");
-            })->orWhereHas('variant', function ($q) use ($search) {
+            })->orWhereHas('variant', function ($q) use ($search): void {
                 $q->where('sku', 'like', "%{$search}%")->orWhere('name', 'like', "%{$search}%");
             });
         }
@@ -47,11 +48,11 @@ final class StockController extends Controller
         if ($request->filled('stock_status')) {
             $stockStatus = $request->get('stock_status');
             match ($stockStatus) {
-                'low_stock' => $query->lowStock(),
-                'out_of_stock' => $query->outOfStock(),
+                'low_stock'     => $query->lowStock(),
+                'out_of_stock'  => $query->outOfStock(),
                 'needs_reorder' => $query->needsReorder(),
                 'expiring_soon' => $query->expiringSoon(),
-                default => null,
+                default         => null,
             };
         }
         // Apply sorting
@@ -63,7 +64,7 @@ final class StockController extends Controller
         $locations = Location::enabled()->get();
         $suppliers = Partner::enabled()->get();
 
-        return view('stock.index', compact('stockItems', 'locations', 'suppliers'));
+        return view('stock.index', ['stockItems' => $stockItems, 'locations' => $locations, 'suppliers' => $suppliers]);
     }
 
     /**
@@ -73,7 +74,7 @@ final class StockController extends Controller
     {
         $stock = VariantInventory::with(['variant.product', 'location', 'supplier', 'stockMovements.user'])->findOrFail($stockId);
 
-        return view('stock.show', compact('stock'));
+        return view('stock.show', ['stock' => $stock]);
     }
 
     /**
@@ -87,7 +88,7 @@ final class StockController extends Controller
             $stock->adjustStock($validated['quantity'], $validated['reason']);
 
             return response()->json(['success' => true, 'message' => __('inventory.stock_adjusted'), 'data' => ['new_stock' => $stock->fresh()->stock, 'available_stock' => $stock->fresh()->available_stock]]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->json(['success' => false, 'message' => __('inventory.adjustment_failed'), 'error' => $e->getMessage()], 500);
         }
     }
@@ -105,7 +106,7 @@ final class StockController extends Controller
             } else {
                 return response()->json(['success' => false, 'message' => __('inventory.reserve_failed_message')], 400);
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->json(['success' => false, 'message' => __('inventory.reserve_failed'), 'error' => $e->getMessage()], 500);
         }
     }
@@ -121,7 +122,7 @@ final class StockController extends Controller
             $stock->unreserve($validated['quantity']);
 
             return response()->json(['success' => true, 'message' => __('inventory.stock_unreserved'), 'data' => ['reserved' => $stock->fresh()->reserved, 'available_stock' => $stock->fresh()->available_stock]]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->json(['success' => false, 'message' => __('inventory.unreserve_failed'), 'error' => $e->getMessage()], 500);
         }
     }
@@ -161,16 +162,12 @@ final class StockController extends Controller
         // Calculate summary statistics
         $summary = ['total_items' => $stockItems->count(), 'total_stock_value' => $stockItems->sum('stock_value'), 'total_reserved_value' => $stockItems->sum('reserved_value'), 'low_stock_items' => $stockItems->filter(fn ($item) => $item->isLowStock())->count(), 'out_of_stock_items' => $stockItems->filter(fn ($item) => $item->isOutOfStock())->count(), 'needs_reorder_items' => $stockItems->filter(fn ($item) => $item->needsReorder())->count()];
         // Group by location
-        $byLocation = $stockItems->groupBy('location.name')->map(function ($items) {
-            return ['count' => $items->count(), 'total_value' => $items->sum('stock_value'), 'reserved_value' => $items->sum('reserved_value'), 'low_stock' => $items->filter(fn ($item) => $item->isLowStock())->count(), 'out_of_stock' => $items->filter(fn ($item) => $item->isOutOfStock())->count()];
-        });
+        $byLocation = $stockItems->groupBy('location.name')->map(fn ($items): array => ['count' => $items->count(), 'total_value' => $items->sum('stock_value'), 'reserved_value' => $items->sum('reserved_value'), 'low_stock' => $items->filter(fn ($item) => $item->isLowStock())->count(), 'out_of_stock' => $items->filter(fn ($item) => $item->isOutOfStock())->count()]);
         // Group by supplier
-        $bySupplier = $stockItems->groupBy('supplier.name')->map(function ($items) {
-            return ['count' => $items->count(), 'total_value' => $items->sum('stock_value'), 'reserved_value' => $items->sum('reserved_value'), 'low_stock' => $items->filter(fn ($item) => $item->isLowStock())->count(), 'out_of_stock' => $items->filter(fn ($item) => $item->isOutOfStock())->count()];
-        });
+        $bySupplier = $stockItems->groupBy('supplier.name')->map(fn ($items): array => ['count' => $items->count(), 'total_value' => $items->sum('stock_value'), 'reserved_value' => $items->sum('reserved_value'), 'low_stock' => $items->filter(fn ($item) => $item->isLowStock())->count(), 'out_of_stock' => $items->filter(fn ($item) => $item->isOutOfStock())->count()]);
         $locations = Location::enabled()->get();
 
-        return view('stock.report', compact('stockItems', 'summary', 'byLocation', 'bySupplier', 'locations'));
+        return view('stock.report', ['stockItems' => $stockItems, 'summary' => $summary, 'byLocation' => $byLocation, 'bySupplier' => $bySupplier, 'locations' => $locations]);
     }
 
     /**

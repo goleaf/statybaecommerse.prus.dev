@@ -32,13 +32,13 @@ final class CustomerGroupController extends Controller
         // Search by name
         if ($request->has('search')) {
             $search = $request->get('search');
-            $query->where(function ($q) use ($search) {
+            $query->where(function ($q) use ($search): void {
                 $q->whereRaw("JSON_EXTRACT(name, '\$.lt') LIKE ?", ["%{$search}%"])->orWhereRaw("JSON_EXTRACT(name, '\$.en') LIKE ?", ["%{$search}%"]);
             });
         }
         $customerGroups = $query->paginate(12);
 
-        return view('customer-groups.index', compact('customerGroups'));
+        return view('customer-groups.index', ['customerGroups' => $customerGroups]);
     }
 
     /**
@@ -52,7 +52,7 @@ final class CustomerGroupController extends Controller
         }
         $customerGroup->load(['users', 'discounts', 'priceLists']);
 
-        return view('customer-groups.show', compact('customerGroup'));
+        return view('customer-groups.show', ['customerGroup' => $customerGroup]);
     }
 
     /**

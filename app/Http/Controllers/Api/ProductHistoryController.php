@@ -33,13 +33,13 @@ final class ProductHistoryController extends Controller
     {
         $definition = new ListQueryDefinition(
             filters: [
-                'action' => ['type' => 'string', 'column' => 'product_histories.action'],
+                'action'     => ['type' => 'string', 'column' => 'product_histories.action'],
                 'field_name' => ['type' => 'string', 'column' => 'product_histories.field_name'],
-                'user_id' => ['type' => 'int', 'column' => 'product_histories.user_id'],
-                'date_from' => ['type' => 'datetime', 'column' => 'product_histories.created_at', 'operator' => '>='],
-                'date_to' => ['type' => 'datetime', 'column' => 'product_histories.created_at', 'operator' => '<='],
-                'search' => [
-                    'type' => 'string',
+                'user_id'    => ['type' => 'int', 'column' => 'product_histories.user_id'],
+                'date_from'  => ['type' => 'datetime', 'column' => 'product_histories.created_at', 'operator' => '>='],
+                'date_to'    => ['type' => 'datetime', 'column' => 'product_histories.created_at', 'operator' => '<='],
+                'search'     => [
+                    'type'     => 'string',
                     'callback' => static function (Builder $builder, string $search): void {
                         $builder->where(function (Builder $query) use ($search): void {
                             $query->where('description', 'like', "%{$search}%")
@@ -51,7 +51,7 @@ final class ProductHistoryController extends Controller
             ],
             sortable: [
                 'created_at' => ['column' => 'product_histories.created_at', 'default_direction' => 'desc'],
-                'action' => ['column' => 'product_histories.action'],
+                'action'     => ['column' => 'product_histories.action'],
             ],
             defaultSort: 'created_at',
             defaultDirection: 'desc',
@@ -73,10 +73,10 @@ final class ProductHistoryController extends Controller
 
         $payload = ListResponse::fromPaginator($histories, $listQuery, [
             'histories' => $histories->items(),
-            'product' => [
-                'id' => $product->id,
+            'product'   => [
+                'id'   => $product->id,
                 'name' => $product->name,
-                'sku' => $product->sku,
+                'sku'  => $product->sku,
             ],
         ]);
 
@@ -139,7 +139,7 @@ final class ProductHistoryController extends Controller
         foreach ($histories as $history) {
             $csvData .= sprintf("%s,%s,%s,%s,%s,%s,%s,%s\n", $history->created_at->format('Y-m-d H:i:s'), $history->action, $history->field_name ?? 'N/A', is_array($history->old_value) ? json_encode($history->old_value) : $history->old_value ?? 'N/A', is_array($history->new_value) ? json_encode($history->new_value) : $history->new_value ?? 'N/A', str_replace(["\r", "\n"], ' ', $history->description ?? ''), $history->user?->name ?? 'System', $history->ip_address ?? 'N/A');
         }
-        $filename = "product_history_{$product->sku}_".now()->format('Y-m-d_H-i-s').'.csv';
+        $filename = "product_history_{$product->sku}_" . now()->format('Y-m-d_H-i-s') . '.csv';
 
         return response($csvData)->header('Content-Type', 'text/csv; charset=UTF-8')->header('Content-Disposition', "attachment; filename=\"{$filename}\"");
     }
@@ -154,37 +154,5 @@ final class ProductHistoryController extends Controller
         $history->load(['user:id,name,email']);
 
         return response()->json(['data' => $history, 'message' => 'History entry created successfully'], 201);
-}
-
-    private function productHistoryListDefinition(): ListQueryDefinition
-    {
-        return ListQueryDefinition::make()
-            ->defaultPerPage(15)
-            ->maxPerPage(100)
-            ->defaultSort('created_at', 'desc')
-            ->allowedSorts([
-                'created_at' => ['column' => 'created_at'],
-                'action' => ['column' => ['action', 'id']],
-                'field_name' => ['column' => ['field_name', 'id']],
-                'user' => ['column' => 'user_id'],
-            ])
-            ->filters([
-                'action' => ['type' => 'string', 'nullable' => true, 'scope' => 'byAction'],
-                'field_name' => ['type' => 'string', 'nullable' => true, 'scope' => 'byField'],
-                'user_id' => ['type' => 'int', 'nullable' => true, 'scope' => 'byUser'],
-                'date_from' => ['type' => 'date', 'column' => 'created_at', 'operator' => '>='],
-                'date_to' => ['type' => 'date', 'column' => 'created_at', 'operator' => '<='],
-                'search' => [
-                    'type' => 'string',
-                    'nullable' => true,
-                    'callback' => static function (Builder $builder, string $search): void {
-                        $builder->where(static function (Builder $query) use ($search): void {
-                            $query->where('description', 'like', '%'.$search.'%')
-                                ->orWhere('action', 'like', '%'.$search.'%')
-                                ->orWhere('field_name', 'like', '%'.$search.'%');
-                        });
-                    },
-                ],
-            ]);
     }
 }

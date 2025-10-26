@@ -7,11 +7,9 @@ namespace App\Http\Controllers\Monitoring;
 use App\Support\Monitoring\ApplicationMetrics;
 use Illuminate\Http\Response;
 
-final class MetricsController
+final readonly class MetricsController
 {
-    public function __construct(private readonly ApplicationMetrics $metrics)
-    {
-    }
+    public function __construct(private ApplicationMetrics $metrics) {}
 
     public function __invoke(): Response
     {

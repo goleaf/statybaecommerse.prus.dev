@@ -27,9 +27,7 @@ final class CategoryController extends Controller
 {
     use HandlesContentNegotiation;
 
-    public function __construct(private readonly CategoryRepository $categories)
-    {
-    }
+    public function __construct(private readonly CategoryRepository $categories) {}
 
     /**
      * Handle tree functionality with proper error handling.
@@ -51,7 +49,7 @@ final class CategoryController extends Controller
         $definition = new ListQueryDefinition(
             filters: [
                 'search' => [
-                    'type' => 'string',
+                    'type'     => 'string',
                     'callback' => static function (Builder $builder, string $term): void {
                         $builder->where(function (Builder $query) use ($term): void {
                             $query->where('name', 'like', "%{$term}%")
@@ -61,7 +59,7 @@ final class CategoryController extends Controller
                 ],
             ],
             sortable: [
-                'name' => ['column' => 'categories.name'],
+                'name'       => ['column' => 'categories.name'],
                 'sort_order' => ['column' => 'categories.sort_order'],
             ],
             defaultSort: 'sort_order',
@@ -100,30 +98,5 @@ final class CategoryController extends Controller
         $payload = CategoryContract::forCategory($category);
 
         return $this->respondWithContract($request, $payload);
-    }
-
-    private function categoryListDefinition(): ListQueryDefinition
-    {
-        return ListQueryDefinition::make()
-            ->defaultPerPage(20)
-            ->maxPerPage(100)
-            ->defaultSort('sort_order', 'asc')
-            ->allowedSorts([
-                'name' => ['column' => ['name', 'id']],
-                'sort_order' => ['column' => ['sort_order', 'name']],
-                'product_count' => ['column' => 'products_count'],
-            ])
-            ->filters([
-                'search' => [
-                    'type' => 'string',
-                    'nullable' => true,
-                    'callback' => static function (Builder $builder, string $search): void {
-                        $builder->where(static function (Builder $query) use ($search): void {
-                            $query->where('name', 'like', '%'.$search.'%')
-                                ->orWhere('description', 'like', '%'.$search.'%');
-                        });
-                    },
-                ],
-            ]);
     }
 }

@@ -16,7 +16,7 @@ class LegalController extends Controller
             ->with('translations')
             ->firstWhere('key', 'privacy-policy');
 
-        return view('frontend.legal.privacy', compact('legal'));
+        return view('frontend.legal.privacy', ['legal' => $legal]);
     }
 
     public function terms(): View
@@ -25,7 +25,7 @@ class LegalController extends Controller
             ->with('translations')
             ->firstWhere('key', 'terms-of-use');
 
-        return view('frontend.legal.terms', compact('legal'));
+        return view('frontend.legal.terms', ['legal' => $legal]);
     }
 
     public function cookies(): View
@@ -34,7 +34,7 @@ class LegalController extends Controller
             ->with('translations')
             ->firstWhere('key', 'cookie-policy');
 
-        return view('frontend.legal.cookies', compact('legal'));
+        return view('frontend.legal.cookies', ['legal' => $legal]);
     }
 
     public function shipping(): View
@@ -43,7 +43,7 @@ class LegalController extends Controller
             ->with('translations')
             ->firstWhere('key', 'shipping-policy');
 
-        return view('frontend.legal.shipping', compact('legal'));
+        return view('frontend.legal.shipping', ['legal' => $legal]);
     }
 
     public function returns(): View
@@ -52,6 +52,6 @@ class LegalController extends Controller
             ->with('translations')
             ->firstWhere('key', 'return-policy');
 
-        return view('frontend.legal.returns', compact('legal'));
+        return view('frontend.legal.returns', ['legal' => $legal]);
     }
 }

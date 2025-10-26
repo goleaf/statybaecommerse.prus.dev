@@ -11,6 +11,9 @@ use App\Models\DiscountCode;
 use App\Models\DiscountRedemption;
 use App\Models\DocumentTemplate;
 use App\Services\DocumentService;
+use Carbon\CarbonInterface;
+use Exception;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -18,8 +21,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Database\Eloquent\Builder;
-use Carbon\CarbonInterface;
+use Throwable;
 
 /**
  * DiscountCodeController
@@ -48,10 +50,10 @@ final class DiscountCodeController extends Controller
         if (! $code->isValid()) {
             $expiresAt = $code->expires_at instanceof CarbonInterface ? $code->expires_at : null;
             $message = match (true) {
-                $code->hasReachedLimit() => __('discount_code_limit_reached'),
+                $code->hasReachedLimit()                                       => __('discount_code_limit_reached'),
                 $expiresAt instanceof CarbonInterface && $expiresAt->lt(now()) => __('discount_code_expired_message'),
-                ! $code->is_active => __('discount_code_inactive'),
-                default => __('discount_code_invalid'),
+                ! $code->is_active                                             => __('discount_code_inactive'),
+                default                                                        => __('discount_code_invalid'),
             };
 
             return response()->json(['valid' => false, 'message' => $message], 422);
@@ -81,21 +83,21 @@ final class DiscountCodeController extends Controller
             DB::beginTransaction();
             // Create redemption record
             $redemption = DiscountRedemption::create([
-                'discount_id' => $code->discount_id,
-                'code_id' => $code->id,
-                'order_id' => $validated['order_id'] ?? null,
-                'user_id' => Auth::id(),
+                'discount_id'  => $code->discount_id,
+                'code_id'      => $code->id,
+                'order_id'     => $validated['order_id'] ?? null,
+                'user_id'      => Auth::id(),
                 'amount_saved' => 0,
                 // Will be calculated based on order
                 'currency_code' => 'EUR',
-                'redeemed_at' => now(),
+                'redeemed_at'   => now(),
             ]);
             // Increment usage count
             $code->incrementUsage();
             DB::commit();
 
             return response()->json(['success' => true, 'message' => __('discount_code_success'), 'redemption' => $redemption]);
-        } catch (\Exception $e) {
+        } catch (Exception) {
             DB::rollBack();
 
             return response()->json(['success' => false, 'message' => __('Something went wrong. Please try again.')], 500);
@@ -172,15 +174,15 @@ final class DiscountCodeController extends Controller
             $expiresAt = $code->expires_at instanceof CarbonInterface ? $code->expires_at : null;
 
             return [
-                'id' => $code->id,
-                'code' => $code->code,
+                'id'          => $code->id,
+                'code'        => $code->code,
                 'description' => $code->description,
-                'discount' => [
-                    'name' => $discount->name,
-                    'type' => $discount->type,
+                'discount'    => [
+                    'name'  => $discount->name,
+                    'type'  => $discount->type,
                     'value' => $discount->value,
                 ],
-                'expires_at' => $expiresAt?->format('d/m/Y'),
+                'expires_at'     => $expiresAt?->format('d/m/Y'),
                 'remaining_uses' => $code->remaining_uses,
             ];
         })->values();
@@ -201,7 +203,7 @@ final class DiscountCodeController extends Controller
 
             if (! $discountCode->discount instanceof Discount) {
                 return response()->json([
-                    'error' => 'Discount data unavailable',
+                    'error'   => 'Discount data unavailable',
                     'message' => __('discount_code_invalid'),
                 ], 422);
             }
@@ -212,18 +214,18 @@ final class DiscountCodeController extends Controller
 
             // Prepare the variable map that will be injected into the template.
             $variables = [
-                'DISCOUNT_CODE' => $discountCode->code,
-                'DISCOUNT_NAME' => $discount->name,
+                'DISCOUNT_CODE'        => $discountCode->code,
+                'DISCOUNT_NAME'        => $discount->name,
                 'DISCOUNT_DESCRIPTION' => $discountCode->description,
-                'DISCOUNT_VALUE' => $discount->value,
-                'DISCOUNT_TYPE' => $discount->type,
-                'USAGE_LIMIT' => $discountCode->usage_limit ?? 'Unlimited',
-                'USAGE_COUNT' => $discountCode->usage_count,
-                'REMAINING_USES' => $discountCode->remaining_uses ?? 'Unlimited',
-                'STARTS_AT' => $startsAt?->format('d/m/Y H:i') ?? 'Immediately',
-                'EXPIRES_AT' => $expiresAt?->format('d/m/Y H:i') ?? 'Never',
-                'STATUS' => $discountCode->status,
-                'IS_ACTIVE' => $discountCode->is_active ? 'Yes' : 'No',
+                'DISCOUNT_VALUE'       => $discount->value,
+                'DISCOUNT_TYPE'        => $discount->type,
+                'USAGE_LIMIT'          => $discountCode->usage_limit ?? 'Unlimited',
+                'USAGE_COUNT'          => $discountCode->usage_count,
+                'REMAINING_USES'       => $discountCode->remaining_uses ?? 'Unlimited',
+                'STARTS_AT'            => $startsAt?->format('d/m/Y H:i') ?? 'Immediately',
+                'EXPIRES_AT'           => $expiresAt?->format('d/m/Y H:i') ?? 'Never',
+                'STATUS'               => $discountCode->status,
+                'IS_ACTIVE'            => $discountCode->is_active ? 'Yes' : 'No',
             ];
 
             $document = $this->documentService->generateDocument($template, $discountCode, $variables);
@@ -235,8 +237,8 @@ final class DiscountCodeController extends Controller
 
                 if ($request->wantsJson()) {
                     return response()->json([
-                        'success' => true,
-                        'document_id' => $document->id,
+                        'success'      => true,
+                        'document_id'  => $document->id,
                         'download_url' => $downloadUrl,
                     ]);
                 }
@@ -247,10 +249,10 @@ final class DiscountCodeController extends Controller
             return response($document->content, 200, ['Content-Type' => 'text/html']);
         } catch (ModelNotFoundException $exception) {
             return response()->json([
-                'error' => 'Template not found',
+                'error'   => 'Template not found',
                 'message' => $exception->getMessage(),
             ], 404);
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             return response()->json(['error' => 'Failed to generate document', 'message' => $e->getMessage()], 500);
         }
     }

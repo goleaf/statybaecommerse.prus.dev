@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Models\Brand;
+use Exception;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -25,7 +26,7 @@ final class BrandController extends Controller
         $brand = Brand::query()->with(['translations', 'media'])->where('slug', $slug)->where('is_enabled', true)->first();
         if (! $brand) {
             // Try to find by translated slug
-            $brand = Brand::query()->with(['translations', 'media'])->whereHas('translations', function ($query) use ($slug) {
+            $brand = Brand::query()->with(['translations', 'media'])->whereHas('translations', function ($query) use ($slug): void {
                 $query->where('slug', $slug)->where('locale', app()->getLocale());
             })->where('is_enabled', true)->first();
         }
@@ -48,26 +49,24 @@ final class BrandController extends Controller
                 ->orderByDesc('published_at')
                 ->limit(12)
                 ->get()
-                ->filter(function ($product) {
-                    // Filter out products that are not properly configured for display
-                    return ! empty($product->name) &&
-                           $product->is_visible &&
-                           $product->price > 0 &&
-                           ! empty($product->slug);
-                });
-        } catch (\Exception $e) {
+                ->filter(fn ($product): bool => // Filter out products that are not properly configured for display
+                    ! empty($product->name) &&
+                       $product->is_visible &&
+                       $product->price > 0 &&
+                       ! empty($product->slug));
+        } catch (Exception) {
             // If there's an error loading products, return empty collection
             $products = collect();
         }
 
         // Get SEO data
-        $seoTitle = $brand->getTranslatedSeoTitle() ?: $brand->getTranslatedName().' - '.config('app.name');
+        $seoTitle = $brand->getTranslatedSeoTitle() ?: $brand->getTranslatedName() . ' - ' . config('app.name');
         $seoDescription = $brand->getTranslatedSeoDescription() ?: $brand->getTranslatedDescription();
 
         return view('frontend.brands.show', [
-            'brand' => $brand,
-            'products' => $products,
-            'seoTitle' => $seoTitle,
+            'brand'          => $brand,
+            'products'       => $products,
+            'seoTitle'       => $seoTitle,
             'seoDescription' => $seoDescription,
         ]);
     }

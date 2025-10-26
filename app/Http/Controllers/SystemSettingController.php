@@ -35,12 +35,10 @@ final class SystemSettingController extends Controller
             $query->where('group', $request->group);
         })->when($request->filled('search'), function ($query) use ($request): void {
             $query->searchable($request->search);
-        })->ordered()->get()->skipWhile(function ($setting) {
-            // Skip system settings that are not properly configured for display
-            return empty($setting->key) || ! $setting->is_active || ! $setting->is_public || empty($setting->group) || empty($setting->name);
-        })->paginate(20);
+        })->ordered()->get()->skipWhile(fn ($setting): bool => // Skip system settings that are not properly configured for display
+            empty($setting->key) || ! $setting->is_active || ! $setting->is_public || empty($setting->group) || empty($setting->name))->paginate(20);
 
-        return view('system-settings.index', compact('categories', 'settings'));
+        return view('system-settings.index', ['categories' => $categories, 'settings' => $settings]);
     }
 
     /**
@@ -52,12 +50,10 @@ final class SystemSettingController extends Controller
         // Update access count and last accessed time
         $setting->increment('access_count');
         $setting->update(['last_accessed_at' => now()]);
-        $relatedSettings = SystemSetting::active()->public()->where('group', $setting->group)->where('id', '!=', $setting->id)->limit(5)->get()->skipWhile(function ($relatedSetting) {
-            // Skip related system settings that are not properly configured for display
-            return empty($relatedSetting->key) || ! $relatedSetting->is_active || ! $relatedSetting->is_public || empty($relatedSetting->group) || empty($relatedSetting->name);
-        });
+        $relatedSettings = SystemSetting::active()->public()->where('group', $setting->group)->where('id', '!=', $setting->id)->limit(5)->get()->skipWhile(fn ($relatedSetting): bool => // Skip related system settings that are not properly configured for display
+            empty($relatedSetting->key) || ! $relatedSetting->is_active || ! $relatedSetting->is_public || empty($relatedSetting->group) || empty($relatedSetting->name));
 
-        return view('system-settings.show', compact('setting', 'relatedSettings'));
+        return view('system-settings.show', ['setting' => $setting, 'relatedSettings' => $relatedSettings]);
     }
 
     /**
@@ -66,13 +62,11 @@ final class SystemSettingController extends Controller
     public function category(string $slug): View
     {
         $category = SystemSettingCategory::where('slug', $slug)->active()->firstOrFail();
-        $settings = $category->settings()->active()->public()->ordered()->get()->skipWhile(function ($setting) {
-            // Skip system settings that are not properly configured for display
-            return empty($setting->key) || ! $setting->is_active || ! $setting->is_public || empty($setting->group) || empty($setting->name);
-        })->paginate(20);
+        $settings = $category->settings()->active()->public()->ordered()->get()->skipWhile(fn ($setting): bool => // Skip system settings that are not properly configured for display
+            empty($setting->key) || ! $setting->is_active || ! $setting->is_public || empty($setting->group) || empty($setting->name))->paginate(20);
         $relatedCategories = SystemSettingCategory::active()->where('id', '!=', $category->id)->limit(5)->get();
 
-        return view('system-settings.category', compact('category', 'settings', 'relatedCategories'));
+        return view('system-settings.category', ['category' => $category, 'settings' => $settings, 'relatedCategories' => $relatedCategories]);
     }
 
     /**
@@ -80,15 +74,13 @@ final class SystemSettingController extends Controller
      */
     public function group(string $group): View
     {
-        $settings = SystemSetting::active()->public()->where('group', $group)->ordered()->get()->skipWhile(function ($setting) {
-            // Skip system settings that are not properly configured for display
-            return empty($setting->key) || ! $setting->is_active || ! $setting->is_public || empty($setting->group) || empty($setting->name);
-        })->paginate(20);
+        $settings = SystemSetting::active()->public()->where('group', $group)->ordered()->get()->skipWhile(fn ($setting): bool => // Skip system settings that are not properly configured for display
+            empty($setting->key) || ! $setting->is_active || ! $setting->is_public || empty($setting->group) || empty($setting->name))->paginate(20);
         $categories = SystemSettingCategory::active()->withCount(['settings' => function ($query) use ($group): void {
             $query->where('group', $group)->active()->public();
         }])->having('settings_count', '>', 0)->get();
 
-        return view('system-settings.group', compact('settings', 'categories', 'group'));
+        return view('system-settings.group', ['settings' => $settings, 'categories' => $categories, 'group' => $group]);
     }
 
     /**
@@ -102,7 +94,7 @@ final class SystemSettingController extends Controller
             $q->where('name', 'like', "%{$query}%")->orWhere('description', 'like', "%{$query}%");
         })->get();
 
-        return view('system-settings.search', compact('settings', 'categories', 'query'));
+        return view('system-settings.search', ['settings' => $settings, 'categories' => $categories, 'query' => $query]);
     }
 
     #[OA\Get(
@@ -111,9 +103,9 @@ final class SystemSettingController extends Controller
         description: 'Return key-value pairs for public system settings. Results can be filtered by group, category, or key whitelist.',
         tags: ['System Settings'],
         parameters: [
-            new OA\QueryParameter(name: 'group', in: 'query', description: 'Filter settings by group slug.', schema: new OA\Schema(type: 'string')),
-            new OA\QueryParameter(name: 'category', in: 'query', description: 'Filter by category slug.', schema: new OA\Schema(type: 'string')),
-            new OA\QueryParameter(name: 'keys', in: 'query', description: 'Comma separated list of keys to include.', schema: new OA\Schema(type: 'string')),
+            new OA\QueryParameter(name: 'group', description: 'Filter settings by group slug.', in: 'query', schema: new OA\Schema(type: 'string')),
+            new OA\QueryParameter(name: 'category', description: 'Filter by category slug.', in: 'query', schema: new OA\Schema(type: 'string')),
+            new OA\QueryParameter(name: 'keys', description: 'Comma separated list of keys to include.', in: 'query', schema: new OA\Schema(type: 'string')),
         ],
         responses: [
             new OA\Response(
@@ -151,7 +143,7 @@ final class SystemSettingController extends Controller
             ),
         ],
         responses: [
-            new OA\Response(response: 200, ref: '#/components/responses/SystemSettingsIndex'),
+            new OA\Response(ref: '#/components/responses/SystemSettingsIndex', response: 200),
         ]
     )]
     public function api(Request $request): JsonResponse
@@ -165,9 +157,7 @@ final class SystemSettingController extends Controller
         })->when($request->filled('keys'), function ($query) use ($request): void {
             $keys = explode(',', $request->keys);
             $query->whereIn('key', $keys);
-        })->get()->mapWithKeys(function ($setting) {
-            return [$setting->key => $setting->value];
-        });
+        })->get()->mapWithKeys(fn ($setting): array => [$setting->key => $setting->value]);
 
         return response()->json($settings);
     }
@@ -177,7 +167,7 @@ final class SystemSettingController extends Controller
         summary: 'Retrieve a single system setting',
         tags: ['System Settings'],
         parameters: [
-            new OA\Parameter(name: 'key', in: 'path', required: true, description: 'System setting key.', schema: new OA\Schema(type: 'string')),
+            new OA\Parameter(name: 'key', description: 'System setting key.', in: 'path', required: true, schema: new OA\Schema(type: 'string')),
         ],
         responses: [
             new OA\Response(
@@ -208,8 +198,8 @@ final class SystemSettingController extends Controller
             ),
         ],
         responses: [
-            new OA\Response(response: 200, ref: '#/components/responses/SystemSettingItem'),
-            new OA\Response(response: 404, ref: '#/components/responses/SystemSettingNotFound'),
+            new OA\Response(ref: '#/components/responses/SystemSettingItem', response: 200),
+            new OA\Response(ref: '#/components/responses/SystemSettingNotFound', response: 404),
         ]
     )]
     public function apiByKey(string $key): JsonResponse
@@ -245,16 +235,14 @@ final class SystemSettingController extends Controller
         summary: 'List public system setting categories.',
         tags: ['System Settings'],
         responses: [
-            new OA\Response(response: 200, ref: '#/components/responses/SystemSettingCategories'),
+            new OA\Response(ref: '#/components/responses/SystemSettingCategories', response: 200),
         ]
     )]
     public function categories(): JsonResponse
     {
         $categories = SystemSettingCategory::active()->withCount(['settings' => function ($query): void {
             $query->active()->public();
-        }])->having('settings_count', '>', 0)->ordered()->get()->map(function ($category) {
-            return ['id' => $category->id, 'name' => $category->getTranslatedName(), 'slug' => $category->slug, 'description' => $category->getTranslatedDescription(), 'icon' => $category->getIconClass(), 'color' => $category->color, 'settings_count' => $category->settings_count];
-        });
+        }])->having('settings_count', '>', 0)->ordered()->get()->map(fn ($category): array => ['id' => $category->id, 'name' => $category->getTranslatedName(), 'slug' => $category->slug, 'description' => $category->getTranslatedDescription(), 'icon' => $category->getIconClass(), 'color' => $category->color, 'settings_count' => $category->settings_count]);
 
         return response()->json($categories);
     }
@@ -279,14 +267,12 @@ final class SystemSettingController extends Controller
         summary: 'List public system setting groups.',
         tags: ['System Settings'],
         responses: [
-            new OA\Response(response: 200, ref: '#/components/responses/SystemSettingGroups'),
+            new OA\Response(ref: '#/components/responses/SystemSettingGroups', response: 200),
         ]
     )]
     public function groups(): JsonResponse
     {
-        $groups = SystemSetting::active()->public()->select('group')->selectRaw('count(*) as settings_count')->groupBy('group')->orderBy('settings_count', 'desc')->get()->map(function ($group) {
-            return ['name' => $group->group, 'label' => ucfirst($group->group), 'settings_count' => $group->settings_count];
-        });
+        $groups = SystemSetting::active()->public()->select('group')->selectRaw('count(*) as settings_count')->groupBy('group')->orderBy('settings_count', 'desc')->get()->map(fn ($group): array => ['name' => $group->group, 'label' => ucfirst((string) $group->group), 'settings_count' => $group->settings_count]);
 
         return response()->json($groups);
     }

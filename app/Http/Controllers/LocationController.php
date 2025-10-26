@@ -21,18 +21,16 @@ final class LocationController extends Controller
      */
     public function index(Request $request): View
     {
-        $locations = Location::query()->enabled()->with(['country', 'inventories'])->when($request->has('type'), fn ($query) => $query->where('type', $request->get('type')))->when($request->has('country'), fn ($query) => $query->where('country_code', $request->get('country')))->when($request->has('city'), fn ($query) => $query->where('city', $request->get('city')))->when($request->has('has_coordinates'), fn ($query) => $query->whereNotNull('latitude')->whereNotNull('longitude'))->when($request->has('has_opening_hours'), fn ($query) => $query->whereNotNull('opening_hours'))->when($request->has('is_open_now'), fn ($query) => $query->where('is_enabled', true))->when($request->has('search'), fn ($query) => $query->where(function ($q) use ($request) {
+        $locations = Location::query()->enabled()->with(['country', 'inventories'])->when($request->has('type'), fn ($query) => $query->where('type', $request->get('type')))->when($request->has('country'), fn ($query) => $query->where('country_code', $request->get('country')))->when($request->has('city'), fn ($query) => $query->where('city', $request->get('city')))->when($request->has('has_coordinates'), fn ($query) => $query->whereNotNull('latitude')->whereNotNull('longitude'))->when($request->has('has_opening_hours'), fn ($query) => $query->whereNotNull('opening_hours'))->when($request->has('is_open_now'), fn ($query) => $query->where('is_enabled', true))->when($request->has('search'), fn ($query) => $query->where(function ($q) use ($request): void {
             $search = $request->get('search');
             $q->where('name', 'like', "%{$search}%")->orWhere('code', 'like', "%{$search}%")->orWhere('city', 'like', "%{$search}%")->orWhere('address_line_1', 'like', "%{$search}%");
-        }))->orderBy('sort_order')->orderBy('name')->get()->skipWhile(function ($location) {
-            // Skip locations that are not properly configured for display
-            return empty($location->name) || ! $location->is_enabled || empty($location->type) || empty($location->city) || empty($location->country_code);
-        })->paginate(24);
+        }))->orderBy('sort_order')->orderBy('name')->get()->skipWhile(fn ($location): bool => // Skip locations that are not properly configured for display
+            empty($location->name) || ! $location->is_enabled || empty($location->type) || empty($location->city) || empty($location->country_code))->paginate(24);
         $types = Location::distinct()->pluck('type')->filter()->sort()->values();
         $countries = Location::distinct()->pluck('country_code')->filter()->sort()->values();
         $cities = Location::distinct()->pluck('city')->filter()->sort()->values();
 
-        return view('locations.index', compact('locations', 'types', 'countries', 'cities'));
+        return view('locations.index', ['locations' => $locations, 'types' => $types, 'countries' => $countries, 'cities' => $cities]);
     }
 
     /**
@@ -40,16 +38,14 @@ final class LocationController extends Controller
      */
     public function show(Location $location): View
     {
-        $location->load(['translations', 'country', 'inventories' => function ($query) {
+        $location->load(['translations', 'country', 'inventories' => function ($query): void {
             $query->with('product')->latest()->limit(10);
         }]);
         // Get related locations of the same type in the same city
-        $relatedLocations = Location::query()->where('type', $location->type)->where('city', $location->city)->where('id', '!=', $location->id)->enabled()->limit(6)->get()->skipWhile(function ($relatedLocation) {
-            // Skip related locations that are not properly configured for display
-            return empty($relatedLocation->name) || ! $relatedLocation->is_enabled || empty($relatedLocation->type) || empty($relatedLocation->city) || empty($relatedLocation->country_code);
-        });
+        $relatedLocations = Location::query()->where('type', $location->type)->where('city', $location->city)->where('id', '!=', $location->id)->enabled()->limit(6)->get()->skipWhile(fn ($relatedLocation): bool => // Skip related locations that are not properly configured for display
+            empty($relatedLocation->name) || ! $relatedLocation->is_enabled || empty($relatedLocation->type) || empty($relatedLocation->city) || empty($relatedLocation->country_code));
 
-        return view('locations.show', compact('location', 'relatedLocations'));
+        return view('locations.show', ['location' => $location, 'relatedLocations' => $relatedLocations]);
     }
 
     /**
@@ -57,13 +53,11 @@ final class LocationController extends Controller
      */
     public function api(Request $request): JsonResponse
     {
-        $locations = Location::query()->enabled()->when($request->has('search'), fn ($query) => $query->where(function ($q) use ($request) {
+        $locations = Location::query()->enabled()->when($request->has('search'), fn ($query) => $query->where(function ($q) use ($request): void {
             $search = $request->get('search');
             $q->where('name', 'like', "%{$search}%")->orWhere('code', 'like', "%{$search}%")->orWhere('city', 'like', "%{$search}%");
-        }))->when($request->has('type'), fn ($query) => $query->where('type', $request->get('type')))->when($request->has('country'), fn ($query) => $query->where('country_code', $request->get('country')))->when($request->has('city'), fn ($query) => $query->where('city', $request->get('city')))->orderBy('sort_order')->orderBy('name')->get(['id', 'name', 'code', 'type', 'city', 'country_code', 'latitude', 'longitude'])->skipWhile(function ($location) {
-            // Skip locations that are not properly configured for API response
-            return empty($location->name) || ! $location->is_enabled || empty($location->type) || empty($location->city) || empty($location->country_code);
-        });
+        }))->when($request->has('type'), fn ($query) => $query->where('type', $request->get('type')))->when($request->has('country'), fn ($query) => $query->where('country_code', $request->get('country')))->when($request->has('city'), fn ($query) => $query->where('city', $request->get('city')))->orderBy('sort_order')->orderBy('name')->get(['id', 'name', 'code', 'type', 'city', 'country_code', 'latitude', 'longitude'])->skipWhile(fn ($location): bool => // Skip locations that are not properly configured for API response
+            empty($location->name) || ! $location->is_enabled || empty($location->type) || empty($location->city) || empty($location->country_code));
 
         return response()->json(['locations' => $locations, 'total' => $locations->count()]);
     }
@@ -120,19 +114,17 @@ final class LocationController extends Controller
      */
     public function statistics(): JsonResponse
     {
-        return response()->json(['total_locations' => Location::count(), 'enabled_locations' => Location::enabled()->count(), 'disabled_locations' => Location::where('is_enabled', false)->count(), 'default_locations' => Location::default()->count(), 'by_type' => Location::selectRaw('type, COUNT(*) as count')->groupBy('type')->get()->mapWithKeys(function ($item) {
+        return response()->json(['total_locations' => Location::count(), 'enabled_locations' => Location::enabled()->count(), 'disabled_locations' => Location::where('is_enabled', false)->count(), 'default_locations' => Location::default()->count(), 'by_type' => Location::selectRaw('type, COUNT(*) as count')->groupBy('type')->get()->mapWithKeys(function ($item): array {
             $typeLabel = match ($item->type) {
-                'warehouse' => 'Warehouse',
-                'store' => 'Store',
-                'office' => 'Office',
+                'warehouse'    => 'Warehouse',
+                'store'        => 'Store',
+                'office'       => 'Office',
                 'pickup_point' => 'Pickup Point',
-                'other' => 'Other',
-                default => $item->type,
+                'other'        => 'Other',
+                default        => $item->type,
             };
 
             return [$typeLabel => $item->count];
-        }), 'by_country' => Location::selectRaw('country_code, COUNT(*) as count')->groupBy('country_code')->get()->mapWithKeys(function ($item) {
-            return [$item->country_code => $item->count];
-        }), 'with_coordinates' => Location::whereNotNull('latitude')->whereNotNull('longitude')->count(), 'with_opening_hours' => Location::whereNotNull('opening_hours')->count()]);
+        }), 'by_country' => Location::selectRaw('country_code, COUNT(*) as count')->groupBy('country_code')->get()->mapWithKeys(fn ($item): array => [$item->country_code => $item->count]), 'with_coordinates' => Location::whereNotNull('latitude')->whereNotNull('longitude')->count(), 'with_opening_hours' => Location::whereNotNull('opening_hours')->count()]);
     }
 }

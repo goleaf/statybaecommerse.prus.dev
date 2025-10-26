@@ -6,13 +6,12 @@ namespace App\Http\Controllers;
 
 use App\Enums\ExportStatus;
 use App\Models\Export;
-use App\Services\Export\ExportService;
 use App\Support\Exports\ExportUrlGenerator;
+use App\Support\Storage\SecureStorage;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Contracts\View\View as ViewContract;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Response as HttpResponse;
-use App\Support\Storage\SecureStorage;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -24,7 +23,7 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
  */
 class ExportController extends Controller
 {
-    public function __construct(private readonly ExportService $service) {}
+    public function __construct() {}
 
     /**
      * Display a listing of the resource with pagination and filtering.
@@ -49,7 +48,7 @@ class ExportController extends Controller
                 'name' => $export->artifact_filename ?? basename((string) $path),
                 'path' => $path,
                 'size' => $size,
-                'url' => ExportUrlGenerator::temporarySignedDownloadUrl($export, 60),
+                'url'  => ExportUrlGenerator::temporarySignedDownloadUrl($export, 60),
             ];
         })->filter(fn (array $file): bool => $file['path'] !== null)->values()->all();
 
@@ -70,7 +69,7 @@ class ExportController extends Controller
             return redirect()->away(ExportUrlGenerator::temporarySignedDownloadUrl($export));
         }
 
-        $path = 'exports/'.$filename;
+        $path = 'exports/' . $filename;
         $disk = Storage::disk(SecureStorage::disk());
         if (! $disk->exists($path)) {
             return redirect()->route('exports.index')->with('error', __('File not found.'));

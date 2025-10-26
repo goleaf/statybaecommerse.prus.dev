@@ -29,7 +29,7 @@ final class ReportController extends Controller
             ->where('is_public', true)
             ->whereNotNull('type')
             ->whereNotNull('category')
-            ->whereNotNull('name->'.app()->getLocale());
+            ->whereNotNull('name->' . app()->getLocale());
         // Apply filters
         if ($request->filled('type')) {
             $query->where('type', $request->get('type'));
@@ -39,8 +39,8 @@ final class ReportController extends Controller
         }
         if ($request->filled('search')) {
             $search = $request->get('search');
-            $query->where(function ($q) use ($search) {
-                $q->where('name->'.app()->getLocale(), 'like', "%{$search}%")->orWhere('description->'.app()->getLocale(), 'like', "%{$search}%");
+            $query->where(function ($q) use ($search): void {
+                $q->where('name->' . app()->getLocale(), 'like', "%{$search}%")->orWhere('description->' . app()->getLocale(), 'like', "%{$search}%");
             });
         }
         // Apply sorting
@@ -52,10 +52,10 @@ final class ReportController extends Controller
         $reports = PaginationService::paginateWithOnEachSide($query, 12);
         $reports->appends($request->query());
         // Get filter options
-        $types = Report::select('type')->where('is_active', true)->where('is_public', true)->distinct()->pluck('type')->mapWithKeys(fn ($type) => [$type => __("admin.reports.types.{$type}")]);
-        $categories = Report::select('category')->where('is_active', true)->where('is_public', true)->distinct()->pluck('category')->mapWithKeys(fn ($category) => [$category => __("admin.reports.categories.{$category}")]);
+        $types = Report::select('type')->where('is_active', true)->where('is_public', true)->distinct()->pluck('type')->mapWithKeys(fn ($type): array => [$type => __("admin.reports.types.{$type}")]);
+        $categories = Report::select('category')->where('is_active', true)->where('is_public', true)->distinct()->pluck('category')->mapWithKeys(fn ($category): array => [$category => __("admin.reports.categories.{$category}")]);
 
-        return view('reports.index', compact('reports', 'types', 'categories'));
+        return view('reports.index', ['reports' => $reports, 'types' => $types, 'categories' => $categories]);
     }
 
     /**
@@ -70,14 +70,12 @@ final class ReportController extends Controller
         // Increment view count
         $report->incrementViewCount();
         // Get related reports
-        $relatedReports = Report::where('is_active', true)->where('is_public', true)->where('id', '!=', $report->id)->where(function ($query) use ($report) {
+        $relatedReports = Report::where('is_active', true)->where('is_public', true)->where('id', '!=', $report->id)->where(function ($query) use ($report): void {
             $query->where('type', $report->type)->orWhere('category', $report->category);
-        })->limit(4)->get()->skipWhile(function ($relatedReport) {
-            // Skip related reports that are not properly configured for display
-            return empty($relatedReport->name) || ! $relatedReport->is_active || ! $relatedReport->is_public || empty($relatedReport->type) || empty($relatedReport->category);
-        });
+        })->limit(4)->get()->skipWhile(fn ($relatedReport): bool => // Skip related reports that are not properly configured for display
+            empty($relatedReport->name) || ! $relatedReport->is_active || ! $relatedReport->is_public || empty($relatedReport->type) || empty($relatedReport->category));
 
-        return view('reports.show', compact('report', 'relatedReports'));
+        return view('reports.show', ['report' => $report, 'relatedReports' => $relatedReports]);
     }
 
     /**
@@ -93,9 +91,9 @@ final class ReportController extends Controller
         $report->incrementDownloadCount();
         // Generate PDF or return content based on report type
         $content = $this->generateReportContent($report);
-        $filename = Str::slug($report->name).'_'.now()->format('Y-m-d').'.pdf';
+        $filename = Str::slug($report->name) . '_' . now()->format('Y-m-d') . '.pdf';
 
-        return response($content)->header('Content-Type', 'application/pdf')->header('Content-Disposition', 'attachment; filename="'.$filename.'"');
+        return response($content)->header('Content-Type', 'application/pdf')->header('Content-Disposition', 'attachment; filename="' . $filename . '"');
     }
 
     /**

@@ -46,28 +46,26 @@ final class NewsController extends Controller
         $news = $news->appends($request->except('page'));
         $categories = NewsCategory::visible()->with('translations')->get();
         $tags = NewsTag::visible()->with('translations')->get();
-        $featuredNews = News::published()->featured()->with(['categories', 'tags', 'images'])->orderBy('published_at', 'desc')->limit(3)->get()->skipWhile(function ($news) {
-            // Skip news items that are not properly configured for display
-            return empty($news->title) || empty($news->slug) || ! $news->is_published || empty($news->getFirstMediaUrl('images'));
-        });
+        $featuredNews = News::published()->featured()->with(['categories', 'tags', 'images'])->orderBy('published_at', 'desc')->limit(3)->get()->skipWhile(fn ($news): bool => // Skip news items that are not properly configured for display
+            empty($news->title) || empty($news->slug) || ! $news->is_published || empty($news->getFirstMediaUrl('images')));
 
         if ($request->wantsJson()) {
             $itemsView = view('news.partials.grid-items', ['newsItems' => $news])->render();
 
             return response()->json([
-                'html' => $itemsView,
+                'html'          => $itemsView,
                 'next_page_url' => $news->nextPageUrl(),
-                'has_more' => $news->hasMorePages(),
-                'meta' => [
+                'has_more'      => $news->hasMorePages(),
+                'meta'          => [
                     'current_page' => $news->currentPage(),
-                    'last_page' => $news->lastPage(),
-                    'per_page' => $news->perPage(),
-                    'total' => $news->total(),
+                    'last_page'    => $news->lastPage(),
+                    'per_page'     => $news->perPage(),
+                    'total'        => $news->total(),
                 ],
             ]);
         }
 
-        return view('news.index', compact('news', 'categories', 'tags', 'featuredNews'));
+        return view('news.index', ['news' => $news, 'categories' => $categories, 'tags' => $tags, 'featuredNews' => $featuredNews]);
     }
 
     /**
@@ -75,22 +73,20 @@ final class NewsController extends Controller
      */
     public function show(string $slug): View
     {
-        $news = News::published()->whereHas('translations', function ($query) use ($slug) {
+        $news = News::published()->whereHas('translations', function ($query) use ($slug): void {
             $query->where('slug', $slug)->where('locale', app()->getLocale());
-        })->with(['categories', 'tags', 'images', 'comments' => function ($query) {
+        })->with(['categories', 'tags', 'images', 'comments' => function ($query): void {
             $query->approved()->visible()->topLevel()->with('replies');
         }])->firstOrFail();
         // Increment view count
         $news->incrementViewCount();
         // Get related news
-        $relatedNews = News::published()->where('id', '!=', $news->id)->whereHas('categories', function ($query) use ($news) {
+        $relatedNews = News::published()->where('id', '!=', $news->id)->whereHas('categories', function ($query) use ($news): void {
             $query->whereIn('news_category_id', $news->categories->pluck('id'));
-        })->with(['categories', 'tags', 'images'])->limit(4)->get()->skipWhile(function ($relatedNews) {
-            // Skip related news items that are not properly configured for display
-            return empty($relatedNews->title) || empty($relatedNews->slug) || ! $relatedNews->is_published || empty($relatedNews->getFirstMediaUrl('images'));
-        });
+        })->with(['categories', 'tags', 'images'])->limit(4)->get()->skipWhile(fn ($relatedNews): bool => // Skip related news items that are not properly configured for display
+            empty($relatedNews->title) || empty($relatedNews->slug) || ! $relatedNews->is_published || empty($relatedNews->getFirstMediaUrl('images')));
 
-        return view('news.show', compact('news', 'relatedNews'));
+        return view('news.show', ['news' => $news, 'relatedNews' => $relatedNews]);
     }
 
     /**
@@ -98,14 +94,14 @@ final class NewsController extends Controller
      */
     public function category(string $slug): View
     {
-        $category = NewsCategory::visible()->whereHas('translations', function ($query) use ($slug) {
+        $category = NewsCategory::visible()->whereHas('translations', function ($query) use ($slug): void {
             $query->where('slug', $slug)->where('locale', app()->getLocale());
         })->firstOrFail();
         $news = News::published()->byCategory($category->id)->with(['categories', 'tags', 'images'])->orderBy('published_at', 'desc')->paginate(12);
         $categories = NewsCategory::visible()->with('translations')->get();
         $tags = NewsTag::visible()->with('translations')->get();
 
-        return view('news.category', compact('news', 'category', 'categories', 'tags'));
+        return view('news.category', ['news' => $news, 'category' => $category, 'categories' => $categories, 'tags' => $tags]);
     }
 
     /**
@@ -113,13 +109,13 @@ final class NewsController extends Controller
      */
     public function tag(string $slug): View
     {
-        $tag = NewsTag::visible()->whereHas('translations', function ($query) use ($slug) {
+        $tag = NewsTag::visible()->whereHas('translations', function ($query) use ($slug): void {
             $query->where('slug', $slug)->where('locale', app()->getLocale());
         })->firstOrFail();
         $news = News::published()->byTag($tag->id)->with(['categories', 'tags', 'images'])->orderBy('published_at', 'desc')->paginate(12);
         $categories = NewsCategory::visible()->with('translations')->get();
         $tags = NewsTag::visible()->with('translations')->get();
 
-        return view('news.tag', compact('news', 'tag', 'categories', 'tags'));
+        return view('news.tag', ['news' => $news, 'tag' => $tag, 'categories' => $categories, 'tags' => $tags]);
     }
 }

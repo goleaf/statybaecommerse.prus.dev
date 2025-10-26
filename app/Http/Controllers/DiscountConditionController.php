@@ -35,15 +35,13 @@ final class DiscountConditionController extends Controller
         if ($request->filled('operator')) {
             $query->byOperator($request->get('operator'));
         }
-        $conditions = $query->get()->skipWhile(function ($condition) {
-            // Skip discount conditions that are not properly configured for display
-            return empty($condition->type) || ! $condition->is_active || empty($condition->discount) || empty($condition->discount_id) || empty($condition->operator);
-        })->paginate(20);
+        $conditions = $query->get()->skipWhile(fn ($condition): bool => // Skip discount conditions that are not properly configured for display
+            empty($condition->type) || ! $condition->is_active || empty($condition->discount) || empty($condition->discount_id) || empty($condition->operator))->paginate(20);
         $discounts = Discount::active()->get();
         $types = DiscountCondition::getTypes();
         $operators = DiscountCondition::getOperators();
 
-        return view('discount-conditions.index', compact('conditions', 'discounts', 'types', 'operators'));
+        return view('discount-conditions.index', ['conditions' => $conditions, 'discounts' => $discounts, 'types' => $types, 'operators' => $operators]);
     }
 
     /**
@@ -53,7 +51,7 @@ final class DiscountConditionController extends Controller
     {
         $discountCondition->load(['discount', 'translations']);
 
-        return view('discount-conditions.show', compact('discountCondition'));
+        return view('discount-conditions.show', ['discountCondition' => $discountCondition]);
     }
 
     #[OA\Post(
@@ -62,13 +60,13 @@ final class DiscountConditionController extends Controller
         description: 'Evaluate a discount condition against a provided test value to determine whether it matches and is valid.',
         tags: ['Discount Conditions'],
         parameters: [
-            new OA\Parameter(name: 'discountCondition', in: 'path', required: true, description: 'Discount condition identifier.', schema: new OA\Schema(type: 'integer', format: 'int64')),
+            new OA\Parameter(name: 'discountCondition', description: 'Discount condition identifier.', in: 'path', required: true, schema: new OA\Schema(type: 'integer', format: 'int64')),
         ],
         requestBody: new OA\RequestBody(
             required: true,
-            content: new OA\JsonContent(type: 'object', required: ['test_value'], properties: [
+            content: new OA\JsonContent(required: ['test_value'], properties: [
                 new OA\Property(property: 'test_value', type: 'string'),
-            ])
+            ], type: 'object')
         ),
         responses: [
             new OA\Response(response: 200, description: 'Condition test results.', content: new OA\JsonContent(ref: '#/components/schemas/DiscountConditionTestResponse')),
@@ -92,19 +90,19 @@ final class DiscountConditionController extends Controller
             ),
         ],
         requestBody: new OA\RequestBody(
-            required: true,
             description: 'Value to test against the condition.',
+            required: true,
             content: new OA\JsonContent(
-                type: 'object',
                 required: ['test_value'],
                 properties: [
                     new OA\Property(property: 'test_value', type: 'string'),
                 ],
+                type: 'object',
             ),
         ),
         responses: [
-            new OA\Response(response: 200, ref: '#/components/responses/DiscountConditionTest'),
-            new OA\Response(response: 422, ref: '#/components/responses/ValidationError'),
+            new OA\Response(ref: '#/components/responses/DiscountConditionTest', response: 200),
+            new OA\Response(ref: '#/components/responses/ValidationError', response: 422),
         ]
     )]
     public function test(\App\Http\Requests\DiscountConditionTestRequest $request, DiscountCondition $discountCondition): JsonResponse
@@ -122,7 +120,7 @@ final class DiscountConditionController extends Controller
         summary: 'List conditions for a discount',
         tags: ['Discount Conditions'],
         parameters: [
-            new OA\Parameter(name: 'discount', in: 'path', required: true, description: 'Discount identifier.', schema: new OA\Schema(type: 'integer', format: 'int64')),
+            new OA\Parameter(name: 'discount', description: 'Discount identifier.', in: 'path', required: true, schema: new OA\Schema(type: 'integer', format: 'int64')),
         ],
         responses: [
             new OA\Response(response: 200, description: 'Discount conditions.', content: new OA\JsonContent(ref: '#/components/schemas/DiscountConditionCollection')),
@@ -145,16 +143,14 @@ final class DiscountConditionController extends Controller
             ),
         ],
         responses: [
-            new OA\Response(response: 200, ref: '#/components/responses/DiscountConditions'),
+            new OA\Response(ref: '#/components/responses/DiscountConditions', response: 200),
         ]
     )]
     public function forDiscount(Discount $discount): JsonResponse
     {
         $conditions = $discount->conditions()->active()->byPriority('desc')->with('translations')->get();
 
-        return response()->json(['conditions' => $conditions->map(function ($condition) {
-            return ['id' => $condition->id, 'type' => $condition->type, 'type_label' => $condition->getTypeLabel(), 'operator' => $condition->operator, 'operator_label' => $condition->getOperatorLabel(), 'value' => $condition->value, 'priority' => $condition->priority, 'position' => $condition->position, 'description' => $condition->human_readable_condition, 'name' => $condition->translated_name];
-        })]);
+        return response()->json(['conditions' => $conditions->map(fn ($condition): array => ['id' => $condition->id, 'type' => $condition->type, 'type_label' => $condition->getTypeLabel(), 'operator' => $condition->operator, 'operator_label' => $condition->getOperatorLabel(), 'value' => $condition->value, 'priority' => $condition->priority, 'position' => $condition->position, 'description' => $condition->human_readable_condition, 'name' => $condition->translated_name])]);
     }
 
     #[OA\Get(
@@ -162,7 +158,7 @@ final class DiscountConditionController extends Controller
         summary: 'List operators for a discount condition type',
         tags: ['Discount Conditions'],
         parameters: [
-            new OA\QueryParameter(name: 'type', in: 'query', description: 'Discount condition type key.', schema: new OA\Schema(type: 'string')),
+            new OA\QueryParameter(name: 'type', description: 'Discount condition type key.', in: 'query', schema: new OA\Schema(type: 'string')),
         ],
         responses: [
             new OA\Response(response: 200, description: 'Available operators.', content: new OA\JsonContent(ref: '#/components/schemas/DiscountConditionOperatorsResponse')),
@@ -185,7 +181,7 @@ final class DiscountConditionController extends Controller
             ),
         ],
         responses: [
-            new OA\Response(response: 200, ref: '#/components/responses/DiscountConditionOperators'),
+            new OA\Response(ref: '#/components/responses/DiscountConditionOperators', response: 200),
         ]
     )]
     public function operatorsForType(Request $request): JsonResponse
@@ -216,7 +212,7 @@ final class DiscountConditionController extends Controller
         summary: 'Summarize discount condition usage metrics.',
         tags: ['Discount Conditions'],
         responses: [
-            new OA\Response(response: 200, ref: '#/components/responses/DiscountConditionStatistics'),
+            new OA\Response(ref: '#/components/responses/DiscountConditionStatistics', response: 200),
         ]
     )]
     public function statistics(): JsonResponse

@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Referral;
 use App\Models\ReferralReward;
 use App\Models\User;
+use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -35,7 +36,7 @@ final class ReferralController extends Controller
         $totalRewards = ReferralReward::where('user_id', $user->id)->sum('amount');
         $pendingRewards = ReferralReward::where('user_id', $user->id)->pending()->sum('amount');
 
-        return view('referrals.index', compact('referrals', 'totalReferrals', 'completedReferrals', 'totalRewards', 'pendingRewards'));
+        return view('referrals.index', ['referrals' => $referrals, 'totalReferrals' => $totalReferrals, 'completedReferrals' => $completedReferrals, 'totalRewards' => $totalRewards, 'pendingRewards' => $pendingRewards]);
     }
 
     /**
@@ -45,7 +46,7 @@ final class ReferralController extends Controller
     {
         $referral = Referral::where('referral_code', $code)->firstOrFail();
 
-        return view('referrals.show', compact('referral'));
+        return view('referrals.show', ['referral' => $referral]);
     }
 
     /**
@@ -91,7 +92,7 @@ final class ReferralController extends Controller
             DB::commit();
 
             return redirect()->route('referrals.index')->with('success', __('referrals.referral_created'));
-        } catch (\Exception $e) {
+        } catch (Exception) {
             DB::rollBack();
 
             return redirect()->back()->with('error', __('referrals.referral_creation_failed'));
@@ -113,7 +114,7 @@ final class ReferralController extends Controller
             $user->update(['referral_code' => $code, 'referral_code_generated_at' => now()]);
 
             return response()->json(['success' => true, 'message' => __('referrals.code_generated'), 'code' => $code]);
-        } catch (\Exception $e) {
+        } catch (Exception) {
             return response()->json(['success' => false, 'message' => __('referrals.code_generation_failed')]);
         }
     }
@@ -134,7 +135,7 @@ final class ReferralController extends Controller
         }
         // Find referral by code
         $referral = Referral::findByCode($request->code);
-        if (! $referral) {
+        if (! $referral instanceof \App\Models\Referral) {
             return response()->json(['success' => false, 'message' => __('referrals.invalid_code')]);
         }
         // Check if referral is valid
@@ -152,7 +153,7 @@ final class ReferralController extends Controller
             DB::commit();
 
             return response()->json(['success' => true, 'message' => __('referrals.code_applied')]);
-        } catch (\Exception $e) {
+        } catch (Exception) {
             DB::rollBack();
 
             return response()->json(['success' => false, 'message' => __('referrals.code_application_failed')]);
@@ -170,7 +171,7 @@ final class ReferralController extends Controller
         }
         $shareText = __('referrals.share_text', ['code' => $user->referral_code, 'url' => route('referrals.apply', $user->referral_code)]);
 
-        return view('referrals.share', compact('user', 'shareText'));
+        return view('referrals.share', ['user' => $user, 'shareText' => $shareText]);
     }
 
     /**
@@ -191,7 +192,7 @@ final class ReferralController extends Controller
         // Monthly statistics
         $monthlyStats = Referral::where('referrer_id', $user->id)->selectRaw('YEAR(created_at) as year, MONTH(created_at) as month, COUNT(*) as count')->groupBy('year', 'month')->orderBy('year', 'desc')->orderBy('month', 'desc')->limit(12)->get();
 
-        return view('referrals.statistics', compact('totalReferrals', 'completedReferrals', 'pendingReferrals', 'expiredReferrals', 'totalRewards', 'pendingRewards', 'appliedRewards', 'conversionRate', 'monthlyStats'));
+        return view('referrals.statistics', ['totalReferrals' => $totalReferrals, 'completedReferrals' => $completedReferrals, 'pendingReferrals' => $pendingReferrals, 'expiredReferrals' => $expiredReferrals, 'totalRewards' => $totalRewards, 'pendingRewards' => $pendingRewards, 'appliedRewards' => $appliedRewards, 'conversionRate' => $conversionRate, 'monthlyStats' => $monthlyStats]);
     }
 
     /**
@@ -205,6 +206,6 @@ final class ReferralController extends Controller
         $pendingRewards = ReferralReward::where('user_id', $user->id)->pending()->sum('amount');
         $appliedRewards = ReferralReward::where('user_id', $user->id)->applied()->sum('amount');
 
-        return view('referrals.rewards', compact('rewards', 'totalRewards', 'pendingRewards', 'appliedRewards'));
+        return view('referrals.rewards', ['rewards' => $rewards, 'totalRewards' => $totalRewards, 'pendingRewards' => $pendingRewards, 'appliedRewards' => $appliedRewards]);
     }
 }

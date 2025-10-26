@@ -27,7 +27,7 @@ final class ReferralCodeController extends Controller
         $referralCodes = $user->referralCodes()->with(['campaign', 'user'])->orderBy('created_at', 'desc')->paginate(10);
         $stats = ['total_codes' => $user->referralCodes()->count(), 'active_codes' => $user->referralCodes()->active()->count(), 'total_usage' => $user->referralCodes()->sum('usage_count'), 'total_rewards' => $user->referralCodes()->sum('reward_amount')];
 
-        return view('referral-codes.index', compact('referralCodes', 'stats'));
+        return view('referral-codes.index', ['referralCodes' => $referralCodes, 'stats' => $stats]);
     }
 
     /**
@@ -39,7 +39,7 @@ final class ReferralCodeController extends Controller
         $referralCode->load(['campaign', 'user', 'referrals', 'rewards', 'usageLogs', 'statistics']);
         $stats = $referralCode->stats;
 
-        return view('referral-codes.show', compact('referralCode', 'stats'));
+        return view('referral-codes.show', ['referralCode' => $referralCode, 'stats' => $stats]);
     }
 
     /**
@@ -50,7 +50,7 @@ final class ReferralCodeController extends Controller
         $this->authorize('create', ReferralCode::class);
         $campaigns = \App\Models\ReferralCampaign::active()->get();
 
-        return view('referral-codes.create', compact('campaigns'));
+        return view('referral-codes.create', ['campaigns' => $campaigns]);
     }
 
     /**
@@ -78,7 +78,7 @@ final class ReferralCodeController extends Controller
         $this->authorize('update', $referralCode);
         $campaigns = \App\Models\ReferralCampaign::active()->get();
 
-        return view('referral-codes.edit', compact('referralCode', 'campaigns'));
+        return view('referral-codes.edit', ['referralCode' => $referralCode, 'campaigns' => $campaigns]);
     }
 
     /**
@@ -144,7 +144,7 @@ final class ReferralCodeController extends Controller
         $this->authorize('view', $referralCode);
         $usageLogs = $referralCode->usageLogs()->with('user')->orderBy('created_at', 'desc')->paginate(20);
 
-        return view('referral-codes.usage', compact('referralCode', 'usageLogs'));
+        return view('referral-codes.usage', ['referralCode' => $referralCode, 'usageLogs' => $usageLogs]);
     }
 
     /**
@@ -154,10 +154,8 @@ final class ReferralCodeController extends Controller
     {
         $this->authorize('view', $referralCode);
         $statistics = $referralCode->statistics()->orderBy('date', 'desc')->limit(30)->get();
-        $chartData = $statistics->map(function ($stat) {
-            return ['date' => $stat->date->format('Y-m-d'), 'views' => $stat->total_views, 'clicks' => $stat->total_clicks, 'signups' => $stat->total_signups, 'conversions' => $stat->total_conversions, 'revenue' => $stat->total_revenue];
-        });
+        $chartData = $statistics->map(fn ($stat): array => ['date' => $stat->date->format('Y-m-d'), 'views' => $stat->total_views, 'clicks' => $stat->total_clicks, 'signups' => $stat->total_signups, 'conversions' => $stat->total_conversions, 'revenue' => $stat->total_revenue]);
 
-        return view('referral-codes.statistics', compact('referralCode', 'statistics', 'chartData'));
+        return view('referral-codes.statistics', ['referralCode' => $referralCode, 'statistics' => $statistics, 'chartData' => $chartData]);
     }
 }

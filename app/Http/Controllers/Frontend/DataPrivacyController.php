@@ -151,14 +151,14 @@ final class DataPrivacyController extends Controller
                     $product = $item->product;
 
                     return [
-                        'wishlist_id' => $wishlist->getKey(),
+                        'wishlist_id'   => $wishlist->getKey(),
                         'wishlist_name' => $wishlist->getAttribute('name'),
-                        'product_id' => $product?->getKey(),
-                        'product_name' => $product?->getAttribute('name'),
-                        'variant_id' => $item->getAttribute('variant_id'),
-                        'quantity' => $item->getAttribute('quantity'),
-                        'notes' => $item->getAttribute('notes'),
-                        'added_at' => $item->created_at?->toAtomString(),
+                        'product_id'    => $product?->getKey(),
+                        'product_name'  => $product?->getAttribute('name'),
+                        'variant_id'    => $item->getAttribute('variant_id'),
+                        'quantity'      => $item->getAttribute('quantity'),
+                        'notes'         => $item->getAttribute('notes'),
+                        'added_at'      => $item->created_at?->toAtomString(),
                     ];
                 });
             })
@@ -167,79 +167,73 @@ final class DataPrivacyController extends Controller
         $payload = [
             'meta' => [
                 'generated_at' => now()->toAtomString(),
-                'application' => config('app.name'),
-                'locale' => app()->getLocale(),
-                'user_id' => $user->getKey(),
+                'application'  => config('app.name'),
+                'locale'       => app()->getLocale(),
+                'user_id'      => $user->getKey(),
             ],
             'profile' => [
-                'name' => $user->getAttribute('name'),
-                'first_name' => $user->getAttribute('first_name'),
-                'last_name' => $user->getAttribute('last_name'),
-                'email' => $user->getAttribute('email'),
-                'phone' => $user->getAttribute('phone') ?? $user->getAttribute('phone_number'),
-                'locale' => $user->preferredLocale(),
-                'created_at' => $user->created_at?->toAtomString(),
-                'updated_at' => $user->updated_at?->toAtomString(),
-                'marketing_preferences' => (array) $user->getAttribute('marketing_preferences'),
-                'privacy_settings' => (array) $user->getAttribute('privacy_settings'),
+                'name'                     => $user->getAttribute('name'),
+                'first_name'               => $user->getAttribute('first_name'),
+                'last_name'                => $user->getAttribute('last_name'),
+                'email'                    => $user->getAttribute('email'),
+                'phone'                    => $user->getAttribute('phone') ?? $user->getAttribute('phone_number'),
+                'locale'                   => $user->preferredLocale(),
+                'created_at'               => $user->created_at?->toAtomString(),
+                'updated_at'               => $user->updated_at?->toAtomString(),
+                'marketing_preferences'    => (array) $user->getAttribute('marketing_preferences'),
+                'privacy_settings'         => (array) $user->getAttribute('privacy_settings'),
                 'notification_preferences' => (array) $user->getAttribute('notification_preferences'),
             ],
-            'addresses' => $addresses->map(static function (Address $address): array {
-                return [
-                    'id' => $address->getKey(),
-                    'type' => $address->getAttribute('type'),
-                    'first_name' => $address->getAttribute('first_name'),
-                    'last_name' => $address->getAttribute('last_name'),
-                    'company_name' => $address->getAttribute('company_name'),
-                    'address_line_1' => $address->getAttribute('address_line_1'),
-                    'address_line_2' => $address->getAttribute('address_line_2'),
-                    'city' => $address->getAttribute('city'),
-                    'state' => $address->getAttribute('state'),
-                    'postal_code' => $address->getAttribute('postal_code'),
-                    'country_code' => $address->getAttribute('country_code'),
-                    'is_default' => (bool) $address->getAttribute('is_default'),
-                    'is_billing' => (bool) $address->getAttribute('is_billing'),
-                    'is_shipping' => (bool) $address->getAttribute('is_shipping'),
-                    'created_at' => $address->created_at?->toAtomString(),
-                    'updated_at' => $address->updated_at?->toAtomString(),
-                ];
-            })->values(),
+            'addresses' => $addresses->map(static fn (Address $address): array => [
+                'id'             => $address->getKey(),
+                'type'           => $address->getAttribute('type'),
+                'first_name'     => $address->getAttribute('first_name'),
+                'last_name'      => $address->getAttribute('last_name'),
+                'company_name'   => $address->getAttribute('company_name'),
+                'address_line_1' => $address->getAttribute('address_line_1'),
+                'address_line_2' => $address->getAttribute('address_line_2'),
+                'city'           => $address->getAttribute('city'),
+                'state'          => $address->getAttribute('state'),
+                'postal_code'    => $address->getAttribute('postal_code'),
+                'country_code'   => $address->getAttribute('country_code'),
+                'is_default'     => (bool) $address->getAttribute('is_default'),
+                'is_billing'     => (bool) $address->getAttribute('is_billing'),
+                'is_shipping'    => (bool) $address->getAttribute('is_shipping'),
+                'created_at'     => $address->created_at?->toAtomString(),
+                'updated_at'     => $address->updated_at?->toAtomString(),
+            ])->values(),
             'orders' => $orders->map(static function (Order $order): array {
                 /** @var Collection<int, OrderItem> $items */
                 $items = $order->items;
 
                 return [
-                    'id' => $order->getKey(),
-                    'number' => $order->getAttribute('number'),
-                    'status' => $order->getAttribute('status'),
-                    'total' => $order->getAttribute('total'),
-                    'currency' => $order->getAttribute('currency'),
+                    'id'         => $order->getKey(),
+                    'number'     => $order->getAttribute('number'),
+                    'status'     => $order->getAttribute('status'),
+                    'total'      => $order->getAttribute('total'),
+                    'currency'   => $order->getAttribute('currency'),
                     'created_at' => $order->created_at?->toAtomString(),
                     'updated_at' => $order->updated_at?->toAtomString(),
-                    'items' => $items->map(static function (OrderItem $item): array {
-                        return [
-                            'id' => $item->getKey(),
-                            'product_id' => $item->product_id,
-                            'name' => $item->name,
-                            'sku' => $item->sku,
-                            'quantity' => $item->quantity,
-                            'price' => $item->price,
-                            'total' => $item->total,
-                        ];
-                    })->values(),
+                    'items'      => $items->map(static fn (OrderItem $item): array => [
+                        'id'         => $item->getKey(),
+                        'product_id' => $item->product_id,
+                        'name'       => $item->name,
+                        'sku'        => $item->sku,
+                        'quantity'   => $item->quantity,
+                        'price'      => $item->price,
+                        'total'      => $item->total,
+                    ])->values(),
                 ];
             })->values(),
-            'reviews' => $reviews->map(static function (Review $review): array {
-                return [
-                    'id' => $review->getKey(),
-                    'product_id' => $review->product_id,
-                    'rating' => $review->rating,
-                    'title' => $review->title,
-                    'body' => $review->getAttribute('body'),
-                    'created_at' => $review->created_at?->toAtomString(),
-                    'updated_at' => $review->updated_at?->toAtomString(),
-                ];
-            })->values(),
+            'reviews' => $reviews->map(static fn (Review $review): array => [
+                'id'         => $review->getKey(),
+                'product_id' => $review->product_id,
+                'rating'     => $review->rating,
+                'title'      => $review->title,
+                'body'       => $review->getAttribute('body'),
+                'created_at' => $review->created_at?->toAtomString(),
+                'updated_at' => $review->updated_at?->toAtomString(),
+            ])->values(),
             'wishlist' => $wishlistProducts,
         ];
 
@@ -276,16 +270,16 @@ final class DataPrivacyController extends Controller
             $anonymisedEmail = sprintf('deleted-user-%s@deleted.example', $emailKey);
 
             $account->forceFill([
-                'name' => __('Deleted User'),
-                'first_name' => null,
-                'last_name' => null,
-                'email' => $anonymisedEmail,
-                'phone' => null,
-                'phone_number' => null,
-                'privacy_settings' => [],
-                'marketing_preferences' => [],
+                'name'                     => __('Deleted User'),
+                'first_name'               => null,
+                'last_name'                => null,
+                'email'                    => $anonymisedEmail,
+                'phone'                    => null,
+                'phone_number'             => null,
+                'privacy_settings'         => [],
+                'marketing_preferences'    => [],
                 'notification_preferences' => [],
-                'preferences' => [],
+                'preferences'              => [],
             ])->save();
 
             /** @phpstan-ignore-next-line */

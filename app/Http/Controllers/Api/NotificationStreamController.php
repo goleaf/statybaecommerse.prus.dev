@@ -31,16 +31,16 @@ final class NotificationStreamController extends Controller
         $response->headers->set('Connection', 'keep-alive');
         $response->headers->set('Access-Control-Allow-Origin', '*');
         $response->headers->set('Access-Control-Allow-Headers', 'Cache-Control');
-        $response->setCallback(function () use ($user) {
+        $response->setCallback(function () use ($user): void {
             // Send initial connection confirmation
-            echo 'data: '.json_encode(['type' => 'connected', 'message' => 'Connected to live notifications', 'timestamp' => now()->toISOString()])."\n\n";
+            echo 'data: ' . json_encode(['type' => 'connected', 'message' => 'Connected to live notifications', 'timestamp' => now()->toISOString()]) . "\n\n";
             // Keep connection alive with periodic heartbeats
             $lastHeartbeat = time();
             $lastNotificationCount = $user->unreadNotifications()->count();
             while (true) {
                 // Send heartbeat every 30 seconds
                 if (time() - $lastHeartbeat >= 30) {
-                    echo 'data: '.json_encode(['type' => 'heartbeat', 'timestamp' => now()->toISOString()])."\n\n";
+                    echo 'data: ' . json_encode(['type' => 'heartbeat', 'timestamp' => now()->toISOString()]) . "\n\n";
                     $lastHeartbeat = time();
                 }
                 // Check for new notifications
@@ -48,12 +48,12 @@ final class NotificationStreamController extends Controller
                 if ($currentNotificationCount > $lastNotificationCount) {
                     $newNotifications = $user->unreadNotifications()->latest()->limit($currentNotificationCount - $lastNotificationCount)->get();
                     foreach ($newNotifications as $notification) {
-                        echo 'data: '.json_encode(['type' => 'notification', 'id' => $notification->id, 'title' => $notification->data['title'] ?? 'Notification', 'message' => $notification->data['message'] ?? '', 'type' => $notification->data['type'] ?? 'info', 'timestamp' => $notification->created_at->toISOString()])."\n\n";
+                        echo 'data: ' . json_encode(['id' => $notification->id, 'title' => $notification->data['title'] ?? 'Notification', 'message' => $notification->data['message'] ?? '', 'type' => $notification->data['type'] ?? 'info', 'timestamp' => $notification->created_at->toISOString()]) . "\n\n";
                     }
                     $lastNotificationCount = $currentNotificationCount;
                 }
                 // Check if connection is still alive
-                if (connection_aborted()) {
+                if (connection_aborted() !== 0) {
                     break;
                 }
                 // Small delay to prevent excessive CPU usage

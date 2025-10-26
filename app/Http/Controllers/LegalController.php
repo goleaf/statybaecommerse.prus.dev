@@ -37,9 +37,9 @@ final class LegalController extends Controller
         $documents = Legal::query()
             ->with('translations')
             ->when($type !== '', fn ($q) => $q->byType($type))
-            ->whereHas('translations', function ($q) use ($query) {
+            ->whereHas('translations', function ($q) use ($query): void {
                 if ($query !== '') {
-                    $q->where(function ($qq) use ($query) {
+                    $q->where(function ($qq) use ($query): void {
                         $qq
                             ->where('title', 'like', "%{$query}%")
                             ->orWhere('content', 'like', "%{$query}%");
@@ -119,10 +119,10 @@ final class LegalController extends Controller
             ->get();
 
         return response()->view('legal.show', [
-            'document' => $document,
-            'translation' => $translation,
+            'document'         => $document,
+            'translation'      => $translation,
             'relatedDocuments' => $relatedDocuments,
-            'otherDocuments' => $otherDocuments,
+            'otherDocuments'   => $otherDocuments,
         ]);
     }
 
@@ -138,10 +138,10 @@ final class LegalController extends Controller
             ->get();
 
         $xml = '<?xml version="1.0" encoding="UTF-8"?>'
-            .'<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
+            . '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">';
 
         foreach ($translations as $t) {
-            $loc = e((string) url('/legal/'.$t->slug));
+            $loc = e((string) url('/legal/' . $t->slug));
             $xml .= "<url><loc>{$loc}</loc><changefreq>weekly</changefreq></url>";
         }
 
@@ -158,14 +158,14 @@ final class LegalController extends Controller
             ->get();
 
         $rss = '<?xml version="1.0" encoding="UTF-8"?>'
-            .'<rss version="2.0"><channel>'
-            .'<title>Legal Documents</title>'
-            .'<link>'.e((string) url('/legal')).'</link>'
-            .'<description>Latest legal documents</description>';
+            . '<rss version="2.0"><channel>'
+            . '<title>Legal Documents</title>'
+            . '<link>' . e((string) url('/legal')) . '</link>'
+            . '<description>Latest legal documents</description>';
 
         foreach ($translations as $t) {
             $title = e((string) $t->title);
-            $link = e((string) url('/legal/'.$t->slug));
+            $link = e((string) url('/legal/' . $t->slug));
             $desc = e((string) str(strip_tags((string) $t->content))->limit(200));
             $rss .= "<item><title>{$title}</title><link>{$link}</link><description>{$desc}</description></item>";
         }

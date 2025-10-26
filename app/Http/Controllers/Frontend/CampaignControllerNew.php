@@ -25,13 +25,13 @@ final class CampaignControllerNew extends Controller
      */
     public function index(Request $request): View
     {
-        $query = Campaign::active()->with(['targetCategories', 'targetProducts', 'targetCustomerGroups'])->when($request->filled('type'), fn ($q) => $q->where('type', $request->type))->when($request->filled('category'), fn ($q) => $q->whereHas('targetCategories', fn ($subQ) => $subQ->where('categories.id', $request->category)))->when($request->filled('product'), fn ($q) => $q->whereHas('targetProducts', fn ($subQ) => $subQ->where('products.id', $request->product)))->when($request->filled('customer_group'), fn ($q) => $q->whereHas('targetCustomerGroups', fn ($subQ) => $subQ->where('customer_groups.id', $request->customer_group)))->when($request->filled('search'), fn ($q) => $q->where('name', 'like', '%'.$request->search.'%'))->when($request->filled('featured'), fn ($q) => $q->featured())->when($request->filled('budget_min'), fn ($q) => $q->where('budget', '>=', $request->budget_min))->when($request->filled('budget_max'), fn ($q) => $q->where('budget', '<=', $request->budget_max));
+        $query = Campaign::active()->with(['targetCategories', 'targetProducts', 'targetCustomerGroups'])->when($request->filled('type'), fn ($q) => $q->where('type', $request->type))->when($request->filled('category'), fn ($q) => $q->whereHas('targetCategories', fn ($subQ) => $subQ->where('categories.id', $request->category)))->when($request->filled('product'), fn ($q) => $q->whereHas('targetProducts', fn ($subQ) => $subQ->where('products.id', $request->product)))->when($request->filled('customer_group'), fn ($q) => $q->whereHas('targetCustomerGroups', fn ($subQ) => $subQ->where('customer_groups.id', $request->customer_group)))->when($request->filled('search'), fn ($q) => $q->where('name', 'like', '%' . $request->search . '%'))->when($request->filled('featured'), fn ($q) => $q->featured())->when($request->filled('budget_min'), fn ($q) => $q->where('budget', '>=', $request->budget_min))->when($request->filled('budget_max'), fn ($q) => $q->where('budget', '<=', $request->budget_max));
         $campaigns = $query->orderBy('display_priority', 'desc')->orderBy('is_featured', 'desc')->orderBy('created_at', 'desc')->paginate(12);
         $categories = Category::whereHas('campaigns')->get();
         $products = Product::whereHas('campaigns')->get();
         $customerGroups = CustomerGroup::whereHas('campaigns')->get();
 
-        return view('campaigns.index', compact('campaigns', 'categories', 'products', 'customerGroups'));
+        return view('campaigns.index', ['campaigns' => $campaigns, 'categories' => $categories, 'products' => $products, 'customerGroups' => $customerGroups]);
     }
 
     /**
@@ -45,11 +45,11 @@ final class CampaignControllerNew extends Controller
         // Track view
         $campaign->recordView(sessionId: session()->getId(), ipAddress: request()->ip(), userAgent: request()->userAgent(), referer: request()->header('referer'), customerId: auth()->id());
         // Load related campaigns
-        $relatedCampaigns = Campaign::active()->where('id', '!=', $campaign->id)->where(function ($q) use ($campaign) {
+        $relatedCampaigns = Campaign::active()->where('id', '!=', $campaign->id)->where(function ($q) use ($campaign): void {
             $q->whereHas('targetCategories', fn ($subQ) => $subQ->whereIn('categories.id', $campaign->targetCategories->pluck('id')))->orWhereHas('targetProducts', fn ($subQ) => $subQ->whereIn('products.id', $campaign->targetProducts->pluck('id')))->orWhere('type', $campaign->type);
         })->limit(4)->get();
 
-        return view('campaigns.show', compact('campaign', 'relatedCampaigns'));
+        return view('campaigns.show', ['campaign' => $campaign, 'relatedCampaigns' => $relatedCampaigns]);
     }
 
     /**
@@ -87,7 +87,7 @@ final class CampaignControllerNew extends Controller
     {
         $campaigns = Campaign::active()->featured()->with(['targetCategories', 'targetProducts'])->orderBy('display_priority', 'desc')->orderBy('created_at', 'desc')->paginate(12);
 
-        return view('campaigns.featured', compact('campaigns'));
+        return view('campaigns.featured', ['campaigns' => $campaigns]);
     }
 
     /**
@@ -101,7 +101,7 @@ final class CampaignControllerNew extends Controller
         }
         $campaigns = Campaign::active()->where('type', $type)->with(['targetCategories', 'targetProducts'])->orderBy('display_priority', 'desc')->orderBy('created_at', 'desc')->paginate(12);
 
-        return view('campaigns.by-type', compact('campaigns', 'type'));
+        return view('campaigns.by-type', ['campaigns' => $campaigns, 'type' => $type]);
     }
 
     /**
@@ -113,11 +113,11 @@ final class CampaignControllerNew extends Controller
         if (empty($query)) {
             return redirect()->route('campaigns.index');
         }
-        $campaigns = Campaign::active()->where(function ($q) use ($query) {
-            $q->where('name', 'like', '%'.$query.'%')->orWhere('description', 'like', '%'.$query.'%')->orWhere('content', 'like', '%'.$query.'%');
+        $campaigns = Campaign::active()->where(function ($q) use ($query): void {
+            $q->where('name', 'like', '%' . $query . '%')->orWhere('description', 'like', '%' . $query . '%')->orWhere('content', 'like', '%' . $query . '%');
         })->with(['targetCategories', 'targetProducts'])->orderBy('display_priority', 'desc')->orderBy('created_at', 'desc')->paginate(12);
 
-        return view('campaigns.search', compact('campaigns', 'query'));
+        return view('campaigns.search', ['campaigns' => $campaigns, 'query' => $query]);
     }
 
     /**
@@ -125,9 +125,7 @@ final class CampaignControllerNew extends Controller
      */
     public function api(Request $request): JsonResponse
     {
-        $campaigns = Campaign::active()->when($request->filled('type'), fn ($q) => $q->where('type', $request->type))->when($request->filled('featured'), fn ($q) => $q->featured())->when($request->filled('limit'), fn ($q) => $q->limit($request->limit))->orderBy('display_priority', 'desc')->orderBy('created_at', 'desc')->get()->map(function ($campaign) {
-            return ['id' => $campaign->id, 'name' => $campaign->name, 'slug' => $campaign->slug, 'description' => $campaign->description, 'type' => $campaign->type, 'status' => $campaign->status, 'budget' => $campaign->budget, 'start_date' => $campaign->start_date?->toISOString(), 'end_date' => $campaign->end_date?->toISOString(), 'cta_text' => $campaign->cta_text, 'cta_url' => $campaign->cta_url, 'is_featured' => $campaign->is_featured, 'total_views' => $campaign->total_views, 'total_clicks' => $campaign->total_clicks, 'total_conversions' => $campaign->total_conversions, 'conversion_rate' => $campaign->conversion_rate, 'image_url' => $campaign->getImageUrl('medium'), 'banner_url' => $campaign->getBannerUrl('medium')];
-        });
+        $campaigns = Campaign::active()->when($request->filled('type'), fn ($q) => $q->where('type', $request->type))->when($request->filled('featured'), fn ($q) => $q->featured())->when($request->filled('limit'), fn ($q) => $q->limit($request->limit))->orderBy('display_priority', 'desc')->orderBy('created_at', 'desc')->get()->map(fn ($campaign): array => ['id' => $campaign->id, 'name' => $campaign->name, 'slug' => $campaign->slug, 'description' => $campaign->description, 'type' => $campaign->type, 'status' => $campaign->status, 'budget' => $campaign->budget, 'start_date' => $campaign->start_date?->toISOString(), 'end_date' => $campaign->end_date?->toISOString(), 'cta_text' => $campaign->cta_text, 'cta_url' => $campaign->cta_url, 'is_featured' => $campaign->is_featured, 'total_views' => $campaign->total_views, 'total_clicks' => $campaign->total_clicks, 'total_conversions' => $campaign->total_conversions, 'conversion_rate' => $campaign->conversion_rate, 'image_url' => $campaign->getImageUrl('medium'), 'banner_url' => $campaign->getBannerUrl('medium')]);
 
         return response()->json(['data' => $campaigns, 'meta' => ['total' => $campaigns->count(), 'types' => Campaign::active()->distinct()->pluck('type')]]);
     }
@@ -143,6 +141,6 @@ final class CampaignControllerNew extends Controller
         // Track API view
         $campaign->recordView(sessionId: session()->getId(), ipAddress: request()->ip(), userAgent: request()->userAgent(), referer: request()->header('referer'), customerId: auth()->id());
 
-        return response()->json(['data' => ['id' => $campaign->id, 'name' => $campaign->name, 'slug' => $campaign->slug, 'description' => $campaign->description, 'type' => $campaign->type, 'status' => $campaign->status, 'subject' => $campaign->subject, 'content' => $campaign->content, 'budget' => $campaign->budget, 'budget_limit' => $campaign->budget_limit, 'start_date' => $campaign->start_date?->toISOString(), 'end_date' => $campaign->end_date?->toISOString(), 'cta_text' => $campaign->cta_text, 'cta_url' => $campaign->cta_url, 'is_featured' => $campaign->is_featured, 'display_priority' => $campaign->display_priority, 'total_views' => $campaign->total_views, 'total_clicks' => $campaign->total_clicks, 'total_conversions' => $campaign->total_conversions, 'total_revenue' => $campaign->total_revenue, 'conversion_rate' => $campaign->conversion_rate, 'click_through_rate' => $campaign->getClickThroughRate(), 'roi' => $campaign->getROI(), 'image_url' => $campaign->getImageUrl('large'), 'banner_url' => $campaign->getBannerUrl('large'), 'target_categories' => $campaign->targetCategories->map(fn ($cat) => ['id' => $cat->id, 'name' => $cat->name, 'slug' => $cat->slug]), 'target_products' => $campaign->targetProducts->map(fn ($prod) => ['id' => $prod->id, 'name' => $prod->name, 'slug' => $prod->slug]), 'target_customer_groups' => $campaign->targetCustomerGroups->map(fn ($group) => ['id' => $group->id, 'name' => $group->name]), 'meta_title' => $campaign->meta_title, 'meta_description' => $campaign->meta_description, 'social_media_ready' => $campaign->social_media_ready, 'created_at' => $campaign->created_at->toISOString(), 'updated_at' => $campaign->updated_at->toISOString()]]);
+        return response()->json(['data' => ['id' => $campaign->id, 'name' => $campaign->name, 'slug' => $campaign->slug, 'description' => $campaign->description, 'type' => $campaign->type, 'status' => $campaign->status, 'subject' => $campaign->subject, 'content' => $campaign->content, 'budget' => $campaign->budget, 'budget_limit' => $campaign->budget_limit, 'start_date' => $campaign->start_date?->toISOString(), 'end_date' => $campaign->end_date?->toISOString(), 'cta_text' => $campaign->cta_text, 'cta_url' => $campaign->cta_url, 'is_featured' => $campaign->is_featured, 'display_priority' => $campaign->display_priority, 'total_views' => $campaign->total_views, 'total_clicks' => $campaign->total_clicks, 'total_conversions' => $campaign->total_conversions, 'total_revenue' => $campaign->total_revenue, 'conversion_rate' => $campaign->conversion_rate, 'click_through_rate' => $campaign->getClickThroughRate(), 'roi' => $campaign->getROI(), 'image_url' => $campaign->getImageUrl('large'), 'banner_url' => $campaign->getBannerUrl(), 'target_categories' => $campaign->targetCategories->map(fn ($cat): array => ['id' => $cat->id, 'name' => $cat->name, 'slug' => $cat->slug]), 'target_products' => $campaign->targetProducts->map(fn ($prod): array => ['id' => $prod->id, 'name' => $prod->name, 'slug' => $prod->slug]), 'target_customer_groups' => $campaign->targetCustomerGroups->map(fn ($group): array => ['id' => $group->id, 'name' => $group->name]), 'meta_title' => $campaign->meta_title, 'meta_description' => $campaign->meta_description, 'social_media_ready' => $campaign->social_media_ready, 'created_at' => $campaign->created_at->toISOString(), 'updated_at' => $campaign->updated_at->toISOString()]]);
     }
 }

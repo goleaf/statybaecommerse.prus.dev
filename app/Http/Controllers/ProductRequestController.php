@@ -27,7 +27,7 @@ final class ProductRequestController extends Controller
             abort(404, __('translations.product_not_requestable'));
         }
 
-        return view('products.request-form', compact('product'));
+        return view('products.request-form', ['product' => $product]);
     }
 
     /**
@@ -39,7 +39,7 @@ final class ProductRequestController extends Controller
         if (! $product->isRequestable()) {
             return redirect()->back()->withErrors(['error' => __('translations.product_not_requestable')]);
         }
-        $productRequest = ProductRequest::create(['product_id' => $product->id, 'user_id' => auth()->id(), 'name' => $data->name, 'email' => $data->email, 'phone' => $data->phone, 'message' => $data->message, 'requested_quantity' => $data->requested_quantity, 'status' => 'pending']);
+        ProductRequest::create(['product_id' => $product->id, 'user_id' => auth()->id(), 'name' => $data->name, 'email' => $data->email, 'phone' => $data->phone, 'message' => $data->message, 'requested_quantity' => $data->requested_quantity, 'status' => 'pending']);
         // Increment the requests count on the product
         $product->incrementRequestsCount();
 
@@ -53,7 +53,7 @@ final class ProductRequestController extends Controller
     {
         $this->authorize('view', $productRequest);
 
-        return view('products.request-details', compact('productRequest'));
+        return view('products.request-details', ['productRequest' => $productRequest]);
     }
 
     /**
@@ -64,7 +64,7 @@ final class ProductRequestController extends Controller
         $user = $request->user();
         $productRequests = ProductRequest::with(['product', 'respondedBy'])->where('user_id', $user->id)->orderBy('created_at', 'desc')->paginate(10);
 
-        return view('products.requests-index', compact('productRequests'));
+        return view('products.requests-index', ['productRequests' => $productRequests]);
     }
 
     /**

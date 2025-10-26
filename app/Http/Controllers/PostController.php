@@ -33,13 +33,13 @@ final class PostController extends Controller
         // Search
         if ($request->filled('search')) {
             $search = $request->search;
-            $query->where(function ($q) use ($search) {
+            $query->where(function ($q) use ($search): void {
                 $q->where('title', 'like', "%{$search}%")->orWhere('excerpt', 'like', "%{$search}%")->orWhere('content', 'like', "%{$search}%");
             });
         }
         $posts = PaginationService::paginateWithContext($query, 'posts');
 
-        return view('posts.index', compact('posts'));
+        return view('posts.index', ['posts' => $posts]);
     }
 
     /**
@@ -54,12 +54,10 @@ final class PostController extends Controller
         // Increment views count
         $post->increment('views_count');
         // Get related posts
-        $relatedPosts = Post::published()->where('id', '!=', $post->id)->where('user_id', $post->user_id)->limit(3)->get()->skipWhile(function ($relatedPost) {
-            // Skip related posts that are not properly configured for display
-            return empty($relatedPost->title) || empty($relatedPost->slug) || $relatedPost->status !== 'published' || empty($relatedPost->excerpt);
-        });
+        $relatedPosts = Post::published()->where('id', '!=', $post->id)->where('user_id', $post->user_id)->limit(3)->get()->skipWhile(fn ($relatedPost): bool => // Skip related posts that are not properly configured for display
+            empty($relatedPost->title) || empty($relatedPost->slug) || $relatedPost->status !== 'published' || empty($relatedPost->excerpt));
 
-        return view('posts.show', compact('post', 'relatedPosts'));
+        return view('posts.show', ['post' => $post, 'relatedPosts' => $relatedPosts]);
     }
 
     /**
@@ -69,7 +67,7 @@ final class PostController extends Controller
     {
         $posts = PaginationService::paginateWithContext(Post::published()->featured()->with('user')->latest('published_at'), 'posts');
 
-        return view('posts.featured', compact('posts'));
+        return view('posts.featured', ['posts' => $posts]);
     }
 
     /**
@@ -80,7 +78,7 @@ final class PostController extends Controller
         $posts = Post::published()->byAuthor($authorId)->with('user')->latest('published_at')->paginate(12);
         $author = $posts->first()?->user;
 
-        return view('posts.by-author', compact('posts', 'author'));
+        return view('posts.by-author', ['posts' => $posts, 'author' => $author]);
     }
 
     /**
@@ -91,13 +89,13 @@ final class PostController extends Controller
         $query = Post::published()->with('user')->latest('published_at');
         if ($request->filled('q')) {
             $search = $request->q;
-            $query->where(function ($q) use ($search) {
+            $query->where(function ($q) use ($search): void {
                 $q->where('title', 'like', "%{$search}%")->orWhere('excerpt', 'like', "%{$search}%")->orWhere('content', 'like', "%{$search}%")->orWhere('tags', 'like', "%{$search}%");
             });
         }
         $posts = $query->paginate(12);
         $searchTerm = $request->q;
 
-        return view('posts.search', compact('posts', 'searchTerm'));
+        return view('posts.search', ['posts' => $posts, 'searchTerm' => $searchTerm]);
     }
 }

@@ -32,8 +32,8 @@ final class CityController extends Controller
         // Search
         if ($request->filled('search')) {
             $search = $request->get('search');
-            $query->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")->orWhere('code', 'like', "%{$search}%")->orWhereHas('translations', function ($translationQuery) use ($search) {
+            $query->where(function ($q) use ($search): void {
+                $q->where('name', 'like', "%{$search}%")->orWhere('code', 'like', "%{$search}%")->orWhereHas('translations', function ($translationQuery) use ($search): void {
                     $translationQuery->where('name', 'like', "%{$search}%");
                 });
             });
@@ -65,7 +65,7 @@ final class CityController extends Controller
         // Get countries for filter dropdown
         $countries = Country::withTranslations()->enabled()->active()->ordered()->orderBy('name')->get();
 
-        return view('cities.index', compact('cities', 'countries'));
+        return view('cities.index', ['cities' => $cities, 'countries' => $countries]);
     }
 
     /**
@@ -80,27 +80,21 @@ final class CityController extends Controller
         // Get nearby cities (within 50km radius if coordinates available)
         $nearbyCities = collect();
         if ($city->latitude && $city->longitude) {
-            $nearbyCities = City::withTranslations()->enabled()->active()->where('id', '!=', $city->id)->whereNotNull('latitude')->whereNotNull('longitude')->get()->skipWhile(function ($nearbyCity) {
-                // Skip nearby cities that are not properly configured for display
-                return empty($nearbyCity->name) || ! $nearbyCity->is_enabled || ! $nearbyCity->is_active || empty($nearbyCity->country_id) || empty($nearbyCity->code);
-            })->filter(function ($nearbyCity) use ($city) {
-                $distance = $this->calculateDistance($city->latitude, $city->longitude, $nearbyCity->latitude, $nearbyCity->longitude);
+            $nearbyCities = City::withTranslations()->enabled()->active()->where('id', '!=', $city->id)->whereNotNull('latitude')->whereNotNull('longitude')->get()->skipWhile(fn ($nearbyCity): bool => // Skip nearby cities that are not properly configured for display
+                empty($nearbyCity->name) || ! $nearbyCity->is_enabled || ! $nearbyCity->is_active || empty($nearbyCity->country_id) || empty($nearbyCity->code))->filter(function ($nearbyCity) use ($city): bool {
+                    $distance = $this->calculateDistance($city->latitude, $city->longitude, $nearbyCity->latitude, $nearbyCity->longitude);
 
-                return $distance <= 50;
-                // Within 50km
-            })->sortBy(function ($nearbyCity) use ($city) {
-                return $this->calculateDistance($city->latitude, $city->longitude, $nearbyCity->latitude, $nearbyCity->longitude);
-            })->take(5);
+                    return $distance <= 50;
+                    // Within 50km
+                })->sortBy(fn ($nearbyCity): float => $this->calculateDistance($city->latitude, $city->longitude, $nearbyCity->latitude, $nearbyCity->longitude))->take(5);
         }
         // Get related cities (same country, region, or level)
-        $relatedCities = City::withTranslations()->enabled()->active()->where('id', '!=', $city->id)->where(function ($q) use ($city) {
+        $relatedCities = City::withTranslations()->enabled()->active()->where('id', '!=', $city->id)->where(function ($q) use ($city): void {
             $q->where('country_id', $city->country_id)->orWhere('region_id', $city->region_id)->orWhere('level', $city->level);
-        })->limit(6)->get()->skipWhile(function ($relatedCity) {
-            // Skip related cities that are not properly configured for display
-            return empty($relatedCity->name) || ! $relatedCity->is_enabled || ! $relatedCity->is_active || empty($relatedCity->country_id) || empty($relatedCity->code);
-        });
+        })->limit(6)->get()->skipWhile(fn ($relatedCity): bool => // Skip related cities that are not properly configured for display
+            empty($relatedCity->name) || ! $relatedCity->is_enabled || ! $relatedCity->is_active || empty($relatedCity->country_id) || empty($relatedCity->code));
 
-        return view('cities.show', compact('city', 'nearbyCities', 'relatedCities'));
+        return view('cities.show', ['city' => $city, 'nearbyCities' => $nearbyCities, 'relatedCities' => $relatedCities]);
     }
 
     /**
@@ -113,13 +107,11 @@ final class CityController extends Controller
         if (empty($query)) {
             return response()->json([]);
         }
-        $cities = City::with(['country', 'region'])->withTranslations()->enabled()->active()->where(function ($q) use ($query) {
-            $q->where('name', 'like', "%{$query}%")->orWhere('code', 'like', "%{$query}%")->orWhereHas('translations', function ($translationQuery) use ($query) {
+        $cities = City::with(['country', 'region'])->withTranslations()->enabled()->active()->where(function ($q) use ($query): void {
+            $q->where('name', 'like', "%{$query}%")->orWhere('code', 'like', "%{$query}%")->orWhereHas('translations', function ($translationQuery) use ($query): void {
                 $translationQuery->where('name', 'like', "%{$query}%");
             });
-        })->limit($limit)->get()->map(function ($city) {
-            return ['id' => $city->id, 'name' => $city->translated_name, 'code' => $city->code, 'country' => $city->country?->translated_name, 'region' => $city->region?->translated_name, 'url' => route('cities.show', $city)];
-        });
+        })->limit($limit)->get()->map(fn ($city): array => ['id' => $city->id, 'name' => $city->translated_name, 'code' => $city->code, 'country' => $city->country?->translated_name, 'region' => $city->region?->translated_name, 'url' => route('cities.show', $city)]);
 
         return response()->json($cities);
     }
@@ -131,7 +123,7 @@ final class CityController extends Controller
     {
         $cities = City::withTranslations()->enabled()->active()->byCountry($country->id)->ordered()->orderBy('name')->paginate(24);
 
-        return view('cities.by-country', compact('cities', 'country'));
+        return view('cities.by-country', ['cities' => $cities, 'country' => $country]);
     }
 
     /**

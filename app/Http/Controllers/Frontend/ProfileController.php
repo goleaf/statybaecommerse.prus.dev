@@ -21,18 +21,16 @@ use Illuminate\Validation\Rule;
 
 final class ProfileController extends Controller
 {
-    public function __construct(private readonly TableAvailability $tables)
-    {
-    }
+    public function __construct(private readonly TableAvailability $tables) {}
 
     public function index(Request $request): Response
     {
         $user = $this->resolveUser($request)->load('addresses');
 
         return response()->view('profile.index', [
-            'user' => $user,
+            'user'      => $user,
             'addresses' => $user->addresses,
-            'customer' => $this->resolveCustomerForUser($user),
+            'customer'  => $this->resolveCustomerForUser($user),
         ]);
     }
 
@@ -41,9 +39,9 @@ final class ProfileController extends Controller
         $user = $this->resolveUser($request);
 
         return response()->view('profile.edit', [
-            'user' => $user,
+            'user'      => $user,
             'countries' => $this->resolveCountries(),
-            'customer' => $this->resolveCustomerForUser($user),
+            'customer'  => $this->resolveCustomerForUser($user),
         ]);
     }
 
@@ -100,11 +98,11 @@ final class ProfileController extends Controller
         $user = $this->resolveUser($request);
 
         return response()->view('profile.addresses', [
-            'user' => $user,
-            'addresses' => $user->addresses()->latest()->get(),
-            'types' => AddressType::cases(),
+            'user'         => $user,
+            'addresses'    => $user->addresses()->latest()->get(),
+            'types'        => AddressType::cases(),
             'addressTypes' => AddressType::options(),
-            'countries' => $this->resolveCountries(),
+            'countries'    => $this->resolveCountries(),
         ]);
     }
 
@@ -127,7 +125,7 @@ final class ProfileController extends Controller
         $user = $this->resolveUser($request);
         $this->ensureAddressOwner($user->getKey(), $address);
 
-        $validated = $this->validateAddress($request, $address);
+        $validated = $this->validateAddress($request);
 
         $address->update($validated);
 
@@ -148,23 +146,23 @@ final class ProfileController extends Controller
         return redirect()->route('frontend.profile.addresses')->with('status', 'address-deleted');
     }
 
-    private function validateAddress(Request $request, ?Address $address = null): array
+    private function validateAddress(Request $request): array
     {
         $rules = [
-            'type' => ['required', Rule::in(array_map(static fn (AddressType $type) => $type->value, AddressType::cases()))],
-            'first_name' => ['required', 'string', 'max:120'],
-            'last_name' => ['required', 'string', 'max:120'],
+            'type'           => ['required', Rule::in(array_map(static fn (AddressType $type) => $type->value, AddressType::cases()))],
+            'first_name'     => ['required', 'string', 'max:120'],
+            'last_name'      => ['required', 'string', 'max:120'],
             'address_line_1' => ['required', 'string', 'max:255'],
             'address_line_2' => ['nullable', 'string', 'max:255'],
-            'city' => ['required', 'string', 'max:120'],
-            'state' => ['nullable', 'string', 'max:120'],
-            'postal_code' => ['required', 'string', 'max:32'],
-            'country_code' => ['required', 'string', 'size:2'],
-            'phone' => ['nullable', 'string', 'max:50'],
-            'email' => ['nullable', 'email', 'max:255'],
-            'is_default' => ['sometimes', 'boolean'],
-            'is_billing' => ['sometimes', 'boolean'],
-            'is_shipping' => ['sometimes', 'boolean'],
+            'city'           => ['required', 'string', 'max:120'],
+            'state'          => ['nullable', 'string', 'max:120'],
+            'postal_code'    => ['required', 'string', 'max:32'],
+            'country_code'   => ['required', 'string', 'size:2'],
+            'phone'          => ['nullable', 'string', 'max:50'],
+            'email'          => ['nullable', 'email', 'max:255'],
+            'is_default'     => ['sometimes', 'boolean'],
+            'is_billing'     => ['sometimes', 'boolean'],
+            'is_shipping'    => ['sometimes', 'boolean'],
         ];
 
         $data = $request->validate($rules);
@@ -239,13 +237,13 @@ final class ProfileController extends Controller
         $columnLookup = array_flip($columns);
 
         $customer->fill(array_intersect_key([
-            'name' => $user->name,
-            'email' => $validated['email'],
-            'phone' => $validated['phone'] ?? null,
-            'address' => $validated['address'] ?? null,
+            'name'        => $user->name,
+            'email'       => $validated['email'],
+            'phone'       => $validated['phone'] ?? null,
+            'address'     => $validated['address'] ?? null,
             'postal_code' => $validated['postal_code'] ?? null,
-            'country_id' => $validated['country_id'] ?? null,
-            'city_id' => $validated['city_id'] ?? null,
+            'country_id'  => $validated['country_id'] ?? null,
+            'city_id'     => $validated['city_id'] ?? null,
         ], $columnLookup));
 
         foreach (['is_default', 'is_billing', 'is_shipping'] as $flag) {
@@ -300,16 +298,16 @@ final class ProfileController extends Controller
     private function profileRules(User $user): array
     {
         return [
-            'name' => ['sometimes', 'nullable', 'string', 'max:255'],
-            'first_name' => ['sometimes', 'nullable', 'string', 'max:120'],
-            'last_name' => ['sometimes', 'nullable', 'string', 'max:120'],
-            'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->getKey())],
-            'phone' => ['nullable', 'string', 'max:50'],
-            'address' => ['nullable', 'string', 'max:255'],
+            'name'        => ['sometimes', 'nullable', 'string', 'max:255'],
+            'first_name'  => ['sometimes', 'nullable', 'string', 'max:120'],
+            'last_name'   => ['sometimes', 'nullable', 'string', 'max:120'],
+            'email'       => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->getKey())],
+            'phone'       => ['nullable', 'string', 'max:50'],
+            'address'     => ['nullable', 'string', 'max:255'],
             'postal_code' => ['nullable', 'string', 'max:32'],
-            'country_id' => $this->countryRule(),
-            'city_id' => $this->cityRule(),
-            'password' => ['nullable', 'confirmed', 'min:8'],
+            'country_id'  => $this->countryRule(),
+            'city_id'     => $this->cityRule(),
+            'password'    => ['nullable', 'confirmed', 'min:8'],
         ];
     }
 

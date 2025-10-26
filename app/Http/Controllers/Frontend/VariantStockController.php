@@ -23,7 +23,7 @@ final class VariantStockController extends Controller
      */
     public function index(Request $request): View
     {
-        $query = VariantInventory::with(['variant.product', 'location', 'supplier'])->whereHas('variant.product', function ($q) {
+        $query = VariantInventory::with(['variant.product', 'location', 'supplier'])->whereHas('variant.product', function ($q): void {
             $q->where('is_visible', true);
         });
         // Apply filters
@@ -32,25 +32,25 @@ final class VariantStockController extends Controller
         }
         if ($request->filled('status')) {
             match ($request->status) {
-                'low_stock' => $query->lowStock(),
-                'out_of_stock' => $query->outOfStock(),
+                'low_stock'     => $query->lowStock(),
+                'out_of_stock'  => $query->outOfStock(),
                 'needs_reorder' => $query->needsReorder(),
                 'expiring_soon' => $query->expiringSoon(),
-                default => null,
+                default         => null,
             };
         }
         if ($request->filled('search')) {
             $search = $request->search;
-            $query->whereHas('variant.product', function ($q) use ($search) {
+            $query->whereHas('variant.product', function ($q) use ($search): void {
                 $q->where('name', 'like', "%{$search}%");
-            })->orWhereHas('variant', function ($q) use ($search) {
+            })->orWhereHas('variant', function ($q) use ($search): void {
                 $q->where('name', 'like', "%{$search}%")->orWhere('sku', 'like', "%{$search}%");
             });
         }
         $variantStocks = $query->paginate(20);
         $locations = Location::enabled()->get();
 
-        return view('variant-stock.index', compact('variantStocks', 'locations'));
+        return view('variant-stock.index', ['variantStocks' => $variantStocks, 'locations' => $locations]);
     }
 
     /**
@@ -60,7 +60,7 @@ final class VariantStockController extends Controller
     {
         $variantStock->load(['variant.product', 'location', 'supplier', 'stockMovements.user']);
 
-        return view('variant-stock.show', compact('variantStock'));
+        return view('variant-stock.show', ['variantStock' => $variantStock]);
     }
 
     /**
@@ -88,9 +88,7 @@ final class VariantStockController extends Controller
     public function getStockByLocation(Request $request): JsonResponse
     {
         $request->validate(['variant_id' => 'required|exists:product_variants,id']);
-        $stocks = VariantInventory::with('location')->where('variant_id', $request->variant_id)->where('is_tracked', true)->get()->map(function ($inventory) {
-            return ['location_id' => $inventory->location_id, 'location_name' => $inventory->location->name, 'available_stock' => $inventory->available_stock, 'stock_status' => $inventory->stock_status, 'stock_status_label' => $inventory->stock_status_label];
-        });
+        $stocks = VariantInventory::with('location')->where('variant_id', $request->variant_id)->where('is_tracked', true)->get()->map(fn ($inventory): array => ['location_id' => $inventory->location_id, 'location_name' => $inventory->location->name, 'available_stock' => $inventory->available_stock, 'stock_status' => $inventory->stock_status, 'stock_status_label' => $inventory->stock_status_label]);
 
         return response()->json($stocks);
     }
@@ -100,11 +98,9 @@ final class VariantStockController extends Controller
      */
     public function getLowStockAlerts(): JsonResponse
     {
-        $lowStockItems = VariantInventory::with(['variant.product', 'location'])->lowStock()->whereHas('variant.product', function ($q) {
+        $lowStockItems = VariantInventory::with(['variant.product', 'location'])->lowStock()->whereHas('variant.product', function ($q): void {
             $q->where('is_visible', true);
-        })->limit(10)->get()->map(function ($inventory) {
-            return ['id' => $inventory->id, 'product_name' => $inventory->product_name, 'variant_name' => $inventory->variant_name, 'location_name' => $inventory->location_name, 'current_stock' => $inventory->stock, 'threshold' => $inventory->threshold, 'stock_status' => $inventory->stock_status];
-        });
+        })->limit(10)->get()->map(fn ($inventory): array => ['id' => $inventory->id, 'product_name' => $inventory->product_name, 'variant_name' => $inventory->variant_name, 'location_name' => $inventory->location_name, 'current_stock' => $inventory->stock, 'threshold' => $inventory->threshold, 'stock_status' => $inventory->stock_status]);
 
         return response()->json($lowStockItems);
     }

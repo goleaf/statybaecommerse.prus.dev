@@ -30,7 +30,7 @@ final class ReferralRewardController extends Controller
         $rewards = ReferralReward::forUser($user->id)->with(['referral', 'order'])->orderBy('created_at', 'desc')->paginate(15);
         $stats = ['total_rewards' => ReferralReward::forUser($user->id)->count(), 'pending_rewards' => ReferralReward::forUser($user->id)->pending()->count(), 'applied_rewards' => ReferralReward::forUser($user->id)->applied()->count(), 'expired_rewards' => ReferralReward::forUser($user->id)->expired()->count(), 'total_amount' => ReferralReward::forUser($user->id)->sum('amount'), 'pending_amount' => ReferralReward::forUser($user->id)->pending()->sum('amount'), 'applied_amount' => ReferralReward::forUser($user->id)->applied()->sum('amount')];
 
-        return view('referral-rewards.index', compact('rewards', 'stats'));
+        return view('referral-rewards.index', ['rewards' => $rewards, 'stats' => $stats]);
     }
 
     /**
@@ -44,7 +44,7 @@ final class ReferralRewardController extends Controller
         }
         $reward->load(['referral', 'order', 'logs']);
 
-        return view('referral-rewards.show', compact('reward'));
+        return view('referral-rewards.show', ['reward' => $reward]);
     }
 
     /**

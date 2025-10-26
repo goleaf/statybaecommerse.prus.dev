@@ -35,7 +35,7 @@ final class CampaignClickController extends Controller
         tags: ['Campaign Clicks'],
         parameters: [
             new OA\QueryParameter(name: 'page', description: 'Page number to retrieve.', in: 'query', schema: new OA\Schema(type: 'integer', minimum: 1)),
-            new OA\QueryParameter(name: 'per_page', description: 'Items per page (1-100).', in: 'query', schema: new OA\Schema(type: 'integer', minimum: 1, maximum: 100)),
+            new OA\QueryParameter(name: 'per_page', description: 'Items per page (1-100).', in: 'query', schema: new OA\Schema(type: 'integer', maximum: 100, minimum: 1)),
             new OA\QueryParameter(name: 'sort', description: 'Sort definition, e.g. `-clicked_at` or `conversion_value`.', in: 'query', schema: new OA\Schema(type: 'string')),
             new OA\QueryParameter(name: 'campaign_id', description: 'Filter clicks by campaign identifier.', in: 'query', schema: new OA\Schema(type: 'integer', format: 'int64')),
             new OA\QueryParameter(name: 'click_type', description: 'Filter by click type (cta, banner, link, button, image).', in: 'query', schema: new OA\Schema(type: 'string')),
@@ -418,8 +418,7 @@ final class CampaignClickController extends Controller
     /**
      * Handle exportCsv functionality with proper error handling.
      *
-     * @param  mixed                                             $clicks
-     * @return Symfony\Component\HttpFoundation\StreamedResponse
+     * @param mixed $clicks
      */
     private function exportCsv($clicks, string $filename): \Symfony\Component\HttpFoundation\StreamedResponse
     {
@@ -439,7 +438,7 @@ final class CampaignClickController extends Controller
             });
             fclose($handle);
         }, 200, $headers);
-}
+    }
 
     private function campaignClickListDefinition(): ListQueryDefinition
     {
@@ -448,19 +447,19 @@ final class CampaignClickController extends Controller
             ->maxPerPage(100)
             ->defaultSort('clicked_at', 'desc')
             ->allowedSorts([
-                'clicked_at' => ['column' => 'clicked_at'],
-                'created_at' => ['column' => 'created_at'],
+                'clicked_at'       => ['column' => 'clicked_at'],
+                'created_at'       => ['column' => 'created_at'],
                 'conversion_value' => ['column' => 'conversion_value'],
             ])
             ->filters([
-                'campaign_id' => ['type' => 'int', 'column' => 'campaign_id'],
-                'click_type' => ['type' => 'string', 'column' => 'click_type'],
-                'device_type' => ['type' => 'string', 'column' => 'device_type'],
+                'campaign_id'  => ['type' => 'int', 'column' => 'campaign_id'],
+                'click_type'   => ['type' => 'string', 'column' => 'click_type'],
+                'device_type'  => ['type' => 'string', 'column' => 'device_type'],
                 'is_converted' => ['type' => 'bool', 'column' => 'is_converted'],
-                'country' => ['type' => 'string', 'column' => 'country'],
-                'utm_source' => ['type' => 'string', 'column' => 'utm_source'],
-                'date_from' => ['type' => 'date', 'column' => 'clicked_at', 'operator' => '>='],
-                'date_to' => ['type' => 'date', 'column' => 'clicked_at', 'operator' => '<='],
+                'country'      => ['type' => 'string', 'column' => 'country'],
+                'utm_source'   => ['type' => 'string', 'column' => 'utm_source'],
+                'date_from'    => ['type' => 'date', 'column' => 'clicked_at', 'operator' => '>='],
+                'date_to'      => ['type' => 'date', 'column' => 'clicked_at', 'operator' => '<='],
             ]);
     }
 }

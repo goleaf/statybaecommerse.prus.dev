@@ -61,7 +61,7 @@ final class LocaleController
         $configured = config('app.supported_locales', []);
 
         if (is_string($configured)) {
-            $configured = array_map('trim', explode(',', $configured));
+            $configured = array_map(static fn ($value): string => trim((string) $value), explode(',', $configured));
         }
 
         if (! is_array($configured)) {
@@ -87,7 +87,7 @@ final class LocaleController
     }
 
     /**
-     * @param  array<int, string>  $supported
+     * @param array<int, string> $supported
      */
     private function resolveLocale(?string $candidate, array $supported): string
     {
@@ -105,7 +105,7 @@ final class LocaleController
     }
 
     /**
-     * @param  array<int, string>  $supported
+     * @param array<int, string> $supported
      */
     private function preferredFallbackLocale(array $supported): ?string
     {
@@ -124,7 +124,7 @@ final class LocaleController
     }
 
     /**
-     * @param  array<int, string>  $supported
+     * @param array<int, string> $supported
      */
     private function fallbackRedirect(array $supported): string
     {

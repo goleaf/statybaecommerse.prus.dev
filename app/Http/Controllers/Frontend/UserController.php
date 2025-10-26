@@ -37,7 +37,7 @@ final class UserController extends Controller
     {
         $user = Auth::user();
 
-        return view('users.profile', compact('user'));
+        return view('users.profile', ['user' => $user]);
     }
 
     /**
@@ -49,17 +49,13 @@ final class UserController extends Controller
         // Get user statistics
         $stats = ['orders_count' => $user->orders()->count(), 'total_spent' => $user->total_spent, 'reviews_count' => $user->reviews()->count(), 'wishlist_count' => $user->wishlist()->count(), 'addresses_count' => $user->addresses()->count()];
         // Get recent orders
-        $recentOrders = $user->orders()->with(['items.product'])->latest()->limit(5)->get()->skipWhile(function ($order) {
-            // Skip orders that are not properly configured for display
-            return empty($order->number) || empty($order->status) || $order->total_amount <= 0 || empty($order->items);
-        });
+        $recentOrders = $user->orders()->with(['items.product'])->latest()->limit(5)->get()->skipWhile(fn ($order): bool => // Skip orders that are not properly configured for display
+            empty($order->number) || empty($order->status) || $order->total_amount <= 0 || empty($order->items));
         // Get recent reviews
-        $recentReviews = $user->reviews()->with('product')->latest()->limit(3)->get()->skipWhile(function ($review) {
-            // Skip reviews that are not properly configured for display
-            return empty($review->title) || empty($review->comment) || $review->rating <= 0 || ! $review->is_approved;
-        });
+        $recentReviews = $user->reviews()->with('product')->latest()->limit(3)->get()->skipWhile(fn ($review): bool => // Skip reviews that are not properly configured for display
+            empty($review->title) || empty($review->comment) || $review->rating <= 0 || ! $review->is_approved);
 
-        return view('users.dashboard', compact('user', 'stats', 'recentOrders', 'recentReviews'));
+        return view('users.dashboard', ['user' => $user, 'stats' => $stats, 'recentOrders' => $recentOrders, 'recentReviews' => $recentReviews]);
     }
 
     /**
@@ -99,9 +95,9 @@ final class UserController extends Controller
         $user->update(['avatar_url' => $avatarPath]);
 
         return response()->json([
-            'success' => true,
+            'success'    => true,
             'avatar_url' => SecureStorage::temporarySignedUrl($avatarPath),
-            'message' => __('users.avatar_updated_successfully'),
+            'message'    => __('users.avatar_updated_successfully'),
         ]);
     }
 
@@ -143,7 +139,7 @@ final class UserController extends Controller
         $user = Auth::user();
         $orders = $user->orders()->with(['items.product', 'items.productVariant'])->latest()->paginate(10);
 
-        return view('users.orders', compact('orders'));
+        return view('users.orders', ['orders' => $orders]);
     }
 
     /**
@@ -152,12 +148,10 @@ final class UserController extends Controller
     public function addresses(): View
     {
         $user = Auth::user();
-        $addresses = $user->addresses()->latest()->get()->skipWhile(function ($address) {
-            // Skip addresses that are not properly configured for display
-            return empty($address->street) || empty($address->city) || empty($address->postal_code) || empty($address->country);
-        });
+        $addresses = $user->addresses()->latest()->get()->skipWhile(fn ($address): bool => // Skip addresses that are not properly configured for display
+            empty($address->street) || empty($address->city) || empty($address->postal_code) || empty($address->country));
 
-        return view('users.addresses', compact('addresses'));
+        return view('users.addresses', ['addresses' => $addresses]);
     }
 
     /**
@@ -168,7 +162,7 @@ final class UserController extends Controller
         $user = Auth::user();
         $reviews = $user->reviews()->with('product')->latest()->paginate(10);
 
-        return view('users.reviews', compact('reviews'));
+        return view('users.reviews', ['reviews' => $reviews]);
     }
 
     /**
@@ -179,7 +173,7 @@ final class UserController extends Controller
         $user = Auth::user();
         $wishlist = $user->wishlist()->with(['images', 'brand', 'category'])->latest()->paginate(12);
 
-        return view('users.wishlist', compact('wishlist'));
+        return view('users.wishlist', ['wishlist' => $wishlist]);
     }
 
     /**
@@ -190,13 +184,11 @@ final class UserController extends Controller
         $user = Auth::user();
         $documents = $user->documents()->with('template')->latest()->paginate(10);
 
-        return view('users.documents', compact('documents'));
+        return view('users.documents', ['documents' => $documents]);
     }
 
     /**
      * Handle downloadDocument functionality with proper error handling.
-     *
-     * @return Symfony\Component\HttpFoundation\BinaryFileResponse
      */
     public function downloadDocument(Document $document): \Symfony\Component\HttpFoundation\BinaryFileResponse
     {

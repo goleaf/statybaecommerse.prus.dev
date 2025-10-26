@@ -33,7 +33,7 @@ final class WishlistController extends Controller
             ->paginate(12);
 
         return view('frontend.wishlist.index', [
-            'wishlist' => $wishlist,
+            'wishlist'      => $wishlist,
             'wishlistItems' => $wishlistItems,
         ]);
     }
@@ -43,8 +43,8 @@ final class WishlistController extends Controller
         $data = $request->validate([
             'product_id' => ['required', 'integer', 'exists:products,id'],
             'variant_id' => ['nullable', 'integer', 'exists:product_variants,id'],
-            'quantity' => ['nullable', 'integer', 'min:1'],
-            'notes' => ['nullable', 'string', 'max:65535'],
+            'quantity'   => ['nullable', 'integer', 'min:1'],
+            'notes'      => ['nullable', 'string', 'max:65535'],
         ]);
 
         /** @var User $user */
@@ -60,7 +60,7 @@ final class WishlistController extends Controller
                 return $this->respond(
                     $request,
                     [
-                        'status' => 'error',
+                        'status'  => 'error',
                         'message' => __('The selected variant does not belong to the given product.'),
                     ],
                     __('Unable to add the selected product to your wishlist.'),
@@ -83,7 +83,7 @@ final class WishlistController extends Controller
 
         $attributes = [
             'quantity' => $data['quantity'] ?? 1,
-            'notes' => $data['notes'] ?? null,
+            'notes'    => $data['notes'] ?? null,
         ];
 
         if ($item instanceof WishlistItem) {
@@ -103,10 +103,10 @@ final class WishlistController extends Controller
         $item->load(['product', 'variant']);
 
         $payload = [
-            'status' => 'added',
-            'message' => __('Product added to your wishlist.'),
+            'status'         => 'added',
+            'message'        => __('Product added to your wishlist.'),
             'wishlist_count' => $wishlist->items()->count(),
-            'item' => $this->transformItem($item),
+            'item'           => $this->transformItem($item),
         ];
 
         return $this->respond($request, $payload, __('Product added to your wishlist.'));
@@ -127,7 +127,7 @@ final class WishlistController extends Controller
             return $this->respond(
                 $request,
                 [
-                    'status' => 'error',
+                    'status'  => 'error',
                     'message' => __('Your wishlist is already empty.'),
                 ],
                 __('Your wishlist is already empty.'),
@@ -153,7 +153,7 @@ final class WishlistController extends Controller
             return $this->respond(
                 $request,
                 [
-                    'status' => 'error',
+                    'status'  => 'error',
                     'message' => __('The requested item was not found in your wishlist.'),
                 ],
                 __('The requested item was not found in your wishlist.'),
@@ -164,8 +164,8 @@ final class WishlistController extends Controller
         $item->delete();
 
         $payload = [
-            'status' => 'removed',
-            'message' => __('Product removed from your wishlist.'),
+            'status'         => 'removed',
+            'message'        => __('Product removed from your wishlist.'),
             'wishlist_count' => $wishlist->items()->count(),
         ];
 
@@ -182,8 +182,8 @@ final class WishlistController extends Controller
             return $this->respond(
                 $request,
                 [
-                    'status' => 'success',
-                    'message' => __('Your wishlist is already empty.'),
+                    'status'         => 'success',
+                    'message'        => __('Your wishlist is already empty.'),
                     'wishlist_count' => 0,
                 ],
                 __('Your wishlist is already empty.')
@@ -193,8 +193,8 @@ final class WishlistController extends Controller
         $wishlist->items()->delete();
 
         $payload = [
-            'status' => 'cleared',
-            'message' => __('Your wishlist has been cleared.'),
+            'status'         => 'cleared',
+            'message'        => __('Your wishlist has been cleared.'),
             'wishlist_count' => 0,
         ];
 
@@ -221,10 +221,10 @@ final class WishlistController extends Controller
         return $user
             ->wishlists()
             ->create([
-                'name' => __('My Wishlist'),
+                'name'        => __('My Wishlist'),
                 'description' => __('Automatically created wishlist.'),
-                'is_public' => false,
-                'is_default' => true,
+                'is_public'   => false,
+                'is_default'  => true,
             ]);
     }
 
@@ -250,13 +250,13 @@ final class WishlistController extends Controller
         $item->loadMissing(['product', 'variant']);
 
         return [
-            'id' => $item->id,
-            'product_id' => $item->product_id,
-            'variant_id' => $item->variant_id,
-            'quantity' => $item->quantity,
-            'notes' => $item->notes,
-            'display_name' => $item->display_name,
-            'current_price' => $item->current_price,
+            'id'              => $item->id,
+            'product_id'      => $item->product_id,
+            'variant_id'      => $item->variant_id,
+            'quantity'        => $item->quantity,
+            'notes'           => $item->notes,
+            'display_name'    => $item->display_name,
+            'current_price'   => $item->current_price,
             'formatted_price' => $item->formatted_current_price,
         ];
     }

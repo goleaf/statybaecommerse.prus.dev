@@ -35,7 +35,7 @@ final class AddressController extends Controller
         $user = Auth::user();
         $addresses = Address::where('user_id', $user->id)->where('is_active', true)->orderBy('is_default', 'desc')->orderBy('created_at', 'desc')->get();
 
-        return view('addresses.index', compact('addresses'));
+        return view('addresses.index', ['addresses' => $addresses]);
     }
 
     /**
@@ -46,7 +46,7 @@ final class AddressController extends Controller
         $countries = Country::orderBy('name')->get();
         $addressTypes = AddressType::options();
 
-        return view('addresses.create', compact('countries', 'addressTypes'));
+        return view('addresses.create', ['countries' => $countries, 'addressTypes' => $addressTypes]);
     }
 
     /**
@@ -61,7 +61,7 @@ final class AddressController extends Controller
         if ($data['is_default'] ?? false) {
             Address::where('user_id', Auth::id())->update(['is_default' => false]);
         }
-        $address = Address::create($data);
+        Address::create($data);
 
         return redirect()->route('frontend.addresses.index')->with('success', __('translations.address_created_successfully'));
     }
@@ -73,7 +73,7 @@ final class AddressController extends Controller
     {
         $this->authorize('view', $address);
 
-        return view('addresses.show', compact('address'));
+        return view('addresses.show', ['address' => $address]);
     }
 
     /**
@@ -85,7 +85,7 @@ final class AddressController extends Controller
         $countries = Country::orderBy('name')->get();
         $addressTypes = AddressType::options();
 
-        return view('addresses.edit', compact('address', 'countries', 'addressTypes'));
+        return view('addresses.edit', ['address' => $address, 'countries' => $countries, 'addressTypes' => $addressTypes]);
     }
 
     /**
@@ -139,8 +139,6 @@ final class AddressController extends Controller
 
     /**
      * Handle getCountries functionality with proper error handling.
-     *
-     * @return Illuminate\Http\JsonResponse
      */
     public function getCountries(): JsonResponse
     {
@@ -151,8 +149,6 @@ final class AddressController extends Controller
 
     /**
      * Handle getCities functionality with proper error handling.
-     *
-     * @return Illuminate\Http\JsonResponse
      */
     public function getCities(GetCitiesRequest $request): JsonResponse
     {

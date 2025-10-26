@@ -59,7 +59,7 @@ final class CampaignConversionController extends Controller
         $deviceTypes = CampaignConversion::distinct()->pluck('device_type');
         $sources = CampaignConversion::distinct()->pluck('source');
 
-        return view('campaign-conversions.index', compact('conversions', 'campaigns', 'conversionTypes', 'statuses', 'deviceTypes', 'sources'));
+        return view('campaign-conversions.index', ['conversions' => $conversions, 'campaigns' => $campaigns, 'conversionTypes' => $conversionTypes, 'statuses' => $statuses, 'deviceTypes' => $deviceTypes, 'sources' => $sources]);
     }
 
     /**
@@ -69,7 +69,7 @@ final class CampaignConversionController extends Controller
     {
         $campaignConversion->load(['campaign', 'customer', 'order']);
 
-        return view('campaign-conversions.show', compact('campaignConversion'));
+        return view('campaign-conversions.show', ['campaignConversion' => $campaignConversion]);
     }
 
     /**
@@ -89,19 +89,13 @@ final class CampaignConversionController extends Controller
             $query->where('campaign_id', $request->campaign_id);
         }
         $conversions = $query->get();
-        $analytics = ['total_conversions' => $conversions->count(), 'total_value' => $conversions->sum('conversion_value'), 'average_value' => $conversions->avg('conversion_value'), 'conversion_rate' => $conversions->avg('conversion_rate'), 'roi' => $conversions->avg('roi'), 'roas' => $conversions->avg('roas'), 'by_type' => $conversions->groupBy('conversion_type')->map->count(), 'by_status' => $conversions->groupBy('status')->map->count(), 'by_device' => $conversions->groupBy('device_type')->map->count(), 'by_source' => $conversions->groupBy('source')->map->count(), 'by_medium' => $conversions->groupBy('medium')->map->count(), 'by_country' => $conversions->groupBy('country')->map->count(), 'daily_trends' => $conversions->groupBy(function ($conversion) {
-            return $conversion->converted_at->format('Y-m-d');
-        })->map(function ($group) {
-            return ['count' => $group->count(), 'value' => $group->sum('conversion_value')];
-        })];
+        $analytics = ['total_conversions' => $conversions->count(), 'total_value' => $conversions->sum('conversion_value'), 'average_value' => $conversions->avg('conversion_value'), 'conversion_rate' => $conversions->avg('conversion_rate'), 'roi' => $conversions->avg('roi'), 'roas' => $conversions->avg('roas'), 'by_type' => $conversions->groupBy('conversion_type')->map->count(), 'by_status' => $conversions->groupBy('status')->map->count(), 'by_device' => $conversions->groupBy('device_type')->map->count(), 'by_source' => $conversions->groupBy('source')->map->count(), 'by_medium' => $conversions->groupBy('medium')->map->count(), 'by_country' => $conversions->groupBy('country')->map->count(), 'daily_trends' => $conversions->groupBy(fn ($conversion) => $conversion->converted_at->format('Y-m-d'))->map(fn ($group): array => ['count' => $group->count(), 'value' => $group->sum('conversion_value')])];
 
         return response()->json($analytics);
     }
 
     /**
      * Handle export functionality with proper error handling.
-     *
-     * @return Symfony\Component\HttpFoundation\StreamedResponse
      */
     public function export(Request $request): \Symfony\Component\HttpFoundation\StreamedResponse
     {
@@ -129,9 +123,9 @@ final class CampaignConversionController extends Controller
             $query->where('converted_at', '<=', $request->date_to);
         }
         $conversions = $query->get();
-        $headers = ['Content-Type' => 'text/csv', 'Content-Disposition' => 'attachment; filename="campaign_conversions_'.now()->format('Y-m-d_H-i-s').'.csv"'];
+        $headers = ['Content-Type' => 'text/csv', 'Content-Disposition' => 'attachment; filename="campaign_conversions_' . now()->format('Y-m-d_H-i-s') . '.csv"'];
 
-        return response()->stream(function () use ($conversions) {
+        return response()->stream(function () use ($conversions): void {
             $handle = fopen('php://output', 'w');
             // CSV headers
             fputcsv($handle, ['ID', 'Campaign', 'Customer', 'Order', 'Type', 'Value', 'Status', 'Source', 'Medium', 'Device Type', 'Country', 'City', 'ROI', 'ROAS', 'Converted At']);
@@ -153,7 +147,7 @@ final class CampaignConversionController extends Controller
         $statuses = ['pending' => __('campaign_conversions.statuses.pending'), 'completed' => __('campaign_conversions.statuses.completed'), 'cancelled' => __('campaign_conversions.statuses.cancelled'), 'refunded' => __('campaign_conversions.statuses.refunded')];
         $deviceTypes = ['mobile' => __('campaign_conversions.device_types.mobile'), 'tablet' => __('campaign_conversions.device_types.tablet'), 'desktop' => __('campaign_conversions.device_types.desktop')];
 
-        return view('campaign-conversions.create', compact('campaigns', 'conversionTypes', 'statuses', 'deviceTypes'));
+        return view('campaign-conversions.create', ['campaigns' => $campaigns, 'conversionTypes' => $conversionTypes, 'statuses' => $statuses, 'deviceTypes' => $deviceTypes]);
     }
 
     /**
@@ -179,7 +173,7 @@ final class CampaignConversionController extends Controller
         $statuses = ['pending' => __('campaign_conversions.statuses.pending'), 'completed' => __('campaign_conversions.statuses.completed'), 'cancelled' => __('campaign_conversions.statuses.cancelled'), 'refunded' => __('campaign_conversions.statuses.refunded')];
         $deviceTypes = ['mobile' => __('campaign_conversions.device_types.mobile'), 'tablet' => __('campaign_conversions.device_types.tablet'), 'desktop' => __('campaign_conversions.device_types.desktop')];
 
-        return view('campaign-conversions.edit', compact('campaignConversion', 'campaigns', 'conversionTypes', 'statuses', 'deviceTypes'));
+        return view('campaign-conversions.edit', ['campaignConversion' => $campaignConversion, 'campaigns' => $campaigns, 'conversionTypes' => $conversionTypes, 'statuses' => $statuses, 'deviceTypes' => $deviceTypes]);
     }
 
     /**

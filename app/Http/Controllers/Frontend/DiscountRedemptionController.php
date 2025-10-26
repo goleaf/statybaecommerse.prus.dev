@@ -55,13 +55,7 @@ final class DiscountRedemptionController extends Controller
             ->where('status', 'redeemed')
             ->count();
 
-        return view('frontend.discount-redemptions.index', compact(
-            'redemptions',
-            'totalRedemptions',
-            'totalSaved',
-            'pendingRedemptions',
-            'redeemedRedemptions'
-        ));
+        return view('frontend.discount-redemptions.index', ['redemptions' => $redemptions, 'totalRedemptions' => $totalRedemptions, 'totalSaved' => $totalSaved, 'pendingRedemptions' => $pendingRedemptions, 'redeemedRedemptions' => $redeemedRedemptions]);
     }
 
     public function show(DiscountRedemption $redemption): View
@@ -73,7 +67,7 @@ final class DiscountRedemptionController extends Controller
 
         $redemption->load(['discount', 'code', 'order']);
 
-        return view('frontend.discount-redemptions.show', compact('redemption'));
+        return view('frontend.discount-redemptions.show', ['redemption' => $redemption]);
     }
 
     public function create(): View
@@ -114,18 +108,18 @@ final class DiscountRedemptionController extends Controller
 
         // Create redemption
         $redemption = DiscountRedemption::create([
-            'discount_id' => $discountCode->discount_id,
-            'code_id' => $discountCode->id,
-            'user_id' => auth()->id(),
-            'order_id' => $validated['order_id'] ?? null,
-            'amount_saved' => $discountCode->discount->value,
+            'discount_id'   => $discountCode->discount_id,
+            'code_id'       => $discountCode->id,
+            'user_id'       => auth()->id(),
+            'order_id'      => $validated['order_id'] ?? null,
+            'amount_saved'  => $discountCode->discount->value,
             'currency_code' => 'EUR',
-            'redeemed_at' => now(),
-            'status' => 'pending',
-            'ip_address' => $request->ip(),
-            'user_agent' => $request->userAgent(),
-            'created_by' => auth()->id(),
-            'updated_by' => auth()->id(),
+            'redeemed_at'   => now(),
+            'status'        => 'pending',
+            'ip_address'    => $request->ip(),
+            'user_agent'    => $request->userAgent(),
+            'created_by'    => auth()->id(),
+            'updated_by'    => auth()->id(),
         ]);
 
         // Update usage count

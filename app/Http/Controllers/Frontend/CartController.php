@@ -42,13 +42,13 @@ final class CartController extends Controller
         $newQuantity = ((int) ($current['quantity'] ?? 0)) + $addedQuantity;
 
         $cart[$key] = [
-            'id' => $key,
+            'id'         => $key,
             'product_id' => $product->getKey(),
-            'name' => $product->name,
-            'sku' => $product->sku,
-            'price' => (float) ($product->sale_price ?? $product->price ?? 0),
-            'quantity' => $newQuantity,
-            'image' => $product->getFirstMediaUrl(config('media.storage.collection_name'), 'thumb') ?: null,
+            'name'       => $product->name,
+            'sku'        => $product->sku,
+            'price'      => (float) ($product->sale_price ?? $product->price ?? 0),
+            'quantity'   => $newQuantity,
+            'image'      => $product->getFirstMediaUrl(config('media.storage.collection_name'), 'thumb') ?: null,
         ];
 
         $this->saveCart($cart);
@@ -57,11 +57,11 @@ final class CartController extends Controller
             $cartItem = $this->persistCartItem($request, $product, $addedQuantity);
 
             return $this->respondWithSummary($request, [
-                'success' => true,
+                'success'   => true,
                 'cart_item' => [
-                    'id' => $cartItem->getKey(),
-                    'product_id' => $cartItem->product_id,
-                    'quantity' => $cartItem->quantity,
+                    'id'          => $cartItem->getKey(),
+                    'product_id'  => $cartItem->product_id,
+                    'quantity'    => $cartItem->quantity,
                     'total_price' => (float) ($cartItem->total_price ?? 0.0),
                 ],
             ], 201);
@@ -77,7 +77,7 @@ final class CartController extends Controller
                 'quantity' => ['required', 'integer', 'min:1'],
             ]);
 
-            if ($cartItem === null) {
+            if (! $cartItem instanceof \App\Models\CartItem) {
                 return response()->json([
                     'success' => false,
                     'message' => __('Cart item not found.'),
@@ -92,20 +92,20 @@ final class CartController extends Controller
             $this->syncSessionFromCartItem($cartItem);
 
             return $this->respondWithSummary($request, [
-                'success' => true,
+                'success'   => true,
                 'cart_item' => [
-                    'id' => $cartItem->getKey(),
+                    'id'       => $cartItem->getKey(),
                     'quantity' => $cartItem->quantity,
                 ],
             ]);
         }
 
         $payload = $request->validate([
-            'items' => ['required_without:product_id', 'array'],
+            'items'              => ['required_without:product_id', 'array'],
             'items.*.product_id' => ['required', 'integer'],
-            'items.*.quantity' => ['required', 'integer', 'min:1'],
-            'product_id' => ['sometimes', 'integer'],
-            'quantity' => ['required_without:items', 'integer', 'min:1'],
+            'items.*.quantity'   => ['required', 'integer', 'min:1'],
+            'product_id'         => ['sometimes', 'integer'],
+            'quantity'           => ['required_without:items', 'integer', 'min:1'],
         ]);
 
         $cart = $this->getCart();
@@ -131,7 +131,7 @@ final class CartController extends Controller
     public function remove(Request $request, ?CartItem $cartItem = null): RedirectResponse|JsonResponse
     {
         if ($request->expectsJson()) {
-            if ($cartItem === null) {
+            if (! $cartItem instanceof \App\Models\CartItem) {
                 return response()->json([
                     'success' => false,
                     'message' => __('Cart item not found.'),
@@ -200,12 +200,12 @@ final class CartController extends Controller
             $cartItem->quantity += $quantity;
         } else {
             $cartItem = new CartItem([
-                'session_id' => $sessionId,
-                'user_id' => $userId,
-                'product_id' => $product->getKey(),
-                'quantity' => $quantity,
-                'unit_price' => $unitPrice,
-                'price' => $unitPrice,
+                'session_id'  => $sessionId,
+                'user_id'     => $userId,
+                'product_id'  => $product->getKey(),
+                'quantity'    => $quantity,
+                'unit_price'  => $unitPrice,
+                'price'       => $unitPrice,
                 'total_price' => round($unitPrice * $quantity, 2),
             ]);
         }
@@ -215,11 +215,11 @@ final class CartController extends Controller
         $cartItem->price = $unitPrice;
         $cartItem->total_price = round($unitPrice * $cartItem->quantity, 2);
         $cartItem->product_snapshot = array_filter([
-            'name' => $product->name,
+            'name'  => $product->name,
             'price' => $unitPrice,
-            'sku' => $product->sku,
+            'sku'   => $product->sku,
             'image' => $product->getFirstMediaUrl(config('media.storage.collection_name'), 'thumb') ?: null,
-        ], static fn ($value) => $value !== null);
+        ], static fn (float|string|null $value): bool => $value !== null);
 
         $cartItem->save();
 
@@ -254,13 +254,13 @@ final class CartController extends Controller
 
         $payload['summary'] ??= $this->transformSummary($summary);
         $payload['cart'] ??= [
-            'count' => $summary['count'],
-            'items' => $summary['items'],
+            'count'    => $summary['count'],
+            'items'    => $summary['items'],
             'subtotal' => $summary['subtotal'],
             'discount' => $summary['discount'],
-            'tax' => $summary['tax'],
+            'tax'      => $summary['tax'],
             'shipping' => $summary['shipping'],
-            'total' => $summary['total'],
+            'total'    => $summary['total'],
         ];
 
         return response()->json($payload, $status);
@@ -277,30 +277,30 @@ final class CartController extends Controller
         );
 
         return [
-            'items' => $summary['items'],
+            'items'    => $summary['items'],
             'subtotal' => $breakdown->subtotal,
-            'tax' => $breakdown->tax,
+            'tax'      => $breakdown->tax,
             'shipping' => $breakdown->shipping,
             'discount' => $breakdown->discount,
-            'total' => $breakdown->total,
-            'summary' => $breakdown->toSummary() + ['item_count' => $summary['count']],
+            'total'    => $breakdown->total,
+            'summary'  => $breakdown->toSummary() + ['item_count' => $summary['count']],
         ];
     }
 
     /**
-     * @param array{items: array<int, mixed>, count:int, subtotal:float, tax:float, shipping:float, discount:float, total:float} $summary
+     * @param  array{items: array<int, mixed>, count:int, subtotal:float, tax:float, shipping:float, discount:float, total:float} $summary
      * @return array<string, mixed>
      */
     private function transformSummary(array $summary): array
     {
         return [
             'item_count' => $summary['count'],
-            'items' => $summary['items'],
-            'subtotal' => $summary['subtotal'],
-            'tax' => $summary['tax'],
-            'shipping' => $summary['shipping'],
-            'discount' => $summary['discount'],
-            'total' => $summary['total'],
+            'items'      => $summary['items'],
+            'subtotal'   => $summary['subtotal'],
+            'tax'        => $summary['tax'],
+            'shipping'   => $summary['shipping'],
+            'discount'   => $summary['discount'],
+            'total'      => $summary['total'],
         ];
     }
 

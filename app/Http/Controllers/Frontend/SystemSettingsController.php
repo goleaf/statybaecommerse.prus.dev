@@ -26,7 +26,7 @@ final class SystemSettingsController extends Controller
         $query = SystemSetting::query()->with('category')->where('is_active', true);
         // Apply filters
         if ($request->filled('category')) {
-            $query->whereHas('category', function ($q) use ($request) {
+            $query->whereHas('category', function ($q) use ($request): void {
                 $q->where('slug', $request->category);
             });
         }
@@ -37,8 +37,8 @@ final class SystemSettingsController extends Controller
             $query->where('type', $request->type);
         }
         if ($request->filled('search')) {
-            $query->where(function ($q) use ($request) {
-                $q->where('name', 'like', '%'.$request->search.'%')->orWhere('key', 'like', '%'.$request->search.'%')->orWhere('description', 'like', '%'.$request->search.'%');
+            $query->where(function ($q) use ($request): void {
+                $q->where('name', 'like', '%' . $request->search . '%')->orWhere('key', 'like', '%' . $request->search . '%')->orWhere('description', 'like', '%' . $request->search . '%');
             });
         }
         // Only show public settings
@@ -48,7 +48,7 @@ final class SystemSettingsController extends Controller
         $groups = SystemSetting::select('group')->where('is_active', true)->where('is_public', true)->distinct()->orderBy('group')->pluck('group');
         $types = SystemSetting::select('type')->where('is_active', true)->where('is_public', true)->distinct()->orderBy('type')->pluck('type');
 
-        return view('system-settings.index', compact('settings', 'categories', 'groups', 'types'));
+        return view('system-settings.index', ['settings' => $settings, 'categories' => $categories, 'groups' => $groups, 'types' => $types]);
     }
 
     /**
@@ -62,7 +62,7 @@ final class SystemSettingsController extends Controller
         }
         $setting->load('category');
 
-        return view('system-settings.show', compact('setting'));
+        return view('system-settings.show', ['setting' => $setting]);
     }
 
     /**
@@ -75,7 +75,7 @@ final class SystemSettingsController extends Controller
         }
         $settings = $category->settings()->where('is_active', true)->where('is_public', true)->ordered()->get();
 
-        return view('system-settings.category', compact('category', 'settings'));
+        return view('system-settings.category', ['category' => $category, 'settings' => $settings]);
     }
 
     /**
@@ -88,7 +88,7 @@ final class SystemSettingsController extends Controller
             abort(404);
         }
 
-        return view('system-settings.group', compact('group', 'settings'));
+        return view('system-settings.group', ['group' => $group, 'settings' => $settings]);
     }
 
     /**
@@ -102,16 +102,14 @@ final class SystemSettingsController extends Controller
             $query->where('group', $request->group);
         }
         if ($request->filled('category')) {
-            $query->whereHas('category', function ($q) use ($request) {
+            $query->whereHas('category', function ($q) use ($request): void {
                 $q->where('slug', $request->category);
             });
         }
         if ($request->filled('key')) {
             $query->where('key', $request->key);
         }
-        $settings = $query->get()->map(function ($setting) {
-            return $setting->getApiResponse();
-        });
+        $settings = $query->get()->map(fn ($setting) => $setting->getApiResponse());
 
         return response()->json(['success' => true, 'data' => $settings, 'meta' => ['total' => $settings->count(), 'timestamp' => now()->toISOString()]]);
     }
@@ -134,9 +132,7 @@ final class SystemSettingsController extends Controller
      */
     public function categories(): JsonResponse
     {
-        $categories = SystemSettingCategory::active()->ordered()->get()->map(function ($category) {
-            return ['id' => $category->id, 'name' => $category->getTranslatedName(), 'slug' => $category->slug, 'description' => $category->getTranslatedDescription(), 'icon' => $category->getIconClass(), 'color' => $category->color, 'settings_count' => $category->getActiveSettingsCount()];
-        });
+        $categories = SystemSettingCategory::active()->ordered()->get()->map(fn ($category): array => ['id' => $category->id, 'name' => $category->getTranslatedName(), 'slug' => $category->slug, 'description' => $category->getTranslatedDescription(), 'icon' => $category->getIconClass(), 'color' => $category->color, 'settings_count' => $category->getActiveSettingsCount()]);
 
         return response()->json(['success' => true, 'data' => $categories]);
     }
@@ -146,10 +142,10 @@ final class SystemSettingsController extends Controller
      */
     public function groups(): JsonResponse
     {
-        $groups = SystemSetting::select('group')->where('is_active', true)->where('is_public', true)->distinct()->orderBy('group')->get()->map(function ($setting) {
+        $groups = SystemSetting::select('group')->where('is_active', true)->where('is_public', true)->distinct()->orderBy('group')->get()->map(function ($setting): array {
             $count = SystemSetting::where('group', $setting->group)->where('is_active', true)->where('is_public', true)->count();
 
-            return ['name' => $setting->group, 'label' => __('admin.system_settings.'.$setting->group), 'count' => $count];
+            return ['name' => $setting->group, 'label' => __('admin.system_settings.' . $setting->group), 'count' => $count];
         });
 
         return response()->json(['success' => true, 'data' => $groups]);

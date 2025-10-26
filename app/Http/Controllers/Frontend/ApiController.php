@@ -50,9 +50,9 @@ final class ApiController extends Controller
                         $url = ProductImageUrlResolver::resolve($image->path);
 
                         return [
-                            'url' => $url,
+                            'url'       => $url,
                             'thumbnail' => $url,
-                            'alt' => $image->alt_text ?? $product->name,
+                            'alt'       => $image->alt_text ?? $product->name,
                         ];
                     })
                     ->values()
@@ -181,7 +181,7 @@ final class ApiController extends Controller
 
     public function getRecentlyViewed(Request $request): JsonResponse
     {
-        $recentlyViewed = array_values(array_unique(array_map('intval', (array) $request->session()->get('recently_viewed', []))));
+        $recentlyViewed = array_values(array_unique(array_map(static fn ($id): int => (int) $id, (array) $request->session()->get('recently_viewed', []))));
 
         if ($recentlyViewed === []) {
             return response()->json([]);
@@ -220,9 +220,9 @@ final class ApiController extends Controller
                         $url = ProductImageUrlResolver::resolve($image->path);
 
                         return [
-                            'url' => $url,
+                            'url'       => $url,
                             'thumbnail' => $url,
-                            'alt' => $image->alt_text ?? $product->name,
+                            'alt'       => $image->alt_text ?? $product->name,
                         ];
                     })
                     ->values()
@@ -258,8 +258,8 @@ final class ApiController extends Controller
         }
 
         $recentlyViewed = array_values(array_filter(
-            array_map('intval', (array) $request->session()->get('recently_viewed', [])),
-            static fn (int $id) => $id !== $productId
+            array_map(static fn ($productId): int => (int) $productId, (array) $request->session()->get('recently_viewed', [])),
+            static fn (int $id): bool => $id !== $productId
         ));
 
         array_unshift($recentlyViewed, $productId);

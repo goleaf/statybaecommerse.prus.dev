@@ -20,8 +20,8 @@ use App\Models\User;
 use App\Services\NotificationService;
 use App\Support\ApiErrorResponse;
 use App\Support\ErrorCodes;
-use Illuminate\Auth\AuthenticationException;
 use App\Support\RequestContext;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
@@ -70,7 +70,7 @@ final class NotificationController extends Controller
 
         try {
             $payload = $this->notificationService->markAsReadForUser($user, $notification);
-        } catch (ModelNotFoundException $exception) {
+        } catch (ModelNotFoundException) {
             return $this->notFoundResponse();
         }
 
@@ -87,7 +87,7 @@ final class NotificationController extends Controller
 
         try {
             $payload = $this->notificationService->markAsUnreadForUser($user, $notification);
-        } catch (ModelNotFoundException $exception) {
+        } catch (ModelNotFoundException) {
             return $this->notFoundResponse();
         }
 
@@ -128,7 +128,7 @@ final class NotificationController extends Controller
 
         try {
             $payload = $this->notificationService->show($user, $notification);
-        } catch (ModelNotFoundException $exception) {
+        } catch (ModelNotFoundException) {
             return $this->notFoundResponse();
         }
 
@@ -144,7 +144,7 @@ final class NotificationController extends Controller
 
         try {
             $this->notificationService->deleteForUser($user, $notification);
-        } catch (ModelNotFoundException $exception) {
+        } catch (ModelNotFoundException) {
             return $this->notFoundResponse();
         }
 
@@ -232,14 +232,14 @@ final class NotificationController extends Controller
         $message = $exception->getMessage();
 
         $field = match (true) {
-            str_contains($message, 'Per page') => 'per_page',
-            str_contains($message, 'Page') => 'page',
-            str_contains($message, 'Sort direction') => 'direction',
-            str_contains($message, 'Sort field') => 'sort',
+            str_contains($message, 'Per page')          => 'per_page',
+            str_contains($message, 'Page')              => 'page',
+            str_contains($message, 'Sort direction')    => 'direction',
+            str_contains($message, 'Sort field')        => 'sort',
             str_contains($message, 'Notification type') => 'type',
-            str_contains($message, 'Read filter') => 'read',
-            str_contains($message, 'Search term') => 'q',
-            default => 'query',
+            str_contains($message, 'Read filter')       => 'read',
+            str_contains($message, 'Search term')       => 'q',
+            default                                     => 'query',
         };
 
         return [$field => [$message]];

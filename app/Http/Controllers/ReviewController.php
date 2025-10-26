@@ -28,12 +28,10 @@ final class ReviewController extends Controller
      */
     public function index(Request $request): View
     {
-        $reviews = Review::with(['user', 'product'])->where('is_approved', true)->latest()->get()->skipWhile(function ($review) {
-            // Skip reviews that are not properly configured for display
-            return empty($review->title) || empty($review->comment) || ! $review->is_approved || $review->rating <= 0;
-        })->paginate(20);
+        $reviews = Review::with(['user', 'product'])->where('is_approved', true)->latest()->get()->skipWhile(fn ($review): bool => // Skip reviews that are not properly configured for display
+            empty($review->title) || empty($review->comment) || ! $review->is_approved || $review->rating <= 0)->paginate(20);
 
-        return view('reviews.index', compact('reviews'));
+        return view('reviews.index', ['reviews' => $reviews]);
     }
 
     /**
@@ -46,7 +44,7 @@ final class ReviewController extends Controller
         }
         $review->load(['user', 'product']);
 
-        return view('reviews.show', compact('review'));
+        return view('reviews.show', ['review' => $review]);
     }
 
     /**
@@ -60,7 +58,7 @@ final class ReviewController extends Controller
             $product = Product::findOrFail($productId);
         }
 
-        return view('reviews.create', compact('product'));
+        return view('reviews.create', ['product' => $product]);
     }
 
     /**
@@ -82,7 +80,7 @@ final class ReviewController extends Controller
             abort(403);
         }
 
-        return view('reviews.edit', compact('review'));
+        return view('reviews.edit', ['review' => $review]);
     }
 
     /**
@@ -130,8 +128,8 @@ final class ReviewController extends Controller
 
         if ($likedBy->contains($userId)) {
             return response()->json([
-                'message' => __('You have already marked this review as helpful.'),
-                'helpful_count' => (int) ($review->helpful_count ?? $likedBy->count()),
+                'message'        => __('You have already marked this review as helpful.'),
+                'helpful_count'  => (int) ($review->helpful_count ?? $likedBy->count()),
                 'reported_count' => (int) ($review->reported_count ?? 0),
             ]);
         }
@@ -148,8 +146,8 @@ final class ReviewController extends Controller
         $review->refresh();
 
         return response()->json([
-            'message' => __('Thanks for your feedback!'),
-            'helpful_count' => (int) ($review->helpful_count ?? $likedBy->count()),
+            'message'        => __('Thanks for your feedback!'),
+            'helpful_count'  => (int) ($review->helpful_count ?? $likedBy->count()),
             'reported_count' => (int) ($review->reported_count ?? 0),
         ]);
     }
@@ -171,8 +169,8 @@ final class ReviewController extends Controller
 
         if ($reportedBy->contains($userId)) {
             return response()->json([
-                'message' => __('You have already reported this review.'),
-                'helpful_count' => (int) ($review->helpful_count ?? 0),
+                'message'        => __('You have already reported this review.'),
+                'helpful_count'  => (int) ($review->helpful_count ?? 0),
                 'reported_count' => (int) ($review->reported_count ?? $reportedBy->count()),
             ]);
         }
@@ -195,8 +193,8 @@ final class ReviewController extends Controller
         $review->refresh();
 
         return response()->json([
-            'message' => __('Thanks for letting us know.'),
-            'helpful_count' => (int) ($review->helpful_count ?? 0),
+            'message'        => __('Thanks for letting us know.'),
+            'helpful_count'  => (int) ($review->helpful_count ?? 0),
             'reported_count' => (int) ($review->reported_count ?? $reportedBy->count()),
         ]);
     }
@@ -206,12 +204,10 @@ final class ReviewController extends Controller
      */
     public function productReviews(Product $product): View
     {
-        $reviews = $product->reviews()->with('user')->where('is_approved', true)->latest()->get()->skipWhile(function ($review) {
-            // Skip reviews that are not properly configured for display
-            return empty($review->title) || empty($review->comment) || ! $review->is_approved || $review->rating <= 0;
-        })->paginate(10);
+        $reviews = $product->reviews()->with('user')->where('is_approved', true)->latest()->get()->skipWhile(fn ($review): bool => // Skip reviews that are not properly configured for display
+            empty($review->title) || empty($review->comment) || ! $review->is_approved || $review->rating <= 0)->paginate(10);
         $ratingStats = ['average' => $product->reviews()->where('is_approved', true)->avg('rating') ?? 0, 'count' => $product->reviews()->where('is_approved', true)->count(), 'distribution' => $product->reviews()->where('is_approved', true)->selectRaw('rating, COUNT(*) as count')->groupBy('rating')->orderBy('rating')->pluck('count', 'rating')->toArray()];
 
-        return view('reviews.product', compact('product', 'reviews', 'ratingStats'));
+        return view('reviews.product', ['product' => $product, 'reviews' => $reviews, 'ratingStats' => $ratingStats]);
     }
 }

@@ -26,18 +26,16 @@ final class SearchController extends Controller
         if (! empty($query)) {
             $products = Product::query()
                 ->where('is_active', true)
-                ->when($category, function ($query, $category) {
-                    return $query->whereHas('categories', function ($q) use ($category) {
-                        $q->where('id', $category);
-                    });
-                })
-                ->where(function ($q) use ($query) {
+                ->when($category, fn ($query, $category) => $query->whereHas('categories', function ($q) use ($category): void {
+                    $q->where('id', $category);
+                }))
+                ->where(function ($q) use ($query): void {
                     $q->where('name', 'like', "%{$query}%")
                         ->orWhere('description', 'like', "%{$query}%");
                 })
                 ->paginate(20)
                 ->appends([
-                    'q' => $query,
+                    'q'        => $query,
                     'category' => $category,
                 ])
                 ->withPath(route('frontend.search.index'));
@@ -45,7 +43,7 @@ final class SearchController extends Controller
 
         $categories = Category::where('is_active', true)->get();
 
-        return view('frontend.search.index', compact('products', 'query', 'categories'));
+        return view('frontend.search.index', ['products' => $products, 'query' => $query, 'categories' => $categories]);
     }
 
     /**
@@ -55,7 +53,7 @@ final class SearchController extends Controller
     {
         $query = $request->get('q', '');
 
-        if (strlen($query) < 2) {
+        if (strlen((string) $query) < 2) {
             return response()->json([]);
         }
 
@@ -63,13 +61,11 @@ final class SearchController extends Controller
             ->where('name', 'like', "%{$query}%")
             ->limit(5)
             ->get(['id', 'name', 'slug'])
-            ->map(function ($product) {
-                return [
-                    'id' => $product->id,
-                    'name' => $product->name,
-                    'url' => route('frontend.products.show', $product),
-                ];
-            });
+            ->map(fn ($product): array => [
+                'id'   => $product->id,
+                'name' => $product->name,
+                'url'  => route('frontend.products.show', $product),
+            ]);
 
         return response()->json($products);
     }
@@ -81,7 +77,7 @@ final class SearchController extends Controller
     {
         $query = $request->get('q', '');
 
-        if (strlen($query) < 2) {
+        if (strlen((string) $query) < 2) {
             return response()->json([]);
         }
 
@@ -92,9 +88,7 @@ final class SearchController extends Controller
             ->where('name', 'like', "%{$query}%")
             ->limit(3)
             ->pluck('name')
-            ->map(function ($name) {
-                return ['value' => $name, 'type' => 'product'];
-            });
+            ->map(fn ($name): array => ['value' => $name, 'type' => 'product']);
 
         $suggestions = $suggestions->merge($products);
 
@@ -103,9 +97,7 @@ final class SearchController extends Controller
             ->where('name', 'like', "%{$query}%")
             ->limit(2)
             ->pluck('name')
-            ->map(function ($name) {
-                return ['value' => $name, 'type' => 'category'];
-            });
+            ->map(fn ($name): array => ['value' => $name, 'type' => 'category']);
 
         $suggestions = $suggestions->merge($categories);
 
