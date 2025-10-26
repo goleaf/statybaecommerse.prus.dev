@@ -56,4 +56,38 @@ return [
     'commission_rate_help' => 'Commission rate (0-100)',
     'logo_help'            => 'Partner logo',
     'banner_help'          => 'Partner banner',
+
+    'dashboard' => [
+        'title'        => 'Partner orders',
+        'subtitle'     => 'Track partner order statuses and revenue at a glance.',
+        'result_count' => ':count orders total',
+        'tabs'         => [
+            'open'      => 'Open',
+            'shipped'   => 'Shipped',
+            'cancelled' => 'Cancelled',
+        ],
+        'table'        => [
+            'order'         => 'Order',
+            'status'        => 'Status',
+            'payment_status'=> 'Payment',
+            'items'         => 'Items',
+            'items_count'   => '{0}No items|{1}1 item|[2,*]:count items',
+            'total'         => 'Total',
+            'placed_at'     => 'Placed on',
+        ],
+        'empty'        => [
+            'title'       => 'No orders match this filter yet',
+            'description' => 'Adjust the status filter or check back once new partner orders arrive.',
+        ],
+        'errors'       => [
+            'forbidden'    => [
+                'title'       => 'Partner access required',
+                'description' => 'Your account is not linked to an active partner. Contact support to request access.',
+            ],
+            'unauthorized' => [
+                'title'       => 'Sign in to continue',
+                'description' => 'You need to sign in with a partner-enabled account to view partner orders.',
+            ],
+        ],
+    ],
 ];
