@@ -43,6 +43,10 @@ final class LocationController extends Controller
                 });
             });
 
+        // Remove any locations lacking coordinate data so the storefront map and mobile
+        // clients never receive incomplete entries that could break geocoding logic.
+        $locationsQuery->whereNotNull('latitude')->whereNotNull('longitude');
+
         // Guard against incomplete records before pagination so the paginator always operates on the query builder
         $locations = $locationsQuery
             ->whereNotNull('name')
@@ -95,6 +99,9 @@ final class LocationController extends Controller
         $locations = $this->filterDisplayableLocations(
             Location::query()
                 ->enabled()
+                // Ensure every API response contains coordinates so map clients can render pins.
+                ->whereNotNull('latitude')
+                ->whereNotNull('longitude')
                 ->when($request->filled('search'), fn ($query) => $query->where(function ($q) use ($request): void {
                     $search = $request->string('search')->toString();
                     // Perform a simple LIKE search across the human readable columns so the public API stays flexible.
@@ -122,6 +129,8 @@ final class LocationController extends Controller
             Location::query()
                 ->where('type', $type)
                 ->enabled()
+                ->whereNotNull('latitude')
+                ->whereNotNull('longitude')
                 ->with(['country'])
                 ->orderBy('sort_order')
                 ->orderBy('name')
@@ -140,6 +149,8 @@ final class LocationController extends Controller
             Location::query()
                 ->where('country_code', $countryCode)
                 ->enabled()
+                ->whereNotNull('latitude')
+                ->whereNotNull('longitude')
                 ->orderBy('sort_order')
                 ->orderBy('name')
                 ->get()
@@ -157,6 +168,8 @@ final class LocationController extends Controller
             Location::query()
                 ->where('city', 'like', "%{$city}%")
                 ->enabled()
+                ->whereNotNull('latitude')
+                ->whereNotNull('longitude')
                 ->with(['country'])
                 ->orderBy('sort_order')
                 ->orderBy('name')
@@ -279,7 +292,8 @@ final class LocationController extends Controller
     private function filterDisplayableLocations(Collection $locations): Collection
     {
         // Filtering on the collection keeps the query readable while still trimming any incomplete
-        // rows that slipped past legacy imports or partially filled admin forms.
+        // rows that slipped past legacy imports or partially filled admin forms. Requiring
+        // coordinates here ensures client-side maps do not attempt to render invalid pins.
         return $locations
             ->filter($this->isDisplayableLocation(...))
             ->values();
@@ -295,6 +309,8 @@ final class LocationController extends Controller
             && filled($location->name)
             && filled($location->type)
             && filled($location->city)
-            && filled($location->country_code);
+            && filled($location->country_code)
+            // Ensure the location has coordinates so downstream clients can render it.
+            && $location->hasCoordinates();
     }
 }
