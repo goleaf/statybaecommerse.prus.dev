@@ -55,18 +55,53 @@
                         {{ __('translations.write_review') }}
                     </button>
                 @else
-                    <a
-                        href="{{ route('login') }}"
+                    <button
+                        type="button"
+                        wire:click="promptLogin"
+                        wire:loading.attr="disabled"
                         class="inline-flex items-center gap-2 rounded-full bg-primary-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-1">
                         <svg class="h-4 w-4" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 8.5a2 2 0 11-4 0 2 2 0 014 0z" />
                             <path stroke-linecap="round" stroke-linejoin="round" d="M4 16a6 6 0 1112 0H4z" />
                         </svg>
                         {{ __('translations.login_to_review') }}
-                    </a>
+                    </button>
                 @endauth
             </div>
         </div>
+
+        {{-- Display a login prompt when guests attempt to interact with review features. --}}
+        @if ($showLoginPrompt)
+            <div class="rounded-2xl border border-sky-200 bg-sky-50 p-5 text-sky-800">
+                <div class="flex items-start gap-3">
+                    <svg class="h-5 w-5 mt-0.5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm-.75-11.25a.75.75 0 011.5 0V9.5a.75.75 0 01-1.5 0V6.75zm0 4.5a.75.75 0 011.5 0v1a.75.75 0 01-1.5 0v-1z" clip-rule="evenodd" />
+                    </svg>
+                    <div class="space-y-2">
+                        <p class="text-sm font-semibold text-sky-900">
+                            {{ __('translations.review_login_prompt_title') }}
+                        </p>
+                        <p class="text-sm text-sky-800">
+                            {{ __('translations.review_login_prompt_body') }}
+                        </p>
+                        <div class="flex flex-wrap items-center gap-3">
+                            <a
+                                href="{{ route('login') }}"
+                                class="inline-flex items-center gap-2 rounded-full bg-primary-600 px-4 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-1">
+                                {{ __('translations.login_to_review') }}
+                            </a>
+                            <button
+                                type="button"
+                                wire:click="hideLoginPrompt"
+                                wire:loading.attr="disabled"
+                                class="text-xs font-semibold text-sky-700 hover:text-sky-900">
+                                {{ __('translations.dismiss_prompt') }}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endif
 
         @if (session()->has('success'))
             <div class="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-700">
@@ -79,6 +114,39 @@
                 {{ $message }}
             </div>
         @enderror
+
+        {{-- Highlight the authenticated customer's pending review submission. --}}
+        @if ($pendingReview)
+            <article class="rounded-2xl border border-amber-200 bg-amber-50 p-6 shadow-sm">
+                <div class="flex items-start gap-3">
+                    <div class="flex h-10 w-10 items-center justify-center rounded-full bg-amber-100 text-sm font-semibold text-amber-700">
+                        {{ Str::upper(Str::substr(optional($pendingReview->user)->name ?? __('frontend.reviews.anonymous'), 0, 1)) }}
+                    </div>
+                    <div class="space-y-2">
+                        <div class="flex flex-wrap items-center gap-2">
+                            <span class="rounded-full bg-amber-200 px-2.5 py-1 text-xs font-semibold uppercase tracking-wide text-amber-800">
+                                {{ __('translations.review_pending_badge') }}
+                            </span>
+                            <span class="text-xs text-amber-700">
+                                {{ __('translations.review_pending_visibility') }}
+                            </span>
+                        </div>
+                        <div class="flex items-center gap-2 text-sm text-amber-800">
+                            @for ($i = 1; $i <= 5; $i++)
+                                <svg class="h-4 w-4 {{ $i <= (int) $pendingReview->rating ? 'text-amber-500' : 'text-amber-200' }}" viewBox="0 0 20 20" fill="currentColor">
+                                    <path d="M10 15.27l-5.18 2.73 1-5.82-4.23-4.12 5.85-.85L10 2l2.56 5.21 5.85.85-4.23 4.12 1 5.82z" />
+                                </svg>
+                            @endfor
+                            <span>{{ $pendingReview->created_at?->translatedFormat('Y-m-d') }}</span>
+                        </div>
+                        @if ($pendingReview->title)
+                            <p class="text-sm font-semibold text-amber-900">{{ $pendingReview->title }}</p>
+                        @endif
+                        <p class="text-sm leading-relaxed text-amber-800">{{ $pendingReview->content }}</p>
+                    </div>
+                </div>
+            </article>
+        @endif
 
         @if ($showReviewForm)
             <div class="rounded-2xl border border-slate-100 bg-slate-50/70 p-6">
@@ -210,7 +278,7 @@
                     $name = $reviewerName($review);
                     $initial = $reviewerInitial($review);
                 @endphp
-                <article class="rounded-2xl border border-slate-100 p-6 shadow-sm">
+                <article class="rounded-2xl border border-slate-100 p-6 shadow-sm" wire:key="review-{{ $review->id }}">
                     <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                         <div class="flex items-start gap-3">
                             <div class="flex h-10 w-10 items-center justify-center rounded-full bg-primary-100 text-sm font-semibold text-primary-600">
@@ -239,6 +307,43 @@
                     </div>
 
                     <p class="mt-4 text-sm leading-relaxed text-slate-600">{{ $review->content }}</p>
+
+                    {{-- Provide interaction controls for helpful votes and reporting. --}}
+                    <div class="mt-6 flex flex-wrap items-center justify-between gap-4 text-sm text-slate-500">
+                        <div class="flex items-center gap-3">
+                            <span class="font-medium text-slate-600">
+                                {{ __('translations.review_helpful_prompt') }}
+                            </span>
+                            <div class="flex items-center gap-2">
+                                <button
+                                    type="button"
+                                    wire:click="markReviewHelpful({{ $review->id }})"
+                                    wire:loading.attr="disabled"
+                                    wire:target="markReviewHelpful({{ $review->id }})"
+                                    class="inline-flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700 transition hover:bg-emerald-100 disabled:opacity-70">
+                                    <svg class="h-4 w-4" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M10 5.5l3.5 3.5-3.5 3.5M6.5 9h7" />
+                                    </svg>
+                                    {{ __('translations.review_mark_helpful') }} ({{ $review->helpful_count ?? 0 }})
+                                </button>
+                                <button
+                                    type="button"
+                                    wire:click="reportReview({{ $review->id }})"
+                                    wire:loading.attr="disabled"
+                                    wire:target="reportReview({{ $review->id }})"
+                                    wire:confirm="{{ __('translations.confirm_report_review') }}"
+                                    class="inline-flex items-center gap-1 rounded-full border border-red-200 bg-red-50 px-3 py-1 text-xs font-semibold text-red-700 transition hover:bg-red-100 disabled:opacity-70">
+                                    <svg class="h-4 w-4" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M10 4.5l5.5 10h-11L10 4.5zm0 4v3m0 2h.01" />
+                                    </svg>
+                                    {{ __('translations.review_report_label') }} ({{ $review->reported_count ?? 0 }})
+                                </button>
+                            </div>
+                        </div>
+                        <span class="text-xs text-slate-400">
+                            {{ __('translations.review_visibility_public') }}
+                        </span>
+                    </div>
                 </article>
             @empty
                 <div class="flex flex-col items-center justify-center gap-4 rounded-2xl border border-dashed border-slate-200 bg-slate-50/70 p-10 text-center">
@@ -263,11 +368,13 @@
                             {{ __('translations.write_review') }}
                         </button>
                     @else
-                        <a
-                            href="{{ route('login') }}"
+                        <button
+                            type="button"
+                            wire:click="promptLogin"
+                            wire:loading.attr="disabled"
                             class="inline-flex items-center gap-2 rounded-full bg-primary-600 px-5 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-1">
                             {{ __('translations.login_to_review') }}
-                        </a>
+                        </button>
                     @endauth
                 </div>
             @endforelse
