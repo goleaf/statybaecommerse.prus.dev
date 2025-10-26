@@ -4,16 +4,17 @@ declare(strict_types=1);
 
 namespace App\Filament\Pages;
 
-use Filament\Schemas\Schema;
 use App\Services\ImportExport\ProviderRegistry;
 use App\Support\Storage\SecureStorage;
+use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Forms;
+use Filament\Notifications\Notification;
+use Filament\Pages\Page;
 use Filament\Schemas\Components\Fieldset;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
-use Filament\Notifications\Notification;
-use Filament\Pages\Page;
+use Filament\Schemas\Schema;
 use Illuminate\Support\Facades\Storage;
 
 final class DataImportExport extends Page
@@ -23,10 +24,8 @@ final class DataImportExport extends Page
     /**
      * Aligns the navigation icon with Filament's BackedEnum-aware union expectations while conveying the
      * accepted union types for maintainers via PHPDoc.
-     *
-     * @var string|\BackedEnum|null
      */
-    protected static $navigationIcon = 'heroicon-o-arrow-down-tray';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-arrow-down-tray';
 
     public ?string $provider = 'xml';
 
@@ -38,7 +37,7 @@ final class DataImportExport extends Page
 
     public array|string|null $file = null;
 
-    public function form(Schema $schema): Schema   
+    public function form(Schema $schema): Schema
     {
         return $schema
             ->schema([

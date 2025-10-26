@@ -26,7 +26,7 @@ final class TopPerformingSliders extends BaseWidget
         'xl' => 1,
     ];
 
-    public function table(Table $table): Table   
+    public function table(Table $table): Table
     {
         // Configure the widget table to meet the Filament v4 return type contract.
         $startDate = $this->pageFilters['startDate'] ?? now()->subDays(30);

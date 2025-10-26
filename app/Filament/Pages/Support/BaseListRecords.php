@@ -19,7 +19,7 @@ abstract class BaseListRecords extends ListRecords
     /**
      * Configure the shared table instance for list pages before applying layout helpers.
      */
-    public function table(Table $table): Table   
+    public function table(Table $table): Table
     {
         // Configure the Filament table definition for the resource.
         $table = parent::table($table);

@@ -14,7 +14,7 @@ abstract class BaseManageRecords extends ManageRecords
     use ConfiguresToggleableTableLayout;
     use HasToggleableTable;
 
-    public function table(Table $table): Table   
+    public function table(Table $table): Table
     {
         // Ensure the base manage records page conforms to the Filament v4 table return type.
         $table = parent::table($table);
