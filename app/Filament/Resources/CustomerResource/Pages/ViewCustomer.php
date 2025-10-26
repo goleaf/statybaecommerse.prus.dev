@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\CustomerResource\Pages;
 
-
-use Filament\Schemas\Schema;
 use App\Filament\Resources\CustomerResource;
 use App\Filament\Resources\ReviewResource;
 use App\Models\Address;
@@ -13,10 +11,9 @@ use App\Models\Customer;
 use App\Models\Order;
 use App\Models\Review;
 use Filament\Actions;
-use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
-use Filament\Infolists\Infolist;
 use Filament\Resources\Pages\ViewRecord;
+use Filament\Schemas\Schema;
 use Icetalker\FilamentTableRepeatableEntry\Infolists\Components\TableRepeatableEntry;
 use Illuminate\Support\Str;
 use LaraZeus\ListGroup\Entries\ListItem;
@@ -33,7 +30,7 @@ final class ViewCustomer extends ViewRecord
         ];
     }
 
-    public function infolist(Schema $schema): Schema   
+    public function infolist(Schema $schema): Schema
     {
         return $schema->schema([
             ListEntry::make('customerQuickLinks')
