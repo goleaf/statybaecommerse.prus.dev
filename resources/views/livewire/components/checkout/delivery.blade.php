@@ -62,6 +62,8 @@
                                         name="shipping"
                                         value="{{ $option['id'] }}"
                                         class="mt-0.5 size-4 shrink-0 cursor-pointer border-gray-300 text-primary-500 focus:ring-primary-600 active:ring-2 active:ring-offset-2"
+                                        wire:loading.attr="disabled"
+                                        wire:target="refreshShippingOptions,placeOrder"
                                     >
                                     <span class="flex flex-col ml-3">
                                         <span
@@ -94,8 +96,8 @@
                 </fieldset>
 
                 <div class="pt-6 mt-10 border-t border-gray-200 sm:flex sm:items-center sm:justify-end">
-                    <x-buttons.submit
-                        :title="__('Go to checkout')"
+                    <x-buttons.primary
+                        type="submit"
                         class="w-full px-8 py-2 text-sm sm:w-auto"
                         wire:loading.attr="data-loading"
                         wire:loading.attr="disabled"

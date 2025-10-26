@@ -110,6 +110,40 @@
     </div>
 
     @if (isset($options) && $options->isNotEmpty())
+        @php
+            // Normalise both array and object option payloads so the view can treat them consistently.
+            $normalizedOptionGroups = collect($options)->map(static function ($group): array {
+                $attribute = data_get($group, 'attribute');
+
+                // Prefer translated names when the attribute model is available, otherwise fall back to raw labels.
+                $attributeLabel = null;
+                if (is_object($attribute) && method_exists($attribute, 'trans')) {
+                    $attributeLabel = $attribute->trans('name') ?? data_get($attribute, 'name');
+                } else {
+                    $attributeLabel = data_get($group, 'attribute_name') ?? data_get($attribute, 'name');
+                }
+
+                $values = collect(data_get($group, 'values', []))->map(static function ($value): array {
+                    // Cast identifiers to integers and gracefully resolve the stored value/name pair for display.
+                    $valueId = (int) data_get($value, 'id');
+
+                    return [
+                        'id'    => $valueId,
+                        'label' => data_get($value, 'value') ?? data_get($value, 'name'),
+                    ];
+                });
+
+                return [
+                    'label'  => $attributeLabel,
+                    'values' => $values,
+                ];
+            });
+
+            // Keep a keyed map handy for rendering selected chips without walking the full option tree repeatedly.
+            $normalizedOptionValues = $normalizedOptionGroups
+                ->flatMap(static fn (array $group) => $group['values'])
+                ->keyBy('id');
+        @endphp
         <div class="mb-6">
             <h2 class="text-xl font-semibold mb-2">{{ __('Filter by') }}</h2>
             <div class="flex flex-wrap items-center gap-2 mb-2">
@@ -133,7 +167,7 @@
                 @endif
             </div>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                @foreach ($options as $group)
+                @foreach ($normalizedOptionGroups as $group)
                     <div>
                         <div class="text-sm font-medium mb-2">{{ $group->attribute->name }}</div>
                         <div class="flex flex-wrap gap-2">
