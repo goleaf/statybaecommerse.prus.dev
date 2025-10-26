@@ -26,19 +26,24 @@ use Livewire\Form;
  */
 final class RegistrationForm extends Form
 {
-    #[Validate('required|string|max:255')]
+    // Enforce consistent validation when using Livewire's validateOnly lifecycle.
+    #[Validate(['required', 'string', 'max:255'])]
     public string $first_name = '';
 
-    #[Validate('required|string|max:255')]
+    // Mirror the same validation rigor for the last name field for parity in UX.
+    #[Validate(['required', 'string', 'max:255'])]
     public string $last_name = '';
 
-    #[Validate('required|string|lowercase|email|max:255|unique:users,email')]
+    // Keep email uniqueness scoped to the users table while forcing lowercase formatting.
+    #[Validate(['required', 'string', 'lowercase', 'email', 'max:255', 'unique:users,email'])]
     public string $email = '';
 
-    #[Validate('required|string|confirmed')]
+    // Maintain Livewire realtime validation parity for the password field.
+    #[Validate(['required', 'string', 'confirmed'])]
     public string $password = '';
 
-    #[Validate('required|string')]
+    // Track the confirmation field so we can surface inline validation feedback.
+    #[Validate(['required', 'string'])]
     public string $password_confirmation = '';
 
     /**
@@ -57,6 +62,8 @@ final class RegistrationForm extends Form
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', Rule::unique(User::class, 'email')],
             // Apply Laravel's default password requirements alongside confirmation checks.
             'password' => ['required', 'string', 'confirmed', Password::defaults()],
+            // Explicitly require the confirmation field so validation messages remain precise.
+            'password_confirmation' => ['required', 'string'],
         ];
     }
 
