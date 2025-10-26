@@ -16,6 +16,9 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use App\Support\Cache\CacheKeys;
+use App\Support\Cache\CacheTags;
+use App\Support\Cache\TagAwareCache;
 use Illuminate\Support\Collection;
 use App\Support\Cache\CacheKeys;
 use App\Support\Cache\CacheTags;
@@ -150,7 +153,7 @@ class Show extends Component
     /**
      * Provide the available attribute filters for the current collection.
      *
-     * @return Collection<int, array{attribute_id:int, attribute_name:string, values:Collection<int, array{id:int, name:string, selected:bool}>}>
+     * @return Collection<int, AttributeFilterGroupData>
      */
     #[Computed]
     public function getAvailableOptionsProperty(): Collection

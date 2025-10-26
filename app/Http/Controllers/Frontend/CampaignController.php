@@ -252,7 +252,17 @@ final class CampaignController extends Controller
 
         $performance = ['high_performing' => Campaign::where('conversion_rate', '>', 5)->count(), 'medium_performing' => Campaign::whereBetween('conversion_rate', [2, 5])->count(), 'low_performing' => Campaign::where('conversion_rate', '<', 2)->count(), 'needs_attention' => $needsAttentionCount];
 
-        return response()->json(['success' => true, 'data' => $performance]);
+        $total = collect($buckets)->sum('count');
+
+        $payload = [
+            'buckets' => $buckets,
+            'summary' => [
+                'total_campaigns' => $total,
+                'generated_at'    => now()->toIso8601String(),
+            ],
+        ];
+
+        return response()->json(['success' => true, 'data' => $payload]);
     }
 
     /**
@@ -535,8 +545,50 @@ final class CampaignController extends Controller
             })
             ->first();
 
-        // Assemble the final analytics payload grouping insights by marketing theme.
-        $analytics = [
+        // Summarise engagement, conversion, and value metrics for chart widgets.
+        $data = [
+            'summary' => [
+                'engagement' => [
+                    'total_views'        => $totalViews,
+                    'total_clicks'       => $totalClicks,
+                    'average_ctr'        => round((float) $averageCtr, 2),
+                    'top_campaigns'      => $topEngagementCampaigns,
+                ],
+                'conversion' => [
+                    'total_conversions'         => $totalConversions,
+                    'average_conversion_rate'   => round($averageConversionRate, 2),
+                    'verified_conversions'      => $verifiedConversions,
+                    'attributed_conversions'    => $attributedConversions,
+                    'assisted_conversions'      => $assistedConversions,
+                    'assisted_conversion_value' => round($assistedConversionValue, 2),
+                    'attribution_breakdown'     => $attributionBreakdown,
+                ],
+                'value' => [
+                    'total_revenue'               => round($totalRevenue, 2),
+                    'total_budget'                => round($totalBudget, 2),
+                    'roi_percentage'              => $roiPercentage,
+                    'roas'                        => $roas,
+                    'average_roi'                 => round($averageRoi, 2),
+                    'average_roas'                => round($averageRoas, 2),
+                    'average_cost_per_conversion' => round($averageCostPerConversion, 2),
+                ],
+            ],
+            'journey' => [
+                'funnel_breakdown'    => $funnelBreakdown,
+                'average_touchpoints' => round($averageTouchpoints, 2),
+                'engagement_depth'    => [
+                    'average_time_on_site' => round($averageTimeOnSite, 2),
+                    'average_page_views'   => round($averagePageViews, 2),
+                ],
+            ],
+            'experimentation' => [
+                'multi_variant_campaigns' => $multiVariantCampaigns,
+                'winning_variant'         => $winningVariant,
+                'variant_performance'     => $variantPerformance->take(10)->values()->all(),
+            ],
+        ];
+
+        $meta = [
             'period' => [
                 'days'       => $period,
                 'label'      => sprintf('Last %d days', $period),
@@ -545,23 +597,20 @@ final class CampaignController extends Controller
                 'granularity' => 'day',
                 'normalized_dates' => $timelineDates->all(),
             ],
-            'totals' => [
-                'campaigns_created' => $campaigns->count(),
-                'campaigns_started' => Campaign::query()
+            'counters' => [
+                'campaigns_created'  => $campaigns->count(),
+                'campaigns_started'  => Campaign::query()
                     ->withoutGlobalScopes()
-                    // Exclude future launches so the metric reflects historical starts only.
                     ->whereBetween('starts_at', [$startDate, $now])
                     ->count(),
                 'campaigns_completed' => Campaign::query()
                     ->withoutGlobalScopes()
-                    // Only count completions that wrapped up during the window.
                     ->whereBetween('ends_at', [$startDate, $now])
                     ->where('status', 'completed')
                     ->count(),
-                'active_campaigns' => Campaign::query()
+                'active_campaigns'    => Campaign::query()
                     ->withoutGlobalScopes()
                     ->where('status', 'active')
-                    // Clamp to active campaigns that have started and not yet lapsed relative to the audit window.
                     ->where(function ($query) use ($now): void {
                         $query
                             ->whereNull('starts_at')
@@ -695,7 +744,7 @@ final class CampaignController extends Controller
             ],
         ];
 
-        return response()->json(['success' => true, 'data' => $analytics]);
+        return response()->json(['success' => true, 'data' => $data, 'meta' => $meta]);
     }
 
     /**

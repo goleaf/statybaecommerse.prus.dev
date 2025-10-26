@@ -147,6 +147,8 @@
         <div class="mb-6">
             <h2 class="text-xl font-semibold mb-2">{{ __('Filter by') }}</h2>
             <div class="flex flex-wrap items-center gap-2 mb-2">
+                {{-- Collapse the nested filter groups so we can resolve labels for chips quickly. --}}
+                @php($flatValues = $options->flatMap(fn ($group) => $group->values))
                 @foreach (collect($selectedValues)->filter() as $valId)
                     @php($val = $this->filterValueLookup->get((int) $valId))
                     @if ($val)
