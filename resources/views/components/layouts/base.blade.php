@@ -208,7 +208,9 @@
         function updateCartCount() {
             // Update cart counters safely without assuming elements exist
             try {
-                const cartItems = JSON.parse(sessionStorage.getItem('cart') || '[]');
+                const storedCart = window.sessionStorage.getItem('cart');
+                const parsedCart = storedCart ? JSON.parse(storedCart) : [];
+                const cartItems = Array.isArray(parsedCart) ? parsedCart : Object.values(parsedCart || {});
                 const count = cartItems.reduce((total, item) => total + (Number(item.quantity) || 0), 0);
 
                 const el = document.getElementById('cart-count');
@@ -224,9 +226,29 @@
                         node.style.display = count > 0 ? 'inline' : 'none';
                     }
                 });
+                // Emit a browser event so standalone Alpine widgets receive the same signal.
+                window.dispatchEvent(
+                    new CustomEvent('cart-updated', {
+                        detail: { quantity: count },
+                    }),
+                );
+
+                return count;
             } catch (e) {
                 // Silently ignore to avoid breaking pages without cart UI
+
+                return 0;
             }
+        }
+
+        // Hydrate the cart snapshot in sessionStorage so client listeners can read trusted data.
+        try {
+            const serverCartState = @json(array_values(session('cart', [])));
+            if (Array.isArray(serverCartState)) {
+                window.sessionStorage.setItem('cart', JSON.stringify(serverCartState));
+            }
+        } catch (error) {
+            // Ignore storage errors (e.g. Safari private mode) to avoid breaking rendering.
         }
 
         // Initialize cart count on page load
