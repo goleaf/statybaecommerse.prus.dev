@@ -7,6 +7,7 @@ namespace App\Http\Resources;
 use App\Support\Contracts\Entities\UserContract;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Arr;
 
 class AdminUserResource extends JsonResource
 {
@@ -18,8 +19,10 @@ class AdminUserResource extends JsonResource
     public function toArray(Request $request): array
     {
         $contract = UserContract::fromModel($this->resource);
-        $meta = $contract['meta'];
+        $meta = is_array($contract['meta'] ?? null) ? $contract['meta'] : [];
 
+        // Merge all of the computed properties that only exist on the admin
+        // projection of a user into the existing contract payload.
         $meta = array_merge($meta, [
             'full_name' => $this->resource->full_name,
             'initials' => $this->resource->initials,
@@ -45,38 +48,46 @@ class AdminUserResource extends JsonResource
         ]);
 
         if ($this->resource->relationLoaded('addresses')) {
-            $meta['addresses'] = $this->resource->addresses->map(function ($address) {
-                return $address->except(['user_id'])->toArray();
+            $meta['addresses'] = $this->resource->addresses->map(static function ($address): array {
+                // We cannot rely on Eloquent models exposing an `except` helper,
+                // so remove the foreign key manually before serialising.
+                return Arr::except($address->toArray(), ['user_id']);
             })->toArray();
         }
 
         if ($this->resource->relationLoaded('orders')) {
-            $meta['orders'] = $this->resource->orders->map(function ($order) {
-                return $order->except(['user_id'])->toArray();
+            $meta['orders'] = $this->resource->orders->map(static function ($order): array {
+                // Order resources follow the same rule—strip the redundant
+                // relation pointer before returning the array payload.
+                return Arr::except($order->toArray(), ['user_id']);
             })->toArray();
         }
 
         if ($this->resource->relationLoaded('wishlist')) {
-            $meta['wishlist'] = $this->resource->wishlist->map(function ($product) {
+            $meta['wishlist'] = $this->resource->wishlist->map(static function ($product): array {
+                // Wishlist entries are simple product arrays, so return them as-is.
                 return $product->toArray();
             })->toArray();
         }
 
         if ($this->resource->relationLoaded('reviews')) {
-            $meta['reviews'] = $this->resource->reviews->map(function ($review) {
-                return $review->except(['user_id'])->toArray();
+            $meta['reviews'] = $this->resource->reviews->map(static function ($review): array {
+                // Remove the user pointer to keep the payload clean for reviews too.
+                return Arr::except($review->toArray(), ['user_id']);
             })->toArray();
         }
 
         if ($this->resource->relationLoaded('partners')) {
-            $meta['partners'] = $this->resource->partners->map(function ($partner) {
+            $meta['partners'] = $this->resource->partners->map(static function ($partner): array {
+                // Partners expose their complete data set in the admin panel.
                 return $partner->toArray();
             })->toArray();
         }
 
         if ($this->resource->relationLoaded('referrals')) {
-            $meta['referrals'] = $this->resource->referrals->map(function ($referral) {
-                return $referral->except(['referrer_id', 'referred_id'])->toArray();
+            $meta['referrals'] = $this->resource->referrals->map(static function ($referral): array {
+                // Both referral foreign keys are redundant for API consumers, so strip them.
+                return Arr::except($referral->toArray(), ['referrer_id', 'referred_id']);
             })->toArray();
         }
 
