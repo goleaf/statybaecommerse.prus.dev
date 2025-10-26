@@ -83,6 +83,11 @@ final class DocumentActionTest extends TestCase
         $this->assertNotNull($handler);
 
         $record = User::factory()->create(['name' => 'Jane Doe']);
+        // Backdate timestamps to prove the action prefers real model values over runtime defaults.
+        $record->forceFill([
+            'created_at' => now()->subDays(3),
+            'updated_at' => now()->subDay(),
+        ])->saveQuietly();
 
         $data = [
             'template_id' => $this->template->id,
@@ -104,6 +109,8 @@ final class DocumentActionTest extends TestCase
                 expect($variables['MODEL_TYPE'])->toBe($record->getMorphClass());
                 expect($variables['NAME'])->toBe($record->name);
                 expect($title)->toBe($data['title']);
+                expect($variables['CREATED_AT'])->toBe($record->created_at?->format('d/m/Y H:i'));
+                expect($variables['UPDATED_AT'])->toBe($record->updated_at?->format('d/m/Y H:i'));
             }
         );
 
