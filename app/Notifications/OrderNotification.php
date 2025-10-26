@@ -21,37 +21,47 @@ final class OrderNotification extends Notification implements ShouldQueue
     /**
      * Initialize the class instance with required dependencies.
      */
-    public function __construct(public array $data) {}
+    public function __construct(public array $data)
+    {
+        // Store the raw order payload for downstream formatting.
+    }
 
     /**
      * Handle via functionality with proper error handling.
      *
-     * @param  mixed  $notifiable
+     * @return list<string>
      */
-    public function via($notifiable): array
+    public function via(object $notifiable): array
     {
+        // Persist the update in the database notification feed by default.
         return ['database'];
     }
 
     /**
      * Handle toDatabase functionality with proper error handling.
      *
-     * @param  mixed  $notifiable
+     * @return array<string, mixed>
      */
-    public function toDatabase($notifiable): array
+    public function toDatabase(object $notifiable): array
     {
+        // Return the provided payload verbatim for maximum flexibility.
         return $this->data;
     }
 
     /**
      * Handle toMail functionality with proper error handling.
-     *
-     * @param  mixed  $notifiable
      */
-    public function toMail($notifiable): MailMessage
+    public function toMail(object $notifiable): MailMessage
     {
-        return (new MailMessage)->subject($this->data['title'])->line($this->data['message'])->when(isset($this->data['order_number']), function ($mail) {
-            return $mail->line('Užsakymo numeris: '.$this->data['order_number']);
-        });
+        // Assemble an optional transactional email mirroring the database payload.
+        $mail = (new MailMessage())
+            ->subject($this->data['title'])
+            ->line($this->data['message']);
+
+        if (isset($this->data['order_number'])) {
+            $mail->line(__('Order number: :number', ['number' => $this->data['order_number']]));
+        }
+
+        return $mail;
     }
 }
