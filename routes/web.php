@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\V1\HealthController;
 use App\Http\Controllers\ApiDocsController;
 use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\MailPreviewController;
+use App\Http\Controllers\Frontend\UserController;
 use App\Http\Controllers\NewsCommentController;
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\SecureMediaDownloadController;
@@ -510,6 +511,11 @@ Route::middleware('auth')->group(function (): void {
         return redirect()->route('account.orders');
     })->name('account');
     Route::get('/account/orders', Pages\Account\Orders::class)->name('account.orders');
+
+    // Hardened endpoint for avatar uploads to ensure sanitised filenames and secure storage.
+    Route::post('/user/avatar', [UserController::class, 'updateAvatar'])
+        ->middleware('throttle:frontend.profile')
+        ->name('user.avatar.update');
 });
 
 // Admin routes have been moved to routes/admin.php

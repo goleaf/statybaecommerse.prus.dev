@@ -16,7 +16,9 @@ use App\Http\Requests\Frontend\UpdateUserSocialLinksRequest;
 use App\Models\Document;
 use App\Models\User;
 use App\Support\Storage\SecureStorage;
+use App\Support\Uploads\SecureUpload;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -88,14 +90,31 @@ final class UserController extends Controller
      */
     public function updateAvatar(UpdateUserAvatarRequest $request): JsonResponse
     {
+        /** @var User $user */
         $user = Auth::user();
-        // Delete old avatar if exists
         $disk = SecureStorage::disk();
+
+        // Resolve the uploaded avatar and fail loudly if the transport is missing the expected file instance.
+        $uploadedAvatar = $request->file('avatar');
+        if (! $uploadedAvatar instanceof UploadedFile) {
+            abort(422, __('validation.uploaded', ['attribute' => 'avatar']));
+        }
+
+        // Clean up the previous avatar so we do not leak orphaned files when users rotate their image frequently.
         if ($user->avatar_url && Storage::disk($disk)->exists($user->avatar_url)) {
             Storage::disk($disk)->delete($user->avatar_url);
         }
-        // Store new avatar
-        $avatarPath = $request->file('avatar')->store('avatars', $disk);
+
+        // Store the new avatar using the hardened uploader so filenames are safe and metadata stripped.
+        $avatarPath = SecureUpload::storeUploadedFile(
+            $uploadedAvatar,
+            'avatars',
+            $disk,
+            UpdateUserAvatarRequest::allowedMimeTypes(),
+            UpdateUserAvatarRequest::allowedExtensions(),
+            UpdateUserAvatarRequest::maxFileSizeKilobytes(),
+        );
+
         $user->update(['avatar_url' => $avatarPath]);
 
         return response()->json([
