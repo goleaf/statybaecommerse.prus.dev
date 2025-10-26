@@ -14,6 +14,7 @@ use DB;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -66,7 +67,29 @@ final class Brand extends Model implements HasMedia, TranslatableRecord
     use Searchable;
     use SoftDeletes;
 
-    protected $fillable = ['name', 'slug', 'description', 'website', 'is_enabled', 'is_active', 'is_visible', 'is_featured', 'seo_title', 'seo_description'];
+    /**
+     * Allow the admin panel to mass assign all primary profile fields, including premium flags and social links.
+     *
+     * @var array<int, string>
+     */
+    protected $fillable = ['name', 'slug', 'description', 'website', 'is_enabled', 'is_active', 'is_visible', 'is_featured', 'is_premium', 'seo_title', 'seo_description', 'social_links'];
+
+    /**
+     * Enumerate supported social platforms to sanitise JSON payloads from the Filament repeater.
+     *
+     * @var array<int, string>
+     */
+    public const SOCIAL_LINK_PLATFORMS = [
+        'facebook',
+        'instagram',
+        'linkedin',
+        'tiktok',
+        'twitter',
+        'youtube',
+        'pinterest',
+        'github',
+        'website',
+    ];
 
     /**
      * Point the shared OrdersByName trait at the human readable column exposed in storefront UIs.
@@ -79,10 +102,12 @@ final class Brand extends Model implements HasMedia, TranslatableRecord
     protected function casts(): array
     {
         return [
+            // Force boolean casting so API consumers never receive integer toggles.
             'is_enabled'  => 'boolean',
             'is_active'   => 'boolean',
             'is_visible'  => 'boolean',
             'is_featured' => 'boolean',
+            'is_premium'  => 'boolean',
         ];
     }
 
@@ -407,7 +432,18 @@ final class Brand extends Model implements HasMedia, TranslatableRecord
      */
     public function getBusinessInfo(): array
     {
-        return ['products_count' => $this->products()->count(), 'published_products_count' => $this->products()->published()->count(), 'total_revenue' => $this->getTotalRevenue(), 'average_product_price' => $this->getAverageProductPrice(), 'is_active' => $this->is_enabled, 'has_products' => $this->products()->exists(), 'has_website' => ! empty($this->website), 'has_media' => $this->hasAnyMedia()];
+        return [
+            'products_count'           => $this->products()->count(),
+            'published_products_count' => $this->products()->published()->count(),
+            'total_revenue'            => $this->getTotalRevenue(),
+            'average_product_price'    => $this->getAverageProductPrice(),
+            'is_active'                => $this->is_enabled,
+            'is_premium'               => (bool) $this->is_premium,
+            'has_products'             => $this->products()->exists(),
+            'has_website'              => ! empty($this->website),
+            'has_media'                => $this->hasAnyMedia(),
+            'social_links_count'       => count($this->social_links),
+        ];
     }
 
     /**
@@ -415,7 +451,21 @@ final class Brand extends Model implements HasMedia, TranslatableRecord
      */
     public function getCompleteInfo(?string $locale = null): array
     {
-        return array_merge($this->getBrandInfo(), $this->getMediaInfo(), $this->getSeoInfo(), $this->getBusinessInfo(), ['translations' => $this->getAvailableLocales(), 'has_translations' => count($this->getAvailableLocales()) > 0, 'created_at' => $this->created_at?->toISOString(), 'updated_at' => $this->updated_at?->toISOString()]);
+        return array_merge(
+            $this->getBrandInfo(),
+            $this->getMediaInfo(),
+            $this->getSeoInfo(),
+            $this->getBusinessInfo(),
+            [
+                'social_links'       => $this->social_links,
+                'social_links_count' => count($this->social_links),
+                'translations'       => $this->getAvailableLocales(),
+                'has_translations'   => count($this->getAvailableLocales()) > 0,
+                'is_premium'         => (bool) $this->is_premium,
+                'created_at'         => $this->created_at?->toISOString(),
+                'updated_at'         => $this->updated_at?->toISOString(),
+            ],
+        );
     }
 
     // Additional helper methods
@@ -490,6 +540,14 @@ final class Brand extends Model implements HasMedia, TranslatableRecord
     public function getWebsiteDomainAttribute(): ?string
     {
         return $this->getWebsiteDomain();
+    }
+
+    /**
+     * Quickly determine whether the brand has been elevated to premium status.
+     */
+    public function isPremium(): bool
+    {
+        return (bool) $this->is_premium;
     }
 
     /**
@@ -639,6 +697,16 @@ final class Brand extends Model implements HasMedia, TranslatableRecord
     }
 
     /**
+     * Handle scopePremium functionality with proper error handling.
+     *
+     * @param mixed $query
+     */
+    public function scopePremium($query)
+    {
+        return $query->where('is_premium', true);
+    }
+
+    /**
      * Handle registerMediaCollections functionality with proper error handling.
      */
     public function registerMediaCollections(): void
@@ -664,5 +732,58 @@ final class Brand extends Model implements HasMedia, TranslatableRecord
         // Legacy conversions for backward compatibility - now in WebP
         $this->addMediaConversion('thumb')->performOnCollections('logo')->width(200)->height(200)->format('webp')->quality(85)->sharpen(10)->optimize();
         $this->addMediaConversion('small')->performOnCollections('logo')->width(400)->height(400)->format('webp')->quality(85)->sharpen(10)->optimize();
+    }
+
+    /**
+     * Normalise JSON social links so the admin repeater and API payloads stay consistent.
+     */
+    protected function socialLinks(): Attribute
+    {
+        return Attribute::make(
+            get: function ($value): array {
+                // Decode the stored payload if the array cast has not already run.
+                $decoded = is_array($value) ? $value : (is_string($value) ? json_decode($value, true) : []);
+
+                return collect($decoded)
+                    ->filter(fn ($link): bool => is_array($link) && isset($link['platform'], $link['url']))
+                    ->map(function (array $link): array {
+                        // Cast individual entries to strings and keep the structure minimal.
+                        return [
+                            'platform' => (string) $link['platform'],
+                            'url'      => (string) $link['url'],
+                        ];
+                    })
+                    ->values()
+                    ->all();
+            },
+            set: function ($value): array {
+                // Accept repeater-style arrays or associative payloads from seeders.
+                return collect(is_array($value) ? $value : [])
+                    ->map(function ($link) {
+                        if (! is_array($link)) {
+                            return null;
+                        }
+
+                        $platform = strtolower((string) ($link['platform'] ?? ''));
+                        $url = trim((string) ($link['url'] ?? ''));
+
+                        if ($platform === '' || $url === '') {
+                            return null;
+                        }
+
+                        if (! in_array($platform, self::SOCIAL_LINK_PLATFORMS, true)) {
+                            return null;
+                        }
+
+                        return [
+                            'platform' => $platform,
+                            'url'      => $url,
+                        ];
+                    })
+                    ->filter()
+                    ->values()
+                    ->all();
+            },
+        );
     }
 }
