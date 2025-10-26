@@ -61,6 +61,7 @@ final class ShippingOptionResolver
                 return [
                     'id'                 => $normalizedId,
                     'name'               => $option->name,
+                    'description'        => $option->description,
                     'price'              => $price,
                     'formatted_price'    => app_money_format($price, $option->currency_code),
                     'estimated_delivery' => $option->estimated_delivery_text,
