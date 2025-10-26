@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Livewire\Pages;
 
+use App\Data\Storefront\Home\HomeStatsData;
 use App\Livewire\Concerns\WithCart;
 use App\Livewire\Concerns\WithNotifications;
 use App\Models\Brand;
@@ -20,7 +21,7 @@ use Livewire\Attributes\Computed;
 use Livewire\Component;
 
 /**
- * @property-read array<string, int|float> $stats
+ * @property-read HomeStatsData $stats
  * @property-read Collection<int, Product> $featuredProducts
  * @property-read Collection<int, Product> $latestProducts
  * @property-read Collection<int, Review> $latestReviews
@@ -30,11 +31,8 @@ final class Home extends Component
     use WithCart;
     use WithNotifications;
 
-    /**
-     * @return array<string, int|float>
-     */
     #[Computed]
-    public function stats(): array
+    public function stats(): HomeStatsData
     {
         $locale = app()->getLocale();
 
@@ -62,7 +60,7 @@ final class Home extends Component
             ]
         );
 
-        return $stats;
+        return HomeStatsData::fromArray($stats);
     }
 
     /**
@@ -182,7 +180,8 @@ final class Home extends Component
         $appName = config('app.name');
 
         return view('livewire.pages.home', [
-            'stats'            => $this->stats,
+            // Pass primitive array to Blade while keeping typed data internally for reuse.
+            'stats'            => $this->stats->toArray(),
             'featuredProducts' => $this->featuredProducts,
             'latestProducts'   => $this->latestProducts,
             'latestReviews'    => $this->latestReviews,

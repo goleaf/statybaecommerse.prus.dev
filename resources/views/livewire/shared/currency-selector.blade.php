@@ -2,7 +2,7 @@
     <div class="relative">
         <select wire:model="activeCurrencyCode" class="rounded-md border-gray-300 text-sm">
             @foreach ($currencies as $c)
-                <option value="{{ $c['code'] }}">{{ $c['symbol'] }} {{ $c['code'] }}</option>
+                <option value="{{ $c->code }}">{{ $c->symbol }} {{ $c->code }}</option>
             @endforeach
         </select>
     </div>
