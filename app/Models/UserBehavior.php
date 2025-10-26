@@ -33,19 +33,33 @@ final class UserBehavior extends Model
     use OrdersByName;
 
     /**
-     * Configure the OrdersByName trait to rely on the event column for ordering analytics records.
+     * Configure the OrdersByName trait to rely on the behaviour type column for ordering analytics records.
      */
-    protected string $nameColumn = 'event';
+    protected string $nameColumn = 'behavior_type';
 
     /**
-     * Allow mass assignment of the core tracking columns required for capturing behaviour snapshots.
+     * Allow mass assignment of the storefront tracking columns required for capturing behaviour snapshots.
      */
-    protected $fillable = ['user_id', 'event', 'payload', 'occurred_at'];
+    protected $fillable = [
+        'user_id',
+        'session_id',
+        'product_id',
+        'category_id',
+        'behavior_type',
+        'metadata',
+        'referrer',
+        'user_agent',
+        'ip_address',
+        'created_at',
+    ];
 
     /**
-     * Ensure JSON payloads become arrays automatically and that occurred_at is treated as a Carbon instance.
+     * Ensure JSON payloads become arrays automatically and that created_at is treated as a Carbon instance.
      */
-    protected $casts = ['payload' => 'array', 'occurred_at' => 'datetime'];
+    protected $casts = [
+        'metadata'   => 'array',
+        'created_at' => 'datetime',
+    ];
 
     /**
      * Disable automatic timestamps so the occurred_at field remains the single source of truth.

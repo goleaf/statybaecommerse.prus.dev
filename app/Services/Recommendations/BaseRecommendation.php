@@ -6,6 +6,7 @@ namespace App\Services\Recommendations;
 
 use App\Models\Product;
 use App\Models\User;
+use App\Models\UserBehavior;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
@@ -199,7 +200,9 @@ abstract class BaseRecommendation
             $features["brand_{$product->brand_id}"] = 1.0;
         }
         // Price range features
-        $priceRange = $this->getPriceRange($product->price);
+        // Cast to float because decimal casts surface as strings when the
+        // model is hydrated, but our price buckets expect numeric comparison.
+        $priceRange = $this->getPriceRange((float) $product->price);
         $features["price_range_{$priceRange}"] = 1.0;
         // Attribute features
         foreach ($product->attributes as $attribute) {
@@ -235,8 +238,19 @@ abstract class BaseRecommendation
      */
     protected function trackRecommendation(string $algorithm, ?User $user = null, ?Product $product = null, array $recommendations = []): void
     {
-        if (class_exists(\App\Models\UserBehavior::class)) {
-            \App\Models\UserBehavior::create(['user_id' => $user?->id, 'session_id' => session()->getId(), 'product_id' => $product?->id, 'behavior_type' => 'recommendation_view', 'metadata' => ['algorithm' => $algorithm, 'recommendation_count' => count($recommendations), 'recommended_products' => array_column($recommendations, 'id')], 'created_at' => now()]);
+        if (class_exists(UserBehavior::class)) {
+            UserBehavior::create([
+                'user_id'       => $user?->id,
+                'session_id'    => session()->getId(),
+                'product_id'    => $product?->id,
+                'behavior_type' => 'recommendation_view',
+                'metadata'      => [
+                    'algorithm'            => $algorithm,
+                    'recommendation_count' => count($recommendations),
+                    'recommended_products' => array_column($recommendations, 'id'),
+                ],
+                'created_at' => now(),
+            ]);
         }
     }
 }
