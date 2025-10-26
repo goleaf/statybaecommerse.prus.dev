@@ -65,6 +65,11 @@ return [
         'gift_message'     => 'Dovanų žinutė',
         'create_account'   => 'Sukurti paskyrą',
         'guest_checkout'   => 'Pirkti kaip svečias',
+        'fill_billing_address'   => 'Užpildykite sąskaitos duomenis.',
+        'select_shipping_address' => 'Nurodykite pristatymo adresą.',
+        'estimated_delivery'      => 'Pasirinkite pristatymo būdą ir matykite numatomą laiką.',
+        'choose_payment_method'   => 'Pasirinkite pageidaujamą mokėjimo būdą.',
+        'no_shipping_available'   => 'Šiam adresui pristatymo būdų nėra.',
     ],
     'account' => [
         'title'            => 'Mano paskyra',

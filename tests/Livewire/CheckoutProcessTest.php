@@ -93,14 +93,14 @@ it('allows guests to complete a multi-step checkout with dynamic shipping and pa
 
     // Populate billing data for the first step of the wizard.
     $component
-        ->set('billingFirstName', 'Jane')
-        ->set('billingLastName', 'Doe')
-        ->set('billingEmail', 'jane@example.test')
-        ->set('billingPhone', '+3706000000')
-        ->set('billingAddress', 'Gedimino pr. 1')
-        ->set('billingCity', 'Vilnius')
-        ->set('billingPostalCode', '01103')
-        ->set('billingCountryCode', 'LT');
+        ->set('billing.first_name', 'Jane')
+        ->set('billing.last_name', 'Doe')
+        ->set('billing.email', 'jane@example.test')
+        ->set('billing.phone', '+3706000000')
+        ->set('billing.address', 'Gedimino pr. 1')
+        ->set('billing.city', 'Vilnius')
+        ->set('billing.postal_code', '01103')
+        ->set('billing.country', 'LT');
 
     $component->call('nextStep');
 
@@ -197,21 +197,21 @@ it('captures translated country information when billing and shipping differ', f
 
     // Complete the billing step while pointing to Estonia and disable the shipping shortcut to provide a Lithuanian delivery.
     $component
-        ->set('billingFirstName', 'Ieva')
-        ->set('billingLastName', 'Jonaitė')
-        ->set('billingEmail', 'ieva@example.test')
-        ->set('billingPhone', '+3706000001')
-        ->set('billingAddress', 'Laisvės al. 1')
-        ->set('billingCity', 'Kaunas')
-        ->set('billingPostalCode', '44001')
-        ->set('billingCountryCode', 'EE')
+        ->set('billing.first_name', 'Ieva')
+        ->set('billing.last_name', 'Jonaitė')
+        ->set('billing.email', 'ieva@example.test')
+        ->set('billing.phone', '+3706000001')
+        ->set('billing.address', 'Laisvės al. 1')
+        ->set('billing.city', 'Kaunas')
+        ->set('billing.postal_code', '44001')
+        ->set('billing.country', 'EE')
         ->set('sameAsShipping', false)
-        ->set('shippingFirstName', 'Jonas')
-        ->set('shippingLastName', 'Jonaitis')
-        ->set('shippingAddress', 'Konstitucijos pr. 7')
-        ->set('shippingCity', 'Vilnius')
-        ->set('shippingPostalCode', '09308')
-        ->set('shippingCountryCode', 'LT');
+        ->set('shipping.first_name', 'Jonas')
+        ->set('shipping.last_name', 'Jonaitis')
+        ->set('shipping.address', 'Konstitucijos pr. 7')
+        ->set('shipping.city', 'Vilnius')
+        ->set('shipping.postal_code', '09308')
+        ->set('shipping.country', 'LT');
 
     $component->call('nextStep');
     expect(collect($component->get('availableShippingOptions'))->pluck('id')->all())
@@ -319,14 +319,14 @@ it('surfaces and clears shipping option validation when availability changes', f
     $component->call('$refresh');
 
     $component
-        ->set('billingFirstName', 'Asta')
-        ->set('billingLastName', 'Petrauskienė')
-        ->set('billingEmail', 'asta@example.test')
-        ->set('billingPhone', '+3706000002')
-        ->set('billingAddress', 'Tilto g. 8')
-        ->set('billingCity', 'Vilnius')
-        ->set('billingPostalCode', '01102')
-        ->set('billingCountryCode', 'LT');
+        ->set('billing.first_name', 'Asta')
+        ->set('billing.last_name', 'Petrauskienė')
+        ->set('billing.email', 'asta@example.test')
+        ->set('billing.phone', '+3706000002')
+        ->set('billing.address', 'Tilto g. 8')
+        ->set('billing.city', 'Vilnius')
+        ->set('billing.postal_code', '01102')
+        ->set('billing.country', 'LT');
 
     $component->call('nextStep');
     $component->set('selectedShippingOption', $shippingOption->getKey());
@@ -334,10 +334,10 @@ it('surfaces and clears shipping option validation when availability changes', f
     $component->assertHasNoErrors();
 
     // Switch to a country with no configured shipping choices and confirm the validation surface is populated.
-    $component->set('shippingCountryCode', 'LV');
+    $component->set('shipping.country', 'LV');
     $component->assertHasErrors(['selectedShippingOption']);
 
     // Restore the original country so the resolver repopulates options and removes stale errors.
-    $component->set('shippingCountryCode', 'LT');
+    $component->set('shipping.country', 'LT');
     $component->assertHasNoErrors();
 });
