@@ -15,6 +15,7 @@ use App\Http\Requests\Frontend\UpdateUserProfileRequest;
 use App\Http\Requests\Frontend\UpdateUserSocialLinksRequest;
 use App\Models\Document;
 use App\Models\User;
+use App\Support\Audit\AdminActivityLogger;
 use App\Support\Storage\SecureStorage;
 use App\Support\Uploads\SecureUpload;
 use Illuminate\Http\JsonResponse;
@@ -32,6 +33,11 @@ use Illuminate\View\View;
  */
 final class UserController extends Controller
 {
+    /**
+     * Centralise audit logging so preference updates surface in admin reports.
+     */
+    public function __construct(private readonly AdminActivityLogger $activityLogger) {}
+
     /**
      * Handle profile functionality with proper error handling.
      */
@@ -149,7 +155,24 @@ final class UserController extends Controller
      */
     public function updatePrivacySettings(UpdateUserPrivacySettingsRequest $request): RedirectResponse
     {
-        Auth::user()->update(['privacy_settings' => $request->validated('privacy_settings', [])]);
+        /** @var User $user */
+        $user = Auth::user();
+
+        // Capture the prior settings before persisting the update to construct
+        // a meaningful audit diff for compliance reviews.
+        $previousSettings = (array) $user->getAttribute('privacy_settings');
+        $newSettings = $request->validated('privacy_settings', []);
+
+        $user->update(['privacy_settings' => $newSettings]);
+
+        $this->activityLogger->log(
+            $user,
+            'privacy_settings_updated',
+            $user,
+            ['privacy_settings' => $previousSettings],
+            ['privacy_settings' => $newSettings],
+            ['channel'          => 'frontend']
+        );
 
         return redirect()->route('users.profile')->with('success', __('users.privacy_settings_updated_successfully'));
     }
@@ -239,7 +262,20 @@ final class UserController extends Controller
     public function statistics(): JsonResponse
     {
         $user = Auth::user();
-        $statistics = ['orders' => ['total' => $user->orders()->count(), 'completed' => $user->orders()->where('status', 'completed')->count(), 'pending' => $user->orders()->where('status', 'pending')->count(), 'total_spent' => $user->total_spent, 'average_order_value' => $user->average_order_value], 'reviews' => ['total' => $user->reviews()->count(), 'average_rating' => $user->average_rating], 'wishlist' => ['total' => $user->wishlist()->count()], 'addresses' => ['total' => $user->addresses()->count()], 'documents' => ['total' => $user->documents()->count()]];
+        $statistics = [
+            'orders'     => [
+                'total'              => $user->orders()->count(),
+                // Count delivered orders while tolerating legacy "completed" rows for backwards compatibility.
+                'delivered'          => $user->orders()->whereIn('status', ['delivered', 'completed'])->count(),
+                'pending'            => $user->orders()->where('status', 'pending')->count(),
+                'total_spent'        => $user->total_spent,
+                'average_order_value' => $user->average_order_value,
+            ],
+            'reviews'   => ['total' => $user->reviews()->count(), 'average_rating' => $user->average_rating],
+            'wishlist'  => ['total' => $user->wishlist()->count()],
+            'addresses' => ['total' => $user->addresses()->count()],
+            'documents' => ['total' => $user->documents()->count()],
+        ];
 
         return response()->json(['success' => true, 'data' => $statistics]);
     }

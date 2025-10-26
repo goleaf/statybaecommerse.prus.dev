@@ -14,16 +14,16 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Placeholder;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Tabs;
+use Filament\Forms\Components\Tabs\Tab;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Form;
 use Filament\Notifications\Notification as FilamentNotification;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Grid as SchemaGrid;
-use Filament\Schemas\Components\Section as SchemaSection;
-use Filament\Schemas\Components\Tabs as SchemaTabs;
-use Filament\Schemas\Components\Tabs\Tab as SchemaTab;
-use Filament\Schemas\Schema;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
@@ -76,19 +76,19 @@ final class CollectionRuleResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
         // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
         // Expose the schema via the Filament v4 `Form` instance to drop the deprecated array fallback.
-        return $schema->schema([
-            SchemaTabs::make('collection_rule_tabs')
+        return $form->schema([
+            Tabs::make('collection_rule_tabs')
                 ->tabs([
-                    SchemaTab::make(__('admin.collection_rules.form.tabs.basic_information'))
+                    Tab::make(__('admin.collection_rules.form.tabs.basic_information'))
                         ->icon('heroicon-o-information-circle')
                         ->schema([
-                            SchemaSection::make(__('admin.collection_rules.form.sections.basic_information'))
+                            Section::make(__('admin.collection_rules.form.sections.basic_information'))
                                 ->schema([
-                                    SchemaGrid::make(2)
+                                    Grid::make(2)
                                         ->schema([
                                             Select::make('collection_id')
                                                 ->label(__('admin.collection_rules.form.fields.collection'))
@@ -104,7 +104,7 @@ final class CollectionRuleResource extends Resource
                                                 ->maxLength(255)
                                                 ->columnSpan(1),
                                         ]),
-                                    SchemaGrid::make(3)
+                                    Grid::make(3)
                                         ->schema([
                                             Select::make('operator')
                                                 ->label(__('admin.collection_rules.form.fields.operator'))
@@ -136,10 +136,10 @@ final class CollectionRuleResource extends Resource
                                 ])
                                 ->columns(1),
                         ]),
-                    SchemaTab::make(__('admin.collection_rules.form.tabs.rule_details'))
+                    Tab::make(__('admin.collection_rules.form.tabs.rule_details'))
                         ->icon('heroicon-o-cog-6-tooth')
                         ->schema([
-                            SchemaSection::make(__('admin.collection_rules.form.sections.rule_details'))
+                            Section::make(__('admin.collection_rules.form.sections.rule_details'))
                                 ->schema([
                                     Placeholder::make('collection_name')
                                         ->label(__('admin.collection_rules.form.fields.collection_name'))

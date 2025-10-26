@@ -66,6 +66,11 @@ final class CacheTags
         return 'brands';
     }
 
+    public static function currencies(): string
+    {
+        return 'currencies';
+    }
+
     /**
      * @param  array<int, int|string> $ids
      * @return array<int, string>
@@ -103,6 +108,16 @@ final class CacheTags
     public static function reviews(): string
     {
         return 'reviews';
+    }
+
+    public static function settings(): string
+    {
+        return 'settings';
+    }
+
+    public static function testing(): string
+    {
+        return 'testing';
     }
 
     public static function orders(): string

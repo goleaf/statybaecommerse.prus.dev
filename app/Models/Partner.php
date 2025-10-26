@@ -37,6 +37,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @property array<string, mixed>|null $metadata
  * @property-read \App\Models\PartnerTier|null $tier
  * @property-read float $effective_discount_rate
+ * @property-read float $effective_commission_rate
  *
  * @mixin \Eloquent
  */
@@ -171,7 +172,8 @@ final class Partner extends Model implements HasMedia
             return (float) $ownRate;
         }
 
-        $tier = $this->getRelationValue('tier');
+        // Lazily resolve the tier relationship so persisted partners without eager loading still inherit tier discounts.
+        $tier = $this->resolveTierForFallback();
         if ($tier instanceof PartnerTier) {
             $tierRate = $tier->getAttribute('discount_rate');
 
@@ -181,6 +183,52 @@ final class Partner extends Model implements HasMedia
         }
 
         return 0.0;
+    }
+
+    /**
+     * Handle getEffectiveCommissionRateAttribute functionality with proper error handling.
+     */
+    public function getEffectiveCommissionRateAttribute(): float
+    {
+        // Prefer the partner-specific commission rate before falling back to the linked tier configuration.
+        $ownRate = $this->getAttribute('commission_rate');
+        if (is_numeric($ownRate)) {
+            return (float) $ownRate;
+        }
+
+        // Resolve the tier relation lazily so accessors work even when the relationship was not eager loaded.
+        $tier = $this->resolveTierForFallback();
+        if ($tier instanceof PartnerTier) {
+            $tierRate = $tier->getAttribute('commission_rate');
+
+            if (is_numeric($tierRate)) {
+                return (float) $tierRate;
+            }
+        }
+
+        return 0.0;
+    }
+
+    /**
+     * Resolve the tier relationship with a lazy-loading fallback for accessor usage.
+     */
+    private function resolveTierForFallback(): ?PartnerTier
+    {
+        // Return the already loaded relation when available to avoid redundant database queries.
+        $tier = $this->getRelationValue('tier');
+        if ($tier instanceof PartnerTier) {
+            return $tier;
+        }
+
+        // Attempt to lazy load the relation when a foreign key is present but the relation was not eager loaded.
+        $resolved = $this->tier()->getResults();
+        if ($resolved instanceof PartnerTier) {
+            $this->setRelation('tier', $resolved);
+
+            return $resolved;
+        }
+
+        return null;
     }
 
     /**

@@ -67,3 +67,25 @@ it('orders records predictably through the orderedByName scope', function (): vo
     expect($ascending)->toBe(['ORD-300', 'ORD-301', 'ORD-302']);
     expect($descending)->toBe(['ORD-302', 'ORD-301', 'ORD-300']);
 });
+
+it('generates a unique order number when none is provided', function (): void {
+    // Seed an order with a fixed number so collisions can be detected deterministically.
+    $existingOrder = Order::factory()->create(['number' => 'ORD-AAAAAA']);
+
+    // Create a barebones order without a number to trigger the model boot logic.
+    $order = Order::query()->create([
+        'status'          => 'pending',
+        'subtotal'        => 0,
+        'tax_amount'      => 0,
+        'shipping_amount' => 0,
+        'discount_amount' => 0,
+        'total'           => 0,
+        'currency'        => 'EUR',
+    ]);
+
+    // Assert the generated identifier follows the ORD-XXXXXX convention and remains unique.
+    expect($order->number)
+        ->toMatch('/^ORD-[A-Z0-9]{6}$/')
+        ->not()->toBeNull()
+        ->not()->toBe($existingOrder->number);
+});

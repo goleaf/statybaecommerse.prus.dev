@@ -177,10 +177,12 @@ class OrderTest extends TestCase
         $pendingOrder = Order::factory()->create(['status' => 'pending']);
         $processingOrder = Order::factory()->create(['status' => 'processing']);
         $shippedOrder = Order::factory()->create(['status' => 'shipped']);
+        $deliveredOrder = Order::factory()->create(['status' => 'delivered']);
 
         $this->assertFalse($pendingOrder->isPaid());
         $this->assertTrue($processingOrder->isPaid());
         $this->assertTrue($shippedOrder->isPaid());
+        $this->assertTrue($deliveredOrder->isPaid());
     }
 
     public function test_order_is_shippable(): void
@@ -205,7 +207,7 @@ class OrderTest extends TestCase
 
         $this->assertTrue($pendingOrder->canBeCancelled());
         $this->assertTrue($confirmedOrder->canBeCancelled());
-        $this->assertFalse($processingOrder->canBeCancelled());
+        $this->assertTrue($processingOrder->canBeCancelled());
         $this->assertFalse($shippedOrder->canBeCancelled());
     }
 

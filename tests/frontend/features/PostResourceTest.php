@@ -32,15 +32,30 @@ it('can create a post', function (): void {
 
     Livewire::test(CreatePost::class)
         ->fillForm([
-            'title'            => $newPost->title,
-            'slug'             => $newPost->slug,
-            'content'          => $newPost->content,
-            'excerpt'          => $newPost->excerpt,
-            'status'           => $newPost->status,
-            'user_id'          => $this->user->id,
-            'meta_title'       => $newPost->meta_title,
-            'meta_description' => $newPost->meta_description,
-            'featured'         => $newPost->featured,
+            'title.lt'            => $newPost->title,
+            'title.en'            => $newPost->title,
+            'title.de'            => null,
+            'title.ru'            => null,
+            'slug'                => $newPost->slug,
+            'content.lt'          => $newPost->content,
+            'content.en'          => $newPost->content,
+            'content.de'          => null,
+            'content.ru'          => null,
+            'excerpt.lt'          => $newPost->excerpt,
+            'excerpt.en'          => $newPost->excerpt,
+            'excerpt.de'          => null,
+            'excerpt.ru'          => null,
+            'status'              => $newPost->status,
+            'user_id'             => $this->user->id,
+            'meta_title.lt'       => $newPost->meta_title,
+            'meta_title.en'       => $newPost->meta_title,
+            'meta_title.de'       => null,
+            'meta_title.ru'       => null,
+            'meta_description.lt' => $newPost->meta_description,
+            'meta_description.en' => $newPost->meta_description,
+            'meta_description.de' => null,
+            'meta_description.ru' => null,
+            'featured'            => $newPost->featured,
         ])
         ->call('create')
         ->assertHasNoFormErrors();
@@ -53,12 +68,12 @@ it('can create a post', function (): void {
 });
 
 it('can edit a post', function (): void {
-    $post = Post::factory()->create(['user_id' => $this->user->id]);
+    $post = Post::factory()->published()->create(['user_id' => $this->user->id]);
     $newTitle = 'Updated Title';
 
     Livewire::test(EditPost::class, ['record' => $post->getRouteKey()])
         ->fillForm([
-            'title' => $newTitle,
+            'title.lt' => $newTitle,
         ])
         ->call('save')
         ->assertHasNoFormErrors();
@@ -83,12 +98,26 @@ it('saves tags as a comma separated string', function () {
 });
 
 it('can view a post', function () {
-    $post = Post::factory()->create(['user_id' => $this->user->id]);
+    $post = Post::factory()->published()->create(['user_id' => $this->user->id]);
+
+    $expectedTitleState = [
+        'lt' => $post->title,
+        'en' => $post->title_translations['en'] ?? null,
+        'de' => $post->title_translations['de'] ?? null,
+        'ru' => $post->title_translations['ru'] ?? null,
+    ];
+
+    $expectedContentState = [
+        'lt' => $post->content,
+        'en' => $post->content_translations['en'] ?? null,
+        'de' => $post->content_translations['de'] ?? null,
+        'ru' => $post->content_translations['ru'] ?? null,
+    ];
 
     Livewire::test(ViewPost::class, ['record' => $post->getRouteKey()])
         ->assertFormSet([
-            'title'   => $post->title,
-            'content' => $post->content,
+            'title'   => $expectedTitleState,
+            'content' => $expectedContentState,
         ]);
 });
 
@@ -101,6 +130,50 @@ it('can delete a post', function (): void {
     $this->assertDatabaseMissing('posts', [
         'id' => $post->id,
     ]);
+});
+
+it('persists translations from language tabs', function (): void {
+    $formPayload = [
+        // Provide translations for every multilingual field to emulate a real Language Tabs submission.
+        'title.lt'            => 'Pavadinimas',
+        'title.en'            => 'Title',
+        'title.de'            => 'Titel',
+        'title.ru'            => null,
+        'excerpt.lt'          => 'Santrauka',
+        'excerpt.en'          => 'Summary',
+        'excerpt.de'          => 'Zusammenfassung',
+        'excerpt.ru'          => null,
+        'content.lt'          => '<p>Turinys</p>',
+        'content.en'          => '<p>Content</p>',
+        'content.de'          => '<p>Inhalt</p>',
+        'content.ru'          => null,
+        'meta_title.lt'       => 'Meta LT',
+        'meta_title.en'       => 'Meta EN',
+        'meta_title.de'       => 'Meta DE',
+        'meta_title.ru'       => null,
+        'meta_description.lt' => 'LT meta',
+        'meta_description.en' => 'EN meta',
+        'meta_description.de' => 'DE meta',
+        'meta_description.ru' => null,
+        'slug'                => 'pavadinimas',
+        'status'              => 'draft',
+        'user_id'             => $this->user->id,
+        'featured'            => false,
+    ];
+
+    Livewire::test(CreatePost::class)
+        ->fillForm($formPayload)
+        ->assertSet('data.title', function ($value): bool {
+            expect($value)->toBeArray();
+            expect($value)->toMatchArray([
+                'lt' => 'Pavadinimas',
+                'en' => 'Title',
+                'de' => 'Titel',
+                'ru' => null,
+            ]);
+
+            return true;
+        });
 });
 
 it('can publish a post', function (): void {

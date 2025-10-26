@@ -98,13 +98,13 @@ class RecommendationBlockResourceTest extends TestCase
 
     public function test_can_filter_recommendation_blocks_by_type(): void
     {
-        RecommendationBlock::factory()->create(['type' => 'featured']);
-        RecommendationBlock::factory()->create(['type' => 'related']);
+        RecommendationBlock::factory()->create(['type' => 'similar_products']);
+        RecommendationBlock::factory()->create(['type' => 'frequently_bought_together']);
 
         Livewire::test(ListRecommendationBlocks::class)
-            ->filterTable('type', 'featured')
-            ->assertCanSeeTableRecords(RecommendationBlock::where('type', 'featured')->get())
-            ->assertCanNotSeeTableRecords(RecommendationBlock::where('type', 'related')->get());
+            ->filterTable('type', 'similar_products')
+            ->assertCanSeeTableRecords(RecommendationBlock::where('type', 'similar_products')->get())
+            ->assertCanNotSeeTableRecords(RecommendationBlock::where('type', 'frequently_bought_together')->get());
     }
 
     public function test_can_filter_recommendation_blocks_by_position(): void
@@ -131,13 +131,13 @@ class RecommendationBlockResourceTest extends TestCase
 
     public function test_can_search_recommendation_blocks_by_name(): void
     {
-        RecommendationBlock::factory()->create(['name' => 'Featured Products']);
-        RecommendationBlock::factory()->create(['name' => 'Related Items']);
+        RecommendationBlock::factory()->create(['name' => 'Similar Products Block']);
+        RecommendationBlock::factory()->create(['name' => 'Category Highlights']);
 
         Livewire::test(ListRecommendationBlocks::class)
-            ->searchTable('Featured')
-            ->assertCanSeeTableRecords(RecommendationBlock::where('name', 'like', '%Featured%')->get())
-            ->assertCanNotSeeTableRecords(RecommendationBlock::where('name', 'like', '%Related%')->get());
+            ->searchTable('Similar')
+            ->assertCanSeeTableRecords(RecommendationBlock::where('name', 'like', '%Similar%')->get())
+            ->assertCanNotSeeTableRecords(RecommendationBlock::where('name', 'like', '%Category%')->get());
     }
 
     public function test_can_bulk_delete_recommendation_blocks(): void

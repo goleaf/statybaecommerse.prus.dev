@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -20,45 +21,109 @@ final class InventoryController extends Controller
      */
     public function index(Request $request): View
     {
+        // Start with the base inventory query eager loading relationships used by the Blade template.
         $query = Product::with(['brand', 'categories'])->where('is_visible', true)->published();
-        // Apply filters
+
+        // Restrict stock status filtering to the recognised set so unexpected input cannot
+        // break the column comparison logic or leak invalid SQL fragments.
         if ($request->filled('stock_status')) {
-            $query->where(function ($q) use ($request) {
-                match ($request->stock_status) {
-                    'in_stock'     => $q->where('manage_stock', true)->whereRaw('stock_quantity > low_stock_threshold'),
-                    'low_stock'    => $q->where('manage_stock', true)->where('stock_quantity', '>', 0)->whereRaw('stock_quantity <= low_stock_threshold'),
-                    'out_of_stock' => $q->where('manage_stock', true)->where('stock_quantity', '<=', 0),
-                    'not_tracked'  => $q->where('manage_stock', false),
-                    default        => null,
-                };
-            });
+            $stockStatusInput = $request->input('stock_status');
+
+            if (is_string($stockStatusInput) && in_array($stockStatusInput, ['in_stock', 'low_stock', 'out_of_stock', 'not_tracked'], true)) {
+                $query->where(static function (Builder $stockScopedQuery) use ($stockStatusInput): void {
+                    switch ($stockStatusInput) {
+                        case 'in_stock':
+                            $stockScopedQuery
+                                ->where('manage_stock', true)
+                                // Use whereColumn so the database safely compares column values without raw SQL.
+                                ->whereColumn('stock_quantity', '>', 'low_stock_threshold');
+
+                            break;
+
+                        case 'low_stock':
+                            $stockScopedQuery
+                                ->where('manage_stock', true)
+                                ->where('stock_quantity', '>', 0)
+                                ->whereColumn('stock_quantity', '<=', 'low_stock_threshold');
+
+                            break;
+
+                        case 'out_of_stock':
+                            $stockScopedQuery
+                                ->where('manage_stock', true)
+                                ->where('stock_quantity', '<=', 0);
+
+                            break;
+
+                        case 'not_tracked':
+                            $stockScopedQuery->where('manage_stock', false);
+
+                            break;
+                    }
+                });
+            }
         }
+
+        // Normalise the incoming brand identifier to an integer to avoid unexpected casting quirks.
         if ($request->filled('brand')) {
-            $query->where('brand_id', $request->brand);
+            $brandId = $request->integer('brand');
+
+            $query->where('brand_id', $brandId);
         }
+
+        // Filter products by their attached categories using the relationship key instead of a raw column name.
         if ($request->filled('category')) {
-            $query->whereHas('categories', function ($q) use ($request) {
-                $q->where('category_id', $request->category);
+            $categoryId = $request->integer('category');
+
+            $query->whereHas('categories', static function (Builder $categoryQuery) use ($categoryId): void {
+                $categoryQuery->whereKey($categoryId);
             });
         }
+
+        // Trim the search term so accidental whitespace does not impact the lookup.
         if ($request->filled('search')) {
-            $search = $request->search;
-            $query->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")->orWhere('sku', 'like', "%{$search}%")->orWhere('description', 'like', "%{$search}%");
-            });
+            $searchInput = $request->input('search');
+
+            if (is_string($searchInput)) {
+                $search = trim($searchInput);
+
+                if ($search !== '') {
+                    $query->where(static function (Builder $searchQuery) use ($search): void {
+                        $likeExpression = "%{$search}%";
+
+                        $searchQuery
+                            ->where('name', 'like', $likeExpression)
+                            ->orWhere('sku', 'like', $likeExpression)
+                            ->orWhere('description', 'like', $likeExpression);
+                    });
+                }
+            }
         }
-        // Apply sorting
-        $sortBy = $request->get('sort', 'name');
-        $sortDirection = $request->get('direction', 'asc');
+
+        // Whitelist allowed sort columns and directions so the generated ORDER BY clause stays predictable.
         $allowedSorts = ['name', 'sku', 'price', 'stock_quantity', 'created_at'];
-        if (in_array($sortBy, $allowedSorts)) {
-            $query->orderBy($sortBy, $sortDirection);
+        $allowedDirections = ['asc', 'desc'];
+        $sortByInput = $request->input('sort', 'name');
+        $sortDirectionInput = $request->input('direction', 'asc');
+
+        $sortBy = ! is_string($sortByInput) || ! in_array($sortByInput, $allowedSorts, true) ? 'name' : $sortByInput;
+
+        if (! is_string($sortDirectionInput)) {
+            $sortDirection = 'asc';
         } else {
-            $query->orderBy('name', 'asc');
+            $sortDirection = strtolower($sortDirectionInput);
+
+            if (! in_array($sortDirection, $allowedDirections, true)) {
+                $sortDirection = 'asc';
+            }
         }
+
+        $query->orderBy($sortBy, $sortDirection);
+
+        // Paginate results while preserving query parameters so filters persist across pages.
         $products = $query->paginate(20)->withQueryString();
 
-        return view('inventory', compact('products'));
+        return view('inventory', ['products' => $products]);
     }
 
     /**
@@ -68,6 +133,6 @@ final class InventoryController extends Controller
     {
         $product->load(['brand', 'categories', 'reviews', 'variants']);
 
-        return view('products.show', compact('product'));
+        return view('products.show', ['product' => $product]);
     }
 }

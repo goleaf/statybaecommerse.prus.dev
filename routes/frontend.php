@@ -82,6 +82,13 @@ Route::middleware(['web'])->group(function () {
         Route::delete('/data', [App\Http\Controllers\Frontend\DataPrivacyController::class, 'destroy'])->name('data.destroy');
     });
 
+    // Legacy user profile routes maintained for backwards compatibility with
+    // existing blade templates that reference the "users.*" namespace.
+    Route::middleware(['auth'])->prefix('users')->name('users.')->group(function () {
+        Route::get('/profile', [App\Http\Controllers\Frontend\UserController::class, 'profile'])->name('profile');
+        Route::post('/privacy-settings', [App\Http\Controllers\Frontend\UserController::class, 'updatePrivacySettings'])->name('privacy.update');
+    });
+
     // Campaigns
     Route::prefix('campaigns')->name('frontend.campaigns.')->group(function () {
         Route::get('/', [App\Http\Controllers\Frontend\CampaignController::class, 'index'])->name('index');

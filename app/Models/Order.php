@@ -25,6 +25,8 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Str;
+use RuntimeException;
 use Schema;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
@@ -63,6 +65,19 @@ final class Order extends Model
     public array $translatable = ['notes', 'billing_address', 'shipping_address'];
 
     protected $fillable = ['number', 'user_id', 'status', 'subtotal', 'tax_amount', 'shipping_amount', 'discount_amount', 'total', 'currency', 'billing_address', 'shipping_address', 'notes', 'shipped_at', 'delivered_at', 'channel_id', 'shipping_option_id', 'partner_id', 'coupon_id', 'payment_status', 'payment_state', 'payment_method', 'payment_reference'];
+
+    /**
+     * Bootstrap the model and ensure a unique order number is assigned.
+     */
+    protected static function booted(): void
+    {
+        // Automatically assign a human friendly unique identifier whenever an order is created.
+        static::creating(function (Order $order): void {
+            if (! is_string($order->number) || trim($order->number) === '') {
+                $order->number = self::generateUniqueNumber();
+            }
+        });
+    }
 
     /**
      * Handle casts functionality with proper error handling.
@@ -391,8 +406,8 @@ final class Order extends Model
             });
         }
 
-        // Also include lifecycle statuses that imply payment captured
-        return $query->orWhereIn('status', ['processing', 'confirmed', 'shipped', 'delivered', 'completed']);
+        // Also include lifecycle statuses that imply payment captured, keeping legacy completed records accessible.
+        return $query->orWhereIn('status', ['processing', 'shipped', 'delivered', 'completed']);
     }
 
     public function scopeCreatedOnDate(Builder $query, CarbonInterface $date): Builder
@@ -412,7 +427,9 @@ final class Order extends Model
      */
     public function isPaid(): bool
     {
-        return in_array($this->status, ['processing', 'shipped', 'delivered', 'completed']);
+        $enum = self::resolveStatusEnum($this->status);
+
+        return $enum !== null && in_array($enum, [OrderStatus::PROCESSING, OrderStatus::SHIPPED, OrderStatus::DELIVERED], true);
     }
 
     /**
@@ -422,17 +439,9 @@ final class Order extends Model
     {
         $status = $this->status;
 
-        if ($status instanceof OrderStatus) {
-            return in_array($status, [OrderStatus::PROCESSING, OrderStatus::CONFIRMED], true);
-        }
+        $enum = self::resolveStatusEnum($status);
 
-        try {
-            $enum = OrderStatus::from((string) $status);
-        } catch (ValueError) {
-            return false;
-        }
-
-        return in_array($enum, [OrderStatus::PROCESSING, OrderStatus::CONFIRMED], true);
+        return $enum === OrderStatus::PROCESSING;
     }
 
     /**
@@ -442,17 +451,9 @@ final class Order extends Model
     {
         $status = $this->status;
 
-        if ($status instanceof OrderStatus) {
-            return in_array($status, [OrderStatus::PENDING, OrderStatus::CONFIRMED], true);
-        }
+        $enum = self::resolveStatusEnum($status);
 
-        try {
-            $enum = OrderStatus::from((string) $status);
-        } catch (ValueError) {
-            return false;
-        }
-
-        return in_array($enum, [OrderStatus::PENDING, OrderStatus::CONFIRMED], true);
+        return $enum !== null && in_array($enum, [OrderStatus::PENDING, OrderStatus::PROCESSING], true);
     }
 
     /**
@@ -462,17 +463,9 @@ final class Order extends Model
     {
         $status = $this->status;
 
-        if ($status instanceof OrderStatus) {
-            return in_array($status, [OrderStatus::DELIVERED, OrderStatus::COMPLETED], true);
-        }
+        $enum = self::resolveStatusEnum($status);
 
-        try {
-            $enum = OrderStatus::from((string) $status);
-        } catch (ValueError) {
-            return false;
-        }
-
-        return in_array($enum, [OrderStatus::DELIVERED, OrderStatus::COMPLETED], true);
+        return $enum === OrderStatus::DELIVERED;
     }
 
     /**
@@ -622,5 +615,60 @@ final class Order extends Model
         }
 
         return self::$createdAtIndexAvailable[$cacheKey] = $schema->hasIndex($table, 'orders_created_at_index');
+    }
+
+    /**
+     * Generate a collision resistant order number adhering to the ORD-XXXXXX format.
+     */
+    private static function generateUniqueNumber(): string
+    {
+        // Attempt a small number of retries so concurrent writers still succeed gracefully.
+        for ($attempt = 0; $attempt < 10; $attempt++) {
+            try {
+                $token = strtoupper(bin2hex(random_bytes(3)));
+            } catch (Throwable) {
+                // Fall back to Str::random when the crypto source is unavailable (e.g. during tests).
+                $token = strtoupper(Str::random(6));
+            }
+
+            $candidate = sprintf('ORD-%s', $token);
+
+            if (! self::query()->where('number', $candidate)->exists()) {
+                return $candidate;
+            }
+        }
+
+        throw new RuntimeException('Unable to allocate a unique order number after multiple attempts.');
+    }
+
+    /**
+     * Normalise legacy string statuses into the modern enum representation.
+     */
+    private static function resolveStatusEnum(mixed $status): ?OrderStatus
+    {
+        if ($status instanceof OrderStatus) {
+            return $status;
+        }
+
+        if (! is_string($status) || $status === '') {
+            return null;
+        }
+
+        // Map historical statuses onto the streamlined lifecycle without breaking older data snapshots.
+        $normalized = match ($status) {
+            'confirmed' => OrderStatus::PROCESSING,
+            'completed' => OrderStatus::DELIVERED,
+            default      => null,
+        };
+
+        if ($normalized instanceof OrderStatus) {
+            return $normalized;
+        }
+
+        try {
+            return OrderStatus::from($status);
+        } catch (ValueError) {
+            return null;
+        }
     }
 }

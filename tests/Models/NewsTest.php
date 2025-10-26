@@ -6,6 +6,7 @@ namespace Tests\Models;
 
 use App\Enums\ModerationState;
 use App\Models\News;
+use App\Models\NewsImage;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -38,6 +39,7 @@ final class NewsTest extends TestCase
 
         // Confirm the casts cover every persisted attribute that needs type juggling.
         $this->assertSame([
+            'id'                      => 'int',
             'is_visible'              => 'boolean',
             'is_featured'             => 'boolean',
             'is_breaking'             => 'boolean',
@@ -48,6 +50,7 @@ final class NewsTest extends TestCase
             'published_at'            => 'datetime',
             'view_count'              => 'integer',
             'meta_data'               => 'array',
+            'deleted_at'              => 'datetime',
         ], $news->getCasts());
     }
 
@@ -155,5 +158,94 @@ final class NewsTest extends TestCase
         // Refresh the instance to ensure relationships are reloaded for the accessor call.
         $fresh = $news->fresh();
         $this->assertSame('<p>Allowed content</p>', $fresh->content);
+    }
+
+    public function test_primary_image_helpers_prioritise_featured_assets(): void
+    {
+        // Seed a published article with translations so the helper can resolve locale-aware fields.
+        $news = News::factory()->create([
+            'is_visible'       => true,
+            'published_at'     => now()->subDay(),
+            'moderation_state' => ModerationState::Published->value,
+        ]);
+        $news->translations()->create([
+            'locale'  => 'lt',
+            'title'   => 'Primary Image Article',
+            'slug'    => 'primary-image-article',
+            'summary' => 'Summary copy',
+            'content' => 'Body copy',
+        ]);
+
+        // Attach two images where the featured flag should determine the preferred item.
+        NewsImage::factory()->create([
+            'news_id'     => $news->id,
+            'is_featured' => false,
+            'sort_order'  => 5,
+            'file_path'   => 'news-images/non-featured.jpg',
+        ]);
+        $featured = NewsImage::factory()->create([
+            'news_id'     => $news->id,
+            'is_featured' => true,
+            'sort_order'  => 10,
+            'file_path'   => 'news-images/featured.jpg',
+        ]);
+
+        $fresh = $news->fresh('images');
+        $this->assertSame($featured->id, $fresh->primaryImage()?->id);
+        $this->assertSame($featured->url, $fresh->getPrimaryImageUrl());
+        $this->assertSame($featured->thumbnail_url, $fresh->getPrimaryImageUrl(true));
+        $this->assertTrue($fresh->hasPrimaryImage());
+
+        // Ensure the helper gracefully falls back when no assets are attached.
+        $empty = News::factory()->create([
+            'is_visible'       => true,
+            'published_at'     => now()->subDay(),
+            'moderation_state' => ModerationState::Published->value,
+        ]);
+        $empty->translations()->create([
+            'locale'  => 'lt',
+            'title'   => 'No Image Article',
+            'slug'    => 'no-image-article',
+            'summary' => 'Summary copy',
+            'content' => 'Body copy',
+        ]);
+
+        $this->assertNull($empty->primaryImage());
+        $this->assertNull($empty->getPrimaryImageUrl());
+        $this->assertNull($empty->getPrimaryImageUrl(true));
+        $this->assertFalse($empty->hasPrimaryImage());
+    }
+
+    public function test_is_ready_for_frontend_requires_full_content_stack(): void
+    {
+        // Start with a published article that is missing the imagery requirement.
+        $news = News::factory()->create([
+            'is_visible'       => true,
+            'published_at'     => now()->subDay(),
+            'moderation_state' => ModerationState::Published->value,
+        ]);
+        $news->translations()->create([
+            'locale'  => 'lt',
+            'title'   => 'Display Ready Article',
+            'slug'    => 'display-ready-article',
+            'summary' => 'Summary copy',
+            'content' => 'Body copy',
+        ]);
+
+        $this->assertFalse($news->isReadyForFrontend());
+
+        // Add an image so the record satisfies the storefront display requirements.
+        NewsImage::factory()->create([
+            'news_id'     => $news->id,
+            'is_featured' => true,
+            'sort_order'  => 1,
+            'file_path'   => 'news-images/ready.jpg',
+        ]);
+
+        $this->assertTrue($news->fresh('images')->isReadyForFrontend());
+
+        // Toggle visibility to ensure the helper respects moderation and visibility controls.
+        $news->update(['is_visible' => false]);
+        $this->assertFalse($news->fresh()->isReadyForFrontend());
     }
 }

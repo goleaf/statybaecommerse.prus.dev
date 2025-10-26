@@ -30,11 +30,9 @@ final class OrderController extends Controller
      */
     private const VIEWABLE_STATUS_VALUES = [
         OrderStatus::PENDING->value,
-        OrderStatus::CONFIRMED->value,
         OrderStatus::PROCESSING->value,
         OrderStatus::SHIPPED->value,
         OrderStatus::DELIVERED->value,
-        OrderStatus::COMPLETED->value,
     ];
 
     public function show(Request $request, string $orderIdentifier): JsonResponse|View|Response

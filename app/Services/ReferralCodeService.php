@@ -147,6 +147,32 @@ final class ReferralCodeService
     }
 
     /**
+     * Build share-ready URLs for popular social channels so customers can
+     * distribute their referral code with a single tap.
+     */
+    public function getShareLinks(string $code, ?string $message = null): array
+    {
+        $referralUrl = urlencode($this->getReferralUrl($code));
+        $shareTargets = config('referral.share_targets', []);
+        $subject = rawurlencode($message ?? __('referrals.share.subject'));
+        $body = rawurlencode(($message ?? __('referrals.share.body')) . ' ' . $this->getReferralUrl($code));
+
+        // Map each configured target into a concrete share link while keeping
+        // the code resilient to partial configuration overrides.
+        $links = [];
+        foreach ($shareTargets as $channel => $template) {
+            if ($channel === 'email') {
+                $links[$channel] = sprintf($template, $subject, $body);
+                continue;
+            }
+
+            $links[$channel] = sprintf($template, $referralUrl);
+        }
+
+        return $links;
+    }
+
+    /**
      * Handle extractCodeFromUrl functionality with proper error handling.
      */
     public function extractCodeFromUrl(string $url): ?string

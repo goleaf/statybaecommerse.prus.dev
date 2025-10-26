@@ -101,14 +101,36 @@ final class PartnerTest extends TestCase
 
         // Persist two partners: one with an explicit discount and another relying on the tier value.
         $explicit = Partner::factory()->for($tier, 'tier')->create(['discount_rate' => 0.0500]);
-        $inherited = Partner::factory()->for($tier, 'tier')->make(['discount_rate' => null]);
-        $inherited->setRelation('tier', $tier);
+        $inherited = Partner::factory()->for($tier, 'tier')->create(['discount_rate' => 0.0000]);
 
         // The accessor should return the partner-specific discount when defined.
         $explicit->refresh();
         self::assertSame(0.0500, $explicit->getAttribute('effective_discount_rate'));
 
-        // When the partner discount is null it should fall back to the tier's configured discount.
+        // When the partner discount is null it should fall back to the tier's configured discount even without eager loading.
+        $inherited->refresh();
+        $inherited->setAttribute('discount_rate', null);
+        $inherited->unsetRelation('tier');
         self::assertSame(0.0750, $inherited->getAttribute('effective_discount_rate'));
+    }
+
+    public function test_effective_commission_rate_falls_back_to_tier_value(): void
+    {
+        // Create a tier with a known commission so the accessor fallback can be asserted precisely.
+        $tier = PartnerTier::factory()->create(['commission_rate' => 0.0225]);
+
+        // Persist partners covering both explicit commission overrides and inherited tier defaults.
+        $explicit = Partner::factory()->for($tier, 'tier')->create(['commission_rate' => 0.0175]);
+        $inherited = Partner::factory()->for($tier, 'tier')->create(['commission_rate' => 0.0000]);
+
+        // Partner-specific overrides should be returned unchanged.
+        $explicit->refresh();
+        self::assertSame(0.0175, $explicit->getAttribute('effective_commission_rate'));
+
+        // Partners without an override should inherit the tier commission, even when the relation was not eager loaded.
+        $inherited->refresh();
+        $inherited->setAttribute('commission_rate', null);
+        $inherited->unsetRelation('tier');
+        self::assertSame(0.0225, $inherited->getAttribute('effective_commission_rate'));
     }
 }

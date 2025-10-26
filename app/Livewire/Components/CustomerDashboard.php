@@ -39,7 +39,17 @@ final class CustomerDashboard extends Component
     #[Computed]
     public function stats(): array
     {
-        return ['total_orders' => $this->user->orders()->count(), 'completed_orders' => $this->user->orders()->where('status', 'completed')->count(), 'pending_orders' => $this->user->orders()->where('status', 'pending')->count(), 'total_spent' => $this->user->orders()->where('status', 'completed')->sum('total'), 'wishlist_items' => $this->user->wishlist()->count(), 'reviews_written' => $this->user->reviews()->count(), 'member_since' => $this->user->created_at->format('Y'), 'last_order' => $this->user->orders()->latest()->first()?->created_at?->diffForHumans()];
+        return [
+            'total_orders'     => $this->user->orders()->count(),
+            // Treat legacy "completed" records as delivered so dashboards remain accurate during migration.
+            'completed_orders' => $this->user->orders()->whereIn('status', ['delivered', 'completed'])->count(),
+            'pending_orders'   => $this->user->orders()->where('status', 'pending')->count(),
+            'total_spent'      => $this->user->orders()->whereIn('status', ['delivered', 'completed'])->sum('total'),
+            'wishlist_items'   => $this->user->wishlist()->count(),
+            'reviews_written'  => $this->user->reviews()->count(),
+            'member_since'     => $this->user->created_at->format('Y'),
+            'last_order'       => $this->user->orders()->latest()->first()?->created_at?->diffForHumans(),
+        ];
     }
 
     /**
@@ -67,7 +77,7 @@ final class CustomerDashboard extends Component
     public function recommendedProducts(): Collection
     {
         // Simple recommendation based on previous purchases
-        $purchasedCategories = $this->user->orders()->with('items.product.categories')->where('status', 'completed')->get()->pluck('items')->flatten()->pluck('product.categories')->flatten()->pluck('id')->unique();
+        $purchasedCategories = $this->user->orders()->with('items.product.categories')->whereIn('status', ['delivered', 'completed'])->get()->pluck('items')->flatten()->pluck('product.categories')->flatten()->pluck('id')->unique();
 
         return Product::query()->with(['media', 'brand'])->where('is_visible', true)->whereHas('categories', function ($query) use ($purchasedCategories) {
             $query->whereIn('categories.id', $purchasedCategories);
