@@ -6,10 +6,13 @@ namespace App\Livewire\Modals\Account;
 
 use App\Models\Address;
 use App\Models\Country;
+use App\Support\Address\AddressDataSanitizer;
 use Filament\Notifications\Notification;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Validate;
 use LivewireUI\Modal\ModalComponent;
 
@@ -47,7 +50,7 @@ class AddressForm extends ModalComponent
     #[Validate('required|in:billing,shipping')]
     public string $type = 'billing';
 
-    #[Validate('required|exists:countries,cca2')]
+    #[Validate('required|string|size:2')]
     public ?string $country_code = null;
 
     #[Validate('required|string|max:20')]
@@ -68,8 +71,12 @@ class AddressForm extends ModalComponent
      */
     public function mount(?int $addressId = null): void
     {
-        // Load countries
+        // Load countries using the configured allow-list to prevent unintended
+        // leakage of address data into unsupported regions.
+        $allowedCountries = $this->allowedCountries();
+
         $this->countries = Country::where('is_active', true)
+            ->when($allowedCountries !== [], fn ($query) => $query->whereIn('cca2', $allowedCountries))
             ->orderBy('name')
             ->pluck('name', 'cca2');
 
@@ -108,8 +115,7 @@ class AddressForm extends ModalComponent
         $this->validate();
 
         try {
-            $addressData = [
-                'user_id' => Auth::id(),
+            $addressData = AddressDataSanitizer::sanitize([
                 'type' => $this->type,
                 'first_name' => $this->first_name,
                 'last_name' => $this->last_name,
@@ -122,7 +128,9 @@ class AddressForm extends ModalComponent
                 'is_active' => true,
                 'is_billing' => $this->type === 'billing',
                 'is_shipping' => $this->type === 'shipping',
-            ];
+            ], $this->country_code);
+
+            $this->assertAllowListCompliance($addressData);
 
             // Check if this is the first address of this type, make it default
             $existingAddresses = Auth::user()->addresses()
@@ -148,7 +156,9 @@ class AddressForm extends ModalComponent
                 $message = __('Address updated successfully');
             } else {
                 // Create new address
-                Address::create($addressData);
+                $address = new Address($addressData);
+                $address->user()->associate(Auth::user());
+                $address->save();
                 $message = __('Address added successfully');
             }
 
@@ -160,6 +170,15 @@ class AddressForm extends ModalComponent
             $this->dispatch('addresses-updated');
             $this->closeModal();
 
+        } catch (ValidationException $e) {
+            foreach ($e->errors() as $field => $messages) {
+                $this->addError($field, $messages[0] ?? __('Failed to save address.'));
+            }
+            Notification::make()
+                ->title(__('Error'))
+                ->body(__('Failed to save address. Please review the highlighted fields.'))
+                ->danger()
+                ->send();
         } catch (\Exception $e) {
             Notification::make()
                 ->title(__('Error'))
@@ -167,6 +186,57 @@ class AddressForm extends ModalComponent
                 ->danger()
                 ->send();
         }
+    }
+
+    /**
+     * Ensure the provided address fragments comply with configured allow-lists.
+     *
+     * @param array<string, mixed> $addressData
+     *
+     * @throws ValidationException
+     */
+    private function assertAllowListCompliance(array $addressData): void
+    {
+        $allowedCountries = $this->allowedCountries();
+        $country = Str::upper((string) ($addressData['country_code'] ?? ''));
+
+        if ($country === '' || ($allowedCountries !== [] && ! in_array($country, $allowedCountries, true))) {
+            throw ValidationException::withMessages(['country_code' => __('The selected country is not supported.')]);
+        }
+
+        $state = (string) ($addressData['state'] ?? '');
+        $allowedRegions = config("addresses.allowed_regions.$country", []);
+        if ($state !== '' && $allowedRegions !== [] && ! in_array($state, $allowedRegions, true)) {
+            throw ValidationException::withMessages(['state' => __('The selected region is not supported for the chosen country.')]);
+        }
+
+        $postal = (string) ($addressData['postal_code'] ?? '');
+        $pattern = config("addresses.postal_code_patterns.$country");
+        if ($postal !== '' && $pattern !== null && preg_match($pattern, $postal) !== 1) {
+            throw ValidationException::withMessages(['postal_code' => __('The postal code format is invalid for the selected country.')]);
+        }
+    }
+
+    /**
+     * Retrieve the allow-listed countries for the modal.
+     *
+     * @return array<int, string>
+     */
+    private function allowedCountries(): array
+    {
+        $configured = config('addresses.allowed_countries', []);
+
+        if ($configured !== []) {
+            return $configured;
+        }
+
+        return Country::query()
+            ->where('is_active', true)
+            ->pluck('cca2')
+            ->map(static fn (string $code): string => Str::upper($code))
+            ->unique()
+            ->values()
+            ->all();
     }
 
     /**
