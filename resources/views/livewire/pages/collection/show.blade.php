@@ -113,13 +113,35 @@
         <div class="mb-6">
             <h2 class="text-xl font-semibold mb-2">{{ __('Filter by') }}</h2>
             <div class="flex flex-wrap items-center gap-2 mb-2">
+                @php
+                    // Normalise all option values once so repeated lookups stay efficient even with mixed payload shapes.
+                    $allAttributeValues = $options->flatMap(static function ($group): \Illuminate\Support\Collection {
+                        // The data_get helper gracefully handles both associative arrays and the legacy array-with-object structure.
+                        return collect(data_get($group, 'values', []));
+                    });
+                @endphp
                 @foreach (collect($selectedValues)->filter() as $valId)
-                    @php($val = $options->flatten(1)->firstWhere('id', (int) $valId) ?? null)
+                    @php
+                        // Resolve the currently iterated filter value by matching against potential identifier fields.
+                        $val = $allAttributeValues->first(static function ($candidate) use ($valId) {
+                            $candidateId = is_array($candidate)
+                                ? ($candidate['id'] ?? $candidate['value_id'] ?? null)
+                                : ($candidate->id ?? null);
+
+                            return (int) $candidateId === (int) $valId;
+                        });
+                    @endphp
                     @if ($val)
+                        @php
+                            // Extract a human-readable label, checking array keys first and then falling back to object properties.
+                            $valueLabel = is_array($val)
+                                ? ($val['label'] ?? $val['name'] ?? $val['value'] ?? '')
+                                : ($val->label ?? $val->name ?? $val->value ?? '');
+                        @endphp
                         <button type="button" wire:click="removeAttributeFilter({{ (int) $valId }})"
                                 wire:confirm="{{ __('translations.confirm_remove_attribute_filter') }}"
                                 class="inline-flex items-center gap-1 text-xs bg-gray-100 rounded-full px-2 py-1">
-                            <span>{{ $val->value }}</span>
+                            <span>{{ $valueLabel }}</span>
                             <span aria-hidden="true">×</span>
                         </button>
                     @endif
@@ -134,14 +156,35 @@
             </div>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 @foreach ($options as $group)
+                    @php
+                        // Determine the attribute label from either the new array payload or the legacy object structure.
+                        $attributeName = data_get($group, 'attribute_name')
+                            ?? data_get($group, 'attribute.name')
+                            ?? '';
+
+                        // Convert the values list into a Laravel collection for consistent iteration semantics.
+                        $values = collect(data_get($group, 'values', []));
+                    @endphp
                     <div>
-                        <div class="text-sm font-medium mb-2">{{ $group['attribute']->name }}</div>
+                        <div class="text-sm font-medium mb-2">{{ $attributeName }}</div>
                         <div class="flex flex-wrap gap-2">
-                            @foreach ($group['values'] as $val)
+                            @foreach ($values as $val)
+                                @php
+                                    // Identify whether the value is the new array representation or the legacy Eloquent model.
+                                    $isArrayValue = is_array($val);
+                                    $valueId = $isArrayValue
+                                        ? ($val['id'] ?? $val['value_id'] ?? $loop->index)
+                                        : ($val->id ?? $loop->index);
+
+                                    // Surface the most descriptive label we can find for the rendered checkbox caption.
+                                    $valueLabel = $isArrayValue
+                                        ? ($val['label'] ?? $val['name'] ?? $val['value'] ?? '')
+                                        : ($val->label ?? $val->name ?? $val->value ?? '');
+                                @endphp
                                 <label class="inline-flex items-center gap-1 text-sm">
                                     <input type="checkbox" wire:model.live="selectedValues"
-                                           value="{{ $val->id }}" />
-                                    <span>{{ $val->value }}</span>
+                                           value="{{ $valueId }}" />
+                                    <span>{{ $valueLabel }}</span>
                                 </label>
                             @endforeach
                         </div>
