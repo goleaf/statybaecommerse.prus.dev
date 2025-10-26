@@ -67,11 +67,15 @@
                         </div>
                         
                         <div class="space-y-2">
-                            <a href="{{ route('cart.index') }}" 
+                            <a wire:navigate
+                               {{-- Maintain sidebar state by navigating client-side --}}
+                               href="{{ route('cart.index') }}"
                                class="block w-full text-center px-4 py-2 bg-gray-100 text-gray-800 rounded-md hover:bg-gray-200 transition-colors">
                                 {{ __('store.nav.cart') }}
                             </a>
-                            <a href="{{ route('checkout.index') }}" 
+                            <a wire:navigate
+                               {{-- Jump into checkout without reloading the Livewire cart widget --}}
+                               href="{{ route('checkout.index') }}"
                                class="block w-full text-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
                                 {{ __('store.checkout.proceed') }}
                             </a>
