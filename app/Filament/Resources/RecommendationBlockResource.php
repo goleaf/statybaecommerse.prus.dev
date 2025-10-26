@@ -253,13 +253,7 @@ final class RecommendationBlockResource extends Resource
      */
     protected static function getTypeOptions(): array
     {
-        return [
-            'featured' => __('recommendation_blocks.types.featured'),
-            'related'  => __('recommendation_blocks.types.related'),
-            'similar'  => __('recommendation_blocks.types.similar'),
-            'trending' => __('recommendation_blocks.types.trending'),
-            'recent'   => __('recommendation_blocks.types.recent'),
-        ];
+        return RecommendationBlockOptions::types();
     }
 
     /**
