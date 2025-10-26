@@ -25,17 +25,17 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Forms\Components\Tabs;
+use Filament\Forms\Components\Tabs\Tab;
+use Filament\Forms\Form;
 use Filament\Forms\Get;
+use Filament\Infolists\Components\Grid as InfolistGrid;
 use Filament\Infolists\Components\IconEntry;
+use Filament\Infolists\Components\Section as InfolistSection;
 use Filament\Infolists\Components\TextEntry;
+use Filament\Infolists\Infolist;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Grid as InfolistGrid;
-use Filament\Schemas\Components\Section as InfolistSection;
-use Filament\Schemas\Components\Section as SchemaSection;
-use Filament\Schemas\Components\Tabs as SchemaTabs;
-use Filament\Schemas\Components\Tabs\Tab as SchemaTab;
-use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -79,15 +79,15 @@ final class DiscountConditionResource extends Resource
         return __('discount_conditions.single');
     }
 
-    public static function form(Schema $schema): Schema
+    public static function form(Form $form): Form
     {
-        return $schema
+        return $form
             ->schema([
-                SchemaTabs::make('discount_condition')
+                Tabs::make('discount_condition')
                     ->tabs([
-                        SchemaTab::make(__('discount_conditions.basic_information'))
+                        Tab::make(__('discount_conditions.basic_information'))
                             ->schema([
-                                SchemaSection::make()
+                                Section::make()
                                     ->columns(2)
                                     ->schema([
                                         Select::make('discount_id')
@@ -96,7 +96,7 @@ final class DiscountConditionResource extends Resource
                                             ->searchable()
                                             ->preload()
                                             ->required(),
-                                        TextInput::make('position')
+                                        // Allow operators to fine-tune how conditions are stacked for evaluation.
                                         TextInput::make('position')
                                             ->label(__('discount_conditions.position'))
                                             ->numeric()
@@ -113,9 +113,9 @@ final class DiscountConditionResource extends Resource
                                             ->default(true),
                                     ]),
                             ]),
-                        SchemaTab::make(__('discount_conditions.condition_settings'))
+                        Tab::make(__('discount_conditions.condition_settings'))
                             ->schema([
-                                SchemaSection::make()
+                                Section::make()
                                     ->columns(2)
                                     ->schema([
                                         Select::make('type')
@@ -123,9 +123,10 @@ final class DiscountConditionResource extends Resource
                                             ->options(static fn (): array => DiscountCondition::getTypes())
                                             ->required()
                                             ->live(),
+                                        // Populate the operator list dynamically based on the selected condition type.
                                         Select::make('operator')
-                                        ->label(__('discount_conditions.operator'))
-                                        ->options(static fn (Get $get): array => DiscountCondition::getOperatorsForType($get('type') ?? ''))
+                                            ->label(__('discount_conditions.operator'))
+                                            ->options(static fn (Get $get): array => DiscountCondition::getOperatorsForType($get('type') ?? ''))
                                             ->required()
                                             ->live(),
                                         Textarea::make('value')
@@ -149,9 +150,9 @@ final class DiscountConditionResource extends Resource
                                             ->dehydrateStateUsing(static fn (?string $state): mixed => self::decodeValueFromTextarea($state)),
                                     ]),
                             ]),
-                        SchemaTab::make(__('discount_conditions.targeting'))
+                        Tab::make(__('discount_conditions.targeting'))
                             ->schema([
-                                SchemaSection::make()
+                                Section::make()
                                     ->columns(2)
                                     ->schema([
                                         Combobox::make('products')
@@ -308,11 +309,11 @@ final class DiscountConditionResource extends Resource
             ->defaultSort('priority', 'asc');
     }
 
-    public static function infolist(Schema $schema): Schema
+    public static function infolist(Infolist $infolist): Infolist
     {
         // Provide the infolist schema using the Filament v4 return type.
-        return $schema
-            ->components([
+        return $infolist
+            ->schema([
                 InfolistSection::make(__('discount_conditions.basic_information'))
                     ->schema([
                         InfolistGrid::make()
