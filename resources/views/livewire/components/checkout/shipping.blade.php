@@ -37,7 +37,7 @@
                                         {{-- Debounced selection calms recalculation requests when toggling addresses. --}}
                                         <input
                                             type="radio"
-                                            wire:model.live.debounce.300ms="shippingAddressId"
+                                            wire:model.live.debounce.400ms="shippingAddressId"
                                             id="shipping-address-{{ $shippingAddress->id }}"
                                             name="shipping"
                                             value="{{ $shippingAddress->id }}"
@@ -96,7 +96,7 @@
                                             {{-- Debounced binding matches the shipping selector for consistent UX. --}}
                                             <input
                                                 type="radio"
-                                                wire:model.live.debounce.300ms="billingAddressId"
+                                                wire:model.live.debounce.400ms="billingAddressId"
                                                 id="billing-address-{{ $billingAddress->id }}"
                                                 name="billing"
                                                 value="{{ $billingAddress->id }}"

@@ -5,9 +5,15 @@ declare(strict_types=1);
 namespace App\Livewire\Components\Checkout;
 
 use App\Models\Address;
+use App\Models\CartItem;
+use App\Models\ShippingOption;
 use App\Services\Shipping\ShippingOptionResolver;
 use Illuminate\Contracts\View\View;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Collection as SupportCollection;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Session;
 use Livewire\Attributes\On;
 use Livewire\Attributes\Validate;
 use Spatie\LivewireWizard\Components\StepComponent;
@@ -19,89 +25,35 @@ use Spatie\LivewireWizard\Components\StepComponent;
  *
  * @property mixed    $options
  * @property int|null $currentSelected
+ *
+ * @method void nextStep()
  */
 class Delivery extends StepComponent
 {
     /**
-     * Normalised shipping options resolved for the current checkout context.
-     *
-     * @var array<int, array{id:int|string,name:string,price:float|int,currency:string,eta:string|null}>
+     * @var array<int, array{id:int,name:string,description:string,price:float,formatted_price:string,estimated_delivery:string,currency_code:string}>
      */
     public array $options = [];
 
+    /**
+     * Track whether the component is currently resolving shipping options so the
+     * view can disable actions and show optimistic UI feedback.
+     */
+    public bool $isResolving = false;
+
     #[Validate('required', message: 'You must select a delivery method')]
     public int|string|null $currentSelected = null;
-
-    /**
-     * Example address structure used by resolver.
-     *
-     * @var array{country:string|null,city:string|null,zip:string|null,street:string|null}
-     */
-    public array $address = [
-        'country' => null,
-        'city'    => null,
-        'zip'     => null,
-        'street'  => null,
-    ];
-
-    /**
-     * Tracks whether shipping options are currently being recomputed.
-     */
-    public bool $calculating = false;
 
     /**
      * Initialize the Livewire component with parameters.
      */
     public function mount(): void
     {
-        // Pull any persisted checkout data so the component starts hydrated.
-        $checkout = session()->get('checkout');
-
-        // Seed the initially selected option from the persisted checkout state.
-        $this->currentSelected = data_get($checkout, 'shipping_option.id');
-
-        // Normalise the stored shipping address into the resolver-friendly format.
-        $this->address = $this->normaliseAddress((array) data_get($checkout, 'shipping_address', []));
-
-        // Resolve shipping options immediately so the delivery step starts hydrated.
-        $this->recalculate();
-    }
-
-    /**
-     * Allow the frontend to explicitly trigger a shipping refresh.
-     *
-     * This method is invoked both on initial render via `wire:init` and when the
-     * shopper taps the "Recalculate" control to pull the latest resolver output.
-     */
-    public function recalculate(): void
-    {
-        // Normalise the identifier from the checkout payload to guard against nulls.
-        $shippingAddressId = data_get(session()->get('checkout'), 'shipping_address.id');
-        $normalizedId = is_numeric($shippingAddressId) ? (int) $shippingAddressId : null;
-
-        $this->recalculateOptions($normalizedId);
-    }
-
-    /**
-     * Refresh shipping options whenever the shipping address changes upstream.
-     */
-    #[On('shipping-address-updated')]
-    public function handleShippingAddressUpdated(?int $shippingAddressId = null): void
-    {
-        // Rehydrate the address using the selected ID before recomputing options.
-        $this->address = $this->resolveAddressFromId($shippingAddressId);
-
-        $this->recalculate();
-    }
-
-    /**
-     * React to inline address field updates so shipping prices stay in sync.
-     */
-    public function updated($prop): void
-    {
-        if (is_string($prop) && str_starts_with($prop, 'address.')) {
-            $this->recalculate();
-        }
+        // Restore the persisted selection so returning visitors keep their previous
+        // choice, then immediately resolve context-aware options for the cart.
+        $storedSelection = data_get(session()->get('checkout'), 'shipping_option.0.id');
+        $this->currentSelected = is_numeric($storedSelection) ? (int) $storedSelection : null;
+        $this->resolveOptions();
     }
 
     /**
@@ -111,38 +63,95 @@ class Delivery extends StepComponent
     {
         $this->validate();
         session()->forget('checkout.shipping_option');
-        // Find the dynamic option computed by the resolver above.
-        $selected = collect($this->options ?? [])->firstWhere('id', $this->currentSelected);
 
-        if ($selected === null) {
-            // Bail out early if the referenced option disappeared between recomputations.
-            $this->addError('currentSelected', __('Select a shipping option'));
+        // Retrieve the hydrated shipping payload that matches the current selection
+        // so we can persist the calculated price back into the session.
+        $optionData = $this->findResolvedOption((int) $this->currentSelected);
+        $optionModel = ShippingOption::query()->find($this->currentSelected);
+
+        if ($optionModel === null || $optionData === null) {
+            // Fall back to validation messaging when the selected option disappears
+            // between renders (for example, after an address change).
+            $this->addError('currentSelected', __('Please choose a valid delivery option.'));
 
             return;
         }
 
-        // Persist dynamic price (what user saw) for later order calculations.
-        session()->put('checkout.shipping_option', [
-            'id'       => $selected['id'],
-            'name'     => $selected['name'],
-            'price'    => $selected['price'],
-            'currency' => $selected['currency'] ?? 'EUR',
-            'eta'      => $selected['eta'] ?? null,
+        $optionPrice = (float) $optionData['price'];
+        $option = array_merge($optionModel->toArray(), [
+            'price'                   => $optionPrice,
+            'formatted_price'         => (string) $optionData['formatted_price'],
+            'estimated_delivery'      => (string) $optionData['estimated_delivery'],
+            'estimated_delivery_text' => (string) $optionData['estimated_delivery'],
         ]);
+        $baseAmount = $optionPrice;
+        $channelUrl = config('app.url');
+        $cartSubtotal = session('cart.subtotal');
+        $subtotal = is_numeric($cartSubtotal) ? (float) $cartSubtotal : 0.0;
+
+        // Apply shipping discount context if any (free shipping or cap)
+        $engine = app(\App\Services\Discounts\DiscountEngine::class);
+        $context = [
+            'currency_code' => current_currency(),
+            'channel_id'    => is_string($channelUrl) ? $channelUrl : null,
+            'user_id'       => Auth::id(),
+            'now'           => now(),
+            'cart'          => ['subtotal' => $subtotal, 'items' => []],
+            'shipping'      => ['base_amount' => $baseAmount],
+        ];
+        $result = $engine->evaluate($context);
+        $discountValue = data_get($result, 'shipping.discount_amount', 0.0);
+        $shippingDiscount = is_numeric($discountValue) ? (float) $discountValue : 0.0;
+        if ($shippingDiscount > 0) {
+            $option['price'] = max(0.0, $baseAmount - $shippingDiscount);
+        }
+
+        // Persist dynamic price (what user saw) for later order calculations.
+        session()->put('checkout.shipping_option', [$option]);
 
         // Notify interested listeners about the selection so totals can refresh.
-        $this->dispatch('shippingOptionSaved', $selected);
+        $this->dispatch('shippingOptionSaved', $option);
         $this->dispatch('cart-price-update');
 
         $this->nextStep();
     }
 
     /**
+     * Handle address-driven shipping refresh requests triggered from the
+     * preceding address step. The Livewire payload supplies the address id and
+     * country code so we can avoid redundant lookups.
+     */
+    #[On('checkout-address-updated')]
+    public function handleCheckoutAddressUpdated(?int $addressId = null, ?string $countryCode = null): void
+    {
+        $this->resolveOptions($addressId, $countryCode);
+    }
+
+    /**
+     * Optimistically update the selection when a radio item is clicked so the UI
+     * reflects the expected choice before the network round trip finishes.
+     */
+    public function selectOption(int $optionId): void
+    {
+        if ($this->findResolvedOption($optionId) === null) {
+            return;
+        }
+
+        $this->currentSelected = $optionId;
+    }
+
+    /**
      * Handle stepInfo functionality with proper error handling.
+     */
+    /**
+     * @return array{label:string, complete:bool}
      */
     public function stepInfo(): array
     {
-        return ['label' => __('Delivery method'), 'complete' => session()->exists('checkout') && data_get(session()->get('checkout'), 'shipping_option') !== null];
+        return [
+            'label'    => __('Delivery method'),
+            'complete' => session()->exists('checkout') && data_get(session()->get('checkout'), 'shipping_option') !== null,
+        ];
     }
 
     /**
@@ -154,79 +163,123 @@ class Delivery extends StepComponent
     }
 
     /**
-     * Pull fresh options from the resolver so shipping reflects the latest address data.
+     * Resolve the current shipping options for the active cart and address.
      */
-    private function recalculate(): void
+    private function resolveOptions(?int $addressId = null, ?string $countryCode = null): void
     {
-        // Prevent stale session data from polluting downstream calculations.
-        session()->forget('checkout.shipping_option');
+        $this->isResolving = true;
 
-        // Toggle the loading indicator so the frontend can show feedback.
-        $this->calculating = true;
+        $resolver = app(ShippingOptionResolver::class);
+        $cartItems = $this->getCartItems();
+        /** @var SupportCollection<int, array{id:int,name:string,price:float,formatted_price:string,estimated_delivery:string}> $resolved */
+        $resolved = $resolver->resolve($cartItems->collect(), $countryCode ?? $this->resolveCountryCode($addressId));
 
-        try {
-            $resolver = app(ShippingOptionResolver::class);
+        $optionIds = $resolved
+            ->pluck('id')
+            ->filter(static fn ($id): bool => is_numeric($id))
+            ->map(static fn ($id): int => (int) $id);
 
-            $options = $resolver->forCart(user: auth()->user(), destination: $this->address);
+        /** @var SupportCollection<int, ShippingOption> $optionModels */
+        $optionModels = ShippingOption::query()->whereIn('id', $optionIds)->get()->keyBy('id');
 
-            $this->options = collect($options)
-                ->map(function (array $option): array {
-                    // Collapse resolver payload into the minimal set required by the checkout UI.
-                    return [
-                        'id'       => $option['id'],
-                        'name'     => $option['name'],
-                        'price'    => $option['price'],
-                        'currency' => $option['currency'] ?? 'EUR',
-                        'eta'      => $option['eta'] ?? ($option['estimated_delivery'] ?? null),
-                    ];
-                })
-                ->values()
-                ->all();
+        // Normalise the resolved dataset so the view only needs to consume a
+        // predictable array structure, regardless of the underlying model state.
+        $this->options = $resolved
+            ->map(function (array $option) use ($optionModels): array {
+                $identifier = (int) $option['id'];
+                $model = $optionModels->get($identifier);
+                $name = (string) $option['name'];
+                $price = (float) $option['price'];
+                $formatted = (string) $option['formatted_price'];
+                $eta = (string) $option['estimated_delivery'];
+                $description = $model !== null ? (string) $model->description : '';
+                $currency = $model !== null ? (string) $model->currency_code : current_currency();
 
-            $availableIds = collect($this->options)->pluck('id');
+                return [
+                    'id'                 => $identifier,
+                    'name'               => $name,
+                    'description'        => $description,
+                    'price'              => $price,
+                    'formatted_price'    => $formatted,
+                    'estimated_delivery' => $eta,
+                    'currency_code'      => $currency,
+                ];
+            })
+            ->values()
+            ->all();
 
-            if ($availableIds->doesntContain($this->currentSelected)) {
-                // Default to the first available option to keep the UI interactive.
-                $this->currentSelected = $availableIds->first();
-            }
-        } finally {
-            // Always clear the loading flag, even if the resolver fails mid-flight.
-            $this->calculating = false;
+        if ($this->currentSelected !== null && $this->findResolvedOption((int) $this->currentSelected) === null) {
+            $this->currentSelected = null;
         }
+
+        if ($this->currentSelected === null && $this->options !== []) {
+            $firstIdentifier = Arr::get($this->options, '0.id');
+            $this->currentSelected = is_numeric($firstIdentifier) ? (int) $firstIdentifier : null;
+        }
+
+        $this->isResolving = false;
     }
 
     /**
-     * Normalise the address array into the resolver-friendly structure.
+     * Attempt to find the resolved option for a specific identifier.
      *
-     * @param  array<string, mixed>  $raw
-     * @return array{country:string|null,city:string|null,zip:string|null,street:string|null}
+     * @return array{id:int,name:string,description:string,price:float,formatted_price:string,estimated_delivery:string,currency_code:string}|null
      */
-    private function normaliseAddress(array $raw): array
+    private function findResolvedOption(int $optionId): ?array
     {
-        return [
-            'country' => $raw['country_code'] ?? $raw['country'] ?? null,
-            'city'    => $raw['city'] ?? ($raw['city_name'] ?? null),
-            'zip'     => $raw['postal_code'] ?? $raw['zip'] ?? null,
-            'street'  => $raw['address_line_1'] ?? $raw['street'] ?? null,
-        ];
-    }
+        foreach ($this->options as $option) {
+            if (! is_array($option)) {
+                continue;
+            }
 
-    /**
-     * Load the selected address from storage and normalise it for resolver usage.
-     */
-    private function resolveAddressFromId(?int $shippingAddressId = null): array
-    {
-        if ($shippingAddressId !== null) {
-            $address = Address::query()
-                ->where('user_id', Auth::id())
-                ->find($shippingAddressId);
-
-            if ($address !== null) {
-                return $this->normaliseAddress($address->toArray());
+            $identifier = $option['id'] ?? null;
+            if (is_numeric($identifier) && (int) $identifier === $optionId) {
+                /** @var array{id:int,name:string,description:string,price:float,formatted_price:string,estimated_delivery:string,currency_code:string} $option */
+                return $option;
             }
         }
 
-        // Fallback to any persisted checkout data when no explicit ID is provided.
-        return $this->normaliseAddress((array) data_get(session()->get('checkout'), 'shipping_address', []));
+        return null;
+    }
+
+    /**
+     * Load the cart items for the active shopper so the shipping resolver can
+     * inspect weights and order totals.
+     *
+     * @return EloquentCollection<int, CartItem>
+     */
+    private function getCartItems(): EloquentCollection
+    {
+        $query = CartItem::query()->with('product');
+
+        if (Auth::check()) {
+            $query->forUser((int) Auth::id());
+        } else {
+            $query->forSession(Session::getId());
+        }
+
+        return $query->get();
+    }
+
+    /**
+     * Derive the most relevant country code from either the dispatched event or
+     * the persisted checkout session so pricing stays accurate.
+     */
+    private function resolveCountryCode(?int $addressId = null): ?string
+    {
+        if ($addressId !== null) {
+            $address = Address::query()
+                ->when(Auth::check(), static fn ($query) => $query->where('user_id', Auth::id()))
+                ->find($addressId);
+
+            $code = $address?->getAttribute('country_code');
+            if (is_string($code) && $code !== '') {
+                return $code;
+            }
+        }
+
+        $storedCountry = data_get(session()->get('checkout'), 'shipping_address.country_code');
+
+        return is_string($storedCountry) && $storedCountry !== '' ? $storedCountry : null;
     }
 }

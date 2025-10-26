@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Livewire\Components\Checkout;
 
 use App\Models\Address;
+use App\Models\User;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\On;
@@ -19,6 +20,8 @@ use Spatie\LivewireWizard\Components\StepComponent;
  * @property int|null $shippingAddressId
  * @property bool     $sameAsShipping
  * @property int|null $billingAddressId
+ *
+ * @method void nextStep()
  */
 class Shipping extends StepComponent
 {
@@ -75,8 +78,10 @@ class Shipping extends StepComponent
     public function mount(): void
     {
         $checkout = session()->get('checkout');
-        $this->shippingAddressId = data_get($checkout, 'shipping_address.id');
-        $this->billingAddressId = data_get($checkout, 'billing_address.id');
+        $storedShipping = data_get($checkout, 'shipping_address.id');
+        $storedBilling = data_get($checkout, 'billing_address.id');
+        $this->shippingAddressId = is_numeric($storedShipping) ? (int) $storedShipping : null;
+        $this->billingAddressId = is_numeric($storedBilling) ? (int) $storedBilling : null;
         $this->sameAsShipping = (bool) data_get($checkout, 'same_as_shipping');
     }
 
@@ -89,16 +94,76 @@ class Shipping extends StepComponent
         if (session()->exists('checkout')) {
             session()->forget('checkout');
         }
-        session()->put('checkout', ['shipping_address' => $shippingAddress = Address::query()->find($this->shippingAddressId)->toArray(), 'same_as_shipping' => $this->sameAsShipping, 'billing_address' => $this->sameAsShipping ? $shippingAddress : Address::query()->find($this->billingAddressId)->toArray()]);
+        if (! Auth::check()) {
+            return;
+        }
+
+        $shippingAddress = Address::query()
+            ->where('user_id', Auth::id())
+            ->find($this->shippingAddressId);
+
+        if ($shippingAddress === null) {
+            $this->addError('shippingAddressId', __('Please choose a valid delivery address.'));
+
+            return;
+        }
+
+        $billingAddress = $this->sameAsShipping
+            ? $shippingAddress
+            : Address::query()->where('user_id', Auth::id())->find($this->billingAddressId);
+
+        if (! $this->sameAsShipping && $billingAddress === null) {
+            $this->addError('billingAddressId', __('Please choose a valid billing address.'));
+
+            return;
+        }
+
+        $shippingPayload = $shippingAddress->toArray();
+        $billingPayload = $this->sameAsShipping ? $shippingPayload : ($billingAddress?->toArray() ?? []);
+
+        session()->put('checkout', [
+            'shipping_address' => $shippingPayload,
+            'same_as_shipping' => $this->sameAsShipping,
+            'billing_address'  => $billingPayload,
+        ]);
+        // Notify downstream checkout steps that a definitive shipping address was
+        // persisted so they can refresh shipping quotes without waiting for a
+        // manual page transition.
+        $this->broadcastShippingContext($this->shippingAddressId);
         $this->nextStep();
+    }
+
+    /**
+     * React to radio button updates in near real-time so the delivery step can
+     * re-evaluate pricing with a slight debounce applied by the Livewire binder.
+     */
+    public function updatedShippingAddressId(mixed $addressId): void
+    {
+        $this->shippingAddressId = is_numeric($addressId) ? (int) $addressId : null;
+        $this->broadcastShippingContext($this->shippingAddressId);
+    }
+
+    /**
+     * Normalise billing id updates so the typed property stays in sync with the
+     * Livewire payload while validation continues to work as expected.
+     */
+    public function updatedBillingAddressId(mixed $addressId): void
+    {
+        $this->billingAddressId = is_numeric($addressId) ? (int) $addressId : null;
     }
 
     /**
      * Handle stepInfo functionality with proper error handling.
      */
+    /**
+     * @return array{label:string, complete:bool}
+     */
     public function stepInfo(): array
     {
-        return ['label' => __('Address'), 'complete' => session()->exists('checkout') && data_get(session()->get('checkout'), 'shipping_address') !== null];
+        return [
+            'label'    => __('Address'),
+            'complete' => session()->exists('checkout') && data_get(session()->get('checkout'), 'shipping_address') !== null,
+        ];
     }
 
     /**
@@ -107,8 +172,39 @@ class Shipping extends StepComponent
     #[On('addresses-updated')]
     public function render(): View
     {
-        $addresses = Auth::user()->addresses()->get()->groupBy('type');
+        $user = Auth::user();
+        $addresses = $user instanceof User ? $user->addresses()->get()->groupBy('type') : collect();
+
+        // Whenever address records mutate (create/update/delete) we emit the
+        // current selection so dependent components can rehydrate gracefully.
+        $this->broadcastShippingContext($this->shippingAddressId);
 
         return view('livewire.components.checkout.shipping', ['addresses' => $addresses]);
+    }
+
+    /**
+     * Broadcast the active shipping address context (id + country code) to other
+     * checkout components so they can refresh their state without duplication.
+     */
+    private function broadcastShippingContext(?int $addressId): void
+    {
+        if ($addressId === null || ! Auth::check()) {
+            return;
+        }
+
+        $address = Address::query()
+            ->where('user_id', Auth::id())
+            ->find($addressId);
+
+        if ($address === null) {
+            return;
+        }
+
+        $countryCode = $address->getAttribute('country_code');
+        if (! is_string($countryCode) || $countryCode === '') {
+            return;
+        }
+
+        $this->dispatch('checkout-address-updated', addressId: $address->getKey(), countryCode: $countryCode);
     }
 }
