@@ -35,10 +35,13 @@ final class DiscountConditionController extends Controller
         if ($request->filled('operator')) {
             $query->byOperator($request->get('operator'));
         }
-        $conditions = $query->get()->skipWhile(function ($condition) {
-            // Skip discount conditions that are not properly configured for display
-            return empty($condition->type) || ! $condition->is_active || empty($condition->discount) || empty($condition->discount_id) || empty($condition->operator);
-        })->paginate(20);
+        $conditions = $query
+            // Filter out discount conditions that are missing the key attributes required for the index view.
+            ->whereNotNull('type')
+            ->whereNotNull('discount_id')
+            ->whereNotNull('operator')
+            ->whereHas('discount')
+            ->paginate(20);
         $discounts = Discount::active()->get();
         $types = DiscountCondition::getTypes();
         $operators = DiscountCondition::getOperators();
