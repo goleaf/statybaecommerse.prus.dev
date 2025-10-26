@@ -58,3 +58,39 @@ it('prevents duplicate registrations using the same email address', function ():
     expect(User::where('email', 'duplicate@example.com')->count())->toBe(1);
     expect(Auth::check())->toBeFalse();
 });
+
+it('requires the password confirmation field before creating an account', function (): void {
+    // Act: attempt to register without supplying the confirmation field payload.
+    $component = Livewire::test(Register::class)
+        ->set('registrationForm.first_name', 'Jamie')
+        ->set('registrationForm.last_name', 'Rivera')
+        ->set('registrationForm.email', 'jamie@example.com')
+        ->set('registrationForm.password', 'Password123!')
+        ->set('registrationForm.password_confirmation', '')
+        ->call('register');
+
+    // Assert: ensure the confirmation field is treated as required and no user gets persisted.
+    $component->assertHasErrors([
+        'registrationForm.password_confirmation' => ['required'],
+        'registrationForm.password' => ['confirmed'],
+    ]);
+    expect(User::where('email', 'jamie@example.com')->exists())->toBeFalse();
+    expect(Auth::check())->toBeFalse();
+});
+
+it('normalizes uppercase email input before storing the user record', function (): void {
+    // Act: submit mixed-case email data to confirm the lowercase validation mutates the payload.
+    $component = Livewire::test(Register::class)
+        ->set('registrationForm.first_name', 'Casey')
+        ->set('registrationForm.last_name', 'Morgan')
+        ->set('registrationForm.email', 'UPPER@Example.COM')
+        ->set('registrationForm.password', 'Password123!')
+        ->set('registrationForm.password_confirmation', 'Password123!')
+        ->call('register');
+
+    // Assert: confirm validation passes and that the stored email has been normalized.
+    $component->assertHasNoErrors();
+    $user = User::where('email', 'upper@example.com')->first();
+    expect($user)->not->toBeNull();
+    expect($user->email)->toBe('upper@example.com');
+});
