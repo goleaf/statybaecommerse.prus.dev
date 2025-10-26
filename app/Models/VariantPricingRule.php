@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\OrdersByName;
 use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\EnabledScope;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
@@ -31,7 +32,9 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 #[ScopedBy([ActiveScope::class, EnabledScope::class])]
 final class VariantPricingRule extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory;
+    use OrdersByName;
+    use SoftDeletes;
 
     protected $table = 'variant_pricing_rules';
 
@@ -50,6 +53,11 @@ final class VariantPricingRule extends Model
         'valid_until',
         'description',
     ];
+
+    /**
+     * Prefer the public-facing name column when applying shared alphabetical ordering.
+     */
+    protected string $nameColumn = 'name';
 
     protected function casts(): array
     {

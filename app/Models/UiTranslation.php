@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\OrdersByName;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -31,6 +32,7 @@ use Illuminate\Database\Eloquent\Model;
 final class UiTranslation extends Model
 {
     use HasFactory;
+    use OrdersByName;
 
     protected $table = 'ui_translations';
 
@@ -41,6 +43,11 @@ final class UiTranslation extends Model
         'group',
         'metadata',
     ];
+
+    /**
+     * Sort translations alphabetically by their key so maintenance screens remain predictable.
+     */
+    protected string $nameColumn = 'key';
 
     protected function casts(): array
     {
