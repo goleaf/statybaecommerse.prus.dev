@@ -13,6 +13,9 @@ use Filament\Pages\Page;
 use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
+use Illuminate\Contracts\Pagination\CursorPaginator;
+use Illuminate\Contracts\Pagination\Paginator;
+use Illuminate\Database\Eloquent\Builder;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
 use Hydrat\TableLayoutToggle\Concerns\HasToggleableTable;
@@ -21,7 +24,9 @@ final class InventoryManagement extends Page implements HasTable
 {
     use ConfiguresToggleableTableLayout;
     use HasToggleableTable;
-    use InteractsWithTable;
+    use InteractsWithTable {
+        InteractsWithTable::paginateTableQuery as protected basePaginateTableQuery;
+    }
 
     /**
      * Aligns the navigation icon with Filament's BackedEnum-aware union expectations and communicates
@@ -88,5 +93,21 @@ final class InventoryManagement extends Page implements HasTable
             ]);
 
         return $this->applyToggleableTableLayout($table); // Reuse the helper to apply saved column visibility.
+    }
+
+    /**
+     * Override the paginator so the generated links retain the current query string filters.
+     */
+    protected function paginateTableQuery(Builder $query): Paginator|CursorPaginator
+    {
+        // Defer to the base Filament pagination logic before adjusting the query string behaviour.
+        $paginator = $this->basePaginateTableQuery($query);
+
+        // Append the existing request query parameters (product, location, etc.) to every page link.
+        if (method_exists($paginator, 'withQueryString')) {
+            return $paginator->withQueryString();
+        }
+
+        return $paginator;
     }
 }
