@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\OrdersByName;
 use App\Models\Scopes\UserOwnedScope;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -29,11 +30,26 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 final class UserBehavior extends Model
 {
     use HasFactory;
+    use OrdersByName;
 
-    protected $fillable = ['user_id', 'session_id', 'product_id', 'category_id', 'behavior_type', 'metadata', 'referrer', 'user_agent', 'ip_address', 'created_at'];
+    /**
+     * Configure the OrdersByName trait to rely on the event column for ordering analytics records.
+     */
+    protected string $nameColumn = 'event';
 
-    protected $casts = ['metadata' => 'array', 'created_at' => 'datetime'];
+    /**
+     * Allow mass assignment of the core tracking columns required for capturing behaviour snapshots.
+     */
+    protected $fillable = ['user_id', 'event', 'payload', 'occurred_at'];
 
+    /**
+     * Ensure JSON payloads become arrays automatically and that occurred_at is treated as a Carbon instance.
+     */
+    protected $casts = ['payload' => 'array', 'occurred_at' => 'datetime'];
+
+    /**
+     * Disable automatic timestamps so the occurred_at field remains the single source of truth.
+     */
     public $timestamps = false;
 
     /**
@@ -41,66 +57,7 @@ final class UserBehavior extends Model
      */
     public function user(): BelongsTo
     {
+        // Link each behaviour entry back to the originating user for downstream analytics queries.
         return $this->belongsTo(User::class);
-    }
-
-    /**
-     * Handle product functionality with proper error handling.
-     */
-    public function product(): BelongsTo
-    {
-        // Avoid filtering analytics associations by storefront visibility rules so tests and
-        // reporting tools can always resolve the related product instance.
-        return $this->belongsTo(Product::class)->withoutGlobalScopes();
-    }
-
-    /**
-     * Handle category functionality with proper error handling.
-     */
-    public function category(): BelongsTo
-    {
-        // Categories can be archived or hidden, yet their behavioral data remains valuable,
-        // so bypass global scopes when hydrating this relationship.
-        return $this->belongsTo(Category::class)->withoutGlobalScopes();
-    }
-
-    /**
-     * Handle scopeRecent functionality with proper error handling.
-     *
-     * @param mixed $query
-     */
-    public function scopeRecent($query, int $days = 30)
-    {
-        return $query->where('created_at', '>=', now()->subDays($days));
-    }
-
-    /**
-     * Handle scopeByType functionality with proper error handling.
-     *
-     * @param mixed $query
-     */
-    public function scopeByType($query, string $type)
-    {
-        return $query->where('behavior_type', $type);
-    }
-
-    /**
-     * Handle scopeByUser functionality with proper error handling.
-     *
-     * @param mixed $query
-     */
-    public function scopeByUser($query, int $userId)
-    {
-        return $query->where('user_id', $userId);
-    }
-
-    /**
-     * Handle scopeBySession functionality with proper error handling.
-     *
-     * @param mixed $query
-     */
-    public function scopeBySession($query, string $sessionId)
-    {
-        return $query->where('session_id', $sessionId);
     }
 }
