@@ -4,10 +4,17 @@ declare(strict_types=1);
 
 namespace App\Livewire\Pages\Collection;
 
+use App\Models\AttributeValue;
 use App\Models\Collection as CollectionModel;
+use App\Models\CollectionRule;
 use App\Models\Product;
+use App\Models\ProductVariant;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Contracts\View\View;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Collection;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use BackedEnum;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Url;
@@ -21,9 +28,12 @@ use Livewire\Component;
  * @property string $slug
  * @property CollectionModel|null $collection
  * @property int $page
- * @property array $brandIds
+ * @property array<int, int|string> $brandIds
  * @property string|null $sort
- * @property array $selectedValues
+ * @property array<int, int|string> $selectedValues
+ * @property-read LengthAwarePaginator<int, Product> $products
+ * @property-read Collection<int, array{attribute_id:int, attribute_name:string, values:Collection<int, array{id:int, name:string, selected:bool}>}> $availableOptions
+ * @property-read Collection<int, \App\Models\Brand> $availableBrands
  */
 #[Layout('components.layouts.base')]
 class Show extends Component
@@ -35,12 +45,18 @@ class Show extends Component
     #[Url]
     public int $page = 1;
 
+    /**
+     * @var array<int, int|string>
+     */
     #[Url]
     public array $brandIds = [];
 
     #[Url]
     public ?string $sort = null;
 
+    /**
+     * @var array<int, int|string>
+     */
     #[Url]
     public array $selectedValues = [];
 
@@ -50,15 +66,17 @@ class Show extends Component
     public function mount(CollectionModel $collection): void
     {
         abort_if(! app_feature_enabled('collection'), 404);
-        // Ensure collection is enabled
+
         if (! $collection->is_enabled) {
             abort(404);
         }
+
         $this->collection = $collection;
         $this->slug = $collection->slug;
-        // Handle translation redirects if needed
+
         $locale = app()->getLocale();
         $canonical = $this->collection->translations()->where('locale', $locale)->value('slug') ?: $this->collection->slug;
+
         if ($canonical && $canonical !== $this->slug) {
             redirect()->to(route('localized.collections.show', ['locale' => $locale, 'collection' => $canonical]), 301)->send();
             exit;
@@ -66,183 +84,167 @@ class Show extends Component
     }
 
     /**
-     * Handle products functionality with proper error handling.
+     * Resolve the paginated product list for the current collection context.
+     *
+     * @return LengthAwarePaginator<int, Product>
      */
     #[Computed]
     public function products(): LengthAwarePaginator
     {
         $collection = $this->collection;
-        $query = Product::query()->select(['id', 'slug', 'name', 'summary', 'brand_id', 'published_at'])->with(['brand:id,slug,name', 'media', 'prices' => function ($pq) {
-            $pq->whereRelation('currency', 'code', current_currency());
-        }, 'prices.currency:id,code'])->withCount('variants');
-        $selectedBrandIds = collect($this->brandIds)->map(fn ($v) => (int) $v)->filter()->values();
-        $selected = collect($this->selectedValues)->map(fn ($v) => (int) $v)->filter()->values();
-        if ($selected->isNotEmpty()) {
-            $query->whereHas('variants.values', function ($q) use ($selected) {
-                $q->whereIn('id', $selected->all());
+
+        $query = Product::query()
+            ->select(['id', 'slug', 'name', 'summary', 'brand_id', 'published_at'])
+            ->withCount('variants');
+
+        $query->with(['brand:id,slug,name', 'media', 'prices.currency:id,code']);
+
+        $query->with(['prices' => static function (Builder $priceQuery): void {
+            // Only eager load prices for the active currency to avoid leaking unused rows.
+            $priceQuery->whereRelation('currency', 'code', current_currency());
+        }]);
+
+        $selectedBrandIds = collect($this->brandIds)
+            ->map(static fn (mixed $value): int => (int) $value)
+            ->filter()
+            ->values();
+
+        $selectedAttributes = collect($this->selectedValues)
+            ->map(static fn (mixed $value): int => (int) $value)
+            ->filter()
+            ->values();
+
+        if ($selectedAttributes->isNotEmpty()) {
+            $query->whereHas('variants.values', static function (Builder $valueQuery) use ($selectedAttributes): void {
+                // Limit products to those that expose the selected attribute values.
+                $valueQuery->whereIn('id', $selectedAttributes->all());
             });
         }
+
         if ($selectedBrandIds->isNotEmpty()) {
             $query->whereIn('brand_id', $selectedBrandIds->all());
         }
-        if ($collection?->isAuto()) {
-            // Apply automatic rules defined in Shopper collection rules
-            $rules = $collection->rules()->get();
-            $matchAll = ($collection->match_conditions->value ?? $collection->match_conditions ?? 'all') === 'all';
-            $query->where(function ($outer) use ($rules, $matchAll) {
-                // Group rules by type
-                $byType = $rules->groupBy(fn ($r) => $r->rule->value ?? (string) $r->rule);
-                $applyRule = function ($q, $r) {
-                    $op = $r->operator->value ?? (string) $r->operator;
-                    $val = $r->value;
-                    switch ($r->rule->value ?? (string) $r->rule) {
-                        case 'product_title':
-                            $like = '%'.str_replace(['%', '_'], ['\%', '\_'], $val).'%';
 
-                            return $q->where(function ($w) use ($op, $like) {
-                                if (in_array($op, ['contains', 'starts_with', 'ends_with'])) {
-                                    $w->where('name', 'like', $like);
-                                } elseif ($op === 'not_contains') {
-                                    $w->where('name', 'not like', $like);
-                                } elseif ($op === 'equals_to') {
-                                    $w->where('name', '=', $like);
-                                } elseif ($op === 'not_equals_to') {
-                                    $w->where('name', '!=', $like);
-                                }
-                            });
-                        case 'product_price':
-                            return $q->whereHas('prices', function ($pq) use ($op, $val) {
-                                $pq->whereRelation('currency', 'code', current_currency());
-                                $pq->when(in_array($op, ['less_than', 'greater_than', 'equals_to', 'not_equals_to']), function ($w) use ($op, $val) {
-                                    return match ($op) {
-                                        'less_than' => $w->where('amount', '<', (float) $val),
-                                        'greater_than' => $w->where('amount', '>', (float) $val),
-                                        'equals_to' => $w->where('amount', '=', (float) $val),
-                                        'not_equals_to' => $w->where('amount', '!=', (float) $val),
-                                    };
-                                });
-                            });
-                        case 'product_brand':
-                            return $q->when(is_numeric($val), fn ($bq) => $bq->where('brand_id', (int) $val));
-                        case 'product_category':
-                            return $q->whereHas('categories', fn ($cq) => $cq->where('id', (int) $val));
-                        default:
-                            return $q;
-                    }
-                };
-                if ($matchAll) {
-                    foreach ($rules as $r) {
-                        $outer->where(fn ($w) => $applyRule($w, $r));
-                    }
-                } else {
-                    $outer->where(function ($any) use ($rules, $applyRule) {
-                        foreach ($rules as $r) {
-                            $any->orWhere(fn ($w) => $applyRule($w, $r));
-                        }
-                    });
-                }
-            });
-        } else {
-            $query->whereHas('collections', fn ($cq) => $cq->where('collections.id', $collection?->id));
-        }
-        $query->where('is_visible', true)->whereNotNull('published_at')->where('published_at', '<=', now());
-        switch ($this->sort) {
-            case 'name_asc':
-                $query->orderBy('name');
-                break;
-            case 'name_desc':
-                $query->orderByDesc('name');
-                break;
-            default:
-                $query->orderByDesc('published_at');
-        }
+        $this->applyCollectionScope($query, $collection);
+
+        $query
+            ->where('is_visible', true)
+            ->whereNotNull('published_at')
+            ->where('published_at', '<=', now());
+
+        match ($this->sort) {
+            'name_asc' => $query->orderBy('name'),
+            'name_desc' => $query->orderByDesc('name'),
+            default => $query->orderByDesc('published_at'),
+        };
 
         return $query->paginate(12);
     }
 
     /**
-     * Handle getAvailableOptionsProperty functionality with proper error handling.
+     * Provide the available attribute filters for the current collection.
      *
-     * @return Illuminate\Support\Collection
+     * @return Collection<int, array{attribute_id:int, attribute_name:string, values:Collection<int, array{id:int, name:string, selected:bool}>}>
      */
-    public function getAvailableOptionsProperty(): \Illuminate\Support\Collection
+    #[Computed]
+    public function getAvailableOptionsProperty(): Collection
     {
         $collection = $this->collection;
-        $builder = Product::query()->where('is_visible', true)->whereNotNull('published_at')->where('published_at', '<=', now());
-        if ($collection?->isAuto()) {
-            $rules = $collection->rules()->get();
-            $matchAll = ($collection->match_conditions->value ?? $collection->match_conditions ?? 'all') === 'all';
-            $builder->where(function ($outer) use ($rules, $matchAll) {
-                $applyRule = function ($q, $r) {
-                    $op = $r->operator->value ?? (string) $r->operator;
-                    $val = $r->value;
-                    switch ($r->rule->value ?? (string) $r->rule) {
-                        case 'product_title':
-                            $like = '%'.str_replace(['%', '_'], ['\%', '\_'], $val).'%';
 
-                            return $q->where(function ($w) use ($op, $like) {
-                                if (in_array($op, ['contains', 'starts_with', 'ends_with'])) {
-                                    $w->where('name', 'like', $like);
-                                } elseif ($op === 'not_contains') {
-                                    $w->where('name', 'not like', $like);
-                                } elseif ($op === 'equals_to') {
-                                    $w->where('name', '=', $like);
-                                } elseif ($op === 'not_equals_to') {
-                                    $w->where('name', '!=', $like);
-                                }
-                            });
-                        case 'product_price':
-                            return $q->whereHas('prices', function ($pq) use ($op, $val) {
-                                $pq->whereRelation('currency', 'code', current_currency());
-                                $pq->when(in_array($op, ['less_than', 'greater_than', 'equals_to', 'not_equals_to']), function ($w) use ($op, $val) {
-                                    return match ($op) {
-                                        'less_than' => $w->where('amount', '<', (float) $val),
-                                        'greater_than' => $w->where('amount', '>', (float) $val),
-                                        'equals_to' => $w->where('amount', '=', (float) $val),
-                                        'not_equals_to' => $w->where('amount', '!=', (float) $val),
-                                    };
-                                });
-                            });
-                        case 'product_brand':
-                            return $q->when(is_numeric($val), fn ($bq) => $bq->where('brand_id', (int) $val));
-                        case 'product_category':
-                            return $q->whereHas('categories', fn ($cq) => $cq->where('id', (int) $val));
-                        default:
-                            return $q;
+        $builder = Product::query()
+            ->where('is_visible', true)
+            ->whereNotNull('published_at')
+            ->where('published_at', '<=', now());
+
+        $this->applyCollectionScope($builder, $collection);
+
+        /** @var EloquentCollection<int, Product> $products */
+        $products = $builder->with(['variants.values.attribute'])->get();
+
+        $selectedValues = collect($this->selectedValues)
+            ->map(static fn (mixed $value): int => (int) $value)
+            ->filter()
+            ->values();
+
+        $options = [];
+
+        foreach ($products as $product) {
+            /** @var EloquentCollection<int, ProductVariant> $variants */
+            $variants = $product->variants;
+
+            foreach ($variants as $variant) {
+                /** @var EloquentCollection<int, AttributeValue> $values */
+                $values = $variant->values;
+
+                foreach ($values as $value) {
+                    $attribute = $value->attribute;
+
+                    if ($attribute === null) {
+                        continue;
                     }
-                };
-                if ($matchAll) {
-                    foreach ($rules as $r) {
-                        $outer->where(fn ($w) => $applyRule($w, $r));
+
+                    $attributeId = (int) $value->attribute_id;
+
+                    if (! array_key_exists($attributeId, $options)) {
+                        // Lazily build the option container for the attribute the first time we encounter it.
+                        $options[$attributeId] = [
+                            'attribute_id' => $attributeId,
+                            'attribute_name' => (string) $attribute->name,
+                            'values' => [],
+                        ];
                     }
-                } else {
-                    $outer->where(function ($any) use ($rules, $applyRule) {
-                        foreach ($rules as $r) {
-                            $any->orWhere(fn ($w) => $applyRule($w, $r));
-                        }
-                    });
+
+                    $options[$attributeId]['values'][$value->id] = [
+                        'id' => (int) $value->id,
+                        'name' => (string) $value->name,
+                        'selected' => $selectedValues->contains((int) $value->id),
+                    ];
                 }
-            });
-        } else {
-            $builder->whereHas('collections', fn ($cq) => $cq->where('collections.id', $collection?->id));
+            }
         }
-        $products = $builder->with(['variants.values.attribute'])->limit(100)->get();
 
-        return $products
-            ->pluck('variants')
-            ->flatten()
-            ->pluck('values')
-            ->flatten()
-            ->unique('id')
-            ->groupBy('attribute_id')
-            ->map(fn ($values) => [
-                'attribute' => $values->first()?->attribute,
-                'values' => $values->sortBy('position')->values(),
-            ]);
+        return collect($options)
+            ->map(static function (array $option): array {
+                // Normalize nested values to sequential collections for predictable rendering.
+                $option['values'] = collect($option['values'])->values();
+
+                return $option;
+            })
+            ->values();
     }
 
     /**
-     * Handle clearAttributeFilters functionality with proper error handling.
+     * Resolve the list of brands that are available to be filtered within the collection.
+     *
+     * @return Collection<int, \App\Models\Brand>
+     */
+    #[Computed]
+    public function getAvailableBrandsProperty(): Collection
+    {
+        $collection = $this->collection;
+
+        $builder = Product::query()
+            ->select(['id', 'brand_id'])
+            ->with(['brand:id,name'])
+            ->where('is_visible', true)
+            ->whereNotNull('published_at')
+            ->where('published_at', '<=', now());
+
+        $this->applyCollectionScope($builder, $collection);
+
+        return $builder
+            ->whereNotNull('brand_id')
+            ->with('brand')
+            ->get()
+            ->pluck('brand')
+            ->filter()
+            ->unique('id')
+            ->sortBy('name')
+            ->values();
+    }
+
+    /**
+     * Clear all attribute filters at once.
      */
     public function clearAttributeFilters(): void
     {
@@ -251,16 +253,19 @@ class Show extends Component
     }
 
     /**
-     * Handle removeAttributeFilter functionality with proper error handling.
+     * Remove a specific attribute value from the filter set.
      */
     public function removeAttributeFilter(int $valueId): void
     {
-        $this->selectedValues = array_values(array_filter($this->selectedValues, static fn ($id) => (int) $id !== $valueId));
+        $this->selectedValues = array_values(array_filter(
+            $this->selectedValues,
+            static fn (int|string $id): bool => (int) $id !== $valueId
+        ));
         $this->page = 1;
     }
 
     /**
-     * Handle updatedSort functionality with proper error handling.
+     * Reset pagination whenever the sort order changes.
      */
     public function updatedSort(): void
     {
@@ -268,79 +273,7 @@ class Show extends Component
     }
 
     /**
-     * Handle getAvailableBrandsProperty functionality with proper error handling.
-     *
-     * @return Illuminate\Support\Collection
-     */
-    public function getAvailableBrandsProperty(): \Illuminate\Support\Collection
-    {
-        $collection = $this->collection;
-        $builder = Product::query()->select(['id', 'brand_id'])->with(['brand:id,name'])->where('is_visible', true)->whereNotNull('published_at')->where('published_at', '<=', now());
-        if ($collection?->isAuto()) {
-            // Reuse the product scoping done in getProductsProperty for rules
-            $rules = $collection->rules()->get();
-            $matchAll = ($collection->match_conditions->value ?? $collection->match_conditions ?? 'all') === 'all';
-            $builder->where(function ($outer) use ($rules, $matchAll) {
-                $byType = $rules->groupBy(fn ($r) => $r->rule->value ?? (string) $r->rule);
-                $applyRule = function ($q, $r) {
-                    $op = $r->operator->value ?? (string) $r->operator;
-                    $val = $r->value;
-                    switch ($r->rule->value ?? (string) $r->rule) {
-                        case 'product_title':
-                            $like = '%'.str_replace(['%', '_'], ['\%', '\_'], $val).'%';
-
-                            return $q->where(function ($w) use ($op, $like) {
-                                if (in_array($op, ['contains', 'starts_with', 'ends_with'])) {
-                                    $w->where('name', 'like', $like);
-                                } elseif ($op === 'not_contains') {
-                                    $w->where('name', 'not like', $like);
-                                } elseif ($op === 'equals_to') {
-                                    $w->where('name', '=', $like);
-                                } elseif ($op === 'not_equals_to') {
-                                    $w->where('name', '!=', $like);
-                                }
-                            });
-                        case 'product_price':
-                            return $q->whereHas('prices', function ($pq) use ($op, $val) {
-                                $pq->whereRelation('currency', 'code', current_currency());
-                                $pq->when(in_array($op, ['less_than', 'greater_than', 'equals_to', 'not_equals_to']), function ($w) use ($op, $val) {
-                                    return match ($op) {
-                                        'less_than' => $w->where('amount', '<', (float) $val),
-                                        'greater_than' => $w->where('amount', '>', (float) $val),
-                                        'equals_to' => $w->where('amount', '=', (float) $val),
-                                        'not_equals_to' => $w->where('amount', '!=', (float) $val),
-                                    };
-                                });
-                            });
-                        case 'product_brand':
-                            return $q->when(is_numeric($val), fn ($bq) => $bq->where('brand_id', (int) $val));
-                        case 'product_category':
-                            return $q->whereHas('categories', fn ($cq) => $cq->where('id', (int) $val));
-                        default:
-                            return $q;
-                    }
-                };
-                if ($matchAll) {
-                    foreach ($rules as $r) {
-                        $outer->where(fn ($w) => $applyRule($w, $r));
-                    }
-                } else {
-                    $outer->where(function ($any) use ($rules, $applyRule) {
-                        foreach ($rules as $r) {
-                            $any->orWhere(fn ($w) => $applyRule($w, $r));
-                        }
-                    });
-                }
-            });
-        } else {
-            $builder->whereHas('collections', fn ($cq) => $cq->where('collections.id', $collection?->id));
-        }
-
-        return $builder->whereNotNull('brand_id')->with('brand')->get()->pluck('brand')->filter()->unique('id')->sortBy('name')->values();
-    }
-
-    /**
-     * Handle clearBrandFilters functionality with proper error handling.
+     * Clear all active brand filters.
      */
     public function clearBrandFilters(): void
     {
@@ -349,11 +282,14 @@ class Show extends Component
     }
 
     /**
-     * Handle removeBrandFilter functionality with proper error handling.
+     * Remove a single brand filter.
      */
     public function removeBrandFilter(int $brandId): void
     {
-        $this->brandIds = array_values(array_filter($this->brandIds, static fn ($id) => (int) $id !== $brandId));
+        $this->brandIds = array_values(array_filter(
+            $this->brandIds,
+            static fn (int|string $id): bool => (int) $id !== $brandId
+        ));
         $this->page = 1;
     }
 
@@ -362,6 +298,198 @@ class Show extends Component
      */
     public function render(): View
     {
-        return view('livewire.pages.collection.show', ['collection' => $this->collection, 'products' => $this->products, 'options' => $this->availableOptions])->title($this->collection?->name ?? __('Collection'));
+        return view('livewire.pages.collection.show', [
+            'collection' => $this->collection,
+            'products' => $this->products,
+            'options' => $this->availableOptions,
+        ])->title($this->collection?->name ?? __('Collection'));
+    }
+
+    /**
+     * Apply the correct collection scoping behaviour depending on whether the collection is automatic or manual.
+     */
+    private function applyCollectionScope(Builder $query, ?CollectionModel $collection): void
+    {
+        if ($collection === null) {
+            return;
+        }
+
+        if (! $collection->isAuto()) {
+            $query->whereHas('collections', static function (Builder $relation) use ($collection): void {
+                $relation->where('collections.id', $collection->id);
+            });
+
+            return;
+        }
+
+        $rules = $this->resolveCollectionRules($collection);
+
+        if ($rules->isEmpty()) {
+            return;
+        }
+
+        if ($this->shouldMatchAll($collection)) {
+            $rules->each(function (array $rule) use ($query): void {
+                $this->applyRuleConstraint($query, $rule, 'where');
+            });
+
+            return;
+        }
+
+        $query->where(function (Builder $outer) use ($rules): void {
+            $rules->each(function (array $rule) use ($outer): void {
+                $this->applyRuleConstraint($outer, $rule, 'orWhere');
+            });
+        });
+    }
+
+    /**
+     * Normalize collection rules into simple arrays for downstream processing.
+     *
+     * @return Collection<int, array{field:string, operator:string, value:string|null}>
+     */
+    private function resolveCollectionRules(CollectionModel $collection): Collection
+    {
+        return $collection->rules()
+            ->where('is_active', true)
+            ->orderBy('position')
+            ->get(['field', 'operator', 'value'])
+            ->map(static function (CollectionRule $rule): array {
+                return [
+                    'field' => (string) $rule->field,
+                    'operator' => (string) $rule->operator,
+                    'value' => $rule->value,
+                ];
+            });
+    }
+
+    /**
+     * Determine whether all rules must be satisfied simultaneously.
+     */
+    private function shouldMatchAll(CollectionModel $collection): bool
+    {
+        $matchConditions = $collection->match_conditions ?? null;
+
+        if ($matchConditions instanceof BackedEnum) {
+            return $matchConditions->value === 'all';
+        }
+
+        if (is_object($matchConditions) && property_exists($matchConditions, 'value')) {
+            return $matchConditions->value === 'all';
+        }
+
+        if (is_string($matchConditions)) {
+            return $matchConditions === 'all';
+        }
+
+        return true;
+    }
+
+    /**
+     * Apply an individual rule constraint to the provided query builder.
+     *
+     * @param  'where'|'orWhere'  $booleanMethod
+     */
+    private function applyRuleConstraint(Builder $query, array $rule, string $booleanMethod): void
+    {
+        $field = $rule['field'];
+        $operator = $rule['operator'];
+        $value = $rule['value'];
+
+        if ($field === 'product_title') {
+            $pattern = $this->resolveTitlePattern($operator, $value);
+
+            if ($pattern === null) {
+                return;
+            }
+
+            $query->{$booleanMethod}(static function (Builder $builder) use ($operator, $pattern): void {
+                match ($operator) {
+                    'contains', 'starts_with', 'ends_with' => $builder->where('name', 'like', $pattern),
+                    'not_contains' => $builder->where('name', 'not like', $pattern),
+                    'equals_to' => $builder->where('name', '=', $pattern),
+                    'not_equals_to' => $builder->where('name', '!=', $pattern),
+                    default => null,
+                };
+            });
+
+            return;
+        }
+
+        if ($field === 'product_price') {
+            if (! $this->isSupportedPriceOperator($operator) || ! is_numeric($value)) {
+                return;
+            }
+
+            $amount = (float) $value;
+
+            $query->{$booleanMethod}(static function (Builder $builder) use ($operator, $amount): void {
+                $builder->whereHas('prices', static function (Builder $priceQuery) use ($operator, $amount): void {
+                    $priceQuery->whereRelation('currency', 'code', current_currency());
+
+                    match ($operator) {
+                        'less_than' => $priceQuery->where('amount', '<', $amount),
+                        'greater_than' => $priceQuery->where('amount', '>', $amount),
+                        'equals_to' => $priceQuery->where('amount', '=', $amount),
+                        'not_equals_to' => $priceQuery->where('amount', '!=', $amount),
+                        default => null,
+                    };
+                });
+            });
+
+            return;
+        }
+
+        if ($field === 'product_brand') {
+            if (! is_numeric($value)) {
+                return;
+            }
+
+            $query->{$booleanMethod}('brand_id', '=', (int) $value);
+
+            return;
+        }
+
+        if ($field === 'product_category') {
+            if (! is_numeric($value)) {
+                return;
+            }
+
+            $categoryId = (int) $value;
+
+            $query->{$booleanMethod}(static function (Builder $builder) use ($categoryId): void {
+                $builder->whereHas('categories', static function (Builder $categoryQuery) use ($categoryId): void {
+                    $categoryQuery->where('id', $categoryId);
+                });
+            });
+        }
+    }
+
+    /**
+     * Build the LIKE pattern for the requested operator.
+     */
+    private function resolveTitlePattern(string $operator, mixed $value): ?string
+    {
+        if (! is_string($value) || $value === '') {
+            return null;
+        }
+
+        $escaped = str_replace(['%', '_'], ['\\%', '\\_'], $value);
+
+        return match ($operator) {
+            'contains', 'not_contains' => "%{$escaped}%",
+            'starts_with' => "{$escaped}%",
+            'ends_with' => "%{$escaped}",
+            'equals_to', 'not_equals_to' => $escaped,
+            default => null,
+        };
+    }
+
+    /**
+     * Identify the operators that support numeric price comparisons.
+     */
+    private function isSupportedPriceOperator(string $operator): bool
+    {
+        return in_array($operator, ['less_than', 'greater_than', 'equals_to', 'not_equals_to'], true);
     }
 }

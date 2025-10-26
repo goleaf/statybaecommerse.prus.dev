@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Filament\Resources\UserProductInteractions\Schemas;
 
 use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
+use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
@@ -21,20 +22,22 @@ class UserProductInteractionForm
                 Select::make('product_id')
                     ->relationship('product', 'name')
                     ->required(),
-                TextInput::make('interaction_type')
+                Select::make('product_variant_id')
+                    ->relationship('variant', 'name')
+                    ->searchable()
+                    ->nullable(),
+                TextInput::make('event')
+                    ->label(__('admin.user_product_interactions.event'))
                     ->required(),
-                TextInput::make('rating')
-                    ->numeric(),
-                TextInput::make('count')
-                    ->required()
-                    ->numeric()
-                    ->default(1),
-                SupportFlatpickr::makeDateTime('first_interaction')
+                SupportFlatpickr::makeDateTime('occurred_at')
+                    ->label(__('admin.user_product_interactions.occurred_at'))
                     ->default(now())
                     ->required(),
-                SupportFlatpickr::makeDateTime('last_interaction')
-                    ->default(now())
-                    ->required(),
+                KeyValue::make('meta')
+                    ->label(__('admin.user_product_interactions.meta'))
+                    ->keyLabel('Key')
+                    ->valueLabel('Value')
+                    ->columnSpanFull(),
             ]);
     }
 }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\OrdersByName;
 use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\EnabledScope;
 use App\Models\Scopes\VisibleScope;
@@ -60,6 +61,7 @@ final class Category extends Model implements HasMedia
     use HasFactory;
     use HasTranslations;
     use InteractsWithMedia;
+    use OrdersByName;
     use Searchable;
     use SoftDeletes;
 
@@ -232,14 +234,8 @@ final class Category extends Model implements HasMedia
         return $query->orderBy('sort_order')->orderBy('name');
     }
 
-    /**
-     * Scope a query to order categories alphabetically by their name column.
-     */
-    public function scopeOrderedByName(Builder $query): Builder
-    {
-        // Enforce name-based ordering for areas where alphabetical navigation is required.
-        return $query->orderBy('name');
-    }
+    // Alphabetical ordering now flows through the OrdersByName trait to share
+    // the same normalisation behaviour as the rest of the models.
 
     /**
      * Handle scopeWithProductCounts functionality with proper error handling.

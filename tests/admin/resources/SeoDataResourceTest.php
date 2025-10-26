@@ -37,7 +37,7 @@ final class SeoDataResourceTest extends TestCase
         $this->assertDatabaseHas('seo_data', [
             'title' => json_encode(['lt' => 'Test SEO Title']),
             'description' => json_encode(['lt' => 'Test SEO description']),
-            'keywords' => json_encode(['lt' => 'test, seo, keywords']),
+            'keywords' => json_encode(['test', 'seo', 'keywords']),
             'type' => 'page',
             'url' => '/test-page',
         ]);

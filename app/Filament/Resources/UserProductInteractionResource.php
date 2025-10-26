@@ -110,19 +110,19 @@ final class UserProductInteractionResource extends Resource
 
                                         return Product::create($data)->getKey();
                                     }),
-                                // Map each interaction type to its localized label for admins.
-                                Select::make('interaction_type')
-                                    ->label(__('admin.user_product_interactions.interaction_type'))
+                                // Map each event to its localized label for admins.
+                                Select::make('event')
+                                    ->label(__('admin.user_product_interactions.event'))
                                     ->options([
                                         // Maintain readable alignment so localized labels stay scannable for admins.
-                                        'view'        => __('admin.user_product_interactions.interaction_types.view'),
-                                        'click'       => __('admin.user_product_interactions.interaction_types.click'),
-                                        'add_to_cart' => __('admin.user_product_interactions.interaction_types.add_to_cart'),
-                                        'purchase'    => __('admin.user_product_interactions.interaction_types.purchase'),
-                                        'review'      => __('admin.user_product_interactions.interaction_types.review'),
-                                        'share'       => __('admin.user_product_interactions.interaction_types.share'),
-                                        'favorite'    => __('admin.user_product_interactions.interaction_types.favorite'),
-                                        'compare'     => __('admin.user_product_interactions.interaction_types.compare'),
+                                        'view'        => __('admin.user_product_interactions.events.view'),
+                                        'click'       => __('admin.user_product_interactions.events.click'),
+                                        'add_to_cart' => __('admin.user_product_interactions.events.add_to_cart'),
+                                        'purchase'    => __('admin.user_product_interactions.events.purchase'),
+                                        'review'      => __('admin.user_product_interactions.events.review'),
+                                        'share'       => __('admin.user_product_interactions.events.share'),
+                                        'favorite'    => __('admin.user_product_interactions.events.favorite'),
+                                        'compare'     => __('admin.user_product_interactions.events.compare'),
                                     ])
                                     ->required()
                                     ->default('view')
@@ -167,17 +167,17 @@ final class UserProductInteractionResource extends Resource
                                     ->label(__('admin.products.sku'))
                                     ->maxLength(100),
                             ]),
-                        Select::make('interaction_type')
-                            ->label(__('admin.user_product_interactions.interaction_type'))
+                        Select::make('event')
+                            ->label(__('admin.user_product_interactions.event'))
                             ->options([
-                                'view'        => __('admin.user_product_interactions.interaction_types.view'),
-                                'click'       => __('admin.user_product_interactions.interaction_types.click'),
-                                'add_to_cart' => __('admin.user_product_interactions.interaction_types.add_to_cart'),
-                                'purchase'    => __('admin.user_product_interactions.interaction_types.purchase'),
-                                'review'      => __('admin.user_product_interactions.interaction_types.review'),
-                                'share'       => __('admin.user_product_interactions.interaction_types.share'),
-                                'favorite'    => __('admin.user_product_interactions.interaction_types.favorite'),
-                                'compare'     => __('admin.user_product_interactions.interaction_types.compare'),
+                                'view'        => __('admin.user_product_interactions.events.view'),
+                                'click'       => __('admin.user_product_interactions.events.click'),
+                                'add_to_cart' => __('admin.user_product_interactions.events.add_to_cart'),
+                                'purchase'    => __('admin.user_product_interactions.events.purchase'),
+                                'review'      => __('admin.user_product_interactions.events.review'),
+                                'share'       => __('admin.user_product_interactions.events.share'),
+                                'favorite'    => __('admin.user_product_interactions.events.favorite'),
+                                'compare'     => __('admin.user_product_interactions.events.compare'),
                             ])
                             ->required()
                             ->default('view')
@@ -276,8 +276,8 @@ final class UserProductInteractionResource extends Resource
                     ->sortable()
                     ->toggleable()
                     ->copyable(),
-                BadgeColumn::make('interaction_type')
-                    ->label(__('admin.user_product_interactions.interaction_type'))
+                BadgeColumn::make('event')
+                    ->label(__('admin.user_product_interactions.event'))
                     ->colors([
                         'info'      => 'view',
                         'success'   => 'click',
@@ -363,17 +363,17 @@ final class UserProductInteractionResource extends Resource
                     ->searchable()
                     ->preload()
                     ->multiple(),
-                SelectFilter::make('interaction_type')
-                    ->label(__('admin.user_product_interactions.interaction_type'))
+                SelectFilter::make('event')
+                    ->label(__('admin.user_product_interactions.event'))
                     ->options([
-                        'view'        => __('admin.user_product_interactions.interaction_types.view'),
-                        'click'       => __('admin.user_product_interactions.interaction_types.click'),
-                        'add_to_cart' => __('admin.user_product_interactions.interaction_types.add_to_cart'),
-                        'purchase'    => __('admin.user_product_interactions.interaction_types.purchase'),
-                        'review'      => __('admin.user_product_interactions.interaction_types.review'),
-                        'share'       => __('admin.user_product_interactions.interaction_types.share'),
-                        'favorite'    => __('admin.user_product_interactions.interaction_types.favorite'),
-                        'compare'     => __('admin.user_product_interactions.interaction_types.compare'),
+                        'view'        => __('admin.user_product_interactions.events.view'),
+                        'click'       => __('admin.user_product_interactions.events.click'),
+                        'add_to_cart' => __('admin.user_product_interactions.events.add_to_cart'),
+                        'purchase'    => __('admin.user_product_interactions.events.purchase'),
+                        'review'      => __('admin.user_product_interactions.events.review'),
+                        'share'       => __('admin.user_product_interactions.events.share'),
+                        'favorite'    => __('admin.user_product_interactions.events.favorite'),
+                        'compare'     => __('admin.user_product_interactions.events.compare'),
                     ])
                     ->multiple(),
                 TernaryFilter::make('is_anonymous')
@@ -392,16 +392,16 @@ final class UserProductInteractionResource extends Resource
                     ->query(fn (Builder $query): Builder => $query->where('rating', '<', 3.0)),
                 Filter::make('recent_interactions')
                     ->label(__('admin.user_product_interactions.recent_interactions'))
-                    ->query(fn (Builder $query): Builder => $query->where('last_interaction', '>=', now()->subDays(7))),
+                    ->query(fn (Builder $query): Builder => $query->where('occurred_at', '>=', now()->subDays(7))),
                 Filter::make('this_month')
                     ->label(__('admin.user_product_interactions.this_month'))
-                    ->query(fn (Builder $query): Builder => $query->where('last_interaction', '>=', now()->startOfMonth())),
+                    ->query(fn (Builder $query): Builder => $query->where('occurred_at', '>=', now()->startOfMonth())),
                 Filter::make('this_week')
                     ->label(__('admin.user_product_interactions.this_week'))
-                    ->query(fn (Builder $query): Builder => $query->where('last_interaction', '>=', now()->startOfWeek())),
+                    ->query(fn (Builder $query): Builder => $query->where('occurred_at', '>=', now()->startOfWeek())),
                 Filter::make('today')
                     ->label(__('admin.user_product_interactions.today'))
-                    ->query(fn (Builder $query): Builder => $query->where('last_interaction', '>=', now()->startOfDay())),
+                    ->query(fn (Builder $query): Builder => $query->where('occurred_at', '>=', now()->startOfDay())),
                 Filter::make('high_count')
                     ->label(__('admin.user_product_interactions.high_count'))
                     ->query(fn (Builder $query): Builder => $query->where('count', '>=', 5)),
@@ -435,7 +435,7 @@ final class UserProductInteractionResource extends Resource
                     ->icon('heroicon-o-arrow-path')
                     ->color('warning')
                     ->action(function (UserProductInteraction $record): void {
-                        $record->update(['count' => 1, 'last_interaction' => now()]);
+                        $record->update(['count' => 1, 'occurred_at' => now()]);
                         Notification::make()
                             ->title(__('admin.user_product_interactions.count_reset_successfully'))
                             ->success()
@@ -452,7 +452,7 @@ final class UserProductInteractionResource extends Resource
                         $newRecord = $record->replicate();
                         $newRecord->count = 1;
                         $newRecord->first_interaction = now();
-                        $newRecord->last_interaction = now();
+                        $newRecord->occurred_at = now();
                         $newRecord->save();
 
                         Notification::make()
@@ -507,7 +507,7 @@ final class UserProductInteractionResource extends Resource
                                     return;
                                 }
 
-                                $record->update(['count' => 1, 'last_interaction' => now()]);
+                                $record->update(['count' => 1, 'occurred_at' => now()]);
                             });
                             Notification::make()
                                 ->title(__('admin.user_product_interactions.all_counts_reset_successfully'))
@@ -568,7 +568,7 @@ final class UserProductInteractionResource extends Resource
             ])
             ->recordAction(null)
             ->recordUrl(fn () => '#')
-            ->defaultSort('last_interaction', 'desc')
+            ->defaultSort('occurred_at', 'desc')
             ->poll('30s');
     }
 

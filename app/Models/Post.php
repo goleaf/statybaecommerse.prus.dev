@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Enums\ModerationState;
-use App\Models\PostApproval;
 use App\Models\Scopes\PublishedScope;
 use App\Services\Security\HtmlContentSanitizer;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -73,20 +73,20 @@ final class Post extends Model implements HasMedia
     protected function casts(): array
     {
         return [
-            'published_at' => 'datetime',
-            'featured' => 'boolean',
-            'title_translations' => 'array',
-            'content_translations' => 'array',
-            'excerpt_translations' => 'array',
-            'meta_title_translations' => 'array',
+            'published_at'                  => 'datetime',
+            'featured'                      => 'boolean',
+            'title_translations'            => 'array',
+            'content_translations'          => 'array',
+            'excerpt_translations'          => 'array',
+            'meta_title_translations'       => 'array',
             'meta_description_translations' => 'array',
-            'tags_translations' => 'array',
-            'allow_comments' => 'boolean',
-            'is_pinned' => 'boolean',
-            'moderation_state' => ModerationState::class,
-            'submitted_for_review_at' => 'datetime',
-            'approved_at' => 'datetime',
-            'approved_by_id' => 'integer',
+            'tags_translations'             => 'array',
+            'allow_comments'                => 'boolean',
+            'is_pinned'                     => 'boolean',
+            'moderation_state'              => ModerationState::class,
+            'submitted_for_review_at'       => 'datetime',
+            'approved_at'                   => 'datetime',
+            'approved_by_id'                => 'integer',
         ];
     }
 
@@ -159,7 +159,7 @@ final class Post extends Model implements HasMedia
 
         return match ($this->status) {
             'published' => ModerationState::Published,
-            default => ModerationState::Draft,
+            default     => ModerationState::Draft,
         };
     }
 
@@ -170,7 +170,7 @@ final class Post extends Model implements HasMedia
      */
     public function getTranslatedTitle(?string $locale = null): string
     {
-        $locale = $locale ?? app()->getLocale();
+        $locale ??= app()->getLocale();
         $translations = $this->title_translations ?? [];
 
         return $translations[$locale] ?? $this->title;
@@ -181,7 +181,7 @@ final class Post extends Model implements HasMedia
      */
     public function getTranslatedContent(?string $locale = null): string
     {
-        $locale = $locale ?? app()->getLocale();
+        $locale ??= app()->getLocale();
         $translations = $this->content_translations ?? [];
 
         $content = (string) ($translations[$locale] ?? $this->content ?? '');
@@ -196,7 +196,7 @@ final class Post extends Model implements HasMedia
      */
     public function getTranslatedExcerpt(?string $locale = null): ?string
     {
-        $locale = $locale ?? app()->getLocale();
+        $locale ??= app()->getLocale();
         $translations = $this->excerpt_translations ?? [];
 
         return $translations[$locale] ?? $this->excerpt;
@@ -207,7 +207,7 @@ final class Post extends Model implements HasMedia
      */
     public function getTranslatedMetaTitle(?string $locale = null): ?string
     {
-        $locale = $locale ?? app()->getLocale();
+        $locale ??= app()->getLocale();
         $translations = $this->meta_title_translations ?? [];
 
         return $translations[$locale] ?? $this->meta_title;
@@ -218,8 +218,8 @@ final class Post extends Model implements HasMedia
      */
     public function trans(string $field, ?string $locale = null): mixed
     {
-        $locale = $locale ?? app()->getLocale();
-        $translationField = $field.'_translations';
+        $locale ??= app()->getLocale();
+        $translationField = $field . '_translations';
         if (property_exists($this, $translationField)) {
             $translations = $this->{$translationField} ?? [];
 
@@ -234,7 +234,7 @@ final class Post extends Model implements HasMedia
      */
     public function getTranslatedMetaDescription(?string $locale = null): ?string
     {
-        $locale = $locale ?? app()->getLocale();
+        $locale ??= app()->getLocale();
         $translations = $this->meta_description_translations ?? [];
 
         return $translations[$locale] ?? $this->meta_description;
@@ -245,7 +245,7 @@ final class Post extends Model implements HasMedia
      */
     public function getTranslatedTags(?string $locale = null): ?string
     {
-        $locale = $locale ?? app()->getLocale();
+        $locale ??= app()->getLocale();
         $translations = $this->tags_translations ?? [];
 
         return $translations[$locale] ?? $this->tags;
@@ -256,7 +256,7 @@ final class Post extends Model implements HasMedia
     /**
      * Handle scopePublished functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopePublished($query)
     {
@@ -266,7 +266,7 @@ final class Post extends Model implements HasMedia
     /**
      * Handle scopeFeatured functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeFeatured($query)
     {
@@ -276,7 +276,7 @@ final class Post extends Model implements HasMedia
     /**
      * Handle scopePinned functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopePinned($query)
     {
@@ -286,7 +286,7 @@ final class Post extends Model implements HasMedia
     /**
      * Handle scopeByAuthor functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeByAuthor($query, int $userId)
     {
@@ -330,7 +330,7 @@ final class Post extends Model implements HasMedia
     /**
      * Handle scopeWithTranslations functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeWithTranslations($query, ?string $locale = null)
     {
@@ -380,7 +380,7 @@ final class Post extends Model implements HasMedia
         $translationFields = ['title', 'content', 'excerpt', 'meta_title', 'meta_description', 'tags'];
         foreach ($translationFields as $field) {
             if (isset($data[$field])) {
-                $translationField = $field.'_translations';
+                $translationField = $field . '_translations';
                 $translations = $this->{$translationField} ?? [];
                 $translations[$locale] = $data[$field];
                 $this->{$translationField} = $translations;
@@ -398,7 +398,7 @@ final class Post extends Model implements HasMedia
         $translation = [];
         $translationFields = ['title', 'content', 'excerpt', 'meta_title', 'meta_description', 'tags'];
         foreach ($translationFields as $field) {
-            $translationField = $field.'_translations';
+            $translationField = $field . '_translations';
             $translations = $this->{$translationField} ?? [];
             if (! isset($translations[$locale])) {
                 $translations[$locale] = $this->{$field};
@@ -454,16 +454,16 @@ final class Post extends Model implements HasMedia
     public function getStatusInfo(): array
     {
         return [
-            'status' => $this->status,
+            'status'           => $this->status,
             'moderation_state' => $this->resolveModerationState()->value,
-            'status_label' => $this->getStatusLabelAttribute(),
-            'status_color' => $this->getStatusColor(),
-            'is_published' => $this->isPublished(),
-            'is_draft' => $this->isDraft(),
-            'is_archived' => $this->isArchived(),
-            'featured' => $this->featured,
-            'is_pinned' => $this->is_pinned,
-            'published_at' => $this->published_at?->toISOString(),
+            'status_label'     => $this->getStatusLabelAttribute(),
+            'status_color'     => $this->getStatusColor(),
+            'is_published'     => $this->isPublished(),
+            'is_draft'         => $this->isDraft(),
+            'is_archived'      => $this->isArchived(),
+            'featured'         => $this->featured,
+            'is_pinned'        => $this->is_pinned,
+            'published_at'     => $this->published_at?->toISOString(),
         ];
     }
 
@@ -637,7 +637,7 @@ final class Post extends Model implements HasMedia
     /**
      * Handle scopeRecent functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeRecent($query, int $days = 30)
     {
@@ -647,7 +647,7 @@ final class Post extends Model implements HasMedia
     /**
      * Handle scopePopular functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopePopular($query, int $minViews = 100)
     {
@@ -657,7 +657,7 @@ final class Post extends Model implements HasMedia
     /**
      * Handle scopeWithHighEngagement functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeWithHighEngagement($query, float $minRate = 5.0)
     {
@@ -667,7 +667,7 @@ final class Post extends Model implements HasMedia
     /**
      * Handle scopeAllowComments functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeAllowComments($query)
     {
@@ -675,9 +675,23 @@ final class Post extends Model implements HasMedia
     }
 
     /**
+     * Handle scopeOrderedByName functionality with proper error handling.
+     *
+     * @param Builder<Post> $query
+     */
+    public function scopeOrderedByName(Builder $query, string $direction = 'asc'): Builder
+    {
+        // Normalize the requested sort direction to keep the query predictable for consumers.
+        $direction = strtolower($direction) === 'desc' ? 'desc' : 'asc';
+
+        // Order by the title column to offer a deterministic alphabetical listing for the posts catalog.
+        return $query->orderBy('title', $direction);
+    }
+
+    /**
      * Handle scopeWithMedia functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeWithMedia($query)
     {
@@ -687,7 +701,7 @@ final class Post extends Model implements HasMedia
     /**
      * Handle scopeWithoutMedia functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeWithoutMedia($query)
     {

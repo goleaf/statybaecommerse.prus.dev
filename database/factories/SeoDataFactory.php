@@ -36,7 +36,7 @@ final class SeoDataFactory extends Factory
             'locale' => $locale,
             'title' => fake()->sentence(6),
             'description' => fake()->paragraph(2),
-            'keywords' => implode(', ', fake()->words(5)),
+            'keywords' => fake()->words(5),
             'canonical_url' => fake()->url(),
             'meta_tags' => [
                 'og:type' => fake()->randomElement(['website', 'product', 'article']),
@@ -117,7 +117,7 @@ final class SeoDataFactory extends Factory
             'locale' => 'lt',
             'title' => fake('lt_LT')->sentence(6),
             'description' => fake('lt_LT')->paragraph(2),
-            'keywords' => implode(', ', fake('lt_LT')->words(5)),
+            'keywords' => fake('lt_LT')->words(5),
         ]);
     }
 
@@ -127,7 +127,7 @@ final class SeoDataFactory extends Factory
             'locale' => 'en',
             'title' => fake('en_US')->sentence(6),
             'description' => fake('en_US')->paragraph(2),
-            'keywords' => implode(', ', fake('en_US')->words(5)),
+            'keywords' => fake('en_US')->words(5),
         ]);
     }
 

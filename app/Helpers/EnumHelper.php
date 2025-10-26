@@ -12,6 +12,7 @@ use App\Enums\PaymentType;
 use App\Enums\ProductStatus;
 use App\Enums\UserRole;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 
 final class EnumHelper
 {
@@ -43,9 +44,9 @@ final class EnumHelper
      */
     public static function getOptions(string $name): array
     {
-        $enumClass = self::getEnum($name);
+        $enumClass = self::resolveEnumClass($name);
 
-        if (! $enumClass || ! class_exists($enumClass)) {
+        if ($enumClass === null) {
             return [];
         }
 
@@ -57,9 +58,9 @@ final class EnumHelper
      */
     public static function getOptionsWithDescriptions(string $name): array
     {
-        $enumClass = self::getEnum($name);
+        $enumClass = self::resolveEnumClass($name);
 
-        if (! $enumClass || ! class_exists($enumClass)) {
+        if ($enumClass === null) {
             return [];
         }
 
@@ -71,15 +72,17 @@ final class EnumHelper
      */
     public static function getCase(string $name, string $value): ?EnumInterface
     {
-        $enumClass = self::getEnum($name);
+        $enumClass = self::resolveEnumClass($name);
 
-        if (! $enumClass || ! class_exists($enumClass)) {
+        if ($enumClass === null) {
             return null;
         }
 
         try {
+            // from() throws a ValueError for unknown values, so we gracefully convert
+            // that exception into a null result to keep helper consumers defensive-free.
             return $enumClass::from($value);
-        } catch (\ValueError $e) {
+        } catch (\ValueError) {
             return null;
         }
     }
@@ -89,9 +92,9 @@ final class EnumHelper
      */
     public static function getCaseByLabel(string $name, string $label): ?EnumInterface
     {
-        $enumClass = self::getEnum($name);
+        $enumClass = self::resolveEnumClass($name);
 
-        if (! $enumClass || ! class_exists($enumClass)) {
+        if ($enumClass === null || ! method_exists($enumClass, 'fromLabel')) {
             return null;
         }
 
@@ -163,9 +166,9 @@ final class EnumHelper
      */
     public static function getValues(string $name): array
     {
-        $enumClass = self::getEnum($name);
+        $enumClass = self::resolveEnumClass($name);
 
-        if (! $enumClass || ! class_exists($enumClass)) {
+        if ($enumClass === null) {
             return [];
         }
 
@@ -177,9 +180,9 @@ final class EnumHelper
      */
     public static function getLabels(string $name): array
     {
-        $enumClass = self::getEnum($name);
+        $enumClass = self::resolveEnumClass($name);
 
-        if (! $enumClass || ! class_exists($enumClass)) {
+        if ($enumClass === null) {
             return [];
         }
 
@@ -191,13 +194,16 @@ final class EnumHelper
      */
     public static function getDescriptions(string $name): array
     {
-        $enumClass = self::getEnum($name);
+        $enumClass = self::resolveEnumClass($name);
 
-        if (! $enumClass || ! class_exists($enumClass)) {
+        if ($enumClass === null) {
             return [];
         }
 
-        return $enumClass::map(fn ($case) => $case->description());
+        return $enumClass::collection()
+            ->filter(fn (EnumInterface $case): bool => method_exists($case, 'description'))
+            ->map(fn (EnumInterface $case): string => $case->description())
+            ->toArray();
     }
 
     /**
@@ -205,13 +211,16 @@ final class EnumHelper
      */
     public static function getIcons(string $name): array
     {
-        $enumClass = self::getEnum($name);
+        $enumClass = self::resolveEnumClass($name);
 
-        if (! $enumClass || ! class_exists($enumClass)) {
+        if ($enumClass === null) {
             return [];
         }
 
-        return $enumClass::map(fn ($case) => $case->icon());
+        return $enumClass::collection()
+            ->filter(fn (EnumInterface $case): bool => method_exists($case, 'icon'))
+            ->map(fn (EnumInterface $case): string => $case->icon())
+            ->toArray();
     }
 
     /**
@@ -219,13 +228,16 @@ final class EnumHelper
      */
     public static function getColors(string $name): array
     {
-        $enumClass = self::getEnum($name);
+        $enumClass = self::resolveEnumClass($name);
 
-        if (! $enumClass || ! class_exists($enumClass)) {
+        if ($enumClass === null) {
             return [];
         }
 
-        return $enumClass::map(fn ($case) => $case->color());
+        return $enumClass::collection()
+            ->filter(fn (EnumInterface $case): bool => method_exists($case, 'color'))
+            ->map(fn (EnumInterface $case): string => $case->color())
+            ->toArray();
     }
 
     /**
@@ -233,13 +245,16 @@ final class EnumHelper
      */
     public static function getPriorities(string $name): array
     {
-        $enumClass = self::getEnum($name);
+        $enumClass = self::resolveEnumClass($name);
 
-        if (! $enumClass || ! class_exists($enumClass)) {
+        if ($enumClass === null) {
             return [];
         }
 
-        return $enumClass::map(fn ($case) => $case->priority());
+        return $enumClass::collection()
+            ->filter(fn (EnumInterface $case): bool => method_exists($case, 'priority'))
+            ->map(fn (EnumInterface $case): int => $case->priority())
+            ->toArray();
     }
 
     /**
@@ -247,13 +262,16 @@ final class EnumHelper
      */
     public static function getArrays(string $name): array
     {
-        $enumClass = self::getEnum($name);
+        $enumClass = self::resolveEnumClass($name);
 
-        if (! $enumClass || ! class_exists($enumClass)) {
+        if ($enumClass === null) {
             return [];
         }
 
-        return $enumClass::map(fn ($case) => $case->toArray());
+        return $enumClass::collection()
+            ->filter(fn (EnumInterface $case): bool => method_exists($case, 'toArray'))
+            ->map(fn (EnumInterface $case): array => $case->toArray())
+            ->toArray();
     }
 
     /**
@@ -261,9 +279,9 @@ final class EnumHelper
      */
     public static function getCollection(string $name): Collection
     {
-        $enumClass = self::getEnum($name);
+        $enumClass = self::resolveEnumClass($name);
 
-        if (! $enumClass || ! class_exists($enumClass)) {
+        if ($enumClass === null) {
             return collect();
         }
 
@@ -275,9 +293,9 @@ final class EnumHelper
      */
     public static function getOrderedCollection(string $name): Collection
     {
-        $enumClass = self::getEnum($name);
+        $enumClass = self::resolveEnumClass($name);
 
-        if (! $enumClass || ! class_exists($enumClass)) {
+        if ($enumClass === null) {
             return collect();
         }
 
@@ -289,13 +307,21 @@ final class EnumHelper
      */
     public static function getFilteredCollection(string $name, string $property, mixed $value): Collection
     {
-        $enumClass = self::getEnum($name);
+        $enumClass = self::resolveEnumClass($name);
 
-        if (! $enumClass || ! class_exists($enumClass)) {
+        if ($enumClass === null) {
             return collect();
         }
 
-        return $enumClass::filter(fn ($case) => $case->$property() === $value);
+        return $enumClass::collection()->filter(
+            function (EnumInterface $case) use ($property, $value): bool {
+                if (! method_exists($case, $property)) {
+                    return false;
+                }
+
+                return $case->{$property}() === $value;
+            }
+        );
     }
 
     /**
@@ -303,13 +329,23 @@ final class EnumHelper
      */
     public static function getSortedCollection(string $name, string $property, bool $descending = false): Collection
     {
-        $enumClass = self::getEnum($name);
+        $enumClass = self::resolveEnumClass($name);
 
-        if (! $enumClass || ! class_exists($enumClass)) {
+        if ($enumClass === null) {
             return collect();
         }
 
-        return $enumClass::sortBy($property, $descending);
+        return $enumClass::collection()->sortBy(
+            function (EnumInterface $case) use ($property) {
+                if (! method_exists($case, $property)) {
+                    return null;
+                }
+
+                return $case->{$property}();
+            },
+            SORT_REGULAR,
+            $descending,
+        );
     }
 
     /**
@@ -317,13 +353,19 @@ final class EnumHelper
      */
     public static function getGroupedCollection(string $name, string $property): Collection
     {
-        $enumClass = self::getEnum($name);
+        $enumClass = self::resolveEnumClass($name);
 
-        if (! $enumClass || ! class_exists($enumClass)) {
+        if ($enumClass === null) {
             return collect();
         }
 
-        return $enumClass::groupBy($property);
+        return $enumClass::collection()->groupBy(function (EnumInterface $case) use ($property) {
+            if (! method_exists($case, $property)) {
+                return null;
+            }
+
+            return $case->{$property}();
+        });
     }
 
     /**
@@ -331,13 +373,35 @@ final class EnumHelper
      */
     public static function getSearchedCollection(string $name, string $query): Collection
     {
-        $enumClass = self::getEnum($name);
+        $enumClass = self::resolveEnumClass($name);
 
-        if (! $enumClass || ! class_exists($enumClass)) {
+        if ($enumClass === null) {
             return collect();
         }
 
-        return $enumClass::search($query);
+        $query = trim($query);
+
+        if ($query === '') {
+            return $enumClass::collection();
+        }
+
+        $needle = mb_strtolower($query);
+
+        return $enumClass::collection()
+            ->filter(function (EnumInterface $case) use ($needle): bool {
+                $candidates = collect([$case->value]);
+
+                foreach (['label', 'description'] as $method) {
+                    if (method_exists($case, $method)) {
+                        $candidates->push($case->{$method}());
+                    }
+                }
+
+                return $candidates
+                    ->filter(fn ($value) => is_string($value))
+                    ->contains(fn (string $value) => Str::contains(mb_strtolower($value), $needle));
+            })
+            ->values();
     }
 
     /**
@@ -345,13 +409,31 @@ final class EnumHelper
      */
     public static function getPaginatedCollection(string $name, int $perPage, int $page = 1): array
     {
-        $enumClass = self::getEnum($name);
+        $enumClass = self::resolveEnumClass($name);
 
-        if (! $enumClass || ! class_exists($enumClass)) {
-            return [];
+        if ($enumClass === null) {
+            return [
+                'data' => [],
+                'total' => 0,
+                'per_page' => $perPage,
+                'current_page' => $page,
+                'last_page' => 0,
+            ];
         }
 
-        return $enumClass::paginate($perPage, $page);
+        $page = max(1, $page);
+        $collection = $enumClass::collection();
+        $total = $collection->count();
+        $perPage = max(1, $perPage);
+        $lastPage = (int) ceil($total / $perPage);
+
+        return [
+            'data' => $collection->forPage($page, $perPage)->values(),
+            'total' => $total,
+            'per_page' => $perPage,
+            'current_page' => $page,
+            'last_page' => $lastPage,
+        ];
     }
 
     /**
@@ -359,13 +441,13 @@ final class EnumHelper
      */
     public static function getRandomCollection(string $name, int $count = 1): Collection
     {
-        $enumClass = self::getEnum($name);
+        $enumClass = self::resolveEnumClass($name);
 
-        if (! $enumClass || ! class_exists($enumClass)) {
+        if ($enumClass === null) {
             return collect();
         }
 
-        return $enumClass::random($count);
+        return $enumClass::collection()->shuffle()->take($count);
     }
 
     /**
@@ -373,13 +455,23 @@ final class EnumHelper
      */
     public static function getUniqueCollection(string $name, string $property): Collection
     {
-        $enumClass = self::getEnum($name);
+        $enumClass = self::resolveEnumClass($name);
 
-        if (! $enumClass || ! class_exists($enumClass)) {
+        if ($enumClass === null) {
             return collect();
         }
 
-        return $enumClass::unique(fn ($case) => $case->$property());
+        return $enumClass::collection()
+            ->unique(function (EnumInterface $case) use ($property) {
+                if (! method_exists($case, $property)) {
+                    return null;
+                }
+
+                $value = $case->{$property}();
+
+                return is_scalar($value) ? $value : serialize($value);
+            })
+            ->values();
     }
 
     /**
@@ -387,13 +479,27 @@ final class EnumHelper
      */
     public static function getUniqueCollectionByMultiple(string $name, array $properties): Collection
     {
-        $enumClass = self::getEnum($name);
+        $enumClass = self::resolveEnumClass($name);
 
-        if (! $enumClass || ! class_exists($enumClass)) {
+        if ($enumClass === null) {
             return collect();
         }
 
-        return $enumClass::unique(fn ($case) => implode('|', array_map(fn ($prop) => $case->$prop(), $properties)));
+        return $enumClass::collection()
+            ->unique(function (EnumInterface $case) use ($properties) {
+                return collect($properties)
+                    ->map(function (string $prop) use ($case) {
+                        if (! method_exists($case, $prop)) {
+                            return null;
+                        }
+
+                        $value = $case->{$prop}();
+
+                        return is_scalar($value) ? $value : serialize($value);
+                    })
+                    ->implode('|');
+            })
+            ->values();
     }
 
     /**
@@ -401,13 +507,7 @@ final class EnumHelper
      */
     public static function getUniqueCollectionByAll(string $name): Collection
     {
-        $enumClass = self::getEnum($name);
-
-        if (! $enumClass || ! class_exists($enumClass)) {
-            return collect();
-        }
-
-        return $enumClass::unique(fn ($case) => $case->value.'|'.$case->label().'|'.$case->color().'|'.$case->icon().'|'.$case->priority().'|'.$case->description());
+        return self::getUniqueCollectionByMultiple($name, ['value', 'label', 'color', 'icon', 'priority', 'description']);
     }
 
     /**
@@ -904,5 +1004,19 @@ final class EnumHelper
     public static function getUniqueCollectionByLabelColorIconPriorityAndDescription(string $name): Collection
     {
         return self::getUniqueCollectionByMultiple($name, ['label', 'color', 'icon', 'priority', 'description']);
+    }
+
+    /**
+     * Resolve the configured enum to a concrete class implementing the expected contract.
+     */
+    private static function resolveEnumClass(string $name): ?string
+    {
+        $enumClass = self::getEnum($name);
+
+        if (! $enumClass || ! class_exists($enumClass) || ! is_a($enumClass, EnumInterface::class, true)) {
+            return null;
+        }
+
+        return $enumClass;
     }
 }

@@ -272,6 +272,18 @@ final class SeoDataResource extends Resource
                     ->toggleable(),
                 TextColumn::make('keywords')
                     ->label(__('seo_data.fields.keywords'))
+                    ->formatStateUsing(function ($state): string {
+                        // Join array based keywords for backwards compatibility with legacy string expectations.
+                        if (is_array($state)) {
+                            return implode(', ', array_filter(array_map(static fn ($keyword): string => trim((string) $keyword), $state)));
+                        }
+
+                        if ($state === null) {
+                            return '';
+                        }
+
+                        return trim((string) $state);
+                    })
                     ->limit(50)
                     ->toggleable(),
                 TextColumn::make('canonical_url')
@@ -459,6 +471,18 @@ final class SeoDataResource extends Resource
                             ->placeholder(__('seo_data.placeholders.no_description')),
                         TextEntry::make('keywords')
                             ->label(__('seo_data.fields.keywords'))
+                            ->formatStateUsing(function ($state): string {
+                                // Normalise the info panel output so arrays render predictably.
+                                if (is_array($state)) {
+                                    return implode(', ', array_filter(array_map(static fn ($keyword): string => trim((string) $keyword), $state)));
+                                }
+
+                                if ($state === null) {
+                                    return '';
+                                }
+
+                                return trim((string) $state);
+                            })
                             ->placeholder(__('seo_data.placeholders.no_keywords')),
                         TextEntry::make('canonical_url')
                             ->label(__('seo_data.fields.canonical_url'))
@@ -508,10 +532,7 @@ final class SeoDataResource extends Resource
                         TextEntry::make('keywords_count')
                             ->label(__('seo_data.fields.keywords_count'))
                             ->numeric()
-                            ->state(fn (SeoData $record): int => collect(explode(',', (string) self::normalizeString($record->keywords)))
-                                ->map(fn (string $keyword): string => trim($keyword))
-                                ->filter()
-                                ->count()),
+                            ->state(fn (SeoData $record): int => count($record->keywords)),
                     ]),
                 SchemaSection::make(__('seo_data.sections.advanced'))
                     ->collapsible()

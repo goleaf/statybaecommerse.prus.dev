@@ -16,23 +16,23 @@ class SystemSettingCategoryTest extends TestCase
     public function test_can_create_system_setting_category(): void
     {
         $category = SystemSettingCategory::factory()->create([
-            'name' => 'Test Category',
-            'slug' => 'test-category',
+            'name'        => 'Test Category',
+            'slug'        => 'test-category',
             'description' => 'Test description',
-            'icon' => 'heroicon-o-cog',
-            'color' => '#FF0000',
-            'sort_order' => 1,
-            'is_active' => true,
+            'icon'        => 'heroicon-o-cog',
+            'color'       => '#FF0000',
+            'sort_order'  => 1,
+            'is_active'   => true,
         ]);
 
         $this->assertDatabaseHas('system_setting_categories', [
-            'name' => 'Test Category',
-            'slug' => 'test-category',
+            'name'        => 'Test Category',
+            'slug'        => 'test-category',
             'description' => 'Test description',
-            'icon' => 'heroicon-o-cog',
-            'color' => '#FF0000',
-            'sort_order' => 1,
-            'is_active' => true,
+            'icon'        => 'heroicon-o-cog',
+            'color'       => '#FF0000',
+            'sort_order'  => 1,
+            'is_active'   => true,
         ]);
 
         $this->assertEquals('Test Category', $category->name);
@@ -56,6 +56,7 @@ class SystemSettingCategoryTest extends TestCase
             'sort_order',
             'is_active',
             'parent_id',
+            'meta',
         ];
 
         $this->assertEquals($expectedFillable, $category->getFillable());
@@ -65,9 +66,9 @@ class SystemSettingCategoryTest extends TestCase
     {
         $parent = SystemSettingCategory::factory()->create();
         $category = SystemSettingCategory::factory()->create([
-            'is_active' => '1',
+            'is_active'  => '1',
             'sort_order' => '5',
-            'parent_id' => (string) $parent->getKey(),
+            'parent_id'  => (string) $parent->getKey(),
         ]);
 
         $this->assertIsBool($category->is_active);
@@ -83,7 +84,7 @@ class SystemSettingCategoryTest extends TestCase
         $parentCategory = SystemSettingCategory::factory()->create(['name' => 'Parent Category']);
         $childCategory = SystemSettingCategory::factory()->create([
             'parent_id' => $parentCategory->id,
-            'name' => 'Child Category',
+            'name'      => 'Child Category',
         ]);
 
         $this->assertInstanceOf(SystemSettingCategory::class, $childCategory->parent);
@@ -96,11 +97,11 @@ class SystemSettingCategoryTest extends TestCase
         $parentCategory = SystemSettingCategory::factory()->create(['name' => 'Parent Category']);
         $child1 = SystemSettingCategory::factory()->create([
             'parent_id' => $parentCategory->id,
-            'name' => 'Child 1',
+            'name'      => 'Child 1',
         ]);
         $child2 = SystemSettingCategory::factory()->create([
             'parent_id' => $parentCategory->id,
-            'name' => 'Child 2',
+            'name'      => 'Child 2',
         ]);
 
         $children = $parentCategory->children;
@@ -114,9 +115,9 @@ class SystemSettingCategoryTest extends TestCase
         $category = SystemSettingCategory::factory()->create(['name' => 'Test Category']);
         $translation = SystemSettingCategoryTranslation::factory()->create([
             'system_setting_category_id' => $category->id,
-            'locale' => 'en',
-            'name' => 'Test Category EN',
-            'description' => 'Test description EN',
+            'locale'                     => 'en',
+            'name'                       => 'Test Category EN',
+            'description'                => 'Test description EN',
         ]);
 
         $translations = $category->translations;
@@ -170,8 +171,8 @@ class SystemSettingCategoryTest extends TestCase
         // Test with translation
         SystemSettingCategoryTranslation::factory()->create([
             'system_setting_category_id' => $category->id,
-            'locale' => 'en',
-            'name' => 'English Name',
+            'locale'                     => 'en',
+            'name'                       => 'English Name',
         ]);
 
         $this->assertEquals('English Name', $category->getTranslatedName('en'));
@@ -189,8 +190,8 @@ class SystemSettingCategoryTest extends TestCase
         // Test with translation
         SystemSettingCategoryTranslation::factory()->create([
             'system_setting_category_id' => $category->id,
-            'locale' => 'en',
-            'description' => 'English Description',
+            'locale'                     => 'en',
+            'description'                => 'English Description',
         ]);
 
         $this->assertEquals('English Description', $category->getTranslatedDescription('en'));
@@ -212,7 +213,7 @@ class SystemSettingCategoryTest extends TestCase
         $parentCategory = SystemSettingCategory::factory()->create(['name' => 'Parent']);
         $childCategory = SystemSettingCategory::factory()->create([
             'parent_id' => $parentCategory->id,
-            'name' => 'Child',
+            'name'      => 'Child',
         ]);
 
         $this->assertEquals($parentCategory->id, $childCategory->getParent()->id);
@@ -223,21 +224,21 @@ class SystemSettingCategoryTest extends TestCase
     {
         $parentCategory = SystemSettingCategory::factory()->create(['name' => 'Parent']);
         $child1 = SystemSettingCategory::factory()->create([
-            'parent_id' => $parentCategory->id,
-            'is_active' => true,
+            'parent_id'  => $parentCategory->id,
+            'is_active'  => true,
             'sort_order' => 2,
-            'name' => 'Child 2',
+            'name'       => 'Child 2',
         ]);
         $child2 = SystemSettingCategory::factory()->create([
-            'parent_id' => $parentCategory->id,
-            'is_active' => true,
+            'parent_id'  => $parentCategory->id,
+            'is_active'  => true,
             'sort_order' => 1,
-            'name' => 'Child 1',
+            'name'       => 'Child 1',
         ]);
         $inactiveChild = SystemSettingCategory::factory()->create([
             'parent_id' => $parentCategory->id,
             'is_active' => false,
-            'name' => 'Inactive Child',
+            'name'      => 'Inactive Child',
         ]);
 
         $children = $parentCategory->getChildren();
@@ -250,11 +251,11 @@ class SystemSettingCategoryTest extends TestCase
         $grandParent = SystemSettingCategory::factory()->create(['name' => 'Grandparent']);
         $parent = SystemSettingCategory::factory()->create([
             'parent_id' => $grandParent->id,
-            'name' => 'Parent',
+            'name'      => 'Parent',
         ]);
         $child = SystemSettingCategory::factory()->create([
             'parent_id' => $parent->id,
-            'name' => 'Child',
+            'name'      => 'Child',
         ]);
 
         $this->assertEquals('Grandparent > Parent > Child', $child->getPath());
@@ -267,11 +268,11 @@ class SystemSettingCategoryTest extends TestCase
         $grandParent = SystemSettingCategory::factory()->create(['name' => 'Grandparent']);
         $parent = SystemSettingCategory::factory()->create([
             'parent_id' => $grandParent->id,
-            'name' => 'Parent',
+            'name'      => 'Parent',
         ]);
         $child = SystemSettingCategory::factory()->create([
             'parent_id' => $parent->id,
-            'name' => 'Child',
+            'name'      => 'Child',
         ]);
 
         $this->assertEquals(0, $grandParent->getDepth());
@@ -299,8 +300,8 @@ class SystemSettingCategoryTest extends TestCase
         // Check that activity log was created
         $this->assertDatabaseHas('activity_log', [
             'subject_type' => SystemSettingCategory::class,
-            'subject_id' => $category->id,
-            'event' => 'updated',
+            'subject_id'   => $category->id,
+            'event'        => 'updated',
         ]);
     }
 }

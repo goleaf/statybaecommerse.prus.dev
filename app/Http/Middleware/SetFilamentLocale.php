@@ -8,10 +8,11 @@ use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Session;
+use Symfony\Component\HttpFoundation\Response;
 
 final class SetFilamentLocale
 {
-    public function handle(Request $request, Closure $next): mixed
+    public function handle(Request $request, Closure $next): Response
     {
         // Get locale from request parameter, session, or default to Lithuanian
         $locale = $request->get('locale')
@@ -32,6 +33,9 @@ final class SetFilamentLocale
         App::setLocale($locale);
         Session::put('locale', $locale);
 
-        return $next($request);
+        /** @var Response $response */
+        $response = $next($request);
+
+        return $response;
     }
 }

@@ -20,16 +20,15 @@ final class InventoryTest extends TestCase
     public function test_fillable_configuration_is_explicit(): void
     {
         // Verifies that mass-assignment remains locked down to the documented attributes.
-        $inventory = new Inventory();
+        $inventory = new Inventory;
 
         $this->assertSame([
             'product_id',
-            'location_id',
-            'quantity',
-            'reserved',
-            'incoming',
-            'threshold',
-            'is_tracked',
+            'product_variant_id',
+            'warehouse_id',
+            'sku',
+            'qty',
+            'meta',
         ], $inventory->getFillable());
     }
 
@@ -37,18 +36,25 @@ final class InventoryTest extends TestCase
     {
         // Use the factory to persist values that require casting to integers and booleans.
         $inventory = Inventory::factory()->create([
-            'quantity' => '10',
-            'reserved' => '2',
-            'incoming' => '5',
-            'threshold' => '3',
-            'is_tracked' => '1',
+            'qty'  => '10',
+            'meta' => [
+                'reserved'   => '2',
+                'incoming'   => '5',
+                'threshold'  => '3',
+                'is_tracked' => '1',
+            ],
         ]);
 
-        $this->assertIsInt($inventory->quantity);
-        $this->assertIsInt($inventory->reserved);
-        $this->assertIsInt($inventory->incoming);
-        $this->assertIsInt($inventory->threshold);
-        $this->assertIsBool($inventory->is_tracked);
+        $this->assertIsInt($inventory->qty);
+        $this->assertIsInt($inventory->quantity); // Legacy accessor remains supported.
+        $this->assertSame(10, $inventory->qty);
+
+        $meta = $inventory->meta;
+        $this->assertIsArray($meta);
+        $this->assertSame(2, $inventory->reserved);
+        $this->assertSame(5, $inventory->incoming);
+        $this->assertSame(3, $inventory->threshold);
+        $this->assertTrue($inventory->is_tracked);
     }
 
     public function test_relationships_link_to_product_and_location(): void
@@ -58,11 +64,12 @@ final class InventoryTest extends TestCase
         $location = Location::factory()->create();
 
         $inventory = Inventory::factory()->create([
-            'product_id' => $product->id,
-            'location_id' => $location->id,
+            'product_id'   => $product->id,
+            'warehouse_id' => $location->id,
         ]);
 
         $this->assertTrue($inventory->product->is($product));
+        $this->assertTrue($inventory->warehouse->is($location));
         $this->assertTrue($inventory->location->is($location));
     }
 
@@ -70,8 +77,8 @@ final class InventoryTest extends TestCase
     {
         // Ensure subtraction handles over-reservation gracefully.
         $inventory = Inventory::factory()->create([
-            'quantity' => 4,
-            'reserved' => 10,
+            'qty'  => 4,
+            'meta' => ['reserved' => 10],
         ]);
 
         $this->assertSame(0, $inventory->available_quantity);
@@ -89,8 +96,8 @@ final class InventoryTest extends TestCase
     public function test_tracked_scope_filters_only_tracked_records(): void
     {
         // Seed a tracked and an untracked inventory to ensure the scope filters correctly.
-        Inventory::factory()->create(['is_tracked' => true]);
-        Inventory::factory()->create(['is_tracked' => false]);
+        Inventory::factory()->create(['meta' => ['is_tracked' => true]]);
+        Inventory::factory()->create(['meta' => ['is_tracked' => false]]);
 
         $results = Inventory::tracked()->get();
 
@@ -102,30 +109,36 @@ final class InventoryTest extends TestCase
     {
         // Build scenarios that verify low stock depends on both the threshold and reserved units.
         Inventory::factory()->create([
-            'quantity' => 10,
-            'reserved' => 6,
-            'threshold' => 5,
+            'qty'  => 10,
+            'meta' => [
+                'reserved'  => 6,
+                'threshold' => 5,
+            ],
         ]);
 
         Inventory::factory()->create([
-            'quantity' => 10,
-            'reserved' => 2,
-            'threshold' => 5,
+            'qty'  => 10,
+            'meta' => [
+                'reserved'  => 2,
+                'threshold' => 5,
+            ],
         ]);
 
         $results = Inventory::lowStock()->get();
 
         $this->assertCount(1, $results);
-        $this->assertSame(4, $results->first()->quantity - $results->first()->reserved);
+        $this->assertSame(4, $results->first()->qty - $results->first()->reserved);
     }
 
     public function test_low_stock_detection_requires_positive_threshold(): void
     {
         // Explicitly set a zero threshold to confirm the helper ignores such configurations.
         $inventory = Inventory::factory()->create([
-            'quantity' => 3,
-            'reserved' => 0,
-            'threshold' => 0,
+            'qty'  => 3,
+            'meta' => [
+                'reserved'  => 0,
+                'threshold' => 0,
+            ],
         ]);
 
         $this->assertFalse($inventory->isLowStock());
@@ -134,8 +147,9 @@ final class InventoryTest extends TestCase
     public function test_default_attributes_prevent_null_math(): void
     {
         // Creating a model in memory should populate defaults that keep calculations safe.
-        $inventory = new Inventory();
+        $inventory = new Inventory;
 
+        $this->assertSame(0, $inventory->qty);
         $this->assertSame(0, $inventory->quantity);
         $this->assertSame(0, $inventory->reserved);
         $this->assertSame(0, $inventory->incoming);

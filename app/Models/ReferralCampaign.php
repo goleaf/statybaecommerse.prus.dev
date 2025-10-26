@@ -1,16 +1,19 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\OrdersByName;
 use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\DateRangeScope;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Spatie\Activitylog\Traits\LogsActivity;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Translatable\HasTranslations;
 
 /**
@@ -48,9 +51,19 @@ use Spatie\Translatable\HasTranslations;
 final class ReferralCampaign extends Model
 {
     /** @use HasFactory<\Database\Factories\ReferralCampaignFactory> */
-    use HasFactory, HasTranslations, LogsActivity;
+    use HasFactory;
 
-    protected $fillable = ['name', 'description', 'is_active', 'start_date', 'end_date', 'reward_amount', 'reward_type', 'max_referrals_per_user', 'max_total_referrals', 'conditions', 'metadata'];
+    use HasTranslations;
+    use LogsActivity;
+    use OrdersByName;
+
+    /**
+     * Ensure alphabetical ordering leverages the translated name column so
+     * marketing teams can quickly locate campaigns in admin pickers.
+     */
+    protected string $nameColumn = 'name';
+
+    protected $fillable = ['name', 'description', 'is_active', 'start_date', 'end_date', 'reward_amount', 'reward_type', 'max_referrals_per_user', 'max_total_referrals', 'conditions', 'metadata', 'meta'];
 
     /** @var array<int, string> */
     public array $translatable = ['name', 'description'];
@@ -60,7 +73,7 @@ final class ReferralCampaign extends Model
      */
     protected function casts(): array
     {
-        return ['is_active' => 'boolean', 'start_date' => 'datetime', 'end_date' => 'datetime', 'reward_amount' => 'float', 'max_referrals_per_user' => 'integer', 'max_total_referrals' => 'integer', 'conditions' => 'array', 'metadata' => 'array'];
+        return ['is_active' => 'boolean', 'start_date' => 'datetime', 'end_date' => 'datetime', 'reward_amount' => 'float', 'max_referrals_per_user' => 'integer', 'max_total_referrals' => 'integer', 'conditions' => 'array', 'metadata' => 'array', 'meta' => 'array'];
     }
 
     /**
@@ -95,11 +108,40 @@ final class ReferralCampaign extends Model
     }
 
     /**
+     * Locate campaigns that are currently in progress so dashboards can focus
+     * on live promotions without additional date filtering logic.
+     */
+    public function scopeRunning(Builder $query): Builder
+    {
+        $now = now();
+
+        return $query
+            ->where('is_active', true)
+            ->where(static function (Builder $builder) use ($now): void {
+                $builder->whereNull('start_date')->orWhere('start_date', '<=', $now);
+            })
+            ->where(static function (Builder $builder) use ($now): void {
+                $builder->whereNull('end_date')->orWhere('end_date', '>=', $now);
+            });
+    }
+
+    /**
+     * Retrieve campaigns scheduled for the future to support planning reports
+     * and proactive email notifications.
+     */
+    public function scopeUpcoming(Builder $query): Builder
+    {
+        return $query->where(function (Builder $builder): void {
+            $builder->where('start_date', '>', now());
+        });
+    }
+
+    /**
      * Handle isActive functionality with proper error handling.
      */
     public function isActive(): bool
     {
-        if (!$this->is_active) {
+        if (! $this->is_active) {
             return false;
         }
         if ($this->start_date && $this->start_date->isFuture()) {
@@ -149,7 +191,7 @@ final class ReferralCampaign extends Model
      */
     public function canAcceptReferrals(): bool
     {
-        if (!$this->isRunning()) {
+        if (! $this->isRunning()) {
             return false;
         }
 

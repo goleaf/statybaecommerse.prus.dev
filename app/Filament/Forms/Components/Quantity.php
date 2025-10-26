@@ -20,8 +20,14 @@ final class Quantity extends TextInput
         /** @var static $component */
         $component = parent::make($name);
 
+        // Apply a consistent set of sensible defaults so every quantity field
+        // behaves like a non-negative integer input across the admin panel.
         return $component
             ->numeric()
+            // Use a nullable integer rule so optional quantity fields can remain empty
+            // while still enforcing whole-number validation when a value is provided.
+            ->rule('nullable|integer')
+            ->extraAttributes(['inputmode' => 'numeric'])
             ->minValue(0)
             ->step(1);
     }
@@ -31,8 +37,8 @@ final class Quantity extends TextInput
      */
     public function steps(int|float|string|null $step): static
     {
-        $this->step($step);
-
-        return $this;
+        // Delegate to Filament's native implementation to keep validation and
+        // HTML attribute handling in sync with upstream behaviour.
+        return $this->step($step);
     }
 }

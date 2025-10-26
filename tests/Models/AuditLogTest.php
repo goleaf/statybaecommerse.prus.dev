@@ -7,13 +7,11 @@ use App\Models\User;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
-
-uses(TestCase::class, RefreshDatabase::class);
+uses(RefreshDatabase::class);
 
 it('defines the expected fillable attributes', function (): void {
     // Instantiate a fresh model instance to inspect its mass assignment configuration.
-    $fillable = (new AuditLog())->getFillable();
+    $fillable = (new AuditLog)->getFillable();
 
     // Ensure each attribute that should be mass assignable is explicitly listed.
     expect($fillable)->toBe([
@@ -41,7 +39,7 @@ it('casts the diff attribute to an array when retrieved from the database', func
 
 it('exposes the morph relation for the audited entity', function (): void {
     // Calling the relation method should yield a MorphTo relation for polymorphic lookups.
-    $relation = (new AuditLog())->entity();
+    $relation = (new AuditLog)->entity();
 
     // Validate that the relationship contract matches the expected polymorphic type.
     expect($relation)->toBeInstanceOf(MorphTo::class);
@@ -49,7 +47,7 @@ it('exposes the morph relation for the audited entity', function (): void {
 
 it('exposes the belongs-to relation for the user who triggered the action', function (): void {
     // Fetch the relation definition without needing to hit the database.
-    $relation = (new AuditLog())->user();
+    $relation = (new AuditLog)->user();
 
     // Confirm the relation allows traversing back to the owning user model.
     expect($relation)->toBeInstanceOf(BelongsTo::class);

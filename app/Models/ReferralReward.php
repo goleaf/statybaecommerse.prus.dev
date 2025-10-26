@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\OrdersByName;
 use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\DateRangeScope;
 use App\Models\Scopes\StatusScope;
@@ -22,11 +23,11 @@ use Spatie\Translatable\HasTranslations;
  *
  * Eloquent model representing the ReferralReward entity with comprehensive relationships, scopes, and business logic for the e-commerce system.
  *
- * @property mixed $fillable
- * @property array $translatable
+ * @property mixed                     $fillable
+ * @property array                     $translatable
  * @property \App\Models\Referral|null $referral
- * @property \App\Models\User|null $user
- * @property \App\Models\Order|null $order
+ * @property \App\Models\User|null     $user
+ * @property \App\Models\Order|null    $order
  *
  * @method static \Illuminate\Database\Eloquent\Builder|ReferralReward newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|ReferralReward newQuery()
@@ -37,9 +38,18 @@ use Spatie\Translatable\HasTranslations;
 #[ScopedBy([ActiveScope::class, DateRangeScope::class, StatusScope::class, UserOwnedScope::class])]
 final class ReferralReward extends Model
 {
-    use HasFactory, HasTranslations, SoftDeletes;
+    use HasFactory;
+    use HasTranslations;
+    use OrdersByName;
+    use SoftDeletes;
 
-    protected $fillable = ['referral_id', 'user_id', 'order_id', 'type', 'amount', 'currency_code', 'status', 'applied_at', 'expires_at', 'metadata', 'title', 'description', 'is_active', 'priority', 'conditions', 'reward_data'];
+    /**
+     * Sort referral rewards by their translated title so finance teams can
+     * quickly locate bonuses and discounts in admin tooling.
+     */
+    protected string $nameColumn = 'title';
+
+    protected $fillable = ['referral_id', 'user_id', 'order_id', 'type', 'amount', 'currency_code', 'status', 'applied_at', 'expires_at', 'metadata', 'meta', 'title', 'description', 'is_active', 'priority', 'conditions', 'reward_data'];
 
     protected static function booted(): void
     {
@@ -68,7 +78,7 @@ final class ReferralReward extends Model
      */
     protected function casts(): array
     {
-        return ['amount' => 'decimal:2', 'applied_at' => 'datetime', 'expires_at' => 'datetime', 'metadata' => 'array', 'conditions' => 'array', 'reward_data' => 'array', 'is_active' => 'boolean', 'priority' => 'integer'];
+        return ['amount' => 'decimal:2', 'applied_at' => 'datetime', 'expires_at' => 'datetime', 'metadata' => 'array', 'meta' => 'array', 'conditions' => 'array', 'reward_data' => 'array', 'is_active' => 'boolean', 'priority' => 'integer'];
     }
 
     /**
@@ -229,7 +239,7 @@ final class ReferralReward extends Model
      */
     public function getFormattedAmountAttribute(): string
     {
-        return number_format($this->amount, 2).' '.$this->currency_code;
+        return number_format($this->amount, 2) . ' ' . $this->currency_code;
     }
 
     /**
@@ -295,15 +305,15 @@ final class ReferralReward extends Model
         $contextValue = $context[$field];
 
         return match ($operator) {
-            '=' => $contextValue == $value,
-            '!=' => $contextValue != $value,
-            '>' => $contextValue > $value,
-            '>=' => $contextValue >= $value,
-            '<' => $contextValue < $value,
-            '<=' => $contextValue <= $value,
-            'in' => in_array($contextValue, (array) $value),
+            '='      => $contextValue == $value,
+            '!='     => $contextValue != $value,
+            '>'      => $contextValue > $value,
+            '>='     => $contextValue >= $value,
+            '<'      => $contextValue < $value,
+            '<='     => $contextValue <= $value,
+            'in'     => in_array($contextValue, (array) $value),
             'not_in' => ! in_array($contextValue, (array) $value),
-            default => false,
+            default  => false,
         };
     }
 

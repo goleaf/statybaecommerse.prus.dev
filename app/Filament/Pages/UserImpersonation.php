@@ -24,9 +24,12 @@ final class UserImpersonation extends Page implements HasTable
     use InteractsWithTable;
 
     /**
-     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations.
+     * Aligns the navigation icon with Filament's BackedEnum-aware union expectations while declaring
+     * the accepted union type via PHPDoc for downstream analyzers.
+     *
+     * @var string|\BackedEnum|null
      */
-    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-user';
+    protected static $navigationIcon = 'heroicon-o-user';
 
     public static function getNavigationGroup(): BackedEnum|string|null
     {

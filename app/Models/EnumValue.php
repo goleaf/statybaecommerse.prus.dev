@@ -65,27 +65,38 @@ final class EnumValue extends Model
     // Scopes
     public function scopeActive(Builder $query): Builder
     {
+        // Limit the query to only active enum values.
         return $query->where('is_active', true);
     }
 
     public function scopeDefault(Builder $query): Builder
     {
+        // Limit the query to only default enum values.
         return $query->where('is_default', true);
     }
 
     public function scopeByType(Builder $query, string $type): Builder
     {
+        // Filter enum values by a specific type key.
         return $query->where('type', $type);
     }
 
     public function scopeOrdered(Builder $query): Builder
     {
-        return $query->orderBy('sort_order')->orderBy('name');
+        // Apply a deterministic ordering using the position and name columns.
+        return $query->orderBy('sort_order')->orderedByName();
+    }
+
+    public function scopeOrderedByName(Builder $query): Builder
+    {
+        // Order enum values alphabetically by their name column.
+        return $query->orderBy('name');
     }
 
     // Accessors
     protected function usageCount(): Attribute
     {
+        // Lazily compute the usage count by delegating to the helper method.
         return Attribute::make(
             get: fn (): int => $this->getUsageCount()
         );
@@ -93,6 +104,7 @@ final class EnumValue extends Model
 
     protected function formattedValue(): Attribute
     {
+        // Present a human-readable representation of the enum value tuple.
         return Attribute::make(
             get: fn (): string => "{$this->type}::{$this->key} => {$this->value}"
         );
@@ -101,6 +113,7 @@ final class EnumValue extends Model
     // Methods
     public function getUsageCount(): int
     {
+        // Guard against malformed metadata payloads.
         $metadata = $this->metadata;
 
         if (! is_array($metadata)) {
@@ -112,16 +125,19 @@ final class EnumValue extends Model
 
     public function activate(): bool
     {
+        // Flip the active flag to true and persist the change.
         return $this->update(['is_active' => true]);
     }
 
     public function deactivate(): bool
     {
+        // Flip the active flag to false and persist the change.
         return $this->update(['is_active' => false]);
     }
 
     public function setAsDefault(): bool
     {
+        // Ensure only one enum value per type is marked as default.
         self::where('type', $this->type)
             ->where('id', '!=', $this->id)
             ->update(['is_default' => false]);
@@ -131,6 +147,7 @@ final class EnumValue extends Model
 
     public function duplicate(): self
     {
+        // Clone the existing model while resetting fields that must remain unique.
         $newEnumValue = $this->replicate();
         $newEnumValue->key = $this->key.'_copy';
         $newEnumValue->is_default = false;
@@ -151,6 +168,7 @@ final class EnumValue extends Model
     // Static methods
     public static function getTypes(): array
     {
+        // Provide a mapping of known type identifiers to translated labels.
         $defaultTypes = [
             'navigation_group' => __('admin.enum_values.types.navigation_group'),
             'order_status' => __('admin.enum_values.types.order_status'),
@@ -171,6 +189,7 @@ final class EnumValue extends Model
 
         foreach ($existingTypes as $type) {
             if (! isset($defaultTypes[$type])) {
+                // Create a presentable label for custom types on the fly.
                 $defaultTypes[$type] = Str::headline(str_replace('_', ' ', $type));
             }
         }
@@ -182,6 +201,7 @@ final class EnumValue extends Model
 
     public static function getValuesByType(string $type): array
     {
+        // Return an associative array of key => value pairs for the requested type.
         return self::where('type', $type)
             ->active()
             ->ordered()
@@ -191,6 +211,7 @@ final class EnumValue extends Model
 
     public static function getDefaultValue(string $type): ?string
     {
+        // Locate the default enum key for the provided type.
         $default = self::where('type', $type)
             ->where('is_default', true)
             ->first();
@@ -200,6 +221,7 @@ final class EnumValue extends Model
 
     public static function cleanupUnused(): int
     {
+        // Soft delete enum values that have not been used within the retention window.
         $threshold = now()->subMonths(6);
 
         $candidates = self::query()

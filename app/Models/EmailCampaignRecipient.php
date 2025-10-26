@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Builder;
+use App\Models\Concerns\OrdersByName;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -14,12 +14,21 @@ final class EmailCampaignRecipient extends Model
     /** @use HasFactory<\Database\Factories\EmailCampaignRecipientFactory> */
     use HasFactory;
 
+    use OrdersByName;
+
+    /**
+     * Sort recipients by email by default because that column is guaranteed to
+     * be unique and present even when no display name is provided.
+     */
+    protected string $nameColumn = 'email';
+
     protected $fillable = [
         'email_campaign_id',
         'email',
         'name',
         'status',
         'metadata',
+        'meta',
         'scheduled_at',
         'sent_at',
         'delivered_at',
@@ -41,6 +50,7 @@ final class EmailCampaignRecipient extends Model
 
     protected $casts = [
         'metadata'          => 'array',
+        'meta'              => 'array',
         'scheduled_at'      => 'datetime',
         'sent_at'           => 'datetime',
         'delivered_at'      => 'datetime',
@@ -85,14 +95,30 @@ final class EmailCampaignRecipient extends Model
     }
 
     /**
-     * Scope a query to order email campaign recipients alphabetically by their name.
+     * Expose the relationship to the associated customer record when a
+     * recipient corresponds to a registered storefront user.
      *
-     * @param  Builder<EmailCampaignRecipient> $query
-     * @return Builder<EmailCampaignRecipient>
+     * @return BelongsTo<User, self>
      */
-    public function scopeOrderedByName(Builder $query): Builder
+    public function user(): BelongsTo
     {
-        // Order recipients by the name column in ascending order for predictable listings.
-        return $query->orderBy('name');
+        /** @var BelongsTo<User, self> $relation */
+        $relation = $this->belongsTo(User::class);
+
+        return $relation;
+    }
+
+    /**
+     * Provide access to the marketing subscriber entity so unsubscribes and
+     * engagement metrics can be correlated with newsletter signups.
+     *
+     * @return BelongsTo<Subscriber, self>
+     */
+    public function subscriber(): BelongsTo
+    {
+        /** @var BelongsTo<Subscriber, self> $relation */
+        $relation = $this->belongsTo(Subscriber::class);
+
+        return $relation;
     }
 }

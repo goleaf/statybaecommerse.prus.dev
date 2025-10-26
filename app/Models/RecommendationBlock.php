@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\OrdersByName;
 use App\Models\Scopes\ActiveScope;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -29,6 +31,13 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 final class RecommendationBlock extends Model
 {
     use HasFactory;
+    use OrdersByName;
+
+    /**
+     * Order recommendation blocks by their public name by default so the
+     * reusable OrdersByName trait can keep admin listings predictable.
+     */
+    protected string $nameColumn = 'name';
 
     protected $fillable = [
         'name',
@@ -45,20 +54,28 @@ final class RecommendationBlock extends Model
         'config_ids',
         'cache_duration',
         'display_settings',
+        'meta',
     ];
 
     protected $casts = [
-        'config_ids' => 'array',
-        'is_active' => 'boolean',
-        'is_default' => 'boolean',
-        'show_title' => 'boolean',
+        'config_ids'       => 'array',
+        'is_active'        => 'boolean',
+        'is_default'       => 'boolean',
+        'show_title'       => 'boolean',
         'show_description' => 'boolean',
-        'max_products' => 'integer',
-        'sort_order' => 'integer',
-        'cache_duration' => 'integer',
+        'max_products'     => 'integer',
+        'sort_order'       => 'integer',
+        'cache_duration'   => 'integer',
         'display_settings' => 'array',
+        'meta'             => 'array',
     ];
 
+    /**
+     * Connect products to recommendation blocks to drive personalised widget
+     * output on the storefront.
+     *
+     * @return BelongsToMany<Product, self>
+     */
     public function products(): BelongsToMany
     {
         return $this->belongsToMany(Product::class, 'recommendation_block_products', 'recommendation_block_id', 'product_id');
@@ -66,6 +83,8 @@ final class RecommendationBlock extends Model
 
     /**
      * Handle analytics functionality with proper error handling.
+     *
+     * @return HasMany<RecommendationAnalytics, self>
      */
     public function analytics(): HasMany
     {
@@ -74,8 +93,10 @@ final class RecommendationBlock extends Model
 
     /**
      * Handle cache functionality with proper error handling.
+     *
+     * @return HasMany<RecommendationCache, self>
      */
-    public function cache(): HasMany
+    public function caches(): HasMany
     {
         return $this->hasMany(RecommendationCache::class, 'block_id');
     }
@@ -91,9 +112,9 @@ final class RecommendationBlock extends Model
     /**
      * Handle scopeActive functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param Builder<self> $query
      */
-    public function scopeActive($query)
+    public function scopeActive(Builder $query): Builder
     {
         return $query->where('is_active', true);
     }
@@ -101,10 +122,29 @@ final class RecommendationBlock extends Model
     /**
      * Handle scopeByName functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param Builder<self> $query
      */
-    public function scopeByName($query, string $name)
+    public function scopeByName(Builder $query, string $name): Builder
     {
         return $query->where('name', $name);
+    }
+
+    /**
+     * Provide a convenience scope that mirrors the key-based lookups expected
+     * by the prompt instructions while reusing the underlying name column.
+     */
+    public function scopeWithKey(Builder $query, string $key): Builder
+    {
+        return $query->where('name', $key);
+    }
+
+    /**
+     * Handle scopeOrderedByName functionality with proper error handling.
+     *
+     * @param Builder<self> $query
+     */
+    public function scopeOrderedByName(Builder $query, string $direction = 'asc'): Builder
+    {
+        return $query->orderBy('name', $direction);
     }
 }
