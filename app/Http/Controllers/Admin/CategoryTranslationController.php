@@ -11,4 +11,7 @@ use App\Http\Controllers\Controller;
  *
  * HTTP controller handling CategoryTranslationController related web requests, responses, and business logic with proper validation and error handling.
  */
-final class CategoryTranslationController extends Controller {}
+final class CategoryTranslationController extends Controller
+{
+    // This controller currently acts as a placeholder until translation-specific actions are implemented.
+}
