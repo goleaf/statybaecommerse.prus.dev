@@ -64,10 +64,16 @@ final class ReferralController extends Controller
     public function index(): View
     {
         $user = Auth::user();
-        $referrals = $user->referrals()->with(['referred', 'rewards'])->latest()->get()->skipWhile(function ($referral) {
-            // Skip referrals that are not properly configured for display
-            return empty($referral->referred) || empty($referral->referred_id) || empty($referral->referrer_id) || empty($referral->status);
-        })->paginate(10);
+
+        $referralsQuery = $user->referrals()
+            ->with(['referred', 'rewards'])
+            ->whereHas('referred')
+            ->whereNotNull('referrals.referred_id')
+            ->whereNotNull('referrals.referrer_id')
+            ->whereNotNull('referrals.status')
+            ->latest();
+
+        $referrals = $referralsQuery->paginate(10); // Paginate the cleaned query so large histories stay memory friendly.
         $stats = ['total_referrals' => $user->referrals()->count(), 'completed_referrals' => $user->referrals()->completed()->count(), 'pending_referrals' => $user->referrals()->where('status', 'pending')->count(), 'total_rewards' => $user->referralRewards()->sum('amount')];
         $referralCode = $user->activeReferralCode();
 
