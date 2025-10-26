@@ -678,6 +678,63 @@ final class CheckoutProcess extends Component
     }
 
     /**
+     * Calculate a shipping discount for the provided base amount using the discount engine.
+     */
+    private function calculateShippingDiscount(float $baseAmount): float
+    {
+        if ($baseAmount <= 0.0) {
+            return 0.0;
+        }
+
+        $engine = app(DiscountEngine::class);
+        $channelUrl = config('app.url');
+        $cartSubtotal = session('cart.subtotal');
+        $subtotal = is_numeric($cartSubtotal) ? (float) $cartSubtotal : 0.0;
+
+        $context = [
+            'currency_code' => current_currency(),
+            'channel_id'    => is_string($channelUrl) ? $channelUrl : null,
+            'user_id'       => auth()->id(),
+            'now'           => now(),
+            'cart'          => ['subtotal' => $subtotal, 'items' => []],
+            'shipping'      => ['base_amount' => $baseAmount],
+        ];
+
+        $result = $engine->evaluate($context);
+        $discountValue = data_get($result, 'shipping.discount_amount', 0.0);
+
+        return is_numeric($discountValue) ? max(0.0, (float) $discountValue) : 0.0;
+    }
+
+    /**
+     * Build badges describing how the shipping rate is constrained for display purposes.
+     *
+     * @return array<int, array{type:string,label:string}>
+     */
+    private function buildShippingBadges(float $baseAmount, float $finalAmount, float $discountAmount, string $currency): array
+    {
+        $badges = [];
+
+        if ($finalAmount <= 0.0) {
+            $badges[] = [
+                'type'  => 'free',
+                'label' => __('ecommerce.free_shipping'),
+            ];
+
+            return $badges;
+        }
+
+        if ($discountAmount > 0.0 && $finalAmount < $baseAmount) {
+            $badges[] = [
+                'type'  => 'capped',
+                'label' => __('Shipping capped at :amount', ['amount' => app_money_format($finalAmount, $currency)]),
+            ];
+        }
+
+        return $badges;
+    }
+
+    /**
      * Keep shipping address fields aligned with billing when the customer chooses the shortcut toggle.
      */
     private function synchroniseShippingFromBilling(): void

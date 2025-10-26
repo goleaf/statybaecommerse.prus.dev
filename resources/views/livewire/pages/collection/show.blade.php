@@ -166,18 +166,21 @@
             </div>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 @foreach ($filterGroupCollection as $group)
-                    @php($attribute = $group['attribute'] ?? [])
-                    <div wire:key="filter-group-{{ data_get($attribute, 'id', uniqid('attr-', false)) }}">
+                    @php
+                        $attribute = $group['attribute'] ?? [];
+                        $attributeId = (int) ($attribute['id'] ?? 0);
+                        $attributeKey = $attributeId > 0 ? $attributeId : uniqid('attr-', false);
+                    @endphp
+                    <div wire:key="filter-group-{{ $attributeKey }}">
                         <div class="text-sm font-medium mb-2">{{ $attribute['name'] ?? __('Filters') }}</div>
                         <div class="flex flex-wrap gap-2">
                             @foreach ($group['values'] ?? [] as $value)
                                 @php($valueId = (int) ($value['id'] ?? 0))
-                                <label wire:key="filter-{{ (int) ($attribute['id'] ?? 0) }}-{{ $valueId }}"
+                                <label wire:key="filter-{{ $attributeId }}-{{ $valueId }}"
                                        class="inline-flex items-center gap-1 text-sm">
                                     <input type="checkbox"
-                                           value="{{ $valueId }}"
-                                           wire:change="toggleFilter({{ (int) ($attribute['id'] ?? 0) }}, {{ $valueId }})"
-                                           @checked(in_array($valueId, $activeValueIds, true))>
+                                           wire:click="toggleFilter({{ $attributeId }}, {{ $valueId }})"
+                                           @checked(! empty($value['selected']))>
                                     <span>{{ $value['label'] ?? '' }}</span>
                                 </label>
                             @endforeach

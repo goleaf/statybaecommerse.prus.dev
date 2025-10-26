@@ -174,18 +174,20 @@ final class Delivery extends StepComponent
 
                 $discount = $this->calculateShippingDiscount($baseAmount);
                 $finalAmount = max(0.0, round($baseAmount - $discount, 2));
-                $formatted = app_money_format($finalAmount, $currency);
+                $formattedFinal = app_money_format($finalAmount, $currency);
+                $formattedResolved = app_money_format($baseAmount, $currency);
 
                 return [
-                    'id'                 => $identifier,
-                    'name'               => (string) ($option['name'] ?? $model?->name ?? ''),
-                    'description'        => (string) ($option['description'] ?? $model?->description ?? ''),
-                    'price'              => $finalAmount,
-                    'resolved_price'     => $baseAmount,
-                    'formatted_price'    => (string) ($option['formatted_price'] ?? $formatted),
-                    'estimated_delivery' => (string) ($option['estimated_delivery'] ?? $model?->estimated_delivery_text ?? ''),
-                    'currency_code'      => $currency,
-                    'badges'             => $this->buildBadges($baseAmount, $finalAmount, $discount, $currency),
+                    'id'                        => $identifier,
+                    'name'                      => (string) ($option['name'] ?? $model?->name ?? ''),
+                    'description'               => (string) ($option['description'] ?? $model?->description ?? ''),
+                    'price'                     => $finalAmount,
+                    'resolved_price'            => $baseAmount,
+                    'resolved_formatted_price'  => $formattedResolved,
+                    'formatted_price'           => $formattedFinal,
+                    'estimated_delivery'        => (string) ($option['estimated_delivery'] ?? $model?->estimated_delivery_text ?? ''),
+                    'currency_code'             => $currency,
+                    'badges'                    => $this->buildBadges($baseAmount, $finalAmount, $discount, $currency),
                 ];
             })
             ->values()
