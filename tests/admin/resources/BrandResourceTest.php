@@ -9,7 +9,7 @@ use Livewire\Livewire;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
-beforeEach(function () {
+beforeEach(function (): void {
     // Create administrator role and permissions
     $role = Role::create(['name' => 'administrator']);
     $permissions = [
@@ -32,64 +32,82 @@ beforeEach(function () {
 
     // Create a test brand
     $this->testBrand = Brand::factory()->create([
-        'name' => 'Test Brand',
-        'slug' => 'test-brand',
+        'name'       => 'Test Brand',
+        'slug'       => 'test-brand',
         'is_enabled' => true,
     ]);
 });
 
-it('can list brands in admin panel', function () {
+it('can list brands in admin panel', function (): void {
     $this
         ->actingAs($this->adminUser)
         ->get(BrandResource::getUrl('index'))
         ->assertOk();
 });
 
-it('can create a new brand', function () {
+it('lists brands alphabetically by default', function (): void {
+    $alpha = Brand::factory()->create([
+        'name'       => 'Alpha Tools',
+        'slug'       => 'alpha-tools',
+        'is_enabled' => true,
+    ]);
+    $zulu = Brand::factory()->create([
+        'name'       => 'Zulu Tools',
+        'slug'       => 'zulu-tools',
+        'is_enabled' => true,
+    ]);
+
+    Livewire::actingAs($this->adminUser)
+        ->test(BrandResource\Pages\ListBrands::class)
+        // Expect the listing to surface an A→Z ordering anchored by the shared OrdersByName scope.
+        ->assertCanSeeTableRecordsInOrder([$alpha, $this->testBrand, $zulu]);
+});
+
+it('can create a new brand', function (): void {
     Livewire::actingAs($this->adminUser)
         ->test(BrandResource\Pages\CreateBrand::class)
         ->fillForm([
-            'name' => 'New Brand',
-            'slug' => 'new-brand',
+            'name'        => 'New Brand',
+            'slug'        => 'new-brand',
             'description' => 'A new brand description',
-            'website' => 'https://newbrand.com',
-            'is_enabled' => true,
+            'website'     => 'https://newbrand.com',
+            'is_enabled'  => true,
         ])
         ->call('create')
         ->assertHasNoFormErrors();
 
     $this->assertDatabaseHas('brands', [
-        'name' => 'New Brand',
-        'slug' => 'new-brand',
+        'name'       => 'New Brand',
+        'slug'       => 'new-brand',
         'is_enabled' => true,
     ]);
 });
 
-it('can view a brand in admin panel', function () {
+it('can view a brand in admin panel', function (): void {
     $this
         ->actingAs($this->adminUser)
         ->get(BrandResource::getUrl('view', ['record' => $this->testBrand]))
         ->assertOk();
 });
 
-it('can edit a brand', function () {
+it('can edit a brand', function (): void {
     Livewire::actingAs($this->adminUser)
         ->test(BrandResource\Pages\EditBrand::class, ['record' => $this->testBrand->getRouteKey()])
         ->fillForm([
-            'name' => 'Updated Brand',
+            'name'        => 'Updated Brand',
             'description' => 'Updated description',
         ])
         ->call('save')
         ->assertHasNoFormErrors();
 
     $this->assertDatabaseHas('brands', [
-        'id' => $this->testBrand->id,
-        'name' => 'Updated Brand',
+        'id'          => $this->testBrand->id,
+        'name'        => 'Updated Brand',
         'description' => 'Updated description',
     ]);
 });
 
-it('can delete a brand', function () {
+it('can delete a brand', function (): void {
     Livewire::actingAs($this->adminUser)
         ->test(BrandResource\Pages\ListBrands::class)
         ->callTableAction('delete', $this->testBrand);
@@ -99,7 +117,7 @@ it('can delete a brand', function () {
     ]);
 });
 
-it('can restore a deleted brand', function () {
+it('can restore a deleted brand', function (): void {
     $this->testBrand->delete();
 
     Livewire::actingAs($this->adminUser)
@@ -108,12 +126,12 @@ it('can restore a deleted brand', function () {
         ->callTableBulkAction('restore', [$this->testBrand]);
 
     $this->assertDatabaseHas('brands', [
-        'id' => $this->testBrand->id,
+        'id'         => $this->testBrand->id,
         'deleted_at' => null,
     ]);
 });
 
-it('can force delete a brand', function () {
+it('can force delete a brand', function (): void {
     $this->testBrand->delete();
 
     Livewire::actingAs($this->adminUser)
@@ -126,7 +144,7 @@ it('can force delete a brand', function () {
     ]);
 });
 
-it('validates required fields when creating brand', function () {
+it('validates required fields when creating brand', function (): void {
     Livewire::actingAs($this->adminUser)
         ->test(BrandResource\Pages\CreateBrand::class)
         ->fillForm([
@@ -137,7 +155,7 @@ it('validates required fields when creating brand', function () {
         ->assertHasFormErrors(['name' => 'required', 'slug' => 'required']);
 });
 
-it('validates unique slug when creating brand', function () {
+it('validates unique slug when creating brand', function (): void {
     // Create a brand with existing slug
     Brand::factory()->create(['slug' => 'existing-slug']);
 
@@ -151,19 +169,19 @@ it('validates unique slug when creating brand', function () {
         ->assertHasFormErrors(['slug' => 'unique']);
 });
 
-it('validates website URL format', function () {
+it('validates website URL format', function (): void {
     Livewire::actingAs($this->adminUser)
         ->test(BrandResource\Pages\CreateBrand::class)
         ->fillForm([
-            'name' => 'Test Brand',
-            'slug' => 'test-brand',
+            'name'    => 'Test Brand',
+            'slug'    => 'test-brand',
             'website' => 'invalid-url',  // This should fail validation
         ])
         ->call('create')
         ->assertHasFormErrors(['website' => 'url']);
 });
 
-it('can filter brands by enabled status', function () {
+it('can filter brands by enabled status', function (): void {
     Brand::factory()->create(['is_enabled' => false]);
 
     Livewire::actingAs($this->adminUser)
@@ -173,7 +191,7 @@ it('can filter brands by enabled status', function () {
         ->assertCanNotSeeTableRecords(Brand::where('is_enabled', false)->get());
 });
 
-it('can search brands by name', function () {
+it('can search brands by name', function (): void {
     $searchBrand = Brand::factory()->create(['name' => 'Searchable Brand']);
 
     Livewire::actingAs($this->adminUser)
@@ -183,7 +201,7 @@ it('can search brands by name', function () {
         ->assertCanNotSeeTableRecords([$this->testBrand]);
 });
 
-it('can sort brands by name', function () {
+it('can sort brands by name', function (): void {
     $brandA = Brand::factory()->create(['name' => 'Alpha Brand']);
     $brandB = Brand::factory()->create(['name' => 'Beta Brand']);
 
@@ -193,7 +211,7 @@ it('can sort brands by name', function () {
         ->assertCanSeeTableRecords([$brandA, $brandB], inOrder: true);
 });
 
-it('can bulk enable brands', function () {
+it('can bulk enable brands', function (): void {
     $disabledBrands = Brand::factory()->count(2)->create(['is_enabled' => false]);
 
     Livewire::actingAs($this->adminUser)
@@ -202,13 +220,13 @@ it('can bulk enable brands', function () {
 
     foreach ($disabledBrands as $brand) {
         $this->assertDatabaseHas('brands', [
-            'id' => $brand->id,
+            'id'         => $brand->id,
             'is_enabled' => true,
         ]);
     }
 });
 
-it('can bulk disable brands', function () {
+it('can bulk disable brands', function (): void {
     $enabledBrands = Brand::factory()->count(2)->create(['is_enabled' => true]);
 
     Livewire::actingAs($this->adminUser)
@@ -217,13 +235,13 @@ it('can bulk disable brands', function () {
 
     foreach ($enabledBrands as $brand) {
         $this->assertDatabaseHas('brands', [
-            'id' => $brand->id,
+            'id'         => $brand->id,
             'is_enabled' => false,
         ]);
     }
 });
 
-it('can bulk delete brands', function () {
+it('can bulk delete brands', function (): void {
     $brandsToDelete = Brand::factory()->count(2)->create();
 
     Livewire::actingAs($this->adminUser)
@@ -235,7 +253,7 @@ it('can bulk delete brands', function () {
     }
 });
 
-it('requires admin role to access brand resources', function () {
+it('requires admin role to access brand resources', function (): void {
     $regularUser = User::factory()->create();
 
     $this
@@ -244,7 +262,7 @@ it('requires admin role to access brand resources', function () {
         ->assertStatus(403);
 });
 
-it('displays brand logo in table', function () {
+it('displays brand logo in table', function (): void {
     // This test would require media library setup
     // For now, we'll just test that the table loads
     $this
@@ -253,7 +271,7 @@ it('displays brand logo in table', function () {
         ->assertOk();
 });
 
-it('displays products count in table', function () {
+it('displays products count in table', function (): void {
     // This test would require products relationship
     // For now, we'll just test that the table loads
     $this
@@ -262,7 +280,7 @@ it('displays products count in table', function () {
         ->assertOk();
 });
 
-it('displays translations count in table', function () {
+it('displays translations count in table', function (): void {
     // This test would require translations relationship
     // For now, we'll just test that the table loads
     $this
@@ -271,29 +289,29 @@ it('displays translations count in table', function () {
         ->assertOk();
 });
 
-it('can toggle brand active status', function () {
+it('can toggle brand active status', function (): void {
     Livewire::actingAs($this->adminUser)
         ->test(BrandResource\Pages\ListBrands::class)
         ->callTableAction('toggle_active', $this->testBrand);
 
     $this->assertDatabaseHas('brands', [
-        'id' => $this->testBrand->id,
+        'id'        => $this->testBrand->id,
         'is_active' => ! $this->testBrand->is_active,
     ]);
 });
 
-it('can toggle brand featured status', function () {
+it('can toggle brand featured status', function (): void {
     Livewire::actingAs($this->adminUser)
         ->test(BrandResource\Pages\ListBrands::class)
         ->callTableAction('toggle_featured', $this->testBrand);
 
     $this->assertDatabaseHas('brands', [
-        'id' => $this->testBrand->id,
+        'id'          => $this->testBrand->id,
         'is_featured' => ! $this->testBrand->is_featured,
     ]);
 });
 
-it('can filter brands by visibility', function () {
+it('can filter brands by visibility', function (): void {
     $visibleBrand = Brand::factory()->create(['is_visible' => true]);
     $hiddenBrand = Brand::factory()->create(['is_visible' => false]);
 
@@ -304,7 +322,7 @@ it('can filter brands by visibility', function () {
         ->assertCanNotSeeTableRecords([$hiddenBrand]);
 });
 
-it('can filter brands by featured status', function () {
+it('can filter brands by featured status', function (): void {
     $featuredBrand = Brand::factory()->create(['is_featured' => true]);
     $regularBrand = Brand::factory()->create(['is_featured' => false]);
 
@@ -315,7 +333,7 @@ it('can filter brands by featured status', function () {
         ->assertCanNotSeeTableRecords([$regularBrand]);
 });
 
-it('can filter brands with products', function () {
+it('can filter brands with products', function (): void {
     $brandWithProducts = Brand::factory()->create();
     $brandWithoutProducts = Brand::factory()->create();
 
@@ -326,7 +344,7 @@ it('can filter brands with products', function () {
         ->assertCanNotSeeTableRecords([$brandWithoutProducts]);
 });
 
-it('can filter brands without products', function () {
+it('can filter brands without products', function (): void {
     $brandWithProducts = Brand::factory()->create();
     $brandWithoutProducts = Brand::factory()->create();
 
@@ -337,7 +355,7 @@ it('can filter brands without products', function () {
         ->assertCanNotSeeTableRecords([$brandWithProducts]);
 });
 
-it('can filter brands with website', function () {
+it('can filter brands with website', function (): void {
     $brandWithWebsite = Brand::factory()->create(['website' => 'https://example.com']);
     $brandWithoutWebsite = Brand::factory()->create(['website' => null]);
 
@@ -348,7 +366,7 @@ it('can filter brands with website', function () {
         ->assertCanNotSeeTableRecords([$brandWithoutWebsite]);
 });
 
-it('can filter recent brands', function () {
+it('can filter recent brands', function (): void {
     $recentBrand = Brand::factory()->create(['created_at' => now()->subDays(15)]);
     $oldBrand = Brand::factory()->create(['created_at' => now()->subDays(45)]);
 
@@ -359,7 +377,7 @@ it('can filter recent brands', function () {
         ->assertCanNotSeeTableRecords([$oldBrand]);
 });
 
-it('can bulk feature brands', function () {
+it('can bulk feature brands', function (): void {
     $brandsToFeature = Brand::factory()->count(2)->create(['is_featured' => false]);
 
     Livewire::actingAs($this->adminUser)
@@ -368,13 +386,13 @@ it('can bulk feature brands', function () {
 
     foreach ($brandsToFeature as $brand) {
         $this->assertDatabaseHas('brands', [
-            'id' => $brand->id,
+            'id'          => $brand->id,
             'is_featured' => true,
         ]);
     }
 });
 
-it('can bulk unfeature brands', function () {
+it('can bulk unfeature brands', function (): void {
     $brandsToUnfeature = Brand::factory()->count(2)->create(['is_featured' => true]);
 
     Livewire::actingAs($this->adminUser)
@@ -383,13 +401,13 @@ it('can bulk unfeature brands', function () {
 
     foreach ($brandsToUnfeature as $brand) {
         $this->assertDatabaseHas('brands', [
-            'id' => $brand->id,
+            'id'          => $brand->id,
             'is_featured' => false,
         ]);
     }
 });
 
-it('can sort brands by products count', function () {
+it('can sort brands by products count', function (): void {
     $brandWithManyProducts = Brand::factory()->create();
     $brandWithFewProducts = Brand::factory()->create();
 
@@ -399,14 +417,14 @@ it('can sort brands by products count', function () {
         ->assertCanSeeTableRecords([$brandWithFewProducts, $brandWithManyProducts], inOrder: true);
 });
 
-it('can copy brand slug', function () {
+it('can copy brand slug', function (): void {
     $this
         ->actingAs($this->adminUser)
         ->get(BrandResource::getUrl('index'))
         ->assertOk();
 });
 
-it('can view brand website in new tab', function () {
+it('can view brand website in new tab', function (): void {
     $brandWithWebsite = Brand::factory()->create(['website' => 'https://example.com']);
 
     $this
@@ -415,7 +433,7 @@ it('can view brand website in new tab', function () {
         ->assertOk();
 });
 
-it('displays brand tooltip with description', function () {
+it('displays brand tooltip with description', function (): void {
     $brandWithDescription = Brand::factory()->create(['description' => 'Test description']);
 
     $this
@@ -424,7 +442,7 @@ it('displays brand tooltip with description', function () {
         ->assertOk();
 });
 
-it('can paginate brands table', function () {
+it('can paginate brands table', function (): void {
     Brand::factory()->count(15)->create();
 
     Livewire::actingAs($this->adminUser)
@@ -433,7 +451,7 @@ it('can paginate brands table', function () {
         ->assertCanNotSeeTableRecords(Brand::skip(10)->take(5)->get());
 });
 
-it('can change pagination size', function () {
+it('can change pagination size', function (): void {
     Brand::factory()->count(15)->create();
 
     Livewire::actingAs($this->adminUser)
@@ -442,7 +460,7 @@ it('can change pagination size', function () {
         ->assertCanSeeTableRecords(Brand::take(15)->get());
 });
 
-it('validates file upload size for logo', function () {
+it('validates file upload size for logo', function (): void {
     // This test would require file upload testing
     // For now, we'll just test that the form loads
     $this
@@ -451,7 +469,7 @@ it('validates file upload size for logo', function () {
         ->assertOk();
 });
 
-it('validates file upload size for banner', function () {
+it('validates file upload size for banner', function (): void {
     // This test would require file upload testing
     // For now, we'll just test that the form loads
     $this
@@ -460,7 +478,7 @@ it('validates file upload size for banner', function () {
         ->assertOk();
 });
 
-it('can upload brand logo with image editor', function () {
+it('can upload brand logo with image editor', function (): void {
     // This test would require file upload testing
     // For now, we'll just test that the form loads
     $this
@@ -469,7 +487,7 @@ it('can upload brand logo with image editor', function () {
         ->assertOk();
 });
 
-it('can upload brand banner with image editor', function () {
+it('can upload brand banner with image editor', function (): void {
     // This test would require file upload testing
     // For now, we'll just test that the form loads
     $this
@@ -478,35 +496,35 @@ it('can upload brand banner with image editor', function () {
         ->assertOk();
 });
 
-it('can access brand form tabs', function () {
+it('can access brand form tabs', function (): void {
     $this
         ->actingAs($this->adminUser)
         ->get(BrandResource::getUrl('create'))
         ->assertOk();
 });
 
-it('can access brand edit form tabs', function () {
+it('can access brand edit form tabs', function (): void {
     $this
         ->actingAs($this->adminUser)
         ->get(BrandResource::getUrl('edit', ['record' => $this->testBrand]))
         ->assertOk();
 });
 
-it('can access brand view page', function () {
+it('can access brand view page', function (): void {
     $this
         ->actingAs($this->adminUser)
         ->get(BrandResource::getUrl('view', ['record' => $this->testBrand]))
         ->assertOk();
 });
 
-it('displays navigation badge with brand count', function () {
+it('displays navigation badge with brand count', function (): void {
     $this
         ->actingAs($this->adminUser)
         ->get(BrandResource::getUrl('index'))
         ->assertOk();
 });
 
-it('can search brands globally', function () {
+it('can search brands globally', function (): void {
     $searchableBrand = Brand::factory()->create(['name' => 'Searchable Brand']);
 
     $this
