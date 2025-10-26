@@ -232,21 +232,79 @@ final class CampaignTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertJson(['success' => true]);
+        // The frontend widgets now expect the richer analytics payload that ships period metadata alongside totals and insight blocks.
         $response->assertJsonStructure([
             'success',
             'data' => [
-                'period',
-                'start_date',
-                'end_date',
-                'campaigns_created',
-                'campaigns_started',
-                'campaigns_completed',
-                'total_views',
-                'total_clicks',
-                'total_conversions',
-                'total_revenue',
-                'top_performing_campaigns',
-                'campaign_types_breakdown',
+                'period' => [
+                    'days',
+                    'label',
+                    'start_date',
+                    'end_date',
+                ],
+                'totals' => [
+                    'campaigns_created',
+                    'campaigns_started',
+                    'campaigns_completed',
+                    'active_campaigns',
+                ],
+                'insights' => [
+                    'views_clicks' => [
+                        'title',
+                        'description',
+                        'metrics' => [
+                            'total_views',
+                            'total_clicks',
+                            'average_click_through_rate',
+                            'top_campaigns',
+                        ],
+                    ],
+                    'conversions' => [
+                        'title',
+                        'description',
+                        'metrics' => [
+                            'total_conversions',
+                            'average_conversion_rate',
+                            'verified_conversions',
+                            'attributed_conversions',
+                            'assisted_conversions',
+                            'assisted_conversion_value',
+                            'attribution_breakdown',
+                        ],
+                    ],
+                    'roi_tracking' => [
+                        'title',
+                        'description',
+                        'metrics' => [
+                            'total_revenue',
+                            'total_budget',
+                            'roi_percentage',
+                            'roas',
+                            'average_roi',
+                            'average_roas',
+                            'average_cost_per_conversion',
+                        ],
+                    ],
+                    'customer_journey' => [
+                        'title',
+                        'description',
+                        'metrics' => [
+                            'average_touchpoints',
+                            'average_time_on_site',
+                            'average_page_views',
+                            'funnel_breakdown',
+                        ],
+                    ],
+                    'a_b_testing' => [
+                        'title',
+                        'description',
+                        'metrics' => [
+                            'multi_variant_campaigns',
+                            'winning_variant',
+                            'variant_performance',
+                        ],
+                    ],
+                ],
             ],
         ]);
     }

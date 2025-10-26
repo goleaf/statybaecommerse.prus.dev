@@ -88,10 +88,10 @@ class OrderTest extends TestCase
 
         $this->assertEquals('pending', $order->status);
 
-        $order->status = 'completed';
+        $order->status = 'delivered';
         $order->save();
 
-        $this->assertEquals('completed', $order->status);
+        $this->assertEquals('delivered', $order->status);
     }
 
     public function test_order_can_calculate_totals(): void

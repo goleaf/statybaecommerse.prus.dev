@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Livewire;
 
+use App\Data\Storefront\Testing\TestResultsData;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\File;
 use JsonException;
@@ -11,10 +12,7 @@ use Livewire\Component;
 
 final class TestResults extends Component
 {
-    /**
-     * @var array<string, mixed>
-     */
-    public array $results = [];
+    public TestResultsData $resultsData;
 
     public bool $isRunning = false;
 
@@ -37,21 +35,15 @@ final class TestResults extends Component
 
     public function loadResults(): void
     {
-        $this->results = $this->readResults();
-        $this->isRunning = ($this->results['status'] ?? 'completed') === 'running';
+        $this->resultsData = $this->readResults();
+        $this->isRunning = $this->resultsData->status === 'running';
 
-        $totalTestsValue = $this->results['total_tests'] ?? 0;
-        $completedValue = $this->results['completed_tests'] ?? 0;
+        $totalTests = max(0, $this->resultsData->totalTests);
+        $completedTests = max(0, min($this->resultsData->completedTests, $totalTests));
 
-        $totalTests = is_numeric($totalTestsValue) ? (int) $totalTestsValue : 0;
-        $completedTests = is_numeric($completedValue) ? (int) $completedValue : 0;
-
-        if ($totalTests > 0) {
-            $completedTests = max(0, min($completedTests, $totalTests));
-            $this->progress = (int) round(($completedTests / $totalTests) * 100);
-        } else {
-            $this->progress = 0;
-        }
+        $this->progress = $totalTests > 0
+            ? (int) round(($completedTests / $totalTests) * 100)
+            : 0;
     }
 
     public function render(): View
@@ -60,41 +52,33 @@ final class TestResults extends Component
     }
 
     /**
+     * Expose an array representation for Blade compatibility while retaining typed data internally.
+     *
      * @return array<string, mixed>
      */
-    private function readResults(): array
+    public function getResultsProperty(): array
     {
-        $defaults = [
-            'status'          => 'no_data',
-            'total_tests'     => 0,
-            'completed_tests' => 0,
-            'passed_tests'    => 0,
-            'failed_tests'    => 0,
-            'tests'           => [],
-            'errors'          => [],
-            'started_at'      => null,
-            'completed_at'    => null,
-        ];
+        return $this->resultsData->toArray();
+    }
 
+    private function readResults(): TestResultsData
+    {
         $path = storage_path('app/test-results.json');
 
         if (! File::exists($path)) {
-            return $defaults;
+            return TestResultsData::fromArray([]);
         }
 
         try {
             $decoded = json_decode(File::get($path) ?: '[]', true, 512, JSON_THROW_ON_ERROR);
         } catch (JsonException $exception) {
-            return $defaults;
+            return TestResultsData::fromArray([]);
         }
 
         if (! is_array($decoded)) {
-            return $defaults;
+            return TestResultsData::fromArray([]);
         }
 
-        /** @var array<string, mixed> $merged */
-        $merged = array_replace_recursive($defaults, $decoded);
-
-        return $merged;
+        return TestResultsData::fromArray($decoded);
     }
 }

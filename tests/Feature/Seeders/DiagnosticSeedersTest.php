@@ -43,7 +43,7 @@ final class DiagnosticSeedersTest extends TestCase
         $this->seed(PartnerSeeder::class);
         $this->seed(PartnerSeeder::class);
 
-        $this->assertGreaterThanOrEqual(3, PartnerTier::count());
+        $this->assertGreaterThanOrEqual(4, PartnerTier::count());
         $this->assertGreaterThanOrEqual(5, Partner::count());
         $this->assertSame(
             Partner::count(),

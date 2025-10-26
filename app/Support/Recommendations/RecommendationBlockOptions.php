@@ -19,12 +19,18 @@ final class RecommendationBlockOptions
     public static function types(): array
     {
         return [
-            // The labels are resolved through translations to keep UI copy consistent.
-            'featured' => __('recommendation_blocks.types.featured'),
-            'related'  => __('recommendation_blocks.types.related'),
-            'similar'  => __('recommendation_blocks.types.similar'),
-            'trending' => __('recommendation_blocks.types.trending'),
-            'recent'   => __('recommendation_blocks.types.recent'),
+            // Core instruction-aligned block types.
+            'similar_products'           => __('recommendation_blocks.types.similar_products'),
+            'frequently_bought_together' => __('recommendation_blocks.types.frequently_bought_together'),
+            'trending_products'          => __('recommendation_blocks.types.trending_products'),
+            'personalized'               => __('recommendation_blocks.types.personalized'),
+            'category_based'             => __('recommendation_blocks.types.category_based'),
+            // Legacy identifiers remain for backwards compatibility with existing fixtures.
+            'featured'                   => __('recommendation_blocks.types.featured'),
+            'related'                    => __('recommendation_blocks.types.related'),
+            'similar'                    => __('recommendation_blocks.types.similar'),
+            'trending'                   => __('recommendation_blocks.types.trending'),
+            'recent'                     => __('recommendation_blocks.types.recent'),
         ];
     }
 

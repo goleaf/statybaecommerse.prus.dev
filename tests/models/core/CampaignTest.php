@@ -454,6 +454,9 @@ final class CampaignTest extends TestCase
         ]);
 
         $this->assertEquals(1, $campaign->fresh()->total_views);
+
+        // Legacy metadata access must stay in sync for components still bound to JSON payloads.
+        $this->assertSame(1, $campaign->fresh()->metadata['total_views']);
     }
 
     public function test_record_click_method(): void
@@ -473,6 +476,9 @@ final class CampaignTest extends TestCase
         ]);
 
         $this->assertEquals(1, $campaign->fresh()->total_clicks);
+
+        // Confirm the metadata mirror reflects the atomic column increment.
+        $this->assertSame(1, $campaign->fresh()->metadata['total_clicks']);
     }
 
     public function test_record_conversion_method(): void
@@ -497,6 +503,39 @@ final class CampaignTest extends TestCase
         $freshCampaign = $campaign->fresh();
         $this->assertEquals(1, $freshCampaign->total_conversions);
         $this->assertEquals(100.5, $freshCampaign->total_revenue);
+
+        // Ensure both the conversion counter and revenue total remain available through metadata.
+        $this->assertSame(1, $freshCampaign->metadata['total_conversions']);
+        $this->assertSame(100.5, $freshCampaign->metadata['total_revenue']);
+    }
+
+    public function test_record_conversion_updates_conversion_rate_column_and_metadata(): void
+    {
+        $campaign = Campaign::factory()->create([
+            'total_clicks'      => 4,
+            'total_conversions' => 1,
+            'total_revenue'     => 10.0,
+            'conversion_rate'   => 25.0,
+            'metadata'          => [
+                'total_clicks'      => 4,
+                'total_conversions' => 1,
+                'total_revenue'     => 10.0,
+                'conversion_rate'   => 25.0,
+            ],
+        ]);
+
+        // Recording an additional conversion should update counters, revenue, and derived rates.
+        $campaign->recordConversion('purchase', 20.0, null, null, null, ['order_total' => 20.0]);
+
+        $freshCampaign = $campaign->fresh();
+        $this->assertSame(2, $freshCampaign->total_conversions);
+        $this->assertSame(30.0, (float) $freshCampaign->total_revenue);
+        $this->assertSame(50.0, $freshCampaign->conversion_rate);
+
+        // Validate metadata mirrors continue to report the same aggregates for legacy consumers.
+        $this->assertSame(2, $freshCampaign->metadata['total_conversions']);
+        $this->assertSame(30.0, (float) $freshCampaign->metadata['total_revenue']);
+        $this->assertSame(50.0, (float) $freshCampaign->metadata['conversion_rate']);
     }
 
     public function test_get_banner_url_method(): void
@@ -931,5 +970,42 @@ final class CampaignTest extends TestCase
         $this->assertFalse($summary['track_conversions']);
         $this->assertTrue($summary['is_featured']);
         $this->assertFalse($summary['social_media_ready']);
+    }
+
+    public function test_automation_flags_prioritise_column_values_over_metadata(): void
+    {
+        $campaign = Campaign::factory()->create([
+            'auto_start'           => true,
+            'auto_end'             => false,
+            'auto_pause_on_budget' => false,
+            'metadata'             => [
+                'auto_start'           => false,
+                'auto_end'             => true,
+                'auto_pause_on_budget' => true,
+            ],
+        ]);
+
+        $freshCampaign = $campaign->fresh();
+
+        // Column-backed booleans must override any conflicting legacy metadata payloads.
+        $this->assertTrue($freshCampaign->auto_start);
+        $this->assertFalse($freshCampaign->auto_end);
+        $this->assertFalse($freshCampaign->auto_pause_on_budget);
+    }
+
+    public function test_automation_flags_fallback_to_metadata_when_column_absent(): void
+    {
+        $campaign = new Campaign([
+            'metadata' => [
+                'auto_start'           => true,
+                'auto_end'             => true,
+                'auto_pause_on_budget' => true,
+            ],
+        ]);
+
+        // When the model lacks persisted column values, legacy metadata should still drive the toggles.
+        $this->assertTrue($campaign->auto_start);
+        $this->assertTrue($campaign->auto_end);
+        $this->assertTrue($campaign->auto_pause_on_budget);
     }
 }

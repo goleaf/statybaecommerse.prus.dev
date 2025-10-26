@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services\Cart;
 
 use App\Models\CartItem;
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Session\Session as SessionStore;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Arr;
@@ -45,7 +46,25 @@ final class CartService
     }
 
     /**
-     * @return array{items: array<int, array{id:int|null, product_id:int|null, name:string, price:float, quantity:int, total:float, image:?string, attributes: array<string, mixed>}>, count:int, subtotal:float, tax:float, shipping:float, discount:float, total:float}
+     * @return array{
+     *     items: array<int, array{
+     *         id:int|null,
+     *         product_id:int|null,
+     *         variant_id:int|null,
+     *         name:string,
+     *         price:float,
+     *         quantity:int,
+     *         total:float,
+     *         image:?string,
+     *         attributes: array<string, mixed>
+     *     }>,
+     *     count:int,
+     *     subtotal:float,
+     *     tax:float,
+     *     shipping:float,
+     *     discount:float,
+     *     total:float
+     * }
      */
     public function getSummary(?int $userId, string $sessionId): array
     {
@@ -220,7 +239,25 @@ final class CartService
     }
 
     /**
-     * @return array{items: array<int, array{id:int|null, product_id:int|null, name:string, price:float, quantity:int, total:float, image:?string, attributes: array<string, mixed>}>, count:int, subtotal:float, tax:float, shipping:float, discount:float, total:float}
+     * @return array{
+     *     items: array<int, array{
+     *         id:int|null,
+     *         product_id:int|null,
+     *         variant_id:int|null,
+     *         name:string,
+     *         price:float,
+     *         quantity:int,
+     *         total:float,
+     *         image:?string,
+     *         attributes: array<string, mixed>
+     *     }>,
+     *     count:int,
+     *     subtotal:float,
+     *     tax:float,
+     *     shipping:float,
+     *     discount:float,
+     *     total:float
+     * }
      */
     private function buildSummaryFromFacade(string $sessionId): array
     {
@@ -245,6 +282,15 @@ final class CartService
                         ? $associatedModel->getKey()
                         : null,
                 );
+                $attributes = $this->normalizeAttributes($item->attributes ?? []);
+                $variantId = $this->extractNullableInt(
+                    $attributes['variant_id'] ?? (
+                        is_object($associatedModel) && method_exists($associatedModel, 'getAttribute')
+                            ? $associatedModel->getAttribute('variant_id')
+                            : null
+                    ),
+                );
+
                 $image = null;
                 if (is_object($associatedModel) && method_exists($associatedModel, 'getFirstMediaUrl')) {
                     $image = $associatedModel->getFirstMediaUrl('images');
@@ -253,12 +299,13 @@ final class CartService
                 $items[] = [
                     'id'         => $this->extractNullableInt($item->id ?? null),
                     'product_id' => $productId,
+                    'variant_id' => $variantId,
                     'name'       => is_string($item->name ?? null) ? (string) $item->name : '',
                     'price'      => round($price, 2),
                     'quantity'   => $quantity,
                     'total'      => round($total, 2),
                     'image'      => $image,
-                    'attributes' => $this->normalizeAttributes($item->attributes ?? []),
+                    'attributes' => $this->purgeVariantIdentifier($attributes),
                 ];
 
                 $subtotal += $total;
@@ -274,7 +321,25 @@ final class CartService
     }
 
     /**
-     * @return array{items: array<int, array{id:int|null, product_id:int|null, name:string, price:float, quantity:int, total:float, image:?string, attributes: array<string, mixed>}>, count:int, subtotal:float, tax:float, shipping:float, discount:float, total:float}
+     * @return array{
+     *     items: array<int, array{
+     *         id:int|null,
+     *         product_id:int|null,
+     *         variant_id:int|null,
+     *         name:string,
+     *         price:float,
+     *         quantity:int,
+     *         total:float,
+     *         image:?string,
+     *         attributes: array<string, mixed>
+     *     }>,
+     *     count:int,
+     *     subtotal:float,
+     *     tax:float,
+     *     shipping:float,
+     *     discount:float,
+     *     total:float
+     * }
      */
     private function buildSummaryFromSession(): array
     {
@@ -300,12 +365,13 @@ final class CartService
             $items[] = [
                 'id'         => $this->extractNullableInt($item['id'] ?? null),
                 'product_id' => $this->extractNullableInt($item['product_id'] ?? null),
+                'variant_id' => $this->extractNullableInt($item['variant_id'] ?? null),
                 'name'       => isset($item['name']) && is_string($item['name']) ? $item['name'] : '',
                 'price'      => round($price, 2),
                 'quantity'   => $quantity,
                 'total'      => round($total, 2),
                 'image'      => isset($item['image']) && is_string($item['image']) ? $item['image'] : null,
-                'attributes' => $this->normalizeAttributes($item['attributes'] ?? []),
+                'attributes' => $this->normalizeAttributes($item['attributes'] ?? $item['options'] ?? []),
             ];
 
             $subtotal += $total;
@@ -316,7 +382,25 @@ final class CartService
     }
 
     /**
-     * @return array{items: array<int, array{id:int|null, product_id:int|null, name:string, price:float, quantity:int, total:float, image:?string, attributes: array<string, mixed>}>, count:int, subtotal:float, tax:float, shipping:float, discount:float, total:float}
+     * @return array{
+     *     items: array<int, array{
+     *         id:int|null,
+     *         product_id:int|null,
+     *         variant_id:int|null,
+     *         name:string,
+     *         price:float,
+     *         quantity:int,
+     *         total:float,
+     *         image:?string,
+     *         attributes: array<string, mixed>
+     *     }>,
+     *     count:int,
+     *     subtotal:float,
+     *     tax:float,
+     *     shipping:float,
+     *     discount:float,
+     *     total:float
+     * }
      */
     private function buildSummaryFromDatabase(?int $userId, string $sessionId): array
     {
@@ -353,12 +437,13 @@ final class CartService
             $items[] = [
                 'id'         => $this->extractNullableInt($item->getKey()),
                 'product_id' => $this->extractNullableInt($item->product_id),
+                'variant_id' => $this->extractNullableInt($item->variant_id ?? $item->product_variant_id),
                 'name'       => $name,
                 'price'      => round($price, 2),
                 'quantity'   => $quantity,
                 'total'      => round($total, 2),
                 'image'      => $image,
-                'attributes' => $attributes,
+                'attributes' => $this->purgeVariantIdentifier($attributes),
             ];
 
             $subtotal += $total;
@@ -369,26 +454,63 @@ final class CartService
     }
 
     /**
-     * @param  array<int, array{id:int|null, product_id:int|null, name:string, price:float, quantity:int, total:float, image:?string, attributes: array<string, mixed>}>                                                                                                  $items
-     * @return array{items: array<int, array{id:int|null, product_id:int|null, name:string, price:float, quantity:int, total:float, image:?string, attributes: array<string, mixed>}>, count:int, subtotal:float, tax:float, shipping:float, discount:float, total:float}
+     * @param  array<int, array{
+     *     id:int|null,
+     *     product_id:int|null,
+     *     variant_id:int|null,
+     *     name:string,
+     *     price:float,
+     *     quantity:int,
+     *     total:float,
+     *     image:?string,
+     *     attributes: array<string, mixed>
+     * }> $items
+     * @return array{
+     *     items: array<int, array{
+     *         id:int|null,
+     *         product_id:int|null,
+     *         variant_id:int|null,
+     *         name:string,
+     *         price:float,
+     *         quantity:int,
+     *         total:float,
+     *         image:?string,
+     *         attributes: array<string, mixed>
+     *     }>,
+     *     count:int,
+     *     subtotal:float,
+     *     tax:float,
+     *     shipping:float,
+     *     discount:float,
+     *     total:float
+     * }
      */
     private function finalizeSummary(array $items, int $count, float $subtotal): array
     {
         // Resolve the discount from the same session store we mutate elsewhere to maintain consistent state.
         $discountRaw = $this->session->get('cart_discount', 0.0);
-        $discount = is_numeric($discountRaw) ? (float) $discountRaw : 0.0;
+        $discount = is_numeric($discountRaw) ? max(0.0, (float) $discountRaw) : 0.0;
         $taxRateRaw = config('shared.tax.default_rate', 0.21);
-        $taxRate = is_numeric($taxRateRaw) ? (float) $taxRateRaw : 0.21;
+        $taxRate = is_numeric($taxRateRaw) ? max(0.0, (float) $taxRateRaw) : 0.21;
         $shippingThresholdRaw = config('shared.shipping.free_threshold', 50.0);
-        $shippingThreshold = is_numeric($shippingThresholdRaw) ? (float) $shippingThresholdRaw : 50.0;
+        $shippingThreshold = is_numeric($shippingThresholdRaw) ? max(0.0, (float) $shippingThresholdRaw) : 50.0;
         $shippingCostRaw = config('shared.shipping.flat_rate', 5.99);
-        $shippingCost = is_numeric($shippingCostRaw) ? (float) $shippingCostRaw : 5.99;
+        $shippingCost = is_numeric($shippingCostRaw) ? max(0.0, (float) $shippingCostRaw) : 5.99;
 
-        $tax = $subtotal * $taxRate;
-        $shipping = ($count === 0 || $subtotal <= 0.0)
+        // Ensure downstream totals never exceed the positive subtotal after accounting for discounts.
+        $effectiveSubtotal = max(0.0, $subtotal);
+        $discount = min($discount, $effectiveSubtotal);
+        $netSubtotal = $effectiveSubtotal - $discount;
+
+        // Calculate tax on the discounted subtotal so promotional adjustments reduce tax exposure accurately.
+        $tax = $netSubtotal * $taxRate;
+
+        // Free shipping applies once the discounted subtotal reaches the configured threshold.
+        $shipping = ($count === 0 || $netSubtotal <= 0.0)
             ? 0.0
-            : ($subtotal > $shippingThreshold ? 0.0 : $shippingCost);
-        $total = $subtotal - $discount + $tax + $shipping;
+            : ($netSubtotal >= $shippingThreshold ? 0.0 : $shippingCost);
+
+        $total = $netSubtotal + $tax + $shipping;
 
         return [
             'items'    => $items,
@@ -410,11 +532,55 @@ final class CartService
             return $attributes->toArray();
         }
 
+        if ($attributes instanceof Arrayable) {
+            return $attributes->toArray();
+        }
+
+        if (is_string($attributes)) {
+            // Allow legacy JSON blobs to hydrate into associative arrays for downstream consumers.
+            $decoded = json_decode($attributes, true);
+
+            if (is_array($decoded)) {
+                return $decoded;
+            }
+        }
+
         return is_array($attributes) ? $attributes : [];
     }
 
     /**
-     * @return array{items: array<int, array{id:int|null, product_id:int|null, name:string, price:float, quantity:int, total:float, image:?string, attributes: array<string, mixed>}>, count:int, subtotal:float, tax:float, shipping:float, discount:float, total:float}
+     * Strip duplicated variant identifiers from the attribute bag once elevated to the dedicated column.
+     *
+     * @param  array<string, mixed> $attributes
+     * @return array<string, mixed>
+     */
+    private function purgeVariantIdentifier(array $attributes): array
+    {
+        unset($attributes['variant_id']);
+
+        return $attributes;
+    }
+
+    /**
+     * @return array{
+     *     items: array<int, array{
+     *         id:int|null,
+     *         product_id:int|null,
+     *         variant_id:int|null,
+     *         name:string,
+     *         price:float,
+     *         quantity:int,
+     *         total:float,
+     *         image:?string,
+     *         attributes: array<string, mixed>
+     *     }>,
+     *     count:int,
+     *     subtotal:float,
+     *     tax:float,
+     *     shipping:float,
+     *     discount:float,
+     *     total:float
+     * }
      */
     private function emptySummary(): array
     {
@@ -441,11 +607,26 @@ final class CartService
 
     private function extractPositiveInt(mixed $value): int
     {
-        if (is_numeric($value)) {
-            return max(0, (int) $value);
+        $minimum = max(0, (int) config('shared.cart.min_quantity', 1));
+        $maximumCandidate = (int) config('shared.cart.max_quantity', max($minimum, 50));
+        $maximum = $maximumCandidate < $minimum ? $minimum : $maximumCandidate;
+
+        if (! is_numeric($value)) {
+            // Fallback to the minimum so callers never see zero-quantity line items.
+            return $minimum;
         }
 
-        return 0;
+        $quantity = (int) $value;
+
+        if ($quantity < $minimum) {
+            return $minimum;
+        }
+
+        if ($quantity > $maximum) {
+            return $maximum;
+        }
+
+        return $quantity;
     }
 
     private function extractFloat(mixed $value): float

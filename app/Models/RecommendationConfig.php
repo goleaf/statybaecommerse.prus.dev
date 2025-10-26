@@ -99,6 +99,8 @@ final class RecommendationConfig extends Model
             'hybrid'        => \App\Services\Recommendations\HybridRecommendation::class,
             'popularity'    => \App\Services\Recommendations\PopularityRecommendation::class,
             'trending'      => \App\Services\Recommendations\TrendingRecommendation::class,
+            'personalized'  => \App\Services\Recommendations\PersonalizedRecommendation::class,
+            'category_based'=> \App\Services\Recommendations\CategoryBasedRecommendation::class,
             'cross_sell'    => \App\Services\Recommendations\CrossSellRecommendation::class,
             'up_sell'       => \App\Services\Recommendations\UpSellRecommendation::class,
             default         => \App\Services\Recommendations\ContentBasedRecommendation::class,

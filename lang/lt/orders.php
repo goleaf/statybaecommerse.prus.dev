@@ -182,7 +182,7 @@ return [
         'processing_orders'    => 'Apdorojami užsakymai',
         'shipped_orders'       => 'Išsiųsti užsakymai',
         'delivered_orders'     => 'Pristatyti užsakymai',
-        'completed_orders'     => 'Užbaigti užsakymai',
+        'completed_orders'     => 'Pristatyti užsakymai',
         'cancelled_orders'     => 'Atšaukti užsakymai',
         'total_revenue'        => 'Bendros pajamos',
         'average_order_value'  => 'Vidutinė užsakymo vertė',

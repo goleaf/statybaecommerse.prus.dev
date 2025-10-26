@@ -12,7 +12,7 @@ return [
     'recent_orders'          => 'Nauji užsakymai',
     'active_users'           => 'Aktyvūs vartotojai',
     'published_products'     => 'Publikuoti produktai',
-    'completed_orders'       => 'Užbaigti užsakymai',
+    'completed_orders'       => 'Pristatyti užsakymai',
     'users_description'      => 'Iš viso registruotų vartotojų',
     'products_description'   => 'Iš viso produktų kataloge',
     'orders_description'     => 'Iš viso pateiktų užsakymų',

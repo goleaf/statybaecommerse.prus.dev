@@ -9,9 +9,11 @@ use App\Models\Collection;
 use App\Models\Product;
 use App\Models\User;
 use App\Support\Nav;
+use Filament\Forms\Form;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use ReflectionClass;
 use Tests\TestCase;
+use Tests\Support\Filament\FakeFormComponent;
 
 class CollectionResourceComprehensiveTest extends TestCase
 {
@@ -57,6 +59,42 @@ class CollectionResourceComprehensiveTest extends TestCase
     public function test_collection_resource_form_method_exists(): void
     {
         $this->assertTrue(method_exists(CollectionResource::class, 'form'));
+    }
+
+    public function test_collection_resource_form_includes_merchandising_and_seo_fields(): void
+    {
+        $form = CollectionResource::form(Form::make(new FakeFormComponent));
+        $components = collect($form->getFlatComponents(withHidden: true, withActions: false));
+
+        $statePaths = $components
+            ->map(static fn ($component) => method_exists($component, 'getStatePath') ? $component->getStatePath() : null)
+            ->filter()
+            ->values();
+
+        // Ensure manual/dynamic toggles and merchandising settings are exposed for auditing.
+        $this->assertContains('is_automatic', $statePaths->all());
+        $this->assertContains('is_active', $statePaths->all());
+        $this->assertContains('display_type', $statePaths->all());
+        $this->assertContains('products_per_page', $statePaths->all());
+        $this->assertContains('max_products', $statePaths->all());
+        $this->assertContains('show_filters', $statePaths->all());
+
+        // Confirm SEO meta fields exist so collections can deliver optimized landing pages.
+        $this->assertContains('seo_title', $statePaths->all());
+        $this->assertContains('seo_description', $statePaths->all());
+        $this->assertContains('meta_title', $statePaths->all());
+        $this->assertContains('meta_description', $statePaths->all());
+        $this->assertContains('meta_keywords', $statePaths->all());
+
+        $displayComponent = $components->first(fn ($component) => method_exists($component, 'getStatePath')
+            && $component->getStatePath() === 'display_type');
+
+        $this->assertNotNull($displayComponent);
+        $this->assertSame([
+            'grid'     => __('admin.collections.display_types.grid'),
+            'list'     => __('admin.collections.display_types.list'),
+            'carousel' => __('admin.collections.display_types.carousel'),
+        ], method_exists($displayComponent, 'getOptions') ? $displayComponent->getOptions() : []);
     }
 
     public function test_collection_resource_table_method_exists(): void

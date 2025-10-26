@@ -15,11 +15,16 @@ return [
     'position'          => 'Position',
 
     'types' => [
-        'featured' => 'Featured',
-        'related'  => 'Related',
-        'similar'  => 'Similar',
-        'trending' => 'Trending',
-        'recent'   => 'Recent',
+        'similar_products'           => 'Similar Products',
+        'frequently_bought_together' => 'Frequently Bought Together',
+        'trending_products'          => 'Trending Products',
+        'personalized'               => 'Personalized',
+        'category_based'             => 'Category-Based',
+        'featured'                   => 'Featured',
+        'related'                    => 'Related',
+        'similar'                    => 'Similar',
+        'trending'                   => 'Trending',
+        'recent'                     => 'Recent',
     ],
 
     'fields' => [
@@ -41,11 +46,16 @@ return [
 
     'options' => [
         'types' => [
-            'featured' => 'Featured',
-            'related'  => 'Related',
-            'similar'  => 'Similar',
-            'trending' => 'Trending',
-            'recent'   => 'Recent',
+            'similar_products'           => 'Similar Products',
+            'frequently_bought_together' => 'Frequently Bought Together',
+            'trending_products'          => 'Trending Products',
+            'personalized'               => 'Personalized',
+            'category_based'             => 'Category-Based',
+            'featured'                   => 'Featured',
+            'related'                    => 'Related',
+            'similar'                    => 'Similar',
+            'trending'                   => 'Trending',
+            'recent'                     => 'Recent',
         ],
         'positions' => [
             'top'     => 'Top',
@@ -62,37 +72,22 @@ return [
     ],
 
     'tabs' => [
-        'all'      => 'All',
-        'active'   => 'Active',
-        'featured' => 'Featured',
-        'related'  => 'Related',
-        'similar'  => 'Similar',
-        'trending' => 'Trending',
-        'recent'   => 'Recent',
+        'all'                        => 'All Blocks',
+        'active'                     => 'Active Blocks',
+        'similar_products'           => 'Similar Products',
+        'frequently_bought_together' => 'Frequently Bought Together',
+        'trending_products'          => 'Trending Products',
+        'personalized'               => 'Personalized',
+        'category_based'             => 'Category-Based',
+        'featured'                   => 'Featured',
+        'related'                    => 'Related',
+        'similar'                    => 'Similar',
+        'trending'                   => 'Trending',
+        'recent'                     => 'Recent',
     ],
 
     'actions' => [
         'toggle_active' => 'Toggle Active',
         'set_default'   => 'Set as Default',
-    ],
-
-    'tabs' => [
-        'all'      => 'All Blocks',
-        'active'   => 'Active Blocks',
-        'featured' => 'Featured',
-        'related'  => 'Related',
-        'similar'  => 'Similar',
-        'trending' => 'Trending',
-        'recent'   => 'Recent',
-    ],
-
-    'tabs' => [
-        'all'      => 'All Blocks',
-        'active'   => 'Active Blocks',
-        'featured' => 'Featured',
-        'related'  => 'Related',
-        'similar'  => 'Similar',
-        'trending' => 'Trending',
-        'recent'   => 'Recent',
     ],
 ];

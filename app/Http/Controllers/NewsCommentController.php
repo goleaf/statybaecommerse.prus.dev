@@ -8,6 +8,7 @@ use App\Data\NewsCommentData;
 use App\Models\News;
 use App\Models\NewsComment;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Validation\ValidationException;
 
 /**
  * NewsCommentController
@@ -24,14 +25,31 @@ final class NewsCommentController extends Controller
         $news = News::published()->whereHas('translations', function ($query) use ($slug): void {
             $query->where('slug', $slug)->where('locale', app()->getLocale());
         })->firstOrFail();
+        $parentId = $data->parent_id;
+
+        if ($parentId !== null) {
+            // Ensure the referenced parent comment belongs to the same news item to avoid leaking IDs across articles.
+            $parentExists = NewsComment::query()
+                ->where('news_id', $news->id)
+                ->whereKey($parentId)
+                ->exists();
+
+            if (! $parentExists) {
+                // Surface a validation error so the frontend can render a friendly message for mismatched parent comments.
+                throw ValidationException::withMessages([
+                    'parent_id' => __('news.invalid_parent_comment'),
+                ]);
+            }
+        }
+
         NewsComment::create([
             'news_id'      => $news->id,
-            'parent_id'    => $data->parent_id,
+            'parent_id'    => $parentId,
             'author_name'  => $data->author_name,
             'author_email' => $data->author_email,
             'content'      => $data->content,
             'is_approved'  => false,
-            // Comments need approval
+            // Comments need approval before being displayed to other readers.
             'is_visible' => true,
         ]);
 

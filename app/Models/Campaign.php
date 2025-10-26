@@ -421,10 +421,23 @@ final class Campaign extends Model
      */
     public function recordView(?string $sessionId = null, ?string $ipAddress = null, ?string $userAgent = null, ?string $referer = null, ?int $customerId = null): void
     {
-        $this->views()->create(['session_id' => $sessionId, 'ip_address' => $ipAddress, 'user_agent' => $userAgent, 'referer' => $referer, 'customer_id' => $customerId, 'viewed_at' => now()]);
-        $metadata = $this->metadata ?? [];
-        $metadata['total_views'] = ($metadata['total_views'] ?? 0) + 1;
-        $this->update(['metadata' => $metadata]);
+        // Persist the raw view event so downstream analytics can inspect the interaction payload.
+        $this->views()->create([
+            'session_id'  => $sessionId,
+            'ip_address'  => $ipAddress,
+            'user_agent'  => $userAgent,
+            'referer'     => $referer,
+            'customer_id' => $customerId,
+            'viewed_at'   => now(),
+        ]);
+
+        // Keep the denormalised counter column in sync for aggregate queries without touching timestamps.
+        self::withoutTimestamps(function (): void {
+            $this->increment('total_views');
+        });
+
+        // Mirror the refreshed totals in metadata for legacy widgets still reading from JSON blobs.
+        $this->persistAnalyticsState(['total_views']);
     }
 
     /**
@@ -432,10 +445,24 @@ final class Campaign extends Model
      */
     public function recordClick(string $clickType = 'cta', ?string $clickedUrl = null, ?string $sessionId = null, ?string $ipAddress = null, ?string $userAgent = null, ?int $customerId = null): void
     {
-        $this->clicks()->create(['session_id' => $sessionId, 'ip_address' => $ipAddress, 'user_agent' => $userAgent, 'click_type' => $clickType, 'clicked_url' => $clickedUrl, 'customer_id' => $customerId, 'clicked_at' => now()]);
-        $metadata = $this->metadata ?? [];
-        $metadata['total_clicks'] = ($metadata['total_clicks'] ?? 0) + 1;
-        $this->update(['metadata' => $metadata]);
+        // Capture the click record before mutating aggregates to preserve an auditable event log.
+        $this->clicks()->create([
+            'session_id'  => $sessionId,
+            'ip_address'  => $ipAddress,
+            'user_agent'  => $userAgent,
+            'click_type'  => $clickType,
+            'clicked_url' => $clickedUrl,
+            'customer_id' => $customerId,
+            'clicked_at'  => now(),
+        ]);
+
+        // Increment the counter column atomically without bumping timestamps for noise-free analytics.
+        self::withoutTimestamps(function (): void {
+            $this->increment('total_clicks');
+        });
+
+        // Keep legacy metadata snapshots aligned with the authoritative database column.
+        $this->persistAnalyticsState(['total_clicks']);
     }
 
     /**
@@ -443,12 +470,68 @@ final class Campaign extends Model
      */
     public function recordConversion(string $conversionType = 'purchase', float $conversionValue = 0, ?int $orderId = null, ?int $customerId = null, ?string $sessionId = null, array $conversionData = []): void
     {
-        $this->conversions()->create(['order_id' => $orderId, 'customer_id' => $customerId, 'conversion_type' => $conversionType, 'conversion_value' => $conversionValue, 'session_id' => $sessionId, 'conversion_data' => $conversionData, 'converted_at' => now()]);
-        $metadata = $this->metadata ?? [];
-        $metadata['total_conversions'] = ($metadata['total_conversions'] ?? 0) + 1;
-        $metadata['total_revenue'] = ($metadata['total_revenue'] ?? 0) + $conversionValue;
-        $metadata['conversion_rate'] = $this->getConversionRate();
-        $this->update(['metadata' => $metadata]);
+        // Store the conversion snapshot including attribution metadata for full revenue traceability.
+        $this->conversions()->create([
+            'order_id'         => $orderId,
+            'customer_id'      => $customerId,
+            'conversion_type'  => $conversionType,
+            'conversion_value' => $conversionValue,
+            'session_id'       => $sessionId,
+            'conversion_data'  => $conversionData,
+            'converted_at'     => now(),
+        ]);
+
+        // Update conversion and revenue aggregates without polluting updated_at.
+        self::withoutTimestamps(function () use ($conversionValue): void {
+            $this->increment('total_conversions');
+            $this->increment('total_revenue', $conversionValue);
+        });
+
+        // Recompute derived analytics and keep metadata mirrors consistent for backwards compatibility.
+        $this->persistAnalyticsState(['total_conversions', 'total_revenue'], true);
+    }
+
+    /**
+     * Synchronise denormalised analytics columns with the legacy metadata payload.
+     */
+    private function persistAnalyticsState(array $columns, bool $recalculateConversionRate = false): void
+    {
+        // Guarantee the metadata array exists even for legacy rows created before JSON support.
+        $metadata = $this->metadataPayload();
+
+        // Optionally refresh the stored conversion rate before persisting the snapshot.
+        if ($recalculateConversionRate) {
+            $this->conversion_rate = $this->getConversionRate();
+        }
+
+        // Mirror the latest column values into metadata to support consumers that still rely on it.
+        foreach ($columns as $column) {
+            $metadata[$column] = $this->getAttribute($column);
+        }
+
+        if ($recalculateConversionRate) {
+            $metadata['conversion_rate'] = $this->conversion_rate;
+        }
+
+        // Persist quietly to avoid firing events while still updating the authoritative attributes.
+        $attributesToPersist = ['metadata' => $metadata];
+
+        if ($recalculateConversionRate) {
+            $attributesToPersist['conversion_rate'] = $this->conversion_rate;
+        }
+
+        $this->forceFill($attributesToPersist)->saveQuietly();
+    }
+
+    /**
+     * Provide a normalised metadata array for accessors that still support legacy payloads.
+     *
+     * @return array<string, mixed>
+     */
+    private function metadataPayload(): array
+    {
+        // Cast null metadata to an empty array so array access stays safe across PHP versions.
+        return is_array($this->metadata) ? $this->metadata : [];
     }
 
     /**
@@ -540,33 +623,53 @@ final class Campaign extends Model
     /**
      * Handle getDescriptionAttribute functionality with proper error handling.
      */
-    public function getDescriptionAttribute(): ?string
+    public function getDescriptionAttribute(?string $value): ?string
     {
-        return $this->metadata['description'] ?? null;
+        // Use the persisted column value when present, falling back to metadata for legacy records.
+        if ($value !== null) {
+            return $value;
+        }
+
+        return $this->metadataPayload()['description'] ?? null;
     }
 
     /**
      * Handle getTypeAttribute functionality with proper error handling.
      */
-    public function getTypeAttribute(): ?string
+    public function getTypeAttribute(?string $value): ?string
     {
-        return $this->metadata['type'] ?? 'banner';
+        // Honour the stored campaign type column but retain backward compatibility with metadata snapshots.
+        if ($value !== null) {
+            return $value;
+        }
+
+        return $this->metadataPayload()['type'] ?? 'banner';
     }
 
     /**
      * Handle getSubjectAttribute functionality with proper error handling.
      */
-    public function getSubjectAttribute(): ?string
+    public function getSubjectAttribute(?string $value): ?string
     {
-        return $this->metadata['subject'] ?? null;
+        // Prioritise the dedicated subject column and fall back to the legacy metadata payload otherwise.
+        if ($value !== null) {
+            return $value;
+        }
+
+        return $this->metadataPayload()['subject'] ?? null;
     }
 
     /**
      * Handle getContentAttribute functionality with proper error handling.
      */
-    public function getContentAttribute(): ?string
+    public function getContentAttribute(?string $value): ?string
     {
-        return $this->metadata['content'] ?? null;
+        // Prefer the column content when hydrated while still supporting historical metadata dumps.
+        if ($value !== null) {
+            return $value;
+        }
+
+        return $this->metadataPayload()['content'] ?? null;
     }
 
     /**
@@ -592,153 +695,254 @@ final class Campaign extends Model
     /**
      * Handle getBudgetAttribute functionality with proper error handling.
      */
-    public function getBudgetAttribute(): ?float
+    public function getBudgetAttribute(?float $value): ?float
     {
-        return $this->metadata['budget'] ?? null;
+        // Retain metadata support for legacy rows while allowing column overrides when introduced.
+        if ($value !== null) {
+            return $value;
+        }
+
+        $metadata = $this->metadataPayload();
+
+        return isset($metadata['budget']) ? (float) $metadata['budget'] : null;
     }
 
     /**
      * Handle getTotalViewsAttribute functionality with proper error handling.
      */
-    public function getTotalViewsAttribute(): int
+    public function getTotalViewsAttribute(?int $value): int
     {
-        return $this->metadata['total_views'] ?? 0;
+        // Aggregate counters should prefer the authoritative column yet still honour legacy metadata.
+        if ($value !== null) {
+            return $value;
+        }
+
+        return (int) ($this->metadataPayload()['total_views'] ?? 0);
     }
 
     /**
      * Handle getTotalClicksAttribute functionality with proper error handling.
      */
-    public function getTotalClicksAttribute(): int
+    public function getTotalClicksAttribute(?int $value): int
     {
-        return $this->metadata['total_clicks'] ?? 0;
+        // Favour the denormalised column while keeping backwards compatibility with JSON payloads.
+        if ($value !== null) {
+            return $value;
+        }
+
+        return (int) ($this->metadataPayload()['total_clicks'] ?? 0);
     }
 
     /**
      * Handle getTotalConversionsAttribute functionality with proper error handling.
      */
-    public function getTotalConversionsAttribute(): int
+    public function getTotalConversionsAttribute(?int $value): int
     {
-        return $this->metadata['total_conversions'] ?? 0;
+        // Ensure reporting reads from the persisted column before falling back to historical metadata.
+        if ($value !== null) {
+            return $value;
+        }
+
+        return (int) ($this->metadataPayload()['total_conversions'] ?? 0);
     }
 
     /**
      * Handle getTotalRevenueAttribute functionality with proper error handling.
      */
-    public function getTotalRevenueAttribute(): float
+    public function getTotalRevenueAttribute(?float $value): float
     {
-        return $this->metadata['total_revenue'] ?? 0;
+        // Prefer the up-to-date revenue column while accepting metadata for migrated records.
+        if ($value !== null) {
+            return $value;
+        }
+
+        return (float) ($this->metadataPayload()['total_revenue'] ?? 0);
     }
 
     /**
      * Handle getConversionRateAttribute functionality with proper error handling.
      */
-    public function getConversionRateAttribute(): float
+    public function getConversionRateAttribute(?float $value): float
     {
-        return $this->metadata['conversion_rate'] ?? 0;
+        // Trust the stored conversion rate when calculated, otherwise fall back to the legacy JSON snapshot.
+        if ($value !== null) {
+            return $value;
+        }
+
+        return (float) ($this->metadataPayload()['conversion_rate'] ?? 0);
     }
 
     /**
      * Handle getTargetAudienceAttribute functionality with proper error handling.
      */
-    public function getTargetAudienceAttribute(): ?array
+    public function getTargetAudienceAttribute(?array $value): ?array
     {
-        return $this->metadata['target_audience'] ?? null;
+        // Return the native JSON column when available while preserving compatibility with metadata dumps.
+        if ($value !== null) {
+            return $value;
+        }
+
+        $metadata = $this->metadataPayload();
+
+        return isset($metadata['target_audience']) ? (array) $metadata['target_audience'] : null;
     }
 
     /**
      * Handle getTargetSegmentsAttribute functionality with proper error handling.
      */
-    public function getTargetSegmentsAttribute(): ?array
+    public function getTargetSegmentsAttribute(?array $value): ?array
     {
-        return $this->metadata['target_segments'] ?? null;
+        // Surface the stored column when defined, otherwise rely on the metadata fallback.
+        if ($value !== null) {
+            return $value;
+        }
+
+        $metadata = $this->metadataPayload();
+
+        return isset($metadata['target_segments']) ? (array) $metadata['target_segments'] : null;
     }
 
     /**
      * Handle getDisplayPriorityAttribute functionality with proper error handling.
      */
-    public function getDisplayPriorityAttribute(): int
+    public function getDisplayPriorityAttribute(?int $value): int
     {
-        return $this->metadata['display_priority'] ?? 0;
+        // Read from the dedicated priority column when set, otherwise fall back to metadata defaults.
+        if ($value !== null) {
+            return $value;
+        }
+
+        return (int) ($this->metadataPayload()['display_priority'] ?? 0);
     }
 
     /**
      * Handle getBannerImageAttribute functionality with proper error handling.
      */
-    public function getBannerImageAttribute(): ?string
+    public function getBannerImageAttribute(?string $value): ?string
     {
-        return $this->metadata['banner_image'] ?? null;
+        // Prefer the stored banner image column while keeping legacy metadata compatible.
+        if ($value !== null) {
+            return $value;
+        }
+
+        return $this->metadataPayload()['banner_image'] ?? null;
     }
 
     /**
      * Handle getBannerAltTextAttribute functionality with proper error handling.
      */
-    public function getBannerAltTextAttribute(): ?string
+    public function getBannerAltTextAttribute(?string $value): ?string
     {
-        return $this->metadata['banner_alt_text'] ?? null;
+        // Ensure the accessibility text uses the column when filled, with metadata as a safety net.
+        if ($value !== null) {
+            return $value;
+        }
+
+        return $this->metadataPayload()['banner_alt_text'] ?? null;
     }
 
     /**
      * Handle getCtaTextAttribute functionality with proper error handling.
      */
-    public function getCtaTextAttribute(): ?string
+    public function getCtaTextAttribute(?string $value): ?string
     {
-        return $this->metadata['cta_text'] ?? null;
+        // Return the column-backed CTA copy when available before consulting metadata.
+        if ($value !== null) {
+            return $value;
+        }
+
+        return $this->metadataPayload()['cta_text'] ?? null;
     }
 
     /**
      * Handle getCtaUrlAttribute functionality with proper error handling.
      */
-    public function getCtaUrlAttribute(): ?string
+    public function getCtaUrlAttribute(?string $value): ?string
     {
-        return $this->metadata['cta_url'] ?? null;
+        // Prefer the stored URL column and fall back to metadata when migrating older records.
+        if ($value !== null) {
+            return $value;
+        }
+
+        return $this->metadataPayload()['cta_url'] ?? null;
     }
 
     /**
      * Handle getAutoStartAttribute functionality with proper error handling.
      */
-    public function getAutoStartAttribute(): bool
+    public function getAutoStartAttribute(?bool $value): bool
     {
-        return $this->metadata['auto_start'] ?? false;
+        // Automation toggles should respect the persisted boolean column while preserving metadata support.
+        if ($value !== null) {
+            return (bool) $value;
+        }
+
+        return (bool) ($this->metadataPayload()['auto_start'] ?? false);
     }
 
     /**
      * Handle getAutoEndAttribute functionality with proper error handling.
      */
-    public function getAutoEndAttribute(): bool
+    public function getAutoEndAttribute(?bool $value): bool
     {
-        return $this->metadata['auto_end'] ?? false;
+        // Honour the stored column before falling back to metadata when dealing with legacy exports.
+        if ($value !== null) {
+            return (bool) $value;
+        }
+
+        return (bool) ($this->metadataPayload()['auto_end'] ?? false);
     }
 
     /**
      * Handle getAutoPauseOnBudgetAttribute functionality with proper error handling.
      */
-    public function getAutoPauseOnBudgetAttribute(): bool
+    public function getAutoPauseOnBudgetAttribute(?bool $value): bool
     {
-        return $this->metadata['auto_pause_on_budget'] ?? false;
+        // Always favour the dedicated column value and rely on metadata only for backwards compatibility.
+        if ($value !== null) {
+            return (bool) $value;
+        }
+
+        return (bool) ($this->metadataPayload()['auto_pause_on_budget'] ?? false);
     }
 
     /**
      * Handle getMetaTitleAttribute functionality with proper error handling.
      */
-    public function getMetaTitleAttribute(): ?string
+    public function getMetaTitleAttribute(?string $value): ?string
     {
-        return $this->metadata['meta_title'] ?? null;
+        // Prefer the SEO title column with metadata available as a migration fallback.
+        if ($value !== null) {
+            return $value;
+        }
+
+        return $this->metadataPayload()['meta_title'] ?? null;
     }
 
     /**
      * Handle getMetaDescriptionAttribute functionality with proper error handling.
      */
-    public function getMetaDescriptionAttribute(): ?string
+    public function getMetaDescriptionAttribute(?string $value): ?string
     {
-        return $this->metadata['meta_description'] ?? null;
+        // Return the canonical SEO description column when set, otherwise consult metadata.
+        if ($value !== null) {
+            return $value;
+        }
+
+        return $this->metadataPayload()['meta_description'] ?? null;
     }
 
     /**
      * Handle getSocialMediaReadyAttribute functionality with proper error handling.
      */
-    public function getSocialMediaReadyAttribute(): bool
+    public function getSocialMediaReadyAttribute(?bool $value): bool
     {
-        return $this->metadata['social_media_ready'] ?? false;
+        // Trust the stored boolean column for social readiness, keeping metadata for historic entries.
+        if ($value !== null) {
+            return (bool) $value;
+        }
+
+        return (bool) ($this->metadataPayload()['social_media_ready'] ?? false);
     }
 
     /**
