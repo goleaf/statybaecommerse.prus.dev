@@ -1188,6 +1188,16 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
     {
         $settings = $this->attributes['privacy_settings'] ?? [];
 
+        if (is_string($settings)) {
+            try {
+                $decoded = json_decode($settings, true, 512, JSON_THROW_ON_ERROR);
+            } catch (JsonException) {
+                $decoded = json_decode($settings, true) ?? [];
+            }
+
+            $settings = is_array($decoded) ? $decoded : [];
+        }
+
         return is_array($settings) ? $settings : [];
     }
 

@@ -14,6 +14,7 @@ use App\Models\UserWishlist;
 use App\Models\WishlistItem;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
+use Spatie\Activitylog\Models\Activity;
 use Tests\TestCase;
 
 final class DataPrivacyControllerTest extends TestCase
@@ -103,6 +104,17 @@ final class DataPrivacyControllerTest extends TestCase
         $this->assertNotEmpty($payload['orders']);
         $this->assertNotEmpty($payload['wishlist']);
         $this->assertNotEmpty($payload['reviews']);
+
+        $this->assertDatabaseHas('admin_activity_logs', [
+            'user_id'       => $user->getKey(),
+            'action'        => 'gdpr_data_export',
+            'resource_type' => User::class,
+            'resource_id'   => $user->getKey(),
+        ]);
+
+        $activity = Activity::query()->where('event', 'gdpr_data_export')->first();
+        $this->assertNotNull($activity);
+        $this->assertSame($user->getKey(), $activity->causer_id);
     }
 
     public function test_user_can_delete_account(): void
@@ -133,5 +145,16 @@ final class DataPrivacyControllerTest extends TestCase
         $this->assertStringStartsWith('deleted-user-' . $userKeyString, $user->email);
         $this->assertSame('Deleted User', $user->name);
         $this->assertSame(0, Address::query()->where('user_id', $user->getKey())->count());
+
+        $this->assertDatabaseHas('admin_activity_logs', [
+            'user_id'       => $user->getKey(),
+            'action'        => 'gdpr_account_deletion',
+            'resource_type' => User::class,
+            'resource_id'   => $user->getKey(),
+        ]);
+
+        $deletionActivity = Activity::query()->where('event', 'gdpr_account_deletion')->first();
+        $this->assertNotNull($deletionActivity);
+        $this->assertSame($user->getKey(), $deletionActivity->causer_id);
     }
 }
