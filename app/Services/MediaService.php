@@ -29,9 +29,9 @@ final class MediaService
      * @var array<string, array<string, int>>
      */
     public const DEFAULT_VARIANTS = [
-        'thumb' => ['width' => 180, 'height' => 180],
+        'thumb'  => ['width' => 180, 'height' => 180],
         'medium' => ['width' => 720, 'height' => 720],
-        'large' => ['width' => 1440, 'height' => 1440],
+        'large'  => ['width' => 1440, 'height' => 1440],
     ];
 
     public function __construct(
@@ -85,7 +85,7 @@ final class MediaService
         $originalPath = $media->getPath();
 
         foreach ($variants as $name => $dimensions) {
-            $relativePath = $variantDirectory.'/'.$this->variantFileName($media, (string) $name);
+            $relativePath = $variantDirectory . '/' . $this->variantFileName($media, (string) $name);
             $absolutePath = $this->absolutePath($disk, $relativePath);
 
             try {
@@ -96,8 +96,8 @@ final class MediaService
             } catch (Throwable $exception) {
                 Log::warning('Media variant generation failed', [
                     'media_id' => $media->getKey(),
-                    'variant' => $name,
-                    'message' => $exception->getMessage(),
+                    'variant'  => $name,
+                    'message'  => $exception->getMessage(),
                 ]);
 
                 continue;
@@ -143,7 +143,7 @@ final class MediaService
     public function variantPath(Media $media, string $variant): ?string
     {
         $variants = $media->getCustomProperty('variants', []);
-        $path = Arr::get($variants, $variant.'.path');
+        $path = Arr::get($variants, $variant . '.path');
 
         return is_string($path) ? $path : null;
     }
@@ -164,12 +164,12 @@ final class MediaService
             $dimensions = @getimagesize($absolutePath) ?: null;
 
             $metadata = [
-                'path' => $path,
-                'url' => SecureStorage::temporarySignedUrl($path),
-                'width' => $dimensions[0] ?? null,
-                'height' => $dimensions[1] ?? null,
-                'size' => $disk->size($path),
-                'format' => pathinfo($media->file_name, PATHINFO_EXTENSION),
+                'path'      => $path,
+                'url'       => SecureStorage::temporarySignedUrl($path),
+                'width'     => $dimensions[0] ?? null,
+                'height'    => $dimensions[1] ?? null,
+                'size'      => $disk->size($path),
+                'format'    => pathinfo($media->file_name, PATHINFO_EXTENSION),
                 'mime_type' => $media->mime_type,
             ];
 
@@ -207,7 +207,7 @@ final class MediaService
             $sanitized = 'media';
         }
 
-        return $sanitized.'-'.Str::random(8).($extension !== '' ? '.'.$extension : '');
+        return $sanitized . '-' . Str::random(8) . ($extension !== '' ? '.' . $extension : '');
     }
 
     private function deriveMediaName(UploadedFile $file): string
@@ -221,16 +221,16 @@ final class MediaService
     private function variantDirectory(Media $media): string
     {
         $relative = trim(dirname($media->getPathRelativeToRoot()), '/');
-        $directory = $relative === '.' || $relative === '' ? '' : $relative.'/';
+        $directory = $relative === '.' || $relative === '' ? '' : $relative . '/';
 
-        return $directory.'variants';
+        return $directory . 'variants';
     }
 
     private function variantFileName(Media $media, string $variant): string
     {
         $basename = pathinfo($media->file_name, PATHINFO_FILENAME);
 
-        return $basename.'-'.$variant.'.webp';
+        return $basename . '-' . $variant . '.webp';
     }
 
     /**
@@ -242,12 +242,12 @@ final class MediaService
         $dimensions = @getimagesize($absolutePath) ?: null;
 
         return [
-            'path' => $relativePath,
-            'url' => SecureStorage::temporarySignedUrl($relativePath),
-            'width' => $dimensions[0] ?? null,
-            'height' => $dimensions[1] ?? null,
-            'size' => $disk->size($relativePath),
-            'format' => 'webp',
+            'path'      => $relativePath,
+            'url'       => SecureStorage::temporarySignedUrl($relativePath),
+            'width'     => $dimensions[0] ?? null,
+            'height'    => $dimensions[1] ?? null,
+            'size'      => $disk->size($relativePath),
+            'format'    => 'webp',
             'mime_type' => 'image/webp',
         ];
     }
@@ -259,7 +259,7 @@ final class MediaService
             /** @var string $prefix */
             $prefix = $adapter->getPathPrefix();
 
-            return $prefix.ltrim($relativePath, '/');
+            return $prefix . ltrim($relativePath, '/');
         }
 
         if (method_exists($disk, 'path')) {

@@ -27,15 +27,15 @@ final class AutocompleteRateLimitTest extends TestCase
 
         $originalLimit = config('api.rate_limits.autocomplete');
         config(['api.rate_limits.autocomplete' => 1]);
-        RateLimiter::clear('user:'.$user->getKey().'|autocomplete');
+        RateLimiter::clear('user:' . $user->getKey() . '|autocomplete');
 
         Sanctum::actingAs($user, ['system.autocomplete']);
 
         $payload = [
-            'model_class' => User::class,
+            'model_class'  => User::class,
             'search_field' => 'email',
-            'label_field' => 'email',
-            'value_field' => 'id',
+            'label_field'  => 'email',
+            'value_field'  => 'id',
             'search_query' => (string) $user->email,
         ];
 
@@ -44,7 +44,7 @@ final class AutocompleteRateLimitTest extends TestCase
             $this->postJson(route('api.v1.autocomplete.search'), $payload)->assertStatus(429);
         } finally {
             config(['api.rate_limits.autocomplete' => $originalLimit]);
-            RateLimiter::clear('user:'.$user->getKey().'|autocomplete');
+            RateLimiter::clear('user:' . $user->getKey() . '|autocomplete');
         }
     }
 }

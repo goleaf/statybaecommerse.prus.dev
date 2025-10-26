@@ -132,11 +132,11 @@ final class TestingLegalResourceStub
     private function createLegal(Request $request): SymfonyResponse
     {
         Legal::create([
-            'key' => (string) $request->input('key'),
-            'type' => (string) $request->input('type'),
-            'is_enabled' => $request->boolean('is_enabled'),
-            'is_required' => $request->boolean('is_required'),
-            'sort_order' => (int) $request->input('sort_order', 0),
+            'key'          => (string) $request->input('key'),
+            'type'         => (string) $request->input('type'),
+            'is_enabled'   => $request->boolean('is_enabled'),
+            'is_required'  => $request->boolean('is_required'),
+            'sort_order'   => (int) $request->input('sort_order', 0),
             'published_at' => $request->input('published_at'),
         ]);
 
@@ -159,11 +159,11 @@ final class TestingLegalResourceStub
         $legal = $this->findLegal($legalId);
 
         $legal->fill([
-            'key' => (string) $request->input('key', $legal->key),
-            'type' => (string) $request->input('type', $legal->type),
-            'is_enabled' => $request->has('is_enabled') ? $request->boolean('is_enabled') : $legal->is_enabled,
+            'key'         => (string) $request->input('key', $legal->key),
+            'type'        => (string) $request->input('type', $legal->type),
+            'is_enabled'  => $request->has('is_enabled') ? $request->boolean('is_enabled') : $legal->is_enabled,
             'is_required' => $request->has('is_required') ? $request->boolean('is_required') : $legal->is_required,
-            'sort_order' => (int) $request->input('sort_order', $legal->sort_order ?? 0),
+            'sort_order'  => (int) $request->input('sort_order', $legal->sort_order ?? 0),
         ]);
 
         if ($request->has('published_at')) {

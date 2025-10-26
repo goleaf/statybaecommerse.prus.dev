@@ -24,30 +24,30 @@ final class AddressFactory extends Factory
     public function definition(): array
     {
         return [
-            'user_id' => User::factory(),
-            'type' => $this->faker->randomElement(AddressType::values()),
-            'first_name' => $this->faker->firstName(),
-            'last_name' => $this->faker->lastName(),
-            'company_name' => $this->faker->optional(0.3)->company(),
-            'company_vat' => $this->faker->optional(0.2)->numerify('LT########'),
+            'user_id'        => User::factory(),
+            'type'           => $this->faker->randomElement(AddressType::values()),
+            'first_name'     => $this->faker->firstName(),
+            'last_name'      => $this->faker->lastName(),
+            'company_name'   => $this->faker->optional(0.3)->company(),
+            'company_vat'    => $this->faker->optional(0.2)->numerify('LT########'),
             'address_line_1' => $this->faker->streetAddress(),
             'address_line_2' => $this->faker->optional(0.3)->secondaryAddress(),
-            'apartment' => $this->faker->optional(0.2)->numerify('Apt ###'),
-            'floor' => $this->faker->optional(0.1)->numerify('#th Floor'),
-            'building' => $this->faker->optional(0.1)->buildingNumber(),
-            'city' => $this->faker->city(),
-            'state' => $this->faker->optional(0.7)->state(),
-            'postal_code' => $this->faker->postcode(),
-            'country_code' => $this->faker->countryCode(),
-            'phone' => $this->faker->optional(0.8)->phoneNumber(),
-            'email' => $this->faker->optional(0.6)->safeEmail(),
-            'is_default' => $this->faker->boolean(20),
-            'is_billing' => false,
-            'is_shipping' => false,
-            'is_active' => $this->faker->boolean(95),
-            'notes' => $this->faker->optional(0.2)->sentence(),
-            'instructions' => $this->faker->optional(0.1)->sentence(),
-            'landmark' => $this->faker->optional(0.1)->sentence(),
+            'apartment'      => $this->faker->optional(0.2)->numerify('Apt ###'),
+            'floor'          => $this->faker->optional(0.1)->numerify('#th Floor'),
+            'building'       => $this->faker->optional(0.1)->buildingNumber(),
+            'city'           => $this->faker->city(),
+            'state'          => $this->faker->optional(0.7)->state(),
+            'postal_code'    => $this->faker->postcode(),
+            'country_code'   => $this->faker->countryCode(),
+            'phone'          => $this->faker->optional(0.8)->phoneNumber(),
+            'email'          => $this->faker->optional(0.6)->safeEmail(),
+            'is_default'     => $this->faker->boolean(20),
+            'is_billing'     => false,
+            'is_shipping'    => false,
+            'is_active'      => $this->faker->boolean(95),
+            'notes'          => $this->faker->optional(0.2)->sentence(),
+            'instructions'   => $this->faker->optional(0.1)->sentence(),
+            'landmark'       => $this->faker->optional(0.1)->sentence(),
         ];
     }
 
@@ -138,7 +138,7 @@ final class AddressFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'company_name' => fake()->company(),
-            'company_vat' => fake()->numerify('LT########'),
+            'company_vat'  => fake()->numerify('LT########'),
         ]);
     }
 
@@ -148,10 +148,10 @@ final class AddressFactory extends Factory
     public function withAdditionalInfo(): static
     {
         return $this->state(fn (array $attributes) => [
-            'apartment' => fake()->numerify('Apt ###'),
-            'floor' => fake()->numerify('#th Floor'),
-            'building' => fake()->buildingNumber(),
-            'landmark' => fake()->sentence(),
+            'apartment'    => fake()->numerify('Apt ###'),
+            'floor'        => fake()->numerify('#th Floor'),
+            'building'     => fake()->buildingNumber(),
+            'landmark'     => fake()->sentence(),
             'instructions' => fake()->sentence(),
         ]);
     }

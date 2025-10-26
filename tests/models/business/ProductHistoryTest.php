@@ -29,18 +29,18 @@ final class ProductHistoryTest extends TestCase
     public function test_can_create_product_history_entry(): void
     {
         $history = ProductHistory::create([
-            'product_id' => $this->product->id,
-            'user_id' => $this->user->id,
-            'action' => 'created',
-            'field_name' => 'name',
-            'old_value' => null,
-            'new_value' => 'Test Product',
+            'product_id'  => $this->product->id,
+            'user_id'     => $this->user->id,
+            'action'      => 'created',
+            'field_name'  => 'name',
+            'old_value'   => null,
+            'new_value'   => 'Test Product',
             'description' => 'Product was created',
-            'ip_address' => '127.0.0.1',
-            'user_agent' => 'Test Agent',
-            'metadata' => ['test' => 'data'],
+            'ip_address'  => '127.0.0.1',
+            'user_agent'  => 'Test Agent',
+            'metadata'    => ['test' => 'data'],
             'causer_type' => User::class,
-            'causer_id' => $this->user->id,
+            'causer_id'   => $this->user->id,
         ]);
 
         $this->assertInstanceOf(ProductHistory::class, $history);
@@ -177,7 +177,7 @@ final class ProductHistoryTest extends TestCase
     public function test_change_summary_attribute(): void
     {
         $history = ProductHistory::factory()->create([
-            'action' => 'created',
+            'action'     => 'created',
             'field_name' => 'name',
         ]);
 

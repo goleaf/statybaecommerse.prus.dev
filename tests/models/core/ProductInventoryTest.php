@@ -15,7 +15,7 @@ final class ProductInventoryTest extends TestCase
     public function test_product_stock_quantity_casting(): void
     {
         $product = Product::factory()->create([
-            'stock_quantity' => '100',
+            'stock_quantity'      => '100',
             'low_stock_threshold' => '10',
         ]);
 
@@ -38,8 +38,8 @@ final class ProductInventoryTest extends TestCase
     public function test_product_is_in_stock(): void
     {
         $product = Product::factory()->create([
-            'manage_stock' => true,
-            'stock_quantity' => 10,
+            'manage_stock'        => true,
+            'stock_quantity'      => 10,
             'low_stock_threshold' => 5,
         ]);
 
@@ -49,8 +49,8 @@ final class ProductInventoryTest extends TestCase
     public function test_product_is_low_stock(): void
     {
         $product = Product::factory()->create([
-            'manage_stock' => true,
-            'stock_quantity' => 3,
+            'manage_stock'        => true,
+            'stock_quantity'      => 3,
             'low_stock_threshold' => 5,
         ]);
 
@@ -60,7 +60,7 @@ final class ProductInventoryTest extends TestCase
     public function test_product_is_out_of_stock(): void
     {
         $product = Product::factory()->create([
-            'manage_stock' => true,
+            'manage_stock'   => true,
             'stock_quantity' => 0,
         ]);
 
@@ -70,7 +70,7 @@ final class ProductInventoryTest extends TestCase
     public function test_product_not_tracked_is_always_in_stock(): void
     {
         $product = Product::factory()->create([
-            'manage_stock' => false,
+            'manage_stock'   => false,
             'stock_quantity' => 0,
         ]);
 
@@ -82,8 +82,8 @@ final class ProductInventoryTest extends TestCase
     public function test_product_stock_status_in_stock(): void
     {
         $product = Product::factory()->create([
-            'manage_stock' => true,
-            'stock_quantity' => 10,
+            'manage_stock'        => true,
+            'stock_quantity'      => 10,
             'low_stock_threshold' => 5,
         ]);
 
@@ -93,8 +93,8 @@ final class ProductInventoryTest extends TestCase
     public function test_product_stock_status_low_stock(): void
     {
         $product = Product::factory()->create([
-            'manage_stock' => true,
-            'stock_quantity' => 3,
+            'manage_stock'        => true,
+            'stock_quantity'      => 3,
             'low_stock_threshold' => 5,
         ]);
 
@@ -104,7 +104,7 @@ final class ProductInventoryTest extends TestCase
     public function test_product_stock_status_out_of_stock(): void
     {
         $product = Product::factory()->create([
-            'manage_stock' => true,
+            'manage_stock'   => true,
             'stock_quantity' => 0,
         ]);
 
@@ -123,7 +123,7 @@ final class ProductInventoryTest extends TestCase
     public function test_product_can_decrease_stock(): void
     {
         $product = Product::factory()->create([
-            'manage_stock' => true,
+            'manage_stock'   => true,
             'stock_quantity' => 10,
         ]);
 
@@ -136,7 +136,7 @@ final class ProductInventoryTest extends TestCase
     public function test_product_cannot_decrease_stock_below_zero(): void
     {
         $product = Product::factory()->create([
-            'manage_stock' => true,
+            'manage_stock'   => true,
             'stock_quantity' => 5,
         ]);
 
@@ -149,7 +149,7 @@ final class ProductInventoryTest extends TestCase
     public function test_product_can_increase_stock(): void
     {
         $product = Product::factory()->create([
-            'manage_stock' => true,
+            'manage_stock'   => true,
             'stock_quantity' => 10,
         ]);
 

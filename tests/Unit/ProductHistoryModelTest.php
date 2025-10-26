@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Tests\Unit;
 
@@ -43,7 +45,7 @@ final class ProductHistoryModelTest extends TestCase
         $user = User::factory()->create();
         $history = ProductHistory::factory()->create([
             'causer_type' => User::class,
-            'causer_id' => $user->id,
+            'causer_id'   => $user->id,
         ]);
 
         $this->assertInstanceOf(User::class, $history->causer);
@@ -56,18 +58,18 @@ final class ProductHistoryModelTest extends TestCase
         $user = User::factory()->create();
 
         $data = [
-            'product_id' => $product->id,
-            'user_id' => $user->id,
-            'action' => 'updated',
-            'field_name' => 'price',
-            'old_value' => ['price' => '10.00'],
-            'new_value' => ['price' => '12.00'],
+            'product_id'  => $product->id,
+            'user_id'     => $user->id,
+            'action'      => 'updated',
+            'field_name'  => 'price',
+            'old_value'   => ['price' => '10.00'],
+            'new_value'   => ['price' => '12.00'],
             'description' => 'Price updated',
-            'ip_address' => '127.0.0.1',
-            'user_agent' => 'Mozilla/5.0',
-            'metadata' => ['source' => 'admin_panel'],
+            'ip_address'  => '127.0.0.1',
+            'user_agent'  => 'Mozilla/5.0',
+            'metadata'    => ['source' => 'admin_panel'],
             'causer_type' => User::class,
-            'causer_id' => $user->id,
+            'causer_id'   => $user->id,
         ];
 
         $history = ProductHistory::create($data);
@@ -81,7 +83,7 @@ final class ProductHistoryModelTest extends TestCase
     public function test_casts_array_and_json_correctly(): void
     {
         $history = ProductHistory::factory()->create([
-            'metadata' => ['key' => 'value'],
+            'metadata'  => ['key' => 'value'],
             'old_value' => ['price' => '10.00'],
             'new_value' => ['price' => '12.00'],
         ]);
@@ -99,7 +101,7 @@ final class ProductHistoryModelTest extends TestCase
 
         $history = ProductHistory::factory()->create([
             'causer_type' => null,
-            'causer_id' => null,
+            'causer_id'   => null,
         ]);
 
         $this->assertEquals(User::class, $history->causer_type);
@@ -117,7 +119,7 @@ final class ProductHistoryModelTest extends TestCase
         $histories = ProductHistory::forProduct($product1->id)->get();
 
         $this->assertCount(3, $histories);
-        $this->assertTrue($histories->every(fn($h) => $h->product_id === $product1->id));
+        $this->assertTrue($histories->every(fn ($h) => $h->product_id === $product1->id));
     }
 
     public function test_scope_by_user_filters_by_user_id(): void
@@ -131,7 +133,7 @@ final class ProductHistoryModelTest extends TestCase
         $histories = ProductHistory::byUser($user1->id)->get();
 
         $this->assertCount(3, $histories);
-        $this->assertTrue($histories->every(fn($h) => $h->user_id === $user1->id));
+        $this->assertTrue($histories->every(fn ($h) => $h->user_id === $user1->id));
     }
 
     public function test_scope_by_action_filters_by_action_type(): void
@@ -143,7 +145,7 @@ final class ProductHistoryModelTest extends TestCase
         $histories = ProductHistory::byAction('created')->get();
 
         $this->assertCount(3, $histories);
-        $this->assertTrue($histories->every(fn($h) => $h->action === 'created'));
+        $this->assertTrue($histories->every(fn ($h) => $h->action === 'created'));
     }
 
     public function test_scope_by_field_filters_by_field_name(): void
@@ -154,7 +156,7 @@ final class ProductHistoryModelTest extends TestCase
         $histories = ProductHistory::byField('price')->get();
 
         $this->assertCount(3, $histories);
-        $this->assertTrue($histories->every(fn($h) => $h->field_name === 'price'));
+        $this->assertTrue($histories->every(fn ($h) => $h->field_name === 'price'));
     }
 
     public function test_scope_recent_filters_by_days(): void
@@ -167,7 +169,7 @@ final class ProductHistoryModelTest extends TestCase
         $recentHistories = ProductHistory::recent(30)->get();
 
         $this->assertCount(2, $recentHistories);
-        $this->assertTrue($recentHistories->every(fn($h) => $h->created_at >= now()->subDays(30)));
+        $this->assertTrue($recentHistories->every(fn ($h) => $h->created_at >= now()->subDays(30)));
     }
 
     public function test_formatted_old_value_accessor_handles_null(): void
@@ -231,7 +233,7 @@ final class ProductHistoryModelTest extends TestCase
     public function test_change_summary_accessor_for_created_action(): void
     {
         $history = ProductHistory::factory()->create([
-            'action' => 'created',
+            'action'     => 'created',
             'field_name' => 'name',
         ]);
 
@@ -244,7 +246,7 @@ final class ProductHistoryModelTest extends TestCase
     public function test_change_summary_accessor_for_deleted_action(): void
     {
         $history = ProductHistory::factory()->create([
-            'action' => 'deleted',
+            'action'     => 'deleted',
             'field_name' => 'status',
         ]);
 
@@ -257,10 +259,10 @@ final class ProductHistoryModelTest extends TestCase
     public function test_change_summary_accessor_for_updated_action(): void
     {
         $history = ProductHistory::factory()->create([
-            'action' => 'updated',
+            'action'     => 'updated',
             'field_name' => 'price',
-            'old_value' => '10.00',
-            'new_value' => '12.00',
+            'old_value'  => '10.00',
+            'new_value'  => '12.00',
         ]);
 
         $summary = $history->change_summary;
@@ -333,7 +335,7 @@ final class ProductHistoryModelTest extends TestCase
         $this->assertEquals('price_changed', $history->action);
         $this->assertEquals('price', $history->field_name);
         $this->assertDatabaseHas('product_histories', [
-            'id' => $history->id,
+            'id'     => $history->id,
             'action' => 'price_changed',
         ]);
     }

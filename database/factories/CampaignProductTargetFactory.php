@@ -55,7 +55,7 @@ final class CampaignProductTargetFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'target_type' => 'product',
-            'product_id' => Product::factory(),
+            'product_id'  => Product::factory(),
             'category_id' => null,
         ]);
     }
@@ -64,7 +64,7 @@ final class CampaignProductTargetFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'target_type' => 'category',
-            'product_id' => null,
+            'product_id'  => null,
             'category_id' => Category::factory(),
         ]);
     }
@@ -80,7 +80,7 @@ final class CampaignProductTargetFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'target_type' => 'product',
-            'product_id' => $product->id,
+            'product_id'  => $product->id,
             'category_id' => null,
         ]);
     }
@@ -89,7 +89,7 @@ final class CampaignProductTargetFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'target_type' => 'category',
-            'product_id' => null,
+            'product_id'  => null,
             'category_id' => $category->id,
         ]);
     }

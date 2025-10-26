@@ -55,16 +55,16 @@ final class CustomerManagementResourceTest extends TestCase
 
         Livewire::test(CreateCustomer::class)
             ->fillForm([
-                'name' => $newCustomerData->name,
-                'email' => $newCustomerData->email,
-                'phone' => $newCustomerData->phone,
-                'is_active' => true,
-                'is_verified' => false,
-                'customerGroups' => [$customerGroup->id],
-                'preferred_language' => 'lt',
-                'preferred_currency' => 'EUR',
+                'name'                    => $newCustomerData->name,
+                'email'                   => $newCustomerData->email,
+                'phone'                   => $newCustomerData->phone,
+                'is_active'               => true,
+                'is_verified'             => false,
+                'customerGroups'          => [$customerGroup->id],
+                'preferred_language'      => 'lt',
+                'preferred_currency'      => 'EUR',
                 'newsletter_subscription' => false,
-                'sms_notifications' => false,
+                'sms_notifications'       => false,
             ])
             ->call('create')
             ->assertNotified();
@@ -80,7 +80,7 @@ final class CustomerManagementResourceTest extends TestCase
         $createdCustomer = User::where('email', $newCustomerData->email)->firstOrFail();
 
         $this->assertDatabaseHas('customer_group_user', [
-            'user_id' => $createdCustomer->id,
+            'user_id'           => $createdCustomer->id,
             'customer_group_id' => $customerGroup->id,
         ]);
     }

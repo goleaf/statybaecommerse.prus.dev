@@ -28,9 +28,9 @@ it('can list discounts in admin panel', function () {
 
 it('can create a new discount', function () {
     $discountData = [
-        'name' => 'Test Discount',
-        'type' => 'percentage',
-        'value' => 10,
+        'name'      => 'Test Discount',
+        'type'      => 'percentage',
+        'value'     => 10,
         'is_active' => true,
     ];
 
@@ -41,9 +41,9 @@ it('can create a new discount', function () {
         ->assertHasNoFormErrors();
 
     $this->assertDatabaseHas('discounts', [
-        'name' => 'Test Discount',
-        'type' => 'percentage',
-        'value' => 10,
+        'name'      => 'Test Discount',
+        'type'      => 'percentage',
+        'value'     => 10,
         'is_active' => true,
     ]);
 });
@@ -62,15 +62,15 @@ it('can edit a discount', function () {
     Livewire::actingAs($this->adminUser)
         ->test(EditDiscount::class, ['record' => $discount->id])
         ->fillForm([
-            'name' => 'Updated Discount',
+            'name'  => 'Updated Discount',
             'value' => 15,
         ])
         ->call('save')
         ->assertHasNoFormErrors();
 
     $this->assertDatabaseHas('discounts', [
-        'id' => $discount->id,
-        'name' => 'Updated Discount',
+        'id'    => $discount->id,
+        'name'  => 'Updated Discount',
         'value' => 15,
     ]);
 });
@@ -92,8 +92,8 @@ it('validates required fields when creating discount', function () {
     Livewire::actingAs($this->adminUser)
         ->test(CreateDiscount::class)
         ->fillForm([
-            'name' => null,
-            'type' => null,
+            'name'  => null,
+            'type'  => null,
             'value' => null,
         ])
         ->call('create')
@@ -104,8 +104,8 @@ it('validates discount type options', function () {
     Livewire::actingAs($this->adminUser)
         ->test(CreateDiscount::class)
         ->fillForm([
-            'name' => 'Test Discount',
-            'type' => 'invalid_type',
+            'name'  => 'Test Discount',
+            'type'  => 'invalid_type',
             'value' => 10,
         ])
         ->call('create')
@@ -116,8 +116,8 @@ it('validates numeric value field', function () {
     Livewire::actingAs($this->adminUser)
         ->test(CreateDiscount::class)
         ->fillForm([
-            'name' => 'Test Discount',
-            'type' => 'percentage',
+            'name'  => 'Test Discount',
+            'type'  => 'percentage',
             'value' => 'not_a_number',
         ])
         ->call('create')
@@ -148,9 +148,9 @@ it('can filter discounts by active status', function () {
 
 it('shows correct discount data in table', function () {
     $discount = Discount::factory()->create([
-        'name' => 'Test Discount',
-        'type' => 'percentage',
-        'value' => 10,
+        'name'      => 'Test Discount',
+        'type'      => 'percentage',
+        'value'     => 10,
         'is_active' => true,
     ]);
 
@@ -184,15 +184,15 @@ it('can set start and expiration dates', function () {
         ->test(EditDiscount::class, ['record' => $discount->id])
         ->fillForm([
             'starts_at' => $startsAt,
-            'ends_at' => $expiresAt,
+            'ends_at'   => $expiresAt,
         ])
         ->call('save')
         ->assertHasNoFormErrors();
 
     $this->assertDatabaseHas('discounts', [
-        'id' => $discount->id,
+        'id'        => $discount->id,
         'starts_at' => $startsAt->format('Y-m-d H:i:s'),
-        'ends_at' => $expiresAt->format('Y-m-d H:i:s'),
+        'ends_at'   => $expiresAt->format('Y-m-d H:i:s'),
     ]);
 });
 
@@ -242,10 +242,10 @@ it('validates unique discount slug', function () {
     Livewire::actingAs($this->adminUser)
         ->test(CreateDiscount::class)
         ->fillForm([
-            'name' => 'Another Discount',
-            'type' => 'percentage',
+            'name'  => 'Another Discount',
+            'type'  => 'percentage',
             'value' => 10,
-            'slug' => 'UNIQUE',
+            'slug'  => 'UNIQUE',
         ])
         ->call('create')
         ->assertHasFormErrors(['slug']);
@@ -255,10 +255,10 @@ it('can create discount without slug', function () {
     Livewire::actingAs($this->adminUser)
         ->test(CreateDiscount::class)
         ->fillForm([
-            'name' => 'Test Discount',
-            'type' => 'percentage',
+            'name'  => 'Test Discount',
+            'type'  => 'percentage',
             'value' => 10,
-            'slug' => null,
+            'slug'  => null,
         ])
         ->call('create')
         ->assertHasNoFormErrors();
@@ -286,9 +286,9 @@ it('can duplicate a discount', function () {
         ->assertHasNoTableActionErrors();
 
     $this->assertDatabaseHas('discounts', [
-        'name' => 'Original Discount (Copy)',
-        'slug' => $discount->slug.'-copy',
-        'status' => 'draft',
+        'name'        => 'Original Discount (Copy)',
+        'slug'        => $discount->slug . '-copy',
+        'status'      => 'draft',
         'usage_count' => 0,
     ]);
 });
@@ -392,8 +392,8 @@ it('validates discount value for percentage type', function () {
     Livewire::actingAs($this->adminUser)
         ->test(CreateDiscount::class)
         ->fillForm([
-            'name' => 'Test Discount',
-            'type' => 'percentage',
+            'name'  => 'Test Discount',
+            'type'  => 'percentage',
             'value' => 150,  // Invalid percentage
         ])
         ->call('create')
@@ -404,8 +404,8 @@ it('validates discount value for fixed type', function () {
     Livewire::actingAs($this->adminUser)
         ->test(CreateDiscount::class)
         ->fillForm([
-            'name' => 'Test Discount',
-            'type' => 'fixed',
+            'name'  => 'Test Discount',
+            'type'  => 'fixed',
             'value' => -10,  // Invalid negative value
         ])
         ->call('create')
@@ -416,16 +416,16 @@ it('allows free shipping discount without value', function () {
     Livewire::actingAs($this->adminUser)
         ->test(CreateDiscount::class)
         ->fillForm([
-            'name' => 'Free Shipping',
-            'type' => 'free_shipping',
+            'name'  => 'Free Shipping',
+            'type'  => 'free_shipping',
             'value' => null,
         ])
         ->call('create')
         ->assertHasNoFormErrors();
 
     $this->assertDatabaseHas('discounts', [
-        'name' => 'Free Shipping',
-        'type' => 'free_shipping',
+        'name'  => 'Free Shipping',
+        'type'  => 'free_shipping',
         'value' => null,
     ]);
 });

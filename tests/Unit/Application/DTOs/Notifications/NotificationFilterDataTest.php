@@ -12,4 +12,3 @@ test('per page must be positive and within bounds', function (): void {
 test('type cannot be empty string', function (): void {
     expect(fn () => new NotificationFilterData(type: '   '))->toThrow(InvalidArgumentException::class);
 });
-

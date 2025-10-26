@@ -10,7 +10,7 @@ uses(RefreshDatabase::class);
 
 it('renders the search index page without errors', function (): void {
     Category::factory()->create([
-        'name' => 'Tools',
+        'name'      => 'Tools',
         'is_active' => true,
     ]);
 
@@ -23,10 +23,10 @@ it('renders the search index page without errors', function (): void {
 
 it('returns suggestion urls using the frontend product route', function (): void {
     $product = Product::factory()->create([
-        'name' => 'Precision Hammer',
-        'slug' => 'precision-hammer',
-        'is_visible' => true,
-        'status' => 'published',
+        'name'         => 'Precision Hammer',
+        'slug'         => 'precision-hammer',
+        'is_visible'   => true,
+        'status'       => 'published',
         'published_at' => now()->subDay(),
     ]);
     $product->forceFill(['is_active' => true])->save();
@@ -45,9 +45,9 @@ it('returns suggestion urls using the frontend product route', function (): void
 
 it('returns autocomplete data for valid queries', function (): void {
     $product = Product::factory()->create([
-        'name' => 'Cordless Drill',
-        'is_visible' => true,
-        'status' => 'published',
+        'name'         => 'Cordless Drill',
+        'is_visible'   => true,
+        'status'       => 'published',
         'published_at' => now()->subDay(),
     ]);
     $product->forceFill(['is_active' => true])->save();

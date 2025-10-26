@@ -14,4 +14,3 @@ final class CartAddItemRequestTest extends TestCase
             ->assertStatus(422);
     }
 }
-

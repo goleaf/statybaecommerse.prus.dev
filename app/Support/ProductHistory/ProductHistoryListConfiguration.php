@@ -22,42 +22,42 @@ final class ProductHistoryListConfiguration
         return new ListQueryDefinition(
             filters: [
                 'action' => [
-                    'type' => 'string',
+                    'type'     => 'string',
                     'nullable' => true,
-                    'column' => 'product_histories.action',
+                    'column'   => 'product_histories.action',
                 ],
                 'field_name' => [
-                    'type' => 'string',
+                    'type'     => 'string',
                     'nullable' => true,
-                    'column' => 'product_histories.field_name',
+                    'column'   => 'product_histories.field_name',
                 ],
                 'user_id' => [
-                    'type' => 'int',
+                    'type'     => 'int',
                     'nullable' => true,
-                    'column' => 'product_histories.user_id',
+                    'column'   => 'product_histories.user_id',
                 ],
                 'date_from' => [
-                    'type' => 'datetime',
+                    'type'     => 'datetime',
                     'nullable' => true,
-                    'column' => 'product_histories.created_at',
+                    'column'   => 'product_histories.created_at',
                     'operator' => '>=',
                 ],
                 'date_to' => [
-                    'type' => 'datetime',
+                    'type'     => 'datetime',
                     'nullable' => true,
-                    'column' => 'product_histories.created_at',
+                    'column'   => 'product_histories.created_at',
                     'operator' => '<=',
                 ],
                 'search' => [
-                    'type' => 'string',
-                    'nullable' => true,
+                    'type'        => 'string',
+                    'nullable'    => true,
                     'allow_empty' => false,
-                    'callback' => [self::class, 'applySearchFilter'],
+                    'callback'    => [self::class, 'applySearchFilter'],
                 ],
             ],
             sortable: [
                 'created_at' => [
-                    'column' => 'product_histories.created_at',
+                    'column'            => 'product_histories.created_at',
                     'default_direction' => 'desc',
                 ],
                 'action' => [

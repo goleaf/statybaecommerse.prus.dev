@@ -23,12 +23,12 @@ final class ProductFeatureFactory extends Factory
     public function definition(): array
     {
         return [
-            'product_id' => Product::factory(),
-            'feature_type' => $this->faker->randomElement(['specification', 'benefit', 'feature', 'technical', 'performance']),
-            'feature_key' => $this->faker->word(),
+            'product_id'    => Product::factory(),
+            'feature_type'  => $this->faker->randomElement(['specification', 'benefit', 'feature', 'technical', 'performance']),
+            'feature_key'   => $this->faker->word(),
             'feature_value' => $this->faker->sentence(),
-            'weight' => $this->faker->randomFloat(4, 0, 1),
-            'is_active' => true,
+            'weight'        => $this->faker->randomFloat(4, 0, 1),
+            'is_active'     => true,
         ];
     }
 
@@ -38,21 +38,21 @@ final class ProductFeatureFactory extends Factory
     public function specification(): static
     {
         $specifications = [
-            'weight' => ['Lightweight', 'Heavy', 'Ultra-light', 'Standard weight'],
+            'weight'     => ['Lightweight', 'Heavy', 'Ultra-light', 'Standard weight'],
             'dimensions' => ['Compact', 'Large', 'Portable', 'Standard size'],
-            'material' => ['Plastic', 'Metal', 'Wood', 'Glass', 'Fabric'],
-            'color' => ['Black', 'White', 'Blue', 'Red', 'Green', 'Multi-color'],
-            'size' => ['Small', 'Medium', 'Large', 'Extra Large'],
+            'material'   => ['Plastic', 'Metal', 'Wood', 'Glass', 'Fabric'],
+            'color'      => ['Black', 'White', 'Blue', 'Red', 'Green', 'Multi-color'],
+            'size'       => ['Small', 'Medium', 'Large', 'Extra Large'],
         ];
 
         $key = $this->faker->randomElement(array_keys($specifications));
         $values = $specifications[$key];
 
         return $this->state(fn (array $attributes) => [
-            'feature_type' => 'specification',
-            'feature_key' => $key,
+            'feature_type'  => 'specification',
+            'feature_key'   => $key,
             'feature_value' => $this->faker->randomElement($values),
-            'weight' => $this->faker->randomFloat(4, 0.8, 1.0),
+            'weight'        => $this->faker->randomFloat(4, 0.8, 1.0),
         ]);
     }
 
@@ -63,20 +63,20 @@ final class ProductFeatureFactory extends Factory
     {
         $benefits = [
             'energy_efficient' => ['Saves power', 'Eco-friendly', 'Low consumption', 'Energy star rated'],
-            'user_friendly' => ['Easy to use', 'Intuitive', 'Beginner-friendly', 'Simple operation'],
-            'durable' => ['Long-lasting', 'Robust', 'Reliable', 'Built to last'],
-            'comfortable' => ['Comfortable', 'Ergonomic', 'Soft', 'Cozy'],
-            'versatile' => ['Versatile', 'Multi-purpose', 'Flexible', 'Adaptable'],
+            'user_friendly'    => ['Easy to use', 'Intuitive', 'Beginner-friendly', 'Simple operation'],
+            'durable'          => ['Long-lasting', 'Robust', 'Reliable', 'Built to last'],
+            'comfortable'      => ['Comfortable', 'Ergonomic', 'Soft', 'Cozy'],
+            'versatile'        => ['Versatile', 'Multi-purpose', 'Flexible', 'Adaptable'],
         ];
 
         $key = $this->faker->randomElement(array_keys($benefits));
         $values = $benefits[$key];
 
         return $this->state(fn (array $attributes) => [
-            'feature_type' => 'benefit',
-            'feature_key' => $key,
+            'feature_type'  => 'benefit',
+            'feature_key'   => $key,
             'feature_value' => $this->faker->randomElement($values),
-            'weight' => $this->faker->randomFloat(4, 0.7, 0.95),
+            'weight'        => $this->faker->randomFloat(4, 0.7, 0.95),
         ]);
     }
 
@@ -86,21 +86,21 @@ final class ProductFeatureFactory extends Factory
     public function technical(): static
     {
         $technical = [
-            'processor' => ['Fast', 'Efficient', 'High-performance', 'Advanced'],
-            'memory' => ['Large capacity', 'Fast access', 'Expandable', 'High-speed'],
-            'storage' => ['High capacity', 'Fast transfer', 'Secure', 'Reliable'],
+            'processor'    => ['Fast', 'Efficient', 'High-performance', 'Advanced'],
+            'memory'       => ['Large capacity', 'Fast access', 'Expandable', 'High-speed'],
+            'storage'      => ['High capacity', 'Fast transfer', 'Secure', 'Reliable'],
             'connectivity' => ['WiFi', 'Bluetooth', 'USB-C', 'Wireless', 'Ethernet'],
-            'battery' => ['Long-lasting', 'Quick charge', 'Extended', 'High capacity'],
+            'battery'      => ['Long-lasting', 'Quick charge', 'Extended', 'High capacity'],
         ];
 
         $key = $this->faker->randomElement(array_keys($technical));
         $values = $technical[$key];
 
         return $this->state(fn (array $attributes) => [
-            'feature_type' => 'technical',
-            'feature_key' => $key,
+            'feature_type'  => 'technical',
+            'feature_key'   => $key,
             'feature_value' => $this->faker->randomElement($values),
-            'weight' => $this->faker->randomFloat(4, 0.6, 0.9),
+            'weight'        => $this->faker->randomFloat(4, 0.6, 0.9),
         ]);
     }
 
@@ -110,21 +110,21 @@ final class ProductFeatureFactory extends Factory
     public function performance(): static
     {
         $performance = [
-            'speed' => ['Fast', 'Ultra-fast', 'Lightning quick', 'High-speed'],
-            'quality' => ['High quality', 'Premium', 'Professional', 'Superior'],
+            'speed'      => ['Fast', 'Ultra-fast', 'Lightning quick', 'High-speed'],
+            'quality'    => ['High quality', 'Premium', 'Professional', 'Superior'],
             'efficiency' => ['Optimized', 'Streamlined', 'Enhanced', 'Improved'],
-            'accuracy' => ['Precise', 'Accurate', 'Reliable', 'Consistent'],
-            'power' => ['Powerful', 'High-performance', 'Strong', 'Robust'],
+            'accuracy'   => ['Precise', 'Accurate', 'Reliable', 'Consistent'],
+            'power'      => ['Powerful', 'High-performance', 'Strong', 'Robust'],
         ];
 
         $key = $this->faker->randomElement(array_keys($performance));
         $values = $performance[$key];
 
         return $this->state(fn (array $attributes) => [
-            'feature_type' => 'performance',
-            'feature_key' => $key,
+            'feature_type'  => 'performance',
+            'feature_key'   => $key,
             'feature_value' => $this->faker->randomElement($values),
-            'weight' => $this->faker->randomFloat(4, 0.75, 1.0),
+            'weight'        => $this->faker->randomFloat(4, 0.75, 1.0),
         ]);
     }
 
@@ -134,21 +134,21 @@ final class ProductFeatureFactory extends Factory
     public function feature(): static
     {
         $features = [
-            'warranty' => ['1 year', '2 years', '3 years', '5 years', 'Lifetime'],
-            'shipping' => ['Free shipping', 'Express delivery', 'Standard delivery', 'Same day'],
+            'warranty'     => ['1 year', '2 years', '3 years', '5 years', 'Lifetime'],
+            'shipping'     => ['Free shipping', 'Express delivery', 'Standard delivery', 'Same day'],
             'availability' => ['In stock', 'Limited quantity', 'Pre-order', 'Backorder'],
-            'rating' => ['5 stars', 'Highly rated', 'Customer favorite', 'Best seller'],
-            'popularity' => ['Best seller', 'Trending', 'Popular choice', 'Top rated'],
+            'rating'       => ['5 stars', 'Highly rated', 'Customer favorite', 'Best seller'],
+            'popularity'   => ['Best seller', 'Trending', 'Popular choice', 'Top rated'],
         ];
 
         $key = $this->faker->randomElement(array_keys($features));
         $values = $features[$key];
 
         return $this->state(fn (array $attributes) => [
-            'feature_type' => 'feature',
-            'feature_key' => $key,
+            'feature_type'  => 'feature',
+            'feature_key'   => $key,
             'feature_value' => $this->faker->randomElement($values),
-            'weight' => $this->faker->randomFloat(4, 0.5, 0.85),
+            'weight'        => $this->faker->randomFloat(4, 0.5, 0.85),
         ]);
     }
 

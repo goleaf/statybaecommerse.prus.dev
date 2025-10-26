@@ -6,8 +6,8 @@ namespace Tests\Unit;
 
 use App\Models\ProductVariant;
 use App\Models\VariantAnalytics;
+use DateTime;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Carbon;
 use Tests\TestCase;
 
 final class VariantAnalyticsTest extends TestCase
@@ -29,7 +29,7 @@ final class VariantAnalyticsTest extends TestCase
     {
         // Arrange
         $analytics = VariantAnalytics::factory()->create([
-            'views' => 1000,
+            'views'  => 1000,
             'clicks' => 100,
         ]);
 
@@ -41,7 +41,7 @@ final class VariantAnalyticsTest extends TestCase
     {
         // Arrange
         $analytics = VariantAnalytics::factory()->create([
-            'views' => 0,
+            'views'  => 0,
             'clicks' => 100,
         ]);
 
@@ -53,7 +53,7 @@ final class VariantAnalyticsTest extends TestCase
     {
         // Arrange
         $analytics = VariantAnalytics::factory()->create([
-            'clicks' => 200,
+            'clicks'      => 200,
             'add_to_cart' => 50,
         ]);
 
@@ -65,7 +65,7 @@ final class VariantAnalyticsTest extends TestCase
     {
         // Arrange
         $analytics = VariantAnalytics::factory()->create([
-            'clicks' => 0,
+            'clicks'      => 0,
             'add_to_cart' => 50,
         ]);
 
@@ -78,7 +78,7 @@ final class VariantAnalyticsTest extends TestCase
         // Arrange
         $analytics = VariantAnalytics::factory()->create([
             'add_to_cart' => 100,
-            'purchases' => 20,
+            'purchases'   => 20,
         ]);
 
         // Act & Assert
@@ -90,7 +90,7 @@ final class VariantAnalyticsTest extends TestCase
         // Arrange
         $analytics = VariantAnalytics::factory()->create([
             'add_to_cart' => 0,
-            'purchases' => 20,
+            'purchases'   => 20,
         ]);
 
         // Act & Assert
@@ -101,7 +101,7 @@ final class VariantAnalyticsTest extends TestCase
     {
         // Arrange
         $analytics = VariantAnalytics::factory()->create([
-            'revenue' => 1000.00,
+            'revenue'   => 1000.00,
             'purchases' => 10,
         ]);
 
@@ -113,7 +113,7 @@ final class VariantAnalyticsTest extends TestCase
     {
         // Arrange
         $analytics = VariantAnalytics::factory()->create([
-            'revenue' => 1000.00,
+            'revenue'   => 1000.00,
             'purchases' => 0,
         ]);
 
@@ -181,14 +181,14 @@ final class VariantAnalyticsTest extends TestCase
             ->withVariant($variant)
             ->create([
                 'conversion_rate' => 1.0,
-                'revenue' => 100.00,
+                'revenue'         => 100.00,
             ]);
 
         $highPerforming = VariantAnalytics::factory()
             ->withVariant($variant)
             ->create([
                 'conversion_rate' => 10.0,
-                'revenue' => 1000.00,
+                'revenue'         => 1000.00,
             ]);
 
         // Act
@@ -228,8 +228,8 @@ final class VariantAnalyticsTest extends TestCase
         $variant = ProductVariant::factory()->create();
         $date = '2025-12-24'; // Use a fixed unique date
         $data = [
-            'views' => 100,
-            'clicks' => 50,
+            'views'   => 100,
+            'clicks'  => 50,
             'revenue' => 500.00,
         ];
 
@@ -241,7 +241,7 @@ final class VariantAnalyticsTest extends TestCase
         $this->assertEquals($variant->product_id, $analytics->product_id);
         $this->assertEquals($variant->id, $analytics->variant_id);
         $this->assertEquals($date, $analytics->date->toDateString());
-        $this->assertEquals('daily:'.$date, $analytics->date_bucket);
+        $this->assertEquals('daily:' . $date, $analytics->date_bucket);
         $this->assertEquals(100, $analytics->views);
         $this->assertEquals(50, $analytics->clicks);
         $this->assertEquals(500.00, $analytics->revenue);
@@ -266,7 +266,7 @@ final class VariantAnalyticsTest extends TestCase
         $this->assertEquals($existingAnalytics->id, $analytics->id);
         $this->assertEquals(200, $analytics->views);
         $this->assertEquals($variant->id, $analytics->variant_id);
-        $this->assertEquals('daily:'.$date, $analytics->date_bucket);
+        $this->assertEquals('daily:' . $date, $analytics->date_bucket);
 
         // Verify the record was actually updated, not created new
         $this->assertDatabaseCount('variant_analytics', 1);
@@ -290,7 +290,7 @@ final class VariantAnalyticsTest extends TestCase
 
         // Assert
         $this->assertEquals($variant->product_id, $analytics->product_id);
-        $this->assertEquals('weekly:'.$startOfWeek, $analytics->date_bucket);
+        $this->assertEquals('weekly:' . $startOfWeek, $analytics->date_bucket);
         $this->assertEquals(10, $analytics->views);
 
         // Calling again should increment rather than create a new row
@@ -323,8 +323,8 @@ final class VariantAnalyticsTest extends TestCase
     {
         // Arrange
         $analytics = VariantAnalytics::factory()->create([
-            'views' => 1000,
-            'purchases' => 50,
+            'views'           => 1000,
+            'purchases'       => 50,
             'conversion_rate' => 0,
         ]);
 
@@ -341,8 +341,8 @@ final class VariantAnalyticsTest extends TestCase
     {
         // Arrange
         $analytics = VariantAnalytics::factory()->create([
-            'views' => 0,
-            'purchases' => 50,
+            'views'           => 0,
+            'purchases'       => 50,
             'conversion_rate' => 10,
         ]);
 
@@ -379,9 +379,9 @@ final class VariantAnalyticsTest extends TestCase
     {
         // Arrange
         $analytics = VariantAnalytics::factory()->create([
-            'views' => '100',
-            'clicks' => '50',
-            'revenue' => '500.1234',
+            'views'           => '100',
+            'clicks'          => '50',
+            'revenue'         => '500.1234',
             'conversion_rate' => '10.5678',
         ]);
 
@@ -392,6 +392,6 @@ final class VariantAnalyticsTest extends TestCase
         $this->assertIsString($analytics->date_bucket);
         $this->assertIsString($analytics->revenue); // Laravel decimal cast returns string
         $this->assertIsString($analytics->conversion_rate); // Laravel decimal cast returns string
-        $this->assertInstanceOf(\DateTime::class, $analytics->date);
+        $this->assertInstanceOf(DateTime::class, $analytics->date);
     }
 }

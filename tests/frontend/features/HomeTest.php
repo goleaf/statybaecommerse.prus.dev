@@ -24,8 +24,8 @@ final class HomeTest extends TestCase
     public function test_displays_featured_products(): void
     {
         $featuredProduct = Product::factory()->create([
-            'is_visible' => true,
-            'is_featured' => true,
+            'is_visible'   => true,
+            'is_featured'  => true,
             'published_at' => now()->subDay(),
         ]);
 
@@ -38,9 +38,9 @@ final class HomeTest extends TestCase
     public function test_displays_latest_products(): void
     {
         $newerProduct = Product::factory()->create([
-            'is_visible' => true,
+            'is_visible'   => true,
             'published_at' => now()->subDay(),
-            'created_at' => now()->subHour(),
+            'created_at'   => now()->subHour(),
         ]);
 
         Livewire::test(Home::class)
@@ -55,8 +55,8 @@ final class HomeTest extends TestCase
         $product = Product::factory()->create(['is_visible' => true]);
 
         $approvedReview = Review::factory()->create([
-            'product_id' => $product->id,
-            'user_id' => $user->id,
+            'product_id'  => $product->id,
+            'user_id'     => $user->id,
             'is_approved' => true,
         ]);
 
@@ -69,9 +69,9 @@ final class HomeTest extends TestCase
     public function test_can_add_product_to_cart_from_homepage(): void
     {
         $product = Product::factory()->create([
-            'is_visible' => true,
+            'is_visible'     => true,
             'stock_quantity' => 10,
-            'published_at' => now()->subDay(),
+            'published_at'   => now()->subDay(),
         ]);
 
         Livewire::test(Home::class)
@@ -87,9 +87,9 @@ final class HomeTest extends TestCase
     public function test_cannot_add_out_of_stock_product_to_cart(): void
     {
         $product = Product::factory()->create([
-            'is_visible' => true,
+            'is_visible'     => true,
             'stock_quantity' => 0,
-            'published_at' => now()->subDay(),
+            'published_at'   => now()->subDay(),
         ]);
 
         Livewire::test(Home::class)
@@ -104,7 +104,7 @@ final class HomeTest extends TestCase
     public function test_cannot_add_invisible_product_to_cart(): void
     {
         $product = Product::factory()->create([
-            'is_visible' => false,
+            'is_visible'     => false,
             'stock_quantity' => 10,
         ]);
 
@@ -120,13 +120,13 @@ final class HomeTest extends TestCase
     public function test_only_shows_published_products(): void
     {
         $publishedProduct = Product::factory()->create([
-            'is_visible' => true,
-            'is_featured' => true,
+            'is_visible'   => true,
+            'is_featured'  => true,
             'published_at' => now()->subDay(),
         ]);
         $unpublishedProduct = Product::factory()->create([
-            'is_visible' => true,
-            'is_featured' => true,
+            'is_visible'   => true,
+            'is_featured'  => true,
             'published_at' => now()->addDay(),
         ]);
 

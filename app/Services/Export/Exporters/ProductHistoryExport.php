@@ -37,12 +37,12 @@ final class ProductHistoryExport implements Exportable
     {
         return [
             'occurred_at' => new ExportColumn('occurred_at', __('Occurred At'), 'created_at'),
-            'action' => new ExportColumn('action', __('Action'), 'action'),
-            'field_name' => new ExportColumn('field_name', __('Field'), 'field_name'),
-            'old_value' => new ExportColumn('old_value', __('Old Value'), 'old_value'),
-            'new_value' => new ExportColumn('new_value', __('New Value'), 'new_value'),
+            'action'      => new ExportColumn('action', __('Action'), 'action'),
+            'field_name'  => new ExportColumn('field_name', __('Field'), 'field_name'),
+            'old_value'   => new ExportColumn('old_value', __('Old Value'), 'old_value'),
+            'new_value'   => new ExportColumn('new_value', __('New Value'), 'new_value'),
             'description' => new ExportColumn('description', __('Description'), 'description'),
-            'user_name' => new ExportColumn(
+            'user_name'   => new ExportColumn(
                 'user_name',
                 __('User'),
                 resolver: static fn (ProductHistory $history): string => (string) ($history->user?->name ?? ''),
@@ -64,7 +64,7 @@ final class ProductHistoryExport implements Exportable
     /**
      * Configure the source query for queued export jobs.
      *
-     * @param  array<string, mixed>  $options
+     * @param array<string, mixed> $options
      */
     public function query(array $options = []): Builder
     {
@@ -104,7 +104,7 @@ final class ProductHistoryExport implements Exportable
     /**
      * Map the model instance into a simple array of scalar values based on the selected columns.
      *
-     * @param  array<string, ExportColumn>  $columns
+     * @param  array<string, ExportColumn> $columns
      * @return array<int, string>
      */
     public function map(Model $model, array $columns): array
@@ -123,6 +123,6 @@ final class ProductHistoryExport implements Exportable
      */
     public static function allowedColumnKeys(): array
     {
-        return array_keys((new self())->columns());
+        return array_keys((new self)->columns());
     }
 }

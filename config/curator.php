@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 return [
     'accepted_file_types' => [
         'image/jpeg',
@@ -27,44 +29,44 @@ return [
         'Awcodes\\Curator\\Curations\\ThumbnailPreset',
     ],
     'directory' => 'media',
-    'disk' => env('FILAMENT_FILESYSTEM_DISK', 'public'),
-    'glide' => [
-        'server' => 'Awcodes\\Curator\\Glide\\DefaultServerFactory',
-        'fallbacks' => [],
+    'disk'      => env('FILAMENT_FILESYSTEM_DISK', 'public'),
+    'glide'     => [
+        'server'     => 'Awcodes\\Curator\\Glide\\DefaultServerFactory',
+        'fallbacks'  => [],
         'route_path' => 'curator',
     ],
-    'image_crop_aspect_ratio' => null,
-    'image_resize_mode' => null,
-    'image_resize_target_height' => null,
-    'image_resize_target_width' => null,
-    'is_limited_to_directory' => false,
-    'is_tenant_aware' => true,
+    'image_crop_aspect_ratio'            => null,
+    'image_resize_mode'                  => null,
+    'image_resize_target_height'         => null,
+    'image_resize_target_width'          => null,
+    'is_limited_to_directory'            => false,
+    'is_tenant_aware'                    => true,
     'tenant_ownership_relationship_name' => 'tenant',
-    'max_size' => 5000,
-    'model' => 'Awcodes\\Curator\\Models\\Media',
-    'min_size' => 0,
-    'path_generator' => null,
-    'resources' => [
-        'label' => 'Media',
-        'plural_label' => 'Media',
-        'navigation_group' => null,
-        'cluster' => null,
-        'navigation_label' => 'Media',
-        'navigation_icon' => 'heroicon-o-photo',
-        'navigation_sort' => null,
+    'max_size'                           => 5000,
+    'model'                              => 'Awcodes\\Curator\\Models\\Media',
+    'min_size'                           => 0,
+    'path_generator'                     => null,
+    'resources'                          => [
+        'label'                  => 'Media',
+        'plural_label'           => 'Media',
+        'navigation_group'       => null,
+        'cluster'                => null,
+        'navigation_label'       => 'Media',
+        'navigation_icon'        => 'heroicon-o-photo',
+        'navigation_sort'        => null,
         'navigation_count_badge' => false,
-        'resource' => 'Awcodes\\Curator\\Resources\\MediaResource',
+        'resource'               => 'Awcodes\\Curator\\Resources\\MediaResource',
     ],
-    'should_preserve_filenames' => false,
+    'should_preserve_filenames'  => false,
     'should_register_navigation' => true,
-    'should_check_exists' => true,
-    'visibility' => 'public',
-    'tabs' => [
-        'display_curation' => true,
+    'should_check_exists'        => true,
+    'visibility'                 => 'public',
+    'tabs'                       => [
+        'display_curation'   => true,
         'display_upload_new' => true,
     ],
     'multi_select_key' => 'metaKey',
-    'table' => [
+    'table'            => [
         'layout' => 'grid',
     ],
 ];

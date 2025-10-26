@@ -19,12 +19,12 @@ final class ProductSimilarityTest extends TestCase
         $product2 = Product::factory()->create();
 
         $similarity = ProductSimilarity::factory()->create([
-            'product_id' => $product1->id,
+            'product_id'         => $product1->id,
             'similar_product_id' => $product2->id,
-            'algorithm_type' => 'cosine_similarity',
-            'similarity_score' => 0.85,
-            'calculation_data' => ['features' => ['color', 'size', 'brand'], 'weights' => [0.3, 0.4, 0.3]],
-            'calculated_at' => now(),
+            'algorithm_type'     => 'cosine_similarity',
+            'similarity_score'   => 0.85,
+            'calculation_data'   => ['features' => ['color', 'size', 'brand'], 'weights' => [0.3, 0.4, 0.3]],
+            'calculated_at'      => now(),
         ]);
 
         $this->assertInstanceOf(ProductSimilarity::class, $similarity);
@@ -62,7 +62,7 @@ final class ProductSimilarityTest extends TestCase
         $similarity = ProductSimilarity::factory()->create([
             'similarity_score' => '0.75',
             'calculation_data' => ['test' => 'data'],
-            'calculated_at' => '2024-01-01 12:00:00',
+            'calculated_at'    => '2024-01-01 12:00:00',
         ]);
 
         $this->assertIsString($similarity->similarity_score);

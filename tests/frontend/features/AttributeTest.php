@@ -28,8 +28,8 @@ class AttributeTest extends TestCase
         Attribute::factory()->create(['type' => 'select', 'group_name' => 'technical_specs']);
 
         $response = $this->get(route('frontend.attributes.index', [
-            'type' => 'text',
-            'group' => 'basic_info',
+            'type'   => 'text',
+            'group'  => 'basic_info',
             'search' => 'test',
         ]));
 
@@ -149,7 +149,7 @@ class AttributeTest extends TestCase
         Attribute::factory()->create(['name' => 'Material Attribute', 'type' => 'select']);
 
         $response = $this->get(route('frontend.attributes.api.search', [
-            'q' => 'Color',
+            'q'    => 'Color',
             'type' => 'select',
         ]));
 
@@ -281,11 +281,11 @@ class AttributeTest extends TestCase
         $attribute = Attribute::factory()->create();
         AttributeValue::factory()->count(3)->create([
             'attribute_id' => $attribute->id,
-            'is_enabled' => true,
+            'is_enabled'   => true,
         ]);
         AttributeValue::factory()->create([
             'attribute_id' => $attribute->id,
-            'is_enabled' => false,
+            'is_enabled'   => false,
         ]);
 
         $response = $this->get(route('frontend.attributes.show', $attribute));

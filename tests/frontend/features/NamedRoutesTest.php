@@ -7,8 +7,8 @@ use Illuminate\Support\Facades\Route;
 beforeEach(function (): void {
     // Some routes depend on config flags or packages; ensure minimal config
     config()->set('shopper.features', [
-        'brand' => 'enabled',
-        'category' => 'enabled',
+        'brand'      => 'enabled',
+        'category'   => 'enabled',
         'collection' => 'enabled',
     ]);
 });

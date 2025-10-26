@@ -19,7 +19,7 @@ final class CompanyTest extends TestCase
     public function test_fillable_configuration_is_explicit(): void
     {
         // Instantiate the model to interrogate fillable configuration safely.
-        $company = new Company();
+        $company = new Company;
 
         // Confirm the mass-assignable attributes to guard against accidental data exposure.
         self::assertSame([
@@ -39,12 +39,12 @@ final class CompanyTest extends TestCase
     public function test_casts_are_defined_for_boolean_and_array_fields(): void
     {
         // Instantiate the model to review its casting behaviour in isolation.
-        $company = new Company();
+        $company = new Company;
 
         // Ensure metadata is kept as an array and the activity flag as a boolean for type safety.
         self::assertSame([
-            'id' => 'int',
-            'metadata' => 'array',
+            'id'        => 'int',
+            'metadata'  => 'array',
             'is_active' => 'boolean',
         ], $company->getCasts());
     }

@@ -18,11 +18,11 @@ final class AdminUserSeeder extends Seeder
         $superUser = User::query()->firstOrNew(['email' => 'superuser@example.com']);
 
         $superUser->forceFill([
-            'name' => 'Super User',
-            'password' => Hash::make('password'),
+            'name'              => 'Super User',
+            'password'          => Hash::make('password'),
             'email_verified_at' => now(),
-            'is_admin' => true,
-            'is_active' => true,
+            'is_admin'          => true,
+            'is_active'         => true,
         ])->save();
 
         if (! $superUser->hasRole('admin')) {

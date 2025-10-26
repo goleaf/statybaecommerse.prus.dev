@@ -10,7 +10,7 @@ uses(TestCase::class);
 
 function sampleProducts(int $n = 6): Collection
 {
-    return collect(range(1, $n))->map(fn ($i) => ['id' => $i, 'name' => 'P'.$i]);
+    return collect(range(1, $n))->map(fn ($i) => ['id' => $i, 'name' => 'P' . $i]);
 }
 
 it('arranges products for gallery and responsive grid', function () {

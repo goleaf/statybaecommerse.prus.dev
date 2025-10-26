@@ -5,11 +5,12 @@ declare(strict_types=1);
 namespace Tests\Feature;
 
 use App\Filament\Resources\CollectionResource;
-use App\Support\Nav;
 use App\Models\Collection;
 use App\Models\Product;
 use App\Models\User;
+use App\Support\Nav;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use ReflectionClass;
 use Tests\TestCase;
 
 class CollectionResourceComprehensiveTest extends TestCase
@@ -34,7 +35,7 @@ class CollectionResourceComprehensiveTest extends TestCase
 
     public function test_collection_resource_has_correct_model(): void
     {
-        $reflection = new \ReflectionClass(CollectionResource::class);
+        $reflection = new ReflectionClass(CollectionResource::class);
         $modelProperty = $reflection->getProperty('model');
         $modelProperty->setAccessible(true);
 
@@ -43,7 +44,7 @@ class CollectionResourceComprehensiveTest extends TestCase
 
     public function test_collection_resource_has_correct_navigation_group(): void
     {
-        $reflection = new \ReflectionClass(CollectionResource::class);
+        $reflection = new ReflectionClass(CollectionResource::class);
         $navigationGroupProperty = $reflection->getProperty('navigationGroup');
         $navigationGroupProperty->setAccessible(true);
 
@@ -100,10 +101,10 @@ class CollectionResourceComprehensiveTest extends TestCase
     public function test_collection_model_can_be_created(): void
     {
         $collection = Collection::factory()->create([
-            'name' => 'Test Collection',
-            'slug' => 'test-collection',
+            'name'        => 'Test Collection',
+            'slug'        => 'test-collection',
             'description' => 'Test description',
-            'is_active' => true,
+            'is_active'   => true,
         ]);
 
         $this->assertInstanceOf(Collection::class, $collection);
@@ -146,7 +147,7 @@ class CollectionResourceComprehensiveTest extends TestCase
     public function test_collection_model_translation_methods(): void
     {
         $collection = Collection::factory()->create([
-            'name' => 'Test Collection',
+            'name'        => 'Test Collection',
             'description' => 'Test description',
         ]);
 
@@ -232,9 +233,9 @@ class CollectionResourceComprehensiveTest extends TestCase
     public function test_collection_model_casts(): void
     {
         $collection = Collection::factory()->create([
-            'is_active' => true,
+            'is_active'    => true,
             'is_automatic' => false,
-            'sort_order' => 5,
+            'sort_order'   => 5,
         ]);
 
         $this->assertIsBool($collection->is_active);

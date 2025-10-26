@@ -92,5 +92,4 @@ final class ProductFeature extends Model
     {
         return $query->orderByDesc('feature_value');
     }
-
 }

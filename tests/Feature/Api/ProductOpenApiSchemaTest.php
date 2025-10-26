@@ -62,7 +62,7 @@ final class ProductOpenApiSchemaTest extends TestCase
         $schema = $this->schemaForPath('/products/search');
         $errors = $this->validator->validateInline($response->json(), $schema, $this->openApi);
 
-        $this->assertSame([], $errors, 'OpenAPI schema validation failed: '.implode('; ', $errors));
+        $this->assertSame([], $errors, 'OpenAPI schema validation failed: ' . implode('; ', $errors));
     }
 
     public function test_product_catalog_matches_documented_schema(): void

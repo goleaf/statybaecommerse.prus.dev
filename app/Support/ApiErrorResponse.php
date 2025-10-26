@@ -11,15 +11,13 @@ final class ApiErrorResponse
 {
     private const DEFAULT_PROBLEM_BASE_URI = 'https://prus.dev/problems';
 
-    private function __construct()
-    {
-    }
+    private function __construct() {}
 
     /**
      * Build an RFC 7807 problem details response enriched with correlation metadata.
      *
-     * @param  array<string, mixed>  $context
-     * @param  array<string, mixed>  $extra
+     * @param array<string, mixed> $context
+     * @param array<string, mixed> $extra
      */
     public static function problem(
         Request $request,
@@ -36,21 +34,21 @@ final class ApiErrorResponse
         $locale ??= RequestContext::resolveLocale($request);
         $traceId = RequestContext::resolveTraceId($request);
         $problem = [
-            'type' => self::typeFor($errorCode),
-            'title' => $title ?? self::titleFor($errorCode, $locale),
-            'status' => $status,
-            'detail' => $detail,
+            'type'     => self::typeFor($errorCode),
+            'title'    => $title ?? self::titleFor($errorCode, $locale),
+            'status'   => $status,
+            'detail'   => $detail,
             'instance' => $request->fullUrl(),
-            'error' => array_filter([
-                'code' => $errorCode,
+            'error'    => array_filter([
+                'code'    => $errorCode,
                 'context' => $context,
             ], static fn (mixed $value) => $value !== null && $value !== []),
             'correlation' => [
-                'trace_id' => $traceId,
+                'trace_id'       => $traceId,
                 'correlation_id' => $traceId,
             ],
             'meta' => [
-                'locale' => $locale,
+                'locale'    => $locale,
                 'timestamp' => now()->toIso8601String(),
             ],
         ];
@@ -72,7 +70,7 @@ final class ApiErrorResponse
     {
         $base = (string) config('app.problem_base_uri', self::DEFAULT_PROBLEM_BASE_URI);
 
-        return rtrim($base, '/').'/'.$errorCode;
+        return rtrim($base, '/') . '/' . $errorCode;
     }
 
     public static function titleFor(string $errorCode, ?string $locale = null): string

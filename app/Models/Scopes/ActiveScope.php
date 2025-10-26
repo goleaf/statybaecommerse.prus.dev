@@ -89,10 +89,10 @@ final class ActiveScope implements Scope
     private function getDefaultStatuses(Model $model): array
     {
         return match ($model::class) {
-            \App\Models\Order::class => [],
-            \App\Models\Referral::class => ['pending', 'active', 'completed', 'expired', 'cancelled'],
+            \App\Models\Order::class              => [],
+            \App\Models\Referral::class           => ['pending', 'active', 'completed', 'expired', 'cancelled'],
             \App\Models\DiscountRedemption::class => ['pending', 'redeemed', 'expired', 'cancelled'],
-            default                  => ['active'],
+            default                               => ['active'],
         };
     }
 
@@ -106,7 +106,7 @@ final class ActiveScope implements Scope
         $connection = $model->getConnection();
         $cacheKey = $this->buildMetadataCacheKey($connection, $model->getTable());
 
-        if (defined($model::class.'::SCOPE_COLUMN_HINTS')) {
+        if (defined($model::class . '::SCOPE_COLUMN_HINTS')) {
             $hints = $model::SCOPE_COLUMN_HINTS;
 
             return self::$tableMetadataCache[$cacheKey] = [

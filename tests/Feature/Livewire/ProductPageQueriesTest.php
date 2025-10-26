@@ -31,37 +31,37 @@ final class ProductPageQueriesTest extends TestCase
         ]);
 
         $product = Product::factory()->create([
-            'type' => 'simple',
-            'brand_id' => $brand->id,
-            'is_visible' => true,
-            'status' => 'published',
-            'published_at' => now()->subDay(),
-            'manage_stock' => true,
-            'stock_quantity' => 25,
+            'type'                => 'simple',
+            'brand_id'            => $brand->id,
+            'is_visible'          => true,
+            'status'              => 'published',
+            'published_at'        => now()->subDay(),
+            'manage_stock'        => true,
+            'stock_quantity'      => 25,
             'low_stock_threshold' => 5,
-            'price' => 199.00,
+            'price'               => 199.00,
         ]);
 
         $product->categories()->attach($category);
 
         ProductVariant::factory()->for($product)->create([
-            'price' => 189.00,
+            'price'           => 189.00,
             'track_inventory' => false,
-            'is_default' => true,
+            'is_default'      => true,
         ]);
 
         ProductVariant::factory()->for($product)->create([
-            'price' => 209.00,
+            'price'           => 209.00,
             'track_inventory' => false,
         ]);
 
         Review::factory()->for($product)->create([
-            'rating' => 5,
+            'rating'      => 5,
             'is_approved' => true,
         ]);
 
         Review::factory()->for($product)->create([
-            'rating' => 3,
+            'rating'      => 3,
             'is_approved' => true,
         ]);
 

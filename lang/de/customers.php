@@ -3,14 +3,14 @@
 declare(strict_types=1);
 
 return [
-    'title'  => 'Kunden',
-    'plural' => 'Kunden',
-    'single' => 'Kunde',
-    'orders' => 'Bestellungen',
-    'order_number_label' => 'Bestellung Nr. :number',
-    'order_placed_on' => 'Aufgegeben am :date',
-    'reviews' => 'Bewertungen',
-    'review_for_product' => 'Bewertung für :product',
+    'title'                 => 'Kunden',
+    'plural'                => 'Kunden',
+    'single'                => 'Kunde',
+    'orders'                => 'Bestellungen',
+    'order_number_label'    => 'Bestellung Nr. :number',
+    'order_placed_on'       => 'Aufgegeben am :date',
+    'reviews'               => 'Bewertungen',
+    'review_for_product'    => 'Bewertung für :product',
     'review_rating_tooltip' => 'Bewertet mit :rating/5 — :title',
 
     'basic_information'    => 'Grundinformationen',
@@ -95,7 +95,7 @@ return [
     'bulk_verified_success'    => 'Ausgewählte Einträge erfolgreich verifiziert',
     'bulk_activated_success'   => 'Ausgewählte Einträge erfolgreich aktiviert',
     'bulk_deactivated_success' => 'Ausgewählte Einträge erfolgreich deaktiviert',
-    'sparkline' => [
+    'sparkline'                => [
         'orders_label' => 'Bestellungen der letzten :days Tage',
     ],
 ];

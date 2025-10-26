@@ -10,6 +10,9 @@ use Illuminate\Contracts\Queue\Job as JobContract;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Support\Facades\Cache;
+
+use function is_string;
+
 use RuntimeException;
 use Tests\TestCase;
 
@@ -24,9 +27,9 @@ final class QueueFailureHandlerTest extends TestCase
         Cache::clear();
 
         config([
-            'queue_monitor.dead_letter.enabled' => true,
-            'queue_monitor.alerts.enabled' => true,
-            'queue_monitor.alerts.window_seconds' => 300,
+            'queue_monitor.dead_letter.enabled'      => true,
+            'queue_monitor.alerts.enabled'           => true,
+            'queue_monitor.alerts.window_seconds'    => 300,
             'queue_monitor.alerts.failure_threshold' => 2,
         ]);
     }
@@ -69,13 +72,13 @@ final class QueueFailureHandlerTest extends TestCase
         /** @var array<string, mixed> $payload */
         $payload = [
             'displayName' => 'App\\Jobs\\ExampleJob',
-            'attempts' => $attempts,
+            'attempts'    => $attempts,
         ];
 
         return new class($attempts, $maxTries, $payload) implements JobContract
         {
             /**
-             * @param  array<string, mixed>  $payload
+             * @param array<string, mixed> $payload
              */
             public function __construct(
                 private readonly int $attempts,
@@ -87,7 +90,7 @@ final class QueueFailureHandlerTest extends TestCase
             {
                 $uuid = $this->payload['uuid'] ?? null;
 
-                return \is_string($uuid) ? $uuid : null;
+                return is_string($uuid) ? $uuid : null;
             }
 
             public function getJobId(): string
@@ -207,9 +210,9 @@ final class NotificationRecorder implements SystemNotificationSender
     {
         $this->callCount++;
         $this->records[] = [
-            'title' => $title,
+            'title'   => $title,
             'message' => $message,
-            'type' => $type,
+            'type'    => $type,
         ];
     }
 }

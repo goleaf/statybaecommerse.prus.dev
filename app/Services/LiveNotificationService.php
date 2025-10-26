@@ -92,9 +92,9 @@ final class LiveNotificationService implements SystemNotificationSender
         $message = "Užsakymo #{$orderId} mokėjimas: {$status}";
         $type = match ($status) {
             'Sėkmingas' => 'success',
-            'Nepavyko' => 'error',
-            'Laukiama' => 'warning',
-            default => 'info',
+            'Nepavyko'  => 'error',
+            'Laukiama'  => 'warning',
+            default     => 'info',
         };
         $this->sendToAdmins($title, $message, $type);
     }

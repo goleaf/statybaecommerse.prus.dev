@@ -9,25 +9,25 @@ uses(RefreshDatabase::class);
 it('renders localized news index and show pages', function (): void {
     /** @var \App\Models\News $news */
     $news = \App\Models\News::create([
-        'is_visible' => true,
+        'is_visible'   => true,
         'published_at' => now()->subDay(),
-        'author_name' => 'Editor',
+        'author_name'  => 'Editor',
     ]);
 
     \App\Models\Translations\NewsTranslation::create([
         'news_id' => $news->id,
-        'locale' => 'lt',
-        'title' => 'Naujiena LT',
-        'slug' => 'naujiena-lt',
+        'locale'  => 'lt',
+        'title'   => 'Naujiena LT',
+        'slug'    => 'naujiena-lt',
         'summary' => 'Trumpas aprašymas LT',
         'content' => '<p>Turinys LT</p>',
     ]);
 
     \App\Models\Translations\NewsTranslation::create([
         'news_id' => $news->id,
-        'locale' => 'en',
-        'title' => 'News EN',
-        'slug' => 'news-en',
+        'locale'  => 'en',
+        'title'   => 'News EN',
+        'slug'    => 'news-en',
         'summary' => 'Short summary EN',
         'content' => '<p>Content EN</p>',
     ]);

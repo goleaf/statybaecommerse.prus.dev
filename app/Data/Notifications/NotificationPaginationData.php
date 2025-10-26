@@ -11,9 +11,13 @@ use InvalidArgumentException;
 final class NotificationPaginationData
 {
     private const DEFAULT_PER_PAGE = 25;
+
     private const MAX_PER_PAGE = 100;
+
     private const DEFAULT_SORT = 'created_at';
+
     private const DEFAULT_DIRECTION = 'desc';
+
     private const ALLOWED_SORTS = ['created_at', 'type'];
 
     private function __construct(
@@ -21,8 +25,7 @@ final class NotificationPaginationData
         private readonly int $perPage,
         private readonly string $sort,
         private readonly string $direction,
-    ) {
-    }
+    ) {}
 
     /**
      * @param array<string, mixed> $input
@@ -39,7 +42,7 @@ final class NotificationPaginationData
             throw new InvalidArgumentException('Per page must be at least 1.');
         }
         if ($perPage > self::MAX_PER_PAGE) {
-            throw new InvalidArgumentException('Per page may not be greater than '.self::MAX_PER_PAGE.'.');
+            throw new InvalidArgumentException('Per page may not be greater than ' . self::MAX_PER_PAGE . '.');
         }
 
         $rawSort = is_string($input['sort'] ?? null) ? strtolower($input['sort']) : self::DEFAULT_SORT;
@@ -78,7 +81,7 @@ final class NotificationPaginationData
     public function apply(Builder $builder): Builder
     {
         $column = match ($this->sort) {
-            'type' => 'notifications.type',
+            'type'  => 'notifications.type',
             default => 'notifications.created_at',
         };
 
@@ -91,11 +94,11 @@ final class NotificationPaginationData
     public function queryMeta(NotificationFilterData $filters, ?NotificationSearchParametersData $search = null): array
     {
         $query = [
-            'filters' => $filters->toArray(),
-            'sort' => $this->sort,
+            'filters'   => $filters->toArray(),
+            'sort'      => $this->sort,
             'direction' => $this->direction,
-            'page' => $this->page,
-            'per_page' => $this->perPage,
+            'page'      => $this->page,
+            'per_page'  => $this->perPage,
         ];
 
         if ($search !== null) {
@@ -111,11 +114,11 @@ final class NotificationPaginationData
     public function paginationMeta(LengthAwarePaginator $paginator): array
     {
         return [
-            'total' => $paginator->total(),
-            'count' => $paginator->count(),
-            'per_page' => $paginator->perPage(),
+            'total'        => $paginator->total(),
+            'count'        => $paginator->count(),
+            'per_page'     => $paginator->perPage(),
             'current_page' => $paginator->currentPage(),
-            'total_pages' => $paginator->lastPage(),
+            'total_pages'  => $paginator->lastPage(),
         ];
     }
 
@@ -126,9 +129,9 @@ final class NotificationPaginationData
     {
         return [
             'first' => $paginator->url(1),
-            'last' => $paginator->url($paginator->lastPage()),
-            'prev' => $paginator->previousPageUrl(),
-            'next' => $paginator->nextPageUrl(),
+            'last'  => $paginator->url($paginator->lastPage()),
+            'prev'  => $paginator->previousPageUrl(),
+            'next'  => $paginator->nextPageUrl(),
         ];
     }
 }

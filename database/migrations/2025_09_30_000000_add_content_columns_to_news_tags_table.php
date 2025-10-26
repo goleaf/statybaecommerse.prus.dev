@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
@@ -34,14 +36,14 @@ return new class extends Migration
         });
 
         DB::table('news_tags')->orderBy('id')->lazyById()->each(function ($tag): void {
-            $name = $tag->name ?: 'News Tag '.$tag->id;
-            $slug = $tag->slug ?: Str::slug($name.'-'.$tag->id);
+            $name = $tag->name ?: 'News Tag ' . $tag->id;
+            $slug = $tag->slug ?: Str::slug($name . '-' . $tag->id);
 
             DB::table('news_tags')
                 ->where('id', $tag->id)
                 ->update([
-                    'name' => $name,
-                    'slug' => $slug,
+                    'name'        => $name,
+                    'slug'        => $slug,
                     'description' => $tag->description,
                 ]);
         });

@@ -29,13 +29,13 @@ final class ApiKeyFactory extends Factory
         $credentials = ApiKey::generateCredentials();
 
         return [
-            'name' => sprintf('%s API Access', $this->faker->company()),
-            'key' => $credentials['hashed'],
-            'secret' => ApiKey::generatePlainTextSecret(),
-            'scopes' => array_values($scopes),
-            'permissions' => null,
-            'rate_limit' => $this->faker->numberBetween(100, 1000),
-            'is_active' => true,
+            'name'         => sprintf('%s API Access', $this->faker->company()),
+            'key'          => $credentials['hashed'],
+            'secret'       => ApiKey::generatePlainTextSecret(),
+            'scopes'       => array_values($scopes),
+            'permissions'  => null,
+            'rate_limit'   => $this->faker->numberBetween(100, 1000),
+            'is_active'    => true,
             'last_used_at' => $this->faker->optional()->dateTimeBetween('-1 month', 'now'),
         ];
     }

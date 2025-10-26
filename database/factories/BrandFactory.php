@@ -51,7 +51,7 @@ class BrandFactory extends Factory
 
     public function definition(): array
     {
-        $brand = new Brand();
+        $brand = new Brand;
         $connection = $brand->newQuery()->getConnection();
         $schema = $connection->getSchemaBuilder();
         $table = $brand->getTable();

@@ -168,7 +168,7 @@ final class AddressController extends Controller
         $cities = City::where('country_id', $validated['country_id'])->orderBy('name')->get(['id', 'name']);
 
         return response()->json($cities);
-}
+    }
 
     /**
      * Build a query for countries restricted to the configured allow-list.

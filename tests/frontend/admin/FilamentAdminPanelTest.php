@@ -15,8 +15,8 @@ beforeEach(function (): void {
 
 it('can access admin panel with authenticated user', function () {
     $admin = User::factory()->create([
-        'name' => 'Test Admin',
-        'email' => 'test@admin.com',
+        'name'     => 'Test Admin',
+        'email'    => 'test@admin.com',
         'is_admin' => true,
     ]);
 
@@ -38,8 +38,8 @@ it('redirects unauthenticated users to login', function () {
 
 it('can access product resource', function () {
     $admin = User::factory()->create([
-        'name' => 'Test Admin',
-        'email' => 'test@admin.com',
+        'name'     => 'Test Admin',
+        'email'    => 'test@admin.com',
         'is_admin' => true,
     ]);
 
@@ -53,8 +53,8 @@ it('can access product resource', function () {
 
 it('can access dashboard', function () {
     $admin = User::factory()->create([
-        'name' => 'Test Admin',
-        'email' => 'test@admin.com',
+        'name'     => 'Test Admin',
+        'email'    => 'test@admin.com',
         'is_admin' => true,
     ]);
 

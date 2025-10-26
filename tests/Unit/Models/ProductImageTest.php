@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Tests\Unit\Models;
 
@@ -19,10 +21,10 @@ final class ProductImageTest extends TestCase
         parent::setUp();
 
         $this->product = Product::factory()->create([
-            'name' => 'Test Product',
-            'status' => 'published',
+            'name'         => 'Test Product',
+            'status'       => 'published',
             'published_at' => now(),
-            'is_visible' => true,
+            'is_visible'   => true,
         ]);
 
         Storage::fake('public');
@@ -32,8 +34,8 @@ final class ProductImageTest extends TestCase
     {
         $image = ProductImage::factory()->create([
             'product_id' => $this->product->id,
-            'path' => 'product-images/test.jpg',
-            'alt_text' => 'Test Image',
+            'path'       => 'product-images/test.jpg',
+            'alt_text'   => 'Test Image',
             'sort_order' => 1,
         ]);
 
@@ -61,7 +63,7 @@ final class ProductImageTest extends TestCase
         $image = ProductImage::factory()->create([
             'product_id' => $this->product->id,
             'sort_order' => '5',
-            'is_active' => '1',
+            'is_active'  => '1',
         ]);
 
         expect($image->product_id)->toBeInt();
@@ -95,12 +97,12 @@ final class ProductImageTest extends TestCase
     {
         ProductImage::factory()->create([
             'product_id' => $this->product->id,
-            'is_active' => true,
+            'is_active'  => true,
         ]);
 
         ProductImage::factory()->create([
             'product_id' => $this->product->id,
-            'is_active' => false,
+            'is_active'  => false,
         ]);
 
         $activeImages = ProductImage::withoutGlobalScope('App\Models\Scopes\ActiveScope')->active()->get();
@@ -112,9 +114,9 @@ final class ProductImageTest extends TestCase
     public function test_scope_for_product_returns_images_for_specific_product(): void
     {
         $otherProduct = Product::factory()->create([
-            'status' => 'published',
+            'status'       => 'published',
             'published_at' => now(),
-            'is_visible' => true,
+            'is_visible'   => true,
         ]);
 
         ProductImage::factory()->count(2)->create([
@@ -128,7 +130,7 @@ final class ProductImageTest extends TestCase
         $productImages = ProductImage::forProduct($this->product->id)->get();
 
         expect($productImages)->toHaveCount(2);
-        expect($productImages->every(fn($img) => $img->product_id === $this->product->id))->toBeTrue();
+        expect($productImages->every(fn ($img) => $img->product_id === $this->product->id))->toBeTrue();
     }
 
     public function test_scope_ordered_returns_images_in_sort_order(): void
@@ -192,7 +194,7 @@ final class ProductImageTest extends TestCase
     {
         $image = ProductImage::factory()->create([
             'product_id' => $this->product->id,
-            'alt_text' => 'Custom Alt Text',
+            'alt_text'   => 'Custom Alt Text',
         ]);
 
         expect($image->getAltTextOrDefault())->toBe('Custom Alt Text');
@@ -202,7 +204,7 @@ final class ProductImageTest extends TestCase
     {
         $image = ProductImage::factory()->create([
             'product_id' => $this->product->id,
-            'alt_text' => null,
+            'alt_text'   => null,
         ]);
 
         // Load the relationship to test the default generation
@@ -223,7 +225,7 @@ final class ProductImageTest extends TestCase
     {
         $image = ProductImage::factory()->create([
             'product_id' => $this->product->id,
-            'path' => 'product-images/test.jpg',
+            'path'       => 'product-images/test.jpg',
         ]);
 
         expect($image->url)->toBeString();
@@ -234,7 +236,7 @@ final class ProductImageTest extends TestCase
     {
         $image = ProductImage::factory()->create([
             'product_id' => $this->product->id,
-            'path' => 'https://example.com/image.jpg',
+            'path'       => 'https://example.com/image.jpg',
         ]);
 
         expect($image->url)->toBe('https://example.com/image.jpg');
@@ -244,7 +246,7 @@ final class ProductImageTest extends TestCase
     {
         $image = ProductImage::factory()->create([
             'product_id' => $this->product->id,
-            'path' => '/images/product.jpg',
+            'path'       => '/images/product.jpg',
         ]);
 
         expect($image->url)->toContain('images/product.jpg');
@@ -254,7 +256,7 @@ final class ProductImageTest extends TestCase
     {
         $image = ProductImage::factory()->create([
             'product_id' => $this->product->id,
-            'path' => 'product-images/test.jpg',
+            'path'       => 'product-images/test.jpg',
         ]);
 
         expect($image->full_path)->toContain('storage');
@@ -271,7 +273,7 @@ final class ProductImageTest extends TestCase
         // Test non-existent file
         $image = ProductImage::factory()->create([
             'product_id' => $this->product->id,
-            'path' => $path,
+            'path'       => $path,
         ]);
 
         expect($image->exists_on_disk)->toBeFalse();
@@ -318,10 +320,10 @@ final class ProductImageTest extends TestCase
     {
         $image = ProductImage::create([
             'product_id' => $this->product->id,
-            'path' => 'test/path.jpg',
-            'alt_text' => 'Test',
+            'path'       => 'test/path.jpg',
+            'alt_text'   => 'Test',
             'sort_order' => 5,
-            'is_active' => true,
+            'is_active'  => true,
         ]);
 
         expect($image->product_id)->toBe($this->product->id);
@@ -350,12 +352,12 @@ final class ProductImageTest extends TestCase
     {
         $image = ProductImage::factory()->create([
             'product_id' => $this->product->id,
-            'alt_text' => 'Original',
+            'alt_text'   => 'Original',
             'sort_order' => 1,
         ]);
 
         $image->update([
-            'alt_text' => 'Updated',
+            'alt_text'   => 'Updated',
             'sort_order' => 5,
         ]);
 

@@ -23,8 +23,8 @@ class CategoryShowTest extends TestCase
         // Create a visible category
         $this->category = Category::factory()->create([
             'is_visible' => true,
-            'name' => 'Test Category',
-            'slug' => 'test-category',
+            'name'       => 'Test Category',
+            'slug'       => 'test-category',
         ]);
     }
 
@@ -58,7 +58,7 @@ class CategoryShowTest extends TestCase
     {
         $brand = Brand::factory()->create();
         $products = Product::factory()->count(3)->create([
-            'brand_id' => $brand->id,
+            'brand_id'   => $brand->id,
             'is_visible' => true,
         ]);
 
@@ -74,11 +74,11 @@ class CategoryShowTest extends TestCase
     {
         $brand = Brand::factory()->create();
         $visibleProduct = Product::factory()->create([
-            'brand_id' => $brand->id,
+            'brand_id'   => $brand->id,
             'is_visible' => true,
         ]);
         $hiddenProduct = Product::factory()->create([
-            'brand_id' => $brand->id,
+            'brand_id'   => $brand->id,
             'is_visible' => false,
         ]);
 
@@ -94,7 +94,7 @@ class CategoryShowTest extends TestCase
     {
         $brand = Brand::factory()->create();
         $products = Product::factory()->count(15)->create([
-            'brand_id' => $brand->id,
+            'brand_id'   => $brand->id,
             'is_visible' => true,
         ]);
 
@@ -110,15 +110,15 @@ class CategoryShowTest extends TestCase
     {
         $brand = Brand::factory()->create();
         $product1 = Product::factory()->create([
-            'brand_id' => $brand->id,
+            'brand_id'   => $brand->id,
             'is_visible' => true,
-            'name' => 'Product A',
+            'name'       => 'Product A',
             'created_at' => now()->subDay(),
         ]);
         $product2 = Product::factory()->create([
-            'brand_id' => $brand->id,
+            'brand_id'   => $brand->id,
             'is_visible' => true,
-            'name' => 'Product B',
+            'name'       => 'Product B',
             'created_at' => now(),
         ]);
 
@@ -153,7 +153,7 @@ class CategoryShowTest extends TestCase
     {
         $brand = Brand::factory()->create();
         $products = Product::factory()->count(5)->create([
-            'brand_id' => $brand->id,
+            'brand_id'   => $brand->id,
             'is_visible' => true,
         ]);
 
@@ -172,7 +172,7 @@ class CategoryShowTest extends TestCase
     {
         $brand = Brand::factory()->create();
         $product = Product::factory()->create([
-            'brand_id' => $brand->id,
+            'brand_id'   => $brand->id,
             'is_visible' => true,
         ]);
 

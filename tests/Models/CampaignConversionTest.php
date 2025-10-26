@@ -17,7 +17,7 @@ final class CampaignConversionTest extends TestCase
 
     public function test_fillable_configuration_includes_core_columns(): void
     {
-        $model = new CampaignConversion();
+        $model = new CampaignConversion;
 
         $this->assertContains('campaign_id', $model->getFillable());
         $this->assertContains('conversion_type', $model->getFillable());
@@ -27,7 +27,7 @@ final class CampaignConversionTest extends TestCase
 
     public function test_casts_configuration_preserves_expected_types(): void
     {
-        $casts = (new CampaignConversion())->getCasts();
+        $casts = (new CampaignConversion)->getCasts();
 
         $this->assertSame('decimal:2', $casts['conversion_value'] ?? null);
         $this->assertSame('array', $casts['conversion_data'] ?? null);

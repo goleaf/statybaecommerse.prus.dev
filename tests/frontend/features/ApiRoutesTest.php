@@ -123,40 +123,40 @@ class ApiRoutesTest extends TestCase
     public function test_discount_code_api_routes(): void
     {
         $discount = Discount::factory()->create([
-            'type' => 'percentage',
-            'value' => 10,
-            'minimum_amount' => null,
-            'usage_limit' => null,
-            'usage_count' => 0,
+            'type'               => 'percentage',
+            'value'              => 10,
+            'minimum_amount'     => null,
+            'usage_limit'        => null,
+            'usage_count'        => 0,
             'per_customer_limit' => null,
-            'starts_at' => now()->subDay(),
-            'ends_at' => now()->addDay(),
-            'status' => 'active',
-            'is_active' => true,
-            'is_enabled' => true,
+            'starts_at'          => now()->subDay(),
+            'ends_at'            => now()->addDay(),
+            'status'             => 'active',
+            'is_active'          => true,
+            'is_enabled'         => true,
         ]);
         $discountCode = DiscountCode::factory()->create([
-            'discount_id' => $discount->getKey(),
-            'code' => 'HONEST10',
-            'type' => 'percentage',
-            'value' => 10,
-            'minimum_amount' => 0,
-            'usage_limit' => null,
+            'discount_id'          => $discount->getKey(),
+            'code'                 => 'HONEST10',
+            'type'                 => 'percentage',
+            'value'                => 10,
+            'minimum_amount'       => 0,
+            'usage_limit'          => null,
             'usage_limit_per_user' => null,
-            'usage_count' => 0,
-            'starts_at' => now()->subDay(),
-            'expires_at' => now()->addDay(),
-            'status' => 'active',
-            'is_active' => true,
-            'is_stackable' => false,
-            'customer_group_id' => null,
+            'usage_count'          => 0,
+            'starts_at'            => now()->subDay(),
+            'expires_at'           => now()->addDay(),
+            'status'               => 'active',
+            'is_active'            => true,
+            'is_stackable'         => false,
+            'customer_group_id'    => null,
         ]);
         $product = Product::first();
         $cartPayload = [
             'subtotal' => 100.0,
-            'items' => [[
+            'items'    => [[
                 'product_id' => $product?->getKey(),
-                'quantity' => 1,
+                'quantity'   => 1,
                 'unit_price' => 100.0,
             ]],
         ];
@@ -169,8 +169,8 @@ class ApiRoutesTest extends TestCase
 
         // Test apply discount code
         $response = $this->post('/api/discount-codes/apply', [
-            'code' => $discountCode->code,
-            'cart' => $cartPayload,
+            'code'     => $discountCode->code,
+            'cart'     => $cartPayload,
             'shipping' => ['base_amount' => 0],
         ]);
         $response->assertStatus(200);
@@ -236,7 +236,7 @@ class ApiRoutesTest extends TestCase
         // Test create product history (authenticated)
         $this->actingAs($this->user, 'sanctum');
         $response = $this->post("/api/products/{$product->id}/history", [
-            'action' => 'view',
+            'action'   => 'view',
             'metadata' => ['source' => 'api_test'],
         ]);
         $response->assertStatus(200);
@@ -256,7 +256,7 @@ class ApiRoutesTest extends TestCase
 
         // Test create product history without authentication
         $response = $this->post("/api/products/{$product->id}/history", [
-            'action' => 'view',
+            'action'   => 'view',
             'metadata' => ['source' => 'api_test'],
         ]);
         $response->assertStatus(401);
@@ -365,7 +365,7 @@ class ApiRoutesTest extends TestCase
 
         // Test process referral
         $response = $this->post('/api/referrals/process', [
-            'code' => $referral->code,
+            'code'    => $referral->code,
             'user_id' => $this->user->id,
         ]);
         $response->assertStatus(200);
@@ -396,7 +396,7 @@ class ApiRoutesTest extends TestCase
 
         // Test generate code
         $response = $this->post('/api/referrals/generate-code', [
-            'type' => 'personal',
+            'type'       => 'personal',
             'expires_at' => now()->addDays(30),
         ]);
         $response->assertStatus(200);
@@ -429,7 +429,7 @@ class ApiRoutesTest extends TestCase
 
         // Test generate code without authentication
         $response = $this->post('/api/referrals/generate-code', [
-            'type' => 'personal',
+            'type'       => 'personal',
             'expires_at' => now()->addDays(30),
         ]);
         $response->assertStatus(401);
@@ -460,7 +460,7 @@ class ApiRoutesTest extends TestCase
 
         // Test process referral with invalid code
         $response = $this->post('/api/referrals/process', [
-            'code' => 'INVALID_CODE',
+            'code'    => 'INVALID_CODE',
             'user_id' => $this->user->id,
         ]);
         $response->assertStatus(400);
@@ -468,7 +468,7 @@ class ApiRoutesTest extends TestCase
         // Test process referral with invalid user ID
         $referral = Referral::first();
         $response = $this->post('/api/referrals/process', [
-            'code' => $referral->code,
+            'code'    => $referral->code,
             'user_id' => 999999,
         ]);
         $response->assertStatus(400);
@@ -489,7 +489,7 @@ class ApiRoutesTest extends TestCase
         $discountCode = DiscountCode::first();
         for ($i = 0; $i < 10; $i++) {
             $response = $this->post('/api/discount-codes/validate', [
-                'code' => $discountCode->code,
+                'code'   => $discountCode->code,
                 'amount' => 100.0,
             ]);
             $response->assertStatus(200);
@@ -636,7 +636,7 @@ class ApiRoutesTest extends TestCase
 
         // Test 422 for validation errors
         $response = $this->post('/api/referrals/process', [
-            'code' => '',
+            'code'    => '',
             'user_id' => 'invalid',
         ]);
         $response->assertStatus(422);

@@ -23,9 +23,7 @@ final class SendOrderFulfillmentEmail implements ShouldQueue
     use Queueable;
     use SerializesModels;
 
-    public function __construct(private readonly int $orderId)
-    {
-    }
+    public function __construct(private readonly int $orderId) {}
 
     /**
      * Handle the queued job. The implementation intentionally keeps logging
@@ -46,7 +44,7 @@ final class SendOrderFulfillmentEmail implements ShouldQueue
         }
 
         Log::info('Queued fulfillment email for order.', [
-            'order_id' => $order->id,
+            'order_id'     => $order->id,
             'order_number' => $order->number,
         ]);
     }

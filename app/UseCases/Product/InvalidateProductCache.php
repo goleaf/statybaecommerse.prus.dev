@@ -10,6 +10,7 @@ use Illuminate\Support\Str;
 final class InvalidateProductCache
 {
     public const SEARCH_VERSION_KEY = 'products:cache:search-version';
+
     public const SHOW_VERSION_KEY = 'products:cache:show-version';
 
     public function __invoke(): void

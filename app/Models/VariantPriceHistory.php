@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use DateTime;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -32,9 +33,9 @@ final class VariantPriceHistory extends Model
     protected function casts(): array
     {
         return [
-            'old_price' => 'decimal:4',
-            'new_price' => 'decimal:4',
-            'effective_from' => 'datetime',
+            'old_price'       => 'decimal:4',
+            'new_price'       => 'decimal:4',
+            'effective_from'  => 'datetime',
             'effective_until' => 'datetime',
         ];
     }
@@ -162,18 +163,18 @@ final class VariantPriceHistory extends Model
         string $priceType = 'regular',
         ?string $changeReason = null,
         ?int $changedBy = null,
-        ?\DateTime $effectiveFrom = null,
-        ?\DateTime $effectiveUntil = null
+        ?DateTime $effectiveFrom = null,
+        ?DateTime $effectiveUntil = null
     ): self {
         return self::create([
-            'variant_id' => $variantId,
-            'old_price' => $oldPrice,
-            'new_price' => $newPrice,
-            'price_type' => $priceType,
-            'reason' => $changeReason,
-            'change_reason' => $changeReason,
-            'changed_by' => $changedBy,
-            'effective_from' => $effectiveFrom,
+            'variant_id'      => $variantId,
+            'old_price'       => $oldPrice,
+            'new_price'       => $newPrice,
+            'price_type'      => $priceType,
+            'reason'          => $changeReason,
+            'change_reason'   => $changeReason,
+            'changed_by'      => $changedBy,
+            'effective_from'  => $effectiveFrom,
             'effective_until' => $effectiveUntil,
         ]);
     }

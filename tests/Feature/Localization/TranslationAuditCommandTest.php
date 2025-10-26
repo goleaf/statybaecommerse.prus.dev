@@ -11,7 +11,7 @@ it('feature: passes the translation audit', function (): void {
 
     expect($exitCode)->toBe(
         Command::SUCCESS,
-        "Translation audit failed:\n".$output
+        "Translation audit failed:\n" . $output
     );
 
     expect($output)->toContain('All locales are consistent');

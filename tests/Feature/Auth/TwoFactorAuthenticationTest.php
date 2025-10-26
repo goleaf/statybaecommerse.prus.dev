@@ -24,10 +24,10 @@ final class TwoFactorAuthenticationTest extends TestCase
         $secret = app(TotpGenerator::class)->generateSecret();
 
         $user = User::factory()->create([
-            'email' => 'twofactor@example.com',
-            'password' => Hash::make('correct-password'),
-            'two_factor_secret' => $secret,
-            'two_factor_enabled' => true,
+            'email'                   => 'twofactor@example.com',
+            'password'                => Hash::make('correct-password'),
+            'two_factor_secret'       => $secret,
+            'two_factor_enabled'      => true,
             'two_factor_confirmed_at' => now(),
         ]);
 
@@ -49,10 +49,10 @@ final class TwoFactorAuthenticationTest extends TestCase
         $secret = $generator->generateSecret();
 
         $user = User::factory()->create([
-            'email' => 'complete@example.com',
-            'password' => Hash::make('correct-password'),
-            'two_factor_secret' => $secret,
-            'two_factor_enabled' => true,
+            'email'                   => 'complete@example.com',
+            'password'                => Hash::make('correct-password'),
+            'two_factor_secret'       => $secret,
+            'two_factor_enabled'      => true,
             'two_factor_confirmed_at' => now(),
         ]);
 
@@ -89,10 +89,10 @@ final class TwoFactorAuthenticationTest extends TestCase
         $secret = $generator->generateSecret();
 
         $user = User::factory()->create([
-            'email' => 'throttle@example.com',
-            'password' => Hash::make('correct-password'),
-            'two_factor_secret' => $secret,
-            'two_factor_enabled' => true,
+            'email'                   => 'throttle@example.com',
+            'password'                => Hash::make('correct-password'),
+            'two_factor_secret'       => $secret,
+            'two_factor_enabled'      => true,
             'two_factor_confirmed_at' => now(),
         ]);
 
@@ -129,6 +129,6 @@ final class TwoFactorAuthenticationTest extends TestCase
     {
         $ip = '127.0.0.1';
 
-        return \Illuminate\Support\Str::transliterate('two-factor|'.$user->getAuthIdentifier().'|'.$ip);
+        return \Illuminate\Support\Str::transliterate('two-factor|' . $user->getAuthIdentifier() . '|' . $ip);
     }
 }

@@ -35,7 +35,7 @@ final class Setting extends Model
     /**
      * Handle getValueAttribute functionality with proper error handling.
      *
-     * @param  mixed  $value
+     * @param mixed $value
      */
     public function getValueAttribute($value)
     {
@@ -55,7 +55,7 @@ final class Setting extends Model
     /**
      * Handle setValueAttribute functionality with proper error handling.
      *
-     * @param  mixed  $value
+     * @param mixed $value
      */
     public function setValueAttribute($value): void
     {
@@ -73,7 +73,7 @@ final class Setting extends Model
     /**
      * Handle get functionality with proper error handling.
      *
-     * @param  mixed  $default
+     * @param mixed $default
      */
     public static function get(string $key, $default = null)
     {
@@ -85,7 +85,7 @@ final class Setting extends Model
     /**
      * Handle set functionality with proper error handling.
      *
-     * @param  mixed  $value
+     * @param mixed $value
      */
     public static function set(string $key, $value, string $type = 'string', ?string $description = null): void
     {
@@ -95,7 +95,7 @@ final class Setting extends Model
     /**
      * Handle getPublic functionality with proper error handling.
      *
-     * @param  mixed  $default
+     * @param mixed $default
      */
     public static function getPublic(string $key, $default = null)
     {

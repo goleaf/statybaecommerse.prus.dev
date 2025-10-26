@@ -48,12 +48,12 @@ describe('User Impersonation Widgets Tests', function () {
 
         it('displays new users today', function () {
             User::factory()->count(3)->create([
-                'is_admin' => false,
+                'is_admin'   => false,
                 'created_at' => now(),
             ]);
 
             User::factory()->count(2)->create([
-                'is_admin' => false,
+                'is_admin'   => false,
                 'created_at' => now()->subDays(1),
             ]);
 
@@ -65,7 +65,7 @@ describe('User Impersonation Widgets Tests', function () {
     describe('User Activity Widget', function () {
         it('displays recent user logins', function () {
             User::factory()->count(5)->create([
-                'is_admin' => false,
+                'is_admin'      => false,
                 'last_login_at' => now()->subHours(1),
             ]);
 
@@ -76,12 +76,12 @@ describe('User Impersonation Widgets Tests', function () {
         it('displays user activity trends', function () {
             // Create users with different login patterns
             User::factory()->count(3)->create([
-                'is_admin' => false,
+                'is_admin'      => false,
                 'last_login_at' => now()->subDays(1),
             ]);
 
             User::factory()->count(2)->create([
-                'is_admin' => false,
+                'is_admin'      => false,
                 'last_login_at' => now()->subDays(7),
             ]);
 
@@ -116,7 +116,7 @@ describe('User Impersonation Widgets Tests', function () {
             $user = User::factory()->create(['is_admin' => false]);
             Order::factory()->count(3)->create([
                 'user_id' => $user->id,
-                'total' => 100.00,
+                'total'   => 100.00,
             ]);
 
             // Test widget displays order value
@@ -126,7 +126,7 @@ describe('User Impersonation Widgets Tests', function () {
         it('displays recent orders by impersonated users', function () {
             $user = User::factory()->create(['is_admin' => false]);
             Order::factory()->count(5)->create([
-                'user_id' => $user->id,
+                'user_id'    => $user->id,
                 'created_at' => now()->subHours(1),
             ]);
 
@@ -155,7 +155,7 @@ describe('User Impersonation Widgets Tests', function () {
     describe('User Security Widget', function () {
         it('displays users with two-factor authentication', function () {
             User::factory()->count(3)->create([
-                'is_admin' => false,
+                'is_admin'           => false,
                 'two_factor_enabled' => true,
             ]);
 
@@ -187,12 +187,12 @@ describe('User Impersonation Widgets Tests', function () {
 
         it('displays users by language preference', function () {
             User::factory()->count(3)->create([
-                'is_admin' => false,
+                'is_admin'         => false,
                 'preferred_locale' => 'en',
             ]);
 
             User::factory()->count(2)->create([
-                'is_admin' => false,
+                'is_admin'         => false,
                 'preferred_locale' => 'lt',
             ]);
 

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Tests\Models;
 
@@ -16,7 +18,7 @@ final class PostApprovalTest extends TestCase
     public function test_post_approval_has_expected_fillable_and_casts(): void
     {
         // Instantiate the model so that we can inspect its configuration.
-        $model = new PostApproval();
+        $model = new PostApproval;
 
         // Guarding against mass assignment is handled through explicit fillable declarations.
         self::assertSame([
@@ -42,10 +44,10 @@ final class PostApprovalTest extends TestCase
 
         // Persist an approval record referencing the freshly created models.
         $approval = PostApproval::query()->create([
-            'post_id' => $post->getKey(),
-            'user_id' => $user->getKey(),
-            'decision' => 'approved',
-            'notes' => 'Looks good to publish.',
+            'post_id'    => $post->getKey(),
+            'user_id'    => $user->getKey(),
+            'decision'   => 'approved',
+            'notes'      => 'Looks good to publish.',
             'decided_at' => now(),
         ])->fresh();
 

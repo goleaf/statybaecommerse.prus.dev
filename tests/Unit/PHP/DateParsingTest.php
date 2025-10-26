@@ -47,4 +47,3 @@ final class DateParsingTest extends TestCase
         self::assertNull($invalid2);
     }
 }
-

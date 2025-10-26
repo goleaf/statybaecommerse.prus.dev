@@ -17,8 +17,8 @@ final class SystemNotificationTest extends TestCase
     public function test_notification_can_be_created(): void
     {
         $systemData = [
-            'maintenance_type' => 'scheduled',
-            'duration' => '2 hours',
+            'maintenance_type'  => 'scheduled',
+            'duration'          => '2 hours',
             'affected_services' => ['database', 'api'],
         ];
 
@@ -44,8 +44,8 @@ final class SystemNotificationTest extends TestCase
     {
         $user = User::factory()->create();
         $systemData = [
-            'maintenance_type' => 'scheduled',
-            'duration' => '2 hours',
+            'maintenance_type'  => 'scheduled',
+            'duration'          => '2 hours',
             'affected_services' => ['database', 'api'],
         ];
 
@@ -101,7 +101,7 @@ final class SystemNotificationTest extends TestCase
         $user = User::factory()->create();
         $systemData = [
             'maintenance_type' => 'scheduled',
-            'duration' => '2 hours',
+            'duration'         => '2 hours',
         ];
 
         $notification = new SystemNotification('maintenance_started', $systemData);
@@ -109,8 +109,8 @@ final class SystemNotificationTest extends TestCase
 
         $this->assertDatabaseHas('notifications', [
             'notifiable_type' => User::class,
-            'notifiable_id' => $user->id,
-            'type' => SystemNotification::class,
+            'notifiable_id'   => $user->id,
+            'type'            => SystemNotification::class,
         ]);
 
         $dbNotification = DatabaseNotification::where('notifiable_id', $user->id)->first();

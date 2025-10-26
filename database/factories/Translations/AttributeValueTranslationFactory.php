@@ -19,15 +19,15 @@ final class AttributeValueTranslationFactory extends Factory
     {
         return [
             'attribute_value_id' => AttributeValue::factory(),
-            'locale' => $this->faker->randomElement(['en', 'lt', 'de']),
-            'value' => $this->faker->word(),
-            'description' => $this->faker->optional(0.7)->sentence(),
-            'meta_data' => $this->faker->optional(0.3)->randomElements([
-                'hex' => $this->faker->hexColor(),
-                'rgb' => $this->faker->rgbColorAsArray(),
+            'locale'             => $this->faker->randomElement(['en', 'lt', 'de']),
+            'value'              => $this->faker->word(),
+            'description'        => $this->faker->optional(0.7)->sentence(),
+            'meta_data'          => $this->faker->optional(0.3)->randomElements([
+                'hex'        => $this->faker->hexColor(),
+                'rgb'        => $this->faker->rgbColorAsArray(),
                 'created_by' => $this->faker->userName(),
-                'version' => $this->faker->semver(),
-                'tags' => $this->faker->words(3),
+                'version'    => $this->faker->semver(),
+                'tags'       => $this->faker->words(3),
             ]),
         ];
     }
@@ -84,7 +84,7 @@ final class AttributeValueTranslationFactory extends Factory
     public function colorValue(): static
     {
         return $this->state(fn (array $attributes) => [
-            'value' => $this->faker->colorName(),
+            'value'     => $this->faker->colorName(),
             'meta_data' => [
                 'hex' => $this->faker->hexColor(),
                 'rgb' => $this->faker->rgbColorAsArray(),
@@ -96,10 +96,10 @@ final class AttributeValueTranslationFactory extends Factory
     public function sizeValue(): static
     {
         return $this->state(fn (array $attributes) => [
-            'value' => $this->faker->randomElement(['XS', 'S', 'M', 'L', 'XL', 'XXL']),
+            'value'     => $this->faker->randomElement(['XS', 'S', 'M', 'L', 'XL', 'XXL']),
             'meta_data' => [
                 'measurement' => 'clothing',
-                'order' => $this->faker->numberBetween(1, 10),
+                'order'       => $this->faker->numberBetween(1, 10),
             ],
         ]);
     }
@@ -107,10 +107,10 @@ final class AttributeValueTranslationFactory extends Factory
     public function materialValue(): static
     {
         return $this->state(fn (array $attributes) => [
-            'value' => $this->faker->randomElement(['Cotton', 'Polyester', 'Wool', 'Silk', 'Leather']),
+            'value'       => $this->faker->randomElement(['Cotton', 'Polyester', 'Wool', 'Silk', 'Leather']),
             'description' => $this->faker->sentence(),
-            'meta_data' => [
-                'durability' => $this->faker->randomElement(['low', 'medium', 'high']),
+            'meta_data'   => [
+                'durability'        => $this->faker->randomElement(['low', 'medium', 'high']),
                 'care_instructions' => $this->faker->sentence(),
             ],
         ]);

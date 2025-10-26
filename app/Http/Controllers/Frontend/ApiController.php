@@ -50,9 +50,9 @@ final class ApiController extends Controller
                         $url = ProductImageUrlResolver::resolve($image->path);
 
                         return [
-                            'url' => $url,
+                            'url'       => $url,
                             'thumbnail' => $url,
-                            'alt' => $image->alt_text ?? $product->name,
+                            'alt'       => $image->alt_text ?? $product->name,
                         ];
                     })
                     ->values()
@@ -220,9 +220,9 @@ final class ApiController extends Controller
                         $url = ProductImageUrlResolver::resolve($image->path);
 
                         return [
-                            'url' => $url,
+                            'url'       => $url,
                             'thumbnail' => $url,
-                            'alt' => $image->alt_text ?? $product->name,
+                            'alt'       => $image->alt_text ?? $product->name,
                         ];
                     })
                     ->values()

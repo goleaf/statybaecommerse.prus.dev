@@ -17,17 +17,17 @@ final class CityTest extends TestCase
     public function test_city_can_be_created(): void
     {
         $city = City::factory()->create([
-            'name' => 'Vilnius',
-            'code' => 'VIL',
-            'slug' => 'vilnius',
+            'name'       => 'Vilnius',
+            'code'       => 'VIL',
+            'slug'       => 'vilnius',
             'is_enabled' => true,
             'is_capital' => true,
         ]);
 
         $this->assertDatabaseHas('cities', [
-            'name' => 'Vilnius',
-            'code' => 'VIL',
-            'slug' => 'vilnius',
+            'name'       => 'Vilnius',
+            'code'       => 'VIL',
+            'slug'       => 'vilnius',
             'is_enabled' => true,
             'is_capital' => true,
         ]);
@@ -47,9 +47,9 @@ final class CityTest extends TestCase
         $city = City::factory()->create(['name' => 'Vilnius']);
 
         CityTranslation::create([
-            'city_id' => $city->id,
-            'locale' => 'lt',
-            'name' => 'Vilnius',
+            'city_id'     => $city->id,
+            'locale'      => 'lt',
+            'name'        => 'Vilnius',
             'description' => 'Lietuvos sostinė',
         ]);
 

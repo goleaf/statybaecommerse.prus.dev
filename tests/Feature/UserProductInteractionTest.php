@@ -25,20 +25,20 @@ final class UserProductInteractionTest extends TestCase
         $timestamp = now();
 
         $interaction = UserProductInteraction::create([
-            'user_id' => $user->id,
-            'product_id' => $product->id,
-            'event' => 'view',
+            'user_id'     => $user->id,
+            'product_id'  => $product->id,
+            'event'       => 'view',
             'occurred_at' => $timestamp,
-            'meta' => [
-                'count' => 3,
-                'rating' => 4.25,
+            'meta'        => [
+                'count'             => 3,
+                'rating'            => 4.25,
                 'first_interaction' => $timestamp->clone()->subDay(),
-                'last_interaction' => $timestamp,
+                'last_interaction'  => $timestamp,
             ],
         ]);
 
         $this->assertDatabaseHas('user_product_interactions', [
-            'id' => $interaction->id,
+            'id'    => $interaction->id,
             'event' => 'view',
             'count' => 3,
         ]);
@@ -58,23 +58,23 @@ final class UserProductInteractionTest extends TestCase
         $product = Product::factory()->create();
 
         $recent = UserProductInteraction::factory()->create([
-            'user_id' => $user->id,
+            'user_id'    => $user->id,
             'product_id' => $product->id,
-            'event' => 'click',
-            'meta' => [
+            'event'      => 'click',
+            'meta'       => [
                 'rating' => 4.8,
-                'count' => 8,
+                'count'  => 8,
             ],
             'occurred_at' => now()->subDay(),
         ]);
 
         $stale = UserProductInteraction::factory()->create([
-            'user_id' => $user->id,
+            'user_id'    => $user->id,
             'product_id' => $product->id,
-            'event' => 'view',
-            'meta' => [
+            'event'      => 'view',
+            'meta'       => [
                 'rating' => 1.5,
-                'count' => 2,
+                'count'  => 2,
             ],
             'occurred_at' => now()->subMonths(2),
         ]);
@@ -104,8 +104,8 @@ final class UserProductInteractionTest extends TestCase
     {
         $interaction = UserProductInteraction::factory()->create([
             'meta' => [
-                'rating' => 2.0,
-                'count' => 1,
+                'rating'           => 2.0,
+                'count'            => 1,
                 'last_interaction' => now()->subDay(),
             ],
         ]);

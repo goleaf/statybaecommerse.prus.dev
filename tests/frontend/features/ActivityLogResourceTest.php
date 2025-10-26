@@ -6,15 +6,16 @@ use App\Filament\Resources\ActivityLogResource;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\User;
-use Spatie\Activitylog\Models\Activity;
 
 use function Pest\Laravel\actingAs;
 use function Pest\Livewire\livewire;
 
+use Spatie\Activitylog\Models\Activity;
+
 beforeEach(function () {
     $this->adminUser = User::factory()->create([
         'email' => 'admin@admin.com',
-        'name' => 'Admin User',
+        'name'  => 'Admin User',
     ]);
 
     // Create role and permissions if they don't exist
@@ -131,7 +132,7 @@ it('can filter activities by date range', function () {
         ->filterTable('created_at', [
             'range' => [
                 'start' => now()->subDays(5)->format('Y-m-d'),
-                'end' => now()->format('Y-m-d'),
+                'end'   => now()->format('Y-m-d'),
             ],
         ])
         ->assertCanSeeTableRecords([$recentActivityRecord])
@@ -184,7 +185,7 @@ it('displays activity properties in modal', function () {
         ->performedOn($product)
         ->withProperties([
             'attributes' => ['name' => 'New Name'],
-            'old' => ['name' => 'Old Name'],
+            'old'        => ['name' => 'Old Name'],
         ])
         ->log('Product updated');
 

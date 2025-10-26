@@ -31,12 +31,12 @@ final class CanBeOneOfManyExtendedTest extends TestCase
 
         // Create multiple orders
         $oldOrder = Order::factory()->create([
-            'user_id' => $user->id,
+            'user_id'    => $user->id,
             'created_at' => now()->subDays(5),
         ]);
 
         $latestOrder = Order::factory()->create([
-            'user_id' => $user->id,
+            'user_id'    => $user->id,
             'created_at' => now()->subDays(1),
         ]);
 
@@ -56,12 +56,12 @@ final class CanBeOneOfManyExtendedTest extends TestCase
 
         // Create multiple shipping orders
         $oldOrder = Order::factory()->create([
-            'user_id' => $user->id,
+            'user_id'    => $user->id,
             'created_at' => now()->subDays(5),
         ]);
 
         $latestOrder = Order::factory()->create([
-            'user_id' => $user->id,
+            'user_id'    => $user->id,
             'created_at' => now()->subDays(1),
         ]);
 
@@ -81,12 +81,12 @@ final class CanBeOneOfManyExtendedTest extends TestCase
         // Create multiple views
         $oldView = CampaignView::factory()->create([
             'campaign_id' => $campaign->id,
-            'viewed_at' => now()->subDays(5),
+            'viewed_at'   => now()->subDays(5),
         ]);
 
         $latestView = CampaignView::factory()->create([
             'campaign_id' => $campaign->id,
-            'viewed_at' => now()->subDays(1),
+            'viewed_at'   => now()->subDays(1),
         ]);
 
         // Refresh the campaign to clear any cached relationships
@@ -105,12 +105,12 @@ final class CanBeOneOfManyExtendedTest extends TestCase
         // Create multiple clicks
         $oldClick = CampaignClick::factory()->create([
             'campaign_id' => $campaign->id,
-            'clicked_at' => now()->subDays(5),
+            'clicked_at'  => now()->subDays(5),
         ]);
 
         $latestClick = CampaignClick::factory()->create([
             'campaign_id' => $campaign->id,
-            'clicked_at' => now()->subDays(1),
+            'clicked_at'  => now()->subDays(1),
         ]);
 
         // Refresh the campaign to clear any cached relationships
@@ -129,14 +129,14 @@ final class CanBeOneOfManyExtendedTest extends TestCase
 
         // Create multiple conversions
         $oldConversion = CampaignConversion::factory()->create([
-            'campaign_id' => $campaign->id,
-            'customer_id' => $user->id,
+            'campaign_id'  => $campaign->id,
+            'customer_id'  => $user->id,
             'converted_at' => now()->subDays(5),
         ]);
 
         $latestConversion = CampaignConversion::factory()->create([
-            'campaign_id' => $campaign->id,
-            'customer_id' => $user->id,
+            'campaign_id'  => $campaign->id,
+            'customer_id'  => $user->id,
             'converted_at' => now()->subDays(1),
         ]);
 
@@ -156,12 +156,12 @@ final class CanBeOneOfManyExtendedTest extends TestCase
         // Create multiple schedules
         $oldSchedule = CampaignSchedule::factory()->create([
             'campaign_id' => $campaign->id,
-            'created_at' => now()->subDays(5),
+            'created_at'  => now()->subDays(5),
         ]);
 
         $latestSchedule = CampaignSchedule::factory()->create([
             'campaign_id' => $campaign->id,
-            'created_at' => now()->subDays(1),
+            'created_at'  => now()->subDays(1),
         ]);
 
         // Refresh the campaign to clear any cached relationships
@@ -180,12 +180,12 @@ final class CanBeOneOfManyExtendedTest extends TestCase
         // Create multiple rewards
         $oldReward = ReferralReward::factory()->create([
             'referral_id' => $referral->id,
-            'created_at' => now()->subDays(5),
+            'created_at'  => now()->subDays(5),
         ]);
 
         $latestReward = ReferralReward::factory()->create([
             'referral_id' => $referral->id,
-            'created_at' => now()->subDays(1),
+            'created_at'  => now()->subDays(1),
         ]);
 
         // Refresh the referral to clear any cached relationships
@@ -204,12 +204,12 @@ final class CanBeOneOfManyExtendedTest extends TestCase
 
         // Create multiple referred orders
         $oldOrder = Order::factory()->create([
-            'user_id' => $user->id,
+            'user_id'    => $user->id,
             'created_at' => now()->subDays(5),
         ]);
 
         $latestOrder = Order::factory()->create([
-            'user_id' => $user->id,
+            'user_id'    => $user->id,
             'created_at' => now()->subDays(1),
         ]);
 
@@ -228,12 +228,12 @@ final class CanBeOneOfManyExtendedTest extends TestCase
 
         // Create multiple addresses
         $oldAddress = Address::factory()->create([
-            'user_id' => $user->id,
+            'user_id'    => $user->id,
             'created_at' => now()->subDays(5),
         ]);
 
         $latestAddress = Address::factory()->create([
-            'user_id' => $user->id,
+            'user_id'    => $user->id,
             'created_at' => now()->subDays(1),
         ]);
 
@@ -253,13 +253,13 @@ final class CanBeOneOfManyExtendedTest extends TestCase
 
         // Create multiple cart items
         $oldCartItem = CartItem::factory()->create([
-            'user_id' => $user->id,
+            'user_id'    => $user->id,
             'product_id' => $product->id,
             'created_at' => now()->subDays(5),
         ]);
 
         $latestCartItem = CartItem::factory()->create([
-            'user_id' => $user->id,
+            'user_id'    => $user->id,
             'product_id' => $product->id,
             'created_at' => now()->subDays(1),
         ]);
@@ -279,12 +279,12 @@ final class CanBeOneOfManyExtendedTest extends TestCase
 
         // Create multiple notifications
         $oldNotification = Notification::factory()->create([
-            'user_id' => $user->id,
+            'user_id'    => $user->id,
             'created_at' => now()->subDays(5),
         ]);
 
         $latestNotification = Notification::factory()->create([
-            'user_id' => $user->id,
+            'user_id'    => $user->id,
             'created_at' => now()->subDays(1),
         ]);
 
@@ -304,12 +304,12 @@ final class CanBeOneOfManyExtendedTest extends TestCase
         // Create multiple referrals
         $oldReferral = Referral::factory()->create([
             'referrer_id' => $user->id,
-            'created_at' => now()->subDays(5),
+            'created_at'  => now()->subDays(5),
         ]);
 
         $latestReferral = Referral::factory()->create([
             'referrer_id' => $user->id,
-            'created_at' => now()->subDays(1),
+            'created_at'  => now()->subDays(1),
         ]);
 
         // Refresh the user to clear any cached relationships

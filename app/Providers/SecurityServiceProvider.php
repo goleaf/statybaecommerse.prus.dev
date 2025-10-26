@@ -52,7 +52,7 @@ final class SecurityServiceProvider extends ServiceProvider
         $ip = $this->ipAddress($request);
         $email = Str::of((string) $request->input('email', ''))->lower()->value();
 
-        return Str::transliterate('auth-login|'.$email.'|'.$ip);
+        return Str::transliterate('auth-login|' . $email . '|' . $ip);
     }
 
     private function passwordResetIdentifier(Request $request): string
@@ -60,7 +60,7 @@ final class SecurityServiceProvider extends ServiceProvider
         $ip = $this->ipAddress($request);
         $email = Str::of((string) $request->input('email', ''))->lower()->value();
 
-        return Str::transliterate('password-reset|'.$email.'|'.$ip);
+        return Str::transliterate('password-reset|' . $email . '|' . $ip);
     }
 
     private function twoFactorIdentifier(Request $request): string
@@ -70,7 +70,7 @@ final class SecurityServiceProvider extends ServiceProvider
         $ip = $this->ipAddress($request);
         $userId = (string) $request->session()->get('auth.two_factor.id', 'guest');
 
-        return Str::transliterate('two-factor|'.$userId.'|'.$ip);
+        return Str::transliterate('two-factor|' . $userId . '|' . $ip);
     }
 
     private function ipAddress(Request $request): string

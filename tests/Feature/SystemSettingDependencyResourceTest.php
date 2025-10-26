@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Tests\Feature;
 
@@ -28,11 +30,11 @@ final class SystemSettingDependencyResourceTest extends TestCase
         $setting2 = SystemSetting::factory()->create(['key' => 'setting2']);
 
         SystemSettingDependency::factory()->create([
-            'setting_id' => $setting1->id,
+            'setting_id'            => $setting1->id,
             'depends_on_setting_id' => $setting2->id,
-            'condition' => 'equals',
-            'condition_value' => 'enabled',
-            'is_active' => true,
+            'condition'             => 'equals',
+            'condition_value'       => 'enabled',
+            'is_active'             => true,
         ]);
 
         Livewire::test(\App\Filament\Resources\SystemSettingDependencyResource\Pages\ListSystemSettingDependencies::class)
@@ -48,21 +50,21 @@ final class SystemSettingDependencyResourceTest extends TestCase
 
         Livewire::test(\App\Filament\Resources\SystemSettingDependencyResource\Pages\CreateSystemSettingDependency::class)
             ->fillForm([
-                'setting_id' => $setting1->id,
+                'setting_id'            => $setting1->id,
                 'depends_on_setting_id' => $setting2->id,
-                'condition' => 'equals',
-                'condition_value' => 'enabled',
-                'is_active' => true,
+                'condition'             => 'equals',
+                'condition_value'       => 'enabled',
+                'is_active'             => true,
             ])
             ->call('create')
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('system_setting_dependencies', [
-            'setting_id' => $setting1->id,
+            'setting_id'            => $setting1->id,
             'depends_on_setting_id' => $setting2->id,
-            'condition' => 'equals',
-            'condition_value' => 'enabled',
-            'is_active' => true,
+            'condition'             => 'equals',
+            'condition_value'       => 'enabled',
+            'is_active'             => true,
         ]);
     }
 
@@ -73,33 +75,33 @@ final class SystemSettingDependencyResourceTest extends TestCase
         $setting3 = SystemSetting::factory()->create(['key' => 'setting3']);
 
         $dependency = SystemSettingDependency::factory()->create([
-            'setting_id' => $setting1->id,
+            'setting_id'            => $setting1->id,
             'depends_on_setting_id' => $setting2->id,
-            'condition' => 'equals',
-            'condition_value' => 'enabled',
-            'is_active' => true,
+            'condition'             => 'equals',
+            'condition_value'       => 'enabled',
+            'is_active'             => true,
         ]);
 
         Livewire::test(\App\Filament\Resources\SystemSettingDependencyResource\Pages\EditSystemSettingDependency::class, [
             'record' => $dependency->getRouteKey(),
         ])
             ->fillForm([
-                'setting_id' => $setting1->id,
+                'setting_id'            => $setting1->id,
                 'depends_on_setting_id' => $setting3->id,
-                'condition' => 'equals',
-                'condition_value' => 'enabled',
-                'is_active' => false,
+                'condition'             => 'equals',
+                'condition_value'       => 'enabled',
+                'is_active'             => false,
             ])
             ->call('save')
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('system_setting_dependencies', [
-            'id' => $dependency->id,
-            'setting_id' => $setting1->id,
+            'id'                    => $dependency->id,
+            'setting_id'            => $setting1->id,
             'depends_on_setting_id' => $setting3->id,
-            'condition' => 'equals',
-            'condition_value' => 'enabled',
-            'is_active' => false,
+            'condition'             => 'equals',
+            'condition_value'       => 'enabled',
+            'is_active'             => false,
         ]);
     }
 
@@ -109,11 +111,11 @@ final class SystemSettingDependencyResourceTest extends TestCase
         $setting2 = SystemSetting::factory()->create(['key' => 'setting2']);
 
         $dependency = SystemSettingDependency::factory()->create([
-            'setting_id' => $setting1->id,
+            'setting_id'            => $setting1->id,
             'depends_on_setting_id' => $setting2->id,
-            'condition' => 'equals',
-            'condition_value' => 'enabled',
-            'is_active' => true,
+            'condition'             => 'equals',
+            'condition_value'       => 'enabled',
+            'is_active'             => true,
         ]);
 
         $this
@@ -128,12 +130,12 @@ final class SystemSettingDependencyResourceTest extends TestCase
         $setting3 = SystemSetting::factory()->create(['key' => 'setting3']);
 
         $dependency1 = SystemSettingDependency::factory()->create([
-            'setting_id' => $setting1->id,
+            'setting_id'            => $setting1->id,
             'depends_on_setting_id' => $setting2->id,
         ]);
 
         $dependency2 = SystemSettingDependency::factory()->create([
-            'setting_id' => $setting3->id,
+            'setting_id'            => $setting3->id,
             'depends_on_setting_id' => $setting1->id,
         ]);
 
@@ -150,12 +152,12 @@ final class SystemSettingDependencyResourceTest extends TestCase
         $setting3 = SystemSetting::factory()->create(['key' => 'setting3']);
 
         $dependency1 = SystemSettingDependency::factory()->create([
-            'setting_id' => $setting1->id,
+            'setting_id'            => $setting1->id,
             'depends_on_setting_id' => $setting2->id,
         ]);
 
         $dependency2 = SystemSettingDependency::factory()->create([
-            'setting_id' => $setting3->id,
+            'setting_id'            => $setting3->id,
             'depends_on_setting_id' => $setting1->id,
         ]);
 
@@ -171,15 +173,15 @@ final class SystemSettingDependencyResourceTest extends TestCase
         $setting2 = SystemSetting::factory()->create(['key' => 'setting2']);
 
         $activeDependency = SystemSettingDependency::factory()->create([
-            'setting_id' => $setting1->id,
+            'setting_id'            => $setting1->id,
             'depends_on_setting_id' => $setting2->id,
-            'is_active' => true,
+            'is_active'             => true,
         ]);
 
         $inactiveDependency = SystemSettingDependency::factory()->create([
-            'setting_id' => $setting2->id,
+            'setting_id'            => $setting2->id,
             'depends_on_setting_id' => $setting1->id,
-            'is_active' => false,
+            'is_active'             => false,
         ]);
 
         Livewire::test(\App\Filament\Resources\SystemSettingDependencyResource\Pages\ListSystemSettingDependencies::class)
@@ -194,9 +196,9 @@ final class SystemSettingDependencyResourceTest extends TestCase
         $setting2 = SystemSetting::factory()->create(['key' => 'setting2']);
 
         $dependency = SystemSettingDependency::factory()->create([
-            'setting_id' => $setting1->id,
+            'setting_id'            => $setting1->id,
             'depends_on_setting_id' => $setting2->id,
-            'is_active' => true,
+            'is_active'             => true,
         ]);
 
         Livewire::test(\App\Filament\Resources\SystemSettingDependencyResource\Pages\ListSystemSettingDependencies::class)
@@ -204,7 +206,7 @@ final class SystemSettingDependencyResourceTest extends TestCase
             ->assertNotified();
 
         $this->assertDatabaseHas('system_setting_dependencies', [
-            'id' => $dependency->id,
+            'id'        => $dependency->id,
             'is_active' => false,
         ]);
     }
@@ -215,11 +217,11 @@ final class SystemSettingDependencyResourceTest extends TestCase
         $setting2 = SystemSetting::factory()->create(['key' => 'setting2']);
 
         $dependency = SystemSettingDependency::factory()->create([
-            'setting_id' => $setting1->id,
+            'setting_id'            => $setting1->id,
             'depends_on_setting_id' => $setting2->id,
-            'condition' => 'equals',
-            'condition_value' => 'enabled',
-            'is_active' => true,
+            'condition'             => 'equals',
+            'condition_value'       => 'enabled',
+            'is_active'             => true,
         ]);
 
         Livewire::test(\App\Filament\Resources\SystemSettingDependencyResource\Pages\ListSystemSettingDependencies::class)
@@ -227,10 +229,10 @@ final class SystemSettingDependencyResourceTest extends TestCase
             ->assertNotified();
 
         $this->assertDatabaseHas('system_setting_dependencies', [
-            'setting_id' => $setting1->id,
+            'setting_id'            => $setting1->id,
             'depends_on_setting_id' => $setting2->id,
-            'condition' => 'equals',
-            'condition_value' => 'enabled',
+            'condition'             => 'equals',
+            'condition_value'       => 'enabled',
         ]);
     }
 
@@ -240,15 +242,15 @@ final class SystemSettingDependencyResourceTest extends TestCase
         $setting2 = SystemSetting::factory()->create(['key' => 'setting2']);
 
         $dependency1 = SystemSettingDependency::factory()->create([
-            'setting_id' => $setting1->id,
+            'setting_id'            => $setting1->id,
             'depends_on_setting_id' => $setting2->id,
-            'is_active' => false,
+            'is_active'             => false,
         ]);
 
         $dependency2 = SystemSettingDependency::factory()->create([
-            'setting_id' => $setting2->id,
+            'setting_id'            => $setting2->id,
             'depends_on_setting_id' => $setting1->id,
-            'is_active' => false,
+            'is_active'             => false,
         ]);
 
         Livewire::test(\App\Filament\Resources\SystemSettingDependencyResource\Pages\ListSystemSettingDependencies::class)
@@ -256,12 +258,12 @@ final class SystemSettingDependencyResourceTest extends TestCase
             ->assertNotified();
 
         $this->assertDatabaseHas('system_setting_dependencies', [
-            'id' => $dependency1->id,
+            'id'        => $dependency1->id,
             'is_active' => true,
         ]);
 
         $this->assertDatabaseHas('system_setting_dependencies', [
-            'id' => $dependency2->id,
+            'id'        => $dependency2->id,
             'is_active' => true,
         ]);
     }
@@ -272,15 +274,15 @@ final class SystemSettingDependencyResourceTest extends TestCase
         $setting2 = SystemSetting::factory()->create(['key' => 'setting2']);
 
         $dependency1 = SystemSettingDependency::factory()->create([
-            'setting_id' => $setting1->id,
+            'setting_id'            => $setting1->id,
             'depends_on_setting_id' => $setting2->id,
-            'is_active' => true,
+            'is_active'             => true,
         ]);
 
         $dependency2 = SystemSettingDependency::factory()->create([
-            'setting_id' => $setting2->id,
+            'setting_id'            => $setting2->id,
             'depends_on_setting_id' => $setting1->id,
-            'is_active' => true,
+            'is_active'             => true,
         ]);
 
         Livewire::test(\App\Filament\Resources\SystemSettingDependencyResource\Pages\ListSystemSettingDependencies::class)
@@ -288,12 +290,12 @@ final class SystemSettingDependencyResourceTest extends TestCase
             ->assertNotified();
 
         $this->assertDatabaseHas('system_setting_dependencies', [
-            'id' => $dependency1->id,
+            'id'        => $dependency1->id,
             'is_active' => false,
         ]);
 
         $this->assertDatabaseHas('system_setting_dependencies', [
-            'id' => $dependency2->id,
+            'id'        => $dependency2->id,
             'is_active' => false,
         ]);
     }
@@ -304,19 +306,19 @@ final class SystemSettingDependencyResourceTest extends TestCase
         $setting2 = SystemSetting::factory()->create(['key' => 'setting2']);
 
         $dependency1 = SystemSettingDependency::factory()->create([
-            'setting_id' => $setting1->id,
+            'setting_id'            => $setting1->id,
             'depends_on_setting_id' => $setting2->id,
-            'condition' => 'equals',
-            'condition_value' => 'enabled',
-            'is_active' => true,
+            'condition'             => 'equals',
+            'condition_value'       => 'enabled',
+            'is_active'             => true,
         ]);
 
         $dependency2 = SystemSettingDependency::factory()->create([
-            'setting_id' => $setting2->id,
+            'setting_id'            => $setting2->id,
             'depends_on_setting_id' => $setting1->id,
-            'condition' => 'equals',
-            'condition_value' => 'enabled',
-            'is_active' => true,
+            'condition'             => 'equals',
+            'condition_value'       => 'enabled',
+            'is_active'             => true,
         ]);
 
         Livewire::test(\App\Filament\Resources\SystemSettingDependencyResource\Pages\ListSystemSettingDependencies::class)
@@ -324,17 +326,17 @@ final class SystemSettingDependencyResourceTest extends TestCase
             ->assertNotified();
 
         $this->assertDatabaseHas('system_setting_dependencies', [
-            'setting_id' => $setting1->id,
+            'setting_id'            => $setting1->id,
             'depends_on_setting_id' => $setting2->id,
-            'condition' => 'equals',
-            'condition_value' => 'enabled',
+            'condition'             => 'equals',
+            'condition_value'       => 'enabled',
         ]);
 
         $this->assertDatabaseHas('system_setting_dependencies', [
-            'setting_id' => $setting2->id,
+            'setting_id'            => $setting2->id,
             'depends_on_setting_id' => $setting1->id,
-            'condition' => 'equals',
-            'condition_value' => 'enabled',
+            'condition'             => 'equals',
+            'condition_value'       => 'enabled',
         ]);
     }
 
@@ -345,17 +347,17 @@ final class SystemSettingDependencyResourceTest extends TestCase
         $setting3 = SystemSetting::factory()->create(['key' => 'setting3', 'name' => 'Setting Three']);
 
         $dependency1 = SystemSettingDependency::factory()->create([
-            'setting_id' => $setting1->id,
+            'setting_id'            => $setting1->id,
             'depends_on_setting_id' => $setting2->id,
-            'condition' => 'equals',
-            'condition_value' => 'enabled_value',
+            'condition'             => 'equals',
+            'condition_value'       => 'enabled_value',
         ]);
 
         $dependency2 = SystemSettingDependency::factory()->create([
-            'setting_id' => $setting3->id,
+            'setting_id'            => $setting3->id,
             'depends_on_setting_id' => $setting1->id,
-            'condition' => 'equals',
-            'condition_value' => 'disabled',
+            'condition'             => 'equals',
+            'condition_value'       => 'disabled',
         ]);
 
         // Test the search using model scope directly
@@ -371,17 +373,17 @@ final class SystemSettingDependencyResourceTest extends TestCase
         $setting2 = SystemSetting::factory()->create(['key' => 'setting2']);
 
         $dependency1 = SystemSettingDependency::factory()->create([
-            'setting_id' => $setting1->id,
+            'setting_id'            => $setting1->id,
             'depends_on_setting_id' => $setting2->id,
-            'condition' => 'equals',
-            'condition_value' => 'enabled',
+            'condition'             => 'equals',
+            'condition_value'       => 'enabled',
         ]);
 
         $dependency2 = SystemSettingDependency::factory()->create([
-            'setting_id' => $setting2->id,
+            'setting_id'            => $setting2->id,
             'depends_on_setting_id' => $setting1->id,
-            'condition' => 'equals',
-            'condition_value' => 'disabled',
+            'condition'             => 'equals',
+            'condition_value'       => 'disabled',
         ]);
 
         Livewire::test(\App\Filament\Resources\SystemSettingDependencyResource\Pages\ListSystemSettingDependencies::class)
@@ -393,9 +395,9 @@ final class SystemSettingDependencyResourceTest extends TestCase
     {
         Livewire::test(\App\Filament\Resources\SystemSettingDependencyResource\Pages\CreateSystemSettingDependency::class)
             ->fillForm([
-                'setting_id' => null,
+                'setting_id'            => null,
                 'depends_on_setting_id' => 1,
-                'condition' => 'test condition',
+                'condition'             => 'test condition',
             ])
             ->call('create')
             ->assertHasFormErrors(['setting_id' => 'required']);
@@ -405,9 +407,9 @@ final class SystemSettingDependencyResourceTest extends TestCase
     {
         Livewire::test(\App\Filament\Resources\SystemSettingDependencyResource\Pages\CreateSystemSettingDependency::class)
             ->fillForm([
-                'setting_id' => 1,
+                'setting_id'            => 1,
                 'depends_on_setting_id' => null,
-                'condition' => 'test condition',
+                'condition'             => 'test condition',
             ])
             ->call('create')
             ->assertHasFormErrors(['depends_on_setting_id' => 'required']);
@@ -417,9 +419,9 @@ final class SystemSettingDependencyResourceTest extends TestCase
     {
         Livewire::test(\App\Filament\Resources\SystemSettingDependencyResource\Pages\CreateSystemSettingDependency::class)
             ->fillForm([
-                'setting_id' => 1,
+                'setting_id'            => 1,
                 'depends_on_setting_id' => 2,
-                'condition' => null,
+                'condition'             => null,
             ])
             ->call('create')
             ->assertHasFormErrors(['condition' => 'required']);

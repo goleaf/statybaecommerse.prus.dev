@@ -24,7 +24,7 @@ class OrderResourceTest extends TestCase
         parent::setUp();
 
         $this->actingAs(User::factory()->create([
-            'email' => 'admin@test.com',
+            'email'     => 'admin@test.com',
             'is_active' => true,
         ]));
     }
@@ -93,8 +93,8 @@ class OrderResourceTest extends TestCase
 
         $order = Order::factory()->create([
             'user_id' => $user->id,
-            'status' => 'pending',
-            'total' => 99.99,
+            'status'  => 'pending',
+            'total'   => 99.99,
         ]);
 
         $resource = new OrderResource;
@@ -108,8 +108,8 @@ class OrderResourceTest extends TestCase
         // Test that order was created
         $this->assertDatabaseHas('orders', [
             'user_id' => $user->id,
-            'status' => 'pending',
-            'total' => 99.99,
+            'status'  => 'pending',
+            'total'   => 99.99,
         ]);
     }
 
@@ -161,20 +161,20 @@ class OrderResourceTest extends TestCase
         $product = Product::factory()->create();
 
         $order = Order::factory()->create([
-            'user_id' => $user->id,
-            'zone_id' => $zone->id,
+            'user_id'    => $user->id,
+            'zone_id'    => $zone->id,
             'channel_id' => $channel->id,
-            'status' => 'pending',
-            'total' => 99.99,
+            'status'     => 'pending',
+            'total'      => 99.99,
         ]);
 
         // Create order items
         OrderItem::factory()->create([
-            'order_id' => $order->id,
+            'order_id'   => $order->id,
             'product_id' => $product->id,
-            'quantity' => 2,
+            'quantity'   => 2,
             'unit_price' => 49.99,
-            'total' => 99.98,
+            'total'      => 99.98,
         ]);
 
         // Test that order has relations
@@ -197,7 +197,7 @@ class OrderResourceTest extends TestCase
         // Test pending order can be marked as processing
         $pendingOrder = Order::factory()->create([
             'user_id' => $user->id,
-            'status' => 'pending',
+            'status'  => 'pending',
         ]);
 
         $this->assertTrue($pendingOrder->canBeCancelled());
@@ -207,7 +207,7 @@ class OrderResourceTest extends TestCase
         // Test processing order can be shipped
         $processingOrder = Order::factory()->create([
             'user_id' => $user->id,
-            'status' => 'processing',
+            'status'  => 'processing',
         ]);
 
         $this->assertFalse($processingOrder->canBeCancelled());
@@ -217,7 +217,7 @@ class OrderResourceTest extends TestCase
         // Test shipped order can be delivered
         $shippedOrder = Order::factory()->create([
             'user_id' => $user->id,
-            'status' => 'shipped',
+            'status'  => 'shipped',
         ]);
 
         $this->assertFalse($shippedOrder->canBeCancelled());
@@ -230,8 +230,8 @@ class OrderResourceTest extends TestCase
         $user = User::factory()->create(['name' => 'John Doe']);
         $order = Order::factory()->create([
             'user_id' => $user->id,
-            'total' => 150.0,
-            'status' => 'pending',
+            'total'   => 150.0,
+            'status'  => 'pending',
         ]);
 
         // Test global search details

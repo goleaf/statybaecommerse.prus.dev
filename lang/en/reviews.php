@@ -3,19 +3,19 @@
 declare(strict_types=1);
 
 return [
-    'title' => 'Reviews',
+    'title'  => 'Reviews',
     'plural' => 'Reviews',
     'single' => 'Review',
     'fields' => [
-        'rating' => 'Rating',
-        'title' => 'Title',
-        'content' => 'Content',
+        'rating'      => 'Rating',
+        'title'       => 'Title',
+        'content'     => 'Content',
         'is_approved' => 'Approved',
         'is_featured' => 'Featured',
-        'created_at' => 'Created At',
+        'created_at'  => 'Created At',
     ],
     'actions' => [
-        'approve' => 'Approve',
+        'approve'    => 'Approve',
         'disapprove' => 'Disapprove',
     ],
 ];

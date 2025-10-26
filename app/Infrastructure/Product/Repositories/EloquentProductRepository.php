@@ -20,11 +20,11 @@ use App\Models\Scopes\EnabledScope;
 use App\Models\Scopes\PublishedScope;
 use App\Models\Scopes\StatusScope;
 use App\Models\Scopes\VisibleScope;
+use App\Support\Media\ProductImageUrlResolver;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use JsonException;
-use App\Support\Media\ProductImageUrlResolver;
 
 /**
  * Eloquent-backed repository for domain product read models.
@@ -46,10 +46,10 @@ final class EloquentProductRepository implements ProductRepositoryInterface
                     ->orWhere('sku', 'like', "%{$term}%");
             })
             ->with([
-                'brand' => static fn ($relation) => $relation->withoutGlobalScopes([ActiveScope::class, EnabledScope::class]),
+                'brand'      => static fn ($relation) => $relation->withoutGlobalScopes([ActiveScope::class, EnabledScope::class]),
                 'categories' => static fn ($relation) => $relation->withoutGlobalScopes([ActiveScope::class, EnabledScope::class, VisibleScope::class]),
-                'variants' => static fn ($relation) => $relation->withoutGlobalScopes([ActiveScope::class, EnabledScope::class, StatusScope::class]),
-                'images' => static fn ($relation) => $relation
+                'variants'   => static fn ($relation) => $relation->withoutGlobalScopes([ActiveScope::class, EnabledScope::class, StatusScope::class]),
+                'images'     => static fn ($relation) => $relation
                     ->withoutGlobalScopes([ActiveScope::class])
                     ->orderBy('sort_order'),
             ])
@@ -81,10 +81,10 @@ final class EloquentProductRepository implements ProductRepositoryInterface
             ->withoutGlobalScopes([ActiveScope::class, PublishedScope::class, VisibleScope::class, SoftDeletingScope::class])
             ->where('is_visible', true)
             ->with([
-                'brand' => static fn ($relation) => $relation->withoutGlobalScopes([ActiveScope::class, EnabledScope::class]),
+                'brand'      => static fn ($relation) => $relation->withoutGlobalScopes([ActiveScope::class, EnabledScope::class]),
                 'categories' => static fn ($relation) => $relation->withoutGlobalScopes([ActiveScope::class, EnabledScope::class, VisibleScope::class]),
-                'variants' => static fn ($relation) => $relation->withoutGlobalScopes([ActiveScope::class, EnabledScope::class, StatusScope::class]),
-                'images' => static fn ($relation) => $relation
+                'variants'   => static fn ($relation) => $relation->withoutGlobalScopes([ActiveScope::class, EnabledScope::class, StatusScope::class]),
+                'images'     => static fn ($relation) => $relation
                     ->withoutGlobalScopes([ActiveScope::class])
                     ->orderBy('sort_order'),
             ])

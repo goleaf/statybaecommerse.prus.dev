@@ -24,12 +24,12 @@ final class PopularityRecommendation extends BaseRecommendation
     {
         return [
             'max_results' => 10,
-            'min_score' => 0.1,
+            'min_score'   => 0.1,
             'time_window' => 90,
             // days
             'popularity_weights' => ['sales' => 0.5, 'views' => 0.2, 'reviews' => 0.2, 'wishlist' => 0.1],
-            'min_sales' => 1,
-            'min_reviews' => 0,
+            'min_sales'          => 1,
+            'min_reviews'        => 0,
         ];
     }
 

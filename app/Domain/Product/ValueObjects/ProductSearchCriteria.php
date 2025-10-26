@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Domain\Product\ValueObjects;
 
+use InvalidArgumentException;
+
 /**
  * Value object describing search options for product lookups.
  */
@@ -15,7 +17,7 @@ final class ProductSearchCriteria
         private readonly int $timeoutSeconds,
     ) {
         if ($this->limit < 1) {
-            throw new \InvalidArgumentException('Search limit must be positive.');
+            throw new InvalidArgumentException('Search limit must be positive.');
         }
     }
 

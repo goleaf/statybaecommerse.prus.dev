@@ -9,8 +9,6 @@ use App\Support\Nav;
 use App\Support\ViteManifest;
 use Asmit\ResizedColumn\ResizedColumnPlugin;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
-use App\Filament\Resources\ProductResource;
-use App\Filament\Resources\UserResource;
 
 use function class_exists;
 
@@ -23,7 +21,6 @@ use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Navigation\NavigationGroup;
 use Filament\Panel;
 use Filament\PanelProvider;
-use Filament\SpatieLaravelMediaLibraryPlugin\FilamentSpatieLaravelMediaLibraryPlugin;
 use Filament\Support\Colors\Color;
 use Filament\Widgets\AccountWidget;
 use Hydrat\TableLayoutToggle\Persisters\LocalStoragePersister;
@@ -402,9 +399,8 @@ final class AdminPanelProvider extends PanelProvider
     /**
      * @template T of FilamentPlugin
      *
-     * @param class-string<T> $pluginClass
-     * @param (callable(T): T)|null $configure
-     *
+     * @param  class-string<T>       $pluginClass
+     * @param  (callable(T): T)|null $configure
      * @return T|null
      */
     private function optionalPlugin(string $pluginClass, ?callable $configure = null): ?FilamentPlugin

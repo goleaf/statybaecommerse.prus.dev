@@ -53,14 +53,14 @@ final class LiveNotificationServiceTest extends TestCase
 
         $this->assertDatabaseHas('notifications', [
             'notifiable_type' => User::class,
-            'notifiable_id' => $admin1->id,
-            'type' => TestNotification::class,
+            'notifiable_id'   => $admin1->id,
+            'type'            => TestNotification::class,
         ]);
 
         $this->assertDatabaseHas('notifications', [
             'notifiable_type' => User::class,
-            'notifiable_id' => $admin2->id,
-            'type' => TestNotification::class,
+            'notifiable_id'   => $admin2->id,
+            'type'            => TestNotification::class,
         ]);
 
         // Verify events were dispatched
@@ -80,8 +80,8 @@ final class LiveNotificationServiceTest extends TestCase
 
         $this->assertDatabaseHas('notifications', [
             'notifiable_type' => User::class,
-            'notifiable_id' => $this->regularUser->id,
-            'type' => TestNotification::class,
+            'notifiable_id'   => $this->regularUser->id,
+            'type'            => TestNotification::class,
         ]);
 
         $notification = DatabaseNotification::where('notifiable_id', $this->regularUser->id)->first();
@@ -113,8 +113,8 @@ final class LiveNotificationServiceTest extends TestCase
         foreach ($users as $user) {
             $this->assertDatabaseHas('notifications', [
                 'notifiable_type' => User::class,
-                'notifiable_id' => $user->id,
-                'type' => TestNotification::class,
+                'notifiable_id'   => $user->id,
+                'type'            => TestNotification::class,
             ]);
 
             // Verify event was dispatched for each user
@@ -139,8 +139,8 @@ final class LiveNotificationServiceTest extends TestCase
 
         $this->assertDatabaseHas('notifications', [
             'notifiable_type' => User::class,
-            'notifiable_id' => $admin->id,
-            'type' => TestNotification::class,
+            'notifiable_id'   => $admin->id,
+            'type'            => TestNotification::class,
         ]);
 
         $notification = DatabaseNotification::where('notifiable_id', $admin->id)->first();
@@ -161,8 +161,8 @@ final class LiveNotificationServiceTest extends TestCase
 
         $this->assertDatabaseHas('notifications', [
             'notifiable_type' => User::class,
-            'notifiable_id' => $admin->id,
-            'type' => TestNotification::class,
+            'notifiable_id'   => $admin->id,
+            'type'            => TestNotification::class,
         ]);
 
         $notification = DatabaseNotification::where('notifiable_id', $admin->id)->first();
@@ -183,8 +183,8 @@ final class LiveNotificationServiceTest extends TestCase
 
         $this->assertDatabaseHas('notifications', [
             'notifiable_type' => User::class,
-            'notifiable_id' => $admin->id,
-            'type' => TestNotification::class,
+            'notifiable_id'   => $admin->id,
+            'type'            => TestNotification::class,
         ]);
 
         $notification = DatabaseNotification::where('notifiable_id', $admin->id)->first();

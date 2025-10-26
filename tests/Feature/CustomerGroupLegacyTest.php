@@ -12,11 +12,11 @@ it('feature: can create a customer group with legacy fields only', function () {
     $user = User::factory()->create(['is_admin' => true]);
 
     $customerGroup = CustomerGroup::create([
-        'name' => 'VIP Customers',
-        'code' => 'VIP',
-        'description' => 'High-value customers',
+        'name'                => 'VIP Customers',
+        'code'                => 'VIP',
+        'description'         => 'High-value customers',
         'discount_percentage' => 15,
-        'is_enabled' => true,
+        'is_enabled'          => true,
     ]);
 
     expect($customerGroup->name)->toBe('VIP Customers');
@@ -27,16 +27,16 @@ it('feature: can create a customer group with legacy fields only', function () {
 
 it('feature: can update customer group legacy fields', function () {
     $customerGroup = CustomerGroup::create([
-        'name' => 'Regular Customers',
-        'code' => 'REG',
-        'description' => 'Regular customers',
+        'name'                => 'Regular Customers',
+        'code'                => 'REG',
+        'description'         => 'Regular customers',
         'discount_percentage' => 5,
-        'is_enabled' => true,
+        'is_enabled'          => true,
     ]);
 
     $customerGroup->update([
         'discount_percentage' => 10,
-        'is_enabled' => false,
+        'is_enabled'          => false,
     ]);
 
     expect($customerGroup->fresh()->discount_percentage)->toBe(10.0);
@@ -45,11 +45,11 @@ it('feature: can update customer group legacy fields', function () {
 
 it('feature: can access customer group relationships', function () {
     $customerGroup = CustomerGroup::create([
-        'name' => 'Test Group',
-        'code' => 'TEST',
-        'description' => 'Test customers',
+        'name'                => 'Test Group',
+        'code'                => 'TEST',
+        'description'         => 'Test customers',
         'discount_percentage' => 0,
-        'is_enabled' => true,
+        'is_enabled'          => true,
     ]);
 
     // Test that relationships exist
@@ -61,19 +61,19 @@ it('feature: can access customer group relationships', function () {
 
 it('feature: can use customer group scopes', function () {
     CustomerGroup::create([
-        'name' => 'Enabled Group',
-        'code' => 'ENABLED',
-        'description' => 'Enabled group',
+        'name'                => 'Enabled Group',
+        'code'                => 'ENABLED',
+        'description'         => 'Enabled group',
         'discount_percentage' => 10,
-        'is_enabled' => true,
+        'is_enabled'          => true,
     ]);
 
     CustomerGroup::create([
-        'name' => 'Disabled Group',
-        'code' => 'DISABLED',
-        'description' => 'Disabled group',
+        'name'                => 'Disabled Group',
+        'code'                => 'DISABLED',
+        'description'         => 'Disabled group',
         'discount_percentage' => 0,
-        'is_enabled' => false,
+        'is_enabled'          => false,
     ]);
 
     $enabledGroups = CustomerGroup::enabled()->get();

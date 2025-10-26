@@ -4,27 +4,30 @@ declare(strict_types=1);
 
 namespace App\Support\Helpers;
 
+use DateTimeInterface;
+use NumberFormatter;
+
 final class SharedHelpers
 {
     public static function formatPrice(float $amount, string $currency = 'EUR', ?string $locale = null): string
     {
         $locale = $locale ?? app()->getLocale();
 
-        $formatter = new \NumberFormatter(
+        $formatter = new NumberFormatter(
             $locale === 'lt' ? 'lt_LT' : ($locale === 'de' ? 'de_DE' : 'en_US'),
-            \NumberFormatter::CURRENCY
+            NumberFormatter::CURRENCY
         );
 
         return $formatter->formatCurrency($amount, $currency);
     }
 
-    public static function formatDate(\DateTimeInterface $date, ?string $format = null, ?string $locale = null): string
+    public static function formatDate(DateTimeInterface $date, ?string $format = null, ?string $locale = null): string
     {
         $locale = $locale ?? app()->getLocale();
 
         $format = $format ?? match ($locale) {
-            'lt' => 'Y-m-d H:i',
-            'de' => 'd.m.Y H:i',
+            'lt'    => 'Y-m-d H:i',
+            'de'    => 'd.m.Y H:i',
             default => 'M j, Y g:i A',
         };
 
@@ -37,7 +40,7 @@ final class SharedHelpers
             return $text;
         }
 
-        return mb_substr($text, 0, $length - mb_strlen($suffix)).$suffix;
+        return mb_substr($text, 0, $length - mb_strlen($suffix)) . $suffix;
     }
 
     public static function generateSlug(string $text, string $separator = '-'): string
@@ -100,7 +103,7 @@ final class SharedHelpers
             $bytes /= 1024;
         }
 
-        return round($bytes, 2).' '.$units[$i];
+        return round($bytes, 2) . ' ' . $units[$i];
     }
 
     public static function sanitizeInput(string $input): string
@@ -142,13 +145,13 @@ final class SharedHelpers
         if (preg_match('/^(\+370|370)([0-9]{8})$/', $cleaned, $matches)) {
             $number = $matches[2];
 
-            return '+370 '.substr($number, 0, 3).' '.substr($number, 3, 2).' '.substr($number, 5);
+            return '+370 ' . substr($number, 0, 3) . ' ' . substr($number, 3, 2) . ' ' . substr($number, 5);
         }
 
         if (preg_match('/^8([0-9]{8})$/', $cleaned, $matches)) {
             $number = $matches[1];
 
-            return '+370 '.substr($number, 0, 3).' '.substr($number, 3, 2).' '.substr($number, 5);
+            return '+370 ' . substr($number, 0, 3) . ' ' . substr($number, 3, 2) . ' ' . substr($number, 5);
         }
 
         return $phone;

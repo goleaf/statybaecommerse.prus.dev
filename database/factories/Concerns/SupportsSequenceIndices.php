@@ -17,7 +17,7 @@ use ReflectionUnionType;
 trait SupportsSequenceIndices
 {
     /**
-     * @param  array<int, mixed>  $definitions
+     * @param  array<int, mixed> $definitions
      * @return array<int, mixed>
      */
     protected function normaliseSequenceDefinitions(array $definitions): array

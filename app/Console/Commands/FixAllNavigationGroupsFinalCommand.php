@@ -18,7 +18,7 @@ final class FixAllNavigationGroupsFinalCommand extends Command
     public function handle(): int
     {
         $projectRoot = base_path();
-        $resourcesPath = $projectRoot.'/app/Filament/Resources';
+        $resourcesPath = $projectRoot . '/app/Filament/Resources';
 
         $this->components->info('🔧 Starting final comprehensive NavigationGroup fix...');
 
@@ -36,27 +36,27 @@ final class FixAllNavigationGroupsFinalCommand extends Command
         }
 
         $mapping = [
-            'Products' => 'NavigationGroup::Products->value',
-            'Orders' => 'NavigationGroup::Orders->value',
-            'Users' => 'NavigationGroup::Users->value',
-            'Settings' => 'NavigationGroup::Settings->value',
-            'Analytics' => 'NavigationGroup::Analytics->value',
-            'Content' => 'NavigationGroup::Content->value',
+            'Products'           => 'NavigationGroup::Products->value',
+            'Orders'             => 'NavigationGroup::Orders->value',
+            'Users'              => 'NavigationGroup::Users->value',
+            'Settings'           => 'NavigationGroup::Settings->value',
+            'Analytics'          => 'NavigationGroup::Analytics->value',
+            'Content'            => 'NavigationGroup::Content->value',
             'Content Management' => 'NavigationGroup::ContentManagement->value',
-            'System' => 'NavigationGroup::System->value',
-            'Marketing' => 'NavigationGroup::Marketing->value',
-            'Inventory' => 'NavigationGroup::Inventory->value',
-            'Reports' => 'NavigationGroup::Reports->value',
-            'Locations' => 'NavigationGroup::Locations->value',
-            'Discounts' => 'NavigationGroup::Discounts->value',
-            'Campaigns' => 'NavigationGroup::Campaigns->value',
-            'News' => 'NavigationGroup::News->value',
-            'Referral System' => 'NavigationGroup::Referral->value',
+            'System'             => 'NavigationGroup::System->value',
+            'Marketing'          => 'NavigationGroup::Marketing->value',
+            'Inventory'          => 'NavigationGroup::Inventory->value',
+            'Reports'            => 'NavigationGroup::Reports->value',
+            'Locations'          => 'NavigationGroup::Locations->value',
+            'Discounts'          => 'NavigationGroup::Discounts->value',
+            'Campaigns'          => 'NavigationGroup::Campaigns->value',
+            'News'               => 'NavigationGroup::News->value',
+            'Referral System'    => 'NavigationGroup::Referral->value',
         ];
 
         foreach ($files as $file) {
-            $relativePath = Str::after($file, $projectRoot.'/');
-            $this->line('Processing: '.$relativePath);
+            $relativePath = Str::after($file, $projectRoot . '/');
+            $this->line('Processing: ' . $relativePath);
 
             $content = file_get_contents($file) ?: '';
             $originalContent = $content;
@@ -95,27 +95,27 @@ final class FixAllNavigationGroupsFinalCommand extends Command
 
             $content = preg_replace_callback(
                 '/(\*\* @var UnitEnum\|string\|null \*\/\s*)?protected static \$navigationGroup = ([^;]+);/',
-                static fn (array $matches): string => '/** @var \UnitEnum|string|null */'.PHP_EOL.'    protected static $navigationGroup = '.$matches[2].';',
+                static fn (array $matches): string => '/** @var \UnitEnum|string|null */' . PHP_EOL . '    protected static $navigationGroup = ' . $matches[2] . ';',
                 $content,
             );
 
             if ($content !== $originalContent) {
                 if (file_put_contents($file, $content) !== false) {
-                    $this->info('✅ Fixed: '.$relativePath);
+                    $this->info('✅ Fixed: ' . $relativePath);
                     $fixedCount++;
                 } else {
-                    $this->error('❌ Error writing: '.$relativePath);
+                    $this->error('❌ Error writing: ' . $relativePath);
                     $errorCount++;
                 }
             } else {
-                $this->line('⏭️  No changes needed: '.$relativePath);
+                $this->line('⏭️  No changes needed: ' . $relativePath);
             }
         }
 
         $this->newline();
         $this->line('🎯 NavigationGroup Fix Complete!');
-        $this->line('✅ Files fixed: '.$fixedCount);
-        $this->line('❌ Errors: '.$errorCount);
+        $this->line('✅ Files fixed: ' . $fixedCount);
+        $this->line('❌ Errors: ' . $errorCount);
 
         $this->newline();
         $this->line('🧹 Clearing caches...');

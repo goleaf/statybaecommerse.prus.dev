@@ -19,10 +19,10 @@ final class NormalSettingTranslationFactory extends Factory
     {
         return [
             'enhanced_setting_id' => NormalSetting::factory(),
-            'locale' => $this->faker->randomElement(['en', 'lt', 'de', 'fr', 'es']),
-            'display_name' => $this->faker->words(3, true),
-            'description' => $this->faker->sentence(),
-            'help_text' => $this->faker->optional(0.7)->sentence(),
+            'locale'              => $this->faker->randomElement(['en', 'lt', 'de', 'fr', 'es']),
+            'display_name'        => $this->faker->words(3, true),
+            'description'         => $this->faker->sentence(),
+            'help_text'           => $this->faker->optional(0.7)->sentence(),
         ];
     }
 

@@ -6,6 +6,8 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
 
 class PHPDocCleanCommand extends Command
 {
@@ -63,16 +65,16 @@ class PHPDocCleanCommand extends Command
     {
         $this->line('📁 Directory contents to be deleted:');
 
-        $iterator = new \RecursiveIteratorIterator(
-            new \RecursiveDirectoryIterator($directory, \RecursiveDirectoryIterator::SKIP_DOTS),
-            \RecursiveIteratorIterator::SELF_FIRST
+        $iterator = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($directory, RecursiveDirectoryIterator::SKIP_DOTS),
+            RecursiveIteratorIterator::SELF_FIRST
         );
 
         $fileCount = 0;
         $dirCount = 0;
 
         foreach ($iterator as $item) {
-            $relativePath = str_replace($directory.'/', '', $item->getPathname());
+            $relativePath = str_replace($directory . '/', '', $item->getPathname());
 
             if ($item->isDir()) {
                 $this->line("  📁 {$relativePath}/");

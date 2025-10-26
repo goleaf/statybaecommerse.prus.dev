@@ -34,7 +34,7 @@ it('normalizes rate limit values consistently', function (): void {
 it('merges scopes and permissions without duplicates', function (): void {
     // Arrange: create an API key with overlapping scopes and permissions.
     $apiKey = ApiKey::factory()->create([
-        'scopes' => [ApiKeyScope::OrdersRead->value, '*'],
+        'scopes'      => [ApiKeyScope::OrdersRead->value, '*'],
         'permissions' => ['orders.read', 'orders.write'],
     ]);
 
@@ -122,4 +122,3 @@ it('masks hashed keys safely for display', function (): void {
         ->toEndWith(substr($apiKey->key, -4))
         ->toHaveLength(strlen($apiKey->key));
 });
-

@@ -34,7 +34,7 @@ final class ReferralTest extends TestCase
 
         $response = $this->actingAs($referrer)->post(route('referrals.store'), [
             'referred_email' => $referred->email,
-            'message' => 'Check out this great service!',
+            'message'        => 'Check out this great service!',
         ]);
 
         $response->assertRedirect(route('referrals.index'));
@@ -81,7 +81,7 @@ final class ReferralTest extends TestCase
 
         $response->assertRedirect(route('referrals.index'));
         $this->assertDatabaseHas('referral_codes', [
-            'user_id' => $user->id,
+            'user_id'   => $user->id,
             'is_active' => true,
         ]);
     }
@@ -113,7 +113,7 @@ final class ReferralTest extends TestCase
         $user = User::factory()->create();
         $referralCode = ReferralCode::factory()->create([
             'user_id' => $user->id,
-            'code' => 'TEST123',
+            'code'    => 'TEST123',
         ]);
 
         $response = $this->get(route('referrals.track', 'TEST123'));
@@ -174,8 +174,8 @@ final class ReferralTest extends TestCase
 
         // Statistics should be updated when referral is created
         $this->assertDatabaseHas('referral_statistics', [
-            'user_id' => $user->id,
-            'total_referrals' => 1,
+            'user_id'           => $user->id,
+            'total_referrals'   => 1,
             'pending_referrals' => 1,
         ]);
     }

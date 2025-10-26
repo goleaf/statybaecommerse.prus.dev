@@ -21,7 +21,7 @@ final class UserProductInteractionTest extends TestCase
      */
     public function test_it_defines_expected_fillable_and_casts(): void
     {
-        $interaction = new UserProductInteraction();
+        $interaction = new UserProductInteraction;
 
         self::assertSame([
             'user_id',
@@ -46,10 +46,10 @@ final class UserProductInteractionTest extends TestCase
     {
         $interaction = UserProductInteraction::factory()->create([
             'meta' => [
-                'rating' => 4.5,
-                'count' => 7,
+                'rating'            => 4.5,
+                'count'             => 7,
                 'first_interaction' => now()->subWeek(),
-                'last_interaction' => now()->subDay(),
+                'last_interaction'  => now()->subDay(),
             ],
         ]);
 
@@ -85,8 +85,8 @@ final class UserProductInteractionTest extends TestCase
         $variant = ProductVariant::factory()->create(['product_id' => $product->id]);
 
         $interaction = UserProductInteraction::factory()->create([
-            'user_id' => $user->id,
-            'product_id' => $product->id,
+            'user_id'            => $user->id,
+            'product_id'         => $product->id,
             'product_variant_id' => $variant->id,
         ]);
 
@@ -137,13 +137,13 @@ final class UserProductInteractionTest extends TestCase
     public function test_fill_translates_legacy_attributes(): void
     {
         $interaction = UserProductInteraction::create([
-            'user_id' => User::factory()->create()->id,
-            'product_id' => Product::factory()->create()->id,
-            'interaction_type' => 'view',
-            'rating' => 3.2,
-            'count' => 5,
+            'user_id'           => User::factory()->create()->id,
+            'product_id'        => Product::factory()->create()->id,
+            'interaction_type'  => 'view',
+            'rating'            => 3.2,
+            'count'             => 5,
             'first_interaction' => now()->subWeek(),
-            'last_interaction' => now()->subDay(),
+            'last_interaction'  => now()->subDay(),
         ]);
 
         self::assertSame('view', $interaction->event);

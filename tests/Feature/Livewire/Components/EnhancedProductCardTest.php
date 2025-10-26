@@ -18,7 +18,7 @@ final class EnhancedProductCardTest extends TestCase
     public function test_discount_calculation_uses_sale_price_when_available(): void
     {
         $product = Product::factory()->create([
-            'price' => '80.00',
+            'price'         => '80.00',
             'compare_price' => '100.00',
         ]);
 
@@ -60,17 +60,17 @@ final class EnhancedProductCardTest extends TestCase
 
         AnalyticsEvent::create([
             'event_type' => 'product_view',
-            'user_id' => $user->id,
+            'user_id'    => $user->id,
             'session_id' => 'session-id',
             'properties' => [
                 'product_id' => $product->id,
-                'view_type' => 'quick_view',
+                'view_type'  => 'quick_view',
             ],
         ]);
 
         $this->assertDatabaseHas('analytics_events', [
             'event_type' => 'product_view',
-            'user_id' => $user->id,
+            'user_id'    => $user->id,
         ]);
     }
 }

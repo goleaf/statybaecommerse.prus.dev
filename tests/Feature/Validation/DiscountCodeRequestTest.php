@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Tests\Feature\Validation;
 
 use App\Models\DiscountCode;
-use App\Models\DocumentTemplate;
 use Tests\TestCase;
 
 final class DiscountCodeRequestTest extends TestCase
@@ -30,4 +29,3 @@ final class DiscountCodeRequestTest extends TestCase
             ->assertStatus(422);
     }
 }
-

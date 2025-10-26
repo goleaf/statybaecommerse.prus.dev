@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Tests\Admin\Resources;
 
 use App\Filament\Resources\UserPreferenceResource;
-use App\Support\Nav;
 use App\Models\User;
 use App\Models\UserPreference;
+use App\Support\Nav;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Tests\TestCase;
@@ -23,7 +23,7 @@ final class UserPreferenceResourceTest extends TestCase
         // Create test user
         $this->user = User::factory()->create([
             'email' => 'admin@example.com',
-            'name' => 'Test Admin',
+            'name'  => 'Test Admin',
         ]);
 
         $this->actingAs($this->user);
@@ -47,20 +47,20 @@ final class UserPreferenceResourceTest extends TestCase
 
         Livewire::test(UserPreferenceResource\Pages\CreateUserPreference::class)
             ->fillForm([
-                'user_id' => $user->id,
-                'preference_type' => 'category',
-                'preference_key' => 'electronics',
+                'user_id'          => $user->id,
+                'preference_type'  => 'category',
+                'preference_key'   => 'electronics',
                 'preference_score' => 0.85,
-                'last_updated' => now(),
-                'metadata' => ['source' => 'purchase_history'],
+                'last_updated'     => now(),
+                'metadata'         => ['source' => 'purchase_history'],
             ])
             ->call('create')
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('user_preferences', [
-            'user_id' => $user->id,
-            'preference_type' => 'category',
-            'preference_key' => 'electronics',
+            'user_id'          => $user->id,
+            'preference_type'  => 'category',
+            'preference_key'   => 'electronics',
             'preference_score' => 0.85,
         ]);
     }
@@ -69,9 +69,9 @@ final class UserPreferenceResourceTest extends TestCase
     {
         $user = User::factory()->create();
         $userPreference = UserPreference::factory()->create([
-            'user_id' => $user->id,
-            'preference_type' => 'brand',
-            'preference_key' => 'apple',
+            'user_id'          => $user->id,
+            'preference_type'  => 'brand',
+            'preference_key'   => 'apple',
             'preference_score' => 0.75,
         ]);
 
@@ -80,15 +80,15 @@ final class UserPreferenceResourceTest extends TestCase
         ])
             ->fillForm([
                 'preference_score' => 0.95,
-                'metadata' => ['source' => 'updated_preference'],
+                'metadata'         => ['source' => 'updated_preference'],
             ])
             ->call('save')
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('user_preferences', [
-            'id' => $userPreference->id,
+            'id'               => $userPreference->id,
             'preference_score' => 0.95,
-            'metadata' => json_encode(['source' => 'updated_preference']),
+            'metadata'         => json_encode(['source' => 'updated_preference']),
         ]);
     }
 
@@ -125,7 +125,7 @@ final class UserPreferenceResourceTest extends TestCase
     {
         Livewire::test(UserPreferenceResource\Pages\CreateUserPreference::class)
             ->fillForm([
-                'preference_type' => '',
+                'preference_type'  => '',
                 'preference_score' => 1.5, // Invalid: should be <= 1
             ])
             ->call('create')
@@ -138,8 +138,8 @@ final class UserPreferenceResourceTest extends TestCase
 
         Livewire::test(UserPreferenceResource\Pages\CreateUserPreference::class)
             ->fillForm([
-                'user_id' => $user->id,
-                'preference_type' => 'category',
+                'user_id'          => $user->id,
+                'preference_type'  => 'category',
                 'preference_score' => -0.1, // Invalid: should be >= 0
             ])
             ->call('create')
@@ -150,7 +150,7 @@ final class UserPreferenceResourceTest extends TestCase
     {
         $user = User::factory()->create();
         $userPreference = UserPreference::factory()->create([
-            'user_id' => $user->id,
+            'user_id'          => $user->id,
             'preference_score' => 0.85,
         ]);
 
@@ -159,7 +159,7 @@ final class UserPreferenceResourceTest extends TestCase
             ->assertOk();
 
         $this->assertDatabaseHas('user_preferences', [
-            'id' => $userPreference->id,
+            'id'               => $userPreference->id,
             'preference_score' => 0,
         ]);
     }
@@ -168,7 +168,7 @@ final class UserPreferenceResourceTest extends TestCase
     {
         $user = User::factory()->create();
         $userPreferences = UserPreference::factory()->count(3)->create([
-            'user_id' => $user->id,
+            'user_id'          => $user->id,
             'preference_score' => 0.85,
         ]);
 
@@ -178,7 +178,7 @@ final class UserPreferenceResourceTest extends TestCase
 
         foreach ($userPreferences as $preference) {
             $this->assertDatabaseHas('user_preferences', [
-                'id' => $preference->id,
+                'id'               => $preference->id,
                 'preference_score' => 0,
             ]);
         }
@@ -229,7 +229,7 @@ final class UserPreferenceResourceTest extends TestCase
     {
         $user = User::factory()->create(['name' => 'John Doe']);
         UserPreference::factory()->create([
-            'user_id' => $user->id,
+            'user_id'        => $user->id,
             'preference_key' => 'electronics',
         ]);
 
@@ -256,7 +256,7 @@ final class UserPreferenceResourceTest extends TestCase
 
         Livewire::test(UserPreferenceResource\Pages\CreateUserPreference::class)
             ->fillForm([
-                'user_id' => $user->id,
+                'user_id'         => $user->id,
                 'preference_type' => 'category',
             ])
             ->assertFormSet([
@@ -269,23 +269,23 @@ final class UserPreferenceResourceTest extends TestCase
         $user = User::factory()->create();
 
         $metadata = [
-            'source' => 'purchase_history',
-            'frequency' => 'high',
+            'source'              => 'purchase_history',
+            'frequency'           => 'high',
             'category_preference' => 'electronics',
         ];
 
         Livewire::test(UserPreferenceResource\Pages\CreateUserPreference::class)
             ->fillForm([
-                'user_id' => $user->id,
+                'user_id'         => $user->id,
                 'preference_type' => 'category',
-                'preference_key' => 'electronics',
-                'metadata' => $metadata,
+                'preference_key'  => 'electronics',
+                'metadata'        => $metadata,
             ])
             ->call('create')
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('user_preferences', [
-            'user_id' => $user->id,
+            'user_id'  => $user->id,
             'metadata' => json_encode($metadata),
         ]);
     }

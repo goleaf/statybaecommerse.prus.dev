@@ -17,8 +17,8 @@ final class ZoneFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => fake()->state(),
-            'code' => strtoupper(fake()->lexify('??')).fake()->randomNumber(2, true),
+            'name'       => fake()->state(),
+            'code'       => strtoupper(fake()->lexify('??')) . fake()->randomNumber(2, true),
             'is_enabled' => true,
         ];
     }
@@ -26,8 +26,8 @@ final class ZoneFactory extends Factory
     public function lithuania(): static
     {
         return $this->state(fn (array $attributes) => [
-            'name' => 'Lietuva',
-            'code' => 'LT',
+            'name'       => 'Lietuva',
+            'code'       => 'LT',
             'is_enabled' => true,
         ]);
     }

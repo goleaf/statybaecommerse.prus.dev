@@ -74,4 +74,3 @@ final class GracefulSQLiteConnector extends SQLiteConnector
             || (strlen($path) > 2 && ctype_alpha($path[0]) && $path[1] === ':' && ($path[2] === '\\' || $path[2] === '/'));
     }
 }
-

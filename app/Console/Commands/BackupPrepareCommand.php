@@ -83,7 +83,7 @@ final class BackupPrepareCommand extends Command
                         'driver'   => 'sqlite',
                         'checksum' => $this->hashFile($databaseArtifactPath),
                     ],
-                    'media'    => [
+                    'media' => [
                         'filename' => $mediaArtifact['filename'],
                         'checksum' => $this->hashFile($backupPath . DIRECTORY_SEPARATOR . $mediaArtifact['filename']),
                     ],
@@ -171,7 +171,7 @@ final class BackupPrepareCommand extends Command
     /**
      * Create the media artifact file alongside the backup.
      *
-     * @param  array<int, string>  $mediaPaths
+     * @param  array<int, string>      $mediaPaths
      * @return array{filename: string}
      */
     private function createMediaArtifact(array $mediaPaths, string $backupPath): array
@@ -198,7 +198,7 @@ final class BackupPrepareCommand extends Command
     }
 
     /**
-     * @param  array<int, string>  $mediaPaths
+     * @param array<int, string> $mediaPaths
      */
     private function mediaDirectoriesContainFiles(array $mediaPaths): bool
     {

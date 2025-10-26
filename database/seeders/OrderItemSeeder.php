@@ -36,8 +36,8 @@ final class OrderItemSeeder extends Seeder
                     ->for($order)
                     ->for($product)
                     ->state([
-                        'name' => $product->name,
-                        'sku' => $product->sku ?? fake()->bothify('SKU-####'),
+                        'name'       => $product->name,
+                        'sku'        => $product->sku ?? fake()->bothify('SKU-####'),
                         'created_at' => fake()->dateTimeBetween($order->created_at, 'now'),
                         'updated_at' => fake()->dateTimeBetween($order->created_at, 'now'),
                     ])

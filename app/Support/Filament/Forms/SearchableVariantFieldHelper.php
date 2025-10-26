@@ -20,9 +20,7 @@ final class SearchableVariantFieldHelper
     /**
      * Prevent instantiation because this helper only exposes static utility methods.
      */
-    private function __construct()
-    {
-    }
+    private function __construct() {}
 
     /**
      * Hydrate the searchable input state so Filament keeps the cached option list in sync.

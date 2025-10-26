@@ -12,7 +12,7 @@ use function Pest\Livewire\livewire;
 beforeEach(function () {
     $this->adminUser = User::factory()->create([
         'email' => 'admin@admin.com',
-        'name' => 'Admin User',
+        'name'  => 'Admin User',
     ]);
 
     // Create role and permissions if they don't exist
@@ -46,7 +46,7 @@ it('can render analytics resource page', function () {
 it('displays orders in analytics table', function () {
     $orders = Order::factory()->count(5)->create([
         'status' => 'completed',
-        'total' => 100.0,
+        'total'  => 100.0,
     ]);
 
     livewire(AnalyticsResource\Pages\AnalyticsDashboard::class)
@@ -56,19 +56,19 @@ it('displays orders in analytics table', function () {
 it('can filter orders by date range', function () {
     $oldOrder = Order::factory()->create([
         'created_at' => now()->subMonths(2),
-        'status' => 'completed',
+        'status'     => 'completed',
     ]);
 
     $recentOrder = Order::factory()->create([
         'created_at' => now()->subDays(5),
-        'status' => 'completed',
+        'status'     => 'completed',
     ]);
 
     livewire(AnalyticsResource\Pages\AnalyticsDashboard::class)
         ->filterTable('created_at', [
             'range' => [
                 'start' => now()->subDays(10)->format('Y-m-d'),
-                'end' => now()->format('Y-m-d'),
+                'end'   => now()->format('Y-m-d'),
             ],
         ])
         ->assertCanSeeTableRecords([$recentOrder])
@@ -112,7 +112,7 @@ it('can filter orders from this month', function () {
 
 it('displays correct order summaries', function () {
     Order::factory()->count(3)->create([
-        'total' => 100.0,
+        'total'  => 100.0,
         'status' => 'completed',
     ]);
 
@@ -124,7 +124,7 @@ it('displays correct order summaries', function () {
 it('can view order details', function () {
     $order = Order::factory()->create([
         'reference' => 'ORD-12345',
-        'status' => 'completed',
+        'status'    => 'completed',
     ]);
 
     livewire(AnalyticsResource\Pages\AnalyticsDashboard::class)
@@ -136,12 +136,12 @@ it('can view order details', function () {
 it('groups orders by month correctly', function () {
     Order::factory()->create([
         'created_at' => now()->startOfMonth(),
-        'status' => 'completed',
+        'status'     => 'completed',
     ]);
 
     Order::factory()->create([
         'created_at' => now()->subMonth()->startOfMonth(),
-        'status' => 'completed',
+        'status'     => 'completed',
     ]);
 
     livewire(AnalyticsResource\Pages\AnalyticsDashboard::class)

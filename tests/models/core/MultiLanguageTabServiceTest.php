@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use App\Services\MultiLanguageTabService;
 use Illuminate\Support\Collection;
 
@@ -34,10 +36,10 @@ it('prepares translation data by extracting translatable fields', function (): v
     config()->set('app.supported_locales', ['lt', 'en']);
 
     $formData = [
-        'title_lt' => 'Pavadinimas LT',
-        'title_en' => 'Title EN',
+        'title_lt'       => 'Pavadinimas LT',
+        'title_en'       => 'Title EN',
         'description_lt' => 'Aprašymas LT',
-        'status' => 'published',
+        'status'         => 'published',
     ];
 
     $result = MultiLanguageTabService::prepareTranslationData($formData, ['title', 'description']);
@@ -96,7 +98,7 @@ it('creates simple tabs for each language when TabLayout plugin is available', f
     config()->set('app.supported_locales', ['lt', 'en']);
 
     $tabs = MultiLanguageTabService::createSimpleTabs([
-        'name' => ['type' => 'text', 'required' => true],
+        'name'        => ['type' => 'text', 'required' => true],
         'description' => ['type' => 'textarea'],
     ]);
 

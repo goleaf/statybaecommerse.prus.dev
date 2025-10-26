@@ -37,7 +37,7 @@ final class ModelScopeServiceProvider extends ServiceProvider
                 }
 
                 try {
-                    $modelClass::addGlobalScope(new $scopeClass());
+                    $modelClass::addGlobalScope(new $scopeClass);
                 } catch (Throwable) {
                     // Avoid bubbling issues from unexpected constructor signatures or other runtime failures.
                     continue;

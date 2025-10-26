@@ -57,14 +57,14 @@ final class NotificationServiceTest extends TestCase
 
         $this->assertDatabaseHas('notifications', [
             'notifiable_type' => User::class,
-            'notifiable_id' => $admin1->id,
-            'type' => TestNotification::class,
+            'notifiable_id'   => $admin1->id,
+            'type'            => TestNotification::class,
         ]);
 
         $this->assertDatabaseHas('notifications', [
             'notifiable_type' => User::class,
-            'notifiable_id' => $admin2->id,
-            'type' => TestNotification::class,
+            'notifiable_id'   => $admin2->id,
+            'type'            => TestNotification::class,
         ]);
     }
 
@@ -74,8 +74,8 @@ final class NotificationServiceTest extends TestCase
 
         $this->assertDatabaseHas('notifications', [
             'notifiable_type' => User::class,
-            'notifiable_id' => $this->regularUser->id,
-            'type' => TestNotification::class,
+            'notifiable_id'   => $this->regularUser->id,
+            'type'            => TestNotification::class,
         ]);
 
         $notification = DatabaseNotification::where('notifiable_id', $this->regularUser->id)->first();
@@ -97,8 +97,8 @@ final class NotificationServiceTest extends TestCase
         foreach ($users as $user) {
             $this->assertDatabaseHas('notifications', [
                 'notifiable_type' => User::class,
-                'notifiable_id' => $user->id,
-                'type' => TestNotification::class,
+                'notifiable_id'   => $user->id,
+                'type'            => TestNotification::class,
             ]);
         }
     }
@@ -106,10 +106,10 @@ final class NotificationServiceTest extends TestCase
     public function test_notify_order_created_sends_notifications(): void
     {
         $order = Order::factory()->create([
-            'user_id' => $this->regularUser->id,
+            'user_id'      => $this->regularUser->id,
             'order_number' => 'ORD-001',
-            'total' => 100.00,
-            'status' => 'pending',
+            'total'        => 100.00,
+            'status'       => 'pending',
         ]);
 
         $this->notificationService->notifyOrderCreated($order);
@@ -117,8 +117,8 @@ final class NotificationServiceTest extends TestCase
         // Check customer notification
         $this->assertDatabaseHas('notifications', [
             'notifiable_type' => User::class,
-            'notifiable_id' => $this->regularUser->id,
-            'type' => OrderNotification::class,
+            'notifiable_id'   => $this->regularUser->id,
+            'type'            => OrderNotification::class,
         ]);
 
         $customerNotification = DatabaseNotification::where('notifiable_id', $this->regularUser->id)->first();
@@ -131,18 +131,18 @@ final class NotificationServiceTest extends TestCase
     public function test_notify_order_updated_sends_notifications(): void
     {
         $order = Order::factory()->create([
-            'user_id' => $this->regularUser->id,
+            'user_id'      => $this->regularUser->id,
             'order_number' => 'ORD-002',
-            'total' => 150.00,
-            'status' => 'processing',
+            'total'        => 150.00,
+            'status'       => 'processing',
         ]);
 
         $this->notificationService->notifyOrderUpdated($order);
 
         $this->assertDatabaseHas('notifications', [
             'notifiable_type' => User::class,
-            'notifiable_id' => $this->regularUser->id,
-            'type' => OrderNotification::class,
+            'notifiable_id'   => $this->regularUser->id,
+            'type'            => OrderNotification::class,
         ]);
 
         $notification = DatabaseNotification::where('notifiable_id', $this->regularUser->id)->first();
@@ -154,8 +154,8 @@ final class NotificationServiceTest extends TestCase
     public function test_notify_product_created_sends_notifications(): void
     {
         $product = Product::factory()->create([
-            'name' => 'Test Product',
-            'sku' => 'TEST-001',
+            'name'  => 'Test Product',
+            'sku'   => 'TEST-001',
             'price' => 99.99,
         ]);
 
@@ -175,8 +175,8 @@ final class NotificationServiceTest extends TestCase
     public function test_notify_product_updated_sends_notifications(): void
     {
         $product = Product::factory()->create([
-            'name' => 'Updated Product',
-            'sku' => 'UPD-001',
+            'name'  => 'Updated Product',
+            'sku'   => 'UPD-001',
             'price' => 149.99,
         ]);
 
@@ -196,7 +196,7 @@ final class NotificationServiceTest extends TestCase
     public function test_notify_user_registered_sends_notifications(): void
     {
         $newUser = User::factory()->create([
-            'name' => 'New User',
+            'name'  => 'New User',
             'email' => 'newuser@example.com',
         ]);
 
@@ -218,7 +218,7 @@ final class NotificationServiceTest extends TestCase
     {
         $systemData = [
             'maintenance_type' => 'scheduled',
-            'duration' => '2 hours',
+            'duration'         => '2 hours',
         ];
 
         $this->notificationService->notifySystemEvent('maintenance_started', $systemData);
@@ -237,29 +237,29 @@ final class NotificationServiceTest extends TestCase
     {
         // Create unread notifications
         DatabaseNotification::create([
-            'id' => 'test-count-1',
-            'type' => TestNotification::class,
+            'id'              => 'test-count-1',
+            'type'            => TestNotification::class,
             'notifiable_type' => User::class,
-            'notifiable_id' => $this->regularUser->id,
-            'data' => ['title' => 'Test 1', 'message' => 'Test message 1'],
+            'notifiable_id'   => $this->regularUser->id,
+            'data'            => ['title' => 'Test 1', 'message' => 'Test message 1'],
         ]);
 
         DatabaseNotification::create([
-            'id' => 'test-count-2',
-            'type' => TestNotification::class,
+            'id'              => 'test-count-2',
+            'type'            => TestNotification::class,
             'notifiable_type' => User::class,
-            'notifiable_id' => $this->regularUser->id,
-            'data' => ['title' => 'Test 2', 'message' => 'Test message 2'],
+            'notifiable_id'   => $this->regularUser->id,
+            'data'            => ['title' => 'Test 2', 'message' => 'Test message 2'],
         ]);
 
         // Create read notification
         DatabaseNotification::create([
-            'id' => 'test-count-3',
-            'type' => TestNotification::class,
+            'id'              => 'test-count-3',
+            'type'            => TestNotification::class,
             'notifiable_type' => User::class,
-            'notifiable_id' => $this->regularUser->id,
-            'data' => ['title' => 'Test 3', 'message' => 'Test message 3'],
-            'read_at' => now(),
+            'notifiable_id'   => $this->regularUser->id,
+            'data'            => ['title' => 'Test 3', 'message' => 'Test message 3'],
+            'read_at'         => now(),
         ]);
 
         $count = $this->notificationService->getUnreadCount($this->regularUser);
@@ -271,19 +271,19 @@ final class NotificationServiceTest extends TestCase
     {
         // Create unread notifications
         DatabaseNotification::create([
-            'id' => 'test-mark-read-1',
-            'type' => TestNotification::class,
+            'id'              => 'test-mark-read-1',
+            'type'            => TestNotification::class,
             'notifiable_type' => User::class,
-            'notifiable_id' => $this->regularUser->id,
-            'data' => ['title' => 'Test 1', 'message' => 'Test message 1'],
+            'notifiable_id'   => $this->regularUser->id,
+            'data'            => ['title' => 'Test 1', 'message' => 'Test message 1'],
         ]);
 
         DatabaseNotification::create([
-            'id' => 'test-mark-read-2',
-            'type' => TestNotification::class,
+            'id'              => 'test-mark-read-2',
+            'type'            => TestNotification::class,
             'notifiable_type' => User::class,
-            'notifiable_id' => $this->regularUser->id,
-            'data' => ['title' => 'Test 2', 'message' => 'Test message 2'],
+            'notifiable_id'   => $this->regularUser->id,
+            'data'            => ['title' => 'Test 2', 'message' => 'Test message 2'],
         ]);
 
         $this->assertEquals(2, $this->regularUser->unreadNotifications()->count());
@@ -298,12 +298,12 @@ final class NotificationServiceTest extends TestCase
         // Create notifications with different timestamps
         for ($i = 1; $i <= 7; $i++) {
             DatabaseNotification::create([
-                'id' => "test-recent-{$i}",
-                'type' => TestNotification::class,
+                'id'              => "test-recent-{$i}",
+                'type'            => TestNotification::class,
                 'notifiable_type' => User::class,
-                'notifiable_id' => $this->regularUser->id,
-                'data' => ['title' => "Test {$i}", 'message' => "Test message {$i}"],
-                'created_at' => now()->subMinutes($i),
+                'notifiable_id'   => $this->regularUser->id,
+                'data'            => ['title' => "Test {$i}", 'message' => "Test message {$i}"],
+                'created_at'      => now()->subMinutes($i),
             ]);
         }
 
@@ -319,11 +319,11 @@ final class NotificationServiceTest extends TestCase
     public function test_delete_notification_deletes_specific_notification(): void
     {
         $notification = DatabaseNotification::create([
-            'id' => 'test-delete',
-            'type' => TestNotification::class,
+            'id'              => 'test-delete',
+            'type'            => TestNotification::class,
             'notifiable_type' => User::class,
-            'notifiable_id' => $this->regularUser->id,
-            'data' => ['title' => 'Test', 'message' => 'Test message'],
+            'notifiable_id'   => $this->regularUser->id,
+            'data'            => ['title' => 'Test', 'message' => 'Test message'],
         ]);
 
         $result = $this->notificationService->deleteNotification($this->regularUser, $notification->id);
@@ -345,19 +345,19 @@ final class NotificationServiceTest extends TestCase
     {
         // Create multiple notifications
         DatabaseNotification::create([
-            'id' => 'test-delete-all-1',
-            'type' => TestNotification::class,
+            'id'              => 'test-delete-all-1',
+            'type'            => TestNotification::class,
             'notifiable_type' => User::class,
-            'notifiable_id' => $this->regularUser->id,
-            'data' => ['title' => 'Test 1', 'message' => 'Test message 1'],
+            'notifiable_id'   => $this->regularUser->id,
+            'data'            => ['title' => 'Test 1', 'message' => 'Test message 1'],
         ]);
 
         DatabaseNotification::create([
-            'id' => 'test-delete-all-2',
-            'type' => TestNotification::class,
+            'id'              => 'test-delete-all-2',
+            'type'            => TestNotification::class,
             'notifiable_type' => User::class,
-            'notifiable_id' => $this->regularUser->id,
-            'data' => ['title' => 'Test 2', 'message' => 'Test message 2'],
+            'notifiable_id'   => $this->regularUser->id,
+            'data'            => ['title' => 'Test 2', 'message' => 'Test message 2'],
         ]);
 
         $this->assertEquals(2, $this->regularUser->notifications()->count());

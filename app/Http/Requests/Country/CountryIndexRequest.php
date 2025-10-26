@@ -32,13 +32,13 @@ final class CountryIndexRequest extends FormRequest
     {
         // Enforce strict validation on filter, sort and pagination parameters.
         return [
-            'region' => ['nullable', 'string', 'max:255'],
-            'currency' => ['nullable', 'string', 'max:3'],
+            'region'       => ['nullable', 'string', 'max:255'],
+            'currency'     => ['nullable', 'string', 'max:3'],
             'is_eu_member' => ['nullable', 'boolean'],
             'requires_vat' => ['nullable', 'boolean'],
-            'search' => ['nullable', 'string', 'max:255'],
-            'sort' => ['nullable', 'string', 'in:name,-name,sort_order,-sort_order'],
-            'per_page' => ['nullable', 'integer', 'min:1', 'max:100'],
+            'search'       => ['nullable', 'string', 'max:255'],
+            'sort'         => ['nullable', 'string', 'in:name,-name,sort_order,-sort_order'],
+            'per_page'     => ['nullable', 'integer', 'min:1', 'max:100'],
         ];
     }
 }

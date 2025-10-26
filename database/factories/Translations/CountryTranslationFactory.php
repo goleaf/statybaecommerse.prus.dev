@@ -18,21 +18,21 @@ final class CountryTranslationFactory extends Factory
     public function definition(): array
     {
         return [
-            'country_id' => Country::factory(),
-            'locale' => $this->faker->randomElement(['lt', 'en', 'de', 'fr', 'es']),
-            'name' => $this->faker->country(),
+            'country_id'    => Country::factory(),
+            'locale'        => $this->faker->randomElement(['lt', 'en', 'de', 'fr', 'es']),
+            'name'          => $this->faker->country(),
             'name_official' => $this->faker->optional(0.7)->country(),
-            'description' => $this->faker->optional(0.6)->paragraph(),
+            'description'   => $this->faker->optional(0.6)->paragraph(),
         ];
     }
 
     public function lithuanian(): static
     {
         return $this->state(fn (array $attributes) => [
-            'locale' => 'lt',
-            'name' => $this->faker->randomElement(['Lietuva', 'Latvija', 'Estija', 'Lenkija', 'Vokietija', 'Prancūzija', 'Ispanija', 'Italija', 'Portugalija', 'Nyderlandai']),
+            'locale'        => 'lt',
+            'name'          => $this->faker->randomElement(['Lietuva', 'Latvija', 'Estija', 'Lenkija', 'Vokietija', 'Prancūzija', 'Ispanija', 'Italija', 'Portugalija', 'Nyderlandai']),
             'name_official' => $this->faker->optional(0.7)->randomElement(['Lietuvos Respublika', 'Latvijos Respublika', 'Estijos Respublika', 'Lenkijos Respublika', 'Vokietijos Federacinė Respublika', 'Prancūzijos Respublika', 'Ispanijos Karalystė', 'Italijos Respublika', 'Portugalijos Respublika', 'Nyderlandų Karalystė']),
-            'description' => $this->faker->optional(0.6)->randomElement([
+            'description'   => $this->faker->optional(0.6)->randomElement([
                 'Šalis Europoje',
                 'Šiaurės Europos šalis',
                 'Rytų Europos šalis',
@@ -50,10 +50,10 @@ final class CountryTranslationFactory extends Factory
     public function english(): static
     {
         return $this->state(fn (array $attributes) => [
-            'locale' => 'en',
-            'name' => $this->faker->country(),
+            'locale'        => 'en',
+            'name'          => $this->faker->country(),
             'name_official' => $this->faker->optional(0.7)->country(),
-            'description' => $this->faker->optional(0.6)->randomElement([
+            'description'   => $this->faker->optional(0.6)->randomElement([
                 'A country in Europe',
                 'A Northern European country',
                 'An Eastern European country',
@@ -71,10 +71,10 @@ final class CountryTranslationFactory extends Factory
     public function german(): static
     {
         return $this->state(fn (array $attributes) => [
-            'locale' => 'de',
-            'name' => $this->faker->randomElement(['Litauen', 'Lettland', 'Estland', 'Polen', 'Deutschland', 'Frankreich', 'Spanien', 'Italien', 'Portugal', 'Niederlande']),
+            'locale'        => 'de',
+            'name'          => $this->faker->randomElement(['Litauen', 'Lettland', 'Estland', 'Polen', 'Deutschland', 'Frankreich', 'Spanien', 'Italien', 'Portugal', 'Niederlande']),
             'name_official' => $this->faker->optional(0.7)->randomElement(['Republik Litauen', 'Republik Lettland', 'Republik Estland', 'Republik Polen', 'Bundesrepublik Deutschland', 'Französische Republik', 'Königreich Spanien', 'Italienische Republik', 'Portugiesische Republik', 'Königreich der Niederlande']),
-            'description' => $this->faker->optional(0.6)->randomElement([
+            'description'   => $this->faker->optional(0.6)->randomElement([
                 'Ein Land in Europa',
                 'Ein nordeuropäisches Land',
                 'Ein osteuropäisches Land',
@@ -92,10 +92,10 @@ final class CountryTranslationFactory extends Factory
     public function french(): static
     {
         return $this->state(fn (array $attributes) => [
-            'locale' => 'fr',
-            'name' => $this->faker->randomElement(['Lituanie', 'Lettonie', 'Estonie', 'Pologne', 'Allemagne', 'France', 'Espagne', 'Italie', 'Portugal', 'Pays-Bas']),
+            'locale'        => 'fr',
+            'name'          => $this->faker->randomElement(['Lituanie', 'Lettonie', 'Estonie', 'Pologne', 'Allemagne', 'France', 'Espagne', 'Italie', 'Portugal', 'Pays-Bas']),
             'name_official' => $this->faker->optional(0.7)->randomElement(['République de Lituanie', 'République de Lettonie', 'République d\'Estonie', 'République de Pologne', 'République fédérale d\'Allemagne', 'République française', 'Royaume d\'Espagne', 'République italienne', 'République portugaise', 'Royaume des Pays-Bas']),
-            'description' => $this->faker->optional(0.6)->randomElement([
+            'description'   => $this->faker->optional(0.6)->randomElement([
                 'Un pays en Europe',
                 'Un pays d\'Europe du Nord',
                 'Un pays d\'Europe de l\'Est',
@@ -113,10 +113,10 @@ final class CountryTranslationFactory extends Factory
     public function spanish(): static
     {
         return $this->state(fn (array $attributes) => [
-            'locale' => 'es',
-            'name' => $this->faker->randomElement(['Lituania', 'Letonia', 'Estonia', 'Polonia', 'Alemania', 'Francia', 'España', 'Italia', 'Portugal', 'Países Bajos']),
+            'locale'        => 'es',
+            'name'          => $this->faker->randomElement(['Lituania', 'Letonia', 'Estonia', 'Polonia', 'Alemania', 'Francia', 'España', 'Italia', 'Portugal', 'Países Bajos']),
             'name_official' => $this->faker->optional(0.7)->randomElement(['República de Lituania', 'República de Letonia', 'República de Estonia', 'República de Polonia', 'República Federal de Alemania', 'República Francesa', 'Reino de España', 'República Italiana', 'República Portuguesa', 'Reino de los Países Bajos']),
-            'description' => $this->faker->optional(0.6)->randomElement([
+            'description'   => $this->faker->optional(0.6)->randomElement([
                 'Un país en Europa',
                 'Un país del norte de Europa',
                 'Un país del este de Europa',

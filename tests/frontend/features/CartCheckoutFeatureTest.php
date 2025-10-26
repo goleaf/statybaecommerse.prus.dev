@@ -14,7 +14,7 @@ it('manages cart items through http endpoints', function (): void {
     $this->actingAs($user)
         ->postJson(route('frontend.cart.add'), [
             'product_id' => $product->id,
-            'quantity' => 2,
+            'quantity'   => 2,
         ])
         ->assertCreated()
         ->assertJsonPath('cart_item.quantity', 2);
@@ -46,7 +46,7 @@ it('converts a cart into an order during checkout', function (): void {
     $this->actingAs($user)
         ->postJson(route('frontend.cart.add'), [
             'product_id' => $product->id,
-            'quantity' => 3,
+            'quantity'   => 3,
         ])
         ->assertCreated();
 
@@ -63,7 +63,7 @@ it('converts a cart into an order during checkout', function (): void {
 
     $response = $this->actingAs($user)->post(route('frontend.checkout.process'), [
         'payment_method' => 'card',
-        'confirm' => true,
+        'confirm'        => true,
     ]);
 
     $response->assertRedirect(route('frontend.checkout.success'));

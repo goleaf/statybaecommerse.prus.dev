@@ -43,36 +43,36 @@ final class ShippingOptionResourceTest extends TestCase
     {
         $matrix = [
             'domestic' => [
-                'courier' => true,
+                'courier'       => true,
                 'parcel_locker' => true,
             ],
         ];
 
         Livewire::test(CreateShippingOption::class)
             ->fillForm([
-                'name' => 'Kurieris Express',
-                'slug' => 'kurieris-express',
-                'carrier_name' => 'Kurieris',
-                'service_type' => 'express',
-                'description' => 'Greitas pristatymas',
-                'price' => 9.99,
-                'currency_code' => 'EUR',
-                'is_enabled' => true,
-                'is_default' => false,
-                'sort_order' => 1,
+                'name'               => 'Kurieris Express',
+                'slug'               => 'kurieris-express',
+                'carrier_name'       => 'Kurieris',
+                'service_type'       => 'express',
+                'description'        => 'Greitas pristatymas',
+                'price'              => 9.99,
+                'currency_code'      => 'EUR',
+                'is_enabled'         => true,
+                'is_default'         => false,
+                'sort_order'         => 1,
                 'estimated_days_min' => 1,
                 'estimated_days_max' => 3,
-                'shipping_matrix' => $matrix,
+                'shipping_matrix'    => $matrix,
             ])
             ->call('create')
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('shipping_options', [
-            'slug' => 'kurieris-express',
-            'carrier_name' => 'Kurieris',
-            'service_type' => 'express',
+            'slug'          => 'kurieris-express',
+            'carrier_name'  => 'Kurieris',
+            'service_type'  => 'express',
             'currency_code' => 'EUR',
-            'is_enabled' => true,
+            'is_enabled'    => true,
         ]);
 
         $record = ShippingOption::firstWhere('slug', 'kurieris-express');
@@ -82,16 +82,16 @@ final class ShippingOptionResourceTest extends TestCase
     public function test_can_edit_shipping_option(): void
     {
         $record = ShippingOption::factory()->create([
-            'name' => 'Standartinis',
-            'slug' => 'standartinis',
-            'carrier_name' => 'LT Post',
-            'service_type' => 'standard',
-            'price' => 4.5,
-            'currency_code' => 'EUR',
-            'is_enabled' => true,
+            'name'               => 'Standartinis',
+            'slug'               => 'standartinis',
+            'carrier_name'       => 'LT Post',
+            'service_type'       => 'standard',
+            'price'              => 4.5,
+            'currency_code'      => 'EUR',
+            'is_enabled'         => true,
             'estimated_days_min' => 2,
             'estimated_days_max' => 5,
-            'shipping_matrix' => $this->normalizeMatrixState([
+            'shipping_matrix'    => $this->normalizeMatrixState([
                 'domestic' => [
                     'courier' => true,
                 ],
@@ -100,9 +100,9 @@ final class ShippingOptionResourceTest extends TestCase
 
         $updatedMatrix = [
             'domestic' => [
-                'courier' => true,
+                'courier'       => true,
                 'parcel_locker' => false,
-                'post' => true,
+                'post'          => true,
             ],
             'baltics' => [
                 'courier' => true,
@@ -116,18 +116,18 @@ final class ShippingOptionResourceTest extends TestCase
                 ],
             ]))
             ->fillForm([
-                'name' => 'Standartinis Plus',
-                'price' => 5.25,
+                'name'               => 'Standartinis Plus',
+                'price'              => 5.25,
                 'estimated_days_min' => 2,
                 'estimated_days_max' => 4,
-                'shipping_matrix' => $updatedMatrix,
+                'shipping_matrix'    => $updatedMatrix,
             ])
             ->call('save')
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('shipping_options', [
-            'id' => $record->getKey(),
-            'name' => 'Standartinis Plus',
+            'id'    => $record->getKey(),
+            'name'  => 'Standartinis Plus',
             'price' => 5.25,
         ]);
 
@@ -148,10 +148,10 @@ final class ShippingOptionResourceTest extends TestCase
             ->fillForm([
                 'shipping_matrix' => [
                     'domestic' => [
-                        'courier' => false,
+                        'courier'       => false,
                         'parcel_locker' => false,
-                        'post' => false,
-                        'freight' => false,
+                        'post'          => false,
+                        'freight'       => false,
                     ],
                     'baltics' => [
                         'courier' => false,
@@ -165,7 +165,7 @@ final class ShippingOptionResourceTest extends TestCase
     }
 
     /**
-     * @param  array<string, array<string, bool>>  $matrix
+     * @param  array<string, array<string, bool>> $matrix
      * @return array<string, array<string, bool>>
      */
     private function normalizeMatrixState(array $matrix): array

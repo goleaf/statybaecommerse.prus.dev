@@ -32,10 +32,10 @@ beforeEach(function () {
 
     // Create test data
     $this->testEnumValue = EnumValue::factory()->create([
-        'type' => 'order_status',
-        'key' => 'pending',
-        'value' => 'Pending',
-        'name' => 'Pending Order',
+        'type'      => 'order_status',
+        'key'       => 'pending',
+        'value'     => 'Pending',
+        'name'      => 'Pending Order',
         'is_active' => true,
     ]);
 });
@@ -51,23 +51,23 @@ it('can create an enum value', function () {
     Livewire::actingAs($this->adminUser)
         ->test(EnumValueResource\Pages\CreateEnumValue::class)
         ->fillForm([
-            'type' => 'payment_status',
-            'key' => 'paid',
-            'value' => 'Paid',
-            'name' => 'Payment Completed',
+            'type'        => 'payment_status',
+            'key'         => 'paid',
+            'value'       => 'Paid',
+            'name'        => 'Payment Completed',
             'description' => 'Payment has been completed successfully',
-            'sort_order' => 1,
-            'is_active' => true,
-            'is_default' => false,
+            'sort_order'  => 1,
+            'is_active'   => true,
+            'is_default'  => false,
         ])
         ->call('create')
         ->assertHasNoFormErrors();
 
     $this->assertDatabaseHas('enum_values', [
-        'type' => 'payment_status',
-        'key' => 'paid',
-        'value' => 'Paid',
-        'name' => 'Payment Completed',
+        'type'      => 'payment_status',
+        'key'       => 'paid',
+        'value'     => 'Paid',
+        'name'      => 'Payment Completed',
         'is_active' => true,
     ]);
 });
@@ -84,15 +84,15 @@ it('can edit an enum value record', function () {
         ->test(EnumValueResource\Pages\EditEnumValue::class, ['record' => $this->testEnumValue->id])
         ->fillForm([
             'value' => 'Processing',
-            'name' => 'Processing Order',
+            'name'  => 'Processing Order',
         ])
         ->call('save')
         ->assertHasNoFormErrors();
 
     $this->assertDatabaseHas('enum_values', [
-        'id' => $this->testEnumValue->id,
+        'id'    => $this->testEnumValue->id,
         'value' => 'Processing',
-        'name' => 'Processing Order',
+        'name'  => 'Processing Order',
     ]);
 });
 
@@ -113,10 +113,10 @@ it('validates required fields', function () {
     Livewire::actingAs($this->adminUser)
         ->test(EnumValueResource\Pages\CreateEnumValue::class)
         ->fillForm([
-            'type' => '',
-            'key' => '',
+            'type'  => '',
+            'key'   => '',
             'value' => '',
-            'name' => '',
+            'name'  => '',
         ])
         ->call('create')
         ->assertHasFormErrors(['type', 'key', 'value', 'name']);
@@ -157,7 +157,7 @@ it('can search enum values by name', function () {
 
     $this
         ->actingAs($this->adminUser)
-        ->get(EnumValueResource::getUrl('index').'?search=Special')
+        ->get(EnumValueResource::getUrl('index') . '?search=Special')
         ->assertOk();
 });
 
@@ -166,7 +166,7 @@ it('can search enum values by key', function () {
 
     $this
         ->actingAs($this->adminUser)
-        ->get(EnumValueResource::getUrl('index').'?search=special')
+        ->get(EnumValueResource::getUrl('index') . '?search=special')
         ->assertOk();
 });
 
@@ -175,21 +175,21 @@ it('can search enum values by value', function () {
 
     $this
         ->actingAs($this->adminUser)
-        ->get(EnumValueResource::getUrl('index').'?search=Special')
+        ->get(EnumValueResource::getUrl('index') . '?search=Special')
         ->assertOk();
 });
 
 it('can sort enum values by type', function () {
     $this
         ->actingAs($this->adminUser)
-        ->get(EnumValueResource::getUrl('index').'?sort=type&direction=asc')
+        ->get(EnumValueResource::getUrl('index') . '?sort=type&direction=asc')
         ->assertOk();
 });
 
 it('can sort enum values by sort order', function () {
     $this
         ->actingAs($this->adminUser)
-        ->get(EnumValueResource::getUrl('index').'?sort=sort_order&direction=asc')
+        ->get(EnumValueResource::getUrl('index') . '?sort=sort_order&direction=asc')
         ->assertOk();
 });
 
@@ -362,72 +362,72 @@ it('can access enum value resource pages', function () {
 
 it('validates enum value with metadata', function () {
     $metadata = [
-        'color' => 'blue',
-        'icon' => 'check-circle',
+        'color'       => 'blue',
+        'icon'        => 'check-circle',
         'description' => 'This is a test status',
     ];
 
     Livewire::actingAs($this->adminUser)
         ->test(EnumValueResource\Pages\CreateEnumValue::class)
         ->fillForm([
-            'type' => 'order_status',
-            'key' => 'test_status',
-            'value' => 'Test Status',
-            'name' => 'Test Status Name',
-            'metadata' => $metadata,
+            'type'      => 'order_status',
+            'key'       => 'test_status',
+            'value'     => 'Test Status',
+            'name'      => 'Test Status Name',
+            'metadata'  => $metadata,
             'is_active' => true,
         ])
         ->call('create')
         ->assertHasNoFormErrors();
 
     $this->assertDatabaseHas('enum_values', [
-        'type' => 'order_status',
-        'key' => 'test_status',
-        'value' => 'Test Status',
-        'name' => 'Test Status Name',
+        'type'      => 'order_status',
+        'key'       => 'test_status',
+        'value'     => 'Test Status',
+        'name'      => 'Test Status Name',
         'is_active' => true,
     ]);
 });
 
 it('handles enum value with complex metadata', function () {
     $complexMetadata = [
-        'color' => 'green',
-        'icon' => 'check-circle',
+        'color'       => 'green',
+        'icon'        => 'check-circle',
         'description' => 'Complex status description',
-        'priority' => 'high',
-        'category' => 'business',
-        'tags' => ['important', 'urgent'],
+        'priority'    => 'high',
+        'category'    => 'business',
+        'tags'        => ['important', 'urgent'],
     ];
 
     Livewire::actingAs($this->adminUser)
         ->test(EnumValueResource\Pages\CreateEnumValue::class)
         ->fillForm([
-            'type' => 'priority',
-            'key' => 'high_priority',
-            'value' => 'High Priority',
-            'name' => 'High Priority Status',
-            'metadata' => $complexMetadata,
+            'type'      => 'priority',
+            'key'       => 'high_priority',
+            'value'     => 'High Priority',
+            'name'      => 'High Priority Status',
+            'metadata'  => $complexMetadata,
             'is_active' => true,
         ])
         ->call('create')
         ->assertHasNoFormErrors();
 
     $this->assertDatabaseHas('enum_values', [
-        'type' => 'priority',
-        'key' => 'high_priority',
-        'value' => 'High Priority',
-        'name' => 'High Priority Status',
+        'type'      => 'priority',
+        'key'       => 'high_priority',
+        'value'     => 'High Priority',
+        'name'      => 'High Priority Status',
         'is_active' => true,
     ]);
 });
 
 it('can set only one default per type', function () {
     $enumValue1 = EnumValue::factory()->create([
-        'type' => 'order_status',
+        'type'       => 'order_status',
         'is_default' => true,
     ]);
     $enumValue2 = EnumValue::factory()->create([
-        'type' => 'order_status',
+        'type'       => 'order_status',
         'is_default' => false,
     ]);
 
@@ -465,21 +465,21 @@ it('handles enum value with empty metadata', function () {
     Livewire::actingAs($this->adminUser)
         ->test(EnumValueResource\Pages\CreateEnumValue::class)
         ->fillForm([
-            'type' => 'status',
-            'key' => 'empty_metadata',
-            'value' => 'Empty Metadata',
-            'name' => 'Empty Metadata Status',
-            'metadata' => [],
+            'type'      => 'status',
+            'key'       => 'empty_metadata',
+            'value'     => 'Empty Metadata',
+            'name'      => 'Empty Metadata Status',
+            'metadata'  => [],
             'is_active' => true,
         ])
         ->call('create')
         ->assertHasNoFormErrors();
 
     $this->assertDatabaseHas('enum_values', [
-        'type' => 'status',
-        'key' => 'empty_metadata',
-        'value' => 'Empty Metadata',
-        'name' => 'Empty Metadata Status',
+        'type'      => 'status',
+        'key'       => 'empty_metadata',
+        'value'     => 'Empty Metadata',
+        'name'      => 'Empty Metadata Status',
         'is_active' => true,
     ]);
 });

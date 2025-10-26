@@ -53,9 +53,9 @@ describe('User Impersonation Integration', function () {
         // Send notification
         Livewire::test(\App\Filament\Pages\UserImpersonation::class)
             ->callTableAction('send_notification', $targetUser, [
-                'title' => 'Test Notification',
+                'title'   => 'Test Notification',
                 'message' => 'This is a test message',
-                'type' => 'info',
+                'type'    => 'info',
             ])
             ->assertNotified(__('admin.notifications.notification_sent'));
 
@@ -86,17 +86,17 @@ describe('User Impersonation Integration', function () {
 
     it('can filter and search users effectively', function () {
         $activeUser = User::factory()->create([
-            'is_admin' => false,
+            'is_admin'  => false,
             'is_active' => true,
-            'name' => 'John Doe',
-            'email' => 'john@example.com',
+            'name'      => 'John Doe',
+            'email'     => 'john@example.com',
         ]);
 
         $inactiveUser = User::factory()->create([
-            'is_admin' => false,
+            'is_admin'  => false,
             'is_active' => false,
-            'name' => 'Jane Smith',
-            'email' => 'jane@example.com',
+            'name'      => 'Jane Smith',
+            'email'     => 'jane@example.com',
         ]);
 
         // Test filtering by active status
@@ -131,9 +131,9 @@ describe('User Impersonation Integration', function () {
         // Start impersonation
         session([
             'impersonate' => [
-                'original_user_id' => $this->admin->id,
+                'original_user_id'     => $this->admin->id,
                 'impersonated_user_id' => $targetUser->id,
-                'started_at' => now()->toISOString(),
+                'started_at'           => now()->toISOString(),
             ],
         ]);
 
@@ -164,9 +164,9 @@ describe('User Impersonation Integration', function () {
         // Create expired impersonation session
         session([
             'impersonate' => [
-                'original_user_id' => $this->admin->id,
+                'original_user_id'     => $this->admin->id,
                 'impersonated_user_id' => $targetUser->id,
-                'started_at' => now()->subHours(25)->toISOString(),  // Expired
+                'started_at'           => now()->subHours(25)->toISOString(),  // Expired
             ],
         ]);
 

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Traits;
 
 use Illuminate\Support\Facades\DB;
+use Throwable;
 
 // Using native Laravel helpers and custom PriceData DTO
 
@@ -41,7 +42,7 @@ trait HasProductPricing
                     $value = (float) $net;
                 }
             }
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             // Fallback silently to base price if price list tables missing
         }
 

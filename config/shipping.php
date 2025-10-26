@@ -12,16 +12,16 @@ return [
     ],
     'matrix' => [
         'zones' => [
-            'domestic' => 'Lithuania / Domestic',
-            'baltics' => 'Baltics',
-            'europe' => 'European Union',
+            'domestic'      => 'Lithuania / Domestic',
+            'baltics'       => 'Baltics',
+            'europe'        => 'European Union',
             'international' => 'International',
         ],
         'methods' => [
-            'courier' => 'Courier Delivery',
+            'courier'       => 'Courier Delivery',
             'parcel_locker' => 'Parcel Locker',
-            'post' => 'Postal Service',
-            'freight' => 'Freight / Oversized',
+            'post'          => 'Postal Service',
+            'freight'       => 'Freight / Oversized',
         ],
     ],
 ];

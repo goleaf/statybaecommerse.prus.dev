@@ -32,7 +32,7 @@ it('validates required fields', function () {
         ->fillForm([])
         ->call('login')
         ->assertHasFormErrors([
-            'email' => 'required',
+            'email'    => 'required',
             'password' => 'required',
         ]);
 });
@@ -49,7 +49,7 @@ it('validates email format', function () {
 it('fails with invalid credentials', function () {
     livewire(Login::class)
         ->fillForm([
-            'email' => 'nonexistent@example.com',
+            'email'    => 'nonexistent@example.com',
             'password' => 'wrongpassword',
         ])
         ->call('login')
@@ -60,13 +60,13 @@ it('fails with invalid credentials', function () {
 
 it('logs in user with valid credentials', function () {
     $user = User::factory()->create([
-        'email' => 'test@example.com',
+        'email'    => 'test@example.com',
         'password' => Hash::make('password123'),
     ]);
 
     livewire(Login::class)
         ->fillForm([
-            'email' => 'test@example.com',
+            'email'    => 'test@example.com',
             'password' => 'password123',
         ])
         ->call('login')
@@ -79,13 +79,13 @@ it('logs in user with valid credentials', function () {
 
 it('remembers user when remember me is checked', function () {
     $user = User::factory()->create([
-        'email' => 'test@example.com',
+        'email'    => 'test@example.com',
         'password' => Hash::make('password123'),
     ]);
 
     livewire(Login::class)
         ->fillForm([
-            'email' => 'test@example.com',
+            'email'    => 'test@example.com',
             'password' => 'password123',
             'remember' => true,
         ])
@@ -98,7 +98,7 @@ it('remembers user when remember me is checked', function () {
 
 it('redirects to intended url after login', function () {
     $user = User::factory()->create([
-        'email' => 'test@example.com',
+        'email'    => 'test@example.com',
         'password' => Hash::make('password123'),
     ]);
 
@@ -106,7 +106,7 @@ it('redirects to intended url after login', function () {
 
     livewire(Login::class)
         ->fillForm([
-            'email' => 'test@example.com',
+            'email'    => 'test@example.com',
             'password' => 'password123',
         ])
         ->call('login')
@@ -118,7 +118,7 @@ it('rate limits login attempts', function () {
     for ($i = 0; $i < 5; $i++) {
         livewire(Login::class)
             ->fillForm([
-                'email' => 'test@example.com',
+                'email'    => 'test@example.com',
                 'password' => 'wrongpassword',
             ])
             ->call('login');
@@ -127,7 +127,7 @@ it('rate limits login attempts', function () {
     // 6th attempt should be rate limited
     livewire(Login::class)
         ->fillForm([
-            'email' => 'test@example.com',
+            'email'    => 'test@example.com',
             'password' => 'wrongpassword',
         ])
         ->call('login')

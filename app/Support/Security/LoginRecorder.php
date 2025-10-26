@@ -33,7 +33,7 @@ final class LoginRecorder
 
         $preferences['last_login'] = [
             'device_hash' => $deviceHash,
-            'ip_hash' => $ipHash,
+            'ip_hash'     => $ipHash,
             'recorded_at' => now()->toIso8601String(),
         ];
 
@@ -41,8 +41,8 @@ final class LoginRecorder
             'last_login_at' => now(),
             // Persist the hashed representation instead of the raw IP address.
             'last_login_ip' => $ipHash,
-            'login_count' => (int) $user->login_count + 1,
-            'preferences' => $preferences,
+            'login_count'   => (int) $user->login_count + 1,
+            'preferences'   => $preferences,
         ]);
 
         $user->save();

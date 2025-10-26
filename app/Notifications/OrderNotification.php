@@ -54,7 +54,7 @@ final class OrderNotification extends Notification implements ShouldQueue
     public function toMail(object $notifiable): MailMessage
     {
         // Assemble an optional transactional email mirroring the database payload.
-        $mail = (new MailMessage())
+        $mail = (new MailMessage)
             ->subject($this->data['title'])
             ->line($this->data['message']);
 

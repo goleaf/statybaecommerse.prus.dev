@@ -15,10 +15,10 @@ enum PriorityEnum: int
     public function getLabel(): string
     {
         return match ($this) {
-            self::LOW => 'Low',
-            self::NORMAL => 'Normal',
-            self::HIGH => 'High',
-            self::URGENT => 'Urgent',
+            self::LOW      => 'Low',
+            self::NORMAL   => 'Normal',
+            self::HIGH     => 'High',
+            self::URGENT   => 'Urgent',
             self::CRITICAL => 'Critical',
         };
     }
@@ -26,10 +26,10 @@ enum PriorityEnum: int
     public function getColor(): string
     {
         return match ($this) {
-            self::LOW => 'gray',
-            self::NORMAL => 'info',
-            self::HIGH => 'warning',
-            self::URGENT => 'danger',
+            self::LOW      => 'gray',
+            self::NORMAL   => 'info',
+            self::HIGH     => 'warning',
+            self::URGENT   => 'danger',
             self::CRITICAL => 'danger',
         };
     }
@@ -37,10 +37,10 @@ enum PriorityEnum: int
     public function getIcon(): string
     {
         return match ($this) {
-            self::LOW => 'heroicon-o-arrow-down',
-            self::NORMAL => 'heroicon-o-minus',
-            self::HIGH => 'heroicon-o-arrow-up',
-            self::URGENT => 'heroicon-o-exclamation-triangle',
+            self::LOW      => 'heroicon-o-arrow-down',
+            self::NORMAL   => 'heroicon-o-minus',
+            self::HIGH     => 'heroicon-o-arrow-up',
+            self::URGENT   => 'heroicon-o-exclamation-triangle',
             self::CRITICAL => 'heroicon-o-fire',
         };
     }

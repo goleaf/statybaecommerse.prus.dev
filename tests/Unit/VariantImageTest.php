@@ -7,8 +7,8 @@ namespace Tests\Unit;
 use App\Models\ProductVariant;
 use App\Models\User;
 use App\Models\VariantImage;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Support\Storage\SecureStorage;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
@@ -29,10 +29,10 @@ class VariantImageTest extends TestCase
         $variantImage = VariantImage::factory()->create([
             'variant_id' => $this->productVariant->id,
             'image_path' => 'test-image.jpg',
-            'alt_text' => 'Test Image',
+            'alt_text'   => 'Test Image',
             'sort_order' => 1,
             'is_primary' => true,
-            'is_active' => true,
+            'is_active'  => true,
         ]);
 
         $this->assertInstanceOf(VariantImage::class, $variantImage);
@@ -96,12 +96,12 @@ class VariantImageTest extends TestCase
         // Create active and inactive images
         VariantImage::factory()->create([
             'variant_id' => $this->productVariant->id,
-            'is_active' => true,
+            'is_active'  => true,
         ]);
 
         VariantImage::factory()->create([
             'variant_id' => $this->productVariant->id,
-            'is_active' => false,
+            'is_active'  => false,
         ]);
 
         $activeImages = VariantImage::active()->get();
@@ -203,7 +203,7 @@ class VariantImageTest extends TestCase
     public function test_can_get_image_metadata(): void
     {
         $variantImage = VariantImage::factory()->create([
-            'file_size' => 2048,
+            'file_size'  => 2048,
             'dimensions' => '1200x800',
         ]);
 
@@ -373,7 +373,7 @@ class VariantImageTest extends TestCase
         $variantImage->restore();
 
         $this->assertDatabaseHas('variant_images', [
-            'id' => $variantImage->id,
+            'id'         => $variantImage->id,
             'deleted_at' => null,
         ]);
     }

@@ -10,6 +10,13 @@ use Illuminate\Contracts\Cache\Repository as CacheRepository;
 use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+
+use function is_array;
+use function is_bool;
+use function is_int;
+use function is_numeric;
+use function is_string;
+
 use Throwable;
 
 final class QueueFailureHandler
@@ -51,33 +58,33 @@ final class QueueFailureHandler
             $payload = $this->normalizePayload($event);
 
             $deadLetter = DeadLetterJob::create([
-                'uuid' => Str::uuid()->toString(),
+                'uuid'       => Str::uuid()->toString(),
                 'connection' => $event->connectionName,
-                'queue' => $event->job->getQueue(),
-                'job' => $event->job->resolveName(),
-                'attempts' => $event->job->attempts(),
-                'payload' => $payload,
-                'exception' => $event->exception->getMessage(),
-                'context' => [
+                'queue'      => $event->job->getQueue(),
+                'job'        => $event->job->resolveName(),
+                'attempts'   => $event->job->attempts(),
+                'payload'    => $payload,
+                'exception'  => $event->exception->getMessage(),
+                'context'    => [
                     'exception_class' => $event->exception::class,
-                    'max_tries' => $event->job->maxTries(),
+                    'max_tries'       => $event->job->maxTries(),
                 ],
                 'failed_at' => now(),
             ]);
 
             Log::warning('Job moved to dead-letter queue', [
                 'dead_letter_id' => $deadLetter->id,
-                'uuid' => $deadLetter->uuid,
-                'job' => $deadLetter->job,
-                'queue' => $deadLetter->queue,
-                'connection' => $deadLetter->connection,
-                'attempts' => $deadLetter->attempts,
+                'uuid'           => $deadLetter->uuid,
+                'job'            => $deadLetter->job,
+                'queue'          => $deadLetter->queue,
+                'connection'     => $deadLetter->connection,
+                'attempts'       => $deadLetter->attempts,
             ]);
 
             return $deadLetter;
         } catch (Throwable $exception) {
             Log::error('Failed to persist job in dead-letter queue', [
-                'job' => $event->job->resolveName(),
+                'job'   => $event->job->resolveName(),
                 'error' => $exception->getMessage(),
             ]);
 
@@ -95,7 +102,7 @@ final class QueueFailureHandler
         } catch (Throwable) {
             $encoded = json_encode($payload);
 
-            return \is_string($encoded)
+            return is_string($encoded)
                 ? $encoded
                 : (string) $event->job->getRawBody();
         }
@@ -105,7 +112,7 @@ final class QueueFailureHandler
     {
         $config = config('queue_monitor.alerts');
 
-        if (! \is_array($config) || ! ($config['enabled'] ?? false)) {
+        if (! is_array($config) || ! ($config['enabled'] ?? false)) {
             return;
         }
 
@@ -113,12 +120,12 @@ final class QueueFailureHandler
         $threshold = $this->sanitizePositiveInt($config['failure_threshold'] ?? 5, 1);
         $timestamp = (int) now()->timestamp;
         $bucket = intdiv($timestamp, $window);
-        $key = 'queue:failure:spike:'.$bucket;
+        $key = 'queue:failure:spike:' . $bucket;
 
         /** @var array{count:mixed, alerted:mixed}|null $state */
         $state = $this->cache->get($key);
 
-        if (! \is_array($state)) {
+        if (! is_array($state)) {
             $state = ['count' => 0, 'alerted' => false];
         }
 
@@ -126,7 +133,7 @@ final class QueueFailureHandler
         $alerted = $this->sanitizeBoolean($state['alerted'] ?? false);
 
         $state = [
-            'count' => $count,
+            'count'   => $count,
             'alerted' => $alerted,
         ];
 
@@ -170,7 +177,7 @@ final class QueueFailureHandler
             );
         } catch (Throwable $exception) {
             Log::error('Failed to send queue spike notification', [
-                'job' => $jobName,
+                'job'   => $jobName,
                 'error' => $exception->getMessage(),
             ]);
         }
@@ -178,11 +185,11 @@ final class QueueFailureHandler
 
     private function sanitizePositiveInt(mixed $value, int $minimum): int
     {
-        if (\is_int($value)) {
+        if (is_int($value)) {
             return max($value, $minimum);
         }
 
-        if (\is_numeric($value)) {
+        if (is_numeric($value)) {
             $normalized = (int) $value;
 
             if ($normalized >= $minimum) {
@@ -195,11 +202,11 @@ final class QueueFailureHandler
 
     private function sanitizeInteger(mixed $value, int $fallback): int
     {
-        if (\is_int($value)) {
+        if (is_int($value)) {
             return $value;
         }
 
-        if (\is_numeric($value)) {
+        if (is_numeric($value)) {
             return (int) $value;
         }
 
@@ -208,7 +215,7 @@ final class QueueFailureHandler
 
     private function sanitizeBoolean(mixed $value): bool
     {
-        if (\is_bool($value)) {
+        if (is_bool($value)) {
             return $value;
         }
 

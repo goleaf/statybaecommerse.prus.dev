@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Livewire\Concerns;
 
+use Exception;
 use Illuminate\Support\Str;
 
 /**
@@ -35,7 +36,7 @@ trait WithValidation
         } catch (\Illuminate\Validation\ValidationException $e) {
             $this->notifyError(__('Please fix the validation errors'));
             throw $e;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->notifyError(__('shared.operation_failed'));
             throw $e;
         }

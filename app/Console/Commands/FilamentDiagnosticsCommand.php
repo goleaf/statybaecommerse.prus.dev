@@ -12,6 +12,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use ReflectionException;
 use ReflectionProperty;
+use SplFileInfo;
 use Symfony\Component\Process\Process;
 use Throwable;
 
@@ -48,7 +49,7 @@ final class FilamentDiagnosticsCommand extends Command
         $resourcesWithNavigationIssues = [];
 
         foreach ($modelNames as $model) {
-            $resourceFile = $resourceFiles->first(fn ($file) => $file->getFilename() === $model.'Resource.php');
+            $resourceFile = $resourceFiles->first(fn ($file) => $file->getFilename() === $model . 'Resource.php');
 
             $this->components->task("Analyzing model {$model}", function () use (
                 $resourceFile,
@@ -78,12 +79,12 @@ final class FilamentDiagnosticsCommand extends Command
                 $this->recordFormUsage($resourceFile->getFilename(), $content, $resourcesUsingOldForm, $resourcesUsingNewSchema);
                 $this->recordNavigationIssues($resourceFile->getFilename(), $content, $resourcesWithNavigationIssues);
 
-                $process = Process::fromShellCommandline('php -l '.escapeshellarg($resourceFile->getPathname()))
+                $process = Process::fromShellCommandline('php -l ' . escapeshellarg($resourceFile->getPathname()))
                     ->setTimeout(null);
                 $process->run();
 
                 if (! $process->isSuccessful()) {
-                    $resourcesWithSyntaxIssues[] = $resourceFile->getFilename().' :: '.$process->getErrorOutput().$process->getOutput();
+                    $resourcesWithSyntaxIssues[] = $resourceFile->getFilename() . ' :: ' . $process->getErrorOutput() . $process->getOutput();
                 }
             });
         }
@@ -106,7 +107,7 @@ final class FilamentDiagnosticsCommand extends Command
             $this->components->info('All Filament resource pages correctly resolve their resource classes.');
         } else {
             $this->components->error('Detected issues while resolving resource pages:');
-            $pageIssues->each(fn (string $issue) => $this->line(' - '.$issue));
+            $pageIssues->each(fn (string $issue) => $this->line(' - ' . $issue));
         }
 
         return self::SUCCESS;
@@ -129,7 +130,7 @@ final class FilamentDiagnosticsCommand extends Command
     }
 
     /**
-     * @return Collection<int, \SplFileInfo>
+     * @return Collection<int, SplFileInfo>
      */
     private function gatherResourceFiles(Filesystem $filesystem): Collection
     {
@@ -143,8 +144,8 @@ final class FilamentDiagnosticsCommand extends Command
     }
 
     /**
-     * @param  array<int, string>  $resourcesUsingOldForm
-     * @param  array<int, string>  $resourcesUsingNewSchema
+     * @param array<int, string> $resourcesUsingOldForm
+     * @param array<int, string> $resourcesUsingNewSchema
      */
     private function recordFormUsage(string $fileName, string $content, array &$resourcesUsingOldForm, array &$resourcesUsingNewSchema): void
     {
@@ -160,7 +161,7 @@ final class FilamentDiagnosticsCommand extends Command
     }
 
     /**
-     * @param  array<int, string>  $resourcesWithNavigationIssues
+     * @param array<int, string> $resourcesWithNavigationIssues
      */
     private function recordNavigationIssues(string $fileName, string $content, array &$resourcesWithNavigationIssues): void
     {
@@ -174,13 +175,13 @@ final class FilamentDiagnosticsCommand extends Command
     }
 
     /**
-     * @param  array<int, string>  $modelsWithResources
-     * @param  array<int, string>  $modelsWithoutResources
-     * @param  array<int, string>  $emptyResources
-     * @param  array<int, string>  $resourcesWithSyntaxIssues
-     * @param  array<int, string>  $resourcesUsingOldForm
-     * @param  array<int, string>  $resourcesUsingNewSchema
-     * @param  array<int, string>  $resourcesWithNavigationIssues
+     * @param array<int, string> $modelsWithResources
+     * @param array<int, string> $modelsWithoutResources
+     * @param array<int, string> $emptyResources
+     * @param array<int, string> $resourcesWithSyntaxIssues
+     * @param array<int, string> $resourcesUsingOldForm
+     * @param array<int, string> $resourcesUsingNewSchema
+     * @param array<int, string> $resourcesWithNavigationIssues
      */
     private function renderSummary(
         array $modelsWithResources,
@@ -209,7 +210,7 @@ final class FilamentDiagnosticsCommand extends Command
     }
 
     /**
-     * @param  array<int, string>  $items
+     * @param array<int, string> $items
      */
     private function listIssues(string $label, array $items): void
     {
@@ -218,9 +219,9 @@ final class FilamentDiagnosticsCommand extends Command
         }
 
         $this->line('');
-        $this->warn($label.':');
+        $this->warn($label . ':');
         foreach ($items as $item) {
-            $this->line(' - '.$item);
+            $this->line(' - ' . $item);
         }
     }
 
@@ -246,12 +247,12 @@ final class FilamentDiagnosticsCommand extends Command
                     try {
                         $reflection = new ReflectionProperty($pageClass, 'resource');
                         if ($reflection->isStatic() && ! $reflection->isInitialized()) {
-                            $issues->push($pageClass.' has an uninitialised static $resource property.');
+                            $issues->push($pageClass . ' has an uninitialised static $resource property.');
 
                             continue;
                         }
                     } catch (ReflectionException $e) {
-                        $issues->push($pageClass.' does not define a static $resource property: '.$e->getMessage());
+                        $issues->push($pageClass . ' does not define a static $resource property: ' . $e->getMessage());
 
                         continue;
                     }
@@ -259,7 +260,7 @@ final class FilamentDiagnosticsCommand extends Command
                     try {
                         $pageClass::getResource();
                     } catch (Throwable $e) {
-                        $issues->push($pageClass.'::getResource() failed: '.$e->getMessage());
+                        $issues->push($pageClass . '::getResource() failed: ' . $e->getMessage());
                     }
                 }
             }

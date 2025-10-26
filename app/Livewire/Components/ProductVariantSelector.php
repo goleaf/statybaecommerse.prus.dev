@@ -128,8 +128,8 @@ final class ProductVariantSelector extends Component
 
         $this->dispatch('itemAddedToCart', [
             'variant_id' => $this->selectedVariant->id,
-            'quantity' => $this->quantity,
-            'price' => $this->getVariantPrice(),
+            'quantity'   => $this->quantity,
+            'price'      => $this->getVariantPrice(),
         ]);
 
         session()->flash('success', __('product_variants.messages.added_to_cart'));
@@ -272,10 +272,10 @@ final class ProductVariantSelector extends Component
         $quantity = $this->selectedVariant?->available_quantity ?? 0;
 
         return match ($status) {
-            'in_stock' => __('product_variants.messages.in_stock', ['quantity' => $quantity]),
-            'low_stock' => __('product_variants.messages.low_stock', ['quantity' => $quantity]),
+            'in_stock'     => __('product_variants.messages.in_stock', ['quantity' => $quantity]),
+            'low_stock'    => __('product_variants.messages.low_stock', ['quantity' => $quantity]),
             'out_of_stock' => __('product_variants.messages.out_of_stock'),
-            default => __('product_variants.messages.variant_not_available'),
+            default        => __('product_variants.messages.variant_not_available'),
         };
     }
 

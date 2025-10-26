@@ -21,11 +21,11 @@ final class NewsTagFactory extends Factory
         $name = $this->faker->unique()->words(2, true);
 
         return [
-            'name' => $name,
-            'slug' => Str::slug($name),
+            'name'        => $name,
+            'slug'        => Str::slug($name),
             'description' => $this->faker->sentence(),
-            'is_visible' => $this->faker->boolean(80),  // 80% chance of being visible
-            'color' => $this->faker->randomElement([
+            'is_visible'  => $this->faker->boolean(80),  // 80% chance of being visible
+            'color'       => $this->faker->randomElement([
                 '#3B82F6',  // Blue
                 '#10B981',  // Green
                 '#F59E0B',  // Yellow
@@ -46,13 +46,13 @@ final class NewsTagFactory extends Factory
         return $this->afterCreating(function (NewsTag $newsTag): void {
             $translations = [
                 'lt' => [
-                    'name' => $newsTag->name,
-                    'slug' => $newsTag->slug,
+                    'name'        => $newsTag->name,
+                    'slug'        => $newsTag->slug,
                     'description' => $newsTag->description,
                 ],
                 'en' => [
-                    'name' => $newsTag->name,
-                    'slug' => $newsTag->slug,
+                    'name'        => $newsTag->name,
+                    'slug'        => $newsTag->slug,
                     'description' => $newsTag->description,
                 ],
             ];
@@ -60,7 +60,7 @@ final class NewsTagFactory extends Factory
             foreach ($translations as $locale => $payload) {
                 NewsTagTranslation::query()->updateOrCreate([
                     'news_tag_id' => $newsTag->id,
-                    'locale' => $locale,
+                    'locale'      => $locale,
                 ], $payload);
             }
         });
@@ -167,7 +167,7 @@ final class NewsTagFactory extends Factory
     public function breaking(): static
     {
         return $this->state(fn (array $attributes) => [
-            'color' => '#EF4444',
+            'color'      => '#EF4444',
             'sort_order' => 1,
             'is_visible' => true,
         ]);
@@ -176,7 +176,7 @@ final class NewsTagFactory extends Factory
     public function exclusive(): static
     {
         return $this->state(fn (array $attributes) => [
-            'color' => '#8B5CF6',
+            'color'      => '#8B5CF6',
             'sort_order' => 2,
             'is_visible' => true,
         ]);
@@ -185,7 +185,7 @@ final class NewsTagFactory extends Factory
     public function trending(): static
     {
         return $this->state(fn (array $attributes) => [
-            'color' => '#F59E0B',
+            'color'      => '#F59E0B',
             'sort_order' => 3,
             'is_visible' => true,
         ]);
@@ -194,7 +194,7 @@ final class NewsTagFactory extends Factory
     public function popular(): static
     {
         return $this->state(fn (array $attributes) => [
-            'color' => '#10B981',
+            'color'      => '#10B981',
             'sort_order' => 4,
             'is_visible' => true,
         ]);
@@ -203,7 +203,7 @@ final class NewsTagFactory extends Factory
     public function latest(): static
     {
         return $this->state(fn (array $attributes) => [
-            'color' => '#3B82F6',
+            'color'      => '#3B82F6',
             'sort_order' => 5,
             'is_visible' => true,
         ]);
@@ -212,7 +212,7 @@ final class NewsTagFactory extends Factory
     public function important(): static
     {
         return $this->state(fn (array $attributes) => [
-            'color' => '#DC2626',
+            'color'      => '#DC2626',
             'sort_order' => 6,
             'is_visible' => true,
         ]);
@@ -221,7 +221,7 @@ final class NewsTagFactory extends Factory
     public function update(): static
     {
         return $this->state(fn (array $attributes) => [
-            'color' => '#06B6D4',
+            'color'      => '#06B6D4',
             'sort_order' => 7,
             'is_visible' => true,
         ]);
@@ -230,7 +230,7 @@ final class NewsTagFactory extends Factory
     public function announcement(): static
     {
         return $this->state(fn (array $attributes) => [
-            'color' => '#8B5CF6',
+            'color'      => '#8B5CF6',
             'sort_order' => 8,
             'is_visible' => true,
         ]);
@@ -239,7 +239,7 @@ final class NewsTagFactory extends Factory
     public function event(): static
     {
         return $this->state(fn (array $attributes) => [
-            'color' => '#EC4899',
+            'color'      => '#EC4899',
             'sort_order' => 9,
             'is_visible' => true,
         ]);
@@ -248,7 +248,7 @@ final class NewsTagFactory extends Factory
     public function news(): static
     {
         return $this->state(fn (array $attributes) => [
-            'color' => '#6366F1',
+            'color'      => '#6366F1',
             'sort_order' => 10,
             'is_visible' => true,
         ]);
@@ -257,7 +257,7 @@ final class NewsTagFactory extends Factory
     public function report(): static
     {
         return $this->state(fn (array $attributes) => [
-            'color' => '#059669',
+            'color'      => '#059669',
             'sort_order' => 11,
             'is_visible' => true,
         ]);
@@ -266,7 +266,7 @@ final class NewsTagFactory extends Factory
     public function analysis(): static
     {
         return $this->state(fn (array $attributes) => [
-            'color' => '#7C3AED',
+            'color'      => '#7C3AED',
             'sort_order' => 12,
             'is_visible' => true,
         ]);
@@ -275,7 +275,7 @@ final class NewsTagFactory extends Factory
     public function technology(): static
     {
         return $this->state(fn (array $attributes) => [
-            'color' => '#0EA5E9',
+            'color'      => '#0EA5E9',
             'sort_order' => 13,
             'is_visible' => true,
         ]);
@@ -284,7 +284,7 @@ final class NewsTagFactory extends Factory
     public function business(): static
     {
         return $this->state(fn (array $attributes) => [
-            'color' => '#059669',
+            'color'      => '#059669',
             'sort_order' => 14,
             'is_visible' => true,
         ]);
@@ -293,7 +293,7 @@ final class NewsTagFactory extends Factory
     public function sports(): static
     {
         return $this->state(fn (array $attributes) => [
-            'color' => '#DC2626',
+            'color'      => '#DC2626',
             'sort_order' => 15,
             'is_visible' => true,
         ]);
@@ -302,7 +302,7 @@ final class NewsTagFactory extends Factory
     public function entertainment(): static
     {
         return $this->state(fn (array $attributes) => [
-            'color' => '#EC4899',
+            'color'      => '#EC4899',
             'sort_order' => 16,
             'is_visible' => true,
         ]);
@@ -311,7 +311,7 @@ final class NewsTagFactory extends Factory
     public function health(): static
     {
         return $this->state(fn (array $attributes) => [
-            'color' => '#10B981',
+            'color'      => '#10B981',
             'sort_order' => 17,
             'is_visible' => true,
         ]);
@@ -320,7 +320,7 @@ final class NewsTagFactory extends Factory
     public function science(): static
     {
         return $this->state(fn (array $attributes) => [
-            'color' => '#3B82F6',
+            'color'      => '#3B82F6',
             'sort_order' => 18,
             'is_visible' => true,
         ]);
@@ -329,7 +329,7 @@ final class NewsTagFactory extends Factory
     public function politics(): static
     {
         return $this->state(fn (array $attributes) => [
-            'color' => '#EF4444',
+            'color'      => '#EF4444',
             'sort_order' => 19,
             'is_visible' => true,
         ]);
@@ -338,7 +338,7 @@ final class NewsTagFactory extends Factory
     public function education(): static
     {
         return $this->state(fn (array $attributes) => [
-            'color' => '#8B5CF6',
+            'color'      => '#8B5CF6',
             'sort_order' => 20,
             'is_visible' => true,
         ]);

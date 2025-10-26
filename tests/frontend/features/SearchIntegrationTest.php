@@ -17,8 +17,8 @@ final class SearchIntegrationTest extends TestCase
     public function test_search_page_returns_products(): void
     {
         $product = Product::factory()->create([
-            'name' => 'Test Product',
-            'is_visible' => true,
+            'name'         => 'Test Product',
+            'is_visible'   => true,
             'published_at' => now()->subDay(),
         ]);
 
@@ -55,8 +55,8 @@ final class SearchIntegrationTest extends TestCase
     public function test_live_search_api_endpoint_works(): void
     {
         $product = Product::factory()->create([
-            'name' => 'API Test Product',
-            'is_visible' => true,
+            'name'         => 'API Test Product',
+            'is_visible'   => true,
             'published_at' => now()->subDay(),
         ]);
 
@@ -73,27 +73,27 @@ final class SearchIntegrationTest extends TestCase
     {
         // Create a product
         $product = Product::factory()->create([
-            'name' => 'Multi Test Product',
-            'is_visible' => true,
+            'name'         => 'Multi Test Product',
+            'is_visible'   => true,
             'published_at' => now()->subDay(),
         ]);
 
         // Create a category
         $category = Category::factory()->create([
-            'name' => 'Multi Test Category',
+            'name'       => 'Multi Test Category',
             'is_visible' => true,
         ]);
         $category->products()->attach($product);
 
         // Create a brand
         $brand = Brand::factory()->create([
-            'name' => 'Multi Test Brand',
+            'name'       => 'Multi Test Brand',
             'is_enabled' => true,
         ]);
         Product::factory()->create([
-            'name' => 'Brand Product',
-            'brand_id' => $brand->id,
-            'is_visible' => true,
+            'name'         => 'Brand Product',
+            'brand_id'     => $brand->id,
+            'is_visible'   => true,
             'published_at' => now()->subDay(),
         ]);
 
@@ -113,15 +113,15 @@ final class SearchIntegrationTest extends TestCase
     {
         // Create visible product
         $visibleProduct = Product::factory()->create([
-            'name' => 'Visible Test Product',
-            'is_visible' => true,
+            'name'         => 'Visible Test Product',
+            'is_visible'   => true,
             'published_at' => now()->subDay(),
         ]);
 
         // Create invisible product
         Product::factory()->create([
-            'name' => 'Invisible Test Product',
-            'is_visible' => false,
+            'name'         => 'Invisible Test Product',
+            'is_visible'   => false,
             'published_at' => now()->subDay(),
         ]);
 
@@ -137,15 +137,15 @@ final class SearchIntegrationTest extends TestCase
     {
         // Create published product
         $publishedProduct = Product::factory()->create([
-            'name' => 'Published Test Product',
-            'is_visible' => true,
+            'name'         => 'Published Test Product',
+            'is_visible'   => true,
             'published_at' => now()->subDay(),
         ]);
 
         // Create future product
         Product::factory()->create([
-            'name' => 'Future Test Product',
-            'is_visible' => true,
+            'name'         => 'Future Test Product',
+            'is_visible'   => true,
             'published_at' => now()->addDay(),
         ]);
 
@@ -160,8 +160,8 @@ final class SearchIntegrationTest extends TestCase
     public function test_search_handles_special_characters(): void
     {
         $product = Product::factory()->create([
-            'name' => 'Product with % & _ special chars',
-            'is_visible' => true,
+            'name'         => 'Product with % & _ special chars',
+            'is_visible'   => true,
             'published_at' => now()->subDay(),
         ]);
 
@@ -176,8 +176,8 @@ final class SearchIntegrationTest extends TestCase
     public function test_search_caching_improves_performance(): void
     {
         $product = Product::factory()->create([
-            'name' => 'Performance Test Product',
-            'is_visible' => true,
+            'name'         => 'Performance Test Product',
+            'is_visible'   => true,
             'published_at' => now()->subDay(),
         ]);
 
@@ -203,8 +203,8 @@ final class SearchIntegrationTest extends TestCase
     public function test_search_works_with_translations(): void
     {
         $product = Product::factory()->create([
-            'name' => 'English Test Product',
-            'is_visible' => true,
+            'name'         => 'English Test Product',
+            'is_visible'   => true,
             'published_at' => now()->subDay(),
         ]);
 
@@ -222,9 +222,9 @@ final class SearchIntegrationTest extends TestCase
     public function test_search_returns_proper_urls(): void
     {
         $product = Product::factory()->create([
-            'name' => 'URL Test Product',
-            'slug' => 'url-test-product',
-            'is_visible' => true,
+            'name'         => 'URL Test Product',
+            'slug'         => 'url-test-product',
+            'is_visible'   => true,
             'published_at' => now()->subDay(),
         ]);
 
@@ -242,8 +242,8 @@ final class SearchIntegrationTest extends TestCase
         // Create many products
         for ($i = 1; $i <= 50; $i++) {
             Product::factory()->create([
-                'name' => "Large Test Product {$i}",
-                'is_visible' => true,
+                'name'         => "Large Test Product {$i}",
+                'is_visible'   => true,
                 'published_at' => now()->subDay(),
             ]);
         }
@@ -258,14 +258,14 @@ final class SearchIntegrationTest extends TestCase
     public function test_search_works_with_brand_relationships(): void
     {
         $brand = Brand::factory()->create([
-            'name' => 'Relationship Test Brand',
+            'name'       => 'Relationship Test Brand',
             'is_enabled' => true,
         ]);
 
         $product = Product::factory()->create([
-            'name' => 'Branded Test Product',
-            'brand_id' => $brand->id,
-            'is_visible' => true,
+            'name'         => 'Branded Test Product',
+            'brand_id'     => $brand->id,
+            'is_visible'   => true,
             'published_at' => now()->subDay(),
         ]);
 
@@ -281,13 +281,13 @@ final class SearchIntegrationTest extends TestCase
     public function test_search_works_with_category_relationships(): void
     {
         $category = Category::factory()->create([
-            'name' => 'Relationship Test Category',
+            'name'       => 'Relationship Test Category',
             'is_visible' => true,
         ]);
 
         $product = Product::factory()->create([
-            'name' => 'Categorized Test Product',
-            'is_visible' => true,
+            'name'         => 'Categorized Test Product',
+            'is_visible'   => true,
             'published_at' => now()->subDay(),
         ]);
         $category->products()->attach($product);

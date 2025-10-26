@@ -4,8 +4,12 @@ declare(strict_types=1);
 
 namespace App\Services\Images;
 
+use Exception;
 use Illuminate\Support\Facades\Log;
+use InvalidArgumentException;
+use RuntimeException;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
+use Throwable;
 
 /**
  * WebPConversionService
@@ -65,8 +69,8 @@ final class WebPConversionService
             }
 
             return false;
-        } catch (\Exception $e) {
-            Log::error("Failed to convert media {$media->id} to WebP: ".$e->getMessage());
+        } catch (Exception $e) {
+            Log::error("Failed to convert media {$media->id} to WebP: " . $e->getMessage());
 
             return false;
         }
@@ -97,10 +101,10 @@ final class WebPConversionService
         // Create image resource based on type
         $image = match ($mimeType) {
             'image/jpeg' => imagecreatefromjpeg($sourcePath),
-            'image/png' => imagecreatefrompng($sourcePath),
-            'image/gif' => imagecreatefromgif($sourcePath),
+            'image/png'  => imagecreatefrompng($sourcePath),
+            'image/gif'  => imagecreatefromgif($sourcePath),
             'image/webp' => imagecreatefromwebp($sourcePath),
-            default => null,
+            default      => null,
         };
         if (! $image) {
             Log::error("Failed to create image resource from: {$sourcePath}");
@@ -163,7 +167,7 @@ final class WebPConversionService
         }
         // Create a small test image
         $testImage = imagecreatetruecolor(1, 1);
-        $tmpPath = sys_get_temp_dir().'/webp_test_'.uniqid().'.webp';
+        $tmpPath = sys_get_temp_dir() . '/webp_test_' . uniqid() . '.webp';
         $result = imagewebp($testImage, $tmpPath, 85);
         imagedestroy($testImage);
         if ($result && file_exists($tmpPath)) {
@@ -182,7 +186,7 @@ final class WebPConversionService
     {
         $pathInfo = pathinfo($originalPath);
 
-        return $pathInfo['dirname'].'/'.$pathInfo['filename'].'.webp';
+        return $pathInfo['dirname'] . '/' . $pathInfo['filename'] . '.webp';
     }
 
     /**
@@ -191,13 +195,13 @@ final class WebPConversionService
     public function convertAndOptimizeToWebP(string $sourcePath, ?string $outputPath = null, bool $createThumbnail = false): array
     {
         if (! file_exists($sourcePath)) {
-            throw new \InvalidArgumentException("Source file does not exist: {$sourcePath}");
+            throw new InvalidArgumentException("Source file does not exist: {$sourcePath}");
         }
         $results = [];
         // Generate output path if not provided
         if (! $outputPath) {
             $pathInfo = pathinfo($sourcePath);
-            $outputPath = $pathInfo['dirname'].'/'.$pathInfo['filename'].'.webp';
+            $outputPath = $pathInfo['dirname'] . '/' . $pathInfo['filename'] . '.webp';
         }
         // Convert main image
         $mainImage = $this->processImage($sourcePath, $outputPath, self::MAX_WIDTH, self::MAX_HEIGHT);
@@ -224,19 +228,19 @@ final class WebPConversionService
         try {
             $imageInfo = getimagesize($sourcePath);
             if (! $imageInfo) {
-                throw new \InvalidArgumentException("Invalid image file: {$sourcePath}");
+                throw new InvalidArgumentException("Invalid image file: {$sourcePath}");
             }
             [$originalWidth, $originalHeight, $imageType] = $imageInfo;
             // Create image resource based on type
             $image = match ($imageType) {
                 IMAGETYPE_JPEG => imagecreatefromjpeg($sourcePath),
-                IMAGETYPE_PNG => imagecreatefrompng($sourcePath),
-                IMAGETYPE_GIF => imagecreatefromgif($sourcePath),
+                IMAGETYPE_PNG  => imagecreatefrompng($sourcePath),
+                IMAGETYPE_GIF  => imagecreatefromgif($sourcePath),
                 IMAGETYPE_WEBP => imagecreatefromwebp($sourcePath),
-                default => throw new \InvalidArgumentException("Unsupported image type: {$imageType}"),
+                default        => throw new InvalidArgumentException("Unsupported image type: {$imageType}"),
             };
             if (! $image) {
-                throw new \RuntimeException("Failed to create image resource from: {$sourcePath}");
+                throw new RuntimeException("Failed to create image resource from: {$sourcePath}");
             }
             // Calculate new dimensions maintaining aspect ratio
             [$newWidth, $newHeight] = $this->calculateDimensions($originalWidth, $originalHeight, $maxWidth, $maxHeight);
@@ -263,11 +267,11 @@ final class WebPConversionService
             $success = imagewebp($image, $outputPath, self::WEBP_QUALITY);
             imagedestroy($image);
             if (! $success) {
-                throw new \RuntimeException("Failed to save WebP image: {$outputPath}");
+                throw new RuntimeException("Failed to save WebP image: {$outputPath}");
             }
 
             return ['path' => $outputPath, 'size' => filesize($outputPath), 'width' => $newWidth, 'height' => $newHeight, 'original_size' => filesize($sourcePath), 'compression_ratio' => round((1 - filesize($outputPath) / filesize($sourcePath)) * 100, 2)];
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             Log::error('Image processing failed', ['source' => $sourcePath, 'output' => $outputPath, 'error' => $e->getMessage()]);
 
             return null;
@@ -296,7 +300,7 @@ final class WebPConversionService
     {
         $pathInfo = pathinfo($mainPath);
 
-        return $pathInfo['dirname'].'/'.$pathInfo['filename'].'_thumb.webp';
+        return $pathInfo['dirname'] . '/' . $pathInfo['filename'] . '_thumb.webp';
     }
 
     /**
@@ -313,7 +317,7 @@ final class WebPConversionService
                 if ($progressCallback) {
                     $progressCallback($index + 1, $total, $imagePath, $result);
                 }
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
                 $results[$imagePath] = ['error' => $e->getMessage()];
                 if ($progressCallback) {
                     $progressCallback($index + 1, $total, $imagePath, ['error' => $e->getMessage()]);

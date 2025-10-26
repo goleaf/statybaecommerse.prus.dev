@@ -29,7 +29,7 @@ final class FixFormToSchemaCommand extends Command
         $errorCount = 0;
 
         foreach ($resourcesToFix as $resource) {
-            $file = base_path('app/Filament/Resources/'.$resource.'.php');
+            $file = base_path('app/Filament/Resources/' . $resource . '.php');
 
             if (! file_exists($file)) {
                 $this->error(sprintf('❌ File not found: %s', $file));
@@ -38,7 +38,7 @@ final class FixFormToSchemaCommand extends Command
                 continue;
             }
 
-            $this->line('🔧 Fixing: '.$resource);
+            $this->line('🔧 Fixing: ' . $resource);
             $content = file_get_contents($file) ?: '';
             $originalContent = $content;
 
@@ -63,12 +63,12 @@ final class FixFormToSchemaCommand extends Command
             }
 
             if ($content !== $originalContent && file_put_contents($file, $content) !== false) {
-                $this->info('  ✅ Fixed: '.$resource);
+                $this->info('  ✅ Fixed: ' . $resource);
                 $fixedCount++;
             } elseif ($content === $originalContent) {
-                $this->line('  ⏭️  No changes needed: '.$resource);
+                $this->line('  ⏭️  No changes needed: ' . $resource);
             } else {
-                $this->error('  ❌ Failed to write: '.$resource);
+                $this->error('  ❌ Failed to write: ' . $resource);
                 $errorCount++;
             }
         }

@@ -18,7 +18,7 @@ it('convertImageToWebP returns false safely when unsupported', function () {
     $svc = app(WebPConversionService::class);
 
     // Create a tiny temp png to avoid external deps
-    $tmp = sys_get_temp_dir().'/tiny_'.uniqid().'.png';
+    $tmp = sys_get_temp_dir() . '/tiny_' . uniqid() . '.png';
     $im = imagecreatetruecolor(1, 1);
     imagepng($im, $tmp);
     imagedestroy($im);

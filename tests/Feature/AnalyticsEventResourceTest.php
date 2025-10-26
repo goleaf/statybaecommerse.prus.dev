@@ -26,7 +26,7 @@ final class AnalyticsEventResourceTest extends TestCase
         Filament::setCurrentPanel('admin');
         // Create a test user for authentication
         $this->adminUser = User::factory()->create([
-            'email' => 'admin@example.com',
+            'email'    => 'admin@example.com',
             'is_admin' => true,
         ]);
     }
@@ -47,18 +47,18 @@ final class AnalyticsEventResourceTest extends TestCase
         // Arrange
         $user = User::factory()->create();
         $analyticsEventData = [
-            'event_name' => 'Test Event',
-            'event_type' => 'page_view',
-            'description' => 'Test analytics event',
-            'user_id' => $user->id,
-            'session_id' => 'test_session_123',
-            'ip_address' => '192.168.1.1',
-            'device_type' => 'desktop',
-            'browser' => 'Chrome',
-            'os' => 'Windows',
-            'country' => 'Lithuania',
-            'city' => 'Vilnius',
-            'is_important' => true,
+            'event_name'    => 'Test Event',
+            'event_type'    => 'page_view',
+            'description'   => 'Test analytics event',
+            'user_id'       => $user->id,
+            'session_id'    => 'test_session_123',
+            'ip_address'    => '192.168.1.1',
+            'device_type'   => 'desktop',
+            'browser'       => 'Chrome',
+            'os'            => 'Windows',
+            'country'       => 'Lithuania',
+            'city'          => 'Vilnius',
+            'is_important'  => true,
             'is_conversion' => false,
         ];
 
@@ -70,12 +70,12 @@ final class AnalyticsEventResourceTest extends TestCase
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('analytics_events', [
-            'event_name' => 'Test Event',
-            'event_type' => 'page_view',
+            'event_name'  => 'Test Event',
+            'event_type'  => 'page_view',
             'description' => 'Test analytics event',
-            'user_id' => $user->id,
-            'session_id' => 'test_session_123',
-            'ip_address' => '192.168.1.1',
+            'user_id'     => $user->id,
+            'session_id'  => 'test_session_123',
+            'ip_address'  => '192.168.1.1',
         ]);
     }
 
@@ -93,7 +93,7 @@ final class AnalyticsEventResourceTest extends TestCase
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('analytics_events', [
-            'id' => $analyticsEvent->id,
+            'id'          => $analyticsEvent->id,
             'description' => $newDescription,
         ]);
     }
@@ -163,7 +163,7 @@ final class AnalyticsEventResourceTest extends TestCase
             ->assertNotified();
 
         $this->assertDatabaseHas('analytics_events', [
-            'id' => $analyticsEvent->id,
+            'id'           => $analyticsEvent->id,
             'is_important' => true,
         ]);
     }
@@ -180,7 +180,7 @@ final class AnalyticsEventResourceTest extends TestCase
             ->assertNotified();
 
         $this->assertDatabaseHas('analytics_events', [
-            'id' => $analyticsEvent->id,
+            'id'            => $analyticsEvent->id,
             'is_conversion' => true,
         ]);
     }
@@ -198,7 +198,7 @@ final class AnalyticsEventResourceTest extends TestCase
 
         foreach ($analyticsEvents as $analyticsEvent) {
             $this->assertDatabaseHas('analytics_events', [
-                'id' => $analyticsEvent->id,
+                'id'           => $analyticsEvent->id,
                 'is_important' => true,
             ]);
         }
@@ -217,7 +217,7 @@ final class AnalyticsEventResourceTest extends TestCase
 
         foreach ($analyticsEvents as $analyticsEvent) {
             $this->assertDatabaseHas('analytics_events', [
-                'id' => $analyticsEvent->id,
+                'id'            => $analyticsEvent->id,
                 'is_conversion' => true,
             ]);
         }
@@ -310,8 +310,8 @@ final class AnalyticsEventResourceTest extends TestCase
     {
         // Arrange
         $analyticsEvent = AnalyticsEvent::factory()->create([
-            'is_conversion' => true,
-            'conversion_value' => null,
+            'is_conversion'       => true,
+            'conversion_value'    => null,
             'conversion_currency' => null,
         ]);
 
@@ -319,15 +319,15 @@ final class AnalyticsEventResourceTest extends TestCase
         Livewire::actingAs($this->adminUser)
             ->test(EditAnalyticsEvent::class, ['record' => $analyticsEvent->id])
             ->fillForm([
-                'conversion_value' => 99.99,
+                'conversion_value'    => 99.99,
                 'conversion_currency' => 'EUR',
             ])
             ->call('save')
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('analytics_events', [
-            'id' => $analyticsEvent->id,
-            'conversion_value' => 99.99,
+            'id'                  => $analyticsEvent->id,
+            'conversion_value'    => 99.99,
             'conversion_currency' => 'EUR',
         ]);
     }

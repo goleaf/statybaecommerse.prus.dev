@@ -33,12 +33,12 @@ final class VariantBulkPriceUpdateTest extends TestCase
         $this->product = Product::factory()->create();
 
         $this->variants = ProductVariant::factory()->count(3)->create([
-            'product_id' => $this->product->id,
-            'price' => 100.0,
-            'wholesale_price' => 80.0,
-            'member_price' => 90.0,
+            'product_id'        => $this->product->id,
+            'price'             => 100.0,
+            'wholesale_price'   => 80.0,
+            'member_price'      => 90.0,
             'promotional_price' => 85.0,
-            'is_on_sale' => false,
+            'is_on_sale'        => false,
         ]);
     }
 
@@ -78,13 +78,13 @@ final class VariantBulkPriceUpdateTest extends TestCase
         $action = VariantBulkPriceUpdate::make();
 
         $data = [
-            'price_type' => 'price',
-            'update_type' => 'percentage',
-            'update_value' => 10,  // 10% increase
-            'apply_to_sale_items' => true,
+            'price_type'           => 'price',
+            'update_type'          => 'percentage',
+            'update_value'         => 10,  // 10% increase
+            'apply_to_sale_items'  => true,
             'update_compare_price' => false,
-            'set_sale_period' => false,
-            'change_reason' => 'Test price update',
+            'set_sale_period'      => false,
+            'change_reason'        => 'Test price update',
         ];
 
         $action->action($data, $this->variants);
@@ -101,13 +101,13 @@ final class VariantBulkPriceUpdateTest extends TestCase
         $action = VariantBulkPriceUpdate::make();
 
         $data = [
-            'price_type' => 'price',
-            'update_type' => 'fixed_amount',
-            'update_value' => 15.0,
-            'apply_to_sale_items' => true,
+            'price_type'           => 'price',
+            'update_type'          => 'fixed_amount',
+            'update_value'         => 15.0,
+            'apply_to_sale_items'  => true,
             'update_compare_price' => false,
-            'set_sale_period' => false,
-            'change_reason' => 'Test fixed amount update',
+            'set_sale_period'      => false,
+            'change_reason'        => 'Test fixed amount update',
         ];
 
         $action->action($data, $this->variants);
@@ -124,13 +124,13 @@ final class VariantBulkPriceUpdateTest extends TestCase
         $action = VariantBulkPriceUpdate::make();
 
         $data = [
-            'price_type' => 'price',
-            'update_type' => 'multiply_by',
-            'update_value' => 1.5,
-            'apply_to_sale_items' => true,
+            'price_type'           => 'price',
+            'update_type'          => 'multiply_by',
+            'update_value'         => 1.5,
+            'apply_to_sale_items'  => true,
             'update_compare_price' => false,
-            'set_sale_period' => false,
-            'change_reason' => 'Test multiply update',
+            'set_sale_period'      => false,
+            'change_reason'        => 'Test multiply update',
         ];
 
         $action->action($data, $this->variants);
@@ -147,13 +147,13 @@ final class VariantBulkPriceUpdateTest extends TestCase
         $action = VariantBulkPriceUpdate::make();
 
         $data = [
-            'price_type' => 'price',
-            'update_type' => 'set_to',
-            'update_value' => 200.0,
-            'apply_to_sale_items' => true,
+            'price_type'           => 'price',
+            'update_type'          => 'set_to',
+            'update_value'         => 200.0,
+            'apply_to_sale_items'  => true,
             'update_compare_price' => false,
-            'set_sale_period' => false,
-            'change_reason' => 'Test set to update',
+            'set_sale_period'      => false,
+            'change_reason'        => 'Test set to update',
         ];
 
         $action->action($data, $this->variants);
@@ -170,13 +170,13 @@ final class VariantBulkPriceUpdateTest extends TestCase
         $action = VariantBulkPriceUpdate::make();
 
         $data = [
-            'price_type' => 'wholesale_price',
-            'update_type' => 'percentage',
-            'update_value' => 20,  // 20% increase
-            'apply_to_sale_items' => true,
+            'price_type'           => 'wholesale_price',
+            'update_type'          => 'percentage',
+            'update_value'         => 20,  // 20% increase
+            'apply_to_sale_items'  => true,
             'update_compare_price' => false,
-            'set_sale_period' => false,
-            'change_reason' => 'Test wholesale update',
+            'set_sale_period'      => false,
+            'change_reason'        => 'Test wholesale update',
         ];
 
         $action->action($data, $this->variants);
@@ -196,13 +196,13 @@ final class VariantBulkPriceUpdateTest extends TestCase
         $action = VariantBulkPriceUpdate::make();
 
         $data = [
-            'price_type' => 'price',
-            'update_type' => 'percentage',
-            'update_value' => 10,
-            'apply_to_sale_items' => false,  // Don't apply to sale items
+            'price_type'           => 'price',
+            'update_type'          => 'percentage',
+            'update_value'         => 10,
+            'apply_to_sale_items'  => false,  // Don't apply to sale items
             'update_compare_price' => false,
-            'set_sale_period' => false,
-            'change_reason' => 'Test skip sale items',
+            'set_sale_period'      => false,
+            'change_reason'        => 'Test skip sale items',
         ];
 
         $action->action($data, $this->variants);
@@ -226,14 +226,14 @@ final class VariantBulkPriceUpdateTest extends TestCase
         $action = VariantBulkPriceUpdate::make();
 
         $data = [
-            'price_type' => 'price',
-            'update_type' => 'percentage',
-            'update_value' => 10,
-            'apply_to_sale_items' => true,
+            'price_type'           => 'price',
+            'update_type'          => 'percentage',
+            'update_value'         => 10,
+            'apply_to_sale_items'  => true,
             'update_compare_price' => true,
             'compare_price_action' => 'match_new_price',
-            'set_sale_period' => false,
-            'change_reason' => 'Test compare price update',
+            'set_sale_period'      => false,
+            'change_reason'        => 'Test compare price update',
         ];
 
         $action->action($data, $this->variants);
@@ -253,15 +253,15 @@ final class VariantBulkPriceUpdateTest extends TestCase
         $saleEndDate = now()->addDays(7);
 
         $data = [
-            'price_type' => 'price',
-            'update_type' => 'percentage',
-            'update_value' => 10,
-            'apply_to_sale_items' => true,
+            'price_type'           => 'price',
+            'update_type'          => 'percentage',
+            'update_value'         => 10,
+            'apply_to_sale_items'  => true,
             'update_compare_price' => false,
-            'set_sale_period' => true,
-            'sale_start_date' => $saleStartDate,
-            'sale_end_date' => $saleEndDate,
-            'change_reason' => 'Test sale period',
+            'set_sale_period'      => true,
+            'sale_start_date'      => $saleStartDate,
+            'sale_end_date'        => $saleEndDate,
+            'change_reason'        => 'Test sale period',
         ];
 
         $action->action($data, $this->variants);
@@ -282,13 +282,13 @@ final class VariantBulkPriceUpdateTest extends TestCase
         $action = VariantBulkPriceUpdate::make();
 
         $data = [
-            'price_type' => 'price',
-            'update_type' => 'fixed_amount',
-            'update_value' => -150.0,  // This would make price negative
-            'apply_to_sale_items' => true,
+            'price_type'           => 'price',
+            'update_type'          => 'fixed_amount',
+            'update_value'         => -150.0,  // This would make price negative
+            'apply_to_sale_items'  => true,
             'update_compare_price' => false,
-            'set_sale_period' => false,
-            'change_reason' => 'Test negative price prevention',
+            'set_sale_period'      => false,
+            'change_reason'        => 'Test negative price prevention',
         ];
 
         $action->action($data, $this->variants);
@@ -305,13 +305,13 @@ final class VariantBulkPriceUpdateTest extends TestCase
         $action = VariantBulkPriceUpdate::make();
 
         $data = [
-            'price_type' => 'price',
-            'update_type' => 'percentage',
-            'update_value' => 10,
-            'apply_to_sale_items' => true,
+            'price_type'           => 'price',
+            'update_type'          => 'percentage',
+            'update_value'         => 10,
+            'apply_to_sale_items'  => true,
             'update_compare_price' => false,
-            'set_sale_period' => false,
-            'change_reason' => 'Test history recording',
+            'set_sale_period'      => false,
+            'change_reason'        => 'Test history recording',
         ];
 
         $action->action($data, $this->variants);
@@ -320,10 +320,10 @@ final class VariantBulkPriceUpdateTest extends TestCase
         foreach ($this->variants as $variant) {
             $this->assertDatabaseHas('variant_price_histories', [
                 'variant_id' => $variant->id,
-                'old_price' => 100.0,
-                'new_price' => 110.0,
+                'old_price'  => 100.0,
+                'new_price'  => 110.0,
                 'price_type' => 'price',
-                'reason' => 'Test history recording',
+                'reason'     => 'Test history recording',
                 'changed_by' => $this->user->id,
             ]);
         }

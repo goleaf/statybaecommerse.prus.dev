@@ -15,7 +15,7 @@ final class InventoryAnomalyDetected extends Notification implements ShouldQueue
     use Queueable;
 
     /**
-     * @param  Collection<int, string>|array<int, string>  $anomalies
+     * @param Collection<int, string>|array<int, string> $anomalies
      */
     public function __construct(private readonly array $anomalies)
     {
@@ -34,7 +34,7 @@ final class InventoryAnomalyDetected extends Notification implements ShouldQueue
     public function toMail(object $notifiable): MailMessage
     {
         // Build a simple summary and append each anomaly as its own line item.
-        $message = (new MailMessage())
+        $message = (new MailMessage)
             ->subject(__('Inventory anomaly report'))
             ->greeting(__('Inventory Anomalies Detected'))
             ->line(__('The scheduled reconciliation job found the following issues:'));

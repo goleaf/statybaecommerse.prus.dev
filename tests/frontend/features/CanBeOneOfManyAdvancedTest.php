@@ -24,12 +24,12 @@ final class CanBeOneOfManyAdvancedTest extends TestCase
 
         // Create multiple orders
         $oldestOrder = Order::factory()->create([
-            'user_id' => $user->id,
+            'user_id'    => $user->id,
             'created_at' => now()->subDays(10),
         ]);
 
         $latestOrder = Order::factory()->create([
-            'user_id' => $user->id,
+            'user_id'    => $user->id,
             'created_at' => now()->subDays(1),
         ]);
 
@@ -49,13 +49,13 @@ final class CanBeOneOfManyAdvancedTest extends TestCase
 
         // Create multiple reviews
         $oldestReview = Review::factory()->create([
-            'user_id' => $user->id,
+            'user_id'    => $user->id,
             'product_id' => $product->id,
             'created_at' => now()->subDays(10),
         ]);
 
         $latestReview = Review::factory()->create([
-            'user_id' => $user->id,
+            'user_id'    => $user->id,
             'product_id' => $product->id,
             'created_at' => now()->subDays(1),
         ]);
@@ -77,13 +77,13 @@ final class CanBeOneOfManyAdvancedTest extends TestCase
         // Create multiple reviews
         $oldestReview = Review::factory()->create([
             'product_id' => $product->id,
-            'user_id' => $user->id,
+            'user_id'    => $user->id,
             'created_at' => now()->subDays(10),
         ]);
 
         $latestReview = Review::factory()->create([
             'product_id' => $product->id,
-            'user_id' => $user->id,
+            'user_id'    => $user->id,
             'created_at' => now()->subDays(1),
         ]);
 
@@ -126,16 +126,16 @@ final class CanBeOneOfManyAdvancedTest extends TestCase
 
         // Create multiple order items
         $oldestItem = OrderItem::factory()->create([
-            'order_id' => $order->id,
-            'name' => 'Oldest Item',
-            'sku' => 'OLD-001',
+            'order_id'   => $order->id,
+            'name'       => 'Oldest Item',
+            'sku'        => 'OLD-001',
             'created_at' => now()->subDays(10),
         ]);
 
         $latestItem = OrderItem::factory()->create([
-            'order_id' => $order->id,
-            'name' => 'Latest Item',
-            'sku' => 'LAT-001',
+            'order_id'   => $order->id,
+            'name'       => 'Latest Item',
+            'sku'        => 'LAT-001',
             'created_at' => now()->subDays(1),
         ]);
 
@@ -155,16 +155,16 @@ final class CanBeOneOfManyAdvancedTest extends TestCase
         // Create multiple documents
         $oldDocument = Document::factory()->create([
             'documentable_type' => User::class,
-            'documentable_id' => $user->id,
-            'status' => 'active',
-            'created_at' => now()->subDays(10),
+            'documentable_id'   => $user->id,
+            'status'            => 'active',
+            'created_at'        => now()->subDays(10),
         ]);
 
         $latestDocument = Document::factory()->create([
             'documentable_type' => User::class,
-            'documentable_id' => $user->id,
-            'status' => 'active',
-            'created_at' => now()->subDays(1),
+            'documentable_id'   => $user->id,
+            'status'            => 'active',
+            'created_at'        => now()->subDays(1),
         ]);
 
         // Refresh the user to clear any cached relationships
@@ -183,16 +183,16 @@ final class CanBeOneOfManyAdvancedTest extends TestCase
         // Create multiple documents
         $oldDocument = Document::factory()->create([
             'documentable_type' => Product::class,
-            'documentable_id' => $product->id,
-            'status' => 'active',
-            'created_at' => now()->subDays(10),
+            'documentable_id'   => $product->id,
+            'status'            => 'active',
+            'created_at'        => now()->subDays(10),
         ]);
 
         $latestDocument = Document::factory()->create([
             'documentable_type' => Product::class,
-            'documentable_id' => $product->id,
-            'status' => 'active',
-            'created_at' => now()->subDays(1),
+            'documentable_id'   => $product->id,
+            'status'            => 'active',
+            'created_at'        => now()->subDays(1),
         ]);
 
         // Refresh the product to clear any cached relationships

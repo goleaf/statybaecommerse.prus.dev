@@ -34,24 +34,24 @@ final class CreateTestNotifications extends Command
         // Create various types of notifications
         $notifications = [
             [
-                'title' => 'Sveiki atvykę į valdymo skydą',
+                'title'   => 'Sveiki atvykę į valdymo skydą',
                 'message' => 'Jūsų e-komercijos sistema sėkmingai sukonfigūruota ir paruošta naudojimui.',
-                'type' => 'success',
+                'type'    => 'success',
             ],
             [
-                'title' => 'Sistemos atnaujinimas',
+                'title'   => 'Sistemos atnaujinimas',
                 'message' => 'Sistema buvo sėkmingai atnaujinta iki naujausios versijos.',
-                'type' => 'info',
+                'type'    => 'info',
             ],
             [
-                'title' => 'Priežiūros režimas',
+                'title'   => 'Priežiūros režimas',
                 'message' => 'Sistema bus nepasiekiama dėl planuotos priežiūros nuo 02:00 iki 04:00.',
-                'type' => 'warning',
+                'type'    => 'warning',
             ],
             [
-                'title' => 'Saugumo įspėjimas',
+                'title'   => 'Saugumo įspėjimas',
                 'message' => 'Aptiktas įtartinas veiksmas. Prašome patikrinti savo paskyrą.',
-                'type' => 'error',
+                'type'    => 'error',
             ],
         ];
 
@@ -76,7 +76,7 @@ final class CreateTestNotifications extends Command
 
         $totalNotifications = $adminUsers->count() * count($notifications) + ($lowStockProducts->count() * $adminUsers->count());
 
-        $this->info("Created {$totalNotifications} test notifications for ".$adminUsers->count().' admin users.');
+        $this->info("Created {$totalNotifications} test notifications for " . $adminUsers->count() . ' admin users.');
         $this->info('Check the notification bell icon in the admin panel!');
 
         return 0;

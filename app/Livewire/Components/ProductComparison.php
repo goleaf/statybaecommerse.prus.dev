@@ -17,8 +17,8 @@ use Livewire\Component;
  * Livewire component for ProductComparison with reactive frontend functionality, real-time updates, and user interaction handling.
  *
  * @property array $compareProducts
- * @property bool $isOpen
- * @property int $maxProducts
+ * @property bool  $isOpen
+ * @property int   $maxProducts
  */
 final class ProductComparison extends Component
 {
@@ -126,7 +126,7 @@ final class ProductComparison extends Component
     /**
      * Handle getProductAttributeValue functionality with proper error handling.
      *
-     * @param  mixed  $attributeId
+     * @param mixed $attributeId
      */
     public function getProductAttributeValue(Product $product, $attributeId): string
     {

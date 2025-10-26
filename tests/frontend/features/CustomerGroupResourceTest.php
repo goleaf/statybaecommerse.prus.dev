@@ -5,11 +5,12 @@ declare(strict_types=1);
 use App\Filament\Resources\CustomerGroupResource;
 use App\Models\CustomerGroup;
 use App\Models\User;
-use Spatie\Permission\Models\Role;
 
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Laravel\assertDatabaseMissing;
+
+use Spatie\Permission\Models\Role;
 
 beforeEach(function () {
     Role::findOrCreate('admin', 'web');
@@ -31,10 +32,10 @@ it('can render customer group resource create page', function () {
 
 it('can create customer group', function () {
     $newData = [
-        'name' => 'VIP Customers',
-        'description' => 'High value customers with special privileges',
+        'name'                => 'VIP Customers',
+        'description'         => 'High value customers with special privileges',
         'discount_percentage' => 15.00,
-        'is_active' => true,
+        'is_active'           => true,
     ];
 
     actingAs($this->admin)
@@ -68,10 +69,10 @@ it('can render customer group resource edit page', function () {
 it('can update customer group', function () {
     $customerGroup = CustomerGroup::factory()->create();
     $newData = [
-        'name' => 'Updated Group',
-        'description' => 'Updated description',
+        'name'                => 'Updated Group',
+        'description'         => 'Updated description',
         'discount_percentage' => 20.00,
-        'is_active' => false,
+        'is_active'           => false,
     ];
 
     actingAs($this->admin)
@@ -80,7 +81,7 @@ it('can update customer group', function () {
         ->assertRedirect();
 
     assertDatabaseHas('customer_groups', array_merge(
-        ['id' => $customerGroup->id],
+        ['id'         => $customerGroup->id],
         ['is_enabled' => $newData['is_active']],
         collect($newData)->except('is_active')->all()
     ));
@@ -111,7 +112,7 @@ it('can filter active customer groups', function () {
     $inactiveGroup = CustomerGroup::factory()->create(['is_active' => false]);
 
     actingAs($this->admin)
-        ->get(CustomerGroupResource::getUrl('index').'?filter[active]=1')
+        ->get(CustomerGroupResource::getUrl('index') . '?filter[active]=1')
         ->assertSuccessful()
         ->assertSeeText($activeGroup->name)
         ->assertDontSeeText($inactiveGroup->name);
@@ -128,7 +129,7 @@ it('validates discount percentage is within valid range', function () {
     actingAs($this->admin)
         ->from(CustomerGroupResource::getUrl('create'))
         ->post(CustomerGroupResource::getUrl('create'), [
-            'name' => 'Test Group',
+            'name'                => 'Test Group',
             'discount_percentage' => 150,
         ])
         ->assertSessionHasErrors(['discount_percentage']);
@@ -136,7 +137,7 @@ it('validates discount percentage is within valid range', function () {
     actingAs($this->admin)
         ->from(CustomerGroupResource::getUrl('create'))
         ->post(CustomerGroupResource::getUrl('create'), [
-            'name' => 'Test Group',
+            'name'                => 'Test Group',
             'discount_percentage' => -5,
         ])
         ->assertSessionHasErrors(['discount_percentage']);

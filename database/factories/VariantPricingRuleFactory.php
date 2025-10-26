@@ -24,19 +24,19 @@ final class VariantPricingRuleFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => $this->faker->words(3, true),
-            'type' => $this->faker->randomElement(['percentage', 'fixed', 'tier', 'bulk']),
-            'value' => $this->faker->randomFloat(2, 1, 100),
+            'name'               => $this->faker->words(3, true),
+            'type'               => $this->faker->randomElement(['percentage', 'fixed', 'tier', 'bulk']),
+            'value'              => $this->faker->randomFloat(2, 1, 100),
             'product_variant_id' => ProductVariant::factory(),
-            'customer_group_id' => CustomerGroup::factory(),
-            'min_quantity' => $this->faker->numberBetween(1, 10),
-            'max_quantity' => $this->faker->numberBetween(100, 1000),
-            'priority' => $this->faker->numberBetween(1, 10),
-            'is_active' => $this->faker->boolean(80),
-            'is_cumulative' => $this->faker->boolean(30),
-            'valid_from' => $this->faker->optional(0.7)->dateTimeBetween('-1 month', '+1 month'),
-            'valid_until' => $this->faker->optional(0.5)->dateTimeBetween('+1 month', '+1 year'),
-            'description' => $this->faker->optional(0.6)->sentence(),
+            'customer_group_id'  => CustomerGroup::factory(),
+            'min_quantity'       => $this->faker->numberBetween(1, 10),
+            'max_quantity'       => $this->faker->numberBetween(100, 1000),
+            'priority'           => $this->faker->numberBetween(1, 10),
+            'is_active'          => $this->faker->boolean(80),
+            'is_cumulative'      => $this->faker->boolean(30),
+            'valid_from'         => $this->faker->optional(0.7)->dateTimeBetween('-1 month', '+1 month'),
+            'valid_until'        => $this->faker->optional(0.5)->dateTimeBetween('+1 month', '+1 year'),
+            'description'        => $this->faker->optional(0.6)->sentence(),
         ];
     }
 
@@ -76,7 +76,7 @@ final class VariantPricingRuleFactory extends Factory
     public function percentage(): static
     {
         return $this->state(fn (array $attributes) => [
-            'type' => 'percentage',
+            'type'  => 'percentage',
             'value' => $this->faker->numberBetween(1, 50),
         ]);
     }
@@ -87,7 +87,7 @@ final class VariantPricingRuleFactory extends Factory
     public function fixed(): static
     {
         return $this->state(fn (array $attributes) => [
-            'type' => 'fixed',
+            'type'  => 'fixed',
             'value' => $this->faker->randomFloat(2, 1, 100),
         ]);
     }
@@ -98,7 +98,7 @@ final class VariantPricingRuleFactory extends Factory
     public function tier(): static
     {
         return $this->state(fn (array $attributes) => [
-            'type' => 'tier',
+            'type'  => 'tier',
             'value' => $this->faker->numberBetween(1, 20),
         ]);
     }
@@ -109,7 +109,7 @@ final class VariantPricingRuleFactory extends Factory
     public function bulk(): static
     {
         return $this->state(fn (array $attributes) => [
-            'type' => 'bulk',
+            'type'  => 'bulk',
             'value' => $this->faker->numberBetween(1, 15),
         ]);
     }
@@ -140,7 +140,7 @@ final class VariantPricingRuleFactory extends Factory
     public function currentlyValid(): static
     {
         return $this->state(fn (array $attributes) => [
-            'valid_from' => $this->faker->dateTimeBetween('-1 week', 'now'),
+            'valid_from'  => $this->faker->dateTimeBetween('-1 week', 'now'),
             'valid_until' => $this->faker->dateTimeBetween('+1 week', '+1 month'),
         ]);
     }
@@ -151,7 +151,7 @@ final class VariantPricingRuleFactory extends Factory
     public function expired(): static
     {
         return $this->state(fn (array $attributes) => [
-            'valid_from' => $this->faker->dateTimeBetween('-2 months', '-1 month'),
+            'valid_from'  => $this->faker->dateTimeBetween('-2 months', '-1 month'),
             'valid_until' => $this->faker->dateTimeBetween('-1 month', '-1 week'),
         ]);
     }
@@ -162,7 +162,7 @@ final class VariantPricingRuleFactory extends Factory
     public function future(): static
     {
         return $this->state(fn (array $attributes) => [
-            'valid_from' => $this->faker->dateTimeBetween('+1 week', '+1 month'),
+            'valid_from'  => $this->faker->dateTimeBetween('+1 week', '+1 month'),
             'valid_until' => $this->faker->dateTimeBetween('+2 months', '+3 months'),
         ]);
     }

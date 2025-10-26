@@ -35,12 +35,12 @@ final class PartnerTierResourceTest extends TestCase
 
         Livewire::test(\App\Filament\Resources\PartnerTierResource\Pages\CreatePartnerTier::class)
             ->fillForm([
-                'name' => $newPartnerTier->name,
-                'code' => $newPartnerTier->code,
-                'discount_rate' => $newPartnerTier->discount_rate,
-                'commission_rate' => $newPartnerTier->commission_rate,
+                'name'                => $newPartnerTier->name,
+                'code'                => $newPartnerTier->code,
+                'discount_rate'       => $newPartnerTier->discount_rate,
+                'commission_rate'     => $newPartnerTier->commission_rate,
                 'minimum_order_value' => $newPartnerTier->minimum_order_value,
-                'is_enabled' => $newPartnerTier->is_enabled,
+                'is_enabled'          => $newPartnerTier->is_enabled,
             ])
             ->call('create')
             ->assertHasNoFormErrors();
@@ -66,7 +66,7 @@ final class PartnerTierResourceTest extends TestCase
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('partner_tiers', [
-            'id' => $partnerTier->id,
+            'id'   => $partnerTier->id,
             'name' => $updatedName,
         ]);
     }
@@ -79,12 +79,12 @@ final class PartnerTierResourceTest extends TestCase
             'record' => $partnerTier->getRouteKey(),
         ])
             ->assertFormSet([
-                'name' => $partnerTier->name,
-                'code' => $partnerTier->code,
-                'discount_rate' => $partnerTier->discount_rate,
-                'commission_rate' => $partnerTier->commission_rate,
+                'name'                => $partnerTier->name,
+                'code'                => $partnerTier->code,
+                'discount_rate'       => $partnerTier->discount_rate,
+                'commission_rate'     => $partnerTier->commission_rate,
                 'minimum_order_value' => $partnerTier->minimum_order_value,
-                'is_enabled' => $partnerTier->is_enabled,
+                'is_enabled'          => $partnerTier->is_enabled,
             ]);
     }
 
@@ -137,8 +137,8 @@ final class PartnerTierResourceTest extends TestCase
     {
         Livewire::test(\App\Filament\Resources\PartnerTierResource\Pages\CreatePartnerTier::class)
             ->fillForm([
-                'name' => 'Test Tier',
-                'code' => 'TEST',
+                'name'          => 'Test Tier',
+                'code'          => 'TEST',
                 'discount_rate' => 'invalid',
             ])
             ->call('create')
@@ -149,8 +149,8 @@ final class PartnerTierResourceTest extends TestCase
     {
         Livewire::test(\App\Filament\Resources\PartnerTierResource\Pages\CreatePartnerTier::class)
             ->fillForm([
-                'name' => 'Test Tier',
-                'code' => 'TEST',
+                'name'          => 'Test Tier',
+                'code'          => 'TEST',
                 'discount_rate' => 1.5,
             ])
             ->call('create')

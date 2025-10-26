@@ -31,6 +31,6 @@ final class Show extends Component
      */
     public function render()
     {
-        return view('livewire.pages.location.show', ['location' => $this->location])->layout('components.layouts.base', ['title' => $this->location->name.' - '.__('translations.locations')]);
+        return view('livewire.pages.location.show', ['location' => $this->location])->layout('components.layouts.base', ['title' => $this->location->name . ' - ' . __('translations.locations')]);
     }
 }

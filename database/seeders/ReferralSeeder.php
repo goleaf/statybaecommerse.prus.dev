@@ -71,9 +71,9 @@ final class ReferralSeeder extends Seeder
 
         $this->command->info('Referral system seeded successfully!');
         $this->command->info('Created:');
-        $this->command->info('- '.$users->count().' users');
-        $this->command->info('- '.$referrals->count().' referrals');
-        $this->command->info('- '.ReferralCode::count().' referral codes');
-        $this->command->info('- '.ReferralReward::count().' referral rewards');
+        $this->command->info('- ' . $users->count() . ' users');
+        $this->command->info('- ' . $referrals->count() . ' referrals');
+        $this->command->info('- ' . ReferralCode::count() . ' referral codes');
+        $this->command->info('- ' . ReferralReward::count() . ' referral rewards');
     }
 }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services\Debug;
 
 use Illuminate\Support\Facades\Log;
+use Throwable;
 
 /**
  * EcommerceDebugCollector
@@ -22,7 +23,7 @@ class EcommerceDebugCollector
         if (function_exists('debugbar') && app()->bound('debugbar')) {
             try {
                 app('debugbar')->addMessage($payload, 'cart');
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
                 // ignore
             }
         }
@@ -38,7 +39,7 @@ class EcommerceDebugCollector
         if (function_exists('debugbar') && app()->bound('debugbar')) {
             try {
                 app('debugbar')->addMessage($payload, 'order');
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
                 // ignore
             }
         }

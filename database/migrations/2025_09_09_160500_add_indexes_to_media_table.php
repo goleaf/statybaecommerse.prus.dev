@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
@@ -40,7 +42,7 @@ return new class extends Migration
             $database = DB::getDatabaseName();
             $result = DB::select(
                 'SELECT COUNT(1) as cnt FROM INFORMATION_SCHEMA.STATISTICS WHERE TABLE_SCHEMA = ? AND TABLE_NAME = ? AND INDEX_NAME = ?',
-                [$database, DB::getTablePrefix().$table, $index]
+                [$database, DB::getTablePrefix() . $table, $index]
             );
 
             return (int) ($result[0]->cnt ?? 0) > 0;

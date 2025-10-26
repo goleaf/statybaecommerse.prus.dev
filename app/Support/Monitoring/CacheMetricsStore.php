@@ -10,17 +10,16 @@ use Illuminate\Support\Carbon;
 final class CacheMetricsStore
 {
     private const DEFAULT_PAYLOAD = [
-        'hits' => 0,
-        'misses' => 0,
-        'stores' => [],
+        'hits'       => 0,
+        'misses'     => 0,
+        'stores'     => [],
         'updated_at' => null,
     ];
 
     public function __construct(
         private readonly CacheRepository $repository,
         private readonly string $cacheKey,
-    ) {
-    }
+    ) {}
 
     public function recordHit(?string $storeName, string $key): void
     {
@@ -66,18 +65,18 @@ final class CacheMetricsStore
             $storeMisses = (int) ($metrics['misses'] ?? 0);
             $storeTotal = $storeHits + $storeMisses;
             $stores[] = [
-                'store' => is_string($name) && $name !== '' ? $name : 'default',
-                'hits' => $storeHits,
-                'misses' => $storeMisses,
+                'store'    => is_string($name) && $name !== '' ? $name : 'default',
+                'hits'     => $storeHits,
+                'misses'   => $storeMisses,
                 'hit_rate' => $storeTotal > 0 ? $storeHits / $storeTotal : 0.0,
             ];
         }
 
         return [
-            'hits' => $hits,
-            'misses' => $misses,
-            'hit_rate' => $hitRate,
-            'stores' => $stores,
+            'hits'       => $hits,
+            'misses'     => $misses,
+            'hit_rate'   => $hitRate,
+            'stores'     => $stores,
             'updated_at' => $payload['updated_at'] ?? null,
         ];
     }

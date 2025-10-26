@@ -54,7 +54,7 @@ final class ProductControllerTest extends TestCase
     public function test_by_brand_returns_products_from_brand(): void
     {
         $brand = Brand::factory()->create([
-            'is_active' => true,
+            'is_active'  => true,
             'is_enabled' => true,
             'is_visible' => true,
         ]);
@@ -97,33 +97,33 @@ final class ProductControllerTest extends TestCase
         $user = User::factory()->create();
 
         $response = $this->actingAs($user)->post(route('frontend.products.add-review', $product), [
-            'rating' => 5,
-            'title' => 'Amazing',
+            'rating'  => 5,
+            'title'   => 'Amazing',
             'content' => 'Loved using this tool.',
         ]);
 
         $response->assertRedirect(route('frontend.products.show', $product));
         $this->assertDatabaseHas(Review::class, [
             'product_id' => $product->id,
-            'user_id' => $user->id,
-            'rating' => 5,
-            'title' => 'Amazing',
+            'user_id'    => $user->id,
+            'rating'     => 5,
+            'title'      => 'Amazing',
         ]);
     }
 
     private function createVisibleProduct(array $overrides = []): Product
     {
         $brand = Brand::factory()->create([
-            'is_active' => true,
+            'is_active'  => true,
             'is_enabled' => true,
             'is_visible' => true,
         ]);
         $category = Category::factory()->create(['is_visible' => true]);
 
         $product = Product::factory()->create(array_merge([
-            'brand_id' => $overrides['brand_id'] ?? $brand->id,
-            'is_visible' => true,
-            'status' => 'active',
+            'brand_id'     => $overrides['brand_id'] ?? $brand->id,
+            'is_visible'   => true,
+            'status'       => 'active',
             'published_at' => now()->subHour(),
         ], $overrides));
 

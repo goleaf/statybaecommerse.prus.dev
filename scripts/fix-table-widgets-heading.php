@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-$baseDir = __DIR__.'/../app/Filament';
+$baseDir = __DIR__ . '/../app/Filament';
 
 $rii = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($baseDir));
 $updated = 0;
@@ -23,7 +23,7 @@ foreach ($rii as $file) {
 
     // Determine if class extends TableWidget (directly or via alias BaseWidget)
     $isTableWidget = (bool) (preg_match('/extends\s+\\?Filament\\\\Widgets\\\\TableWidget\b/', $code)
-        || (preg_match('/use\s+Filament\\\\Widgets\\\\TableWidget\s+as\s+([A-Za-z_][A-Za-z0-9_]*)\s*;/', $code, $m) && preg_match('/extends\s+'.preg_quote($m[1], '/').'\b/', $code))
+        || (preg_match('/use\s+Filament\\\\Widgets\\\\TableWidget\s+as\s+([A-Za-z_][A-Za-z0-9_]*)\s*;/', $code, $m) && preg_match('/extends\s+' . preg_quote($m[1], '/') . '\b/', $code))
         || preg_match('/extends\s+TableWidget\b/', $code));
 
     if (! $isTableWidget) {

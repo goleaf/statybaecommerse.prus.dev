@@ -38,20 +38,20 @@ final class BrandFrontendTest extends TestCase
         $category = Category::factory()->create();
 
         $product = Product::factory()->for($brand)->create([
-            'name' => 'Festool dulkių siurblys',
-            'slug' => 'festool-dulkiu-siurblys',
-            'is_visible' => true,
-            'status' => 'published',
+            'name'         => 'Festool dulkių siurblys',
+            'slug'         => 'festool-dulkiu-siurblys',
+            'is_visible'   => true,
+            'status'       => 'published',
             'published_at' => now()->subDay(),
         ]);
         $product->categories()->attach($category->id);
 
         Price::factory()->create([
             'priceable_type' => Product::class,
-            'priceable_id' => $product->id,
-            'currency_id' => 1,
-            'amount' => 349.00,
-            'is_enabled' => true,
+            'priceable_id'   => $product->id,
+            'currency_id'    => 1,
+            'amount'         => 349.00,
+            'is_enabled'     => true,
         ]);
 
         $this->get(route('frontend.brands.show', $brand))

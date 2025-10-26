@@ -4,7 +4,12 @@ declare(strict_types=1);
 
 namespace App\Support\Tracing;
 
+use function count;
+
 use Illuminate\Support\Str;
+
+use function strlen;
+
 use Symfony\Component\HttpFoundation\HeaderBag;
 
 final class TraceContext
@@ -17,8 +22,7 @@ final class TraceContext
         private readonly ?string $parentSpanId,
         private readonly string $correlationId,
         private readonly string $traceFlags,
-    ) {
-    }
+    ) {}
 
     public static function fromHeaders(HeaderBag $headers, string $correlationId): self
     {
@@ -26,7 +30,7 @@ final class TraceContext
 
         if ($traceparent !== null) {
             $parts = explode('-', (string) $traceparent);
-            if (\count($parts) >= 4) {
+            if (count($parts) >= 4) {
                 $traceId = self::validTraceId($parts[1] ?? '') ? strtolower($parts[1]) : null;
                 $parentSpanId = self::validSpanId($parts[2] ?? '') ? strtolower($parts[2]) : null;
                 $flags = self::sanitizeTraceFlags($parts[3] ?? self::DEFAULT_TRACE_FLAGS);
@@ -132,12 +136,12 @@ final class TraceContext
 
     private static function validTraceId(string $value): bool
     {
-        return \strlen($value) === 32 && ctype_xdigit($value) && strtolower($value) !== str_repeat('0', 32);
+        return strlen($value) === 32 && ctype_xdigit($value) && strtolower($value) !== str_repeat('0', 32);
     }
 
     private static function validSpanId(string $value): bool
     {
-        return \strlen($value) === 16 && ctype_xdigit($value) && strtolower($value) !== str_repeat('0', 16);
+        return strlen($value) === 16 && ctype_xdigit($value) && strtolower($value) !== str_repeat('0', 16);
     }
 
     private static function generateTraceId(): string
@@ -167,7 +171,7 @@ final class TraceContext
             return self::DEFAULT_TRACE_FLAGS;
         }
 
-        if (\strlen($flags) !== 2) {
+        if (strlen($flags) !== 2) {
             $flags = str_pad(substr($flags, 0, 2), 2, '0');
         }
 

@@ -28,35 +28,35 @@ final class SliderAnalyticsTest extends TestCase
     {
         // Create active sliders with various features
         Slider::factory()->create([
-            'title' => 'Active Slider with Image',
-            'is_active' => true,
-            'button_text' => 'Learn More',
-            'button_url' => 'https://example.com',
-            'description' => 'This is a test slider',
+            'title'            => 'Active Slider with Image',
+            'is_active'        => true,
+            'button_text'      => 'Learn More',
+            'button_url'       => 'https://example.com',
+            'description'      => 'This is a test slider',
             'background_color' => '#ff0000',
-            'text_color' => '#ffffff',
+            'text_color'       => '#ffffff',
         ]);
 
         Slider::factory()->create([
-            'title' => 'Active Slider without Image',
-            'is_active' => true,
+            'title'       => 'Active Slider without Image',
+            'is_active'   => true,
             'button_text' => null,
-            'button_url' => null,
+            'button_url'  => null,
             'description' => null,
         ]);
 
         Slider::factory()->create([
-            'title' => 'Inactive Slider',
-            'is_active' => false,
+            'title'       => 'Inactive Slider',
+            'is_active'   => false,
             'button_text' => 'Click Here',
-            'button_url' => '/internal-link',
+            'button_url'  => '/internal-link',
         ]);
 
         Slider::factory()->create([
-            'title' => 'Slider with Background',
-            'is_active' => true,
+            'title'            => 'Slider with Background',
+            'is_active'        => true,
             'background_color' => '#00ff00',
-            'text_color' => '#000000',
+            'text_color'       => '#000000',
         ]);
     }
 

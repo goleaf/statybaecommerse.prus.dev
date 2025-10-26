@@ -6,6 +6,7 @@ namespace Tests\Unit\Domain;
 
 use App\Models\Order;
 use Tests\TestCase;
+use ValueError;
 
 final class EnumsAreEnforcedTest extends TestCase
 {
@@ -13,7 +14,7 @@ final class EnumsAreEnforcedTest extends TestCase
     {
         $order = Order::factory()->make();
 
-        $this->expectException(\ValueError::class);
+        $this->expectException(ValueError::class);
         $order->status = 'definitely-not-a-valid-status';
     }
 
@@ -21,7 +22,7 @@ final class EnumsAreEnforcedTest extends TestCase
     {
         $order = Order::factory()->make();
 
-        $this->expectException(\ValueError::class);
+        $this->expectException(ValueError::class);
         $order->payment_status = 'unknown-payment-state';
     }
 
@@ -29,8 +30,7 @@ final class EnumsAreEnforcedTest extends TestCase
     {
         $order = Order::factory()->make();
 
-        $this->expectException(\ValueError::class);
+        $this->expectException(ValueError::class);
         $order->payment_method = 'totally-made-up-gateway';
     }
 }
-

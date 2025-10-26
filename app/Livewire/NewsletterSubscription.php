@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Livewire;
 
 use App\Models\Subscriber;
+use Exception;
 use Illuminate\Support\Facades\Log;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
@@ -18,11 +19,11 @@ use Livewire\Component;
  * @property string $first_name
  * @property string $last_name
  * @property string $company
- * @property array $interests
- * @property bool $isSubscribed
- * @property bool $showSuccess
+ * @property array  $interests
+ * @property bool   $isSubscribed
+ * @property bool   $showSuccess
  * @property string $source
- * @property mixed $listeners
+ * @property mixed  $listeners
  */
 final class NewsletterSubscription extends Component
 {
@@ -86,11 +87,11 @@ final class NewsletterSubscription extends Component
                 $this->showSuccess = true;
                 session()->flash('success', __('newsletter.subscribed_successfully'));
                 // Dispatch event for other components to listen
-                $this->dispatch('subscriber-added', ['email' => $this->email, 'name' => trim($this->first_name.' '.$this->last_name)]);
+                $this->dispatch('subscriber-added', ['email' => $this->email, 'name' => trim($this->first_name . ' ' . $this->last_name)]);
             }
             $this->resetForm();
-        } catch (\Exception $e) {
-            Log::error('Newsletter subscription error: '.$e->getMessage());
+        } catch (Exception $e) {
+            Log::error('Newsletter subscription error: ' . $e->getMessage());
             session()->flash('error', __('newsletter.subscription_error'));
         }
     }

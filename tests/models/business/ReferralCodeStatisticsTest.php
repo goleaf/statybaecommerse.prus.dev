@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Tests\Unit;
 
@@ -16,14 +18,14 @@ final class ReferralCodeStatisticsTest extends TestCase
         $referralCode = ReferralCode::factory()->create();
 
         $statistics = ReferralCodeStatistics::factory()->create([
-            'referral_code_id' => $referralCode->id,
-            'date' => '2024-01-01',
-            'total_views' => 100,
-            'total_clicks' => 50,
-            'total_signups' => 25,
+            'referral_code_id'  => $referralCode->id,
+            'date'              => '2024-01-01',
+            'total_views'       => 100,
+            'total_clicks'      => 50,
+            'total_signups'     => 25,
             'total_conversions' => 10,
-            'total_revenue' => 500.0,
-            'metadata' => ['source' => 'email', 'campaign' => 'winter_sale'],
+            'total_revenue'     => 500.0,
+            'metadata'          => ['source' => 'email', 'campaign' => 'winter_sale'],
         ]);
 
         $this->assertInstanceOf(ReferralCodeStatistics::class, $statistics);
@@ -63,9 +65,9 @@ final class ReferralCodeStatisticsTest extends TestCase
     public function test_referral_code_statistics_casts(): void
     {
         $statistics = ReferralCodeStatistics::factory()->create([
-            'date' => '2024-01-01',
+            'date'          => '2024-01-01',
             'total_revenue' => '250.75',
-            'metadata' => ['test' => 'data'],
+            'metadata'      => ['test' => 'data'],
         ]);
 
         $this->assertInstanceOf(\Carbon\Carbon::class, $statistics->date);
@@ -93,17 +95,17 @@ final class ReferralCodeStatisticsTest extends TestCase
 
         $janStats = ReferralCodeStatistics::factory()->create([
             'referral_code_id' => $referralCode->id,
-            'date' => '2024-01-15',
+            'date'             => '2024-01-15',
         ]);
 
         $febStats = ReferralCodeStatistics::factory()->create([
             'referral_code_id' => $referralCode->id,
-            'date' => '2024-02-15',
+            'date'             => '2024-02-15',
         ]);
 
         $marStats = ReferralCodeStatistics::factory()->create([
             'referral_code_id' => $referralCode->id,
-            'date' => '2024-03-15',
+            'date'             => '2024-03-15',
         ]);
 
         $janFebStats = ReferralCodeStatistics::byDateRange('2024-01-01', '2024-02-28')->get();
@@ -179,12 +181,12 @@ final class ReferralCodeStatisticsTest extends TestCase
     {
         $highPerforming = ReferralCodeStatistics::factory()->create([
             'total_conversions' => 10,
-            'total_revenue' => 500.0,
+            'total_revenue'     => 500.0,
         ]);
 
         $lowPerforming = ReferralCodeStatistics::factory()->create([
             'total_conversions' => 1,
-            'total_revenue' => 50.0,
+            'total_revenue'     => 50.0,
         ]);
 
         $highPerformingStats = ReferralCodeStatistics::highPerforming()->get();
@@ -195,7 +197,7 @@ final class ReferralCodeStatisticsTest extends TestCase
     public function test_referral_code_statistics_get_conversion_rate_method(): void
     {
         $statistics = ReferralCodeStatistics::factory()->create([
-            'total_clicks' => 100,
+            'total_clicks'      => 100,
             'total_conversions' => 25,
         ]);
 
@@ -205,7 +207,7 @@ final class ReferralCodeStatisticsTest extends TestCase
     public function test_referral_code_statistics_get_conversion_rate_with_zero_clicks(): void
     {
         $statistics = ReferralCodeStatistics::factory()->create([
-            'total_clicks' => 0,
+            'total_clicks'      => 0,
             'total_conversions' => 0,
         ]);
 
@@ -215,7 +217,7 @@ final class ReferralCodeStatisticsTest extends TestCase
     public function test_referral_code_statistics_get_signup_rate_method(): void
     {
         $statistics = ReferralCodeStatistics::factory()->create([
-            'total_views' => 200,
+            'total_views'   => 200,
             'total_signups' => 40,
         ]);
 
@@ -225,7 +227,7 @@ final class ReferralCodeStatisticsTest extends TestCase
     public function test_referral_code_statistics_get_signup_rate_with_zero_views(): void
     {
         $statistics = ReferralCodeStatistics::factory()->create([
-            'total_views' => 0,
+            'total_views'   => 0,
             'total_signups' => 0,
         ]);
 
@@ -235,7 +237,7 @@ final class ReferralCodeStatisticsTest extends TestCase
     public function test_referral_code_statistics_get_click_through_rate_method(): void
     {
         $statistics = ReferralCodeStatistics::factory()->create([
-            'total_views' => 1000,
+            'total_views'  => 1000,
             'total_clicks' => 150,
         ]);
 
@@ -245,7 +247,7 @@ final class ReferralCodeStatisticsTest extends TestCase
     public function test_referral_code_statistics_get_click_through_rate_with_zero_views(): void
     {
         $statistics = ReferralCodeStatistics::factory()->create([
-            'total_views' => 0,
+            'total_views'  => 0,
             'total_clicks' => 0,
         ]);
 
@@ -256,7 +258,7 @@ final class ReferralCodeStatisticsTest extends TestCase
     {
         $statistics = ReferralCodeStatistics::factory()->create([
             'total_conversions' => 10,
-            'total_revenue' => 500.0,
+            'total_revenue'     => 500.0,
         ]);
 
         $this->assertEquals(50.0, $statistics->getAverageRevenuePerConversion());
@@ -266,7 +268,7 @@ final class ReferralCodeStatisticsTest extends TestCase
     {
         $statistics = ReferralCodeStatistics::factory()->create([
             'total_conversions' => 0,
-            'total_revenue' => 0.0,
+            'total_revenue'     => 0.0,
         ]);
 
         $this->assertEquals(0.0, $statistics->getAverageRevenuePerConversion());

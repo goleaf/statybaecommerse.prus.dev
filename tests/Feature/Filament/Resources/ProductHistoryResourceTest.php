@@ -33,14 +33,14 @@ final class ProductHistoryResourceTest extends TestCase
         app()->setLocale('en');
 
         $this->admin = User::factory()->create([
-            'email' => 'admin@example.com',
+            'email'    => 'admin@example.com',
             'is_admin' => true,
         ]);
 
         $this->product = Product::factory()->create([
-            'status' => 'published',
+            'status'       => 'published',
             'published_at' => now(),
-            'is_visible' => true,
+            'is_visible'   => true,
         ]);
 
         $this->actingAs($this->admin);
@@ -50,8 +50,8 @@ final class ProductHistoryResourceTest extends TestCase
     {
         $history = ProductHistory::factory()->create([
             'product_id' => $this->product->id,
-            'user_id' => $this->admin->id,
-            'action' => 'created',
+            'user_id'    => $this->admin->id,
+            'action'     => 'created',
             'field_name' => 'name',
         ]);
 
@@ -67,20 +67,20 @@ final class ProductHistoryResourceTest extends TestCase
         Livewire::test(CreateProductHistory::class)
             ->fillForm([
                 'product_id' => $this->product->id,
-                'user_id' => $this->admin->id,
-                'action' => 'updated',
+                'user_id'    => $this->admin->id,
+                'action'     => 'updated',
                 'field_name' => 'price',
-                'old_value' => '99.99',
-                'new_value' => '129.99',
-                'meta' => ['reason' => 'Seasonal pricing'],
+                'old_value'  => '99.99',
+                'new_value'  => '129.99',
+                'meta'       => ['reason' => 'Seasonal pricing'],
             ])
             ->call('create')
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('product_histories', [
             'product_id' => $this->product->id,
-            'user_id' => $this->admin->id,
-            'action' => 'updated',
+            'user_id'    => $this->admin->id,
+            'action'     => 'updated',
             'field_name' => 'price',
         ]);
     }
@@ -89,24 +89,24 @@ final class ProductHistoryResourceTest extends TestCase
     {
         $history = ProductHistory::factory()->create([
             'product_id' => $this->product->id,
-            'user_id' => $this->admin->id,
-            'action' => 'updated',
+            'user_id'    => $this->admin->id,
+            'action'     => 'updated',
             'field_name' => 'description',
         ]);
 
         Livewire::test(EditProductHistory::class, ['record' => $history->getRouteKey()])
             ->fillForm([
                 'product_id' => $this->product->id,
-                'user_id' => $this->admin->id,
-                'action' => 'status_changed',
-                'new_value' => 'published',
+                'user_id'    => $this->admin->id,
+                'action'     => 'status_changed',
+                'new_value'  => 'published',
             ])
             ->call('save')
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('product_histories', [
-            'id' => $history->id,
-            'action' => 'status_changed',
+            'id'        => $history->id,
+            'action'    => 'status_changed',
             'new_value' => '"published"',
         ]);
     }
@@ -115,8 +115,8 @@ final class ProductHistoryResourceTest extends TestCase
     {
         $matching = ProductHistory::factory()->create([
             'product_id' => $this->product->id,
-            'user_id' => $this->admin->id,
-            'action' => 'updated',
+            'user_id'    => $this->admin->id,
+            'action'     => 'updated',
         ]);
 
         $other = ProductHistory::factory()->create();
@@ -142,7 +142,7 @@ final class ProductHistoryResourceTest extends TestCase
 
         Livewire::test(ListProductHistories::class)
             ->filterTable('date', [
-                'from' => Carbon::now()->subDay()->toDateString(),
+                'from'  => Carbon::now()->subDay()->toDateString(),
                 'until' => Carbon::now()->addDay()->toDateString(),
             ])
             ->assertCanSeeTableRecords([$today]);

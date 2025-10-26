@@ -86,7 +86,7 @@ final class ReportTest extends TestCase
         $response->assertSessionHas('success');
 
         $this->assertDatabaseHas('reports', [
-            'id' => $report->id,
+            'id'           => $report->id,
             'generated_by' => $user->id,
         ]);
     }

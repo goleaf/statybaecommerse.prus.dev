@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Tests\Feature;
 
 use App\Filament\Resources\UserResource;
-use App\Support\Nav;
 use App\Models\User;
+use App\Support\Nav;
 use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -21,7 +21,7 @@ class UserResourceTest extends TestCase
         parent::setUp();
 
         $this->actingAs(User::factory()->create([
-            'email' => 'admin@test.com',
+            'email'     => 'admin@test.com',
             'is_active' => true,
         ]));
     }
@@ -87,8 +87,8 @@ class UserResourceTest extends TestCase
     public function test_user_resource_with_sample_data(): void
     {
         $user = User::factory()->create([
-            'name' => 'John Doe',
-            'email' => 'john@example.com',
+            'name'      => 'John Doe',
+            'email'     => 'john@example.com',
             'is_active' => true,
         ]);
 

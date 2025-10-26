@@ -6,7 +6,6 @@ namespace App\Providers;
 
 use App\Models\ApiKey;
 use Illuminate\Cache\RateLimiting\Limit;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -23,7 +22,7 @@ final class ApiServiceProvider extends ServiceProvider
     private array $configBaselines = [];
 
     /**
-     * @param  \Illuminate\Contracts\Foundation\Application  $app
+     * @param \Illuminate\Contracts\Foundation\Application $app
      */
     public function __construct($app)
     {
@@ -171,7 +170,7 @@ final class ApiServiceProvider extends ServiceProvider
     /**
      * Normalize a limit definition array into the concrete RateLimiter Limit objects.
      *
-     * @param array<int|string, mixed> $definitions
+     * @param  array<int|string, mixed> $definitions
      * @return array<int, Limit>
      */
     private function resolveLimit(array $definitions, string $key): array
@@ -401,7 +400,7 @@ final class ApiServiceProvider extends ServiceProvider
     /**
      * Seed baseline configuration values so runtime overrides can be detected reliably.
      *
-     * @param  array<int, string>  $keys
+     * @param array<int, string> $keys
      */
     private function seedConfigBaselines(array $keys): void
     {

@@ -1,13 +1,15 @@
 <?php
-require __DIR__.'/../vendor/autoload.php';
-$app = require_once __DIR__.'/../bootstrap/app.php';
+
+declare(strict_types=1);
+require __DIR__ . '/../vendor/autoload.php';
+$app = require_once __DIR__ . '/../bootstrap/app.php';
 $app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
 
 use App\Livewire\ProductVariantShowcase;
 use App\Models\Product;
 use App\Models\ProductVariant;
-use Livewire\Livewire;
 use Illuminate\Support\Facades\DB;
+use Livewire\Livewire;
 
 // Ensure database fresh for script? We'll define using sqlite memory? We'll reuse same migration as test? Not replic.
 
@@ -15,8 +17,8 @@ Product::query()->delete();
 ProductVariant::query()->delete();
 
 $product = Product::factory()->create([
-    'is_visible' => true,
-    'status' => 'published',
+    'is_visible'   => true,
+    'status'       => 'published',
     'published_at' => now(),
 ]);
 
@@ -28,9 +30,9 @@ $variants = [
 
 foreach ($variants as $attributes) {
     ProductVariant::factory()->for($product)->create(array_merge([
-        'stock_quantity' => $attributes['available_quantity'],
+        'stock_quantity'    => $attributes['available_quantity'],
         'reserved_quantity' => 0,
-        'is_default' => false,
+        'is_default'        => false,
     ], $attributes));
 }
 

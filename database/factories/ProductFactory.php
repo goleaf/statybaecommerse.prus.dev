@@ -17,6 +17,7 @@ use Illuminate\Support\Str;
 class ProductFactory extends Factory
 {
     use SupportsSequenceIndices;
+
     protected $model = Product::class;
 
     private const PRESET_PRODUCTS = [
@@ -304,12 +305,12 @@ class ProductFactory extends Factory
     /**
      * Strip attributes that don't exist on the products table for lightweight test schemas.
      *
-     * @param  array<string, mixed>  $attributes
+     * @param  array<string, mixed> $attributes
      * @return array<string, mixed>
      */
     private function guardForMissingColumns(array $attributes): array
     {
-        $table = (new Product())->getTable();
+        $table = (new Product)->getTable();
 
         if (! Schema::hasTable($table)) {
             return $attributes;

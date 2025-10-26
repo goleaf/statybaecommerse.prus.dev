@@ -39,9 +39,9 @@ return [
 
     // Section titles
     'basic_information' => 'Basic Information',
-    'pricing_settings' => 'Pricing Settings',
-    'permissions' => 'Permissions',
-    'settings' => 'Settings',
+    'pricing_settings'  => 'Pricing Settings',
+    'permissions'       => 'Permissions',
+    'settings'          => 'Settings',
 
     // Navigation
     'navigation_label' => 'Customer Groups',
@@ -65,25 +65,25 @@ return [
     'filter_created_date'      => 'Created Date',
 
     // Actions
-    'action_view'   => 'View',
-    'action_edit'   => 'Edit',
-    'action_delete' => 'Delete',
-    'action_create' => 'Create New',
-    'activate' => 'Activate',
-    'deactivate' => 'Deactivate',
-    'set_default' => 'Set as Default',
-    'activate_selected' => 'Activate Selected',
+    'action_view'         => 'View',
+    'action_edit'         => 'Edit',
+    'action_delete'       => 'Delete',
+    'action_create'       => 'Create New',
+    'activate'            => 'Activate',
+    'deactivate'          => 'Deactivate',
+    'set_default'         => 'Set as Default',
+    'activate_selected'   => 'Activate Selected',
     'deactivate_selected' => 'Deactivate Selected',
 
     // Messages
-    'created_successfully' => 'Customer group created successfully',
-    'updated_successfully' => 'Customer group updated successfully',
-    'deleted_successfully' => 'Customer group deleted successfully',
-    'activated_successfully' => 'Customer group activated successfully',
-    'deactivated_successfully' => 'Customer group deactivated successfully',
+    'created_successfully'        => 'Customer group created successfully',
+    'updated_successfully'        => 'Customer group updated successfully',
+    'deleted_successfully'        => 'Customer group deleted successfully',
+    'activated_successfully'      => 'Customer group activated successfully',
+    'deactivated_successfully'    => 'Customer group deactivated successfully',
     'set_as_default_successfully' => 'Customer group set as default successfully',
-    'bulk_activated_success' => 'Selected customer groups activated successfully',
-    'bulk_deactivated_success' => 'Selected customer groups deactivated successfully',
+    'bulk_activated_success'      => 'Selected customer groups activated successfully',
+    'bulk_deactivated_success'    => 'Selected customer groups deactivated successfully',
 
     // Widgets
     'widget_total_groups'         => 'Total Groups',

@@ -42,7 +42,7 @@ test('cities index maintains a stable query count', function (): void {
 test('attribute values index maintains a stable query count', function (): void {
     $attribute = Attribute::factory()->create([
         'is_enabled' => true,
-        'is_active' => true,
+        'is_active'  => true,
     ]);
 
     AttributeValue::factory()->count(6)->for($attribute, 'attribute')->create();
@@ -62,7 +62,7 @@ test('reports index maintains a stable query count', function (): void {
 
 test('menu repository by key avoids n+1 queries', function (): void {
     $menu = Menu::factory()->active()->create([
-        'key' => 'main_header',
+        'key'      => 'main_header',
         'location' => 'header',
     ]);
 
@@ -71,19 +71,19 @@ test('menu repository by key avoids n+1 queries', function (): void {
         ->visible()
         ->sequence(fn ($sequence) => ['sort_order' => $sequence->index])
         ->create([
-            'menu_id' => $menu->id,
+            'menu_id'   => $menu->id,
             'parent_id' => null,
         ]);
 
     foreach ($roots as $root) {
         MenuItem::factory()->count(2)->visible()->sequence(fn ($sequence) => ['sort_order' => $sequence->index])
             ->create([
-                'menu_id' => $menu->id,
+                'menu_id'   => $menu->id,
                 'parent_id' => $root->id,
             ]);
     }
 
-    assertQueryCountLessThanOrEqual(4, function () use ($menu): void {
+    assertQueryCountLessThanOrEqual(4, function (): void {
         $repository = app(MenuRepository::class);
         $payload = $repository->byKey('main_header', app()->getLocale());
 
@@ -101,7 +101,7 @@ test('menu repository index query count remains bounded', function (): void {
     foreach ($menus as $menu) {
         MenuItem::factory()->count(4)->visible()->sequence(fn ($sequence) => ['sort_order' => $sequence->index])
             ->create([
-                'menu_id' => $menu->id,
+                'menu_id'   => $menu->id,
                 'parent_id' => null,
             ]);
     }

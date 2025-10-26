@@ -24,13 +24,13 @@ final class DiscountConditionTranslationFactory extends Factory
     {
         return [
             'discount_condition_id' => DiscountCondition::factory(),
-            'locale' => $this->faker->randomElement(['lt', 'en']),
-            'name' => $this->faker->sentence(3),
-            'description' => $this->faker->paragraph(),
-            'metadata' => $this->faker->optional(0.3)->randomElements([
+            'locale'                => $this->faker->randomElement(['lt', 'en']),
+            'name'                  => $this->faker->sentence(3),
+            'description'           => $this->faker->paragraph(),
+            'metadata'              => $this->faker->optional(0.3)->randomElements([
                 'category' => 'electronics',
-                'brand' => 'test_brand',
-                'season' => 'winter',
+                'brand'    => 'test_brand',
+                'season'   => 'winter',
             ]),
         ];
     }
@@ -41,8 +41,8 @@ final class DiscountConditionTranslationFactory extends Factory
     public function lithuanian(): static
     {
         return $this->state(fn (array $attributes) => [
-            'locale' => 'lt',
-            'name' => 'Nuolaidos sąlyga',
+            'locale'      => 'lt',
+            'name'        => 'Nuolaidos sąlyga',
             'description' => 'Ši sąlyga nustato nuolaidos taikymo kriterijus.',
         ]);
     }
@@ -53,8 +53,8 @@ final class DiscountConditionTranslationFactory extends Factory
     public function english(): static
     {
         return $this->state(fn (array $attributes) => [
-            'locale' => 'en',
-            'name' => 'Discount Condition',
+            'locale'      => 'en',
+            'name'        => 'Discount Condition',
             'description' => 'This condition sets the criteria for applying the discount.',
         ]);
     }

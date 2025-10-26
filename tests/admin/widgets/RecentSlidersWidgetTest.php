@@ -50,19 +50,19 @@ class RecentSlidersWidgetTest extends TestCase
     {
         // Create sample sliders
         $slider1 = Slider::factory()->create([
-            'title' => 'First Slider',
+            'title'       => 'First Slider',
             'button_text' => 'Click Me',
-            'sort_order' => 1,
-            'is_active' => true,
-            'created_at' => now()->subDays(1),
+            'sort_order'  => 1,
+            'is_active'   => true,
+            'created_at'  => now()->subDays(1),
         ]);
 
         $slider2 = Slider::factory()->create([
-            'title' => 'Second Slider',
+            'title'       => 'Second Slider',
             'button_text' => 'Learn More',
-            'sort_order' => 2,
-            'is_active' => false,
-            'created_at' => now()->subDays(2),
+            'sort_order'  => 2,
+            'is_active'   => false,
+            'created_at'  => now()->subDays(2),
         ]);
 
         $widget = new RecentSlidersWidget;
@@ -99,12 +99,12 @@ class RecentSlidersWidgetTest extends TestCase
     public function test_recent_sliders_widget_orders_by_latest(): void
     {
         $oldSlider = Slider::factory()->create([
-            'title' => 'Old Slider',
+            'title'      => 'Old Slider',
             'created_at' => now()->subDays(5),
         ]);
 
         $newSlider = Slider::factory()->create([
-            'title' => 'New Slider',
+            'title'      => 'New Slider',
             'created_at' => now(),
         ]);
 

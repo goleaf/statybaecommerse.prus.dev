@@ -29,14 +29,14 @@ final class CategoryBrandControllerTest extends TestCase
     {
         $category = Category::factory()->create(['is_visible' => true]);
         $brand = Brand::factory()->create([
-            'is_active' => true,
+            'is_active'  => true,
             'is_enabled' => true,
             'is_visible' => true,
         ]);
         $product = Product::factory()->create([
-            'brand_id' => $brand->id,
-            'is_visible' => true,
-            'status' => 'active',
+            'brand_id'     => $brand->id,
+            'is_visible'   => true,
+            'status'       => 'active',
             'published_at' => now(),
         ]);
         $product->categories()->attach($category->id);
@@ -50,7 +50,7 @@ final class CategoryBrandControllerTest extends TestCase
     public function test_brand_index_lists_brands(): void
     {
         $brand = Brand::factory()->create([
-            'is_active' => true,
+            'is_active'  => true,
             'is_enabled' => true,
             'is_visible' => true,
         ]);
@@ -65,15 +65,15 @@ final class CategoryBrandControllerTest extends TestCase
     public function test_brand_show_lists_products(): void
     {
         $brand = Brand::factory()->create([
-            'is_active' => true,
+            'is_active'  => true,
             'is_enabled' => true,
             'is_visible' => true,
         ]);
         $category = Category::factory()->create(['is_visible' => true]);
         $product = Product::factory()->create([
-            'brand_id' => $brand->id,
-            'is_visible' => true,
-            'status' => 'active',
+            'brand_id'     => $brand->id,
+            'is_visible'   => true,
+            'status'       => 'active',
             'published_at' => now(),
         ]);
         $product->categories()->attach($category->id);

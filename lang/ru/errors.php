@@ -2,8 +2,6 @@
 
 declare(strict_types=1);
 
-use App\Support\ErrorCode;
-
 return [
     'titles' => [
         // @translators: Сообщение при отсутствии страницы или записи (HTTP 404).

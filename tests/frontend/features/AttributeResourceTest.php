@@ -43,17 +43,17 @@ final class AttributeResourceTest extends TestCase
     public function test_attribute_resource_can_create_attribute(): void
     {
         $attributeData = [
-            'name' => 'Test Attribute',
-            'slug' => 'test-attribute',
-            'type' => 'text',
-            'description' => 'Test description',
-            'is_required' => true,
+            'name'          => 'Test Attribute',
+            'slug'          => 'test-attribute',
+            'type'          => 'text',
+            'description'   => 'Test description',
+            'is_required'   => true,
             'is_filterable' => true,
             'is_searchable' => false,
-            'is_visible' => true,
-            'is_enabled' => true,
-            'sort_order' => 1,
-            'group_name' => 'test-group',
+            'is_visible'    => true,
+            'is_enabled'    => true,
+            'sort_order'    => 1,
+            'group_name'    => 'test-group',
         ];
 
         $response = $this->post(route('filament.admin.resources.attributes.store'), $attributeData);
@@ -61,29 +61,29 @@ final class AttributeResourceTest extends TestCase
         $response->assertRedirect();
 
         $this->assertDatabaseHas('attributes', [
-            'name' => 'Test Attribute',
-            'slug' => 'test-attribute',
-            'type' => 'text',
-            'description' => 'Test description',
-            'is_required' => true,
+            'name'          => 'Test Attribute',
+            'slug'          => 'test-attribute',
+            'type'          => 'text',
+            'description'   => 'Test description',
+            'is_required'   => true,
             'is_filterable' => true,
             'is_searchable' => false,
-            'is_visible' => true,
-            'is_enabled' => true,
-            'sort_order' => 1,
-            'group_name' => 'test-group',
+            'is_visible'    => true,
+            'is_enabled'    => true,
+            'sort_order'    => 1,
+            'group_name'    => 'test-group',
         ]);
     }
 
     public function test_attribute_resource_can_edit_attribute(): void
     {
         $attribute = Attribute::factory()->create([
-            'name' => 'Original Name',
+            'name'        => 'Original Name',
             'description' => 'Original Description',
         ]);
 
         $updateData = [
-            'name' => 'Updated Name',
+            'name'        => 'Updated Name',
             'description' => 'Updated Description',
         ];
 
@@ -92,8 +92,8 @@ final class AttributeResourceTest extends TestCase
         $response->assertRedirect();
 
         $this->assertDatabaseHas('attributes', [
-            'id' => $attribute->id,
-            'name' => 'Updated Name',
+            'id'          => $attribute->id,
+            'name'        => 'Updated Name',
             'description' => 'Updated Description',
         ]);
     }

@@ -12,8 +12,8 @@ use App\Models\Product;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 
 /**
@@ -23,14 +23,17 @@ use Illuminate\Support\Str;
 final class AutocompleteService
 {
     private const DEFAULT_LIMIT = 10;
+
     private const MAX_LIMIT = 50;
+
     private const RECENT_CACHE_LIMIT = 20;
+
     private const RECENT_TTL_SECONDS = 604800; // 7 days
 
     /**
      * Perform an autocomplete search across the selected resource types.
      *
-     * @param  array<int, string>  $types
+     * @param  array<int, string>               $types
      * @return array<int, array<string, mixed>>
      */
     public function search(string $query, int $limit = self::DEFAULT_LIMIT, array $types = []): array
@@ -49,12 +52,12 @@ final class AutocompleteService
 
         foreach ($types as $type) {
             $results = $results->merge(match ($type) {
-                'products' => $this->searchProducts($normalizedQuery, $perTypeLimit),
-                'categories' => $this->searchCategories($normalizedQuery, $perTypeLimit),
-                'brands' => $this->searchBrands($normalizedQuery, $perTypeLimit),
+                'products'    => $this->searchProducts($normalizedQuery, $perTypeLimit),
+                'categories'  => $this->searchCategories($normalizedQuery, $perTypeLimit),
+                'brands'      => $this->searchBrands($normalizedQuery, $perTypeLimit),
                 'collections' => $this->searchCollections($normalizedQuery, $perTypeLimit),
-                'attributes' => $this->searchAttributes($normalizedQuery, $perTypeLimit),
-                default => [],
+                'attributes'  => $this->searchAttributes($normalizedQuery, $perTypeLimit),
+                default       => [],
             });
         }
 
@@ -236,10 +239,10 @@ final class AutocompleteService
                     ->limit($limit)
                     ->get()
                     ->map(fn (Product $product) => [
-                        'type' => 'product',
-                        'id' => $product->id,
-                        'title' => $product->name,
-                        'url' => $this->productUrl($product),
+                        'type'       => 'product',
+                        'id'         => $product->id,
+                        'title'      => $product->name,
+                        'url'        => $this->productUrl($product),
                         'is_popular' => true,
                     ])
                     ->all();
@@ -248,7 +251,7 @@ final class AutocompleteService
     }
 
     /**
-     * @param  array<string, mixed>  $filters
+     * @param  array<string, mixed>                                                       $filters
      * @return array{brand_id: int|null, category_id: int|null, search_term: string|null}
      */
     private function normaliseProductContext(array $filters): array
@@ -264,14 +267,14 @@ final class AutocompleteService
         }
 
         return [
-            'brand_id' => $this->resolveBrandIdentifier($brand),
+            'brand_id'    => $this->resolveBrandIdentifier($brand),
             'category_id' => $this->resolveCategoryIdentifier($category),
             'search_term' => $searchTerm,
         ];
     }
 
     /**
-     * @param  array{brand_id: int|null, category_id: int|null, search_term: string|null}  $context
+     * @param array{brand_id: int|null, category_id: int|null, search_term: string|null} $context
      */
     private function popularSuggestionsCacheKey(int $limit, array $context): string
     {
@@ -285,7 +288,7 @@ final class AutocompleteService
     }
 
     /**
-     * @param  array{brand_id: int|null, category_id: int|null, search_term: string|null}  $context
+     * @param array{brand_id: int|null, category_id: int|null, search_term: string|null} $context
      */
     private function applyProductContextFilters(Builder $query, array $context): void
     {
@@ -430,7 +433,7 @@ final class AutocompleteService
     }
 
     /**
-     * @param  array<int, string>  $types
+     * @param  array<int, string> $types
      * @return array<int, string>
      */
     private function resolveTypes(array $types): array
@@ -446,7 +449,7 @@ final class AutocompleteService
 
     private function prepareSearchTerm(string $query): string
     {
-        return '%'.str_replace(['%', '_'], ['\\%', '\\_'], $query).'%';
+        return '%' . str_replace(['%', '_'], ['\\%', '\\_'], $query) . '%';
     }
 
     private function calculateRelevanceScore(string $haystack, string $needle): int
@@ -466,13 +469,13 @@ final class AutocompleteService
     private function mapProduct(Product $product, string $query): array
     {
         return [
-            'type' => 'product',
-            'id' => $product->id,
-            'title' => $product->name,
-            'subtitle' => $product->brand?->name,
-            'url' => $this->productUrl($product),
-            'image' => $product->getFirstMediaUrl('images', 'thumb') ?: null,
-            'price' => $product->price,
+            'type'            => 'product',
+            'id'              => $product->id,
+            'title'           => $product->name,
+            'subtitle'        => $product->brand?->name,
+            'url'             => $this->productUrl($product),
+            'image'           => $product->getFirstMediaUrl('images', 'thumb') ?: null,
+            'price'           => $product->price,
             'formatted_price' => number_format((float) $product->price, 2),
             'relevance_score' => $this->calculateRelevanceScore($product->name, $query),
         ];
@@ -484,11 +487,11 @@ final class AutocompleteService
     private function mapCategory(Category $category, string $query): array
     {
         return [
-            'type' => 'category',
-            'id' => $category->id,
-            'title' => $category->name,
-            'subtitle' => $category->parent?->name,
-            'url' => url('/category/'.$category->slug),
+            'type'            => 'category',
+            'id'              => $category->id,
+            'title'           => $category->name,
+            'subtitle'        => $category->parent?->name,
+            'url'             => url('/category/' . $category->slug),
             'relevance_score' => $this->calculateRelevanceScore($category->name ?? '', $query),
         ];
     }
@@ -499,10 +502,10 @@ final class AutocompleteService
     private function mapBrand(Brand $brand, string $query): array
     {
         return [
-            'type' => 'brand',
-            'id' => $brand->id,
-            'title' => $brand->name,
-            'url' => url('/brands/'.$brand->slug),
+            'type'            => 'brand',
+            'id'              => $brand->id,
+            'title'           => $brand->name,
+            'url'             => url('/brands/' . $brand->slug),
             'relevance_score' => $this->calculateRelevanceScore($brand->name ?? '', $query),
         ];
     }
@@ -513,10 +516,10 @@ final class AutocompleteService
     private function mapCollection(Collection $collection, string $query): array
     {
         return [
-            'type' => 'collection',
-            'id' => $collection->id,
-            'title' => $collection->name,
-            'url' => url('/collections/'.$collection->slug),
+            'type'            => 'collection',
+            'id'              => $collection->id,
+            'title'           => $collection->name,
+            'url'             => url('/collections/' . $collection->slug),
             'relevance_score' => $this->calculateRelevanceScore($collection->name ?? '', $query),
         ];
     }
@@ -527,24 +530,24 @@ final class AutocompleteService
     private function mapAttribute(Attribute $attribute, string $query): array
     {
         return [
-            'type' => 'attribute',
-            'id' => $attribute->id,
-            'title' => $attribute->name,
-            'code' => $attribute->code,
+            'type'            => 'attribute',
+            'id'              => $attribute->id,
+            'title'           => $attribute->name,
+            'code'            => $attribute->code,
             'relevance_score' => $this->calculateRelevanceScore($attribute->name ?? $attribute->code ?? '', $query),
         ];
     }
 
     private function productUrl(Product $product): string
     {
-        return url('/products/'.$product->slug);
+        return url('/products/' . $product->slug);
     }
 
     private function recentCacheKey(): string
     {
         $user = $this->currentUser();
 
-        return 'autocomplete:recent:'.($user?->getAuthIdentifier() ?? 'guest');
+        return 'autocomplete:recent:' . ($user?->getAuthIdentifier() ?? 'guest');
     }
 
     private function currentUser(): ?Authenticatable

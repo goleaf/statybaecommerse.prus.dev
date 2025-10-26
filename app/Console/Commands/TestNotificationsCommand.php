@@ -29,23 +29,23 @@ final class TestNotificationsCommand extends Command
 
         // Create order notifications
         $notificationService->createOrderNotification($user, 'created', [
-            'id' => 1,
+            'id'     => 1,
             'number' => 'ORD-001',
         ]);
 
         $notificationService->createOrderNotification($user, 'shipped', [
-            'id' => 1,
+            'id'     => 1,
             'number' => 'ORD-001',
         ], true);
 
         // Create product notifications
         $notificationService->createProductNotification($user, 'low_stock', [
-            'id' => 1,
+            'id'   => 1,
             'name' => 'Test Product',
         ], true);
 
         $notificationService->createProductNotification($user, 'created', [
-            'id' => 2,
+            'id'   => 2,
             'name' => 'New Product',
         ]);
 

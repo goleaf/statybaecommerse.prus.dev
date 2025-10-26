@@ -22,14 +22,14 @@ final class DiscountCodeControllerTest extends TestCase
 
         $discount = $this->makeDiscount();
         $code = $this->makeCode($discount, [
-            'code' => 'PAST10',
+            'code'       => 'PAST10',
             'expires_at' => now()->subDay(),
         ]);
         $payload = $this->buildCartPayload();
 
         $response = $this->postJson(route('frontend.discount-codes.apply'), [
-            'code' => $code->code,
-            'cart' => $payload,
+            'code'     => $code->code,
+            'cart'     => $payload,
             'shipping' => ['base_amount' => 0],
         ]);
 
@@ -43,15 +43,15 @@ final class DiscountCodeControllerTest extends TestCase
 
         $discount = $this->makeDiscount(['usage_limit' => 1, 'usage_count' => 1]);
         $code = $this->makeCode($discount, [
-            'code' => 'LIMITED',
+            'code'        => 'LIMITED',
             'usage_limit' => 1,
             'usage_count' => 1,
         ]);
         $payload = $this->buildCartPayload();
 
         $response = $this->postJson(route('frontend.discount-codes.apply'), [
-            'code' => $code->code,
-            'cart' => $payload,
+            'code'     => $code->code,
+            'cart'     => $payload,
             'shipping' => ['base_amount' => 0],
         ]);
 
@@ -68,24 +68,24 @@ final class DiscountCodeControllerTest extends TestCase
 
         $discountA = $this->makeDiscount(['code' => 'STACKA']);
         $codeA = $this->makeCode($discountA, [
-            'code' => 'STACKA',
+            'code'         => 'STACKA',
             'is_stackable' => false,
         ]);
         $responseA = $this->postJson(route('frontend.discount-codes.apply'), [
-            'code' => $codeA->code,
-            'cart' => $cartPayload,
+            'code'     => $codeA->code,
+            'cart'     => $cartPayload,
             'shipping' => ['base_amount' => 0],
         ]);
         $responseA->assertStatus(200);
 
         $discountB = $this->makeDiscount(['code' => 'STACKB']);
         $codeB = $this->makeCode($discountB, [
-            'code' => 'STACKB',
+            'code'         => 'STACKB',
             'is_stackable' => false,
         ]);
         $responseB = $this->postJson(route('frontend.discount-codes.apply'), [
-            'code' => $codeB->code,
-            'cart' => $cartPayload,
+            'code'     => $codeB->code,
+            'cart'     => $cartPayload,
             'shipping' => ['base_amount' => 0],
         ]);
 
@@ -97,17 +97,17 @@ final class DiscountCodeControllerTest extends TestCase
     {
         // Create a baseline active discount that can be safely applied during tests.
         return Discount::factory()->create(array_merge([
-            'type' => 'percentage',
-            'value' => 10,
-            'minimum_amount' => null,
-            'usage_limit' => null,
-            'usage_count' => 0,
+            'type'               => 'percentage',
+            'value'              => 10,
+            'minimum_amount'     => null,
+            'usage_limit'        => null,
+            'usage_count'        => 0,
             'per_customer_limit' => null,
-            'starts_at' => now()->subDay(),
-            'ends_at' => now()->addDays(7),
-            'status' => 'active',
-            'is_active' => true,
-            'is_enabled' => true,
+            'starts_at'          => now()->subDay(),
+            'ends_at'            => now()->addDays(7),
+            'status'             => 'active',
+            'is_active'          => true,
+            'is_enabled'         => true,
         ], $overrides));
     }
 
@@ -115,20 +115,20 @@ final class DiscountCodeControllerTest extends TestCase
     {
         // Ensure every generated code matches the permissive baseline unless a test overrides it explicitly.
         return DiscountCode::factory()->create(array_merge([
-            'discount_id' => $discount->getKey(),
-            'code' => 'HONEST10',
-            'type' => 'percentage',
-            'value' => 10,
-            'minimum_amount' => 0,
-            'usage_limit' => null,
+            'discount_id'          => $discount->getKey(),
+            'code'                 => 'HONEST10',
+            'type'                 => 'percentage',
+            'value'                => 10,
+            'minimum_amount'       => 0,
+            'usage_limit'          => null,
             'usage_limit_per_user' => null,
-            'usage_count' => 0,
-            'starts_at' => now()->subDay(),
-            'expires_at' => now()->addDays(7),
-            'status' => 'active',
-            'is_active' => true,
-            'is_stackable' => false,
-            'customer_group_id' => null,
+            'usage_count'          => 0,
+            'starts_at'            => now()->subDay(),
+            'expires_at'           => now()->addDays(7),
+            'status'               => 'active',
+            'is_active'            => true,
+            'is_stackable'         => false,
+            'customer_group_id'    => null,
         ], $overrides));
     }
 
@@ -139,9 +139,9 @@ final class DiscountCodeControllerTest extends TestCase
 
         return [
             'subtotal' => 100.0,
-            'items' => [[
+            'items'    => [[
                 'product_id' => $product->getKey(),
-                'quantity' => 1,
+                'quantity'   => 1,
                 'unit_price' => 100.0,
             ]],
         ];

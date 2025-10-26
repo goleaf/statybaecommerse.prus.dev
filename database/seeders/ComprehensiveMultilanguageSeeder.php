@@ -13,8 +13,10 @@ use App\Models\Location;
 use App\Models\Product;
 use App\Models\Zone;
 use App\Services\Images\LocalImageGeneratorService;
+use Exception;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Log;
+use Throwable;
 
 final class ComprehensiveMultilanguageSeeder extends Seeder
 {
@@ -42,9 +44,9 @@ final class ComprehensiveMultilanguageSeeder extends Seeder
             $this->seedProductsWithTranslations();
 
             $this->command->info('✅ Comprehensive multilanguage seeding completed successfully!');
-        } catch (\Exception $e) {
-            Log::error('Comprehensive multilanguage seeding failed: '.$e->getMessage());
-            $this->command->error('❌ Seeding failed: '.$e->getMessage());
+        } catch (Exception $e) {
+            Log::error('Comprehensive multilanguage seeding failed: ' . $e->getMessage());
+            $this->command->error('❌ Seeding failed: ' . $e->getMessage());
             throw $e;
         }
     }
@@ -74,23 +76,23 @@ final class ComprehensiveMultilanguageSeeder extends Seeder
                     ], $data['translations'][$locale]);
                 })
                 ->create([
-                    'cca2' => $data['cca2'],
-                    'cca3' => $data['cca3'],
+                    'cca2'               => $data['cca2'],
+                    'cca3'               => $data['cca3'],
                     'phone_calling_code' => $data['phone_calling_code'],
-                    'flag' => $data['flag'],
-                    'region' => $data['region'],
-                    'subregion' => $data['subregion'],
-                    'latitude' => $data['latitude'],
-                    'longitude' => $data['longitude'],
-                    'currencies' => $data['currencies'],
-                    'name' => $data['translations']['en']['name'],
-                    'name_official' => $data['translations']['en']['name_official'],
-                    'is_enabled' => true,
-                    'sort_order' => $index + 1,
+                    'flag'               => $data['flag'],
+                    'region'             => $data['region'],
+                    'subregion'          => $data['subregion'],
+                    'latitude'           => $data['latitude'],
+                    'longitude'          => $data['longitude'],
+                    'currencies'         => $data['currencies'],
+                    'name'               => $data['translations']['en']['name'],
+                    'name_official'      => $data['translations']['en']['name_official'],
+                    'is_enabled'         => true,
+                    'sort_order'         => $index + 1,
                 ]);
         }
 
-        $this->command->info('   ✅ Created '.count($countriesData).' countries with translations');
+        $this->command->info('   ✅ Created ' . count($countriesData) . ' countries with translations');
     }
 
     private function seedZones(): void
@@ -105,13 +107,13 @@ final class ComprehensiveMultilanguageSeeder extends Seeder
 
         foreach ($zonesData as $data) {
             Zone::factory()->create([
-                'name' => $data['name'],
-                'code' => $data['code'],
+                'name'       => $data['name'],
+                'code'       => $data['code'],
                 'is_enabled' => true,
             ]);
         }
 
-        $this->command->info('   ✅ Created '.count($zonesData).' zones');
+        $this->command->info('   ✅ Created ' . count($zonesData) . ' zones');
     }
 
     private function seedCurrenciesWithTranslations(): void
@@ -126,16 +128,16 @@ final class ComprehensiveMultilanguageSeeder extends Seeder
 
         foreach ($currenciesData as $data) {
             Currency::factory()->create([
-                'code' => $data['code'],
-                'symbol' => $data['symbol'],
-                'name' => $data['name'],
+                'code'          => $data['code'],
+                'symbol'        => $data['symbol'],
+                'name'          => $data['name'],
                 'exchange_rate' => $data['exchange_rate'],
-                'is_default' => $data['is_default'],
-                'is_enabled' => true,
+                'is_default'    => $data['is_default'],
+                'is_enabled'    => true,
             ]);
         }
 
-        $this->command->info('   ✅ Created '.count($currenciesData).' currencies');
+        $this->command->info('   ✅ Created ' . count($currenciesData) . ' currencies');
     }
 
     private function seedLocationsWithTranslations(): void
@@ -144,76 +146,76 @@ final class ComprehensiveMultilanguageSeeder extends Seeder
 
         $locations = [
             [
-                'code' => 'VLN001',
+                'code'           => 'VLN001',
                 'address_line_1' => 'Gedimino pr. 9',
-                'city' => 'Vilnius',
-                'state' => 'Vilnius County',
-                'postal_code' => '01103',
-                'country_code' => 'LT',
-                'phone' => '+370 5 123 4567',
-                'email' => 'vilnius@statybaecommerse.lt',
-                'is_enabled' => true,
-                'is_default' => true,
-                'type' => 'warehouse',
-                'translations' => [
+                'city'           => 'Vilnius',
+                'state'          => 'Vilnius County',
+                'postal_code'    => '01103',
+                'country_code'   => 'LT',
+                'phone'          => '+370 5 123 4567',
+                'email'          => 'vilnius@statybaecommerse.lt',
+                'is_enabled'     => true,
+                'is_default'     => true,
+                'type'           => 'warehouse',
+                'translations'   => [
                     'lt' => [
-                        'name' => 'Vilniaus sandėlis',
-                        'slug' => 'vilniaus-sandelis',
+                        'name'        => 'Vilniaus sandėlis',
+                        'slug'        => 'vilniaus-sandelis',
                         'description' => 'Pagrindinis sandėlis Vilniuje su pilnu statybos medžiagų asortimentu',
                     ],
                     'en' => [
-                        'name' => 'Vilnius Warehouse',
-                        'slug' => 'vilnius-warehouse',
+                        'name'        => 'Vilnius Warehouse',
+                        'slug'        => 'vilnius-warehouse',
                         'description' => 'Main warehouse in Vilnius with full range of construction materials',
                     ],
                 ],
             ],
             [
-                'code' => 'KNS001',
+                'code'           => 'KNS001',
                 'address_line_1' => 'Laisvės al. 53',
-                'city' => 'Kaunas',
-                'state' => 'Kaunas County',
-                'postal_code' => '44309',
-                'country_code' => 'LT',
-                'phone' => '+370 37 123 456',
-                'email' => 'kaunas@statybaecommerse.lt',
-                'is_enabled' => true,
-                'is_default' => false,
-                'type' => 'store',
-                'translations' => [
+                'city'           => 'Kaunas',
+                'state'          => 'Kaunas County',
+                'postal_code'    => '44309',
+                'country_code'   => 'LT',
+                'phone'          => '+370 37 123 456',
+                'email'          => 'kaunas@statybaecommerse.lt',
+                'is_enabled'     => true,
+                'is_default'     => false,
+                'type'           => 'store',
+                'translations'   => [
                     'lt' => [
-                        'name' => 'Kauno parduotuvė',
-                        'slug' => 'kauno-parduotuve',
+                        'name'        => 'Kauno parduotuvė',
+                        'slug'        => 'kauno-parduotuve',
                         'description' => 'Parduotuvė Kaune su statybos medžiagomis ir įrankiais',
                     ],
                     'en' => [
-                        'name' => 'Kaunas Store',
-                        'slug' => 'kaunas-store',
+                        'name'        => 'Kaunas Store',
+                        'slug'        => 'kaunas-store',
                         'description' => 'Store in Kaunas with construction materials and tools',
                     ],
                 ],
             ],
             [
-                'code' => 'KLP001',
+                'code'           => 'KLP001',
                 'address_line_1' => 'Taikos pr. 61',
-                'city' => 'Klaipėda',
-                'state' => 'Klaipėda County',
-                'postal_code' => '91181',
-                'country_code' => 'LT',
-                'phone' => '+370 46 123 789',
-                'email' => 'klaipeda@statybaecommerse.lt',
-                'is_enabled' => true,
-                'is_default' => false,
-                'type' => 'pickup_point',
-                'translations' => [
+                'city'           => 'Klaipėda',
+                'state'          => 'Klaipėda County',
+                'postal_code'    => '91181',
+                'country_code'   => 'LT',
+                'phone'          => '+370 46 123 789',
+                'email'          => 'klaipeda@statybaecommerse.lt',
+                'is_enabled'     => true,
+                'is_default'     => false,
+                'type'           => 'pickup_point',
+                'translations'   => [
                     'lt' => [
-                        'name' => 'Klaipėdos atsiėmimo punktas',
-                        'slug' => 'klaipedos-atsemimo-punktas',
+                        'name'        => 'Klaipėdos atsiėmimo punktas',
+                        'slug'        => 'klaipedos-atsemimo-punktas',
                         'description' => 'Patogus atsiėmimo punktas Klaipėdoje',
                     ],
                     'en' => [
-                        'name' => 'Klaipėda Pickup Point',
-                        'slug' => 'klaipeda-pickup-point',
+                        'name'        => 'Klaipėda Pickup Point',
+                        'slug'        => 'klaipeda-pickup-point',
                         'description' => 'Convenient pickup point in Klaipėda',
                     ],
                 ],
@@ -227,8 +229,8 @@ final class ComprehensiveMultilanguageSeeder extends Seeder
             $location = Location::updateOrCreate(
                 ['code' => $locationData['code']],
                 array_merge($locationData, [
-                    'name' => collect($translations)->mapWithKeys(fn ($trans, $locale) => [$locale => $trans['name']])->all(),
-                    'slug' => collect($translations)->mapWithKeys(fn ($trans, $locale) => [$locale => $trans['slug']])->all(),
+                    'name'        => collect($translations)->mapWithKeys(fn ($trans, $locale) => [$locale => $trans['name']])->all(),
+                    'slug'        => collect($translations)->mapWithKeys(fn ($trans, $locale) => [$locale => $trans['slug']])->all(),
                     'description' => collect($translations)->mapWithKeys(fn ($trans, $locale) => [$locale => $trans['description']])->all(),
                 ])
             );
@@ -236,7 +238,7 @@ final class ComprehensiveMultilanguageSeeder extends Seeder
             $this->command->info("   📍 Created location: {$location->getTranslation('name', 'en')}");
         }
 
-        $this->command->info('   ✅ Created '.count($locations).' locations with translations');
+        $this->command->info('   ✅ Created ' . count($locations) . ' locations with translations');
     }
 
     private function seedCategoriesWithTranslations(): void
@@ -245,77 +247,77 @@ final class ComprehensiveMultilanguageSeeder extends Seeder
 
         $categories = [
             [
-                'name' => 'Construction Materials',
-                'slug' => 'construction-materials',
-                'description' => 'High-quality construction materials for all your building needs',
-                'is_enabled' => true,
-                'sort_order' => 1,
+                'name'         => 'Construction Materials',
+                'slug'         => 'construction-materials',
+                'description'  => 'High-quality construction materials for all your building needs',
+                'is_enabled'   => true,
+                'sort_order'   => 1,
                 'translations' => [
                     'lt' => [
-                        'name' => 'Statybos medžiagos',
-                        'slug' => 'statybos-medziagos',
+                        'name'        => 'Statybos medžiagos',
+                        'slug'        => 'statybos-medziagos',
                         'description' => 'Aukštos kokybės statybos medžiagos visiems jūsų statybos poreikiams',
                     ],
                     'en' => [
-                        'name' => 'Construction Materials',
-                        'slug' => 'construction-materials',
+                        'name'        => 'Construction Materials',
+                        'slug'        => 'construction-materials',
                         'description' => 'High-quality construction materials for all your building needs',
                     ],
                 ],
             ],
             [
-                'name' => 'Tools & Equipment',
-                'slug' => 'tools-equipment',
-                'description' => 'Professional tools and equipment for construction and renovation',
-                'is_enabled' => true,
-                'sort_order' => 2,
+                'name'         => 'Tools & Equipment',
+                'slug'         => 'tools-equipment',
+                'description'  => 'Professional tools and equipment for construction and renovation',
+                'is_enabled'   => true,
+                'sort_order'   => 2,
                 'translations' => [
                     'lt' => [
-                        'name' => 'Įrankiai ir įranga',
-                        'slug' => 'irankiai-iranga',
+                        'name'        => 'Įrankiai ir įranga',
+                        'slug'        => 'irankiai-iranga',
                         'description' => 'Profesionalūs įrankiai ir įranga statybai ir remontui',
                     ],
                     'en' => [
-                        'name' => 'Tools & Equipment',
-                        'slug' => 'tools-equipment',
+                        'name'        => 'Tools & Equipment',
+                        'slug'        => 'tools-equipment',
                         'description' => 'Professional tools and equipment for construction and renovation',
                     ],
                 ],
             ],
             [
-                'name' => 'Electrical Supplies',
-                'slug' => 'electrical-supplies',
-                'description' => 'Complete range of electrical supplies and components',
-                'is_enabled' => true,
-                'sort_order' => 3,
+                'name'         => 'Electrical Supplies',
+                'slug'         => 'electrical-supplies',
+                'description'  => 'Complete range of electrical supplies and components',
+                'is_enabled'   => true,
+                'sort_order'   => 3,
                 'translations' => [
                     'lt' => [
-                        'name' => 'Elektros prekės',
-                        'slug' => 'elektros-prekes',
+                        'name'        => 'Elektros prekės',
+                        'slug'        => 'elektros-prekes',
                         'description' => 'Pilnas elektros prekių ir komponentų asortimentas',
                     ],
                     'en' => [
-                        'name' => 'Electrical Supplies',
-                        'slug' => 'electrical-supplies',
+                        'name'        => 'Electrical Supplies',
+                        'slug'        => 'electrical-supplies',
                         'description' => 'Complete range of electrical supplies and components',
                     ],
                 ],
             ],
             [
-                'name' => 'Plumbing & Heating',
-                'slug' => 'plumbing-heating',
-                'description' => 'Plumbing fixtures, pipes, and heating systems',
-                'is_enabled' => true,
-                'sort_order' => 4,
+                'name'         => 'Plumbing & Heating',
+                'slug'         => 'plumbing-heating',
+                'description'  => 'Plumbing fixtures, pipes, and heating systems',
+                'is_enabled'   => true,
+                'sort_order'   => 4,
                 'translations' => [
                     'lt' => [
-                        'name' => 'Santechnika ir šildymas',
-                        'slug' => 'santechnika-sildymas',
+                        'name'        => 'Santechnika ir šildymas',
+                        'slug'        => 'santechnika-sildymas',
                         'description' => 'Santechnikos įranga, vamzdžiai ir šildymo sistemos',
                     ],
                     'en' => [
-                        'name' => 'Plumbing & Heating',
-                        'slug' => 'plumbing-heating',
+                        'name'        => 'Plumbing & Heating',
+                        'slug'        => 'plumbing-heating',
                         'description' => 'Plumbing fixtures, pipes, and heating systems',
                     ],
                 ],
@@ -326,10 +328,10 @@ final class ComprehensiveMultilanguageSeeder extends Seeder
             $category = Category::updateOrCreate(
                 ['slug' => $categoryData['slug']],
                 [
-                    'name' => $categoryData['name'],
+                    'name'        => $categoryData['name'],
                     'description' => $categoryData['description'],
-                    'is_visible' => $categoryData['is_enabled'],
-                    'sort_order' => $categoryData['sort_order'],
+                    'is_visible'  => $categoryData['is_enabled'],
+                    'sort_order'  => $categoryData['sort_order'],
                 ]
             );
 
@@ -342,17 +344,17 @@ final class ComprehensiveMultilanguageSeeder extends Seeder
                         $category
                             ->addMedia($imagePath)
                             ->withCustomProperties(['source' => 'local_generated'])
-                            ->usingName($categoryData['name'].' Image')
+                            ->usingName($categoryData['name'] . ' Image')
                             ->toMediaCollection('images');
 
                         if (file_exists($imagePath)) {
                             unlink($imagePath);
                         }
                     }
-                } catch (\Throwable $e) {
+                } catch (Throwable $e) {
                     Log::warning('Failed to generate category image', [
                         'category' => $categoryData['name'],
-                        'error' => $e->getMessage(),
+                        'error'    => $e->getMessage(),
                     ]);
                 }
             }
@@ -365,7 +367,7 @@ final class ComprehensiveMultilanguageSeeder extends Seeder
             }
         }
 
-        $this->command->info('   ✅ Created '.count($categories).' categories with translations and images');
+        $this->command->info('   ✅ Created ' . count($categories) . ' categories with translations and images');
     }
 
     private function seedBrandsWithTranslations(): void
@@ -374,58 +376,58 @@ final class ComprehensiveMultilanguageSeeder extends Seeder
 
         $brands = [
             [
-                'name' => 'BuildPro',
-                'slug' => 'buildpro',
-                'description' => 'Professional construction materials and tools',
-                'is_enabled' => true,
-                'sort_order' => 1,
+                'name'         => 'BuildPro',
+                'slug'         => 'buildpro',
+                'description'  => 'Professional construction materials and tools',
+                'is_enabled'   => true,
+                'sort_order'   => 1,
                 'translations' => [
                     'lt' => [
-                        'name' => 'BuildPro',
-                        'slug' => 'buildpro',
+                        'name'        => 'BuildPro',
+                        'slug'        => 'buildpro',
                         'description' => 'Profesionalios statybos medžiagos ir įrankiai',
                     ],
                     'en' => [
-                        'name' => 'BuildPro',
-                        'slug' => 'buildpro',
+                        'name'        => 'BuildPro',
+                        'slug'        => 'buildpro',
                         'description' => 'Professional construction materials and tools',
                     ],
                 ],
             ],
             [
-                'name' => 'ElectroMax',
-                'slug' => 'electromax',
-                'description' => 'Leading electrical supplies manufacturer',
-                'is_enabled' => true,
-                'sort_order' => 2,
+                'name'         => 'ElectroMax',
+                'slug'         => 'electromax',
+                'description'  => 'Leading electrical supplies manufacturer',
+                'is_enabled'   => true,
+                'sort_order'   => 2,
                 'translations' => [
                     'lt' => [
-                        'name' => 'ElectroMax',
-                        'slug' => 'electromax',
+                        'name'        => 'ElectroMax',
+                        'slug'        => 'electromax',
                         'description' => 'Pirmaujantis elektros prekių gamintojas',
                     ],
                     'en' => [
-                        'name' => 'ElectroMax',
-                        'slug' => 'electromax',
+                        'name'        => 'ElectroMax',
+                        'slug'        => 'electromax',
                         'description' => 'Leading electrical supplies manufacturer',
                     ],
                 ],
             ],
             [
-                'name' => 'PlumbTech',
-                'slug' => 'plumbtech',
-                'description' => 'Advanced plumbing and heating solutions',
-                'is_enabled' => true,
-                'sort_order' => 3,
+                'name'         => 'PlumbTech',
+                'slug'         => 'plumbtech',
+                'description'  => 'Advanced plumbing and heating solutions',
+                'is_enabled'   => true,
+                'sort_order'   => 3,
                 'translations' => [
                     'lt' => [
-                        'name' => 'PlumbTech',
-                        'slug' => 'plumbtech',
+                        'name'        => 'PlumbTech',
+                        'slug'        => 'plumbtech',
                         'description' => 'Pažangūs santechnikos ir šildymo sprendimai',
                     ],
                     'en' => [
-                        'name' => 'PlumbTech',
-                        'slug' => 'plumbtech',
+                        'name'        => 'PlumbTech',
+                        'slug'        => 'plumbtech',
                         'description' => 'Advanced plumbing and heating solutions',
                     ],
                 ],
@@ -436,10 +438,10 @@ final class ComprehensiveMultilanguageSeeder extends Seeder
             $brand = Brand::updateOrCreate(
                 ['slug' => $brandData['slug']],
                 [
-                    'name' => $brandData['name'],
+                    'name'        => $brandData['name'],
                     'description' => $brandData['description'],
-                    'is_enabled' => $brandData['is_enabled'],
-                    'sort_order' => $brandData['sort_order'],
+                    'is_enabled'  => $brandData['is_enabled'],
+                    'sort_order'  => $brandData['sort_order'],
                 ]
             );
 
@@ -452,14 +454,14 @@ final class ComprehensiveMultilanguageSeeder extends Seeder
                         $brand
                             ->addMedia($imagePath)
                             ->withCustomProperties(['source' => 'local_generated'])
-                            ->usingName($brandData['name'].' Logo')
+                            ->usingName($brandData['name'] . ' Logo')
                             ->toMediaCollection('logo');
 
                         if (file_exists($imagePath)) {
                             unlink($imagePath);
                         }
                     }
-                } catch (\Throwable $e) {
+                } catch (Throwable $e) {
                     Log::warning('Failed to generate brand logo', [
                         'brand' => $brandData['name'],
                         'error' => $e->getMessage(),
@@ -475,7 +477,7 @@ final class ComprehensiveMultilanguageSeeder extends Seeder
             }
         }
 
-        $this->command->info('   ✅ Created '.count($brands).' brands with translations and images');
+        $this->command->info('   ✅ Created ' . count($brands) . ' brands with translations and images');
     }
 
     private function seedCollectionsWithTranslations(): void
@@ -484,39 +486,39 @@ final class ComprehensiveMultilanguageSeeder extends Seeder
 
         $collections = [
             [
-                'name' => 'Professional Series',
-                'slug' => 'professional-series',
-                'description' => 'Premium products for professional contractors',
-                'is_enabled' => true,
-                'sort_order' => 1,
+                'name'         => 'Professional Series',
+                'slug'         => 'professional-series',
+                'description'  => 'Premium products for professional contractors',
+                'is_enabled'   => true,
+                'sort_order'   => 1,
                 'translations' => [
                     'lt' => [
-                        'name' => 'Profesionalų serija',
-                        'slug' => 'profesionalu-serija',
+                        'name'        => 'Profesionalų serija',
+                        'slug'        => 'profesionalu-serija',
                         'description' => 'Aukščiausios kokybės produktai profesionaliems rangovams',
                     ],
                     'en' => [
-                        'name' => 'Professional Series',
-                        'slug' => 'professional-series',
+                        'name'        => 'Professional Series',
+                        'slug'        => 'professional-series',
                         'description' => 'Premium products for professional contractors',
                     ],
                 ],
             ],
             [
-                'name' => 'Home Builder',
-                'slug' => 'home-builder',
-                'description' => 'Everything you need for home construction and renovation',
-                'is_enabled' => true,
-                'sort_order' => 2,
+                'name'         => 'Home Builder',
+                'slug'         => 'home-builder',
+                'description'  => 'Everything you need for home construction and renovation',
+                'is_enabled'   => true,
+                'sort_order'   => 2,
                 'translations' => [
                     'lt' => [
-                        'name' => 'Namų statytojas',
-                        'slug' => 'namu-statytojas',
+                        'name'        => 'Namų statytojas',
+                        'slug'        => 'namu-statytojas',
                         'description' => 'Viskas, ko reikia namų statybai ir remontui',
                     ],
                     'en' => [
-                        'name' => 'Home Builder',
-                        'slug' => 'home-builder',
+                        'name'        => 'Home Builder',
+                        'slug'        => 'home-builder',
                         'description' => 'Everything you need for home construction and renovation',
                     ],
                 ],
@@ -527,10 +529,10 @@ final class ComprehensiveMultilanguageSeeder extends Seeder
             $collection = Collection::updateOrCreate(
                 ['slug' => $collectionData['slug']],
                 [
-                    'name' => $collectionData['name'],
+                    'name'        => $collectionData['name'],
                     'description' => $collectionData['description'],
-                    'is_enabled' => $collectionData['is_enabled'],
-                    'sort_order' => $collectionData['sort_order'],
+                    'is_enabled'  => $collectionData['is_enabled'],
+                    'sort_order'  => $collectionData['sort_order'],
                 ]
             );
 
@@ -542,7 +544,7 @@ final class ComprehensiveMultilanguageSeeder extends Seeder
             }
         }
 
-        $this->command->info('   ✅ Created '.count($collections).' collections with translations');
+        $this->command->info('   ✅ Created ' . count($collections) . ' collections with translations');
     }
 
     private function seedProductsWithTranslations(): void
@@ -560,76 +562,76 @@ final class ComprehensiveMultilanguageSeeder extends Seeder
 
         $products = [
             [
-                'name' => 'Premium Cement 50kg',
-                'slug' => 'premium-cement-50kg',
-                'sku' => 'CEM-PREM-50',
-                'summary' => 'High-quality Portland cement for construction',
-                'description' => 'Premium Portland cement suitable for all construction projects. Provides excellent strength and durability.',
-                'price' => 12.99,
+                'name'          => 'Premium Cement 50kg',
+                'slug'          => 'premium-cement-50kg',
+                'sku'           => 'CEM-PREM-50',
+                'summary'       => 'High-quality Portland cement for construction',
+                'description'   => 'Premium Portland cement suitable for all construction projects. Provides excellent strength and durability.',
+                'price'         => 12.99,
                 'compare_price' => 15.99,
-                'cost_price' => 8.5,
-                'is_enabled' => true,
-                'translations' => [
+                'cost_price'    => 8.5,
+                'is_enabled'    => true,
+                'translations'  => [
                     'lt' => [
-                        'name' => 'Aukščiausios kokybės cementas 50kg',
-                        'slug' => 'auksciausia-kokybes-cementas-50kg',
-                        'summary' => 'Aukštos kokybės Portlando cementas statybai',
+                        'name'        => 'Aukščiausios kokybės cementas 50kg',
+                        'slug'        => 'auksciausia-kokybes-cementas-50kg',
+                        'summary'     => 'Aukštos kokybės Portlando cementas statybai',
                         'description' => 'Aukščiausios kokybės Portlando cementas, tinkamas visiems statybos projektams. Užtikrina puikų stiprumą ir ilgaamžiškumą.',
                     ],
                     'en' => [
-                        'name' => 'Premium Cement 50kg',
-                        'slug' => 'premium-cement-50kg',
-                        'summary' => 'High-quality Portland cement for construction',
+                        'name'        => 'Premium Cement 50kg',
+                        'slug'        => 'premium-cement-50kg',
+                        'summary'     => 'High-quality Portland cement for construction',
                         'description' => 'Premium Portland cement suitable for all construction projects. Provides excellent strength and durability.',
                     ],
                 ],
             ],
             [
-                'name' => 'Professional Drill Set',
-                'slug' => 'professional-drill-set',
-                'sku' => 'DRILL-PRO-SET',
-                'summary' => 'Complete professional drill set with accessories',
-                'description' => 'Professional-grade drill set including drill bits, screwdriver bits, and carrying case.',
-                'price' => 89.99,
+                'name'          => 'Professional Drill Set',
+                'slug'          => 'professional-drill-set',
+                'sku'           => 'DRILL-PRO-SET',
+                'summary'       => 'Complete professional drill set with accessories',
+                'description'   => 'Professional-grade drill set including drill bits, screwdriver bits, and carrying case.',
+                'price'         => 89.99,
                 'compare_price' => 109.99,
-                'cost_price' => 55.0,
-                'is_enabled' => true,
-                'translations' => [
+                'cost_price'    => 55.0,
+                'is_enabled'    => true,
+                'translations'  => [
                     'lt' => [
-                        'name' => 'Profesionalus grąžtų rinkinys',
-                        'slug' => 'profesionalus-graztu-rinkinys',
-                        'summary' => 'Pilnas profesionalus grąžtų rinkinys su priedais',
+                        'name'        => 'Profesionalus grąžtų rinkinys',
+                        'slug'        => 'profesionalus-graztu-rinkinys',
+                        'summary'     => 'Pilnas profesionalus grąžtų rinkinys su priedais',
                         'description' => 'Profesionalios klasės grąžtų rinkinys su grąžtais, atsuktuvo antgaliais ir nešimo dėklu.',
                     ],
                     'en' => [
-                        'name' => 'Professional Drill Set',
-                        'slug' => 'professional-drill-set',
-                        'summary' => 'Complete professional drill set with accessories',
+                        'name'        => 'Professional Drill Set',
+                        'slug'        => 'professional-drill-set',
+                        'summary'     => 'Complete professional drill set with accessories',
                         'description' => 'Professional-grade drill set including drill bits, screwdriver bits, and carrying case.',
                     ],
                 ],
             ],
             [
-                'name' => 'LED Light Bulb 10W',
-                'slug' => 'led-light-bulb-10w',
-                'sku' => 'LED-BULB-10W',
-                'summary' => 'Energy-efficient LED light bulb',
-                'description' => 'High-efficiency LED bulb with warm white light. Long-lasting and energy-saving.',
-                'price' => 4.99,
+                'name'          => 'LED Light Bulb 10W',
+                'slug'          => 'led-light-bulb-10w',
+                'sku'           => 'LED-BULB-10W',
+                'summary'       => 'Energy-efficient LED light bulb',
+                'description'   => 'High-efficiency LED bulb with warm white light. Long-lasting and energy-saving.',
+                'price'         => 4.99,
                 'compare_price' => 6.99,
-                'cost_price' => 2.5,
-                'is_enabled' => true,
-                'translations' => [
+                'cost_price'    => 2.5,
+                'is_enabled'    => true,
+                'translations'  => [
                     'lt' => [
-                        'name' => 'LED lemputė 10W',
-                        'slug' => 'led-lempute-10w',
-                        'summary' => 'Energiją taupanti LED lemputė',
+                        'name'        => 'LED lemputė 10W',
+                        'slug'        => 'led-lempute-10w',
+                        'summary'     => 'Energiją taupanti LED lemputė',
                         'description' => 'Aukšto efektyvumo LED lemputė su šilta balta šviesa. Ilgaamžė ir energiją taupanti.',
                     ],
                     'en' => [
-                        'name' => 'LED Light Bulb 10W',
-                        'slug' => 'led-light-bulb-10w',
-                        'summary' => 'Energy-efficient LED light bulb',
+                        'name'        => 'LED Light Bulb 10W',
+                        'slug'        => 'led-light-bulb-10w',
+                        'summary'     => 'Energy-efficient LED light bulb',
                         'description' => 'High-efficiency LED bulb with warm white light. Long-lasting and energy-saving.',
                     ],
                 ],
@@ -640,16 +642,16 @@ final class ComprehensiveMultilanguageSeeder extends Seeder
             $product = Product::updateOrCreate(
                 ['sku' => $productData['sku']],
                 [
-                    'name' => $productData['name'],
-                    'slug' => $productData['slug'],
-                    'summary' => $productData['summary'],
-                    'description' => $productData['description'],
-                    'price' => $productData['price'],
+                    'name'          => $productData['name'],
+                    'slug'          => $productData['slug'],
+                    'summary'       => $productData['summary'],
+                    'description'   => $productData['description'],
+                    'price'         => $productData['price'],
                     'compare_price' => $productData['compare_price'],
-                    'cost_price' => $productData['cost_price'],
-                    'is_enabled' => $productData['is_enabled'],
-                    'is_visible' => $productData['is_enabled'],
-                    'brand_id' => $brands->random()->id,
+                    'cost_price'    => $productData['cost_price'],
+                    'is_enabled'    => $productData['is_enabled'],
+                    'is_visible'    => $productData['is_enabled'],
+                    'brand_id'      => $brands->random()->id,
                 ]
             );
 
@@ -670,17 +672,17 @@ final class ComprehensiveMultilanguageSeeder extends Seeder
                         $product
                             ->addMedia($imagePath)
                             ->withCustomProperties(['source' => 'local_generated'])
-                            ->usingName($productData['name'].' Image')
+                            ->usingName($productData['name'] . ' Image')
                             ->toMediaCollection('images');
 
                         if (file_exists($imagePath)) {
                             unlink($imagePath);
                         }
                     }
-                } catch (\Throwable $e) {
+                } catch (Throwable $e) {
                     Log::warning('Failed to generate product image', [
                         'product' => $productData['name'],
-                        'error' => $e->getMessage(),
+                        'error'   => $e->getMessage(),
                     ]);
                 }
             }
@@ -693,6 +695,6 @@ final class ComprehensiveMultilanguageSeeder extends Seeder
             }
         }
 
-        $this->command->info('   ✅ Created '.count($products).' products with translations and images');
+        $this->command->info('   ✅ Created ' . count($products) . ' products with translations and images');
     }
 }

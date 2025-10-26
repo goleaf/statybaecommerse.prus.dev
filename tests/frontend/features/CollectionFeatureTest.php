@@ -40,9 +40,9 @@ final class CollectionFeatureTest extends TestCase
     public function test_collection_show_page_loads_successfully(): void
     {
         $collection = Collection::factory()->create([
-            'is_visible' => true,
-            'is_active' => true,
-            'name' => 'Test Collection',
+            'is_visible'  => true,
+            'is_active'   => true,
+            'name'        => 'Test Collection',
             'description' => 'Test Description',
         ]);
 
@@ -171,8 +171,8 @@ final class CollectionFeatureTest extends TestCase
         // Create translation with different slug
         \App\Models\Translations\CollectionTranslation::factory()->create([
             'collection_id' => $collection->id,
-            'locale' => 'lt',
-            'slug' => 'new-slug',
+            'locale'        => 'lt',
+            'slug'          => 'new-slug',
         ]);
 
         $response = $this->get("/lt/collections/{$collection->slug}");

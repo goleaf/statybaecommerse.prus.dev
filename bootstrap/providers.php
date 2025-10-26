@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 $providers = [
     App\Providers\AppServiceProvider::class,
     App\Providers\DebugServiceProvider::class,

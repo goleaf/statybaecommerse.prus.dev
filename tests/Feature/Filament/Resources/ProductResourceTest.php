@@ -10,7 +10,6 @@ use App\Filament\Resources\ProductResource\Pages\ListProducts;
 use App\Jobs\ProcessExportJob;
 use App\Models\Brand;
 use App\Models\Export;
-use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;

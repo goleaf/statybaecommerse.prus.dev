@@ -51,17 +51,17 @@ final class CampaignProductTarget extends Model
     protected function casts(): array
     {
         return [
-            'campaign_id' => 'integer',
-            'product_id' => 'integer',
-            'category_id' => 'integer',
-            'brand_id' => 'integer',
+            'campaign_id'   => 'integer',
+            'product_id'    => 'integer',
+            'category_id'   => 'integer',
+            'brand_id'      => 'integer',
             'collection_id' => 'integer',
-            'priority' => 'integer',
-            'weight' => 'integer',
-            'sort_order' => 'integer',
-            'is_active' => 'boolean',
-            'is_featured' => 'boolean',
-            'conditions' => 'array',
+            'priority'      => 'integer',
+            'weight'        => 'integer',
+            'sort_order'    => 'integer',
+            'is_active'     => 'boolean',
+            'is_featured'   => 'boolean',
+            'conditions'    => 'array',
         ];
     }
 
@@ -111,11 +111,11 @@ final class CampaignProductTarget extends Model
     public function getTargetNameAttribute(): ?string
     {
         return match ($this->target_type) {
-            'product' => $this->product?->name,
-            'category' => $this->category?->name,
-            'brand' => $this->brand?->name,
+            'product'    => $this->product?->name,
+            'category'   => $this->category?->name,
+            'brand'      => $this->brand?->name,
             'collection' => $this->collection?->name,
-            default => null,
+            default      => null,
         };
     }
 
@@ -125,11 +125,11 @@ final class CampaignProductTarget extends Model
     public function getTargetIdentifierAttribute(): ?string
     {
         return match ($this->target_type) {
-            'product' => $this->product?->sku,
-            'category' => $this->category?->slug,
-            'brand' => $this->brand?->slug,
+            'product'    => $this->product?->sku,
+            'category'   => $this->category?->slug,
+            'brand'      => $this->brand?->slug,
             'collection' => $this->collection?->slug,
-            default => null,
+            default      => null,
         };
     }
 
@@ -155,11 +155,11 @@ final class CampaignProductTarget extends Model
     public function getTargetModel(): ?Model
     {
         return match ($this->target_type) {
-            'product' => $this->product,
-            'category' => $this->category,
-            'brand' => $this->brand,
+            'product'    => $this->product,
+            'category'   => $this->category,
+            'brand'      => $this->brand,
             'collection' => $this->collection,
-            default => null,
+            default      => null,
         };
     }
 

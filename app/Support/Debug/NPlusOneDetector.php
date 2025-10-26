@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace App\Support\Debug;
 
+use DateTimeInterface;
 use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use Throwable;
 
 final class NPlusOneDetector
 {
@@ -45,14 +47,14 @@ final class NPlusOneDetector
         }
 
         $location = $this->findApplicationFrame();
-        $fingerprint = md5($event->sql.'|'.serialize($this->normalizeBindings($event->bindings))."|{$location}");
+        $fingerprint = md5($event->sql . '|' . serialize($this->normalizeBindings($event->bindings)) . "|{$location}");
 
         if (! isset($this->queries[$fingerprint])) {
             $this->queries[$fingerprint] = [
-                'count' => 0,
-                'sql' => $event->sql,
+                'count'          => 0,
+                'sql'            => $event->sql,
                 'binding_sample' => Arr::map($event->bindings, function ($binding) {
-                    if ($binding instanceof \DateTimeInterface) {
+                    if ($binding instanceof DateTimeInterface) {
                         return $binding->format('c');
                     }
 
@@ -82,8 +84,8 @@ final class NPlusOneDetector
 
         $payload = array_map(function (array $data) {
             return [
-                'count' => $data['count'],
-                'sql' => Str::limit($data['sql'], 250),
+                'count'    => $data['count'],
+                'sql'      => Str::limit($data['sql'], 250),
                 'location' => $data['location'],
                 'bindings' => $data['binding_sample'],
             ];
@@ -92,7 +94,7 @@ final class NPlusOneDetector
         if (function_exists('debugbar') && app()->bound('debugbar')) {
             try {
                 app('debugbar')->addMessage(['n_plus_one' => $payload], 'queries');
-            } catch (\Throwable $exception) {
+            } catch (Throwable $exception) {
                 Log::debug('Failed pushing N+1 details to debugbar', ['error' => $exception->getMessage()]);
             }
         }
@@ -102,7 +104,7 @@ final class NPlusOneDetector
 
     private function findApplicationFrame(): string
     {
-        $basePath = base_path().DIRECTORY_SEPARATOR;
+        $basePath = base_path() . DIRECTORY_SEPARATOR;
         $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 50);
 
         foreach ($trace as $frame) {
@@ -112,32 +114,32 @@ final class NPlusOneDetector
 
             $file = $frame['file'];
 
-            if (str_starts_with($file, $basePath.'vendor')) {
+            if (str_starts_with($file, $basePath . 'vendor')) {
                 continue;
             }
 
-            if (str_starts_with($file, $basePath.'storage')) {
+            if (str_starts_with($file, $basePath . 'storage')) {
                 continue;
             }
 
-            if (str_starts_with($file, $basePath.'bootstrap')) {
+            if (str_starts_with($file, $basePath . 'bootstrap')) {
                 continue;
             }
 
-            return str_replace($basePath, '', $file).':'.$frame['line'];
+            return str_replace($basePath, '', $file) . ':' . $frame['line'];
         }
 
         return 'unknown';
     }
 
     /**
-     * @param  array<int, mixed>  $bindings
+     * @param  array<int, mixed> $bindings
      * @return array<int, mixed>
      */
     private function normalizeBindings(array $bindings): array
     {
         return array_map(function ($binding) {
-            if ($binding instanceof \DateTimeInterface) {
+            if ($binding instanceof DateTimeInterface) {
                 return $binding->getTimestamp();
             }
 

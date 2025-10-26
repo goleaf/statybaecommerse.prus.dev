@@ -24,10 +24,10 @@ final class SystemSettingCategoryFactory extends Factory
         $name = $this->faker->unique()->words(2, true);
 
         return [
-            'name' => ucwords($name),
-            'slug' => str($name)->slug(),
+            'name'        => ucwords($name),
+            'slug'        => str($name)->slug(),
             'description' => $this->faker->paragraph(),
-            'icon' => $this->faker->randomElement([
+            'icon'        => $this->faker->randomElement([
                 'heroicon-o-cog-6-tooth',
                 'heroicon-o-shield-check',
                 'heroicon-o-bolt',
@@ -47,8 +47,8 @@ final class SystemSettingCategoryFactory extends Factory
                 'gray',
             ]),
             'sort_order' => $this->faker->numberBetween(0, 100),
-            'is_active' => true,
-            'parent_id' => null,
+            'is_active'  => true,
+            'parent_id'  => null,
         ];
     }
 

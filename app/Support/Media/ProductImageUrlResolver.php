@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace App\Support\Media;
 
+use function array_unique;
+use function asset;
+
 use Illuminate\Support\Facades\Storage;
 
-use function asset;
-use function array_unique;
 use function str_starts_with;
 
 /**
@@ -47,4 +48,3 @@ final class ProductImageUrlResolver
         return Storage::disk('public')->url($path);
     }
 }
-

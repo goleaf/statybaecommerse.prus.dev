@@ -14,4 +14,3 @@ final class DiscountApplyCouponRequestTest extends TestCase
             ->assertStatus(422);
     }
 }
-

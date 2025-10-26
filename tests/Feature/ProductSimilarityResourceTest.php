@@ -20,7 +20,7 @@ class ProductSimilarityResourceTest extends TestCase
         parent::setUp();
 
         $this->actingAs(User::factory()->create([
-            'email' => 'admin@example.com',
+            'email'    => 'admin@example.com',
             'is_admin' => true,
         ]));
     }
@@ -31,10 +31,10 @@ class ProductSimilarityResourceTest extends TestCase
         $product2 = Product::factory()->create();
 
         ProductSimilarity::factory()->create([
-            'product_id' => $product1->id,
+            'product_id'         => $product1->id,
             'similar_product_id' => $product2->id,
-            'algorithm_type' => 'cosine_similarity',
-            'similarity_score' => 0.85,
+            'algorithm_type'     => 'cosine_similarity',
+            'similarity_score'   => 0.85,
         ]);
 
         Livewire::test(\App\Filament\Resources\ProductSimilarityResource\Pages\ListProductSimilarities::class)
@@ -48,20 +48,20 @@ class ProductSimilarityResourceTest extends TestCase
 
         Livewire::test(\App\Filament\Resources\ProductSimilarityResource\Pages\CreateProductSimilarity::class)
             ->fillForm([
-                'product_id' => $product1->id,
+                'product_id'         => $product1->id,
                 'similar_product_id' => $product2->id,
-                'algorithm_type' => 'jaccard_similarity',
-                'similarity_score' => 0.75,
-                'calculation_data' => ['key' => 'value'],
+                'algorithm_type'     => 'jaccard_similarity',
+                'similarity_score'   => 0.75,
+                'calculation_data'   => ['key' => 'value'],
             ])
             ->call('create')
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('product_similarities', [
-            'product_id' => $product1->id,
+            'product_id'         => $product1->id,
             'similar_product_id' => $product2->id,
-            'algorithm_type' => 'jaccard_similarity',
-            'similarity_score' => 0.75,
+            'algorithm_type'     => 'jaccard_similarity',
+            'similarity_score'   => 0.75,
         ]);
     }
 
@@ -71,10 +71,10 @@ class ProductSimilarityResourceTest extends TestCase
         $product2 = Product::factory()->create();
 
         $similarity = ProductSimilarity::factory()->create([
-            'product_id' => $product1->id,
+            'product_id'         => $product1->id,
             'similar_product_id' => $product2->id,
-            'algorithm_type' => 'cosine_similarity',
-            'similarity_score' => 0.85,
+            'algorithm_type'     => 'cosine_similarity',
+            'similarity_score'   => 0.85,
         ]);
 
         Livewire::test(\App\Filament\Resources\ProductSimilarityResource\Pages\EditProductSimilarity::class, [
@@ -88,7 +88,7 @@ class ProductSimilarityResourceTest extends TestCase
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('product_similarities', [
-            'id' => $similarity->id,
+            'id'               => $similarity->id,
             'similarity_score' => 0.95,
         ]);
     }
@@ -99,10 +99,10 @@ class ProductSimilarityResourceTest extends TestCase
         $product2 = Product::factory()->create(['name' => 'Product B']);
 
         $similarity = ProductSimilarity::factory()->create([
-            'product_id' => $product1->id,
+            'product_id'         => $product1->id,
             'similar_product_id' => $product2->id,
-            'algorithm_type' => 'cosine_similarity',
-            'similarity_score' => 0.9,
+            'algorithm_type'     => 'cosine_similarity',
+            'similarity_score'   => 0.9,
         ]);
 
         Livewire::test(\App\Filament\Resources\ProductSimilarityResource\Pages\ViewProductSimilarity::class, [
@@ -118,17 +118,17 @@ class ProductSimilarityResourceTest extends TestCase
         $product3 = Product::factory()->create();
 
         ProductSimilarity::factory()->create([
-            'product_id' => $product1->id,
+            'product_id'         => $product1->id,
             'similar_product_id' => $product2->id,
-            'algorithm_type' => 'cosine_similarity',
-            'similarity_score' => 0.85,
+            'algorithm_type'     => 'cosine_similarity',
+            'similarity_score'   => 0.85,
         ]);
 
         ProductSimilarity::factory()->create([
-            'product_id' => $product1->id,
+            'product_id'         => $product1->id,
             'similar_product_id' => $product3->id,
-            'algorithm_type' => 'jaccard_similarity',
-            'similarity_score' => 0.75,
+            'algorithm_type'     => 'jaccard_similarity',
+            'similarity_score'   => 0.75,
         ]);
 
         Livewire::test(\App\Filament\Resources\ProductSimilarityResource\Pages\ListProductSimilarities::class)
@@ -144,15 +144,15 @@ class ProductSimilarityResourceTest extends TestCase
         $product3 = Product::factory()->create();
 
         ProductSimilarity::factory()->create([
-            'product_id' => $product1->id,
+            'product_id'         => $product1->id,
             'similar_product_id' => $product2->id,
-            'similarity_score' => 0.9,
+            'similarity_score'   => 0.9,
         ]);
 
         ProductSimilarity::factory()->create([
-            'product_id' => $product1->id,
+            'product_id'         => $product1->id,
             'similar_product_id' => $product3->id,
-            'similarity_score' => 0.5,
+            'similarity_score'   => 0.5,
         ]);
 
         Livewire::test(\App\Filament\Resources\ProductSimilarityResource\Pages\ListProductSimilarities::class)
@@ -170,9 +170,9 @@ class ProductSimilarityResourceTest extends TestCase
         $product2 = Product::factory()->create(['name' => 'Test Product 2']);
 
         ProductSimilarity::factory()->create([
-            'product_id' => $product1->id,
+            'product_id'         => $product1->id,
             'similar_product_id' => $product2->id,
-            'algorithm_type' => 'cosine_similarity',
+            'algorithm_type'     => 'cosine_similarity',
         ]);
 
         Livewire::test(\App\Filament\Resources\ProductSimilarityResource\Pages\ListProductSimilarities::class)
@@ -190,11 +190,11 @@ class ProductSimilarityResourceTest extends TestCase
 
         $similarities = collect([
             ProductSimilarity::factory()->create([
-                'product_id' => $product1->id,
+                'product_id'         => $product1->id,
                 'similar_product_id' => $product2->id,
             ]),
             ProductSimilarity::factory()->create([
-                'product_id' => $product1->id,
+                'product_id'         => $product1->id,
                 'similar_product_id' => $product3->id,
             ]),
         ]);
@@ -214,7 +214,7 @@ class ProductSimilarityResourceTest extends TestCase
         $product2 = Product::factory()->create(['name' => 'Product 2']);
 
         $similarity = ProductSimilarity::factory()->create([
-            'product_id' => $product1->id,
+            'product_id'         => $product1->id,
             'similar_product_id' => $product2->id,
         ]);
 
@@ -229,17 +229,17 @@ class ProductSimilarityResourceTest extends TestCase
         $product3 = Product::factory()->create();
 
         ProductSimilarity::factory()->create([
-            'product_id' => $product1->id,
+            'product_id'         => $product1->id,
             'similar_product_id' => $product2->id,
-            'algorithm_type' => 'cosine_similarity',
-            'similarity_score' => 0.9,
+            'algorithm_type'     => 'cosine_similarity',
+            'similarity_score'   => 0.9,
         ]);
 
         ProductSimilarity::factory()->create([
-            'product_id' => $product1->id,
+            'product_id'         => $product1->id,
             'similar_product_id' => $product3->id,
-            'algorithm_type' => 'jaccard_similarity',
-            'similarity_score' => 0.5,
+            'algorithm_type'     => 'jaccard_similarity',
+            'similarity_score'   => 0.5,
         ]);
 
         $this->assertCount(1, ProductSimilarity::byAlgorithm('cosine_similarity')->get());
@@ -253,15 +253,15 @@ class ProductSimilarityResourceTest extends TestCase
         $product2 = Product::factory()->create();
 
         $highSimilarity = ProductSimilarity::factory()->create([
-            'product_id' => $product1->id,
+            'product_id'         => $product1->id,
             'similar_product_id' => $product2->id,
-            'similarity_score' => 0.9,
+            'similarity_score'   => 0.9,
         ]);
 
         $lowSimilarity = ProductSimilarity::factory()->create([
-            'product_id' => $product1->id,
+            'product_id'         => $product1->id,
             'similar_product_id' => $product2->id,
-            'similarity_score' => 0.3,
+            'similarity_score'   => 0.3,
         ]);
 
         // Test that high similarity gets success color

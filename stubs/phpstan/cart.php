@@ -1,10 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Darryldecode\Cart {
     use Illuminate\Support\Collection;
+
     /**
      * @template TKey of array-key
      * @template TValue
+     *
      * @extends Collection<TKey, TValue>
      */
     class CartCollection extends Collection {}
@@ -29,7 +33,7 @@ namespace Darryldecode\Cart {
          */
         public function getContent()
         {
-            return new CartCollection();
+            return new CartCollection;
         }
 
         /**
@@ -45,9 +49,7 @@ namespace Darryldecode\Cart {
             return 0;
         }
 
-        public function clear(): void
-        {
-        }
+        public function clear(): void {}
     }
 }
 
@@ -58,7 +60,7 @@ namespace Darryldecode\Cart\Facades {
     {
         public static function session(?string $sessionKey = null): Cart
         {
-            return new Cart();
+            return new Cart;
         }
     }
 }

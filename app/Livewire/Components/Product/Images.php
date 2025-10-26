@@ -13,8 +13,8 @@ use Livewire\Component;
  * Livewire component for Images with reactive frontend functionality, real-time updates, and user interaction handling.
  *
  * @property string|null $thumbnail
- * @property array $images
- * @property int $active
+ * @property array       $images
+ * @property int         $active
  */
 class Images extends Component
 {

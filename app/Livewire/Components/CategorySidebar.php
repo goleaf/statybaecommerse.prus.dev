@@ -17,7 +17,7 @@ use Livewire\Component;
  * Livewire component for CategorySidebar with reactive frontend functionality, real-time updates, and user interaction handling.
  *
  * @property int|null $selectedCategoryId
- * @property int $maxDepth
+ * @property int      $maxDepth
  */
 final class CategorySidebar extends Component
 {
@@ -45,7 +45,7 @@ final class CategorySidebar extends Component
     /**
      * Handle buildTree functionality with proper error handling.
      *
-     * @param  mixed  $categories
+     * @param mixed $categories
      */
     private function buildTree($categories, int $depth): array
     {

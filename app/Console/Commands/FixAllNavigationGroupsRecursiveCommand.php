@@ -31,7 +31,7 @@ final class FixAllNavigationGroupsRecursiveCommand extends Command
 
             $content = preg_replace(
                 '/(protected static \?\w+ \$model = [^;]+;)\s*\*\* @var UnitEnum\|string\|null \*\/\s*protected static \$navigationGroup/',
-                '$1'.PHP_EOL.PHP_EOL.'    protected static string|\UnitEnum|null $navigationGroup',
+                '$1' . PHP_EOL . PHP_EOL . '    protected static string|\UnitEnum|null $navigationGroup',
                 $content,
             );
 
@@ -49,7 +49,7 @@ final class FixAllNavigationGroupsRecursiveCommand extends Command
 
             if ($content !== $originalContent) {
                 file_put_contents($file->getPathname(), $content);
-                $this->line('Fixed: '.basename($file));
+                $this->line('Fixed: ' . basename($file));
             }
         }
 

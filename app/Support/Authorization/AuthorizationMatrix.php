@@ -186,7 +186,7 @@ final class AuthorizationMatrix
             }
 
             $definitions[] = [
-                'role' => $role,
+                'role'        => $role,
                 'permissions' => self::permissionsForRole($role),
             ];
         }

@@ -16,10 +16,9 @@ final class VariantStockCheckAvailabilityRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'variant_id' => ['required', 'exists:product_variants,id'],
+            'variant_id'  => ['required', 'exists:product_variants,id'],
             'location_id' => ['nullable', 'exists:locations,id'],
-            'quantity' => ['required', 'integer', 'min:1'],
+            'quantity'    => ['required', 'integer', 'min:1'],
         ];
     }
 }
-

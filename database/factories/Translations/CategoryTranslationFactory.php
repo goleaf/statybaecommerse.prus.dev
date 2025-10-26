@@ -20,14 +20,14 @@ final class CategoryTranslationFactory extends Factory
         $name = $this->faker->unique()->words(3, true);
 
         return [
-            'category_id' => Category::factory(),
-            'locale' => $this->faker->randomElement(['lt', 'en']),
-            'name' => $name,
-            'slug' => $this->faker->unique()->slug(),
-            'description' => $this->faker->paragraph(),
-            'seo_title' => $name.' | '.$this->faker->company(),
+            'category_id'     => Category::factory(),
+            'locale'          => $this->faker->randomElement(['lt', 'en']),
+            'name'            => $name,
+            'slug'            => $this->faker->unique()->slug(),
+            'description'     => $this->faker->paragraph(),
+            'seo_title'       => $name . ' | ' . $this->faker->company(),
             'seo_description' => $this->faker->sentence(12),
-            'meta_keywords' => $this->faker->words(3),
+            'meta_keywords'   => $this->faker->words(3),
         ];
     }
 

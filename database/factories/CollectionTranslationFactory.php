@@ -18,23 +18,23 @@ final class CollectionTranslationFactory extends Factory
     public function definition(): array
     {
         return [
-            'collection_id' => Collection::factory(),
-            'locale' => $this->faker->randomElement(['en', 'lt']),
-            'name' => $this->faker->words(3, true),
-            'slug' => $this->faker->slug(),
-            'description' => $this->faker->paragraph(),
-            'meta_title' => $this->faker->sentence(),
+            'collection_id'    => Collection::factory(),
+            'locale'           => $this->faker->randomElement(['en', 'lt']),
+            'name'             => $this->faker->words(3, true),
+            'slug'             => $this->faker->slug(),
+            'description'      => $this->faker->paragraph(),
+            'meta_title'       => $this->faker->sentence(),
             'meta_description' => $this->faker->paragraph(),
-            'meta_keywords' => $this->faker->words(5, false),
+            'meta_keywords'    => $this->faker->words(5, false),
         ];
     }
 
     public function english(): static
     {
         return $this->state(fn (array $attributes) => [
-            'locale' => 'en',
-            'name' => $this->faker->words(3, true),
-            'slug' => $this->faker->slug(),
+            'locale'      => 'en',
+            'name'        => $this->faker->words(3, true),
+            'slug'        => $this->faker->slug(),
             'description' => $this->faker->paragraph(),
         ]);
     }
@@ -42,9 +42,9 @@ final class CollectionTranslationFactory extends Factory
     public function lithuanian(): static
     {
         return $this->state(fn (array $attributes) => [
-            'locale' => 'lt',
-            'name' => $this->faker->words(3, true),
-            'slug' => $this->faker->slug(),
+            'locale'      => 'lt',
+            'name'        => $this->faker->words(3, true),
+            'slug'        => $this->faker->slug(),
             'description' => $this->faker->paragraph(),
         ]);
     }
@@ -52,9 +52,9 @@ final class CollectionTranslationFactory extends Factory
     public function withSeo(): static
     {
         return $this->state(fn (array $attributes) => [
-            'meta_title' => $this->faker->sentence(),
+            'meta_title'       => $this->faker->sentence(),
             'meta_description' => $this->faker->paragraph(),
-            'meta_keywords' => $this->faker->words(5, false),
+            'meta_keywords'    => $this->faker->words(5, false),
         ]);
     }
 }

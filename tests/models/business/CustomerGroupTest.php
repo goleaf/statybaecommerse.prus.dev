@@ -16,25 +16,25 @@ final class CustomerGroupTest extends TestCase
     public function test_customer_group_can_be_created(): void
     {
         $customerGroup = CustomerGroup::factory()->create([
-            'name' => 'VIP Customers',
+            'name'        => 'VIP Customers',
             'description' => 'High-value customers with special privileges',
-            'is_enabled' => true,
+            'is_enabled'  => true,
         ]);
 
         $this->assertDatabaseHas('customer_groups', [
-            'name' => 'VIP Customers',
+            'name'        => 'VIP Customers',
             'description' => 'High-value customers with special privileges',
-            'is_enabled' => true,
+            'is_enabled'  => true,
         ]);
     }
 
     public function test_customer_group_casts_work_correctly(): void
     {
         $customerGroup = CustomerGroup::factory()->create([
-            'is_enabled' => true,
+            'is_enabled'          => true,
             'discount_percentage' => 15.50,
-            'conditions' => ['min_order' => 100],
-            'created_at' => now(),
+            'conditions'          => ['min_order' => 100],
+            'created_at'          => now(),
         ]);
 
         $this->assertIsBool($customerGroup->is_enabled);

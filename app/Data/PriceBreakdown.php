@@ -31,9 +31,9 @@ final class PriceBreakdown implements Arrayable
         return [
             'subtotal' => $this->subtotal,
             'discount' => $this->discount,
-            'tax' => $this->tax,
+            'tax'      => $this->tax,
             'shipping' => $this->shipping,
-            'total' => $this->total,
+            'total'    => $this->total,
             'currency' => $this->currency,
             'tax_rate' => $this->taxRate,
         ];
@@ -47,9 +47,9 @@ final class PriceBreakdown implements Arrayable
         return [
             'subtotal' => format_money($this->subtotal, $this->currency, $locale),
             'discount' => format_money($this->discount, $this->currency, $locale),
-            'tax' => format_money($this->tax, $this->currency, $locale),
+            'tax'      => format_money($this->tax, $this->currency, $locale),
             'shipping' => format_money($this->shipping, $this->currency, $locale),
-            'total' => format_money($this->total, $this->currency, $locale),
+            'total'    => format_money($this->total, $this->currency, $locale),
         ];
     }
 }

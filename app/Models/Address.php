@@ -166,8 +166,6 @@ final class Address extends Model
 
     /**
      * Handle scopeDefault functionality with proper error handling.
-     *
-     * @param Builder $query
      */
     public function scopeDefault(Builder $query): Builder
     {
@@ -177,8 +175,6 @@ final class Address extends Model
 
     /**
      * Handle scopeByType functionality with proper error handling.
-     *
-     * @param Builder $query
      */
     public function scopeByType(Builder $query, string $type): Builder
     {
@@ -188,8 +184,6 @@ final class Address extends Model
 
     /**
      * Handle scopeBilling functionality with proper error handling.
-     *
-     * @param Builder $query
      */
     public function scopeBilling(Builder $query): Builder
     {
@@ -199,8 +193,6 @@ final class Address extends Model
 
     /**
      * Handle scopeShipping functionality with proper error handling.
-     *
-     * @param Builder $query
      */
     public function scopeShipping(Builder $query): Builder
     {
@@ -210,8 +202,6 @@ final class Address extends Model
 
     /**
      * Handle scopeActive functionality with proper error handling.
-     *
-     * @param Builder $query
      */
     public function scopeActive(Builder $query): Builder
     {
@@ -221,8 +211,6 @@ final class Address extends Model
 
     /**
      * Handle scopeForUser functionality with proper error handling.
-     *
-     * @param Builder $query
      */
     public function scopeForUser(Builder $query, int $userId): Builder
     {
@@ -232,8 +220,6 @@ final class Address extends Model
 
     /**
      * Handle scopeByCountry functionality with proper error handling.
-     *
-     * @param Builder $query
      */
     public function scopeByCountry(Builder $query, string $countryCode): Builder
     {

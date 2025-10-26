@@ -31,11 +31,11 @@ final class HomepageCatalogueDataProvider
             CacheKeys::homeStats($locale),
             static function (): array {
                 return [
-                    'products_count'  => Product::query()->count(),
+                    'products_count'   => Product::query()->count(),
                     'categories_count' => Category::query()->count(),
-                    'brands_count'    => Brand::query()->count(),
-                    'reviews_count'   => Review::query()->where('is_approved', true)->count(),
-                    'avg_rating'      => (float) (Review::query()->where('is_approved', true)->avg('rating') ?? 0.0),
+                    'brands_count'     => Brand::query()->count(),
+                    'reviews_count'    => Review::query()->where('is_approved', true)->count(),
+                    'avg_rating'       => (float) (Review::query()->where('is_approved', true)->avg('rating') ?? 0.0),
                 ];
             },
             CacheKeys::TTL_ONE_HOUR,
@@ -150,16 +150,16 @@ final class HomepageCatalogueDataProvider
         );
 
         return [
-            'stats' => $stats,
-            'featuredProducts' => $featuredProducts,
-            'latestProducts' => $latestProducts,
-            'trendingProducts' => $trendingProducts,
-            'saleProducts' => $saleProducts,
+            'stats'             => $stats,
+            'featuredProducts'  => $featuredProducts,
+            'latestProducts'    => $latestProducts,
+            'trendingProducts'  => $trendingProducts,
+            'saleProducts'      => $saleProducts,
             'popularCategories' => $popularCategories,
-            'topCategories' => $popularCategories,
-            'topBrands' => $topBrands,
+            'topCategories'     => $popularCategories,
+            'topBrands'         => $topBrands,
             'highlightedBrands' => $topBrands,
-            'popularBrands' => $topBrands,
+            'popularBrands'     => $topBrands,
         ];
     }
 }

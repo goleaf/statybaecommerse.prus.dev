@@ -15,8 +15,8 @@ final class TagAwareCacheFake
     private array $flushed = [];
 
     /**
-     * @param  callable(): mixed  $callback
-     * @param  array<int, Stringable|scalar|null>  $tags
+     * @param  callable(): mixed                  $callback
+     * @param  array<int, Stringable|scalar|null> $tags
      * @return mixed
      */
     public function remember(string $key, DateInterval|DateTimeInterface|int $ttl, callable $callback, array $tags = [])
@@ -26,7 +26,7 @@ final class TagAwareCacheFake
     }
 
     /**
-     * @param  array<int, Stringable|scalar|null>  $tags
+     * @param array<int, Stringable|scalar|null> $tags
      */
     public function flush(array $tags): void
     {
@@ -42,7 +42,7 @@ final class TagAwareCacheFake
     /**
      * Assert that the provided tags were flushed at least once.
      *
-     * @param  array<int, string>  $expectedTags
+     * @param array<int, string> $expectedTags
      */
     public function assertFlushed(array $expectedTags): void
     {
@@ -63,8 +63,8 @@ final class TagAwareCacheFake
     }
 
     /**
-     * @param  array<int, string>  $haystack
-     * @param  array<int, string>  $needles
+     * @param array<int, string> $haystack
+     * @param array<int, string> $needles
      */
     private function containsAll(array $haystack, array $needles): bool
     {
@@ -78,7 +78,7 @@ final class TagAwareCacheFake
     }
 
     /**
-     * @param  array<int, Stringable|scalar|null>  $tags
+     * @param  array<int, Stringable|scalar|null> $tags
      * @return array<int, string>
      */
     private function normalize(array $tags): array

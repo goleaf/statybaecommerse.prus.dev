@@ -39,20 +39,20 @@ final class CompanyResourceTest extends TestCase
 
         Livewire::test(CreateCompany::class)
             ->fillForm([
-                'name' => $companyData->name,
-                'email' => $companyData->email,
-                'phone' => $companyData->phone,
-                'website' => $companyData->website,
-                'industry' => $companyData->industry,
-                'size' => $companyData->size,
+                'name'        => $companyData->name,
+                'email'       => $companyData->email,
+                'phone'       => $companyData->phone,
+                'website'     => $companyData->website,
+                'industry'    => $companyData->industry,
+                'size'        => $companyData->size,
                 'description' => $companyData->description,
-                'is_active' => $companyData->is_active,
+                'is_active'   => $companyData->is_active,
             ])
             ->call('create')
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas(Company::class, [
-            'name' => $companyData->name,
+            'name'  => $companyData->name,
             'email' => $companyData->email,
         ]);
     }
@@ -66,15 +66,15 @@ final class CompanyResourceTest extends TestCase
             'record' => $company->id,
         ])
             ->fillForm([
-                'name' => $newData->name,
+                'name'  => $newData->name,
                 'email' => $newData->email,
             ])
             ->call('save')
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas(Company::class, [
-            'id' => $company->id,
-            'name' => $newData->name,
+            'id'    => $company->id,
+            'name'  => $newData->name,
             'email' => $newData->email,
         ]);
     }
@@ -113,7 +113,7 @@ final class CompanyResourceTest extends TestCase
             ->assertHasNoTableActionErrors();
 
         $this->assertDatabaseHas(Company::class, [
-            'id' => $company->id,
+            'id'        => $company->id,
             'is_active' => false,
         ]);
     }
@@ -128,7 +128,7 @@ final class CompanyResourceTest extends TestCase
 
         foreach ($companies as $company) {
             $this->assertDatabaseHas(Company::class, [
-                'id' => $company->id,
+                'id'        => $company->id,
                 'is_active' => true,
             ]);
         }
@@ -144,7 +144,7 @@ final class CompanyResourceTest extends TestCase
 
         foreach ($companies as $company) {
             $this->assertDatabaseHas(Company::class, [
-                'id' => $company->id,
+                'id'        => $company->id,
                 'is_active' => false,
             ]);
         }
@@ -198,7 +198,7 @@ final class CompanyResourceTest extends TestCase
     {
         Livewire::test(CreateCompany::class)
             ->fillForm([
-                'name' => '',
+                'name'  => '',
                 'email' => 'test@example.com',
             ])
             ->call('create')
@@ -209,7 +209,7 @@ final class CompanyResourceTest extends TestCase
     {
         Livewire::test(CreateCompany::class)
             ->fillForm([
-                'name' => 'Test Company',
+                'name'  => 'Test Company',
                 'email' => 'invalid-email',
             ])
             ->call('create')
@@ -220,7 +220,7 @@ final class CompanyResourceTest extends TestCase
     {
         Livewire::test(CreateCompany::class)
             ->fillForm([
-                'name' => 'Test Company',
+                'name'    => 'Test Company',
                 'website' => 'not-a-valid-url',
             ])
             ->call('create')

@@ -35,7 +35,7 @@ final class EnhancedFilamentSeeder extends Seeder
 
         collect($permissions)->each(
             fn (string $permission) => Permission::query()->firstOrCreate([
-                'name' => $permission,
+                'name'       => $permission,
                 'guard_name' => 'web',
             ])
         );
@@ -52,7 +52,7 @@ final class EnhancedFilamentSeeder extends Seeder
 
         collect($additionalPermissions)->each(function (string $permission) use ($adminRole): void {
             $permissionModel = Permission::query()->firstOrCreate([
-                'name' => $permission,
+                'name'       => $permission,
                 'guard_name' => 'web',
             ]);
 
@@ -62,12 +62,12 @@ final class EnhancedFilamentSeeder extends Seeder
         $admin = User::query()->firstOrCreate(
             ['email' => 'admin@statybaecommerse.prus.dev'],
             [
-                'name' => 'System Administrator',
-                'password' => bcrypt('admin123'),
+                'name'              => 'System Administrator',
+                'password'          => bcrypt('admin123'),
                 'email_verified_at' => now(),
-                'preferred_locale' => 'lt',
-                'is_admin' => true,
-                'is_active' => true,
+                'preferred_locale'  => 'lt',
+                'is_admin'          => true,
+                'is_active'         => true,
             ]
         );
 

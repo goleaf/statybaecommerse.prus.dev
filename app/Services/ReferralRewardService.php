@@ -8,6 +8,7 @@ use App\Models\Discount;
 use App\Models\Order;
 use App\Models\Referral;
 use App\Models\ReferralReward;
+use Exception;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -26,26 +27,26 @@ final class ReferralRewardService
             // Create the discount in the system
             $discount = $this->createReferralDiscount($userId, $percentage);
             if (! $discount) {
-                throw new \Exception('Failed to create referral discount');
+                throw new Exception('Failed to create referral discount');
             }
             // Create the reward record
             $reward = ReferralReward::create([
-                'referral_id' => $referralId,
-                'user_id' => $userId,
-                'order_id' => $orderId,
-                'type' => 'referred_discount',
-                'amount' => $percentage,
+                'referral_id'   => $referralId,
+                'user_id'       => $userId,
+                'order_id'      => $orderId,
+                'type'          => 'referred_discount',
+                'amount'        => $percentage,
                 'currency_code' => 'EUR',
-                'status' => 'applied',
-                'applied_at' => now(),
-                'expires_at' => now()->addDays(30),
+                'status'        => 'applied',
+                'applied_at'    => now(),
+                'expires_at'    => now()->addDays(30),
                 // 30 days to use
                 'metadata' => ['discount_id' => $discount->id, 'percentage' => $percentage, 'first_order_only' => true],
             ]);
             Log::info('Referred discount created', ['reward_id' => $reward->id, 'referral_id' => $referralId, 'user_id' => $userId, 'order_id' => $orderId, 'discount_id' => $discount->id, 'percentage' => $percentage]);
 
             return $reward;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Failed to create referred discount', ['referral_id' => $referralId, 'user_id' => $userId, 'order_id' => $orderId, 'percentage' => $percentage, 'error' => $e->getMessage()]);
 
             return null;
@@ -59,20 +60,20 @@ final class ReferralRewardService
     {
         try {
             $reward = ReferralReward::create([
-                'referral_id' => $referralId,
-                'user_id' => $userId,
-                'type' => 'referrer_bonus',
-                'amount' => $amount,
+                'referral_id'   => $referralId,
+                'user_id'       => $userId,
+                'type'          => 'referrer_bonus',
+                'amount'        => $amount,
                 'currency_code' => 'EUR',
-                'status' => 'pending',
-                'expires_at' => now()->addDays(90),
+                'status'        => 'pending',
+                'expires_at'    => now()->addDays(90),
                 // 90 days to claim
                 'metadata' => ['bonus_type' => 'referral_completion', 'amount' => $amount],
             ]);
             Log::info('Referrer bonus created', ['reward_id' => $reward->id, 'referral_id' => $referralId, 'user_id' => $userId, 'amount' => $amount]);
 
             return $reward;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Failed to create referrer bonus', ['referral_id' => $referralId, 'user_id' => $userId, 'amount' => $amount, 'error' => $e->getMessage()]);
 
             return null;
@@ -86,30 +87,30 @@ final class ReferralRewardService
     {
         try {
             $discount = Discount::create([
-                'name' => 'Referral Discount - '.$percentage.'%',
-                'slug' => 'referral-'.$userId.'-'.now()->format('Ymd'),
-                'type' => 'percentage',
-                'value' => $percentage,
+                'name'        => 'Referral Discount - ' . $percentage . '%',
+                'slug'        => 'referral-' . $userId . '-' . now()->format('Ymd'),
+                'type'        => 'percentage',
+                'value'       => $percentage,
                 'usage_limit' => 1,
                 // First order only
-                'usage_count' => 0,
-                'minimum_amount' => 0,
-                'starts_at' => now(),
-                'ends_at' => now()->addDays(30),
-                'status' => 'active',
-                'scope' => ['products' => [], 'categories' => [], 'brands' => []],
-                'stacking_policy' => 'exclusive',
-                'metadata' => ['referral_discount' => true, 'user_id' => $userId, 'first_order_only' => true],
-                'priority' => 100,
-                'exclusive' => true,
+                'usage_count'         => 0,
+                'minimum_amount'      => 0,
+                'starts_at'           => now(),
+                'ends_at'             => now()->addDays(30),
+                'status'              => 'active',
+                'scope'               => ['products' => [], 'categories' => [], 'brands' => []],
+                'stacking_policy'     => 'exclusive',
+                'metadata'            => ['referral_discount' => true, 'user_id' => $userId, 'first_order_only' => true],
+                'priority'            => 100,
+                'exclusive'           => true,
                 'applies_to_shipping' => false,
-                'free_shipping' => false,
-                'first_order_only' => true,
-                'per_customer_limit' => 1,
+                'free_shipping'       => false,
+                'first_order_only'    => true,
+                'per_customer_limit'  => 1,
             ]);
 
             return $discount;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Failed to create referral discount', ['user_id' => $userId, 'percentage' => $percentage, 'error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
 
             return null;
@@ -124,16 +125,16 @@ final class ReferralRewardService
         try {
             $reward = ReferralReward::findOrFail($rewardId);
             if (! $reward->isValid()) {
-                throw new \Exception('Reward is not valid or has expired');
+                throw new Exception('Reward is not valid or has expired');
             }
             if ($reward->status !== 'pending') {
-                throw new \Exception('Reward has already been applied');
+                throw new Exception('Reward has already been applied');
             }
             $reward->apply($orderId);
             Log::info('Reward applied', ['reward_id' => $rewardId, 'order_id' => $orderId, 'type' => $reward->type, 'amount' => $reward->amount]);
 
             return true;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Failed to apply reward', ['reward_id' => $rewardId, 'order_id' => $orderId, 'error' => $e->getMessage()]);
 
             return false;

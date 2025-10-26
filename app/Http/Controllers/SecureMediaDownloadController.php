@@ -8,8 +8,8 @@ use App\Support\Storage\SecureStorage;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Symfony\Component\HttpFoundation\StreamedResponse;
 use Illuminate\Support\Facades\Storage;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 final class SecureMediaDownloadController extends Controller
 {
@@ -26,8 +26,8 @@ final class SecureMediaDownloadController extends Controller
             $mime = $filesystem->mimeType($path) ?: 'application/octet-stream';
             $filename = SecureStorage::filename($path);
             $headers = [
-                'Content-Type' => $mime,
-                'X-Content-Type-Options' => 'nosniff',
+                'Content-Type'            => $mime,
+                'X-Content-Type-Options'  => 'nosniff',
                 'Content-Security-Policy' => "default-src 'none'; img-src 'self'; media-src 'self'",
             ];
 
@@ -36,7 +36,7 @@ final class SecureMediaDownloadController extends Controller
             }
 
             return $filesystem->response($path, null, array_merge($headers, [
-                'Content-Disposition' => 'inline; filename="'.$filename.'"',
+                'Content-Disposition' => 'inline; filename="' . $filename . '"',
             ]));
         } catch (FileNotFoundException) {
             abort(404);

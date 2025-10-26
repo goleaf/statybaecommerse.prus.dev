@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 return [
     'entities' => [
-        'product' => ['viewAny', 'view', 'create', 'update', 'delete', 'restore'],
+        'product'  => ['viewAny', 'view', 'create', 'update', 'delete', 'restore'],
         'category' => ['viewAny', 'view', 'create', 'update', 'delete', 'restore'],
-        'brand' => ['viewAny', 'view', 'create', 'update', 'delete', 'restore'],
-        'order' => ['viewAny', 'view', 'create', 'update', 'delete', 'restore'],
-        'user' => ['viewAny', 'view', 'create', 'update', 'delete', 'restore'],
+        'brand'    => ['viewAny', 'view', 'create', 'update', 'delete', 'restore'],
+        'order'    => ['viewAny', 'view', 'create', 'update', 'delete', 'restore'],
+        'user'     => ['viewAny', 'view', 'create', 'update', 'delete', 'restore'],
     ],
     'roles' => [
         'admin' => [
@@ -61,7 +61,7 @@ return [
     ],
     'aliases' => [
         'administrator' => 'admin',
-        'super_admin' => 'admin',
-        'user' => 'viewer',
+        'super_admin'   => 'admin',
+        'user'          => 'viewer',
     ],
 ];

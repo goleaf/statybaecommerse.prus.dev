@@ -20,7 +20,7 @@ class ReviewResourceTest extends TestCase
         parent::setUp();
 
         $this->actingAs(User::factory()->create([
-            'email' => 'admin@example.com',
+            'email'    => 'admin@example.com',
             'is_admin' => true,
         ]));
     }
@@ -40,31 +40,31 @@ class ReviewResourceTest extends TestCase
 
         Livewire::test(\App\Filament\Resources\ReviewResource\Pages\CreateReview::class)
             ->fillForm([
-                'product_id' => $product->id,
-                'user_id' => $user->id,
-                'reviewer_name' => 'John Doe',
+                'product_id'     => $product->id,
+                'user_id'        => $user->id,
+                'reviewer_name'  => 'John Doe',
                 'reviewer_email' => 'john@example.com',
-                'rating' => 5,
-                'title' => 'Great Product',
-                'content' => 'This product is amazing!',
-                'is_approved' => false,
-                'is_featured' => false,
-                'locale' => 'en',
+                'rating'         => 5,
+                'title'          => 'Great Product',
+                'content'        => 'This product is amazing!',
+                'is_approved'    => false,
+                'is_featured'    => false,
+                'locale'         => 'en',
             ])
             ->call('create')
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('reviews', [
-            'product_id' => $product->id,
-            'user_id' => $user->id,
-            'reviewer_name' => 'John Doe',
+            'product_id'     => $product->id,
+            'user_id'        => $user->id,
+            'reviewer_name'  => 'John Doe',
             'reviewer_email' => 'john@example.com',
-            'rating' => 5,
-            'title' => 'Great Product',
-            'content' => 'This product is amazing!',
-            'is_approved' => false,
-            'is_featured' => false,
-            'locale' => 'en',
+            'rating'         => 5,
+            'title'          => 'Great Product',
+            'content'        => 'This product is amazing!',
+            'is_approved'    => false,
+            'is_featured'    => false,
+            'locale'         => 'en',
         ]);
     }
 
@@ -76,9 +76,9 @@ class ReviewResourceTest extends TestCase
             'record' => $review->getRouteKey(),
         ])
             ->fillForm([
-                'title' => 'Updated Review',
+                'title'   => 'Updated Review',
                 'content' => 'Updated content',
-                'rating' => 4,
+                'rating'  => 4,
             ])
             ->call('save')
             ->assertHasNoFormErrors();
@@ -347,10 +347,10 @@ class ReviewResourceTest extends TestCase
     {
         Livewire::test(\App\Filament\Resources\ReviewResource\Pages\CreateReview::class)
             ->fillForm([
-                'product_id' => '',  // Required field
-                'reviewer_name' => '',  // Required field
+                'product_id'     => '',  // Required field
+                'reviewer_name'  => '',  // Required field
                 'reviewer_email' => 'invalid-email',  // Must be valid email
-                'rating' => 6,  // Must be between 1-5
+                'rating'         => 6,  // Must be between 1-5
             ])
             ->call('create')
             ->assertHasFormErrors(['product_id', 'reviewer_name', 'reviewer_email', 'rating']);
@@ -362,7 +362,7 @@ class ReviewResourceTest extends TestCase
         $user = User::factory()->create();
         $review = Review::factory()->create([
             'product_id' => $product->id,
-            'user_id' => $user->id,
+            'user_id'    => $user->id,
         ]);
 
         Livewire::test(\App\Filament\Resources\ReviewResource\Pages\ViewReview::class, [

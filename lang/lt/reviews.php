@@ -3,19 +3,19 @@
 declare(strict_types=1);
 
 return [
-    'title' => 'Atsiliepimai',
+    'title'  => 'Atsiliepimai',
     'plural' => 'Atsiliepimai',
     'single' => 'Atsiliepimas',
     'fields' => [
-        'rating' => 'Įvertinimas',
-        'title' => 'Pavadinimas',
-        'content' => 'Turinys',
+        'rating'      => 'Įvertinimas',
+        'title'       => 'Pavadinimas',
+        'content'     => 'Turinys',
         'is_approved' => 'Patvirtintas',
         'is_featured' => 'Pažymėtas',
-        'created_at' => 'Sukurta',
+        'created_at'  => 'Sukurta',
     ],
     'actions' => [
-        'approve' => 'Patvirtinti',
+        'approve'    => 'Patvirtinti',
         'disapprove' => 'Atmesti',
     ],
 ];

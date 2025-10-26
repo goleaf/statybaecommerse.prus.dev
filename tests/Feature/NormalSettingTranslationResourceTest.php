@@ -23,7 +23,7 @@ final class NormalSettingTranslationResourceTest extends TestCase
         parent::setUp();
 
         $this->adminUser = User::factory()->create([
-            'email' => 'admin@example.com',
+            'email'    => 'admin@example.com',
             'is_admin' => true,
         ]);
     }
@@ -33,14 +33,14 @@ final class NormalSettingTranslationResourceTest extends TestCase
         $this->actingAs($this->adminUser);
 
         $setting = NormalSetting::factory()->create([
-            'key' => 'test_setting',
+            'key'   => 'test_setting',
             'group' => 'general',
         ]);
 
         NormalSettingTranslation::factory()->create([
             'enhanced_setting_id' => $setting->id,
-            'locale' => 'en',
-            'display_name' => 'Test Setting',
+            'locale'              => 'en',
+            'display_name'        => 'Test Setting',
         ]);
 
         Livewire::test(\App\Filament\Resources\NormalSettingTranslationResource\Pages\ListNormalSettingTranslations::class)
@@ -52,25 +52,25 @@ final class NormalSettingTranslationResourceTest extends TestCase
         $this->actingAs($this->adminUser);
 
         $setting = NormalSetting::factory()->create([
-            'key' => 'test_setting',
+            'key'   => 'test_setting',
             'group' => 'general',
         ]);
 
         Livewire::test(\App\Filament\Resources\NormalSettingTranslationResource\Pages\CreateNormalSettingTranslation::class)
             ->fillForm([
                 'enhanced_setting_id' => $setting->id,
-                'locale' => 'en',
-                'display_name' => 'Test Setting',
-                'description' => 'Test description',
-                'help_text' => 'Test help text',
+                'locale'              => 'en',
+                'display_name'        => 'Test Setting',
+                'description'         => 'Test description',
+                'help_text'           => 'Test help text',
             ])
             ->call('create')
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('enhanced_settings_translations', [
             'enhanced_setting_id' => $setting->id,
-            'locale' => 'en',
-            'display_name' => 'Test Setting',
+            'locale'              => 'en',
+            'display_name'        => 'Test Setting',
         ]);
     }
 
@@ -81,8 +81,8 @@ final class NormalSettingTranslationResourceTest extends TestCase
         $setting = NormalSetting::factory()->create();
         $translation = NormalSettingTranslation::factory()->create([
             'enhanced_setting_id' => $setting->id,
-            'locale' => 'en',
-            'display_name' => 'Original Name',
+            'locale'              => 'en',
+            'display_name'        => 'Original Name',
         ]);
 
         Livewire::test(\App\Filament\Resources\NormalSettingTranslationResource\Pages\EditNormalSettingTranslation::class, [
@@ -90,13 +90,13 @@ final class NormalSettingTranslationResourceTest extends TestCase
         ])
             ->fillForm([
                 'display_name' => 'Updated Name',
-                'description' => 'Updated description',
+                'description'  => 'Updated description',
             ])
             ->call('save')
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('enhanced_settings_translations', [
-            'id' => $translation->id,
+            'id'           => $translation->id,
             'display_name' => 'Updated Name',
         ]);
     }
@@ -108,8 +108,8 @@ final class NormalSettingTranslationResourceTest extends TestCase
         $setting = NormalSetting::factory()->create();
         $translation = NormalSettingTranslation::factory()->create([
             'enhanced_setting_id' => $setting->id,
-            'locale' => 'en',
-            'display_name' => 'Test Setting',
+            'locale'              => 'en',
+            'display_name'        => 'Test Setting',
         ]);
 
         Livewire::test(\App\Filament\Resources\NormalSettingTranslationResource\Pages\ViewNormalSettingTranslation::class, [
@@ -165,11 +165,11 @@ final class NormalSettingTranslationResourceTest extends TestCase
 
         $enTranslation = NormalSettingTranslation::factory()->create([
             'enhanced_setting_id' => $setting->id,
-            'locale' => 'en',
+            'locale'              => 'en',
         ]);
         $ltTranslation = NormalSettingTranslation::factory()->create([
             'enhanced_setting_id' => $setting->id,
-            'locale' => 'lt',
+            'locale'              => 'lt',
         ]);
 
         Livewire::test(\App\Filament\Resources\NormalSettingTranslationResource\Pages\ListNormalSettingTranslations::class)
@@ -184,7 +184,7 @@ final class NormalSettingTranslationResourceTest extends TestCase
 
         Livewire::test(\App\Filament\Resources\NormalSettingTranslationResource\Pages\CreateNormalSettingTranslation::class)
             ->fillForm([
-                'locale' => 'en',
+                'locale'       => 'en',
                 'display_name' => 'Test Setting',
             ])
             ->call('create')
@@ -200,7 +200,7 @@ final class NormalSettingTranslationResourceTest extends TestCase
         Livewire::test(\App\Filament\Resources\NormalSettingTranslationResource\Pages\CreateNormalSettingTranslation::class)
             ->fillForm([
                 'enhanced_setting_id' => $setting->id,
-                'display_name' => 'Test Setting',
+                'display_name'        => 'Test Setting',
             ])
             ->call('create')
             ->assertHasFormErrors(['locale']);
@@ -215,7 +215,7 @@ final class NormalSettingTranslationResourceTest extends TestCase
         Livewire::test(\App\Filament\Resources\NormalSettingTranslationResource\Pages\CreateNormalSettingTranslation::class)
             ->fillForm([
                 'enhanced_setting_id' => $setting->id,
-                'locale' => 'en',
+                'locale'              => 'en',
             ])
             ->call('create')
             ->assertHasFormErrors(['display_name']);

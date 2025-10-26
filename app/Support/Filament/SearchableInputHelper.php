@@ -27,7 +27,7 @@ final class SearchableInputHelper
     /**
      * Hydrate a searchable input with a deterministic option payload.
      *
-     * @param  Closure(int|string): (array{value: int|string, label: string|Stringable|Arrayable, payload?: array|Arrayable|Stringable}|null)  $optionResolver
+     * @param Closure(int|string): (array{value: int|string, label: string|Stringable|Arrayable, payload?: array|Arrayable|Stringable}|null) $optionResolver
      */
     public static function hydrate(SearchableInput $component, int|string|null $state, Closure $optionResolver): void
     {
@@ -63,7 +63,7 @@ final class SearchableInputHelper
     /**
      * Clear dependent form keys once a searchable input loses its selection.
      *
-     * @param  array<string, mixed>  $resets
+     * @param array<string, mixed> $resets
      */
     public static function clear(SearchableInput $component, callable $set, array $resets = []): void
     {
@@ -118,7 +118,7 @@ final class SearchableInputHelper
      * treated as an invalid option and coerced to `null` so the component is
      * cleared upstream.
      *
-     * @param  array{value?: int|string, id?: int|string, label?: string|Stringable|Arrayable, payload?: mixed, data?: array<mixed>}|Arrayable|SearchResult|null  $option
+     * @param  array{value?: int|string, id?: int|string, label?: string|Stringable|Arrayable, payload?: mixed, data?: array<mixed>}|Arrayable|SearchResult|null $option
      * @return array{value: int|string, label: string, payload: array<string, mixed>}|null
      */
     private static function normaliseOption(Arrayable|SearchResult|array|null $option): ?array

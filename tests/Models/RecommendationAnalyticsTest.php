@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Tests\Models;
 
@@ -14,7 +16,7 @@ final class RecommendationAnalyticsTest extends TestCase
     public function test_fillable_configuration_and_casts(): void
     {
         // Inspect the model metadata to confirm guarded attribute definitions.
-        $model = new RecommendationAnalytics();
+        $model = new RecommendationAnalytics;
 
         // Ensure mass-assignable attributes include the metrics columns required for analytics ingestion.
         self::assertSame([
@@ -31,17 +33,17 @@ final class RecommendationAnalyticsTest extends TestCase
 
         // Confirm type casting is applied to numeric rates, JSON payloads, and date values.
         self::assertSame([
-            'ctr' => 'decimal:4',
+            'ctr'             => 'decimal:4',
             'conversion_rate' => 'decimal:4',
-            'metrics' => 'array',
-            'date' => 'date',
+            'metrics'         => 'array',
+            'date'            => 'date',
         ], $model->getCasts());
     }
 
     public function test_relationships_resolve_expected_relation_types(): void
     {
         // Validate each relationship accessor returns a BelongsTo relation for linkage traversal.
-        $model = new RecommendationAnalytics();
+        $model = new RecommendationAnalytics;
 
         self::assertInstanceOf(BelongsTo::class, $model->block());
         self::assertInstanceOf(BelongsTo::class, $model->config());

@@ -131,8 +131,8 @@ trait WithFilters
     {
         return $query->when($this->search, function (Builder $q) {
             $q->where(function (Builder $subQuery) {
-                $subQuery->where('name', 'like', '%'.$this->search.'%')->orWhere('description', 'like', '%'.$this->search.'%')->orWhere('sku', 'like', '%'.$this->search.'%')->orWhereHas('brand', function (Builder $brandQuery) {
-                    $brandQuery->where('name', 'like', '%'.$this->search.'%');
+                $subQuery->where('name', 'like', '%' . $this->search . '%')->orWhere('description', 'like', '%' . $this->search . '%')->orWhere('sku', 'like', '%' . $this->search . '%')->orWhereHas('brand', function (Builder $brandQuery) {
+                    $brandQuery->where('name', 'like', '%' . $this->search . '%');
                 });
             });
         })->when($this->selectedCategories, function (Builder $q) {

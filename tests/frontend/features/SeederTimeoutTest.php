@@ -83,10 +83,10 @@ final class SeederTimeoutTest extends TestCase
         foreach ($productIds as $pid) {
             foreach ($categoryIds as $cid) {
                 $rows[] = [
-                    'product_id' => $pid,
+                    'product_id'  => $pid,
                     'category_id' => $cid,
-                    'created_at' => now(),
-                    'updated_at' => now(),
+                    'created_at'  => now(),
+                    'updated_at'  => now(),
                 ];
             }
         }

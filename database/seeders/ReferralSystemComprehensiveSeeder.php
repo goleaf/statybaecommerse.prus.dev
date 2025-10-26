@@ -44,7 +44,7 @@ final class ReferralSystemComprehensiveSeeder extends Seeder
             ->count(40)
             ->state(function () use ($users, $campaigns) {
                 return [
-                    'user_id' => $users->random()->id,
+                    'user_id'     => $users->random()->id,
                     'campaign_id' => $campaigns->random()->id,
                 ];
             })
@@ -61,8 +61,8 @@ final class ReferralSystemComprehensiveSeeder extends Seeder
                 $referred = User::factory()->create();
 
                 return [
-                    'referrer_id' => $referrer->id,
-                    'referred_id' => $referred->id,
+                    'referrer_id'   => $referrer->id,
+                    'referred_id'   => $referred->id,
                     'referral_code' => $code->code,
                 ];
             })
@@ -78,7 +78,7 @@ final class ReferralSystemComprehensiveSeeder extends Seeder
 
                 return [
                     'referral_id' => $referral->id,
-                    'user_id' => fake()->boolean(70) ? $referral->referrer_id : $referral->referred_id,
+                    'user_id'     => fake()->boolean(70) ? $referral->referrer_id : $referral->referred_id,
                 ];
             })
             ->create();
@@ -94,15 +94,15 @@ final class ReferralSystemComprehensiveSeeder extends Seeder
                 $date = now()->subDays($i)->toDateString();
 
                 ReferralCodeStatistics::create([
-                    'referral_code_id' => $referralCode->id,
-                    'date' => $date,
-                    'total_views' => rand(0, 100),
-                    'total_clicks' => rand(0, 50),
-                    'total_signups' => rand(0, 20),
+                    'referral_code_id'  => $referralCode->id,
+                    'date'              => $date,
+                    'total_views'       => rand(0, 100),
+                    'total_clicks'      => rand(0, 50),
+                    'total_signups'     => rand(0, 20),
                     'total_conversions' => rand(0, 10),
-                    'total_revenue' => rand(0, 1000),
-                    'metadata' => [
-                        'source' => 'system',
+                    'total_revenue'     => rand(0, 1000),
+                    'metadata'          => [
+                        'source'       => 'system',
                         'generated_at' => now(),
                     ],
                 ]);
@@ -120,12 +120,12 @@ final class ReferralSystemComprehensiveSeeder extends Seeder
             for ($i = 0; $i < rand(5, 20); $i++) {
                 ReferralCodeUsageLog::create([
                     'referral_code_id' => $referralCode->id,
-                    'user_id' => $users->random()->id,
-                    'ip_address' => fake()->ipv4(),
-                    'user_agent' => fake()->userAgent(),
-                    'referrer' => fake()->url(),
-                    'metadata' => [
-                        'source' => 'system',
+                    'user_id'          => $users->random()->id,
+                    'ip_address'       => fake()->ipv4(),
+                    'user_agent'       => fake()->userAgent(),
+                    'referrer'         => fake()->url(),
+                    'metadata'         => [
+                        'source'    => 'system',
                         'timestamp' => now()->subDays(rand(1, 30)),
                     ],
                 ]);
@@ -144,12 +144,12 @@ final class ReferralSystemComprehensiveSeeder extends Seeder
             for ($i = 0; $i < rand(1, 5); $i++) {
                 ReferralRewardLog::create([
                     'referral_reward_id' => $referralReward->id,
-                    'user_id' => $referralReward->user_id,
-                    'action' => $actions[rand(0, 3)],
-                    'data' => [
+                    'user_id'            => $referralReward->user_id,
+                    'action'             => $actions[rand(0, 3)],
+                    'data'               => [
                         'reward_amount' => $referralReward->amount,
-                        'reward_type' => $referralReward->type,
-                        'timestamp' => now()->subDays(rand(1, 30)),
+                        'reward_type'   => $referralReward->type,
+                        'timestamp'     => now()->subDays(rand(1, 30)),
                     ],
                     'ip_address' => fake()->ipv4(),
                     'user_agent' => fake()->userAgent(),

@@ -20,7 +20,7 @@ final class NewsTest extends TestCase
     public function test_fillable_and_casts_configuration_are_explicit(): void
     {
         // Ensure the fillable attributes remain explicit so mass-assignment stays predictable.
-        $news = new News();
+        $news = new News;
         $this->assertSame([
             'is_visible',
             'is_featured',
@@ -38,23 +38,23 @@ final class NewsTest extends TestCase
 
         // Confirm the casts cover every persisted attribute that needs type juggling.
         $this->assertSame([
-            'is_visible' => 'boolean',
-            'is_featured' => 'boolean',
-            'is_breaking' => 'boolean',
-            'moderation_state' => ModerationState::class,
+            'is_visible'              => 'boolean',
+            'is_featured'             => 'boolean',
+            'is_breaking'             => 'boolean',
+            'moderation_state'        => ModerationState::class,
             'submitted_for_review_at' => 'datetime',
-            'approved_at' => 'datetime',
-            'approved_by_id' => 'integer',
-            'published_at' => 'datetime',
-            'view_count' => 'integer',
-            'meta_data' => 'array',
+            'approved_at'             => 'datetime',
+            'approved_by_id'          => 'integer',
+            'published_at'            => 'datetime',
+            'view_count'              => 'integer',
+            'meta_data'               => 'array',
         ], $news->getCasts());
     }
 
     public function test_relationship_methods_expose_expected_relation_types(): void
     {
         // Using an unsaved instance is enough to validate the relation objects returned by the helpers.
-        $news = new News();
+        $news = new News;
 
         $this->assertInstanceOf(BelongsTo::class, $news->approvedBy());
         $this->assertInstanceOf(HasMany::class, $news->approvals());
@@ -71,8 +71,8 @@ final class NewsTest extends TestCase
     {
         // Create a published article that satisfies all constraints.
         $published = News::factory()->create([
-            'is_visible' => true,
-            'published_at' => now()->subDay(),
+            'is_visible'       => true,
+            'published_at'     => now()->subDay(),
             'moderation_state' => ModerationState::Published->value,
         ]);
         $this->assertTrue($published->isPublished());
@@ -80,22 +80,22 @@ final class NewsTest extends TestCase
 
         // Create variations that should fail each constraint individually.
         $hidden = News::factory()->create([
-            'is_visible' => false,
-            'published_at' => now()->subDay(),
+            'is_visible'       => false,
+            'published_at'     => now()->subDay(),
             'moderation_state' => ModerationState::Published->value,
         ]);
         $this->assertFalse($hidden->isPublished());
 
         $future = News::factory()->create([
-            'is_visible' => true,
-            'published_at' => now()->addDay(),
+            'is_visible'       => true,
+            'published_at'     => now()->addDay(),
             'moderation_state' => ModerationState::Published->value,
         ]);
         $this->assertFalse($future->isPublished());
 
         $draft = News::factory()->create([
-            'is_visible' => true,
-            'published_at' => now()->subDay(),
+            'is_visible'       => true,
+            'published_at'     => now()->subDay(),
             'moderation_state' => ModerationState::Draft->value,
         ]);
         $this->assertFalse($draft->isPublished());
@@ -105,28 +105,28 @@ final class NewsTest extends TestCase
     {
         // Seed a predictable dataset including null author names.
         $alpha = News::factory()->create([
-            'author_name' => 'Alice Author',
+            'author_name'      => 'Alice Author',
             'moderation_state' => ModerationState::Published->value,
-            'published_at' => now()->subDay(),
-            'is_visible' => true,
+            'published_at'     => now()->subDay(),
+            'is_visible'       => true,
         ]);
         $bravo = News::factory()->create([
-            'author_name' => 'Bob Writer',
+            'author_name'      => 'Bob Writer',
             'moderation_state' => ModerationState::Published->value,
-            'published_at' => now()->subHours(2),
-            'is_visible' => true,
+            'published_at'     => now()->subHours(2),
+            'is_visible'       => true,
         ]);
         $charlie = News::factory()->create([
-            'author_name' => null,
+            'author_name'      => null,
             'moderation_state' => ModerationState::Published->value,
-            'published_at' => now()->subHours(3),
-            'is_visible' => true,
+            'published_at'     => now()->subHours(3),
+            'is_visible'       => true,
         ]);
         News::factory()->create([
-            'author_name' => 'Zed Zero',
+            'author_name'      => 'Zed Zero',
             'moderation_state' => ModerationState::Draft->value,
-            'published_at' => now()->subDay(),
-            'is_visible' => true,
+            'published_at'     => now()->subDay(),
+            'is_visible'       => true,
         ]);
 
         // Only published, visible, and scheduled records should remain after applying the scope.
@@ -145,9 +145,9 @@ final class NewsTest extends TestCase
         // Prepare a news item with a translation that contains unwanted markup.
         $news = News::factory()->create();
         $news->translations()->create([
-            'locale' => 'en',
-            'title' => 'Sample',
-            'slug' => 'sample',
+            'locale'  => 'en',
+            'title'   => 'Sample',
+            'slug'    => 'sample',
             'summary' => 'Summary',
             'content' => '<script>alert(1)</script><p>Allowed content</p>',
         ]);

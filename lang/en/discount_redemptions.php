@@ -3,10 +3,10 @@
 declare(strict_types=1);
 
 return [
-    'title'  => 'Discount Redemptions',
-    'plural' => 'Discount Redemptions',
-    'single' => 'Discount Redemption',
-    'list_item_label' => 'Discount :discount',
+    'title'             => 'Discount Redemptions',
+    'plural'            => 'Discount Redemptions',
+    'single'            => 'Discount Redemption',
+    'list_item_label'   => 'Discount :discount',
     'list_item_tooltip' => 'Saved :amount via code :code',
 
     'sections' => [

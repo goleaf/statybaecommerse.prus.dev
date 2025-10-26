@@ -9,8 +9,8 @@ use App\Models\ReferralReward;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
 /**
@@ -166,12 +166,12 @@ final class ReferralRewardController extends Controller
     {
         return [
             'success' => true,
-            'data' => $paginator->items(),
-            'meta' => [
-                'current_page' => $paginator->currentPage(),
-                'per_page' => $paginator->perPage(),
-                'last_page' => $paginator->lastPage(),
-                'total' => $paginator->total(),
+            'data'    => $paginator->items(),
+            'meta'    => [
+                'current_page'  => $paginator->currentPage(),
+                'per_page'      => $paginator->perPage(),
+                'last_page'     => $paginator->lastPage(),
+                'total'         => $paginator->total(),
                 'next_page_url' => $paginator->nextPageUrl(),
                 'prev_page_url' => $paginator->previousPageUrl(),
             ],
@@ -214,28 +214,28 @@ final class ReferralRewardController extends Controller
         if ($aggregates === null) {
             // Safeguard against null responses by returning empty counters.
             return [
-                'total_rewards' => 0,
-                'pending_rewards' => 0,
-                'applied_rewards' => 0,
-                'expired_rewards' => 0,
-                'total_amount' => 0.0,
-                'pending_amount' => 0.0,
-                'applied_amount' => 0.0,
-                'referrer_bonuses' => 0,
+                'total_rewards'      => 0,
+                'pending_rewards'    => 0,
+                'applied_rewards'    => 0,
+                'expired_rewards'    => 0,
+                'total_amount'       => 0.0,
+                'pending_amount'     => 0.0,
+                'applied_amount'     => 0.0,
+                'referrer_bonuses'   => 0,
                 'referred_discounts' => 0,
             ];
         }
 
         // Convert database scalars into the expected array structure with strict typing.
         return [
-            'total_rewards' => (int) ($aggregates->total_rewards ?? 0),
-            'pending_rewards' => (int) ($aggregates->pending_rewards ?? 0),
-            'applied_rewards' => (int) ($aggregates->applied_rewards ?? 0),
-            'expired_rewards' => (int) ($aggregates->expired_rewards ?? 0),
-            'total_amount' => (float) ($aggregates->total_amount ?? 0.0),
-            'pending_amount' => (float) ($aggregates->pending_amount ?? 0.0),
-            'applied_amount' => (float) ($aggregates->applied_amount ?? 0.0),
-            'referrer_bonuses' => (int) ($aggregates->referrer_bonuses ?? 0),
+            'total_rewards'      => (int) ($aggregates->total_rewards ?? 0),
+            'pending_rewards'    => (int) ($aggregates->pending_rewards ?? 0),
+            'applied_rewards'    => (int) ($aggregates->applied_rewards ?? 0),
+            'expired_rewards'    => (int) ($aggregates->expired_rewards ?? 0),
+            'total_amount'       => (float) ($aggregates->total_amount ?? 0.0),
+            'pending_amount'     => (float) ($aggregates->pending_amount ?? 0.0),
+            'applied_amount'     => (float) ($aggregates->applied_amount ?? 0.0),
+            'referrer_bonuses'   => (int) ($aggregates->referrer_bonuses ?? 0),
             'referred_discounts' => (int) ($aggregates->referred_discounts ?? 0),
         ];
     }

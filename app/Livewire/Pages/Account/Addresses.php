@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Livewire\Pages\Account;
 
 use App\Models\Address;
+use Exception;
 use Filament\Notifications\Notification;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
@@ -48,7 +49,7 @@ class Addresses extends Component
                 ->send();
 
             $this->dispatch('addresses-updated');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Notification::make()
                 ->title(__('Error'))
                 ->body(__('Failed to delete address. Please try again.'))
@@ -92,7 +93,7 @@ class Addresses extends Component
                 ->send();
 
             $this->dispatch('addresses-updated');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Notification::make()
                 ->title(__('Error'))
                 ->body(__('Failed to set default address. Please try again.'))

@@ -24,15 +24,15 @@ it('renders coupon resource index page', function () {
 it('lists coupons in table', function () {
     $coupons = collect(range(1, 3))->map(function () {
         return \App\Models\Coupon::create([
-            'code' => Str::upper(Str::random(8)),
-            'name' => 'Test '.Str::random(5),
-            'description' => 'Desc',
-            'type' => 'fixed',
-            'value' => 10,
+            'code'           => Str::upper(Str::random(8)),
+            'name'           => 'Test ' . Str::random(5),
+            'description'    => 'Desc',
+            'type'           => 'fixed',
+            'value'          => 10,
             'minimum_amount' => 0,
-            'usage_limit' => null,
-            'used_count' => 0,
-            'is_active' => true,
+            'usage_limit'    => null,
+            'used_count'     => 0,
+            'is_active'      => true,
         ]);
     });
 
@@ -46,15 +46,15 @@ it('renders coupon create page', function () {
 
 it('renders coupon view and edit pages', function () {
     $coupon = \App\Models\Coupon::create([
-        'code' => Str::upper(Str::random(8)),
-        'name' => 'Test',
-        'description' => 'Desc',
-        'type' => 'fixed',
-        'value' => 5,
+        'code'           => Str::upper(Str::random(8)),
+        'name'           => 'Test',
+        'description'    => 'Desc',
+        'type'           => 'fixed',
+        'value'          => 5,
         'minimum_amount' => 0,
-        'usage_limit' => null,
-        'used_count' => 0,
-        'is_active' => true,
+        'usage_limit'    => null,
+        'used_count'     => 0,
+        'is_active'      => true,
     ]);
 
     $this->get(CouponResource::getUrl('view', ['record' => $coupon]))->assertSuccessful();

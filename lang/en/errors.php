@@ -2,8 +2,6 @@
 
 declare(strict_types=1);
 
-use App\Support\ErrorCode;
-
 return [
     'titles' => [
         // @translators: Displayed when a requested page or record is missing (HTTP 404).

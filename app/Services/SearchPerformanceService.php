@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Support\Telemetry\TelemetryManager;
+use Exception;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use OpenTelemetry\API\Trace\SpanInterface;
@@ -22,9 +23,7 @@ final class SearchPerformanceService
     private const CACHE_TTL = 3600;
 
     // 1 hour
-    public function __construct(private readonly TelemetryManager $telemetry)
-    {
-    }
+    public function __construct(private readonly TelemetryManager $telemetry) {}
 
     /**
      * Handle trackSearchPerformance functionality with proper error handling.
@@ -41,7 +40,7 @@ final class SearchPerformanceService
                     $span->setAttribute('search.execution_time', $executionTime);
                 }
                 // Store in cache for real-time monitoring
-                $cacheKey = self::CACHE_PREFIX.'recent_'.now()->format('Y-m-d-H');
+                $cacheKey = self::CACHE_PREFIX . 'recent_' . now()->format('Y-m-d-H');
                 $recentSearches = Cache::get($cacheKey, []);
                 $recentSearches[] = $metrics;
                 // Keep only last 100 searches per hour
@@ -54,7 +53,7 @@ final class SearchPerformanceService
                 }
                 // Update performance statistics
                 $this->updatePerformanceStats($metrics);
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 if ($span !== null) {
                     $span->recordException($e);
                     $span->setStatus(StatusCode::STATUS_ERROR, $e->getMessage());
@@ -63,7 +62,7 @@ final class SearchPerformanceService
             }
         }, [
             'search.query_length' => strlen($query),
-            'search.type' => $searchType,
+            'search.type'         => $searchType,
         ]);
     }
 
@@ -72,7 +71,7 @@ final class SearchPerformanceService
      */
     public function getPerformanceStats(int $days = 7): array
     {
-        $cacheKey = self::CACHE_PREFIX.'stats_'.$days;
+        $cacheKey = self::CACHE_PREFIX . 'stats_' . $days;
 
         return $this->telemetry->inSpan('search.performance.summary', function (?SpanInterface $span) use ($cacheKey, $days): array {
             $span?->setAttribute('search.days', $days);
@@ -90,7 +89,7 @@ final class SearchPerformanceService
      */
     public function getCacheHitRates(): array
     {
-        $cacheKey = self::CACHE_PREFIX.'cache_hit_rates';
+        $cacheKey = self::CACHE_PREFIX . 'cache_hit_rates';
 
         return Cache::remember($cacheKey, 1800, function () {
             // This would typically come from cache monitoring
@@ -148,7 +147,7 @@ final class SearchPerformanceService
     private function updatePerformanceStats(array $metrics): void
     {
         $date = now()->format('Y-m-d');
-        $cacheKey = self::CACHE_PREFIX.'daily_stats_'.$date;
+        $cacheKey = self::CACHE_PREFIX . 'daily_stats_' . $date;
         $stats = Cache::get($cacheKey, ['total_searches' => 0, 'total_execution_time' => 0, 'total_memory_usage' => 0, 'slow_searches' => 0, 'search_types' => []]);
         $stats['total_searches']++;
         $stats['total_execution_time'] += $metrics['execution_time'];
@@ -170,11 +169,11 @@ final class SearchPerformanceService
     /**
      * Handle getAverageExecutionTime functionality with proper error handling.
      *
-     * @param  DateTime  $since
+     * @param DateTime $since
      */
     private function getAverageExecutionTime(\DateTime $since): float
     {
-        $cacheKey = self::CACHE_PREFIX.'avg_execution_time_'.$since->format('Y-m-d');
+        $cacheKey = self::CACHE_PREFIX . 'avg_execution_time_' . $since->format('Y-m-d');
 
         return Cache::remember($cacheKey, 1800, function () {
             // This would typically query a performance log table
@@ -187,11 +186,11 @@ final class SearchPerformanceService
     /**
      * Handle getSlowSearchesCount functionality with proper error handling.
      *
-     * @param  DateTime  $since
+     * @param DateTime $since
      */
     private function getSlowSearchesCount(\DateTime $since): int
     {
-        $cacheKey = self::CACHE_PREFIX.'slow_searches_'.$since->format('Y-m-d');
+        $cacheKey = self::CACHE_PREFIX . 'slow_searches_' . $since->format('Y-m-d');
 
         return Cache::remember($cacheKey, 1800, function () {
             // This would typically query a performance log table
@@ -202,11 +201,11 @@ final class SearchPerformanceService
     /**
      * Handle getTotalSearches functionality with proper error handling.
      *
-     * @param  DateTime  $since
+     * @param DateTime $since
      */
     private function getTotalSearches(\DateTime $since): int
     {
-        $cacheKey = self::CACHE_PREFIX.'total_searches_'.$since->format('Y-m-d');
+        $cacheKey = self::CACHE_PREFIX . 'total_searches_' . $since->format('Y-m-d');
 
         return Cache::remember($cacheKey, 1800, function () {
             // This would typically query a performance log table
@@ -217,11 +216,11 @@ final class SearchPerformanceService
     /**
      * Handle getMemoryUsageStats functionality with proper error handling.
      *
-     * @param  DateTime  $since
+     * @param DateTime $since
      */
     private function getMemoryUsageStats(\DateTime $since): array
     {
-        $cacheKey = self::CACHE_PREFIX.'memory_stats_'.$since->format('Y-m-d');
+        $cacheKey = self::CACHE_PREFIX . 'memory_stats_' . $since->format('Y-m-d');
 
         return Cache::remember($cacheKey, 1800, function () {
             return [
@@ -237,11 +236,11 @@ final class SearchPerformanceService
     /**
      * Handle getSearchTypePerformance functionality with proper error handling.
      *
-     * @param  DateTime  $since
+     * @param DateTime $since
      */
     private function getSearchTypePerformance(\DateTime $since): array
     {
-        $cacheKey = self::CACHE_PREFIX.'type_performance_'.$since->format('Y-m-d');
+        $cacheKey = self::CACHE_PREFIX . 'type_performance_' . $since->format('Y-m-d');
 
         return Cache::remember($cacheKey, 1800, function () {
             return ['products' => ['avg_time' => 0.2, 'count' => 1000], 'categories' => ['avg_time' => 0.1, 'count' => 500], 'brands' => ['avg_time' => 0.15, 'count' => 300], 'customers' => ['avg_time' => 0.3, 'count' => 200]];
@@ -251,11 +250,11 @@ final class SearchPerformanceService
     /**
      * Handle getHourlyPerformance functionality with proper error handling.
      *
-     * @param  DateTime  $since
+     * @param DateTime $since
      */
     private function getHourlyPerformance(\DateTime $since): array
     {
-        $cacheKey = self::CACHE_PREFIX.'hourly_performance_'.$since->format('Y-m-d');
+        $cacheKey = self::CACHE_PREFIX . 'hourly_performance_' . $since->format('Y-m-d');
 
         return Cache::remember($cacheKey, 1800, function () {
             $hourlyData = [];
@@ -280,10 +279,10 @@ final class SearchPerformanceService
         // This would typically analyze actual cache statistics
         // For now, return estimated values
         return match ($prefix) {
-            'autocomplete_' => 85.0,
+            'autocomplete_'   => 85.0,
             'search_results_' => 75.0,
-            'suggestions_' => 90.0,
-            default => 80.0,
+            'suggestions_'    => 90.0,
+            default           => 80.0,
         };
     }
 }

@@ -23,12 +23,12 @@ final class SimpleReportTest extends TestCase
     public function test_can_create_report(): void
     {
         $reportData = [
-            'name' => 'Test Report',
-            'slug' => 'test-report',
+            'name'        => 'Test Report',
+            'slug'        => 'test-report',
             'description' => 'Test report description',
-            'type' => 'sales',
-            'category' => 'analytics',
-            'is_active' => true,
+            'type'        => 'sales',
+            'category'    => 'analytics',
+            'is_active'   => true,
         ];
 
         $report = Report::create($reportData);
@@ -48,7 +48,7 @@ final class SimpleReportTest extends TestCase
         $report = Report::factory()->create();
 
         $report->update([
-            'name' => 'Updated Report Name',
+            'name'        => 'Updated Report Name',
             'description' => 'Updated description',
         ]);
 

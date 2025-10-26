@@ -96,22 +96,22 @@ final class DiscountController extends Controller
 
         Session::put('cart_discount', $discountAmount);
         Session::put('applied_coupon', [
-            'id' => $coupon->getKey(),
+            'id'   => $coupon->getKey(),
             'code' => $coupon->code,
         ]);
         Session::put('checkout.coupon', [
-            'id' => $coupon->getKey(),
-            'code' => $coupon->code,
+            'id'              => $coupon->getKey(),
+            'code'            => $coupon->code,
             'discount_amount' => $discountAmount,
         ]);
 
         if ($expectsJson) {
             return response()->json([
                 'success' => true,
-                'coupon' => [
-                    'id' => $coupon->getKey(),
-                    'code' => $coupon->code,
-                    'type' => $coupon->type,
+                'coupon'  => [
+                    'id'    => $coupon->getKey(),
+                    'code'  => $coupon->code,
+                    'type'  => $coupon->type,
                     'value' => (float) $coupon->value,
                 ],
                 'discount_amount' => $discountAmount,
@@ -174,10 +174,10 @@ final class DiscountController extends Controller
 
         return [
             'subtotal' => round($subtotal, 2),
-            'tax' => round($tax, 2),
+            'tax'      => round($tax, 2),
             'shipping' => round($shipping, 2),
             'discount' => round($discount, 2),
-            'total' => round(max($total, 0), 2),
+            'total'    => round(max($total, 0), 2),
         ];
     }
 

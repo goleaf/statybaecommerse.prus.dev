@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 $directory = __DIR__ . '/../app/Filament/Resources';
 $files = glob($directory . '/*Resource.php');
 foreach ($files as $file) {

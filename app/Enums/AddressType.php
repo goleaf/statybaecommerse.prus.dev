@@ -67,10 +67,10 @@ enum AddressType: string implements EnumInterface
     {
         return match ($this) {
             self::SHIPPING => 'heroicon-o-truck',
-            self::BILLING => 'heroicon-o-credit-card',
-            self::HOME => 'heroicon-o-home',
-            self::WORK => 'heroicon-o-building-office',
-            self::OTHER => 'heroicon-o-map-pin',
+            self::BILLING  => 'heroicon-o-credit-card',
+            self::HOME     => 'heroicon-o-home',
+            self::WORK     => 'heroicon-o-building-office',
+            self::OTHER    => 'heroicon-o-map-pin',
         };
     }
 
@@ -78,10 +78,10 @@ enum AddressType: string implements EnumInterface
     {
         return match ($this) {
             self::SHIPPING => 'blue',
-            self::BILLING => 'green',
-            self::HOME => 'purple',
-            self::WORK => 'orange',
-            self::OTHER => 'gray',
+            self::BILLING  => 'green',
+            self::HOME     => 'purple',
+            self::WORK     => 'orange',
+            self::OTHER    => 'gray',
         };
     }
 
@@ -89,7 +89,7 @@ enum AddressType: string implements EnumInterface
     {
         return match ($this) {
             self::SHIPPING, self::BILLING => true,
-            default                       => false,
+            default => false,
         };
     }
 
@@ -97,7 +97,7 @@ enum AddressType: string implements EnumInterface
     {
         return match ($this) {
             self::SHIPPING, self::BILLING => true,
-            default                       => false,
+            default => false,
         };
     }
 
@@ -105,10 +105,10 @@ enum AddressType: string implements EnumInterface
     {
         return match ($this) {
             self::SHIPPING => 1,
-            self::BILLING => 2,
-            self::HOME => 3,
-            self::WORK => 4,
-            self::OTHER => 5,
+            self::BILLING  => 2,
+            self::HOME     => 3,
+            self::WORK     => 4,
+            self::OTHER    => 5,
         };
     }
 

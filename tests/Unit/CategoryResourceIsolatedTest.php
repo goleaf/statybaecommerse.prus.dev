@@ -113,7 +113,7 @@ class CategoryResourceIsolatedTest extends TestCase
         $returnCode = 0;
         exec('php -l app/Filament/Resources/CategoryResource.php 2>&1', $output, $returnCode);
 
-        $this->assertEquals(0, $returnCode, 'CategoryResource.php has syntax errors: '.implode("\n", $output));
+        $this->assertEquals(0, $returnCode, 'CategoryResource.php has syntax errors: ' . implode("\n", $output));
     }
 
     public function test_category_model_syntax_is_valid(): void
@@ -123,6 +123,6 @@ class CategoryResourceIsolatedTest extends TestCase
         $returnCode = 0;
         exec('php -l app/Models/Category.php 2>&1', $output, $returnCode);
 
-        $this->assertEquals(0, $returnCode, 'Category.php has syntax errors: '.implode("\n", $output));
+        $this->assertEquals(0, $returnCode, 'Category.php has syntax errors: ' . implode("\n", $output));
     }
 }

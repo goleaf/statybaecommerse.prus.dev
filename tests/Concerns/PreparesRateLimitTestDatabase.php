@@ -32,7 +32,7 @@ trait PreparesRateLimitTestDatabase
 
         config([
             'auth.guards.sanctum' => [
-                'driver' => 'sanctum',
+                'driver'   => 'sanctum',
                 'provider' => 'users',
             ],
             'sanctum.guard' => [],

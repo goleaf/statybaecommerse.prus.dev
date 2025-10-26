@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Application\Product\DTOs;
 
+use InvalidArgumentException;
+
 /**
  * Immutable DTO capturing filters and pagination for the catalog listing.
  */
@@ -19,10 +21,10 @@ final readonly class ListCatalogProductsInputDto
     ) {
         // Normalise pagination to always be within a sensible range.
         if ($this->perPage < 1) {
-            throw new \InvalidArgumentException('Per-page value must be greater than zero.');
+            throw new InvalidArgumentException('Per-page value must be greater than zero.');
         }
         if ($this->page < 1) {
-            throw new \InvalidArgumentException('Page value must be greater than zero.');
+            throw new InvalidArgumentException('Page value must be greater than zero.');
         }
     }
 

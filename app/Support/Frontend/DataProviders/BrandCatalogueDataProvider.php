@@ -55,15 +55,15 @@ final class BrandCatalogueDataProvider
         $availableCategories = $this->resolveBrandCategories($brand);
 
         return [
-            'brand' => $brand,
-            'products' => $products,
-            'availableSorts' => $this->products->sortOptions(),
-            'availableFilters' => $this->products->filterOptions(),
-            'activeSort' => $this->products->resolveSortKey($filters['sort'] ?? null),
-            'activeFilter' => $filters['filter'] ?? null,
+            'brand'               => $brand,
+            'products'            => $products,
+            'availableSorts'      => $this->products->sortOptions(),
+            'availableFilters'    => $this->products->filterOptions(),
+            'activeSort'          => $this->products->resolveSortKey($filters['sort'] ?? null),
+            'activeFilter'        => $filters['filter'] ?? null,
             'availableCategories' => $availableCategories,
-            'relatedCategories' => $availableCategories,
-            'filters' => $filtersWithBrand,
+            'relatedCategories'   => $availableCategories,
+            'filters'             => $filtersWithBrand,
         ];
     }
 

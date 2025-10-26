@@ -18,10 +18,10 @@ use Livewire\WithPagination;
  * Livewire component for ProductReviews with reactive frontend functionality, real-time updates, and user interaction handling.
  *
  * @property Product $product
- * @property bool $showReviewForm
- * @property string $title
- * @property string $content
- * @property int $rating
+ * @property bool    $showReviewForm
+ * @property string  $title
+ * @property string  $content
+ * @property int     $rating
  */
 final class ProductReviews extends Component
 {

@@ -20,9 +20,9 @@ final class CityTranslationFactory extends Factory
         $name = $this->faker->city();
 
         return [
-            'city_id' => City::factory(),
-            'locale' => $this->faker->randomElement(['lt', 'en']),
-            'name' => $name,
+            'city_id'     => City::factory(),
+            'locale'      => $this->faker->randomElement(['lt', 'en']),
+            'name'        => $name,
             'description' => $this->faker->sentence(),
         ];
     }

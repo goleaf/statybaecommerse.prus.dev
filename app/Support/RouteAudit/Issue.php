@@ -11,7 +11,9 @@ namespace App\Support\RouteAudit;
 final class Issue
 {
     public const SEVERITY_ERROR = 'error';
+
     public const SEVERITY_WARNING = 'warning';
+
     public const SEVERITY_INFO = 'info';
 
     /**
@@ -44,9 +46,9 @@ final class Issue
     private static function make(string $severity, string $message, array $context = [], ?string $suggestion = null): array
     {
         $issue = [
-            'severity'   => $severity,
-            'message'    => $message,
-            'context'    => $context,
+            'severity' => $severity,
+            'message'  => $message,
+            'context'  => $context,
         ];
 
         if ($suggestion !== null) {
@@ -56,4 +58,3 @@ final class Issue
         return $issue;
     }
 }
-

@@ -1,78 +1,80 @@
 <?php
 
+declare(strict_types=1);
+
 return [
     // Sections
     'sections' => [
         'basic_information' => 'Grundinformationen',
         'campaign_settings' => 'Kampagneneinstellungen',
-        'content' => 'Inhalt',
-        'media' => 'Medien',
-        'targeting' => 'Zielgruppenausrichtung',
+        'content'           => 'Inhalt',
+        'media'             => 'Medien',
+        'targeting'         => 'Zielgruppenausrichtung',
     ],
 
     // Fields
     'fields' => [
-        'name' => 'Name',
-        'description' => 'Beschreibung',
-        'type' => 'Typ',
-        'status' => 'Status',
-        'start_date' => 'Startdatum',
-        'end_date' => 'Enddatum',
-        'budget' => 'Budget',
-        'target_audience' => 'Zielgruppe',
-        'subject' => 'Betreff',
-        'content' => 'Inhalt',
-        'cta_text' => 'Call-to-Action Text',
-        'cta_url' => 'Call-to-Action URL',
-        'image' => 'Bild',
-        'banner' => 'Banner',
-        'target_segments' => 'Zielsegmente',
-        'target_products' => 'Zielprodukte',
+        'name'              => 'Name',
+        'description'       => 'Beschreibung',
+        'type'              => 'Typ',
+        'status'            => 'Status',
+        'start_date'        => 'Startdatum',
+        'end_date'          => 'Enddatum',
+        'budget'            => 'Budget',
+        'target_audience'   => 'Zielgruppe',
+        'subject'           => 'Betreff',
+        'content'           => 'Inhalt',
+        'cta_text'          => 'Call-to-Action Text',
+        'cta_url'           => 'Call-to-Action URL',
+        'image'             => 'Bild',
+        'banner'            => 'Banner',
+        'target_segments'   => 'Zielsegmente',
+        'target_products'   => 'Zielprodukte',
         'target_categories' => 'Zielkategorien',
-        'created_at' => 'Erstellt am',
+        'created_at'        => 'Erstellt am',
     ],
 
     // Types
     'types' => [
-        'email' => 'E-Mail',
-        'sms' => 'SMS',
-        'push' => 'Push-Benachrichtigung',
+        'email'  => 'E-Mail',
+        'sms'    => 'SMS',
+        'push'   => 'Push-Benachrichtigung',
         'banner' => 'Banner',
-        'popup' => 'Popup',
+        'popup'  => 'Popup',
         'social' => 'Soziale Medien',
     ],
 
     // Status
     'status' => [
-        'draft' => 'Entwurf',
+        'draft'     => 'Entwurf',
         'scheduled' => 'Geplant',
-        'active' => 'Aktiv',
-        'paused' => 'Pausiert',
+        'active'    => 'Aktiv',
+        'paused'    => 'Pausiert',
         'completed' => 'Abgeschlossen',
         'cancelled' => 'Abgebrochen',
     ],
 
     // Segments
     'segments' => [
-        'all_customers' => 'Alle Kunden',
-        'new_customers' => 'Neue Kunden',
-        'returning_customers' => 'Wiederkehrende Kunden',
+        'all_customers'        => 'Alle Kunden',
+        'new_customers'        => 'Neue Kunden',
+        'returning_customers'  => 'Wiederkehrende Kunden',
         'high_value_customers' => 'Hochwertige Kunden',
-        'inactive_customers' => 'Inaktive Kunden',
+        'inactive_customers'   => 'Inaktive Kunden',
     ],
 
     // Filters
     'filters' => [
-        'active' => 'Aktive Kampagnen',
-        'scheduled' => 'Geplante Kampagnen',
-        'created_from' => 'Erstellt von',
+        'active'        => 'Aktive Kampagnen',
+        'scheduled'     => 'Geplante Kampagnen',
+        'created_from'  => 'Erstellt von',
         'created_until' => 'Erstellt bis',
     ],
 
     // Actions
     'actions' => [
         'activate' => 'Aktivieren',
-        'pause' => 'Pausieren',
+        'pause'    => 'Pausieren',
         'complete' => 'Abschließen',
     ],
 
@@ -83,7 +85,7 @@ return [
 
     // Models
     'models' => [
-        'campaign' => 'Kampagne',
+        'campaign'  => 'Kampagne',
         'campaigns' => 'Kampagnen',
     ],
 ];

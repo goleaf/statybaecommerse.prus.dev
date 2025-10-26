@@ -129,7 +129,7 @@ final class CampaignConversionController extends Controller
             $query->where('converted_at', '<=', $request->date_to);
         }
         $conversions = $query->get();
-        $headers = ['Content-Type' => 'text/csv', 'Content-Disposition' => 'attachment; filename="campaign_conversions_'.now()->format('Y-m-d_H-i-s').'.csv"'];
+        $headers = ['Content-Type' => 'text/csv', 'Content-Disposition' => 'attachment; filename="campaign_conversions_' . now()->format('Y-m-d_H-i-s') . '.csv"'];
 
         return response()->stream(function () use ($conversions) {
             $handle = fopen('php://output', 'w');

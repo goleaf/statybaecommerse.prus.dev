@@ -89,7 +89,7 @@ final class TimeoutImplementationTest extends TestCase
     public function test_report_generation_command(): void
     {
         $this->artisan(GenerateReportsCommand::class, [
-            '--type' => 'system',
+            '--type'   => 'system',
             '--format' => 'json',
             '--output' => 'test-reports',
         ])->assertExitCode(0);

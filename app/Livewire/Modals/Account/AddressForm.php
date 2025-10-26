@@ -7,6 +7,7 @@ namespace App\Livewire\Modals\Account;
 use App\Models\Address;
 use App\Models\Country;
 use App\Support\Address\AddressDataSanitizer;
+use Exception;
 use Filament\Notifications\Notification;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Collection;
@@ -21,17 +22,17 @@ use LivewireUI\Modal\ModalComponent;
  *
  * Livewire component for AddressForm with reactive frontend functionality, real-time updates, and user interaction handling.
  *
- * @property string|null $first_name
- * @property string|null $last_name
- * @property string|null $street_address
- * @property string|null $street_address_plus
- * @property string $type
- * @property int|null $country_id
- * @property string|null $postal_code
- * @property string|null $city
- * @property string|null $phone_number
+ * @property string|null  $first_name
+ * @property string|null  $last_name
+ * @property string|null  $street_address
+ * @property string|null  $street_address_plus
+ * @property string       $type
+ * @property int|null     $country_id
+ * @property string|null  $postal_code
+ * @property string|null  $city
+ * @property string|null  $phone_number
  * @property Address|null $address
- * @property Collection $countries
+ * @property Collection   $countries
  */
 class AddressForm extends ModalComponent
 {
@@ -116,18 +117,18 @@ class AddressForm extends ModalComponent
 
         try {
             $addressData = AddressDataSanitizer::sanitize([
-                'type' => $this->type,
-                'first_name' => $this->first_name,
-                'last_name' => $this->last_name,
+                'type'           => $this->type,
+                'first_name'     => $this->first_name,
+                'last_name'      => $this->last_name,
                 'address_line_1' => $this->street_address,
                 'address_line_2' => $this->street_address_plus,
-                'city' => $this->city,
-                'postal_code' => $this->postal_code,
-                'country_code' => $this->country_code,
-                'phone' => $this->phone_number,
-                'is_active' => true,
-                'is_billing' => $this->type === 'billing',
-                'is_shipping' => $this->type === 'shipping',
+                'city'           => $this->city,
+                'postal_code'    => $this->postal_code,
+                'country_code'   => $this->country_code,
+                'phone'          => $this->phone_number,
+                'is_active'      => true,
+                'is_billing'     => $this->type === 'billing',
+                'is_shipping'    => $this->type === 'shipping',
             ], $this->country_code);
 
             $this->assertAllowListCompliance($addressData);
@@ -179,7 +180,7 @@ class AddressForm extends ModalComponent
                 ->body(__('Failed to save address. Please review the highlighted fields.'))
                 ->danger()
                 ->send();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Notification::make()
                 ->title(__('Error'))
                 ->body(__('Failed to save address. Please try again.'))

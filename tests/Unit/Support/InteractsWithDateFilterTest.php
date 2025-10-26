@@ -12,7 +12,8 @@ final class InteractsWithDateFilterTest extends TestCase
 {
     public function test_normalises_unknown_filter_to_first_option(): void
     {
-        $target = new class {
+        $target = new class
+        {
             use InteractsWithDateFilter { normaliseFilter as public traitNormaliseFilter; }
 
             public function getFilters(): array
@@ -29,7 +30,8 @@ final class InteractsWithDateFilterTest extends TestCase
 
     public function test_custom_range_is_sorted_and_fallbacks_on_invalid(): void
     {
-        $target = new class {
+        $target = new class
+        {
             use InteractsWithDateFilter { getDateRange as public traitGetDateRange; }
 
             public function getFilters(): array
@@ -55,4 +57,3 @@ final class InteractsWithDateFilterTest extends TestCase
         self::assertTrue($end2->isSameDay($end2->endOfMonth()));
     }
 }
-

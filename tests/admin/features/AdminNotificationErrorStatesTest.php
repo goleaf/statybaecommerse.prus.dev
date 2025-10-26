@@ -53,7 +53,7 @@ it('throttles excessive notification requests', function (): void {
 
     Config::set('api.rate_limits.notifications', 1);
 
-    $limiterKey = 'user:'.$user->id.'|notifications';
+    $limiterKey = 'user:' . $user->id . '|notifications';
     RateLimiter::clear($limiterKey);
 
     getJson(route('api.v1.notifications.index'))->assertOk();

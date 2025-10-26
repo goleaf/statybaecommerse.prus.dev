@@ -6,15 +6,16 @@ namespace App\Livewire\Components;
 
 use App\Services\Cart\CartService;
 use Livewire\Component;
+use Throwable;
 
 /**
  * ShoppingCartButton
  *
  * Livewire component for ShoppingCartButton with reactive frontend functionality, real-time updates, and user interaction handling.
  *
- * @property int $cartTotalItems
+ * @property int    $cartTotalItems
  * @property string $sessionKey
- * @property mixed $listeners
+ * @property mixed  $listeners
  */
 final class ShoppingCartButton extends Component
 {
@@ -49,7 +50,7 @@ final class ShoppingCartButton extends Component
         if (class_exists(\Darryldecode\Cart\Facades\CartFacade::class)) {
             try {
                 return (int) \Darryldecode\Cart\Facades\CartFacade::session($this->sessionKey)->getTotalQuantity();
-            } catch (\Throwable $e) {
+            } catch (Throwable $e) {
                 // fall through to cart service fallback
             }
         }

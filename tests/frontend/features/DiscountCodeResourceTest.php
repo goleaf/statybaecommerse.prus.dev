@@ -86,21 +86,21 @@ final class DiscountCodeResourceTest extends TestCase
     public function test_can_list_discount_codes(): void
     {
         $discountId = DB::table('discounts')->insertGetId([
-            'name' => 'Test Discount',
-            'type' => 'percentage',
-            'value' => 10,
-            'status' => 'active',
+            'name'       => 'Test Discount',
+            'type'       => 'percentage',
+            'value'      => 10,
+            'status'     => 'active',
             'created_at' => now(),
             'updated_at' => now(),
         ]);
         DB::table('sh_discounts')->insert([
-            'id' => $discountId,
-            'name' => 'Test Discount',
-            'type' => 'percentage',
-            'value' => 10,
-            'status' => 'active',
-            'starts_at' => null,
-            'ends_at' => null,
+            'id'         => $discountId,
+            'name'       => 'Test Discount',
+            'type'       => 'percentage',
+            'value'      => 10,
+            'status'     => 'active',
+            'starts_at'  => null,
+            'ends_at'    => null,
             'deleted_at' => null,
             'created_at' => now(),
             'updated_at' => now(),
@@ -109,11 +109,11 @@ final class DiscountCodeResourceTest extends TestCase
         $codes = collect(range(1, 3))->map(function () use ($discountId) {
             return DiscountCode::query()->create([
                 'discount_id' => $discountId,
-                'code' => strtoupper('CODE'.rand(1000, 9999)),
-                'expires_at' => now()->addMonth(),
-                'max_uses' => 500,
+                'code'        => strtoupper('CODE' . rand(1000, 9999)),
+                'expires_at'  => now()->addMonth(),
+                'max_uses'    => 500,
                 'usage_count' => 0,
-                'metadata' => [],
+                'metadata'    => [],
             ]);
         });
 
@@ -133,31 +133,31 @@ final class DiscountCodeResourceTest extends TestCase
 
         Livewire::test(DiscountCodeResource\Pages\CreateDiscountCode::class)
             ->fillForm([
-                'code' => 'TESTCODE',
-                'name' => 'Test Discount Code',
-                'description' => 'Test description',
-                'type' => 'percentage',
-                'value' => 10.0,
-                'minimum_amount' => 50.0,
-                'maximum_discount' => 100.0,
-                'usage_limit' => 100,
+                'code'                 => 'TESTCODE',
+                'name'                 => 'Test Discount Code',
+                'description'          => 'Test description',
+                'type'                 => 'percentage',
+                'value'                => 10.0,
+                'minimum_amount'       => 50.0,
+                'maximum_discount'     => 100.0,
+                'usage_limit'          => 100,
                 'usage_limit_per_user' => 1,
-                'valid_from' => now(),
-                'valid_until' => now()->addMonth(),
-                'customer_group_id' => $customerGroup->id,
-                'is_active' => true,
-                'is_public' => false,
-                'is_auto_apply' => false,
-                'is_stackable' => false,
-                'is_first_time_only' => false,
+                'valid_from'           => now(),
+                'valid_until'          => now()->addMonth(),
+                'customer_group_id'    => $customerGroup->id,
+                'is_active'            => true,
+                'is_public'            => false,
+                'is_auto_apply'        => false,
+                'is_stackable'         => false,
+                'is_first_time_only'   => false,
             ])
             ->call('create')
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('discount_codes', [
-            'code' => 'TESTCODE',
-            'name' => 'Test Discount Code',
-            'type' => 'percentage',
+            'code'  => 'TESTCODE',
+            'name'  => 'Test Discount Code',
+            'type'  => 'percentage',
             'value' => 10.0,
         ]);
     }
@@ -167,10 +167,10 @@ final class DiscountCodeResourceTest extends TestCase
         $customerGroup = CustomerGroup::factory()->create();
 
         $code = DiscountCode::factory()->create([
-            'code' => 'EDITME',
-            'name' => 'Editable Code',
-            'type' => 'percentage',
-            'value' => 15.0,
+            'code'              => 'EDITME',
+            'name'              => 'Editable Code',
+            'type'              => 'percentage',
+            'value'             => 15.0,
             'customer_group_id' => $customerGroup->id,
         ]);
 
@@ -182,17 +182,17 @@ final class DiscountCodeResourceTest extends TestCase
             'record' => $code->getRouteKey(),
         ])
             ->fillForm([
-                'name' => 'Updated Code Name',
-                'value' => 20.0,
+                'name'      => 'Updated Code Name',
+                'value'     => 20.0,
                 'is_active' => false,
             ])
             ->call('save')
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('discount_codes', [
-            'id' => $code->id,
-            'name' => 'Updated Code Name',
-            'value' => 20.0,
+            'id'        => $code->id,
+            'name'      => 'Updated Code Name',
+            'value'     => 20.0,
             'is_active' => false,
         ]);
     }
@@ -202,10 +202,10 @@ final class DiscountCodeResourceTest extends TestCase
         $customerGroup = CustomerGroup::factory()->create();
 
         $code = DiscountCode::factory()->create([
-            'code' => 'DELME',
-            'name' => 'Deletable Code',
-            'type' => 'fixed',
-            'value' => 5.0,
+            'code'              => 'DELME',
+            'name'              => 'Deletable Code',
+            'type'              => 'fixed',
+            'value'             => 5.0,
             'customer_group_id' => $customerGroup->id,
         ]);
 

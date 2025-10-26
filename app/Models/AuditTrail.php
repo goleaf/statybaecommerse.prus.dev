@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Carbon\CarbonInterface;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Support\Arr;
@@ -107,8 +107,8 @@ final class AuditTrail extends Model
     }
 
     /**
-     * @param  array<string, mixed>  $before
-     * @param  array<string, mixed>  $after
+     * @param  array<string, mixed>                               $before
+     * @param  array<string, mixed>                               $after
      * @return array<string, array{previous:mixed,current:mixed}>
      */
     public static function diff(array $before, array $after): array
@@ -126,7 +126,7 @@ final class AuditTrail extends Model
 
             $diff[$key] = [
                 'previous' => self::serializeValue($previous),
-                'current' => self::serializeValue($current),
+                'current'  => self::serializeValue($current),
             ];
         }
 
@@ -139,7 +139,7 @@ final class AuditTrail extends Model
     }
 
     /**
-     * @param  array<string, array{previous:mixed,current:mixed}>  $diff
+     * @param array<string, array{previous:mixed,current:mixed}> $diff
      *
      * @throws JsonException
      */
@@ -156,13 +156,13 @@ final class AuditTrail extends Model
         // Persist the diff snapshot alongside actor and correlation identifiers for traceability.
         self::query()->create([
             'auditable_type' => $auditable->getMorphClass(),
-            'auditable_id' => $auditable->getKey(),
-            'event' => $event,
-            'actor_type' => $actor?->getMorphClass(),
-            'actor_id' => $actor?->getKey(),
-            'reason' => $reason !== null ? trim($reason) : null,
-            'request_id' => $requestId,
-            'diff' => $diff,
+            'auditable_id'   => $auditable->getKey(),
+            'event'          => $event,
+            'actor_type'     => $actor?->getMorphClass(),
+            'actor_id'       => $actor?->getKey(),
+            'reason'         => $reason !== null ? trim($reason) : null,
+            'request_id'     => $requestId,
+            'diff'           => $diff,
         ]);
     }
 

@@ -45,8 +45,8 @@ final class ReferralSystemSeeder extends Seeder
                 $referred = User::factory()->create();
 
                 return [
-                    'referrer_id' => $referrer->id,
-                    'referred_id' => $referred->id,
+                    'referrer_id'   => $referrer->id,
+                    'referred_id'   => $referred->id,
                     'referral_code' => $code->code,
                 ];
             })
@@ -77,7 +77,7 @@ final class ReferralSystemSeeder extends Seeder
                 ->count(30)
                 ->state(fn (array $attributes) => [
                     'user_id' => $user->id,
-                    'date' => now()->subDays($attributes['total_referrals'] ?? 0)->toDateString(),
+                    'date'    => now()->subDays($attributes['total_referrals'] ?? 0)->toDateString(),
                 ])
                 ->create();
         });

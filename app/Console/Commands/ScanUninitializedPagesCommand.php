@@ -53,7 +53,7 @@ final class ScanUninitializedPagesCommand extends Command
                 continue;
             }
 
-            if (! str_contains($file->getPathname(), DIRECTORY_SEPARATOR.'Pages'.DIRECTORY_SEPARATOR)) {
+            if (! str_contains($file->getPathname(), DIRECTORY_SEPARATOR . 'Pages' . DIRECTORY_SEPARATOR)) {
                 continue;
             }
 

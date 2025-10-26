@@ -26,7 +26,7 @@ final class SystemResourceTest extends TestCase
 
         $this->adminUser = User::factory()->create([
             'email' => 'admin@example.com',
-            'name' => 'Admin User',
+            'name'  => 'Admin User',
         ]);
 
         $this->category = SystemSettingCategory::factory()->create([
@@ -41,10 +41,10 @@ final class SystemResourceTest extends TestCase
 
         $setting = SystemSetting::factory()->create([
             'category_id' => $this->category->id,
-            'key' => 'test_setting',
-            'name' => 'Test Setting',
-            'type' => 'string',
-            'value' => 'test value',
+            'key'         => 'test_setting',
+            'name'        => 'Test Setting',
+            'type'        => 'string',
+            'value'       => 'test value',
         ]);
 
         Livewire::test(SystemResource\Pages\ListSystems::class)
@@ -56,17 +56,17 @@ final class SystemResourceTest extends TestCase
         $this->actingAs($this->adminUser);
 
         $settingData = [
-            'key' => 'new_setting',
-            'name' => 'New Setting',
-            'description' => 'A new test setting',
-            'type' => 'string',
-            'value' => 'new value',
-            'category_id' => $this->category->id,
-            'group' => 'test',
-            'is_active' => true,
-            'is_public' => false,
-            'is_required' => false,
-            'is_readonly' => false,
+            'key'          => 'new_setting',
+            'name'         => 'New Setting',
+            'description'  => 'A new test setting',
+            'type'         => 'string',
+            'value'        => 'new value',
+            'category_id'  => $this->category->id,
+            'group'        => 'test',
+            'is_active'    => true,
+            'is_public'    => false,
+            'is_required'  => false,
+            'is_readonly'  => false,
             'is_encrypted' => false,
         ];
 
@@ -76,7 +76,7 @@ final class SystemResourceTest extends TestCase
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('system_settings', [
-            'key' => 'new_setting',
+            'key'  => 'new_setting',
             'name' => 'New Setting',
             'type' => 'string',
         ]);
@@ -88,15 +88,15 @@ final class SystemResourceTest extends TestCase
 
         $setting = SystemSetting::factory()->create([
             'category_id' => $this->category->id,
-            'key' => 'editable_setting',
-            'name' => 'Editable Setting',
-            'type' => 'string',
-            'value' => 'original value',
+            'key'         => 'editable_setting',
+            'name'        => 'Editable Setting',
+            'type'        => 'string',
+            'value'       => 'original value',
         ]);
 
         $updatedData = [
-            'name' => 'Updated Setting Name',
-            'value' => 'updated value',
+            'name'        => 'Updated Setting Name',
+            'value'       => 'updated value',
             'description' => 'Updated description',
         ];
 
@@ -116,10 +116,10 @@ final class SystemResourceTest extends TestCase
 
         $setting = SystemSetting::factory()->create([
             'category_id' => $this->category->id,
-            'key' => 'viewable_setting',
-            'name' => 'Viewable Setting',
-            'type' => 'boolean',
-            'value' => true,
+            'key'         => 'viewable_setting',
+            'name'        => 'Viewable Setting',
+            'type'        => 'boolean',
+            'value'       => true,
         ]);
 
         Livewire::test(SystemResource\Pages\ViewSystem::class, ['record' => $setting->id])
@@ -132,7 +132,7 @@ final class SystemResourceTest extends TestCase
 
         $setting = SystemSetting::factory()->create([
             'category_id' => $this->category->id,
-            'key' => 'deletable_setting',
+            'key'         => 'deletable_setting',
         ]);
 
         Livewire::test(SystemResource\Pages\ListSystems::class)
@@ -163,11 +163,11 @@ final class SystemResourceTest extends TestCase
 
         $stringSetting = SystemSetting::factory()->create([
             'category_id' => $this->category->id,
-            'type' => 'string',
+            'type'        => 'string',
         ]);
         $booleanSetting = SystemSetting::factory()->create([
             'category_id' => $this->category->id,
-            'type' => 'boolean',
+            'type'        => 'boolean',
         ]);
 
         Livewire::test(SystemResource\Pages\ListSystems::class)
@@ -201,11 +201,11 @@ final class SystemResourceTest extends TestCase
 
         $publicSetting = SystemSetting::factory()->create([
             'category_id' => $this->category->id,
-            'is_public' => true,
+            'is_public'   => true,
         ]);
         $privateSetting = SystemSetting::factory()->create([
             'category_id' => $this->category->id,
-            'is_public' => false,
+            'is_public'   => false,
         ]);
 
         Livewire::test(SystemResource\Pages\ListSystems::class)
@@ -220,13 +220,13 @@ final class SystemResourceTest extends TestCase
 
         $searchableSetting = SystemSetting::factory()->create([
             'category_id' => $this->category->id,
-            'key' => 'searchable_key',
-            'name' => 'Searchable Setting',
+            'key'         => 'searchable_key',
+            'name'        => 'Searchable Setting',
         ]);
         $otherSetting = SystemSetting::factory()->create([
             'category_id' => $this->category->id,
-            'key' => 'other_key',
-            'name' => 'Other Setting',
+            'key'         => 'other_key',
+            'name'        => 'Other Setting',
         ]);
 
         Livewire::test(SystemResource\Pages\ListSystems::class)
@@ -255,11 +255,11 @@ final class SystemResourceTest extends TestCase
 
         $setting1 = SystemSetting::factory()->create([
             'category_id' => $this->category->id,
-            'is_active' => false,
+            'is_active'   => false,
         ]);
         $setting2 = SystemSetting::factory()->create([
             'category_id' => $this->category->id,
-            'is_active' => false,
+            'is_active'   => false,
         ]);
 
         Livewire::test(SystemResource\Pages\ListSystems::class)
@@ -277,11 +277,11 @@ final class SystemResourceTest extends TestCase
 
         $setting1 = SystemSetting::factory()->create([
             'category_id' => $this->category->id,
-            'is_active' => true,
+            'is_active'   => true,
         ]);
         $setting2 = SystemSetting::factory()->create([
             'category_id' => $this->category->id,
-            'is_active' => true,
+            'is_active'   => true,
         ]);
 
         Livewire::test(SystemResource\Pages\ListSystems::class)
@@ -299,7 +299,7 @@ final class SystemResourceTest extends TestCase
 
         $setting = SystemSetting::factory()->create([
             'category_id' => $this->category->id,
-            'cache_key' => 'test_cache_key',
+            'cache_key'   => 'test_cache_key',
         ]);
 
         Livewire::test(SystemResource\Pages\ListSystems::class)
@@ -315,9 +315,9 @@ final class SystemResourceTest extends TestCase
 
         $setting = SystemSetting::factory()->create([
             'category_id' => $this->category->id,
-            'key' => 'exportable_setting',
-            'name' => 'Exportable Setting',
-            'value' => 'export value',
+            'key'         => 'exportable_setting',
+            'name'        => 'Exportable Setting',
+            'value'       => 'export value',
         ]);
 
         $response = Livewire::test(SystemResource\Pages\ListSystems::class)
@@ -337,20 +337,20 @@ final class SystemResourceTest extends TestCase
         foreach ($types as $type) {
             $setting = SystemSetting::factory()->create([
                 'category_id' => $this->category->id,
-                'type' => $type,
-                'key' => "test_{$type}_setting",
-                'value' => match ($type) {
+                'type'        => $type,
+                'key'         => "test_{$type}_setting",
+                'value'       => match ($type) {
                     'boolean' => true,
                     'integer' => 42,
-                    'json' => '{"test": "value"}',
-                    'array' => '["item1", "item2"]',
-                    default => 'test value',
+                    'json'    => '{"test": "value"}',
+                    'array'   => '["item1", "item2"]',
+                    default   => 'test value',
                 },
             ]);
 
             $this->assertDatabaseHas('system_settings', [
                 'type' => $type,
-                'key' => "test_{$type}_setting",
+                'key'  => "test_{$type}_setting",
             ]);
         }
     }
@@ -361,14 +361,14 @@ final class SystemResourceTest extends TestCase
 
         $existingSetting = SystemSetting::factory()->create([
             'category_id' => $this->category->id,
-            'key' => 'unique_key',
+            'key'         => 'unique_key',
         ]);
 
         $settingData = [
-            'key' => 'unique_key', // Same key
-            'name' => 'Duplicate Key Setting',
-            'type' => 'string',
-            'value' => 'test value',
+            'key'         => 'unique_key', // Same key
+            'name'        => 'Duplicate Key Setting',
+            'type'        => 'string',
+            'value'       => 'test value',
             'category_id' => $this->category->id,
         ];
 
@@ -398,14 +398,14 @@ final class SystemResourceTest extends TestCase
         $this->actingAs($this->adminUser);
 
         $settingData = [
-            'key' => 'setting_with_new_category',
-            'name' => 'Setting with New Category',
-            'type' => 'string',
-            'value' => 'test value',
+            'key'         => 'setting_with_new_category',
+            'name'        => 'Setting with New Category',
+            'type'        => 'string',
+            'value'       => 'test value',
             'category_id' => [
-                'name' => 'New Category',
+                'name'        => 'New Category',
                 'description' => 'A new category',
-                'color' => '#FF5733',
+                'color'       => '#FF5733',
             ],
         ];
 
@@ -428,9 +428,9 @@ final class SystemResourceTest extends TestCase
         $this->actingAs($this->adminUser);
 
         $setting = SystemSetting::factory()->create([
-            'category_id' => $this->category->id,
-            'key' => 'encrypted_setting',
-            'type' => 'string',
+            'category_id'  => $this->category->id,
+            'key'          => 'encrypted_setting',
+            'type'         => 'string',
             'is_encrypted' => true,
         ]);
 
@@ -453,9 +453,9 @@ final class SystemResourceTest extends TestCase
 
         $setting = SystemSetting::factory()->create([
             'category_id' => $this->category->id,
-            'key' => 'json_setting',
-            'type' => 'json',
-            'value' => $jsonData,
+            'key'         => 'json_setting',
+            'type'        => 'json',
+            'value'       => $jsonData,
         ]);
 
         $this->assertEquals($jsonData, $setting->value);
@@ -470,9 +470,9 @@ final class SystemResourceTest extends TestCase
 
         $setting = SystemSetting::factory()->create([
             'category_id' => $this->category->id,
-            'key' => 'array_setting',
-            'type' => 'array',
-            'value' => $arrayData,
+            'key'         => 'array_setting',
+            'type'        => 'array',
+            'value'       => $arrayData,
         ]);
 
         $this->assertEquals($arrayData, $setting->value);
@@ -485,9 +485,9 @@ final class SystemResourceTest extends TestCase
 
         $setting = SystemSetting::factory()->create([
             'category_id' => $this->category->id,
-            'key' => 'boolean_setting',
-            'type' => 'boolean',
-            'value' => true,
+            'key'         => 'boolean_setting',
+            'type'        => 'boolean',
+            'value'       => true,
         ]);
 
         $this->assertTrue($setting->value);
@@ -500,9 +500,9 @@ final class SystemResourceTest extends TestCase
 
         $setting = SystemSetting::factory()->create([
             'category_id' => $this->category->id,
-            'key' => 'integer_setting',
-            'type' => 'integer',
-            'value' => 42,
+            'key'         => 'integer_setting',
+            'type'        => 'integer',
+            'value'       => 42,
         ]);
 
         $this->assertEquals(42, $setting->value);

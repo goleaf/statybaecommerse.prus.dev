@@ -24,16 +24,16 @@ final class CanBeOneOfManyUltimateAdvancedTest extends TestCase
         $oldPrice = ProductHistory::factory()->create([
             'product_id' => $product->id,
             'field_name' => 'price',
-            'old_value' => '100.00',
-            'new_value' => '120.00',
+            'old_value'  => '100.00',
+            'new_value'  => '120.00',
             'created_at' => now()->subDays(10),
         ]);
 
         $currentPrice = ProductHistory::factory()->create([
             'product_id' => $product->id,
             'field_name' => 'price',
-            'old_value' => '120.00',
-            'new_value' => '150.00',
+            'old_value'  => '120.00',
+            'new_value'  => '150.00',
             'created_at' => now()->subDays(1),
         ]);
 

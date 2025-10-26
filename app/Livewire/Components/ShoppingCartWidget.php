@@ -20,10 +20,10 @@ use Livewire\Component;
  *
  * Livewire component for ShoppingCartWidget with reactive frontend functionality, real-time updates, and user interaction handling.
  *
- * @property bool $isOpen
- * @property string $discountCode
+ * @property bool              $isOpen
+ * @property string            $discountCode
  * @property DiscountCode|null $appliedDiscount
- * @property array $cartSummary
+ * @property array             $cartSummary
  */
 final class ShoppingCartWidget extends Component
 {
@@ -231,8 +231,8 @@ final class ShoppingCartWidget extends Component
 
         return match ($this->appliedDiscount->type) {
             'percentage' => $subtotal * ($this->appliedDiscount->value / 100),
-            'fixed' => min($this->appliedDiscount->value, $subtotal),
-            default => 0,
+            'fixed'      => min($this->appliedDiscount->value, $subtotal),
+            default      => 0,
         };
     }
 

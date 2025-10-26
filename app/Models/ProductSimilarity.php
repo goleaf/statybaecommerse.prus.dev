@@ -61,7 +61,7 @@ final class ProductSimilarity extends Model
     /**
      * Handle scopeByAlgorithm functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeByAlgorithm($query, string $algorithmType)
     {
@@ -71,7 +71,7 @@ final class ProductSimilarity extends Model
     /**
      * Handle scopeWithMinScore functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeWithMinScore($query, float $minScore)
     {
@@ -81,7 +81,7 @@ final class ProductSimilarity extends Model
     /**
      * Handle scopeOrderedBySimilarity functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeOrderedBySimilarity($query)
     {
@@ -91,7 +91,7 @@ final class ProductSimilarity extends Model
     /**
      * Handle scopeRecent functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeRecent($query, int $days = 7)
     {

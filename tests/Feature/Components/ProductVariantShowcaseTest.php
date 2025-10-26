@@ -24,7 +24,7 @@ final class ProductVariantShowcaseTest extends TestCase
     {
         parent::setUp();
 
-        config(['app.key' => 'base64:'.base64_encode(str_repeat('a', 32))]);
+        config(['app.key' => 'base64:' . base64_encode(str_repeat('a', 32))]);
 
         foreach ([
             'variant_attribute_values',
@@ -176,8 +176,8 @@ final class ProductVariantShowcaseTest extends TestCase
     public function test_variant_metrics_do_not_trigger_additional_queries(): void
     {
         $product = Product::factory()->create([
-            'is_visible' => true,
-            'status' => 'published',
+            'is_visible'   => true,
+            'status'       => 'published',
             'published_at' => now(),
         ]);
 
@@ -189,9 +189,9 @@ final class ProductVariantShowcaseTest extends TestCase
 
         foreach ($variants as $attributes) {
             ProductVariant::factory()->for($product)->create(array_merge([
-                'stock_quantity' => $attributes['available_quantity'],
+                'stock_quantity'    => $attributes['available_quantity'],
                 'reserved_quantity' => 0,
-                'is_default' => false,
+                'is_default'        => false,
             ], $attributes));
         }
 

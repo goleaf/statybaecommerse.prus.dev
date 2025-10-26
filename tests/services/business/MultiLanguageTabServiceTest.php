@@ -36,9 +36,9 @@ it('prepares and splits translation data correctly', function (): void {
     $formData = [
         'title_lt' => 'Pavadinimas',
         'title_en' => 'Title',
-        'slug_lt' => 'pavadinimas',
-        'slug_en' => 'title',
-        'visible' => true,
+        'slug_lt'  => 'pavadinimas',
+        'slug_en'  => 'title',
+        'visible'  => true,
     ];
 
     $result = MultiLanguageTabService::prepareTranslationData($formData, ['title', 'slug']);

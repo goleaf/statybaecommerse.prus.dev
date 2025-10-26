@@ -45,14 +45,14 @@ final class UserPreferenceFactory extends Factory
         ];
 
         return [
-            'user_id' => User::factory(),
-            'preference_type' => fake()->randomElement($preferenceTypes),
-            'preference_key' => fake()->randomElement($preferenceKeys),
+            'user_id'          => User::factory(),
+            'preference_type'  => fake()->randomElement($preferenceTypes),
+            'preference_key'   => fake()->randomElement($preferenceKeys),
             'preference_score' => fake()->randomFloat(6, 0, 1),
-            'last_updated' => fake()->dateTimeBetween('-30 days', 'now'),
-            'metadata' => [
-                'source' => fake()->randomElement(['purchase_history', 'browsing', 'search', 'recommendation']),
-                'frequency' => fake()->randomElement(['low', 'medium', 'high']),
+            'last_updated'     => fake()->dateTimeBetween('-30 days', 'now'),
+            'metadata'         => [
+                'source'     => fake()->randomElement(['purchase_history', 'browsing', 'search', 'recommendation']),
+                'frequency'  => fake()->randomElement(['low', 'medium', 'high']),
                 'confidence' => fake()->randomFloat(2, 0.5, 1.0),
             ],
         ];
@@ -75,7 +75,7 @@ final class UserPreferenceFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'preference_type' => 'category',
-            'preference_key' => fake()->randomElement(['electronics', 'clothing', 'books', 'home', 'sports']),
+            'preference_key'  => fake()->randomElement(['electronics', 'clothing', 'books', 'home', 'sports']),
         ]);
     }
 
@@ -86,7 +86,7 @@ final class UserPreferenceFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'preference_type' => 'brand',
-            'preference_key' => fake()->randomElement(['apple', 'samsung', 'nike', 'adidas', 'sony']),
+            'preference_key'  => fake()->randomElement(['apple', 'samsung', 'nike', 'adidas', 'sony']),
         ]);
     }
 
@@ -97,7 +97,7 @@ final class UserPreferenceFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'preference_type' => 'price_range',
-            'preference_key' => fake()->randomElement(['0-50', '50-100', '100-500', '500-1000', '1000+']),
+            'preference_key'  => fake()->randomElement(['0-50', '50-100', '100-500', '500-1000', '1000+']),
         ]);
     }
 

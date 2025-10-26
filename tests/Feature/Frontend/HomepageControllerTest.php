@@ -33,9 +33,9 @@ final class HomepageControllerTest extends TestCase
         $product = Product::factory()
             ->for($brand)
             ->create([
-                'is_visible' => true,
-                'is_featured' => true,
-                'status' => 'published',
+                'is_visible'   => true,
+                'is_featured'  => true,
+                'status'       => 'published',
                 'published_at' => now()->subDay(),
             ]);
 
@@ -43,11 +43,11 @@ final class HomepageControllerTest extends TestCase
 
         Price::factory()->create([
             'priceable_type' => Product::class,
-            'priceable_id' => $product->id,
-            'currency_id' => 1,
-            'amount' => 99.99,
+            'priceable_id'   => $product->id,
+            'currency_id'    => 1,
+            'amount'         => 99.99,
             'compare_amount' => 129.99,
-            'is_enabled' => true,
+            'is_enabled'     => true,
         ]);
 
         Review::factory()

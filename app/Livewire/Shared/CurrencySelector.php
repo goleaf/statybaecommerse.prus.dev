@@ -12,6 +12,7 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Schema;
 use Livewire\Component;
+use Throwable;
 
 /**
  * CurrencySelector
@@ -19,7 +20,7 @@ use Livewire\Component;
  * Livewire component for CurrencySelector with reactive frontend functionality, real-time updates, and user interaction handling.
  *
  * @property array<int, array{id:int, code:string, symbol:string}> $currencies
- * @property string|null $activeCurrencyCode
+ * @property string|null                                           $activeCurrencyCode
  */
 class CurrencySelector extends Component
 {
@@ -67,7 +68,7 @@ class CurrencySelector extends Component
             $country = Country::query()->find($countryId);
 
             return $country?->svg_flag;
-        } catch (\Throwable $exception) {
+        } catch (Throwable $exception) {
             // In the event of a transient database error we silently fall back to no flag.
             return null;
         }
@@ -103,8 +104,8 @@ class CurrencySelector extends Component
                     ->get(['id', 'code', 'symbol'])
                     ->map(static function (Currency $currency): array {
                         return [
-                            'id' => (int) $currency->id,
-                            'code' => (string) $currency->code,
+                            'id'     => (int) $currency->id,
+                            'code'   => (string) $currency->code,
                             'symbol' => (string) $currency->symbol,
                         ];
                     })
@@ -119,7 +120,7 @@ class CurrencySelector extends Component
     /**
      * Determine which currency code should be considered active.
      *
-     * @param  array<int, array{id:int, code:string, symbol:string}>  $currencies
+     * @param array<int, array{id:int, code:string, symbol:string}> $currencies
      */
     private function resolveActiveCurrencyCode(array $currencies): ?string
     {
@@ -149,7 +150,7 @@ class CurrencySelector extends Component
                             return $code;
                         }
                     }
-                } catch (\Throwable $exception) {
+                } catch (Throwable $exception) {
                     // Ignore and fall back to the configured default code.
                 }
 
@@ -168,8 +169,8 @@ class CurrencySelector extends Component
     private function defaultCurrencyEntry(string $code): array
     {
         return [
-            'id' => 1,
-            'code' => $code,
+            'id'     => 1,
+            'code'   => $code,
             'symbol' => (string) config('app.currency_symbol', '€'),
         ];
     }

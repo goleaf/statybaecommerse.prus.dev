@@ -108,8 +108,8 @@ final class RecommendationSystemTest extends TestCase
 
         // Verify interaction was tracked
         $this->assertDatabaseHas('user_behaviors', [
-            'user_id' => $user->id,
-            'product_id' => $product->id,
+            'user_id'       => $user->id,
+            'product_id'    => $product->id,
             'behavior_type' => 'view',
         ]);
     }

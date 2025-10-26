@@ -23,16 +23,16 @@ final class CanBeOneOfManyFinalUltimateTest extends TestCase
         // Create multiple order items with different totals
         $highValueItem = OrderItem::factory()->create([
             'order_id' => $order->id,
-            'total' => 100.00,
-            'name' => 'High Value Item',
-            'sku' => 'HIGH-001',
+            'total'    => 100.00,
+            'name'     => 'High Value Item',
+            'sku'      => 'HIGH-001',
         ]);
 
         $lowValueItem = OrderItem::factory()->create([
             'order_id' => $order->id,
-            'total' => 10.00,
-            'name' => 'Low Value Item',
-            'sku' => 'LOW-001',
+            'total'    => 10.00,
+            'name'     => 'Low Value Item',
+            'sku'      => 'LOW-001',
         ]);
 
         // Refresh the order to clear any cached relationships
@@ -52,12 +52,12 @@ final class CanBeOneOfManyFinalUltimateTest extends TestCase
         // Create multiple reviews with different ratings
         $highRatedReview = Review::factory()->create([
             'product_id' => $product->id,
-            'rating' => 5,
+            'rating'     => 5,
         ]);
 
         $lowRatedReview = Review::factory()->create([
             'product_id' => $product->id,
-            'rating' => 1,
+            'rating'     => 1,
         ]);
 
         // Refresh the product to clear any cached relationships
@@ -77,12 +77,12 @@ final class CanBeOneOfManyFinalUltimateTest extends TestCase
         // Create multiple reviews with different ratings
         $highRatedReview = Review::factory()->create([
             'user_id' => $user->id,
-            'rating' => 5,
+            'rating'  => 5,
         ]);
 
         $lowRatedReview = Review::factory()->create([
             'user_id' => $user->id,
-            'rating' => 1,
+            'rating'  => 1,
         ]);
 
         // Refresh the user to clear any cached relationships

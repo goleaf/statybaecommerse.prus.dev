@@ -25,7 +25,7 @@ final class RecommendationConfigResourceSimpleTest extends TestCase
         parent::setUp();
 
         $this->actingAs(User::factory()->create([
-            'email' => 'admin@example.com',
+            'email'    => 'admin@example.com',
             'is_admin' => true,
         ]));
     }
@@ -44,33 +44,33 @@ final class RecommendationConfigResourceSimpleTest extends TestCase
 
         Livewire::test(CreateRecommendationConfigSimple::class)
             ->fillForm([
-                'name' => $newData->name,
-                'code' => 'test-config',
-                'description' => $newData->description,
-                'algorithm_type' => 'collaborative',
-                'min_score' => 0.1,
-                'max_results' => 10,
-                'decay_factor' => 0.9,
+                'name'                 => $newData->name,
+                'code'                 => 'test-config',
+                'description'          => $newData->description,
+                'algorithm_type'       => 'collaborative',
+                'min_score'            => 0.1,
+                'max_results'          => 10,
+                'decay_factor'         => 0.9,
                 'exclude_out_of_stock' => true,
-                'exclude_inactive' => true,
-                'price_weight' => 0.2,
-                'rating_weight' => 0.3,
-                'popularity_weight' => 0.2,
-                'recency_weight' => 0.1,
-                'category_weight' => 0.2,
-                'custom_weight' => 0.0,
-                'cache_duration' => 60,
-                'is_active' => true,
-                'is_default' => false,
-                'sort_order' => 0,
-                'notes' => 'Test notes',
+                'exclude_inactive'     => true,
+                'price_weight'         => 0.2,
+                'rating_weight'        => 0.3,
+                'popularity_weight'    => 0.2,
+                'recency_weight'       => 0.1,
+                'category_weight'      => 0.2,
+                'custom_weight'        => 0.0,
+                'cache_duration'       => 60,
+                'is_active'            => true,
+                'is_default'           => false,
+                'sort_order'           => 0,
+                'notes'                => 'Test notes',
             ])
             ->call('create')
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('recommendation_config_simples', [
-            'name' => $newData->name,
-            'code' => 'test-config',
+            'name'           => $newData->name,
+            'code'           => 'test-config',
             'algorithm_type' => 'collaborative',
         ]);
     }
@@ -83,17 +83,17 @@ final class RecommendationConfigResourceSimpleTest extends TestCase
             'record' => $config->getRouteKey(),
         ])
             ->fillForm([
-                'name' => 'Updated Config',
-                'min_score' => 0.2,
+                'name'        => 'Updated Config',
+                'min_score'   => 0.2,
                 'max_results' => 20,
             ])
             ->call('save')
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('recommendation_config_simples', [
-            'id' => $config->id,
-            'name' => 'Updated Config',
-            'min_score' => 0.2,
+            'id'          => $config->id,
+            'name'        => 'Updated Config',
+            'min_score'   => 0.2,
             'max_results' => 20,
         ]);
     }
@@ -227,7 +227,7 @@ final class RecommendationConfigResourceSimpleTest extends TestCase
 
         foreach ($configs as $config) {
             $this->assertDatabaseHas('recommendation_config_simples', [
-                'id' => $config->id,
+                'id'        => $config->id,
                 'is_active' => true,
             ]);
         }
@@ -243,7 +243,7 @@ final class RecommendationConfigResourceSimpleTest extends TestCase
 
         foreach ($configs as $config) {
             $this->assertDatabaseHas('recommendation_config_simples', [
-                'id' => $config->id,
+                'id'        => $config->id,
                 'is_active' => false,
             ]);
         }
@@ -260,7 +260,7 @@ final class RecommendationConfigResourceSimpleTest extends TestCase
             ->assertHasNoActionErrors();
 
         $this->assertDatabaseHas('recommendation_config_simples', [
-            'id' => $config->id,
+            'id'        => $config->id,
             'is_active' => true,
         ]);
     }
@@ -276,7 +276,7 @@ final class RecommendationConfigResourceSimpleTest extends TestCase
             ->assertHasNoActionErrors();
 
         $this->assertDatabaseHas('recommendation_config_simples', [
-            'id' => $config->id,
+            'id'         => $config->id,
             'is_default' => true,
         ]);
     }
@@ -293,12 +293,12 @@ final class RecommendationConfigResourceSimpleTest extends TestCase
             ->assertHasNoActionErrors();
 
         $this->assertDatabaseHas('recommendation_config_simples', [
-            'id' => $newDefault->id,
+            'id'         => $newDefault->id,
             'is_default' => true,
         ]);
 
         $this->assertDatabaseHas('recommendation_config_simples', [
-            'id' => $existingDefault->id,
+            'id'         => $existingDefault->id,
             'is_default' => false,
         ]);
     }
@@ -307,8 +307,8 @@ final class RecommendationConfigResourceSimpleTest extends TestCase
     {
         Livewire::test(CreateRecommendationConfigSimple::class)
             ->fillForm([
-                'name' => '',
-                'code' => 'test-config',
+                'name'           => '',
+                'code'           => 'test-config',
                 'algorithm_type' => 'collaborative',
             ])
             ->call('create')
@@ -319,8 +319,8 @@ final class RecommendationConfigResourceSimpleTest extends TestCase
     {
         Livewire::test(CreateRecommendationConfigSimple::class)
             ->fillForm([
-                'name' => 'Test Config',
-                'code' => '',
+                'name'           => 'Test Config',
+                'code'           => '',
                 'algorithm_type' => 'collaborative',
             ])
             ->call('create')
@@ -333,8 +333,8 @@ final class RecommendationConfigResourceSimpleTest extends TestCase
 
         Livewire::test(CreateRecommendationConfigSimple::class)
             ->fillForm([
-                'name' => 'Test Config',
-                'code' => 'existing-code',
+                'name'           => 'Test Config',
+                'code'           => 'existing-code',
                 'algorithm_type' => 'collaborative',
             ])
             ->call('create')
@@ -345,8 +345,8 @@ final class RecommendationConfigResourceSimpleTest extends TestCase
     {
         Livewire::test(CreateRecommendationConfigSimple::class)
             ->fillForm([
-                'name' => 'Test Config',
-                'code' => 'test-config',
+                'name'           => 'Test Config',
+                'code'           => 'test-config',
                 'algorithm_type' => '',
             ])
             ->call('create')
@@ -357,10 +357,10 @@ final class RecommendationConfigResourceSimpleTest extends TestCase
     {
         Livewire::test(CreateRecommendationConfigSimple::class)
             ->fillForm([
-                'name' => 'Test Config',
-                'code' => 'test-config',
+                'name'           => 'Test Config',
+                'code'           => 'test-config',
                 'algorithm_type' => 'collaborative',
-                'min_score' => 'invalid',
+                'min_score'      => 'invalid',
             ])
             ->call('create')
             ->assertHasFormErrors(['min_score' => 'numeric']);
@@ -370,10 +370,10 @@ final class RecommendationConfigResourceSimpleTest extends TestCase
     {
         Livewire::test(CreateRecommendationConfigSimple::class)
             ->fillForm([
-                'name' => 'Test Config',
-                'code' => 'test-config',
+                'name'           => 'Test Config',
+                'code'           => 'test-config',
                 'algorithm_type' => 'collaborative',
-                'max_results' => 'invalid',
+                'max_results'    => 'invalid',
             ])
             ->call('create')
             ->assertHasFormErrors(['max_results' => 'numeric']);
@@ -412,7 +412,7 @@ final class RecommendationConfigResourceSimpleTest extends TestCase
 
         $this->assertDatabaseHas('recommendation_config_simple_products', [
             'recommendation_config_simple_id' => $config->id,
-            'product_id' => $products->first()->id,
+            'product_id'                      => $products->first()->id,
         ]);
     }
 
@@ -446,7 +446,7 @@ final class RecommendationConfigResourceSimpleTest extends TestCase
 
         $this->assertDatabaseHas('recommendation_config_simple_categories', [
             'recommendation_config_simple_id' => $config->id,
-            'category_id' => $categories->first()->id,
+            'category_id'                     => $categories->first()->id,
         ]);
     }
 

@@ -18,9 +18,9 @@ enum ExportFormat: string
     public function label(): string
     {
         return match ($this) {
-            self::Csv => 'CSV',
+            self::Csv  => 'CSV',
             self::Xlsx => 'Excel (XLSX)',
-            self::Pdf => 'PDF',
+            self::Pdf  => 'PDF',
         };
     }
 }

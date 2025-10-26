@@ -15,17 +15,17 @@ use Livewire\Component;
  * Livewire component for LiveSearch with reactive frontend functionality, real-time updates, and user interaction handling.
  *
  * @property string $query
- * @property array $results
- * @property array $suggestions
- * @property bool $showResults
- * @property bool $showSuggestions
- * @property int $maxResults
- * @property int $minQueryLength
- * @property bool $isSearching
- * @property array $searchTypes
- * @property bool $enableSuggestions
- * @property bool $enableRecentSearches
- * @property bool $enablePopularSearches
+ * @property array  $results
+ * @property array  $suggestions
+ * @property bool   $showResults
+ * @property bool   $showSuggestions
+ * @property int    $maxResults
+ * @property int    $minQueryLength
+ * @property bool   $isSearching
+ * @property array  $searchTypes
+ * @property bool   $enableSuggestions
+ * @property bool   $enableRecentSearches
+ * @property bool   $enablePopularSearches
  */
 final class LiveSearch extends Component
 {
@@ -198,7 +198,7 @@ final class LiveSearch extends Component
     }
 
     /**
-     * @param  array<string, mixed>  $filters
+     * @param  array<string, mixed> $filters
      * @return array<string, mixed>
      */
     private function sanitizeFilters(array $filters): array

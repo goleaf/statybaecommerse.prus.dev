@@ -9,6 +9,4 @@ use RuntimeException;
 /**
  * Used when a webhook references an order that cannot be located in storage.
  */
-final class OrderNotFoundException extends RuntimeException
-{
-}
+final class OrderNotFoundException extends RuntimeException {}

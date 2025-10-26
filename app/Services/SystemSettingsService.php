@@ -6,6 +6,7 @@ namespace App\Services;
 
 use App\Models\SystemSetting;
 use App\Models\SystemSettingCategory;
+use Exception;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -25,7 +26,7 @@ final class SystemSettingsService
     /**
      * Handle get functionality with proper error handling.
      *
-     * @param  mixed  $default
+     * @param mixed $default
      */
     public function get(string $key, $default = null)
     {
@@ -37,7 +38,7 @@ final class SystemSettingsService
     /**
      * Handle set functionality with proper error handling.
      *
-     * @param  mixed  $value
+     * @param mixed $value
      */
     public function set(string $key, $value, array $options = []): void
     {
@@ -49,7 +50,7 @@ final class SystemSettingsService
             $this->clearCache();
             DB::commit();
             Log::info("System setting updated: {$key}", ['key' => $key, 'updated_by' => auth()->id()]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             DB::rollBack();
             Log::error("Failed to update system setting: {$key}", ['key' => $key, 'error' => $e->getMessage()]);
             throw $e;
@@ -59,7 +60,7 @@ final class SystemSettingsService
     /**
      * Handle getPublic functionality with proper error handling.
      *
-     * @param  mixed  $default
+     * @param mixed $default
      */
     public function getPublic(string $key, $default = null)
     {
@@ -83,7 +84,7 @@ final class SystemSettingsService
      */
     public function getPublicSettings(): array
     {
-        return Cache::remember(self::CACHE_KEY.'_public', self::CACHE_TTL, function () {
+        return Cache::remember(self::CACHE_KEY . '_public', self::CACHE_TTL, function () {
             return SystemSetting::active()->public()->get()->pluck('value', 'key')->toArray();
         });
     }
@@ -93,7 +94,7 @@ final class SystemSettingsService
      */
     public function getSettingsByGroup(string $group): array
     {
-        return Cache::remember(self::CACHE_KEY."_group_{$group}", self::CACHE_TTL, function () use ($group) {
+        return Cache::remember(self::CACHE_KEY . "_group_{$group}", self::CACHE_TTL, function () use ($group) {
             return SystemSetting::active()->byGroup($group)->get()->pluck('value', 'key')->toArray();
         });
     }
@@ -103,7 +104,7 @@ final class SystemSettingsService
      */
     public function getSettingsByCategory(string $category): array
     {
-        return Cache::remember(self::CACHE_KEY."_category_{$category}", self::CACHE_TTL, function () use ($category) {
+        return Cache::remember(self::CACHE_KEY . "_category_{$category}", self::CACHE_TTL, function () use ($category) {
             return SystemSetting::active()->byCategory($category)->get()->pluck('value', 'key')->toArray();
         });
     }
@@ -121,7 +122,7 @@ final class SystemSettingsService
             $this->clearCache();
             DB::commit();
             Log::info('Bulk system settings update completed', ['settings_count' => count($settings), 'updated_by' => auth()->id()]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             DB::rollBack();
             Log::error('Failed to bulk update system settings', ['error' => $e->getMessage(), 'updated_by' => auth()->id()]);
             throw $e;
@@ -142,7 +143,7 @@ final class SystemSettingsService
             $this->clearCache();
             DB::commit();
             Log::info('System settings reset to defaults', ['settings_count' => $settings->count(), 'updated_by' => auth()->id()]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             DB::rollBack();
             Log::error('Failed to reset system settings to defaults', ['error' => $e->getMessage(), 'updated_by' => auth()->id()]);
             throw $e;
@@ -174,7 +175,7 @@ final class SystemSettingsService
             $this->clearCache();
             DB::commit();
             Log::info('System settings imported', ['settings_count' => count($settings), 'updated_by' => auth()->id()]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             DB::rollBack();
             Log::error('Failed to import system settings', ['error' => $e->getMessage(), 'updated_by' => auth()->id()]);
             throw $e;
@@ -184,7 +185,7 @@ final class SystemSettingsService
     /**
      * Handle validateSetting functionality with proper error handling.
      *
-     * @param  mixed  $value
+     * @param mixed $value
      */
     public function validateSetting(string $key, $value): bool
     {
@@ -219,7 +220,7 @@ final class SystemSettingsService
      */
     public function getCategoriesWithSettings(): array
     {
-        return Cache::remember(self::CACHE_KEY.'_categories', self::CACHE_TTL, function () {
+        return Cache::remember(self::CACHE_KEY . '_categories', self::CACHE_TTL, function () {
             return SystemSettingCategory::with(['settings' => function ($query) {
                 $query->active()->ordered();
             }])->active()->ordered()->get()->toArray();
@@ -232,18 +233,18 @@ final class SystemSettingsService
     public function clearCache(): void
     {
         Cache::forget(self::CACHE_KEY);
-        Cache::forget(self::CACHE_KEY.'_public');
+        Cache::forget(self::CACHE_KEY . '_public');
         // Clear group-specific caches
         $groups = SystemSetting::distinct()->pluck('group');
         foreach ($groups as $group) {
-            Cache::forget(self::CACHE_KEY."_group_{$group}");
+            Cache::forget(self::CACHE_KEY . "_group_{$group}");
         }
         // Clear category-specific caches
         $categories = SystemSettingCategory::pluck('slug');
         foreach ($categories as $category) {
-            Cache::forget(self::CACHE_KEY."_category_{$category}");
+            Cache::forget(self::CACHE_KEY . "_category_{$category}");
         }
-        Cache::forget(self::CACHE_KEY.'_categories');
+        Cache::forget(self::CACHE_KEY . '_categories');
     }
 
     /**

@@ -1,13 +1,15 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models;
 
 use Database\Factories\CustomerGroupFactory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
 use Spatie\Translatable\HasTranslations;
@@ -72,6 +74,7 @@ final class CustomerGroup extends Model
 {
     /** @use HasFactory<CustomerGroupFactory> */
     use HasFactory;
+
     use HasTranslations {
         getTranslations as getTranslationsFromTrait;
     }
@@ -122,7 +125,7 @@ final class CustomerGroup extends Model
     {
         // Generate a slug automatically when creating a record
         self::creating(static function (CustomerGroup $group): void {
-            if (!$group->slug) {
+            if (! $group->slug) {
                 $group->slug = self::generateSlug($group);
             }
         });
@@ -174,22 +177,22 @@ final class CustomerGroup extends Model
     protected function casts(): array
     {
         return [
-            'discount_fixed' => 'decimal:2',
+            'discount_fixed'       => 'decimal:2',
             'minimum_order_amount' => 'decimal:2',
-            'credit_limit' => 'decimal:2',
-            'has_special_pricing' => 'boolean',
+            'credit_limit'         => 'decimal:2',
+            'has_special_pricing'  => 'boolean',
             'has_volume_discounts' => 'boolean',
-            'can_view_prices' => 'boolean',
-            'can_place_orders' => 'boolean',
-            'can_view_catalog' => 'boolean',
-            'can_use_coupons' => 'boolean',
-            'is_enabled' => 'boolean',
-            'is_active' => 'boolean',
-            'is_default' => 'boolean',
-            'sort_order' => 'integer',
-            'metadata' => 'array',
-            'conditions' => 'array',
-            'deleted_at' => 'datetime',
+            'can_view_prices'      => 'boolean',
+            'can_place_orders'     => 'boolean',
+            'can_view_catalog'     => 'boolean',
+            'can_use_coupons'      => 'boolean',
+            'is_enabled'           => 'boolean',
+            'is_active'            => 'boolean',
+            'is_default'           => 'boolean',
+            'sort_order'           => 'integer',
+            'metadata'             => 'array',
+            'conditions'           => 'array',
+            'deleted_at'           => 'datetime',
         ];
     }
 
@@ -207,7 +210,7 @@ final class CustomerGroup extends Model
                     return null;
                 }
 
-                if (!is_numeric($value)) {
+                if (! is_numeric($value)) {
                     // Bail out gracefully when the persisted value is not numeric to avoid type juggling bugs.
                     return null;
                 }
@@ -219,7 +222,7 @@ final class CustomerGroup extends Model
                     return null;
                 }
 
-                if (!is_numeric($value)) {
+                if (! is_numeric($value)) {
                     return null;
                 }
 
@@ -390,7 +393,7 @@ final class CustomerGroup extends Model
     /**
      * Order customer groups alphabetically for deterministic dropdowns and reports.
      *
-     * @param  Builder<CustomerGroup>  $query
+     * @param  Builder<CustomerGroup> $query
      * @return Builder<CustomerGroup>
      */
     public function scopeOrderedByName(Builder $query, ?string $locale = null): Builder
@@ -425,7 +428,7 @@ final class CustomerGroup extends Model
     {
         $rawDiscount = $this->getAttribute('discount_percentage');
 
-        if (!is_numeric($rawDiscount)) {
+        if (! is_numeric($rawDiscount)) {
             // Treat missing or malformed discounts as zero so downstream logic stays predictable.
             return false;
         }
@@ -585,7 +588,7 @@ final class CustomerGroup extends Model
     {
         $rawFixed = $this->getAttribute('discount_fixed');
 
-        if (!is_numeric($rawFixed)) {
+        if (! is_numeric($rawFixed)) {
             return false;
         }
 

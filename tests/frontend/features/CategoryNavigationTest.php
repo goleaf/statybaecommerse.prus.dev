@@ -17,16 +17,16 @@ final class CategoryNavigationTest extends TestCase
     {
         // Create test categories with translations
         $rootCategory = Category::factory()->create([
-            'name' => 'Test Root',
-            'slug' => 'test-root',
+            'name'       => 'Test Root',
+            'slug'       => 'test-root',
             'is_visible' => true,
             'sort_order' => 1,
         ]);
 
         $childCategory = Category::factory()->create([
-            'name' => 'Test Child',
-            'slug' => 'test-child',
-            'parent_id' => $rootCategory->id,
+            'name'       => 'Test Child',
+            'slug'       => 'test-child',
+            'parent_id'  => $rootCategory->id,
             'is_visible' => true,
             'sort_order' => 1,
         ]);
@@ -34,21 +34,21 @@ final class CategoryNavigationTest extends TestCase
         // Create translations
         CategoryTranslation::create([
             'category_id' => $rootCategory->id,
-            'locale' => 'lt',
-            'name' => 'Test Root',
-            'slug' => 'test-root',
+            'locale'      => 'lt',
+            'name'        => 'Test Root',
+            'slug'        => 'test-root',
             'description' => 'Test description',
         ]);
 
         CategoryTranslation::create([
             'category_id' => $childCategory->id,
-            'locale' => 'lt',
-            'name' => 'Test Child',
-            'slug' => 'test-child',
+            'locale'      => 'lt',
+            'name'        => 'Test Child',
+            'slug'        => 'test-child',
             'description' => 'Test child description',
         ]);
 
-        $response = $this->get('/'.app()->getLocale());
+        $response = $this->get('/' . app()->getLocale());
 
         $response->assertStatus(200);
         $response->assertSee('Test Root');
@@ -58,39 +58,39 @@ final class CategoryNavigationTest extends TestCase
     public function test_category_navigation_links_have_correct_parameters(): void
     {
         $category = Category::factory()->create([
-            'name' => 'Test Category',
-            'slug' => 'test-category',
+            'name'       => 'Test Category',
+            'slug'       => 'test-category',
             'is_visible' => true,
         ]);
 
         CategoryTranslation::create([
             'category_id' => $category->id,
-            'locale' => 'lt',
-            'name' => 'Test Category',
-            'slug' => 'test-category',
+            'locale'      => 'lt',
+            'name'        => 'Test Category',
+            'slug'        => 'test-category',
             'description' => 'Test description',
         ]);
 
-        $response = $this->get('/'.app()->getLocale());
+        $response = $this->get('/' . app()->getLocale());
 
         $response->assertStatus(200);
         // Check that the link uses the correct route parameter
-        $response->assertSee('href="'.route('localized.categories.show', ['locale' => app()->getLocale(), 'category' => 'test-category']).'"', false);
+        $response->assertSee('href="' . route('localized.categories.show', ['locale' => app()->getLocale(), 'category' => 'test-category']) . '"', false);
     }
 
     public function test_category_show_route_works_with_correct_parameter(): void
     {
         $category = Category::factory()->create([
-            'name' => 'Test Category',
-            'slug' => 'test-category',
+            'name'       => 'Test Category',
+            'slug'       => 'test-category',
             'is_visible' => true,
         ]);
 
         CategoryTranslation::create([
             'category_id' => $category->id,
-            'locale' => 'lt',
-            'name' => 'Test Category',
-            'slug' => 'test-category',
+            'locale'      => 'lt',
+            'name'        => 'Test Category',
+            'slug'        => 'test-category',
             'description' => 'Test description',
         ]);
 

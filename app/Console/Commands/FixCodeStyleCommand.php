@@ -73,7 +73,7 @@ final class FixCodeStyleCommand extends Command
             return [];
         }
 
-        $this->warn("⚠️  {$filePath} - Found ".count($fixes).' issues:');
+        $this->warn("⚠️  {$filePath} - Found " . count($fixes) . ' issues:');
 
         foreach ($fixes as $fix) {
             $this->line("   Line {$fix['line']}: {$fix['message']}");
@@ -82,7 +82,7 @@ final class FixCodeStyleCommand extends Command
         if (! $dryRun) {
             $appliedFixes = $codeStyleService->fixFile($filePath);
             if (! empty($appliedFixes)) {
-                $this->info('🔧 Applied '.count($appliedFixes).' fixes');
+                $this->info('🔧 Applied ' . count($appliedFixes) . ' fixes');
             }
         }
 
@@ -157,11 +157,11 @@ final class FixCodeStyleCommand extends Command
     {
         $reportPath = storage_path('logs/code-style-report.json');
         $reportData = [
-            'timestamp' => now()->toISOString(),
-            'total_issues' => count($allFixes),
+            'timestamp'      => now()->toISOString(),
+            'total_issues'   => count($allFixes),
             'issues_by_type' => [],
             'issues_by_file' => [],
-            'all_issues' => $allFixes,
+            'all_issues'     => $allFixes,
         ];
 
         foreach ($allFixes as $fix) {

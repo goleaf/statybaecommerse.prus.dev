@@ -32,36 +32,36 @@ return new class extends Migration
             Schema::table('products', function (Blueprint $table) {
                 // Add missing fields if they don't exist
                 $fields = [
-                    'barcode' => 'string',
-                    'compare_price' => 'decimal:2',
-                    'cost_price' => 'decimal:2',
-                    'track_stock' => 'boolean',
-                    'allow_backorder' => 'boolean',
-                    'video_url' => 'string',
-                    'metadata' => 'json',
-                    'sort_order' => 'integer',
-                    'tax_class' => 'string',
-                    'shipping_class' => 'string',
-                    'download_limit' => 'integer',
-                    'download_expiry' => 'integer',
-                    'external_url' => 'string',
-                    'button_text' => 'string',
-                    'is_requestable' => 'boolean',
-                    'requests_count' => 'integer',
+                    'barcode'          => 'string',
+                    'compare_price'    => 'decimal:2',
+                    'cost_price'       => 'decimal:2',
+                    'track_stock'      => 'boolean',
+                    'allow_backorder'  => 'boolean',
+                    'video_url'        => 'string',
+                    'metadata'         => 'json',
+                    'sort_order'       => 'integer',
+                    'tax_class'        => 'string',
+                    'shipping_class'   => 'string',
+                    'download_limit'   => 'integer',
+                    'download_expiry'  => 'integer',
+                    'external_url'     => 'string',
+                    'button_text'      => 'string',
+                    'is_requestable'   => 'boolean',
+                    'requests_count'   => 'integer',
                     'minimum_quantity' => 'integer',
                     'hide_add_to_cart' => 'boolean',
-                    'request_message' => 'text',
+                    'request_message'  => 'text',
                 ];
 
                 foreach ($fields as $field => $type) {
                     if (! Schema::hasColumn('products', $field)) {
                         match ($type) {
-                            'string' => $table->string($field)->nullable(),
-                            'text' => $table->text($field)->nullable(),
-                            'boolean' => $table->boolean($field)->default(false),
-                            'integer' => $table->integer($field)->default(0),
+                            'string'    => $table->string($field)->nullable(),
+                            'text'      => $table->text($field)->nullable(),
+                            'boolean'   => $table->boolean($field)->default(false),
+                            'integer'   => $table->integer($field)->default(0),
                             'decimal:2' => $table->decimal($field, 10, 2)->nullable(),
-                            'json' => $table->json($field)->nullable(),
+                            'json'      => $table->json($field)->nullable(),
                         };
                     }
                 }

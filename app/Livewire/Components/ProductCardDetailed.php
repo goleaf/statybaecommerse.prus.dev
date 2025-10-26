@@ -14,12 +14,12 @@ use Livewire\Component;
  * Livewire component for ProductCardDetailed with reactive frontend functionality, real-time updates, and user interaction handling.
  *
  * @property Product $product
- * @property bool $showQuickView
- * @property bool $showCompare
- * @property bool $showWishlist
- * @property string $layout
- * @property bool $isInWishlist
- * @property bool $isInComparison
+ * @property bool    $showQuickView
+ * @property bool    $showCompare
+ * @property bool    $showWishlist
+ * @property string  $layout
+ * @property bool    $isInWishlist
+ * @property bool    $isInComparison
  */
 final class ProductCardDetailed extends Component
 {

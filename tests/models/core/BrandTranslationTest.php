@@ -12,12 +12,12 @@ describe('BrandTranslation Model', function () {
     it('can be created with valid data', function () {
         $brand = Brand::factory()->create();
         $translation = BrandTranslation::factory()->create([
-            'brand_id' => $brand->id,
-            'locale' => 'lt',
-            'name' => 'Test Brand LT',
-            'slug' => 'test-brand-lt',
-            'description' => 'Test description in Lithuanian',
-            'seo_title' => 'SEO Title LT',
+            'brand_id'        => $brand->id,
+            'locale'          => 'lt',
+            'name'            => 'Test Brand LT',
+            'slug'            => 'test-brand-lt',
+            'description'     => 'Test description in Lithuanian',
+            'seo_title'       => 'SEO Title LT',
             'seo_description' => 'SEO Description LT',
         ]);
 
@@ -68,9 +68,9 @@ describe('BrandTranslation Model', function () {
         $brand = Brand::factory()->create();
 
         $translation = $brand->translations()->create([
-            'locale' => 'lt',
-            'name' => 'Test Brand LT',
-            'slug' => 'test-brand-lt',
+            'locale'      => 'lt',
+            'name'        => 'Test Brand LT',
+            'slug'        => 'test-brand-lt',
             'description' => 'Test description',
         ]);
 
@@ -85,15 +85,15 @@ describe('BrandTranslation Model', function () {
 
         BrandTranslation::factory()->create([
             'brand_id' => $brand1->id,
-            'locale' => 'lt',
-            'slug' => 'unique-slug',
+            'locale'   => 'lt',
+            'slug'     => 'unique-slug',
         ]);
 
         expect(function () use ($brand2) {
             BrandTranslation::factory()->create([
                 'brand_id' => $brand2->id,
-                'locale' => 'lt',
-                'slug' => 'unique-slug',
+                'locale'   => 'lt',
+                'slug'     => 'unique-slug',
             ]);
         })->toThrow(Exception::class);
     });
@@ -104,14 +104,14 @@ describe('BrandTranslation Model', function () {
 
         BrandTranslation::factory()->create([
             'brand_id' => $brand1->id,
-            'locale' => 'lt',
-            'slug' => 'same-slug',
+            'locale'   => 'lt',
+            'slug'     => 'same-slug',
         ]);
 
         $translation2 = BrandTranslation::factory()->create([
             'brand_id' => $brand2->id,
-            'locale' => 'en',
-            'slug' => 'same-slug',
+            'locale'   => 'en',
+            'slug'     => 'same-slug',
         ]);
 
         expect($translation2)->toBeInstanceOf(BrandTranslation::class);
@@ -122,13 +122,13 @@ describe('BrandTranslation Model', function () {
 
         BrandTranslation::factory()->create([
             'brand_id' => $brand->id,
-            'locale' => 'lt',
+            'locale'   => 'lt',
         ]);
 
         expect(function () use ($brand) {
             BrandTranslation::factory()->create([
                 'brand_id' => $brand->id,
-                'locale' => 'lt',
+                'locale'   => 'lt',
             ]);
         })->toThrow(Exception::class);
     });

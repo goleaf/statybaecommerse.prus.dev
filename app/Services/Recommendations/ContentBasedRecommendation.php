@@ -195,15 +195,15 @@ final class ContentBasedRecommendation extends BaseRecommendation
         $similarityData = [];
         foreach ($similarities as $index => $similarProduct) {
             $similarityData[] = [
-                'product_id' => $productId,
+                'product_id'         => $productId,
                 'similar_product_id' => $similarProduct->id,
-                'algorithm_type' => 'content_based',
-                'similarity_score' => 1.0 - $index * 0.1,
+                'algorithm_type'     => 'content_based',
+                'similarity_score'   => 1.0 - $index * 0.1,
                 // Approximate score based on position
                 'calculation_data' => ['calculated_at' => now(), 'feature_weights' => $this->config['feature_weights']],
-                'calculated_at' => now(),
-                'created_at' => now(),
-                'updated_at' => now(),
+                'calculated_at'    => now(),
+                'created_at'       => now(),
+                'updated_at'       => now(),
             ];
         }
         if (! empty($similarityData)) {

@@ -22,7 +22,7 @@ final class NewsResourceTest extends TestCase
         parent::setUp();
 
         $this->actingAs(User::factory()->create([
-            'email' => 'admin@example.com',
+            'email'    => 'admin@example.com',
             'is_admin' => true,
         ]));
     }
@@ -40,18 +40,18 @@ final class NewsResourceTest extends TestCase
     public function test_can_create_news_article(): void
     {
         $newsData = [
-            'title' => 'Test News Article',
-            'slug' => 'test-news-article',
-            'excerpt' => 'This is a test excerpt',
-            'content' => 'This is the full content of the test news article.',
-            'author_name' => 'Test Author',
-            'author_email' => 'test@example.com',
-            'published_at' => now(),
-            'is_visible' => true,
-            'is_featured' => false,
-            'meta_title' => 'Test Meta Title',
+            'title'            => 'Test News Article',
+            'slug'             => 'test-news-article',
+            'excerpt'          => 'This is a test excerpt',
+            'content'          => 'This is the full content of the test news article.',
+            'author_name'      => 'Test Author',
+            'author_email'     => 'test@example.com',
+            'published_at'     => now(),
+            'is_visible'       => true,
+            'is_featured'      => false,
+            'meta_title'       => 'Test Meta Title',
             'meta_description' => 'Test meta description',
-            'meta_keywords' => 'test, news, article',
+            'meta_keywords'    => 'test, news, article',
         ];
 
         $this
@@ -59,10 +59,10 @@ final class NewsResourceTest extends TestCase
             ->assertRedirect();
 
         $this->assertDatabaseHas('news', [
-            'author_name' => 'Test Author',
+            'author_name'  => 'Test Author',
             'author_email' => 'test@example.com',
-            'is_visible' => true,
-            'is_featured' => false,
+            'is_visible'   => true,
+            'is_featured'  => false,
         ]);
     }
 
@@ -92,7 +92,7 @@ final class NewsResourceTest extends TestCase
             ->assertRedirect();
 
         $this->assertDatabaseHas('news', [
-            'id' => $news->id,
+            'id'          => $news->id,
             'author_name' => 'Updated Author',
             'is_featured' => true,
         ]);
@@ -182,13 +182,13 @@ final class NewsResourceTest extends TestCase
         $categories = NewsCategory::factory()->count(3)->create();
 
         $newsData = [
-            'title' => 'Test News with Categories',
-            'slug' => 'test-news-with-categories',
-            'content' => 'Test content',
-            'author_name' => 'Test Author',
+            'title'        => 'Test News with Categories',
+            'slug'         => 'test-news-with-categories',
+            'content'      => 'Test content',
+            'author_name'  => 'Test Author',
             'published_at' => now(),
-            'is_visible' => true,
-            'categories' => $categories->pluck('id')->toArray(),
+            'is_visible'   => true,
+            'categories'   => $categories->pluck('id')->toArray(),
         ];
 
         $response = $this->post('/admin/news', $newsData);
@@ -203,13 +203,13 @@ final class NewsResourceTest extends TestCase
         $tags = NewsTag::factory()->count(2)->create();
 
         $newsData = [
-            'title' => 'Test News with Tags',
-            'slug' => 'test-news-with-tags',
-            'content' => 'Test content',
-            'author_name' => 'Test Author',
+            'title'        => 'Test News with Tags',
+            'slug'         => 'test-news-with-tags',
+            'content'      => 'Test content',
+            'author_name'  => 'Test Author',
             'published_at' => now(),
-            'is_visible' => true,
-            'tags' => $tags->pluck('id')->toArray(),
+            'is_visible'   => true,
+            'tags'         => $tags->pluck('id')->toArray(),
         ];
 
         $response = $this->post('/admin/news', $newsData);
@@ -222,11 +222,11 @@ final class NewsResourceTest extends TestCase
     public function test_news_slug_is_automatically_generated(): void
     {
         $newsData = [
-            'title' => 'Test News Article Title',
-            'content' => 'Test content',
-            'author_name' => 'Test Author',
+            'title'        => 'Test News Article Title',
+            'content'      => 'Test content',
+            'author_name'  => 'Test Author',
             'published_at' => now(),
-            'is_visible' => true,
+            'is_visible'   => true,
         ];
 
         $response = $this->post('/admin/news', $newsData);
@@ -239,10 +239,10 @@ final class NewsResourceTest extends TestCase
     public function test_news_article_validation_requires_title(): void
     {
         $newsData = [
-            'content' => 'Test content',
-            'author_name' => 'Test Author',
+            'content'      => 'Test content',
+            'author_name'  => 'Test Author',
             'published_at' => now(),
-            'is_visible' => true,
+            'is_visible'   => true,
         ];
 
         $response = $this->post('/admin/news', $newsData);
@@ -252,10 +252,10 @@ final class NewsResourceTest extends TestCase
     public function test_news_article_validation_requires_content(): void
     {
         $newsData = [
-            'title' => 'Test Title',
-            'author_name' => 'Test Author',
+            'title'        => 'Test Title',
+            'author_name'  => 'Test Author',
             'published_at' => now(),
-            'is_visible' => true,
+            'is_visible'   => true,
         ];
 
         $response = $this->post('/admin/news', $newsData);
@@ -265,10 +265,10 @@ final class NewsResourceTest extends TestCase
     public function test_news_article_validation_requires_author_name(): void
     {
         $newsData = [
-            'title' => 'Test Title',
-            'content' => 'Test content',
+            'title'        => 'Test Title',
+            'content'      => 'Test content',
             'published_at' => now(),
-            'is_visible' => true,
+            'is_visible'   => true,
         ];
 
         $response = $this->post('/admin/news', $newsData);

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Tests\Models;
 
@@ -18,7 +20,7 @@ final class ProductVariantTest extends TestCase
     public function test_fillable_configuration_and_casts(): void
     {
         // Instantiate a new model instance to inspect the mass assignment and casts metadata.
-        $model = new ProductVariant();
+        $model = new ProductVariant;
 
         // Validate the full list of fillable attributes matches the domain expectations.
         self::assertSame([
@@ -87,7 +89,7 @@ final class ProductVariantTest extends TestCase
     public function test_relationships_are_defined_with_expected_types(): void
     {
         // Instantiate the model and confirm each relationship entry point returns the appropriate relation object.
-        $model = new ProductVariant();
+        $model = new ProductVariant;
 
         self::assertInstanceOf(BelongsTo::class, $model->product());
         self::assertInstanceOf(MorphMany::class, $model->prices());

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Tests\Models;
 
@@ -18,7 +20,7 @@ final class ProductHistoryTest extends TestCase
     public function test_model_configuration_includes_expected_fillable_and_casts(): void
     {
         // Instantiate the model so we can inspect the configuration arrays safely.
-        $model = new ProductHistory();
+        $model = new ProductHistory;
 
         // Confirm the fillable properties match the whitelist defined in the model.
         self::assertSame([
@@ -59,7 +61,7 @@ final class ProductHistoryTest extends TestCase
         // Store a history record that references the product, user, and causer.
         $history = ProductHistory::factory()->for($product)->for($user)->create([
             'causer_type' => User::class,
-            'causer_id' => $user->getKey(),
+            'causer_id'   => $user->getKey(),
         ])->fresh();
 
         // The belongsTo relationships should resolve to the provided models.
@@ -79,17 +81,17 @@ final class ProductHistoryTest extends TestCase
 
         // Create several history records with varying attributes for scope testing.
         $matching = ProductHistory::factory()->for($productA)->for($userA)->create([
-            'action' => 'updated',
+            'action'     => 'updated',
             'field_name' => 'price',
             'created_at' => now()->subDays(2),
         ]);
         $otherProduct = ProductHistory::factory()->for($productB)->for($userA)->create([
-            'action' => 'created',
+            'action'     => 'created',
             'field_name' => 'name',
             'created_at' => now()->subDays(40),
         ]);
         $otherUser = ProductHistory::factory()->for($productA)->for($userB)->create([
-            'action' => 'deleted',
+            'action'     => 'deleted',
             'field_name' => 'status',
             'created_at' => now()->subDays(10),
         ]);
@@ -125,12 +127,12 @@ final class ProductHistoryTest extends TestCase
     {
         // Seed the translator with the strings used by the accessor methods.
         Lang::addLines([
-            'admin.common.none' => 'None',
-            'admin.common.yes' => 'Yes',
-            'admin.common.no' => 'No',
-            'admin.product_history.actions.created' => 'Created Action',
-            'admin.product_history.actions.updated' => 'Updated Action',
-            'admin.product_history.fields.name' => 'Name Field',
+            'admin.common.none'                       => 'None',
+            'admin.common.yes'                        => 'Yes',
+            'admin.common.no'                         => 'No',
+            'admin.product_history.actions.created'   => 'Created Action',
+            'admin.product_history.actions.updated'   => 'Updated Action',
+            'admin.product_history.fields.name'       => 'Name Field',
             'admin.product_history.summaries.created' => 'Created :field',
             'admin.product_history.summaries.deleted' => 'Deleted :field',
             'admin.product_history.summaries.updated' => ':field changed from :from to :to',
@@ -138,10 +140,10 @@ final class ProductHistoryTest extends TestCase
 
         // Create a history record with complex values to exercise the formatters.
         $history = ProductHistory::factory()->create([
-            'action' => 'updated',
+            'action'     => 'updated',
             'field_name' => 'name',
-            'old_value' => ['foo' => 'bar'],
-            'new_value' => true,
+            'old_value'  => ['foo' => 'bar'],
+            'new_value'  => true,
         ])->fresh();
 
         // Arrays should be encoded as JSON while preserving Unicode characters.
@@ -165,7 +167,7 @@ final class ProductHistoryTest extends TestCase
         $product = Product::factory()->create(['sku' => 'SKU-123']);
         $user = User::factory()->create();
         $request = Request::create('/', 'GET', [], [], [], [
-            'REMOTE_ADDR' => '203.0.113.5',
+            'REMOTE_ADDR'     => '203.0.113.5',
             'HTTP_USER_AGENT' => 'PHPUnit-Agent',
         ]);
         app()->instance('request', $request);

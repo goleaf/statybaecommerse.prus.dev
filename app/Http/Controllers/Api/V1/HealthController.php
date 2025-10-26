@@ -23,7 +23,7 @@ final class HealthController extends Controller
     }
 
     /**
-     * @param  array{status: string, checks: array<string, array<string, mixed>>, timestamp: string}  $payload
+     * @param array{status: string, checks: array<string, array<string, mixed>>, timestamp: string} $payload
      */
     private function respond(array $payload): JsonResponse
     {

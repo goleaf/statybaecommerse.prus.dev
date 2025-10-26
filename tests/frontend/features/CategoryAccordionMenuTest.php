@@ -17,16 +17,16 @@ final class CategoryAccordionMenuTest extends TestCase
     {
         // Create test categories with translations
         $rootCategory = Category::factory()->create([
-            'name' => 'Test Root',
-            'slug' => 'test-root',
+            'name'       => 'Test Root',
+            'slug'       => 'test-root',
             'is_visible' => true,
             'sort_order' => 1,
         ]);
 
         $childCategory = Category::factory()->create([
-            'name' => 'Test Child',
-            'slug' => 'test-child',
-            'parent_id' => $rootCategory->id,
+            'name'       => 'Test Child',
+            'slug'       => 'test-child',
+            'parent_id'  => $rootCategory->id,
             'is_visible' => true,
             'sort_order' => 1,
         ]);
@@ -34,17 +34,17 @@ final class CategoryAccordionMenuTest extends TestCase
         // Create translations
         CategoryTranslation::create([
             'category_id' => $rootCategory->id,
-            'locale' => 'lt',
-            'name' => 'Test Root',
-            'slug' => 'test-root',
+            'locale'      => 'lt',
+            'name'        => 'Test Root',
+            'slug'        => 'test-root',
             'description' => 'Test description',
         ]);
 
         CategoryTranslation::create([
             'category_id' => $childCategory->id,
-            'locale' => 'lt',
-            'name' => 'Test Child',
-            'slug' => 'test-child',
+            'locale'      => 'lt',
+            'name'        => 'Test Child',
+            'slug'        => 'test-child',
             'description' => 'Test child description',
         ]);
 
@@ -58,16 +58,16 @@ final class CategoryAccordionMenuTest extends TestCase
     public function test_accordion_menu_includes_product_count_badges(): void
     {
         $category = Category::factory()->create([
-            'name' => 'Test Category',
-            'slug' => 'test-category',
+            'name'       => 'Test Category',
+            'slug'       => 'test-category',
             'is_visible' => true,
         ]);
 
         CategoryTranslation::create([
             'category_id' => $category->id,
-            'locale' => 'lt',
-            'name' => 'Test Category',
-            'slug' => 'test-category',
+            'locale'      => 'lt',
+            'name'        => 'Test Category',
+            'slug'        => 'test-category',
             'description' => 'Test description',
         ]);
 

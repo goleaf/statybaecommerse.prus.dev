@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Tests\Feature;
 
@@ -49,11 +51,11 @@ class UserWishlistResourceTest extends TestCase
         $this->actingAs($this->user);
 
         $newWishlistData = [
-            'user_id' => $this->user->id,
-            'name' => 'New Wishlist',
+            'user_id'     => $this->user->id,
+            'name'        => 'New Wishlist',
             'description' => 'New wishlist description',
-            'is_public' => true,
-            'is_default' => false,
+            'is_public'   => true,
+            'is_default'  => false,
         ];
 
         Livewire::test(CreateRecord::class, [
@@ -65,11 +67,11 @@ class UserWishlistResourceTest extends TestCase
             ->assertRedirect();
 
         $this->assertDatabaseHas('user_wishlists', [
-            'user_id' => $newWishlistData['user_id'],
-            'name' => $newWishlistData['name'],
+            'user_id'     => $newWishlistData['user_id'],
+            'name'        => $newWishlistData['name'],
             'description' => $newWishlistData['description'],
-            'is_public' => $newWishlistData['is_public'],
-            'is_default' => $newWishlistData['is_default'],
+            'is_public'   => $newWishlistData['is_public'],
+            'is_default'  => $newWishlistData['is_default'],
         ]);
     }
 
@@ -78,15 +80,15 @@ class UserWishlistResourceTest extends TestCase
         $this->actingAs($this->user);
 
         $updatedData = [
-            'name' => 'Updated Wishlist',
+            'name'        => 'Updated Wishlist',
             'description' => 'Updated description',
-            'is_public' => false,
-            'is_default' => true,
+            'is_public'   => false,
+            'is_default'  => true,
         ];
 
         Livewire::test(EditRecord::class, [
             'resource' => UserWishlistResource::class,
-            'record' => $this->wishlist->id,
+            'record'   => $this->wishlist->id,
         ])
             ->fillForm($updatedData)
             ->call('save')
@@ -94,11 +96,11 @@ class UserWishlistResourceTest extends TestCase
             ->assertRedirect();
 
         $this->assertDatabaseHas('user_wishlists', [
-            'id' => $this->wishlist->id,
-            'name' => $updatedData['name'],
+            'id'          => $this->wishlist->id,
+            'name'        => $updatedData['name'],
             'description' => $updatedData['description'],
-            'is_public' => $updatedData['is_public'],
-            'is_default' => $updatedData['is_default'],
+            'is_public'   => $updatedData['is_public'],
+            'is_default'  => $updatedData['is_default'],
         ]);
     }
 
@@ -108,7 +110,7 @@ class UserWishlistResourceTest extends TestCase
 
         Livewire::test(ViewRecord::class, [
             'resource' => UserWishlistResource::class,
-            'record' => $this->wishlist->id,
+            'record'   => $this->wishlist->id,
         ])
             ->assertOk();
     }
@@ -133,12 +135,12 @@ class UserWishlistResourceTest extends TestCase
         $this->actingAs($this->user);
 
         $publicWishlist = UserWishlist::factory()->create([
-            'user_id' => $this->user->id,
+            'user_id'   => $this->user->id,
             'is_public' => true,
         ]);
 
         $privateWishlist = UserWishlist::factory()->create([
-            'user_id' => $this->user->id,
+            'user_id'   => $this->user->id,
             'is_public' => false,
         ]);
 
@@ -155,12 +157,12 @@ class UserWishlistResourceTest extends TestCase
         $this->actingAs($this->user);
 
         $defaultWishlist = UserWishlist::factory()->create([
-            'user_id' => $this->user->id,
+            'user_id'    => $this->user->id,
             'is_default' => true,
         ]);
 
         $nonDefaultWishlist = UserWishlist::factory()->create([
-            'user_id' => $this->user->id,
+            'user_id'    => $this->user->id,
             'is_default' => false,
         ]);
 
@@ -188,7 +190,7 @@ class UserWishlistResourceTest extends TestCase
         $this->actingAs($this->user);
 
         $anotherWishlist = UserWishlist::factory()->create([
-            'user_id' => $this->user->id,
+            'user_id'    => $this->user->id,
             'created_at' => now()->addDay(),
         ]);
 
@@ -230,7 +232,7 @@ class UserWishlistResourceTest extends TestCase
         ])
             ->fillForm([
                 'user_id' => null,
-                'name' => null,
+                'name'    => null,
             ])
             ->call('create')
             ->assertHasFormErrors(['user_id', 'name']);
@@ -250,7 +252,7 @@ class UserWishlistResourceTest extends TestCase
 
         // Test scopePublic
         $publicWishlist = UserWishlist::factory()->create([
-            'user_id' => $this->user->id,
+            'user_id'   => $this->user->id,
             'is_public' => true,
         ]);
 
@@ -260,7 +262,7 @@ class UserWishlistResourceTest extends TestCase
 
         // Test scopeDefault
         $defaultWishlist = UserWishlist::factory()->create([
-            'user_id' => $this->user->id,
+            'user_id'    => $this->user->id,
             'is_default' => true,
         ]);
 

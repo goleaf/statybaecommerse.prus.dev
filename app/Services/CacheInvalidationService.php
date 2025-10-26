@@ -141,7 +141,7 @@ final class CacheInvalidationService
             // Ensure both the legacy navigation cache keys and the new locale-aware
             // helpers are cleared so header menus immediately reflect brand edits.
             $navigationKey = CacheKeys::navigationFeaturedBrands($locale);
-            $legacyNavigationKey = 'nav:featured_brands:'.$locale;
+            $legacyNavigationKey = 'nav:featured_brands:' . $locale;
 
             Cache::forget($navigationKey);
             Cache::forget($legacyNavigationKey);
@@ -289,7 +289,7 @@ final class CacheInvalidationService
     /**
      * Forget a shared cache key and clear the associated tag-aware entry.
      *
-     * @param  array<int, string>  $tags
+     * @param array<int, string> $tags
      */
     private function forgetSharedProductKey(string $key, array $tags): void
     {

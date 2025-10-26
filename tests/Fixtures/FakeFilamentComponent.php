@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Fixtures;
 
+use AllowDynamicProperties;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Schemas\Components\Component;
@@ -15,7 +16,7 @@ use Livewire\Component as LivewireComponent;
 /**
  * Minimal Livewire component that satisfies Filament's HasSchemas contract for unit tests.
  */
-#[\AllowDynamicProperties]
+#[AllowDynamicProperties]
 final class FakeFilamentComponent extends LivewireComponent implements HasSchemas
 {
     /**
@@ -41,7 +42,7 @@ final class FakeFilamentComponent extends LivewireComponent implements HasSchema
         string $key,
         bool $withHidden = false,
         ?Component $skipComponentChildContainersWhileSearching = null
-    ): Component | Action | ActionGroup | null {
+    ): Component|Action|ActionGroup|null {
         return null;
     }
 

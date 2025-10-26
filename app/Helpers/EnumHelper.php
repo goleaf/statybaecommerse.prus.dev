@@ -13,6 +13,7 @@ use App\Enums\ProductStatus;
 use App\Enums\UserRole;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use ValueError;
 
 final class EnumHelper
 {
@@ -22,12 +23,12 @@ final class EnumHelper
     public static function getAllEnums(): array
     {
         return [
-            'address_type' => AddressType::class,
+            'address_type'     => AddressType::class,
             'navigation_group' => NavigationGroup::class,
-            'order_status' => OrderStatus::class,
-            'payment_type' => PaymentType::class,
-            'product_status' => ProductStatus::class,
-            'user_role' => UserRole::class,
+            'order_status'     => OrderStatus::class,
+            'payment_type'     => PaymentType::class,
+            'product_status'   => ProductStatus::class,
+            'user_role'        => UserRole::class,
         ];
     }
 
@@ -82,7 +83,7 @@ final class EnumHelper
             // from() throws a ValueError for unknown values, so we gracefully convert
             // that exception into a null result to keep helper consumers defensive-free.
             return $enumClass::from($value);
-        } catch (\ValueError) {
+        } catch (ValueError) {
             return null;
         }
     }
@@ -319,7 +320,7 @@ final class EnumHelper
                     return false;
                 }
 
-                return $case->{$property}() === $value;
+                return $value === $case->{$property}();
             }
         );
     }
@@ -413,11 +414,11 @@ final class EnumHelper
 
         if ($enumClass === null) {
             return [
-                'data' => [],
-                'total' => 0,
-                'per_page' => $perPage,
+                'data'         => [],
+                'total'        => 0,
+                'per_page'     => $perPage,
                 'current_page' => $page,
-                'last_page' => 0,
+                'last_page'    => 0,
             ];
         }
 
@@ -428,11 +429,11 @@ final class EnumHelper
         $lastPage = (int) ceil($total / $perPage);
 
         return [
-            'data' => $collection->forPage($page, $perPage)->values(),
-            'total' => $total,
-            'per_page' => $perPage,
+            'data'         => $collection->forPage($page, $perPage)->values(),
+            'total'        => $total,
+            'per_page'     => $perPage,
             'current_page' => $page,
-            'last_page' => $lastPage,
+            'last_page'    => $lastPage,
         ];
     }
 

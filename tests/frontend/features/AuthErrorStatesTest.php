@@ -21,7 +21,7 @@ it('validates login credentials before attempting authentication', function (): 
         ->set('loginForm.password', '')
         ->call('login')
         ->assertHasErrors([
-            'loginForm.email' => 'required',
+            'loginForm.email'    => 'required',
             'loginForm.password' => 'required',
         ]);
 });
@@ -59,7 +59,7 @@ it('applies rate limiting to the authenticated profile endpoint', function (): v
 
     Config::set('api.rate_limits.default', 1);
 
-    $limiterKey = 'user:'.$user->id;
+    $limiterKey = 'user:' . $user->id;
     RateLimiter::clear($limiterKey);
 
     \Mockery::mock('alias:App\\Support\\Contracts\\Entities\\UserContract')

@@ -32,7 +32,7 @@ final class CountrySearchRequest extends FormRequest
     {
         // Ensure valid search terms and pagination controls for the autocomplete endpoint.
         return [
-            'q' => ['required', 'string', 'min:2', 'max:255'],
+            'q'        => ['required', 'string', 'min:2', 'max:255'],
             'per_page' => ['nullable', 'integer', 'min:1', 'max:50'],
         ];
     }

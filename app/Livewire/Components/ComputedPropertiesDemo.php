@@ -20,7 +20,7 @@ use Livewire\Component;
  *
  * @property string $filter
  * @property string $selectedCategory
- * @property bool $showExpensiveProducts
+ * @property bool   $showExpensiveProducts
  */
 class ComputedPropertiesDemo extends Component
 {
@@ -58,9 +58,9 @@ class ComputedPropertiesDemo extends Component
         }
         // Apply time filter
         match ($this->filter) {
-            'week' => $query->where('created_at', '>=', now()->subWeek()),
+            'week'  => $query->where('created_at', '>=', now()->subWeek()),
             'month' => $query->where('created_at', '>=', now()->subMonth()),
-            'year' => $query->where('created_at', '>=', now()->subYear()),
+            'year'  => $query->where('created_at', '>=', now()->subYear()),
             default => $query,
         };
 

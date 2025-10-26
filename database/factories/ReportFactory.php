@@ -24,40 +24,40 @@ final class ReportFactory extends Factory
         $category = fake()->randomElement(['sales', 'marketing', 'operations', 'finance', 'customer_service', 'inventory', 'analytics']);
 
         return [
-            'name' => ['en' => $name, 'lt' => $name],
-            'slug' => Str::slug($name),
-            'type' => $type,
-            'category' => $category,
+            'name'       => ['en' => $name, 'lt' => $name],
+            'slug'       => Str::slug($name),
+            'type'       => $type,
+            'category'   => $category,
             'date_range' => $dateRange,
             'start_date' => $dateRange === 'custom' ? now()->subDays(30) : null,
-            'end_date' => $dateRange === 'custom' ? now() : null,
-            'filters' => [
-                'status' => fake()->randomElement(['all', 'paid', 'pending']),
+            'end_date'   => $dateRange === 'custom' ? now() : null,
+            'filters'    => [
+                'status'   => fake()->randomElement(['all', 'paid', 'pending']),
                 'category' => fake()->randomElement(['electronics', 'clothing', 'books']),
             ],
-            'description' => ['en' => fake()->sentence(), 'lt' => fake()->sentence()],
-            'content' => fake()->paragraphs(3, true),
-            'is_active' => fake()->boolean(80),
-            'is_public' => fake()->boolean(60),
-            'is_scheduled' => fake()->boolean(30),
+            'description'        => ['en' => fake()->sentence(), 'lt' => fake()->sentence()],
+            'content'            => fake()->paragraphs(3, true),
+            'is_active'          => fake()->boolean(80),
+            'is_public'          => fake()->boolean(60),
+            'is_scheduled'       => fake()->boolean(30),
             'schedule_frequency' => fake()->randomElement(['daily', 'weekly', 'monthly', 'quarterly', 'yearly']),
-            'last_generated_at' => fake()->optional(0.7)->dateTimeBetween('-30 days', 'now'),
-            'generated_by' => function () {
+            'last_generated_at'  => fake()->optional(0.7)->dateTimeBetween('-30 days', 'now'),
+            'generated_by'       => function () {
                 $userIds = User::pluck('id')->toArray();
 
                 return empty($userIds) ? null : fake()->randomElement($userIds);
             },
-            'view_count' => fake()->numberBetween(0, 1000),
+            'view_count'     => fake()->numberBetween(0, 1000),
             'download_count' => fake()->numberBetween(0, 100),
-            'settings' => [
-                'format' => fake()->randomElement(['pdf', 'excel', 'csv']),
-                'include_charts' => fake()->boolean(),
+            'settings'       => [
+                'format'          => fake()->randomElement(['pdf', 'excel', 'csv']),
+                'include_charts'  => fake()->boolean(),
                 'include_summary' => fake()->boolean(),
             ],
             'metadata' => [
                 'version' => '1.0',
-                'author' => fake()->name(),
-                'tags' => fake()->words(3),
+                'author'  => fake()->name(),
+                'tags'    => fake()->words(3),
             ],
         ];
     }
@@ -79,7 +79,7 @@ final class ReportFactory extends Factory
     public function scheduled(): static
     {
         return $this->state(fn (array $attributes) => [
-            'is_scheduled' => true,
+            'is_scheduled'       => true,
             'schedule_frequency' => fake()->randomElement(['daily', 'weekly', 'monthly']),
         ]);
     }
@@ -88,14 +88,14 @@ final class ReportFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'last_generated_at' => now(),
-            'generated_by' => User::factory(),
+            'generated_by'      => User::factory(),
         ]);
     }
 
     public function popular(): static
     {
         return $this->state(fn (array $attributes) => [
-            'view_count' => fake()->numberBetween(500, 5000),
+            'view_count'     => fake()->numberBetween(500, 5000),
             'download_count' => fake()->numberBetween(50, 500),
         ]);
     }

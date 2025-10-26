@@ -52,21 +52,21 @@ final class CampaignConversionResourceTest extends TestCase
         $this->actingAs($this->user);
 
         $data = [
-            'campaign_id' => $this->campaign->id,
-            'customer_id' => $this->user->id,
-            'conversion_type' => 'purchase',
+            'campaign_id'      => $this->campaign->id,
+            'customer_id'      => $this->user->id,
+            'conversion_type'  => 'purchase',
             'conversion_value' => 100.5,
-            'status' => 'completed',
-            'converted_at' => now(),
+            'status'           => 'completed',
+            'converted_at'     => now(),
         ];
 
         $response = $this->post('/admin/campaign-conversions', $data);
 
         $response->assertRedirect();
         $this->assertDatabaseHas('campaign_conversions', [
-            'campaign_id' => $this->campaign->id,
-            'customer_id' => $this->user->id,
-            'conversion_type' => 'purchase',
+            'campaign_id'      => $this->campaign->id,
+            'customer_id'      => $this->user->id,
+            'conversion_type'  => 'purchase',
             'conversion_value' => 100.5,
         ]);
     }
@@ -77,16 +77,16 @@ final class CampaignConversionResourceTest extends TestCase
 
         $data = [
             'conversion_value' => 200.75,
-            'status' => 'confirmed',
+            'status'           => 'confirmed',
         ];
 
         $response = $this->put("/admin/campaign-conversions/{$this->campaignConversion->id}", $data);
 
         $response->assertRedirect();
         $this->assertDatabaseHas('campaign_conversions', [
-            'id' => $this->campaignConversion->id,
+            'id'               => $this->campaignConversion->id,
             'conversion_value' => 200.75,
-            'status' => 'confirmed',
+            'status'           => 'confirmed',
         ]);
     }
 
@@ -230,7 +230,7 @@ final class CampaignConversionResourceTest extends TestCase
 
         $response->assertRedirect();
         $this->assertDatabaseHas('campaign_conversions', [
-            'id' => $this->campaignConversion->id,
+            'id'          => $this->campaignConversion->id,
             'is_verified' => true,
         ]);
     }
@@ -244,7 +244,7 @@ final class CampaignConversionResourceTest extends TestCase
 
         $response->assertRedirect();
         $this->assertDatabaseHas('campaign_conversions', [
-            'id' => $this->campaignConversion->id,
+            'id'          => $this->campaignConversion->id,
             'is_verified' => false,
         ]);
     }
@@ -257,7 +257,7 @@ final class CampaignConversionResourceTest extends TestCase
 
         $response->assertRedirect();
         $this->assertDatabaseHas('campaign_conversions', [
-            'id' => $this->campaignConversion->id,
+            'id'            => $this->campaignConversion->id,
             'is_attributed' => true,
         ]);
     }
@@ -271,7 +271,7 @@ final class CampaignConversionResourceTest extends TestCase
 
         $response->assertRedirect();
         $this->assertDatabaseHas('campaign_conversions', [
-            'id' => $this->campaignConversion->id,
+            'id'            => $this->campaignConversion->id,
             'is_attributed' => false,
         ]);
     }
@@ -286,7 +286,7 @@ final class CampaignConversionResourceTest extends TestCase
 
         $response->assertRedirect();
         $this->assertDatabaseHas('campaign_conversions', [
-            'id' => $this->campaignConversion->id,
+            'id'          => $this->campaignConversion->id,
             'is_verified' => true,
         ]);
     }
@@ -302,7 +302,7 @@ final class CampaignConversionResourceTest extends TestCase
 
         $response->assertRedirect();
         $this->assertDatabaseHas('campaign_conversions', [
-            'id' => $this->campaignConversion->id,
+            'id'          => $this->campaignConversion->id,
             'is_verified' => false,
         ]);
     }
@@ -317,7 +317,7 @@ final class CampaignConversionResourceTest extends TestCase
 
         $response->assertRedirect();
         $this->assertDatabaseHas('campaign_conversions', [
-            'id' => $this->campaignConversion->id,
+            'id'            => $this->campaignConversion->id,
             'is_attributed' => true,
         ]);
     }
@@ -333,7 +333,7 @@ final class CampaignConversionResourceTest extends TestCase
 
         $response->assertRedirect();
         $this->assertDatabaseHas('campaign_conversions', [
-            'id' => $this->campaignConversion->id,
+            'id'            => $this->campaignConversion->id,
             'is_attributed' => false,
         ]);
     }

@@ -12,7 +12,7 @@ use Livewire\Component;
  *
  * Livewire component for NotificationDropdown with reactive frontend functionality, real-time updates, and user interaction handling.
  *
- * @property int $unreadCount
+ * @property int   $unreadCount
  * @property mixed $recentNotifications
  * @property mixed $listeners
  */

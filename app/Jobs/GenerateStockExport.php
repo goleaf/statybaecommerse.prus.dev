@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Jobs;
 
 use App\Models\VariantInventory;
+use App\Support\Storage\SecureStorage;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\Eloquent\Builder;
@@ -12,8 +13,8 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
-use App\Support\Storage\SecureStorage;
 use Illuminate\Support\Facades\Storage;
+use RuntimeException;
 
 /**
  * GenerateStockExport
@@ -30,7 +31,7 @@ final class GenerateStockExport implements ShouldQueue
     public int $tries = 3;
 
     /**
-     * @param  array<string, mixed>  $filters
+     * @param array<string, mixed> $filters
      */
     public function __construct(
         private readonly array $filters,
@@ -63,13 +64,13 @@ final class GenerateStockExport implements ShouldQueue
         $filename = sprintf(
             'stock_export_%s%s.csv',
             $timestamp,
-            $this->requestedBy ? '_user-'.$this->requestedBy : ''
+            $this->requestedBy ? '_user-' . $this->requestedBy : ''
         );
-        $path = 'exports/'.$filename;
+        $path = 'exports/' . $filename;
 
         $stream = fopen('php://temp', 'w+');
         if ($stream === false) {
-            throw new \RuntimeException('Unable to create temporary stream for stock export.');
+            throw new RuntimeException('Unable to create temporary stream for stock export.');
         }
 
         fputcsv($stream, [
@@ -114,14 +115,14 @@ final class GenerateStockExport implements ShouldQueue
         fclose($stream);
 
         if ($contents === false) {
-            throw new \RuntimeException('Failed to read generated stock export.');
+            throw new RuntimeException('Failed to read generated stock export.');
         }
 
         $disk->put($path, $contents);
 
         Log::info('Stock export generated', [
-            'path' => $path,
-            'filters' => $this->filters,
+            'path'         => $path,
+            'filters'      => $this->filters,
             'requested_by' => $this->requestedBy,
         ]);
     }
@@ -147,11 +148,11 @@ final class GenerateStockExport implements ShouldQueue
 
         if (! empty($this->filters['stock_status'])) {
             match ($this->filters['stock_status']) {
-                'low_stock' => $query->lowStock(),
-                'out_of_stock' => $query->outOfStock(),
+                'low_stock'     => $query->lowStock(),
+                'out_of_stock'  => $query->outOfStock(),
                 'needs_reorder' => $query->needsReorder(),
                 'expiring_soon' => $query->expiringSoon(),
-                default => null,
+                default         => null,
             };
         }
 

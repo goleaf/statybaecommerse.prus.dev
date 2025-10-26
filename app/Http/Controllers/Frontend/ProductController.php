@@ -62,23 +62,23 @@ final class ProductController extends Controller
     public function addReview(Request $request, Product $product): RedirectResponse
     {
         $validated = $request->validate([
-            'rating' => ['required', 'integer', 'min:1', 'max:5'],
-            'title' => ['nullable', 'string', 'max:255'],
+            'rating'  => ['required', 'integer', 'min:1', 'max:5'],
+            'title'   => ['nullable', 'string', 'max:255'],
             'content' => ['required', 'string'],
         ]);
 
         $user = $request->user();
 
         Review::create([
-            'product_id' => $product->getKey(),
-            'user_id' => $user?->getKey(),
-            'rating' => (int) $validated['rating'],
-            'title' => $validated['title'] ?? null,
-            'content' => $validated['content'],
-            'reviewer_name' => $user?->name,
+            'product_id'     => $product->getKey(),
+            'user_id'        => $user?->getKey(),
+            'rating'         => (int) $validated['rating'],
+            'title'          => $validated['title'] ?? null,
+            'content'        => $validated['content'],
+            'reviewer_name'  => $user?->name,
             'reviewer_email' => $user?->email,
-            'locale' => app()->getLocale(),
-            'is_approved' => false,
+            'locale'         => app()->getLocale(),
+            'is_approved'    => false,
         ]);
 
         return redirect()->route('frontend.products.show', $product);

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Tests\Unit\Models;
 
@@ -15,13 +17,13 @@ final class CustomerGroupTest extends TestCase
     public function test_customer_group_can_be_created(): void
     {
         $customerGroup = CustomerGroup::factory()->create([
-            'name' => ['lt' => 'VIP Klientai', 'en' => 'VIP Customers'],
-            'code' => 'VIP001',
+            'name'       => ['lt' => 'VIP Klientai', 'en' => 'VIP Customers'],
+            'code'       => 'VIP001',
             'is_enabled' => true,
         ]);
 
         $this->assertDatabaseHas('customer_groups', [
-            'code' => 'VIP001',
+            'code'       => 'VIP001',
             'is_enabled' => true,
         ]);
         $this->assertInstanceOf(CustomerGroup::class, $customerGroup);
@@ -30,14 +32,14 @@ final class CustomerGroupTest extends TestCase
     public function test_customer_group_casts_work_correctly(): void
     {
         $customerGroup = CustomerGroup::factory()->create([
-            'is_enabled' => true,
-            'is_active' => true,
+            'is_enabled'          => true,
+            'is_active'           => true,
             'has_special_pricing' => true,
             'discount_percentage' => 15.5,
-            'discount_fixed' => 10.0,
-            'sort_order' => 5,
-            'metadata' => ['key' => 'value'],
-            'conditions' => ['min_order' => 100],
+            'discount_fixed'      => 10.0,
+            'sort_order'          => 5,
+            'metadata'            => ['key' => 'value'],
+            'conditions'          => ['min_order' => 100],
         ]);
 
         $this->assertTrue($customerGroup->is_enabled);
@@ -238,9 +240,9 @@ final class CustomerGroupTest extends TestCase
     {
         $group = CustomerGroup::factory()->create([
             'can_view_catalog' => true,
-            'can_view_prices' => true,
+            'can_view_prices'  => true,
             'can_place_orders' => true,
-            'can_use_coupons' => false,
+            'can_use_coupons'  => false,
         ]);
 
         $this->assertTrue($group->canViewCatalog());
@@ -423,7 +425,7 @@ final class CustomerGroupTest extends TestCase
     public function test_customer_group_translations_work(): void
     {
         $customerGroup = CustomerGroup::factory()->create([
-            'name' => ['lt' => 'Lietuviškas Pavadinimas', 'en' => 'English Name'],
+            'name'        => ['lt' => 'Lietuviškas Pavadinimas', 'en' => 'English Name'],
             'description' => ['lt' => 'Lietuviškas Aprašymas', 'en' => 'English Description'],
         ]);
 

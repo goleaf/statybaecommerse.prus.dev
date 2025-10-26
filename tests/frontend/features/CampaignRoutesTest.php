@@ -114,10 +114,10 @@ class CampaignRoutesTest extends TestCase
 
         // Test conversion store
         $response = $this->post('/campaign-conversions', [
-            'campaign_id' => $this->campaign->id,
-            'user_id' => $this->user->id,
+            'campaign_id'     => $this->campaign->id,
+            'user_id'         => $this->user->id,
             'conversion_type' => 'purchase',
-            'value' => 100.00,
+            'value'           => 100.00,
         ]);
         $response->assertStatus(200);
 
@@ -132,7 +132,7 @@ class CampaignRoutesTest extends TestCase
         // Test conversion update
         $response = $this->put("/campaign-conversions/{$conversion->id}", [
             'conversion_type' => 'signup',
-            'value' => 50.00,
+            'value'           => 50.00,
         ]);
         $response->assertStatus(200);
 

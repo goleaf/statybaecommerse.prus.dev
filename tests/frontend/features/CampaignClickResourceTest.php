@@ -45,34 +45,34 @@ class CampaignClickResourceTest extends TestCase
 
         Livewire::test(\App\Filament\Resources\CampaignClickResource\Pages\CreateCampaignClick::class)
             ->fillForm([
-                'campaign_id' => $campaign->id,
-                'customer_id' => $user->id,
-                'session_id' => 'test-session-123',
-                'ip_address' => '192.168.1.1',
-                'user_agent' => 'Mozilla/5.0 Test Browser',
-                'click_type' => 'cta',
-                'clicked_url' => 'https://example.com/cta',
-                'clicked_at' => now(),
-                'device_type' => 'desktop',
-                'browser' => 'chrome',
-                'os' => 'windows',
-                'country' => 'Lithuania',
-                'city' => 'Vilnius',
-                'utm_source' => 'google',
-                'utm_medium' => 'cpc',
-                'utm_campaign' => 'test-campaign',
+                'campaign_id'      => $campaign->id,
+                'customer_id'      => $user->id,
+                'session_id'       => 'test-session-123',
+                'ip_address'       => '192.168.1.1',
+                'user_agent'       => 'Mozilla/5.0 Test Browser',
+                'click_type'       => 'cta',
+                'clicked_url'      => 'https://example.com/cta',
+                'clicked_at'       => now(),
+                'device_type'      => 'desktop',
+                'browser'          => 'chrome',
+                'os'               => 'windows',
+                'country'          => 'Lithuania',
+                'city'             => 'Vilnius',
+                'utm_source'       => 'google',
+                'utm_medium'       => 'cpc',
+                'utm_campaign'     => 'test-campaign',
                 'conversion_value' => 100.50,
-                'is_converted' => true,
+                'is_converted'     => true,
             ])
             ->call('create')
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('campaign_clicks', [
-            'campaign_id' => $campaign->id,
-            'customer_id' => $user->id,
-            'session_id' => 'test-session-123',
-            'ip_address' => '192.168.1.1',
-            'click_type' => 'cta',
+            'campaign_id'  => $campaign->id,
+            'customer_id'  => $user->id,
+            'session_id'   => 'test-session-123',
+            'ip_address'   => '192.168.1.1',
+            'click_type'   => 'cta',
             'is_converted' => true,
         ]);
     }
@@ -90,8 +90,8 @@ class CampaignClickResourceTest extends TestCase
             'record' => $click->id,
         ])
             ->fillForm([
-                'click_type' => 'banner',
-                'is_converted' => true,
+                'click_type'       => 'banner',
+                'is_converted'     => true,
                 'conversion_value' => 250.75,
             ])
             ->call('save')
@@ -252,8 +252,8 @@ class CampaignClickResourceTest extends TestCase
     {
         Livewire::test(\App\Filament\Resources\CampaignClickResource\Pages\CreateCampaignClick::class)
             ->fillForm([
-                'campaign_id' => null, // Required field
-                'click_type' => 'invalid_type', // Invalid option
+                'campaign_id'      => null, // Required field
+                'click_type'       => 'invalid_type', // Invalid option
                 'conversion_value' => 'invalid_number', // Invalid number
             ])
             ->call('create')

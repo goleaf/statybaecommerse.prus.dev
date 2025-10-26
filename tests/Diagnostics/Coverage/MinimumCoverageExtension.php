@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace Tests\Diagnostics\Coverage;
 
+use function extension_loaded;
 use function in_array;
-use function sprintf;
-use function strtolower;
+use function ini_get;
+
 use PHPUnit\Event\TestRunner\ExecutionFinished;
 use PHPUnit\Event\TestRunner\ExecutionFinishedSubscriber;
 use PHPUnit\Runner\CodeCoverage as RunnerCoverage;
@@ -16,9 +17,10 @@ use PHPUnit\Runner\Extension\ParameterCollection;
 use PHPUnit\TextUI\Configuration\Configuration;
 use RuntimeException;
 use SebastianBergmann\CodeCoverage\Util\Percentage;
-use function extension_loaded;
-use function ini_get;
+
+use function sprintf;
 use function str_contains;
+use function strtolower;
 
 /**
  * PHPUnit extension that enforces a configurable minimum line coverage percentage.
@@ -42,10 +44,9 @@ final class MinimumCoverageExtension implements Extension
         }
 
         // Register the subscriber that checks the aggregated coverage once execution finishes.
-        $facade->registerSubscriber(new class($this->defaultThreshold) implements ExecutionFinishedSubscriber {
-            public function __construct(private readonly float $defaultThreshold)
-            {
-            }
+        $facade->registerSubscriber(new class($this->defaultThreshold) implements ExecutionFinishedSubscriber
+        {
+            public function __construct(private readonly float $defaultThreshold) {}
 
             public function notify(ExecutionFinished $event): void
             {

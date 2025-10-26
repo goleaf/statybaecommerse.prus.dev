@@ -21,14 +21,14 @@ enum AuthorizationRole: string
     public function label(): string
     {
         return match ($this) {
-            self::SUPER_ADMIN => 'Super Admin',
-            self::ADMIN => 'Admin',
+            self::SUPER_ADMIN   => 'Super Admin',
+            self::ADMIN         => 'Admin',
             self::ADMINISTRATOR => 'Administrator',
-            self::MANAGER => 'Manager',
-            self::EDITOR => 'Editor',
-            self::SUPPORT => 'Support',
-            self::VIEWER => 'Viewer',
-            self::USER => 'User',
+            self::MANAGER       => 'Manager',
+            self::EDITOR        => 'Editor',
+            self::SUPPORT       => 'Support',
+            self::VIEWER        => 'Viewer',
+            self::USER          => 'User',
         };
     }
 }

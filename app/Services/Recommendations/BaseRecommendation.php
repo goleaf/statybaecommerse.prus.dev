@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Log;
  * Service class containing BaseRecommendation business logic, external integrations, and complex operations with proper error handling and logging.
  *
  * @property array $config
- * @property int $maxResults
+ * @property int   $maxResults
  * @property float $minScore
  * @property array $filters
  */
@@ -54,7 +54,7 @@ abstract class BaseRecommendation
     /**
      * Handle applyFilters functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     protected function applyFilters($query)
     {
@@ -71,7 +71,7 @@ abstract class BaseRecommendation
     /**
      * Handle applyFilter functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     protected function applyFilter($query, array $filter)
     {
@@ -84,11 +84,11 @@ abstract class BaseRecommendation
         }
 
         return match ($type) {
-            'where' => $query->where($field, $operator, $value),
-            'whereIn' => $query->whereIn($field, $value),
-            'whereNotIn' => $query->whereNotIn($field, $value),
+            'where'        => $query->where($field, $operator, $value),
+            'whereIn'      => $query->whereIn($field, $value),
+            'whereNotIn'   => $query->whereNotIn($field, $value),
             'whereBetween' => $query->whereBetween($field, $value),
-            'whereHas' => $query->whereHas($field, function ($q) use ($value) {
+            'whereHas'     => $query->whereHas($field, function ($q) use ($value) {
                 $q->where($value['field'], $value['operator'] ?? '=', $value['value']);
             }),
             default => $query,
@@ -128,7 +128,7 @@ abstract class BaseRecommendation
             $parts[] = "product:{$product->id}";
         }
         if (! empty($context)) {
-            $parts[] = 'context:'.md5(serialize($context));
+            $parts[] = 'context:' . md5(serialize($context));
         }
 
         return implode('|', $parts);

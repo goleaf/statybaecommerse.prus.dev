@@ -24,7 +24,7 @@ final class TraceContextProcessor
         $extra['correlation_id'] = $context->correlationId();
         $extra['traceparent'] = $context->toTraceParent();
         $extra['trace'] = [
-            'id' => $context->traceId(),
+            'id'   => $context->traceId(),
             'span' => [
                 'id' => $context->spanId(),
             ],

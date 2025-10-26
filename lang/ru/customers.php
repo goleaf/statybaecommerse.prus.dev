@@ -3,14 +3,14 @@
 declare(strict_types=1);
 
 return [
-    'title'  => 'Клиенты',
-    'plural' => 'Клиенты',
-    'single' => 'Клиент',
-    'orders' => 'Заказы',
-    'order_number_label' => 'Заказ № :number',
-    'order_placed_on' => 'Размещён :date',
-    'reviews' => 'Отзывы',
-    'review_for_product' => 'Отзыв о :product',
+    'title'                 => 'Клиенты',
+    'plural'                => 'Клиенты',
+    'single'                => 'Клиент',
+    'orders'                => 'Заказы',
+    'order_number_label'    => 'Заказ № :number',
+    'order_placed_on'       => 'Размещён :date',
+    'reviews'               => 'Отзывы',
+    'review_for_product'    => 'Отзыв о :product',
     'review_rating_tooltip' => 'Оценка :rating/5 — :title',
 
     'basic_information'    => 'Основная информация',
@@ -95,7 +95,7 @@ return [
     'bulk_verified_success'    => 'Выбранные записи успешно подтверждены',
     'bulk_activated_success'   => 'Выбранные записи успешно активированы',
     'bulk_deactivated_success' => 'Выбранные записи успешно деактивированы',
-    'sparkline' => [
+    'sparkline'                => [
         'orders_label' => 'Заказы за последние :days дней',
     ],
 ];

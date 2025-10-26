@@ -31,35 +31,35 @@ final class SliderResourceTest extends TestCase
     {
         // Create active sliders with various features
         Slider::factory()->create([
-            'title' => 'Active Slider with Image',
-            'is_active' => true,
-            'button_text' => 'Learn More',
-            'button_url' => 'https://example.com',
-            'description' => 'This is a test slider',
+            'title'            => 'Active Slider with Image',
+            'is_active'        => true,
+            'button_text'      => 'Learn More',
+            'button_url'       => 'https://example.com',
+            'description'      => 'This is a test slider',
             'background_color' => '#ff0000',
-            'text_color' => '#ffffff',
+            'text_color'       => '#ffffff',
         ]);
 
         Slider::factory()->create([
-            'title' => 'Active Slider without Image',
-            'is_active' => true,
+            'title'       => 'Active Slider without Image',
+            'is_active'   => true,
             'button_text' => null,
-            'button_url' => null,
+            'button_url'  => null,
             'description' => null,
         ]);
 
         Slider::factory()->create([
-            'title' => 'Inactive Slider',
-            'is_active' => false,
+            'title'       => 'Inactive Slider',
+            'is_active'   => false,
             'button_text' => 'Click Here',
-            'button_url' => '/internal-link',
+            'button_url'  => '/internal-link',
         ]);
 
         Slider::factory()->create([
-            'title' => 'Slider with Background',
-            'is_active' => true,
+            'title'            => 'Slider with Background',
+            'is_active'        => true,
             'background_color' => '#00ff00',
-            'text_color' => '#000000',
+            'text_color'       => '#000000',
         ]);
     }
 
@@ -101,27 +101,27 @@ final class SliderResourceTest extends TestCase
     {
         Livewire::test(\App\Filament\Resources\Sliders\Pages\CreateSlider::class)
             ->fillForm([
-                'title' => 'New Test Slider',
-                'description' => 'Test description',
-                'button_text' => 'Click Me',
-                'button_url' => 'https://test.com',
+                'title'            => 'New Test Slider',
+                'description'      => 'Test description',
+                'button_text'      => 'Click Me',
+                'button_url'       => 'https://test.com',
                 'background_color' => '#ff0000',
-                'text_color' => '#ffffff',
-                'is_active' => true,
-                'sort_order' => 1,
+                'text_color'       => '#ffffff',
+                'is_active'        => true,
+                'sort_order'       => 1,
             ])
             ->call('create')
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('sliders', [
-            'title' => 'New Test Slider',
-            'description' => 'Test description',
-            'button_text' => 'Click Me',
-            'button_url' => 'https://test.com',
+            'title'            => 'New Test Slider',
+            'description'      => 'Test description',
+            'button_text'      => 'Click Me',
+            'button_url'       => 'https://test.com',
             'background_color' => '#ff0000',
-            'text_color' => '#ffffff',
-            'is_active' => true,
-            'sort_order' => 1,
+            'text_color'       => '#ffffff',
+            'is_active'        => true,
+            'sort_order'       => 1,
         ]);
     }
 
@@ -133,18 +133,18 @@ final class SliderResourceTest extends TestCase
             'record' => $slider->getRouteKey(),
         ])
             ->fillForm([
-                'title' => 'Updated Slider Title',
+                'title'       => 'Updated Slider Title',
                 'description' => 'Updated description',
-                'is_active' => false,
+                'is_active'   => false,
             ])
             ->call('save')
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('sliders', [
-            'id' => $slider->id,
-            'title' => 'Updated Slider Title',
+            'id'          => $slider->id,
+            'title'       => 'Updated Slider Title',
             'description' => 'Updated description',
-            'is_active' => false,
+            'is_active'   => false,
         ]);
     }
 
@@ -221,7 +221,7 @@ final class SliderResourceTest extends TestCase
             ->assertHasNoTableActionErrors();
 
         $this->assertDatabaseHas('sliders', [
-            'title' => $slider->title.' (Copy)',
+            'title' => $slider->title . ' (Copy)',
         ]);
     }
 
@@ -239,7 +239,7 @@ final class SliderResourceTest extends TestCase
     {
         Livewire::test(\App\Filament\Resources\Sliders\Pages\CreateSlider::class)
             ->fillForm([
-                'title' => 'Test Slider',
+                'title'      => 'Test Slider',
                 'button_url' => 'invalid-url',  // Invalid URL format
             ])
             ->call('create')
@@ -287,8 +287,8 @@ final class SliderResourceTest extends TestCase
         ])
             ->fillForm([
                 'settings' => [
-                    'autoplay' => true,
-                    'interval' => 5000,
+                    'autoplay'        => true,
+                    'interval'        => 5000,
                     'show_indicators' => true,
                 ],
             ])

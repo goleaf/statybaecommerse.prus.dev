@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-$baseDir = __DIR__.'/../app/Filament/Resources';
+$baseDir = __DIR__ . '/../app/Filament/Resources';
 
 /** Recursively iterate over Pages/*.php and ensure the static $resource property exists. */
 $iterator = new RecursiveIteratorIterator(
@@ -39,7 +39,7 @@ foreach ($iterator as $file) {
 
     if (preg_match('/^use\s+App\\\\Filament\\\\Resources\\\\([A-Za-z0-9_\\\\]+Resource);/m', $code, $m)) {
         $parts = explode('\\\\', $m[1]);
-        $resourceShort = end($parts).'Resource';
+        $resourceShort = end($parts) . 'Resource';
     }
 
     if ($resourceShort === null) {

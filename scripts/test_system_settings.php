@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 require_once 'vendor/autoload.php';
 
 use Illuminate\Container\Container;
@@ -9,9 +11,9 @@ use Illuminate\Events\Dispatcher;
 $capsule = new Capsule;
 
 $capsule->addConnection([
-    'driver' => 'sqlite',
-    'database' => __DIR__.'/database/database.sqlite',
-    'prefix' => '',
+    'driver'   => 'sqlite',
+    'database' => __DIR__ . '/database/database.sqlite',
+    'prefix'   => '',
 ]);
 
 $capsule->setEventDispatcher(new Dispatcher(new Container));
@@ -34,7 +36,7 @@ foreach ($tables as $table) {
 // Test 2: Check categories
 echo "\n2. Checking categories...\n";
 $categories = Capsule::table('system_setting_categories')->get();
-echo '   Found '.$categories->count()." categories:\n";
+echo '   Found ' . $categories->count() . " categories:\n";
 foreach ($categories as $category) {
     echo "   - {$category->name} ({$category->slug})\n";
 }
@@ -42,7 +44,7 @@ foreach ($categories as $category) {
 // Test 3: Check settings
 echo "\n3. Checking settings...\n";
 $settings = Capsule::table('system_settings')->get();
-echo '   Found '.$settings->count()." settings:\n";
+echo '   Found ' . $settings->count() . " settings:\n";
 foreach ($settings as $setting) {
     echo "   - {$setting->name} ({$setting->key}) = {$setting->value}\n";
 }

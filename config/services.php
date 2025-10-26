@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 return [
 
     /*
@@ -23,28 +25,28 @@ return [
     ],
 
     'ses' => [
-        'key' => env('AWS_ACCESS_KEY_ID'),
+        'key'    => env('AWS_ACCESS_KEY_ID'),
         'secret' => env('AWS_SECRET_ACCESS_KEY'),
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
     'mailchimp' => [
-        'api_key' => env('MAILCHIMP_API_KEY'),
+        'api_key'  => env('MAILCHIMP_API_KEY'),
         'base_url' => env('MAILCHIMP_BASE_URL', 'https://us1.api.mailchimp.com/3.0'),
-        'list_id' => env('MAILCHIMP_LIST_ID'),
+        'list_id'  => env('MAILCHIMP_LIST_ID'),
     ],
 
     'slack' => [
         'notifications' => [
             'bot_user_oauth_token' => env('SLACK_BOT_USER_OAUTH_TOKEN'),
-            'channel' => env('SLACK_BOT_USER_DEFAULT_CHANNEL'),
+            'channel'              => env('SLACK_BOT_USER_DEFAULT_CHANNEL'),
         ],
     ],
 
     'partner_api' => [
-        'header' => env('PARTNER_API_HEADER', 'X-Partner-Key'),
+        'header'     => env('PARTNER_API_HEADER', 'X-Partner-Key'),
         'rate_limit' => [
-            'max_attempts' => (int) env('PARTNER_API_RATE_LIMIT_MAX_ATTEMPTS', 60),
+            'max_attempts'  => (int) env('PARTNER_API_RATE_LIMIT_MAX_ATTEMPTS', 60),
             'decay_seconds' => (int) env('PARTNER_API_RATE_LIMIT_DECAY', 60),
         ],
     ],

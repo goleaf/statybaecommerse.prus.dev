@@ -23,7 +23,7 @@ final class OpenApiSpecDriftTest extends TestCase
         $spec = \Symfony\Component\Yaml\Yaml::parseFile($sourcePath);
 
         $expectedYaml = \Symfony\Component\Yaml\Yaml::dump($spec, 20, 2, \Symfony\Component\Yaml\Yaml::DUMP_OBJECT_AS_MAP);
-        $expectedJson = json_encode($spec, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES).PHP_EOL;
+        $expectedJson = json_encode($spec, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . PHP_EOL;
 
         $this->assertSame($expectedYaml, File::get($yamlPath), 'Committed OpenAPI YAML is out of date. Regenerate from doc/api and recommit.');
         $this->assertSame($expectedJson, File::get($jsonPath), 'Committed OpenAPI JSON is out of date. Regenerate from doc/api and recommit.');

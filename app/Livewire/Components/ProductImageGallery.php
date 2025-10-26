@@ -16,9 +16,9 @@ use Livewire\Component;
  * Livewire component for ProductImageGallery with reactive frontend functionality, real-time updates, and user interaction handling.
  *
  * @property Product $product
- * @property int $currentImageIndex
- * @property bool $showLightbox
- * @property string $imageSize
+ * @property int     $currentImageIndex
+ * @property bool    $showLightbox
+ * @property string  $imageSize
  */
 final class ProductImageGallery extends Component
 {
@@ -158,14 +158,14 @@ final class ProductImageGallery extends Component
                 $thumb = $image->thumbnail_url ?? $full;
 
                 return [
-                    'original' => $full,
-                    'xl' => $full,
-                    'lg' => $full,
-                    'md' => $full,
-                    'sm' => $full,
-                    'xs' => $thumb,
-                    'alt' => $image->formatted_alt_text ?? $variant->display_name ?? $this->product->name,
-                    'title' => $variant->display_name ?? $variant->name ?? $this->product->name,
+                    'original'  => $full,
+                    'xl'        => $full,
+                    'lg'        => $full,
+                    'md'        => $full,
+                    'sm'        => $full,
+                    'xs'        => $thumb,
+                    'alt'       => $image->formatted_alt_text ?? $variant->display_name ?? $this->product->name,
+                    'title'     => $variant->display_name ?? $variant->name ?? $this->product->name,
                     'generated' => false,
                 ];
             })

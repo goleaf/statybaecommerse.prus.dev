@@ -52,13 +52,13 @@ class SimplifiedStatsWidgetTest extends TestCase
 
         $order = Order::factory()->create([
             'user_id' => $user->id,
-            'total' => 100.0,
-            'status' => 'completed',
+            'total'   => 100.0,
+            'status'  => 'completed',
         ]);
 
         $review = Review::factory()->create([
-            'product_id' => $product->id,
-            'rating' => 5,
+            'product_id'  => $product->id,
+            'rating'      => 5,
             'is_approved' => true,
         ]);
 
@@ -80,17 +80,17 @@ class SimplifiedStatsWidgetTest extends TestCase
     {
         // Create orders with different statuses
         Order::factory()->create([
-            'total' => 100.0,
+            'total'  => 100.0,
             'status' => 'completed',
         ]);
 
         Order::factory()->create([
-            'total' => 50.0,
+            'total'  => 50.0,
             'status' => 'completed',
         ]);
 
         Order::factory()->create([
-            'total' => 25.0,
+            'total'  => 25.0,
             'status' => 'cancelled',  // Should not be included
         ]);
 
@@ -107,13 +107,13 @@ class SimplifiedStatsWidgetTest extends TestCase
     {
         // Create old orders (last month)
         Order::factory()->create([
-            'total' => 100.0,
+            'total'      => 100.0,
             'created_at' => now()->subMonth(),
         ]);
 
         // Create recent orders (this month)
         Order::factory()->create([
-            'total' => 200.0,
+            'total'      => 200.0,
             'created_at' => now(),
         ]);
 

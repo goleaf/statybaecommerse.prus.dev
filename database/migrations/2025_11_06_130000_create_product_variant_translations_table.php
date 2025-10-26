@@ -47,7 +47,7 @@ return new class extends Migration
             'seo_description_lt',
             'seo_description_en',
         ])->filter(static fn (string $column): bool => Schema::hasColumn('product_variants', $column))
-          ->values();
+            ->values();
 
         if ($columns->isEmpty()) {
             return;
@@ -115,4 +115,3 @@ return new class extends Migration
         }
     }
 };
-

@@ -171,8 +171,8 @@ return new class extends Migration
     {
         $tables = [
             'sh_currencies' => 'currencies',
-            'sh_channels' => 'channels',
-            'sh_countries' => 'countries',
+            'sh_channels'   => 'channels',
+            'sh_countries'  => 'countries',
         ];
 
         foreach ($tables as $tableName => $displayName) {

@@ -26,7 +26,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @method static \Illuminate\Database\Eloquent\Builder|MenuItem query()
  *
  * @mixin \Eloquent
-*/
+ */
 #[ObservedBy([MenuItemObserver::class])]
 #[ScopedBy([VisibleScope::class])]
 #[ObservedBy([MenuItemObserver::class])]

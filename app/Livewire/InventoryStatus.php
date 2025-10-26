@@ -13,7 +13,7 @@ use Livewire\Component;
  * Livewire component for InventoryStatus with reactive frontend functionality, real-time updates, and user interaction handling.
  *
  * @property Product $product
- * @property bool $showDetails
+ * @property bool    $showDetails
  */
 final class InventoryStatus extends Component
 {

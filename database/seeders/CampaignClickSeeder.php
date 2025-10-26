@@ -34,7 +34,7 @@ final class CampaignClickSeeder extends Seeder
                 ->state(function () use ($campaign): array {
                     return [
                         'utm_campaign' => $campaign->name,
-                        'clicked_at' => now()->subDays(random_int(0, 30)),
+                        'clicked_at'   => now()->subDays(random_int(0, 30)),
                     ];
                 })
                 ->create();

@@ -6,8 +6,10 @@ namespace Tests\Unit\Filament\Resources;
 
 use App\Filament\Resources\BrandResource;
 use App\Models\Brand;
+use BackedEnum;
 use Illuminate\Contracts\Support\Htmlable;
 use PHPUnit\Framework\TestCase;
+use UnitEnum;
 
 final class BrandResourceMetadataTest extends TestCase
 {
@@ -22,12 +24,12 @@ final class BrandResourceMetadataTest extends TestCase
         $group = BrandResource::getNavigationGroup();
 
         self::assertTrue(
-            is_string($icon) || $icon instanceof \BackedEnum || $icon instanceof Htmlable || $icon === null,
+            is_string($icon) || $icon instanceof BackedEnum || $icon instanceof Htmlable || $icon === null,
             'Navigation icon should be a string, backed enum, Htmlable instance, or null.'
         );
 
         self::assertTrue(
-            is_string($group) || $group instanceof \UnitEnum || $group === null,
+            is_string($group) || $group instanceof UnitEnum || $group === null,
             'Navigation group should be a string, enum, or null.'
         );
     }

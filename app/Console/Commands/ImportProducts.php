@@ -550,7 +550,7 @@ class ImportProducts extends Command
     /**
      * Insert or update a product row derived from the spreadsheet entry and hydrate variants.
      *
-     * @param  array<string, mixed> $item
+     * @param  array<string, mixed>                                                                 $item
      * @return array{status:string, product_id:?string, variant_status:?string, variant_id:?string}
      */
     protected function upsertProductFromItem(array $item, string $delimiter, float $vat): array
@@ -731,10 +731,10 @@ class ImportProducts extends Command
         }
 
         return [
-            'status' => $action,
-            'product_id' => is_string($id) || is_int($id) ? (string) $id : null,
+            'status'         => $action,
+            'product_id'     => is_string($id) || is_int($id) ? (string) $id : null,
             'variant_status' => $variantOutcome['status'] ?? null,
-            'variant_id' => $variantOutcome['variant_id'] ?? null,
+            'variant_id'     => $variantOutcome['variant_id'] ?? null,
         ];
     }
 
@@ -796,6 +796,7 @@ class ImportProducts extends Command
 
             if (isset($this->categoryCache[$cacheKey])) {
                 $parentId = $this->categoryCache[$cacheKey];
+
                 continue;
             }
 
@@ -967,8 +968,8 @@ class ImportProducts extends Command
     /**
      * Create or update product variant records for the imported row.
      *
-     * @param  array<string, mixed> $attributes
-     * @param  array<string, mixed> $item
+     * @param  array<string, mixed>                     $attributes
+     * @param  array<string, mixed>                     $item
      * @return array{status:string, variant_id:?string}
      */
     protected function syncVariantData(
@@ -1099,7 +1100,7 @@ class ImportProducts extends Command
         }
 
         return [
-            'status' => $status,
+            'status'     => $status,
             'variant_id' => $variantId,
         ];
     }
@@ -1107,8 +1108,8 @@ class ImportProducts extends Command
     /**
      * Extract meaningful variant options from product attributes and raw columns.
      *
-     * @param  array<string, mixed> $attributes
-     * @param  array<string, mixed> $item
+     * @param  array<string, mixed>  $attributes
+     * @param  array<string, mixed>  $item
      * @return array<string, string>
      */
     protected function extractVariantOptions(array $attributes, array $item): array
@@ -1164,7 +1165,7 @@ class ImportProducts extends Command
     /**
      * Generate a deterministic variant SKU seed taking the product SKU and options into account.
      *
-     * @param array<string, mixed> $attributes
+     * @param array<string, mixed>  $attributes
      * @param array<string, string> $variantOptions
      */
     protected function resolveVariantSkuSeed(

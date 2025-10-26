@@ -27,30 +27,30 @@ final class DiscountPriceGlobalScopesTest extends TestCase
     {
         // Create test discount codes
         $activeCode = DiscountCode::factory()->create([
-            'is_active' => true,
-            'status' => 'active',
-            'starts_at' => now()->subDay(),
+            'is_active'  => true,
+            'status'     => 'active',
+            'starts_at'  => now()->subDay(),
             'expires_at' => now()->addDay(),
         ]);
 
         $inactiveCode = DiscountCode::factory()->create([
-            'is_active' => false,
-            'status' => 'active',
-            'starts_at' => now()->subDay(),
+            'is_active'  => false,
+            'status'     => 'active',
+            'starts_at'  => now()->subDay(),
             'expires_at' => now()->addDay(),
         ]);
 
         $expiredCode = DiscountCode::factory()->create([
-            'is_active' => true,
-            'status' => 'active',
-            'starts_at' => now()->subDays(2),
+            'is_active'  => true,
+            'status'     => 'active',
+            'starts_at'  => now()->subDays(2),
             'expires_at' => now()->subDay(),
         ]);
 
         $inactiveStatusCode = DiscountCode::factory()->create([
-            'is_active' => true,
-            'status' => 'inactive',
-            'starts_at' => now()->subDay(),
+            'is_active'  => true,
+            'status'     => 'inactive',
+            'starts_at'  => now()->subDay(),
             'expires_at' => now()->addDay(),
         ]);
 
@@ -90,17 +90,17 @@ final class DiscountPriceGlobalScopesTest extends TestCase
         // Create test discount redemptions
         $userRedemption = DiscountRedemption::factory()->create([
             'user_id' => $user->id,
-            'status' => 'completed',
+            'status'  => 'completed',
         ]);
 
         $otherUserRedemption = DiscountRedemption::factory()->create([
             'user_id' => User::factory()->create()->id,
-            'status' => 'completed',
+            'status'  => 'completed',
         ]);
 
         $pendingRedemption = DiscountRedemption::factory()->create([
             'user_id' => $user->id,
-            'status' => 'pending',
+            'status'  => 'pending',
         ]);
 
         // Test that only current user's redemptions with allowed status are returned
@@ -119,20 +119,20 @@ final class DiscountPriceGlobalScopesTest extends TestCase
         // Create test prices
         $enabledPrice = Price::factory()->create([
             'is_enabled' => true,
-            'starts_at' => now()->subDay(),
-            'ends_at' => now()->addDay(),
+            'starts_at'  => now()->subDay(),
+            'ends_at'    => now()->addDay(),
         ]);
 
         $disabledPrice = Price::factory()->create([
             'is_enabled' => false,
-            'starts_at' => now()->subDay(),
-            'ends_at' => now()->addDay(),
+            'starts_at'  => now()->subDay(),
+            'ends_at'    => now()->addDay(),
         ]);
 
         $expiredPrice = Price::factory()->create([
             'is_enabled' => true,
-            'starts_at' => now()->subDays(2),
-            'ends_at' => now()->subDay(),
+            'starts_at'  => now()->subDays(2),
+            'ends_at'    => now()->subDay(),
         ]);
 
         // Test that only enabled prices within date range are returned
@@ -151,20 +151,20 @@ final class DiscountPriceGlobalScopesTest extends TestCase
         // Create test price lists
         $enabledList = PriceList::factory()->create([
             'is_enabled' => true,
-            'starts_at' => now()->subDay(),
-            'ends_at' => now()->addDay(),
+            'starts_at'  => now()->subDay(),
+            'ends_at'    => now()->addDay(),
         ]);
 
         $disabledList = PriceList::factory()->create([
             'is_enabled' => false,
-            'starts_at' => now()->subDay(),
-            'ends_at' => now()->addDay(),
+            'starts_at'  => now()->subDay(),
+            'ends_at'    => now()->addDay(),
         ]);
 
         $expiredList = PriceList::factory()->create([
             'is_enabled' => true,
-            'starts_at' => now()->subDays(2),
-            'ends_at' => now()->subDay(),
+            'starts_at'  => now()->subDays(2),
+            'ends_at'    => now()->subDay(),
         ]);
 
         // Test that only enabled price lists within date range are returned
@@ -182,20 +182,20 @@ final class DiscountPriceGlobalScopesTest extends TestCase
     {
         // Create test price list items
         $activeItem = PriceListItem::factory()->create([
-            'is_active' => true,
-            'valid_from' => now()->subDay(),
+            'is_active'   => true,
+            'valid_from'  => now()->subDay(),
             'valid_until' => now()->addDay(),
         ]);
 
         $inactiveItem = PriceListItem::factory()->create([
-            'is_active' => false,
-            'valid_from' => now()->subDay(),
+            'is_active'   => false,
+            'valid_from'  => now()->subDay(),
             'valid_until' => now()->addDay(),
         ]);
 
         $expiredItem = PriceListItem::factory()->create([
-            'is_active' => true,
-            'valid_from' => now()->subDays(2),
+            'is_active'   => true,
+            'valid_from'  => now()->subDays(2),
             'valid_until' => now()->subDay(),
         ]);
 
@@ -231,14 +231,14 @@ final class DiscountPriceGlobalScopesTest extends TestCase
         // Create test data with relationships
         $enabledPrice = Price::factory()->create([
             'is_enabled' => true,
-            'starts_at' => now()->subDay(),
-            'ends_at' => now()->addDay(),
+            'starts_at'  => now()->subDay(),
+            'ends_at'    => now()->addDay(),
         ]);
 
         $disabledPrice = Price::factory()->create([
             'is_enabled' => false,
-            'starts_at' => now()->subDay(),
-            'ends_at' => now()->addDay(),
+            'starts_at'  => now()->subDay(),
+            'ends_at'    => now()->addDay(),
         ]);
 
         // Test that relationships also apply global scopes
@@ -251,23 +251,23 @@ final class DiscountPriceGlobalScopesTest extends TestCase
     {
         // Test different combinations of discount scopes
         $code1 = DiscountCode::factory()->create([
-            'is_active' => true,
-            'status' => 'active',
-            'starts_at' => now()->subDay(),
+            'is_active'  => true,
+            'status'     => 'active',
+            'starts_at'  => now()->subDay(),
             'expires_at' => now()->addDay(),
         ]);
 
         $code2 = DiscountCode::factory()->create([
-            'is_active' => false,
-            'status' => 'active',
-            'starts_at' => now()->subDay(),
+            'is_active'  => false,
+            'status'     => 'active',
+            'starts_at'  => now()->subDay(),
             'expires_at' => now()->addDay(),
         ]);
 
         $code3 = DiscountCode::factory()->create([
-            'is_active' => true,
-            'status' => 'inactive',
-            'starts_at' => now()->subDay(),
+            'is_active'  => true,
+            'status'     => 'inactive',
+            'starts_at'  => now()->subDay(),
             'expires_at' => now()->addDay(),
         ]);
 
@@ -284,20 +284,20 @@ final class DiscountPriceGlobalScopesTest extends TestCase
         // Test different combinations of price scopes
         $price1 = Price::factory()->create([
             'is_enabled' => true,
-            'starts_at' => now()->subDay(),
-            'ends_at' => now()->addDay(),
+            'starts_at'  => now()->subDay(),
+            'ends_at'    => now()->addDay(),
         ]);
 
         $price2 = Price::factory()->create([
             'is_enabled' => false,
-            'starts_at' => now()->subDay(),
-            'ends_at' => now()->addDay(),
+            'starts_at'  => now()->subDay(),
+            'ends_at'    => now()->addDay(),
         ]);
 
         $price3 = Price::factory()->create([
             'is_enabled' => true,
-            'starts_at' => now()->subDays(2),
-            'ends_at' => now()->subDay(),
+            'starts_at'  => now()->subDays(2),
+            'ends_at'    => now()->subDay(),
         ]);
 
         // Test bypassing specific scopes
@@ -316,12 +316,12 @@ final class DiscountPriceGlobalScopesTest extends TestCase
         // Create redemptions for different users
         $user1Redemption = DiscountRedemption::factory()->create([
             'user_id' => $user1->id,
-            'status' => 'completed',
+            'status'  => 'completed',
         ]);
 
         $user2Redemption = DiscountRedemption::factory()->create([
             'user_id' => $user2->id,
-            'status' => 'completed',
+            'status'  => 'completed',
         ]);
 
         // Test as user1
@@ -346,20 +346,20 @@ final class DiscountPriceGlobalScopesTest extends TestCase
         // Test date range scope with different date field combinations
         $price1 = Price::factory()->create([
             'is_enabled' => true,
-            'starts_at' => now()->subDay(),
-            'ends_at' => now()->addDay(),
+            'starts_at'  => now()->subDay(),
+            'ends_at'    => now()->addDay(),
         ]);
 
         $price2 = Price::factory()->create([
             'is_enabled' => true,
-            'starts_at' => now()->subDays(2),
-            'ends_at' => now()->subDay(),
+            'starts_at'  => now()->subDays(2),
+            'ends_at'    => now()->subDay(),
         ]);
 
         $price3 = Price::factory()->create([
             'is_enabled' => true,
-            'starts_at' => now()->addDay(),
-            'ends_at' => now()->addDays(2),
+            'starts_at'  => now()->addDay(),
+            'ends_at'    => now()->addDays(2),
         ]);
 
         // Test that only prices within current date range are returned

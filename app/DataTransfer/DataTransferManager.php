@@ -10,9 +10,7 @@ use InvalidArgumentException;
 
 final class DataTransferManager
 {
-    public function __construct(private readonly Container $container)
-    {
-    }
+    public function __construct(private readonly Container $container) {}
 
     public function resolve(string $key): DataTransferContract
     {

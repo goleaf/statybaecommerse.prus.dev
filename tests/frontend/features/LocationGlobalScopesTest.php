@@ -23,17 +23,17 @@ final class LocationGlobalScopesTest extends TestCase
     {
         // Create test cities
         $activeEnabledCity = City::factory()->create([
-            'is_active' => true,
+            'is_active'  => true,
             'is_enabled' => true,
         ]);
 
         $inactiveCity = City::factory()->create([
-            'is_active' => false,
+            'is_active'  => false,
             'is_enabled' => true,
         ]);
 
         $disabledCity = City::factory()->create([
-            'is_active' => true,
+            'is_active'  => true,
             'is_enabled' => false,
         ]);
 
@@ -69,17 +69,17 @@ final class LocationGlobalScopesTest extends TestCase
     {
         // Create test regions
         $activeEnabledRegion = Region::factory()->create([
-            'is_active' => true,
+            'is_active'  => true,
             'is_enabled' => true,
         ]);
 
         $inactiveRegion = Region::factory()->create([
-            'is_active' => false,
+            'is_active'  => false,
             'is_enabled' => true,
         ]);
 
         $disabledRegion = Region::factory()->create([
-            'is_active' => true,
+            'is_active'  => true,
             'is_enabled' => false,
         ]);
 
@@ -98,17 +98,17 @@ final class LocationGlobalScopesTest extends TestCase
     {
         // Create test currencies
         $activeEnabledCurrency = Currency::factory()->create([
-            'is_active' => true,
+            'is_active'  => true,
             'is_enabled' => true,
         ]);
 
         $inactiveCurrency = Currency::factory()->create([
-            'is_active' => false,
+            'is_active'  => false,
             'is_enabled' => true,
         ]);
 
         $disabledCurrency = Currency::factory()->create([
-            'is_active' => true,
+            'is_active'  => true,
             'is_enabled' => false,
         ]);
 
@@ -127,17 +127,17 @@ final class LocationGlobalScopesTest extends TestCase
     {
         // Create test customer groups
         $activeEnabledGroup = CustomerGroup::factory()->create([
-            'is_active' => true,
+            'is_active'  => true,
             'is_enabled' => true,
         ]);
 
         $inactiveGroup = CustomerGroup::factory()->create([
-            'is_active' => false,
+            'is_active'  => false,
             'is_enabled' => true,
         ]);
 
         $disabledGroup = CustomerGroup::factory()->create([
-            'is_active' => true,
+            'is_active'  => true,
             'is_enabled' => false,
         ]);
 
@@ -156,17 +156,17 @@ final class LocationGlobalScopesTest extends TestCase
     {
         // Create test partner tiers
         $activeEnabledTier = PartnerTier::factory()->create([
-            'is_active' => true,
+            'is_active'  => true,
             'is_enabled' => true,
         ]);
 
         $inactiveTier = PartnerTier::factory()->create([
-            'is_active' => false,
+            'is_active'  => false,
             'is_enabled' => true,
         ]);
 
         $disabledTier = PartnerTier::factory()->create([
-            'is_active' => true,
+            'is_active'  => true,
             'is_enabled' => false,
         ]);
 
@@ -213,17 +213,17 @@ final class LocationGlobalScopesTest extends TestCase
     {
         // Test different combinations of location scopes
         $city1 = City::factory()->create([
-            'is_active' => true,
+            'is_active'  => true,
             'is_enabled' => true,
         ]);
 
         $city2 = City::factory()->create([
-            'is_active' => false,
+            'is_active'  => false,
             'is_enabled' => true,
         ]);
 
         $city3 = City::factory()->create([
-            'is_active' => true,
+            'is_active'  => true,
             'is_enabled' => false,
         ]);
 
@@ -239,17 +239,17 @@ final class LocationGlobalScopesTest extends TestCase
     {
         // Test different combinations of currency scopes
         $currency1 = Currency::factory()->create([
-            'is_active' => true,
+            'is_active'  => true,
             'is_enabled' => true,
         ]);
 
         $currency2 = Currency::factory()->create([
-            'is_active' => false,
+            'is_active'  => false,
             'is_enabled' => true,
         ]);
 
         $currency3 = Currency::factory()->create([
-            'is_active' => true,
+            'is_active'  => true,
             'is_enabled' => false,
         ]);
 
@@ -265,17 +265,17 @@ final class LocationGlobalScopesTest extends TestCase
     {
         // Test different combinations of customer group scopes
         $group1 = CustomerGroup::factory()->create([
-            'is_active' => true,
+            'is_active'  => true,
             'is_enabled' => true,
         ]);
 
         $group2 = CustomerGroup::factory()->create([
-            'is_active' => false,
+            'is_active'  => false,
             'is_enabled' => true,
         ]);
 
         $group3 = CustomerGroup::factory()->create([
-            'is_active' => true,
+            'is_active'  => true,
             'is_enabled' => false,
         ]);
 
@@ -291,17 +291,17 @@ final class LocationGlobalScopesTest extends TestCase
     {
         // Test different combinations of partner tier scopes
         $tier1 = PartnerTier::factory()->create([
-            'is_active' => true,
+            'is_active'  => true,
             'is_enabled' => true,
         ]);
 
         $tier2 = PartnerTier::factory()->create([
-            'is_active' => false,
+            'is_active'  => false,
             'is_enabled' => true,
         ]);
 
         $tier3 = PartnerTier::factory()->create([
-            'is_active' => true,
+            'is_active'  => true,
             'is_enabled' => false,
         ]);
 

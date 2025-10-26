@@ -27,7 +27,7 @@ final class VariantInventoryTest extends TestCase
         $variant = ProductVariant::factory()->create();
         $location = Location::factory()->create();
         $inventory = VariantInventory::factory()->create([
-            'variant_id' => $variant->id,
+            'variant_id'  => $variant->id,
             'location_id' => $location->id,
         ]);
 
@@ -40,7 +40,7 @@ final class VariantInventoryTest extends TestCase
         $variant = ProductVariant::factory()->create();
         $location = Location::factory()->create();
         $inventory = VariantInventory::factory()->create([
-            'variant_id' => $variant->id,
+            'variant_id'  => $variant->id,
             'location_id' => $location->id,
         ]);
 
@@ -51,7 +51,7 @@ final class VariantInventoryTest extends TestCase
     public function test_available_stock_calculation(): void
     {
         $inventory = VariantInventory::factory()->create([
-            'stock' => 100,
+            'stock'    => 100,
             'reserved' => 20,
         ]);
 
@@ -61,7 +61,7 @@ final class VariantInventoryTest extends TestCase
     public function test_available_stock_never_negative(): void
     {
         $inventory = VariantInventory::factory()->create([
-            'stock' => 10,
+            'stock'    => 10,
             'reserved' => 20,
         ]);
 
@@ -71,7 +71,7 @@ final class VariantInventoryTest extends TestCase
     public function test_is_low_stock(): void
     {
         $inventory = VariantInventory::factory()->create([
-            'stock' => 5,
+            'stock'     => 5,
             'threshold' => 10,
         ]);
 
@@ -81,7 +81,7 @@ final class VariantInventoryTest extends TestCase
     public function test_is_not_low_stock(): void
     {
         $inventory = VariantInventory::factory()->create([
-            'stock' => 15,
+            'stock'     => 15,
             'threshold' => 10,
         ]);
 
@@ -91,7 +91,7 @@ final class VariantInventoryTest extends TestCase
     public function test_is_out_of_stock(): void
     {
         $inventory = VariantInventory::factory()->create([
-            'stock' => 0,
+            'stock'    => 0,
             'reserved' => 0,
         ]);
 
@@ -101,7 +101,7 @@ final class VariantInventoryTest extends TestCase
     public function test_is_not_out_of_stock(): void
     {
         $inventory = VariantInventory::factory()->create([
-            'stock' => 10,
+            'stock'    => 10,
             'reserved' => 5,
         ]);
 
@@ -122,11 +122,11 @@ final class VariantInventoryTest extends TestCase
     public function test_low_stock_scope(): void
     {
         VariantInventory::factory()->create([
-            'stock' => 5,
+            'stock'     => 5,
             'threshold' => 10,
         ]);
         VariantInventory::factory()->create([
-            'stock' => 15,
+            'stock'     => 15,
             'threshold' => 10,
         ]);
 
@@ -150,10 +150,10 @@ final class VariantInventoryTest extends TestCase
     public function test_variant_inventory_casts(): void
     {
         $inventory = VariantInventory::factory()->create([
-            'stock' => '100',
-            'reserved' => '20',
-            'incoming' => '50',
-            'threshold' => '10',
+            'stock'      => '100',
+            'reserved'   => '20',
+            'incoming'   => '50',
+            'threshold'  => '10',
             'is_tracked' => '1',
         ]);
 

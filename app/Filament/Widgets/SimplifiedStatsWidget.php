@@ -11,9 +11,8 @@ use App\Models\User;
 use App\Support\Cache\CacheKeys;
 use App\Support\Cache\CacheTagHelper;
 use App\Support\Cache\CacheTags;
-use DateTimeInterface;
 use Carbon\Carbon;
-use DateInterval;
+use DateTimeInterface;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 use Illuminate\Cache\TaggableStore;
@@ -173,7 +172,7 @@ class SimplifiedStatsWidget extends BaseWidget
                         return [
                             $date => [
                                 'revenue' => isset($data['revenue']) ? (float) $data['revenue'] : 0.0,
-                                'orders' => isset($data['total_orders']) ? (int) $data['total_orders'] : 0,
+                                'orders'  => isset($data['total_orders']) ? (int) $data['total_orders'] : 0,
                             ],
                         ];
                     });
@@ -184,7 +183,7 @@ class SimplifiedStatsWidget extends BaseWidget
                 foreach ($dateKeys as $dateKey) {
                     $dayStats = $orderStats->get($dateKey, [
                         'revenue' => 0.0,
-                        'orders' => 0,
+                        'orders'  => 0,
                     ]);
 
                     $revenueChart[] = (float) $dayStats['revenue'];
@@ -193,7 +192,7 @@ class SimplifiedStatsWidget extends BaseWidget
 
                 return [
                     'revenue' => $revenueChart,
-                    'orders' => $ordersChart,
+                    'orders'  => $ordersChart,
                 ];
             }
         );
@@ -278,27 +277,27 @@ class SimplifiedStatsWidget extends BaseWidget
 
                 return [
                     'orders' => [
-                        'total_revenue' => (float) ($orderStats->total_revenue ?? 0),
+                        'total_revenue'      => (float) ($orderStats->total_revenue ?? 0),
                         'last_month_revenue' => (float) ($orderStats->last_month_revenue ?? 0),
-                        'total_orders' => (int) ($orderStats->total_orders ?? 0),
-                        'last_month_orders' => (int) ($orderStats->last_month_orders ?? 0),
+                        'total_orders'       => (int) ($orderStats->total_orders ?? 0),
+                        'last_month_orders'  => (int) ($orderStats->last_month_orders ?? 0),
                     ],
                     'users' => [
-                        'total_users' => (int) ($userStats->total_users ?? 0),
+                        'total_users'          => (int) ($userStats->total_users ?? 0),
                         'new_users_this_month' => (int) ($userStats->new_users_this_month ?? 0),
                     ],
                     'products' => [
-                        'total_products' => (int) ($productStats->total_products ?? 0),
+                        'total_products'  => (int) ($productStats->total_products ?? 0),
                         'active_products' => (int) ($productStats->active_products ?? 0),
                     ],
                     'catalog' => [
                         'total_categories' => $categoryCount,
-                        'total_brands' => $brandCount,
+                        'total_brands'     => $brandCount,
                     ],
                     'reviews' => [
-                        'total_reviews' => (int) ($reviewStats->total_reviews ?? 0),
+                        'total_reviews'    => (int) ($reviewStats->total_reviews ?? 0),
                         'approved_reviews' => (int) ($reviewStats->approved_reviews ?? 0),
-                        'avg_rating' => (float) ($reviewStats->avg_rating ?? 0),
+                        'avg_rating'       => (float) ($reviewStats->avg_rating ?? 0),
                     ],
                 ];
             }
@@ -331,9 +330,8 @@ class SimplifiedStatsWidget extends BaseWidget
      *
      * @template TValue
      *
-     * @param  array<int, string>     $tags
-     * @param  callable(): TValue     $callback
-     * @param  DateTimeInterface|int  $ttl
+     * @param  array<int, string> $tags
+     * @param  callable(): TValue $callback
      * @return TValue
      */
     private function rememberDashboardCache(array $tags, string $key, DateTimeInterface|int $ttl, callable $callback): mixed

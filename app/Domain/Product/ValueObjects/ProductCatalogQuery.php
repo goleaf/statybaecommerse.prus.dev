@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Domain\Product\ValueObjects;
 
+use InvalidArgumentException;
+
 /**
  * Encapsulates pagination and sorting inputs for catalog listings.
  */
@@ -17,7 +19,7 @@ final class ProductCatalogQuery
         private readonly string $sortOrder,
     ) {
         if ($this->perPage < 1) {
-            throw new \InvalidArgumentException('Per-page value must be positive.');
+            throw new InvalidArgumentException('Per-page value must be positive.');
         }
     }
 

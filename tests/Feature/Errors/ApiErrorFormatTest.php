@@ -41,9 +41,9 @@ final class ApiErrorFormatTest extends TestCase
             ->assertJsonPath('error.code', ErrorCodes::VALIDATION_FAILED)
             ->assertJsonStructure([
                 'title', 'status', 'detail', 'instance',
-                'error' => ['code', 'context' => ['violations']],
+                'error'       => ['code', 'context' => ['violations']],
                 'correlation' => ['trace_id', 'correlation_id'],
-                'meta' => ['locale', 'timestamp'],
+                'meta'        => ['locale', 'timestamp'],
             ]);
     }
 
@@ -58,10 +58,9 @@ final class ApiErrorFormatTest extends TestCase
             ->assertJsonPath('error.code', ErrorCodes::VALIDATION_FAILED)
             ->assertJsonStructure([
                 'title', 'status', 'detail', 'instance',
-                'error' => ['code'],
+                'error'       => ['code'],
                 'correlation' => ['trace_id', 'correlation_id'],
-                'meta' => ['locale', 'timestamp'],
+                'meta'        => ['locale', 'timestamp'],
             ]);
     }
 }
-

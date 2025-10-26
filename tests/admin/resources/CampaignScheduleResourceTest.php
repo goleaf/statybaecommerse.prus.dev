@@ -38,11 +38,11 @@ beforeEach(function () {
     ]);
 
     $this->testCampaignSchedule = CampaignSchedule::factory()->create([
-        'campaign_id' => $this->testCampaign->id,
-        'schedule_type' => ScheduleType::DAILY->value,
+        'campaign_id'     => $this->testCampaign->id,
+        'schedule_type'   => ScheduleType::DAILY->value,
         'schedule_config' => ['time' => '09:00', 'timezone' => 'Europe/Vilnius', 'frequency' => 'every_day'],
-        'next_run_at' => now()->addDay(),
-        'is_active' => true,
+        'next_run_at'     => now()->addDay(),
+        'is_active'       => true,
     ]);
 });
 
@@ -59,19 +59,19 @@ it('can create a campaign schedule', function () {
     Livewire::actingAs($this->adminUser)
         ->test(CampaignScheduleResource\Pages\CreateCampaignSchedule::class)
         ->fillForm([
-            'campaign_id' => $campaign->id,
-            'schedule_type' => ScheduleType::WEEKLY->value,
+            'campaign_id'     => $campaign->id,
+            'schedule_type'   => ScheduleType::WEEKLY->value,
             'schedule_config' => ['day' => 'monday', 'time' => '10:00', 'timezone' => 'Europe/Vilnius', 'frequency' => 'every_week'],
-            'next_run_at' => now()->addWeek(),
-            'is_active' => true,
+            'next_run_at'     => now()->addWeek(),
+            'is_active'       => true,
         ])
         ->call('create')
         ->assertHasNoFormErrors();
 
     $this->assertDatabaseHas('campaign_schedules', [
-        'campaign_id' => $campaign->id,
+        'campaign_id'   => $campaign->id,
         'schedule_type' => ScheduleType::WEEKLY->value,
-        'is_active' => true,
+        'is_active'     => true,
     ]);
 });
 
@@ -87,15 +87,15 @@ it('can edit a campaign schedule record', function () {
         ->test(CampaignScheduleResource\Pages\EditCampaignSchedule::class, ['record' => $this->testCampaignSchedule->id])
         ->fillForm([
             'schedule_type' => ScheduleType::MONTHLY->value,
-            'is_active' => false,
+            'is_active'     => false,
         ])
         ->call('save')
         ->assertHasNoFormErrors();
 
     $this->assertDatabaseHas('campaign_schedules', [
-        'id' => $this->testCampaignSchedule->id,
+        'id'            => $this->testCampaignSchedule->id,
         'schedule_type' => ScheduleType::MONTHLY->value,
-        'is_active' => false,
+        'is_active'     => false,
     ]);
 });
 
@@ -116,9 +116,9 @@ it('validates required fields', function () {
     Livewire::actingAs($this->adminUser)
         ->test(CampaignScheduleResource\Pages\CreateCampaignSchedule::class)
         ->fillForm([
-            'campaign_id' => '',
+            'campaign_id'   => '',
             'schedule_type' => '',
-            'next_run_at' => '',
+            'next_run_at'   => '',
         ])
         ->call('create')
         ->assertHasFormErrors(['campaign_id', 'schedule_type', 'next_run_at']);
@@ -163,7 +163,7 @@ it('can search campaign schedules by campaign name', function () {
 
     $this
         ->actingAs($this->adminUser)
-        ->get(CampaignScheduleResource::getUrl('index').'?search=Special')
+        ->get(CampaignScheduleResource::getUrl('index') . '?search=Special')
         ->assertOk();
 });
 
@@ -173,7 +173,7 @@ it('can sort campaign schedules by next run date', function () {
 
     $this
         ->actingAs($this->adminUser)
-        ->get(CampaignScheduleResource::getUrl('index').'?sort=next_run_at&direction=asc')
+        ->get(CampaignScheduleResource::getUrl('index') . '?sort=next_run_at&direction=asc')
         ->assertOk();
 });
 
@@ -298,11 +298,11 @@ it('shows correct schedule type badges', function () {
 it('can filter overdue schedules', function () {
     $overdueSchedule = CampaignSchedule::factory()->create([
         'next_run_at' => now()->subDay(),
-        'is_active' => true,
+        'is_active'   => true,
     ]);
     $futureSchedule = CampaignSchedule::factory()->create([
         'next_run_at' => now()->addDay(),
-        'is_active' => true,
+        'is_active'   => true,
     ]);
 
     $this
@@ -337,10 +337,10 @@ it('validates schedule configuration format', function () {
     Livewire::actingAs($this->adminUser)
         ->test(CampaignScheduleResource\Pages\CreateCampaignSchedule::class)
         ->fillForm([
-            'campaign_id' => $this->testCampaign->id,
-            'schedule_type' => ScheduleType::CUSTOM->value,
+            'campaign_id'     => $this->testCampaign->id,
+            'schedule_type'   => ScheduleType::CUSTOM->value,
             'schedule_config' => 'invalid_json',
-            'next_run_at' => now()->addDay(),
+            'next_run_at'     => now()->addDay(),
         ])
         ->call('create')
         ->assertHasNoFormErrors();
@@ -348,27 +348,27 @@ it('validates schedule configuration format', function () {
 
 it('handles campaign schedule with complex configuration', function () {
     $complexConfig = [
-        'time' => '09:00',
-        'timezone' => 'Europe/Vilnius',
-        'days' => ['monday', 'wednesday', 'friday'],
+        'time'      => '09:00',
+        'timezone'  => 'Europe/Vilnius',
+        'days'      => ['monday', 'wednesday', 'friday'],
         'frequency' => 'weekly',
     ];
 
     Livewire::actingAs($this->adminUser)
         ->test(CampaignScheduleResource\Pages\CreateCampaignSchedule::class)
         ->fillForm([
-            'campaign_id' => $this->testCampaign->id,
-            'schedule_type' => ScheduleType::CUSTOM->value,
+            'campaign_id'     => $this->testCampaign->id,
+            'schedule_type'   => ScheduleType::CUSTOM->value,
             'schedule_config' => $complexConfig,
-            'next_run_at' => now()->addWeek(),
-            'is_active' => true,
+            'next_run_at'     => now()->addWeek(),
+            'is_active'       => true,
         ])
         ->call('create')
         ->assertHasNoFormErrors();
 
     $this->assertDatabaseHas('campaign_schedules', [
-        'campaign_id' => $this->testCampaign->id,
+        'campaign_id'   => $this->testCampaign->id,
         'schedule_type' => ScheduleType::CUSTOM->value,
-        'is_active' => true,
+        'is_active'     => true,
     ]);
 });

@@ -20,7 +20,7 @@ final class PermissionFactory extends Factory
         $name = Str::slug($this->faker->unique()->sentence(2), '_');
 
         return [
-            'name' => $name,
+            'name'       => $name,
             'guard_name' => 'web',
         ];
     }

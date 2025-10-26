@@ -16,7 +16,7 @@ uses(RefreshDatabase::class);
 
 // Ensure the whitelist of assignable attributes stays aligned with the migration surface.
 it('exposes expected fillable attributes', function (): void {
-    $document = new Document();
+    $document = new Document;
 
     expect($document->getFillable())
         ->toEqualCanonicalizing([
@@ -49,11 +49,11 @@ it('exposes expected fillable attributes', function (): void {
 // Confirm casting and helper accessors transform data into predictable runtime shapes.
 it('casts attributes to their expected runtime types', function (): void {
     $document = Document::factory()->create([
-        'is_public' => true,
+        'is_public'       => true,
         'is_downloadable' => false,
-        'file_size' => 42_000,
-        'generated_at' => now()->subDay(),
-        'expires_at' => now()->addDays(10),
+        'file_size'       => 42_000,
+        'generated_at'    => now()->subDay(),
+        'expires_at'      => now()->addDays(10),
     ]);
 
     $document->refresh();
@@ -78,17 +78,17 @@ it('resolves related template, users, audit logs, and polymorphic parents', func
 
     $document = Document::factory()->create([
         'document_template_id' => $template->getKey(),
-        'documentable_type' => Order::class,
-        'documentable_id' => $order->getKey(),
-        'created_by' => $creator->getKey(),
-        'updated_by' => $updater->getKey(),
+        'documentable_type'    => Order::class,
+        'documentable_id'      => $order->getKey(),
+        'created_by'           => $creator->getKey(),
+        'updated_by'           => $updater->getKey(),
     ]);
 
     AuditLog::query()->create([
         'entity_type' => Document::class,
-        'entity_id' => (string) $document->getKey(),
-        'action' => 'created',
-        'user_id' => $creator->getKey(),
+        'entity_id'   => (string) $document->getKey(),
+        'action'      => 'created',
+        'user_id'     => $creator->getKey(),
     ]);
 
     $document->unsetRelation('auditLogs');
@@ -121,7 +121,7 @@ it('builds secure download urls when a file is present', function (): void {
 
     URL::shouldReceive('temporarySignedRoute')
         ->once()
-        ->withArgs(function (string $routeName, $expiration, array $parameters) use ($document): bool {
+        ->withArgs(function (string $routeName, $expiration, array $parameters): bool {
             return $routeName === 'media.secure-download'
                 && $expiration instanceof \DateTimeInterface
                 && ($parameters['encodedPath'] ?? null) === SecureStorage::encodePath('documents/test.pdf')
@@ -160,17 +160,17 @@ it('filters by status, format, and owning model', function (): void {
     $otherOrder = Order::factory()->create();
 
     $matching = Document::factory()->create([
-        'status' => Document::STATUS_PUBLISHED,
-        'format' => Document::FORMAT_PDF,
+        'status'            => Document::STATUS_PUBLISHED,
+        'format'            => Document::FORMAT_PDF,
         'documentable_type' => Order::class,
-        'documentable_id' => $order->getKey(),
+        'documentable_id'   => $order->getKey(),
     ]);
 
     Document::factory()->create([
-        'status' => Document::STATUS_DRAFT,
-        'format' => Document::FORMAT_HTML,
+        'status'            => Document::STATUS_DRAFT,
+        'format'            => Document::FORMAT_HTML,
         'documentable_type' => Order::class,
-        'documentable_id' => $otherOrder->getKey(),
+        'documentable_id'   => $otherOrder->getKey(),
     ]);
 
     $statusMatches = Document::query()->byStatus(Document::STATUS_PUBLISHED)->get();

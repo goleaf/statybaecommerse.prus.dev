@@ -23,9 +23,9 @@ final class CatalogIntegrityService
      * @var array<class-string<Model>, array{entity: string, foreign_key: string}>
      */
     private const TRANSLATION_MODELS = [
-        ProductTranslation::class => ['entity' => 'product', 'foreign_key' => 'product_id'],
-        CategoryTranslation::class => ['entity' => 'category', 'foreign_key' => 'category_id'],
-        BrandTranslation::class => ['entity' => 'brand', 'foreign_key' => 'brand_id'],
+        ProductTranslation::class    => ['entity' => 'product', 'foreign_key' => 'product_id'],
+        CategoryTranslation::class   => ['entity' => 'category', 'foreign_key' => 'category_id'],
+        BrandTranslation::class      => ['entity' => 'brand', 'foreign_key' => 'brand_id'],
         CollectionTranslation::class => ['entity' => 'collection', 'foreign_key' => 'collection_id'],
     ];
 
@@ -81,11 +81,11 @@ final class CatalogIntegrityService
                     ->all();
 
                 $conflicts[] = [
-                    'entity' => $meta['entity'],
-                    'locale' => (string) $duplicate->locale,
-                    'slug' => (string) $duplicate->slug,
+                    'entity'          => $meta['entity'],
+                    'locale'          => (string) $duplicate->locale,
+                    'slug'            => (string) $duplicate->slug,
                     'translation_ids' => $translationIds,
-                    'entity_ids' => $entityIds,
+                    'entity_ids'      => $entityIds,
                 ];
             }
         }
@@ -137,7 +137,7 @@ final class CatalogIntegrityService
 
                         $cycles[] = [
                             'category_ids' => $normalized,
-                            'slugs' => $slugs,
+                            'slugs'        => $slugs,
                         ];
                     }
 
@@ -286,11 +286,11 @@ final class CatalogIntegrityService
             if ($variantDiffs !== []) {
                 ksort($variantDiffs);
                 $mismatches[] = [
-                    'product_id' => (int) $productId,
-                    'product_slug' => $normalizedSlug,
-                    'expected' => $expected,
+                    'product_id'          => (int) $productId,
+                    'product_slug'        => $normalizedSlug,
+                    'expected'            => $expected,
                     'baseline_variant_id' => $baselineVariantId,
-                    'variants' => $variantDiffs,
+                    'variants'            => $variantDiffs,
                 ];
             }
         }
@@ -303,7 +303,7 @@ final class CatalogIntegrityService
     }
 
     /**
-     * @param  array<int, int>  $ids
+     * @param  array<int, int> $ids
      * @return array<int, int>
      */
     private function uniquePreservingOrder(array $ids): array
@@ -324,7 +324,7 @@ final class CatalogIntegrityService
     /**
      * Normalize a detected category cycle so that comparisons are deterministic.
      *
-     * @param  array<int, int>  $cycle
+     * @param  array<int, int> $cycle
      * @return array<int, int>
      */
     private function normalizeCycle(array $cycle): array

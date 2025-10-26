@@ -24,14 +24,14 @@ final class UserDataCreator
         $user = Auth::user();
 
         $view->with([
-            'isAuthenticated' => Auth::check(),
-            'user' => $user,
-            'userRole' => $user?->getRoleNames()->first(),
-            'userPermissions' => $user?->getAllPermissions()->pluck('name')->toArray() ?? [],
-            'isAdmin' => $user?->hasRole('admin') ?? false,
-            'isCustomer' => $user?->hasRole('customer') ?? false,
+            'isAuthenticated'   => Auth::check(),
+            'user'              => $user,
+            'userRole'          => $user?->getRoleNames()->first(),
+            'userPermissions'   => $user?->getAllPermissions()->pluck('name')->toArray() ?? [],
+            'isAdmin'           => $user?->hasRole('admin') ?? false,
+            'isCustomer'        => $user?->hasRole('customer') ?? false,
             'userNotifications' => $this->getUserNotifications($user),
-            'userPreferences' => $this->getUserPreferences($user),
+            'userPreferences'   => $this->getUserPreferences($user),
         ]);
     }
 
@@ -56,25 +56,25 @@ final class UserDataCreator
     {
         if (! $user) {
             return [
-                'locale' => app()->getLocale(),
-                'currency' => current_currency(),
-                'theme' => 'light',
+                'locale'        => app()->getLocale(),
+                'currency'      => current_currency(),
+                'theme'         => 'light',
                 'notifications' => [
                     'email' => false,
-                    'push' => false,
-                    'sms' => false,
+                    'push'  => false,
+                    'sms'   => false,
                 ],
             ];
         }
 
         return [
-            'locale' => $user->preferred_locale ?? app()->getLocale(),
-            'currency' => $user->preferred_currency ?? current_currency(),
-            'theme' => $user->theme_preference ?? 'light',
+            'locale'        => $user->preferred_locale ?? app()->getLocale(),
+            'currency'      => $user->preferred_currency ?? current_currency(),
+            'theme'         => $user->theme_preference ?? 'light',
             'notifications' => [
                 'email' => $user->email_notifications ?? true,
-                'push' => $user->push_notifications ?? false,
-                'sms' => $user->sms_notifications ?? false,
+                'push'  => $user->push_notifications ?? false,
+                'sms'   => $user->sms_notifications ?? false,
             ],
         ];
     }

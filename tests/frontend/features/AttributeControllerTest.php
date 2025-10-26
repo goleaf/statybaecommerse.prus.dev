@@ -26,8 +26,8 @@ final class AttributeControllerTest extends TestCase
     public function test_attribute_show_page_loads(): void
     {
         $attribute = Attribute::factory()->create([
-            'is_enabled' => true,
-            'name' => 'Test Attribute',
+            'is_enabled'  => true,
+            'name'        => 'Test Attribute',
             'description' => 'Test Description',
         ]);
 
@@ -54,7 +54,7 @@ final class AttributeControllerTest extends TestCase
     public function test_attribute_search_api(): void
     {
         Attribute::factory()->create([
-            'name' => 'Test Attribute',
+            'name'       => 'Test Attribute',
             'is_enabled' => true,
         ]);
 
@@ -198,8 +198,8 @@ final class AttributeControllerTest extends TestCase
     {
         $attribute = Attribute::factory()->create([
             'is_enabled' => true,
-            'name' => 'Test Attribute',
-            'type' => 'text',
+            'name'       => 'Test Attribute',
+            'type'       => 'text',
         ]);
 
         // Create related attributes

@@ -13,8 +13,8 @@ use function Pest\Livewire\livewire;
 
 beforeEach(function () {
     $this->adminUser = User::factory()->create([
-        'email' => 'admin@admin.com',
-        'name' => 'Admin User',
+        'email'    => 'admin@admin.com',
+        'name'     => 'Admin User',
         'is_admin' => true,
     ]);
 
@@ -35,20 +35,20 @@ it('can render low stock alerts widget', function () {
 it('displays products with low stock', function () {
     // Create products with different stock levels
     $lowStockProduct = Product::factory()->create([
-        'name' => 'Low Stock Product',
-        'sku' => 'LOW001',
-        'is_visible' => true,
-        'manage_stock' => true,
-        'stock_quantity' => 2,
+        'name'                => 'Low Stock Product',
+        'sku'                 => 'LOW001',
+        'is_visible'          => true,
+        'manage_stock'        => true,
+        'stock_quantity'      => 2,
         'low_stock_threshold' => 5,
     ]);
 
     $normalStockProduct = Product::factory()->create([
-        'name' => 'Normal Stock Product',
-        'sku' => 'NORMAL001',
-        'is_visible' => true,
-        'manage_stock' => true,
-        'stock_quantity' => 10,
+        'name'                => 'Normal Stock Product',
+        'sku'                 => 'NORMAL001',
+        'is_visible'          => true,
+        'manage_stock'        => true,
+        'stock_quantity'      => 10,
         'low_stock_threshold' => 5,
     ]);
 
@@ -59,11 +59,11 @@ it('displays products with low stock', function () {
 
 it('can render table columns correctly', function () {
     Product::factory()->create([
-        'name' => 'Test Product',
-        'sku' => 'TEST001',
-        'is_visible' => true,
-        'manage_stock' => true,
-        'stock_quantity' => 1,
+        'name'                => 'Test Product',
+        'sku'                 => 'TEST001',
+        'is_visible'          => true,
+        'manage_stock'        => true,
+        'stock_quantity'      => 1,
         'low_stock_threshold' => 5,
     ]);
 
@@ -76,11 +76,11 @@ it('can render table columns correctly', function () {
 
 it('can perform restock action', function () {
     $product = Product::factory()->create([
-        'name' => 'Restock Product',
-        'sku' => 'RESTOCK001',
-        'is_visible' => true,
-        'manage_stock' => true,
-        'stock_quantity' => 2,
+        'name'                => 'Restock Product',
+        'sku'                 => 'RESTOCK001',
+        'is_visible'          => true,
+        'manage_stock'        => true,
+        'stock_quantity'      => 2,
         'low_stock_threshold' => 5,
     ]);
 
@@ -94,11 +94,11 @@ it('can perform restock action', function () {
 
 it('can access edit product action', function () {
     $product = Product::factory()->create([
-        'name' => 'Edit Product',
-        'sku' => 'EDIT001',
-        'is_visible' => true,
-        'manage_stock' => true,
-        'stock_quantity' => 1,
+        'name'                => 'Edit Product',
+        'sku'                 => 'EDIT001',
+        'is_visible'          => true,
+        'manage_stock'        => true,
+        'stock_quantity'      => 1,
         'low_stock_threshold' => 5,
     ]);
 
@@ -108,20 +108,20 @@ it('can access edit product action', function () {
 
 it('shows correct stock status badges', function () {
     $outOfStockProduct = Product::factory()->create([
-        'name' => 'Out of Stock',
-        'sku' => 'OUT001',
-        'is_visible' => true,
-        'manage_stock' => true,
-        'stock_quantity' => 0,
+        'name'                => 'Out of Stock',
+        'sku'                 => 'OUT001',
+        'is_visible'          => true,
+        'manage_stock'        => true,
+        'stock_quantity'      => 0,
         'low_stock_threshold' => 5,
     ]);
 
     $lowStockProduct = Product::factory()->create([
-        'name' => 'Low Stock',
-        'sku' => 'LOW001',
-        'is_visible' => true,
-        'manage_stock' => true,
-        'stock_quantity' => 3,
+        'name'                => 'Low Stock',
+        'sku'                 => 'LOW001',
+        'is_visible'          => true,
+        'manage_stock'        => true,
+        'stock_quantity'      => 3,
         'low_stock_threshold' => 5,
     ]);
 
@@ -131,26 +131,26 @@ it('shows correct stock status badges', function () {
 
 it('only shows visible products that manage stock', function () {
     $visibleManagedProduct = Product::factory()->create([
-        'name' => 'Visible Managed',
-        'is_visible' => true,
-        'manage_stock' => true,
-        'stock_quantity' => 2,
+        'name'                => 'Visible Managed',
+        'is_visible'          => true,
+        'manage_stock'        => true,
+        'stock_quantity'      => 2,
         'low_stock_threshold' => 5,
     ]);
 
     $hiddenProduct = Product::factory()->create([
-        'name' => 'Hidden Product',
-        'is_visible' => false,
-        'manage_stock' => true,
-        'stock_quantity' => 2,
+        'name'                => 'Hidden Product',
+        'is_visible'          => false,
+        'manage_stock'        => true,
+        'stock_quantity'      => 2,
         'low_stock_threshold' => 5,
     ]);
 
     $unmanagedProduct = Product::factory()->create([
-        'name' => 'Unmanaged Product',
-        'is_visible' => true,
-        'manage_stock' => false,
-        'stock_quantity' => 2,
+        'name'                => 'Unmanaged Product',
+        'is_visible'          => true,
+        'manage_stock'        => false,
+        'stock_quantity'      => 2,
         'low_stock_threshold' => 5,
     ]);
 
@@ -161,18 +161,18 @@ it('only shows visible products that manage stock', function () {
 
 it('sorts products by stock quantity ascending', function () {
     $product1 = Product::factory()->create([
-        'name' => 'Product 1',
-        'is_visible' => true,
-        'manage_stock' => true,
-        'stock_quantity' => 3,
+        'name'                => 'Product 1',
+        'is_visible'          => true,
+        'manage_stock'        => true,
+        'stock_quantity'      => 3,
         'low_stock_threshold' => 5,
     ]);
 
     $product2 = Product::factory()->create([
-        'name' => 'Product 2',
-        'is_visible' => true,
-        'manage_stock' => true,
-        'stock_quantity' => 1,
+        'name'                => 'Product 2',
+        'is_visible'          => true,
+        'manage_stock'        => true,
+        'stock_quantity'      => 1,
         'low_stock_threshold' => 5,
     ]);
 
@@ -182,18 +182,18 @@ it('sorts products by stock quantity ascending', function () {
 
 it('can search products by name', function () {
     $searchableProduct = Product::factory()->create([
-        'name' => 'Searchable Product',
-        'is_visible' => true,
-        'manage_stock' => true,
-        'stock_quantity' => 2,
+        'name'                => 'Searchable Product',
+        'is_visible'          => true,
+        'manage_stock'        => true,
+        'stock_quantity'      => 2,
         'low_stock_threshold' => 5,
     ]);
 
     $otherProduct = Product::factory()->create([
-        'name' => 'Other Product',
-        'is_visible' => true,
-        'manage_stock' => true,
-        'stock_quantity' => 2,
+        'name'                => 'Other Product',
+        'is_visible'          => true,
+        'manage_stock'        => true,
+        'stock_quantity'      => 2,
         'low_stock_threshold' => 5,
     ]);
 
@@ -210,10 +210,10 @@ it('displays correct heading', function () {
 
 it('shows empty state when no low stock products', function () {
     Product::factory()->create([
-        'name' => 'Well Stocked Product',
-        'is_visible' => true,
-        'manage_stock' => true,
-        'stock_quantity' => 20,
+        'name'                => 'Well Stocked Product',
+        'is_visible'          => true,
+        'manage_stock'        => true,
+        'stock_quantity'      => 20,
         'low_stock_threshold' => 5,
     ]);
 

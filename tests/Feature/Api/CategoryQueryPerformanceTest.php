@@ -21,8 +21,8 @@ final class CategoryQueryPerformanceTest extends TestCase
         $roots = Category::factory()
             ->count(3)
             ->sequence(fn (int $index) => [
-                'name' => 'Kategorija '.($index + 1),
-                'slug' => 'kategorija-'.($index + 1),
+                'name'       => 'Kategorija ' . ($index + 1),
+                'slug'       => 'kategorija-' . ($index + 1),
                 'sort_order' => $index,
             ])
             ->create();
@@ -31,9 +31,9 @@ final class CategoryQueryPerformanceTest extends TestCase
             Category::factory()
                 ->count(2)
                 ->sequence(fn (int $childIndex) => [
-                    'name' => 'Subkategorija '.($index + 1).'-'.($childIndex + 1),
-                    'slug' => 'subkategorija-'.($index + 1).'-'.($childIndex + 1),
-                    'parent_id' => $root->id,
+                    'name'       => 'Subkategorija ' . ($index + 1) . '-' . ($childIndex + 1),
+                    'slug'       => 'subkategorija-' . ($index + 1) . '-' . ($childIndex + 1),
+                    'parent_id'  => $root->id,
                     'sort_order' => $childIndex,
                 ])
                 ->create();
@@ -47,6 +47,6 @@ final class CategoryQueryPerformanceTest extends TestCase
         $response->assertOk();
 
         $queries = DB::getQueryLog();
-        $this->assertLessThanOrEqual(5, count($queries), 'Category tree executed too many queries: '.count($queries));
+        $this->assertLessThanOrEqual(5, count($queries), 'Category tree executed too many queries: ' . count($queries));
     }
 }

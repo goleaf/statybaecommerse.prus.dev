@@ -26,10 +26,10 @@ final class BrandTranslationFactory extends Factory
         $name = $this->faker->company();
 
         return [
-            'brand_id' => Brand::factory(),
-            'locale' => $this->faker->randomElement(['en', 'lt', 'ru', 'de']),
-            'name' => $name,
-            'slug' => Str::slug($name),
+            'brand_id'    => Brand::factory(),
+            'locale'      => $this->faker->randomElement(['en', 'lt', 'ru', 'de']),
+            'name'        => $name,
+            'slug'        => Str::slug($name),
             'description' => $this->faker->paragraph(),
         ];
     }
@@ -40,10 +40,10 @@ final class BrandTranslationFactory extends Factory
     public function lithuanian(): static
     {
         return $this->state(fn (array $attributes) => [
-            'locale' => 'lt',
-            'name' => $this->faker->company().' (LT)',
-            'slug' => Str::slug($attributes['name'] ?? $this->faker->company()).'-lt',
-            'description' => 'Lietuviškas aprašymas: '.$this->faker->paragraph(),
+            'locale'      => 'lt',
+            'name'        => $this->faker->company() . ' (LT)',
+            'slug'        => Str::slug($attributes['name'] ?? $this->faker->company()) . '-lt',
+            'description' => 'Lietuviškas aprašymas: ' . $this->faker->paragraph(),
         ]);
     }
 
@@ -53,9 +53,9 @@ final class BrandTranslationFactory extends Factory
     public function english(): static
     {
         return $this->state(fn (array $attributes) => [
-            'locale' => 'en',
-            'name' => $attributes['name'] ?? $this->faker->company(),
-            'slug' => Str::slug($attributes['name'] ?? $this->faker->company()),
+            'locale'      => 'en',
+            'name'        => $attributes['name'] ?? $this->faker->company(),
+            'slug'        => Str::slug($attributes['name'] ?? $this->faker->company()),
             'description' => $this->faker->paragraph(),
         ]);
     }
@@ -66,10 +66,10 @@ final class BrandTranslationFactory extends Factory
     public function russian(): static
     {
         return $this->state(fn (array $attributes) => [
-            'locale' => 'ru',
-            'name' => $this->faker->company().' (RU)',
-            'slug' => Str::slug($attributes['name'] ?? $this->faker->company()).'-ru',
-            'description' => 'Русское описание: '.$this->faker->paragraph(),
+            'locale'      => 'ru',
+            'name'        => $this->faker->company() . ' (RU)',
+            'slug'        => Str::slug($attributes['name'] ?? $this->faker->company()) . '-ru',
+            'description' => 'Русское описание: ' . $this->faker->paragraph(),
         ]);
     }
 
@@ -79,10 +79,10 @@ final class BrandTranslationFactory extends Factory
     public function german(): static
     {
         return $this->state(fn (array $attributes) => [
-            'locale' => 'de',
-            'name' => $this->faker->company().' (DE)',
-            'slug' => Str::slug($attributes['name'] ?? $this->faker->company()).'-de',
-            'description' => 'Deutsche Beschreibung: '.$this->faker->paragraph(),
+            'locale'      => 'de',
+            'name'        => $this->faker->company() . ' (DE)',
+            'slug'        => Str::slug($attributes['name'] ?? $this->faker->company()) . '-de',
+            'description' => 'Deutsche Beschreibung: ' . $this->faker->paragraph(),
         ]);
     }
 }

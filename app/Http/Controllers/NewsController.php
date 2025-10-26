@@ -55,14 +55,14 @@ final class NewsController extends Controller
             $itemsView = view('news.partials.grid-items', ['newsItems' => $news])->render();
 
             return response()->json([
-                'html' => $itemsView,
+                'html'          => $itemsView,
                 'next_page_url' => $news->nextPageUrl(),
-                'has_more' => $news->hasMorePages(),
-                'meta' => [
+                'has_more'      => $news->hasMorePages(),
+                'meta'          => [
                     'current_page' => $news->currentPage(),
-                    'last_page' => $news->lastPage(),
-                    'per_page' => $news->perPage(),
-                    'total' => $news->total(),
+                    'last_page'    => $news->lastPage(),
+                    'per_page'     => $news->perPage(),
+                    'total'        => $news->total(),
                 ],
             ]);
         }

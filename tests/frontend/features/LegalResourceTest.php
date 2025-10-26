@@ -53,19 +53,19 @@ final class LegalResourceTest extends TestCase
 
         Livewire::test(LegalResource\Pages\CreateLegal::class)
             ->fillForm([
-                'key' => $newData->key,
-                'is_enabled' => $newData->is_enabled,
+                'key'          => $newData->key,
+                'is_enabled'   => $newData->is_enabled,
                 'translations' => [
                     [
-                        'locale' => 'en',
-                        'title' => 'Privacy Policy',
-                        'slug' => 'privacy-policy',
+                        'locale'  => 'en',
+                        'title'   => 'Privacy Policy',
+                        'slug'    => 'privacy-policy',
                         'content' => 'This is our privacy policy content.',
                     ],
                     [
-                        'locale' => 'lt',
-                        'title' => 'Privatumo politika',
-                        'slug' => 'privatumo-politika',
+                        'locale'  => 'lt',
+                        'title'   => 'Privatumo politika',
+                        'slug'    => 'privatumo-politika',
                         'content' => 'Čia yra mūsų privatumo politikos turinys.',
                     ],
                 ],
@@ -74,7 +74,7 @@ final class LegalResourceTest extends TestCase
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('legals', [
-            'key' => $newData->key,
+            'key'        => $newData->key,
             'is_enabled' => $newData->is_enabled,
         ]);
     }
@@ -95,7 +95,7 @@ final class LegalResourceTest extends TestCase
 
         Livewire::test(LegalResource\Pages\EditLegal::class, ['record' => $legal->getRouteKey()])
             ->fillForm([
-                'key' => $newData->key,
+                'key'        => $newData->key,
                 'is_enabled' => $newData->is_enabled,
             ])
             ->call('save')

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Models\Subscriber;
+use Exception;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\LazyCollection;
@@ -42,7 +43,7 @@ final class EmailMarketingService
     public function syncSubscriberToMailchimp(Subscriber $subscriber): bool
     {
         try {
-            $response = Http::withHeaders(['Authorization' => 'Bearer '.$this->apiKey, 'Content-Type' => 'application/json'])->post("{$this->baseUrl}/lists/{$this->listId}/members", ['email_address' => $subscriber->email, 'status' => $this->mapStatusToMailchimp($subscriber->status), 'merge_fields' => ['FNAME' => $subscriber->first_name, 'LNAME' => $subscriber->last_name, 'COMPANY' => $subscriber->company ?? '', 'PHONE' => $subscriber->phone ?? ''], 'tags' => $subscriber->interests ?? [], 'marketing_permissions' => [['marketing_permission_id' => 'email', 'enabled' => $subscriber->status === 'active']]]);
+            $response = Http::withHeaders(['Authorization' => 'Bearer ' . $this->apiKey, 'Content-Type' => 'application/json'])->post("{$this->baseUrl}/lists/{$this->listId}/members", ['email_address' => $subscriber->email, 'status' => $this->mapStatusToMailchimp($subscriber->status), 'merge_fields' => ['FNAME' => $subscriber->first_name, 'LNAME' => $subscriber->last_name, 'COMPANY' => $subscriber->company ?? '', 'PHONE' => $subscriber->phone ?? ''], 'tags' => $subscriber->interests ?? [], 'marketing_permissions' => [['marketing_permission_id' => 'email', 'enabled' => $subscriber->status === 'active']]]);
             if ($response->successful()) {
                 Log::info('Subscriber synced to Mailchimp', ['subscriber_id' => $subscriber->id, 'email' => $subscriber->email]);
 
@@ -51,7 +52,7 @@ final class EmailMarketingService
             Log::error('Failed to sync subscriber to Mailchimp', ['subscriber_id' => $subscriber->id, 'response' => $response->body()]);
 
             return false;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Exception syncing subscriber to Mailchimp', ['subscriber_id' => $subscriber->id, 'error' => $e->getMessage()]);
 
             return false;
@@ -64,7 +65,7 @@ final class EmailMarketingService
     public function createCampaign(array $campaignData): ?string
     {
         try {
-            $response = Http::withHeaders(['Authorization' => 'Bearer '.$this->apiKey, 'Content-Type' => 'application/json'])->post("{$this->baseUrl}/campaigns", ['type' => 'regular', 'recipients' => ['list_id' => $this->listId, 'segment_opts' => ['saved_segment_id' => $campaignData['segment_id'] ?? null]], 'settings' => ['subject_line' => $campaignData['subject'], 'from_name' => $campaignData['from_name'] ?? config('app.name'), 'reply_to' => $campaignData['reply_to'] ?? config('mail.from.address'), 'title' => $campaignData['title']]]);
+            $response = Http::withHeaders(['Authorization' => 'Bearer ' . $this->apiKey, 'Content-Type' => 'application/json'])->post("{$this->baseUrl}/campaigns", ['type' => 'regular', 'recipients' => ['list_id' => $this->listId, 'segment_opts' => ['saved_segment_id' => $campaignData['segment_id'] ?? null]], 'settings' => ['subject_line' => $campaignData['subject'], 'from_name' => $campaignData['from_name'] ?? config('app.name'), 'reply_to' => $campaignData['reply_to'] ?? config('mail.from.address'), 'title' => $campaignData['title']]]);
             if ($response->successful()) {
                 $data = $response->json();
                 Log::info('Campaign created in Mailchimp', ['campaign_id' => $data['id'], 'title' => $campaignData['title']]);
@@ -74,7 +75,7 @@ final class EmailMarketingService
             Log::error('Failed to create campaign in Mailchimp', ['response' => $response->body()]);
 
             return null;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Exception creating campaign in Mailchimp', ['error' => $e->getMessage()]);
 
             return null;
@@ -87,13 +88,13 @@ final class EmailMarketingService
     public function getCampaignAnalytics(string $campaignId): ?array
     {
         try {
-            $response = Http::withHeaders(['Authorization' => 'Bearer '.$this->apiKey])->get("{$this->baseUrl}/campaigns/{$campaignId}");
+            $response = Http::withHeaders(['Authorization' => 'Bearer ' . $this->apiKey])->get("{$this->baseUrl}/campaigns/{$campaignId}");
             if ($response->successful()) {
                 return $response->json();
             }
 
             return null;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Exception getting campaign analytics', ['campaign_id' => $campaignId, 'error' => $e->getMessage()]);
 
             return null;
@@ -128,7 +129,7 @@ final class EmailMarketingService
     public function getMailchimpStats(): ?array
     {
         try {
-            $response = Http::withHeaders(['Authorization' => 'Bearer '.$this->apiKey])->get("{$this->baseUrl}/lists/{$this->listId}");
+            $response = Http::withHeaders(['Authorization' => 'Bearer ' . $this->apiKey])->get("{$this->baseUrl}/lists/{$this->listId}");
             if ($response->successful()) {
                 $data = $response->json();
 
@@ -136,7 +137,7 @@ final class EmailMarketingService
             }
 
             return null;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Exception getting Mailchimp stats', ['error' => $e->getMessage()]);
 
             return null;
@@ -149,10 +150,10 @@ final class EmailMarketingService
     private function mapStatusToMailchimp(string $status): string
     {
         return match ($status) {
-            'active' => 'subscribed',
-            'inactive' => 'unsubscribed',
+            'active'       => 'subscribed',
+            'inactive'     => 'unsubscribed',
             'unsubscribed' => 'unsubscribed',
-            default => 'unsubscribed',
+            default        => 'unsubscribed',
         };
     }
 
@@ -162,7 +163,7 @@ final class EmailMarketingService
     public function createInterestSegment(string $interest): ?string
     {
         try {
-            $response = Http::withHeaders(['Authorization' => 'Bearer '.$this->apiKey, 'Content-Type' => 'application/json'])->post("{$this->baseUrl}/lists/{$this->listId}/segments", ['name' => ucfirst($interest).' Subscribers', 'options' => ['match' => 'any', 'conditions' => [['condition_type' => 'Interests', 'field' => 'interests-'.$interest, 'op' => 'interestcontains', 'value' => [$interest]]]]]);
+            $response = Http::withHeaders(['Authorization' => 'Bearer ' . $this->apiKey, 'Content-Type' => 'application/json'])->post("{$this->baseUrl}/lists/{$this->listId}/segments", ['name' => ucfirst($interest) . ' Subscribers', 'options' => ['match' => 'any', 'conditions' => [['condition_type' => 'Interests', 'field' => 'interests-' . $interest, 'op' => 'interestcontains', 'value' => [$interest]]]]]);
             if ($response->successful()) {
                 $data = $response->json();
                 Log::info('Interest segment created in Mailchimp', ['segment_id' => $data['id'], 'interest' => $interest]);
@@ -171,7 +172,7 @@ final class EmailMarketingService
             }
 
             return null;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Exception creating interest segment', ['interest' => $interest, 'error' => $e->getMessage()]);
 
             return null;

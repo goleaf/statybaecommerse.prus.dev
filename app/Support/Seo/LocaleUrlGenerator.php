@@ -6,6 +6,7 @@ namespace App\Support\Seo;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Route;
+use Throwable;
 
 final class LocaleUrlGenerator
 {
@@ -44,13 +45,13 @@ final class LocaleUrlGenerator
 
         try {
             return route($routeName, $resolvedParameters);
-        } catch (\Throwable) {
+        } catch (Throwable) {
             return null;
         }
     }
 
     /**
-     * @param  callable(string): (array|null)  $parameterResolver
+     * @param  callable(string): (array|null) $parameterResolver
      * @return array<string, string>
      */
     public function generateAlternates(string $routeName, callable $parameterResolver): array
@@ -87,15 +88,15 @@ final class LocaleUrlGenerator
         }
 
         $rest = trim(implode('/', $segments), '/');
-        $queryString = $query !== '' ? '?'.$query : '';
+        $queryString = $query !== '' ? '?' . $query : '';
 
         $links = [];
         foreach ($this->supportedLocales() as $locale) {
-            $url = $rest === '' ? url('/'.$locale) : url('/'.$locale.'/'.$rest);
-            $links[$locale] = $url.$queryString;
+            $url = $rest === '' ? url('/' . $locale) : url('/' . $locale . '/' . $rest);
+            $links[$locale] = $url . $queryString;
         }
 
-        $fallbackUrl = ($rest === '' ? url('/') : url('/'.$rest)).$queryString;
+        $fallbackUrl = ($rest === '' ? url('/') : url('/' . $rest)) . $queryString;
 
         return $this->appendDefaultLocale($links, $fallbackUrl);
     }
@@ -129,7 +130,7 @@ final class LocaleUrlGenerator
     }
 
     /**
-     * @param  array<string, string>  $links
+     * @param  array<string, string> $links
      * @return array<string, string>
      */
     private function appendDefaultLocale(array $links, ?string $fallback = null): array

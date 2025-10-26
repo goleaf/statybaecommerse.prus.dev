@@ -97,20 +97,20 @@ final class SimpleSkipWhileTest extends TestCase
         // Add 1000 invalid products first
         for ($i = 1; $i <= 1000; $i++) {
             $products->push((object) [
-                'id' => $i,
-                'name' => '',
+                'id'         => $i,
+                'name'       => '',
                 'is_visible' => false,
-                'price' => 0,
+                'price'      => 0,
             ]);
         }
 
         // Add 10 valid products at the end
         for ($i = 1001; $i <= 1010; $i++) {
             $products->push((object) [
-                'id' => $i,
-                'name' => "Valid Product {$i}",
+                'id'         => $i,
+                'name'       => "Valid Product {$i}",
                 'is_visible' => true,
-                'price' => 100,
+                'price'      => 100,
             ]);
         }
 

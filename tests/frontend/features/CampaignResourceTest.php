@@ -46,52 +46,52 @@ final class CampaignResourceTest extends TestCase
 
         $newCampaign = Campaign::factory()->make([
             'channel_id' => $channel->id,
-            'zone_id' => $zone->id,
+            'zone_id'    => $zone->id,
         ]);
 
         Livewire::test(\App\Filament\Resources\CampaignResource\Pages\CreateCampaign::class)
             ->fillForm([
-                'name' => $newCampaign->name,
-                'slug' => $newCampaign->slug,
-                'description' => $newCampaign->description,
-                'type' => $newCampaign->type,
-                'status' => $newCampaign->status,
-                'start_date' => $newCampaign->start_date,
-                'end_date' => $newCampaign->end_date,
-                'budget' => $newCampaign->budget,
-                'budget_limit' => $newCampaign->budget_limit,
-                'channel_id' => $channel->id,
-                'zone_id' => $zone->id,
-                'display_priority' => $newCampaign->display_priority,
-                'max_uses' => $newCampaign->max_uses,
-                'subject' => $newCampaign->subject,
-                'content' => $newCampaign->content,
-                'cta_text' => $newCampaign->cta_text,
-                'cta_url' => $newCampaign->cta_url,
-                'target_audience' => $newCampaign->target_audience,
-                'is_featured' => $newCampaign->is_featured,
-                'send_notifications' => $newCampaign->send_notifications,
-                'track_conversions' => $newCampaign->track_conversions,
-                'auto_start' => $newCampaign->auto_start,
-                'auto_end' => $newCampaign->auto_end,
-                'auto_pause_on_budget' => $newCampaign->auto_pause_on_budget,
-                'meta_title' => $newCampaign->meta_title,
-                'meta_description' => $newCampaign->meta_description,
-                'social_media_ready' => $newCampaign->social_media_ready,
-                'target_categories' => [$category->id],
-                'target_products' => [$product->id],
+                'name'                   => $newCampaign->name,
+                'slug'                   => $newCampaign->slug,
+                'description'            => $newCampaign->description,
+                'type'                   => $newCampaign->type,
+                'status'                 => $newCampaign->status,
+                'start_date'             => $newCampaign->start_date,
+                'end_date'               => $newCampaign->end_date,
+                'budget'                 => $newCampaign->budget,
+                'budget_limit'           => $newCampaign->budget_limit,
+                'channel_id'             => $channel->id,
+                'zone_id'                => $zone->id,
+                'display_priority'       => $newCampaign->display_priority,
+                'max_uses'               => $newCampaign->max_uses,
+                'subject'                => $newCampaign->subject,
+                'content'                => $newCampaign->content,
+                'cta_text'               => $newCampaign->cta_text,
+                'cta_url'                => $newCampaign->cta_url,
+                'target_audience'        => $newCampaign->target_audience,
+                'is_featured'            => $newCampaign->is_featured,
+                'send_notifications'     => $newCampaign->send_notifications,
+                'track_conversions'      => $newCampaign->track_conversions,
+                'auto_start'             => $newCampaign->auto_start,
+                'auto_end'               => $newCampaign->auto_end,
+                'auto_pause_on_budget'   => $newCampaign->auto_pause_on_budget,
+                'meta_title'             => $newCampaign->meta_title,
+                'meta_description'       => $newCampaign->meta_description,
+                'social_media_ready'     => $newCampaign->social_media_ready,
+                'target_categories'      => [$category->id],
+                'target_products'        => [$product->id],
                 'target_customer_groups' => [$customerGroup->id],
             ])
             ->call('create')
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('discount_campaigns', [
-            'name' => $newCampaign->name,
-            'slug' => $newCampaign->slug,
-            'type' => $newCampaign->type,
-            'status' => $newCampaign->status,
+            'name'       => $newCampaign->name,
+            'slug'       => $newCampaign->slug,
+            'type'       => $newCampaign->type,
+            'status'     => $newCampaign->status,
             'channel_id' => $channel->id,
-            'zone_id' => $zone->id,
+            'zone_id'    => $zone->id,
         ]);
 
         $campaign = Campaign::where('slug', $newCampaign->slug)->first();
@@ -119,18 +119,18 @@ final class CampaignResourceTest extends TestCase
             'record' => $campaign->getRouteKey(),
         ])
             ->fillForm([
-                'name' => 'Updated Campaign Name',
+                'name'       => 'Updated Campaign Name',
                 'channel_id' => $channel->id,
-                'budget' => 2000.0,
+                'budget'     => 2000.0,
             ])
             ->call('save')
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('discount_campaigns', [
-            'id' => $campaign->id,
-            'name' => 'Updated Campaign Name',
+            'id'         => $campaign->id,
+            'name'       => 'Updated Campaign Name',
             'channel_id' => $channel->id,
-            'budget' => 2000.0,
+            'budget'     => 2000.0,
         ]);
     }
 
@@ -154,7 +154,7 @@ final class CampaignResourceTest extends TestCase
             ->callTableAction('activate', $campaign);
 
         $this->assertDatabaseHas('discount_campaigns', [
-            'id' => $campaign->id,
+            'id'     => $campaign->id,
             'status' => 'active',
         ]);
     }
@@ -167,7 +167,7 @@ final class CampaignResourceTest extends TestCase
             ->callTableAction('pause', $campaign);
 
         $this->assertDatabaseHas('discount_campaigns', [
-            'id' => $campaign->id,
+            'id'     => $campaign->id,
             'status' => 'paused',
         ]);
     }
@@ -220,9 +220,9 @@ final class CampaignResourceTest extends TestCase
     public function test_can_filter_active_campaigns(): void
     {
         $activeCampaign = Campaign::factory()->create([
-            'status' => 'active',
+            'status'    => 'active',
             'starts_at' => now()->subDay(),
-            'ends_at' => now()->addDay(),
+            'ends_at'   => now()->addDay(),
         ]);
         $inactiveCampaign = Campaign::factory()->create(['status' => 'paused']);
 
@@ -246,11 +246,11 @@ final class CampaignResourceTest extends TestCase
     public function test_can_filter_expired_campaigns(): void
     {
         $expiredCampaign = Campaign::factory()->create([
-            'status' => 'active',
+            'status'  => 'active',
             'ends_at' => now()->subDay(),
         ]);
         $activeCampaign = Campaign::factory()->create([
-            'status' => 'active',
+            'status'  => 'active',
             'ends_at' => now()->addDay(),
         ]);
 
@@ -280,7 +280,7 @@ final class CampaignResourceTest extends TestCase
 
         foreach ($campaigns as $campaign) {
             $this->assertDatabaseHas('discount_campaigns', [
-                'id' => $campaign->id,
+                'id'     => $campaign->id,
                 'status' => 'active',
             ]);
         }
@@ -295,7 +295,7 @@ final class CampaignResourceTest extends TestCase
 
         foreach ($campaigns as $campaign) {
             $this->assertDatabaseHas('discount_campaigns', [
-                'id' => $campaign->id,
+                'id'     => $campaign->id,
                 'status' => 'paused',
             ]);
         }
@@ -351,8 +351,8 @@ final class CampaignResourceTest extends TestCase
     {
         Livewire::test(\App\Filament\Resources\CampaignResource\Pages\CreateCampaign::class)
             ->fillForm([
-                'name' => 'Test Campaign Name',
-                'type' => 'email',
+                'name'   => 'Test Campaign Name',
+                'type'   => 'email',
                 'status' => 'draft',
             ])
             ->call('create')
@@ -368,11 +368,11 @@ final class CampaignResourceTest extends TestCase
     {
         Livewire::test(\App\Filament\Resources\CampaignResource\Pages\CreateCampaign::class)
             ->fillForm([
-                'name' => 'Test Campaign',
-                'type' => 'email',
-                'status' => 'draft',
+                'name'       => 'Test Campaign',
+                'type'       => 'email',
+                'status'     => 'draft',
                 'start_date' => now()->addDay(),
-                'end_date' => now()->subDay(),
+                'end_date'   => now()->subDay(),
             ])
             ->call('create')
             ->assertHasFormErrors(['end_date']);
@@ -382,8 +382,8 @@ final class CampaignResourceTest extends TestCase
     {
         Livewire::test(\App\Filament\Resources\CampaignResource\Pages\CreateCampaign::class)
             ->fillForm([
-                'name' => 'Test Campaign',
-                'type' => 'email',
+                'name'   => 'Test Campaign',
+                'type'   => 'email',
                 'status' => 'draft',
                 'budget' => 'invalid',
             ])
@@ -395,8 +395,8 @@ final class CampaignResourceTest extends TestCase
     {
         Livewire::test(\App\Filament\Resources\CampaignResource\Pages\CreateCampaign::class)
             ->fillForm([
-                'name' => 'Test Campaign',
-                'type' => 'email',
+                'name'   => 'Test Campaign',
+                'type'   => 'email',
                 'status' => 'draft',
                 'budget' => -100,
             ])
@@ -410,9 +410,9 @@ final class CampaignResourceTest extends TestCase
 
         Livewire::test(\App\Filament\Resources\CampaignResource\Pages\CreateCampaign::class)
             ->fillForm([
-                'name' => 'Test Campaign',
-                'slug' => 'existing-slug',
-                'type' => 'email',
+                'name'   => 'Test Campaign',
+                'slug'   => 'existing-slug',
+                'type'   => 'email',
                 'status' => 'draft',
             ])
             ->call('create')
@@ -423,9 +423,9 @@ final class CampaignResourceTest extends TestCase
     {
         Livewire::test(\App\Filament\Resources\CampaignResource\Pages\CreateCampaign::class)
             ->fillForm([
-                'name' => 'Test Campaign',
-                'slug' => 'invalid slug!',
-                'type' => 'email',
+                'name'   => 'Test Campaign',
+                'slug'   => 'invalid slug!',
+                'type'   => 'email',
                 'status' => 'draft',
             ])
             ->call('create')
@@ -436,9 +436,9 @@ final class CampaignResourceTest extends TestCase
     {
         Livewire::test(\App\Filament\Resources\CampaignResource\Pages\CreateCampaign::class)
             ->fillForm([
-                'name' => 'Test Campaign',
-                'type' => 'email',
-                'status' => 'draft',
+                'name'    => 'Test Campaign',
+                'type'    => 'email',
+                'status'  => 'draft',
                 'cta_url' => 'invalid-url',
             ])
             ->call('create')
@@ -455,7 +455,7 @@ final class CampaignResourceTest extends TestCase
             ->callTableAction('restore', $campaign);
 
         $this->assertDatabaseHas('discount_campaigns', [
-            'id' => $campaign->id,
+            'id'         => $campaign->id,
             'deleted_at' => null,
         ]);
     }

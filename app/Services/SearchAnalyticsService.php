@@ -44,7 +44,7 @@ final class SearchAnalyticsService
      */
     public function getPopularSearches(int $limit = 10): array
     {
-        return Cache::remember(self::POPULAR_SEARCHES_CACHE_KEY."_{$limit}", self::CACHE_TTL, function () {
+        return Cache::remember(self::POPULAR_SEARCHES_CACHE_KEY . "_{$limit}", self::CACHE_TTL, function () {
             // This would typically come from database
             // For now, return cached popular searches
             return [['query' => 'laptop', 'count' => 150, 'result_count' => 45], ['query' => 'smartphone', 'count' => 120, 'result_count' => 38], ['query' => 'headphones', 'count' => 95, 'result_count' => 22], ['query' => 'camera', 'count' => 80, 'result_count' => 15], ['query' => 'tablet', 'count' => 70, 'result_count' => 18]];
@@ -56,7 +56,7 @@ final class SearchAnalyticsService
      */
     public function getNoResultSearches(int $limit = 10): array
     {
-        return Cache::remember(self::NO_RESULT_SEARCHES_CACHE_KEY."_{$limit}", self::CACHE_TTL, function () {
+        return Cache::remember(self::NO_RESULT_SEARCHES_CACHE_KEY . "_{$limit}", self::CACHE_TTL, function () {
             // This would typically come from database
             return [['query' => 'xyz123', 'count' => 5], ['query' => 'nonexistent', 'count' => 3], ['query' => 'test123', 'count' => 2]];
         });
@@ -67,7 +67,7 @@ final class SearchAnalyticsService
      */
     public function getSearchTrends(int $days = 7): array
     {
-        return Cache::remember(self::SEARCH_TRENDS_CACHE_KEY."_{$days}", self::CACHE_TTL, function () use ($days) {
+        return Cache::remember(self::SEARCH_TRENDS_CACHE_KEY . "_{$days}", self::CACHE_TTL, function () use ($days) {
             // This would typically come from database
             $trends = [];
             for ($i = $days - 1; $i >= 0; $i--) {
@@ -155,7 +155,7 @@ final class SearchAnalyticsService
     /**
      * Handle getTotalSearches functionality with proper error handling.
      *
-     * @param  DateTime  $since
+     * @param DateTime $since
      */
     public function getTotalSearches(\DateTime $since): int
     {
@@ -167,7 +167,7 @@ final class SearchAnalyticsService
     /**
      * Handle getUniqueSearches functionality with proper error handling.
      *
-     * @param  DateTime  $since
+     * @param DateTime $since
      */
     public function getUniqueSearches(\DateTime $since): int
     {
@@ -179,7 +179,7 @@ final class SearchAnalyticsService
     /**
      * Handle getNoResultSearchesCount functionality with proper error handling.
      *
-     * @param  DateTime  $since
+     * @param DateTime $since
      */
     public function getNoResultSearchesCount(\DateTime $since): int
     {
@@ -191,7 +191,7 @@ final class SearchAnalyticsService
     /**
      * Handle getAverageResultsPerSearch functionality with proper error handling.
      *
-     * @param  DateTime  $since
+     * @param DateTime $since
      */
     public function getAverageResultsPerSearch(\DateTime $since): float
     {
@@ -203,11 +203,11 @@ final class SearchAnalyticsService
     /**
      * Handle getPopularSearchesForDateRange functionality with proper error handling.
      *
-     * @param  DateTime|null  $since
+     * @param DateTime|null $since
      */
     public function getPopularSearchesForDateRange(int $limit = 10, ?\DateTime $since = null): array
     {
-        $cacheKey = "search_analytics_popular_{$limit}_".($since ? $since->format('Y-m-d') : 'all');
+        $cacheKey = "search_analytics_popular_{$limit}_" . ($since ? $since->format('Y-m-d') : 'all');
 
         return Cache::remember($cacheKey, 1800, function () use ($limit, $since) {
             $query = DB::table('search_analytics')->select('query', DB::raw('COUNT(*) as search_count'), DB::raw('AVG(result_count) as avg_results'))->groupBy('query')->orderBy('search_count', 'desc')->limit($limit);

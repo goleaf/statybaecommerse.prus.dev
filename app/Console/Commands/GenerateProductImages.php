@@ -9,6 +9,7 @@ use App\Services\Images\ProductImageService;
 use App\Services\Images\WebPConversionService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
+use Throwable;
 
 final class GenerateProductImages extends Command
 {
@@ -22,7 +23,7 @@ final class GenerateProductImages extends Command
 
     public function handle(): int
     {
-        $this->info('🎨 '.__('translations.generate_images').'...');
+        $this->info('🎨 ' . __('translations.generate_images') . '...');
 
         if ($this->option('convert-existing')) {
             $this->convertExistingImages();
@@ -30,7 +31,7 @@ final class GenerateProductImages extends Command
 
         $this->generateNewImages();
 
-        $this->info('✅ '.__('translations.image_generated').'!');
+        $this->info('✅ ' . __('translations.image_generated') . '!');
 
         return self::SUCCESS;
     }
@@ -95,14 +96,14 @@ final class GenerateProductImages extends Command
                         $product
                             ->addMedia($imagePath)
                             ->withCustomProperties([
-                                'generated' => true,
+                                'generated'    => true,
                                 'product_name' => $product->name,
                                 'image_number' => $i + 1,
-                                'alt_text' => __('translations.product_image_alt', ['name' => $product->name, 'number' => $i + 1]),
+                                'alt_text'     => __('translations.product_image_alt', ['name' => $product->name, 'number' => $i + 1]),
                                 'generated_at' => now()->toISOString(),
                             ])
-                            ->usingName($product->name.' - '.__('translations.image').' '.($i + 1))
-                            ->usingFileName('product_'.$product->id.'_cmd_'.($i + 1).'.webp')
+                            ->usingName($product->name . ' - ' . __('translations.image') . ' ' . ($i + 1))
+                            ->usingFileName('product_' . $product->id . '_cmd_' . ($i + 1) . '.webp')
                             ->toMediaCollection('images');
 
                         if (file_exists($imagePath)) {
@@ -111,9 +112,9 @@ final class GenerateProductImages extends Command
                     }
 
                     $successCount++;
-                } catch (\Throwable $e) {
+                } catch (Throwable $e) {
                     $errorCount++;
-                    $this->error("Failed to generate images for product {$product->id}: ".$e->getMessage());
+                    $this->error("Failed to generate images for product {$product->id}: " . $e->getMessage());
                 }
 
                 $progressBar->advance();

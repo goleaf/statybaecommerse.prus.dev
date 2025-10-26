@@ -17,9 +17,8 @@ final class AdjustStockRequest extends FormRequest
     {
         return [
             'quantity' => ['required', 'integer'],
-            'reason' => ['required', 'string', 'in:sale,return,adjustment,manual_adjustment,restock,damage,theft,transfer'],
-            'notes' => ['nullable', 'string', 'max:1000'],
+            'reason'   => ['required', 'string', 'in:sale,return,adjustment,manual_adjustment,restock,damage,theft,transfer'],
+            'notes'    => ['nullable', 'string', 'max:1000'],
         ];
     }
 }
-

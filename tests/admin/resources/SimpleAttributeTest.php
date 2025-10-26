@@ -23,8 +23,8 @@ final class SimpleAttributeTest extends TestCase
     public function test_can_create_attribute(): void
     {
         $attribute = Attribute::factory()->create([
-            'name' => 'Test Attribute',
-            'type' => 'text',
+            'name'      => 'Test Attribute',
+            'type'      => 'text',
             'is_active' => true,
         ]);
 

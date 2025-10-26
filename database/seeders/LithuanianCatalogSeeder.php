@@ -8,6 +8,7 @@ use App\Models\Category;
 use App\Services\Images\LocalImageGeneratorService;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
+use Throwable;
 
 final class LithuanianCatalogSeeder extends Seeder
 {
@@ -22,41 +23,41 @@ final class LithuanianCatalogSeeder extends Seeder
     {
         $categories = [
             [
-                'name' => 'Sandarinimo plėvelės ir juostos',
-                'slug' => 'sandarinimo-pleveles-ir-juostos',
+                'name'        => 'Sandarinimo plėvelės ir juostos',
+                'slug'        => 'sandarinimo-pleveles-ir-juostos',
                 'description' => 'Sandarinimo sprendimai: juostos, plėvelės, hidroizoliacija ir priedai.',
-                'sort_order' => 1,
-                'image_url' => 'local://category/sandarinimo-pleveles-ir-juostos.webp',
-                'children' => [
+                'sort_order'  => 1,
+                'image_url'   => 'local://category/sandarinimo-pleveles-ir-juostos.webp',
+                'children'    => [
                     [
-                        'name' => 'Juostos',
-                        'slug' => 'juostos',
+                        'name'        => 'Juostos',
+                        'slug'        => 'juostos',
                         'description' => 'Sandarinimo juostos vidaus ir lauko darbams.',
-                        'sort_order' => 1,
-                        'image_url' => 'local://category/juostos.webp',
-                        'children' => [
+                        'sort_order'  => 1,
+                        'image_url'   => 'local://category/juostos.webp',
+                        'children'    => [
                             ['name' => 'Laukui', 'slug' => 'laukui', 'description' => 'Juostos, skirtos naudoti lauko sąlygomis.', 'sort_order' => 1, 'image_url' => 'local://category/juostos-laukui.webp'],
                             ['name' => 'Vidui', 'slug' => 'vidui', 'description' => 'Juostos, skirtos vidaus darbams ir patalpoms.', 'sort_order' => 2, 'image_url' => 'local://category/juostos-vidui.webp'],
                         ],
                     ],
                     [
-                        'name' => 'Plėvelės',
-                        'slug' => 'pleveles',
+                        'name'        => 'Plėvelės',
+                        'slug'        => 'pleveles',
                         'description' => 'Sandarinimo plėvelės vidaus ir išorės darbams.',
-                        'sort_order' => 2,
-                        'image_url' => 'local://category/pleveles.webp',
-                        'children' => [
+                        'sort_order'  => 2,
+                        'image_url'   => 'local://category/pleveles.webp',
+                        'children'    => [
                             ['name' => 'Vidui', 'slug' => 'pleveles-vidui', 'description' => 'Plėvelės, skirtos naudoti patalpų viduje.', 'sort_order' => 1, 'image_url' => 'local://category/pleveles-vidui.webp'],
                             ['name' => 'Išorei', 'slug' => 'pleveles-isorei', 'description' => 'Plėvelės, skirtos naudoti lauko sąlygomis.', 'sort_order' => 2, 'image_url' => 'local://category/pleveles-isorei.webp'],
                         ],
                     ],
                     [
-                        'name' => 'Pamatų hidroizoliacija',
-                        'slug' => 'pamatu-hidroizoliacija',
+                        'name'        => 'Pamatų hidroizoliacija',
+                        'slug'        => 'pamatu-hidroizoliacija',
                         'description' => 'Pamatų hidroizoliacijos sprendimai horizontaliai ir vertikaliai apsaugai.',
-                        'sort_order' => 3,
-                        'image_url' => 'local://category/pamatu-hidroizoliacija.webp',
-                        'children' => [
+                        'sort_order'  => 3,
+                        'image_url'   => 'local://category/pamatu-hidroizoliacija.webp',
+                        'children'    => [
                             ['name' => 'Horizontali', 'slug' => 'hidroizoliacija-horizontali', 'description' => 'Horizontali pamatų hidroizoliacija.', 'sort_order' => 1, 'image_url' => 'local://category/hidroizoliacija-horizontali.webp'],
                             ['name' => 'Vertikali', 'slug' => 'hidroizoliacija-vertikali', 'description' => 'Vertikali pamatų hidroizoliacija.', 'sort_order' => 2, 'image_url' => 'local://category/hidroizoliacija-vertikali.webp'],
                         ],
@@ -66,19 +67,19 @@ final class LithuanianCatalogSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Tvirtinimo elementai, varžtai, medvarsčiai',
-                'slug' => 'tvirtinimo-elementai-varztai-medvarzciai',
+                'name'        => 'Tvirtinimo elementai, varžtai, medvarsčiai',
+                'slug'        => 'tvirtinimo-elementai-varztai-medvarzciai',
                 'description' => 'Platus tvirtinimo elementų, varžtų ir medvaržčių asortimentas.',
-                'sort_order' => 2,
-                'image_url' => 'local://category/tvirtinimo-elementai.webp',
-                'children' => [
+                'sort_order'  => 2,
+                'image_url'   => 'local://category/tvirtinimo-elementai.webp',
+                'children'    => [
                     [
-                        'name' => 'Medvarsčiai',
-                        'slug' => 'medvarzciai',
+                        'name'        => 'Medvarsčiai',
+                        'slug'        => 'medvarzciai',
                         'description' => 'Medienai skirti varžtai – įvairių tipų ir paskirčių.',
-                        'sort_order' => 1,
-                        'image_url' => 'local://category/medvarzciai.webp',
-                        'children' => [
+                        'sort_order'  => 1,
+                        'image_url'   => 'local://category/medvarzciai.webp',
+                        'children'    => [
                             ['name' => 'Įleidžiama galvute', 'slug' => 'ileidziama-galvute', 'description' => 'Su įleidžiama galvute, švariam paviršiui.', 'sort_order' => 1, 'image_url' => 'local://category/ileidziama-galvute.webp'],
                             ['name' => 'Plokščia galvute', 'slug' => 'plokscia-galvute', 'description' => 'Plokščios galvutės medvaržčiai bendram naudojimui.', 'sort_order' => 2, 'image_url' => 'local://category/plokscia-galvute.webp'],
                             ['name' => 'Pusapvale galvute', 'slug' => 'pusapvale-galvute', 'description' => 'Pusapvalės galvutės sprendimai.', 'sort_order' => 3, 'image_url' => 'local://category/pusapvale-galvute.webp'],
@@ -91,12 +92,12 @@ final class LithuanianCatalogSeeder extends Seeder
                         ],
                     ],
                     [
-                        'name' => 'Tvirtinimas į betoną, mūrą',
-                        'slug' => 'tvirtinimas-i-betona-mura',
+                        'name'        => 'Tvirtinimas į betoną, mūrą',
+                        'slug'        => 'tvirtinimas-i-betona-mura',
                         'description' => 'Sprendimai tvirtinimui į betoną, mūrą bei kitus kietus pagrindus.',
-                        'sort_order' => 2,
-                        'image_url' => 'local://category/tvirtinimas-betonas-muras.webp',
-                        'children' => [
+                        'sort_order'  => 2,
+                        'image_url'   => 'local://category/tvirtinimas-betonas-muras.webp',
+                        'children'    => [
                             ['name' => 'Su plastikiniu kaiščiu', 'slug' => 'plastikinis-kaiscius', 'description' => 'Klasikiniai plastikiniai kaiščiai.', 'sort_order' => 1, 'image_url' => 'local://category/plastikinis-kaiscius.webp'],
                             ['name' => 'Su nailoniniu kaiščiu', 'slug' => 'nailoninis-kaiscius', 'description' => 'Aukšto patvarumo nailoniniai kaiščiai.', 'sort_order' => 2, 'image_url' => 'local://category/nailoninis-kaiscius.webp'],
                             ['name' => 'Inkariniai', 'slug' => 'inkariniai', 'description' => 'Inkariniai tvirtinimo elementai.', 'sort_order' => 3, 'image_url' => 'local://category/inkariniai.webp'],
@@ -107,12 +108,12 @@ final class LithuanianCatalogSeeder extends Seeder
                         ],
                     ],
                     [
-                        'name' => 'Medžio konstrukcijų tvirtinimas',
-                        'slug' => 'medzio-konstrukciju-tvirtinimas',
+                        'name'        => 'Medžio konstrukcijų tvirtinimas',
+                        'slug'        => 'medzio-konstrukciju-tvirtinimas',
                         'description' => 'Plokštelės, kampai, sijų atramos ir kiti sprendimai medienai.',
-                        'sort_order' => 3,
-                        'image_url' => 'local://category/medzio-konstrukciju-tvirtinimas.webp',
-                        'children' => [
+                        'sort_order'  => 3,
+                        'image_url'   => 'local://category/medzio-konstrukciju-tvirtinimas.webp',
+                        'children'    => [
                             ['name' => 'Plokštelės', 'slug' => 'ploksteles', 'description' => 'Tvirtinimo plokštelės įvairioms jungtims.', 'sort_order' => 1, 'image_url' => 'local://category/ploksteles.webp'],
                             ['name' => 'Kampai', 'slug' => 'kampai', 'description' => 'Kampai medžio jungtims sutvirtinti.', 'sort_order' => 2, 'image_url' => 'local://category/kampai.webp'],
                             ['name' => 'Sijų atrama', 'slug' => 'siju-atrama', 'description' => 'Atramos sijos tvirtesniam sujungimui.', 'sort_order' => 3, 'image_url' => 'local://category/siju-atrama.webp'],
@@ -125,23 +126,23 @@ final class LithuanianCatalogSeeder extends Seeder
                     ['name' => 'Sriegiai, varžtai, veržlės, poveržlės', 'slug' => 'sriegiai-varztai-verzles-poverzles', 'description' => 'Sriegiai ir tvirtinimo detalės.', 'sort_order' => 4, 'image_url' => 'local://category/sriegiai-ir-detales.webp'],
                     ['name' => 'Kniedės', 'slug' => 'kniedes', 'description' => 'Kniedės ir kniedijimo sprendimai.', 'sort_order' => 5, 'image_url' => 'local://category/kniedes.webp'],
                     [
-                        'name' => 'Vinys, kabės',
-                        'slug' => 'vinys-kabes',
+                        'name'        => 'Vinys, kabės',
+                        'slug'        => 'vinys-kabes',
                         'description' => 'Palaidos ir pistoletinės vinys bei kabės.',
-                        'sort_order' => 6,
-                        'image_url' => 'local://category/vinys-kabes.webp',
-                        'children' => [
+                        'sort_order'  => 6,
+                        'image_url'   => 'local://category/vinys-kabes.webp',
+                        'children'    => [
                             ['name' => 'Palaidos', 'slug' => 'palaidos', 'description' => 'Palaidos vinys ir kabės.', 'sort_order' => 1, 'image_url' => 'local://category/palaidos-vinys.webp'],
                             ['name' => 'Pistoletinės', 'slug' => 'pistoletines', 'description' => 'Pistoletams skirtos vinys ir kabės.', 'sort_order' => 2, 'image_url' => 'local://category/pistoletines-vinys.webp'],
                         ],
                     ],
                     [
-                        'name' => 'Lengvas tvirtinimas',
-                        'slug' => 'lengvas-tvirtinimas',
+                        'name'        => 'Lengvas tvirtinimas',
+                        'slug'        => 'lengvas-tvirtinimas',
                         'description' => 'Lengvo tvirtinimo sprendimai gipsui, izoliacijai ir kt.',
-                        'sort_order' => 7,
-                        'image_url' => 'local://category/lengvas-tvirtinimas.webp',
-                        'children' => [
+                        'sort_order'  => 7,
+                        'image_url'   => 'local://category/lengvas-tvirtinimas.webp',
+                        'children'    => [
                             ['name' => 'Gipsui', 'slug' => 'gipsui', 'description' => 'Tvirtinimo elementai gipso plokštėms.', 'sort_order' => 1, 'image_url' => 'local://category/gipsui.webp'],
                             ['name' => 'Į termoizoliaciją', 'slug' => 'i-termoizoliacija', 'description' => 'Tvirtinimas į termoizoliacines medžiagas.', 'sort_order' => 2, 'image_url' => 'local://category/i-termoizoliacija.webp'],
                             ['name' => 'Laikikliai ir kt.', 'slug' => 'laikikliai-ir-kt', 'description' => 'Laikikliai ir kiti priedai.', 'sort_order' => 3, 'image_url' => 'local://category/laikikliai-ir-kt.webp'],
@@ -154,23 +155,23 @@ final class LithuanianCatalogSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Įsukami, įkalami poliai',
-                'slug' => 'isukami-ikalami-poliai',
+                'name'        => 'Įsukami, įkalami poliai',
+                'slug'        => 'isukami-ikalami-poliai',
                 'description' => 'Poliai pamatams ir konstrukcijoms – įsukami ir įkalami.',
-                'sort_order' => 3,
-                'image_url' => 'local://category/poliai.webp',
-                'children' => [
+                'sort_order'  => 3,
+                'image_url'   => 'local://category/poliai.webp',
+                'children'    => [
                     ['name' => 'HDG', 'slug' => 'hdg', 'description' => 'Cinkuoti poliai HDG.', 'sort_order' => 1, 'image_url' => 'local://category/hdg.webp'],
                     ['name' => 'HEX HDG', 'slug' => 'hex-hdg', 'description' => 'HEX tipo cinkuoti poliai.', 'sort_order' => 2, 'image_url' => 'local://category/hex-hdg.webp'],
                 ],
             ],
             [
-                'name' => 'Chemija statyboms',
-                'slug' => 'chemija-statyboms',
+                'name'        => 'Chemija statyboms',
+                'slug'        => 'chemija-statyboms',
                 'description' => 'Statybinė chemija: putos, klijai, hermetikai, dažai ir kt.',
-                'sort_order' => 4,
-                'image_url' => 'local://category/chemija-statyboms.webp',
-                'children' => [
+                'sort_order'  => 4,
+                'image_url'   => 'local://category/chemija-statyboms.webp',
+                'children'    => [
                     ['name' => 'Klijuojančios putos', 'slug' => 'klijuojancios-putos', 'description' => 'Klijavimui skirtos poliuretano putos.', 'sort_order' => 1, 'image_url' => 'local://category/klijuojancios-putos.webp'],
                     ['name' => 'Montavimo putos', 'slug' => 'montavimo-putos', 'description' => 'Montavimui ir sandarinimui skirtos putos.', 'sort_order' => 2, 'image_url' => 'local://category/montavimo-putos.webp'],
                     ['name' => 'Purškiama termoizoliacija', 'slug' => 'purskiama-termoizoliacija', 'description' => 'Purškiamos izoliacijos sprendimai.', 'sort_order' => 3, 'image_url' => 'local://category/purskiama-termoizoliacija.webp'],
@@ -186,12 +187,12 @@ final class LithuanianCatalogSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Įrankiai ir jų priedai',
-                'slug' => 'irankiai-ir-ju-priedai',
+                'name'        => 'Įrankiai ir jų priedai',
+                'slug'        => 'irankiai-ir-ju-priedai',
                 'description' => 'Profesionalūs įrankiai ir priedai darbams atlikti.',
-                'sort_order' => 5,
-                'image_url' => 'local://category/irankiai.webp',
-                'children' => [
+                'sort_order'  => 5,
+                'image_url'   => 'local://category/irankiai.webp',
+                'children'    => [
                     ['name' => 'Pieštukai', 'slug' => 'piestukai', 'description' => 'Žymėjimo pieštukai.', 'sort_order' => 1, 'image_url' => 'local://category/piestukai.webp'],
                     ['name' => 'Matavimo', 'slug' => 'matavimo', 'description' => 'Matavimo priemonės ir įrankiai.', 'sort_order' => 2, 'image_url' => 'local://category/matavimo.webp'],
                     ['name' => 'Armatūrai rišti', 'slug' => 'armaturai-risti', 'description' => 'Įrankiai armatūrai rišti.', 'sort_order' => 3, 'image_url' => 'local://category/armaturai-risti.webp'],
@@ -209,20 +210,20 @@ final class LithuanianCatalogSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Stogų danga ir priedai',
-                'slug' => 'stogu-danga-ir-priedai',
+                'name'        => 'Stogų danga ir priedai',
+                'slug'        => 'stogu-danga-ir-priedai',
                 'description' => 'Stogo dangos, EPDM ir visi reikalingi priedai.',
-                'sort_order' => 6,
-                'image_url' => 'local://category/stogu-danga-priedai.webp',
-                'children' => [
+                'sort_order'  => 6,
+                'image_url'   => 'local://category/stogu-danga-priedai.webp',
+                'children'    => [
                     ['name' => 'EPDM medžiaga ir įrankiai montavimui', 'slug' => 'epdm-medziaga-ir-irankiai-montavimui', 'description' => 'EPDM membranos ir jų montavimo įrankiai.', 'sort_order' => 1, 'image_url' => 'local://category/epdm-medziaga-irankiai.webp'],
                     [
-                        'name' => 'Stogų priedai',
-                        'slug' => 'stogu-priedai',
+                        'name'        => 'Stogų priedai',
+                        'slug'        => 'stogu-priedai',
                         'description' => 'Ventiliacija, apsaugos ir sandarinimas stogams.',
-                        'sort_order' => 2,
-                        'image_url' => 'local://category/stogu-priedai.webp',
-                        'children' => [
+                        'sort_order'  => 2,
+                        'image_url'   => 'local://category/stogu-priedai.webp',
+                        'children'    => [
                             ['name' => 'Ventiliuojami profiliai', 'slug' => 'ventiliuojami-profiliai', 'description' => 'Ventiliuojami profiliai stogams.', 'sort_order' => 1, 'image_url' => 'local://category/ventiliuojami-profiliai.webp'],
                             ['name' => 'Paukščių užtvaros', 'slug' => 'pauksciu-uztvaros', 'description' => 'Apsaugos nuo paukščių stogui.', 'sort_order' => 2, 'image_url' => 'local://category/pauksciu-uztvaros.webp'],
                             ['name' => 'Latakų apsauga', 'slug' => 'lataku-apsauga', 'description' => 'Latakų apsaugos sprendimai.', 'sort_order' => 3, 'image_url' => 'local://category/lataku-apsauga.webp'],
@@ -233,27 +234,27 @@ final class LithuanianCatalogSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Fasadams',
-                'slug' => 'fasadams',
+                'name'        => 'Fasadams',
+                'slug'        => 'fasadams',
                 'description' => 'Ventiliuojami ir kiti fasadų sprendimai bei priedai.',
-                'sort_order' => 7,
-                'image_url' => 'local://category/fasadams.webp',
-                'children' => [
+                'sort_order'  => 7,
+                'image_url'   => 'local://category/fasadams.webp',
+                'children'    => [
                     [
-                        'name' => 'Ventiliuojami fasadai',
-                        'slug' => 'ventiliuojami-fasadai',
+                        'name'        => 'Ventiliuojami fasadai',
+                        'slug'        => 'ventiliuojami-fasadai',
                         'description' => 'Ventiliuojamų fasadų medžiagos ir priedai.',
-                        'sort_order' => 1,
-                        'image_url' => 'local://category/ventiliuojami-fasadai.webp',
-                        'children' => [
+                        'sort_order'  => 1,
+                        'image_url'   => 'local://category/ventiliuojami-fasadai.webp',
+                        'children'    => [
                             ['name' => 'Akmenys, stount', 'slug' => 'akmenys-stount', 'description' => 'Fasadiniai akmenys ir "stount" tipo medžiagos.', 'sort_order' => 1, 'image_url' => 'local://category/akmenys.webp'],
                             [
-                                'name' => 'Priedai fasadams',
-                                'slug' => 'priedai-fasadams',
+                                'name'        => 'Priedai fasadams',
+                                'slug'        => 'priedai-fasadams',
                                 'description' => 'Tinkleliai, barjerai, profiliai, varžtai.',
-                                'sort_order' => 2,
-                                'image_url' => 'local://category/priedai-fasadams.webp',
-                                'children' => [
+                                'sort_order'  => 2,
+                                'image_url'   => 'local://category/priedai-fasadams.webp',
+                                'children'    => [
                                     ['name' => 'Pelių barjerai', 'slug' => 'peliu-barjerai', 'description' => 'Barjerai nuo graužikų.', 'sort_order' => 1, 'image_url' => 'local://category/peliu-barjerai.webp'],
                                     ['name' => 'Įvairūs tinkliukai', 'slug' => 'ivairus-tinkliukai', 'description' => 'Fasadiniai tinkliukai ir tinkleliai.', 'sort_order' => 2, 'image_url' => 'local://category/tinkliukai.webp'],
                                     ['name' => 'Ventiliuojami profiliai', 'slug' => 'fasadiniai-ventiliuojami-profiliai', 'description' => 'Profilių sistemos vėdinamiems fasadams.', 'sort_order' => 3, 'image_url' => 'local://category/fasado-profiliai.webp'],
@@ -266,12 +267,12 @@ final class LithuanianCatalogSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Elektros prekės',
-                'slug' => 'elektros-prekes',
+                'name'        => 'Elektros prekės',
+                'slug'        => 'elektros-prekes',
                 'description' => 'Elektrinės izoliacijos juostos, sujungimai ir tvirtinimo sprendimai.',
-                'sort_order' => 8,
-                'image_url' => 'local://category/elektros-prekes.webp',
-                'children' => [
+                'sort_order'  => 8,
+                'image_url'   => 'local://category/elektros-prekes.webp',
+                'children'    => [
                     ['name' => 'Izoliacinės juostos', 'slug' => 'izoliacines-juostos', 'description' => 'Elektrinės izoliacinės juostos.', 'sort_order' => 1, 'image_url' => 'local://category/izoliacines-juostos.webp'],
                     ['name' => 'Laidų sujungimas', 'slug' => 'laidu-sujungimas', 'description' => 'Laidų sujungimo elementai.', 'sort_order' => 2, 'image_url' => 'local://category/laidu-sujungimas.webp'],
                     ['name' => 'Laidų tvirtinimas', 'slug' => 'laidu-tvirtinimas', 'description' => 'Laidų tvirtinimo sprendimai.', 'sort_order' => 3, 'image_url' => 'local://category/laidu-tvirtinimas.webp'],
@@ -279,12 +280,12 @@ final class LithuanianCatalogSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Darbo apranga, saugos priemonės',
-                'slug' => 'darbo-apranga-saugos-priemones',
+                'name'        => 'Darbo apranga, saugos priemonės',
+                'slug'        => 'darbo-apranga-saugos-priemones',
                 'description' => 'Darbo rūbai ir asmeninės saugos priemonės.',
-                'sort_order' => 9,
-                'image_url' => 'local://category/darbo-apranga-sauga.webp',
-                'children' => [
+                'sort_order'  => 9,
+                'image_url'   => 'local://category/darbo-apranga-sauga.webp',
+                'children'    => [
                     ['name' => 'Kelnės', 'slug' => 'kelnes', 'description' => 'Darbo kelnės.', 'sort_order' => 1, 'image_url' => 'local://category/kelnes.webp'],
                     ['name' => 'Džemperiai', 'slug' => 'dzemperiai', 'description' => 'Darbo džemperiai.', 'sort_order' => 2, 'image_url' => 'local://category/dzemperiai.webp'],
                     ['name' => 'Striukės', 'slug' => 'striukes', 'description' => 'Darbo striukės.', 'sort_order' => 3, 'image_url' => 'local://category/striukes.webp'],
@@ -310,11 +311,11 @@ final class LithuanianCatalogSeeder extends Seeder
         $category = Category::firstOrCreate(
             ['slug' => $data['slug']],
             [
-                'name' => $data['name'],
+                'name'        => $data['name'],
                 'description' => $data['description'] ?? null,
-                'parent_id' => $parentId,
-                'sort_order' => $data['sort_order'] ?? 0,
-                'is_visible' => true,
+                'parent_id'   => $parentId,
+                'sort_order'  => $data['sort_order'] ?? 0,
+                'is_visible'  => true,
             ]
         );
 
@@ -324,15 +325,15 @@ final class LithuanianCatalogSeeder extends Seeder
         foreach ($locales as $loc) {
             $name = $this->translateLike($data['name'], $loc);
             $rows[] = [
-                'category_id' => $category->id,
-                'locale' => $loc,
-                'name' => $name,
-                'slug' => Str::slug($data['slug'].'-'.$loc),  // Ensure unique slugs per locale
-                'description' => $this->translateLike((string) ($data['description'] ?? ''), $loc),
-                'seo_title' => $name,
+                'category_id'     => $category->id,
+                'locale'          => $loc,
+                'name'            => $name,
+                'slug'            => Str::slug($data['slug'] . '-' . $loc),  // Ensure unique slugs per locale
+                'description'     => $this->translateLike((string) ($data['description'] ?? ''), $loc),
+                'seo_title'       => $name,
                 'seo_description' => $this->translateLike('Statybinių prekių kategorija.', $loc),
-                'created_at' => $now,
-                'updated_at' => $now,
+                'created_at'      => $now,
+                'updated_at'      => $now,
             ];
         }
         // Create translations using factory relationships
@@ -340,20 +341,20 @@ final class LithuanianCatalogSeeder extends Seeder
             $category->translations()->updateOrCreate(
                 [
                     'category_id' => $translationData['category_id'],
-                    'locale' => $translationData['locale'],
+                    'locale'      => $translationData['locale'],
                 ],
                 [
-                    'name' => $translationData['name'],
-                    'slug' => $translationData['slug'],
-                    'description' => $translationData['description'],
-                    'seo_title' => $translationData['seo_title'],
+                    'name'            => $translationData['name'],
+                    'slug'            => $translationData['slug'],
+                    'description'     => $translationData['description'],
+                    'seo_title'       => $translationData['seo_title'],
                     'seo_description' => $translationData['seo_description'],
                 ]
             );
         }
 
         if ($category && ($category->wasRecentlyCreated || ! $category->hasMedia('images')) && isset($data['image_url'])) {
-            $this->attachGeneratedImage($category, 'images', $data['name'].' Image');
+            $this->attachGeneratedImage($category, 'images', $data['name'] . ' Image');
         }
 
         if (isset($data['children']) && is_array($data['children'])) {
@@ -370,7 +371,7 @@ final class LithuanianCatalogSeeder extends Seeder
             if (! file_exists($imagePath)) {
                 return;
             }
-            $filename = Str::slug($name).'.webp';
+            $filename = Str::slug($name) . '.webp';
             $category
                 ->addMedia($imagePath)
                 ->withCustomProperties(['source' => 'local_generated'])
@@ -378,7 +379,7 @@ final class LithuanianCatalogSeeder extends Seeder
                 ->usingFileName($filename)
                 ->toMediaCollection($collection);
             @unlink($imagePath);
-        } catch (\Throwable) {
+        } catch (Throwable) {
             // ignore
         }
     }
@@ -396,11 +397,11 @@ final class LithuanianCatalogSeeder extends Seeder
     private function translateLike(string $text, string $locale): string
     {
         return match ($locale) {
-            'lt' => $text,
-            'en' => $text.' (EN)',
-            'ru' => $text.' (RU)',
-            'de' => $text.' (DE)',
-            default => $text.' ('.strtoupper($locale).')',
+            'lt'    => $text,
+            'en'    => $text . ' (EN)',
+            'ru'    => $text . ' (RU)',
+            'de'    => $text . ' (DE)',
+            default => $text . ' (' . strtoupper($locale) . ')',
         };
     }
 }

@@ -24,27 +24,27 @@ class AdminUserResource extends JsonResource
         // Merge all of the computed properties that only exist on the admin
         // projection of a user into the existing contract payload.
         $meta = array_merge($meta, [
-            'full_name' => $this->resource->full_name,
-            'initials' => $this->resource->initials,
-            'avatar_url' => $this->resource->avatar_url,
-            'is_email_verified' => $this->resource->isEmailVerified(),
-            'is_phone_verified' => $this->resource->isPhoneVerified(),
-            'has_two_factor' => $this->resource->hasTwoFactor(),
-            'is_on_trial' => $this->resource->isOnTrial(),
-            'has_active_subscription' => $this->resource->hasActiveSubscription(),
+            'full_name'                 => $this->resource->full_name,
+            'initials'                  => $this->resource->initials,
+            'avatar_url'                => $this->resource->avatar_url,
+            'is_email_verified'         => $this->resource->isEmailVerified(),
+            'is_phone_verified'         => $this->resource->isPhoneVerified(),
+            'has_two_factor'            => $this->resource->hasTwoFactor(),
+            'is_on_trial'               => $this->resource->isOnTrial(),
+            'has_active_subscription'   => $this->resource->hasActiveSubscription(),
             'subscription_status_color' => $this->resource->subscription_status_color,
-            'status_color' => $this->resource->status_color,
-            'status_text' => $this->resource->status_text,
-            'age' => $this->resource->age,
-            'gender_text' => $this->resource->gender_text,
-            'locale_text' => $this->resource->locale_text,
-            'roles_label' => $this->resource->roles_label,
-            'total_spent' => $this->resource->total_spent,
-            'average_order_value' => $this->resource->average_order_value,
-            'last_order_date' => $this->resource->last_order_date,
-            'orders_count' => $this->resource->orders_count,
-            'reviews_count' => $this->resource->reviews_count,
-            'average_rating' => $this->resource->average_rating,
+            'status_color'              => $this->resource->status_color,
+            'status_text'               => $this->resource->status_text,
+            'age'                       => $this->resource->age,
+            'gender_text'               => $this->resource->gender_text,
+            'locale_text'               => $this->resource->locale_text,
+            'roles_label'               => $this->resource->roles_label,
+            'total_spent'               => $this->resource->total_spent,
+            'average_order_value'       => $this->resource->average_order_value,
+            'last_order_date'           => $this->resource->last_order_date,
+            'orders_count'              => $this->resource->orders_count,
+            'reviews_count'             => $this->resource->reviews_count,
+            'average_rating'            => $this->resource->average_rating,
         ]);
 
         if ($this->resource->relationLoaded('addresses')) {
@@ -105,8 +105,8 @@ class AdminUserResource extends JsonResource
     {
         return [
             'meta' => [
-                'timestamp' => now()->toISOString(),
-                'version' => '1.0',
+                'timestamp'  => now()->toISOString(),
+                'version'    => '1.0',
                 'admin_view' => true,
             ],
         ];

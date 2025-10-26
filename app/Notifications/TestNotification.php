@@ -47,9 +47,9 @@ final class TestNotification extends Notification
     {
         // Provide a consistent payload for debugging and API inspection.
         return [
-            'title' => $this->title,
+            'title'   => $this->title,
             'message' => $this->message,
-            'type' => $this->type,
+            'type'    => $this->type,
             'sent_at' => now()->toIso8601String(),
         ];
     }

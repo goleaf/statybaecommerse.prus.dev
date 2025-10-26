@@ -106,7 +106,7 @@ class FixFilamentV4Command extends Command
             if (! $this->option('dry-run')) {
                 File::put($filePath, $content);
             }
-            $this->changes[] = "✅ Updated {$type}: ".basename($filePath);
+            $this->changes[] = "✅ Updated {$type}: " . basename($filePath);
         }
     }
 
@@ -194,7 +194,7 @@ class FixFilamentV4Command extends Command
         // Update navigation property type hints
         $content = str_replace(
             'protected static ?NavigationGroup $navigationGroup',
-            '/** @var \UnitEnum|string|null */'."\n    protected static \$navigationGroup",
+            '/** @var \UnitEnum|string|null */' . "\n    protected static \$navigationGroup",
             $content
         );
 
@@ -224,7 +224,7 @@ class FixFilamentV4Command extends Command
 
         $this->line('');
         $this->info('🎉 Migration completed!');
-        $this->info('📝 Total files updated: '.count($this->changes));
+        $this->info('📝 Total files updated: ' . count($this->changes));
 
         if (empty($this->changes)) {
             $this->info('ℹ️  No files needed updating - all resources are already v4 compatible!');

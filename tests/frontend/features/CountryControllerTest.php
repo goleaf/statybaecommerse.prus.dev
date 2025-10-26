@@ -30,7 +30,7 @@ final class CountryControllerTest extends TestCase
         Country::factory()->create(['region' => 'Asia', 'currency_code' => 'USD', 'is_active' => true, 'is_enabled' => true]);
 
         $response = $this->get(route('countries.index', [
-            'region' => 'Europe',
+            'region'   => 'Europe',
             'currency' => 'EUR',
         ]));
 
@@ -88,10 +88,10 @@ final class CountryControllerTest extends TestCase
     public function test_country_show_page_loads_successfully(): void
     {
         $country = Country::factory()->create([
-            'name' => 'Lithuania',
-            'cca2' => 'LT',
-            'region' => 'Europe',
-            'is_active' => true,
+            'name'       => 'Lithuania',
+            'cca2'       => 'LT',
+            'region'     => 'Europe',
+            'is_active'  => true,
             'is_enabled' => true,
         ]);
 
@@ -160,7 +160,7 @@ final class CountryControllerTest extends TestCase
                 ],
             ],
             'links' => ['first', 'last', 'prev', 'next'],
-            'meta' => ['current_page', 'from', 'last_page', 'path', 'per_page', 'to', 'total'],
+            'meta'  => ['current_page', 'from', 'last_page', 'path', 'per_page', 'to', 'total'],
         ]);
     }
 
@@ -272,9 +272,9 @@ final class CountryControllerTest extends TestCase
         $country = Country::factory()->create(['name' => 'Lithuania']);
 
         CountryTranslation::factory()->create([
-            'country_id' => $country->id,
-            'locale' => 'lt',
-            'name' => 'Lietuva',
+            'country_id'  => $country->id,
+            'locale'      => 'lt',
+            'name'        => 'Lietuva',
             'description' => 'Šalis Europoje',
         ]);
 

@@ -14,11 +14,11 @@ describe('Product Model', function () {
     it('can be created with valid data', function () {
         $brand = Brand::factory()->create();
         $product = Product::factory()->create([
-            'name' => 'Test Product',
-            'slug' => 'test-product',
-            'sku' => 'TEST-001',
-            'price' => 29.99,
-            'brand_id' => $brand->id,
+            'name'         => 'Test Product',
+            'slug'         => 'test-product',
+            'sku'          => 'TEST-001',
+            'price'        => 29.99,
+            'brand_id'     => $brand->id,
             'is_published' => true,
         ]);
 
@@ -45,18 +45,18 @@ describe('Product Model', function () {
 
     it('casts attributes correctly', function () {
         $product = Product::factory()->create([
-            'price' => '29.99',
-            'compare_price' => '39.99',
-            'cost_price' => '15.00',
-            'weight' => '1.5',
-            'stock_quantity' => '10',
+            'price'               => '29.99',
+            'compare_price'       => '39.99',
+            'cost_price'          => '15.00',
+            'weight'              => '1.5',
+            'stock_quantity'      => '10',
             'low_stock_threshold' => '5',
-            'track_stock' => 1,
-            'allow_backorder' => 0,
-            'is_published' => 1,
-            'is_featured' => 0,
-            'is_digital' => 0,
-            'requires_shipping' => 1,
+            'track_stock'         => 1,
+            'allow_backorder'     => 0,
+            'is_published'        => 1,
+            'is_featured'         => 0,
+            'is_digital'          => 0,
+            'requires_shipping'   => 1,
         ]);
 
         expect($product->price)->toBeFloat();
@@ -255,8 +255,8 @@ describe('Product Model', function () {
 
     it('can be searched globally', function () {
         $product = Product::factory()->create([
-            'name' => 'Searchable Product',
-            'sku' => 'SEARCH-001',
+            'name'        => 'Searchable Product',
+            'sku'         => 'SEARCH-001',
             'description' => 'This product is searchable',
         ]);
 
@@ -278,7 +278,7 @@ describe('Product Model', function () {
 
     it('calculates discount percentage correctly', function () {
         $product = Product::factory()->create([
-            'price' => 20.00,
+            'price'         => 20.00,
             'compare_price' => 25.00,
         ]);
 
@@ -287,7 +287,7 @@ describe('Product Model', function () {
 
     it('returns null discount percentage when no compare price', function () {
         $product = Product::factory()->create([
-            'price' => 20.00,
+            'price'         => 20.00,
             'compare_price' => null,
         ]);
 
@@ -296,7 +296,7 @@ describe('Product Model', function () {
 
     it('returns null discount percentage when compare price is lower', function () {
         $product = Product::factory()->create([
-            'price' => 25.00,
+            'price'         => 25.00,
             'compare_price' => 20.00,
         ]);
 
@@ -306,13 +306,13 @@ describe('Product Model', function () {
     it('can get formatted price', function () {
         $product = Product::factory()->create(['price' => 29.99]);
 
-        expect($product->formatted_price)->toBe('29,99'."\u{00A0}".'€');
+        expect($product->formatted_price)->toBe('29,99' . "\u{00A0}" . '€');
     });
 
     it('can get formatted compare price', function () {
         $product = Product::factory()->create(['compare_price' => 39.99]);
 
-        expect($product->formatted_compare_price)->toBe('39,99'."\u{00A0}".'€');
+        expect($product->formatted_compare_price)->toBe('39,99' . "\u{00A0}" . '€');
     });
 
     it('can get stock status', function () {

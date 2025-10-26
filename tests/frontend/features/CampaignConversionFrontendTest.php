@@ -82,7 +82,7 @@ class CampaignConversionFrontendTest extends TestCase
         $recentConversion = CampaignConversion::factory()->create(['converted_at' => now()->subDays(3)]);
         $oldConversion = CampaignConversion::factory()->create(['converted_at' => now()->subDays(10)]);
 
-        $response = $this->get('/campaign-conversions?date_from='.now()->subDays(5)->format('Y-m-d'));
+        $response = $this->get('/campaign-conversions?date_from=' . now()->subDays(5)->format('Y-m-d'));
 
         $response->assertOk();
         $response->assertSee($recentConversion->id);
@@ -118,30 +118,30 @@ class CampaignConversionFrontendTest extends TestCase
         $campaign = Campaign::factory()->create();
 
         $conversionData = [
-            'campaign_id' => $campaign->id,
-            'conversion_type' => 'purchase',
+            'campaign_id'      => $campaign->id,
+            'conversion_type'  => 'purchase',
             'conversion_value' => 150.50,
-            'status' => 'completed',
-            'converted_at' => now()->format('Y-m-d H:i:s'),
-            'source' => 'google',
-            'medium' => 'cpc',
-            'device_type' => 'desktop',
-            'country' => 'LT',
-            'city' => 'Vilnius',
+            'status'           => 'completed',
+            'converted_at'     => now()->format('Y-m-d H:i:s'),
+            'source'           => 'google',
+            'medium'           => 'cpc',
+            'device_type'      => 'desktop',
+            'country'          => 'LT',
+            'city'             => 'Vilnius',
         ];
 
         $response = $this->post('/campaign-conversions', $conversionData);
 
         $this->assertDatabaseHas('campaign_conversions', [
-            'campaign_id' => $campaign->id,
-            'conversion_type' => 'purchase',
+            'campaign_id'      => $campaign->id,
+            'conversion_type'  => 'purchase',
             'conversion_value' => 150.50,
-            'status' => 'completed',
-            'source' => 'google',
-            'medium' => 'cpc',
-            'device_type' => 'desktop',
-            'country' => 'LT',
-            'city' => 'Vilnius',
+            'status'           => 'completed',
+            'source'           => 'google',
+            'medium'           => 'cpc',
+            'device_type'      => 'desktop',
+            'country'          => 'LT',
+            'city'             => 'Vilnius',
         ]);
 
         $response->assertRedirect();
@@ -163,27 +163,27 @@ class CampaignConversionFrontendTest extends TestCase
     {
         $conversion = CampaignConversion::factory()->create([
             'conversion_value' => 100,
-            'status' => 'pending',
+            'status'           => 'pending',
         ]);
 
         $updateData = [
-            'campaign_id' => $conversion->campaign_id,
-            'conversion_type' => $conversion->conversion_type,
+            'campaign_id'      => $conversion->campaign_id,
+            'conversion_type'  => $conversion->conversion_type,
             'conversion_value' => 200,
-            'status' => 'completed',
-            'converted_at' => $conversion->converted_at->format('Y-m-d H:i:s'),
-            'source' => 'facebook',
-            'medium' => 'social',
+            'status'           => 'completed',
+            'converted_at'     => $conversion->converted_at->format('Y-m-d H:i:s'),
+            'source'           => 'facebook',
+            'medium'           => 'social',
         ];
 
         $response = $this->put("/campaign-conversions/{$conversion->id}", $updateData);
 
         $this->assertDatabaseHas('campaign_conversions', [
-            'id' => $conversion->id,
+            'id'               => $conversion->id,
             'conversion_value' => 200,
-            'status' => 'completed',
-            'source' => 'facebook',
-            'medium' => 'social',
+            'status'           => 'completed',
+            'source'           => 'facebook',
+            'medium'           => 'social',
         ]);
 
         $response->assertRedirect();
@@ -216,7 +216,7 @@ class CampaignConversionFrontendTest extends TestCase
     {
         CampaignConversion::factory()->count(10)->create([
             'conversion_value' => 100,
-            'converted_at' => now()->subDays(5),
+            'converted_at'     => now()->subDays(5),
         ]);
 
         $response = $this->get('/campaign-conversions/analytics/data');
@@ -249,7 +249,7 @@ class CampaignConversionFrontendTest extends TestCase
         CampaignConversion::factory()->create(['converted_at' => now()->subDays(5)]);
         CampaignConversion::factory()->create(['converted_at' => now()->subDays(15)]);
 
-        $response = $this->get('/campaign-conversions/analytics/data?date_from='.now()->subDays(10)->format('Y-m-d'));
+        $response = $this->get('/campaign-conversions/analytics/data?date_from=' . now()->subDays(10)->format('Y-m-d'));
 
         $response->assertOk();
         $data = $response->json();
@@ -283,10 +283,10 @@ class CampaignConversionFrontendTest extends TestCase
         $campaign = Campaign::factory()->create();
 
         $response = $this->post('/campaign-conversions', [
-            'campaign_id' => $campaign->id,
-            'conversion_type' => 'purchase',
+            'campaign_id'      => $campaign->id,
+            'conversion_type'  => 'purchase',
             'conversion_value' => 'invalid',
-            'converted_at' => now()->format('Y-m-d H:i:s'),
+            'converted_at'     => now()->format('Y-m-d H:i:s'),
         ]);
 
         $response->assertSessionHasErrors(['conversion_value']);
@@ -295,10 +295,10 @@ class CampaignConversionFrontendTest extends TestCase
     public function test_validation_works_for_existing_campaign(): void
     {
         $response = $this->post('/campaign-conversions', [
-            'campaign_id' => 999999,
-            'conversion_type' => 'purchase',
+            'campaign_id'      => 999999,
+            'conversion_type'  => 'purchase',
             'conversion_value' => 100,
-            'converted_at' => now()->format('Y-m-d H:i:s'),
+            'converted_at'     => now()->format('Y-m-d H:i:s'),
         ]);
 
         $response->assertSessionHasErrors(['campaign_id']);
@@ -313,7 +313,7 @@ class CampaignConversionFrontendTest extends TestCase
         $conversion = CampaignConversion::factory()->create([
             'campaign_id' => $campaign->id,
             'customer_id' => $customer->id,
-            'order_id' => $order->id,
+            'order_id'    => $order->id,
         ]);
 
         $response = $this->get("/campaign-conversions/{$conversion->id}");
@@ -328,7 +328,7 @@ class CampaignConversionFrontendTest extends TestCase
     {
         CampaignConversion::factory()->count(10)->create([
             'conversion_value' => 100,
-            'converted_at' => now()->subDays(5),
+            'converted_at'     => now()->subDays(5),
         ]);
 
         $response = $this->get('/campaign-conversions');
@@ -366,10 +366,10 @@ class CampaignConversionFrontendTest extends TestCase
 
         // Test create success message
         $response = $this->post('/campaign-conversions', [
-            'campaign_id' => $campaign->id,
-            'conversion_type' => 'purchase',
+            'campaign_id'      => $campaign->id,
+            'conversion_type'  => 'purchase',
             'conversion_value' => 100,
-            'converted_at' => now()->format('Y-m-d H:i:s'),
+            'converted_at'     => now()->format('Y-m-d H:i:s'),
         ]);
 
         $response->assertRedirect();
@@ -379,10 +379,10 @@ class CampaignConversionFrontendTest extends TestCase
 
         // Test update success message
         $response = $this->put("/campaign-conversions/{$conversion->id}", [
-            'campaign_id' => $campaign->id,
-            'conversion_type' => 'purchase',
+            'campaign_id'      => $campaign->id,
+            'conversion_type'  => 'purchase',
             'conversion_value' => 200,
-            'converted_at' => $conversion->converted_at->format('Y-m-d H:i:s'),
+            'converted_at'     => $conversion->converted_at->format('Y-m-d H:i:s'),
         ]);
 
         $response->assertRedirect();

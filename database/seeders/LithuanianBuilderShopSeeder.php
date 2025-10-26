@@ -80,12 +80,12 @@ class LithuanianBuilderShopSeeder extends Seeder
         $admin = User::firstOrCreate(
             ['email' => 'admin@statybaecommerse.lt'],
             [
-                'name' => 'Administratorius Sistema',
-                'first_name' => 'Administratorius',
-                'last_name' => 'Sistema',
-                'password' => bcrypt('password'),
+                'name'              => 'Administratorius Sistema',
+                'first_name'        => 'Administratorius',
+                'last_name'         => 'Sistema',
+                'password'          => bcrypt('password'),
                 'email_verified_at' => now(),
-                'preferred_locale' => 'lt',
+                'preferred_locale'  => 'lt',
             ]
         );
         $admin->assignRole(AuthorizationRole::ADMIN->value);
@@ -93,12 +93,12 @@ class LithuanianBuilderShopSeeder extends Seeder
         $manager = User::firstOrCreate(
             ['email' => 'manager@statybaecommerse.lt'],
             [
-                'name' => 'Vadybininkas Parduotuvės',
-                'first_name' => 'Vadybininkas',
-                'last_name' => 'Parduotuvės',
-                'password' => bcrypt('password'),
+                'name'              => 'Vadybininkas Parduotuvės',
+                'first_name'        => 'Vadybininkas',
+                'last_name'         => 'Parduotuvės',
+                'password'          => bcrypt('password'),
                 'email_verified_at' => now(),
-                'preferred_locale' => 'lt',
+                'preferred_locale'  => 'lt',
             ]
         );
         $manager->assignRole(AuthorizationRole::MANAGER->value);
@@ -108,34 +108,34 @@ class LithuanianBuilderShopSeeder extends Seeder
     {
         $mainCategories = [
             [
-                'name' => 'Elektriniai įrankiai',
-                'slug' => 'elektriniai-irankiai',
+                'name'        => 'Elektriniai įrankiai',
+                'slug'        => 'elektriniai-irankiai',
                 'description' => 'Profesionalūs elektriniai įrankiai statybos ir remonto darbams',
-                'sort_order' => 1,
+                'sort_order'  => 1,
             ],
             [
-                'name' => 'Rankiniai įrankiai',
-                'slug' => 'rankiniai-irankiai',
+                'name'        => 'Rankiniai įrankiai',
+                'slug'        => 'rankiniai-irankiai',
                 'description' => 'Aukštos kokybės rankiniai įrankiai visoms statybos reikmėms',
-                'sort_order' => 2,
+                'sort_order'  => 2,
             ],
             [
-                'name' => 'Statybinės medžiagos',
-                'slug' => 'statybines-medziagos',
+                'name'        => 'Statybinės medžiagos',
+                'slug'        => 'statybines-medziagos',
                 'description' => 'Platus statybinių medžiagų asortimentas namų statybai',
-                'sort_order' => 3,
+                'sort_order'  => 3,
             ],
             [
-                'name' => 'Saugos priemonės',
-                'slug' => 'saugos-priemones',
+                'name'        => 'Saugos priemonės',
+                'slug'        => 'saugos-priemones',
                 'description' => 'Darbuotojų saugos priemonės ir apsauginė įranga',
-                'sort_order' => 4,
+                'sort_order'  => 4,
             ],
             [
-                'name' => 'Matavimo įranga',
-                'slug' => 'matavimo-iranga',
+                'name'        => 'Matavimo įranga',
+                'slug'        => 'matavimo-iranga',
                 'description' => 'Preciziškas matavimo ir žymėjimo įrankiai',
-                'sort_order' => 5,
+                'sort_order'  => 5,
             ],
         ];
 
@@ -146,9 +146,9 @@ class LithuanianBuilderShopSeeder extends Seeder
                 $categories[] = $existing;
             } else {
                 $categories[] = Category::factory()->create($categoryData + [
-                    'is_visible' => true,
-                    'seo_title' => $categoryData['name'].' - Statybaecommerse.lt',
-                    'seo_description' => $categoryData['description'].'. Geriausi sprendimai statybininkams.',
+                    'is_visible'      => true,
+                    'seo_title'       => $categoryData['name'] . ' - Statybaecommerse.lt',
+                    'seo_description' => $categoryData['description'] . '. Geriausi sprendimai statybininkams.',
                 ]);
             }
         }
@@ -198,13 +198,13 @@ class LithuanianBuilderShopSeeder extends Seeder
 
                     if (! $existing) {
                         Category::factory()->create([
-                            'name' => $subName,
-                            'slug' => $slug,
-                            'description' => "Specializuoti {$subName} aukščiausios kokybės",
-                            'parent_id' => $parent->id,
-                            'sort_order' => $index + 1,
-                            'is_visible' => true,
-                            'seo_title' => $subName.' - '.$parentName,
+                            'name'            => $subName,
+                            'slug'            => $slug,
+                            'description'     => "Specializuoti {$subName} aukščiausios kokybės",
+                            'parent_id'       => $parent->id,
+                            'sort_order'      => $index + 1,
+                            'is_visible'      => true,
+                            'seo_title'       => $subName . ' - ' . $parentName,
                             'seo_description' => "Profesionalūs {$subName} statybos darbams. Platus pasirinkimas ir konkurencingos kainos.",
                         ]);
                     }
@@ -217,39 +217,39 @@ class LithuanianBuilderShopSeeder extends Seeder
     {
         $lithuanianBrands = [
             [
-                'name' => 'Makita Lietuva',
-                'slug' => 'makita-lietuva',
+                'name'        => 'Makita Lietuva',
+                'slug'        => 'makita-lietuva',
                 'description' => 'Japonų kokybės elektriniai įrankiai profesionalams',
-                'website' => 'https://makita.lt',
-                'is_enabled' => true,
+                'website'     => 'https://makita.lt',
+                'is_enabled'  => true,
             ],
             [
-                'name' => 'Bosch Professional LT',
-                'slug' => 'bosch-professional-lt',
+                'name'        => 'Bosch Professional LT',
+                'slug'        => 'bosch-professional-lt',
                 'description' => 'Vokiškas tikslumas ir patikimumas statybos įrankiuose',
-                'website' => 'https://bosch.lt',
-                'is_enabled' => true,
+                'website'     => 'https://bosch.lt',
+                'is_enabled'  => true,
             ],
             [
-                'name' => 'DeWalt Baltics',
-                'slug' => 'dewalt-baltics',
+                'name'        => 'DeWalt Baltics',
+                'slug'        => 'dewalt-baltics',
                 'description' => 'Amerikiečių kokybės įrankiai intensyviam naudojimui',
-                'website' => 'https://dewalt.lt',
-                'is_enabled' => true,
+                'website'     => 'https://dewalt.lt',
+                'is_enabled'  => true,
             ],
             [
-                'name' => 'Hilti Lithuania',
-                'slug' => 'hilti-lithuania',
+                'name'        => 'Hilti Lithuania',
+                'slug'        => 'hilti-lithuania',
                 'description' => 'Šveicarų inžinerijos sprendimai statybos pramonei',
-                'website' => 'https://hilti.lt',
-                'is_enabled' => true,
+                'website'     => 'https://hilti.lt',
+                'is_enabled'  => true,
             ],
             [
-                'name' => 'Knauf Lietuva',
-                'slug' => 'knauf-lietuva',
+                'name'        => 'Knauf Lietuva',
+                'slug'        => 'knauf-lietuva',
                 'description' => 'Gipso plokščių ir statybinių mišinių lyderis',
-                'website' => 'https://knauf.lt',
-                'is_enabled' => true,
+                'website'     => 'https://knauf.lt',
+                'is_enabled'  => true,
             ],
         ];
 
@@ -260,8 +260,8 @@ class LithuanianBuilderShopSeeder extends Seeder
                 $brands[] = $existing;
             } else {
                 $brands[] = Brand::factory()->create($brandData + [
-                    'seo_title' => $brandData['name'].' - Oficialus atstovas Lietuvoje',
-                    'seo_description' => $brandData['description'].'. Originalūs gaminiai su garantija.',
+                    'seo_title'       => $brandData['name'] . ' - Oficialus atstovas Lietuvoje',
+                    'seo_description' => $brandData['description'] . '. Originalūs gaminiai su garantija.',
                 ]);
             }
         }
@@ -314,13 +314,13 @@ class LithuanianBuilderShopSeeder extends Seeder
                         $price = $product->sale_price ?? $product->price;
 
                         OrderItem::factory()->create([
-                            'order_id' => $order->id,
+                            'order_id'   => $order->id,
                             'product_id' => $product->id,
-                            'name' => $product->name,
-                            'sku' => $product->sku,
-                            'quantity' => $quantity,
+                            'name'       => $product->name,
+                            'sku'        => $product->sku,
+                            'quantity'   => $quantity,
                             'unit_price' => $price,
-                            'total' => $price * $quantity,
+                            'total'      => $price * $quantity,
                         ]);
                     }
                 });

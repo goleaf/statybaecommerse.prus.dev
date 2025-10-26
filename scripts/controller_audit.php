@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This script inspects Laravel controllers under app/Http/Controllers and prints a Markdown report.
  * It is intentionally heuristic-based because full static analysis would require booting Laravel.
@@ -16,14 +17,14 @@ error_reporting(E_ALL);
 $controllerDir = realpath(__DIR__ . '/../app/Http/Controllers');
 
 if ($controllerDir === false) {
-    fwrite(STDERR, "Unable to locate controllers directory." . PHP_EOL);
+    fwrite(STDERR, 'Unable to locate controllers directory.' . PHP_EOL);
     exit(1);
 }
 
 /**
  * Helper function to collect all PHP files inside the controller directory recursively.
  *
- * @param string $baseDir Directory to search.
+ * @param  string             $baseDir Directory to search.
  * @return array<int, string> List of absolute file paths.
  */
 function listControllerFiles(string $baseDir): array
@@ -49,7 +50,7 @@ function listControllerFiles(string $baseDir): array
 /**
  * Extract public method names via token parsing so we avoid false positives in comments.
  *
- * @param string $code PHP source code to inspect.
+ * @param  string             $code PHP source code to inspect.
  * @return array<int, string> List of method names found.
  */
 function extractPublicMethods(string $code): array
@@ -114,8 +115,8 @@ function extractPublicMethods(string $code): array
 /**
  * Assess various heuristics for a controller file so we can populate the audit table.
  *
- * @param string $relativePath Path relative to repository root, used for reporting.
- * @param string $code         Source code content.
+ * @param  string               $relativePath Path relative to repository root, used for reporting.
+ * @param  string               $code         Source code content.
  * @return array<string, mixed> Structured metadata describing the controller.
  */
 function analyseController(string $relativePath, string $code): array
@@ -154,9 +155,9 @@ function analyseController(string $relativePath, string $code): array
     $likelyNPlusOne = false;
 
     if (preg_match('/->(get|all)\(/i', $code) === 1 || preg_match('/::all\(/i', $code) === 1) {
-        $likelyNPlusOne = !str_contains($normalizedCode, '->with(')
-            && !str_contains($normalizedCode, '->load(')
-            && !str_contains($normalizedCode, 'with([');
+        $likelyNPlusOne = ! str_contains($normalizedCode, '->with(')
+            && ! str_contains($normalizedCode, '->load(')
+            && ! str_contains($normalizedCode, 'with([');
     }
 
     // Transaction detection.
@@ -167,7 +168,7 @@ function analyseController(string $relativePath, string $code): array
     $httpStatuses = [];
     preg_match_all('/->json\([^,]+,\s*(\d{3})/i', $code, $statusMatches);
 
-    if (!empty($statusMatches[1])) {
+    if (! empty($statusMatches[1])) {
         $httpStatuses = array_values(array_unique($statusMatches[1]));
     }
 
@@ -206,21 +207,21 @@ function analyseController(string $relativePath, string $code): array
     $todos = preg_match('/TODO/i', $code) === 1 ? 'Present' : 'None';
 
     return [
-        'file' => $relativePath,
-        'methods' => $publicMethods,
-        'validation' => $validationSummary,
-        'authorization' => $hasAuthorization ? 'Present' : 'Missing',
+        'file'            => $relativePath,
+        'methods'         => $publicMethods,
+        'validation'      => $validationSummary,
+        'authorization'   => $hasAuthorization ? 'Present' : 'Missing',
         'mass_assignment' => $massAssignmentRisk ? 'Risky pattern' : 'Looks safe',
-        'n_plus_one' => $likelyNPlusOne ? 'Likely' : 'Monitored',
-        'transactions' => $usesTransactions ? 'Uses DB transactions' : 'Not detected',
-        'http_statuses' => $httpStatuses,
-        'throws' => $throws,
-        'returns' => $returns,
-        'pagination' => $hasPagination ? 'Yes' : 'No',
-        'rate_limited' => $rateLimited ? 'Yes' : 'No',
-        'route_binding' => $routeModelBinding ? 'Likely' : 'Unclear',
-        'todos' => $todos,
-        'code' => $code,
+        'n_plus_one'      => $likelyNPlusOne ? 'Likely' : 'Monitored',
+        'transactions'    => $usesTransactions ? 'Uses DB transactions' : 'Not detected',
+        'http_statuses'   => $httpStatuses,
+        'throws'          => $throws,
+        'returns'         => $returns,
+        'pagination'      => $hasPagination ? 'Yes' : 'No',
+        'rate_limited'    => $rateLimited ? 'Yes' : 'No',
+        'route_binding'   => $routeModelBinding ? 'Likely' : 'Unclear',
+        'todos'           => $todos,
+        'code'            => $code,
     ];
 }
 
@@ -241,7 +242,7 @@ function formatList(array $values): string
 $basePath = realpath(__DIR__ . '/..');
 
 if ($basePath === false) {
-    fwrite(STDERR, "Unable to resolve repository root." . PHP_EOL);
+    fwrite(STDERR, 'Unable to resolve repository root.' . PHP_EOL);
     exit(1);
 }
 
@@ -311,7 +312,7 @@ foreach ($rows as $row) {
 
     if ($row['n_plus_one'] === 'Likely') {
         $score += 2;
-        $reasons[] = 'Potential N+1 query risk from broad get()/all().' ;
+        $reasons[] = 'Potential N+1 query risk from broad get()/all().';
     }
 
     if ($row['pagination'] === 'No' && preg_match('/index|list|search/i', implode(' ', $row['methods'])) === 1) {
@@ -326,8 +327,8 @@ foreach ($rows as $row) {
 
     if ($score > 0) {
         $issueCandidates[] = [
-            'file' => $row['file'],
-            'score' => $score,
+            'file'    => $row['file'],
+            'score'   => $score,
             'reasons' => array_values(array_unique($reasons)),
         ];
     }
@@ -344,6 +345,5 @@ echo PHP_EOL . 'Top 10 controller issues to investigate:' . PHP_EOL;
 foreach ($topIssues as $index => $issue) {
     $position = $index + 1;
     $reasonText = implode(' ', $issue['reasons']);
-    printf("%d. %s — %s" . PHP_EOL, $position, $issue['file'], $reasonText);
+    printf('%d. %s — %s' . PHP_EOL, $position, $issue['file'], $reasonText);
 }
-

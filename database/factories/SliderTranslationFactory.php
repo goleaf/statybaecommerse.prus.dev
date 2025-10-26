@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -17,9 +19,9 @@ class SliderTranslationFactory extends Factory
     public function definition(): array
     {
         return [
-            'slider_id' => \App\Models\Slider::factory(),
-            'locale' => fake()->randomElement(['en', 'lt']),
-            'title' => fake()->sentence(3),
+            'slider_id'   => \App\Models\Slider::factory(),
+            'locale'      => fake()->randomElement(['en', 'lt']),
+            'title'       => fake()->sentence(3),
             'description' => fake()->paragraph(2),
             'button_text' => fake()->randomElement(['Learn More', 'Get Started', 'Shop Now', 'Discover', 'Explore']),
         ];

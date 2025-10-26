@@ -16,7 +16,7 @@ it('tracks search performance and updates cached recent searches', function () {
     $svc = app(SearchPerformanceService::class);
     $svc->trackSearchPerformance('hammer', 0.25, 10, 'products');
 
-    $key = 'search_performance_recent_'.now()->format('Y-m-d-H');
+    $key = 'search_performance_recent_' . now()->format('Y-m-d-H');
     $recent = Cache::get($key, []);
 
     expect($recent)->toBeArray()->not->toBeEmpty();

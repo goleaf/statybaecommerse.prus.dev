@@ -10,8 +10,8 @@ it('redirects to account with verified flag', function (): void {
     login($user);
 
     $signed = URL::temporarySignedRoute('verification.verify', now()->addMinutes(5), [
-        'id' => $user->getKey(),
-        'hash' => sha1($user->email),
+        'id'     => $user->getKey(),
+        'hash'   => sha1($user->email),
         'locale' => 'en',
     ]);
 

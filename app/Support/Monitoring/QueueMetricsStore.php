@@ -13,18 +13,17 @@ use Illuminate\Support\Str;
 final class QueueMetricsStore
 {
     private const DEFAULT_PAYLOAD = [
-        'total_failed' => 0,
+        'total_failed'    => 0,
         'total_processed' => 0,
-        'queues' => [],
-        'updated_at' => null,
-        'last_failure' => null,
+        'queues'          => [],
+        'updated_at'      => null,
+        'last_failure'    => null,
     ];
 
     public function __construct(
         private readonly CacheRepository $repository,
         private readonly string $cacheKey,
-    ) {
-    }
+    ) {}
 
     public function recordProcessed(JobProcessed $event): void
     {
@@ -59,10 +58,10 @@ final class QueueMetricsStore
 
             $payload['last_failure'] = [
                 'connection' => $connection,
-                'queue' => $queue,
-                'job' => $jobName ?: 'unknown',
-                'failed_at' => $payload['queues'][$key]['last_failed_at'],
-                'exception' => Str::limit($event->exception?->getMessage() ?? '', 240),
+                'queue'      => $queue,
+                'job'        => $jobName ?: 'unknown',
+                'failed_at'  => $payload['queues'][$key]['last_failed_at'],
+                'exception'  => Str::limit($event->exception?->getMessage() ?? '', 240),
             ];
 
             return $payload;
@@ -94,23 +93,23 @@ final class QueueMetricsStore
         $queues = [];
         foreach ($payload['queues'] ?? [] as $item) {
             $queues[] = [
-                'connection' => (string) ($item['connection'] ?? 'default'),
-                'queue' => (string) ($item['queue'] ?? 'default'),
-                'failed' => (int) ($item['failed'] ?? 0),
-                'processed' => (int) ($item['processed'] ?? 0),
-                'last_failed_at' => $item['last_failed_at'] ?? null,
-                'last_failed_job' => $item['last_failed_job'] ?? null,
+                'connection'             => (string) ($item['connection'] ?? 'default'),
+                'queue'                  => (string) ($item['queue'] ?? 'default'),
+                'failed'                 => (int) ($item['failed'] ?? 0),
+                'processed'              => (int) ($item['processed'] ?? 0),
+                'last_failed_at'         => $item['last_failed_at'] ?? null,
+                'last_failed_job'        => $item['last_failed_job'] ?? null,
                 'last_exception_message' => $item['last_exception_message'] ?? null,
-                'last_processed_at' => $item['last_processed_at'] ?? null,
+                'last_processed_at'      => $item['last_processed_at'] ?? null,
             ];
         }
 
         return [
-            'total_failed' => (int) ($payload['total_failed'] ?? 0),
+            'total_failed'    => (int) ($payload['total_failed'] ?? 0),
             'total_processed' => (int) ($payload['total_processed'] ?? 0),
-            'queues' => $queues,
-            'updated_at' => $payload['updated_at'] ?? null,
-            'last_failure' => $payload['last_failure'] ?? null,
+            'queues'          => $queues,
+            'updated_at'      => $payload['updated_at'] ?? null,
+            'last_failure'    => $payload['last_failure'] ?? null,
         ];
     }
 
@@ -126,19 +125,19 @@ final class QueueMetricsStore
     private function initialQueuePayload(string $connection, string $queue): array
     {
         return [
-            'connection' => $connection,
-            'queue' => $queue,
-            'failed' => 0,
-            'processed' => 0,
-            'last_failed_at' => null,
-            'last_failed_job' => null,
+            'connection'             => $connection,
+            'queue'                  => $queue,
+            'failed'                 => 0,
+            'processed'              => 0,
+            'last_failed_at'         => null,
+            'last_failed_job'        => null,
             'last_exception_message' => null,
-            'last_processed_at' => null,
+            'last_processed_at'      => null,
         ];
     }
 
     private function queueKey(string $connection, string $queue): string
     {
-        return $connection.':'.$queue;
+        return $connection . ':' . $queue;
     }
 }

@@ -29,7 +29,7 @@ final class CampaignCustomerSegmentResourceTest extends BaseTestCase
         parent::setUp();
 
         $this->adminUser = User::factory()->create([
-            'email' => 'admin@example.com',
+            'email'    => 'admin@example.com',
             'is_admin' => true,
         ]);
 
@@ -40,7 +40,7 @@ final class CampaignCustomerSegmentResourceTest extends BaseTestCase
     public function test_can_list_campaign_customer_segments(): void
     {
         $segment = CampaignCustomerSegment::factory()->create([
-            'campaign_id' => $this->campaign->id,
+            'campaign_id'       => $this->campaign->id,
             'customer_group_id' => $this->customerGroup->id,
         ]);
 
@@ -57,19 +57,19 @@ final class CampaignCustomerSegmentResourceTest extends BaseTestCase
     public function test_can_create_campaign_customer_segment(): void
     {
         $segmentData = [
-            'campaign_id' => $this->campaign->id,
+            'campaign_id'       => $this->campaign->id,
             'customer_group_id' => $this->customerGroup->id,
-            'segment_type' => 'demographic',
-            'segment_criteria' => [
+            'segment_type'      => 'demographic',
+            'segment_criteria'  => [
                 'age_range' => '25-35',
-                'gender' => 'female',
+                'gender'    => 'female',
             ],
-            'targeting_tags' => ['young_adults', 'female'],
+            'targeting_tags'    => ['young_adults', 'female'],
             'custom_conditions' => 'Age between 25-35 and female',
             'track_performance' => true,
-            'auto_optimize' => false,
-            'is_active' => true,
-            'sort_order' => 1,
+            'auto_optimize'     => false,
+            'is_active'         => true,
+            'sort_order'        => 1,
         ];
 
         $this->actingAs($this->adminUser);
@@ -80,38 +80,38 @@ final class CampaignCustomerSegmentResourceTest extends BaseTestCase
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('campaign_customer_segments', [
-            'campaign_id' => $this->campaign->id,
+            'campaign_id'       => $this->campaign->id,
             'customer_group_id' => $this->customerGroup->id,
-            'segment_type' => 'demographic',
-            'is_active' => true,
+            'segment_type'      => 'demographic',
+            'is_active'         => true,
             'track_performance' => true,
-            'auto_optimize' => false,
-            'sort_order' => 1,
+            'auto_optimize'     => false,
+            'sort_order'        => 1,
         ]);
     }
 
     public function test_can_edit_campaign_customer_segment(): void
     {
         $segment = CampaignCustomerSegment::factory()->create([
-            'campaign_id' => $this->campaign->id,
+            'campaign_id'       => $this->campaign->id,
             'customer_group_id' => $this->customerGroup->id,
-            'segment_type' => 'demographic',
+            'segment_type'      => 'demographic',
         ]);
 
         $this->actingAs($this->adminUser);
 
         $updatedData = [
-            'segment_type' => 'behavioral',
+            'segment_type'     => 'behavioral',
             'segment_criteria' => [
                 'purchase_frequency' => 'high',
-                'loyalty_level' => 'vip',
+                'loyalty_level'      => 'vip',
             ],
-            'targeting_tags' => ['frequent_buyers', 'vip_customers'],
+            'targeting_tags'    => ['frequent_buyers', 'vip_customers'],
             'custom_conditions' => 'High purchase frequency and VIP loyalty',
             'track_performance' => true,
-            'auto_optimize' => true,
-            'is_active' => false,
-            'sort_order' => 5,
+            'auto_optimize'     => true,
+            'is_active'         => false,
+            'sort_order'        => 5,
         ];
 
         Livewire::test(Pages\EditCampaignCustomerSegment::class, ['record' => $segment->getRouteKey()])
@@ -129,14 +129,14 @@ final class CampaignCustomerSegmentResourceTest extends BaseTestCase
     public function test_can_view_campaign_customer_segment(): void
     {
         $segment = CampaignCustomerSegment::factory()->create([
-            'campaign_id' => $this->campaign->id,
+            'campaign_id'       => $this->campaign->id,
             'customer_group_id' => $this->customerGroup->id,
-            'segment_type' => 'geographic',
-            'segment_criteria' => [
+            'segment_type'      => 'geographic',
+            'segment_criteria'  => [
                 'country' => 'Lithuania',
-                'region' => 'Vilnius',
+                'region'  => 'Vilnius',
             ],
-            'targeting_tags' => ['lithuania', 'vilnius'],
+            'targeting_tags'    => ['lithuania', 'vilnius'],
             'custom_conditions' => 'Located in Vilnius, Lithuania',
         ]);
 
@@ -151,7 +151,7 @@ final class CampaignCustomerSegmentResourceTest extends BaseTestCase
     public function test_can_delete_campaign_customer_segment(): void
     {
         $segment = CampaignCustomerSegment::factory()->create([
-            'campaign_id' => $this->campaign->id,
+            'campaign_id'       => $this->campaign->id,
             'customer_group_id' => $this->customerGroup->id,
         ]);
 
@@ -167,12 +167,12 @@ final class CampaignCustomerSegmentResourceTest extends BaseTestCase
     public function test_can_filter_by_segment_type(): void
     {
         $demographicSegment = CampaignCustomerSegment::factory()->demographic()->create([
-            'campaign_id' => $this->campaign->id,
+            'campaign_id'       => $this->campaign->id,
             'customer_group_id' => $this->customerGroup->id,
         ]);
 
         $behavioralSegment = CampaignCustomerSegment::factory()->behavioral()->create([
-            'campaign_id' => $this->campaign->id,
+            'campaign_id'       => $this->campaign->id,
             'customer_group_id' => $this->customerGroup->id,
         ]);
 
@@ -187,12 +187,12 @@ final class CampaignCustomerSegmentResourceTest extends BaseTestCase
     public function test_can_filter_by_active_status(): void
     {
         $activeSegment = CampaignCustomerSegment::factory()->active()->create([
-            'campaign_id' => $this->campaign->id,
+            'campaign_id'       => $this->campaign->id,
             'customer_group_id' => $this->customerGroup->id,
         ]);
 
         $inactiveSegment = CampaignCustomerSegment::factory()->inactive()->create([
-            'campaign_id' => $this->campaign->id,
+            'campaign_id'       => $this->campaign->id,
             'customer_group_id' => $this->customerGroup->id,
         ]);
 
@@ -207,12 +207,12 @@ final class CampaignCustomerSegmentResourceTest extends BaseTestCase
     public function test_can_search_campaign_customer_segments(): void
     {
         $segment1 = CampaignCustomerSegment::factory()->create([
-            'campaign_id' => $this->campaign->id,
+            'campaign_id'       => $this->campaign->id,
             'customer_group_id' => $this->customerGroup->id,
         ]);
 
         $segment2 = CampaignCustomerSegment::factory()->create([
-            'campaign_id' => Campaign::factory()->create(['name' => 'Special Campaign'])->id,
+            'campaign_id'       => Campaign::factory()->create(['name' => 'Special Campaign'])->id,
             'customer_group_id' => $this->customerGroup->id,
         ]);
 
@@ -230,9 +230,9 @@ final class CampaignCustomerSegmentResourceTest extends BaseTestCase
 
         Livewire::test(Pages\CreateCampaignCustomerSegment::class)
             ->fillForm([
-                'campaign_id' => null,
+                'campaign_id'       => null,
                 'customer_group_id' => null,
-                'segment_type' => null,
+                'segment_type'      => null,
             ])
             ->call('create')
             ->assertHasFormErrors(['campaign_id' => 'required'])
@@ -243,17 +243,17 @@ final class CampaignCustomerSegmentResourceTest extends BaseTestCase
     public function test_can_use_tabs_in_list_view(): void
     {
         $demographicSegment = CampaignCustomerSegment::factory()->demographic()->create([
-            'campaign_id' => $this->campaign->id,
+            'campaign_id'       => $this->campaign->id,
             'customer_group_id' => $this->customerGroup->id,
         ]);
 
         $behavioralSegment = CampaignCustomerSegment::factory()->behavioral()->create([
-            'campaign_id' => $this->campaign->id,
+            'campaign_id'       => $this->campaign->id,
             'customer_group_id' => $this->customerGroup->id,
         ]);
 
         $activeSegment = CampaignCustomerSegment::factory()->active()->create([
-            'campaign_id' => $this->campaign->id,
+            'campaign_id'       => $this->campaign->id,
             'customer_group_id' => $this->customerGroup->id,
         ]);
 
@@ -282,12 +282,12 @@ final class CampaignCustomerSegmentResourceTest extends BaseTestCase
     public function test_can_bulk_delete_campaign_customer_segments(): void
     {
         $segment1 = CampaignCustomerSegment::factory()->create([
-            'campaign_id' => $this->campaign->id,
+            'campaign_id'       => $this->campaign->id,
             'customer_group_id' => $this->customerGroup->id,
         ]);
 
         $segment2 = CampaignCustomerSegment::factory()->create([
-            'campaign_id' => $this->campaign->id,
+            'campaign_id'       => $this->campaign->id,
             'customer_group_id' => $this->customerGroup->id,
         ]);
 
@@ -304,7 +304,7 @@ final class CampaignCustomerSegmentResourceTest extends BaseTestCase
     public function test_can_restore_deleted_campaign_customer_segment(): void
     {
         $segment = CampaignCustomerSegment::factory()->create([
-            'campaign_id' => $this->campaign->id,
+            'campaign_id'       => $this->campaign->id,
             'customer_group_id' => $this->customerGroup->id,
         ]);
 
@@ -318,7 +318,7 @@ final class CampaignCustomerSegmentResourceTest extends BaseTestCase
             ->assertHasNoTableActionErrors();
 
         $this->assertDatabaseHas('campaign_customer_segments', [
-            'id' => $segment->id,
+            'id'         => $segment->id,
             'deleted_at' => null,
         ]);
     }
@@ -326,7 +326,7 @@ final class CampaignCustomerSegmentResourceTest extends BaseTestCase
     public function test_can_force_delete_campaign_customer_segment(): void
     {
         $segment = CampaignCustomerSegment::factory()->create([
-            'campaign_id' => $this->campaign->id,
+            'campaign_id'       => $this->campaign->id,
             'customer_group_id' => $this->customerGroup->id,
         ]);
 
@@ -347,16 +347,16 @@ final class CampaignCustomerSegmentResourceTest extends BaseTestCase
     public function test_segment_criteria_is_stored_as_json(): void
     {
         $criteria = [
-            'age_range' => '25-35',
-            'gender' => 'female',
+            'age_range'    => '25-35',
+            'gender'       => 'female',
             'income_level' => 'high',
-            'location' => 'Vilnius',
+            'location'     => 'Vilnius',
         ];
 
         $segment = CampaignCustomerSegment::factory()->create([
-            'campaign_id' => $this->campaign->id,
+            'campaign_id'       => $this->campaign->id,
             'customer_group_id' => $this->customerGroup->id,
-            'segment_criteria' => $criteria,
+            'segment_criteria'  => $criteria,
         ]);
 
         $segment->refresh();
@@ -369,9 +369,9 @@ final class CampaignCustomerSegmentResourceTest extends BaseTestCase
         $tags = ['young_adults', 'female', 'high_income', 'vilnius'];
 
         $segment = CampaignCustomerSegment::factory()->create([
-            'campaign_id' => $this->campaign->id,
+            'campaign_id'       => $this->campaign->id,
             'customer_group_id' => $this->customerGroup->id,
-            'targeting_tags' => $tags,
+            'targeting_tags'    => $tags,
         ]);
 
         $segment->refresh();

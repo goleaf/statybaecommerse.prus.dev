@@ -14,7 +14,7 @@ beforeEach(function () {
     if (! function_exists('route')) {
         function route($name, $params = [])
         {
-            return '/test/'.$name.'/'.implode('-', array_values($params));
+            return '/test/' . $name . '/' . implode('-', array_values($params));
         }
     }
 });

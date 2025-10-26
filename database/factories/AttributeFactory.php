@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Factories;
 
@@ -21,43 +23,43 @@ class AttributeFactory extends Factory
         $groupNames = ['basic_info', 'technical_specs', 'appearance', 'dimensions', 'materials', 'features', 'compatibility', 'warranty', 'shipping', 'seo'];
 
         return [
-            'name' => $label,
-            'slug' => strtolower(str_replace(' ', '-', $label)),
-            'type' => $this->faker->randomElement($types),
-            'description' => $this->faker->optional(0.7)->sentence(),
+            'name'             => $label,
+            'slug'             => strtolower(str_replace(' ', '-', $label)),
+            'type'             => $this->faker->randomElement($types),
+            'description'      => $this->faker->optional(0.7)->sentence(),
             'validation_rules' => $this->faker->optional(0.3)->randomElement([
                 ['required' => true, 'max' => 255],
-                ['min' => 1, 'max' => 100],
+                ['min'      => 1, 'max' => 100],
                 ['required' => true],
             ]),
             'default_value' => $this->faker->optional(0.4)->randomElement(['red', 'blue', 'green', 'small', 'medium', 'large']),
-            'is_required' => $this->faker->boolean(30),
+            'is_required'   => $this->faker->boolean(30),
             'is_filterable' => $this->faker->boolean(80),
             'is_searchable' => $this->faker->boolean(60),
-            'is_visible' => $this->faker->boolean(90),
-            'is_editable' => $this->faker->boolean(85),
-            'is_sortable' => $this->faker->boolean(70),
-            'sort_order' => $this->faker->numberBetween(0, 100),
-            'is_enabled' => $this->faker->boolean(95),
-            'is_active' => $this->faker->boolean(95),
-            'category_id' => null,
-            'group_name' => $this->faker->optional(0.6)->randomElement($groupNames),
-            'icon' => $this->faker->optional(0.4)->randomElement([
+            'is_visible'    => $this->faker->boolean(90),
+            'is_editable'   => $this->faker->boolean(85),
+            'is_sortable'   => $this->faker->boolean(70),
+            'sort_order'    => $this->faker->numberBetween(0, 100),
+            'is_enabled'    => $this->faker->boolean(95),
+            'is_active'     => $this->faker->boolean(95),
+            'category_id'   => null,
+            'group_name'    => $this->faker->optional(0.6)->randomElement($groupNames),
+            'icon'          => $this->faker->optional(0.4)->randomElement([
                 'heroicon-o-adjustments-horizontal',
                 'heroicon-o-color-swatch',
                 'heroicon-o-cube',
                 'heroicon-o-cog-6-tooth',
                 'heroicon-o-tag',
             ]),
-            'color' => $this->faker->optional(0.3)->hexColor(),
-            'min_value' => $this->faker->optional(0.2)->randomFloat(2, 0, 10),
-            'max_value' => $this->faker->optional(0.2)->randomFloat(2, 10, 100),
-            'step_value' => $this->faker->optional(0.1)->randomFloat(2, 0.1, 1),
+            'color'       => $this->faker->optional(0.3)->hexColor(),
+            'min_value'   => $this->faker->optional(0.2)->randomFloat(2, 0, 10),
+            'max_value'   => $this->faker->optional(0.2)->randomFloat(2, 10, 100),
+            'step_value'  => $this->faker->optional(0.1)->randomFloat(2, 0.1, 1),
             'placeholder' => $this->faker->optional(0.5)->sentence(3),
-            'help_text' => $this->faker->optional(0.3)->sentence(),
-            'meta_data' => $this->faker->optional(0.2)->randomElement([
+            'help_text'   => $this->faker->optional(0.3)->sentence(),
+            'meta_data'   => $this->faker->optional(0.2)->randomElement([
                 ['unit' => 'cm', 'precision' => 2],
-                ['unit' => 'kg', 'precision' => 1],
+                ['unit'   => 'kg', 'precision' => 1],
                 ['format' => 'currency', 'currency' => 'EUR'],
                 ['format' => 'percentage'],
             ]),
@@ -72,7 +74,7 @@ class AttributeFactory extends Factory
 
         $schema = Schema::connection(config('database.default', 'sqlite'));
 
-        if (!$schema->hasTable('attributes')) {
+        if (! $schema->hasTable('attributes')) {
             $schema->create('attributes', static function (Blueprint $table): void {
                 $table->id();
                 $table->string('name');
@@ -104,7 +106,7 @@ class AttributeFactory extends Factory
             });
         }
 
-        if (!$schema->hasTable('attribute_values')) {
+        if (! $schema->hasTable('attribute_values')) {
             $schema->create('attribute_values', static function (Blueprint $table): void {
                 $table->id();
                 $table->unsignedBigInteger('attribute_id');
@@ -124,7 +126,7 @@ class AttributeFactory extends Factory
             });
         }
 
-        if (!$schema->hasTable('product_attributes')) {
+        if (! $schema->hasTable('product_attributes')) {
             $schema->create('product_attributes', static function (Blueprint $table): void {
                 $table->id();
                 $table->unsignedBigInteger('product_id');
@@ -146,7 +148,7 @@ class AttributeFactory extends Factory
      */
     public function required(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'is_required' => true,
         ]);
     }
@@ -156,7 +158,7 @@ class AttributeFactory extends Factory
      */
     public function optional(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'is_required' => false,
         ]);
     }
@@ -166,7 +168,7 @@ class AttributeFactory extends Factory
      */
     public function filterable(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'is_filterable' => true,
         ]);
     }
@@ -176,7 +178,7 @@ class AttributeFactory extends Factory
      */
     public function searchable(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'is_searchable' => true,
         ]);
     }
@@ -186,7 +188,7 @@ class AttributeFactory extends Factory
      */
     public function sortable(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'is_sortable' => true,
         ]);
     }
@@ -196,7 +198,7 @@ class AttributeFactory extends Factory
      */
     public function visible(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'is_visible' => true,
         ]);
     }
@@ -206,7 +208,7 @@ class AttributeFactory extends Factory
      */
     public function hidden(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'is_visible' => false,
         ]);
     }
@@ -216,7 +218,7 @@ class AttributeFactory extends Factory
      */
     public function editable(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'is_editable' => true,
         ]);
     }
@@ -226,7 +228,7 @@ class AttributeFactory extends Factory
      */
     public function readonly(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'is_editable' => false,
         ]);
     }
@@ -236,9 +238,9 @@ class AttributeFactory extends Factory
      */
     public function enabled(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'is_enabled' => true,
-            'is_active' => true,
+            'is_active'  => true,
         ]);
     }
 
@@ -247,9 +249,9 @@ class AttributeFactory extends Factory
      */
     public function disabled(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'is_enabled' => false,
-            'is_active' => false,
+            'is_active'  => false,
         ]);
     }
 
@@ -258,7 +260,7 @@ class AttributeFactory extends Factory
      */
     public function text(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'type' => 'text',
         ]);
     }
@@ -268,10 +270,10 @@ class AttributeFactory extends Factory
      */
     public function number(): static
     {
-        return $this->state(fn(array $attributes) => [
-            'type' => 'number',
-            'min_value' => 0,
-            'max_value' => 100,
+        return $this->state(fn (array $attributes) => [
+            'type'       => 'number',
+            'min_value'  => 0,
+            'max_value'  => 100,
             'step_value' => 1,
         ]);
     }
@@ -281,8 +283,8 @@ class AttributeFactory extends Factory
      */
     public function boolean(): static
     {
-        return $this->state(fn(array $attributes) => [
-            'type' => 'boolean',
+        return $this->state(fn (array $attributes) => [
+            'type'          => 'boolean',
             'default_value' => 'false',
         ]);
     }
@@ -292,7 +294,7 @@ class AttributeFactory extends Factory
      */
     public function select(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'type' => 'select',
         ]);
     }
@@ -302,7 +304,7 @@ class AttributeFactory extends Factory
      */
     public function multiselect(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'type' => 'multiselect',
         ]);
     }
@@ -312,8 +314,8 @@ class AttributeFactory extends Factory
      */
     public function color(): static
     {
-        return $this->state(fn(array $attributes) => [
-            'type' => 'color',
+        return $this->state(fn (array $attributes) => [
+            'type'          => 'color',
             'default_value' => '#000000',
         ]);
     }
@@ -323,7 +325,7 @@ class AttributeFactory extends Factory
      */
     public function date(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'type' => 'date',
         ]);
     }
@@ -333,8 +335,8 @@ class AttributeFactory extends Factory
      */
     public function textarea(): static
     {
-        return $this->state(fn(array $attributes) => [
-            'type' => 'textarea',
+        return $this->state(fn (array $attributes) => [
+            'type'       => 'textarea',
             'max_length' => 1000,
         ]);
     }
@@ -344,7 +346,7 @@ class AttributeFactory extends Factory
      */
     public function file(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'type' => 'file',
         ]);
     }
@@ -354,7 +356,7 @@ class AttributeFactory extends Factory
      */
     public function image(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'type' => 'image',
         ]);
     }
@@ -364,7 +366,7 @@ class AttributeFactory extends Factory
      */
     public function inGroup(string $groupName): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'group_name' => $groupName,
         ]);
     }
@@ -374,7 +376,7 @@ class AttributeFactory extends Factory
      */
     public function forCategory(int $categoryId): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'category_id' => $categoryId,
         ]);
     }

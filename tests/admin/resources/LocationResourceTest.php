@@ -42,25 +42,25 @@ final class LocationResourceTest extends TestCase
         $country = Country::factory()->create(['cca2' => 'LT']);
 
         $locationData = [
-            'code' => 'WH001',
-            'name' => 'Test Warehouse',
-            'type' => 'warehouse',
+            'code'           => 'WH001',
+            'name'           => 'Test Warehouse',
+            'type'           => 'warehouse',
             'address_line_1' => '123 Test Street',
-            'city' => 'Vilnius',
-            'country_code' => 'LT',
-            'phone' => '+37012345678',
-            'email' => 'test@example.com',
-            'is_enabled' => true,
-            'is_default' => false,
-            'sort_order' => 1,
+            'city'           => 'Vilnius',
+            'country_code'   => 'LT',
+            'phone'          => '+37012345678',
+            'email'          => 'test@example.com',
+            'is_enabled'     => true,
+            'is_default'     => false,
+            'sort_order'     => 1,
         ];
 
         $response = $this->post('/admin/locations', $locationData);
 
         $this->assertDatabaseHas('locations', [
-            'code' => 'WH001',
-            'name' => 'Test Warehouse',
-            'type' => 'warehouse',
+            'code'       => 'WH001',
+            'name'       => 'Test Warehouse',
+            'type'       => 'warehouse',
             'is_enabled' => true,
         ]);
 
@@ -81,17 +81,17 @@ final class LocationResourceTest extends TestCase
         $location = Location::factory()->create(['name' => 'Old Name']);
 
         $updateData = [
-            'name' => 'Updated Name',
-            'type' => 'store',
+            'name'       => 'Updated Name',
+            'type'       => 'store',
             'is_enabled' => false,
         ];
 
         $response = $this->put("/admin/locations/{$location->id}", $updateData);
 
         $this->assertDatabaseHas('locations', [
-            'id' => $location->id,
-            'name' => 'Updated Name',
-            'type' => 'store',
+            'id'         => $location->id,
+            'name'       => 'Updated Name',
+            'type'       => 'store',
             'is_enabled' => false,
         ]);
 
@@ -161,16 +161,16 @@ final class LocationResourceTest extends TestCase
     public function test_locations_accept_valid_email(): void
     {
         $locationData = [
-            'code' => 'WH001',
-            'name' => 'Test Warehouse',
-            'type' => 'warehouse',
+            'code'  => 'WH001',
+            'name'  => 'Test Warehouse',
+            'type'  => 'warehouse',
             'email' => 'test@example.com',
         ];
 
         $response = $this->post('/admin/locations', $locationData);
 
         $this->assertDatabaseHas('locations', [
-            'code' => 'WH001',
+            'code'  => 'WH001',
             'email' => 'test@example.com',
         ]);
 
@@ -180,9 +180,9 @@ final class LocationResourceTest extends TestCase
     public function test_locations_reject_invalid_email(): void
     {
         $locationData = [
-            'code' => 'WH001',
-            'name' => 'Test Warehouse',
-            'type' => 'warehouse',
+            'code'  => 'WH001',
+            'name'  => 'Test Warehouse',
+            'type'  => 'warehouse',
             'email' => 'invalid-email',
         ];
 
@@ -194,18 +194,18 @@ final class LocationResourceTest extends TestCase
     public function test_locations_accept_valid_coordinates(): void
     {
         $locationData = [
-            'code' => 'WH001',
-            'name' => 'Test Warehouse',
-            'type' => 'warehouse',
-            'latitude' => 54.6872,
+            'code'      => 'WH001',
+            'name'      => 'Test Warehouse',
+            'type'      => 'warehouse',
+            'latitude'  => 54.6872,
             'longitude' => 25.2797,
         ];
 
         $response = $this->post('/admin/locations', $locationData);
 
         $this->assertDatabaseHas('locations', [
-            'code' => 'WH001',
-            'latitude' => 54.6872,
+            'code'      => 'WH001',
+            'latitude'  => 54.6872,
             'longitude' => 25.2797,
         ]);
 
@@ -215,9 +215,9 @@ final class LocationResourceTest extends TestCase
     public function test_locations_reject_invalid_latitude(): void
     {
         $locationData = [
-            'code' => 'WH001',
-            'name' => 'Test Warehouse',
-            'type' => 'warehouse',
+            'code'     => 'WH001',
+            'name'     => 'Test Warehouse',
+            'type'     => 'warehouse',
             'latitude' => 91.0, // Invalid latitude (> 90)
         ];
 
@@ -229,9 +229,9 @@ final class LocationResourceTest extends TestCase
     public function test_locations_reject_invalid_longitude(): void
     {
         $locationData = [
-            'code' => 'WH001',
-            'name' => 'Test Warehouse',
-            'type' => 'warehouse',
+            'code'      => 'WH001',
+            'name'      => 'Test Warehouse',
+            'type'      => 'warehouse',
             'longitude' => 181.0, // Invalid longitude (> 180)
         ];
 
@@ -249,9 +249,9 @@ final class LocationResourceTest extends TestCase
         ];
 
         $locationData = [
-            'code' => 'WH001',
-            'name' => 'Test Warehouse',
-            'type' => 'warehouse',
+            'code'          => 'WH001',
+            'name'          => 'Test Warehouse',
+            'type'          => 'warehouse',
             'opening_hours' => $openingHours,
         ];
 
@@ -266,15 +266,15 @@ final class LocationResourceTest extends TestCase
     public function test_locations_can_have_contact_info(): void
     {
         $contactInfo = [
-            'manager' => 'John Doe',
-            'department' => 'Warehouse',
+            'manager'           => 'John Doe',
+            'department'        => 'Warehouse',
             'emergency_contact' => '+37012345678',
         ];
 
         $locationData = [
-            'code' => 'WH001',
-            'name' => 'Test Warehouse',
-            'type' => 'warehouse',
+            'code'         => 'WH001',
+            'name'         => 'Test Warehouse',
+            'type'         => 'warehouse',
             'contact_info' => $contactInfo,
         ];
 
@@ -341,7 +341,7 @@ final class LocationResourceTest extends TestCase
         $location2 = Location::factory()->create(['is_enabled' => false]);
 
         $response = $this->post('/admin/locations/bulk-actions', [
-            'action' => 'enable',
+            'action'  => 'enable',
             'records' => [$location1->id, $location2->id],
         ]);
 
@@ -357,7 +357,7 @@ final class LocationResourceTest extends TestCase
         $location2 = Location::factory()->create(['is_enabled' => true]);
 
         $response = $this->post('/admin/locations/bulk-actions', [
-            'action' => 'disable',
+            'action'  => 'disable',
             'records' => [$location1->id, $location2->id],
         ]);
 

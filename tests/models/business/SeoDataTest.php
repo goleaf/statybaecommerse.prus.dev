@@ -17,16 +17,16 @@ class SeoDataTest extends TestCase
     public function test_seo_data_can_be_created(): void
     {
         $seoData = SeoData::factory()->create([
-            'title' => 'Test Page Title',
-            'description' => 'Test page description for SEO',
-            'keywords' => ['test', 'page', 'seo'],
+            'title'         => 'Test Page Title',
+            'description'   => 'Test page description for SEO',
+            'keywords'      => ['test', 'page', 'seo'],
             'canonical_url' => 'https://example.com/test-page',
         ]);
 
         $this->assertDatabaseHas('seo_data', [
-            'title' => 'Test Page Title',
-            'description' => 'Test page description for SEO',
-            'keywords' => json_encode(['test', 'page', 'seo']),
+            'title'         => 'Test Page Title',
+            'description'   => 'Test page description for SEO',
+            'keywords'      => json_encode(['test', 'page', 'seo']),
             'canonical_url' => 'https://example.com/test-page',
         ]);
     }
@@ -34,11 +34,11 @@ class SeoDataTest extends TestCase
     public function test_seo_data_casts_work_correctly(): void
     {
         $seoData = SeoData::factory()->create([
-            'no_index' => false,
-            'no_follow' => false,
-            'meta_tags' => ['og:type' => 'website'],
+            'no_index'        => false,
+            'no_follow'       => false,
+            'meta_tags'       => ['og:type' => 'website'],
             'structured_data' => ['@context' => 'https://schema.org'],
-            'created_at' => now(),
+            'created_at'      => now(),
         ]);
 
         $this->assertIsBool($seoData->no_index);
@@ -116,11 +116,11 @@ class SeoDataTest extends TestCase
     public function test_seo_data_can_have_meta_tags(): void
     {
         $metaTags = [
-            'og:title' => 'Open Graph Title',
+            'og:title'       => 'Open Graph Title',
             'og:description' => 'Open Graph Description',
-            'og:image' => 'https://example.com/og-image.jpg',
-            'og:type' => 'website',
-            'twitter:card' => 'summary_large_image',
+            'og:image'       => 'https://example.com/og-image.jpg',
+            'og:type'        => 'website',
+            'twitter:card'   => 'summary_large_image',
         ];
 
         $seoData = SeoData::factory()->create([
@@ -138,7 +138,7 @@ class SeoDataTest extends TestCase
     public function test_seo_data_robots_attribute(): void
     {
         $seoData = SeoData::factory()->create([
-            'no_index' => false,
+            'no_index'  => false,
             'no_follow' => false,
         ]);
 
@@ -211,10 +211,10 @@ class SeoDataTest extends TestCase
     public function test_seo_data_seo_score_calculation(): void
     {
         $seoData = SeoData::factory()->create([
-            'title' => 'This is a perfectly optimized title for SEO',
-            'description' => 'This is a perfectly optimized description for SEO that is between 120 and 160 characters long and provides good information.',
-            'keywords' => ['keyword1', 'keyword2', 'keyword3', 'keyword4', 'keyword5'],
-            'canonical_url' => 'https://example.com/page',
+            'title'           => 'This is a perfectly optimized title for SEO',
+            'description'     => 'This is a perfectly optimized description for SEO that is between 120 and 160 characters long and provides good information.',
+            'keywords'        => ['keyword1', 'keyword2', 'keyword3', 'keyword4', 'keyword5'],
+            'canonical_url'   => 'https://example.com/page',
             'structured_data' => ['@context' => 'https://schema.org'],
         ]);
 
@@ -239,10 +239,10 @@ class SeoDataTest extends TestCase
     public function test_seo_data_seo_score_color(): void
     {
         $seoData = SeoData::factory()->create([
-            'title' => 'This is a perfectly optimized title for SEO',
-            'description' => 'This is a perfectly optimized description for SEO that is between 120 and 160 characters long and provides good information.',
-            'keywords' => ['keyword1', 'keyword2', 'keyword3', 'keyword4', 'keyword5'],
-            'canonical_url' => 'https://example.com/page',
+            'title'           => 'This is a perfectly optimized title for SEO',
+            'description'     => 'This is a perfectly optimized description for SEO that is between 120 and 160 characters long and provides good information.',
+            'keywords'        => ['keyword1', 'keyword2', 'keyword3', 'keyword4', 'keyword5'],
+            'canonical_url'   => 'https://example.com/page',
             'structured_data' => ['@context' => 'https://schema.org'],
         ]);
 
@@ -261,12 +261,12 @@ class SeoDataTest extends TestCase
     public function test_seo_data_can_have_structured_data(): void
     {
         $structuredData = [
-            '@context' => 'https://schema.org',
-            '@type' => 'Product',
-            'name' => 'Test Product',
+            '@context'    => 'https://schema.org',
+            '@type'       => 'Product',
+            'name'        => 'Test Product',
             'description' => 'Test product description',
-            'sku' => 'TEST-001',
-            'brand' => 'Test Brand',
+            'sku'         => 'TEST-001',
+            'brand'       => 'Test Brand',
         ];
 
         $seoData = SeoData::factory()->create([
@@ -285,15 +285,15 @@ class SeoDataTest extends TestCase
     public function test_seo_data_meta_tags_html_attribute(): void
     {
         $seoData = SeoData::factory()->create([
-            'title' => 'Test Page Title',
-            'description' => 'Test page description',
-            'keywords' => ['test', 'page', 'seo'],
+            'title'         => 'Test Page Title',
+            'description'   => 'Test page description',
+            'keywords'      => ['test', 'page', 'seo'],
             'canonical_url' => 'https://example.com/test-page',
-            'no_index' => true,
-            'no_follow' => false,
-            'meta_tags' => [
+            'no_index'      => true,
+            'no_follow'     => false,
+            'meta_tags'     => [
                 'og:type' => 'website',
-                'author' => 'Test Author',
+                'author'  => 'Test Author',
             ],
         ]);
 
@@ -314,8 +314,8 @@ class SeoDataTest extends TestCase
     {
         $structuredData = [
             '@context' => 'https://schema.org',
-            '@type' => 'Product',
-            'name' => 'Test Product',
+            '@type'    => 'Product',
+            'name'     => 'Test Product',
         ];
 
         $seoData = SeoData::factory()->create([
@@ -344,7 +344,7 @@ class SeoDataTest extends TestCase
         $product = Product::factory()->create();
         $seoData = SeoData::factory()->create([
             'seoable_type' => Product::class,
-            'seoable_id' => $product->id,
+            'seoable_id'   => $product->id,
         ]);
 
         $this->assertInstanceOf(Product::class, $seoData->seoable);
@@ -356,7 +356,7 @@ class SeoDataTest extends TestCase
         $product = Product::factory()->create(['name' => 'Test Product']);
         $seoData = SeoData::factory()->create([
             'seoable_type' => Product::class,
-            'seoable_id' => $product->id,
+            'seoable_id'   => $product->id,
         ]);
 
         $this->assertEquals('Test Product', $seoData->seoable_name);

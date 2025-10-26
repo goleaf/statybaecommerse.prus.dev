@@ -14,7 +14,7 @@ beforeEach(function () {
     app(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
     $guard = config('auth.defaults.guard', 'web');
     \Spatie\Permission\Models\Role::query()->firstOrCreate([
-        'name' => 'admin',
+        'name'       => 'admin',
         'guard_name' => is_string($guard) ? $guard : 'web',
     ]);
     $this->admin->syncRoles(['admin']);
@@ -34,13 +34,13 @@ it('can render discount resource create page', function () {
 
 it('can create discount', function () {
     $newData = [
-        'name' => 'Test Discount',
+        'name'        => 'Test Discount',
         'description' => 'Test discount description',
-        'type' => 'percentage',
-        'value' => 10.0,
-        'starts_at' => now()->toDateTimeString(),
-        'ends_at' => now()->addDays(30)->toDateTimeString(),
-        'is_active' => true,
+        'type'        => 'percentage',
+        'value'       => 10.0,
+        'starts_at'   => now()->toDateTimeString(),
+        'ends_at'     => now()->addDays(30)->toDateTimeString(),
+        'is_active'   => true,
     ];
 
     actingAs($this->admin)
@@ -48,9 +48,9 @@ it('can create discount', function () {
         ->assertRedirect();
 
     assertDatabaseHas('discounts', [
-        'name' => 'Test Discount',
-        'type' => 'percentage',
-        'value' => 10.0,
+        'name'      => 'Test Discount',
+        'type'      => 'percentage',
+        'value'     => 10.0,
         'is_active' => true,
     ]);
 });
@@ -74,11 +74,11 @@ it('can render discount resource edit page', function () {
 it('can update discount', function () {
     $discount = Discount::factory()->create();
     $newData = [
-        'name' => 'Updated Discount',
+        'name'        => 'Updated Discount',
         'description' => 'Updated description',
-        'type' => 'fixed',
-        'value' => 25.0,
-        'is_active' => false,
+        'type'        => 'fixed',
+        'value'       => 25.0,
+        'is_active'   => false,
     ];
 
     \Livewire\Livewire::test(\App\Filament\Resources\DiscountResource\Pages\EditDiscount::class, ['record' => $discount->id])
@@ -132,11 +132,11 @@ it('can filter active discounts', function () {
 it('can filter current discounts', function () {
     $currentDiscount = Discount::factory()->create([
         'starts_at' => now()->subDays(1),
-        'ends_at' => now()->addDays(1),
+        'ends_at'   => now()->addDays(1),
     ]);
     $expiredDiscount = Discount::factory()->create([
         'starts_at' => now()->subDays(10),
-        'ends_at' => now()->subDays(1),
+        'ends_at'   => now()->subDays(1),
     ]);
 
     \Livewire\Livewire::test(\App\Filament\Resources\DiscountResource\Pages\ListDiscounts::class)
@@ -152,9 +152,9 @@ it('validates required fields when creating discount', function () {
 it('validates discount value is positive', function () {
     actingAs($this->admin)
         ->post(DiscountResource::getUrl('create'), [
-            'name' => 'Test Discount',
-            'type' => 'percentage',
-            'value' => -10,
+            'name'      => 'Test Discount',
+            'type'      => 'percentage',
+            'value'     => -10,
             'starts_at' => now()->toDateTimeString(),
         ])
         ->assertSessionHasErrors(['value']);
@@ -163,11 +163,11 @@ it('validates discount value is positive', function () {
 it('validates ends_at is after starts_at', function () {
     actingAs($this->admin)
         ->post(DiscountResource::getUrl('create'), [
-            'name' => 'Test Discount',
-            'type' => 'percentage',
-            'value' => 10,
+            'name'      => 'Test Discount',
+            'type'      => 'percentage',
+            'value'     => 10,
             'starts_at' => now()->toDateTimeString(),
-            'ends_at' => now()->subDays(1)->toDateTimeString(),
+            'ends_at'   => now()->subDays(1)->toDateTimeString(),
         ])
         ->assertSessionHasErrors(['ends_at']);
 });

@@ -70,15 +70,15 @@ final class EnumValueTest extends TestCase
     {
         // Arrange: deliberately craft records to assert deterministic ordering.
         $third = EnumValue::factory()->create([
-            'name' => 'Gamma',
+            'name'       => 'Gamma',
             'sort_order' => 2,
         ]);
         $second = EnumValue::factory()->create([
-            'name' => 'Beta',
+            'name'       => 'Beta',
             'sort_order' => 1,
         ]);
         $first = EnumValue::factory()->create([
-            'name' => 'Alpha',
+            'name'       => 'Alpha',
             'sort_order' => 1,
         ]);
 
@@ -177,9 +177,9 @@ final class EnumValueTest extends TestCase
     {
         // Arrange: craft a source enum value with metadata state.
         $enum = EnumValue::factory()->create([
-            'key' => 'original',
+            'key'        => 'original',
             'is_default' => true,
-            'metadata' => ['usage_count' => 9, 'extra' => 'info'],
+            'metadata'   => ['usage_count' => 9, 'extra' => 'info'],
         ]);
 
         // Act: duplicate the enum value using the helper.
@@ -245,15 +245,15 @@ final class EnumValueTest extends TestCase
 
         // Create candidates across the threshold with varying usage counts.
         $deletable = EnumValue::factory()->create([
-            'metadata' => ['usage_count' => 0],
+            'metadata'   => ['usage_count' => 0],
             'created_at' => Carbon::now()->subMonths(7),
         ]);
         $retainedBecauseUsed = EnumValue::factory()->create([
-            'metadata' => ['usage_count' => 3],
+            'metadata'   => ['usage_count' => 3],
             'created_at' => Carbon::now()->subMonths(7),
         ]);
         $retainedBecauseRecent = EnumValue::factory()->create([
-            'metadata' => ['usage_count' => 0],
+            'metadata'   => ['usage_count' => 0],
             'created_at' => Carbon::now()->subMonths(3),
         ]);
 

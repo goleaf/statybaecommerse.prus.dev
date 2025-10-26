@@ -15,22 +15,22 @@ it('can generate related product recommendations', function () {
     $brand = Brand::factory()->create();
 
     $mainProduct = Product::factory()->create([
-        'name' => 'Main Product',
-        'brand_id' => $brand->id,
+        'name'       => 'Main Product',
+        'brand_id'   => $brand->id,
         'is_visible' => true,
     ]);
     $mainProduct->categories()->attach($category->id);
 
     $relatedProduct = Product::factory()->create([
-        'name' => 'Related Product',
-        'brand_id' => $brand->id,
+        'name'       => 'Related Product',
+        'brand_id'   => $brand->id,
         'is_visible' => true,
     ]);
     $relatedProduct->categories()->attach($category->id);
 
     Livewire::test(\App\Livewire\Components\ProductRecommendations::class, [
         'productId' => $mainProduct->id,
-        'type' => 'related',
+        'type'      => 'related',
     ])
         ->assertSee('Related Product');
 });
@@ -54,17 +54,17 @@ it('can generate personalized recommendations based on purchase history', functi
     // Create purchase history
     $order = Order::factory()->create([
         'user_id' => $user->id,
-        'status' => 'completed',
+        'status'  => 'completed',
     ]);
 
     OrderItem::factory()->create([
-        'order_id' => $order->id,
+        'order_id'   => $order->id,
         'product_id' => $purchasedProduct->id,
     ]);
 
     Livewire::test(\App\Livewire\Components\ProductRecommendations::class, [
         'userId' => $user->id,
-        'type' => 'personalized',
+        'type'   => 'personalized',
     ])
         ->assertSee('Laptop') // Should recommend laptop (same category)
         ->assertDontSee('Book'); // Should not recommend book (different category)
@@ -78,7 +78,7 @@ it('can generate popular product recommendations', function () {
     for ($i = 0; $i < 5; $i++) {
         $order = Order::factory()->create(['status' => 'completed']);
         OrderItem::factory()->create([
-            'order_id' => $order->id,
+            'order_id'   => $order->id,
             'product_id' => $popularProduct->id,
         ]);
     }
@@ -98,19 +98,19 @@ it('can generate cross-sell recommendations', function () {
         $order = Order::factory()->create(['status' => 'completed']);
 
         OrderItem::factory()->create([
-            'order_id' => $order->id,
+            'order_id'   => $order->id,
             'product_id' => $mainProduct->id,
         ]);
 
         OrderItem::factory()->create([
-            'order_id' => $order->id,
+            'order_id'   => $order->id,
             'product_id' => $crossSellProduct->id,
         ]);
     }
 
     Livewire::test(\App\Livewire\Components\ProductRecommendations::class, [
         'productId' => $mainProduct->id,
-        'type' => 'cross_sell',
+        'type'      => 'cross_sell',
     ])
         ->assertSee('Cross Sell Product');
 });
@@ -119,20 +119,20 @@ it('can generate up-sell recommendations', function () {
     $category = Category::factory()->create();
 
     $baseProduct = Product::factory()->create([
-        'name' => 'Base Product',
+        'name'  => 'Base Product',
         'price' => 100.00,
     ]);
     $baseProduct->categories()->attach($category->id);
 
     $upSellProduct = Product::factory()->create([
-        'name' => 'Premium Product',
+        'name'  => 'Premium Product',
         'price' => 130.00, // 30% more expensive
     ]);
     $upSellProduct->categories()->attach($category->id);
 
     Livewire::test(\App\Livewire\Components\ProductRecommendations::class, [
         'productId' => $baseProduct->id,
-        'type' => 'up_sell',
+        'type'      => 'up_sell',
     ])
         ->assertSee('Premium Product');
 });
@@ -143,7 +143,7 @@ it('can track recently viewed products', function () {
 
     $component = Livewire::test(\App\Livewire\Components\ProductRecommendations::class, [
         'productId' => $product1->id,
-        'type' => 'recently_viewed',
+        'type'      => 'recently_viewed',
     ]);
 
     $component->call('trackView');
@@ -167,19 +167,19 @@ it('can generate customers also bought recommendations', function () {
         $order = Order::factory()->create(['status' => 'completed']);
 
         OrderItem::factory()->create([
-            'order_id' => $order->id,
+            'order_id'   => $order->id,
             'product_id' => $mainProduct->id,
         ]);
 
         OrderItem::factory()->create([
-            'order_id' => $order->id,
+            'order_id'   => $order->id,
             'product_id' => $alsoBoughtProduct->id,
         ]);
     }
 
     Livewire::test(\App\Livewire\Components\ProductRecommendations::class, [
         'productId' => $mainProduct->id,
-        'type' => 'customers_also_bought',
+        'type'      => 'customers_also_bought',
     ])
         ->assertSee('Also Bought Product');
 });
@@ -191,12 +191,12 @@ it('can generate trending product recommendations', function () {
     // Create recent orders for trending product (last 30 days)
     for ($i = 0; $i < 5; $i++) {
         $order = Order::factory()->create([
-            'status' => 'completed',
+            'status'     => 'completed',
             'created_at' => now()->subDays(rand(1, 30)),
         ]);
 
         OrderItem::factory()->create([
-            'order_id' => $order->id,
+            'order_id'   => $order->id,
             'product_id' => $trendingProduct->id,
         ]);
     }
@@ -204,12 +204,12 @@ it('can generate trending product recommendations', function () {
     // Create old orders for old product (more than 30 days ago)
     for ($i = 0; $i < 5; $i++) {
         $order = Order::factory()->create([
-            'status' => 'completed',
+            'status'     => 'completed',
             'created_at' => now()->subDays(rand(35, 60)),
         ]);
 
         OrderItem::factory()->create([
-            'order_id' => $order->id,
+            'order_id'   => $order->id,
             'product_id' => $oldProduct->id,
         ]);
     }
@@ -226,7 +226,7 @@ it('can handle recommendation fallbacks', function () {
 
     Livewire::test(\App\Livewire\Components\ProductRecommendations::class, [
         'userId' => $user->id,
-        'type' => 'personalized',
+        'type'   => 'personalized',
     ]);
 
     // Should fallback to popular products when no purchase history
@@ -242,8 +242,8 @@ it('can calculate customer segments correctly', function () {
     for ($i = 0; $i < 12; $i++) {
         Order::factory()->create([
             'user_id' => $vipCustomer->id,
-            'status' => 'completed',
-            'total' => 150.00,
+            'status'  => 'completed',
+            'total'   => 150.00,
         ]);
     }
 
@@ -251,8 +251,8 @@ it('can calculate customer segments correctly', function () {
     for ($i = 0; $i < 6; $i++) {
         Order::factory()->create([
             'user_id' => $regularCustomer->id,
-            'status' => 'completed',
-            'total' => 80.00,
+            'status'  => 'completed',
+            'total'   => 80.00,
         ]);
     }
 
@@ -267,19 +267,19 @@ it('can calculate customer segments correctly', function () {
 
 it('can perform SEO score calculations', function () {
     $goodSEOProduct = Product::factory()->create([
-        'name' => 'Well Optimized Product',
-        'seo_title' => 'Perfect SEO Title for Product - 45 Characters',
+        'name'            => 'Well Optimized Product',
+        'seo_title'       => 'Perfect SEO Title for Product - 45 Characters',
         'seo_description' => 'This is a perfectly optimized meta description that contains exactly the right amount of characters for good SEO performance.',
-        'meta_keywords' => 'product, seo, optimized',
-        'description' => 'This is a detailed product description with more than 100 characters to ensure good content quality for SEO purposes.',
+        'meta_keywords'   => 'product, seo, optimized',
+        'description'     => 'This is a detailed product description with more than 100 characters to ensure good content quality for SEO purposes.',
     ]);
 
     $poorSEOProduct = Product::factory()->create([
-        'name' => 'Poor SEO Product',
-        'seo_title' => null,
+        'name'            => 'Poor SEO Product',
+        'seo_title'       => null,
         'seo_description' => null,
-        'meta_keywords' => null,
-        'description' => 'Short desc',
+        'meta_keywords'   => null,
+        'description'     => 'Short desc',
     ]);
 
     $seoPage = new \App\Filament\Pages\SEOAnalytics;

@@ -59,11 +59,11 @@ final class Index extends AbstractPageComponent implements HasSchemas
             Select::make('sortBy')
                 ->label(__('frontend/brands.filters.sort_label'))
                 ->options([
-                    'name' => __('frontend/brands.filters.options.name'),
-                    'name_desc' => __('frontend/brands.filters.options.name_desc'),
+                    'name'           => __('frontend/brands.filters.options.name'),
+                    'name_desc'      => __('frontend/brands.filters.options.name_desc'),
                     'products_count' => __('frontend/brands.filters.options.products_count'),
-                    'created_at' => __('frontend/brands.filters.options.created_at'),
-                    'featured' => __('frontend/brands.filters.options.featured'),
+                    'created_at'     => __('frontend/brands.filters.options.created_at'),
+                    'featured'       => __('frontend/brands.filters.options.featured'),
                 ])
                 ->live()
                 ->afterStateUpdated(fn () => $this->resetPage())
@@ -83,21 +83,21 @@ final class Index extends AbstractPageComponent implements HasSchemas
         // Apply search filter
         if ($this->search !== '') {
             $query->where(function ($q) {
-                $q->where('name', 'like', '%'.$this->search.'%')->orWhere('description', 'like', '%'.$this->search.'%')->orWhereHas('translations', function ($translationQuery) {
+                $q->where('name', 'like', '%' . $this->search . '%')->orWhere('description', 'like', '%' . $this->search . '%')->orWhereHas('translations', function ($translationQuery) {
                     $translationQuery->where('locale', app()->getLocale())->where(function ($tq) {
-                        $tq->where('name', 'like', '%'.$this->search.'%')->orWhere('description', 'like', '%'.$this->search.'%');
+                        $tq->where('name', 'like', '%' . $this->search . '%')->orWhere('description', 'like', '%' . $this->search . '%');
                     });
                 });
             });
         }
         // Apply sorting
         match ($this->sortBy) {
-            'name' => $query->orderBy('name'),
-            'name_desc' => $query->orderByDesc('name'),
+            'name'           => $query->orderBy('name'),
+            'name_desc'      => $query->orderByDesc('name'),
             'products_count' => $query->orderByDesc('products_count'),
-            'created_at' => $query->orderByDesc('created_at'),
-            'featured' => $query->orderByDesc('is_featured')->orderBy('name'),
-            default => $query->orderBy('name'),
+            'created_at'     => $query->orderByDesc('created_at'),
+            'featured'       => $query->orderByDesc('is_featured')->orderBy('name'),
+            default          => $query->orderBy('name'),
         };
 
         return $query->paginate(12);
@@ -133,6 +133,6 @@ final class Index extends AbstractPageComponent implements HasSchemas
      */
     public function render(): View
     {
-        return view('livewire.pages.brand.index')->title(__('frontend/brands.meta.title').' - '.config('app.name'));
+        return view('livewire.pages.brand.index')->title(__('frontend/brands.meta.title') . ' - ' . config('app.name'));
     }
 }

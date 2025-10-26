@@ -8,6 +8,7 @@ use App\Models\Scopes\ActiveScope;
 use App\Traits\HasTranslations;
 use Carbon\CarbonImmutable;
 use Carbon\CarbonInterface;
+use DateTimeInterface;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -67,7 +68,7 @@ final class CampaignClick extends Model
                     return $value->copy()->setTimezone('UTC')->format('Y-m-d H:i:s');
                 }
 
-                if ($value instanceof \DateTimeInterface) {
+                if ($value instanceof DateTimeInterface) {
                     return CarbonImmutable::instance($value)
                         ->setTimezone('UTC')
                         ->format('Y-m-d H:i:s');

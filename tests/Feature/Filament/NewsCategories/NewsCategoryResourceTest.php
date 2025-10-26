@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Tests\Feature\Filament\NewsCategories;
 
@@ -20,7 +22,7 @@ final class NewsCategoryResourceTest extends TestCase
         parent::setUp();
 
         $admin = User::factory()->create([
-            'email' => 'admin@example.com',
+            'email'    => 'admin@example.com',
             'is_admin' => true,
         ]);
 
@@ -72,10 +74,10 @@ final class NewsCategoryResourceTest extends TestCase
         ])
             ->fillForm([
                 'is_visible' => false,
-                'parent_id' => $hiddenParent->slug,
+                'parent_id'  => $hiddenParent->slug,
                 'sort_order' => 10,
-                'color' => '#123456',
-                'icon' => 'heroicon-o-newspaper',
+                'color'      => '#123456',
+                'icon'       => 'heroicon-o-newspaper',
             ])
             ->call('save')
             ->assertHasNoFormErrors();
@@ -95,15 +97,15 @@ final class NewsCategoryResourceTest extends TestCase
 
         $category->translations()->createMany([
             [
-                'locale' => 'lt',
-                'name' => 'Paslėpta kategorija',
-                'slug' => "paslepta-kategorija-{$category->slug}",
+                'locale'      => 'lt',
+                'name'        => 'Paslėpta kategorija',
+                'slug'        => "paslepta-kategorija-{$category->slug}",
                 'description' => 'Kategorija lietuvių kalba',
             ],
             [
-                'locale' => 'en',
-                'name' => 'Hidden Category',
-                'slug' => "hidden-category-{$category->slug}",
+                'locale'      => 'en',
+                'name'        => 'Hidden Category',
+                'slug'        => "hidden-category-{$category->slug}",
                 'description' => 'Category in English',
             ],
         ]);

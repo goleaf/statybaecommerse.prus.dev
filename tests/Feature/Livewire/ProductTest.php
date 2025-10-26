@@ -18,11 +18,11 @@ final class ProductTest extends TestCase
     public function test_product_factory_creates_valid_product(): void
     {
         $product = Product::factory()->create([
-            'is_visible' => true,
-            'published_at' => now()->subDay(),
-            'status' => 'published',
-            'stock_quantity' => 10,
-            'manage_stock' => true,
+            'is_visible'          => true,
+            'published_at'        => now()->subDay(),
+            'status'              => 'published',
+            'stock_quantity'      => 10,
+            'manage_stock'        => true,
             'low_stock_threshold' => 5,
         ]);
 
@@ -51,7 +51,7 @@ final class ProductTest extends TestCase
 
         Review::factory()->approved()->count(3)->create([
             'product_id' => $product->id,
-            'rating' => 5,
+            'rating'     => 5,
         ]);
 
         $product->loadAvg('reviews as average_rating', 'rating');
@@ -64,7 +64,7 @@ final class ProductTest extends TestCase
     public function test_product_discount_percentage_accessor(): void
     {
         $product = Product::factory()->create([
-            'price' => '80.00',
+            'price'         => '80.00',
             'compare_price' => '100.00',
         ]);
 

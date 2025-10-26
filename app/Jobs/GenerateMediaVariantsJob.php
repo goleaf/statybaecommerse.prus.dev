@@ -36,7 +36,7 @@ final class GenerateMediaVariantsJob implements ShouldQueue
     }
 
     /**
-     * @param  array<string, array<string, int>>  $variants
+     * @param array<string, array<string, int>> $variants
      */
     public function __construct(
         private readonly int $mediaId,

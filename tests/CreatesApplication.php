@@ -57,7 +57,7 @@ trait CreatesApplication
         TestingDatabase::ensureExists();
 
         putenv('DB_CONNECTION=sqlite');
-        putenv('DB_DATABASE='.$databasePath);
+        putenv('DB_DATABASE=' . $databasePath);
         $_ENV['DB_CONNECTION'] = 'sqlite';
         $_ENV['DB_DATABASE'] = $databasePath;
         $_SERVER['DB_CONNECTION'] = 'sqlite';

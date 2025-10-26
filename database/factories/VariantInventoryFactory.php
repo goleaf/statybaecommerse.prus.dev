@@ -23,33 +23,33 @@ class VariantInventoryFactory extends Factory
         $reserved = $this->faker->numberBetween(0, (int) floor($stock / 3));
 
         return [
-            'variant_id' => ProductVariant::factory(),
-            'location_id' => Location::factory(),
-            'warehouse_code' => $this->faker->regexify('[A-Z]{3}-[0-9]{3}'),
-            'stock' => $stock,
-            'reserved' => $reserved,
-            'available' => max(0, $stock - $reserved),
-            'incoming' => $this->faker->numberBetween(0, 40),
-            'threshold' => $this->faker->numberBetween(5, 20),
-            'reorder_point' => $this->faker->numberBetween(5, 20),
-            'reorder_quantity' => $this->faker->numberBetween(25, 100),
-            'max_stock_level' => $this->faker->numberBetween(200, 500),
-            'cost_per_unit' => $this->faker->randomFloat(2, 5, 150),
-            'supplier_id' => Partner::factory(),
-            'batch_number' => $this->faker->optional()->regexify('[A-Z0-9]{8}'),
-            'expiry_date' => $this->faker->optional()->dateTimeBetween('+1 month', '+1 year'),
-            'status' => $this->faker->randomElement(['active', 'inactive', 'discontinued']),
-            'is_tracked' => true,
-            'notes' => $this->faker->optional()->sentence(),
+            'variant_id'        => ProductVariant::factory(),
+            'location_id'       => Location::factory(),
+            'warehouse_code'    => $this->faker->regexify('[A-Z]{3}-[0-9]{3}'),
+            'stock'             => $stock,
+            'reserved'          => $reserved,
+            'available'         => max(0, $stock - $reserved),
+            'incoming'          => $this->faker->numberBetween(0, 40),
+            'threshold'         => $this->faker->numberBetween(5, 20),
+            'reorder_point'     => $this->faker->numberBetween(5, 20),
+            'reorder_quantity'  => $this->faker->numberBetween(25, 100),
+            'max_stock_level'   => $this->faker->numberBetween(200, 500),
+            'cost_per_unit'     => $this->faker->randomFloat(2, 5, 150),
+            'supplier_id'       => Partner::factory(),
+            'batch_number'      => $this->faker->optional()->regexify('[A-Z0-9]{8}'),
+            'expiry_date'       => $this->faker->optional()->dateTimeBetween('+1 month', '+1 year'),
+            'status'            => $this->faker->randomElement(['active', 'inactive', 'discontinued']),
+            'is_tracked'        => true,
+            'notes'             => $this->faker->optional()->sentence(),
             'last_restocked_at' => $this->faker->optional()->dateTimeBetween('-6 months', 'now'),
-            'last_sold_at' => $this->faker->optional()->dateTimeBetween('-1 month', 'now'),
+            'last_sold_at'      => $this->faker->optional()->dateTimeBetween('-1 month', 'now'),
         ];
     }
 
     public function lowStock(): static
     {
         return $this->state(fn (array $attributes) => [
-            'stock' => $this->faker->numberBetween(1, 10),
+            'stock'         => $this->faker->numberBetween(1, 10),
             'reorder_point' => $this->faker->numberBetween(15, 25),
         ]);
     }
@@ -57,7 +57,7 @@ class VariantInventoryFactory extends Factory
     public function outOfStock(): static
     {
         return $this->state(fn (array $attributes) => [
-            'stock' => 0,
+            'stock'    => 0,
             'reserved' => 0,
         ]);
     }
@@ -65,7 +65,7 @@ class VariantInventoryFactory extends Factory
     public function needsReorder(): static
     {
         return $this->state(fn (array $attributes) => [
-            'stock' => $this->faker->numberBetween(1, 5),
+            'stock'         => $this->faker->numberBetween(1, 5),
             'reorder_point' => $this->faker->numberBetween(10, 20),
         ]);
     }

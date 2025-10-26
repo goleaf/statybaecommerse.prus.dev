@@ -41,11 +41,11 @@ final class ContractValidationTest extends TestCase
         $product = Product::factory()
             ->for($brand)
             ->create([
-                'is_visible' => true,
-                'published_at' => now()->subDay(),
-                'price' => 199,
-                'sale_price' => 149,
-                'manage_stock' => true,
+                'is_visible'     => true,
+                'published_at'   => now()->subDay(),
+                'price'          => 199,
+                'sale_price'     => 149,
+                'manage_stock'   => true,
                 'stock_quantity' => 25,
             ]);
         $product->categories()->attach($category->getKey());
@@ -66,10 +66,10 @@ final class ContractValidationTest extends TestCase
         $brand = Brand::factory()->create(['is_visible' => true]);
         $category = Category::factory()->create(['is_visible' => true]);
         Product::factory()->count(2)->for($brand)->create([
-            'is_visible' => true,
-            'published_at' => now()->subDay(),
-            'price' => 59,
-            'manage_stock' => true,
+            'is_visible'     => true,
+            'published_at'   => now()->subDay(),
+            'price'          => 59,
+            'manage_stock'   => true,
             'stock_quantity' => 8,
         ])->each(fn (Product $product) => $product->categories()->attach($category->getKey()));
 
@@ -107,7 +107,7 @@ final class ContractValidationTest extends TestCase
     {
         $user = User::factory()->create();
         $order = Order::factory()->for($user)->create([
-            'status' => 'processing',
+            'status'         => 'processing',
             'payment_status' => 'paid',
         ]);
         OrderItem::factory()->count(2)->forOrder($order)->create();
@@ -124,7 +124,7 @@ final class ContractValidationTest extends TestCase
     {
         $user = User::factory()->create([
             'preferred_locale' => 'lt',
-            'timezone' => 'Europe/Vilnius',
+            'timezone'         => 'Europe/Vilnius',
         ]);
         Sanctum::actingAs($user, ['profile.read']);
 

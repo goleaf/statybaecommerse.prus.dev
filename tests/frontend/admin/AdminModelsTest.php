@@ -22,8 +22,8 @@ uses(RefreshDatabase::class);
 describe('Campaign Model', function (): void {
     it('can create a campaign', function (): void {
         $campaign = Campaign::factory()->create([
-            'name' => 'Test Campaign',
-            'slug' => 'test-campaign',
+            'name'   => 'Test Campaign',
+            'slug'   => 'test-campaign',
             'status' => 'active',
         ]);
 
@@ -57,8 +57,8 @@ describe('Campaign Model', function (): void {
 describe('Setting Model', function (): void {
     it('can create a setting', function (): void {
         $setting = Setting::factory()->create([
-            'key' => 'test_setting',
-            'value' => 'test_value',
+            'key'          => 'test_setting',
+            'value'        => 'test_value',
             'display_name' => 'Test Setting',
         ]);
 
@@ -83,8 +83,8 @@ describe('Notification Model', function (): void {
         $user = User::factory()->create();
 
         $notification = Notification::factory()->create([
-            'type' => 'info',
-            'title' => 'Test Notification',
+            'type'    => 'info',
+            'title'   => 'Test Notification',
             'message' => 'Test message',
             'user_id' => $user->id,
         ]);
@@ -111,7 +111,7 @@ describe('AnalyticsEvent Model', function (): void {
         $event = AnalyticsEvent::factory()->create([
             'event_name' => 'test_event',
             'event_type' => 'page_view',
-            'user_id' => $user->id,
+            'user_id'    => $user->id,
             'session_id' => 'test_session_123',
         ]);
 
@@ -133,10 +133,10 @@ describe('AnalyticsEvent Model', function (): void {
 describe('PartnerTier Model', function (): void {
     it('can create a partner tier', function (): void {
         $tier = PartnerTier::factory()->create([
-            'name' => 'Gold Partner',
-            'description' => 'Gold tier partner',
+            'name'                => 'Gold Partner',
+            'description'         => 'Gold tier partner',
             'discount_percentage' => 15.0,
-            'min_order_value' => 1000.0,
+            'min_order_value'     => 1000.0,
         ]);
 
         expect($tier->name)->toBe('Gold Partner');
@@ -159,9 +159,9 @@ describe('PartnerTier Model', function (): void {
 describe('Product Model', function (): void {
     it('can create a product', function (): void {
         $product = Product::factory()->create([
-            'name' => 'Test Product',
-            'slug' => 'test-product',
-            'price' => 99.99,
+            'name'       => 'Test Product',
+            'slug'       => 'test-product',
+            'price'      => 99.99,
             'is_visible' => true,
         ]);
 
@@ -198,8 +198,8 @@ describe('Order Model', function (): void {
 
         $order = Order::factory()->create([
             'user_id' => $user->id,
-            'total' => 199.99,
-            'status' => 'pending',
+            'total'   => 199.99,
+            'status'  => 'pending',
         ]);
 
         expect($order->user_id)->toBe($user->id);
@@ -228,8 +228,8 @@ describe('Order Model', function (): void {
 describe('Category Model', function (): void {
     it('can create a category', function (): void {
         $category = Category::factory()->create([
-            'name' => 'Test Category',
-            'slug' => 'test-category',
+            'name'      => 'Test Category',
+            'slug'      => 'test-category',
             'is_active' => true,
         ]);
 
@@ -252,8 +252,8 @@ describe('Category Model', function (): void {
 describe('Brand Model', function (): void {
     it('can create a brand', function (): void {
         $brand = Brand::factory()->create([
-            'name' => 'Test Brand',
-            'slug' => 'test-brand',
+            'name'      => 'Test Brand',
+            'slug'      => 'test-brand',
             'is_active' => true,
         ]);
 
@@ -276,8 +276,8 @@ describe('Brand Model', function (): void {
 describe('Collection Model', function (): void {
     it('can create a collection', function (): void {
         $collection = Collection::factory()->create([
-            'name' => 'Test Collection',
-            'slug' => 'test-collection',
+            'name'      => 'Test Collection',
+            'slug'      => 'test-collection',
             'is_active' => true,
         ]);
 
@@ -300,9 +300,9 @@ describe('Collection Model', function (): void {
 describe('Discount Model', function (): void {
     it('can create a discount', function (): void {
         $discount = Discount::factory()->create([
-            'name' => 'Test Discount',
-            'type' => 'percentage',
-            'value' => 10.0,
+            'name'      => 'Test Discount',
+            'type'      => 'percentage',
+            'value'     => 10.0,
             'is_active' => true,
         ]);
 
@@ -329,10 +329,10 @@ describe('Review Model', function (): void {
         $product = Product::factory()->create();
 
         $review = Review::factory()->create([
-            'user_id' => $user->id,
+            'user_id'    => $user->id,
             'product_id' => $product->id,
-            'rating' => 5,
-            'comment' => 'Great product!',
+            'rating'     => 5,
+            'comment'    => 'Great product!',
         ]);
 
         expect($review->user_id)->toBe($user->id);

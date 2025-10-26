@@ -11,9 +11,7 @@ use Monolog\Logger as MonologLogger;
 
 final class ConfigureContextProcessors
 {
-    public function __construct(private readonly LogContext $logContext)
-    {
-    }
+    public function __construct(private readonly LogContext $logContext) {}
 
     public function __invoke(IlluminateLogger $logger): void
     {

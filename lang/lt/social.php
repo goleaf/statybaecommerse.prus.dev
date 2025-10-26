@@ -1,9 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 return [
-    'facebook' => 'Facebook',
+    'facebook'  => 'Facebook',
     'instagram' => 'Instagram',
-    'twitter' => 'Twitter',
-    'youtube' => 'YouTube',
-    'linkedin' => 'LinkedIn',
+    'twitter'   => 'Twitter',
+    'youtube'   => 'YouTube',
+    'linkedin'  => 'LinkedIn',
 ];

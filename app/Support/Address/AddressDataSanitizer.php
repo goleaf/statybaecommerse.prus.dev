@@ -18,9 +18,7 @@ final class AddressDataSanitizer
     /**
      * Clean and normalise the provided address payload.
      *
-     * @param array<string, mixed> $payload
-     * @param string|null $countryCode
-     *
+     * @param  array<string, mixed> $payload
      * @return array<string, mixed>
      */
     public static function sanitize(array $payload, ?string $countryCode = null): array

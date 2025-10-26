@@ -18,11 +18,11 @@ final class NotificationTest extends TestCase
         $user = User::factory()->create();
 
         $notification = DatabaseNotification::create([
-            'id' => 'test-notification-id',
-            'type' => 'App\Notifications\TestNotification',
+            'id'              => 'test-notification-id',
+            'type'            => 'App\Notifications\TestNotification',
             'notifiable_type' => User::class,
-            'notifiable_id' => $user->id,
-            'data' => ['message' => 'Test notification'],
+            'notifiable_id'   => $user->id,
+            'data'            => ['message' => 'Test notification'],
         ]);
 
         $this->assertInstanceOf(DatabaseNotification::class, $notification);
@@ -38,11 +38,11 @@ final class NotificationTest extends TestCase
         $user = User::factory()->create();
 
         $notification = DatabaseNotification::create([
-            'id' => 'test-notification-id',
-            'type' => 'App\Notifications\TestNotification',
+            'id'              => 'test-notification-id',
+            'type'            => 'App\Notifications\TestNotification',
             'notifiable_type' => User::class,
-            'notifiable_id' => $user->id,
-            'data' => ['message' => 'Test notification'],
+            'notifiable_id'   => $user->id,
+            'data'            => ['message' => 'Test notification'],
         ]);
 
         $this->assertInstanceOf(User::class, $notification->notifiable);
@@ -54,11 +54,11 @@ final class NotificationTest extends TestCase
         $user = User::factory()->create();
 
         $notification = DatabaseNotification::create([
-            'id' => 'test-notification-id',
-            'type' => 'App\Notifications\TestNotification',
+            'id'              => 'test-notification-id',
+            'type'            => 'App\Notifications\TestNotification',
             'notifiable_type' => User::class,
-            'notifiable_id' => $user->id,
-            'data' => ['message' => 'Test notification'],
+            'notifiable_id'   => $user->id,
+            'data'            => ['message' => 'Test notification'],
         ]);
 
         $this->assertNull($notification->read_at);
@@ -74,12 +74,12 @@ final class NotificationTest extends TestCase
         $user = User::factory()->create();
 
         $notification = DatabaseNotification::create([
-            'id' => 'test-notification-id',
-            'type' => 'App\Notifications\TestNotification',
+            'id'              => 'test-notification-id',
+            'type'            => 'App\Notifications\TestNotification',
             'notifiable_type' => User::class,
-            'notifiable_id' => $user->id,
-            'data' => ['message' => 'Test notification'],
-            'read_at' => now(),
+            'notifiable_id'   => $user->id,
+            'data'            => ['message' => 'Test notification'],
+            'read_at'         => now(),
         ]);
 
         $this->assertNotNull($notification->read_at);
@@ -96,11 +96,11 @@ final class NotificationTest extends TestCase
         $user = User::factory()->create();
 
         $notification = DatabaseNotification::create([
-            'id' => 'test-notification-id',
-            'type' => 'App\Notifications\TestNotification',
+            'id'              => 'test-notification-id',
+            'type'            => 'App\Notifications\TestNotification',
             'notifiable_type' => User::class,
-            'notifiable_id' => $user->id,
-            'data' => ['message' => 'Test notification', 'count' => 5],
+            'notifiable_id'   => $user->id,
+            'data'            => ['message' => 'Test notification', 'count' => 5],
         ]);
 
         $this->assertIsArray($notification->data);
@@ -114,21 +114,21 @@ final class NotificationTest extends TestCase
 
         // Create read notification
         DatabaseNotification::create([
-            'id' => 'read-notification-id',
-            'type' => 'App\Notifications\TestNotification',
+            'id'              => 'read-notification-id',
+            'type'            => 'App\Notifications\TestNotification',
             'notifiable_type' => User::class,
-            'notifiable_id' => $user->id,
-            'data' => ['message' => 'Read notification'],
-            'read_at' => now(),
+            'notifiable_id'   => $user->id,
+            'data'            => ['message' => 'Read notification'],
+            'read_at'         => now(),
         ]);
 
         // Create unread notification
         DatabaseNotification::create([
-            'id' => 'unread-notification-id',
-            'type' => 'App\Notifications\TestNotification',
+            'id'              => 'unread-notification-id',
+            'type'            => 'App\Notifications\TestNotification',
             'notifiable_type' => User::class,
-            'notifiable_id' => $user->id,
-            'data' => ['message' => 'Unread notification'],
+            'notifiable_id'   => $user->id,
+            'data'            => ['message' => 'Unread notification'],
         ]);
 
         $readNotifications = DatabaseNotification::whereNotNull('read_at')->get();

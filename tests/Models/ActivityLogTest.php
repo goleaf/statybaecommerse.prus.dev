@@ -37,7 +37,7 @@ final class ActivityLogTest extends TestCase
 
     public function test_relations_expose_expected_relation_objects(): void
     {
-        $model = new ActivityLog();
+        $model = new ActivityLog;
 
         $this->assertInstanceOf(BelongsTo::class, $model->user());
         $this->assertInstanceOf(MorphTo::class, $model->subject());
@@ -46,7 +46,7 @@ final class ActivityLogTest extends TestCase
 
     public function test_fillable_attributes_are_defined(): void
     {
-        $model = new ActivityLog();
+        $model = new ActivityLog;
 
         $this->assertEqualsCanonicalizing([
             'log_name',
@@ -74,14 +74,14 @@ final class ActivityLogTest extends TestCase
 
     public function test_casts_are_configured(): void
     {
-        $model = new ActivityLog();
+        $model = new ActivityLog;
 
         foreach ([
-            'properties' => 'array',
+            'properties'   => 'array',
             'is_important' => 'boolean',
-            'is_system' => 'boolean',
-            'created_at' => 'datetime',
-            'updated_at' => 'datetime',
+            'is_system'    => 'boolean',
+            'created_at'   => 'datetime',
+            'updated_at'   => 'datetime',
         ] as $attribute => $cast) {
             $this->assertArrayHasKey($attribute, $model->getCasts());
             $this->assertSame($cast, $model->getCasts()[$attribute]);
@@ -99,4 +99,3 @@ final class ActivityLogTest extends TestCase
         $this->assertTrue($log->user->is($user));
     }
 }
-

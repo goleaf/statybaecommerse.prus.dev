@@ -3,10 +3,8 @@
 declare(strict_types=1);
 
 use App\Filament\Resources\ProductResource;
-use App\Filament\Resources\ProductResource\Pages\ListProducts;
 use App\Models\Product;
 use App\Models\User;
-use Livewire\Livewire;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
@@ -29,10 +27,10 @@ describe('Product resource authorization', function () {
 
         $rolePermissions = [
             'super_admin' => ['view_products', 'create_products', 'edit_products', 'delete_products'],
-            'admin' => ['view_products', 'create_products', 'edit_products', 'delete_products'],
-            'manager' => ['view_products', 'create_products', 'edit_products'],
-            'editor' => ['view_products', 'create_products', 'edit_products'],
-            'user' => [],
+            'admin'       => ['view_products', 'create_products', 'edit_products', 'delete_products'],
+            'manager'     => ['view_products', 'create_products', 'edit_products'],
+            'editor'      => ['view_products', 'create_products', 'edit_products'],
+            'user'        => [],
         ];
 
         foreach ($rolePermissions as $role => $permissions) {
@@ -118,8 +116,8 @@ describe('Product resource authorization', function () {
 
         expect(ProductResource::canDelete($this->product))->toBeFalse();
     })->with([
-        'editor role missing delete ability' => 'editor',
+        'editor role missing delete ability'  => 'editor',
         'manager role missing delete ability' => 'manager',
-        'basic user' => 'user',
+        'basic user'                          => 'user',
     ]);
 });

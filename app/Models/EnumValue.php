@@ -32,9 +32,9 @@ final class EnumValue extends Model
     ];
 
     protected $casts = [
-        'is_active' => 'boolean',
+        'is_active'  => 'boolean',
         'is_default' => 'boolean',
-        'metadata' => 'array',
+        'metadata'   => 'array',
         'sort_order' => 'integer',
     ];
 
@@ -149,7 +149,7 @@ final class EnumValue extends Model
     {
         // Clone the existing model while resetting fields that must remain unique.
         $newEnumValue = $this->replicate();
-        $newEnumValue->key = $this->key.'_copy';
+        $newEnumValue->key = $this->key . '_copy';
         $newEnumValue->is_default = false;
 
         $metadata = $newEnumValue->metadata;
@@ -170,19 +170,19 @@ final class EnumValue extends Model
     {
         // Provide a mapping of known type identifiers to translated labels.
         $defaultTypes = [
-            'navigation_group' => __('admin.enum_values.types.navigation_group'),
-            'order_status' => __('admin.enum_values.types.order_status'),
-            'payment_status' => __('admin.enum_values.types.payment_status'),
-            'shipping_status' => __('admin.enum_values.types.shipping_status'),
-            'user_role' => __('admin.enum_values.types.user_role'),
-            'product_status' => __('admin.enum_values.types.product_status'),
-            'campaign_type' => __('admin.enum_values.types.campaign_type'),
-            'discount_type' => __('admin.enum_values.types.discount_type'),
+            'navigation_group'  => __('admin.enum_values.types.navigation_group'),
+            'order_status'      => __('admin.enum_values.types.order_status'),
+            'payment_status'    => __('admin.enum_values.types.payment_status'),
+            'shipping_status'   => __('admin.enum_values.types.shipping_status'),
+            'user_role'         => __('admin.enum_values.types.user_role'),
+            'product_status'    => __('admin.enum_values.types.product_status'),
+            'campaign_type'     => __('admin.enum_values.types.campaign_type'),
+            'discount_type'     => __('admin.enum_values.types.discount_type'),
             'notification_type' => __('admin.enum_values.types.notification_type'),
-            'document_type' => __('admin.enum_values.types.document_type'),
-            'address_type' => __('admin.enum_values.types.address_type'),
-            'priority' => __('admin.enum_values.types.priority'),
-            'status' => __('admin.enum_values.types.status'),
+            'document_type'     => __('admin.enum_values.types.document_type'),
+            'address_type'      => __('admin.enum_values.types.address_type'),
+            'priority'          => __('admin.enum_values.types.priority'),
+            'status'            => __('admin.enum_values.types.status'),
         ];
 
         $existingTypes = self::query()->distinct()->pluck('type')->all();

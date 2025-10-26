@@ -9,6 +9,7 @@ use App\Models\CartItem;
 use Illuminate\Contracts\Session\Session;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
+use Throwable;
 
 /**
  * CartLifecycleService
@@ -112,7 +113,7 @@ final class CartLifecycleService
     }
 
     /**
-     * @param  Collection<int, string>  $sessionKeys
+     * @param Collection<int, string> $sessionKeys
      */
     private function clearSessions(Collection $sessionKeys): void
     {
@@ -141,7 +142,7 @@ final class CartLifecycleService
 
         try {
             \Darryldecode\Cart\Facades\CartFacade::session($sessionKey)->clear();
-        } catch (\Throwable) {
+        } catch (Throwable) {
             // Swallow errors from optional cart integrations.
         }
     }

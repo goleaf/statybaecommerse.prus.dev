@@ -2,8 +2,6 @@
 
 declare(strict_types=1);
 
-use App\Support\ErrorCode;
-
 return [
     'titles' => [
         // @translators: Wird angezeigt, wenn die angeforderte Seite oder Ressource fehlt (HTTP 404).

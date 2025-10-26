@@ -79,7 +79,7 @@ final class ReferralModelTest extends TestCase
         // Create 5 active referrals (under limit of 100)
         Referral::factory()->count(5)->create([
             'referrer_id' => $user->id,
-            'status' => 'pending',
+            'status'      => 'pending',
         ]);
 
         $this->assertTrue(Referral::canUserRefer($user->id));
@@ -92,7 +92,7 @@ final class ReferralModelTest extends TestCase
         // Create 101 active referrals (over limit of 100)
         Referral::factory()->count(101)->create([
             'referrer_id' => $user->id,
-            'status' => 'pending',
+            'status'      => 'pending',
         ]);
 
         $this->assertFalse(Referral::canUserRefer($user->id));
@@ -101,7 +101,7 @@ final class ReferralModelTest extends TestCase
     public function test_referral_is_valid_when_pending_and_not_expired(): void
     {
         $referral = Referral::factory()->create([
-            'status' => 'pending',
+            'status'     => 'pending',
             'expires_at' => now()->addDay(),
         ]);
 
@@ -118,7 +118,7 @@ final class ReferralModelTest extends TestCase
     public function test_referral_is_invalid_when_expired(): void
     {
         $referral = Referral::factory()->create([
-            'status' => 'pending',
+            'status'     => 'pending',
             'expires_at' => now()->subDay(),
         ]);
 
@@ -159,11 +159,11 @@ final class ReferralModelTest extends TestCase
         $referral = Referral::factory()->create();
         ReferralReward::factory()->create([
             'referral_id' => $referral->id,
-            'amount' => 10.50,
+            'amount'      => 10.50,
         ]);
         ReferralReward::factory()->create([
             'referral_id' => $referral->id,
-            'amount' => 5.25,
+            'amount'      => 5.25,
         ]);
 
         $this->assertEquals(15.75, $referral->total_rewards_amount);
@@ -201,8 +201,8 @@ final class ReferralModelTest extends TestCase
         $referred = User::factory()->create();
 
         $referral = Referral::createWithCode([
-            'referrer_id' => $referrer->id,
-            'referred_id' => $referred->id,
+            'referrer_id'   => $referrer->id,
+            'referred_id'   => $referred->id,
             'referral_code' => 'CUSTOM123',
         ]);
 

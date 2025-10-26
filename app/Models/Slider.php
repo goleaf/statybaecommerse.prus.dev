@@ -29,8 +29,8 @@ final class Slider extends Model implements HasMedia
     ];
 
     protected $casts = [
-        'is_active' => 'boolean',
-        'settings' => 'array',
+        'is_active'  => 'boolean',
+        'settings'   => 'array',
         'sort_order' => 'integer',
     ];
 

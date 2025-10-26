@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Tests\Unit\Models;
 
@@ -31,11 +33,11 @@ final class UserWishlistTest extends TestCase
     public function test_user_wishlist_can_be_created(): void
     {
         $wishlist = UserWishlist::factory()->create([
-            'user_id' => $this->user->id,
-            'name' => 'Test Wishlist',
+            'user_id'     => $this->user->id,
+            'name'        => 'Test Wishlist',
             'description' => 'Test Description',
-            'is_public' => true,
-            'is_default' => false,
+            'is_public'   => true,
+            'is_default'  => false,
         ]);
 
         $this->assertInstanceOf(UserWishlist::class, $wishlist);
@@ -44,16 +46,16 @@ final class UserWishlistTest extends TestCase
         $this->assertTrue($wishlist->is_public);
         $this->assertFalse($wishlist->is_default);
         $this->assertDatabaseHas('user_wishlists', [
-            'id' => $wishlist->id,
+            'id'      => $wishlist->id,
             'user_id' => $this->user->id,
-            'name' => 'Test Wishlist',
+            'name'    => 'Test Wishlist',
         ]);
     }
 
     public function test_user_wishlist_casts_work_correctly(): void
     {
         $wishlist = UserWishlist::factory()->create([
-            'is_public' => 1,
+            'is_public'  => 1,
             'is_default' => 0,
         ]);
 
@@ -91,7 +93,7 @@ final class UserWishlistTest extends TestCase
         $product = Product::factory()->create();
         WishlistItem::factory()->create([
             'wishlist_id' => $this->wishlist->id,
-            'product_id' => $product->id,
+            'product_id'  => $product->id,
         ]);
 
         $this->assertTrue($this->wishlist->hasProduct($product->id));
@@ -105,8 +107,8 @@ final class UserWishlistTest extends TestCase
 
         WishlistItem::factory()->create([
             'wishlist_id' => $this->wishlist->id,
-            'product_id' => $product->id,
-            'variant_id' => $variant->id,
+            'product_id'  => $product->id,
+            'variant_id'  => $variant->id,
         ]);
 
         $this->assertTrue($this->wishlist->hasProduct($product->id, $variant->id));
@@ -126,9 +128,9 @@ final class UserWishlistTest extends TestCase
         $this->assertEquals('Test notes', $item->notes);
         $this->assertDatabaseHas('wishlist_items', [
             'wishlist_id' => $this->wishlist->id,
-            'product_id' => $product->id,
-            'quantity' => 2,
-            'notes' => 'Test notes',
+            'product_id'  => $product->id,
+            'quantity'    => 2,
+            'notes'       => 'Test notes',
         ]);
     }
 
@@ -142,8 +144,8 @@ final class UserWishlistTest extends TestCase
         $this->assertEquals($variant->id, $item->variant_id);
         $this->assertDatabaseHas('wishlist_items', [
             'wishlist_id' => $this->wishlist->id,
-            'product_id' => $product->id,
-            'variant_id' => $variant->id,
+            'product_id'  => $product->id,
+            'variant_id'  => $variant->id,
         ]);
     }
 
@@ -152,7 +154,7 @@ final class UserWishlistTest extends TestCase
         $product = Product::factory()->create();
         $item = WishlistItem::factory()->create([
             'wishlist_id' => $this->wishlist->id,
-            'product_id' => $product->id,
+            'product_id'  => $product->id,
         ]);
 
         $result = $this->wishlist->removeProduct($product->id);
@@ -170,8 +172,8 @@ final class UserWishlistTest extends TestCase
 
         $item = WishlistItem::factory()->create([
             'wishlist_id' => $this->wishlist->id,
-            'product_id' => $product->id,
-            'variant_id' => $variant->id,
+            'product_id'  => $product->id,
+            'variant_id'  => $variant->id,
         ]);
 
         $result = $this->wishlist->removeProduct($product->id, $variant->id);
@@ -192,12 +194,12 @@ final class UserWishlistTest extends TestCase
     public function test_scope_public(): void
     {
         $publicWishlist = UserWishlist::factory()->create([
-            'user_id' => $this->user->id,
+            'user_id'   => $this->user->id,
             'is_public' => true,
         ]);
 
         $privateWishlist = UserWishlist::factory()->create([
-            'user_id' => $this->user->id,
+            'user_id'   => $this->user->id,
             'is_public' => false,
         ]);
 
@@ -210,12 +212,12 @@ final class UserWishlistTest extends TestCase
     public function test_scope_private(): void
     {
         $publicWishlist = UserWishlist::factory()->create([
-            'user_id' => $this->user->id,
+            'user_id'   => $this->user->id,
             'is_public' => true,
         ]);
 
         $privateWishlist = UserWishlist::factory()->create([
-            'user_id' => $this->user->id,
+            'user_id'   => $this->user->id,
             'is_public' => false,
         ]);
 
@@ -228,12 +230,12 @@ final class UserWishlistTest extends TestCase
     public function test_scope_default(): void
     {
         $defaultWishlist = UserWishlist::factory()->create([
-            'user_id' => $this->user->id,
+            'user_id'    => $this->user->id,
             'is_default' => true,
         ]);
 
         $nonDefaultWishlist = UserWishlist::factory()->create([
-            'user_id' => $this->user->id,
+            'user_id'    => $this->user->id,
             'is_default' => false,
         ]);
 

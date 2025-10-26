@@ -7,6 +7,7 @@ namespace App\Models\Scopes;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Scope;
+use Throwable;
 
 /**
  * EnabledScope
@@ -30,7 +31,7 @@ final class EnabledScope implements Scope
 
     public function apply(Builder $builder, Model $model): void
     {
-        if (defined($model::class.'::SCOPE_COLUMN_HINTS')) {
+        if (defined($model::class . '::SCOPE_COLUMN_HINTS')) {
             $hints = $model::SCOPE_COLUMN_HINTS;
 
             if (! ($hints['is_enabled'] ?? false)) {
@@ -49,7 +50,7 @@ final class EnabledScope implements Scope
         if (! array_key_exists($cacheKey, self::$columnPresence)) {
             try {
                 self::$columnPresence[$cacheKey] = $connection->getSchemaBuilder()->hasColumn($table, 'is_enabled');
-            } catch (\Throwable) {
+            } catch (Throwable) {
                 self::$columnPresence[$cacheKey] = false;
             }
         }

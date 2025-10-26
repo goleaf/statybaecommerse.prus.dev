@@ -17,24 +17,24 @@ class PriceListTest extends TestCase
     public function test_price_list_can_be_created(): void
     {
         $priceList = PriceList::factory()->create([
-            'name' => 'VIP Customer Prices',
-            'code' => 'VIP-PRICES',
+            'name'        => 'VIP Customer Prices',
+            'code'        => 'VIP-PRICES',
             'description' => 'Special pricing for VIP customers',
-            'is_active' => true,
+            'is_active'   => true,
         ]);
 
         $this->assertDatabaseHas('price_lists', [
-            'name' => 'VIP Customer Prices',
-            'code' => 'VIP-PRICES',
+            'name'        => 'VIP Customer Prices',
+            'code'        => 'VIP-PRICES',
             'description' => 'Special pricing for VIP customers',
-            'is_active' => true,
+            'is_active'   => true,
         ]);
     }
 
     public function test_price_list_casts_work_correctly(): void
     {
         $priceList = PriceList::factory()->create([
-            'is_active' => true,
+            'is_active'  => true,
             'is_default' => false,
             'sort_order' => 5,
             'created_at' => now(),
@@ -116,7 +116,7 @@ class PriceListTest extends TestCase
     public function test_price_list_can_have_validity_period(): void
     {
         $priceList = PriceList::factory()->create([
-            'valid_from' => now(),
+            'valid_from'  => now(),
             'valid_until' => now()->addYear(),
         ]);
 
@@ -137,8 +137,8 @@ class PriceListTest extends TestCase
     {
         $priceList = PriceList::factory()->create([
             'discount_percentage' => 10.00,
-            'discount_fixed' => 5.00,
-            'discount_type' => 'percentage',
+            'discount_fixed'      => 5.00,
+            'discount_type'       => 'percentage',
         ]);
 
         $this->assertEquals(10.00, $priceList->discount_percentage);
@@ -187,8 +187,8 @@ class PriceListTest extends TestCase
         $priceList = PriceList::factory()->create([
             'conditions' => [
                 'minimum_quantity' => 10,
-                'customer_type' => 'wholesale',
-                'payment_terms' => 'net_30',
+                'customer_type'    => 'wholesale',
+                'payment_terms'    => 'net_30',
             ],
         ]);
 
@@ -202,10 +202,10 @@ class PriceListTest extends TestCase
     {
         $priceList = PriceList::factory()->create([
             'metadata' => [
-                'created_by' => 'admin',
+                'created_by'      => 'admin',
                 'approval_status' => 'approved',
-                'special_notes' => 'Special pricing for VIP customers',
-                'tags' => ['vip', 'wholesale', 'special'],
+                'special_notes'   => 'Special pricing for VIP customers',
+                'tags'            => ['vip', 'wholesale', 'special'],
             ],
         ]);
 
@@ -220,7 +220,7 @@ class PriceListTest extends TestCase
     {
         $priceList = PriceList::factory()->create([
             'requires_approval' => true,
-            'approval_notes' => 'Requires manager approval',
+            'approval_notes'    => 'Requires manager approval',
         ]);
 
         $this->assertTrue($priceList->requires_approval);
@@ -242,9 +242,9 @@ class PriceListTest extends TestCase
     {
         $priceList = PriceList::factory()->create([
             'auto_assignment_rules' => [
-                'customer_group' => 'vip',
+                'customer_group'      => 'vip',
                 'minimum_order_value' => 500.00,
-                'registration_date' => '2024-01-01',
+                'registration_date'   => '2024-01-01',
             ],
         ]);
 
@@ -259,8 +259,8 @@ class PriceListTest extends TestCase
         $priceList = PriceList::factory()->create([
             'notification_settings' => [
                 'email_notifications' => true,
-                'sms_notifications' => false,
-                'push_notifications' => true,
+                'sms_notifications'   => false,
+                'push_notifications'  => true,
             ],
         ]);
 
@@ -274,8 +274,8 @@ class PriceListTest extends TestCase
     {
         $priceList = PriceList::factory()->create([
             'audit_trail' => [
-                'created_by' => 'admin',
-                'created_at' => now(),
+                'created_by'       => 'admin',
+                'created_at'       => now(),
                 'last_modified_by' => 'manager',
                 'last_modified_at' => now(),
             ],
@@ -292,10 +292,10 @@ class PriceListTest extends TestCase
     {
         $priceList = PriceList::factory()->create([
             'performance_metrics' => [
-                'total_orders' => 250,
-                'total_revenue' => 75000.00,
+                'total_orders'        => 250,
+                'total_revenue'       => 75000.00,
                 'average_order_value' => 300.00,
-                'conversion_rate' => 15.5,
+                'conversion_rate'     => 15.5,
             ],
         ]);
 
@@ -309,8 +309,8 @@ class PriceListTest extends TestCase
     public function test_price_list_can_have_expiry_settings(): void
     {
         $priceList = PriceList::factory()->create([
-            'expires_at' => now()->addYear(),
-            'auto_renew' => true,
+            'expires_at'     => now()->addYear(),
+            'auto_renew'     => true,
             'renewal_period' => 'yearly',
         ]);
 

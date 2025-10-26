@@ -7,8 +7,8 @@ namespace App\Models;
 use App\Models\Scopes\ActiveCampaignScope;
 use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\StatusScope;
-use App\Traits\HasTranslations;
 use App\Support\Storage\SecureStorage;
+use App\Traits\HasTranslations;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -27,8 +27,8 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  *
  * Eloquent model representing the Campaign entity with comprehensive relationships, scopes, and business logic for the e-commerce system.
  *
- * @property mixed $table
- * @property mixed $fillable
+ * @property mixed  $table
+ * @property mixed  $fillable
  * @property string $translationModel
  *
  * @method static \Illuminate\Database\Eloquent\Builder|Campaign newModelQuery()
@@ -460,7 +460,7 @@ final class Campaign extends Model
             return null;
         }
 
-        $path = 'campaigns/'.ltrim((string) $this->banner_image, '/');
+        $path = 'campaigns/' . ltrim((string) $this->banner_image, '/');
 
         return SecureStorage::temporarySignedUrl($path);
     }
@@ -471,12 +471,12 @@ final class Campaign extends Model
     public function getStatusBadgeColor(): string
     {
         return match ($this->status) {
-            'active' => 'success',
+            'active'    => 'success',
             'scheduled' => 'warning',
-            'paused' => 'secondary',
-            'expired' => 'danger',
-            'draft' => 'info',
-            default => 'secondary',
+            'paused'    => 'secondary',
+            'expired'   => 'danger',
+            'draft'     => 'info',
+            default     => 'secondary',
         };
     }
 
@@ -486,12 +486,12 @@ final class Campaign extends Model
     public function getStatusLabel(): string
     {
         return match ($this->status) {
-            'active' => __('campaigns.status.active'),
+            'active'    => __('campaigns.status.active'),
             'scheduled' => __('campaigns.status.scheduled'),
-            'paused' => __('campaigns.status.paused'),
-            'expired' => __('campaigns.status.expired'),
-            'draft' => __('campaigns.status.draft'),
-            default => __('campaigns.status.unknown'),
+            'paused'    => __('campaigns.status.paused'),
+            'expired'   => __('campaigns.status.expired'),
+            'draft'     => __('campaigns.status.draft'),
+            default     => __('campaigns.status.unknown'),
         };
     }
 
@@ -755,13 +755,13 @@ final class Campaign extends Model
     public function getTypeIconAttribute(): string
     {
         return match ($this->type) {
-            'email' => 'heroicon-o-envelope',
-            'sms' => 'heroicon-o-device-phone-mobile',
-            'push' => 'heroicon-o-bell',
+            'email'  => 'heroicon-o-envelope',
+            'sms'    => 'heroicon-o-device-phone-mobile',
+            'push'   => 'heroicon-o-bell',
             'banner' => 'heroicon-o-photo',
-            'popup' => 'heroicon-o-window',
+            'popup'  => 'heroicon-o-window',
             'social' => 'heroicon-o-share',
-            default => 'heroicon-o-megaphone',
+            default  => 'heroicon-o-megaphone',
         };
     }
 
@@ -771,13 +771,13 @@ final class Campaign extends Model
     public function getTypeColorAttribute(): string
     {
         return match ($this->type) {
-            'email' => 'blue',
-            'sms' => 'green',
-            'push' => 'yellow',
+            'email'  => 'blue',
+            'sms'    => 'green',
+            'push'   => 'yellow',
             'banner' => 'purple',
-            'popup' => 'pink',
+            'popup'  => 'pink',
             'social' => 'red',
-            default => 'gray',
+            default  => 'gray',
         };
     }
 
@@ -787,13 +787,13 @@ final class Campaign extends Model
     public function getTypeLabelAttribute(): string
     {
         return match ($this->type) {
-            'email' => __('campaigns.types.email'),
-            'sms' => __('campaigns.types.sms'),
-            'push' => __('campaigns.types.push'),
+            'email'  => __('campaigns.types.email'),
+            'sms'    => __('campaigns.types.sms'),
+            'push'   => __('campaigns.types.push'),
             'banner' => __('campaigns.types.banner'),
-            'popup' => __('campaigns.types.popup'),
+            'popup'  => __('campaigns.types.popup'),
             'social' => __('campaigns.types.social'),
-            default => ucfirst($this->type),
+            default  => ucfirst($this->type),
         };
     }
 
@@ -888,7 +888,7 @@ final class Campaign extends Model
             $score >= 50 => 'C+',
             $score >= 40 => 'C',
             $score >= 30 => 'D',
-            default => 'F',
+            default      => 'F',
         };
     }
 
@@ -903,7 +903,7 @@ final class Campaign extends Model
             $score >= 80 => 'success',
             $score >= 60 => 'warning',
             $score >= 40 => 'info',
-            default => 'danger',
+            default      => 'danger',
         };
     }
 
@@ -920,7 +920,7 @@ final class Campaign extends Model
      */
     public function getFormattedBudgetAttribute(): string
     {
-        return '€'.number_format($this->budget, 2);
+        return '€' . number_format($this->budget, 2);
     }
 
     /**
@@ -928,7 +928,7 @@ final class Campaign extends Model
      */
     public function getFormattedBudgetLimitAttribute(): string
     {
-        return '€'.number_format($this->budget_limit, 2);
+        return '€' . number_format($this->budget_limit, 2);
     }
 
     /**
@@ -936,7 +936,7 @@ final class Campaign extends Model
      */
     public function getFormattedTotalRevenueAttribute(): string
     {
-        return '€'.number_format($this->total_revenue, 2);
+        return '€' . number_format($this->total_revenue, 2);
     }
 
     /**
@@ -944,7 +944,7 @@ final class Campaign extends Model
      */
     public function getFormattedROIAttribute(): string
     {
-        return number_format($this->getROI(), 2).'%';
+        return number_format($this->getROI(), 2) . '%';
     }
 
     /**
@@ -952,7 +952,7 @@ final class Campaign extends Model
      */
     public function getFormattedConversionRateAttribute(): string
     {
-        return number_format($this->getConversionRate(), 2).'%';
+        return number_format($this->getConversionRate(), 2) . '%';
     }
 
     /**
@@ -960,7 +960,7 @@ final class Campaign extends Model
      */
     public function getFormattedClickThroughRateAttribute(): string
     {
-        return number_format($this->getClickThroughRate(), 2).'%';
+        return number_format($this->getClickThroughRate(), 2) . '%';
     }
 
     /**
@@ -968,7 +968,7 @@ final class Campaign extends Model
      */
     public function getFormattedBudgetUtilizationAttribute(): string
     {
-        return number_format($this->budget_utilization, 2).'%';
+        return number_format($this->budget_utilization, 2) . '%';
     }
 
     /**
@@ -976,7 +976,7 @@ final class Campaign extends Model
      */
     public function getFormattedProgressPercentageAttribute(): string
     {
-        return number_format($this->progress_percentage, 1).'%';
+        return number_format($this->progress_percentage, 1) . '%';
     }
 
     /**
@@ -1063,14 +1063,14 @@ final class Campaign extends Model
     /**
      * Handle duplicateForNewPeriod functionality with proper error handling.
      *
-     * @param  Carbon\Carbon  $newStartDate
-     * @param  Carbon\Carbon  $newEndDate
+     * @param Carbon\Carbon $newStartDate
+     * @param Carbon\Carbon $newEndDate
      */
     public function duplicateForNewPeriod(\Carbon\Carbon $newStartDate, \Carbon\Carbon $newEndDate): self
     {
         $duplicate = $this->replicate();
-        $duplicate->name = $this->name.' (Copy)';
-        $duplicate->slug = $this->slug.'-copy-'.time();
+        $duplicate->name = $this->name . ' (Copy)';
+        $duplicate->slug = $this->slug . '-copy-' . time();
         $duplicate->start_date = $newStartDate;
         $duplicate->end_date = $newEndDate;
         $duplicate->status = 'draft';

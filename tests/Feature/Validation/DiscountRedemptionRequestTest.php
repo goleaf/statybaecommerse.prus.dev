@@ -18,4 +18,3 @@ final class DiscountRedemptionRequestTest extends TestCase
             ->assertStatus(422);
     }
 }
-

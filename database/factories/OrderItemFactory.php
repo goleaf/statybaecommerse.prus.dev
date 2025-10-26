@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Factories;
 
@@ -22,18 +24,18 @@ final class OrderItemFactory extends Factory
         $total = $quantity * $unitPrice;
 
         return [
-            'order_id' => Order::factory(),
-            'product_id' => Product::factory(),
+            'order_id'           => Order::factory(),
+            'product_id'         => Product::factory(),
             'product_variant_id' => null,
-            'name' => $this->faker->words(3, true),
-            'sku' => $this->faker->unique()->bothify('SKU-####'),
-            'quantity' => $quantity,
-            'unit_price' => $unitPrice,
-            'price' => $unitPrice,  // Same as unit_price for consistency
-            'total' => $total,
-            'notes' => $this->faker->optional(0.3)->sentence(),
-            'discount_amount' => 0,
-            'status' => 'pending',
+            'name'               => $this->faker->words(3, true),
+            'sku'                => $this->faker->unique()->bothify('SKU-####'),
+            'quantity'           => $quantity,
+            'unit_price'         => $unitPrice,
+            'price'              => $unitPrice,  // Same as unit_price for consistency
+            'total'              => $total,
+            'notes'              => $this->faker->optional(0.3)->sentence(),
+            'discount_amount'    => 0,
+            'status'             => 'pending',
         ];
     }
 
@@ -56,62 +58,62 @@ final class OrderItemFactory extends Factory
 
     public function forOrder(Order $order): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'order_id' => $order->id,
         ]);
     }
 
     public function forProduct(Product $product): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'product_id' => $product->id,
-            'name' => $product->name,
-            'sku' => $product->sku,
+            'name'       => $product->name,
+            'sku'        => $product->sku,
             'unit_price' => $product->price,
-            'price' => $product->price,
-            'total' => null,
+            'price'      => $product->price,
+            'total'      => null,
         ]);
     }
 
     public function forVariant(ProductVariant $variant): static
     {
-        return $this->state(fn(array $attributes) => [
-            'product_id' => $variant->product_id,
+        return $this->state(fn (array $attributes) => [
+            'product_id'         => $variant->product_id,
             'product_variant_id' => $variant->id,
-            'name' => $variant->name,
-            'sku' => $variant->sku,
-            'unit_price' => $variant->price,
-            'price' => $variant->price,
+            'name'               => $variant->name,
+            'sku'                => $variant->sku,
+            'unit_price'         => $variant->price,
+            'price'              => $variant->price,
         ]);
     }
 
     public function highQuantity(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'quantity' => $this->faker->numberBetween(10, 100),
         ]);
     }
 
     public function lowQuantity(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'quantity' => $this->faker->numberBetween(1, 3),
         ]);
     }
 
     public function expensive(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'unit_price' => $this->faker->randomFloat(2, 100, 1000),
-            'price' => $this->faker->randomFloat(2, 100, 1000),
+            'price'      => $this->faker->randomFloat(2, 100, 1000),
         ]);
     }
 
     public function cheap(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'unit_price' => $this->faker->randomFloat(2, 0.1, 10),
-            'price' => $this->faker->randomFloat(2, 0.1, 10),
+            'price'      => $this->faker->randomFloat(2, 0.1, 10),
         ]);
     }
 }

@@ -33,7 +33,7 @@ final class SecurityHeadersTest extends TestCase
                     return null;
                 }
 
-                return $directive.' '.implode(' ', $sources);
+                return $directive . ' ' . implode(' ', $sources);
             })
             ->filter()
             ->implode('; ');

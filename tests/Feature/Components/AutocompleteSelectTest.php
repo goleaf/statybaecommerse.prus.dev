@@ -103,9 +103,9 @@ it('feature: performs search when query is set', function (): void {
 
 it('feature: respects minimum search length', function (): void {
     Product::factory()->create([
-        'name' => 'Test Product',
-        'is_visible' => true,
-        'status' => 'published',
+        'name'         => 'Test Product',
+        'is_visible'   => true,
+        'status'       => 'published',
         'published_at' => now()->subDay(),
     ]);
 
@@ -120,9 +120,9 @@ it('feature: respects minimum search length', function (): void {
 
 it('feature: limits search results', function (): void {
     Product::factory()->count(15)->create([
-        'name' => 'Test Product',
-        'is_visible' => true,
-        'status' => 'published',
+        'name'         => 'Test Product',
+        'is_visible'   => true,
+        'status'       => 'published',
         'published_at' => now()->subDay(),
     ]);
 
@@ -137,9 +137,9 @@ it('feature: limits search results', function (): void {
 
 it('feature: uses custom search field', function (): void {
     Product::factory()->create([
-        'description' => 'Test Description',
-        'is_visible' => true,
-        'status' => 'published',
+        'description'  => 'Test Description',
+        'is_visible'   => true,
+        'status'       => 'published',
         'published_at' => now()->subDay(),
     ]);
 
@@ -162,9 +162,9 @@ it('feature: returns empty results for invalid model class', function (): void {
 
 it('feature: returns empty results for empty search query', function (): void {
     Product::factory()->create([
-        'name' => 'Test Product',
-        'is_visible' => true,
-        'status' => 'published',
+        'name'         => 'Test Product',
+        'is_visible'   => true,
+        'status'       => 'published',
         'published_at' => now()->subDay(),
     ]);
 
@@ -249,9 +249,9 @@ it('feature: provides correct view data', function (): void {
 
 it('feature: handles search with no results', function (): void {
     Product::factory()->create([
-        'name' => 'Different Product',
-        'is_visible' => true,
-        'status' => 'published',
+        'name'         => 'Different Product',
+        'is_visible'   => true,
+        'status'       => 'published',
         'published_at' => now()->subDay(),
     ]);
 

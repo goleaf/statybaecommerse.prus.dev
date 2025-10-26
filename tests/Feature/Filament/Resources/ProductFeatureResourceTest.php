@@ -32,14 +32,14 @@ final class ProductFeatureResourceTest extends TestCase
         app()->setLocale('en');
 
         $this->admin = User::factory()->create([
-            'email' => 'admin@example.com',
+            'email'    => 'admin@example.com',
             'is_admin' => true,
         ]);
 
         $this->product = Product::factory()->create([
-            'status' => 'published',
+            'status'       => 'published',
             'published_at' => now(),
-            'is_visible' => true,
+            'is_visible'   => true,
         ]);
 
         $this->actingAs($this->admin);
@@ -48,9 +48,9 @@ final class ProductFeatureResourceTest extends TestCase
     public function test_list_page_displays_product_features(): void
     {
         $feature = ProductFeature::factory()->create([
-            'product_id' => $this->product->id,
-            'feature_type' => 'benefit',
-            'feature_key' => 'battery',
+            'product_id'    => $this->product->id,
+            'feature_type'  => 'benefit',
+            'feature_key'   => 'battery',
             'feature_value' => 10.5,
         ]);
 
@@ -65,50 +65,50 @@ final class ProductFeatureResourceTest extends TestCase
     {
         Livewire::test(CreateProductFeature::class)
             ->fillForm([
-                'product_id' => $this->product->id,
-                'feature_type' => 'specification',
-                'feature_key' => 'weight',
+                'product_id'    => $this->product->id,
+                'feature_type'  => 'specification',
+                'feature_key'   => 'weight',
                 'feature_value' => 1.2,
-                'weight' => 5,
-                'is_active' => true,
+                'weight'        => 5,
+                'is_active'     => true,
             ])
             ->call('create')
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('product_features', [
-            'product_id' => $this->product->id,
-            'feature_type' => 'specification',
-            'feature_key' => 'weight',
+            'product_id'    => $this->product->id,
+            'feature_type'  => 'specification',
+            'feature_key'   => 'weight',
             'feature_value' => 1.2,
-            'weight' => 5,
-            'is_active' => true,
+            'weight'        => 5,
+            'is_active'     => true,
         ]);
     }
 
     public function test_can_edit_product_feature(): void
     {
         $feature = ProductFeature::factory()->create([
-            'product_id' => $this->product->id,
-            'feature_type' => 'specification',
-            'feature_key' => 'color',
+            'product_id'    => $this->product->id,
+            'feature_type'  => 'specification',
+            'feature_key'   => 'color',
             'feature_value' => 1.0,
-            'weight' => 1,
+            'weight'        => 1,
         ]);
 
         Livewire::test(EditProductFeature::class, ['record' => $feature->getRouteKey()])
             ->fillForm([
                 'feature_value' => 2.5,
-                'weight' => 10,
-                'is_active' => false,
+                'weight'        => 10,
+                'is_active'     => false,
             ])
             ->call('save')
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('product_features', [
-            'id' => $feature->id,
+            'id'            => $feature->id,
             'feature_value' => 2.5,
-            'weight' => 10,
-            'is_active' => false,
+            'weight'        => 10,
+            'is_active'     => false,
         ]);
     }
 
@@ -116,11 +116,11 @@ final class ProductFeatureResourceTest extends TestCase
     {
         $features = collect([
             ProductFeature::factory()->create([
-                'product_id' => $this->product->id,
+                'product_id'    => $this->product->id,
                 'feature_value' => 1.0,
             ]),
             ProductFeature::factory()->create([
-                'product_id' => $this->product->id,
+                'product_id'    => $this->product->id,
                 'feature_value' => 2.0,
             ]),
         ]);
@@ -138,13 +138,13 @@ final class ProductFeatureResourceTest extends TestCase
     public function test_can_filter_features_by_type_and_product(): void
     {
         $matching = ProductFeature::factory()->create([
-            'product_id' => $this->product->id,
-            'feature_type' => 'performance',
+            'product_id'    => $this->product->id,
+            'feature_type'  => 'performance',
             'feature_value' => 5.0,
         ]);
 
         $otherFeature = ProductFeature::factory()->create([
-            'feature_type' => 'benefit',
+            'feature_type'  => 'benefit',
             'feature_value' => 3.0,
         ]);
 
@@ -159,7 +159,7 @@ final class ProductFeatureResourceTest extends TestCase
     public function test_can_bulk_delete_product_features(): void
     {
         $features = ProductFeature::factory()->count(3)->create([
-            'product_id' => $this->product->id,
+            'product_id'    => $this->product->id,
             'feature_value' => 1.0,
         ]);
 
@@ -176,15 +176,15 @@ final class ProductFeatureResourceTest extends TestCase
     public function test_can_filter_features_by_active_state(): void
     {
         $activeFeature = ProductFeature::factory()->create([
-            'product_id' => $this->product->id,
+            'product_id'   => $this->product->id,
             'feature_type' => 'performance',
-            'is_active' => true,
+            'is_active'    => true,
         ]);
 
         $inactiveFeature = ProductFeature::factory()->create([
-            'product_id' => $this->product->id,
+            'product_id'   => $this->product->id,
             'feature_type' => 'benefit',
-            'is_active' => false,
+            'is_active'    => false,
         ]);
 
         Livewire::test(ListProductFeatures::class)

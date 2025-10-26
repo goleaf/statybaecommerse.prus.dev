@@ -33,13 +33,13 @@ final class PaginationService
     public static function getPaginationConfig(string $context = 'default'): array
     {
         return match ($context) {
-            'news' => ['perPage' => 12, 'onEachSide' => 2, 'perPageOptions' => [12, 24, 48, 96]],
-            'posts' => ['perPage' => 12, 'onEachSide' => 2, 'perPageOptions' => [12, 24, 48, 96]],
-            'products' => ['perPage' => 12, 'onEachSide' => 2, 'perPageOptions' => [12, 24, 48, 96]],
+            'news'        => ['perPage' => 12, 'onEachSide' => 2, 'perPageOptions' => [12, 24, 48, 96]],
+            'posts'       => ['perPage' => 12, 'onEachSide' => 2, 'perPageOptions' => [12, 24, 48, 96]],
+            'products'    => ['perPage' => 12, 'onEachSide' => 2, 'perPageOptions' => [12, 24, 48, 96]],
             'collections' => ['perPage' => 12, 'onEachSide' => 2, 'perPageOptions' => [12, 24, 48, 96]],
-            'admin' => ['perPage' => 20, 'onEachSide' => 1, 'perPageOptions' => [10, 20, 50, 100]],
-            'api' => ['perPage' => 15, 'onEachSide' => 1, 'perPageOptions' => [10, 15, 25, 50]],
-            default => ['perPage' => 12, 'onEachSide' => 2, 'perPageOptions' => [12, 24, 48, 96]],
+            'admin'       => ['perPage' => 20, 'onEachSide' => 1, 'perPageOptions' => [10, 20, 50, 100]],
+            'api'         => ['perPage' => 15, 'onEachSide' => 1, 'perPageOptions' => [10, 15, 25, 50]],
+            default       => ['perPage' => 12, 'onEachSide' => 2, 'perPageOptions' => [12, 24, 48, 96]],
         };
     }
 
@@ -73,10 +73,10 @@ final class PaginationService
         $totalPages = (int) ceil($totalCount / $perPage);
         // Adjust onEachSide based on total pages
         $onEachSide = match (true) {
-            $totalPages <= 5 => 2,
+            $totalPages <= 5  => 2,
             $totalPages <= 10 => 2,
             $totalPages <= 20 => 2,
-            default => min($maxOnEachSide, 3),
+            default           => min($maxOnEachSide, 3),
         };
         $paginator = $query->paginate($perPage);
         // Store onEachSide value for use in views
@@ -123,10 +123,10 @@ final class PaginationService
         $totalPages = (int) ceil($filteredCollection->count() / $perPage);
         // Adjust onEachSide based on total pages
         $onEachSide = match (true) {
-            $totalPages <= 5 => 2,
+            $totalPages <= 5  => 2,
             $totalPages <= 10 => 2,
             $totalPages <= 20 => 2,
-            default => min($maxOnEachSide, 3),
+            default           => min($maxOnEachSide, 3),
         };
         $paginator = new \Illuminate\Pagination\LengthAwarePaginator($items, $filteredCollection->count(), $perPage, $currentPage, ['path' => request()->url(), 'pageName' => $pageName]);
         // Set the onEachSide property for the paginator

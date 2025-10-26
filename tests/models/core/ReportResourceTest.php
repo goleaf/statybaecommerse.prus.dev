@@ -200,7 +200,7 @@ class ReportResourceTest extends TestCase
         // Test that SelectFilter can be instantiated without errors
         $selectFilter = SelectFilter::make('type')
             ->options([
-                'sales' => 'Sales Report',
+                'sales'     => 'Sales Report',
                 'customers' => 'Customer Analysis',
             ]);
 
@@ -254,7 +254,7 @@ class ReportResourceTest extends TestCase
 
         $select = Select::make('type')
             ->options([
-                'sales' => 'Sales Report',
+                'sales'     => 'Sales Report',
                 'customers' => 'Customer Analysis',
             ])
             ->required();
@@ -316,8 +316,8 @@ class ReportResourceTest extends TestCase
         $typeOptions = $typeField->getOptions();
 
         $expectedTypeOptions = [
-            'sales' => __('admin.reports.sales_report'),
-            'products' => __('admin.reports.product_performance'),
+            'sales'     => __('admin.reports.sales_report'),
+            'products'  => __('admin.reports.product_performance'),
             'customers' => __('admin.reports.customer_analysis'),
             'inventory' => __('admin.reports.inventory_report'),
         ];
@@ -329,13 +329,13 @@ class ReportResourceTest extends TestCase
         $dateRangeOptions = $dateRangeField->getOptions();
 
         $expectedDateRangeOptions = [
-            'today' => __('admin.date_ranges.today'),
-            'yesterday' => __('admin.date_ranges.yesterday'),
-            'last_7_days' => __('admin.date_ranges.last_7_days'),
+            'today'        => __('admin.date_ranges.today'),
+            'yesterday'    => __('admin.date_ranges.yesterday'),
+            'last_7_days'  => __('admin.date_ranges.last_7_days'),
             'last_30_days' => __('admin.date_ranges.last_30_days'),
             'last_90_days' => __('admin.date_ranges.last_90_days'),
-            'this_year' => __('admin.date_ranges.this_year'),
-            'custom' => __('admin.date_ranges.custom'),
+            'this_year'    => __('admin.date_ranges.this_year'),
+            'custom'       => __('admin.date_ranges.custom'),
         ];
 
         $this->assertEquals($expectedDateRangeOptions, $dateRangeOptions);
@@ -352,8 +352,8 @@ class ReportResourceTest extends TestCase
         $typeFilterOptions = $typeFilter->getOptions();
 
         $expectedTypeFilterOptions = [
-            'sales' => __('admin.reports.sales_report'),
-            'products' => __('admin.reports.product_performance'),
+            'sales'     => __('admin.reports.sales_report'),
+            'products'  => __('admin.reports.product_performance'),
             'customers' => __('admin.reports.customer_analysis'),
             'inventory' => __('admin.reports.inventory_report'),
         ];

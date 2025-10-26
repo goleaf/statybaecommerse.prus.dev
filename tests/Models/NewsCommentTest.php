@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Tests\Models;
 
@@ -16,7 +18,7 @@ final class NewsCommentTest extends TestCase
     public function test_fillable_and_casts_configuration(): void
     {
         // Instantiate a fresh model instance to inspect its configuration without hitting the database.
-        $model = new NewsComment();
+        $model = new NewsComment;
 
         // Validate that the expected columns can be mass assigned for administrative tooling.
         self::assertSame([
@@ -45,11 +47,11 @@ final class NewsCommentTest extends TestCase
 
         // Validate the precise cast definitions for each attribute we rely on within business logic.
         self::assertSame([
-            'news_id' => 'integer',
-            'parent_id' => 'integer',
+            'news_id'     => 'integer',
+            'parent_id'   => 'integer',
             'is_approved' => 'boolean',
-            'is_visible' => 'boolean',
-            'is_active' => 'boolean',
+            'is_visible'  => 'boolean',
+            'is_active'   => 'boolean',
         ], $relevantCasts);
     }
 
@@ -170,4 +172,3 @@ final class NewsCommentTest extends TestCase
         self::assertFalse($hidden->is_active);
     }
 }
-

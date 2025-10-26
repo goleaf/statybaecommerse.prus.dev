@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 use App\Models\Order;
 use App\Models\User;
-use function Pest\Laravel\actingAs;
 
 it('unit: customer resolver returns user name or null', function (): void {
     /** @var callable $resolver */
@@ -21,4 +20,3 @@ it('unit: customer resolver returns user name or null', function (): void {
     $orderWithoutUser->unsetRelation('user');
     expect($resolver($orderWithoutUser))->toBeNull();
 });
-

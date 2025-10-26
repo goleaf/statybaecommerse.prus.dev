@@ -43,10 +43,10 @@ it('can create product through admin', function () {
     // Skip the create page test due to Filament v4 schemas compatibility issues
     // and test product creation directly in database
     $product = Product::factory()->create([
-        'name' => 'Test Product',
-        'slug' => 'test-product',
-        'brand_id' => $brand->id,
-        'price' => 99.99,
+        'name'       => 'Test Product',
+        'slug'       => 'test-product',
+        'brand_id'   => $brand->id,
+        'price'      => 99.99,
         'is_visible' => true,
     ]);
 
@@ -79,9 +79,9 @@ it('can create enhanced setting', function () {
     $this->actingAs($user);
 
     $setting = EnhancedSetting::create([
-        'key' => 'test_setting',
+        'key'   => 'test_setting',
         'value' => 'test_value',
-        'type' => 'text',
+        'type'  => 'text',
         'group' => 'test',
     ]);
 

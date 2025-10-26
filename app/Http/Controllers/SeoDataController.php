@@ -40,7 +40,7 @@ final class SeoDataController extends Controller
         // Search in title, description, and keywords using a grouped LIKE query.
         $search = $request->input('search');
         if (is_string($search) && $search !== '') {
-            $like = '%'.$search.'%';
+            $like = '%' . $search . '%';
             $query->where(function (Builder $builder) use ($like): void {
                 $builder
                     ->where('title', 'like', $like)
@@ -97,7 +97,7 @@ final class SeoDataController extends Controller
         // Apply the text search filter in a dedicated grouped condition.
         $search = $request->input('search');
         if (is_string($search) && $search !== '') {
-            $like = '%'.$search.'%';
+            $like = '%' . $search . '%';
             $query->where(function (Builder $builder) use ($like): void {
                 $builder
                     ->where('title', 'like', $like)

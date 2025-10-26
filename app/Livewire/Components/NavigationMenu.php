@@ -19,8 +19,8 @@ use Livewire\Component;
  *
  * Livewire component for NavigationMenu with reactive frontend functionality, real-time updates, and user interaction handling.
  *
- * @property bool $mobileMenuOpen
- * @property bool $searchOpen
+ * @property bool   $mobileMenuOpen
+ * @property bool   $searchOpen
  * @property string $searchQuery
  */
 final class NavigationMenu extends Component
@@ -37,7 +37,7 @@ final class NavigationMenu extends Component
     #[Computed]
     public function headerMenu()
     {
-        return TagAwareCache::remember('nav:header_menu:'.app()->getLocale(), now()->addMinutes(30), function () {
+        return TagAwareCache::remember('nav:header_menu:' . app()->getLocale(), now()->addMinutes(30), function () {
             /** @var Menu|null $menu */
             $menu = Menu::query()->where('key', 'main_header')->where('is_active', true)->first();
             if (! $menu) {
@@ -54,7 +54,7 @@ final class NavigationMenu extends Component
     #[Computed]
     public function mainCategories()
     {
-        return TagAwareCache::remember('nav:main_categories:'.app()->getLocale(), now()->addHour(), function () {
+        return TagAwareCache::remember('nav:main_categories:' . app()->getLocale(), now()->addHour(), function () {
             return Category::query()->with(['translations' => function ($q) {
                 $q->where('locale', app()->getLocale());
             }, 'children.translations' => function ($q) {
@@ -69,7 +69,7 @@ final class NavigationMenu extends Component
     #[Computed]
     public function featuredBrands()
     {
-        return TagAwareCache::remember('nav:featured_brands:'.app()->getLocale(), now()->addHour(), function () {
+        return TagAwareCache::remember('nav:featured_brands:' . app()->getLocale(), now()->addHour(), function () {
             return Brand::query()->with(['translations' => function ($q) {
                 $q->where('locale', app()->getLocale());
             }])->where('is_enabled', true)->where('is_featured', true)->orderBy('sort_order')->limit(6)->get();
@@ -82,7 +82,7 @@ final class NavigationMenu extends Component
     #[Computed]
     public function featuredCollections()
     {
-        return TagAwareCache::remember('nav:featured_collections:'.app()->getLocale(), now()->addHour(), function () {
+        return TagAwareCache::remember('nav:featured_collections:' . app()->getLocale(), now()->addHour(), function () {
             return Collection::query()->with(['translations' => function ($q) {
                 $q->where('locale', app()->getLocale());
             }])->where('is_enabled', true)->where('is_featured', true)->orderBy('sort_order')->limit(4)->get();

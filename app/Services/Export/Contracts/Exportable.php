@@ -30,7 +30,7 @@ interface Exportable
     /**
      * Configure the source query for the export.
      *
-     * @param  array<string, mixed>  $options
+     * @param array<string, mixed> $options
      */
     public function query(array $options = []): Builder;
 
@@ -42,7 +42,7 @@ interface Exportable
     /**
      * Resolve a single row into a serializable array using the provided columns.
      *
-     * @param  array<string, \App\Services\Export\ExportColumn>  $columns
+     * @param  array<string, \App\Services\Export\ExportColumn> $columns
      * @return array<int, string>
      */
     public function map(Model $model, array $columns): array;

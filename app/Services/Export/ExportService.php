@@ -60,9 +60,9 @@ final class ExportService
         $this->downloadUrlTtl = $this->resolveInteger($config['download_url_ttl'] ?? null, 60);
 
         $this->writerMap = [
-            'csv' => CsvExportWriter::class,
+            'csv'  => CsvExportWriter::class,
             'xlsx' => XlsxExportWriter::class,
-            'pdf' => PdfExportWriter::class,
+            'pdf'  => PdfExportWriter::class,
         ];
 
         foreach (($config['formats'] ?? []) as $key => $writer) {
@@ -98,10 +98,10 @@ final class ExportService
         }
 
         $model->forceFill([
-            'status' => ExportStatus::Processing,
+            'status'         => ExportStatus::Processing,
             'processed_rows' => 0,
             'failure_reason' => null,
-            'failed_at' => null,
+            'failed_at'      => null,
         ])->save();
 
         $disk = $model->artifact_disk ?? $this->disk;
@@ -133,12 +133,12 @@ final class ExportService
             $writer->close();
 
             $model->forceFill([
-                'status' => ExportStatus::Completed,
-                'artifact_path' => $path,
+                'status'            => ExportStatus::Completed,
+                'artifact_path'     => $path,
                 'artifact_filename' => $this->buildFileName($exportable, $model),
-                'completed_at' => now(),
-                'total_rows' => $total,
-                'processed_rows' => $total,
+                'completed_at'      => now(),
+                'total_rows'        => $total,
+                'processed_rows'    => $total,
             ])->save();
 
             $this->notifySuccess($model);
@@ -149,8 +149,8 @@ final class ExportService
             ]);
 
             $model->forceFill([
-                'status' => ExportStatus::Failed,
-                'failed_at' => now(),
+                'status'         => ExportStatus::Failed,
+                'failed_at'      => now(),
                 'failure_reason' => $exception->getMessage(),
             ])->save();
 
@@ -169,19 +169,19 @@ final class ExportService
         $columns = $this->resolveColumns($exportable, $data->requestedColumns());
         $options = [
             'record_ids' => $data->recordIdentifiers(),
-            'filters' => $data->filters,
-            'meta' => $data->metadata(),
+            'filters'    => $data->filters,
+            'meta'       => $data->metadata(),
         ];
 
         $export = Export::query()->create([
-            'name' => $data->name ?: $exportable->name(),
-            'format' => $data->normalizedFormat(),
-            'status' => ExportStatus::Queued,
-            'exportable_type' => $exportable::class,
-            'columns' => array_keys($columns),
+            'name'               => $data->name ?: $exportable->name(),
+            'format'             => $data->normalizedFormat(),
+            'status'             => ExportStatus::Queued,
+            'exportable_type'    => $exportable::class,
+            'columns'            => array_keys($columns),
             'exportable_options' => $options,
-            'artifact_disk' => $this->disk,
-            'requested_by' => $user?->getKey() ?? $data->userId,
+            'artifact_disk'      => $this->disk,
+            'requested_by'       => $user?->getKey() ?? $data->userId,
         ]);
 
         ProcessExportJob::dispatch($export->getKey());
@@ -190,7 +190,7 @@ final class ExportService
     }
 
     /**
-     * @param  array<int, string>  $requested
+     * @param  array<int, string>          $requested
      * @return array<string, ExportColumn>
      */
     private function resolveColumns(Exportable $exportable, array $requested): array
@@ -207,7 +207,7 @@ final class ExportService
             ->mapWithKeys(fn (string $key): array => [$key => $available[$key]])
             ->tap(function (Collection $collection): void {
                 if ($collection->isEmpty()) {
-                    throw new \InvalidArgumentException('At least one column must be selected for export.');
+                    throw new InvalidArgumentException('At least one column must be selected for export.');
                 }
             })
             ->all();
@@ -218,7 +218,7 @@ final class ExportService
         $instance = $this->container->make($class);
 
         if (! $instance instanceof Exportable) {
-            throw new \InvalidArgumentException(sprintf('%s must implement %s', $class, Exportable::class));
+            throw new InvalidArgumentException(sprintf('%s must implement %s', $class, Exportable::class));
         }
 
         return $instance;
@@ -229,20 +229,20 @@ final class ExportService
         $format = Str::lower($format);
 
         if (! array_key_exists($format, $this->writerMap)) {
-            throw new \InvalidArgumentException("Unsupported export format: {$format}");
+            throw new InvalidArgumentException("Unsupported export format: {$format}");
         }
 
         $writer = $this->container->make($this->writerMap[$format]);
 
         if (! $writer instanceof ExportWriter) {
-            throw new \InvalidArgumentException(sprintf('Writer for format %s must implement %s', $format, ExportWriter::class));
+            throw new InvalidArgumentException(sprintf('Writer for format %s must implement %s', $format, ExportWriter::class));
         }
 
         return $writer;
     }
 
     /**
-     * @param  array<string, mixed>  $options
+     * @param array<string, mixed> $options
      */
     private function buildQuery(Exportable $exportable, array $options): Builder
     {
@@ -260,7 +260,7 @@ final class ExportService
     {
         $extension = Str::lower($export->format);
 
-        return 'exports/'.$export->uuid.'.'.$extension;
+        return 'exports/' . $export->uuid . '.' . $extension;
     }
 
     private function buildFileName(Exportable $exportable, Export $export): string
@@ -269,7 +269,7 @@ final class ExportService
         $timestamp = now()->format('Ymd_His');
         $extension = Str::lower($export->format);
 
-        return trim($base.'-'.$timestamp.'.'.$extension, '-');
+        return trim($base . '-' . $timestamp . '.' . $extension, '-');
     }
 
     private function resolveInteger(mixed $value, int $default): int
@@ -311,9 +311,9 @@ final class ExportService
         }
 
         return match ($entity) {
-            ExportType::ORDERS => $this->resolveExportable(OrderExport::class),
+            ExportType::ORDERS   => $this->resolveExportable(OrderExport::class),
             ExportType::PRODUCTS => $this->resolveExportable(ProductExport::class),
-            ExportType::USERS => $this->resolveExportable(UserExport::class),
+            ExportType::USERS    => $this->resolveExportable(UserExport::class),
         };
     }
 

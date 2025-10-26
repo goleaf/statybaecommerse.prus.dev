@@ -58,8 +58,8 @@ final class ProductHistoryAdminApiTest extends TestCase
         Sanctum::actingAs($user, ['*']);
 
         $response = $this->getJson(route('api.admin.product-histories.index', [
-            'product' => $product->getKey(),
-            'action' => 'updated',
+            'product'  => $product->getKey(),
+            'action'   => 'updated',
             'per_page' => 10,
         ]));
 

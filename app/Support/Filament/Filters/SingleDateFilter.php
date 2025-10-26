@@ -9,7 +9,7 @@ use Illuminate\Support\Carbon;
 
 final class SingleDateFilter
 {
-    public static function apply(Builder $query, string|null $value, string $column, bool $withTime = false): Builder
+    public static function apply(Builder $query, ?string $value, string $column, bool $withTime = false): Builder
     {
         if (blank($value)) {
             return $query;

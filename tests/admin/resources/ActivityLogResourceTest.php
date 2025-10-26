@@ -23,9 +23,9 @@ class ActivityLogResourceTest extends TestCase
         Filament::setCurrentPanel('admin');
 
         $this->adminUser = User::factory()->create([
-            'email' => 'admin@admin.com',
-            'name' => 'Admin User',
-            'is_active' => true,
+            'email'             => 'admin@admin.com',
+            'name'              => 'Admin User',
+            'is_active'         => true,
             'email_verified_at' => now(),
         ]);
 
@@ -55,18 +55,18 @@ class ActivityLogResourceTest extends TestCase
     public function test_can_create_activity_log(): void
     {
         $activityData = [
-            'log_name' => 'auth',
+            'log_name'    => 'auth',
             'description' => 'User logged in successfully',
             'causer_type' => User::class,
-            'causer_id' => auth()->id(),
-            'properties' => ['test' => 'data'],
+            'causer_id'   => auth()->id(),
+            'properties'  => ['test' => 'data'],
         ];
 
         $activity = ActivityLog::create($activityData);
 
         $this->assertDatabaseHas('activity_log', [
-            'causer_id' => auth()->id(),
-            'log_name' => 'auth',
+            'causer_id'   => auth()->id(),
+            'log_name'    => 'auth',
             'description' => 'User logged in successfully',
         ]);
 
@@ -104,9 +104,9 @@ class ActivityLogResourceTest extends TestCase
     public function test_can_filter_activity_log_by_date(): void
     {
         $activity = ActivityLog::factory()->create([
-            'log_name' => 'default',
+            'log_name'    => 'default',
             'description' => 'Activity created today',
-            'created_at' => now(),
+            'created_at'  => now(),
         ]);
 
         $todayActivities = ActivityLog::whereDate('created_at', today())->get();
@@ -119,7 +119,7 @@ class ActivityLogResourceTest extends TestCase
         $user = User::factory()->create();
 
         $activity = ActivityLog::factory()->create([
-            'causer_id' => $user->id,
+            'causer_id'   => $user->id,
             'causer_type' => User::class,
             'description' => 'Profile updated',
         ]);
@@ -133,7 +133,7 @@ class ActivityLogResourceTest extends TestCase
         $properties = [
             'old_values' => ['name' => 'Old Name'],
             'new_values' => ['name' => 'New Name'],
-            'changes' => ['name' => ['Old Name', 'New Name']],
+            'changes'    => ['name' => ['Old Name', 'New Name']],
         ];
 
         $activity = ActivityLog::factory()->create([
@@ -154,23 +154,23 @@ class ActivityLogResourceTest extends TestCase
         $user = User::factory()->create();
 
         $activityData = [
-            'log_name' => 'test',
-            'description' => 'Test activity',
-            'event' => 'custom',
-            'causer_type' => User::class,
-            'causer_id' => $user->id,
-            'properties' => ['test' => 'data'],
+            'log_name'     => 'test',
+            'description'  => 'Test activity',
+            'event'        => 'custom',
+            'causer_type'  => User::class,
+            'causer_id'    => $user->id,
+            'properties'   => ['test' => 'data'],
             'is_important' => false,
-            'is_system' => false,
+            'is_system'    => false,
         ];
 
         $activity = ActivityLog::create($activityData);
 
         $this->assertDatabaseHas('activity_log', [
-            'log_name' => 'test',
+            'log_name'    => 'test',
             'description' => 'Test activity',
-            'event' => 'custom',
-            'causer_id' => $user->id,
+            'event'       => 'custom',
+            'causer_id'   => $user->id,
         ]);
     }
 
@@ -183,7 +183,7 @@ class ActivityLogResourceTest extends TestCase
         $activity->update(['is_important' => true]);
 
         $this->assertDatabaseHas('activity_log', [
-            'id' => $activity->id,
+            'id'           => $activity->id,
             'is_important' => true,
         ]);
     }
@@ -192,7 +192,7 @@ class ActivityLogResourceTest extends TestCase
     {
         $user = User::factory()->create();
         $activity = ActivityLog::factory()->create([
-            'causer_id' => $user->id,
+            'causer_id'   => $user->id,
             'causer_type' => User::class,
         ]);
 
@@ -205,7 +205,7 @@ class ActivityLogResourceTest extends TestCase
         $user = User::factory()->create();
         $activity = ActivityLog::factory()->create([
             'subject_type' => User::class,
-            'subject_id' => $user->id,
+            'subject_id'   => $user->id,
         ]);
 
         $this->assertInstanceOf(User::class, $activity->subject);
@@ -217,7 +217,7 @@ class ActivityLogResourceTest extends TestCase
         $user = User::factory()->create();
         $activity = ActivityLog::factory()->create([
             'causer_type' => User::class,
-            'causer_id' => $user->id,
+            'causer_id'   => $user->id,
         ]);
 
         $this->assertInstanceOf(User::class, $activity->causer);

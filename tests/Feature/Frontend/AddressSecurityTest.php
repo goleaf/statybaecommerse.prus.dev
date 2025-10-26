@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Tests\Feature\Frontend;
 
 use App\Enums\AddressType;
+use App\Http\Middleware\TestingLegalResourceStub;
 use App\Models\Address;
 use App\Models\User;
-use App\Http\Middleware\TestingLegalResourceStub;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Testing\Fluent\AssertableJson;
 use Tests\TestCase;
@@ -41,10 +41,10 @@ final class AddressSecurityTest extends TestCase
         $intruder = User::factory()->create();
 
         $address = Address::factory()->for($owner)->create([
-            'type' => AddressType::SHIPPING->value,
+            'type'         => AddressType::SHIPPING->value,
             'country_code' => 'LT',
-            'state' => 'Vilnius County',
-            'postal_code' => '12345',
+            'state'        => 'Vilnius County',
+            'postal_code'  => '12345',
         ]);
 
         $response = $this->actingAs($intruder)
@@ -62,33 +62,33 @@ final class AddressSecurityTest extends TestCase
         $intruder = User::factory()->create();
 
         $address = Address::factory()->for($owner)->create([
-            'type' => AddressType::SHIPPING->value,
+            'type'         => AddressType::SHIPPING->value,
             'country_code' => 'LT',
-            'state' => 'Vilnius County',
-            'postal_code' => '12345',
+            'state'        => 'Vilnius County',
+            'postal_code'  => '12345',
         ]);
 
         $payload = [
-            'type' => AddressType::BILLING->value,
-            'first_name' => 'Safe',
-            'last_name' => 'User',
-            'company' => null,
-            'company_name' => null,
-            'company_vat' => null,
+            'type'           => AddressType::BILLING->value,
+            'first_name'     => 'Safe',
+            'last_name'      => 'User',
+            'company'        => null,
+            'company_name'   => null,
+            'company_vat'    => null,
             'address_line_1' => 'Konstitucijos pr. 3',
             'address_line_2' => null,
-            'apartment' => null,
-            'floor' => null,
-            'building' => null,
-            'city' => 'Vilnius',
-            'state' => 'Vilnius County',
-            'postal_code' => 'LT-12345',
-            'country_code' => 'LT',
-            'phone' => '+37060000000',
-            'email' => null,
-            'notes' => null,
-            'instructions' => null,
-            'is_default' => true,
+            'apartment'      => null,
+            'floor'          => null,
+            'building'       => null,
+            'city'           => 'Vilnius',
+            'state'          => 'Vilnius County',
+            'postal_code'    => 'LT-12345',
+            'country_code'   => 'LT',
+            'phone'          => '+37060000000',
+            'email'          => null,
+            'notes'          => null,
+            'instructions'   => null,
+            'is_default'     => true,
         ];
 
         $response = $this->actingAs($intruder)
@@ -105,26 +105,26 @@ final class AddressSecurityTest extends TestCase
         $user = User::factory()->create();
 
         $payload = [
-            'type' => AddressType::SHIPPING->value,
-            'first_name' => 'Jane',
-            'last_name' => 'Doe',
-            'company' => null,
-            'company_name' => null,
-            'company_vat' => null,
+            'type'           => AddressType::SHIPPING->value,
+            'first_name'     => 'Jane',
+            'last_name'      => 'Doe',
+            'company'        => null,
+            'company_name'   => null,
+            'company_vat'    => null,
             'address_line_1' => 'Gedimino pr. 1',
             'address_line_2' => null,
-            'apartment' => null,
-            'floor' => null,
-            'building' => null,
-            'city' => 'Vilnius',
-            'state' => 'Vilnius County',
-            'postal_code' => 'LT-54321',
-            'country_code' => 'XX',
-            'phone' => '+37060000001',
-            'email' => null,
-            'notes' => null,
-            'instructions' => null,
-            'is_default' => true,
+            'apartment'      => null,
+            'floor'          => null,
+            'building'       => null,
+            'city'           => 'Vilnius',
+            'state'          => 'Vilnius County',
+            'postal_code'    => 'LT-54321',
+            'country_code'   => 'XX',
+            'phone'          => '+37060000001',
+            'email'          => null,
+            'notes'          => null,
+            'instructions'   => null,
+            'is_default'     => true,
         ];
 
         $response = $this->actingAs($user)

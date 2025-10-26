@@ -6,8 +6,8 @@ namespace App\Console\Commands;
 
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Events\Dispatcher;
-use Illuminate\Database\Console\Seeds\SeedCommand;
 use Illuminate\Database\ConnectionResolverInterface;
+use Illuminate\Database\Console\Seeds\SeedCommand;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
 use Symfony\Component\Console\Input\InputOption;
 

@@ -10,6 +10,4 @@ use RuntimeException;
  * Thrown when the configured provider data is missing required webhook values
  * such as the shared secret or header definitions.
  */
-final class InvalidProviderConfigurationException extends RuntimeException
-{
-}
+final class InvalidProviderConfigurationException extends RuntimeException {}

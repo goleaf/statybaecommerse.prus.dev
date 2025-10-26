@@ -31,4 +31,3 @@ final class ReferralCodeRequestTest extends TestCase
         ])->assertStatus(422);
     }
 }
-

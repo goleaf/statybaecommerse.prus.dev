@@ -15,10 +15,10 @@ beforeEach(function () {
     $adminRole = Role::findByName('admin', 'web');
 
     $this->admin = User::factory()->create([
-        'name' => 'Test Admin',
-        'email' => 'admin@test.com',
+        'name'      => 'Test Admin',
+        'email'     => 'admin@test.com',
         'is_active' => true,
-        'is_admin' => true,
+        'is_admin'  => true,
     ]);
     $this->admin->assignRole($adminRole);
 });
@@ -41,14 +41,14 @@ it('can generate sales report data', function () {
     $product = Product::factory()->create(['price' => 100.00]);
     $order = Order::factory()->create([
         'status' => 'completed',
-        'total' => 100.00,
+        'total'  => 100.00,
     ]);
     OrderItem::factory()->create([
-        'order_id' => $order->id,
+        'order_id'   => $order->id,
         'product_id' => $product->id,
-        'quantity' => 1,
+        'quantity'   => 1,
         'unit_price' => 100.00,
-        'total' => 100.00,
+        'total'      => 100.00,
     ]);
 
     // Legacy AdvancedReports removed; ensure Reports page reachable
@@ -84,9 +84,9 @@ it('can create order items properly', function () {
     $product = Product::factory()->create(['price' => 50.00]);
 
     $orderItem = OrderItem::factory()->create([
-        'order_id' => $order->id,
+        'order_id'   => $order->id,
         'product_id' => $product->id,
-        'quantity' => 2,
+        'quantity'   => 2,
         'unit_price' => 50.00,
     ]);
 
@@ -100,24 +100,24 @@ it('validates product review ratings', function () {
     $user = User::factory()->create();
 
     expect(fn () => \App\Models\Review::create([
-        'product_id' => $product->id,
-        'user_id' => $user->id,
-        'reviewer_name' => 'Test User',
+        'product_id'     => $product->id,
+        'user_id'        => $user->id,
+        'reviewer_name'  => 'Test User',
         'reviewer_email' => 'test@example.com',
-        'title' => 'Test Review',
-        'content' => 'Test content',
-        'rating' => 6, // Invalid
+        'title'          => 'Test Review',
+        'content'        => 'Test content',
+        'rating'         => 6, // Invalid
     ]))->toThrow(\InvalidArgumentException::class);
 
     // Valid rating should work
     $review = \App\Models\Review::create([
-        'product_id' => $product->id,
-        'user_id' => $user->id,
-        'reviewer_name' => 'Test User',
+        'product_id'     => $product->id,
+        'user_id'        => $user->id,
+        'reviewer_name'  => 'Test User',
         'reviewer_email' => 'test@example.com',
-        'title' => 'Test Review',
-        'content' => 'Test content',
-        'rating' => 5,
+        'title'          => 'Test Review',
+        'content'        => 'Test content',
+        'rating'         => 5,
     ]);
 
     expect($review->rating)->toBe(5);
@@ -142,16 +142,16 @@ it('can filter products by various criteria', function () {
     $category = \App\Models\Category::factory()->create();
 
     $product1 = Product::factory()->create([
-        'brand_id' => $brand->id,
-        'price' => 100.00,
-        'is_featured' => true,
+        'brand_id'       => $brand->id,
+        'price'          => 100.00,
+        'is_featured'    => true,
         'stock_quantity' => 10,
     ]);
     $product1->categories()->attach($category->id);
 
     $product2 = Product::factory()->create([
-        'price' => 200.00,
-        'is_featured' => false,
+        'price'          => 200.00,
+        'is_featured'    => false,
         'stock_quantity' => 0,
     ]);
 

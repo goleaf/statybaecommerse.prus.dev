@@ -38,7 +38,7 @@ final class SystemSettingsController extends Controller
         }
         if ($request->filled('search')) {
             $query->where(function ($q) use ($request) {
-                $q->where('name', 'like', '%'.$request->search.'%')->orWhere('key', 'like', '%'.$request->search.'%')->orWhere('description', 'like', '%'.$request->search.'%');
+                $q->where('name', 'like', '%' . $request->search . '%')->orWhere('key', 'like', '%' . $request->search . '%')->orWhere('description', 'like', '%' . $request->search . '%');
             });
         }
         // Only show public settings
@@ -149,7 +149,7 @@ final class SystemSettingsController extends Controller
         $groups = SystemSetting::select('group')->where('is_active', true)->where('is_public', true)->distinct()->orderBy('group')->get()->map(function ($setting) {
             $count = SystemSetting::where('group', $setting->group)->where('is_active', true)->where('is_public', true)->count();
 
-            return ['name' => $setting->group, 'label' => __('admin.system_settings.'.$setting->group), 'count' => $count];
+            return ['name' => $setting->group, 'label' => __('admin.system_settings.' . $setting->group), 'count' => $count];
         });
 
         return response()->json(['success' => true, 'data' => $groups]);

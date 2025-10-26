@@ -17,9 +17,9 @@ final class ProductNotificationTest extends TestCase
     public function test_notification_can_be_created(): void
     {
         $productData = [
-            'id' => 1,
-            'name' => 'Test Product',
-            'sku' => 'TEST-001',
+            'id'    => 1,
+            'name'  => 'Test Product',
+            'sku'   => 'TEST-001',
             'price' => 99.99,
         ];
 
@@ -45,9 +45,9 @@ final class ProductNotificationTest extends TestCase
     {
         $user = User::factory()->create();
         $productData = [
-            'id' => 1,
-            'name' => 'Test Product',
-            'sku' => 'TEST-001',
+            'id'    => 1,
+            'name'  => 'Test Product',
+            'sku'   => 'TEST-001',
             'price' => 99.99,
         ];
 
@@ -107,9 +107,9 @@ final class ProductNotificationTest extends TestCase
     {
         $user = User::factory()->create();
         $productData = [
-            'id' => 1,
-            'name' => 'Test Product',
-            'sku' => 'TEST-001',
+            'id'    => 1,
+            'name'  => 'Test Product',
+            'sku'   => 'TEST-001',
             'price' => 99.99,
         ];
 
@@ -118,8 +118,8 @@ final class ProductNotificationTest extends TestCase
 
         $this->assertDatabaseHas('notifications', [
             'notifiable_type' => User::class,
-            'notifiable_id' => $user->id,
-            'type' => ProductNotification::class,
+            'notifiable_id'   => $user->id,
+            'type'            => ProductNotification::class,
         ]);
 
         $dbNotification = DatabaseNotification::where('notifiable_id', $user->id)->first();

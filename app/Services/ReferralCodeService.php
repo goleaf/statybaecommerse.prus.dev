@@ -6,6 +6,7 @@ namespace App\Services;
 
 use App\Models\ReferralCode;
 use Illuminate\Support\Str;
+use InvalidArgumentException;
 
 /**
  * ReferralCodeService
@@ -36,9 +37,9 @@ final class ReferralCodeService
 
         return match ($strategy) {
             'alphanumeric' => $this->generateAlphanumericCode(),
-            'numeric' => $this->generateNumericCode(),
-            'mixed' => $this->generateMixedCode(),
-            default => $this->generateMixedCode(),
+            'numeric'      => $this->generateNumericCode(),
+            'mixed'        => $this->generateMixedCode(),
+            default        => $this->generateMixedCode(),
         };
     }
 
@@ -109,11 +110,11 @@ final class ReferralCodeService
     {
         // Validate format
         if (! $this->validateCodeFormat($code)) {
-            throw new \InvalidArgumentException('Invalid referral code format');
+            throw new InvalidArgumentException('Invalid referral code format');
         }
         // Check availability
         if (! $this->isCodeAvailable($code)) {
-            throw new \InvalidArgumentException('Referral code already exists');
+            throw new InvalidArgumentException('Referral code already exists');
         }
 
         // Create the code
@@ -142,7 +143,7 @@ final class ReferralCodeService
         $baseUrl = config('app.url');
         $referralPath = config('referral.registration_path', '/register');
 
-        return $baseUrl.$referralPath.'?ref='.$code;
+        return $baseUrl . $referralPath . '?ref=' . $code;
     }
 
     /**

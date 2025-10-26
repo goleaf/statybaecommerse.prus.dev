@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Schema;
+use Throwable;
 
 final class CacheInvalidator
 {
@@ -131,7 +132,7 @@ final class CacheInvalidator
     {
         try {
             return Schema::hasTable('categories') && Schema::hasTable('product_categories');
-        } catch (\Throwable $exception) {
+        } catch (Throwable $exception) {
             return false;
         }
     }
@@ -187,7 +188,7 @@ final class CacheInvalidator
     }
 
     /**
-     * @param  array<int, mixed>  $ids
+     * @param  array<int, mixed> $ids
      * @return array<int, int>
      */
     private function mapCategoryIds(array $ids): array
@@ -198,7 +199,7 @@ final class CacheInvalidator
     }
 
     /**
-     * @param  array<int, int>  $categoryIds
+     * @param array<int, int> $categoryIds
      */
     private function forgetProductFallbackCaches(array $categoryIds): void
     {
@@ -225,11 +226,11 @@ final class CacheInvalidator
             Cache::forget("category_tree:{$locale}");
             Cache::forget("category_nav_tree:{$locale}");
             Cache::forget("mobile_category_tree:{$locale}");
-            Cache::forget('nav:header_menu:'.$locale);
-            Cache::forget('nav:main_categories:'.$locale);
-            Cache::forget('nav:featured_brands:'.$locale);
-            Cache::forget('nav:featured_collections:'.$locale);
-            Cache::forget(CacheKeys::categoryNavigationTree().':'.$locale);
+            Cache::forget('nav:header_menu:' . $locale);
+            Cache::forget('nav:main_categories:' . $locale);
+            Cache::forget('nav:featured_brands:' . $locale);
+            Cache::forget('nav:featured_collections:' . $locale);
+            Cache::forget(CacheKeys::categoryNavigationTree() . ':' . $locale);
         }
 
         foreach ([6, 10] as $limit) {
@@ -249,8 +250,8 @@ final class CacheInvalidator
             Cache::forget("category_tree:{$locale}");
             Cache::forget("category_nav_tree:{$locale}");
             Cache::forget("mobile_category_tree:{$locale}");
-            Cache::forget('nav:main_categories:'.$locale);
-            Cache::forget(CacheKeys::categoryNavigationTree().':'.$locale);
+            Cache::forget('nav:main_categories:' . $locale);
+            Cache::forget(CacheKeys::categoryNavigationTree() . ':' . $locale);
         }
 
         Cache::forget(CacheKeys::categoryNavigationTree());

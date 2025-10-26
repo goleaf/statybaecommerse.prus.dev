@@ -154,7 +154,7 @@ final class SkipWhileFunctionalityTest extends TestCase
         ]);
 
         $criteria = [
-            'price' => ['min' => 10, 'max' => 150],
+            'price'    => ['min' => 10, 'max' => 150],
             'category' => 'electronics',
             'in_stock' => true,
         ];

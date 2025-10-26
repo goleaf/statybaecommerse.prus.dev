@@ -62,7 +62,7 @@ final class ProductComparisonSeeder extends Seeder
             $userSessions = rand(2, 5);
 
             for ($i = 0; $i < $userSessions; $i++) {
-                $sessionId = 'user_'.$user->id.'_session_'.($i + 1);
+                $sessionId = 'user_' . $user->id . '_session_' . ($i + 1);
 
                 if (ProductComparison::query()->where('session_id', $sessionId)->exists()) {
                     continue;
@@ -100,7 +100,7 @@ final class ProductComparisonSeeder extends Seeder
                     ->forSession($sessionId)
                     ->forProduct($product)
                     ->state([
-                        'user_id' => $users->random()->id,
+                        'user_id'    => $users->random()->id,
                         'created_at' => $createdAt,
                         'updated_at' => $createdAt,
                     ])

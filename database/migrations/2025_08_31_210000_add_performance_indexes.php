@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
@@ -40,10 +42,10 @@ return new class extends Migration
                     ->all();
 
                 if (! empty($columns)) {
-                    $indexName = 'sh_prod_trans_fulltext_'.substr(md5(implode(',', $columns)), 0, 8);
+                    $indexName = 'sh_prod_trans_fulltext_' . substr(md5(implode(',', $columns)), 0, 8);
                     if (! $this->indexNameExists('sh_product_translations', $indexName)) {
                         try {
-                            DB::statement('ALTER TABLE `sh_product_translations` ADD FULLTEXT `'.$indexName.'` (`'.implode('`,`', $columns).'`)');
+                            DB::statement('ALTER TABLE `sh_product_translations` ADD FULLTEXT `' . $indexName . '` (`' . implode('`,`', $columns) . '`)');
                         } catch (Throwable $e) {
                             // ignore if not supported
                         }
@@ -64,12 +66,12 @@ return new class extends Migration
             return;
         }
         $driver = DB::getDriverName();
-        $cols = '`'.implode('`,`', $columns).'`';
+        $cols = '`' . implode('`,`', $columns) . '`';
         try {
             if ($driver === 'mysql') {
                 DB::statement("CREATE INDEX `{$indexName}` ON `{$table}` ({$cols})");
             } elseif ($driver === 'sqlite') {
-                DB::statement("CREATE INDEX IF NOT EXISTS {$indexName} ON {$table} (".implode(',', $columns).')');
+                DB::statement("CREATE INDEX IF NOT EXISTS {$indexName} ON {$table} (" . implode(',', $columns) . ')');
             } else {
                 Schema::table($table, function (Blueprint $t) use ($columns, $indexName) {
                     try {
@@ -92,7 +94,7 @@ return new class extends Migration
 
                 return ! empty($rows);
             } elseif ($driver === 'sqlite') {
-                $rows = DB::select('PRAGMA index_list('.$table.')');
+                $rows = DB::select('PRAGMA index_list(' . $table . ')');
                 foreach ($rows as $r) {
                     if (! empty($r->name) && $r->name === $indexName) {
                         return true;

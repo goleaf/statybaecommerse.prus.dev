@@ -35,7 +35,7 @@ final class CampaignConversionSeeder extends Seeder
                 ->for($campaign)
                 ->state(fn (): array => [
                     'campaign_name' => $campaign->name,
-                    'converted_at' => now()->subDays(random_int(1, 30))->addMinutes(random_int(1, 600)),
+                    'converted_at'  => now()->subDays(random_int(1, 30))->addMinutes(random_int(1, 600)),
                 ])
                 ->create();
         });

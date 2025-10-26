@@ -21,19 +21,19 @@ use Livewire\WithPagination;
  *
  * Livewire component for SearchWidget with reactive frontend functionality, real-time updates, and user interaction handling.
  *
- * @property string $query
- * @property array $selectedCategories
- * @property array $selectedBrands
- * @property array $selectedAttributes
+ * @property string     $query
+ * @property array      $selectedCategories
+ * @property array      $selectedBrands
+ * @property array      $selectedAttributes
  * @property float|null $minPrice
  * @property float|null $maxPrice
- * @property string $sortBy
- * @property string $sortDirection
- * @property bool $inStock
- * @property bool $onSale
- * @property string $viewMode
- * @property int $perPage
- * @property mixed $queryString
+ * @property string     $sortBy
+ * @property string     $sortDirection
+ * @property bool       $inStock
+ * @property bool       $onSale
+ * @property string     $viewMode
+ * @property int        $perPage
+ * @property mixed      $queryString
  */
 final class SearchWidget extends Component
 {
@@ -181,10 +181,10 @@ final class SearchWidget extends Component
         // Text search
         if ($this->query) {
             $query->where(function ($q) {
-                $q->where('name', 'like', '%'.$this->query.'%')->orWhere('description', 'like', '%'.$this->query.'%')->orWhere('sku', 'like', '%'.$this->query.'%')->orWhereHas('brand', function ($brandQuery) {
-                    $brandQuery->where('name', 'like', '%'.$this->query.'%');
+                $q->where('name', 'like', '%' . $this->query . '%')->orWhere('description', 'like', '%' . $this->query . '%')->orWhere('sku', 'like', '%' . $this->query . '%')->orWhereHas('brand', function ($brandQuery) {
+                    $brandQuery->where('name', 'like', '%' . $this->query . '%');
                 })->orWhereHas('categories', function ($catQuery) {
-                    $catQuery->where('name', 'like', '%'.$this->query.'%');
+                    $catQuery->where('name', 'like', '%' . $this->query . '%');
                 });
             });
         }
@@ -253,7 +253,7 @@ final class SearchWidget extends Component
                         WHEN name LIKE ? THEN 2
                         WHEN description LIKE ? THEN 3
                         ELSE 4
-                    END', [$this->query, '%'.$this->query.'%', '%'.$this->query.'%']);
+                    END', [$this->query, '%' . $this->query . '%', '%' . $this->query . '%']);
                 } else {
                     $query->orderBy('created_at', 'desc');
                 }

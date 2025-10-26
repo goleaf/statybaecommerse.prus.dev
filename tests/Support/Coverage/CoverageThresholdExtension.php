@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace Tests\Support\Coverage;
 
+use function extension_loaded;
+use function ini_get;
+
 use PHPUnit\Runner\Extension\Extension;
 use PHPUnit\Runner\Extension\Facade;
 use PHPUnit\Runner\Extension\ParameterCollection;
 use PHPUnit\TextUI\Configuration\Configuration;
-use function extension_loaded;
-use function ini_get;
+
 use function str_contains;
 
 final class CoverageThresholdExtension implements Extension

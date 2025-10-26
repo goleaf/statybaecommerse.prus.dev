@@ -175,9 +175,9 @@ final class StockController extends Controller
         // Calculate summary statistics
         $summary = ['total_items' => $stockItems->count(), 'total_stock_value' => $stockItems->sum('stock_value'), 'total_reserved_value' => $stockItems->sum('reserved_value'), 'low_stock_items' => $stockItems->filter(fn ($item) => $item->isLowStock())->count(), 'out_of_stock_items' => $stockItems->filter(fn ($item) => $item->isOutOfStock())->count(), 'needs_reorder_items' => $stockItems->filter(fn ($item) => $item->needsReorder())->count()];
         // Group by location
-        $byLocation = $stockItems->groupBy('location.name')->map(fn($items): array => ['count' => $items->count(), 'total_value' => $items->sum('stock_value'), 'reserved_value' => $items->sum('reserved_value'), 'low_stock' => $items->filter(fn ($item) => $item->isLowStock())->count(), 'out_of_stock' => $items->filter(fn ($item) => $item->isOutOfStock())->count()]);
+        $byLocation = $stockItems->groupBy('location.name')->map(fn ($items): array => ['count' => $items->count(), 'total_value' => $items->sum('stock_value'), 'reserved_value' => $items->sum('reserved_value'), 'low_stock' => $items->filter(fn ($item) => $item->isLowStock())->count(), 'out_of_stock' => $items->filter(fn ($item) => $item->isOutOfStock())->count()]);
         // Group by supplier
-        $bySupplier = $stockItems->groupBy('supplier.name')->map(fn($items): array => ['count' => $items->count(), 'total_value' => $items->sum('stock_value'), 'reserved_value' => $items->sum('reserved_value'), 'low_stock' => $items->filter(fn ($item) => $item->isLowStock())->count(), 'out_of_stock' => $items->filter(fn ($item) => $item->isOutOfStock())->count()]);
+        $bySupplier = $stockItems->groupBy('supplier.name')->map(fn ($items): array => ['count' => $items->count(), 'total_value' => $items->sum('stock_value'), 'reserved_value' => $items->sum('reserved_value'), 'low_stock' => $items->filter(fn ($item) => $item->isLowStock())->count(), 'out_of_stock' => $items->filter(fn ($item) => $item->isOutOfStock())->count()]);
         $locations = Location::enabled()->get();
 
         return view('stock.report', ['stockItems' => $stockItems, 'summary' => $summary, 'byLocation' => $byLocation, 'bySupplier' => $bySupplier, 'locations' => $locations]);

@@ -28,14 +28,14 @@ final class DocumentGenerationSystemTest extends TestCase
     public function test_document_template_can_be_created(): void
     {
         $template = DocumentTemplate::create([
-            'name' => 'Test Invoice Template',
-            'slug' => 'test-invoice',
-            'type' => 'invoice',
-            'category' => 'sales',
-            'content' => '<h1>Invoice #$ORDER_NUMBER</h1><p>Customer: $CUSTOMER_NAME</p>',
-            'variables' => ['ORDER_NUMBER', 'CUSTOMER_NAME'],
+            'name'        => 'Test Invoice Template',
+            'slug'        => 'test-invoice',
+            'type'        => 'invoice',
+            'category'    => 'sales',
+            'content'     => '<h1>Invoice #$ORDER_NUMBER</h1><p>Customer: $CUSTOMER_NAME</p>',
+            'variables'   => ['ORDER_NUMBER', 'CUSTOMER_NAME'],
             'description' => 'Test invoice template',
-            'is_active' => true,
+            'is_active'   => true,
         ]);
 
         $this->assertInstanceOf(DocumentTemplate::class, $template);
@@ -50,16 +50,16 @@ final class DocumentGenerationSystemTest extends TestCase
     {
         $user = User::factory()->create(['name' => 'John Doe']);
         $order = Order::factory()->create([
-            'number' => 'ORD-001',
+            'number'  => 'ORD-001',
             'user_id' => $user->id,
         ]);
 
         $template = DocumentTemplate::create([
-            'name' => 'Order Invoice',
-            'slug' => 'order-invoice',
-            'type' => 'invoice',
-            'category' => 'sales',
-            'content' => '<h1>Invoice #$ORDER_NUMBER</h1><p>Customer: $CUSTOMER_NAME</p><p>Total: €$ORDER_TOTAL</p>',
+            'name'      => 'Order Invoice',
+            'slug'      => 'order-invoice',
+            'type'      => 'invoice',
+            'category'  => 'sales',
+            'content'   => '<h1>Invoice #$ORDER_NUMBER</h1><p>Customer: $CUSTOMER_NAME</p><p>Total: €$ORDER_TOTAL</p>',
             'variables' => ['ORDER_NUMBER', 'CUSTOMER_NAME', 'ORDER_TOTAL'],
             'is_active' => true,
         ]);
@@ -68,7 +68,7 @@ final class DocumentGenerationSystemTest extends TestCase
             $template,
             $order,
             [],
-            'Order Invoice for '.$order->number
+            'Order Invoice for ' . $order->number
         );
 
         $this->assertInstanceOf(Document::class, $document);
@@ -84,17 +84,17 @@ final class DocumentGenerationSystemTest extends TestCase
     {
         $user = User::factory()->create(['name' => 'Jane Smith']);
         $order = Order::factory()->create([
-            'number' => 'ORD-002',
+            'number'  => 'ORD-002',
             'user_id' => $user->id,
-            'total' => 150.75,
+            'total'   => 150.75,
         ]);
 
         $template = DocumentTemplate::create([
-            'name' => 'Receipt Template',
-            'slug' => 'receipt',
-            'type' => 'receipt',
-            'category' => 'sales',
-            'content' => '<h1>Receipt #$ORDER_NUMBER</h1><p>Customer: $CUSTOMER_NAME</p><p>Total: €$ORDER_TOTAL</p><p>Date: $ORDER_DATE</p>',
+            'name'      => 'Receipt Template',
+            'slug'      => 'receipt',
+            'type'      => 'receipt',
+            'category'  => 'sales',
+            'content'   => '<h1>Receipt #$ORDER_NUMBER</h1><p>Customer: $CUSTOMER_NAME</p><p>Total: €$ORDER_TOTAL</p><p>Date: $ORDER_DATE</p>',
             'variables' => ['ORDER_NUMBER', 'CUSTOMER_NAME', 'ORDER_TOTAL', 'ORDER_DATE'],
             'is_active' => true,
         ]);
@@ -112,10 +112,10 @@ final class DocumentGenerationSystemTest extends TestCase
     {
         $user = User::factory()->create(['name' => 'Bob Johnson']);
         $order = Order::factory()->create([
-            'number' => 'ORD-003',
+            'number'  => 'ORD-003',
             'user_id' => $user->id,
-            'total' => 299.99,
-            'status' => 'completed',
+            'total'   => 299.99,
+            'status'  => 'completed',
         ]);
 
         $variables = $this->documentService->extractVariablesFromModel($order, 'ORDER_');
@@ -130,9 +130,9 @@ final class DocumentGenerationSystemTest extends TestCase
     public function test_document_service_extracts_variables_from_product(): void
     {
         $product = Product::factory()->create([
-            'name' => 'Test Product',
-            'sku' => 'TEST-001',
-            'price' => 49.99,
+            'name'        => 'Test Product',
+            'sku'         => 'TEST-001',
+            'price'       => 49.99,
             'description' => 'A test product description',
         ]);
 
@@ -159,16 +159,16 @@ final class DocumentGenerationSystemTest extends TestCase
     {
         $user = User::factory()->create(['name' => 'PDF Test User']);
         $order = Order::factory()->create([
-            'number' => 'PDF-001',
+            'number'  => 'PDF-001',
             'user_id' => $user->id,
         ]);
 
         $template = DocumentTemplate::create([
-            'name' => 'PDF Invoice',
-            'slug' => 'pdf-invoice',
-            'type' => 'invoice',
-            'category' => 'sales',
-            'content' => '<h1>PDF Invoice #$ORDER_NUMBER</h1><p>Customer: $CUSTOMER_NAME</p>',
+            'name'      => 'PDF Invoice',
+            'slug'      => 'pdf-invoice',
+            'type'      => 'invoice',
+            'category'  => 'sales',
+            'content'   => '<h1>PDF Invoice #$ORDER_NUMBER</h1><p>Customer: $CUSTOMER_NAME</p>',
             'variables' => ['ORDER_NUMBER', 'CUSTOMER_NAME'],
             'is_active' => true,
         ]);
@@ -188,13 +188,13 @@ final class DocumentGenerationSystemTest extends TestCase
         $order = Order::factory()->create(['user_id' => $user->id]);
 
         $document = Document::create([
-            'title' => 'Test Document',
-            'content' => '<h1>Test</h1>',
-            'format' => 'html',
-            'status' => 'generated',
+            'title'                => 'Test Document',
+            'content'              => '<h1>Test</h1>',
+            'format'               => 'html',
+            'status'               => 'generated',
             'document_template_id' => $template->id,
-            'documentable_id' => $order->id,
-            'documentable_type' => Order::class,
+            'documentable_id'      => $order->id,
+            'documentable_type'    => Order::class,
         ]);
 
         $this->assertEquals($template->id, $document->template->id);
@@ -243,16 +243,16 @@ final class DocumentGenerationSystemTest extends TestCase
     {
         $user = User::factory()->create(['name' => 'Test User']);
         $order = Order::factory()->create([
-            'number' => 'TEST-001',
+            'number'  => 'TEST-001',
             'user_id' => $user->id,
         ]);
 
         $template = DocumentTemplate::create([
-            'name' => 'Template with Missing Vars',
-            'slug' => 'missing-vars',
-            'type' => 'test',
-            'category' => 'test',
-            'content' => '<h1>Order: $ORDER_NUMBER</h1><p>Missing: $NONEXISTENT_VAR</p>',
+            'name'      => 'Template with Missing Vars',
+            'slug'      => 'missing-vars',
+            'type'      => 'test',
+            'category'  => 'test',
+            'content'   => '<h1>Order: $ORDER_NUMBER</h1><p>Missing: $NONEXISTENT_VAR</p>',
             'variables' => ['ORDER_NUMBER', 'NONEXISTENT_VAR'],
             'is_active' => true,
         ]);
@@ -269,16 +269,16 @@ final class DocumentGenerationSystemTest extends TestCase
 
         $user = User::factory()->create(['name' => 'Lietuvos Vartotojas']);
         $order = Order::factory()->create([
-            'number' => 'LT-001',
+            'number'  => 'LT-001',
             'user_id' => $user->id,
         ]);
 
         $template = DocumentTemplate::create([
-            'name' => 'Lithuanian Invoice',
-            'slug' => 'lithuanian-invoice',
-            'type' => 'invoice',
-            'category' => 'sales',
-            'content' => '<h1>Sąskaita faktūra #$ORDER_NUMBER</h1><p>Klientas: $CUSTOMER_NAME</p>',
+            'name'      => 'Lithuanian Invoice',
+            'slug'      => 'lithuanian-invoice',
+            'type'      => 'invoice',
+            'category'  => 'sales',
+            'content'   => '<h1>Sąskaita faktūra #$ORDER_NUMBER</h1><p>Klientas: $CUSTOMER_NAME</p>',
             'variables' => ['ORDER_NUMBER', 'CUSTOMER_NAME'],
             'is_active' => true,
         ]);

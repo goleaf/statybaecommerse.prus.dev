@@ -6,6 +6,7 @@ namespace App\Traits;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use InvalidArgumentException;
 
 /**
  * ExistsOrTrait
@@ -27,6 +28,6 @@ trait ExistsOrTrait
 
             return $exists;
         }
-        throw new \InvalidArgumentException('existsOr can only be used on Builder or Relation instances');
+        throw new InvalidArgumentException('existsOr can only be used on Builder or Relation instances');
     }
 }

@@ -27,9 +27,9 @@ describe('HandleImpersonation Middleware', function () {
 
     it('does nothing when user is not authenticated', function () {
         session(['impersonate' => [
-            'original_user_id' => 1,
+            'original_user_id'     => 1,
             'impersonated_user_id' => 2,
-            'started_at' => now()->toISOString(),
+            'started_at'           => now()->toISOString(),
         ]]);
 
         $response = $this->middleware->handle($this->request, function ($req) {
@@ -45,9 +45,9 @@ describe('HandleImpersonation Middleware', function () {
         $impersonatedUser = User::factory()->create();
 
         session(['impersonate' => [
-            'original_user_id' => $originalUser->id,
+            'original_user_id'     => $originalUser->id,
             'impersonated_user_id' => $impersonatedUser->id,
-            'started_at' => now()->toISOString(),
+            'started_at'           => now()->toISOString(),
         ]]);
 
         Auth::login($originalUser);
@@ -66,9 +66,9 @@ describe('HandleImpersonation Middleware', function () {
         $impersonatedUser = User::factory()->create();
 
         session(['impersonate' => [
-            'original_user_id' => $originalUser->id,
+            'original_user_id'     => $originalUser->id,
             'impersonated_user_id' => $impersonatedUser->id,
-            'started_at' => now()->toISOString(),
+            'started_at'           => now()->toISOString(),
         ]]);
 
         // Already logged in as the impersonated user
@@ -86,9 +86,9 @@ describe('HandleImpersonation Middleware', function () {
         $originalUser = User::factory()->create();
 
         session(['impersonate' => [
-            'original_user_id' => $originalUser->id,
+            'original_user_id'     => $originalUser->id,
             'impersonated_user_id' => 999,  // Non-existent user
-            'started_at' => now()->toISOString(),
+            'started_at'           => now()->toISOString(),
         ]]);
 
         Auth::login($originalUser);
@@ -106,9 +106,9 @@ describe('HandleImpersonation Middleware', function () {
         $impersonatedUser = User::factory()->create();
 
         session(['impersonate' => [
-            'original_user_id' => $originalUser->id,
+            'original_user_id'     => $originalUser->id,
             'impersonated_user_id' => $impersonatedUser->id,
-            'started_at' => now()->toISOString(),
+            'started_at'           => now()->toISOString(),
         ]]);
 
         Auth::login($originalUser);
@@ -134,9 +134,9 @@ describe('HandleImpersonation Middleware', function () {
         $impersonatedUser = User::factory()->create();
 
         session(['impersonate' => [
-            'original_user_id' => $originalUser->id,
+            'original_user_id'     => $originalUser->id,
             'impersonated_user_id' => $impersonatedUser->id,
-            'started_at' => now()->toISOString(),
+            'started_at'           => now()->toISOString(),
         ]]);
 
         Auth::login($originalUser);

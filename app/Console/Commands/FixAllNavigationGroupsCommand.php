@@ -23,7 +23,7 @@ final class FixAllNavigationGroupsCommand extends Command
         $this->components->info('=== COMPREHENSIVE NAVIGATION GROUP FIX ===');
 
         $filamentResourcesPath = base_path('app/Filament/Resources/');
-        $files = glob($filamentResourcesPath.'*.php') ?: [];
+        $files = glob($filamentResourcesPath . '*.php') ?: [];
         $fixedFiles = [];
         $errors = [];
 
@@ -34,23 +34,23 @@ final class FixAllNavigationGroupsCommand extends Command
             $content = file_get_contents($file) ?: '';
             $originalContent = $content;
 
-            $this->output->write('Processing: '.basename($file).'... ');
+            $this->output->write('Processing: ' . basename($file) . '... ');
 
             $content = preg_replace(
                 '/protected static \?\w+ \$navigationGroup = ([^;]+);/',
-                '/** @var \UnitEnum|string|null */'."\n    protected static \$navigationGroup = $1;",
+                '/** @var \UnitEnum|string|null */' . "\n    protected static \$navigationGroup = $1;",
                 $content,
             );
 
             $content = preg_replace(
                 '/(\s+)\/\*\* @var UnitEnum\|string\|null \*\/\s*\n(\s+)protected static \$navigationGroup = NavigationGroup::([^;]+);/',
-                '$1/** @var \UnitEnum|string|null */'."\n$2protected static \$navigationGroup = NavigationGroup::$3;",
+                '$1/** @var \UnitEnum|string|null */' . "\n$2protected static \$navigationGroup = NavigationGroup::$3;",
                 $content,
             );
 
             $content = preg_replace(
                 '/(\s+)\/\*\* @var UnitEnum\|string\|null \*\/\s*\n(\s+)protected static \$navigationGroup = \'([^\']+)\';/',
-                '$1/** @var \UnitEnum|string|null */'."\n$2protected static \$navigationGroup = '$3';",
+                '$1/** @var \UnitEnum|string|null */' . "\n$2protected static \$navigationGroup = '$3';",
                 $content,
             );
 
@@ -58,14 +58,14 @@ final class FixAllNavigationGroupsCommand extends Command
             if (str_contains($content, 'protected static $navigationGroup') && ! str_contains($content, NavigationGroupConstants::UNIT_ENUM_USE)) {
                 $content = preg_replace(
                     '/(use [^;]+;\s*\n)(class \w+ extends Resource)/',
-                    '$1'.NavigationGroupConstants::UNIT_ENUM_USE."\n\n$2",
+                    '$1' . NavigationGroupConstants::UNIT_ENUM_USE . "\n\n$2",
                     $content,
                 );
             }
 
             $content = preg_replace(
                 sprintf('/(%s\s*\n)+/', NavigationGroupConstants::unitEnumImportPattern()),
-                NavigationGroupConstants::UNIT_ENUM_USE."\n",
+                NavigationGroupConstants::UNIT_ENUM_USE . "\n",
                 $content,
             );
 
@@ -84,15 +84,15 @@ final class FixAllNavigationGroupsCommand extends Command
 
         $this->newline();
         $this->line('=== SUMMARY ===');
-        $this->line('Files fixed: '.count($fixedFiles));
-        $this->line('Errors: '.count($errors));
+        $this->line('Files fixed: ' . count($fixedFiles));
+        $this->line('Errors: ' . count($errors));
 
         if ($fixedFiles !== []) {
             $this->newline();
             $this->line('Fixed files:');
 
             foreach ($fixedFiles as $file) {
-                $this->line('- '.basename($file));
+                $this->line('- ' . basename($file));
             }
         }
 
@@ -117,7 +117,7 @@ final class FixAllNavigationGroupsCommand extends Command
             exec(sprintf('php -l %s 2>&1', escapeshellarg($file)), $output, $returnCode);
 
             if ($returnCode !== 0) {
-                $syntaxErrors[] = basename($file).': '.implode(' ', $output);
+                $syntaxErrors[] = basename($file) . ': ' . implode(' ', $output);
             }
         }
 
@@ -127,7 +127,7 @@ final class FixAllNavigationGroupsCommand extends Command
             $this->error('❌ Syntax errors found:');
 
             foreach ($syntaxErrors as $error) {
-                $this->error('- '.$error);
+                $this->error('- ' . $error);
             }
         }
 

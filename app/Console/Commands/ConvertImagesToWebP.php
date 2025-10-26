@@ -6,6 +6,7 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
+use Throwable;
 
 final class ConvertImagesToWebP extends Command
 {
@@ -58,8 +59,8 @@ final class ConvertImagesToWebP extends Command
                 } else {
                     $errorCount++;
                 }
-            } catch (\Throwable $e) {
-                $this->error("Failed to convert {$media->name}: ".$e->getMessage());
+            } catch (Throwable $e) {
+                $this->error("Failed to convert {$media->name}: " . $e->getMessage());
                 $errorCount++;
             }
 
@@ -104,10 +105,10 @@ final class ConvertImagesToWebP extends Command
         // Create image resource
         $image = match ($imageInfo[2]) {
             IMAGETYPE_JPEG => imagecreatefromjpeg($originalPath),
-            IMAGETYPE_PNG => imagecreatefrompng($originalPath),
-            IMAGETYPE_GIF => imagecreatefromgif($originalPath),
+            IMAGETYPE_PNG  => imagecreatefrompng($originalPath),
+            IMAGETYPE_GIF  => imagecreatefromgif($originalPath),
             IMAGETYPE_WEBP => imagecreatefromwebp($originalPath),
-            default => null,
+            default        => null,
         };
 
         if (! $image) {
@@ -138,7 +139,7 @@ final class ConvertImagesToWebP extends Command
         $media->update([
             'file_name' => basename($webpPath),
             'mime_type' => 'image/webp',
-            'size' => filesize($webpPath),
+            'size'      => filesize($webpPath),
         ]);
 
         // Remove original if different

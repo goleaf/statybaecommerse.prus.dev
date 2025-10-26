@@ -23,7 +23,7 @@ final class LoginRateLimitingTest extends TestCase
     public function test_login_attempts_are_throttled_after_configured_limit(): void
     {
         config([
-            'security.rate_limiting.auth.login.max_attempts' => 2,
+            'security.rate_limiting.auth.login.max_attempts'  => 2,
             'security.rate_limiting.auth.login.decay_seconds' => 120,
         ]);
 
@@ -31,7 +31,7 @@ final class LoginRateLimitingTest extends TestCase
             'password' => Hash::make('correct-password'),
         ]);
 
-        $key = Str::transliterate(Str::lower($user->email).'|127.0.0.1');
+        $key = Str::transliterate(Str::lower($user->email) . '|127.0.0.1');
         RateLimiter::clear($key);
 
         $attempt = function () use ($user): void {
@@ -61,7 +61,7 @@ final class LoginRateLimitingTest extends TestCase
         $this->assertSame(429, $finalException?->status);
         $this->assertArrayHasKey('loginForm.email', $finalException?->errors() ?? []);
 
-        $key = Str::transliterate(Str::lower($user->email).'|127.0.0.1');
+        $key = Str::transliterate(Str::lower($user->email) . '|127.0.0.1');
 
         $this->assertTrue(RateLimiter::tooManyAttempts($key, 2));
         $this->assertGreaterThan(0, RateLimiter::availableIn($key));
@@ -72,7 +72,7 @@ final class LoginRateLimitingTest extends TestCase
     public function test_password_reset_requests_are_rate_limited(): void
     {
         config([
-            'security.rate_limiting.auth.password_reset.max_attempts' => 1,
+            'security.rate_limiting.auth.password_reset.max_attempts'  => 1,
             'security.rate_limiting.auth.password_reset.decay_seconds' => 300,
         ]);
 
@@ -82,7 +82,7 @@ final class LoginRateLimitingTest extends TestCase
             'password' => Hash::make('correct-password'),
         ]);
 
-        $key = Str::transliterate('password-reset|'.Str::lower($user->email).'|127.0.0.1');
+        $key = Str::transliterate('password-reset|' . Str::lower($user->email) . '|127.0.0.1');
         RateLimiter::clear($key);
 
         Livewire::test('pages.auth.forgot-password')
@@ -108,7 +108,7 @@ final class LoginRateLimitingTest extends TestCase
         $this->assertIsArray($thrown->errors());
         $this->assertArrayHasKey('email', $thrown->errors());
 
-        $key = Str::transliterate('password-reset|'.Str::lower($user->email).'|127.0.0.1');
+        $key = Str::transliterate('password-reset|' . Str::lower($user->email) . '|127.0.0.1');
 
         $this->assertTrue(RateLimiter::tooManyAttempts($key, 1));
         $this->assertGreaterThan(0, RateLimiter::availableIn($key));

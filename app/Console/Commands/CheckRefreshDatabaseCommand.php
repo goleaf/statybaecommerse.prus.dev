@@ -15,11 +15,11 @@ final class CheckRefreshDatabaseCommand extends Command
      * @var array<string, string>
      */
     private const MUTATION_PATTERNS = [
-        '::factory(' => '/::factory\s*\(/',
-        '->factory(' => '/->factory\s*\(/',
-        '->seed(' => '/->seed\s*\(/',
-        'HTTP verb' => '/->\s*(?:post|put|patch|delete)(?:Json)?\s*\(/i',
-        'HTTP call verb' => "/->\s*call\s*\(\s*['\"]\s*(?:post|put|patch|delete)/i",
+        '::factory('      => '/::factory\s*\(/',
+        '->factory('      => '/->factory\s*\(/',
+        '->seed('         => '/->seed\s*\(/',
+        'HTTP verb'       => '/->\s*(?:post|put|patch|delete)(?:Json)?\s*\(/i',
+        'HTTP call verb'  => "/->\s*call\s*\(\s*['\"]\s*(?:post|put|patch|delete)/i",
         'artisan db:seed' => "/->\s*artisan\s*\(\s*['\"]db:seed/i",
     ];
 
@@ -79,7 +79,7 @@ final class CheckRefreshDatabaseCommand extends Command
 
             if ($indicators !== []) {
                 $flagged[] = [
-                    'file' => $relativePath,
+                    'file'       => $relativePath,
                     'indicators' => $indicators,
                 ];
 

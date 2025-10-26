@@ -18,12 +18,12 @@ beforeEach(function () {
 
 test('slider model can be created', function () {
     $slider = Slider::factory()->create([
-        'title' => 'Test Slider',
+        'title'       => 'Test Slider',
         'description' => 'Test Description',
         'button_text' => 'Click Here',
-        'button_url' => 'https://example.com',
-        'is_active' => true,
-        'sort_order' => 1,
+        'button_url'  => 'https://example.com',
+        'is_active'   => true,
+        'sort_order'  => 1,
     ]);
 
     expect($slider->title)->toBe('Test Slider');
@@ -52,9 +52,9 @@ test('slider model has correct fillable attributes', function () {
 
 test('slider model has correct casts', function () {
     $slider = Slider::factory()->create([
-        'is_active' => true,
+        'is_active'  => true,
         'sort_order' => 5,
-        'settings' => ['key' => 'value'],
+        'settings'   => ['key' => 'value'],
     ]);
 
     expect($slider->is_active)->toBeBool();
@@ -86,20 +86,20 @@ test('slider ordered scope works correctly', function () {
 
 test('home slider component displays active sliders', function () {
     $slider1 = Slider::factory()->create([
-        'title' => 'First Slider',
-        'is_active' => true,
+        'title'      => 'First Slider',
+        'is_active'  => true,
         'sort_order' => 1,
     ]);
 
     $slider2 = Slider::factory()->create([
-        'title' => 'Second Slider',
-        'is_active' => true,
+        'title'      => 'Second Slider',
+        'is_active'  => true,
         'sort_order' => 2,
     ]);
 
     Slider::factory()->create([
-        'title' => 'Inactive Slider',
-        'is_active' => false,
+        'title'      => 'Inactive Slider',
+        'is_active'  => false,
         'sort_order' => 3,
     ]);
 

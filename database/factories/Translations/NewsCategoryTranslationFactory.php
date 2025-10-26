@@ -20,10 +20,10 @@ final class NewsCategoryTranslationFactory extends Factory
 
         return [
             'news_category_id' => null,
-            'locale' => $this->faker->randomElement(['lt', 'en']),
-            'name' => ucwords($name),
-            'slug' => str($name)->slug()->toString(),
-            'description' => $this->faker->paragraph(2),
+            'locale'           => $this->faker->randomElement(['lt', 'en']),
+            'name'             => ucwords($name),
+            'slug'             => str($name)->slug()->toString(),
+            'description'      => $this->faker->paragraph(2),
         ];
     }
 
@@ -31,7 +31,7 @@ final class NewsCategoryTranslationFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'locale' => 'lt',
-            'name' => $this->faker->randomElement([
+            'name'   => $this->faker->randomElement([
                 'Naujienos',
                 'Projektai',
                 'Patarimai',
@@ -43,7 +43,7 @@ final class NewsCategoryTranslationFactory extends Factory
                 'Paslaugos',
                 'Partneriai',
             ]),
-            'slug' => str($this->faker->words(1, true))->slug()->toString(),
+            'slug'        => str($this->faker->words(1, true))->slug()->toString(),
             'description' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
         ]);
     }
@@ -52,7 +52,7 @@ final class NewsCategoryTranslationFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'locale' => 'en',
-            'name' => $this->faker->randomElement([
+            'name'   => $this->faker->randomElement([
                 'News',
                 'Projects',
                 'Tips',
@@ -64,7 +64,7 @@ final class NewsCategoryTranslationFactory extends Factory
                 'Services',
                 'Partners',
             ]),
-            'slug' => str($this->faker->words(1, true))->slug()->toString(),
+            'slug'        => str($this->faker->words(1, true))->slug()->toString(),
             'description' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
         ]);
     }

@@ -137,7 +137,7 @@ describe('Test Configuration', function () {
 
         $document = \App\Models\Document::factory()->create([
             'document_template_id' => $template->id,
-            'created_by' => $user->id,
+            'created_by'           => $user->id,
         ]);
 
         expect($document->template)

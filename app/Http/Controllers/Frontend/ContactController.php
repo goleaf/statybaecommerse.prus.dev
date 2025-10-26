@@ -22,7 +22,7 @@ final class ContactController extends Controller
 
         return view('frontend.contact.index', [
             'supportEmail' => $supportEmail,
-            'company' => $company,
+            'company'      => $company,
         ]);
     }
 
@@ -31,14 +31,14 @@ final class ContactController extends Controller
         $validated = $request->validated();
 
         $contactMessage = ContactMessage::create([
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'subject' => $validated['subject'],
-            'phone' => $validated['phone'] ?? null,
+            'name'         => $validated['name'],
+            'email'        => $validated['email'],
+            'subject'      => $validated['subject'],
+            'phone'        => $validated['phone'] ?? null,
             'order_number' => $validated['order_number'] ?? null,
-            'message' => $validated['message'],
-            'ip_address' => $request->ip(),
-            'user_agent' => $request->userAgent(),
+            'message'      => $validated['message'],
+            'ip_address'   => $request->ip(),
+            'user_agent'   => $request->userAgent(),
         ]);
 
         SendContactMessageJob::dispatch($contactMessage);

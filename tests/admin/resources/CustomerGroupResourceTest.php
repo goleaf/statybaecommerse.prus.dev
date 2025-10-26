@@ -24,17 +24,17 @@ it('can list customer groups in admin panel', function () {
 
 it('can create a new customer group', function () {
     $customerGroupData = [
-        'name' => 'VIP Customers',
-        'code' => 'VIP',
-        'description' => 'High-value customers',
-        'color' => '#ff0000',
-        'icon' => 'star',
-        'discount_percentage' => 15,
+        'name'                 => 'VIP Customers',
+        'code'                 => 'VIP',
+        'description'          => 'High-value customers',
+        'color'                => '#ff0000',
+        'icon'                 => 'star',
+        'discount_percentage'  => 15,
         'minimum_order_amount' => 1000,
-        'credit_limit' => 5000,
-        'payment_terms' => 'net_30',
-        'is_active' => true,
-        'is_default' => false,
+        'credit_limit'         => 5000,
+        'payment_terms'        => 'net_30',
+        'is_active'            => true,
+        'is_default'           => false,
     ];
 
     Livewire::actingAs($this->adminUser)
@@ -44,17 +44,17 @@ it('can create a new customer group', function () {
         ->assertHasNoFormErrors();
 
     $this->assertDatabaseHas('customer_groups', [
-        'name' => 'VIP Customers',
-        'code' => 'VIP',
-        'description' => 'High-value customers',
-        'color' => '#ff0000',
-        'icon' => 'star',
-        'discount_percentage' => 15,
+        'name'                 => 'VIP Customers',
+        'code'                 => 'VIP',
+        'description'          => 'High-value customers',
+        'color'                => '#ff0000',
+        'icon'                 => 'star',
+        'discount_percentage'  => 15,
         'minimum_order_amount' => 1000,
-        'credit_limit' => 5000,
-        'payment_terms' => 'net_30',
-        'is_active' => true,
-        'is_default' => false,
+        'credit_limit'         => 5000,
+        'payment_terms'        => 'net_30',
+        'is_active'            => true,
+        'is_default'           => false,
     ]);
 });
 
@@ -72,15 +72,15 @@ it('can edit a customer group', function () {
     Livewire::actingAs($this->adminUser)
         ->test(EditCustomerGroup::class, ['record' => $customerGroup->id])
         ->fillForm([
-            'name' => 'Updated Group',
+            'name'                => 'Updated Group',
             'discount_percentage' => 20,
         ])
         ->call('save')
         ->assertHasNoFormErrors();
 
     $this->assertDatabaseHas('customer_groups', [
-        'id' => $customerGroup->id,
-        'name' => 'Updated Group',
+        'id'                  => $customerGroup->id,
+        'name'                => 'Updated Group',
         'discount_percentage' => 20,
     ]);
 });
@@ -126,8 +126,8 @@ it('validates payment terms options', function () {
     Livewire::actingAs($this->adminUser)
         ->test(CreateCustomerGroup::class)
         ->fillForm([
-            'name' => 'Test Group',
-            'code' => 'TEST',
+            'name'          => 'Test Group',
+            'code'          => 'TEST',
             'payment_terms' => 'invalid_terms',
         ])
         ->call('create')
@@ -138,11 +138,11 @@ it('validates numeric fields', function () {
     Livewire::actingAs($this->adminUser)
         ->test(CreateCustomerGroup::class)
         ->fillForm([
-            'name' => 'Test Group',
-            'code' => 'TEST',
-            'discount_percentage' => 'not_a_number',
+            'name'                 => 'Test Group',
+            'code'                 => 'TEST',
+            'discount_percentage'  => 'not_a_number',
             'minimum_order_amount' => 'invalid',
-            'credit_limit' => 'invalid',
+            'credit_limit'         => 'invalid',
         ])
         ->call('create')
         ->assertHasFormErrors(['discount_percentage', 'minimum_order_amount', 'credit_limit']);
@@ -152,8 +152,8 @@ it('validates discount percentage range', function () {
     Livewire::actingAs($this->adminUser)
         ->test(CreateCustomerGroup::class)
         ->fillForm([
-            'name' => 'Test Group',
-            'code' => 'TEST',
+            'name'                => 'Test Group',
+            'code'                => 'TEST',
             'discount_percentage' => 150, // Over 100%
         ])
         ->call('create')
@@ -184,13 +184,13 @@ it('can filter customer groups by default status', function () {
 
 it('shows correct customer group data in table', function () {
     $customerGroup = CustomerGroup::factory()->create([
-        'name' => 'VIP Customers',
-        'code' => 'VIP',
-        'discount_percentage' => 15,
+        'name'                 => 'VIP Customers',
+        'code'                 => 'VIP',
+        'discount_percentage'  => 15,
         'minimum_order_amount' => 1000,
-        'credit_limit' => 5000,
-        'is_active' => true,
-        'is_default' => false,
+        'credit_limit'         => 5000,
+        'is_active'            => true,
+        'is_default'           => false,
     ]);
 
     Livewire::actingAs($this->adminUser)
@@ -293,15 +293,15 @@ it('can set color and icon for customer group', function () {
         ->test(EditCustomerGroup::class, ['record' => $customerGroup->id])
         ->fillForm([
             'color' => '#00ff00',
-            'icon' => 'crown',
+            'icon'  => 'crown',
         ])
         ->call('save')
         ->assertHasNoFormErrors();
 
     $this->assertDatabaseHas('customer_groups', [
-        'id' => $customerGroup->id,
+        'id'    => $customerGroup->id,
         'color' => '#00ff00',
-        'icon' => 'crown',
+        'icon'  => 'crown',
     ]);
 });
 
@@ -315,7 +315,7 @@ it('can set description for customer group', function () {
         ->assertHasNoFormErrors();
 
     $this->assertDatabaseHas('customer_groups', [
-        'id' => $customerGroup->id,
+        'id'          => $customerGroup->id,
         'description' => 'This is a test description',
     ]);
 });
@@ -324,8 +324,8 @@ it('validates minimum order amount is not negative', function () {
     Livewire::actingAs($this->adminUser)
         ->test(CreateCustomerGroup::class)
         ->fillForm([
-            'name' => 'Test Group',
-            'code' => 'TEST',
+            'name'                 => 'Test Group',
+            'code'                 => 'TEST',
             'minimum_order_amount' => -100,
         ])
         ->call('create')
@@ -336,8 +336,8 @@ it('validates credit limit is not negative', function () {
     Livewire::actingAs($this->adminUser)
         ->test(CreateCustomerGroup::class)
         ->fillForm([
-            'name' => 'Test Group',
-            'code' => 'TEST',
+            'name'         => 'Test Group',
+            'code'         => 'TEST',
             'credit_limit' => -1000,
         ])
         ->call('create')

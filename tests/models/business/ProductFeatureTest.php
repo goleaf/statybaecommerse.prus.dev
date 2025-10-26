@@ -17,11 +17,11 @@ final class ProductFeatureTest extends TestCase
     {
         $product = Product::factory()->create();
         $feature = ProductFeature::factory()->create([
-            'product_id' => $product->id,
-            'feature_type' => 'category',
-            'feature_key' => 'electronics',
+            'product_id'    => $product->id,
+            'feature_type'  => 'category',
+            'feature_key'   => 'electronics',
             'feature_value' => 0.85,
-            'weight' => 1.0,
+            'weight'        => 1.0,
         ]);
 
         $this->assertInstanceOf(ProductFeature::class, $feature);
@@ -54,7 +54,7 @@ final class ProductFeatureTest extends TestCase
     {
         $feature = ProductFeature::factory()->create([
             'feature_value' => '0.123456',
-            'weight' => '0.9876',
+            'weight'        => '0.9876',
         ]);
 
         $this->assertIsFloat($feature->feature_value);
@@ -77,12 +77,12 @@ final class ProductFeatureTest extends TestCase
         $product = Product::factory()->create();
 
         $categoryFeature = ProductFeature::factory()->create([
-            'product_id' => $product->id,
+            'product_id'   => $product->id,
             'feature_type' => 'category',
         ]);
 
         $brandFeature = ProductFeature::factory()->create([
-            'product_id' => $product->id,
+            'product_id'   => $product->id,
             'feature_type' => 'brand',
         ]);
 
@@ -96,12 +96,12 @@ final class ProductFeatureTest extends TestCase
         $product = Product::factory()->create();
 
         $electronicsFeature = ProductFeature::factory()->create([
-            'product_id' => $product->id,
+            'product_id'  => $product->id,
             'feature_key' => 'electronics',
         ]);
 
         $clothingFeature = ProductFeature::factory()->create([
-            'product_id' => $product->id,
+            'product_id'  => $product->id,
             'feature_key' => 'clothing',
         ]);
 
@@ -115,12 +115,12 @@ final class ProductFeatureTest extends TestCase
         $product = Product::factory()->create();
 
         $highValueFeature = ProductFeature::factory()->create([
-            'product_id' => $product->id,
+            'product_id'    => $product->id,
             'feature_value' => 0.9,
         ]);
 
         $lowValueFeature = ProductFeature::factory()->create([
-            'product_id' => $product->id,
+            'product_id'    => $product->id,
             'feature_value' => 0.3,
         ]);
 
@@ -134,12 +134,12 @@ final class ProductFeatureTest extends TestCase
         $product = Product::factory()->create();
 
         $highValueFeature = ProductFeature::factory()->create([
-            'product_id' => $product->id,
+            'product_id'    => $product->id,
             'feature_value' => 0.9,
         ]);
 
         $lowValueFeature = ProductFeature::factory()->create([
-            'product_id' => $product->id,
+            'product_id'    => $product->id,
             'feature_value' => 0.3,
         ]);
 
@@ -154,12 +154,12 @@ final class ProductFeatureTest extends TestCase
 
         $highWeightFeature = ProductFeature::factory()->create([
             'product_id' => $product->id,
-            'weight' => 0.9,
+            'weight'     => 0.9,
         ]);
 
         $lowWeightFeature = ProductFeature::factory()->create([
             'product_id' => $product->id,
-            'weight' => 0.3,
+            'weight'     => 0.3,
         ]);
 
         $highWeightFeatures = ProductFeature::withMinWeight(0.5)->get();
@@ -173,12 +173,12 @@ final class ProductFeatureTest extends TestCase
 
         $highWeightFeature = ProductFeature::factory()->create([
             'product_id' => $product->id,
-            'weight' => 0.9,
+            'weight'     => 0.9,
         ]);
 
         $lowWeightFeature = ProductFeature::factory()->create([
             'product_id' => $product->id,
-            'weight' => 0.3,
+            'weight'     => 0.3,
         ]);
 
         $lowWeightFeatures = ProductFeature::withMaxWeight(0.5)->get();
@@ -205,12 +205,12 @@ final class ProductFeatureTest extends TestCase
 
         $lowWeightFeature = ProductFeature::factory()->create([
             'product_id' => $product->id,
-            'weight' => 0.1,
+            'weight'     => 0.1,
         ]);
 
         $highWeightFeature = ProductFeature::factory()->create([
             'product_id' => $product->id,
-            'weight' => 0.9,
+            'weight'     => 0.9,
         ]);
 
         $orderedFeatures = ProductFeature::orderedByWeight()->get();
@@ -223,12 +223,12 @@ final class ProductFeatureTest extends TestCase
         $product = Product::factory()->create();
 
         $lowValueFeature = ProductFeature::factory()->create([
-            'product_id' => $product->id,
+            'product_id'    => $product->id,
             'feature_value' => 0.1,
         ]);
 
         $highValueFeature = ProductFeature::factory()->create([
-            'product_id' => $product->id,
+            'product_id'    => $product->id,
             'feature_value' => 0.9,
         ]);
 

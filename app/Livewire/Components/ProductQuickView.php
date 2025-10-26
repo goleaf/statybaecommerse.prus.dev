@@ -18,10 +18,10 @@ use Livewire\Component;
  * Livewire component for ProductQuickView with reactive frontend functionality, real-time updates, and user interaction handling.
  *
  * @property Product|null $product
- * @property bool $showModal
- * @property int $quantity
- * @property int|null $selectedVariantId
- * @property array $selectedAttributes
+ * @property bool         $showModal
+ * @property int          $quantity
+ * @property int|null     $selectedVariantId
+ * @property array        $selectedAttributes
  */
 final class ProductQuickView extends Component
 {

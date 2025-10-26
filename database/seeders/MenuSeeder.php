@@ -17,8 +17,8 @@ final class MenuSeeder extends Seeder
         $menu = Menu::query()->firstOrCreate(
             ['key' => 'main_header'],
             [
-                'name' => 'Pagrindinis meniu',
-                'location' => 'header',
+                'name'      => 'Pagrindinis meniu',
+                'location'  => 'header',
                 'is_active' => true,
             ]
         );
@@ -69,14 +69,14 @@ final class MenuSeeder extends Seeder
 
         return $factory
             ->state([
-                'label' => $label,
-                'url' => null,
-                'route_name' => 'category.show',
+                'label'        => $label,
+                'url'          => null,
+                'route_name'   => 'category.show',
                 'route_params' => ['category' => $category->slug],
-                'icon' => null,
-                'sort_order' => $sortOrder,
-                'is_visible' => true,
-                'parent_id' => $parentItem?->id,
+                'icon'         => null,
+                'sort_order'   => $sortOrder,
+                'is_visible'   => true,
+                'parent_id'    => $parentItem?->id,
             ])
             ->create();
     }

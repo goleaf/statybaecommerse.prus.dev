@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Tests\Feature;
 
@@ -23,7 +25,7 @@ final class CustomerGroupResourceTest extends TestCase
         parent::setUp();
 
         $this->actingAs(User::factory()->create([
-            'email' => 'admin@example.com',
+            'email'    => 'admin@example.com',
             'is_admin' => true,
         ]));
     }
@@ -39,22 +41,22 @@ final class CustomerGroupResourceTest extends TestCase
     public function test_can_create_customer_group(): void
     {
         $customerGroupData = [
-            'name' => 'Test Customer Group',
-            'code' => 'TEST_GROUP',
-            'description' => 'Test customer group description',
-            'slug' => 'test-customer-group',
-            'discount_percentage' => 10.0,
-            'discount_fixed' => 5.0,
-            'has_special_pricing' => true,
+            'name'                 => 'Test Customer Group',
+            'code'                 => 'TEST_GROUP',
+            'description'          => 'Test customer group description',
+            'slug'                 => 'test-customer-group',
+            'discount_percentage'  => 10.0,
+            'discount_fixed'       => 5.0,
+            'has_special_pricing'  => true,
             'has_volume_discounts' => false,
-            'can_view_prices' => true,
-            'can_place_orders' => true,
-            'can_view_catalog' => true,
-            'can_use_coupons' => true,
-            'is_active' => true,
-            'is_default' => false,
-            'sort_order' => 1,
-            'type' => 'regular',
+            'can_view_prices'      => true,
+            'can_place_orders'     => true,
+            'can_view_catalog'     => true,
+            'can_use_coupons'      => true,
+            'is_active'            => true,
+            'is_default'           => false,
+            'sort_order'           => 1,
+            'type'                 => 'regular',
         ];
 
         Livewire::test(CustomerGroupResource\Pages\CreateCustomerGroup::class)
@@ -278,8 +280,8 @@ final class CustomerGroupResourceTest extends TestCase
     {
         Livewire::test(CustomerGroupResource\Pages\CreateCustomerGroup::class)
             ->fillForm([
-                'name' => 'Test Customer Group',
-                'code' => 'TEST',
+                'name'                => 'Test Customer Group',
+                'code'                => 'TEST',
                 'discount_percentage' => 'invalid',
             ])
             ->call('create')
@@ -290,8 +292,8 @@ final class CustomerGroupResourceTest extends TestCase
     {
         Livewire::test(CustomerGroupResource\Pages\CreateCustomerGroup::class)
             ->fillForm([
-                'name' => 'Test Customer Group',
-                'code' => 'TEST',
+                'name'                => 'Test Customer Group',
+                'code'                => 'TEST',
                 'discount_percentage' => 150.0,
             ])
             ->call('create')
@@ -302,8 +304,8 @@ final class CustomerGroupResourceTest extends TestCase
     {
         Livewire::test(CustomerGroupResource\Pages\CreateCustomerGroup::class)
             ->fillForm([
-                'name' => 'Test Customer Group',
-                'code' => 'TEST',
+                'name'           => 'Test Customer Group',
+                'code'           => 'TEST',
                 'discount_fixed' => 'invalid',
             ])
             ->call('create')
@@ -314,8 +316,8 @@ final class CustomerGroupResourceTest extends TestCase
     {
         Livewire::test(CustomerGroupResource\Pages\CreateCustomerGroup::class)
             ->fillForm([
-                'name' => 'Test Customer Group',
-                'code' => 'TEST',
+                'name'           => 'Test Customer Group',
+                'code'           => 'TEST',
                 'discount_fixed' => -10.0,
             ])
             ->call('create')
@@ -346,7 +348,7 @@ final class CustomerGroupResourceTest extends TestCase
     {
         $customerGroup = CustomerGroup::factory()->create([
             'discount_percentage' => 15.0,
-            'is_enabled' => true,
+            'is_enabled'          => true,
         ]);
 
         $this->assertEquals(15.0, $customerGroup->discount_percentage);
@@ -442,10 +444,10 @@ final class CustomerGroupResourceTest extends TestCase
     public function test_customer_group_permissions(): void
     {
         $customerGroup = CustomerGroup::factory()->create([
-            'can_view_prices' => true,
+            'can_view_prices'  => true,
             'can_place_orders' => true,
             'can_view_catalog' => false,
-            'can_use_coupons' => true,
+            'can_use_coupons'  => true,
         ]);
 
         $this->assertTrue($customerGroup->can_view_prices);
@@ -457,7 +459,7 @@ final class CustomerGroupResourceTest extends TestCase
     public function test_customer_group_special_pricing(): void
     {
         $customerGroup = CustomerGroup::factory()->create([
-            'has_special_pricing' => true,
+            'has_special_pricing'  => true,
             'has_volume_discounts' => false,
         ]);
 
@@ -469,7 +471,7 @@ final class CustomerGroupResourceTest extends TestCase
     {
         $customerGroup = CustomerGroup::factory()->create([
             'discount_percentage' => 10.0,
-            'discount_fixed' => 5.0,
+            'discount_fixed'      => 5.0,
         ]);
 
         $this->assertEquals(10.0, $customerGroup->discount_percentage);

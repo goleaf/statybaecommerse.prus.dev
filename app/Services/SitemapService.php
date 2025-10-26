@@ -8,6 +8,7 @@ use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
 use App\Support\Seo\LocaleUrlGenerator;
+use DateTimeInterface;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Carbon;
 use InvalidArgumentException;
@@ -25,7 +26,7 @@ final class SitemapService
     {
         return collect($this->localeUrlGenerator->supportedLocales())
             ->map(fn (string $locale) => [
-                'loc' => route('sitemap.locale', ['locale' => $locale]),
+                'loc'     => route('sitemap.locale', ['locale' => $locale]),
                 'lastmod' => now()->toAtomString(),
             ])
             ->values()
@@ -42,7 +43,7 @@ final class SitemapService
         $urls = [];
 
         $urls[] = $this->makeEntry(
-            $this->localeUrlGenerator->localizedRoute('localized.home', [], $locale) ?? url('/'.$locale),
+            $this->localeUrlGenerator->localizedRoute('localized.home', [], $locale) ?? url('/' . $locale),
             now(),
             'daily',
             1.0,
@@ -64,7 +65,7 @@ final class SitemapService
     }
 
     /**
-     * @param  array<int, array<string, mixed>|null>  $urls
+     * @param array<int, array<string, mixed>|null> $urls
      */
     private function appendCategoryUrls(array &$urls, string $locale): void
     {
@@ -100,7 +101,7 @@ final class SitemapService
     }
 
     /**
-     * @param  array<int, array<string, mixed>|null>  $urls
+     * @param array<int, array<string, mixed>|null> $urls
      */
     private function appendProductUrls(array &$urls, string $locale): void
     {
@@ -137,7 +138,7 @@ final class SitemapService
     }
 
     /**
-     * @param  array<int, array<string, mixed>|null>  $urls
+     * @param array<int, array<string, mixed>|null> $urls
      */
     private function appendBrandUrls(array &$urls, string $locale): void
     {
@@ -173,21 +174,20 @@ final class SitemapService
     }
 
     /**
-     * @param  array<string, mixed>|null  $loc
-     * @param  \DateTimeInterface|null  $lastModified
-     * @param  array<string, string>  $alternates
+     * @param array<string, mixed>|null $loc
+     * @param array<string, string>     $alternates
      */
-    private function makeEntry(?string $loc, ?\DateTimeInterface $lastModified, string $changefreq, float $priority, array $alternates = []): ?array
+    private function makeEntry(?string $loc, ?DateTimeInterface $lastModified, string $changefreq, float $priority, array $alternates = []): ?array
     {
         if (! $loc) {
             return null;
         }
 
         return [
-            'loc' => $loc,
-            'lastmod' => ($lastModified ?? Carbon::now())->toAtomString(),
+            'loc'        => $loc,
+            'lastmod'    => ($lastModified ?? Carbon::now())->toAtomString(),
             'changefreq' => $changefreq,
-            'priority' => number_format($priority, 1, '.', ''),
+            'priority'   => number_format($priority, 1, '.', ''),
             'alternates' => $alternates,
         ];
     }

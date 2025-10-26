@@ -12,4 +12,4 @@ use App\Livewire\Pages\SingleProduct;
  *             product detail templates. This file now aliases the canonical
  *             implementation so existing references keep working.
  */
-class_alias(SingleProduct::class, __NAMESPACE__.'\\ProductPage');
+class_alias(SingleProduct::class, __NAMESPACE__ . '\\ProductPage');

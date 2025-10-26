@@ -39,7 +39,7 @@ final class InvalidateCategoryCache
             Cache::forget(CacheKeys::homeCategoryTree($locale));
             Cache::forget(CacheKeys::homeCatalogueCategories($locale));
             Cache::forget(CacheKeys::navigationCategories(8, $locale));
-            Cache::forget(CacheKeys::categoryNavigationTree().':'.$locale);
+            Cache::forget(CacheKeys::categoryNavigationTree() . ':' . $locale);
 
             if (CacheTagHelper::supportsTags()) {
                 $categoryLocaleTags = CacheTagHelper::merge(

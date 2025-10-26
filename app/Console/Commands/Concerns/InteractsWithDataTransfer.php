@@ -15,7 +15,7 @@ trait InteractsWithDataTransfer
 {
     private const ENTITY_TABLE_MAP = [
         'categories' => 'categories',
-        'products' => 'products',
+        'products'   => 'products',
         'attributes' => 'attributes',
     ];
 
@@ -63,7 +63,7 @@ trait InteractsWithDataTransfer
 
     protected function defaultExportPath(string $entity, string $format): string
     {
-        return storage_path('app/exports/'.$entity.'-'.now()->format('Ymd-His').'.'.$format);
+        return storage_path('app/exports/' . $entity . '-' . now()->format('Ymd-His') . '.' . $format);
     }
 
     protected function ensureDirectory(string $path): void
@@ -76,18 +76,18 @@ trait InteractsWithDataTransfer
     }
 
     /**
-     * @param  resource  $handle
+     * @param resource $handle
      */
     protected function exportRows(string $format, $handle, string $table): int
     {
         return match ($format) {
-            'csv' => $this->writeCsv($handle, $this->iterateRows($table), $table),
+            'csv'   => $this->writeCsv($handle, $this->iterateRows($table), $table),
             default => $this->writeJson($handle, $this->iterateRows($table)),
         };
     }
 
     /**
-     * @param  resource  $handle
+     * @param resource $handle
      */
     protected function importRows(string $format, $handle, string $table, int $chunkSize): int
     {
@@ -121,8 +121,8 @@ trait InteractsWithDataTransfer
     }
 
     /**
-     * @param  resource  $handle
-     * @param  iterable<int, array<string, mixed>|object>  $rows
+     * @param resource                                   $handle
+     * @param iterable<int, array<string, mixed>|object> $rows
      */
     protected function writeJson($handle, iterable $rows): int
     {
@@ -135,7 +135,7 @@ trait InteractsWithDataTransfer
                 throw new RuntimeException('Unable to encode row as JSON.');
             }
 
-            if (fwrite($handle, $encoded.PHP_EOL) === false) {
+            if (fwrite($handle, $encoded . PHP_EOL) === false) {
                 throw new RuntimeException('Unable to write JSON row to output.');
             }
 
@@ -146,8 +146,8 @@ trait InteractsWithDataTransfer
     }
 
     /**
-     * @param  resource  $handle
-     * @param  iterable<int, array<string, mixed>|object>  $rows
+     * @param resource                                   $handle
+     * @param iterable<int, array<string, mixed>|object> $rows
      */
     protected function writeCsv($handle, iterable $rows, string $table): int
     {
@@ -193,19 +193,19 @@ trait InteractsWithDataTransfer
     }
 
     /**
-     * @param  resource  $handle
+     * @param  resource                             $handle
      * @return Generator<int, array<string, mixed>>
      */
     protected function readRows(string $format, $handle): Generator
     {
         return match ($format) {
-            'csv' => $this->readCsv($handle),
+            'csv'   => $this->readCsv($handle),
             default => $this->readJson($handle),
         };
     }
 
     /**
-     * @param  resource  $handle
+     * @param  resource                             $handle
      * @return Generator<int, array<string, mixed>>
      */
     protected function readJson($handle): Generator
@@ -229,7 +229,7 @@ trait InteractsWithDataTransfer
     }
 
     /**
-     * @param  resource  $handle
+     * @param  resource                             $handle
      * @return Generator<int, array<string, mixed>>
      */
     protected function readCsv($handle): Generator
@@ -267,7 +267,7 @@ trait InteractsWithDataTransfer
     }
 
     /**
-     * @param  array<string, mixed>  $row
+     * @param  array<string, mixed> $row
      * @return array<string, mixed>
      */
     protected function normalizeRow(array $row): array
@@ -280,7 +280,7 @@ trait InteractsWithDataTransfer
     }
 
     /**
-     * @param  array<int, array<string, mixed>>  $rows
+     * @param array<int, array<string, mixed>> $rows
      */
     protected function persistBatch(string $table, array $rows): void
     {

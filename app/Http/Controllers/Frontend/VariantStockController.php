@@ -32,11 +32,11 @@ final class VariantStockController extends Controller
         }
         if ($request->filled('status')) {
             match ($request->status) {
-                'low_stock' => $query->lowStock(),
-                'out_of_stock' => $query->outOfStock(),
+                'low_stock'     => $query->lowStock(),
+                'out_of_stock'  => $query->outOfStock(),
                 'needs_reorder' => $query->needsReorder(),
                 'expiring_soon' => $query->expiringSoon(),
-                default => null,
+                default         => null,
             };
         }
         if ($request->filled('search')) {

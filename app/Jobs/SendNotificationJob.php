@@ -7,6 +7,7 @@ namespace App\Jobs;
 use App\Models\Notification;
 use App\Models\User;
 use App\Services\NotificationService;
+use Exception;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -61,7 +62,7 @@ final class SendNotificationJob implements ShouldQueue
                 $this->sendViaChannel($user, $channel);
             }
             Log::info('Notification sent successfully', ['notification_id' => $this->notification->id, 'user_id' => $user->id, 'channels' => $this->channels]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Failed to send notification', ['notification_id' => $this->notification->id, 'error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
             throw $e;
         }
@@ -74,10 +75,10 @@ final class SendNotificationJob implements ShouldQueue
     {
         match ($channel) {
             'database' => $this->sendViaDatabase($user),
-            'mail' => $this->sendViaMail($user),
-            'sms' => $this->sendViaSms($user),
-            'push' => $this->sendViaPush($user),
-            default => Log::warning('Unknown notification channel', ['channel' => $channel]),
+            'mail'     => $this->sendViaMail($user),
+            'sms'      => $this->sendViaSms($user),
+            'push'     => $this->sendViaPush($user),
+            default    => Log::warning('Unknown notification channel', ['channel' => $channel]),
         };
     }
 
@@ -109,7 +110,7 @@ final class SendNotificationJob implements ShouldQueue
         try {
             Mail::to($user->email)->send(new \App\Mail\NotificationMail($this->notification));
             Log::info('Email notification sent', ['notification_id' => $this->notification->id, 'user_id' => $user->id, 'email' => $user->email]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Failed to send email notification', ['notification_id' => $this->notification->id, 'user_id' => $user->id, 'error' => $e->getMessage()]);
         }
     }
@@ -192,7 +193,7 @@ final class SendNotificationJob implements ShouldQueue
     /**
      * Handle failed functionality with proper error handling.
      *
-     * @param  Throwable  $exception
+     * @param Throwable $exception
      */
     public function failed(\Throwable $exception): void
     {

@@ -59,7 +59,7 @@ final class TwoFactorChallenge extends Component
         }
 
         $this->validate([
-            'code' => ['nullable', 'string', 'required_without:recoveryCode'],
+            'code'         => ['nullable', 'string', 'required_without:recoveryCode'],
             'recoveryCode' => ['nullable', 'string', 'required_without:code'],
         ]);
 
@@ -149,7 +149,7 @@ final class TwoFactorChallenge extends Component
         $ipAddress = is_string($ip) && $ip !== '' ? $ip : 'unknown';
         $userId = (string) session()->get('auth.two_factor.id', 'guest');
 
-        return Str::transliterate('two-factor|'.$userId.'|'.$ipAddress);
+        return Str::transliterate('two-factor|' . $userId . '|' . $ipAddress);
     }
 
     private function maxAttempts(): int
@@ -191,9 +191,9 @@ final class TwoFactorChallenge extends Component
         [$localPart, $domain] = explode('@', $email, 2);
         $length = Str::length($localPart);
         $visible = max(1, min(3, $length - 1));
-        $maskedLocal = Str::substr($localPart, 0, $visible).str_repeat('*', max(1, $length - $visible));
+        $maskedLocal = Str::substr($localPart, 0, $visible) . str_repeat('*', max(1, $length - $visible));
 
-        return $maskedLocal.'@'.$domain;
+        return $maskedLocal . '@' . $domain;
     }
 
     private function clearTwoFactorSession(): void

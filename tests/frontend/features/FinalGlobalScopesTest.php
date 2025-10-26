@@ -25,17 +25,17 @@ final class FinalGlobalScopesTest extends TestCase
         // Create test product variants
         $activeVariant = ProductVariant::factory()->create([
             'is_enabled' => true,
-            'status' => 'active',
+            'status'     => 'active',
         ]);
 
         $disabledVariant = ProductVariant::factory()->create([
             'is_enabled' => false,
-            'status' => 'active',
+            'status'     => 'active',
         ]);
 
         $inactiveVariant = ProductVariant::factory()->create([
             'is_enabled' => true,
-            'status' => 'inactive',
+            'status'     => 'inactive',
         ]);
 
         // Test that only active, enabled variants with active status are returned

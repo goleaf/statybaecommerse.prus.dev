@@ -10,4 +10,3 @@ it('unit: telescope watchers are configured using string class names', function 
         expect($key)->toBeString()->toStartWith('Laravel\\Telescope\\Watchers\\');
     }
 });
-

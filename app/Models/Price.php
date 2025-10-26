@@ -49,13 +49,13 @@ final class Price extends Model
     {
         // Guarantee that all monetary values preserve precision while dates remain Carbon instances.
         return [
-            'amount' => 'decimal:4',
+            'amount'         => 'decimal:4',
             'compare_amount' => 'decimal:4',
-            'cost_amount' => 'decimal:4',
-            'starts_at' => 'datetime',
-            'ends_at' => 'datetime',
-            'is_enabled' => 'boolean',
-            'metadata' => 'array',
+            'cost_amount'    => 'decimal:4',
+            'starts_at'      => 'datetime',
+            'ends_at'        => 'datetime',
+            'is_enabled'     => 'boolean',
+            'metadata'       => 'array',
         ];
     }
 
@@ -95,7 +95,7 @@ final class Price extends Model
     /**
      * Handle scopeEnabled functionality with proper error handling.
      *
-     * @param  Builder<self>  $query
+     * @param  Builder<self> $query
      * @return Builder<self>
      */
     public function scopeEnabled(Builder $query): Builder
@@ -107,7 +107,7 @@ final class Price extends Model
     /**
      * Handle scopeActive functionality with proper error handling.
      *
-     * @param  Builder<self>  $query
+     * @param  Builder<self> $query
      * @return Builder<self>
      */
     public function scopeActive(Builder $query): Builder
@@ -130,7 +130,7 @@ final class Price extends Model
     /**
      * Handle scopeForCurrency functionality with proper error handling.
      *
-     * @param  Builder<self>  $query
+     * @param  Builder<self> $query
      * @return Builder<self>
      */
     public function scopeForCurrency(Builder $query, string $currencyCode): Builder
@@ -230,7 +230,7 @@ final class Price extends Model
     /**
      * Handle scopeWithTranslations functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeWithTranslations($query, ?string $locale = null)
     {

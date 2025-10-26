@@ -82,8 +82,8 @@ final class LogContext implements Arrayable
     {
         $context = [
             'correlation_id' => $this->correlationId,
-            'request_id' => $this->requestId,
-            'user_id' => $this->userId,
+            'request_id'     => $this->requestId,
+            'user_id'        => $this->userId,
         ];
 
         if ($this->commandName !== null) {

@@ -32,12 +32,12 @@ final class SystemSettingResourceTest extends TestCase
     public function test_can_create_system_setting(): void
     {
         $settingData = [
-            'key' => 'test_setting',
-            'type' => 'string',
-            'value' => 'test value',
+            'key'         => 'test_setting',
+            'type'        => 'string',
+            'value'       => 'test value',
             'description' => 'Test setting description',
-            'category' => 'general',
-            'is_active' => true,
+            'category'    => 'general',
+            'is_active'   => true,
         ];
 
         Livewire::test(\App\Filament\Resources\SystemSettingResource\Pages\CreateSystemSetting::class)
@@ -46,9 +46,9 @@ final class SystemSettingResourceTest extends TestCase
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('system_settings', [
-            'key' => 'test_setting',
-            'type' => 'string',
-            'value' => 'test value',
+            'key'      => 'test_setting',
+            'type'     => 'string',
+            'value'    => 'test value',
             'category' => 'general',
         ]);
     }
@@ -61,15 +61,15 @@ final class SystemSettingResourceTest extends TestCase
             'record' => $setting->getRouteKey(),
         ])
             ->fillForm([
-                'value' => 'updated value',
+                'value'       => 'updated value',
                 'description' => 'Updated description',
             ])
             ->call('save')
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('system_settings', [
-            'id' => $setting->id,
-            'value' => 'updated value',
+            'id'          => $setting->id,
+            'value'       => 'updated value',
             'description' => 'Updated description',
         ]);
     }
@@ -154,7 +154,7 @@ final class SystemSettingResourceTest extends TestCase
             ->assertHasNoTableActionErrors();
 
         $this->assertDatabaseHas('system_settings', [
-            'id' => $setting->id,
+            'id'        => $setting->id,
             'is_active' => false,
         ]);
     }
@@ -162,7 +162,7 @@ final class SystemSettingResourceTest extends TestCase
     public function test_can_reset_setting_to_default(): void
     {
         $setting = SystemSetting::factory()->create([
-            'value' => 'custom value',
+            'value'         => 'custom value',
             'default_value' => 'default value',
         ]);
 
@@ -171,7 +171,7 @@ final class SystemSettingResourceTest extends TestCase
             ->assertHasNoTableActionErrors();
 
         $this->assertDatabaseHas('system_settings', [
-            'id' => $setting->id,
+            'id'    => $setting->id,
             'value' => 'default value',
         ]);
     }

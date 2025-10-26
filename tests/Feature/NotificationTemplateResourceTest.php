@@ -22,7 +22,7 @@ final class NotificationTemplateResourceTest extends TestCase
         parent::setUp();
 
         $this->adminUser = User::factory()->create([
-            'email' => 'admin@example.com',
+            'email'    => 'admin@example.com',
             'is_admin' => true,
         ]);
     }
@@ -32,10 +32,10 @@ final class NotificationTemplateResourceTest extends TestCase
         $this->actingAs($this->adminUser);
 
         $template = NotificationTemplate::factory()->create([
-            'name' => 'Test Template',
-            'slug' => 'test-template',
-            'type' => 'email',
-            'event' => 'user_registered',
+            'name'      => 'Test Template',
+            'slug'      => 'test-template',
+            'type'      => 'email',
+            'event'     => 'user_registered',
             'is_active' => true,
         ]);
 
@@ -49,12 +49,12 @@ final class NotificationTemplateResourceTest extends TestCase
 
         Livewire::test(\App\Filament\Resources\NotificationTemplateResource\Pages\CreateNotificationTemplate::class)
             ->fillForm([
-                'name' => 'Test Template',
-                'slug' => 'test-template',
-                'type' => 'email',
-                'event' => 'user_registered',
-                'subject' => 'Welcome!',
-                'content' => 'Welcome to our platform!',
+                'name'      => 'Test Template',
+                'slug'      => 'test-template',
+                'type'      => 'email',
+                'event'     => 'user_registered',
+                'subject'   => 'Welcome!',
+                'content'   => 'Welcome to our platform!',
                 'variables' => 'name,email',
                 'is_active' => true,
             ])
@@ -62,10 +62,10 @@ final class NotificationTemplateResourceTest extends TestCase
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('notification_templates', [
-            'name' => 'Test Template',
-            'slug' => 'test-template',
-            'type' => 'email',
-            'event' => 'user_registered',
+            'name'      => 'Test Template',
+            'slug'      => 'test-template',
+            'type'      => 'email',
+            'event'     => 'user_registered',
             'is_active' => true,
         ]);
     }
@@ -75,10 +75,10 @@ final class NotificationTemplateResourceTest extends TestCase
         $this->actingAs($this->adminUser);
 
         $template = NotificationTemplate::factory()->create([
-            'name' => 'Original Template',
-            'slug' => 'original-template',
-            'type' => 'email',
-            'event' => 'user_registered',
+            'name'      => 'Original Template',
+            'slug'      => 'original-template',
+            'type'      => 'email',
+            'event'     => 'user_registered',
             'is_active' => true,
         ]);
 
@@ -86,7 +86,7 @@ final class NotificationTemplateResourceTest extends TestCase
             'record' => $template->getRouteKey(),
         ])
             ->fillForm([
-                'name' => 'Updated Template',
+                'name'    => 'Updated Template',
                 'subject' => 'Updated Subject',
                 'content' => 'Updated content',
             ])
@@ -94,7 +94,7 @@ final class NotificationTemplateResourceTest extends TestCase
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('notification_templates', [
-            'id' => $template->id,
+            'id'   => $template->id,
             'name' => 'Updated Template',
         ]);
     }
@@ -104,12 +104,12 @@ final class NotificationTemplateResourceTest extends TestCase
         $this->actingAs($this->adminUser);
 
         $template = NotificationTemplate::factory()->create([
-            'name' => 'Test Template',
-            'slug' => 'test-template',
-            'type' => 'email',
-            'event' => 'user_registered',
-            'subject' => 'Welcome!',
-            'content' => 'Welcome to our platform!',
+            'name'      => 'Test Template',
+            'slug'      => 'test-template',
+            'type'      => 'email',
+            'event'     => 'user_registered',
+            'subject'   => 'Welcome!',
+            'content'   => 'Welcome to our platform!',
             'is_active' => true,
         ]);
 
@@ -175,9 +175,9 @@ final class NotificationTemplateResourceTest extends TestCase
 
         Livewire::test(\App\Filament\Resources\NotificationTemplateResource\Pages\CreateNotificationTemplate::class)
             ->fillForm([
-                'name' => 'Test Template Name',
-                'type' => 'email',
-                'event' => 'user_registered',
+                'name'    => 'Test Template Name',
+                'type'    => 'email',
+                'event'   => 'user_registered',
                 'subject' => 'Welcome!',
                 'content' => 'Welcome to our platform!',
             ])
@@ -192,8 +192,8 @@ final class NotificationTemplateResourceTest extends TestCase
 
         Livewire::test(\App\Filament\Resources\NotificationTemplateResource\Pages\CreateNotificationTemplate::class)
             ->fillForm([
-                'type' => 'email',
-                'event' => 'user_registered',
+                'type'    => 'email',
+                'event'   => 'user_registered',
                 'subject' => 'Welcome!',
                 'content' => 'Welcome to our platform!',
             ])
@@ -207,9 +207,9 @@ final class NotificationTemplateResourceTest extends TestCase
 
         Livewire::test(\App\Filament\Resources\NotificationTemplateResource\Pages\CreateNotificationTemplate::class)
             ->fillForm([
-                'name' => 'Test Template',
-                'type' => 'email',
-                'event' => 'user_registered',
+                'name'    => 'Test Template',
+                'type'    => 'email',
+                'event'   => 'user_registered',
                 'subject' => 'Welcome!',
                 'content' => 'Welcome to our platform!',
             ])
@@ -223,9 +223,9 @@ final class NotificationTemplateResourceTest extends TestCase
 
         Livewire::test(\App\Filament\Resources\NotificationTemplateResource\Pages\CreateNotificationTemplate::class)
             ->fillForm([
-                'name' => 'Test Template',
-                'slug' => 'test-template',
-                'event' => 'user_registered',
+                'name'    => 'Test Template',
+                'slug'    => 'test-template',
+                'event'   => 'user_registered',
                 'subject' => 'Welcome!',
                 'content' => 'Welcome to our platform!',
             ])
@@ -239,9 +239,9 @@ final class NotificationTemplateResourceTest extends TestCase
 
         Livewire::test(\App\Filament\Resources\NotificationTemplateResource\Pages\CreateNotificationTemplate::class)
             ->fillForm([
-                'name' => 'Test Template',
-                'slug' => 'test-template',
-                'type' => 'email',
+                'name'    => 'Test Template',
+                'slug'    => 'test-template',
+                'type'    => 'email',
                 'subject' => 'Welcome!',
                 'content' => 'Welcome to our platform!',
             ])
@@ -255,10 +255,10 @@ final class NotificationTemplateResourceTest extends TestCase
 
         Livewire::test(\App\Filament\Resources\NotificationTemplateResource\Pages\CreateNotificationTemplate::class)
             ->fillForm([
-                'name' => 'Test Template',
-                'slug' => 'test-template',
-                'type' => 'email',
-                'event' => 'user_registered',
+                'name'    => 'Test Template',
+                'slug'    => 'test-template',
+                'type'    => 'email',
+                'event'   => 'user_registered',
                 'content' => 'Welcome to our platform!',
             ])
             ->call('create')
@@ -271,10 +271,10 @@ final class NotificationTemplateResourceTest extends TestCase
 
         Livewire::test(\App\Filament\Resources\NotificationTemplateResource\Pages\CreateNotificationTemplate::class)
             ->fillForm([
-                'name' => 'Test Template',
-                'slug' => 'test-template',
-                'type' => 'email',
-                'event' => 'user_registered',
+                'name'    => 'Test Template',
+                'slug'    => 'test-template',
+                'type'    => 'email',
+                'event'   => 'user_registered',
                 'subject' => 'Welcome!',
             ])
             ->call('create')
@@ -291,10 +291,10 @@ final class NotificationTemplateResourceTest extends TestCase
 
         Livewire::test(\App\Filament\Resources\NotificationTemplateResource\Pages\CreateNotificationTemplate::class)
             ->fillForm([
-                'name' => 'Test Template',
-                'slug' => 'existing-template',
-                'type' => 'email',
-                'event' => 'user_registered',
+                'name'    => 'Test Template',
+                'slug'    => 'existing-template',
+                'type'    => 'email',
+                'event'   => 'user_registered',
                 'subject' => 'Welcome!',
                 'content' => 'Welcome to our platform!',
             ])
@@ -308,10 +308,10 @@ final class NotificationTemplateResourceTest extends TestCase
 
         Livewire::test(\App\Filament\Resources\NotificationTemplateResource\Pages\CreateNotificationTemplate::class)
             ->fillForm([
-                'name' => 'Test Template',
-                'slug' => 'invalid slug!',
-                'type' => 'email',
-                'event' => 'user_registered',
+                'name'    => 'Test Template',
+                'slug'    => 'invalid slug!',
+                'type'    => 'email',
+                'event'   => 'user_registered',
                 'subject' => 'Welcome!',
                 'content' => 'Welcome to our platform!',
             ])

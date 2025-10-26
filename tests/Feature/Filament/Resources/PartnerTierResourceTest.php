@@ -20,7 +20,7 @@ class PartnerTierResourceTest extends TestCase
 
         // Create test user with admin role
         $this->user = User::factory()->create([
-            'email' => 'admin@example.com',
+            'email'    => 'admin@example.com',
             'is_admin' => true,
         ]);
     }
@@ -40,13 +40,13 @@ class PartnerTierResourceTest extends TestCase
         $this->actingAs($this->user);
 
         $partnerTierData = [
-            'name' => 'Gold Tier',
-            'code' => 'GOLD',
-            'is_enabled' => true,
-            'discount_rate' => 15.0,
-            'commission_rate' => 8.0,
+            'name'                => 'Gold Tier',
+            'code'                => 'GOLD',
+            'is_enabled'          => true,
+            'discount_rate'       => 15.0,
+            'commission_rate'     => 8.0,
             'minimum_order_value' => 1000.0,
-            'benefits' => [
+            'benefits'            => [
                 ['benefit' => 'Priority Support'],
                 ['benefit' => 'Extended Warranty'],
                 ['benefit' => 'Free Shipping'],
@@ -59,11 +59,11 @@ class PartnerTierResourceTest extends TestCase
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('partner_tiers', [
-            'name' => 'Gold Tier',
-            'code' => 'GOLD',
-            'is_enabled' => true,
-            'discount_rate' => 15.0,
-            'commission_rate' => 8.0,
+            'name'                => 'Gold Tier',
+            'code'                => 'GOLD',
+            'is_enabled'          => true,
+            'discount_rate'       => 15.0,
+            'commission_rate'     => 8.0,
             'minimum_order_value' => 1000.0,
         ]);
     }
@@ -81,7 +81,7 @@ class PartnerTierResourceTest extends TestCase
     public function test_can_edit_partner_tier(): void
     {
         $partnerTier = PartnerTier::factory()->create([
-            'name' => 'Original Tier',
+            'name'          => 'Original Tier',
             'discount_rate' => 5.0,
         ]);
 
@@ -89,19 +89,19 @@ class PartnerTierResourceTest extends TestCase
 
         Livewire::test(\App\Filament\Resources\PartnerTierResource\Pages\EditPartnerTier::class, ['record' => $partnerTier->id])
             ->fillForm([
-                'name' => 'Updated Tier',
-                'discount_rate' => 20.0,
-                'commission_rate' => 12.0,
+                'name'                => 'Updated Tier',
+                'discount_rate'       => 20.0,
+                'commission_rate'     => 12.0,
                 'minimum_order_value' => 2000.0,
             ])
             ->call('save')
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('partner_tiers', [
-            'id' => $partnerTier->id,
-            'name' => 'Updated Tier',
-            'discount_rate' => 20.0,
-            'commission_rate' => 12.0,
+            'id'                  => $partnerTier->id,
+            'name'                => 'Updated Tier',
+            'discount_rate'       => 20.0,
+            'commission_rate'     => 12.0,
             'minimum_order_value' => 2000.0,
         ]);
     }
@@ -232,8 +232,8 @@ class PartnerTierResourceTest extends TestCase
         $this->actingAs($this->user);
 
         $tierData = [
-            'name' => 'Test Tier',
-            'code' => 'EXISTING',  // Same code as existing tier
+            'name'       => 'Test Tier',
+            'code'       => 'EXISTING',  // Same code as existing tier
             'is_enabled' => true,
         ];
 
@@ -248,9 +248,9 @@ class PartnerTierResourceTest extends TestCase
         $this->actingAs($this->user);
 
         $tierData = [
-            'name' => 'Test Tier',
-            'code' => 'TEST',
-            'is_enabled' => true,
+            'name'          => 'Test Tier',
+            'code'          => 'TEST',
+            'is_enabled'    => true,
             'discount_rate' => 150.0,  // Invalid: exceeds 100%
         ];
 
@@ -265,9 +265,9 @@ class PartnerTierResourceTest extends TestCase
         $this->actingAs($this->user);
 
         $tierData = [
-            'name' => 'Test Tier',
-            'code' => 'TEST',
-            'is_enabled' => true,
+            'name'            => 'Test Tier',
+            'code'            => 'TEST',
+            'is_enabled'      => true,
             'commission_rate' => 150.0,  // Invalid: exceeds 100%
         ];
 
@@ -282,9 +282,9 @@ class PartnerTierResourceTest extends TestCase
         $this->actingAs($this->user);
 
         $tierData = [
-            'name' => 'Test Tier',
-            'code' => 'TEST',
-            'is_enabled' => true,
+            'name'                => 'Test Tier',
+            'code'                => 'TEST',
+            'is_enabled'          => true,
             'minimum_order_value' => -100.0,  // Invalid: negative value
         ];
 
@@ -299,13 +299,13 @@ class PartnerTierResourceTest extends TestCase
         $this->actingAs($this->user);
 
         $tierData = [
-            'name' => 'Premium Tier',
-            'code' => 'PREMIUM',
-            'is_enabled' => true,
-            'discount_rate' => 25.0,
-            'commission_rate' => 10.0,
+            'name'                => 'Premium Tier',
+            'code'                => 'PREMIUM',
+            'is_enabled'          => true,
+            'discount_rate'       => 25.0,
+            'commission_rate'     => 10.0,
             'minimum_order_value' => 5000.0,
-            'benefits' => [
+            'benefits'            => [
                 ['benefit' => '24/7 Support'],
                 ['benefit' => 'Free Shipping Worldwide'],
                 ['benefit' => 'Extended Warranty'],
@@ -319,10 +319,10 @@ class PartnerTierResourceTest extends TestCase
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('partner_tiers', [
-            'name' => 'Premium Tier',
-            'code' => 'PREMIUM',
-            'discount_rate' => 25.0,
-            'commission_rate' => 10.0,
+            'name'                => 'Premium Tier',
+            'code'                => 'PREMIUM',
+            'discount_rate'       => 25.0,
+            'commission_rate'     => 10.0,
             'minimum_order_value' => 5000.0,
         ]);
     }
@@ -367,7 +367,7 @@ class PartnerTierResourceTest extends TestCase
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('partner_tiers', [
-            'id' => $partnerTier->id,
+            'id'         => $partnerTier->id,
             'is_enabled' => false,
         ]);
     }

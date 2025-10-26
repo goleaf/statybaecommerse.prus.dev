@@ -27,11 +27,11 @@ beforeEach(function (): void {
     test()->inlineChartsPreviousConfig = $previousConfig;
 
     config([
-        'database.default' => 'inline_charts_sqlite',
+        'database.default'                          => 'inline_charts_sqlite',
         'database.connections.inline_charts_sqlite' => [
-            'driver' => 'sqlite',
-            'database' => ':memory:',
-            'prefix' => '',
+            'driver'                  => 'sqlite',
+            'database'                => ':memory:',
+            'prefix'                  => '',
             'foreign_key_constraints' => true,
         ],
     ]);

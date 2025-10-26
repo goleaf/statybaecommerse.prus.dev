@@ -31,7 +31,7 @@ final class ProductHistorySeeder extends Seeder
     private function seedHistoriesForProduct(Product $product, $users): void
     {
         $pivotMetadata = [
-            'source' => 'factory_seed',
+            'source'   => 'factory_seed',
             'currency' => 'EUR',
         ];
 
@@ -41,7 +41,7 @@ final class ProductHistorySeeder extends Seeder
                 ->count(fake()->numberBetween(8, 12))
                 ->for($product)
                 ->state(fn () => [
-                    'user_id' => $users->random()->id,
+                    'user_id'  => $users->random()->id,
                     'metadata' => array_merge($pivotMetadata, ['event_id' => fake()->uuid()]),
                 ])
                 ->make()

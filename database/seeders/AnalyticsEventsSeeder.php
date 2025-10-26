@@ -35,14 +35,14 @@ final class AnalyticsEventsSeeder extends Seeder
                     ->state([
                         'session_id' => "seed-{$product->getKey()}-view-{$index}",
                         'properties' => [
-                            'product_id' => $product->getKey(),
+                            'product_id'   => $product->getKey(),
                             'product_name' => $product->name,
-                            'product_sku' => $product->sku,
-                            'brand' => $product->brand?->name,
+                            'product_sku'  => $product->sku,
+                            'brand'        => $product->brand?->name,
                         ],
                         'trackable_type' => Product::class,
-                        'trackable_id' => $product->getKey(),
-                        'created_at' => now()->subDays($index % 30),
+                        'trackable_id'   => $product->getKey(),
+                        'created_at'     => now()->subDays($index % 30),
                     ])
                     ->create();
             }
@@ -56,14 +56,14 @@ final class AnalyticsEventsSeeder extends Seeder
                     ->state([
                         'session_id' => "seed-{$product->getKey()}-cart-{$index}",
                         'properties' => [
-                            'product_id' => $product->getKey(),
+                            'product_id'   => $product->getKey(),
                             'product_name' => $product->name,
-                            'quantity' => 1,
-                            'price' => $product->price,
+                            'quantity'     => 1,
+                            'price'        => $product->price,
                         ],
                         'trackable_type' => Product::class,
-                        'trackable_id' => $product->getKey(),
-                        'created_at' => now()->subDays($index % 7),
+                        'trackable_id'   => $product->getKey(),
+                        'created_at'     => now()->subDays($index % 7),
                     ])
                     ->create();
             }
@@ -88,8 +88,8 @@ final class AnalyticsEventsSeeder extends Seeder
         if ($existingBrands->isEmpty()) {
             // If no brands exist, create just one
             $brand = Brand::factory()->create([
-                'name' => 'Analytics Brand',
-                'slug' => 'analytics-brand',
+                'name'       => 'Analytics Brand',
+                'slug'       => 'analytics-brand',
                 'is_enabled' => true,
             ]);
             $existingBrands = collect([$brand]);
@@ -98,8 +98,8 @@ final class AnalyticsEventsSeeder extends Seeder
         Product::factory()
             ->count($missing)
             ->state([
-                'status' => 'published',
-                'is_visible' => true,
+                'status'       => 'published',
+                'is_visible'   => true,
                 'published_at' => now(),
             ])
             ->create()

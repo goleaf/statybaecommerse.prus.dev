@@ -17,8 +17,8 @@ use Spatie\Permission\Models\Role;
 it('complete system integration test', function () {
     // Create admin user with permissions
     $admin = User::factory()->create([
-        'name' => 'System Admin',
-        'email' => 'admin@system.test',
+        'name'     => 'System Admin',
+        'email'    => 'admin@system.test',
         'is_admin' => true,
     ]);
 
@@ -36,24 +36,24 @@ it('complete system integration test', function () {
 
     // Test brand creation
     $brand = Brand::factory()->create([
-        'name' => 'Test Brand',
-        'slug' => 'test-brand',
+        'name'       => 'Test Brand',
+        'slug'       => 'test-brand',
         'is_enabled' => true,
     ]);
 
     // Test category creation
     $category = Category::factory()->create([
-        'name' => 'Test Category',
-        'slug' => 'test-category',
+        'name'       => 'Test Category',
+        'slug'       => 'test-category',
         'is_visible' => true,
     ]);
 
     // Test product creation
     $product = Product::factory()->create([
-        'name' => 'Test Product',
-        'slug' => 'test-product',
-        'brand_id' => $brand->id,
-        'price' => 99.99,
+        'name'       => 'Test Product',
+        'slug'       => 'test-product',
+        'brand_id'   => $brand->id,
+        'price'      => 99.99,
         'is_visible' => true,
     ]);
 
@@ -62,10 +62,10 @@ it('complete system integration test', function () {
 
     // Test document template creation
     $template = DocumentTemplate::factory()->create([
-        'name' => 'Product Invoice',
-        'content' => '<h1>Invoice for $PRODUCT_NAME</h1><p>Price: $PRODUCT_PRICE</p>',
+        'name'      => 'Product Invoice',
+        'content'   => '<h1>Invoice for $PRODUCT_NAME</h1><p>Price: $PRODUCT_PRICE</p>',
         'variables' => ['$PRODUCT_NAME', '$PRODUCT_PRICE'],
-        'type' => 'invoice',
+        'type'      => 'invoice',
         'is_active' => true,
     ]);
 
@@ -75,7 +75,7 @@ it('complete system integration test', function () {
     $document = $service->generateDocument(
         $template,
         $product,
-        ['$PRODUCT_NAME' => $product->name, '$PRODUCT_PRICE' => '€'.$product->price],
+        ['$PRODUCT_NAME' => $product->name, '$PRODUCT_PRICE' => '€' . $product->price],
         'Product Invoice #001'
     );
 

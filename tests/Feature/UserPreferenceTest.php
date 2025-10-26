@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Tests\Feature;
 
@@ -16,15 +18,15 @@ final class UserPreferenceTest extends TestCase
         $user = User::factory()->create();
 
         $preference1 = UserPreference::factory()->create([
-            'user_id' => $user->id,
+            'user_id'         => $user->id,
             'preference_type' => 'category',
-            'preference_key' => 'electronics',
+            'preference_key'  => 'electronics',
         ]);
 
         $preference2 = UserPreference::factory()->create([
-            'user_id' => $user->id,
+            'user_id'         => $user->id,
             'preference_type' => 'brand',
-            'preference_key' => 'apple',
+            'preference_key'  => 'apple',
         ]);
 
         $this->assertCount(2, $user->userPreferences);
@@ -37,17 +39,17 @@ final class UserPreferenceTest extends TestCase
         $user = User::factory()->create();
 
         UserPreference::factory()->create([
-            'user_id' => $user->id,
+            'user_id'         => $user->id,
             'preference_type' => 'category',
-            'preference_key' => 'electronics',
+            'preference_key'  => 'electronics',
         ]);
 
         $this->expectException(\Illuminate\Database\QueryException::class);
 
         UserPreference::factory()->create([
-            'user_id' => $user->id,
+            'user_id'         => $user->id,
             'preference_type' => 'category',
-            'preference_key' => 'electronics',
+            'preference_key'  => 'electronics',
         ]);
     }
 
@@ -91,9 +93,9 @@ final class UserPreferenceTest extends TestCase
     public function test_user_preference_metadata_stores_complex_data(): void
     {
         $complexMetadata = [
-            'source' => 'purchase_history',
+            'source'    => 'purchase_history',
             'frequency' => 'high',
-            'nested' => [
+            'nested'    => [
                 'level1' => [
                     'level2' => 'value',
                 ],
@@ -177,27 +179,27 @@ final class UserPreferenceTest extends TestCase
     public function test_user_preference_can_combine_multiple_scopes(): void
     {
         UserPreference::factory()->create([
-            'preference_type' => 'category',
+            'preference_type'  => 'category',
             'preference_score' => 0.8,
-            'last_updated' => now()->subDays(5),
+            'last_updated'     => now()->subDays(5),
         ]);
 
         UserPreference::factory()->create([
-            'preference_type' => 'category',
+            'preference_type'  => 'category',
             'preference_score' => 0.3,
-            'last_updated' => now()->subDays(5),
+            'last_updated'     => now()->subDays(5),
         ]);
 
         UserPreference::factory()->create([
-            'preference_type' => 'brand',
+            'preference_type'  => 'brand',
             'preference_score' => 0.9,
-            'last_updated' => now()->subDays(5),
+            'last_updated'     => now()->subDays(5),
         ]);
 
         UserPreference::factory()->create([
-            'preference_type' => 'category',
+            'preference_type'  => 'category',
             'preference_score' => 0.9,
-            'last_updated' => now()->subDays(50),
+            'last_updated'     => now()->subDays(50),
         ]);
 
         $results = UserPreference::byType('category')

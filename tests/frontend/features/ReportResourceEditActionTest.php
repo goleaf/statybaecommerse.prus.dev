@@ -7,6 +7,7 @@ namespace Tests\Feature\Filament;
 use App\Filament\Resources\ReportResource;
 use App\Models\Report;
 use App\Models\User;
+use Exception;
 use Filament\Actions\EditAction;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
@@ -26,7 +27,7 @@ class ReportResourceEditActionTest extends TestCase
         // Create admin user
         $this->adminUser = User::factory()->create([
             'email' => 'admin@test.com',
-            'name' => 'Admin User',
+            'name'  => 'Admin User',
         ]);
 
         // Ensure role exists and assign it
@@ -143,12 +144,12 @@ class ReportResourceEditActionTest extends TestCase
 
         $report = Report::factory()->create([
             'filters' => [
-                'status' => 'paid',
-                'category' => 'electronics',
+                'status'     => 'paid',
+                'category'   => 'electronics',
                 'min_amount' => 100,
                 'date_range' => [
                     'start' => '2024-01-01',
-                    'end' => '2024-12-31',
+                    'end'   => '2024-12-31',
                 ],
             ],
         ]);
@@ -193,7 +194,7 @@ class ReportResourceEditActionTest extends TestCase
         $report = Report::factory()->create([
             'date_range' => 'custom',
             'start_date' => '2024-01-01',
-            'end_date' => '2024-12-31',
+            'end_date'   => '2024-12-31',
         ]);
 
         // Test EditAction with custom dates
@@ -209,7 +210,7 @@ class ReportResourceEditActionTest extends TestCase
 
         $report = Report::factory()->create([
             'start_date' => null,
-            'end_date' => null,
+            'end_date'   => null,
         ]);
 
         // Test EditAction with null dates
@@ -264,10 +265,10 @@ class ReportResourceEditActionTest extends TestCase
         $this->actingAs($this->adminUser);
 
         $report = Report::factory()->create([
-            'name' => 'Report with Special Characters: @#$%^&*()',
+            'name'    => 'Report with Special Characters: @#$%^&*()',
             'filters' => [
-                'search' => 'test@example.com',
-                'category' => 'Electronics & Gadgets',
+                'search'      => 'test@example.com',
+                'category'    => 'Electronics & Gadgets',
                 'price_range' => '$100-$500',
             ],
         ]);
@@ -407,8 +408,8 @@ class ReportResourceEditActionTest extends TestCase
             Livewire::test(ReportResource\Pages\ListReports::class)
                 ->callTableAction(EditAction::class, $report)
                 ->assertRedirect(ReportResource::getUrl('edit', ['record' => $report]));
-        } catch (\Exception $e) {
-            $this->fail('EditAction should not throw errors: '.$e->getMessage());
+        } catch (Exception $e) {
+            $this->fail('EditAction should not throw errors: ' . $e->getMessage());
         }
     }
 
@@ -466,8 +467,8 @@ class ReportResourceEditActionTest extends TestCase
             Livewire::test(ReportResource\Pages\ListReports::class)
                 ->callTableAction(EditAction::class, $report)
                 ->assertRedirect(ReportResource::getUrl('edit', ['record' => $report]));
-        } catch (\Exception $e) {
-            $this->fail('EditAction should handle errors gracefully: '.$e->getMessage());
+        } catch (Exception $e) {
+            $this->fail('EditAction should handle errors gracefully: ' . $e->getMessage());
         }
     }
 

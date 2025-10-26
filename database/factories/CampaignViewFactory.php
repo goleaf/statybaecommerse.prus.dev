@@ -20,12 +20,12 @@ final class CampaignViewFactory extends Factory
     {
         return [
             'campaign_id' => Campaign::factory(),
-            'session_id' => $this->faker->uuid(),
-            'ip_address' => $this->faker->ipv4(),
-            'user_agent' => $this->faker->userAgent(),
-            'referer' => $this->faker->optional()->url(),
+            'session_id'  => $this->faker->uuid(),
+            'ip_address'  => $this->faker->ipv4(),
+            'user_agent'  => $this->faker->userAgent(),
+            'referer'     => $this->faker->optional()->url(),
             'customer_id' => $this->faker->optional()->randomElement([User::factory()]),
-            'viewed_at' => $this->faker->dateTimeBetween('-1 month', 'now'),
+            'viewed_at'   => $this->faker->dateTimeBetween('-1 month', 'now'),
         ];
     }
 

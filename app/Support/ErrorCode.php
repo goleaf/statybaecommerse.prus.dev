@@ -25,13 +25,13 @@ enum ErrorCode: string
     public function translationKey(): string
     {
         return match ($this) {
-            self::OrderNotFound => 'exceptions.orders.not_found',
+            self::OrderNotFound         => 'exceptions.orders.not_found',
             self::InventoryInsufficient => 'exceptions.inventory.insufficient',
-            self::NotFound => 'errors.not_found',
-            self::ServerError => 'errors.server_error',
-            self::ValidationFailed => 'errors.validation_failed',
-            self::Unauthorized => 'errors.unauthorized',
-            self::Forbidden => 'errors.forbidden',
+            self::NotFound              => 'errors.not_found',
+            self::ServerError           => 'errors.server_error',
+            self::ValidationFailed      => 'errors.validation_failed',
+            self::Unauthorized          => 'errors.unauthorized',
+            self::Forbidden             => 'errors.forbidden',
         };
     }
 
@@ -42,11 +42,11 @@ enum ErrorCode: string
     {
         return match ($this) {
             self::NotFound, self::OrderNotFound => Response::HTTP_NOT_FOUND,
-            self::ValidationFailed => Response::HTTP_UNPROCESSABLE_ENTITY,
-            self::Unauthorized => Response::HTTP_UNAUTHORIZED,
-            self::Forbidden => Response::HTTP_FORBIDDEN,
+            self::ValidationFailed      => Response::HTTP_UNPROCESSABLE_ENTITY,
+            self::Unauthorized          => Response::HTTP_UNAUTHORIZED,
+            self::Forbidden             => Response::HTTP_FORBIDDEN,
             self::InventoryInsufficient => Response::HTTP_CONFLICT,
-            self::ServerError => Response::HTTP_INTERNAL_SERVER_ERROR,
+            self::ServerError           => Response::HTTP_INTERNAL_SERVER_ERROR,
         };
     }
 }

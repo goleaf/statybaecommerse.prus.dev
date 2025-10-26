@@ -15,13 +15,13 @@ beforeEach(function () {
 
 test('can create subscriber', function () {
     $subscriberData = [
-        'email' => 'test@example.com',
+        'email'      => 'test@example.com',
         'first_name' => 'John',
-        'last_name' => 'Doe',
-        'company' => 'Test Company',
-        'interests' => ['products', 'news'],
-        'source' => 'website',
-        'status' => 'active',
+        'last_name'  => 'Doe',
+        'company'    => 'Test Company',
+        'interests'  => ['products', 'news'],
+        'source'     => 'website',
+        'status'     => 'active',
     ];
 
     $subscriber = Subscriber::create($subscriberData);
@@ -35,26 +35,26 @@ test('can create subscriber', function () {
         ->and($subscriber->subscribed_at)->not->toBeNull();
 
     $this->assertDatabaseHas('subscribers', [
-        'email' => 'test@example.com',
+        'email'      => 'test@example.com',
         'first_name' => 'John',
-        'last_name' => 'Doe',
-        'company' => 'Test Company',
-        'status' => 'active',
+        'last_name'  => 'Doe',
+        'company'    => 'Test Company',
+        'status'     => 'active',
     ]);
 });
 
 test('subscriber can be linked to user', function () {
     $user = User::factory()->create([
         'email' => 'user@example.com',
-        'name' => 'John Doe',
+        'name'  => 'John Doe',
     ]);
 
     $subscriber = Subscriber::create([
-        'user_id' => $user->id,
-        'email' => 'user@example.com',
+        'user_id'    => $user->id,
+        'email'      => 'user@example.com',
         'first_name' => 'John',
-        'last_name' => 'Doe',
-        'status' => 'active',
+        'last_name'  => 'Doe',
+        'status'     => 'active',
     ]);
 
     expect($subscriber->user())->not->toBeNull()
@@ -63,12 +63,12 @@ test('subscriber can be linked to user', function () {
 
 test('subscribe static method creates subscriber', function () {
     $data = [
-        'email' => 'subscribe@example.com',
+        'email'      => 'subscribe@example.com',
         'first_name' => 'Jane',
-        'last_name' => 'Smith',
-        'company' => 'Smith Corp',
-        'interests' => ['promotions'],
-        'source' => 'website',
+        'last_name'  => 'Smith',
+        'company'    => 'Smith Corp',
+        'interests'  => ['promotions'],
+        'source'     => 'website',
     ];
 
     $subscriber = Subscriber::subscribe($data);
@@ -84,9 +84,9 @@ test('subscribe links to existing user', function () {
     ]);
 
     $subscriber = Subscriber::subscribe([
-        'email' => 'existing@example.com',
+        'email'      => 'existing@example.com',
         'first_name' => 'Existing',
-        'last_name' => 'User',
+        'last_name'  => 'User',
     ]);
 
     expect($subscriber->user_id)->toBe($user->id);
@@ -158,11 +158,11 @@ test('newsletter subscription component works', function () {
 
     // Check that subscriber was created
     $this->assertDatabaseHas('subscribers', [
-        'email' => 'test@example.com',
+        'email'      => 'test@example.com',
         'first_name' => 'John',
-        'last_name' => 'Doe',
-        'company' => 'Test Company',
-        'status' => 'active',
+        'last_name'  => 'Doe',
+        'company'    => 'Test Company',
+        'status'     => 'active',
     ]);
 
     // Check that we have exactly one subscriber
@@ -188,14 +188,14 @@ test('newsletter subscription handles duplicate email', function () {
 
     // Check that the existing subscriber is still active
     $this->assertDatabaseHas('subscribers', [
-        'email' => 'existing@example.com',
+        'email'  => 'existing@example.com',
         'status' => 'active',
     ]);
 });
 
 test('newsletter subscription resubscribes unsubscribed', function () {
     $subscriber = Subscriber::factory()->create([
-        'email' => 'unsubscribed@example.com',
+        'email'  => 'unsubscribed@example.com',
         'status' => 'unsubscribed',
     ]);
 
@@ -208,7 +208,7 @@ test('newsletter subscription resubscribes unsubscribed', function () {
 
     // Check that the subscriber was resubscribed in the database
     $this->assertDatabaseHas('subscribers', [
-        'email' => 'unsubscribed@example.com',
+        'email'  => 'unsubscribed@example.com',
         'status' => 'active',
     ]);
 });
@@ -216,7 +216,7 @@ test('newsletter subscription resubscribes unsubscribed', function () {
 test('full name accessor works', function () {
     $subscriber = Subscriber::factory()->create([
         'first_name' => 'John',
-        'last_name' => 'Doe',
+        'last_name'  => 'Doe',
     ]);
 
     expect($subscriber->full_name)->toBe('John Doe');

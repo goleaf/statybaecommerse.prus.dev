@@ -26,22 +26,22 @@ class ProductResourceTest extends TestCase
         $brand = Brand::factory()->create();
 
         $product = Product::factory()->create([
-            'name' => 'Test Product',
-            'slug' => 'test-product',
-            'sku' => 'TEST-001',
-            'price' => 99.99,
-            'brand_id' => $brand->id,
-            'status' => 'published',
+            'name'       => 'Test Product',
+            'slug'       => 'test-product',
+            'sku'        => 'TEST-001',
+            'price'      => 99.99,
+            'brand_id'   => $brand->id,
+            'status'     => 'published',
             'is_visible' => true,
         ]);
 
         $this->assertDatabaseHas('products', [
-            'name' => 'Test Product',
-            'slug' => 'test-product',
-            'sku' => 'TEST-001',
-            'price' => 99.99,
-            'brand_id' => $brand->id,
-            'status' => 'published',
+            'name'       => 'Test Product',
+            'slug'       => 'test-product',
+            'sku'        => 'TEST-001',
+            'price'      => 99.99,
+            'brand_id'   => $brand->id,
+            'status'     => 'published',
             'is_visible' => true,
         ]);
     }
@@ -52,15 +52,15 @@ class ProductResourceTest extends TestCase
         $newBrand = Brand::factory()->create();
 
         $product->update([
-            'name' => 'Updated Product',
-            'price' => 149.99,
+            'name'     => 'Updated Product',
+            'price'    => 149.99,
             'brand_id' => $newBrand->id,
         ]);
 
         $this->assertDatabaseHas('products', [
-            'id' => $product->id,
-            'name' => 'Updated Product',
-            'price' => 149.99,
+            'id'       => $product->id,
+            'name'     => 'Updated Product',
+            'price'    => 149.99,
             'brand_id' => $newBrand->id,
         ]);
     }
@@ -99,7 +99,7 @@ class ProductResourceTest extends TestCase
         $product->update(['is_visible' => true]);
 
         $this->assertDatabaseHas('products', [
-            'id' => $product->id,
+            'id'         => $product->id,
             'is_visible' => true,
         ]);
     }
@@ -111,7 +111,7 @@ class ProductResourceTest extends TestCase
         $product->update(['is_featured' => true]);
 
         $this->assertDatabaseHas('products', [
-            'id' => $product->id,
+            'id'          => $product->id,
             'is_featured' => true,
         ]);
     }
@@ -128,7 +128,7 @@ class ProductResourceTest extends TestCase
     public function test_product_can_calculate_discount_percentage(): void
     {
         $product = Product::factory()->create([
-            'price' => 80.0,
+            'price'         => 80.0,
             'compare_price' => 100.0,
         ]);
 
@@ -138,9 +138,9 @@ class ProductResourceTest extends TestCase
     public function test_product_stock_status(): void
     {
         $product = Product::factory()->create([
-            'stock_quantity' => 5,
+            'stock_quantity'      => 5,
             'low_stock_threshold' => 10,
-            'manage_stock' => true,
+            'manage_stock'        => true,
         ]);
 
         $this->assertEquals('low_stock', $product->stock_status);
@@ -152,7 +152,7 @@ class ProductResourceTest extends TestCase
     {
         $product = Product::factory()->create([
             'stock_quantity' => 0,
-            'manage_stock' => true,
+            'manage_stock'   => true,
         ]);
 
         $this->assertEquals('out_of_stock', $product->stock_status);

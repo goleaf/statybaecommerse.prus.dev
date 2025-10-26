@@ -33,4 +33,3 @@ final class StockRequestTest extends TestCase
             ->assertStatus(422);
     }
 }
-

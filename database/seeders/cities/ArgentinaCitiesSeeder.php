@@ -40,11 +40,11 @@ final class ArgentinaCitiesSeeder extends Seeder
             if ($existingCity) {
                 // Update existing city
                 $existingCity->update([
-                    'name' => $cityData['name']['en'],
-                    'slug' => $cityData['slug'],
+                    'name'       => $cityData['name']['en'],
+                    'slug'       => $cityData['slug'],
                     'is_capital' => $cityData['is_capital'],
-                    'latitude' => $cityData['latitude'],
-                    'longitude' => $cityData['longitude'],
+                    'latitude'   => $cityData['latitude'],
+                    'longitude'  => $cityData['longitude'],
                     'population' => $cityData['population'],
                 ]);
                 $city = $existingCity;
@@ -53,12 +53,12 @@ final class ArgentinaCitiesSeeder extends Seeder
                 $city = City::factory()
                     ->forCountry($country)
                     ->state([
-                        'code' => $cityData['code'],
-                        'slug' => $cityData['slug'],
-                        'name' => $cityData['name']['en'],
+                        'code'       => $cityData['code'],
+                        'slug'       => $cityData['slug'],
+                        'name'       => $cityData['name']['en'],
                         'is_capital' => $cityData['is_capital'],
-                        'latitude' => $cityData['latitude'],
-                        'longitude' => $cityData['longitude'],
+                        'latitude'   => $cityData['latitude'],
+                        'longitude'  => $cityData['longitude'],
                         'population' => $cityData['population'],
                         'is_enabled' => true,
                         'is_default' => false,
@@ -70,9 +70,9 @@ final class ArgentinaCitiesSeeder extends Seeder
             foreach (['lt', 'en'] as $locale) {
                 CityTranslation::updateOrCreate([
                     'city_id' => $city->id,
-                    'locale' => $locale,
+                    'locale'  => $locale,
                 ], [
-                    'name' => $cityData['name'][$locale] ?? $cityData['name']['en'],
+                    'name'        => $cityData['name'][$locale] ?? $cityData['name']['en'],
                     'description' => $cityData['description'],
                 ]);
             }

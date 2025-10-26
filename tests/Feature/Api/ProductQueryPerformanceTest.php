@@ -25,14 +25,14 @@ final class ProductQueryPerformanceTest extends TestCase
         Product::factory()
             ->count(3)
             ->sequence(fn (int $index) => [
-                'name' => 'Elektrinis įrankis '.($index + 1),
-                'slug' => 'elektrinis-irankis-'.($index + 1),
-                'sku' => 'SKU-'.($index + 1),
-                'brand_id' => $brand->id,
-                'is_visible' => true,
-                'status' => 'published',
+                'name'         => 'Elektrinis įrankis ' . ($index + 1),
+                'slug'         => 'elektrinis-irankis-' . ($index + 1),
+                'sku'          => 'SKU-' . ($index + 1),
+                'brand_id'     => $brand->id,
+                'is_visible'   => true,
+                'status'       => 'published',
                 'published_at' => now()->subDay(),
-                'price' => 100 + $index,
+                'price'        => 100 + $index,
             ])
             ->create()
             ->each(fn (Product $product) => $product->categories()->attach($category->id));
@@ -45,6 +45,6 @@ final class ProductQueryPerformanceTest extends TestCase
         $response->assertOk();
 
         $queries = DB::getQueryLog();
-        $this->assertLessThanOrEqual(6, count($queries), 'Search endpoint executed too many queries: '.count($queries));
+        $this->assertLessThanOrEqual(6, count($queries), 'Search endpoint executed too many queries: ' . count($queries));
     }
 }

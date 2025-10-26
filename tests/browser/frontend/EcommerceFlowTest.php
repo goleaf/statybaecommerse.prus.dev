@@ -23,32 +23,32 @@ class EcommerceFlowTest extends DuskTestCase
 
         // Create test data
         $this->category = Category::factory()->create([
-            'name' => 'Electronics',
+            'name'       => 'Electronics',
             'is_visible' => true,
         ]);
 
         $this->brand = Brand::factory()->create([
-            'name' => 'Apple',
+            'name'       => 'Apple',
             'is_enabled' => true,
         ]);
 
         $this->product = Product::factory()->create([
-            'name' => 'iPhone 15 Pro',
+            'name'        => 'iPhone 15 Pro',
             'description' => 'Latest iPhone with advanced features',
-            'is_visible' => true,
-            'brand_id' => $this->brand->id,
+            'is_visible'  => true,
+            'brand_id'    => $this->brand->id,
         ]);
 
         $this->product->categories()->attach($this->category->id);
 
         $this->variant = ProductVariant::factory()->create([
-            'product_id' => $this->product->id,
-            'price' => 99999,  // $999.99
+            'product_id'     => $this->product->id,
+            'price'          => 99999,  // $999.99
             'stock_quantity' => 10,
         ]);
 
         $this->user = User::factory()->create([
-            'name' => 'John Doe',
+            'name'  => 'John Doe',
             'email' => 'john@example.com',
         ]);
     }
@@ -71,7 +71,7 @@ class EcommerceFlowTest extends DuskTestCase
             $browser
                 ->visit('/')
                 ->clickLink('iPhone 15 Pro')
-                ->waitForLocation('/products/'.$this->product->slug)
+                ->waitForLocation('/products/' . $this->product->slug)
                 ->assertSee('iPhone 15 Pro')
                 ->assertSee('Latest iPhone with advanced features')
                 ->assertSee('Apple')
@@ -98,7 +98,7 @@ class EcommerceFlowTest extends DuskTestCase
         $this->browse(function (Browser $browser) {
             $browser
                 ->visit('/products')
-                ->click('[data-category-filter="'.$this->category->id.'"]')
+                ->click('[data-category-filter="' . $this->category->id . '"]')
                 ->waitFor('[data-filtered-products]')
                 ->assertSee('iPhone 15 Pro')
                 ->assertSee('Electronics');
@@ -110,7 +110,7 @@ class EcommerceFlowTest extends DuskTestCase
         $this->browse(function (Browser $browser) {
             $browser
                 ->visit('/products')
-                ->click('[data-brand-filter="'.$this->brand->id.'"]')
+                ->click('[data-brand-filter="' . $this->brand->id . '"]')
                 ->waitFor('[data-filtered-products]')
                 ->assertSee('iPhone 15 Pro')
                 ->assertSee('Apple');
@@ -121,7 +121,7 @@ class EcommerceFlowTest extends DuskTestCase
     {
         $this->browse(function (Browser $browser) {
             $browser
-                ->visit('/products/'.$this->product->slug)
+                ->visit('/products/' . $this->product->slug)
                 ->click('[data-add-to-cart-button]')
                 ->waitFor('[data-cart-notification]')
                 ->assertSee('Added to cart')
@@ -133,7 +133,7 @@ class EcommerceFlowTest extends DuskTestCase
     {
         $this->browse(function (Browser $browser) {
             $browser
-                ->visit('/products/'.$this->product->slug)
+                ->visit('/products/' . $this->product->slug)
                 ->click('[data-add-to-cart-button]')
                 ->waitFor('[data-cart-notification]')
                 ->click('[data-cart-link]')
@@ -148,7 +148,7 @@ class EcommerceFlowTest extends DuskTestCase
     {
         $this->browse(function (Browser $browser) {
             $browser
-                ->visit('/products/'.$this->product->slug)
+                ->visit('/products/' . $this->product->slug)
                 ->click('[data-add-to-cart-button]')
                 ->waitFor('[data-cart-notification]')
                 ->visit('/cart')
@@ -165,7 +165,7 @@ class EcommerceFlowTest extends DuskTestCase
     {
         $this->browse(function (Browser $browser) {
             $browser
-                ->visit('/products/'.$this->product->slug)
+                ->visit('/products/' . $this->product->slug)
                 ->click('[data-add-to-cart-button]')
                 ->waitFor('[data-cart-notification]')
                 ->visit('/cart')
@@ -179,7 +179,7 @@ class EcommerceFlowTest extends DuskTestCase
     {
         $this->browse(function (Browser $browser) {
             $browser
-                ->visit('/products/'.$this->product->slug)
+                ->visit('/products/' . $this->product->slug)
                 ->click('[data-add-to-cart-button]')
                 ->waitFor('[data-cart-notification]')
                 ->visit('/cart')
@@ -194,7 +194,7 @@ class EcommerceFlowTest extends DuskTestCase
         $this->browse(function (Browser $browser) {
             $browser
                 ->loginAs($this->user)
-                ->visit('/products/'.$this->product->slug)
+                ->visit('/products/' . $this->product->slug)
                 ->click('[data-add-to-cart-button]')
                 ->waitFor('[data-cart-notification]')
                 ->visit('/cart')
@@ -210,7 +210,7 @@ class EcommerceFlowTest extends DuskTestCase
         $this->browse(function (Browser $browser) {
             $browser
                 ->loginAs($this->user)
-                ->visit('/products/'.$this->product->slug)
+                ->visit('/products/' . $this->product->slug)
                 ->click('[data-add-to-cart-button]')
                 ->waitFor('[data-cart-notification]')
                 ->visit('/checkout')
@@ -247,7 +247,7 @@ class EcommerceFlowTest extends DuskTestCase
         $this->browse(function (Browser $browser) {
             $browser
                 ->loginAs($this->user)
-                ->visit('/products/'.$this->product->slug)
+                ->visit('/products/' . $this->product->slug)
                 ->click('[data-add-to-wishlist-button]')
                 ->waitFor('[data-wishlist-notification]')
                 ->assertSee('Added to wishlist');
@@ -259,7 +259,7 @@ class EcommerceFlowTest extends DuskTestCase
         $this->browse(function (Browser $browser) {
             $browser
                 ->loginAs($this->user)
-                ->visit('/products/'.$this->product->slug)
+                ->visit('/products/' . $this->product->slug)
                 ->click('[data-add-to-wishlist-button]')
                 ->waitFor('[data-wishlist-notification]')
                 ->visit('/account/wishlist')
@@ -273,7 +273,7 @@ class EcommerceFlowTest extends DuskTestCase
         $this->browse(function (Browser $browser) {
             $browser
                 ->loginAs($this->user)
-                ->visit('/products/'.$this->product->slug)
+                ->visit('/products/' . $this->product->slug)
                 ->scrollIntoView('[data-reviews-section]')
                 ->click('[data-write-review-button]')
                 ->waitFor('[data-review-form]')
@@ -290,7 +290,7 @@ class EcommerceFlowTest extends DuskTestCase
     {
         $this->browse(function (Browser $browser) {
             $browser
-                ->visit('/products/'.$this->product->slug)
+                ->visit('/products/' . $this->product->slug)
                 ->scrollIntoView('[data-reviews-section]')
                 ->assertSee('Customer Reviews')
                 ->assertPresent('[data-average-rating]');
@@ -300,16 +300,16 @@ class EcommerceFlowTest extends DuskTestCase
     public function test_customer_can_compare_products(): void
     {
         $secondProduct = Product::factory()->create([
-            'name' => 'Samsung Galaxy S24',
+            'name'       => 'Samsung Galaxy S24',
             'is_visible' => true,
         ]);
 
         $this->browse(function (Browser $browser) use ($secondProduct) {
             $browser
-                ->visit('/products/'.$this->product->slug)
+                ->visit('/products/' . $this->product->slug)
                 ->click('[data-add-to-compare-button]')
                 ->waitFor('[data-compare-notification]')
-                ->visit('/products/'.$secondProduct->slug)
+                ->visit('/products/' . $secondProduct->slug)
                 ->click('[data-add-to-compare-button]')
                 ->waitFor('[data-compare-notification]')
                 ->visit('/compare')

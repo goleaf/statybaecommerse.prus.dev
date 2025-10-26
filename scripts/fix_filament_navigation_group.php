@@ -10,7 +10,7 @@ declare(strict_types=1);
  * It now also cleans up stray duplicate UnitEnum imports across
  * Filament pages so the codebase stays tidy after automated runs.
  */
-require_once __DIR__.'/../vendor/autoload.php';
+require_once __DIR__ . '/../vendor/autoload.php';
 
 use App\Support\Filament\Constants\NavigationGroupConstants;
 use Illuminate\Support\Facades\File;
@@ -45,7 +45,7 @@ class FilamentNavigationGroupFixer
 
     private function processDirectory(string $directory): void
     {
-        $fullPath = __DIR__.'/../'.$directory;
+        $fullPath = __DIR__ . '/../' . $directory;
 
         if (! is_dir($fullPath)) {
             echo "⚠️  Directory not found: {$directory}\n";
@@ -80,7 +80,7 @@ class FilamentNavigationGroupFixer
 
     private function processFile(string $filePath, string $relativeDirectory): void
     {
-        $relativePath = str_replace(__DIR__.'/../', '', $filePath);
+        $relativePath = str_replace(__DIR__ . '/../', '', $filePath);
 
         try {
             $content = file_get_contents($filePath);
@@ -125,8 +125,8 @@ class FilamentNavigationGroupFixer
                 echo "  ⏭️  {$relativePath} - No changes needed\n";
             }
         } catch (\Exception $e) {
-            $this->errors[] = "Error processing {$relativePath}: ".$e->getMessage();
-            echo "  ❌ {$relativePath} - Error: ".$e->getMessage()."\n";
+            $this->errors[] = "Error processing {$relativePath}: " . $e->getMessage();
+            echo "  ❌ {$relativePath} - Error: " . $e->getMessage() . "\n";
         }
     }
 
@@ -182,7 +182,7 @@ class FilamentNavigationGroupFixer
                 $indent = $m[1];
                 $value = $m[2];
                 $removeUnitEnumDocblockAbove($lines, $i);
-                $lines[$i] = $indent.'protected static UnitEnum|string|null $navigationGroup = '.$value.';';
+                $lines[$i] = $indent . 'protected static UnitEnum|string|null $navigationGroup = ' . $value . ';';
                 $modified = true;
 
                 continue;
@@ -193,7 +193,7 @@ class FilamentNavigationGroupFixer
                 $indent = $m[1];
                 $value = $m[3];
                 $removeUnitEnumDocblockAbove($lines, $i);
-                $lines[$i] = $indent.'protected static UnitEnum|string|null $navigationGroup = '.$value.';';
+                $lines[$i] = $indent . 'protected static UnitEnum|string|null $navigationGroup = ' . $value . ';';
                 $modified = true;
 
                 continue;
@@ -204,7 +204,7 @@ class FilamentNavigationGroupFixer
                 $indent = $m[1];
                 $value = $m[2];
                 $removeUnitEnumDocblockAbove($lines, $i);
-                $lines[$i] = $indent.'protected static UnitEnum|string|null $navigationGroup = '.$value.';';
+                $lines[$i] = $indent . 'protected static UnitEnum|string|null $navigationGroup = ' . $value . ';';
                 $modified = true;
 
                 continue;
@@ -265,12 +265,12 @@ class FilamentNavigationGroupFixer
 
     private function generateReport(): void
     {
-        echo "\n".str_repeat('=', 60)."\n";
+        echo "\n" . str_repeat('=', 60) . "\n";
         echo "📊 Filament Navigation Group Fix Report\n";
-        echo str_repeat('=', 60)."\n\n";
+        echo str_repeat('=', 60) . "\n\n";
 
-        echo '✅ Files Processed: '.count($this->processedFiles)."\n";
-        echo '❌ Errors: '.count($this->errors)."\n\n";
+        echo '✅ Files Processed: ' . count($this->processedFiles) . "\n";
+        echo '❌ Errors: ' . count($this->errors) . "\n\n";
 
         if (! empty($this->processedFiles)) {
             echo "📝 Modified Files:\n";

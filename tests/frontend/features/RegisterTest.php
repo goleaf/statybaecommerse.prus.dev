@@ -33,9 +33,9 @@ it('validates required fields', function () {
         ->call('register')
         ->assertHasFormErrors([
             'first_name' => 'required',
-            'last_name' => 'required',
-            'email' => 'required',
-            'password' => 'required',
+            'last_name'  => 'required',
+            'email'      => 'required',
+            'password'   => 'required',
         ]);
 });
 
@@ -62,7 +62,7 @@ it('validates unique email', function () {
 it('validates password confirmation', function () {
     livewire(Register::class)
         ->fillForm([
-            'password' => 'password123',
+            'password'              => 'password123',
             'password_confirmation' => 'different-password',
         ])
         ->call('register')
@@ -71,10 +71,10 @@ it('validates password confirmation', function () {
 
 it('registers a new user successfully', function () {
     $userData = [
-        'first_name' => 'John',
-        'last_name' => 'Doe',
-        'email' => 'john@example.com',
-        'password' => 'password123',
+        'first_name'            => 'John',
+        'last_name'             => 'Doe',
+        'email'                 => 'john@example.com',
+        'password'              => 'password123',
         'password_confirmation' => 'password123',
     ];
 
@@ -85,9 +85,9 @@ it('registers a new user successfully', function () {
         ->assertRedirect(route('account'));
 
     assertDatabaseHas('users', [
-        'first_name' => 'John',
-        'last_name' => 'Doe',
-        'email' => 'john@example.com',
+        'first_name'       => 'John',
+        'last_name'        => 'Doe',
+        'email'            => 'john@example.com',
         'preferred_locale' => app()->getLocale(),
     ]);
 
@@ -103,16 +103,16 @@ it('sets the preferred locale on registration', function () {
 
     livewire(Register::class)
         ->fillForm([
-            'first_name' => 'Jonas',
-            'last_name' => 'Jonaitis',
-            'email' => 'jonas@example.com',
-            'password' => 'password123',
+            'first_name'            => 'Jonas',
+            'last_name'             => 'Jonaitis',
+            'email'                 => 'jonas@example.com',
+            'password'              => 'password123',
             'password_confirmation' => 'password123',
         ])
         ->call('register');
 
     assertDatabaseHas('users', [
-        'email' => 'jonas@example.com',
+        'email'            => 'jonas@example.com',
         'preferred_locale' => 'lt',
     ]);
 });

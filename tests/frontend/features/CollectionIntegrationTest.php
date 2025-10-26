@@ -20,17 +20,17 @@ final class CollectionIntegrationTest extends TestCase
     {
         // Create collections with different types
         $manualCollection = Collection::factory()->create([
-            'name' => 'Manual Collection',
+            'name'         => 'Manual Collection',
             'is_automatic' => false,
-            'is_visible' => true,
-            'is_active' => true,
+            'is_visible'   => true,
+            'is_active'    => true,
         ]);
 
         $automaticCollection = Collection::factory()->create([
-            'name' => 'Automatic Collection',
+            'name'         => 'Automatic Collection',
             'is_automatic' => true,
-            'is_visible' => true,
-            'is_active' => true,
+            'is_visible'   => true,
+            'is_active'    => true,
         ]);
 
         // Create products and brands
@@ -38,13 +38,13 @@ final class CollectionIntegrationTest extends TestCase
         $category = Category::factory()->create(['name' => 'Test Category']);
 
         $product1 = Product::factory()->create([
-            'name' => 'Product 1',
-            'brand_id' => $brand->id,
+            'name'       => 'Product 1',
+            'brand_id'   => $brand->id,
             'is_visible' => true,
         ]);
         $product2 = Product::factory()->create([
-            'name' => 'Product 2',
-            'brand_id' => $brand->id,
+            'name'       => 'Product 2',
+            'brand_id'   => $brand->id,
             'is_visible' => true,
         ]);
 
@@ -94,21 +94,21 @@ final class CollectionIntegrationTest extends TestCase
     {
         // Create collections with different names and types
         $summerCollection = Collection::factory()->create([
-            'name' => 'Summer Collection',
+            'name'         => 'Summer Collection',
             'is_automatic' => false,
-            'is_visible' => true,
+            'is_visible'   => true,
         ]);
 
         $winterCollection = Collection::factory()->create([
-            'name' => 'Winter Collection',
+            'name'         => 'Winter Collection',
             'is_automatic' => true,
-            'is_visible' => true,
+            'is_visible'   => true,
         ]);
 
         $toolsCollection = Collection::factory()->create([
-            'name' => 'Tools Collection',
+            'name'         => 'Tools Collection',
             'is_automatic' => false,
-            'is_visible' => true,
+            'is_visible'   => true,
         ]);
 
         // Test search functionality
@@ -134,14 +134,14 @@ final class CollectionIntegrationTest extends TestCase
     {
         $collection = Collection::factory()->create([
             'is_visible' => true,
-            'is_active' => true,
+            'is_active'  => true,
         ]);
 
         $brand = Brand::factory()->create();
         $category = Category::factory()->create();
 
         $products = Product::factory()->count(5)->create([
-            'brand_id' => $brand->id,
+            'brand_id'   => $brand->id,
             'is_visible' => true,
         ]);
 
@@ -175,19 +175,19 @@ final class CollectionIntegrationTest extends TestCase
     public function test_collection_translation_workflow(): void
     {
         $collection = Collection::factory()->create([
-            'name' => 'English Collection',
-            'slug' => 'english-collection',
+            'name'       => 'English Collection',
+            'slug'       => 'english-collection',
             'is_visible' => true,
-            'is_active' => true,
+            'is_active'  => true,
         ]);
 
         // Create Lithuanian translation
         \App\Models\Translations\CollectionTranslation::factory()->create([
             'collection_id' => $collection->id,
-            'locale' => 'lt',
-            'name' => 'Lietuvių Kolekcija',
-            'slug' => 'lietuviu-kolekcija',
-            'description' => 'Lietuvių aprašymas',
+            'locale'        => 'lt',
+            'name'          => 'Lietuvių Kolekcija',
+            'slug'          => 'lietuviu-kolekcija',
+            'description'   => 'Lietuvių aprašymas',
         ]);
 
         // Test with English locale
@@ -218,15 +218,15 @@ final class CollectionIntegrationTest extends TestCase
 
         // Test admin can create collection
         $collectionData = [
-            'name' => 'Admin Created Collection',
-            'slug' => 'admin-created-collection',
-            'description' => 'Admin created description',
-            'is_visible' => true,
-            'is_automatic' => false,
-            'sort_order' => 1,
-            'display_type' => 'grid',
+            'name'              => 'Admin Created Collection',
+            'slug'              => 'admin-created-collection',
+            'description'       => 'Admin created description',
+            'is_visible'        => true,
+            'is_automatic'      => false,
+            'sort_order'        => 1,
+            'display_type'      => 'grid',
             'products_per_page' => 12,
-            'show_filters' => true,
+            'show_filters'      => true,
         ];
 
         $response = $this->actingAs($adminUser)
@@ -246,7 +246,7 @@ final class CollectionIntegrationTest extends TestCase
 
         // Test admin can update collection
         $updateData = [
-            'name' => 'Updated Collection Name',
+            'name'        => 'Updated Collection Name',
             'description' => 'Updated description',
         ];
 
@@ -255,7 +255,7 @@ final class CollectionIntegrationTest extends TestCase
         $response->assertRedirect();
 
         $this->assertDatabaseHas('collections', [
-            'id' => $collection->id,
+            'id'   => $collection->id,
             'name' => 'Updated Collection Name',
         ]);
     }
@@ -345,13 +345,13 @@ final class CollectionIntegrationTest extends TestCase
     public function test_collection_seo_workflow(): void
     {
         $collection = Collection::factory()->create([
-            'name' => 'SEO Test Collection',
-            'seo_title' => 'SEO Title',
-            'seo_description' => 'SEO Description',
-            'meta_title' => 'Meta Title',
+            'name'             => 'SEO Test Collection',
+            'seo_title'        => 'SEO Title',
+            'seo_description'  => 'SEO Description',
+            'meta_title'       => 'Meta Title',
             'meta_description' => 'Meta Description',
-            'meta_keywords' => ['keyword1', 'keyword2'],
-            'is_visible' => true,
+            'meta_keywords'    => ['keyword1', 'keyword2'],
+            'is_visible'       => true,
         ]);
 
         $response = $this->get("/lt/collections/{$collection->slug}");

@@ -9,7 +9,7 @@ uses(RefreshDatabase::class);
 
 it('loads the admin dashboard without schema container errors', function (): void {
     $admin = User::factory()->create([
-        'email' => 'admin@example.com',
+        'email'    => 'admin@example.com',
         'password' => bcrypt('password'),
         'is_admin' => true,
     ]);

@@ -19,7 +19,7 @@ final class LocalizedProductPageTest extends TestCase
         $brand = Brand::factory()->create([
             'is_enabled' => true,
             'is_visible' => true,
-            'is_active' => true,
+            'is_active'  => true,
         ]);
 
         $category = Category::factory()->create([
@@ -27,16 +27,16 @@ final class LocalizedProductPageTest extends TestCase
         ]);
 
         $product = Product::factory()->create([
-            'brand_id' => $brand->id,
-            'is_visible' => true,
-            'status' => 'published',
+            'brand_id'     => $brand->id,
+            'is_visible'   => true,
+            'status'       => 'published',
             'published_at' => now()->subHour(),
         ]);
 
         $product->categories()->sync([$category->id]);
 
         $response = $this->get(route('localized.products.show', [
-            'locale' => 'en',
+            'locale'  => 'en',
             'product' => $product->slug,
         ]));
 

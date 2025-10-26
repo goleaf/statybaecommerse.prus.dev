@@ -13,7 +13,7 @@ use Traversable;
 /**
  * @implements IteratorAggregate<int, ProductVariant>
  */
-final class ProductVariantCollection implements IteratorAggregate, Countable
+final class ProductVariantCollection implements Countable, IteratorAggregate
 {
     /** @var list<ProductVariant> */
     private array $items;

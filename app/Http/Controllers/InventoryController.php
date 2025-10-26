@@ -25,11 +25,11 @@ final class InventoryController extends Controller
         if ($request->filled('stock_status')) {
             $query->where(function ($q) use ($request) {
                 match ($request->stock_status) {
-                    'in_stock' => $q->where('manage_stock', true)->whereRaw('stock_quantity > low_stock_threshold'),
-                    'low_stock' => $q->where('manage_stock', true)->where('stock_quantity', '>', 0)->whereRaw('stock_quantity <= low_stock_threshold'),
+                    'in_stock'     => $q->where('manage_stock', true)->whereRaw('stock_quantity > low_stock_threshold'),
+                    'low_stock'    => $q->where('manage_stock', true)->where('stock_quantity', '>', 0)->whereRaw('stock_quantity <= low_stock_threshold'),
                     'out_of_stock' => $q->where('manage_stock', true)->where('stock_quantity', '<=', 0),
-                    'not_tracked' => $q->where('manage_stock', false),
-                    default => null,
+                    'not_tracked'  => $q->where('manage_stock', false),
+                    default        => null,
                 };
             });
         }

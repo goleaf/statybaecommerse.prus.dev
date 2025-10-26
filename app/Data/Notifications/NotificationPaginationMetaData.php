@@ -22,11 +22,11 @@ final class NotificationPaginationMetaData implements Arrayable, JsonSerializabl
     {
         return [
             'current_page' => $this->currentPage,
-            'last_page' => $this->lastPage,
-            'per_page' => $this->perPage,
-            'total' => $this->total,
-            'from' => $this->from,
-            'to' => $this->to,
+            'last_page'    => $this->lastPage,
+            'per_page'     => $this->perPage,
+            'total'        => $this->total,
+            'from'         => $this->from,
+            'to'           => $this->to,
         ];
     }
 

@@ -18,7 +18,7 @@ final class HomePageTest extends TestCase
     public function test_homepage_displays_featured_and_latest_products(): void
     {
         $brand = Brand::factory()->create([
-            'is_active' => true,
+            'is_active'  => true,
             'is_enabled' => true,
             'is_visible' => true,
         ]);
@@ -27,27 +27,27 @@ final class HomePageTest extends TestCase
         ]);
 
         $featured = Product::factory()->create([
-            'brand_id' => $brand->id,
-            'is_featured' => true,
-            'is_visible' => true,
-            'status' => 'active',
+            'brand_id'     => $brand->id,
+            'is_featured'  => true,
+            'is_visible'   => true,
+            'status'       => 'active',
             'published_at' => now()->subDay(),
         ]);
         $featured->categories()->attach($category->id);
 
         $latest = Product::factory()->create([
-            'brand_id' => $brand->id,
-            'is_visible' => true,
-            'status' => 'active',
+            'brand_id'     => $brand->id,
+            'is_visible'   => true,
+            'status'       => 'active',
             'published_at' => now(),
         ]);
         $latest->categories()->attach($category->id);
 
         Discount::factory()->create([
-            'status' => 'active',
-            'priority' => 1,
+            'status'    => 'active',
+            'priority'  => 1,
             'starts_at' => now()->subDay(),
-            'ends_at' => now()->addDay(),
+            'ends_at'   => now()->addDay(),
         ]);
 
         $response = $this->get(route('home'));

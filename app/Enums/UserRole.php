@@ -25,11 +25,11 @@ enum UserRole: string implements EnumInterface
     {
         return match ($this) {
             self::SUPER_ADMIN => __('translations.user_role_super_admin'),
-            self::ADMIN => __('translations.user_role_admin'),
-            self::MANAGER => __('translations.user_role_manager'),
-            self::EDITOR => __('translations.user_role_editor'),
-            self::CUSTOMER => __('translations.user_role_customer'),
-            self::GUEST => __('translations.user_role_guest'),
+            self::ADMIN       => __('translations.user_role_admin'),
+            self::MANAGER     => __('translations.user_role_manager'),
+            self::EDITOR      => __('translations.user_role_editor'),
+            self::CUSTOMER    => __('translations.user_role_customer'),
+            self::GUEST       => __('translations.user_role_guest'),
         };
     }
 
@@ -37,11 +37,11 @@ enum UserRole: string implements EnumInterface
     {
         return match ($this) {
             self::SUPER_ADMIN => __('translations.user_role_super_admin_description'),
-            self::ADMIN => __('translations.user_role_admin_description'),
-            self::MANAGER => __('translations.user_role_manager_description'),
-            self::EDITOR => __('translations.user_role_editor_description'),
-            self::CUSTOMER => __('translations.user_role_customer_description'),
-            self::GUEST => __('translations.user_role_guest_description'),
+            self::ADMIN       => __('translations.user_role_admin_description'),
+            self::MANAGER     => __('translations.user_role_manager_description'),
+            self::EDITOR      => __('translations.user_role_editor_description'),
+            self::CUSTOMER    => __('translations.user_role_customer_description'),
+            self::GUEST       => __('translations.user_role_guest_description'),
         };
     }
 
@@ -49,11 +49,11 @@ enum UserRole: string implements EnumInterface
     {
         return match ($this) {
             self::SUPER_ADMIN => 'heroicon-o-shield-check',
-            self::ADMIN => 'heroicon-o-shield-exclamation',
-            self::MANAGER => 'heroicon-o-user-group',
-            self::EDITOR => 'heroicon-o-pencil-square',
-            self::CUSTOMER => 'heroicon-o-user',
-            self::GUEST => 'heroicon-o-user-circle',
+            self::ADMIN       => 'heroicon-o-shield-exclamation',
+            self::MANAGER     => 'heroicon-o-user-group',
+            self::EDITOR      => 'heroicon-o-pencil-square',
+            self::CUSTOMER    => 'heroicon-o-user',
+            self::GUEST       => 'heroicon-o-user-circle',
         };
     }
 
@@ -61,11 +61,11 @@ enum UserRole: string implements EnumInterface
     {
         return match ($this) {
             self::SUPER_ADMIN => 'red',
-            self::ADMIN => 'purple',
-            self::MANAGER => 'blue',
-            self::EDITOR => 'green',
-            self::CUSTOMER => 'indigo',
-            self::GUEST => 'gray',
+            self::ADMIN       => 'purple',
+            self::MANAGER     => 'blue',
+            self::EDITOR      => 'green',
+            self::CUSTOMER    => 'indigo',
+            self::GUEST       => 'gray',
         };
     }
 
@@ -73,11 +73,11 @@ enum UserRole: string implements EnumInterface
     {
         return match ($this) {
             self::SUPER_ADMIN => 100,
-            self::ADMIN => 90,
-            self::MANAGER => 70,
-            self::EDITOR => 50,
-            self::CUSTOMER => 10,
-            self::GUEST => 0,
+            self::ADMIN       => 90,
+            self::MANAGER     => 70,
+            self::EDITOR      => 50,
+            self::CUSTOMER    => 10,
+            self::GUEST       => 0,
         };
     }
 
@@ -85,11 +85,11 @@ enum UserRole: string implements EnumInterface
     {
         return match ($this) {
             self::SUPER_ADMIN => 1,
-            self::ADMIN => 2,
-            self::MANAGER => 3,
-            self::EDITOR => 4,
-            self::CUSTOMER => 5,
-            self::GUEST => 6,
+            self::ADMIN       => 2,
+            self::MANAGER     => 3,
+            self::EDITOR      => 4,
+            self::CUSTOMER    => 5,
+            self::GUEST       => 6,
         };
     }
 
@@ -201,7 +201,7 @@ enum UserRole: string implements EnumInterface
     {
         return match ($this) {
             self::SUPER_ADMIN => true,
-            default => false,
+            default           => false,
         };
     }
 
@@ -209,11 +209,11 @@ enum UserRole: string implements EnumInterface
     {
         return match ($this) {
             self::SUPER_ADMIN => ['manage_users', 'manage_products', 'manage_orders', 'manage_settings', 'view_analytics', 'manage_content', 'manage_inventory', 'manage_marketing', 'view_reports', 'manage_system', 'manage_referrals'],
-            self::ADMIN => ['manage_users', 'manage_products', 'manage_orders', 'manage_settings', 'view_analytics', 'manage_content', 'manage_inventory', 'manage_marketing', 'view_reports', 'manage_referrals'],
-            self::MANAGER => ['manage_products', 'manage_orders', 'view_analytics', 'manage_content', 'manage_inventory', 'manage_marketing', 'view_reports', 'manage_referrals'],
-            self::EDITOR => ['manage_products', 'manage_content'],
-            self::CUSTOMER => ['view_own_orders', 'manage_own_profile', 'view_own_referrals'],
-            self::GUEST => [],
+            self::ADMIN       => ['manage_users', 'manage_products', 'manage_orders', 'manage_settings', 'view_analytics', 'manage_content', 'manage_inventory', 'manage_marketing', 'view_reports', 'manage_referrals'],
+            self::MANAGER     => ['manage_products', 'manage_orders', 'view_analytics', 'manage_content', 'manage_inventory', 'manage_marketing', 'view_reports', 'manage_referrals'],
+            self::EDITOR      => ['manage_products', 'manage_content'],
+            self::CUSTOMER    => ['view_own_orders', 'manage_own_profile', 'view_own_referrals'],
+            self::GUEST       => [],
         };
     }
 

@@ -190,8 +190,8 @@ trait InteractsWithRateLimitSchema
     private function formatRateLimiterKey(string $limiter, string $key): string
     {
         return $this->throttleRequestsShouldHashKeys()
-            ? md5($limiter.$key)
-            : $limiter.':'.$key;
+            ? md5($limiter . $key)
+            : $limiter . ':' . $key;
     }
 
     private function throttleRequestsShouldHashKeys(): bool

@@ -32,14 +32,14 @@ final class CompanyModelTest extends TestCase
     public function test_can_create_company(): void
     {
         $company = Company::factory()->create([
-            'name' => 'Test Company',
-            'email' => 'test@example.com',
+            'name'      => 'Test Company',
+            'email'     => 'test@example.com',
             'is_active' => true,
         ]);
 
         $this->assertDatabaseHas('companies', [
-            'name' => 'Test Company',
-            'email' => 'test@example.com',
+            'name'      => 'Test Company',
+            'email'     => 'test@example.com',
             'is_active' => true,
         ]);
     }
@@ -87,9 +87,9 @@ final class CompanyModelTest extends TestCase
     public function test_company_can_be_created_with_metadata(): void
     {
         $metadata = [
-            'founded_year' => 2020,
+            'founded_year'   => 2020,
             'employee_count' => 50,
-            'revenue' => 1000000,
+            'revenue'        => 1000000,
         ];
 
         $company = Company::factory()->create([

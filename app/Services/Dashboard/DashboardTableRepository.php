@@ -59,12 +59,12 @@ final class DashboardTableRepository
             ->get()
             ->map(function (FailedJob $job) {
                 return [
-                    'id' => (int) $job->id,
+                    'id'         => (int) $job->id,
                     'connection' => $job->connection,
-                    'queue' => $job->queue,
-                    'failed_at' => CarbonImmutable::parse((string) $job->failed_at),
-                    'job' => $job->job_name,
-                    'exception' => $job->exception,
+                    'queue'      => $job->queue,
+                    'failed_at'  => CarbonImmutable::parse((string) $job->failed_at),
+                    'job'        => $job->job_name,
+                    'exception'  => $job->exception,
                 ];
             });
     }

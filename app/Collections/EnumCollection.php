@@ -4,15 +4,20 @@ declare(strict_types=1);
 
 namespace App\Collections;
 
-use BackedEnum;
-use Illuminate\Support\Collection;
-use InvalidArgumentException;
-
 use function array_map;
+
+use BackedEnum;
+
 use function class_basename;
 use function collect;
 use function enum_exists;
+
+use Illuminate\Support\Collection;
+
 use function implode;
+
+use InvalidArgumentException;
+
 use function is_array;
 use function is_bool;
 use function is_numeric;
@@ -24,13 +29,15 @@ use function str_replace;
 use function strtoupper;
 use function usort;
 
+use ValueError;
+
 /**
  * @extends Collection<int, BackedEnum>
  */
 final class EnumCollection extends Collection
 {
     /**
-     * @param  iterable<mixed>  $items
+     * @param iterable<mixed> $items
      */
     public function __construct(iterable $items = [])
     {
@@ -47,7 +54,7 @@ final class EnumCollection extends Collection
     }
 
     /**
-     * @param  class-string<BackedEnum>  $enumClass
+     * @param class-string<BackedEnum> $enumClass
      */
     public static function fromEnum(string $enumClass): self
     {
@@ -60,8 +67,8 @@ final class EnumCollection extends Collection
     }
 
     /**
-     * @param  class-string<BackedEnum>  $enumClass
-     * @param  iterable<int, string|int>  $values
+     * @param class-string<BackedEnum>  $enumClass
+     * @param iterable<int, string|int> $values
      */
     public static function fromValues(string $enumClass, iterable $values): self
     {
@@ -71,7 +78,7 @@ final class EnumCollection extends Collection
         foreach ($values as $value) {
             try {
                 $resolved[] = $enumClass::from($value);
-            } catch (\ValueError) {
+            } catch (ValueError) {
                 // Ignore invalid values silently.
             }
         }
@@ -80,8 +87,8 @@ final class EnumCollection extends Collection
     }
 
     /**
-     * @param  class-string<BackedEnum>  $enumClass
-     * @param  iterable<int, string>  $labels
+     * @param class-string<BackedEnum> $enumClass
+     * @param iterable<int, string>    $labels
      */
     public static function fromLabels(string $enumClass, iterable $labels): self
     {
@@ -232,11 +239,11 @@ final class EnumCollection extends Collection
         $payload = [];
         foreach ($this->items as $enum) {
             $payload[] = [
-                'value' => $enum->value,
-                'label' => $this->stringFromEnum($enum, ['label', 'getLabel'], (string) $enum->value),
+                'value'       => $enum->value,
+                'label'       => $this->stringFromEnum($enum, ['label', 'getLabel'], (string) $enum->value),
                 'description' => $this->stringFromEnum($enum, ['description', 'getDescription'], ''),
-                'icon' => $this->stringFromEnum($enum, ['icon', 'getIcon'], ''),
-                'color' => $this->stringFromEnum($enum, ['color', 'getColor'], ''),
+                'icon'        => $this->stringFromEnum($enum, ['icon', 'getIcon'], ''),
+                'color'       => $this->stringFromEnum($enum, ['color', 'getColor'], ''),
             ];
         }
 
@@ -252,8 +259,8 @@ final class EnumCollection extends Collection
         foreach ($this->items as $enum) {
             $value = (string) $enum->value;
             $payload[] = [
-                'name' => strtoupper($value),
-                'value' => $enum->value,
+                'name'        => strtoupper($value),
+                'value'       => $enum->value,
                 'description' => $this->stringFromEnum($enum, ['description', 'getDescription'], ''),
             ];
         }
@@ -312,12 +319,12 @@ final class EnumCollection extends Collection
         $rows = [];
         foreach ($this->items as $enum) {
             $rows[] = [
-                'value' => $enum->value,
-                'label' => $this->stringFromEnum($enum, ['label', 'getLabel'], (string) $enum->value),
+                'value'       => $enum->value,
+                'label'       => $this->stringFromEnum($enum, ['label', 'getLabel'], (string) $enum->value),
                 'description' => $this->stringFromEnum($enum, ['description', 'getDescription'], ''),
-                'icon' => $this->stringFromEnum($enum, ['icon', 'getIcon'], ''),
-                'color' => $this->stringFromEnum($enum, ['color', 'getColor'], ''),
-                'priority' => $this->intFromEnum($enum, ['priority', 'getPriority']),
+                'icon'        => $this->stringFromEnum($enum, ['icon', 'getIcon'], ''),
+                'color'       => $this->stringFromEnum($enum, ['color', 'getColor'], ''),
+                'priority'    => $this->intFromEnum($enum, ['priority', 'getPriority']),
             ];
         }
 
@@ -326,14 +333,14 @@ final class EnumCollection extends Collection
 
     public function forValidation(): string
     {
-        return 'in:'.implode(',', array_map(static fn (BackedEnum $enum): string => (string) $enum->value, $this->items));
+        return 'in:' . implode(',', array_map(static fn (BackedEnum $enum): string => (string) $enum->value, $this->items));
     }
 
     public function forDatabase(): string
     {
         $values = array_map(static fn (BackedEnum $enum): string => (string) $enum->value, $this->items);
 
-        return "enum('".implode("','", $values)."')";
+        return "enum('" . implode("','", $values) . "')";
     }
 
     public function filterBy(string $property, mixed $value): self
@@ -349,7 +356,7 @@ final class EnumCollection extends Collection
     }
 
     /**
-     * @param  array<string, mixed>  $filters
+     * @param array<string, mixed> $filters
      */
     public function filterByMultiple(array $filters): self
     {
@@ -541,7 +548,7 @@ final class EnumCollection extends Collection
     }
 
     /**
-     * @param  array<int, string>  $methods
+     * @param array<int, string> $methods
      */
     private function stringFromEnum(BackedEnum $enum, array $methods, string $default): string
     {
@@ -556,7 +563,7 @@ final class EnumCollection extends Collection
     }
 
     /**
-     * @param  array<int, string>  $methods
+     * @param array<int, string> $methods
      */
     private function intFromEnum(BackedEnum $enum, array $methods, int $default = 0): int
     {

@@ -6,14 +6,16 @@ namespace App\Models;
 
 use App\Models\Concerns\OrdersByName;
 use App\Models\Scopes\ActiveScope;
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use JsonSerializable;
 use Spatie\Translatable\HasTranslations;
+use Stringable;
 
 /**
  * SeoData
@@ -62,12 +64,12 @@ final class SeoData extends Model
      * @var array<string, string>
      */
     protected $casts = [
-        'keywords' => 'array',
-        'meta' => 'array',
-        'meta_tags' => 'array',
+        'keywords'        => 'array',
+        'meta'            => 'array',
+        'meta_tags'       => 'array',
         'structured_data' => 'array',
-        'no_index' => 'boolean',
-        'no_follow' => 'boolean',
+        'no_index'        => 'boolean',
+        'no_follow'       => 'boolean',
     ];
 
     public array $translatable = ['title', 'description'];
@@ -160,7 +162,7 @@ final class SeoData extends Model
      */
     private function normalizeKeywordsValue(mixed $value): array
     {
-        if ($value instanceof \Stringable) {
+        if ($value instanceof Stringable) {
             $value = (string) $value;
         }
 
@@ -190,7 +192,7 @@ final class SeoData extends Model
      */
     private function normalizeMetaValue(mixed $value): array
     {
-        if ($value instanceof \JsonSerializable) {
+        if ($value instanceof JsonSerializable) {
             $value = $value->jsonSerialize();
         }
 
@@ -322,19 +324,19 @@ final class SeoData extends Model
     {
         $html = '';
         if ($this->title) {
-            $html .= '<title>'.e($this->title).'</title>'.PHP_EOL;
-            $html .= '<meta property="og:title" content="'.e($this->title).'">'.PHP_EOL;
+            $html .= '<title>' . e($this->title) . '</title>' . PHP_EOL;
+            $html .= '<meta property="og:title" content="' . e($this->title) . '">' . PHP_EOL;
         }
         if ($this->description) {
-            $html .= '<meta name="description" content="'.e($this->description).'">'.PHP_EOL;
-            $html .= '<meta property="og:description" content="'.e($this->description).'">'.PHP_EOL;
+            $html .= '<meta name="description" content="' . e($this->description) . '">' . PHP_EOL;
+            $html .= '<meta property="og:description" content="' . e($this->description) . '">' . PHP_EOL;
         }
         $keywordsString = $this->keywordsAsString();
         if ($keywordsString !== '') {
-            $html .= '<meta name="keywords" content="'.e($keywordsString).'">'.PHP_EOL;
+            $html .= '<meta name="keywords" content="' . e($keywordsString) . '">' . PHP_EOL;
         }
         if ($this->canonical_url) {
-            $html .= '<link rel="canonical" href="'.e($this->canonical_url).'">'.PHP_EOL;
+            $html .= '<link rel="canonical" href="' . e($this->canonical_url) . '">' . PHP_EOL;
         }
         if ($this->no_index || $this->no_follow) {
             $robots = [];
@@ -344,11 +346,11 @@ final class SeoData extends Model
             if ($this->no_follow) {
                 $robots[] = 'nofollow';
             }
-            $html .= '<meta name="robots" content="'.implode(', ', $robots).'">'.PHP_EOL;
+            $html .= '<meta name="robots" content="' . implode(', ', $robots) . '">' . PHP_EOL;
         }
         if ($this->meta_tags) {
             foreach ($this->meta_tags as $name => $content) {
-                $html .= '<meta name="'.e($name).'" content="'.e($content).'">'.PHP_EOL;
+                $html .= '<meta name="' . e($name) . '" content="' . e($content) . '">' . PHP_EOL;
             }
         }
 
@@ -381,10 +383,10 @@ final class SeoData extends Model
     public function getSeoableTypeNameAttribute(): string
     {
         return match ($this->seoable_type) {
-            Product::class => 'Product',
+            Product::class  => 'Product',
             Category::class => 'Category',
-            Brand::class => 'Brand',
-            default => class_basename($this->seoable_type),
+            Brand::class    => 'Brand',
+            default         => class_basename($this->seoable_type),
         };
     }
 
@@ -394,8 +396,8 @@ final class SeoData extends Model
     public function getLocaleNameAttribute(): string
     {
         return match ($this->locale) {
-            'lt' => 'Lietuvių',
-            'en' => 'English',
+            'lt'    => 'Lietuvių',
+            'en'    => 'English',
             default => strtoupper($this->locale),
         };
     }
@@ -517,7 +519,7 @@ final class SeoData extends Model
         return match (true) {
             $this->seo_score >= 80 => 'success',
             $this->seo_score >= 60 => 'warning',
-            default => 'danger',
+            default                => 'danger',
         };
     }
 }

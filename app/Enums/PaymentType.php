@@ -21,36 +21,36 @@ enum PaymentType: string implements EnumInterface
     public function label(): string
     {
         return match ($this) {
-            self::Stripe => __('translations.payment_type_stripe'),
+            self::Stripe   => __('translations.payment_type_stripe'),
             self::NotchPay => __('translations.payment_type_notch_pay'),
-            self::Cash => __('translations.payment_type_cash'),
+            self::Cash     => __('translations.payment_type_cash'),
         };
     }
 
     public function description(): string
     {
         return match ($this) {
-            self::Stripe => __('translations.payment_type_stripe_description'),
+            self::Stripe   => __('translations.payment_type_stripe_description'),
             self::NotchPay => __('translations.payment_type_notch_pay_description'),
-            self::Cash => __('translations.payment_type_cash_description'),
+            self::Cash     => __('translations.payment_type_cash_description'),
         };
     }
 
     public function icon(): string
     {
         return match ($this) {
-            self::Stripe => 'heroicon-o-credit-card',
+            self::Stripe   => 'heroicon-o-credit-card',
             self::NotchPay => 'heroicon-o-banknotes',
-            self::Cash => 'heroicon-o-currency-dollar',
+            self::Cash     => 'heroicon-o-currency-dollar',
         };
     }
 
     public function color(): string
     {
         return match ($this) {
-            self::Stripe => 'blue',
+            self::Stripe   => 'blue',
             self::NotchPay => 'green',
-            self::Cash => 'gray',
+            self::Cash     => 'gray',
         };
     }
 
@@ -66,7 +66,7 @@ enum PaymentType: string implements EnumInterface
     {
         return match ($this) {
             self::Cash => true,
-            default => false,
+            default    => false,
         };
     }
 
@@ -97,90 +97,90 @@ enum PaymentType: string implements EnumInterface
     public function processingTime(): string
     {
         return match ($this) {
-            self::Stripe => __('translations.payment_processing_instant'),
+            self::Stripe   => __('translations.payment_processing_instant'),
             self::NotchPay => __('translations.payment_processing_instant'),
-            self::Cash => __('translations.payment_processing_immediate'),
+            self::Cash     => __('translations.payment_processing_immediate'),
         };
     }
 
     public function feePercentage(): float
     {
         return match ($this) {
-            self::Stripe => 2.9,
+            self::Stripe   => 2.9,
             self::NotchPay => 2.5,
-            self::Cash => 0.0,
+            self::Cash     => 0.0,
         };
     }
 
     public function fixedFee(): float
     {
         return match ($this) {
-            self::Stripe => 0.3,
+            self::Stripe   => 0.3,
             self::NotchPay => 0.25,
-            self::Cash => 0.0,
+            self::Cash     => 0.0,
         };
     }
 
     public function minimumAmount(): float
     {
         return match ($this) {
-            self::Stripe => 0.5,
+            self::Stripe   => 0.5,
             self::NotchPay => 0.5,
-            self::Cash => 0.01,
+            self::Cash     => 0.01,
         };
     }
 
     public function maximumAmount(): float
     {
         return match ($this) {
-            self::Stripe => 999999.99,
+            self::Stripe   => 999999.99,
             self::NotchPay => 999999.99,
-            self::Cash => 999999.99,
+            self::Cash     => 999999.99,
         };
     }
 
     public function supportedCurrencies(): array
     {
         return match ($this) {
-            self::Stripe => ['EUR', 'USD', 'GBP', 'CAD', 'AUD'],
+            self::Stripe   => ['EUR', 'USD', 'GBP', 'CAD', 'AUD'],
             self::NotchPay => ['EUR', 'USD', 'XOF', 'XAF'],
-            self::Cash => ['EUR', 'USD', 'GBP', 'CAD', 'AUD'],
+            self::Cash     => ['EUR', 'USD', 'GBP', 'CAD', 'AUD'],
         };
     }
 
     public function priority(): int
     {
         return match ($this) {
-            self::Stripe => 1,
+            self::Stripe   => 1,
             self::NotchPay => 2,
-            self::Cash => 3,
+            self::Cash     => 3,
         };
     }
 
     public function isEnabled(): bool
     {
         return match ($this) {
-            self::Stripe => config('payments.stripe.enabled', true),
+            self::Stripe   => config('payments.stripe.enabled', true),
             self::NotchPay => config('payments.notchpay.enabled', true),
-            self::Cash => config('payments.cash.enabled', true),
+            self::Cash     => config('payments.cash.enabled', true),
         };
     }
 
     public function getConfigKey(): string
     {
         return match ($this) {
-            self::Stripe => 'stripe',
+            self::Stripe   => 'stripe',
             self::NotchPay => 'notchpay',
-            self::Cash => 'cash',
+            self::Cash     => 'cash',
         };
     }
 
     public function getWebhookUrl(): ?string
     {
         return match ($this) {
-            self::Stripe => route('webhooks.stripe'),
+            self::Stripe   => route('webhooks.stripe'),
             self::NotchPay => route('webhooks.notchpay'),
-            self::Cash => null,
+            self::Cash     => null,
         };
     }
 
@@ -232,7 +232,6 @@ enum PaymentType: string implements EnumInterface
     {
         return collect(self::cases())->filter(fn ($case) => $case->supportsRefunds() && $case->isEnabled());
     }
-
 
     public static function fromLabel(string $label): ?static
     {

@@ -17,18 +17,18 @@ final class ProductCatalogTest extends TestCase
     public function test_catalog_query_returns_only_visible_published_products(): void
     {
         $visible = Product::factory()->create([
-            'is_visible' => true,
+            'is_visible'   => true,
             'published_at' => now()->subDay(),
-            'status' => 'published',
+            'status'       => 'published',
         ]);
 
         Product::factory()->create([
-            'is_visible' => false,
+            'is_visible'   => false,
             'published_at' => now()->subDay(),
         ]);
 
         Product::factory()->create([
-            'is_visible' => true,
+            'is_visible'   => true,
             'published_at' => null,
         ]);
 
@@ -52,19 +52,19 @@ final class ProductCatalogTest extends TestCase
         $matchingProduct = Product::factory()
             ->hasAttached($category, [], 'categories')
             ->create([
-                'brand_id' => $brand->id,
-                'is_visible' => true,
+                'brand_id'     => $brand->id,
+                'is_visible'   => true,
                 'published_at' => now()->subDay(),
-                'status' => 'published',
+                'status'       => 'published',
             ]);
 
         Product::factory()
             ->hasAttached($otherCategory, [], 'categories')
             ->create([
-                'brand_id' => $otherBrand->id,
-                'is_visible' => true,
+                'brand_id'     => $otherBrand->id,
+                'is_visible'   => true,
                 'published_at' => now()->subDay(),
-                'status' => 'published',
+                'status'       => 'published',
             ]);
 
         $results = Product::query()
@@ -81,16 +81,16 @@ final class ProductCatalogTest extends TestCase
     public function test_catalog_sorting_by_price(): void
     {
         $cheap = Product::factory()->create([
-            'price' => '10.00',
-            'is_visible' => true,
+            'price'        => '10.00',
+            'is_visible'   => true,
             'published_at' => now()->subDay(),
-            'status' => 'published',
+            'status'       => 'published',
         ]);
         $expensive = Product::factory()->create([
-            'price' => '50.00',
-            'is_visible' => true,
+            'price'        => '50.00',
+            'is_visible'   => true,
             'published_at' => now()->subDay(),
-            'status' => 'published',
+            'status'       => 'published',
         ]);
 
         $asc = Product::query()

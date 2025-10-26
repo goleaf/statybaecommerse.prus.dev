@@ -21,7 +21,7 @@ final class NotificationResourceTest extends TestCase
         parent::setUp();
 
         $this->adminUser = User::factory()->create([
-            'email' => 'admin@test.com',
+            'email'    => 'admin@test.com',
             'is_admin' => true,
         ]);
     }
@@ -30,20 +30,20 @@ final class NotificationResourceTest extends TestCase
     {
         // Create test notifications
         DatabaseNotification::create([
-            'id' => 'test-notification-1',
-            'type' => 'App\Notifications\TestNotification',
+            'id'              => 'test-notification-1',
+            'type'            => 'App\Notifications\TestNotification',
             'notifiable_type' => User::class,
-            'notifiable_id' => $this->adminUser->id,
-            'data' => ['message' => 'Test notification 1'],
+            'notifiable_id'   => $this->adminUser->id,
+            'data'            => ['message' => 'Test notification 1'],
         ]);
 
         DatabaseNotification::create([
-            'id' => 'test-notification-2',
-            'type' => 'App\Notifications\TestNotification',
+            'id'              => 'test-notification-2',
+            'type'            => 'App\Notifications\TestNotification',
             'notifiable_type' => User::class,
-            'notifiable_id' => $this->adminUser->id,
-            'data' => ['message' => 'Test notification 2'],
-            'read_at' => now(),
+            'notifiable_id'   => $this->adminUser->id,
+            'data'            => ['message' => 'Test notification 2'],
+            'read_at'         => now(),
         ]);
 
         $this
@@ -57,11 +57,11 @@ final class NotificationResourceTest extends TestCase
     public function test_admin_can_view_single_notification(): void
     {
         $notification = DatabaseNotification::create([
-            'id' => 'test-notification-view',
-            'type' => 'App\Notifications\TestNotification',
+            'id'              => 'test-notification-view',
+            'type'            => 'App\Notifications\TestNotification',
             'notifiable_type' => User::class,
-            'notifiable_id' => $this->adminUser->id,
-            'data' => ['message' => 'Test notification for viewing'],
+            'notifiable_id'   => $this->adminUser->id,
+            'data'            => ['message' => 'Test notification for viewing'],
         ]);
 
         $this
@@ -74,11 +74,11 @@ final class NotificationResourceTest extends TestCase
     public function test_admin_can_mark_notification_as_read(): void
     {
         $notification = DatabaseNotification::create([
-            'id' => 'test-notification-read',
-            'type' => 'App\Notifications\TestNotification',
+            'id'              => 'test-notification-read',
+            'type'            => 'App\Notifications\TestNotification',
             'notifiable_type' => User::class,
-            'notifiable_id' => $this->adminUser->id,
-            'data' => ['message' => 'Test notification to mark as read'],
+            'notifiable_id'   => $this->adminUser->id,
+            'data'            => ['message' => 'Test notification to mark as read'],
         ]);
 
         $this->assertNull($notification->read_at);
@@ -95,12 +95,12 @@ final class NotificationResourceTest extends TestCase
     public function test_admin_can_mark_notification_as_unread(): void
     {
         $notification = DatabaseNotification::create([
-            'id' => 'test-notification-unread',
-            'type' => 'App\Notifications\TestNotification',
+            'id'              => 'test-notification-unread',
+            'type'            => 'App\Notifications\TestNotification',
             'notifiable_type' => User::class,
-            'notifiable_id' => $this->adminUser->id,
-            'data' => ['message' => 'Test notification to mark as unread'],
-            'read_at' => now(),
+            'notifiable_id'   => $this->adminUser->id,
+            'data'            => ['message' => 'Test notification to mark as unread'],
+            'read_at'         => now(),
         ]);
 
         $this->assertNotNull($notification->read_at);
@@ -117,20 +117,20 @@ final class NotificationResourceTest extends TestCase
     public function test_admin_can_filter_notifications_by_read_status(): void
     {
         DatabaseNotification::create([
-            'id' => 'test-notification-read-filter',
-            'type' => 'App\Notifications\TestNotification',
+            'id'              => 'test-notification-read-filter',
+            'type'            => 'App\Notifications\TestNotification',
             'notifiable_type' => User::class,
-            'notifiable_id' => $this->adminUser->id,
-            'data' => ['message' => 'Read notification'],
-            'read_at' => now(),
+            'notifiable_id'   => $this->adminUser->id,
+            'data'            => ['message' => 'Read notification'],
+            'read_at'         => now(),
         ]);
 
         DatabaseNotification::create([
-            'id' => 'test-notification-unread-filter',
-            'type' => 'App\Notifications\TestNotification',
+            'id'              => 'test-notification-unread-filter',
+            'type'            => 'App\Notifications\TestNotification',
             'notifiable_type' => User::class,
-            'notifiable_id' => $this->adminUser->id,
-            'data' => ['message' => 'Unread notification'],
+            'notifiable_id'   => $this->adminUser->id,
+            'data'            => ['message' => 'Unread notification'],
         ]);
 
         $this
@@ -144,19 +144,19 @@ final class NotificationResourceTest extends TestCase
     public function test_admin_can_bulk_mark_notifications_as_read(): void
     {
         $notification1 = DatabaseNotification::create([
-            'id' => 'test-bulk-read-1',
-            'type' => 'App\Notifications\TestNotification',
+            'id'              => 'test-bulk-read-1',
+            'type'            => 'App\Notifications\TestNotification',
             'notifiable_type' => User::class,
-            'notifiable_id' => $this->adminUser->id,
-            'data' => ['message' => 'Bulk read notification 1'],
+            'notifiable_id'   => $this->adminUser->id,
+            'data'            => ['message' => 'Bulk read notification 1'],
         ]);
 
         $notification2 = DatabaseNotification::create([
-            'id' => 'test-bulk-read-2',
-            'type' => 'App\Notifications\TestNotification',
+            'id'              => 'test-bulk-read-2',
+            'type'            => 'App\Notifications\TestNotification',
             'notifiable_type' => User::class,
-            'notifiable_id' => $this->adminUser->id,
-            'data' => ['message' => 'Bulk read notification 2'],
+            'notifiable_id'   => $this->adminUser->id,
+            'data'            => ['message' => 'Bulk read notification 2'],
         ]);
 
         $this->assertNull($notification1->read_at);
@@ -178,11 +178,11 @@ final class NotificationResourceTest extends TestCase
     public function test_admin_can_delete_notification(): void
     {
         $notification = DatabaseNotification::create([
-            'id' => 'test-notification-delete',
-            'type' => 'App\Notifications\TestNotification',
+            'id'              => 'test-notification-delete',
+            'type'            => 'App\Notifications\TestNotification',
             'notifiable_type' => User::class,
-            'notifiable_id' => $this->adminUser->id,
-            'data' => ['message' => 'Test notification to delete'],
+            'notifiable_id'   => $this->adminUser->id,
+            'data'            => ['message' => 'Test notification to delete'],
         ]);
 
         $this
@@ -198,7 +198,7 @@ final class NotificationResourceTest extends TestCase
     public function test_non_admin_cannot_access_notifications(): void
     {
         $regularUser = User::factory()->create([
-            'email' => 'user@test.com',
+            'email'    => 'user@test.com',
             'is_admin' => false,
         ]);
 
@@ -219,14 +219,14 @@ final class NotificationResourceTest extends TestCase
 
         $notificationData = [
             'notifiable_type' => User::class,
-            'notifiable_id' => $user->id,
-            'type' => 'App\Notifications\TestNotification',
-            'data' => [
-                'title' => 'Test Notification',
+            'notifiable_id'   => $user->id,
+            'type'            => 'App\Notifications\TestNotification',
+            'data'            => [
+                'title'   => 'Test Notification',
                 'message' => 'This is a test notification',
-                'urgent' => false,
-                'color' => 'blue',
-                'tags' => ['test', 'notification'],
+                'urgent'  => false,
+                'color'   => 'blue',
+                'tags'    => ['test', 'notification'],
             ],
         ];
 
@@ -237,19 +237,19 @@ final class NotificationResourceTest extends TestCase
 
         $this->assertDatabaseHas('notifications', [
             'notifiable_type' => User::class,
-            'notifiable_id' => $user->id,
-            'type' => 'App\Notifications\TestNotification',
+            'notifiable_id'   => $user->id,
+            'type'            => 'App\Notifications\TestNotification',
         ]);
     }
 
     public function test_admin_can_edit_notification(): void
     {
         $notification = DatabaseNotification::create([
-            'id' => 'test-notification-edit',
-            'type' => 'App\Notifications\TestNotification',
+            'id'              => 'test-notification-edit',
+            'type'            => 'App\Notifications\TestNotification',
             'notifiable_type' => User::class,
-            'notifiable_id' => $this->adminUser->id,
-            'data' => ['message' => 'Original message'],
+            'notifiable_id'   => $this->adminUser->id,
+            'data'            => ['message' => 'Original message'],
         ]);
 
         $this
@@ -259,9 +259,9 @@ final class NotificationResourceTest extends TestCase
 
         $updatedData = [
             'data' => [
-                'title' => 'Updated Notification',
+                'title'   => 'Updated Notification',
                 'message' => 'Updated message',
-                'urgent' => true,
+                'urgent'  => true,
             ],
         ];
 
@@ -278,14 +278,14 @@ final class NotificationResourceTest extends TestCase
     public function test_admin_can_view_notification_details(): void
     {
         $notification = DatabaseNotification::create([
-            'id' => 'test-notification-view',
-            'type' => 'App\Notifications\TestNotification',
+            'id'              => 'test-notification-view',
+            'type'            => 'App\Notifications\TestNotification',
             'notifiable_type' => User::class,
-            'notifiable_id' => $this->adminUser->id,
-            'data' => [
-                'title' => 'Test Notification',
+            'notifiable_id'   => $this->adminUser->id,
+            'data'            => [
+                'title'   => 'Test Notification',
                 'message' => 'This is a test notification',
-                'urgent' => true,
+                'urgent'  => true,
             ],
         ]);
 
@@ -301,20 +301,20 @@ final class NotificationResourceTest extends TestCase
     {
         // Create urgent notification
         DatabaseNotification::create([
-            'id' => 'urgent-notification',
-            'type' => 'App\Notifications\TestNotification',
+            'id'              => 'urgent-notification',
+            'type'            => 'App\Notifications\TestNotification',
             'notifiable_type' => User::class,
-            'notifiable_id' => $this->adminUser->id,
-            'data' => ['urgent' => true, 'message' => 'Urgent notification'],
+            'notifiable_id'   => $this->adminUser->id,
+            'data'            => ['urgent' => true, 'message' => 'Urgent notification'],
         ]);
 
         // Create normal notification
         DatabaseNotification::create([
-            'id' => 'normal-notification',
-            'type' => 'App\Notifications\TestNotification',
+            'id'              => 'normal-notification',
+            'type'            => 'App\Notifications\TestNotification',
             'notifiable_type' => User::class,
-            'notifiable_id' => $this->adminUser->id,
-            'data' => ['urgent' => false, 'message' => 'Normal notification'],
+            'notifiable_id'   => $this->adminUser->id,
+            'data'            => ['urgent' => false, 'message' => 'Normal notification'],
         ]);
 
         $this
@@ -328,19 +328,19 @@ final class NotificationResourceTest extends TestCase
     public function test_admin_can_filter_notifications_by_type(): void
     {
         DatabaseNotification::create([
-            'id' => 'order-notification',
-            'type' => 'order',
+            'id'              => 'order-notification',
+            'type'            => 'order',
             'notifiable_type' => User::class,
-            'notifiable_id' => $this->adminUser->id,
-            'data' => ['message' => 'Order notification'],
+            'notifiable_id'   => $this->adminUser->id,
+            'data'            => ['message' => 'Order notification'],
         ]);
 
         DatabaseNotification::create([
-            'id' => 'product-notification',
-            'type' => 'product',
+            'id'              => 'product-notification',
+            'type'            => 'product',
             'notifiable_type' => User::class,
-            'notifiable_id' => $this->adminUser->id,
-            'data' => ['message' => 'Product notification'],
+            'notifiable_id'   => $this->adminUser->id,
+            'data'            => ['message' => 'Product notification'],
         ]);
 
         $this
@@ -355,27 +355,27 @@ final class NotificationResourceTest extends TestCase
     {
         // Create today's notification
         DatabaseNotification::create([
-            'id' => 'today-notification',
-            'type' => 'App\Notifications\TestNotification',
+            'id'              => 'today-notification',
+            'type'            => 'App\Notifications\TestNotification',
             'notifiable_type' => User::class,
-            'notifiable_id' => $this->adminUser->id,
-            'data' => ['message' => 'Today notification'],
-            'created_at' => now(),
+            'notifiable_id'   => $this->adminUser->id,
+            'data'            => ['message' => 'Today notification'],
+            'created_at'      => now(),
         ]);
 
         // Create old notification
         DatabaseNotification::create([
-            'id' => 'old-notification',
-            'type' => 'App\Notifications\TestNotification',
+            'id'              => 'old-notification',
+            'type'            => 'App\Notifications\TestNotification',
             'notifiable_type' => User::class,
-            'notifiable_id' => $this->adminUser->id,
-            'data' => ['message' => 'Old notification'],
-            'created_at' => now()->subDays(10),
+            'notifiable_id'   => $this->adminUser->id,
+            'data'            => ['message' => 'Old notification'],
+            'created_at'      => now()->subDays(10),
         ]);
 
         $this
             ->actingAs($this->adminUser)
-            ->get('/admin/notifications?created_at='.now()->format('Y-m-d'))
+            ->get('/admin/notifications?created_at=' . now()->format('Y-m-d'))
             ->assertOk()
             ->assertSee('Today notification')
             ->assertDontSee('Old notification');
@@ -384,19 +384,19 @@ final class NotificationResourceTest extends TestCase
     public function test_admin_can_bulk_mark_notifications_as_urgent(): void
     {
         $notification1 = DatabaseNotification::create([
-            'id' => 'bulk-urgent-1',
-            'type' => 'App\Notifications\TestNotification',
+            'id'              => 'bulk-urgent-1',
+            'type'            => 'App\Notifications\TestNotification',
             'notifiable_type' => User::class,
-            'notifiable_id' => $this->adminUser->id,
-            'data' => ['message' => 'Bulk urgent notification 1'],
+            'notifiable_id'   => $this->adminUser->id,
+            'data'            => ['message' => 'Bulk urgent notification 1'],
         ]);
 
         $notification2 = DatabaseNotification::create([
-            'id' => 'bulk-urgent-2',
-            'type' => 'App\Notifications\TestNotification',
+            'id'              => 'bulk-urgent-2',
+            'type'            => 'App\Notifications\TestNotification',
             'notifiable_type' => User::class,
-            'notifiable_id' => $this->adminUser->id,
-            'data' => ['message' => 'Bulk urgent notification 2'],
+            'notifiable_id'   => $this->adminUser->id,
+            'data'            => ['message' => 'Bulk urgent notification 2'],
         ]);
 
         $this->assertFalse($notification1->data['urgent'] ?? false);
@@ -418,11 +418,11 @@ final class NotificationResourceTest extends TestCase
     public function test_admin_can_bulk_duplicate_notifications(): void
     {
         $notification = DatabaseNotification::create([
-            'id' => 'bulk-duplicate',
-            'type' => 'App\Notifications\TestNotification',
+            'id'              => 'bulk-duplicate',
+            'type'            => 'App\Notifications\TestNotification',
             'notifiable_type' => User::class,
-            'notifiable_id' => $this->adminUser->id,
-            'data' => ['message' => 'Bulk duplicate notification'],
+            'notifiable_id'   => $this->adminUser->id,
+            'data'            => ['message' => 'Bulk duplicate notification'],
         ]);
 
         $originalCount = DatabaseNotification::count();
@@ -441,11 +441,11 @@ final class NotificationResourceTest extends TestCase
     {
         $user = User::factory()->create();
         $notification = DatabaseNotification::create([
-            'id' => 'relationship-test',
-            'type' => 'App\Notifications\TestNotification',
+            'id'              => 'relationship-test',
+            'type'            => 'App\Notifications\TestNotification',
             'notifiable_type' => User::class,
-            'notifiable_id' => $user->id,
-            'data' => ['message' => 'Relationship test'],
+            'notifiable_id'   => $user->id,
+            'data'            => ['message' => 'Relationship test'],
         ]);
 
         // Test notifiable relationship
@@ -463,21 +463,21 @@ final class NotificationResourceTest extends TestCase
 
         // Create read notification
         DatabaseNotification::create([
-            'id' => 'read-scope-test',
-            'type' => 'App\Notifications\TestNotification',
+            'id'              => 'read-scope-test',
+            'type'            => 'App\Notifications\TestNotification',
             'notifiable_type' => User::class,
-            'notifiable_id' => $user->id,
-            'data' => ['message' => 'Read notification'],
-            'read_at' => now(),
+            'notifiable_id'   => $user->id,
+            'data'            => ['message' => 'Read notification'],
+            'read_at'         => now(),
         ]);
 
         // Create unread notification
         DatabaseNotification::create([
-            'id' => 'unread-scope-test',
-            'type' => 'App\Notifications\TestNotification',
+            'id'              => 'unread-scope-test',
+            'type'            => 'App\Notifications\TestNotification',
             'notifiable_type' => User::class,
-            'notifiable_id' => $user->id,
-            'data' => ['message' => 'Unread notification'],
+            'notifiable_id'   => $user->id,
+            'data'            => ['message' => 'Unread notification'],
         ]);
 
         // Test read scope
@@ -494,16 +494,16 @@ final class NotificationResourceTest extends TestCase
     public function test_notification_model_accessors(): void
     {
         $notification = DatabaseNotification::create([
-            'id' => 'accessor-test',
-            'type' => 'App\Notifications\TestNotification',
+            'id'              => 'accessor-test',
+            'type'            => 'App\Notifications\TestNotification',
             'notifiable_type' => User::class,
-            'notifiable_id' => $this->adminUser->id,
-            'data' => [
-                'title' => 'Test Title',
+            'notifiable_id'   => $this->adminUser->id,
+            'data'            => [
+                'title'   => 'Test Title',
                 'message' => 'Test Message',
-                'urgent' => true,
-                'color' => 'red',
-                'tags' => ['test', 'accessor'],
+                'urgent'  => true,
+                'color'   => 'red',
+                'tags'    => ['test', 'accessor'],
             ],
         ]);
 
@@ -531,11 +531,11 @@ final class NotificationResourceTest extends TestCase
     public function test_notification_model_methods(): void
     {
         $notification = DatabaseNotification::create([
-            'id' => 'method-test',
-            'type' => 'App\Notifications\TestNotification',
+            'id'              => 'method-test',
+            'type'            => 'App\Notifications\TestNotification',
             'notifiable_type' => User::class,
-            'notifiable_id' => $this->adminUser->id,
-            'data' => ['message' => 'Method test'],
+            'notifiable_id'   => $this->adminUser->id,
+            'data'            => ['message' => 'Method test'],
         ]);
 
         // Test markAsRead method

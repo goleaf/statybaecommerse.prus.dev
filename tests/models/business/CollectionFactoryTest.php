@@ -23,12 +23,12 @@ final class CollectionFactoryTest extends TestCase
     public function test_collection_factory_with_custom_attributes(): void
     {
         $collection = Collection::factory()->create([
-            'name' => 'Custom Collection',
-            'slug' => 'custom-collection',
-            'description' => 'Custom description',
-            'is_visible' => true,
+            'name'         => 'Custom Collection',
+            'slug'         => 'custom-collection',
+            'description'  => 'Custom description',
+            'is_visible'   => true,
             'is_automatic' => false,
-            'sort_order' => 5,
+            'sort_order'   => 5,
         ]);
 
         $this->assertEquals('Custom Collection', $collection->name);
@@ -107,8 +107,8 @@ final class CollectionFactoryTest extends TestCase
     public function test_collection_factory_with_rules(): void
     {
         $rules = [
-            'category' => 'tools',
-            'brand' => 'bosch',
+            'category'  => 'tools',
+            'brand'     => 'bosch',
             'price_min' => 100,
         ];
 
@@ -238,8 +238,8 @@ final class CollectionFactoryTest extends TestCase
     public function test_collection_factory_with_custom_rules(): void
     {
         $rules = [
-            'category' => 'tools',
-            'brand' => 'bosch',
+            'category'  => 'tools',
+            'brand'     => 'bosch',
             'price_min' => 100,
             'price_max' => 1000,
         ];

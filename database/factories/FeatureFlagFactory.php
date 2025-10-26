@@ -17,24 +17,24 @@ class FeatureFlagFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => fake()->words(3, true),
-            'key' => fake()->unique()->slug(),
+            'name'        => fake()->words(3, true),
+            'key'         => fake()->unique()->slug(),
             'description' => fake()->sentence(10),
-            'is_active' => fake()->boolean(70),
-            'is_enabled' => fake()->boolean(30),
-            'is_global' => fake()->boolean(20),
+            'is_active'   => fake()->boolean(70),
+            'is_enabled'  => fake()->boolean(30),
+            'is_global'   => fake()->boolean(20),
             'environment' => fake()->randomElement(['local', 'staging', 'production', null]),
-            'category' => fake()->randomElement(['ui', 'performance', 'security', 'analytics', 'payment', 'shipping']),
-            'priority' => fake()->numberBetween(0, 100),
-            'conditions' => [
+            'category'    => fake()->randomElement(['ui', 'performance', 'security', 'analytics', 'payment', 'shipping']),
+            'priority'    => fake()->numberBetween(0, 100),
+            'conditions'  => [
                 'user_type' => fake()->randomElement(['admin', 'customer', 'guest']),
-                'country' => fake()->countryCode(),
+                'country'   => fake()->countryCode(),
             ],
             'starts_at' => fake()->optional(0.7)->dateTimeBetween('-1 month', '+1 month'),
-            'ends_at' => fake()->optional(0.5)->dateTimeBetween('+1 month', '+3 months'),
-            'metadata' => [
+            'ends_at'   => fake()->optional(0.5)->dateTimeBetween('+1 month', '+3 months'),
+            'metadata'  => [
                 'version' => fake()->semver(),
-                'team' => fake()->randomElement(['frontend', 'backend', 'devops', 'qa']),
+                'team'    => fake()->randomElement(['frontend', 'backend', 'devops', 'qa']),
             ],
         ];
     }
@@ -49,7 +49,7 @@ class FeatureFlagFactory extends Factory
     public function enabled(): static
     {
         return $this->state(fn (array $attributes) => [
-            'is_active' => true,
+            'is_active'  => true,
             'is_enabled' => true,
         ]);
     }

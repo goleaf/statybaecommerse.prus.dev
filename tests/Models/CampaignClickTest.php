@@ -21,7 +21,7 @@ final class CampaignClickTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function testClickedAtMutatorNormalisesTimestampsToUtc(): void
+    public function test_clicked_at_mutator_normalises_timestamps_to_utc(): void
     {
         // Freeze the clock to make timezone calculations deterministic for the assertion.
         Carbon::setTestNow('2024-01-01 17:00:00');
@@ -43,7 +43,7 @@ final class CampaignClickTest extends TestCase
         }
     }
 
-    public function testBootedHookBackfillsMissingClickedAtAndConversionValue(): void
+    public function test_booted_hook_backfills_missing_clicked_at_and_conversion_value(): void
     {
         // Freeze the current time to keep created timestamps reproducible in assertions.
         Carbon::setTestNow('2025-05-05 12:34:56');
@@ -51,7 +51,7 @@ final class CampaignClickTest extends TestCase
         try {
             // Create a click without timestamps or conversion amounts to trigger the booted callbacks.
             $click = CampaignClick::factory()->create([
-                'clicked_at' => null,
+                'clicked_at'       => null,
                 'conversion_value' => null,
             ]);
 
@@ -67,7 +67,7 @@ final class CampaignClickTest extends TestCase
         }
     }
 
-    public function testScopeByCampaignFiltersResults(): void
+    public function test_scope_by_campaign_filters_results(): void
     {
         // Create two campaigns so we can assert the scope only returns clicks for the first one.
         $campaignA = Campaign::factory()->create();
@@ -86,7 +86,7 @@ final class CampaignClickTest extends TestCase
         self::assertSame($matching->pluck('id')->sort()->values()->all(), collect($results)->sort()->values()->all());
     }
 
-    public function testScopeRecentRestrictsResultsToConfiguredWindow(): void
+    public function test_scope_recent_restricts_results_to_configured_window(): void
     {
         // Fix the current time so relative date calculations behave consistently.
         Carbon::setTestNow('2024-06-01 00:00:00');
@@ -110,7 +110,7 @@ final class CampaignClickTest extends TestCase
         }
     }
 
-    public function testConversionHelpersSurfaceAggregatedInsights(): void
+    public function test_conversion_helpers_surface_aggregated_insights(): void
     {
         // Create a click that we can attach conversions to for aggregation checks.
         $click = CampaignClick::factory()->create();
@@ -137,44 +137,44 @@ final class CampaignClickTest extends TestCase
         self::assertEqualsWithDelta(15.75, $click->fresh()->getTotalConversionValue(), 0.0001);
     }
 
-    public function testMetadataHelpersExposeStoredContext(): void
+    public function test_metadata_helpers_expose_stored_context(): void
     {
         // Persist a click with extended metadata so we can assert the helper arrays mirror the stored data.
         $click = CampaignClick::factory()->create([
-            'utm_source' => 'newsletter',
-            'utm_medium' => 'email',
+            'utm_source'   => 'newsletter',
+            'utm_medium'   => 'email',
             'utm_campaign' => 'spring_sale',
-            'utm_term' => 'discount',
-            'utm_content' => 'cta_button',
-            'country' => 'LT',
-            'city' => 'Vilnius',
-            'ip_address' => '203.0.113.10',
-            'device_type' => 'mobile',
-            'browser' => 'chrome',
-            'os' => 'android',
-            'user_agent' => 'Mozilla/5.0',
+            'utm_term'     => 'discount',
+            'utm_content'  => 'cta_button',
+            'country'      => 'LT',
+            'city'         => 'Vilnius',
+            'ip_address'   => '203.0.113.10',
+            'device_type'  => 'mobile',
+            'browser'      => 'chrome',
+            'os'           => 'android',
+            'user_agent'   => 'Mozilla/5.0',
         ]);
 
         // Assert that the metadata helper accessors return the expected associative arrays.
         self::assertSame([
-            'utm_source' => 'newsletter',
-            'utm_medium' => 'email',
+            'utm_source'   => 'newsletter',
+            'utm_medium'   => 'email',
             'utm_campaign' => 'spring_sale',
-            'utm_term' => 'discount',
-            'utm_content' => 'cta_button',
+            'utm_term'     => 'discount',
+            'utm_content'  => 'cta_button',
         ], $click->getUtmParams());
 
         self::assertSame([
-            'country' => 'LT',
-            'city' => 'Vilnius',
+            'country'    => 'LT',
+            'city'       => 'Vilnius',
             'ip_address' => '203.0.113.10',
         ], $click->getLocationInfo());
 
         self::assertSame([
             'device_type' => 'mobile',
-            'browser' => 'chrome',
-            'os' => 'android',
-            'user_agent' => 'Mozilla/5.0',
+            'browser'     => 'chrome',
+            'os'          => 'android',
+            'user_agent'  => 'Mozilla/5.0',
         ], $click->getDeviceInfo());
     }
 }

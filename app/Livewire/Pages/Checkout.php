@@ -41,7 +41,7 @@ class Checkout extends Component
     public function render(): View
     {
         return view('livewire.pages.checkout', [
-            'items' => CartFacade::session($this->sessionKey)->getContent(),
+            'items'    => CartFacade::session($this->sessionKey)->getContent(),
             'subtotal' => CartFacade::session($this->sessionKey)->getSubTotal(),
         ])->title(__('Proceed to checkout'));
     }

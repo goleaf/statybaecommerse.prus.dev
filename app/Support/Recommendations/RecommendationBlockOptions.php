@@ -21,10 +21,10 @@ final class RecommendationBlockOptions
         return [
             // The labels are resolved through translations to keep UI copy consistent.
             'featured' => __('recommendation_blocks.types.featured'),
-            'related' => __('recommendation_blocks.types.related'),
-            'similar' => __('recommendation_blocks.types.similar'),
+            'related'  => __('recommendation_blocks.types.related'),
+            'similar'  => __('recommendation_blocks.types.similar'),
             'trending' => __('recommendation_blocks.types.trending'),
-            'recent' => __('recommendation_blocks.types.recent'),
+            'recent'   => __('recommendation_blocks.types.recent'),
         ];
     }
 
@@ -36,10 +36,10 @@ final class RecommendationBlockOptions
     public static function positions(): array
     {
         return [
-            'top' => __('recommendation_blocks.positions.top'),
-            'bottom' => __('recommendation_blocks.positions.bottom'),
+            'top'     => __('recommendation_blocks.positions.top'),
+            'bottom'  => __('recommendation_blocks.positions.bottom'),
             'sidebar' => __('recommendation_blocks.positions.sidebar'),
-            'inline' => __('recommendation_blocks.positions.inline'),
+            'inline'  => __('recommendation_blocks.positions.inline'),
         ];
     }
 
@@ -53,7 +53,7 @@ final class RecommendationBlockOptions
         // Tabs track the same type keys used by the select inputs to keep the UI aligned.
         return array_map(
             // Each label is resolved from dedicated translation keys for clarity in the UI.
-            fn (string $type): string => __('recommendation_blocks.tabs.'.$type),
+            fn (string $type): string => __('recommendation_blocks.tabs.' . $type),
             array_keys(self::types()),
         );
     }

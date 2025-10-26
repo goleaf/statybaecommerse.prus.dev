@@ -18,11 +18,11 @@ class TestConfig
     {
         return [
             'stop_on_failure' => true,
-            'parallel' => false,
-            'coverage' => false,
-            'verbose' => true,
-            'memory_limit' => '1G',
-            'timeout' => 300,
+            'parallel'        => false,
+            'coverage'        => false,
+            'verbose'         => true,
+            'memory_limit'    => '1G',
+            'timeout'         => 300,
         ];
     }
 
@@ -33,9 +33,9 @@ class TestConfig
     {
         return [
             'connection' => 'sqlite',
-            'database' => ':memory:',
-            'migrate' => true,
-            'seed' => false,
+            'database'   => ':memory:',
+            'migrate'    => true,
+            'seed'       => false,
         ];
     }
 
@@ -45,12 +45,12 @@ class TestConfig
     public static function getEnvironmentSettings(): array
     {
         return [
-            'APP_ENV' => 'testing',
-            'APP_DEBUG' => true,
-            'DB_CONNECTION' => 'sqlite',
-            'DB_DATABASE' => ':memory:',
-            'CACHE_DRIVER' => 'array',
-            'SESSION_DRIVER' => 'array',
+            'APP_ENV'          => 'testing',
+            'APP_DEBUG'        => true,
+            'DB_CONNECTION'    => 'sqlite',
+            'DB_DATABASE'      => ':memory:',
+            'CACHE_DRIVER'     => 'array',
+            'SESSION_DRIVER'   => 'array',
             'QUEUE_CONNECTION' => 'sync',
         ];
     }
@@ -62,51 +62,51 @@ class TestConfig
     {
         return [
             'admin' => [
-                'enabled' => true,
-                'priority' => 1,
-                'timeout' => 600,
+                'enabled'      => true,
+                'priority'     => 1,
+                'timeout'      => 600,
                 'memory_limit' => '2G',
             ],
             'widgets' => [
-                'enabled' => true,
-                'priority' => 2,
-                'timeout' => 300,
+                'enabled'      => true,
+                'priority'     => 2,
+                'timeout'      => 300,
                 'memory_limit' => '1G',
             ],
             'api' => [
-                'enabled' => true,
-                'priority' => 3,
-                'timeout' => 400,
+                'enabled'      => true,
+                'priority'     => 3,
+                'timeout'      => 400,
                 'memory_limit' => '1G',
             ],
             'integration' => [
-                'enabled' => true,
-                'priority' => 4,
-                'timeout' => 800,
+                'enabled'      => true,
+                'priority'     => 4,
+                'timeout'      => 800,
                 'memory_limit' => '2G',
             ],
             'unit' => [
-                'enabled' => true,
-                'priority' => 5,
-                'timeout' => 200,
+                'enabled'      => true,
+                'priority'     => 5,
+                'timeout'      => 200,
                 'memory_limit' => '512M',
             ],
             'controllers' => [
-                'enabled' => true,
-                'priority' => 6,
-                'timeout' => 300,
+                'enabled'      => true,
+                'priority'     => 6,
+                'timeout'      => 300,
                 'memory_limit' => '1G',
             ],
             'models' => [
-                'enabled' => true,
-                'priority' => 7,
-                'timeout' => 400,
+                'enabled'      => true,
+                'priority'     => 7,
+                'timeout'      => 400,
                 'memory_limit' => '1G',
             ],
             'pages' => [
-                'enabled' => true,
-                'priority' => 8,
-                'timeout' => 300,
+                'enabled'      => true,
+                'priority'     => 8,
+                'timeout'      => 300,
                 'memory_limit' => '1G',
             ],
         ];

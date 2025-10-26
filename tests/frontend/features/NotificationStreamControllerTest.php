@@ -67,14 +67,14 @@ final class NotificationStreamControllerTest extends TestCase
     {
         // Create a notification before starting the stream
         DatabaseNotification::create([
-            'id' => 'test-stream-notification',
-            'type' => TestNotification::class,
+            'id'              => 'test-stream-notification',
+            'type'            => TestNotification::class,
             'notifiable_type' => User::class,
-            'notifiable_id' => $this->user->id,
-            'data' => [
-                'title' => 'Stream Test',
+            'notifiable_id'   => $this->user->id,
+            'data'            => [
+                'title'   => 'Stream Test',
                 'message' => 'Test notification for stream',
-                'type' => 'info',
+                'type'    => 'info',
             ],
         ]);
 
@@ -94,26 +94,26 @@ final class NotificationStreamControllerTest extends TestCase
     {
         // Create multiple notifications
         DatabaseNotification::create([
-            'id' => 'test-stream-1',
-            'type' => TestNotification::class,
+            'id'              => 'test-stream-1',
+            'type'            => TestNotification::class,
             'notifiable_type' => User::class,
-            'notifiable_id' => $this->user->id,
-            'data' => [
-                'title' => 'Notification 1',
+            'notifiable_id'   => $this->user->id,
+            'data'            => [
+                'title'   => 'Notification 1',
                 'message' => 'First notification',
-                'type' => 'info',
+                'type'    => 'info',
             ],
         ]);
 
         DatabaseNotification::create([
-            'id' => 'test-stream-2',
-            'type' => TestNotification::class,
+            'id'              => 'test-stream-2',
+            'type'            => TestNotification::class,
             'notifiable_type' => User::class,
-            'notifiable_id' => $this->user->id,
-            'data' => [
-                'title' => 'Notification 2',
+            'notifiable_id'   => $this->user->id,
+            'data'            => [
+                'title'   => 'Notification 2',
                 'message' => 'Second notification',
-                'type' => 'warning',
+                'type'    => 'warning',
             ],
         ]);
 
@@ -139,14 +139,14 @@ final class NotificationStreamControllerTest extends TestCase
     public function test_stream_includes_notification_timestamp(): void
     {
         DatabaseNotification::create([
-            'id' => 'test-timestamp',
-            'type' => TestNotification::class,
+            'id'              => 'test-timestamp',
+            'type'            => TestNotification::class,
             'notifiable_type' => User::class,
-            'notifiable_id' => $this->user->id,
-            'data' => [
-                'title' => 'Timestamp Test',
+            'notifiable_id'   => $this->user->id,
+            'data'            => [
+                'title'   => 'Timestamp Test',
                 'message' => 'Test with timestamp',
-                'type' => 'info',
+                'type'    => 'info',
             ],
         ]);
 
@@ -162,11 +162,11 @@ final class NotificationStreamControllerTest extends TestCase
     public function test_stream_handles_notifications_with_missing_data(): void
     {
         DatabaseNotification::create([
-            'id' => 'test-missing-data',
-            'type' => TestNotification::class,
+            'id'              => 'test-missing-data',
+            'type'            => TestNotification::class,
             'notifiable_type' => User::class,
-            'notifiable_id' => $this->user->id,
-            'data' => [], // Empty data
+            'notifiable_id'   => $this->user->id,
+            'data'            => [], // Empty data
         ]);
 
         $response = $this->actingAs($this->user)
@@ -184,14 +184,14 @@ final class NotificationStreamControllerTest extends TestCase
     {
         // Test with different notification data structures
         DatabaseNotification::create([
-            'id' => 'test-different-type',
-            'type' => TestNotification::class,
+            'id'              => 'test-different-type',
+            'type'            => TestNotification::class,
             'notifiable_type' => User::class,
-            'notifiable_id' => $this->user->id,
-            'data' => [
-                'title' => 'Different Type',
+            'notifiable_id'   => $this->user->id,
+            'data'            => [
+                'title'   => 'Different Type',
                 'message' => 'Test with different type',
-                'type' => 'error',
+                'type'    => 'error',
             ],
         ]);
 

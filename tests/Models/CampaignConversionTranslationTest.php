@@ -17,7 +17,7 @@ final class CampaignConversionTranslationTest extends TestCase
     public function test_fillable_attributes_are_well_defined(): void
     {
         // Having explicit expectations keeps factories aligned with the model's contract.
-        $model = new CampaignConversionTranslation();
+        $model = new CampaignConversionTranslation;
 
         self::assertSame([
             'campaign_conversion_id',

@@ -20,15 +20,15 @@ final class ProductRequestTest extends TestCase
         $user = User::factory()->create();
 
         $request = ProductRequest::factory()->create([
-            'product_id' => $product->id,
-            'user_id' => $user->id,
-            'name' => 'John Doe',
-            'email' => 'john@example.com',
-            'phone' => '+1234567890',
-            'message' => 'I would like to request this product',
+            'product_id'         => $product->id,
+            'user_id'            => $user->id,
+            'name'               => 'John Doe',
+            'email'              => 'john@example.com',
+            'phone'              => '+1234567890',
+            'message'            => 'I would like to request this product',
             'requested_quantity' => 5,
-            'status' => 'pending',
-            'admin_notes' => 'Customer inquiry',
+            'status'             => 'pending',
+            'admin_notes'        => 'Customer inquiry',
         ]);
 
         $this->assertInstanceOf(ProductRequest::class, $request);
@@ -71,7 +71,7 @@ final class ProductRequestTest extends TestCase
     {
         $request = ProductRequest::factory()->create([
             'requested_quantity' => '10',
-            'responded_at' => '2024-01-01 12:00:00',
+            'responded_at'       => '2024-01-01 12:00:00',
         ]);
 
         $this->assertIsInt($request->requested_quantity);
@@ -180,7 +180,7 @@ final class ProductRequestTest extends TestCase
     {
         $user = User::factory()->create();
         $request = ProductRequest::factory()->create([
-            'status' => 'pending',
+            'status'       => 'pending',
             'responded_at' => null,
             'responded_by' => null,
         ]);
@@ -197,7 +197,7 @@ final class ProductRequestTest extends TestCase
     {
         $user = User::factory()->create();
         $request = ProductRequest::factory()->create([
-            'status' => 'pending',
+            'status'       => 'pending',
             'responded_at' => null,
             'responded_by' => null,
         ]);

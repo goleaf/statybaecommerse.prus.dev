@@ -13,14 +13,14 @@ uses(TestCase::class);
 
 it('dispatches share event with the expected product url', function (): void {
     $product = Product::factory()->make([
-        'slug' => 'test-product',
-        'status' => 'published',
-        'is_visible' => true,
+        'slug'         => 'test-product',
+        'status'       => 'published',
+        'is_visible'   => true,
         'published_at' => now(),
-        'brand_id' => null,
+        'brand_id'     => null,
     ]);
 
-    config()->set('app.key', 'base64:'.base64_encode(random_bytes(32)));
+    config()->set('app.key', 'base64:' . base64_encode(random_bytes(32)));
 
     expect($product->slug)->toBe('test-product');
     expect($product->getRouteKey())->toBe('test-product');
@@ -51,7 +51,7 @@ it('dispatches share event with the expected product url', function (): void {
     if (Route::has('localized.products.show')) {
         try {
             $expectedUrl = route('localized.products.show', [
-                'locale' => app()->getLocale(),
+                'locale'  => app()->getLocale(),
                 'product' => $routeKey,
             ]);
         } catch (UrlGenerationException) {

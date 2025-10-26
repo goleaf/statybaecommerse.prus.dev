@@ -39,13 +39,13 @@ final class VariantAnalyticsResourceTest extends TestCase
         // Arrange
         $variant = ProductVariant::factory()->create();
         $data = [
-            'variant_id' => $variant->id,
-            'date' => now()->toDateString(),
-            'views' => 100,
-            'clicks' => 50,
-            'add_to_cart' => 25,
-            'purchases' => 10,
-            'revenue' => 500.00,
+            'variant_id'      => $variant->id,
+            'date'            => now()->toDateString(),
+            'views'           => 100,
+            'clicks'          => 50,
+            'add_to_cart'     => 25,
+            'purchases'       => 10,
+            'revenue'         => 500.00,
             'conversion_rate' => 10.0,
         ];
 
@@ -66,8 +66,8 @@ final class VariantAnalyticsResourceTest extends TestCase
         $analytics = VariantAnalytics::factory()->withVariant($variant)->create();
 
         $updatedData = [
-            'views' => 200,
-            'clicks' => 100,
+            'views'   => 200,
+            'clicks'  => 100,
             'revenue' => 1000.00,
         ];
 
@@ -147,7 +147,7 @@ final class VariantAnalyticsResourceTest extends TestCase
         // Act & Assert
         Livewire::test(\App\Filament\Resources\VariantAnalyticsResource\Pages\ListVariantAnalytics::class)
             ->filterTable('date_range', [
-                'date_from' => now()->subDays(10)->toDateString(),
+                'date_from'  => now()->subDays(10)->toDateString(),
                 'date_until' => now()->toDateString(),
             ])
             ->assertCanSeeTableRecords([$analytics1])
@@ -205,10 +205,10 @@ final class VariantAnalyticsResourceTest extends TestCase
         $analytics = VariantAnalytics::factory()
             ->withVariant($variant)
             ->create([
-                'views' => 1000,
-                'clicks' => 100,
+                'views'       => 1000,
+                'clicks'      => 100,
                 'add_to_cart' => 50,
-                'purchases' => 10,
+                'purchases'   => 10,
             ]);
 
         // Act & Assert
@@ -221,7 +221,7 @@ final class VariantAnalyticsResourceTest extends TestCase
         // Act & Assert
         Livewire::test(\App\Filament\Resources\VariantAnalyticsResource\Pages\CreateVariantAnalytics::class)
             ->fillForm([
-                'date' => now()->toDateString(),
+                'date'  => now()->toDateString(),
                 'views' => 100,
             ])
             ->call('create')
@@ -237,7 +237,7 @@ final class VariantAnalyticsResourceTest extends TestCase
         Livewire::test(\App\Filament\Resources\VariantAnalyticsResource\Pages\CreateVariantAnalytics::class)
             ->fillForm([
                 'variant_id' => $variant->id,
-                'views' => 100,
+                'views'      => 100,
             ])
             ->call('create')
             ->assertHasFormErrors(['date']);
@@ -252,9 +252,9 @@ final class VariantAnalyticsResourceTest extends TestCase
         Livewire::test(\App\Filament\Resources\VariantAnalyticsResource\Pages\CreateVariantAnalytics::class)
             ->fillForm([
                 'variant_id' => $variant->id,
-                'date' => now()->toDateString(),
-                'views' => 'not_a_number',
-                'clicks' => 'invalid',
+                'date'       => now()->toDateString(),
+                'views'      => 'not_a_number',
+                'clicks'     => 'invalid',
             ])
             ->call('create')
             ->assertHasFormErrors(['views', 'clicks']);

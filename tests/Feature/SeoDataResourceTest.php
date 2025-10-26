@@ -21,7 +21,7 @@ class SeoDataResourceTest extends TestCase
         parent::setUp();
 
         $this->actingAs(\App\Models\User::factory()->create([
-            'email' => 'admin@example.com',
+            'email'    => 'admin@example.com',
             'is_admin' => true,
         ]));
     }
@@ -40,29 +40,29 @@ class SeoDataResourceTest extends TestCase
 
         Livewire::test(\App\Filament\Resources\SeoDataResource\Pages\CreateSeoData::class)
             ->fillForm([
-                'seoable_type' => Product::class,
-                'seoable_id' => $product->id,
-                'locale' => 'lt',
-                'title' => 'Test Product SEO Title',
-                'description' => 'Test product SEO description for better search engine optimization',
-                'keywords' => 'test, product, seo',
+                'seoable_type'  => Product::class,
+                'seoable_id'    => $product->id,
+                'locale'        => 'lt',
+                'title'         => 'Test Product SEO Title',
+                'description'   => 'Test product SEO description for better search engine optimization',
+                'keywords'      => 'test, product, seo',
                 'canonical_url' => 'https://example.com/products/test-product',
-                'no_index' => false,
-                'no_follow' => false,
+                'no_index'      => false,
+                'no_follow'     => false,
             ])
             ->call('create')
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('seo_data', [
-            'seoable_type' => Product::class,
-            'seoable_id' => $product->id,
-            'locale' => 'lt',
-            'title' => 'Test Product SEO Title',
-            'description' => 'Test product SEO description for better search engine optimization',
-            'keywords' => json_encode(['test', 'product', 'seo']),
+            'seoable_type'  => Product::class,
+            'seoable_id'    => $product->id,
+            'locale'        => 'lt',
+            'title'         => 'Test Product SEO Title',
+            'description'   => 'Test product SEO description for better search engine optimization',
+            'keywords'      => json_encode(['test', 'product', 'seo']),
             'canonical_url' => 'https://example.com/products/test-product',
-            'no_index' => false,
-            'no_follow' => false,
+            'no_index'      => false,
+            'no_follow'     => false,
         ]);
     }
 
@@ -72,29 +72,29 @@ class SeoDataResourceTest extends TestCase
 
         Livewire::test(\App\Filament\Resources\SeoDataResource\Pages\CreateSeoData::class)
             ->fillForm([
-                'seoable_type' => Category::class,
-                'seoable_id' => $category->id,
-                'locale' => 'en',
-                'title' => 'Test Category SEO Title',
-                'description' => 'Test category SEO description for better search engine optimization',
-                'keywords' => 'test, category, seo',
+                'seoable_type'  => Category::class,
+                'seoable_id'    => $category->id,
+                'locale'        => 'en',
+                'title'         => 'Test Category SEO Title',
+                'description'   => 'Test category SEO description for better search engine optimization',
+                'keywords'      => 'test, category, seo',
                 'canonical_url' => 'https://example.com/categories/test-category',
-                'no_index' => false,
-                'no_follow' => false,
+                'no_index'      => false,
+                'no_follow'     => false,
             ])
             ->call('create')
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('seo_data', [
-            'seoable_type' => Category::class,
-            'seoable_id' => $category->id,
-            'locale' => 'en',
-            'title' => 'Test Category SEO Title',
-            'description' => 'Test category SEO description for better search engine optimization',
-            'keywords' => json_encode(['test', 'category', 'seo']),
+            'seoable_type'  => Category::class,
+            'seoable_id'    => $category->id,
+            'locale'        => 'en',
+            'title'         => 'Test Category SEO Title',
+            'description'   => 'Test category SEO description for better search engine optimization',
+            'keywords'      => json_encode(['test', 'category', 'seo']),
             'canonical_url' => 'https://example.com/categories/test-category',
-            'no_index' => false,
-            'no_follow' => false,
+            'no_index'      => false,
+            'no_follow'     => false,
         ]);
     }
 
@@ -104,29 +104,29 @@ class SeoDataResourceTest extends TestCase
 
         Livewire::test(\App\Filament\Resources\SeoDataResource\Pages\CreateSeoData::class)
             ->fillForm([
-                'seoable_type' => Brand::class,
-                'seoable_id' => $brand->id,
-                'locale' => 'lt',
-                'title' => 'Test Brand SEO Title',
-                'description' => 'Test brand SEO description for better search engine optimization',
-                'keywords' => 'test, brand, seo',
+                'seoable_type'  => Brand::class,
+                'seoable_id'    => $brand->id,
+                'locale'        => 'lt',
+                'title'         => 'Test Brand SEO Title',
+                'description'   => 'Test brand SEO description for better search engine optimization',
+                'keywords'      => 'test, brand, seo',
                 'canonical_url' => 'https://example.com/brands/test-brand',
-                'no_index' => false,
-                'no_follow' => false,
+                'no_index'      => false,
+                'no_follow'     => false,
             ])
             ->call('create')
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('seo_data', [
-            'seoable_type' => Brand::class,
-            'seoable_id' => $brand->id,
-            'locale' => 'lt',
-            'title' => 'Test Brand SEO Title',
-            'description' => 'Test brand SEO description for better search engine optimization',
-            'keywords' => json_encode(['test', 'brand', 'seo']),
+            'seoable_type'  => Brand::class,
+            'seoable_id'    => $brand->id,
+            'locale'        => 'lt',
+            'title'         => 'Test Brand SEO Title',
+            'description'   => 'Test brand SEO description for better search engine optimization',
+            'keywords'      => json_encode(['test', 'brand', 'seo']),
             'canonical_url' => 'https://example.com/brands/test-brand',
-            'no_index' => false,
-            'no_follow' => false,
+            'no_index'      => false,
+            'no_follow'     => false,
         ]);
     }
 
@@ -138,9 +138,9 @@ class SeoDataResourceTest extends TestCase
             'record' => $seoData->getRouteKey(),
         ])
             ->fillForm([
-                'title' => 'Updated SEO Title',
+                'title'       => 'Updated SEO Title',
                 'description' => 'Updated SEO description for better search engine optimization',
-                'keywords' => 'updated, seo, keywords',
+                'keywords'    => 'updated, seo, keywords',
             ])
             ->call('save')
             ->assertHasNoFormErrors();
@@ -326,11 +326,11 @@ class SeoDataResourceTest extends TestCase
     {
         Livewire::test(\App\Filament\Resources\SeoDataResource\Pages\CreateSeoData::class)
             ->fillForm([
-                'seoable_type' => '',  // Required field
-                'seoable_id' => '',  // Required field
-                'locale' => '',  // Required field
-                'title' => '',  // Required field
-                'description' => '',  // Required field
+                'seoable_type'  => '',  // Required field
+                'seoable_id'    => '',  // Required field
+                'locale'        => '',  // Required field
+                'title'         => '',  // Required field
+                'description'   => '',  // Required field
                 'canonical_url' => 'invalid-url',  // Must be valid URL
             ])
             ->call('create')
@@ -342,7 +342,7 @@ class SeoDataResourceTest extends TestCase
         $product = Product::factory()->create();
         $seoData = SeoData::factory()->create([
             'seoable_type' => Product::class,
-            'seoable_id' => $product->id,
+            'seoable_id'   => $product->id,
         ]);
 
         Livewire::test(\App\Filament\Resources\SeoDataResource\Pages\ViewSeoData::class, [
@@ -354,9 +354,9 @@ class SeoDataResourceTest extends TestCase
     public function test_seo_score_is_displayed_correctly(): void
     {
         $seoData = SeoData::factory()->create([
-            'title' => 'Test Title',
-            'description' => 'Test description',
-            'keywords' => 'test, keywords',
+            'title'         => 'Test Title',
+            'description'   => 'Test description',
+            'keywords'      => 'test, keywords',
             'canonical_url' => 'https://example.com',
         ]);
 

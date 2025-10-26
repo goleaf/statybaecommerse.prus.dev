@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Tests\Models;
 
@@ -15,7 +17,7 @@ final class ProductImageTest extends TestCase
     public function test_configuration_exposes_expected_fillable_casts_and_defaults(): void
     {
         // Instantiate the model to inspect its configuration without hitting the database.
-        $model = new ProductImage();
+        $model = new ProductImage;
 
         // Confirm the table is explicitly configured for clarity when testing joins.
         self::assertSame('product_images', $model->getTable());
@@ -33,7 +35,7 @@ final class ProductImageTest extends TestCase
         self::assertSame([
             'product_id' => 'integer',
             'sort_order' => 'integer',
-            'is_active' => 'boolean',
+            'is_active'  => 'boolean',
         ], $model->getCasts());
 
         // Check that images default to the active state when the attribute is not provided.
@@ -116,7 +118,7 @@ final class ProductImageTest extends TestCase
         $first = ProductImage::factory()->for($product, 'product')->create(['sort_order' => 1]);
         $second = ProductImage::factory()->for($product, 'product')->create(['sort_order' => 5]);
         ProductImage::factory()->for($product, 'product')->create([
-            'is_active' => false,
+            'is_active'  => false,
             'sort_order' => 2,
         ]);
         ProductImage::factory()->for($otherProduct, 'product')->create(['sort_order' => 0]);

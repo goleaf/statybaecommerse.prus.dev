@@ -23,28 +23,28 @@ final class ReferralCodeTest extends TestCase
         $user = User::factory()->create();
 
         $referralCode = ReferralCode::create([
-            'user_id' => $user->id,
-            'code' => 'TEST123',
-            'is_active' => true,
-            'title' => ['lt' => 'Test kodas', 'en' => 'Test code'],
-            'description' => ['lt' => 'Test aprašymas', 'en' => 'Test description'],
-            'usage_limit' => 100,
-            'usage_count' => 0,
+            'user_id'       => $user->id,
+            'code'          => 'TEST123',
+            'is_active'     => true,
+            'title'         => ['lt' => 'Test kodas', 'en' => 'Test code'],
+            'description'   => ['lt' => 'Test aprašymas', 'en' => 'Test description'],
+            'usage_limit'   => 100,
+            'usage_count'   => 0,
             'reward_amount' => 10.50,
-            'reward_type' => 'fixed',
-            'source' => 'admin',
-            'tags' => ['test', 'promo'],
+            'reward_type'   => 'fixed',
+            'source'        => 'admin',
+            'tags'          => ['test', 'promo'],
         ]);
 
         $this->assertDatabaseHas('referral_codes', [
-            'user_id' => $user->id,
-            'code' => 'TEST123',
-            'is_active' => true,
-            'usage_limit' => 100,
-            'usage_count' => 0,
+            'user_id'       => $user->id,
+            'code'          => 'TEST123',
+            'is_active'     => true,
+            'usage_limit'   => 100,
+            'usage_count'   => 0,
             'reward_amount' => 10.50,
-            'reward_type' => 'fixed',
-            'source' => 'admin',
+            'reward_type'   => 'fixed',
+            'source'        => 'admin',
         ]);
 
         $this->assertEquals('Test kodas', $referralCode->getTranslation('title', 'lt'));
@@ -128,11 +128,11 @@ final class ReferralCodeTest extends TestCase
     public function test_expired_scope(): void
     {
         $expiredCode = ReferralCode::factory()->create([
-            'is_active' => false,
+            'is_active'  => false,
             'expires_at' => now()->subDay(),
         ]);
         $activeCode = ReferralCode::factory()->create([
-            'is_active' => true,
+            'is_active'  => true,
             'expires_at' => now()->addDay(),
         ]);
 
@@ -190,8 +190,8 @@ final class ReferralCodeTest extends TestCase
     public function test_is_valid_method(): void
     {
         $validCode = ReferralCode::factory()->create([
-            'is_active' => true,
-            'expires_at' => now()->addDay(),
+            'is_active'   => true,
+            'expires_at'  => now()->addDay(),
             'usage_limit' => 100,
             'usage_count' => 50,
         ]);
@@ -204,14 +204,14 @@ final class ReferralCodeTest extends TestCase
 
         // Test expired code
         $expiredCode = ReferralCode::factory()->create([
-            'is_active' => true,
+            'is_active'  => true,
             'expires_at' => now()->subDay(),
         ]);
         $this->assertFalse($expiredCode->isValid());
 
         // Test usage limit reached
         $limitReachedCode = ReferralCode::factory()->create([
-            'is_active' => true,
+            'is_active'   => true,
             'usage_limit' => 100,
             'usage_count' => 100,
         ]);
@@ -320,7 +320,7 @@ final class ReferralCodeTest extends TestCase
         $this->assertEquals(6, $referralCode->fresh()->usage_count);
         $this->assertDatabaseHas('referral_code_usage_logs', [
             'referral_code_id' => $referralCode->id,
-            'user_id' => $user->id,
+            'user_id'          => $user->id,
         ]);
     }
 
@@ -370,12 +370,12 @@ final class ReferralCodeTest extends TestCase
 
         $validContext = [
             'min_order_amount' => 100,
-            'user_type' => 'premium',
+            'user_type'        => 'premium',
         ];
 
         $invalidContext = [
             'min_order_amount' => 30,
-            'user_type' => 'basic',
+            'user_type'        => 'basic',
         ];
 
         $this->assertTrue($referralCode->meetsConditions($validContext));
@@ -385,11 +385,11 @@ final class ReferralCodeTest extends TestCase
     public function test_display_data_attribute(): void
     {
         $referralCode = ReferralCode::factory()->create([
-            'title' => ['lt' => 'Test pavadinimas', 'en' => 'Test title'],
-            'description' => ['lt' => 'Test aprašymas', 'en' => 'Test description'],
+            'title'         => ['lt' => 'Test pavadinimas', 'en' => 'Test title'],
+            'description'   => ['lt' => 'Test aprašymas', 'en' => 'Test description'],
             'reward_amount' => 25.50,
-            'reward_type' => 'fixed',
-            'tags' => ['test', 'promo'],
+            'reward_type'   => 'fixed',
+            'tags'          => ['test', 'promo'],
         ]);
 
         $displayData = $referralCode->display_data;
@@ -413,13 +413,13 @@ final class ReferralCodeTest extends TestCase
         Referral::factory()->count(3)->create(['referral_code' => $referralCode->code]);
         Referral::factory()->count(2)->create([
             'referral_code' => $referralCode->code,
-            'status' => 'completed',
+            'status'        => 'completed',
         ]);
 
         // Create some rewards
         ReferralReward::factory()->count(2)->create([
             'referral_code' => $referralCode->code,
-            'amount' => 10.50,
+            'amount'        => 10.50,
         ]);
 
         $stats = $referralCode->stats;

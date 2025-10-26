@@ -16,15 +16,15 @@ final class CollectionTest extends TestCase
     public function test_collection_can_be_created(): void
     {
         $collection = Collection::factory()->create([
-            'name' => 'Test Collection',
-            'slug' => 'test-collection',
-            'description' => 'Test description',
-            'is_visible' => true,
-            'is_automatic' => false,
-            'sort_order' => 1,
-            'display_type' => 'grid',
+            'name'              => 'Test Collection',
+            'slug'              => 'test-collection',
+            'description'       => 'Test description',
+            'is_visible'        => true,
+            'is_automatic'      => false,
+            'sort_order'        => 1,
+            'display_type'      => 'grid',
             'products_per_page' => 12,
-            'show_filters' => true,
+            'show_filters'      => true,
         ]);
 
         $this->assertInstanceOf(Collection::class, $collection);
@@ -42,24 +42,24 @@ final class CollectionTest extends TestCase
     public function test_collection_translation_methods(): void
     {
         $collection = Collection::factory()->create([
-            'name' => 'Test Collection',
-            'slug' => 'test-collection',
+            'name'        => 'Test Collection',
+            'slug'        => 'test-collection',
             'description' => 'Test description',
         ]);
 
         // Create translations
         $ltTranslation = CollectionTranslation::factory()->create([
             'collection_id' => $collection->id,
-            'locale' => 'lt',
-            'name' => 'Testo Kolekcija',
-            'description' => 'Testo aprašymas',
+            'locale'        => 'lt',
+            'name'          => 'Testo Kolekcija',
+            'description'   => 'Testo aprašymas',
         ]);
 
         $enTranslation = CollectionTranslation::factory()->create([
             'collection_id' => $collection->id,
-            'locale' => 'en',
-            'name' => 'Test Collection EN',
-            'description' => 'Test description EN',
+            'locale'        => 'en',
+            'name'          => 'Test Collection EN',
+            'description'   => 'Test description EN',
         ]);
 
         // Test translation methods
@@ -127,7 +127,7 @@ final class CollectionTest extends TestCase
     {
         $collection = Collection::factory()->create([
             'is_automatic' => false,
-            'name' => 'Test Collection',
+            'name'         => 'Test Collection',
         ]);
 
         // Test type methods
@@ -175,7 +175,7 @@ final class CollectionTest extends TestCase
 
         // Test update translation
         $this->assertTrue($collection->updateTranslation('en', [
-            'name' => 'English Name',
+            'name'        => 'English Name',
             'description' => 'English Description',
         ]));
 
@@ -186,7 +186,7 @@ final class CollectionTest extends TestCase
         // Test update multiple translations
         $this->assertTrue($collection->updateTranslations([
             'lt' => [
-                'name' => 'Lithuanian Name',
+                'name'        => 'Lithuanian Name',
                 'description' => 'Lithuanian Description',
             ],
         ]));

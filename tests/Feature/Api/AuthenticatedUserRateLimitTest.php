@@ -27,7 +27,7 @@ final class AuthenticatedUserRateLimitTest extends TestCase
 
         $originalLimit = config('api.rate_limits.default');
         config(['api.rate_limits.default' => 1]);
-        RateLimiter::clear('user:'.$user->getKey());
+        RateLimiter::clear('user:' . $user->getKey());
 
         Sanctum::actingAs($user, ['profile.read']);
 
@@ -36,7 +36,7 @@ final class AuthenticatedUserRateLimitTest extends TestCase
             $this->getJson(route('api.v1.user.show'))->assertStatus(429);
         } finally {
             config(['api.rate_limits.default' => $originalLimit]);
-            RateLimiter::clear('user:'.$user->getKey());
+            RateLimiter::clear('user:' . $user->getKey());
         }
     }
 }

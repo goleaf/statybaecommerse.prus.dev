@@ -25,7 +25,7 @@ function policyUser(string $role): User
     ]);
 
     $roleModel = \Spatie\Permission\Models\Role::make([
-        'name' => $role,
+        'name'       => $role,
         'guard_name' => 'web',
     ]);
 

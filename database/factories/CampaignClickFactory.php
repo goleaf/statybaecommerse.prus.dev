@@ -7,8 +7,8 @@ namespace Database\Factories;
 use App\Models\Campaign;
 use App\Models\CampaignClick;
 use App\Models\User;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Facades\Schema;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\CampaignClick>
@@ -22,21 +22,21 @@ final class CampaignClickFactory extends Factory
         return [
             // Only create related campaigns when the backing table exists to keep lightweight API tests stable.
             'campaign_id' => $this->resolveCampaignId(),
-            'session_id' => $this->faker->uuid(),
-            'ip_address' => $this->faker->ipv4(),
-            'user_agent' => $this->faker->userAgent(),
-            'click_type' => $this->faker->randomElement(['cta', 'banner', 'link', 'button']),
+            'session_id'  => $this->faker->uuid(),
+            'ip_address'  => $this->faker->ipv4(),
+            'user_agent'  => $this->faker->userAgent(),
+            'click_type'  => $this->faker->randomElement(['cta', 'banner', 'link', 'button']),
             'clicked_url' => $this->faker->optional(0.8)->url(),
             // Safely associate an existing customer when available without crashing SQLite test databases.
             'customer_id' => $this->resolveRandomCustomerId(),
-            'clicked_at' => $this->faker->dateTimeBetween('-1 month', 'now'),
+            'clicked_at'  => $this->faker->dateTimeBetween('-1 month', 'now'),
         ];
     }
 
     public function cta(): static
     {
         return $this->state(fn (array $attributes) => [
-            'click_type' => 'cta',
+            'click_type'  => 'cta',
             'clicked_url' => $this->faker->url(),
         ]);
     }
@@ -44,7 +44,7 @@ final class CampaignClickFactory extends Factory
     public function banner(): static
     {
         return $this->state(fn (array $attributes) => [
-            'click_type' => 'banner',
+            'click_type'  => 'banner',
             'clicked_url' => $this->faker->url(),
         ]);
     }
@@ -67,7 +67,7 @@ final class CampaignClickFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'device_type' => 'mobile',
-            'user_agent' => $this->faker->userAgent().' Mobile',
+            'user_agent'  => $this->faker->userAgent() . ' Mobile',
         ]);
     }
 
@@ -75,14 +75,14 @@ final class CampaignClickFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'device_type' => 'desktop',
-            'user_agent' => $this->faker->userAgent(),
+            'user_agent'  => $this->faker->userAgent(),
         ]);
     }
 
     public function converted(): static
     {
         return $this->state(fn (array $attributes) => [
-            'is_converted' => true,
+            'is_converted'     => true,
             'conversion_value' => $this->faker->randomFloat(2, 10, 1000),
         ]);
     }

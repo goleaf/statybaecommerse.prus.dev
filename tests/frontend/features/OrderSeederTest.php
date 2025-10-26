@@ -19,7 +19,7 @@ it('seeds at least one order with items', function () {
 
     // A few visible, published products
     Product::factory()->count(3)->create([
-        'is_visible' => true,
+        'is_visible'   => true,
         'published_at' => now(),
     ]);
 
@@ -39,14 +39,14 @@ it('seeds at least one order with items', function () {
     // We need to create a zone in the sh_zones table for the foreign key constraint
     if (! \Illuminate\Support\Facades\DB::table('sh_zones')->exists()) {
         \Illuminate\Support\Facades\DB::table('sh_zones')->insert([
-            'id' => 1,
-            'name' => 'Default Zone',
-            'code' => 'DEFAULT',
+            'id'          => 1,
+            'name'        => 'Default Zone',
+            'code'        => 'DEFAULT',
             'currency_id' => $currency->id,
-            'is_enabled' => true,
-            'is_default' => true,
-            'created_at' => now(),
-            'updated_at' => now(),
+            'is_enabled'  => true,
+            'is_default'  => true,
+            'created_at'  => now(),
+            'updated_at'  => now(),
         ]);
     }
 

@@ -16,16 +16,16 @@ final class CountryTest extends TestCase
     public function test_country_can_be_created(): void
     {
         $country = Country::factory()->create([
-            'name' => 'Lithuania',
-            'code' => 'LT',
-            'iso_code' => 'LTU',
-            'region' => 'europe',
+            'name'          => 'Lithuania',
+            'code'          => 'LT',
+            'iso_code'      => 'LTU',
+            'region'        => 'europe',
             'currency_code' => 'EUR',
         ]);
 
         $this->assertDatabaseHas('countries', [
-            'name' => 'Lithuania',
-            'code' => 'LT',
+            'name'     => 'Lithuania',
+            'code'     => 'LT',
             'iso_code' => 'LTU',
         ]);
 
@@ -37,17 +37,17 @@ final class CountryTest extends TestCase
     public function test_country_has_translations(): void
     {
         $country = Country::factory()->create([
-            'name' => 'Lithuania',
+            'name'          => 'Lithuania',
             'name_official' => 'Republic of Lithuania',
-            'description' => 'A country in Northern Europe',
+            'description'   => 'A country in Northern Europe',
         ]);
 
         $translation = CountryTranslation::factory()->create([
-            'country_id' => $country->id,
-            'locale' => 'lt',
-            'name' => 'Lietuva',
+            'country_id'    => $country->id,
+            'locale'        => 'lt',
+            'name'          => 'Lietuva',
             'name_official' => 'Lietuvos Respublika',
-            'description' => 'Šalis Šiaurės Europoje',
+            'description'   => 'Šalis Šiaurės Europoje',
         ]);
 
         $this->assertTrue($country->hasTranslationFor('lt'));
@@ -61,8 +61,8 @@ final class CountryTest extends TestCase
         $country = Country::factory()->create(['name' => 'Germany']);
         CountryTranslation::factory()->create([
             'country_id' => $country->id,
-            'locale' => 'de',
-            'name' => 'Deutschland',
+            'locale'     => 'de',
+            'name'       => 'Deutschland',
         ]);
 
         $countries = Country::withTranslations('de')->get();
@@ -75,11 +75,11 @@ final class CountryTest extends TestCase
         $country = Country::factory()->create();
         CountryTranslation::factory()->create([
             'country_id' => $country->id,
-            'locale' => 'en',
+            'locale'     => 'en',
         ]);
         CountryTranslation::factory()->create([
             'country_id' => $country->id,
-            'locale' => 'lt',
+            'locale'     => 'lt',
         ]);
 
         $locales = $country->getAvailableLocales();
@@ -106,20 +106,20 @@ final class CountryTest extends TestCase
         $country = Country::factory()->create();
         CountryTranslation::factory()->create([
             'country_id' => $country->id,
-            'locale' => 'es',
-            'name' => 'España',
+            'locale'     => 'es',
+            'name'       => 'España',
         ]);
 
         $updated = $country->updateTranslation('es', [
-            'name' => 'Reino de España',
+            'name'        => 'Reino de España',
             'description' => 'Un país en Europa',
         ]);
 
         $this->assertTrue($updated);
         $this->assertDatabaseHas('country_translations', [
-            'country_id' => $country->id,
-            'locale' => 'es',
-            'name' => 'Reino de España',
+            'country_id'  => $country->id,
+            'locale'      => 'es',
+            'name'        => 'Reino de España',
             'description' => 'Un país en Europa',
         ]);
     }
@@ -138,20 +138,20 @@ final class CountryTest extends TestCase
 
         $this->assertDatabaseHas('country_translations', [
             'country_id' => $country->id,
-            'locale' => 'en',
-            'name' => 'United Kingdom',
+            'locale'     => 'en',
+            'name'       => 'United Kingdom',
         ]);
         $this->assertDatabaseHas('country_translations', [
             'country_id' => $country->id,
-            'locale' => 'lt',
-            'name' => 'Jungtinė Karalystė',
+            'locale'     => 'lt',
+            'name'       => 'Jungtinė Karalystė',
         ]);
     }
 
     public function test_country_full_display_name(): void
     {
         $country = Country::factory()->create([
-            'name' => 'Poland',
+            'name'               => 'Poland',
             'phone_calling_code' => '48',
         ]);
 
@@ -159,7 +159,7 @@ final class CountryTest extends TestCase
         $this->assertEquals('Poland (+48)', $displayName);
 
         $countryWithoutPhoneCode = Country::factory()->create([
-            'name' => 'Monaco',
+            'name'               => 'Monaco',
             'phone_calling_code' => null,
         ]);
 
@@ -170,7 +170,7 @@ final class CountryTest extends TestCase
     public function test_country_coordinates_attribute(): void
     {
         $country = Country::factory()->create([
-            'latitude' => 54.6872,
+            'latitude'  => 54.6872,
             'longitude' => 25.2797,
         ]);
 
@@ -182,9 +182,9 @@ final class CountryTest extends TestCase
     public function test_country_formatted_currency_info(): void
     {
         $country = Country::factory()->create([
-            'currency_code' => 'EUR',
+            'currency_code'   => 'EUR',
             'currency_symbol' => '€',
-            'currencies' => ['EUR' => 'Euro'],
+            'currencies'      => ['EUR' => 'Euro'],
         ]);
 
         $currencyInfo = $country->getFormattedCurrencyInfo();
@@ -197,7 +197,7 @@ final class CountryTest extends TestCase
     {
         $country = Country::factory()->create([
             'requires_vat' => true,
-            'vat_rate' => 21.0,
+            'vat_rate'     => 21.0,
         ]);
 
         $vatInfo = $country->getFormattedVatInfo();
@@ -209,11 +209,11 @@ final class CountryTest extends TestCase
     public function test_country_economic_info(): void
     {
         $country = Country::factory()->create([
-            'currency_code' => 'USD',
+            'currency_code'   => 'USD',
             'currency_symbol' => '$',
-            'requires_vat' => false,
-            'vat_rate' => 0.0,
-            'is_eu_member' => false,
+            'requires_vat'    => false,
+            'vat_rate'        => 0.0,
+            'is_eu_member'    => false,
         ]);
 
         $economicInfo = $country->getEconomicInfo();
@@ -225,11 +225,11 @@ final class CountryTest extends TestCase
     public function test_country_geographic_info(): void
     {
         $country = Country::factory()->create([
-            'region' => 'North America',
+            'region'    => 'North America',
             'subregion' => 'Northern America',
-            'latitude' => 39.8283,
+            'latitude'  => 39.8283,
             'longitude' => -98.5795,
-            'timezone' => 'America/New_York',
+            'timezone'  => 'America/New_York',
         ]);
 
         $geographicInfo = $country->getGeographicInfo();
@@ -256,10 +256,10 @@ final class CountryTest extends TestCase
     public function test_country_helper_methods(): void
     {
         $country = Country::factory()->create([
-            'is_active' => true,
+            'is_active'    => true,
             'is_eu_member' => true,
             'requires_vat' => true,
-            'vat_rate' => 20.0,
+            'vat_rate'     => 20.0,
         ]);
 
         $this->assertTrue($country->isActive());

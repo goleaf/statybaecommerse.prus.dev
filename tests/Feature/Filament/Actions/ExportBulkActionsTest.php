@@ -39,9 +39,9 @@ final class ExportBulkActionsTest extends TestCase
 
         config()->set('export.disk', 'public');
         config()->set('export.formats', [
-            'csv' => \App\Services\Export\Writers\CsvExportWriter::class,
+            'csv'  => \App\Services\Export\Writers\CsvExportWriter::class,
             'xlsx' => \App\Services\Export\Writers\XlsxExportWriter::class,
-            'pdf' => \App\Services\Export\Writers\PdfExportWriter::class,
+            'pdf'  => \App\Services\Export\Writers\PdfExportWriter::class,
         ]);
 
         Storage::fake('public');
@@ -49,7 +49,7 @@ final class ExportBulkActionsTest extends TestCase
         Bus::fake();
 
         $this->admin = User::factory()->create([
-            'email' => 'admin@example.com',
+            'email'    => 'admin@example.com',
             'is_admin' => true,
         ]);
 
@@ -63,7 +63,7 @@ final class ExportBulkActionsTest extends TestCase
         Livewire::test(ListOrders::class)
             ->call('loadTable')
             ->callTableBulkAction('export_selected', $orders, [
-                'format' => 'csv',
+                'format'  => 'csv',
                 'columns' => ['number', 'status'],
             ])
             ->assertHasNoTableBulkActionErrors();
@@ -85,7 +85,7 @@ final class ExportBulkActionsTest extends TestCase
         Livewire::test(ListProducts::class)
             ->call('loadTable')
             ->callTableBulkAction('export_selected', Product::all(), [
-                'format' => 'xlsx',
+                'format'  => 'xlsx',
                 'columns' => ['sku', 'name'],
             ])
             ->assertHasNoTableBulkActionErrors();

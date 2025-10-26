@@ -32,35 +32,35 @@ final class ProductBrowsingTest extends TestCase
         $categoryB = Category::factory()->create(['name' => 'Saugos priemonės', 'slug' => 'saugos-priemones']);
 
         $productA = Product::factory()->for($brandA)->create([
-            'name' => 'Profesionalus perforatorius',
-            'slug' => 'profesionalus-perforatorius',
-            'is_visible' => true,
-            'status' => 'published',
+            'name'         => 'Profesionalus perforatorius',
+            'slug'         => 'profesionalus-perforatorius',
+            'is_visible'   => true,
+            'status'       => 'published',
             'published_at' => now()->subDay(),
         ]);
         $productA->categories()->attach($categoryA->id);
         Price::factory()->create([
             'priceable_type' => Product::class,
-            'priceable_id' => $productA->id,
-            'currency_id' => 1,
-            'amount' => 199.99,
-            'is_enabled' => true,
+            'priceable_id'   => $productA->id,
+            'currency_id'    => 1,
+            'amount'         => 199.99,
+            'is_enabled'     => true,
         ]);
 
         $productB = Product::factory()->for($brandB)->create([
-            'name' => 'Apsauginis šalmas',
-            'slug' => 'apsauginis-salmas',
-            'is_visible' => true,
-            'status' => 'published',
+            'name'         => 'Apsauginis šalmas',
+            'slug'         => 'apsauginis-salmas',
+            'is_visible'   => true,
+            'status'       => 'published',
             'published_at' => now()->subDay(),
         ]);
         $productB->categories()->attach($categoryB->id);
         Price::factory()->create([
             'priceable_type' => Product::class,
-            'priceable_id' => $productB->id,
-            'currency_id' => 1,
-            'amount' => 49.50,
-            'is_enabled' => true,
+            'priceable_id'   => $productB->id,
+            'currency_id'    => 1,
+            'amount'         => 49.50,
+            'is_enabled'     => true,
         ]);
 
         $this->get(route('frontend.products.index'))

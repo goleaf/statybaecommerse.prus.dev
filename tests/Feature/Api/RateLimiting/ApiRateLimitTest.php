@@ -65,10 +65,10 @@ final class ApiRateLimitTest extends TestCase
 
         $rateKey = 'user:' . $user->id . '|autocomplete';
         $payload = [
-            'model_class' => User::class,
+            'model_class'  => User::class,
             'search_query' => $user->email,
-            'label_field' => 'email',
-            'value_field' => 'id',
+            'label_field'  => 'email',
+            'value_field'  => 'id',
         ];
 
         try {
@@ -89,13 +89,13 @@ final class ApiRateLimitTest extends TestCase
         $user = $this->createUser();
 
         $export = Export::create([
-            'name' => 'Orders export',
-            'format' => 'csv',
-            'status' => ExportStatus::Completed,
-            'artifact_disk' => 'secure-media',
-            'artifact_path' => 'exports/orders.csv',
+            'name'              => 'Orders export',
+            'format'            => 'csv',
+            'status'            => ExportStatus::Completed,
+            'artifact_disk'     => 'secure-media',
+            'artifact_path'     => 'exports/orders.csv',
             'artifact_filename' => 'orders.csv',
-            'requested_by' => $user->id,
+            'requested_by'      => $user->id,
         ]);
 
         Storage::disk('secure-media')->put($export->artifact_path, 'report');
@@ -124,10 +124,10 @@ final class ApiRateLimitTest extends TestCase
     private function createUser(): User
     {
         return User::create([
-            'name' => 'Test User',
-            'email' => Str::uuid()->toString() . '@example.com',
-            'password' => 'password',
-            'preferred_locale' => 'en',
+            'name'              => 'Test User',
+            'email'             => Str::uuid()->toString() . '@example.com',
+            'password'          => 'password',
+            'preferred_locale'  => 'en',
             'email_verified_at' => now(),
         ]);
     }

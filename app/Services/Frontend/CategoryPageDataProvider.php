@@ -99,13 +99,13 @@ final class CategoryPageDataProvider
         foreach ($ancestors->reverse() as $ancestor) {
             $breadcrumbs[] = [
                 'label' => $ancestor->name,
-                'url' => route('frontend.categories.show', $ancestor),
+                'url'   => route('frontend.categories.show', $ancestor),
             ];
         }
 
         $breadcrumbs[] = [
             'label' => $category->name,
-            'url' => route('frontend.categories.show', $category),
+            'url'   => route('frontend.categories.show', $category),
         ];
 
         return $breadcrumbs;

@@ -209,8 +209,8 @@ final class TestClass
         $testDir = storage_path('test-code-style-dir');
         File::makeDirectory($testDir, 0755, true);
 
-        $file1 = $testDir.'/test1.php';
-        $file2 = $testDir.'/test2.php';
+        $file1 = $testDir . '/test1.php';
+        $file2 = $testDir . '/test2.php';
 
         File::put($file1, '<?php use App\Models\User; use Illuminate\Support\Facades\Hash;');
         File::put($file2, '<?php $value = 100.00;');

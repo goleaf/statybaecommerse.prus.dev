@@ -4,12 +4,6 @@ declare(strict_types=1);
 
 namespace App\Console;
 
-use App\Support\Logging\LogContext;
-use App\Support\Logging\OperationLog;
-use App\Support\Logging\StructuredLogger;
-use Illuminate\Console\Events\CommandFailed;
-use Illuminate\Console\Events\CommandFinished;
-use Illuminate\Console\Events\CommandStarting;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use Illuminate\Support\Facades\Log;

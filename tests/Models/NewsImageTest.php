@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Tests\Models;
 
@@ -14,7 +16,7 @@ final class NewsImageTest extends TestCase
     public function test_news_image_has_expected_fillable_and_casts(): void
     {
         // Instantiate the model to inspect its configuration without triggering database interactions.
-        $model = new NewsImage();
+        $model = new NewsImage;
 
         // Confirm the fillable attributes protect against unintended mass assignment.
         self::assertSame([
@@ -58,18 +60,18 @@ final class NewsImageTest extends TestCase
     {
         // Create images with distinct featured flags, captions, and sort orders for scope testing.
         $alpha = NewsImage::factory()->create([
-            'caption' => 'Alpha image',
-            'sort_order' => 2,
+            'caption'     => 'Alpha image',
+            'sort_order'  => 2,
             'is_featured' => false,
         ]);
         $bravo = NewsImage::factory()->create([
-            'caption' => 'Bravo image',
-            'sort_order' => 1,
+            'caption'     => 'Bravo image',
+            'sort_order'  => 1,
             'is_featured' => true,
         ]);
         $bravoDuplicate = NewsImage::factory()->create([
-            'caption' => 'Bravo image',
-            'sort_order' => 3,
+            'caption'     => 'Bravo image',
+            'sort_order'  => 3,
             'is_featured' => true,
         ]);
 

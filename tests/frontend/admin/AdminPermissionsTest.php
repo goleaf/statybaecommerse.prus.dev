@@ -126,7 +126,7 @@ describe('Admin Role Permissions', function (): void {
         // Test campaign creation
         Livewire::test(\App\Filament\Resources\CampaignResource\Pages\CreateCampaign::class)
             ->fillForm([
-                'name' => 'Admin Campaign',
+                'name'   => 'Admin Campaign',
                 'status' => 'active',
             ])
             ->call('create')
@@ -135,8 +135,8 @@ describe('Admin Role Permissions', function (): void {
         // Test setting creation
         Livewire::test(\App\Filament\Resources\SystemSettingsResource\Pages\CreateSystemSetting::class)
             ->fillForm([
-                'key' => 'admin_setting',
-                'value' => 'admin_value',
+                'key'          => 'admin_setting',
+                'value'        => 'admin_value',
                 'display_name' => 'Admin Setting',
             ])
             ->call('create')
@@ -173,7 +173,7 @@ describe('Manager Role Permissions', function (): void {
         // Should be able to create campaigns
         Livewire::test(\App\Filament\Resources\CampaignResource\Pages\CreateCampaign::class)
             ->fillForm([
-                'name' => 'Manager Campaign',
+                'name'   => 'Manager Campaign',
                 'status' => 'active',
             ])
             ->call('create')
@@ -283,7 +283,7 @@ describe('Resource-specific Permissions', function (): void {
 
         Livewire::test(\App\Filament\Resources\CampaignResource\Pages\CreateCampaign::class)
             ->fillForm([
-                'name' => 'Test Campaign',
+                'name'   => 'Test Campaign',
                 'status' => 'active',
             ])
             ->call('create')

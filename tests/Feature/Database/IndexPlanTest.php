@@ -44,9 +44,9 @@ final class IndexPlanTest extends TestCase
         ]);
 
         $product = Product::factory()->create([
-            'slug' => 'hammer-drill',
-            'sku' => 'HAMMER-001',
-            'is_visible' => true,
+            'slug'         => 'hammer-drill',
+            'sku'          => 'HAMMER-001',
+            'is_visible'   => true,
             'published_at' => Carbon::now()->subDay(),
         ]);
 
@@ -77,12 +77,12 @@ final class IndexPlanTest extends TestCase
     public function test_menu_queries_use_indexes(): void
     {
         $menu = Menu::factory()->active()->create([
-            'key' => 'main_header',
+            'key'      => 'main_header',
             'location' => 'header',
         ]);
 
         MenuItem::factory()->count(3)->visible()->create([
-            'menu_id' => $menu->id,
+            'menu_id'   => $menu->id,
             'parent_id' => null,
         ]);
 
@@ -102,7 +102,7 @@ final class IndexPlanTest extends TestCase
     }
 
     /**
-     * @param  array<int, object>  $plan
+     * @param array<int, object> $plan
      */
     private function assertPlanUsesIndex(array $plan): void
     {
@@ -120,8 +120,8 @@ final class IndexPlanTest extends TestCase
 
             $noFullScan = $details->every(static fn (string $detail): bool => ! str_contains($detail, 'SCAN TABLE'));
 
-            $this->assertTrue($hasIndexedSearch, 'Expected query plan to reference an index: '.implode(' | ', $details->all()));
-            $this->assertTrue($noFullScan, 'Expected query plan to avoid full table scans: '.implode(' | ', $details->all()));
+            $this->assertTrue($hasIndexedSearch, 'Expected query plan to reference an index: ' . implode(' | ', $details->all()));
+            $this->assertTrue($noFullScan, 'Expected query plan to avoid full table scans: ' . implode(' | ', $details->all()));
 
             return;
         }
@@ -135,8 +135,8 @@ final class IndexPlanTest extends TestCase
     private function explain(string $sql): string
     {
         return match (DB::getDriverName()) {
-            'sqlite' => 'EXPLAIN QUERY PLAN '.$sql,
-            default => 'EXPLAIN '.$sql,
+            'sqlite' => 'EXPLAIN QUERY PLAN ' . $sql,
+            default  => 'EXPLAIN ' . $sql,
         };
     }
 }

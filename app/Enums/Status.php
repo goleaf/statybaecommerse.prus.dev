@@ -15,33 +15,33 @@ enum Status: string
     public function getLabel(): string
     {
         return match ($this) {
-            self::ACTIVE => __('enums.status.active'),
-            self::INACTIVE => __('enums.status.inactive'),
-            self::PENDING => __('enums.status.pending'),
+            self::ACTIVE    => __('enums.status.active'),
+            self::INACTIVE  => __('enums.status.inactive'),
+            self::PENDING   => __('enums.status.pending'),
             self::SUSPENDED => __('enums.status.suspended'),
-            self::ARCHIVED => __('enums.status.archived'),
+            self::ARCHIVED  => __('enums.status.archived'),
         };
     }
 
     public function getColor(): string
     {
         return match ($this) {
-            self::ACTIVE => 'success',
-            self::INACTIVE => 'gray',
-            self::PENDING => 'warning',
+            self::ACTIVE    => 'success',
+            self::INACTIVE  => 'gray',
+            self::PENDING   => 'warning',
             self::SUSPENDED => 'danger',
-            self::ARCHIVED => 'secondary',
+            self::ARCHIVED  => 'secondary',
         };
     }
 
     public function getIcon(): string
     {
         return match ($this) {
-            self::ACTIVE => 'heroicon-o-check-circle',
-            self::INACTIVE => 'heroicon-o-x-circle',
-            self::PENDING => 'heroicon-o-clock',
+            self::ACTIVE    => 'heroicon-o-check-circle',
+            self::INACTIVE  => 'heroicon-o-x-circle',
+            self::PENDING   => 'heroicon-o-clock',
             self::SUSPENDED => 'heroicon-o-pause-circle',
-            self::ARCHIVED => 'heroicon-o-archive-box',
+            self::ARCHIVED  => 'heroicon-o-archive-box',
         };
     }
 

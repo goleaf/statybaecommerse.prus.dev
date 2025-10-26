@@ -4,7 +4,11 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use Exception;
 use Illuminate\Support\Facades\Cache;
+use Log;
+use SimpleXMLElement;
+use Throwable;
 
 /**
  * SearchExportService
@@ -32,34 +36,34 @@ final class SearchExportService
             $exportResults = array_slice($results, 0, self::MAX_EXPORT_RESULTS);
 
             $exportData = [
-                'export_id' => $exportId,
-                'query' => $query,
-                'format' => $format,
-                'total_results' => count($results),
+                'export_id'        => $exportId,
+                'query'            => $query,
+                'format'           => $format,
+                'total_results'    => count($results),
                 'exported_results' => count($exportResults),
-                'exported_at' => now()->toISOString(),
-                'options' => $options,
-                'data' => $this->formatExportData($exportResults, $format, $options),
+                'exported_at'      => now()->toISOString(),
+                'options'          => $options,
+                'data'             => $this->formatExportData($exportResults, $format, $options),
             ];
 
             // Store export data
             $this->storeExportData($exportId, $exportData);
 
             return [
-                'success' => true,
-                'export_id' => $exportId,
-                'download_url' => $this->generateDownloadUrl($exportId),
-                'expires_at' => now()->addHour()->toISOString(),
-                'total_results' => count($results),
+                'success'          => true,
+                'export_id'        => $exportId,
+                'download_url'     => $this->generateDownloadUrl($exportId),
+                'expires_at'       => now()->addHour()->toISOString(),
+                'total_results'    => count($results),
                 'exported_results' => count($exportResults),
-                'format' => $format,
+                'format'           => $format,
             ];
-        } catch (\Exception $e) {
-            \Log::warning('Search export failed: '.$e->getMessage());
+        } catch (Exception $e) {
+            Log::warning('Search export failed: ' . $e->getMessage());
 
             return [
                 'success' => false,
-                'error' => 'Export failed: '.$e->getMessage(),
+                'error'   => 'Export failed: ' . $e->getMessage(),
             ];
         }
     }
@@ -70,11 +74,11 @@ final class SearchExportService
     public function getExportData(string $exportId): ?array
     {
         try {
-            $cacheKey = self::EXPORT_CACHE_PREFIX.$exportId;
+            $cacheKey = self::EXPORT_CACHE_PREFIX . $exportId;
 
             return Cache::get($cacheKey);
-        } catch (\Exception $e) {
-            \Log::warning('Export data retrieval failed: '.$e->getMessage());
+        } catch (Exception $e) {
+            Log::warning('Export data retrieval failed: ' . $e->getMessage());
 
             return null;
         }
@@ -89,31 +93,31 @@ final class SearchExportService
             $shareId = $this->generateShareId($query, $options);
 
             $shareData = [
-                'share_id' => $shareId,
-                'query' => $query,
+                'share_id'      => $shareId,
+                'query'         => $query,
                 'results_count' => count($results),
-                'created_at' => now()->toISOString(),
-                'expires_at' => now()->addDays(7)->toISOString(),
-                'options' => $options,
-                'preview_data' => $this->generatePreviewData($results),
+                'created_at'    => now()->toISOString(),
+                'expires_at'    => now()->addDays(7)->toISOString(),
+                'options'       => $options,
+                'preview_data'  => $this->generatePreviewData($results),
             ];
 
             // Store share data
             $this->storeShareData($shareId, $shareData);
 
             return [
-                'success' => true,
-                'share_id' => $shareId,
-                'share_url' => $this->generateShareUrl($shareId),
+                'success'    => true,
+                'share_id'   => $shareId,
+                'share_url'  => $this->generateShareUrl($shareId),
                 'expires_at' => $shareData['expires_at'],
-                'preview' => $shareData['preview_data'],
+                'preview'    => $shareData['preview_data'],
             ];
-        } catch (\Exception $e) {
-            \Log::warning('Shareable link generation failed: '.$e->getMessage());
+        } catch (Exception $e) {
+            Log::warning('Shareable link generation failed: ' . $e->getMessage());
 
             return [
                 'success' => false,
-                'error' => 'Share link generation failed: '.$e->getMessage(),
+                'error'   => 'Share link generation failed: ' . $e->getMessage(),
             ];
         }
     }
@@ -124,7 +128,7 @@ final class SearchExportService
     public function getSharedSearch(string $shareId): ?array
     {
         try {
-            $cacheKey = 'search_share:'.$shareId;
+            $cacheKey = 'search_share:' . $shareId;
             $shareData = Cache::get($cacheKey);
 
             if (! $shareData) {
@@ -139,8 +143,8 @@ final class SearchExportService
             }
 
             return $shareData;
-        } catch (\Exception $e) {
-            \Log::warning('Shared search retrieval failed: '.$e->getMessage());
+        } catch (Exception $e) {
+            Log::warning('Shared search retrieval failed: ' . $e->getMessage());
 
             return null;
         }
@@ -152,10 +156,10 @@ final class SearchExportService
     private function formatExportData(array $results, string $format, array $options): string
     {
         return match ($format) {
-            'json' => $this->formatAsJson($results, $options),
-            'csv' => $this->formatAsCsv($results, $options),
-            'xml' => $this->formatAsXml($results, $options),
-            'xlsx' => $this->formatAsXlsx($results, $options),
+            'json'  => $this->formatAsJson($results, $options),
+            'csv'   => $this->formatAsCsv($results, $options),
+            'xml'   => $this->formatAsXml($results, $options),
+            'xlsx'  => $this->formatAsXlsx($results, $options),
             default => $this->formatAsJson($results, $options),
         };
     }
@@ -212,7 +216,7 @@ final class SearchExportService
         $rootElement = $options['root_element'] ?? 'search_results';
         $itemElement = $options['item_element'] ?? 'result';
 
-        $xml = new \SimpleXMLElement("<{$rootElement}></{$rootElement}>");
+        $xml = new SimpleXMLElement("<{$rootElement}></{$rootElement}>");
 
         foreach ($results as $result) {
             $item = $xml->addChild($itemElement);
@@ -235,7 +239,7 @@ final class SearchExportService
     /**
      * Handle arrayToXml functionality with proper error handling.
      */
-    private function arrayToXml(array $data, \SimpleXMLElement $xml): void
+    private function arrayToXml(array $data, SimpleXMLElement $xml): void
     {
         foreach ($data as $key => $value) {
             if (is_array($value)) {
@@ -253,13 +257,13 @@ final class SearchExportService
     private function generateExportId(string $query, string $format, array $options): string
     {
         $data = [
-            'query' => $query,
-            'format' => $format,
-            'options' => $options,
+            'query'     => $query,
+            'format'    => $format,
+            'options'   => $options,
             'timestamp' => now()->timestamp,
         ];
 
-        return 'export_'.md5(serialize($data));
+        return 'export_' . md5(serialize($data));
     }
 
     /**
@@ -268,12 +272,12 @@ final class SearchExportService
     private function generateShareId(string $query, array $options): string
     {
         $data = [
-            'query' => $query,
-            'options' => $options,
+            'query'     => $query,
+            'options'   => $options,
             'timestamp' => now()->timestamp,
         ];
 
-        return 'share_'.md5(serialize($data));
+        return 'share_' . md5(serialize($data));
     }
 
     /**
@@ -281,7 +285,7 @@ final class SearchExportService
      */
     private function storeExportData(string $exportId, array $exportData): void
     {
-        $cacheKey = self::EXPORT_CACHE_PREFIX.$exportId;
+        $cacheKey = self::EXPORT_CACHE_PREFIX . $exportId;
         Cache::put($cacheKey, $exportData, self::EXPORT_CACHE_TTL);
     }
 
@@ -290,7 +294,7 @@ final class SearchExportService
      */
     private function storeShareData(string $shareId, array $shareData): void
     {
-        $cacheKey = 'search_share:'.$shareId;
+        $cacheKey = 'search_share:' . $shareId;
         Cache::put($cacheKey, $shareData, 7 * 24 * 60 * 60); // 7 days
     }
 
@@ -301,8 +305,8 @@ final class SearchExportService
     {
         try {
             return route('api.autocomplete.export.download', ['exportId' => $exportId]);
-        } catch (\Throwable $e) {
-            return '/export/'.$exportId;
+        } catch (Throwable $e) {
+            return '/export/' . $exportId;
         }
     }
 
@@ -313,8 +317,8 @@ final class SearchExportService
     {
         try {
             return route('api.autocomplete.share.view', ['shareId' => $shareId]);
-        } catch (\Throwable $e) {
-            return '/share/'.$shareId;
+        } catch (Throwable $e) {
+            return '/share/' . $shareId;
         }
     }
 
@@ -326,10 +330,10 @@ final class SearchExportService
         $preview = array_slice($results, 0, 5);
 
         return [
-            'total_count' => count($results),
-            'preview_count' => count($preview),
+            'total_count'     => count($results),
+            'preview_count'   => count($preview),
             'preview_results' => $preview,
-            'types_summary' => $this->getTypesSummary($results),
+            'types_summary'   => $this->getTypesSummary($results),
         ];
     }
 
@@ -359,8 +363,8 @@ final class SearchExportService
             // This would typically scan all export cache keys and remove expired ones
             // For now, we'll return a placeholder
             return $cleaned;
-        } catch (\Exception $e) {
-            \Log::warning('Export cleanup failed: '.$e->getMessage());
+        } catch (Exception $e) {
+            Log::warning('Export cleanup failed: ' . $e->getMessage());
 
             return 0;
         }
@@ -373,14 +377,14 @@ final class SearchExportService
     {
         try {
             return [
-                'total_exports' => 0, // Would be calculated from cache
-                'active_exports' => 0,
-                'expired_exports' => 0,
-                'most_popular_format' => 'json',
+                'total_exports'              => 0, // Would be calculated from cache
+                'active_exports'             => 0,
+                'expired_exports'            => 0,
+                'most_popular_format'        => 'json',
                 'average_results_per_export' => 0,
             ];
-        } catch (\Exception $e) {
-            \Log::warning('Export statistics failed: '.$e->getMessage());
+        } catch (Exception $e) {
+            Log::warning('Export statistics failed: ' . $e->getMessage());
 
             return [];
         }

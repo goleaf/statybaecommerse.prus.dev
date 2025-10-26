@@ -5,7 +5,7 @@ declare(strict_types=1);
 return [
     'login' => [
         'heading' => 'Sign in to your account',
-        'form' => [
+        'form'    => [
             'email' => [
                 'label' => 'Email address',
             ],
@@ -28,7 +28,7 @@ return [
     'password_reset' => [
         'request' => [
             'heading' => 'Forgot your password?',
-            'form' => [
+            'form'    => [
                 'email' => [
                     'label' => 'Email address',
                 ],
@@ -44,18 +44,18 @@ return [
             'notifications' => [
                 'throttled' => [
                     'title' => 'Too many attempts',
-                    'body' => 'Please try again in :seconds seconds.',
+                    'body'  => 'Please try again in :seconds seconds.',
                 ],
             ],
         ],
         'reset' => [
             'heading' => 'Reset your password',
-            'form' => [
+            'form'    => [
                 'email' => [
                     'label' => 'Email address',
                 ],
                 'password' => [
-                    'label' => 'Password',
+                    'label'                => 'Password',
                     'validation_attribute' => 'password',
                 ],
                 'password_confirmation' => [
@@ -73,15 +73,15 @@ return [
             'notifications' => [
                 'throttled' => [
                     'title' => 'Too many attempts',
-                    'body' => 'Please try again in :seconds seconds.',
+                    'body'  => 'Please try again in :seconds seconds.',
                 ],
             ],
         ],
     ],
     'pages' => [
         'health_check' => [
-            'title' => 'Health Check',
-            'heading' => 'Health Check',
+            'title'            => 'Health Check',
+            'heading'          => 'Health Check',
             'navigation_label' => 'Health Check',
         ],
     ],
@@ -134,22 +134,22 @@ return [
     ],
     'pages' => [
         'dashboard' => [
-            'title' => 'Dashboard',
-            'heading' => 'Dashboard',
+            'title'            => 'Dashboard',
+            'heading'          => 'Dashboard',
             'navigation_label' => 'Dashboard',
         ],
     ],
     'resources' => [
-        'label' => 'Resource',
-        'plural_label' => 'Resources',
+        'label'            => 'Resource',
+        'plural_label'     => 'Resources',
         'navigation_label' => 'Resources',
         'navigation_group' => 'Resources',
-        'pages' => [
+        'pages'            => [
             'create' => [
-                'title' => 'Create :label',
-                'heading' => 'Create :label',
+                'title'      => 'Create :label',
+                'heading'    => 'Create :label',
                 'breadcrumb' => 'Create',
-                'form' => [
+                'form'       => [
                     'actions' => [
                         'create' => [
                             'label' => 'Create',
@@ -164,10 +164,10 @@ return [
                 ],
             ],
             'edit' => [
-                'title' => 'Edit :label',
-                'heading' => 'Edit :label',
+                'title'      => 'Edit :label',
+                'heading'    => 'Edit :label',
                 'breadcrumb' => 'Edit',
-                'form' => [
+                'form'       => [
                     'actions' => [
                         'save' => [
                             'label' => 'Save changes',
@@ -179,8 +179,8 @@ return [
                 ],
             ],
             'list' => [
-                'title' => ':label',
-                'heading' => ':label',
+                'title'      => ':label',
+                'heading'    => ':label',
                 'breadcrumb' => 'List',
             ],
         ],

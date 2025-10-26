@@ -23,17 +23,17 @@ final class CampaignResourceTest extends TestCase
     public function test_can_create_campaign(): void
     {
         $campaignData = [
-            'name' => 'Test Campaign',
-            'slug' => 'test-campaign',
-            'status' => 'draft',
+            'name'      => 'Test Campaign',
+            'slug'      => 'test-campaign',
+            'status'    => 'draft',
             'is_active' => true,
         ];
 
         $campaign = Campaign::create($campaignData);
 
         $this->assertDatabaseHas('discount_campaigns', [
-            'name' => 'Test Campaign',
-            'slug' => 'test-campaign',
+            'name'   => 'Test Campaign',
+            'slug'   => 'test-campaign',
             'status' => 'draft',
         ]);
 
@@ -46,7 +46,7 @@ final class CampaignResourceTest extends TestCase
         $campaign = Campaign::factory()->create();
 
         $campaign->update([
-            'name' => 'Updated Campaign Name',
+            'name'   => 'Updated Campaign Name',
             'status' => 'active',
         ]);
 

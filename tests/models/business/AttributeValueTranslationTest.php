@@ -21,17 +21,17 @@ class AttributeValueTranslationTest extends TestCase
 
         $translation = AttributeValueTranslation::create([
             'attribute_value_id' => $attributeValue->id,
-            'locale' => 'en',
-            'value' => 'Red Color',
-            'description' => 'A beautiful red color option',
-            'meta_data' => json_encode(['hex' => '#FF0000', 'rgb' => '255,0,0']),
+            'locale'             => 'en',
+            'value'              => 'Red Color',
+            'description'        => 'A beautiful red color option',
+            'meta_data'          => json_encode(['hex' => '#FF0000', 'rgb' => '255,0,0']),
         ]);
 
         $this->assertDatabaseHas('attribute_value_translations', [
             'attribute_value_id' => $attributeValue->id,
-            'locale' => 'en',
-            'value' => 'Red Color',
-            'description' => 'A beautiful red color option',
+            'locale'             => 'en',
+            'value'              => 'Red Color',
+            'description'        => 'A beautiful red color option',
         ]);
 
         $this->assertEquals('Red Color', $translation->value);
@@ -45,8 +45,8 @@ class AttributeValueTranslationTest extends TestCase
         $attributeValue = AttributeValue::factory()->create(['attribute_id' => $attribute->id]);
         $translation = AttributeValueTranslation::create([
             'attribute_value_id' => $attributeValue->id,
-            'locale' => 'en',
-            'value' => 'Test Value',
+            'locale'             => 'en',
+            'value'              => 'Test Value',
         ]);
 
         $this->assertInstanceOf(AttributeValue::class, $translation->attributeValue);
@@ -60,9 +60,9 @@ class AttributeValueTranslationTest extends TestCase
 
         $translation = AttributeValueTranslation::create([
             'attribute_value_id' => $attributeValue->id,
-            'locale' => 'en',
-            'value' => 'Test Value',
-            'meta_data' => json_encode(['key' => 'value']),
+            'locale'             => 'en',
+            'value'              => 'Test Value',
+            'meta_data'          => json_encode(['key' => 'value']),
         ]);
 
         $this->assertIsInt($translation->attribute_value_id);
@@ -88,12 +88,12 @@ class AttributeValueTranslationTest extends TestCase
 
         $enTranslation = AttributeValueTranslation::factory()->create([
             'attribute_value_id' => $attributeValue->id,
-            'locale' => 'en',
+            'locale'             => 'en',
         ]);
 
         $ltTranslation = AttributeValueTranslation::factory()->create([
             'attribute_value_id' => $attributeValue->id,
-            'locale' => 'lt',
+            'locale'             => 'lt',
         ]);
 
         $enTranslations = AttributeValueTranslation::byLocale('en')->get();
@@ -132,14 +132,14 @@ class AttributeValueTranslationTest extends TestCase
 
         $translationWithValue = AttributeValueTranslation::factory()->create([
             'attribute_value_id' => $attributeValue->id,
-            'locale' => 'en',
-            'value' => 'Test Value',
+            'locale'             => 'en',
+            'value'              => 'Test Value',
         ]);
 
         $translationWithoutValue = AttributeValueTranslation::factory()->create([
             'attribute_value_id' => $attributeValue->id,
-            'locale' => 'lt',
-            'value' => null,
+            'locale'             => 'lt',
+            'value'              => null,
         ]);
 
         $translationsWithValue = AttributeValueTranslation::withValue()->get();
@@ -155,14 +155,14 @@ class AttributeValueTranslationTest extends TestCase
 
         $translationWithDescription = AttributeValueTranslation::factory()->create([
             'attribute_value_id' => $attributeValue->id,
-            'locale' => 'en',
-            'description' => 'Test Description',
+            'locale'             => 'en',
+            'description'        => 'Test Description',
         ]);
 
         $translationWithoutDescription = AttributeValueTranslation::factory()->create([
             'attribute_value_id' => $attributeValue->id,
-            'locale' => 'lt',
-            'description' => null,
+            'locale'             => 'lt',
+            'description'        => null,
         ]);
 
         $translationsWithDescription = AttributeValueTranslation::withDescription()->get();
@@ -178,7 +178,7 @@ class AttributeValueTranslationTest extends TestCase
 
         $translation = AttributeValueTranslation::factory()->create([
             'attribute_value_id' => $attributeValue->id,
-            'value' => 'Test Value',
+            'value'              => 'Test Value',
         ]);
 
         $this->assertEquals('Test Value', $translation->formatted_value);
@@ -191,7 +191,7 @@ class AttributeValueTranslationTest extends TestCase
 
         $translation = AttributeValueTranslation::factory()->create([
             'attribute_value_id' => $attributeValue->id,
-            'value' => null,
+            'value'              => null,
         ]);
 
         $this->assertEquals(__('attributes.untitled_value'), $translation->formatted_value);
@@ -204,7 +204,7 @@ class AttributeValueTranslationTest extends TestCase
 
         $translation = AttributeValueTranslation::factory()->create([
             'attribute_value_id' => $attributeValue->id,
-            'description' => 'Test Description',
+            'description'        => 'Test Description',
         ]);
 
         $this->assertEquals('Test Description', $translation->formatted_description);
@@ -217,7 +217,7 @@ class AttributeValueTranslationTest extends TestCase
 
         $translation = AttributeValueTranslation::factory()->create([
             'attribute_value_id' => $attributeValue->id,
-            'description' => null,
+            'description'        => null,
         ]);
 
         $this->assertNull($translation->formatted_description);
@@ -230,7 +230,7 @@ class AttributeValueTranslationTest extends TestCase
 
         $translation = AttributeValueTranslation::factory()->create([
             'attribute_value_id' => $attributeValue->id,
-            'meta_data' => ['key' => 'value'],
+            'meta_data'          => ['key' => 'value'],
         ]);
 
         $this->assertEquals(['key' => 'value'], $translation->meta_data_array);
@@ -243,7 +243,7 @@ class AttributeValueTranslationTest extends TestCase
 
         $translation = AttributeValueTranslation::factory()->create([
             'attribute_value_id' => $attributeValue->id,
-            'meta_data' => null,
+            'meta_data'          => null,
         ]);
 
         $this->assertEquals([], $translation->meta_data_array);
@@ -256,14 +256,14 @@ class AttributeValueTranslationTest extends TestCase
 
         $translationWithValue = AttributeValueTranslation::factory()->create([
             'attribute_value_id' => $attributeValue->id,
-            'locale' => 'en',
-            'value' => 'Test Value',
+            'locale'             => 'en',
+            'value'              => 'Test Value',
         ]);
 
         $translationWithoutValue = AttributeValueTranslation::factory()->create([
             'attribute_value_id' => $attributeValue->id,
-            'locale' => 'lt',
-            'value' => null,
+            'locale'             => 'lt',
+            'value'              => null,
         ]);
 
         $this->assertTrue($translationWithValue->hasValue());
@@ -277,14 +277,14 @@ class AttributeValueTranslationTest extends TestCase
 
         $translationWithDescription = AttributeValueTranslation::factory()->create([
             'attribute_value_id' => $attributeValue->id,
-            'locale' => 'en',
-            'description' => 'Test Description',
+            'locale'             => 'en',
+            'description'        => 'Test Description',
         ]);
 
         $translationWithoutDescription = AttributeValueTranslation::factory()->create([
             'attribute_value_id' => $attributeValue->id,
-            'locale' => 'lt',
-            'description' => null,
+            'locale'             => 'lt',
+            'description'        => null,
         ]);
 
         $this->assertTrue($translationWithDescription->hasDescription());
@@ -298,14 +298,14 @@ class AttributeValueTranslationTest extends TestCase
 
         $translationWithMetaData = AttributeValueTranslation::factory()->create([
             'attribute_value_id' => $attributeValue->id,
-            'locale' => 'en',
-            'meta_data' => ['key' => 'value'],
+            'locale'             => 'en',
+            'meta_data'          => ['key' => 'value'],
         ]);
 
         $translationWithoutMetaData = AttributeValueTranslation::factory()->create([
             'attribute_value_id' => $attributeValue->id,
-            'locale' => 'lt',
-            'meta_data' => null,
+            'locale'             => 'lt',
+            'meta_data'          => null,
         ]);
 
         $this->assertTrue($translationWithMetaData->hasMetaData());
@@ -319,18 +319,18 @@ class AttributeValueTranslationTest extends TestCase
 
         $emptyTranslation = AttributeValueTranslation::factory()->create([
             'attribute_value_id' => $attributeValue->id,
-            'locale' => 'en',
-            'value' => null,
-            'description' => null,
-            'meta_data' => null,
+            'locale'             => 'en',
+            'value'              => null,
+            'description'        => null,
+            'meta_data'          => null,
         ]);
 
         $nonEmptyTranslation = AttributeValueTranslation::factory()->create([
             'attribute_value_id' => $attributeValue->id,
-            'locale' => 'lt',
-            'value' => 'Test Value',
-            'description' => null,
-            'meta_data' => null,
+            'locale'             => 'lt',
+            'value'              => 'Test Value',
+            'description'        => null,
+            'meta_data'          => null,
         ]);
 
         $this->assertTrue($emptyTranslation->isEmpty());
@@ -344,15 +344,15 @@ class AttributeValueTranslationTest extends TestCase
 
         $completeTranslation = AttributeValueTranslation::factory()->create([
             'attribute_value_id' => $attributeValue->id,
-            'locale' => 'en',
-            'value' => 'Test Value',
-            'description' => 'Test Description',
+            'locale'             => 'en',
+            'value'              => 'Test Value',
+            'description'        => 'Test Description',
         ]);
 
         $incompleteTranslation = AttributeValueTranslation::factory()->create([
             'attribute_value_id' => $attributeValue->id,
-            'locale' => 'lt',
-            'value' => null,
+            'locale'             => 'lt',
+            'value'              => null,
         ]);
 
         $this->assertTrue($completeTranslation->isComplete());
@@ -366,7 +366,7 @@ class AttributeValueTranslationTest extends TestCase
 
         $translation = AttributeValueTranslation::factory()->create([
             'attribute_value_id' => $attributeValue->id,
-            'locale' => 'en',
+            'locale'             => 'en',
         ]);
 
         $foundTranslation = AttributeValueTranslation::getByAttributeValueAndLocale($attributeValue->id, 'en');
@@ -399,12 +399,12 @@ class AttributeValueTranslationTest extends TestCase
 
         $enTranslation = AttributeValueTranslation::factory()->create([
             'attribute_value_id' => $attributeValue->id,
-            'locale' => 'en',
+            'locale'             => 'en',
         ]);
 
         $ltTranslation = AttributeValueTranslation::factory()->create([
             'attribute_value_id' => $attributeValue->id,
-            'locale' => 'lt',
+            'locale'             => 'lt',
         ]);
 
         $translations = AttributeValueTranslation::getTranslationsForAttributeValue($attributeValue->id);
@@ -421,12 +421,12 @@ class AttributeValueTranslationTest extends TestCase
 
         AttributeValueTranslation::factory()->create([
             'attribute_value_id' => $attributeValue->id,
-            'locale' => 'en',
+            'locale'             => 'en',
         ]);
 
         AttributeValueTranslation::factory()->create([
             'attribute_value_id' => $attributeValue->id,
-            'locale' => 'lt',
+            'locale'             => 'lt',
         ]);
 
         $locales = AttributeValueTranslation::getAvailableLocalesForAttributeValue($attributeValue->id);
@@ -443,7 +443,7 @@ class AttributeValueTranslationTest extends TestCase
 
         AttributeValueTranslation::factory()->create([
             'attribute_value_id' => $attributeValue->id,
-            'locale' => 'en',
+            'locale'             => 'en',
         ]);
 
         $supportedLocales = ['en', 'lt', 'de'];

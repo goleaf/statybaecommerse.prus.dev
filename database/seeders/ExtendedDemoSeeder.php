@@ -23,8 +23,8 @@ use App\Models\Review;
 use App\Models\User;
 use App\Models\VariantInventory;
 use App\Models\Zone;
-use Illuminate\Database\Seeder;
 use App\Support\Storage\SecureStorage;
+use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Storage;
 
 final class ExtendedDemoSeeder extends Seeder
@@ -125,15 +125,15 @@ final class ExtendedDemoSeeder extends Seeder
         $demoUser = User::factory()
             ->has(
                 Address::factory()->state([
-                    'type' => 'shipping',
-                    'last_name' => 'Doe',
-                    'first_name' => 'John',
+                    'type'           => 'shipping',
+                    'last_name'      => 'Doe',
+                    'first_name'     => 'John',
                     'address_line_1' => '123 Main St',
-                    'postal_code' => '00000',
-                    'city' => 'Springfield',
-                    'phone' => '1234567890',
-                    'is_default' => true,
-                    'country' => 'LT',
+                    'postal_code'    => '00000',
+                    'city'           => 'Springfield',
+                    'phone'          => '1234567890',
+                    'is_default'     => true,
+                    'country'        => 'LT',
                 ]),
                 'addresses'
             )
@@ -151,16 +151,16 @@ final class ExtendedDemoSeeder extends Seeder
                 ->for($defaultChannel, 'channel')
                 ->for($defaultZone, 'zone')
                 ->state([
-                    'currency' => $defaultCurrency->code,
+                    'currency'       => $defaultCurrency->code,
                     'payment_method' => 'cash_on_delivery',
                     'payment_status' => 'pending',
                 ])
                 ->has(
                     OrderShipping::factory()->state([
-                        'carrier' => 'standard',
-                        'service' => 'ground',
-                        'price' => 9.99,
-                        'weight' => 1.0,
+                        'carrier'                 => 'standard',
+                        'service'                 => 'ground',
+                        'price'                   => 9.99,
+                        'weight'                  => 1.0,
                         'estimated_delivery_date' => now()->addDays(5),
                     ]),
                     'shipping'
@@ -176,22 +176,22 @@ final class ExtendedDemoSeeder extends Seeder
                     ->for($order)
                     ->for($product)
                     ->state([
-                        'name' => $product->name,
-                        'sku' => $product->sku ?? 'SKU-'.strtoupper(fake()->bothify('??????')),
+                        'name'       => $product->name,
+                        'sku'        => $product->sku ?? 'SKU-' . strtoupper(fake()->bothify('??????')),
                         'unit_price' => $amount,
-                        'quantity' => 1,
-                        'total' => $amount,
+                        'quantity'   => 1,
+                        'total'      => $amount,
                     ])
                     ->create();
             }
 
             // Update order totals
             $order->update([
-                'subtotal' => $order->items()->sum('total'),
+                'subtotal'        => $order->items()->sum('total'),
                 'shipping_amount' => 9.99,
-                'tax_amount' => 0,
+                'tax_amount'      => 0,
                 'discount_amount' => 0,
-                'total' => $order->items()->sum('total') + 9.99,
+                'total'           => $order->items()->sum('total') + 9.99,
             ]);
         }
     }

@@ -20,16 +20,16 @@ class NotificationTest extends TestCase
 
         $notification = Notification::factory()->create([
             'user_id' => $user->id,
-            'type' => 'order_status',
-            'title' => 'Order Updated',
+            'type'    => 'order_status',
+            'title'   => 'Order Updated',
             'message' => 'Your order has been shipped',
             'is_read' => false,
         ]);
 
         $this->assertDatabaseHas('notifications', [
             'user_id' => $user->id,
-            'type' => 'order_status',
-            'title' => 'Order Updated',
+            'type'    => 'order_status',
+            'title'   => 'Order Updated',
             'message' => 'Your order has been shipped',
             'is_read' => false,
         ]);
@@ -56,10 +56,10 @@ class NotificationTest extends TestCase
     public function test_notification_casts_work_correctly(): void
     {
         $notification = Notification::factory()->create([
-            'is_read' => true,
+            'is_read'      => true,
             'is_important' => false,
-            'data' => ['key' => 'value'],
-            'created_at' => now(),
+            'data'         => ['key' => 'value'],
+            'created_at'   => now(),
         ]);
 
         $this->assertIsBool($notification->is_read);
@@ -199,8 +199,8 @@ class NotificationTest extends TestCase
     {
         $notification = Notification::factory()->create([
             'metadata' => [
-                'order_id' => 123,
-                'tracking_number' => 'TRK123456',
+                'order_id'           => 123,
+                'tracking_number'    => 'TRK123456',
                 'estimated_delivery' => '2025-01-15',
             ],
         ]);

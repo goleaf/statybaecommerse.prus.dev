@@ -51,7 +51,7 @@ final class VariantComparisonTable extends Component
 
             $this->dispatch('comparisonUpdated', [
                 'variantIds' => $this->variantIds,
-                'count' => count($this->variantIds),
+                'count'      => count($this->variantIds),
             ]);
         }
     }
@@ -63,7 +63,7 @@ final class VariantComparisonTable extends Component
 
         $this->dispatch('comparisonUpdated', [
             'variantIds' => $this->variantIds,
-            'count' => count($this->variantIds),
+            'count'      => count($this->variantIds),
         ]);
     }
 
@@ -74,7 +74,7 @@ final class VariantComparisonTable extends Component
 
         $this->dispatch('comparisonUpdated', [
             'variantIds' => $this->variantIds,
-            'count' => 0,
+            'count'      => 0,
         ]);
     }
 
@@ -83,8 +83,8 @@ final class VariantComparisonTable extends Component
         $attributes = [];
         foreach ($variant->variantAttributeValues as $attributeValue) {
             $attributes[$attributeValue->attribute_name] = [
-                'value' => $attributeValue->attribute_value,
-                'display' => $attributeValue->attribute_value_display,
+                'value'     => $attributeValue->attribute_value,
+                'display'   => $attributeValue->attribute_value_display,
                 'localized' => $attributeValue->getLocalizedDisplayValue(),
             ];
         }
@@ -136,10 +136,10 @@ final class VariantComparisonTable extends Component
         $quantity = $variant->available_quantity;
 
         return match ($status) {
-            'in_stock' => __('product_variants.messages.in_stock', ['quantity' => $quantity]),
-            'low_stock' => __('product_variants.messages.low_stock', ['quantity' => $quantity]),
+            'in_stock'     => __('product_variants.messages.in_stock', ['quantity' => $quantity]),
+            'low_stock'    => __('product_variants.messages.low_stock', ['quantity' => $quantity]),
             'out_of_stock' => __('product_variants.messages.out_of_stock'),
-            default => __('product_variants.messages.variant_not_available'),
+            default        => __('product_variants.messages.variant_not_available'),
         };
     }
 

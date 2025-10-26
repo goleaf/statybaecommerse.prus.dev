@@ -52,7 +52,7 @@ return new class extends Migration
                         ->where('id', $dependency->id)
                         ->update([
                             'condition_operator' => $operator,
-                            'condition_value' => $value,
+                            'condition_value'    => $value,
                         ]);
                 }
             });
@@ -103,7 +103,7 @@ return new class extends Migration
 
                     $payload = [
                         'operator' => $dependency->condition,
-                        'value' => $decodedValue,
+                        'value'    => $decodedValue,
                     ];
 
                     DB::table('system_setting_dependencies')

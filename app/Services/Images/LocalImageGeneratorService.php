@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Services\Images;
 
 use Illuminate\Support\Str;
+use InvalidArgumentException;
+use RuntimeException;
 
 /**
  * LocalImageGeneratorService
@@ -25,7 +27,7 @@ final class LocalImageGeneratorService
     public function generateWebPImage(string $text, int $width = self::DEFAULT_WIDTH, int $height = self::DEFAULT_HEIGHT, ?string $backgroundColor = null, ?string $textColor = null, ?string $filename = null): string
     {
         if (! extension_loaded('gd')) {
-            throw new \RuntimeException('GD extension is required for image generation');
+            throw new RuntimeException('GD extension is required for image generation');
         }
         // Create image resource
         $image = imagecreatetruecolor($width, $height);
@@ -40,17 +42,17 @@ final class LocalImageGeneratorService
         $this->addTextToImage($image, $text, $textColorResource, $width, $height);
         // Generate filename if not provided
         if (! $filename) {
-            $filename = Str::slug($text).'_'.time().'.webp';
+            $filename = Str::slug($text) . '_' . time() . '.webp';
         } elseif (! str_ends_with($filename, '.webp')) {
             $filename .= '.webp';
         }
         // Save as WebP
-        $tempPath = storage_path('app/temp/'.$filename);
+        $tempPath = storage_path('app/temp/' . $filename);
         $this->ensureDirectoryExists(dirname($tempPath));
         $success = imagewebp($image, $tempPath, self::WEBP_QUALITY);
         imagedestroy($image);
         if (! $success) {
-            throw new \RuntimeException("Failed to save WebP image: {$tempPath}");
+            throw new RuntimeException("Failed to save WebP image: {$tempPath}");
         }
 
         return $tempPath;
@@ -63,7 +65,7 @@ final class LocalImageGeneratorService
     {
         $colors = $this->getCategoryColors($categoryName);
 
-        return $this->generateWebPImage(text: $productName, width: 600, height: 600, backgroundColor: $colors['background'], textColor: $colors['text'], filename: 'product_'.Str::slug($productName));
+        return $this->generateWebPImage(text: $productName, width: 600, height: 600, backgroundColor: $colors['background'], textColor: $colors['text'], filename: 'product_' . Str::slug($productName));
     }
 
     /**
@@ -73,7 +75,7 @@ final class LocalImageGeneratorService
     {
         $colors = $this->getCategoryColors($categoryName);
 
-        return $this->generateWebPImage(text: $categoryName, width: 400, height: 300, backgroundColor: $colors['background'], textColor: $colors['text'], filename: 'category_'.Str::slug($categoryName));
+        return $this->generateWebPImage(text: $categoryName, width: 400, height: 300, backgroundColor: $colors['background'], textColor: $colors['text'], filename: 'category_' . Str::slug($categoryName));
     }
 
     /**
@@ -81,7 +83,7 @@ final class LocalImageGeneratorService
      */
     public function generateBrandLogo(string $brandName): string
     {
-        return $this->generateWebPImage(text: $brandName, width: 300, height: 200, backgroundColor: '#FFFFFF', textColor: '#333333', filename: 'brand_logo_'.Str::slug($brandName));
+        return $this->generateWebPImage(text: $brandName, width: 300, height: 200, backgroundColor: '#FFFFFF', textColor: '#333333', filename: 'brand_logo_' . Str::slug($brandName));
     }
 
     /**
@@ -89,7 +91,7 @@ final class LocalImageGeneratorService
      */
     public function generateBrandBanner(string $brandName): string
     {
-        return $this->generateWebPImage(text: $brandName, width: 1200, height: 400, backgroundColor: $this->getRandomGradientColor(), textColor: '#FFFFFF', filename: 'brand_banner_'.Str::slug($brandName));
+        return $this->generateWebPImage(text: $brandName, width: 1200, height: 400, backgroundColor: $this->getRandomGradientColor(), textColor: '#FFFFFF', filename: 'brand_banner_' . Str::slug($brandName));
     }
 
     /**
@@ -97,7 +99,7 @@ final class LocalImageGeneratorService
      */
     public function generateCollectionImage(string $collectionName): string
     {
-        return $this->generateWebPImage(text: $collectionName, width: 800, height: 500, backgroundColor: $this->getRandomPastelColor(), textColor: '#333333', filename: 'collection_'.Str::slug($collectionName));
+        return $this->generateWebPImage(text: $collectionName, width: 800, height: 500, backgroundColor: $this->getRandomPastelColor(), textColor: '#333333', filename: 'collection_' . Str::slug($collectionName));
     }
 
     /**
@@ -106,35 +108,35 @@ final class LocalImageGeneratorService
     public function convertToWebP(string $sourcePath, ?string $outputPath = null): string
     {
         if (! file_exists($sourcePath)) {
-            throw new \InvalidArgumentException("Source file does not exist: {$sourcePath}");
+            throw new InvalidArgumentException("Source file does not exist: {$sourcePath}");
         }
         $imageInfo = getimagesize($sourcePath);
         if (! $imageInfo) {
-            throw new \InvalidArgumentException("Invalid image file: {$sourcePath}");
+            throw new InvalidArgumentException("Invalid image file: {$sourcePath}");
         }
         $mimeType = $imageInfo['mime'];
         // Create image resource based on type
         $image = match ($mimeType) {
             'image/jpeg' => imagecreatefromjpeg($sourcePath),
-            'image/png' => imagecreatefrompng($sourcePath),
-            'image/gif' => imagecreatefromgif($sourcePath),
+            'image/png'  => imagecreatefrompng($sourcePath),
+            'image/gif'  => imagecreatefromgif($sourcePath),
             'image/webp' => imagecreatefromwebp($sourcePath),
-            default => throw new \InvalidArgumentException("Unsupported image type: {$mimeType}"),
+            default      => throw new InvalidArgumentException("Unsupported image type: {$mimeType}"),
         };
         if (! $image) {
-            throw new \RuntimeException("Failed to create image resource from: {$sourcePath}");
+            throw new RuntimeException("Failed to create image resource from: {$sourcePath}");
         }
         // Generate output path if not provided
         if (! $outputPath) {
             $pathInfo = pathinfo($sourcePath);
-            $outputPath = $pathInfo['dirname'].'/'.$pathInfo['filename'].'.webp';
+            $outputPath = $pathInfo['dirname'] . '/' . $pathInfo['filename'] . '.webp';
         }
         $this->ensureDirectoryExists(dirname($outputPath));
         // Save as WebP
         $success = imagewebp($image, $outputPath, self::WEBP_QUALITY);
         imagedestroy($image);
         if (! $success) {
-            throw new \RuntimeException("Failed to save WebP image: {$outputPath}");
+            throw new RuntimeException("Failed to save WebP image: {$outputPath}");
         }
 
         return $outputPath;
@@ -143,8 +145,8 @@ final class LocalImageGeneratorService
     /**
      * Handle addTextToImage functionality with proper error handling.
      *
-     * @param  mixed  $image
-     * @param  mixed  $textColor
+     * @param mixed $image
+     * @param mixed $textColor
      */
     private function addTextToImage($image, string $text, $textColor, int $width, int $height): void
     {
@@ -156,7 +158,7 @@ final class LocalImageGeneratorService
         $lines = [];
         $currentLine = '';
         foreach ($words as $word) {
-            $testLine = $currentLine.($currentLine ? ' ' : '').$word;
+            $testLine = $currentLine . ($currentLine ? ' ' : '') . $word;
             $textWidth = imagefontwidth($font) * strlen($testLine);
             if ($textWidth > $width * 0.8) {
                 if ($currentLine) {

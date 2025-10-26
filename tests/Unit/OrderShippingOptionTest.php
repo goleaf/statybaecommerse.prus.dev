@@ -20,8 +20,8 @@ beforeEach(function () {
 
 test('order can have a shipping option', function () {
     $order = Order::factory()->create([
-        'user_id' => $this->user->id,
-        'zone_id' => $this->zone->id,
+        'user_id'            => $this->user->id,
+        'zone_id'            => $this->zone->id,
         'shipping_option_id' => $this->shippingOption->id,
     ]);
 
@@ -32,8 +32,8 @@ test('order can have a shipping option', function () {
 
 test('order can be created without shipping option', function () {
     $order = Order::factory()->create([
-        'user_id' => $this->user->id,
-        'zone_id' => $this->zone->id,
+        'user_id'            => $this->user->id,
+        'zone_id'            => $this->zone->id,
         'shipping_option_id' => null,
     ]);
 
@@ -42,14 +42,14 @@ test('order can be created without shipping option', function () {
 
 test('shipping option can have multiple orders', function () {
     $order1 = Order::factory()->create([
-        'user_id' => $this->user->id,
-        'zone_id' => $this->zone->id,
+        'user_id'            => $this->user->id,
+        'zone_id'            => $this->zone->id,
         'shipping_option_id' => $this->shippingOption->id,
     ]);
 
     $order2 = Order::factory()->create([
-        'user_id' => $this->user->id,
-        'zone_id' => $this->zone->id,
+        'user_id'            => $this->user->id,
+        'zone_id'            => $this->zone->id,
         'shipping_option_id' => $this->shippingOption->id,
     ]);
 
@@ -59,8 +59,8 @@ test('shipping option can have multiple orders', function () {
 
 test('order can access shipping option details', function () {
     $order = Order::factory()->create([
-        'user_id' => $this->user->id,
-        'zone_id' => $this->zone->id,
+        'user_id'            => $this->user->id,
+        'zone_id'            => $this->zone->id,
         'shipping_option_id' => $this->shippingOption->id,
     ]);
 

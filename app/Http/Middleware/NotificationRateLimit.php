@@ -25,8 +25,8 @@ final class NotificationRateLimit
             $seconds = RateLimiter::availableIn($key);
 
             return response()->json([
-                'success' => false,
-                'message' => 'Too many notification requests. Please try again in '.$seconds.' seconds.',
+                'success'     => false,
+                'message'     => 'Too many notification requests. Please try again in ' . $seconds . ' seconds.',
                 'retry_after' => $seconds,
             ], 429);
         }
@@ -61,13 +61,13 @@ final class NotificationRateLimit
     private function getMaxAttempts(string $action): int
     {
         return match ($action) {
-            'create' => 10,      // 10 notifications per minute
-            'mark_read' => 60,   // 60 mark as read per minute
+            'create'      => 10,      // 10 notifications per minute
+            'mark_read'   => 60,   // 60 mark as read per minute
             'mark_unread' => 60, // 60 mark as unread per minute
-            'delete' => 30,      // 30 deletes per minute
-            'search' => 100,     // 100 searches per minute
-            'stats' => 200,      // 200 stats requests per minute
-            default => 100,      // 100 requests per minute
+            'delete'      => 30,      // 30 deletes per minute
+            'search'      => 100,     // 100 searches per minute
+            'stats'       => 200,      // 200 stats requests per minute
+            default       => 100,      // 100 requests per minute
         };
     }
 
@@ -77,13 +77,13 @@ final class NotificationRateLimit
     private function getDecayMinutes(string $action): int
     {
         return match ($action) {
-            'create' => 1,       // 1 minute
-            'mark_read' => 1,    // 1 minute
+            'create'      => 1,       // 1 minute
+            'mark_read'   => 1,    // 1 minute
             'mark_unread' => 1,  // 1 minute
-            'delete' => 1,       // 1 minute
-            'search' => 1,       // 1 minute
-            'stats' => 1,        // 1 minute
-            default => 1,        // 1 minute
+            'delete'      => 1,       // 1 minute
+            'search'      => 1,       // 1 minute
+            'stats'       => 1,        // 1 minute
+            default       => 1,        // 1 minute
         };
     }
 }

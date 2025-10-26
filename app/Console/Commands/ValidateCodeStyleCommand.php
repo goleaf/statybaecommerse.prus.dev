@@ -117,7 +117,7 @@ final class ValidateCodeStyleCommand extends Command
 
         $this->info('📈 Summary:');
         $this->line("   Total violations found: {$totalViolations}");
-        $this->line('   Files with violations: '.count($violationsByFile));
+        $this->line('   Files with violations: ' . count($violationsByFile));
         $this->line("   Execution time: {$executionTime}s");
 
         if (! empty($violationTypes)) {
@@ -138,7 +138,7 @@ final class ValidateCodeStyleCommand extends Command
             $topFiles = array_slice($violationsByFile, 0, 10, true);
 
             foreach ($topFiles as $file => $count) {
-                $relativePath = str_replace(base_path().'/', '', $file);
+                $relativePath = str_replace(base_path() . '/', '', $file);
                 $color = $count > 10 ? 'red' : ($count > 5 ? 'yellow' : 'green');
                 $this->line("   <fg={$color}>{$relativePath}: {$count} violations</>");
             }
@@ -154,11 +154,11 @@ final class ValidateCodeStyleCommand extends Command
     {
         $reportPath = storage_path('logs/code-style-validation-report.json');
         $reportData = [
-            'timestamp' => now()->toISOString(),
-            'total_violations' => count($allViolations),
+            'timestamp'          => now()->toISOString(),
+            'total_violations'   => count($allViolations),
             'violations_by_type' => [],
             'violations_by_file' => [],
-            'all_violations' => $allViolations,
+            'all_violations'     => $allViolations,
         ];
 
         foreach ($allViolations as $violation) {

@@ -20,7 +20,7 @@ uses(RefreshDatabase::class);
 beforeEach(function () {
     $this->adminUser = User::factory()->create([
         'email' => 'admin@admin.com',
-        'name' => 'Admin User',
+        'name'  => 'Admin User',
     ]);
 
     // Assign admin role if using Spatie permissions
@@ -40,8 +40,8 @@ describe('AdvancedStatsWidget', function () {
 
     it('displays correct revenue statistics', function () {
         Order::factory()->count(5)->create([
-            'total' => 100.0,
-            'status' => 'completed',
+            'total'      => 100.0,
+            'status'     => 'completed',
             'created_at' => now()->subDays(5),
         ]);
 
@@ -109,7 +109,7 @@ describe('AdvancedStatsWidget', function () {
 
     it('generates revenue chart data correctly', function () {
         Order::factory()->count(5)->create([
-            'total' => 100.0,
+            'total'      => 100.0,
             'created_at' => now()->subDays(5),
         ]);
 
@@ -141,7 +141,7 @@ describe('OrdersChartWidget', function () {
 
     it('displays correct chart data', function () {
         Order::factory()->count(5)->create([
-            'total' => 150.0,
+            'total'      => 150.0,
             'created_at' => now()->subDays(5),
         ]);
 
@@ -191,9 +191,9 @@ describe('TopSellingProductsWidget', function () {
         foreach ($products as $product) {
             $order = Order::factory()->create(['status' => 'completed']);
             OrderItem::factory()->create([
-                'order_id' => $order->id,
+                'order_id'   => $order->id,
                 'product_id' => $product->id,
-                'quantity' => rand(1, 10),
+                'quantity'   => rand(1, 10),
             ]);
         }
 
@@ -205,9 +205,9 @@ describe('TopSellingProductsWidget', function () {
         $product = Product::factory()->create();
         $order = Order::factory()->create(['status' => 'completed']);
         OrderItem::factory()->create([
-            'order_id' => $order->id,
+            'order_id'   => $order->id,
             'product_id' => $product->id,
-            'quantity' => 5,
+            'quantity'   => 5,
         ]);
 
         Livewire::test(TopSellingProductsWidget::class)
@@ -228,22 +228,22 @@ describe('TopSellingProductsWidget', function () {
         // Create more sales for product2
         $order1 = Order::factory()->create(['status' => 'completed']);
         OrderItem::factory()->create([
-            'order_id' => $order1->id,
+            'order_id'   => $order1->id,
             'product_id' => $product1->id,
-            'quantity' => 2,
+            'quantity'   => 2,
         ]);
 
         $order2 = Order::factory()->create(['status' => 'completed']);
         $order3 = Order::factory()->create(['status' => 'completed']);
         OrderItem::factory()->create([
-            'order_id' => $order2->id,
+            'order_id'   => $order2->id,
             'product_id' => $product2->id,
-            'quantity' => 5,
+            'quantity'   => 5,
         ]);
         OrderItem::factory()->create([
-            'order_id' => $order3->id,
+            'order_id'   => $order3->id,
             'product_id' => $product2->id,
-            'quantity' => 3,
+            'quantity'   => 3,
         ]);
 
         $widget = Livewire::test(TopSellingProductsWidget::class);
@@ -264,9 +264,9 @@ describe('TopSellingProductsWidget', function () {
         foreach ($products as $product) {
             $order = Order::factory()->create(['status' => 'completed']);
             OrderItem::factory()->create([
-                'order_id' => $order->id,
+                'order_id'   => $order->id,
                 'product_id' => $product->id,
-                'quantity' => 1,
+                'quantity'   => 1,
             ]);
         }
 

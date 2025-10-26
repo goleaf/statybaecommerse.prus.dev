@@ -21,11 +21,11 @@ final class CampaignConversionTest extends TestCase
         $this->user = User::factory()->create();
         $this->campaign = Campaign::factory()->create();
         $this->campaignConversion = CampaignConversion::factory()->create([
-            'campaign_id' => $this->campaign->id,
-            'customer_id' => $this->user->id,
+            'campaign_id'      => $this->campaign->id,
+            'customer_id'      => $this->user->id,
             'conversion_value' => 100.5,
-            'conversion_type' => 'purchase',
-            'status' => 'completed',
+            'conversion_type'  => 'purchase',
+            'status'           => 'completed',
         ]);
     }
 

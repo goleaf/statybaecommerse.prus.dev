@@ -39,6 +39,7 @@ final class NotificationCollectionData
         foreach ($paginator->items() as $item) {
             if ($item instanceof NotificationData) {
                 $items[] = $item;
+
                 continue;
             }
 
@@ -67,7 +68,7 @@ final class NotificationCollectionData
     public function toArray(): array
     {
         return [
-            'data' => array_map(static fn (NotificationData $notification): array => $notification->toArray(), $this->notifications),
+            'data'       => array_map(static fn (NotificationData $notification): array => $notification->toArray(), $this->notifications),
             'pagination' => $this->pagination->toArray(),
         ];
     }

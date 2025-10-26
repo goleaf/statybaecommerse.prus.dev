@@ -47,13 +47,13 @@ final class FixCriticalFilamentErrorsCommand extends Command
         ];
 
         foreach ($criticalFiles as $resource) {
-            $file = base_path('app/Filament/Resources/'.$resource.'.php');
+            $file = base_path('app/Filament/Resources/' . $resource . '.php');
 
             if (! file_exists($file)) {
                 continue;
             }
 
-            $this->line('Processing '.$file.'...');
+            $this->line('Processing ' . $file . '...');
 
             $content = file_get_contents($file) ?: '';
             $originalContent = $content;

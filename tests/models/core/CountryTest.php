@@ -21,21 +21,21 @@ final class CountryTest extends TestCase
     public function test_country_can_be_created(): void
     {
         $country = Country::factory()->create([
-            'name' => 'Lithuania',
-            'cca2' => 'LT',
-            'cca3' => 'LTU',
-            'region' => 'Europe',
+            'name'          => 'Lithuania',
+            'cca2'          => 'LT',
+            'cca3'          => 'LTU',
+            'region'        => 'Europe',
             'currency_code' => 'EUR',
-            'is_active' => true,
+            'is_active'     => true,
         ]);
 
         $this->assertDatabaseHas('countries', [
-            'name' => 'Lithuania',
-            'cca2' => 'LT',
-            'cca3' => 'LTU',
-            'region' => 'Europe',
+            'name'          => 'Lithuania',
+            'cca2'          => 'LT',
+            'cca3'          => 'LTU',
+            'region'        => 'Europe',
             'currency_code' => 'EUR',
-            'is_active' => true,
+            'is_active'     => true,
         ]);
 
         $this->assertEquals('Lithuania', $country->name);
@@ -51,9 +51,9 @@ final class CountryTest extends TestCase
         $country = Country::factory()->create();
 
         $translation = CountryTranslation::factory()->create([
-            'country_id' => $country->id,
-            'locale' => 'lt',
-            'name' => 'Lietuva',
+            'country_id'    => $country->id,
+            'locale'        => 'lt',
+            'name'          => 'Lietuva',
             'name_official' => 'Lietuvos Respublika',
         ]);
 
@@ -184,7 +184,7 @@ final class CountryTest extends TestCase
     public function test_country_display_name_attribute(): void
     {
         $country = Country::factory()->create([
-            'name' => 'Lithuania',
+            'name'               => 'Lithuania',
             'phone_calling_code' => '370',
         ]);
 
@@ -194,7 +194,7 @@ final class CountryTest extends TestCase
     public function test_country_display_name_attribute_without_phone_code(): void
     {
         $country = Country::factory()->create([
-            'name' => 'Lithuania',
+            'name'               => 'Lithuania',
             'phone_calling_code' => null,
         ]);
 
@@ -207,8 +207,8 @@ final class CountryTest extends TestCase
 
         CountryTranslation::factory()->create([
             'country_id' => $country->id,
-            'locale' => 'lt',
-            'name' => 'Lietuva',
+            'locale'     => 'lt',
+            'name'       => 'Lietuva',
         ]);
 
         $this->assertEquals('Lietuva', $country->translated_name);
@@ -226,8 +226,8 @@ final class CountryTest extends TestCase
         $country = Country::factory()->create(['name_official' => 'Republic of Lithuania']);
 
         CountryTranslation::factory()->create([
-            'country_id' => $country->id,
-            'locale' => 'lt',
+            'country_id'    => $country->id,
+            'locale'        => 'lt',
             'name_official' => 'Lietuvos Respublika',
         ]);
 
@@ -246,8 +246,8 @@ final class CountryTest extends TestCase
         $country = Country::factory()->create(['description' => 'A country in Europe']);
 
         CountryTranslation::factory()->create([
-            'country_id' => $country->id,
-            'locale' => 'lt',
+            'country_id'  => $country->id,
+            'locale'      => 'lt',
             'description' => 'Šalis Europoje',
         ]);
 
@@ -326,8 +326,8 @@ final class CountryTest extends TestCase
     public function test_country_get_full_address_method(): void
     {
         $country = Country::factory()->create([
-            'name' => 'Lithuania',
-            'region' => 'Europe',
+            'name'      => 'Lithuania',
+            'region'    => 'Europe',
             'subregion' => 'Northern Europe',
         ]);
 
@@ -337,8 +337,8 @@ final class CountryTest extends TestCase
     public function test_country_get_full_address_method_with_missing_parts(): void
     {
         $country = Country::factory()->create([
-            'name' => 'Lithuania',
-            'region' => null,
+            'name'      => 'Lithuania',
+            'region'    => null,
             'subregion' => 'Northern Europe',
         ]);
 
@@ -376,18 +376,18 @@ final class CountryTest extends TestCase
     public function test_country_casts_attributes(): void
     {
         $country = Country::factory()->create([
-            'latitude' => 54.6872,
-            'longitude' => 25.2797,
-            'currencies' => ['EUR' => 'Euro'],
-            'languages' => ['lt' => 'Lithuanian'],
-            'timezones' => ['Europe/Vilnius'],
-            'is_active' => true,
+            'latitude'     => 54.6872,
+            'longitude'    => 25.2797,
+            'currencies'   => ['EUR' => 'Euro'],
+            'languages'    => ['lt' => 'Lithuanian'],
+            'timezones'    => ['Europe/Vilnius'],
+            'is_active'    => true,
             'is_eu_member' => true,
             'requires_vat' => true,
-            'vat_rate' => 21.0,
-            'metadata' => ['population' => 2794324],
-            'is_enabled' => true,
-            'sort_order' => 1,
+            'vat_rate'     => 21.0,
+            'metadata'     => ['population' => 2794324],
+            'is_enabled'   => true,
+            'sort_order'   => 1,
         ]);
 
         $this->assertIsNumeric($country->latitude);

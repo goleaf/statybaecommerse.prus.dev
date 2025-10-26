@@ -16,7 +16,7 @@ final class PostSeeder extends Seeder
     {
         // Get or create a user for posts
         $user = User::first() ?? User::factory()->create([
-            'name' => 'Admin User',
+            'name'  => 'Admin User',
             'email' => 'admin@example.com',
         ]);
 

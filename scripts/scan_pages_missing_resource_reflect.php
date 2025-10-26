@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-require __DIR__.'/../vendor/autoload.php';
+require __DIR__ . '/../vendor/autoload.php';
 
-$appDir = realpath(__DIR__.'/../app');
-$baseDir = $appDir.'/Filament/Resources';
+$appDir = realpath(__DIR__ . '/../app');
+$baseDir = $appDir . '/Filament/Resources';
 
 $rii = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($baseDir, FilesystemIterator::SKIP_DOTS | FilesystemIterator::FOLLOW_SYMLINKS));
 
@@ -24,9 +24,9 @@ foreach ($rii as $file) {
 
     $path = $file->getPathname();
     $normPath = str_replace('\\', '/', $path);
-    $relFromApp = ltrim(str_replace(str_replace('\\', '/', $appDir).'/', '', $normPath), '/');
+    $relFromApp = ltrim(str_replace(str_replace('\\', '/', $appDir) . '/', '', $normPath), '/');
     // e.g., Filament/Resources/PartnerResource/Pages/EditPartner.php
-    $class = 'App\\'.str_replace(['/', '.php'], ['\\', ''], $relFromApp);
+    $class = 'App\\' . str_replace(['/', '.php'], ['\\', ''], $relFromApp);
 
     if (! class_exists($class)) {
         require_once $path;
@@ -81,8 +81,8 @@ foreach ($rii as $file) {
 }
 
 foreach ($missing as $row) {
-    echo $row[0].' :: '.$row[1]."\n";
+    echo $row[0] . ' :: ' . $row[1] . "\n";
 }
 
-fwrite(STDERR, 'Total missing: '.count($missing)."\n");
+fwrite(STDERR, 'Total missing: ' . count($missing) . "\n");
 exit(count($missing) === 0 ? 0 : 1);

@@ -20,13 +20,13 @@ use Livewire\Component;
  * Livewire component for ProductFilterWidget with reactive frontend functionality, real-time updates, and user interaction handling.
  *
  * @property string $search
- * @property array $categories
- * @property array $brands
- * @property array $selectedAttributes
- * @property float $minPrice
- * @property float $maxPrice
- * @property bool $inStock
- * @property bool $onSale
+ * @property array  $categories
+ * @property array  $brands
+ * @property array  $selectedAttributes
+ * @property float  $minPrice
+ * @property float  $maxPrice
+ * @property bool   $inStock
+ * @property bool   $onSale
  * @property string $sortBy
  * @property string $sortDirection
  */
@@ -213,8 +213,8 @@ final class ProductFilterWidget extends Component
         // Search filter
         if ($this->search) {
             $query->where(function ($q) {
-                $q->where('name', 'like', '%'.$this->search.'%')->orWhere('description', 'like', '%'.$this->search.'%')->orWhere('sku', 'like', '%'.$this->search.'%')->orWhereHas('brand', function ($brandQuery) {
-                    $brandQuery->where('name', 'like', '%'.$this->search.'%');
+                $q->where('name', 'like', '%' . $this->search . '%')->orWhere('description', 'like', '%' . $this->search . '%')->orWhere('sku', 'like', '%' . $this->search . '%')->orWhereHas('brand', function ($brandQuery) {
+                    $brandQuery->where('name', 'like', '%' . $this->search . '%');
                 });
             });
         }

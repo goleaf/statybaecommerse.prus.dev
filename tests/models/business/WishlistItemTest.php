@@ -23,12 +23,12 @@ class WishlistItemTest extends TestCase
 
         $wishlistItem = WishlistItem::factory()->create([
             'wishlist_id' => $wishlist->id,
-            'product_id' => $product->id,
+            'product_id'  => $product->id,
         ]);
 
         $this->assertDatabaseHas('wishlist_items', [
             'wishlist_id' => $wishlist->id,
-            'product_id' => $product->id,
+            'product_id'  => $product->id,
         ]);
     }
 
@@ -49,7 +49,7 @@ class WishlistItemTest extends TestCase
         $wishlist = \App\Models\UserWishlist::factory()->create();
         $wishlistItem = WishlistItem::factory()->create([
             'wishlist_id' => $wishlist->id,
-            'product_id' => $product->id,
+            'product_id'  => $product->id,
         ]);
 
         $this->assertInstanceOf(Product::class, $wishlistItem->product);
@@ -63,8 +63,8 @@ class WishlistItemTest extends TestCase
         $wishlist = \App\Models\UserWishlist::factory()->create();
         $wishlistItem = WishlistItem::factory()->create([
             'wishlist_id' => $wishlist->id,
-            'product_id' => $product->id,
-            'variant_id' => $variant->id,
+            'product_id'  => $product->id,
+            'variant_id'  => $variant->id,
         ]);
 
         $this->assertInstanceOf(ProductVariant::class, $wishlistItem->variant);
@@ -76,7 +76,7 @@ class WishlistItemTest extends TestCase
         $wishlist = \App\Models\UserWishlist::factory()->create();
         $wishlistItem = WishlistItem::factory()->create([
             'wishlist_id' => $wishlist->id,
-            'created_at' => now(),
+            'created_at'  => now(),
         ]);
 
         $this->assertInstanceOf(\Carbon\Carbon::class, $wishlistItem->created_at);
@@ -117,11 +117,11 @@ class WishlistItemTest extends TestCase
         $wishlist = \App\Models\UserWishlist::factory()->create();
         $wishlistItem1 = WishlistItem::factory()->create([
             'wishlist_id' => $wishlist->id,
-            'product_id' => $product1->id,
+            'product_id'  => $product1->id,
         ]);
         $wishlistItem2 = WishlistItem::factory()->create([
             'wishlist_id' => $wishlist->id,
-            'product_id' => $product2->id,
+            'product_id'  => $product2->id,
         ]);
 
         $product1WishlistItems = WishlistItem::forProduct($product1->id)->get();
@@ -135,11 +135,11 @@ class WishlistItemTest extends TestCase
         $wishlist = \App\Models\UserWishlist::factory()->create();
         $recentWishlistItem = WishlistItem::factory()->create([
             'wishlist_id' => $wishlist->id,
-            'created_at' => now(),
+            'created_at'  => now(),
         ]);
         $oldWishlistItem = WishlistItem::factory()->create([
             'wishlist_id' => $wishlist->id,
-            'created_at' => now()->subDays(10),
+            'created_at'  => now()->subDays(10),
         ]);
 
         $recentWishlistItems = WishlistItem::recent()->get();
@@ -153,7 +153,7 @@ class WishlistItemTest extends TestCase
         $wishlist = \App\Models\UserWishlist::factory()->create();
         $wishlistItem = WishlistItem::factory()->create([
             'wishlist_id' => $wishlist->id,
-            'notes' => 'Want this for birthday gift',
+            'notes'       => 'Want this for birthday gift',
         ]);
 
         $this->assertEquals('Want this for birthday gift', $wishlistItem->notes);
@@ -164,7 +164,7 @@ class WishlistItemTest extends TestCase
         $wishlist = \App\Models\UserWishlist::factory()->create();
         $wishlistItem = WishlistItem::factory()->create([
             'wishlist_id' => $wishlist->id,
-            'quantity' => 2,
+            'quantity'    => 2,
         ]);
 
         $this->assertEquals(2, $wishlistItem->quantity);

@@ -7,6 +7,7 @@ namespace App\Models\Scopes;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Scope;
+use Throwable;
 
 /**
  * PublishedScope
@@ -30,7 +31,7 @@ final class PublishedScope implements Scope
 
     public function apply(Builder $builder, Model $model): void
     {
-        if (defined($model::class.'::SCOPE_COLUMN_HINTS')) {
+        if (defined($model::class . '::SCOPE_COLUMN_HINTS')) {
             $hints = $model::SCOPE_COLUMN_HINTS;
 
             if ($hints['published_at'] ?? false) {
@@ -55,7 +56,7 @@ final class PublishedScope implements Scope
                     'published_at' => $schema->hasColumn($table, 'published_at'),
                     'status'       => $schema->hasColumn($table, 'status'),
                 ];
-            } catch (\Throwable) {
+            } catch (Throwable) {
                 self::$columnPresence[$cacheKey] = [
                     'published_at' => false,
                     'status'       => false,

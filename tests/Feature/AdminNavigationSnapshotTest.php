@@ -6,8 +6,8 @@ namespace Tests\Feature;
 
 use App\Support\Nav;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
 use PHPUnit\Framework\Attributes\CoversNothing;
+use Tests\TestCase;
 
 #[CoversNothing]
 final class AdminNavigationSnapshotTest extends TestCase
@@ -46,15 +46,15 @@ final class AdminNavigationSnapshotTest extends TestCase
                 ));
 
                 return [
-                    'label' => $group['label'],
+                    'label'     => $group['label'],
                     'label_key' => $group['label_key'],
-                    'icon' => $group['icon'],
-                    'sort' => $group['sort'],
+                    'icon'      => $group['icon'],
+                    'sort'      => $group['sort'],
                     'resources' => array_map(
                         static fn (string $resource): array => [
                             'class' => $resource,
-                            'icon' => Nav::iconForResource($resource),
-                            'sort' => Nav::sortForResource($resource),
+                            'icon'  => Nav::iconForResource($resource),
+                            'sort'  => Nav::sortForResource($resource),
                         ],
                         $resources,
                     ),
@@ -69,12 +69,12 @@ final class AdminNavigationSnapshotTest extends TestCase
         ));
 
         return [
-            'groups' => $grouped,
+            'groups'    => $grouped,
             'ungrouped' => array_map(
                 static fn (string $resource): array => [
                     'class' => $resource,
-                    'icon' => Nav::iconForResource($resource),
-                    'sort' => Nav::sortForResource($resource),
+                    'icon'  => Nav::iconForResource($resource),
+                    'sort'  => Nav::sortForResource($resource),
                 ],
                 $ungrouped,
             ),

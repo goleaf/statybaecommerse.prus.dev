@@ -13,7 +13,6 @@ use App\Models\Discount;
 use App\Models\DiscountCode;
 use App\Models\Order;
 use App\Models\User;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Schema;
 use Livewire\Livewire;

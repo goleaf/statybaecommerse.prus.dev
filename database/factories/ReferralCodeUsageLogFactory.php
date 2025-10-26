@@ -17,16 +17,16 @@ final class ReferralCodeUsageLogFactory extends Factory
     {
         return [
             'referral_code_id' => ReferralCode::factory(),
-            'user_id' => $this->faker->optional(0.8)->randomElement(User::pluck('id')->toArray()),
-            'ip_address' => $this->faker->ipv4(),
-            'user_agent' => $this->faker->userAgent(),
-            'referrer' => $this->faker->optional(0.6)->url(),
-            'metadata' => $this->faker->optional(0.3)->randomElements([
+            'user_id'          => $this->faker->optional(0.8)->randomElement(User::pluck('id')->toArray()),
+            'ip_address'       => $this->faker->ipv4(),
+            'user_agent'       => $this->faker->userAgent(),
+            'referrer'         => $this->faker->optional(0.6)->url(),
+            'metadata'         => $this->faker->optional(0.3)->randomElements([
                 'device_type' => $this->faker->randomElement(['desktop', 'mobile', 'tablet']),
-                'browser' => $this->faker->randomElement(['chrome', 'firefox', 'safari', 'edge']),
-                'os' => $this->faker->randomElement(['windows', 'macos', 'linux', 'android', 'ios']),
-                'country' => $this->faker->countryCode(),
-                'city' => $this->faker->city(),
+                'browser'     => $this->faker->randomElement(['chrome', 'firefox', 'safari', 'edge']),
+                'os'          => $this->faker->randomElement(['windows', 'macos', 'linux', 'android', 'ios']),
+                'country'     => $this->faker->countryCode(),
+                'city'        => $this->faker->city(),
             ]),
         ];
     }

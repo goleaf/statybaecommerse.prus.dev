@@ -33,8 +33,8 @@ final class ImportExportCatalogXml extends Command
             }
             $res = $service->import($path, ['only' => $only]);
             $this->info('Import finished');
-            $this->line('Categories: created '.$res['categories']['created'].', updated '.$res['categories']['updated']);
-            $this->line('Products:   created '.$res['products']['created'].', updated '.$res['products']['updated']);
+            $this->line('Categories: created ' . $res['categories']['created'] . ', updated ' . $res['categories']['updated']);
+            $this->line('Products:   created ' . $res['products']['created'] . ', updated ' . $res['products']['updated']);
 
             return 0;
         }

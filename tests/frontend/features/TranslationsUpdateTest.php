@@ -9,10 +9,10 @@ it('updates brand translation', function (): void {
     login($user);
 
     $payload = [
-        'name' => 'Name',
-        'slug' => 'slug',
-        'description' => 'desc',
-        'seo_title' => 'seo',
+        'name'            => 'Name',
+        'slug'            => 'slug',
+        'description'     => 'desc',
+        'seo_title'       => 'seo',
         'seo_description' => 'desc',
     ];
 
@@ -23,10 +23,10 @@ it('updates brand translation', function (): void {
 it('updates category translation', function (): void {
     login(User::factory()->create());
     $payload = [
-        'name' => 'Name',
-        'slug' => 'slug',
-        'description' => 'desc',
-        'seo_title' => 'seo',
+        'name'            => 'Name',
+        'slug'            => 'slug',
+        'description'     => 'desc',
+        'seo_title'       => 'seo',
         'seo_description' => 'desc',
     ];
     $response = $this->put(route('admin.categories.translations.save', ['locale' => 'en', 'id' => 1, 'lang' => 'en']), $payload);
@@ -36,8 +36,8 @@ it('updates category translation', function (): void {
 it('updates collection translation', function (): void {
     login(User::factory()->create());
     $payload = [
-        'name' => 'Name',
-        'slug' => 'slug',
+        'name'        => 'Name',
+        'slug'        => 'slug',
         'description' => 'desc',
     ];
     $response = $this->put(route('admin.collections.translations.save', ['locale' => 'en', 'id' => 1, 'lang' => 'en']), $payload);

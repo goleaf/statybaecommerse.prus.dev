@@ -44,8 +44,8 @@ final class BulkCustomerSeeder extends Seeder
                 $user->customerGroups()->syncWithoutDetaching([
                     $defaultGroup->getKey() => [
                         'assigned_at' => now(),
-                        'created_at' => now(),
-                        'updated_at' => now(),
+                        'created_at'  => now(),
+                        'updated_at'  => now(),
                     ],
                 ]);
             })
@@ -69,10 +69,10 @@ final class BulkCustomerSeeder extends Seeder
                 'lt' => 'Standartinė grupė visiems naujiems klientams.',
                 'en' => 'Default segment for all newly created customers.',
             ],
-            'slug' => 'default-customer-group',
-            'code' => 'DEFAULT',
+            'slug'                => 'default-customer-group',
+            'code'                => 'DEFAULT',
             'discount_percentage' => 0,
-            'metadata' => ['type' => 'regular'],
+            'metadata'            => ['type' => 'regular'],
         ]);
     }
 }

@@ -20,11 +20,11 @@ final class DiscountConditionTest extends TestCase
     {
         // Arrange: create a condition with explicit values to check casting behaviour.
         $condition = DiscountCondition::factory()->create([
-            'value' => ['min' => 100],
-            'position' => 2,
+            'value'     => ['min' => 100],
+            'position'  => 2,
             'is_active' => true,
-            'priority' => 4,
-            'metadata' => ['channel' => 'web'],
+            'priority'  => 4,
+            'metadata'  => ['channel' => 'web'],
         ]);
 
         // Act: reload the model to ensure casts are applied when retrieving attributes.
@@ -48,7 +48,7 @@ final class DiscountConditionTest extends TestCase
         $condition = DiscountCondition::factory()->create(['discount_id' => $discount->id]);
         DiscountConditionTranslation::factory()->english()->create([
             'discount_condition_id' => $condition->id,
-            'name' => 'Connected Condition',
+            'name'                  => 'Connected Condition',
         ]);
         $condition->products()->attach($product->id);
         $condition->categories()->attach($category->id);
@@ -67,17 +67,17 @@ final class DiscountConditionTest extends TestCase
     {
         // Arrange: build a mixture of conditions to exercise the query scopes.
         $active = DiscountCondition::factory()->active()->create([
-            'type' => 'cart_total',
+            'type'     => 'cart_total',
             'operator' => 'greater_than',
             'priority' => 1,
         ]);
         $inactive = DiscountCondition::factory()->inactive()->create([
-            'type' => 'product',
+            'type'     => 'product',
             'operator' => 'contains',
             'priority' => 5,
         ]);
         $additional = DiscountCondition::factory()->active()->create([
-            'type' => 'product',
+            'type'     => 'product',
             'operator' => 'contains',
             'priority' => 3,
         ]);
@@ -106,15 +106,15 @@ final class DiscountConditionTest extends TestCase
 
         DiscountConditionTranslation::factory()->english()->create([
             'discount_condition_id' => $alpha->id,
-            'name' => 'Alpha Condition',
+            'name'                  => 'Alpha Condition',
         ]);
         DiscountConditionTranslation::factory()->english()->create([
             'discount_condition_id' => $beta->id,
-            'name' => 'Beta Condition',
+            'name'                  => 'Beta Condition',
         ]);
         DiscountConditionTranslation::factory()->english()->create([
             'discount_condition_id' => $gamma->id,
-            'name' => 'Gamma Condition',
+            'name'                  => 'Gamma Condition',
         ]);
 
         // Act: pull the ordered identifiers through the dedicated scope.
@@ -128,9 +128,9 @@ final class DiscountConditionTest extends TestCase
     {
         // Arrange: craft a simple numeric rule for repeated evaluation.
         $condition = DiscountCondition::factory()->create([
-            'type' => 'cart_total',
-            'operator' => 'greater_than',
-            'value' => 100,
+            'type'      => 'cart_total',
+            'operator'  => 'greater_than',
+            'value'     => 100,
             'is_active' => true,
         ]);
 
@@ -149,15 +149,15 @@ final class DiscountConditionTest extends TestCase
         // Arrange: seed a translation to exercise the accessor helpers.
         app()->setLocale('en');
         $condition = DiscountCondition::factory()->create([
-            'type' => 'product',
-            'operator' => 'equals_to',
-            'value' => 'VIP',
+            'type'      => 'product',
+            'operator'  => 'equals_to',
+            'value'     => 'VIP',
             'is_active' => true,
         ]);
         DiscountConditionTranslation::factory()->english()->create([
             'discount_condition_id' => $condition->id,
-            'name' => 'VIP Customers',
-            'description' => 'Only VIP customers qualify for this offer.',
+            'name'                  => 'VIP Customers',
+            'description'           => 'Only VIP customers qualify for this offer.',
         ]);
 
         // Act: access the computed properties and helper labels.

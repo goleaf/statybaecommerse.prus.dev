@@ -18,7 +18,7 @@ final class AddressTest extends TestCase
     public function test_fillable_configuration_is_exposed(): void
     {
         // Arrange: instantiate the model to inspect the fillable list.
-        $model = new Address();
+        $model = new Address;
 
         // Assert: verify a curated subset of important attributes is whitelisted.
         $this->assertContains('first_name', $model->getFillable());
@@ -30,15 +30,15 @@ final class AddressTest extends TestCase
     public function test_casts_configuration_matches_expectations(): void
     {
         // Arrange: inspect the model for its cast definitions to guard regressions.
-        $model = new Address();
+        $model = new Address;
 
         // Assert: ensure boolean and enum casts are preserved.
         foreach ([
-            'is_default' => 'boolean',
-            'is_billing' => 'boolean',
+            'is_default'  => 'boolean',
+            'is_billing'  => 'boolean',
             'is_shipping' => 'boolean',
-            'is_active' => 'boolean',
-            'type' => AddressType::class,
+            'is_active'   => 'boolean',
+            'type'        => AddressType::class,
         ] as $attribute => $cast) {
             // Each expected cast should exist with the proper configuration value.
             $this->assertArrayHasKey($attribute, $model->getCasts());

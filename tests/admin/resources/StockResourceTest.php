@@ -26,22 +26,22 @@ final class StockResourceTest extends TestCase
         $product = Product::factory()->create();
 
         $stockData = [
-            'product_id' => $product->id,
-            'quantity' => 100,
+            'product_id'        => $product->id,
+            'quantity'          => 100,
             'reserved_quantity' => 10,
-            'min_quantity' => 5,
-            'max_quantity' => 1000,
-            'is_active' => true,
+            'min_quantity'      => 5,
+            'max_quantity'      => 1000,
+            'is_active'         => true,
         ];
 
         $stock = Stock::create($stockData);
 
         $this->assertDatabaseHas('stocks', [
-            'product_id' => $product->id,
-            'quantity' => 100,
+            'product_id'        => $product->id,
+            'quantity'          => 100,
             'reserved_quantity' => 10,
-            'min_quantity' => 5,
-            'max_quantity' => 1000,
+            'min_quantity'      => 5,
+            'max_quantity'      => 1000,
         ]);
 
         $this->assertEquals(100, $stock->quantity);
@@ -56,7 +56,7 @@ final class StockResourceTest extends TestCase
         $stock = Stock::factory()->create(['product_id' => $product->id]);
 
         $stock->update([
-            'quantity' => 200,
+            'quantity'          => 200,
             'reserved_quantity' => 20,
         ]);
 
@@ -70,12 +70,12 @@ final class StockResourceTest extends TestCase
 
         Stock::factory()->create([
             'product_id' => $product->id,
-            'quantity' => 100,
+            'quantity'   => 100,
         ]);
 
         Stock::factory()->create([
             'product_id' => $product->id,
-            'quantity' => 5,
+            'quantity'   => 5,
         ]);
 
         $inStock = Stock::where('quantity', '>', 10)->get();
@@ -93,12 +93,12 @@ final class StockResourceTest extends TestCase
 
         Stock::factory()->create([
             'product_id' => $product->id,
-            'quantity' => 0,
+            'quantity'   => 0,
         ]);
 
         Stock::factory()->create([
             'product_id' => $product->id,
-            'quantity' => 50,
+            'quantity'   => 50,
         ]);
 
         $outOfStock = Stock::where('quantity', '=', 0)->get();
@@ -115,8 +115,8 @@ final class StockResourceTest extends TestCase
         $product = Product::factory()->create();
 
         $stock = Stock::factory()->create([
-            'product_id' => $product->id,
-            'quantity' => 100,
+            'product_id'        => $product->id,
+            'quantity'          => 100,
             'reserved_quantity' => 20,
         ]);
 

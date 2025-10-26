@@ -15,12 +15,12 @@ final class NotificationSearchRequest extends ApiRequest
     public function rules(): array
     {
         return [
-            'q' => ['required', 'string', 'min:2'],
-            'page' => ['sometimes', 'integer', 'min:1'],
-            'per_page' => ['sometimes', 'integer', 'min:1', 'max:100'],
-            'type' => ['sometimes', 'string'],
-            'read' => ['sometimes', 'boolean'],
-            'sort' => ['sometimes', 'in:created_at,type'],
+            'q'         => ['required', 'string', 'min:2'],
+            'page'      => ['sometimes', 'integer', 'min:1'],
+            'per_page'  => ['sometimes', 'integer', 'min:1', 'max:100'],
+            'type'      => ['sometimes', 'string'],
+            'read'      => ['sometimes', 'boolean'],
+            'sort'      => ['sometimes', 'in:created_at,type'],
             'direction' => ['sometimes', 'in:asc,desc'],
         ];
     }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Models\FailedJob;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
+
 // Keep database state isolated for each scenario; the Pest bootstrap wires the Laravel TestCase globally.
 uses(RefreshDatabase::class);
 

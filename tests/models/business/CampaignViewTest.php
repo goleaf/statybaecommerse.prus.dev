@@ -21,12 +21,12 @@ final class CampaignViewTest extends TestCase
 
         $view = CampaignView::factory()->create([
             'campaign_id' => $campaign->id,
-            'session_id' => 'test_session_123',
-            'ip_address' => '192.168.1.1',
-            'user_agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-            'referer' => 'https://example.com',
+            'session_id'  => 'test_session_123',
+            'ip_address'  => '192.168.1.1',
+            'user_agent'  => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+            'referer'     => 'https://example.com',
             'customer_id' => $customer->id,
-            'viewed_at' => now(),
+            'viewed_at'   => now(),
         ]);
 
         $this->assertInstanceOf(CampaignView::class, $view);
@@ -100,11 +100,11 @@ final class CampaignViewTest extends TestCase
         $view = CampaignView::factory()->create([
             'campaign_id' => $campaign->id,
             'customer_id' => $customer->id,
-            'session_id' => 'unique_session_456',
-            'ip_address' => '10.0.0.1',
-            'user_agent' => 'Custom User Agent',
-            'referer' => 'https://google.com',
-            'viewed_at' => now()->subHour(),
+            'session_id'  => 'unique_session_456',
+            'ip_address'  => '10.0.0.1',
+            'user_agent'  => 'Custom User Agent',
+            'referer'     => 'https://google.com',
+            'viewed_at'   => now()->subHour(),
         ]);
 
         // Test basic model functionality

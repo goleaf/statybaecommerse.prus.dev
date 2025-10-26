@@ -14,19 +14,19 @@ use Livewire\Component;
  *
  * Livewire component for CategoryAutocomplete with reactive frontend functionality, real-time updates, and user interaction handling.
  *
- * @property string $query
- * @property array $results
- * @property bool $showResults
- * @property int $maxResults
- * @property int $minQueryLength
- * @property bool $isSearching
+ * @property string   $query
+ * @property array    $results
+ * @property bool     $showResults
+ * @property int      $maxResults
+ * @property int      $minQueryLength
+ * @property bool     $isSearching
  * @property int|null $selectedCategoryId
- * @property string $selectedCategoryName
- * @property bool $required
- * @property string $placeholder
- * @property string $name
- * @property bool $allowMultiple
- * @property array $selectedCategories
+ * @property string   $selectedCategoryName
+ * @property bool     $required
+ * @property string   $placeholder
+ * @property string   $name
+ * @property bool     $allowMultiple
+ * @property array    $selectedCategories
  */
 final class CategoryAutocomplete extends Component
 {

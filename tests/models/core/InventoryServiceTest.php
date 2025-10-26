@@ -24,7 +24,7 @@ final class InventoryServiceTest extends TestCase
     public function test_adjust_product_stock_increases_quantity(): void
     {
         $product = Product::factory()->create([
-            'manage_stock' => true,
+            'manage_stock'   => true,
             'stock_quantity' => 10,
         ]);
 
@@ -37,7 +37,7 @@ final class InventoryServiceTest extends TestCase
     public function test_adjust_product_stock_decreases_quantity(): void
     {
         $product = Product::factory()->create([
-            'manage_stock' => true,
+            'manage_stock'   => true,
             'stock_quantity' => 10,
         ]);
 
@@ -50,7 +50,7 @@ final class InventoryServiceTest extends TestCase
     public function test_adjust_product_stock_never_goes_below_zero(): void
     {
         $product = Product::factory()->create([
-            'manage_stock' => true,
+            'manage_stock'   => true,
             'stock_quantity' => 5,
         ]);
 
@@ -63,7 +63,7 @@ final class InventoryServiceTest extends TestCase
     public function test_adjust_product_stock_returns_true_for_non_tracked_products(): void
     {
         $product = Product::factory()->create([
-            'manage_stock' => false,
+            'manage_stock'   => false,
             'stock_quantity' => 10,
         ]);
 
@@ -76,18 +76,18 @@ final class InventoryServiceTest extends TestCase
     public function test_get_low_stock_products(): void
     {
         Product::factory()->create([
-            'manage_stock' => true,
-            'stock_quantity' => 3,
+            'manage_stock'        => true,
+            'stock_quantity'      => 3,
             'low_stock_threshold' => 5,
         ]);
         Product::factory()->create([
-            'manage_stock' => true,
-            'stock_quantity' => 10,
+            'manage_stock'        => true,
+            'stock_quantity'      => 10,
             'low_stock_threshold' => 5,
         ]);
         Product::factory()->create([
-            'manage_stock' => false,
-            'stock_quantity' => 1,
+            'manage_stock'        => false,
+            'stock_quantity'      => 1,
             'low_stock_threshold' => 5,
         ]);
 
@@ -100,15 +100,15 @@ final class InventoryServiceTest extends TestCase
     public function test_get_out_of_stock_products(): void
     {
         Product::factory()->create([
-            'manage_stock' => true,
+            'manage_stock'   => true,
             'stock_quantity' => 0,
         ]);
         Product::factory()->create([
-            'manage_stock' => true,
+            'manage_stock'   => true,
             'stock_quantity' => 5,
         ]);
         Product::factory()->create([
-            'manage_stock' => false,
+            'manage_stock'   => false,
             'stock_quantity' => 0,
         ]);
 
@@ -121,17 +121,17 @@ final class InventoryServiceTest extends TestCase
     public function test_get_inventory_summary(): void
     {
         Product::factory()->create([
-            'manage_stock' => true,
-            'stock_quantity' => 10,
+            'manage_stock'        => true,
+            'stock_quantity'      => 10,
             'low_stock_threshold' => 5,
         ]);
         Product::factory()->create([
-            'manage_stock' => true,
-            'stock_quantity' => 3,
+            'manage_stock'        => true,
+            'stock_quantity'      => 3,
             'low_stock_threshold' => 5,
         ]);
         Product::factory()->create([
-            'manage_stock' => true,
+            'manage_stock'   => true,
             'stock_quantity' => 0,
         ]);
         Product::factory()->create([
@@ -151,24 +151,24 @@ final class InventoryServiceTest extends TestCase
     public function test_bulk_adjust_stock(): void
     {
         $product1 = Product::factory()->create([
-            'manage_stock' => true,
+            'manage_stock'   => true,
             'stock_quantity' => 10,
         ]);
         $product2 = Product::factory()->create([
-            'manage_stock' => true,
+            'manage_stock'   => true,
             'stock_quantity' => 20,
         ]);
 
         $adjustments = [
             [
                 'product_id' => $product1->id,
-                'quantity' => 5,
-                'reason' => 'restock',
+                'quantity'   => 5,
+                'reason'     => 'restock',
             ],
             [
                 'product_id' => $product2->id,
-                'quantity' => -3,
-                'reason' => 'damaged',
+                'quantity'   => -3,
+                'reason'     => 'damaged',
             ],
         ];
 
@@ -186,8 +186,8 @@ final class InventoryServiceTest extends TestCase
         $adjustments = [
             [
                 'product_id' => 999999,
-                'quantity' => 5,
-                'reason' => 'restock',
+                'quantity'   => 5,
+                'reason'     => 'restock',
             ],
         ];
 
@@ -203,7 +203,7 @@ final class InventoryServiceTest extends TestCase
         $adjustments = [
             [
                 'quantity' => 5,
-                'reason' => 'restock',
+                'reason'   => 'restock',
             ],
         ];
 

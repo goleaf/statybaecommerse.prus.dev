@@ -12,8 +12,8 @@ use Livewire\Component;
  *
  * Livewire component for LanguageSwitcher with reactive frontend functionality, real-time updates, and user interaction handling.
  *
- * @property array<int, string> $locales
- * @property string $current
+ * @property array<int, string>    $locales
+ * @property string                $current
  * @property array<string, string> $links
  */
 class LanguageSwitcher extends Component
@@ -46,7 +46,7 @@ class LanguageSwitcher extends Component
         $path = parse_url($full, PHP_URL_PATH);
         $path = is_string($path) ? $path : '/';
         $qs = parse_url($full, PHP_URL_QUERY);
-        $query = $qs ? '?'.$qs : '';
+        $query = $qs ? '?' . $qs : '';
         $parts = explode('/', ltrim($path, '/'));
         if ($parts !== [] && $parts[0] !== '' && in_array($parts[0], $this->locales, true)) {
             array_shift($parts);
@@ -54,8 +54,8 @@ class LanguageSwitcher extends Component
         $rest = trim(implode('/', $parts), '/');
         $this->links = [];
         foreach ($this->locales as $loc) {
-            $href = $rest === '' ? url('/'.$loc) : url('/'.$loc.'/'.$rest);
-            $this->links[$loc] = $href.$query;
+            $href = $rest === '' ? url('/' . $loc) : url('/' . $loc . '/' . $rest);
+            $this->links[$loc] = $href . $query;
         }
     }
 

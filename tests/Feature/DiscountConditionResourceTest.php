@@ -26,7 +26,7 @@ final class DiscountConditionResourceTest extends TestCase
         parent::setUp();
 
         $adminUser = User::factory()->create([
-            'email' => 'admin@example.com',
+            'email'    => 'admin@example.com',
             'is_admin' => true,
         ]);
 
@@ -50,29 +50,29 @@ final class DiscountConditionResourceTest extends TestCase
         $discount = Discount::factory()->create();
         $newDiscountConditionData = DiscountCondition::factory()->make([
             'discount_id' => $discount->id,
-            'type' => 'product',
-            'operator' => 'equals_to',
-            'value' => 'test_value',
+            'type'        => 'product',
+            'operator'    => 'equals_to',
+            'value'       => 'test_value',
         ]);
 
         Livewire::test(CreateDiscountCondition::class)
             ->fillForm([
                 'discount_id' => $newDiscountConditionData->discount_id,
-                'type' => $newDiscountConditionData->type,
-                'operator' => $newDiscountConditionData->operator,
-                'value' => $newDiscountConditionData->value,
-                'is_active' => true,
-                'priority' => 1,
+                'type'        => $newDiscountConditionData->type,
+                'operator'    => $newDiscountConditionData->operator,
+                'value'       => $newDiscountConditionData->value,
+                'is_active'   => true,
+                'priority'    => 1,
             ])
             ->call('create')
             ->assertNotified();
 
         $this->assertDatabaseHas('discount_conditions', [
             'discount_id' => $newDiscountConditionData->discount_id,
-            'type' => $newDiscountConditionData->type,
-            'operator' => $newDiscountConditionData->operator,
-            'is_active' => true,
-            'priority' => 1,
+            'type'        => $newDiscountConditionData->type,
+            'operator'    => $newDiscountConditionData->operator,
+            'is_active'   => true,
+            'priority'    => 1,
         ]);
     }
 
@@ -81,7 +81,7 @@ final class DiscountConditionResourceTest extends TestCase
         $discount = Discount::factory()->create();
         $discountCondition = DiscountCondition::factory()->create([
             'discount_id' => $discount->id,
-            'is_active' => true,
+            'is_active'   => true,
         ]);
 
         Livewire::test(EditDiscountCondition::class, [
@@ -89,15 +89,15 @@ final class DiscountConditionResourceTest extends TestCase
         ])
             ->fillForm([
                 'is_active' => false,
-                'priority' => 5,
+                'priority'  => 5,
             ])
             ->call('save')
             ->assertNotified();
 
         $this->assertDatabaseHas('discount_conditions', [
-            'id' => $discountCondition->id,
+            'id'        => $discountCondition->id,
             'is_active' => false,
-            'priority' => 5,
+            'priority'  => 5,
         ]);
     }
 
@@ -119,11 +119,11 @@ final class DiscountConditionResourceTest extends TestCase
         $discount = Discount::factory()->create();
         $productCondition = DiscountCondition::factory()->create([
             'discount_id' => $discount->id,
-            'type' => 'product',
+            'type'        => 'product',
         ]);
         $categoryCondition = DiscountCondition::factory()->create([
             'discount_id' => $discount->id,
-            'type' => 'category',
+            'type'        => 'category',
         ]);
 
         Livewire::test(ListDiscountConditions::class)
@@ -137,11 +137,11 @@ final class DiscountConditionResourceTest extends TestCase
         $discount = Discount::factory()->create();
         $activeCondition = DiscountCondition::factory()->create([
             'discount_id' => $discount->id,
-            'is_active' => true,
+            'is_active'   => true,
         ]);
         $inactiveCondition = DiscountCondition::factory()->create([
             'discount_id' => $discount->id,
-            'is_active' => false,
+            'is_active'   => false,
         ]);
 
         Livewire::test(ListDiscountConditions::class)
@@ -155,7 +155,7 @@ final class DiscountConditionResourceTest extends TestCase
         $discount = Discount::factory()->create();
         $discountConditions = DiscountCondition::factory()->count(3)->create([
             'discount_id' => $discount->id,
-            'is_active' => false,
+            'is_active'   => false,
         ]);
 
         Livewire::test(ListDiscountConditions::class)
@@ -163,7 +163,7 @@ final class DiscountConditionResourceTest extends TestCase
 
         foreach ($discountConditions as $condition) {
             $this->assertDatabaseHas('discount_conditions', [
-                'id' => $condition->id,
+                'id'        => $condition->id,
                 'is_active' => true,
             ]);
         }
@@ -174,7 +174,7 @@ final class DiscountConditionResourceTest extends TestCase
         $discount = Discount::factory()->create();
         $discountConditions = DiscountCondition::factory()->count(3)->create([
             'discount_id' => $discount->id,
-            'is_active' => true,
+            'is_active'   => true,
         ]);
 
         Livewire::test(ListDiscountConditions::class)
@@ -182,7 +182,7 @@ final class DiscountConditionResourceTest extends TestCase
 
         foreach ($discountConditions as $condition) {
             $this->assertDatabaseHas('discount_conditions', [
-                'id' => $condition->id,
+                'id'        => $condition->id,
                 'is_active' => false,
             ]);
         }
@@ -193,14 +193,14 @@ final class DiscountConditionResourceTest extends TestCase
         $discount = Discount::factory()->create();
         $discountCondition = DiscountCondition::factory()->create([
             'discount_id' => $discount->id,
-            'is_active' => true,
+            'is_active'   => true,
         ]);
 
         Livewire::test(ListDiscountConditions::class)
             ->callTableAction('toggle_active', $discountCondition);
 
         $this->assertDatabaseHas('discount_conditions', [
-            'id' => $discountCondition->id,
+            'id'        => $discountCondition->id,
             'is_active' => false,
         ]);
     }
@@ -212,8 +212,8 @@ final class DiscountConditionResourceTest extends TestCase
         Livewire::test(CreateDiscountCondition::class)
             ->fillForm([
                 'discount_id' => $discount->id,
-                'type' => '',
-                'operator' => '',
+                'type'        => '',
+                'operator'    => '',
             ])
             ->call('create')
             ->assertHasFormErrors(['type', 'operator']);
@@ -227,7 +227,7 @@ final class DiscountConditionResourceTest extends TestCase
 
         $discountCondition = DiscountCondition::factory()->create([
             'discount_id' => $discount->id,
-            'type' => 'product',
+            'type'        => 'product',
         ]);
 
         $discountCondition->products()->attach($product);
@@ -247,11 +247,11 @@ final class DiscountConditionResourceTest extends TestCase
         Livewire::test(CreateDiscountCondition::class)
             ->fillForm([
                 'discount_id' => $discount->id,
-                'type' => 'product',
-                'operator' => 'equals_to',
-                'value' => 'sync-test',
-                'products' => [$product->id],
-                'categories' => [$category->id],
+                'type'        => 'product',
+                'operator'    => 'equals_to',
+                'value'       => 'sync-test',
+                'products'    => [$product->id],
+                'categories'  => [$category->id],
             ])
             ->call('create')
             ->assertHasNoFormErrors()
@@ -271,9 +271,9 @@ final class DiscountConditionResourceTest extends TestCase
 
         $discountCondition = DiscountCondition::factory()->create([
             'discount_id' => $discount->id,
-            'type' => 'product',
-            'operator' => 'equals_to',
-            'value' => 'sync-test',
+            'type'        => 'product',
+            'operator'    => 'equals_to',
+            'value'       => 'sync-test',
         ]);
 
         $discountCondition->products()->attach($initialProduct->id);
@@ -287,11 +287,11 @@ final class DiscountConditionResourceTest extends TestCase
         ])
             ->fillForm([
                 'discount_id' => $discount->id,
-                'type' => 'product',
-                'operator' => 'equals_to',
-                'value' => 'sync-test-updated',
-                'products' => [$newProduct->id],
-                'categories' => [$newCategory->id],
+                'type'        => 'product',
+                'operator'    => 'equals_to',
+                'value'       => 'sync-test-updated',
+                'products'    => [$newProduct->id],
+                'categories'  => [$newCategory->id],
             ])
             ->call('save')
             ->assertHasNoFormErrors()

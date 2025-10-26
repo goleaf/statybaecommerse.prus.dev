@@ -17,8 +17,7 @@ final class DiscountRedemptionStoreRequest extends FormRequest
     {
         return [
             'discount_code' => ['required', 'string', 'exists:discount_codes,code'],
-            'order_id' => ['nullable', 'exists:orders,id'],
+            'order_id'      => ['nullable', 'exists:orders,id'],
         ];
     }
 }
-

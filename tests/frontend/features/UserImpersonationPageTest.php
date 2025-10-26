@@ -110,12 +110,12 @@ describe('User Impersonation Page Tests', function () {
 
         it('can filter by recent activity', function () {
             $recentUser = User::factory()->create([
-                'is_admin' => false,
+                'is_admin'      => false,
                 'last_login_at' => now()->subDays(1),
             ]);
 
             $oldUser = User::factory()->create([
-                'is_admin' => false,
+                'is_admin'      => false,
                 'last_login_at' => now()->subDays(60),
             ]);
 
@@ -208,9 +208,9 @@ describe('User Impersonation Page Tests', function () {
     describe('Header Actions', function () {
         it('shows stop impersonation button when impersonating', function () {
             session(['impersonate' => [
-                'original_user_id' => $this->admin->id,
+                'original_user_id'     => $this->admin->id,
                 'impersonated_user_id' => $this->regularUser->id,
-                'started_at' => now()->toISOString(),
+                'started_at'           => now()->toISOString(),
             ]]);
 
             $this->get('/admin/user-impersonation')

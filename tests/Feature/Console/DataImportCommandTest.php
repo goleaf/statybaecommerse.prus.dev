@@ -22,7 +22,7 @@ it('feature: restores foreign key enforcement after truncation failure', functio
     });
 
     try {
-        $command = new DataImportCommand();
+        $command = new DataImportCommand;
 
         $callTruncate = static function (string $table) use ($command): void {
             // Use reflection to invoke the protected truncateTable helper while respecting the command's final contract.

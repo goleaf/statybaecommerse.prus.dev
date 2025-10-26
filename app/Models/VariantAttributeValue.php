@@ -40,7 +40,7 @@ final class VariantAttributeValue extends Model
         return [
             'is_filterable' => 'boolean',
             'is_searchable' => 'boolean',
-            'sort_order' => 'integer',
+            'sort_order'    => 'integer',
         ];
     }
 
@@ -68,8 +68,8 @@ final class VariantAttributeValue extends Model
         $locale = $locale ?: app()->getLocale();
 
         return match ($locale) {
-            'lt' => $this->attribute_value_lt ?: $this->attribute_value_display ?: $this->attribute_value,
-            'en' => $this->attribute_value_en ?: $this->attribute_value_display ?: $this->attribute_value,
+            'lt'    => $this->attribute_value_lt ?: $this->attribute_value_display ?: $this->attribute_value,
+            'en'    => $this->attribute_value_en ?: $this->attribute_value_display ?: $this->attribute_value,
             default => $this->attribute_value_display ?: $this->attribute_value,
         };
     }

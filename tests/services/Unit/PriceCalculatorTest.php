@@ -12,16 +12,16 @@ describe('PriceCalculator', function () {
             'currency' => 'EUR',
             'rounding' => [
                 'precision' => 2,
-                'mode' => PHP_ROUND_HALF_UP,
+                'mode'      => PHP_ROUND_HALF_UP,
             ],
             'vat' => [
-                'rate' => 21.0,
+                'rate'        => 21.0,
                 'setting_key' => 'tax_rate',
             ],
             'shipping' => [
-                'flat_rate' => 5.99,
-                'flat_rate_setting_key' => 'shipping_cost',
-                'free_threshold' => 100.0,
+                'flat_rate'                  => 5.99,
+                'flat_rate_setting_key'      => 'shipping_cost',
+                'free_threshold'             => 100.0,
                 'free_threshold_setting_key' => 'free_shipping_threshold',
             ],
         ]);

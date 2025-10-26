@@ -20,18 +20,18 @@ final class ReferralCodeStatisticsFactory extends Factory
         $conversions = $this->faker->numberBetween(0, $signups);
 
         return [
-            'referral_code_id' => ReferralCode::factory(),
-            'date' => $this->faker->dateTimeBetween('-1 year', 'now')->format('Y-m-d'),
-            'total_views' => $views,
-            'total_clicks' => $clicks,
-            'total_signups' => $signups,
+            'referral_code_id'  => ReferralCode::factory(),
+            'date'              => $this->faker->dateTimeBetween('-1 year', 'now')->format('Y-m-d'),
+            'total_views'       => $views,
+            'total_clicks'      => $clicks,
+            'total_signups'     => $signups,
             'total_conversions' => $conversions,
-            'total_revenue' => $this->faker->randomFloat(2, 0, $conversions * 100),
-            'metadata' => $this->faker->optional(0.2)->randomElements([
+            'total_revenue'     => $this->faker->randomFloat(2, 0, $conversions * 100),
+            'metadata'          => $this->faker->optional(0.2)->randomElements([
                 'avg_session_duration' => $this->faker->numberBetween(30, 600),
-                'bounce_rate' => $this->faker->randomFloat(2, 0, 1),
-                'top_countries' => $this->faker->randomElements(['LT', 'LV', 'EE', 'PL', 'DE'], 3),
-                'top_devices' => $this->faker->randomElements(['desktop', 'mobile', 'tablet'], 2),
+                'bounce_rate'          => $this->faker->randomFloat(2, 0, 1),
+                'top_countries'        => $this->faker->randomElements(['LT', 'LV', 'EE', 'PL', 'DE'], 3),
+                'top_devices'          => $this->faker->randomElements(['desktop', 'mobile', 'tablet'], 2),
             ]),
         ];
     }
@@ -59,11 +59,11 @@ final class ReferralCodeStatisticsFactory extends Factory
             $conversions = $this->faker->numberBetween(100, $signups);
 
             return [
-                'total_views' => $views,
-                'total_clicks' => $clicks,
-                'total_signups' => $signups,
+                'total_views'       => $views,
+                'total_clicks'      => $clicks,
+                'total_signups'     => $signups,
                 'total_conversions' => $conversions,
-                'total_revenue' => $this->faker->randomFloat(2, $conversions * 50, $conversions * 200),
+                'total_revenue'     => $this->faker->randomFloat(2, $conversions * 50, $conversions * 200),
             ];
         });
     }
@@ -77,11 +77,11 @@ final class ReferralCodeStatisticsFactory extends Factory
             $conversions = $this->faker->numberBetween(1, $signups);
 
             return [
-                'total_views' => $views,
-                'total_clicks' => $clicks,
-                'total_signups' => $signups,
+                'total_views'       => $views,
+                'total_clicks'      => $clicks,
+                'total_signups'     => $signups,
                 'total_conversions' => $conversions,
-                'total_revenue' => $this->faker->randomFloat(2, 0, $conversions * 50),
+                'total_revenue'     => $this->faker->randomFloat(2, 0, $conversions * 50),
             ];
         });
     }

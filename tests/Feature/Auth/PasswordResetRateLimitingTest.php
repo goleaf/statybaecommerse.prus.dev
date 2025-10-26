@@ -21,7 +21,7 @@ final class PasswordResetRateLimitingTest extends TestCase
     {
         Notification::fake();
 
-        $email = 'reset'.Str::random(6).'@example.com';
+        $email = 'reset' . Str::random(6) . '@example.com';
 
         $user = User::factory()->create([
             'email' => $email,

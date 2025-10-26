@@ -8,6 +8,7 @@ use App\Models\Product;
 use App\Services\Images\GradientImageService;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Log;
+use Throwable;
 
 final class ProductPlaceholdersSeeder extends Seeder
 {
@@ -33,7 +34,7 @@ final class ProductPlaceholdersSeeder extends Seeder
                             ->withCustomProperties(['placeholder' => true])
                             ->preservingOriginal()
                             ->toMediaCollection($collection);
-                    } catch (\Throwable $e) {
+                    } catch (Throwable $e) {
                         Log::warning('Placeholder attach failed', ['product_id' => $product->id, 'error' => $e->getMessage()]);
                     }
                 }

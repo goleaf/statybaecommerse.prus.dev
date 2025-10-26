@@ -29,8 +29,8 @@ final class SuperAdminSeeder extends Seeder
         $admin = User::factory()
             ->admin()
             ->create([
-                'email' => 'admin@example.com',
-                'name' => 'Super Administrator',
+                'email'    => 'admin@example.com',
+                'name'     => 'Super Administrator',
                 'password' => Hash::make('password'),
             ]);
 
@@ -39,6 +39,6 @@ final class SuperAdminSeeder extends Seeder
         $this->command->info('✅ Super Admin created successfully!');
         $this->command->info('📧 Email: admin@example.com');
         $this->command->info('🔑 Password: password');
-        $this->command->info('🎭 Role: super-admin with '.$permissions->count().' permissions');
+        $this->command->info('🎭 Role: super-admin with ' . $permissions->count() . ' permissions');
     }
 }

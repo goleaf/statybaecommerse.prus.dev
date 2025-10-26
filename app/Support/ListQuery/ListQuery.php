@@ -23,10 +23,10 @@ use Illuminate\Database\Eloquent\Builder;
 final class ListQuery
 {
     /**
-     * @param  array<int, AppliedFilter>  $filterDefinitions
-     * @param  array<int, AppliedSort>  $sortDefinitions
-     * @param  array<string, mixed>  $filters
-     * @param  array<int, array{key: string, direction: string}>  $sorts
+     * @param array<int, AppliedFilter>                         $filterDefinitions
+     * @param array<int, AppliedSort>                           $sortDefinitions
+     * @param array<string, mixed>                              $filters
+     * @param array<int, array{key: string, direction: string}> $sorts
      */
     public function __construct(
         private readonly int $page,

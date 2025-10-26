@@ -19,11 +19,11 @@ final class ShoppingCartTest extends TestCase
     public function test_it_adds_simple_product_to_cart(): void
     {
         $product = Product::factory()->create([
-            'price' => 199.00,
-            'sale_price' => null,
-            'status' => 'published',
-            'is_visible' => true,
-            'is_enabled' => true,
+            'price'        => 199.00,
+            'sale_price'   => null,
+            'status'       => 'published',
+            'is_visible'   => true,
+            'is_enabled'   => true,
             'published_at' => now()->subDay(),
         ]);
 
@@ -45,26 +45,26 @@ final class ShoppingCartTest extends TestCase
     public function test_it_adds_variant_to_cart_with_variant_pricing(): void
     {
         $product = Product::factory()->create([
-            'type' => 'variable',
-            'price' => 249.00,
-            'sale_price' => null,
-            'status' => 'published',
-            'is_visible' => true,
-            'is_enabled' => true,
+            'type'         => 'variable',
+            'price'        => 249.00,
+            'sale_price'   => null,
+            'status'       => 'published',
+            'is_visible'   => true,
+            'is_enabled'   => true,
             'published_at' => now()->subDay(),
         ]);
 
         $variant = ProductVariant::factory()
             ->for($product)
             ->create([
-                'price' => 179.45,
-                'promotional_price' => 149.99,
-                'is_on_sale' => true,
-                'sale_start_date' => now()->subDay(),
-                'sale_end_date' => now()->addDay(),
+                'price'              => 179.45,
+                'promotional_price'  => 149.99,
+                'is_on_sale'         => true,
+                'sale_start_date'    => now()->subDay(),
+                'sale_end_date'      => now()->addDay(),
                 'is_default_variant' => true,
-                'track_inventory' => false,
-                'is_enabled' => true,
+                'track_inventory'    => false,
+                'is_enabled'         => true,
             ]);
 
         session()->start();

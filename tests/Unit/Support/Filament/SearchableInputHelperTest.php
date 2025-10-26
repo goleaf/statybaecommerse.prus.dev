@@ -6,8 +6,8 @@ use App\Support\Filament\SearchableInputHelper;
 use DefStudio\SearchableInput\DTO\SearchResult;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Illuminate\Support\Collection;
-use Mockery as MockeryFacade;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
+use Mockery as MockeryFacade;
 
 uses(MockeryPHPUnitIntegration::class);
 
@@ -37,8 +37,8 @@ test('hydrate helper populates the component state with resolved option data', f
         $component,
         5,
         static fn (int $value): ?array => [
-            'value' => $value,
-            'label' => 'Resolved label',
+            'value'   => $value,
+            'label'   => 'Resolved label',
             'payload' => ['foo' => 'bar'],
         ],
     );

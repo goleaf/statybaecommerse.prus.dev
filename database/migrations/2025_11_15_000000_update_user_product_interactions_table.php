@@ -38,8 +38,8 @@ return new class extends Migration
         Schema::table('user_product_interactions', function (Blueprint $table): void {
             foreach ([
                 'user_product_interaction_unique' => ['user_id', 'product_id', 'event'],
-                'user_interactions_last_idx' => ['user_id', 'event', 'last_interaction'],
-                'user_interactions_product_idx' => ['product_id', 'event', 'count'],
+                'user_interactions_last_idx'      => ['user_id', 'event', 'last_interaction'],
+                'user_interactions_product_idx'   => ['product_id', 'event', 'count'],
             ] as $indexName => $columns) {
                 try {
                     $table->dropIndex($indexName);
@@ -76,8 +76,8 @@ return new class extends Migration
         Schema::table('user_product_interactions', function (Blueprint $table): void {
             foreach ([
                 'user_product_interaction_unique' => ['user_id', 'product_id', 'interaction_type'],
-                'user_interactions_last_idx' => ['user_id', 'interaction_type', 'last_interaction'],
-                'user_interactions_product_idx' => ['product_id', 'interaction_type', 'count'],
+                'user_interactions_last_idx'      => ['user_id', 'interaction_type', 'last_interaction'],
+                'user_interactions_product_idx'   => ['product_id', 'interaction_type', 'count'],
             ] as $indexName => $columns) {
                 try {
                     $table->dropIndex($indexName);

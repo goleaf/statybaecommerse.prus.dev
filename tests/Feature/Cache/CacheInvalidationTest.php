@@ -23,8 +23,8 @@ final class CacheInvalidationTest extends TestCase
 
         $category = Category::factory()->create();
         $product = Product::factory()->published()->create([
-            'brand_id' => Brand::factory(),
-            'is_visible' => true,
+            'brand_id'     => Brand::factory(),
+            'is_visible'   => true,
             'published_at' => now(),
         ]);
 
@@ -45,13 +45,13 @@ final class CacheInvalidationTest extends TestCase
         $fake = TagAwareCache::fake();
 
         $product = Product::factory()->published()->create([
-            'brand_id' => Brand::factory(),
-            'is_visible' => true,
+            'brand_id'     => Brand::factory(),
+            'is_visible'   => true,
             'published_at' => now(),
         ]);
         $variant = ProductVariant::factory()->create([
             'product_id' => $product->id,
-            'price' => 10.0,
+            'price'      => 10.0,
         ]);
 
         $variant->update(['price' => 15.0]);
@@ -68,12 +68,12 @@ final class CacheInvalidationTest extends TestCase
         $fake = TagAwareCache::fake();
 
         $product = Product::factory()->published()->create([
-            'brand_id' => Brand::factory(),
-            'is_visible' => true,
+            'brand_id'     => Brand::factory(),
+            'is_visible'   => true,
             'published_at' => now(),
         ]);
         $variant = ProductVariant::factory()->create([
-            'product_id' => $product->id,
+            'product_id'     => $product->id,
             'stock_quantity' => 5,
         ]);
 
@@ -108,8 +108,8 @@ final class CacheInvalidationTest extends TestCase
         $newBrand = Brand::factory()->create();
 
         $product = Product::factory()->published()->create([
-            'brand_id' => $originalBrand->id,
-            'is_visible' => true,
+            'brand_id'     => $originalBrand->id,
+            'is_visible'   => true,
             'published_at' => now(),
         ]);
 

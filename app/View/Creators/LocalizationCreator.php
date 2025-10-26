@@ -29,28 +29,28 @@ final class LocalizationCreator
 
         $view->with([
             // Locale information
-            'locale' => $locale,
-            'currency' => $currency,
-            'localeName' => $this->getLocaleName($locale),
+            'locale'         => $locale,
+            'currency'       => $currency,
+            'localeName'     => $this->getLocaleName($locale),
             'currencySymbol' => $this->getCurrencySymbol($currency),
 
             // Translation helpers
-            'trans' => fn (string $key, array $replace = []) => $this->translationService->getTranslation($key, $locale, $replace),
+            'trans'       => fn (string $key, array $replace = []) => $this->translationService->getTranslation($key, $locale, $replace),
             'transChoice' => fn (string $key, int $number, array $replace = []) => $this->translationService->getTranslationChoice($key, $number, $locale, $replace),
 
             // Formatting helpers
-            'formatPrice' => fn (float $amount) => $this->formatPrice($amount, $currency),
-            'formatDate' => fn ($date, ?string $format = null) => $this->formatDate($date, $format, $locale),
+            'formatPrice'  => fn (float $amount) => $this->formatPrice($amount, $currency),
+            'formatDate'   => fn ($date, ?string $format = null) => $this->formatDate($date, $format, $locale),
             'formatNumber' => fn (float $number, int $decimals = 2) => $this->formatNumber($number, $decimals, $locale),
 
             // Regional settings
-            'dateFormat' => $this->getDateFormat($locale),
-            'timeFormat' => $this->getTimeFormat($locale),
-            'numberFormat' => $this->getNumberFormat($locale),
+            'dateFormat'     => $this->getDateFormat($locale),
+            'timeFormat'     => $this->getTimeFormat($locale),
+            'numberFormat'   => $this->getNumberFormat($locale),
             'currencyFormat' => $this->getCurrencyFormat($currency),
 
             // Language direction
-            'isRTL' => $this->isRightToLeft($locale),
+            'isRTL'         => $this->isRightToLeft($locale),
             'textDirection' => $this->getTextDirection($locale),
         ]);
     }
@@ -61,10 +61,10 @@ final class LocalizationCreator
     private function getLocaleName(string $locale): string
     {
         return match ($locale) {
-            'lt' => 'Lietuvių',
-            'en' => 'English',
-            'ru' => 'Русский',
-            'de' => 'Deutsch',
+            'lt'    => 'Lietuvių',
+            'en'    => 'English',
+            'ru'    => 'Русский',
+            'de'    => 'Deutsch',
             default => ucfirst($locale),
         };
     }
@@ -75,10 +75,10 @@ final class LocalizationCreator
     private function getCurrencySymbol(string $currency): string
     {
         return match ($currency) {
-            'EUR' => '€',
-            'USD' => '$',
-            'GBP' => '£',
-            'PLN' => 'zł',
+            'EUR'   => '€',
+            'USD'   => '$',
+            'GBP'   => '£',
+            'PLN'   => 'zł',
             default => $currency,
         };
     }
@@ -92,9 +92,9 @@ final class LocalizationCreator
         $formatted = number_format($amount, 2, ',', ' ');
 
         return match ($currency) {
-            'EUR' => "{$formatted} {$symbol}",
-            'USD' => "{$symbol}{$formatted}",
-            'GBP' => "{$symbol}{$formatted}",
+            'EUR'   => "{$formatted} {$symbol}",
+            'USD'   => "{$symbol}{$formatted}",
+            'GBP'   => "{$symbol}{$formatted}",
             default => "{$formatted} {$currency}",
         };
     }
@@ -123,9 +123,9 @@ final class LocalizationCreator
     private function formatNumber(float $number, int $decimals, string $locale): string
     {
         return match ($locale) {
-            'lt' => number_format($number, $decimals, ',', ' '),
-            'en' => number_format($number, $decimals, '.', ','),
-            'de' => number_format($number, $decimals, ',', '.'),
+            'lt'    => number_format($number, $decimals, ',', ' '),
+            'en'    => number_format($number, $decimals, '.', ','),
+            'de'    => number_format($number, $decimals, ',', '.'),
             default => number_format($number, $decimals, '.', ','),
         };
     }
@@ -136,9 +136,9 @@ final class LocalizationCreator
     private function getDateFormat(string $locale): string
     {
         return match ($locale) {
-            'lt' => 'Y-m-d',
-            'en' => 'M j, Y',
-            'de' => 'd.m.Y',
+            'lt'    => 'Y-m-d',
+            'en'    => 'M j, Y',
+            'de'    => 'd.m.Y',
             default => 'Y-m-d',
         };
     }
@@ -149,9 +149,9 @@ final class LocalizationCreator
     private function getTimeFormat(string $locale): string
     {
         return match ($locale) {
-            'lt' => 'H:i',
-            'en' => 'g:i A',
-            'de' => 'H:i',
+            'lt'    => 'H:i',
+            'en'    => 'g:i A',
+            'de'    => 'H:i',
             default => 'H:i',
         };
     }
@@ -162,9 +162,9 @@ final class LocalizationCreator
     private function getNumberFormat(string $locale): array
     {
         return match ($locale) {
-            'lt' => ['decimal' => ',', 'thousands' => ' '],
-            'en' => ['decimal' => '.', 'thousands' => ','],
-            'de' => ['decimal' => ',', 'thousands' => '.'],
+            'lt'    => ['decimal' => ',', 'thousands' => ' '],
+            'en'    => ['decimal' => '.', 'thousands' => ','],
+            'de'    => ['decimal' => ',', 'thousands' => '.'],
             default => ['decimal' => '.', 'thousands' => ','],
         };
     }
@@ -175,9 +175,9 @@ final class LocalizationCreator
     private function getCurrencyFormat(string $currency): array
     {
         return match ($currency) {
-            'EUR' => ['symbol' => '€', 'position' => 'after', 'space' => true],
-            'USD' => ['symbol' => '$', 'position' => 'before', 'space' => false],
-            'GBP' => ['symbol' => '£', 'position' => 'before', 'space' => false],
+            'EUR'   => ['symbol' => '€', 'position' => 'after', 'space' => true],
+            'USD'   => ['symbol' => '$', 'position' => 'before', 'space' => false],
+            'GBP'   => ['symbol' => '£', 'position' => 'before', 'space' => false],
             default => ['symbol' => $currency, 'position' => 'after', 'space' => true],
         };
     }

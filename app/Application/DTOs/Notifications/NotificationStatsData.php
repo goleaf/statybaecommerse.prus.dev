@@ -30,12 +30,12 @@ final class NotificationStatsData
     public function toArray(): array
     {
         return [
-            'total' => $this->total,
-            'read' => $this->read,
-            'unread' => $this->unread,
-            'urgent' => $this->urgent,
-            'today' => $this->today,
-            'this_week' => $this->thisWeek,
+            'total'      => $this->total,
+            'read'       => $this->read,
+            'unread'     => $this->unread,
+            'urgent'     => $this->urgent,
+            'today'      => $this->today,
+            'this_week'  => $this->thisWeek,
             'this_month' => $this->thisMonth,
         ];
     }

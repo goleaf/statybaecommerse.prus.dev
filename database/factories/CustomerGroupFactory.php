@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Factories;
 
@@ -21,27 +23,27 @@ final class CustomerGroupFactory extends Factory
     public function definition(): array
     {
         $attributes = [
-            'name' => $this->faker->words(2, true),
-            'code' => strtoupper($this->faker->bothify('??##')),
-            'description' => $this->faker->sentence(),
-            'slug' => $this->faker->slug(),
+            'name'                => $this->faker->words(2, true),
+            'code'                => strtoupper($this->faker->bothify('??##')),
+            'description'         => $this->faker->sentence(),
+            'slug'                => $this->faker->slug(),
             'discount_percentage' => $this->faker->randomFloat(2, 0, 50),
-            'is_enabled' => $this->faker->boolean(80),
-            'conditions' => [],
+            'is_enabled'          => $this->faker->boolean(80),
+            'conditions'          => [],
         ];
 
         // Only include the JSON metadata payload when the backing table exposes the column to
         // avoid SQLite errors in minimal migration scenarios used during isolated unit tests.
         if (Schema::hasColumn('customer_groups', 'metadata')) {
             $attributes['metadata'] = [
-                'type' => $this->faker->randomElement(['regular', 'vip', 'corporate', 'retail']),
-                'has_special_pricing' => $this->faker->boolean(30),
+                'type'                 => $this->faker->randomElement(['regular', 'vip', 'corporate', 'retail']),
+                'has_special_pricing'  => $this->faker->boolean(30),
                 'has_volume_discounts' => $this->faker->boolean(40),
-                'can_view_prices' => $this->faker->boolean(80),
-                'can_place_orders' => $this->faker->boolean(90),
-                'can_view_catalog' => $this->faker->boolean(85),
-                'can_use_coupons' => $this->faker->boolean(70),
-                'sort_order' => $this->faker->numberBetween(1, 100),
+                'can_view_prices'      => $this->faker->boolean(80),
+                'can_place_orders'     => $this->faker->boolean(90),
+                'can_view_catalog'     => $this->faker->boolean(85),
+                'can_use_coupons'      => $this->faker->boolean(70),
+                'sort_order'           => $this->faker->numberBetween(1, 100),
             ];
         }
 
@@ -67,8 +69,8 @@ final class CustomerGroupFactory extends Factory
      */
     public function active(): static
     {
-        return $this->state(fn(array $attributes) => [
-            'is_active' => true,
+        return $this->state(fn (array $attributes) => [
+            'is_active'  => true,
             'is_enabled' => true,
         ]);
     }
@@ -78,8 +80,8 @@ final class CustomerGroupFactory extends Factory
      */
     public function inactive(): static
     {
-        return $this->state(fn(array $attributes) => [
-            'is_active' => false,
+        return $this->state(fn (array $attributes) => [
+            'is_active'  => false,
             'is_enabled' => false,
         ]);
     }
@@ -89,9 +91,9 @@ final class CustomerGroupFactory extends Factory
      */
     public function default(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'is_default' => true,
-            'is_active' => true,
+            'is_active'  => true,
             'is_enabled' => true,
         ]);
     }
@@ -101,7 +103,7 @@ final class CustomerGroupFactory extends Factory
      */
     public function withSpecialPricing(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'has_special_pricing' => true,
             'discount_percentage' => $this->faker->randomFloat(2, 5, 25),
         ]);
@@ -112,7 +114,7 @@ final class CustomerGroupFactory extends Factory
      */
     public function withVolumeDiscounts(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'has_volume_discounts' => true,
         ]);
     }
@@ -122,7 +124,7 @@ final class CustomerGroupFactory extends Factory
      */
     public function withFixedDiscount(float $amount = 10.0): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'discount_fixed' => $amount,
         ]);
     }
@@ -132,7 +134,7 @@ final class CustomerGroupFactory extends Factory
      */
     public function withPercentageDiscount(float $percentage = 15.0): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'discount_percentage' => $percentage,
         ]);
     }
@@ -142,7 +144,7 @@ final class CustomerGroupFactory extends Factory
      */
     public function ofType(string $type): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'type' => $type,
         ]);
     }
@@ -152,10 +154,10 @@ final class CustomerGroupFactory extends Factory
      */
     public function vip(): static
     {
-        return $this->state(fn(array $attributes) => [
-            'type' => 'vip',
-            'has_special_pricing' => true,
-            'discount_percentage' => $this->faker->randomFloat(2, 15, 30),
+        return $this->state(fn (array $attributes) => [
+            'type'                 => 'vip',
+            'has_special_pricing'  => true,
+            'discount_percentage'  => $this->faker->randomFloat(2, 15, 30),
             'has_volume_discounts' => true,
         ]);
     }
@@ -165,10 +167,10 @@ final class CustomerGroupFactory extends Factory
      */
     public function wholesale(): static
     {
-        return $this->state(fn(array $attributes) => [
-            'type' => 'wholesale',
-            'has_special_pricing' => true,
-            'discount_percentage' => $this->faker->randomFloat(2, 20, 40),
+        return $this->state(fn (array $attributes) => [
+            'type'                 => 'wholesale',
+            'has_special_pricing'  => true,
+            'discount_percentage'  => $this->faker->randomFloat(2, 20, 40),
             'minimum_order_amount' => $this->faker->randomFloat(2, 500, 2000),
         ]);
     }
@@ -178,11 +180,11 @@ final class CustomerGroupFactory extends Factory
      */
     public function corporate(): static
     {
-        return $this->state(fn(array $attributes) => [
-            'type' => 'corporate',
+        return $this->state(fn (array $attributes) => [
+            'type'                => 'corporate',
             'has_special_pricing' => true,
-            'payment_terms' => 'net_30',
-            'credit_limit' => $this->faker->randomFloat(2, 5000, 50000),
+            'payment_terms'       => 'net_30',
+            'credit_limit'        => $this->faker->randomFloat(2, 5000, 50000),
         ]);
     }
 
@@ -191,7 +193,7 @@ final class CustomerGroupFactory extends Factory
      */
     public function withoutPriceAccess(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'can_view_prices' => false,
         ]);
     }
@@ -201,7 +203,7 @@ final class CustomerGroupFactory extends Factory
      */
     public function withoutOrderAccess(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'can_place_orders' => false,
         ]);
     }

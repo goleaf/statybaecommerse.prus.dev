@@ -52,26 +52,26 @@ final class SubscriberResourceTest extends TestCase
 
         Livewire::test(CreateSubscriber::class)
             ->fillForm([
-                'email' => 'test@example.com',
+                'email'      => 'test@example.com',
                 'first_name' => 'John',
-                'last_name' => 'Doe',
-                'phone' => '+37060000000',
-                'company' => 'Test Company',
-                'job_title' => 'Developer',
-                'status' => 'active',
-                'source' => 'website',
-                'user_id' => $user->id,
-                'interests' => ['products', 'news'],
-                'metadata' => ['utm_source' => 'google'],
+                'last_name'  => 'Doe',
+                'phone'      => '+37060000000',
+                'company'    => 'Test Company',
+                'job_title'  => 'Developer',
+                'status'     => 'active',
+                'source'     => 'website',
+                'user_id'    => $user->id,
+                'interests'  => ['products', 'news'],
+                'metadata'   => ['utm_source' => 'google'],
             ])
             ->call('create')
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('subscribers', [
-            'email' => 'test@example.com',
+            'email'      => 'test@example.com',
             'first_name' => 'John',
-            'last_name' => 'Doe',
-            'status' => 'active',
+            'last_name'  => 'Doe',
+            'status'     => 'active',
         ]);
     }
 
@@ -85,17 +85,17 @@ final class SubscriberResourceTest extends TestCase
         Livewire::test(EditSubscriber::class, ['record' => $subscriber->id])
             ->fillForm([
                 'first_name' => 'Updated Name',
-                'status' => 'inactive',
-                'source' => 'website',
-                'phone' => '+37060000000',
+                'status'     => 'inactive',
+                'source'     => 'website',
+                'phone'      => '+37060000000',
             ])
             ->call('save')
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('subscribers', [
-            'id' => $subscriber->id,
+            'id'         => $subscriber->id,
             'first_name' => 'Updated Name',
-            'status' => 'inactive',
+            'status'     => 'inactive',
         ]);
     }
 
@@ -178,7 +178,7 @@ final class SubscriberResourceTest extends TestCase
 
         foreach ($subscribers as $subscriber) {
             $this->assertDatabaseHas('subscribers', [
-                'id' => $subscriber->id,
+                'id'          => $subscriber->id,
                 'is_verified' => true,
             ]);
         }
@@ -196,7 +196,7 @@ final class SubscriberResourceTest extends TestCase
 
         foreach ($subscribers as $subscriber) {
             $this->assertDatabaseHas('subscribers', [
-                'id' => $subscriber->id,
+                'id'     => $subscriber->id,
                 'status' => 'unsubscribed',
             ]);
         }
@@ -214,7 +214,7 @@ final class SubscriberResourceTest extends TestCase
             ->assertHasNoTableActionErrors();
 
         $this->assertDatabaseHas('subscribers', [
-            'id' => $subscriber->id,
+            'id'          => $subscriber->id,
             'is_verified' => true,
         ]);
     }
@@ -231,7 +231,7 @@ final class SubscriberResourceTest extends TestCase
             ->assertHasNoTableActionErrors();
 
         $this->assertDatabaseHas('subscribers', [
-            'id' => $subscriber->id,
+            'id'     => $subscriber->id,
             'status' => 'unsubscribed',
         ]);
     }
@@ -248,7 +248,7 @@ final class SubscriberResourceTest extends TestCase
             ->assertHasNoTableActionErrors();
 
         $this->assertDatabaseHas('subscribers', [
-            'id' => $subscriber->id,
+            'id'     => $subscriber->id,
             'status' => 'active',
         ]);
     }
@@ -277,11 +277,11 @@ final class SubscriberResourceTest extends TestCase
 
         Livewire::test(CreateSubscriber::class)
             ->fillForm([
-                'email' => 'existing@example.com',
+                'email'      => 'existing@example.com',
                 'first_name' => 'John',
-                'last_name' => 'Doe',
-                'status' => 'active',
-                'source' => 'website',
+                'last_name'  => 'Doe',
+                'status'     => 'active',
+                'source'     => 'website',
             ])
             ->call('create')
             ->assertHasFormErrors(['email']);
@@ -301,7 +301,7 @@ final class SubscriberResourceTest extends TestCase
     {
         $subscriber = Subscriber::factory()->create([
             'first_name' => 'John',
-            'last_name' => 'Doe',
+            'last_name'  => 'Doe',
         ]);
 
         $this->assertEquals('John Doe', $subscriber->full_name);

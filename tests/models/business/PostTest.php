@@ -18,7 +18,7 @@ final class PostTest extends TestCase
     private function createTestUser(): User
     {
         return User::factory()->create([
-            'name' => 'Test Author',
+            'name'  => 'Test Author',
             'email' => 'author@example.com',
         ]);
     }
@@ -28,13 +28,13 @@ final class PostTest extends TestCase
         $user = $this->createTestUser();
 
         $post = Post::factory()->create([
-            'title' => 'Test Post',
-            'slug' => 'test-post',
-            'content' => 'This is a test post content.',
-            'excerpt' => 'This is a test excerpt.',
-            'status' => 'published',
-            'featured' => true,
-            'user_id' => $user->id,
+            'title'        => 'Test Post',
+            'slug'         => 'test-post',
+            'content'      => 'This is a test post content.',
+            'excerpt'      => 'This is a test excerpt.',
+            'status'       => 'published',
+            'featured'     => true,
+            'user_id'      => $user->id,
             'published_at' => now(),
         ]);
 
@@ -52,18 +52,18 @@ final class PostTest extends TestCase
     {
         $user = $this->createTestUser();
         $post = Post::factory()->create([
-            'user_id' => $user->id,
-            'title' => 'Original Title',
+            'user_id'            => $user->id,
+            'title'              => 'Original Title',
             'title_translations' => [
                 'lt' => 'Original Title',
                 'en' => 'Original Title',
             ],
-            'content' => 'Original Content',
+            'content'              => 'Original Content',
             'content_translations' => [
                 'lt' => 'Original Content',
                 'en' => 'Original Content',
             ],
-            'excerpt' => 'Original Excerpt',
+            'excerpt'              => 'Original Excerpt',
             'excerpt_translations' => [
                 'lt' => 'Original Excerpt',
                 'en' => 'Original Excerpt',
@@ -77,7 +77,7 @@ final class PostTest extends TestCase
 
         // Test with translation
         $post->updateTranslation('en', [
-            'title' => 'English Title',
+            'title'   => 'English Title',
             'content' => 'English Content',
             'excerpt' => 'English Excerpt',
         ]);
@@ -96,28 +96,28 @@ final class PostTest extends TestCase
 
         // Create test posts with specific attributes
         $publishedPost = Post::factory()->create([
-            'user_id' => $user->id,
-            'status' => 'published',
-            'featured' => false,
+            'user_id'   => $user->id,
+            'status'    => 'published',
+            'featured'  => false,
             'is_pinned' => false,
         ]);
         $draftPost = Post::factory()->create([
-            'user_id' => $user->id,
-            'status' => 'draft',
-            'featured' => false,
+            'user_id'   => $user->id,
+            'status'    => 'draft',
+            'featured'  => false,
             'is_pinned' => false,
         ]);
         $featuredPost = Post::factory()->create([
-            'user_id' => $user->id,
-            'featured' => true,
-            'status' => 'draft',
+            'user_id'   => $user->id,
+            'featured'  => true,
+            'status'    => 'draft',
             'is_pinned' => false,
         ]);
         $pinnedPost = Post::factory()->create([
-            'user_id' => $user->id,
+            'user_id'   => $user->id,
             'is_pinned' => true,
-            'status' => 'draft',
-            'featured' => false,
+            'status'    => 'draft',
+            'featured'  => false,
         ]);
 
         // Test published scope
@@ -144,13 +144,13 @@ final class PostTest extends TestCase
     {
         $user = $this->createTestUser();
         $post = Post::factory()->create([
-            'user_id' => $user->id,
-            'title' => 'Test Post',
-            'content' => 'This is a test post with multiple words to test word count functionality.',
-            'status' => 'published',
-            'featured' => true,
-            'views_count' => 100,
-            'likes_count' => 10,
+            'user_id'        => $user->id,
+            'title'          => 'Test Post',
+            'content'        => 'This is a test post with multiple words to test word count functionality.',
+            'status'         => 'published',
+            'featured'       => true,
+            'views_count'    => 100,
+            'likes_count'    => 10,
             'comments_count' => 5,
         ]);
 
@@ -192,7 +192,7 @@ final class PostTest extends TestCase
         // Test published post
         $publishedPost = Post::factory()->create([
             'user_id' => $user->id,
-            'status' => 'published',
+            'status'  => 'published',
         ]);
         $this->assertTrue($publishedPost->isPublished());
         $this->assertFalse($publishedPost->isDraft());
@@ -202,7 +202,7 @@ final class PostTest extends TestCase
         // Test draft post
         $draftPost = Post::factory()->create([
             'user_id' => $user->id,
-            'status' => 'draft',
+            'status'  => 'draft',
         ]);
         $this->assertFalse($draftPost->isPublished());
         $this->assertTrue($draftPost->isDraft());
@@ -212,7 +212,7 @@ final class PostTest extends TestCase
         // Test archived post
         $archivedPost = Post::factory()->create([
             'user_id' => $user->id,
-            'status' => 'archived',
+            'status'  => 'archived',
         ]);
         $this->assertFalse($archivedPost->isPublished());
         $this->assertFalse($archivedPost->isDraft());
@@ -241,9 +241,9 @@ final class PostTest extends TestCase
     {
         $user = $this->createTestUser();
         $post = Post::factory()->create([
-            'user_id' => $user->id,
-            'views_count' => 100,
-            'likes_count' => 10,
+            'user_id'        => $user->id,
+            'views_count'    => 100,
+            'likes_count'    => 10,
             'comments_count' => 5,
         ]);
 
@@ -270,15 +270,15 @@ final class PostTest extends TestCase
     {
         $user = $this->createTestUser();
         $post = Post::factory()->create([
-            'user_id' => $user->id,
-            'title' => 'Original Title',
-            'title_translations' => [],
-            'content' => 'Original Content',
-            'content_translations' => [],
-            'excerpt_translations' => [],
-            'meta_title_translations' => [],
+            'user_id'                       => $user->id,
+            'title'                         => 'Original Title',
+            'title_translations'            => [],
+            'content'                       => 'Original Content',
+            'content_translations'          => [],
+            'excerpt_translations'          => [],
+            'meta_title_translations'       => [],
             'meta_description_translations' => [],
-            'tags_translations' => [],
+            'tags_translations'             => [],
         ]);
 
         // Test available locales (should be empty initially)
@@ -295,7 +295,7 @@ final class PostTest extends TestCase
 
         // Test update translation
         $this->assertTrue($post->updateTranslation('en', [
-            'title' => 'English Title',
+            'title'   => 'English Title',
             'content' => 'English Content',
         ]));
 
@@ -308,8 +308,8 @@ final class PostTest extends TestCase
     {
         $user = $this->createTestUser();
         $post = Post::factory()->create([
-            'user_id' => $user->id,
-            'title' => 'Test Post',
+            'user_id'            => $user->id,
+            'title'              => 'Test Post',
             'title_translations' => [
                 'lt' => 'Test Post',
                 'en' => 'Test Post',
@@ -331,24 +331,24 @@ final class PostTest extends TestCase
 
         // Create test posts
         $recentPost = Post::factory()->create([
-            'user_id' => $user->id,
-            'created_at' => now()->subDays(15),
-            'views_count' => 150,
-            'likes_count' => 15,
+            'user_id'        => $user->id,
+            'created_at'     => now()->subDays(15),
+            'views_count'    => 150,
+            'likes_count'    => 15,
             'comments_count' => 8,
         ]);
         $oldPost = Post::factory()->create([
-            'user_id' => $user->id,
-            'created_at' => now()->subDays(45),
-            'views_count' => 50,
-            'likes_count' => 0,
+            'user_id'        => $user->id,
+            'created_at'     => now()->subDays(45),
+            'views_count'    => 50,
+            'likes_count'    => 0,
             'comments_count' => 0,
         ]);
         $popularPost = Post::factory()->create([
-            'user_id' => $user->id,
-            'views_count' => 200,
-            'created_at' => now()->subDays(35),
-            'likes_count' => 0,
+            'user_id'        => $user->id,
+            'views_count'    => 200,
+            'created_at'     => now()->subDays(35),
+            'likes_count'    => 0,
             'comments_count' => 0,
         ]);
 
@@ -401,8 +401,8 @@ final class PostTest extends TestCase
     {
         $user = $this->createTestUser();
         $post = Post::factory()->create([
-            'user_id' => $user->id,
-            'created_at' => now()->subDays(10),
+            'user_id'      => $user->id,
+            'created_at'   => now()->subDays(10),
             'published_at' => now()->subDays(5),
         ]);
 

@@ -22,7 +22,7 @@ final class CountryTest extends TestCase
 
         $this->adminUser = User::factory()->create([
             'email' => 'admin@test.com',
-            'name' => 'Admin User',
+            'name'  => 'Admin User',
         ]);
 
         // Assign admin role if roles exist
@@ -35,24 +35,24 @@ final class CountryTest extends TestCase
     public function test_country_model_can_be_created(): void
     {
         $country = Country::create([
-            'cca2' => 'LT',
-            'cca3' => 'LTU',
+            'cca2'               => 'LT',
+            'cca3'               => 'LTU',
             'phone_calling_code' => '370',
-            'flag' => '🇱🇹',
-            'region' => 'Europe',
-            'subregion' => 'Northern Europe',
-            'latitude' => 55.169438,
-            'longitude' => 23.881275,
-            'currencies' => ['EUR'],
-            'is_enabled' => true,
-            'sort_order' => 1,
+            'flag'               => '🇱🇹',
+            'region'             => 'Europe',
+            'subregion'          => 'Northern Europe',
+            'latitude'           => 55.169438,
+            'longitude'          => 23.881275,
+            'currencies'         => ['EUR'],
+            'is_enabled'         => true,
+            'sort_order'         => 1,
         ]);
 
         $this->assertDatabaseHas('countries', [
-            'cca2' => 'LT',
-            'cca3' => 'LTU',
+            'cca2'               => 'LT',
+            'cca3'               => 'LTU',
             'phone_calling_code' => '370',
-            'region' => 'Europe',
+            'region'             => 'Europe',
         ]);
 
         $this->assertEquals('LT', $country->cca2);
@@ -64,30 +64,30 @@ final class CountryTest extends TestCase
     public function test_country_translations_can_be_created(): void
     {
         $country = Country::create([
-            'cca2' => 'LT',
-            'cca3' => 'LTU',
+            'cca2'               => 'LT',
+            'cca3'               => 'LTU',
             'phone_calling_code' => '370',
-            'flag' => '🇱🇹',
-            'region' => 'Europe',
-            'subregion' => 'Northern Europe',
-            'latitude' => 55.169438,
-            'longitude' => 23.881275,
-            'currencies' => ['EUR'],
-            'is_enabled' => true,
-            'sort_order' => 1,
+            'flag'               => '🇱🇹',
+            'region'             => 'Europe',
+            'subregion'          => 'Northern Europe',
+            'latitude'           => 55.169438,
+            'longitude'          => 23.881275,
+            'currencies'         => ['EUR'],
+            'is_enabled'         => true,
+            'sort_order'         => 1,
         ]);
 
         $translation = CountryTranslation::create([
-            'country_id' => $country->id,
-            'locale' => 'en',
-            'name' => 'Lithuania',
+            'country_id'    => $country->id,
+            'locale'        => 'en',
+            'name'          => 'Lithuania',
             'name_official' => 'Republic of Lithuania',
         ]);
 
         $this->assertDatabaseHas('country_translations', [
-            'country_id' => $country->id,
-            'locale' => 'en',
-            'name' => 'Lithuania',
+            'country_id'    => $country->id,
+            'locale'        => 'en',
+            'name'          => 'Lithuania',
             'name_official' => 'Republic of Lithuania',
         ]);
 
@@ -98,30 +98,30 @@ final class CountryTest extends TestCase
     public function test_country_has_translations_relationship(): void
     {
         $country = Country::create([
-            'cca2' => 'LT',
-            'cca3' => 'LTU',
+            'cca2'               => 'LT',
+            'cca3'               => 'LTU',
             'phone_calling_code' => '370',
-            'flag' => '🇱🇹',
-            'region' => 'Europe',
-            'subregion' => 'Northern Europe',
-            'latitude' => 55.169438,
-            'longitude' => 23.881275,
-            'currencies' => ['EUR'],
-            'is_enabled' => true,
-            'sort_order' => 1,
+            'flag'               => '🇱🇹',
+            'region'             => 'Europe',
+            'subregion'          => 'Northern Europe',
+            'latitude'           => 55.169438,
+            'longitude'          => 23.881275,
+            'currencies'         => ['EUR'],
+            'is_enabled'         => true,
+            'sort_order'         => 1,
         ]);
 
         CountryTranslation::create([
-            'country_id' => $country->id,
-            'locale' => 'en',
-            'name' => 'Lithuania',
+            'country_id'    => $country->id,
+            'locale'        => 'en',
+            'name'          => 'Lithuania',
             'name_official' => 'Republic of Lithuania',
         ]);
 
         CountryTranslation::create([
-            'country_id' => $country->id,
-            'locale' => 'lt',
-            'name' => 'Lietuva',
+            'country_id'    => $country->id,
+            'locale'        => 'lt',
+            'name'          => 'Lietuva',
             'name_official' => 'Lietuvos Respublika',
         ]);
 
@@ -135,30 +135,30 @@ final class CountryTest extends TestCase
     public function test_country_trans_method_returns_translated_name(): void
     {
         $country = Country::create([
-            'cca2' => 'LT',
-            'cca3' => 'LTU',
+            'cca2'               => 'LT',
+            'cca3'               => 'LTU',
             'phone_calling_code' => '370',
-            'flag' => '🇱🇹',
-            'region' => 'Europe',
-            'subregion' => 'Northern Europe',
-            'latitude' => 55.169438,
-            'longitude' => 23.881275,
-            'currencies' => ['EUR'],
-            'is_enabled' => true,
-            'sort_order' => 1,
+            'flag'               => '🇱🇹',
+            'region'             => 'Europe',
+            'subregion'          => 'Northern Europe',
+            'latitude'           => 55.169438,
+            'longitude'          => 23.881275,
+            'currencies'         => ['EUR'],
+            'is_enabled'         => true,
+            'sort_order'         => 1,
         ]);
 
         CountryTranslation::create([
-            'country_id' => $country->id,
-            'locale' => 'en',
-            'name' => 'Lithuania',
+            'country_id'    => $country->id,
+            'locale'        => 'en',
+            'name'          => 'Lithuania',
             'name_official' => 'Republic of Lithuania',
         ]);
 
         CountryTranslation::create([
-            'country_id' => $country->id,
-            'locale' => 'lt',
-            'name' => 'Lietuva',
+            'country_id'    => $country->id,
+            'locale'        => 'lt',
+            'name'          => 'Lietuva',
             'name_official' => 'Lietuvos Respublika',
         ]);
 
@@ -178,23 +178,23 @@ final class CountryTest extends TestCase
     public function test_country_display_name_attribute(): void
     {
         $country = Country::create([
-            'cca2' => 'LT',
-            'cca3' => 'LTU',
+            'cca2'               => 'LT',
+            'cca3'               => 'LTU',
             'phone_calling_code' => '370',
-            'flag' => '🇱🇹',
-            'region' => 'Europe',
-            'subregion' => 'Northern Europe',
-            'latitude' => 55.169438,
-            'longitude' => 23.881275,
-            'currencies' => ['EUR'],
-            'is_enabled' => true,
-            'sort_order' => 1,
+            'flag'               => '🇱🇹',
+            'region'             => 'Europe',
+            'subregion'          => 'Northern Europe',
+            'latitude'           => 55.169438,
+            'longitude'          => 23.881275,
+            'currencies'         => ['EUR'],
+            'is_enabled'         => true,
+            'sort_order'         => 1,
         ]);
 
         CountryTranslation::create([
-            'country_id' => $country->id,
-            'locale' => 'en',
-            'name' => 'Lithuania',
+            'country_id'    => $country->id,
+            'locale'        => 'en',
+            'name'          => 'Lithuania',
             'name_official' => 'Republic of Lithuania',
         ]);
 
@@ -223,23 +223,23 @@ final class CountryTest extends TestCase
 
         // Create test countries
         $lithuania = Country::create([
-            'cca2' => 'LT',
-            'cca3' => 'LTU',
+            'cca2'               => 'LT',
+            'cca3'               => 'LTU',
             'phone_calling_code' => '370',
-            'flag' => '🇱🇹',
-            'region' => 'Europe',
-            'subregion' => 'Northern Europe',
-            'latitude' => 55.169438,
-            'longitude' => 23.881275,
-            'currencies' => ['EUR'],
-            'is_enabled' => true,
-            'sort_order' => 1,
+            'flag'               => '🇱🇹',
+            'region'             => 'Europe',
+            'subregion'          => 'Northern Europe',
+            'latitude'           => 55.169438,
+            'longitude'          => 23.881275,
+            'currencies'         => ['EUR'],
+            'is_enabled'         => true,
+            'sort_order'         => 1,
         ]);
 
         CountryTranslation::create([
-            'country_id' => $lithuania->id,
-            'locale' => 'en',
-            'name' => 'Lithuania',
+            'country_id'    => $lithuania->id,
+            'locale'        => 'en',
+            'name'          => 'Lithuania',
             'name_official' => 'Republic of Lithuania',
         ]);
 
@@ -255,15 +255,15 @@ final class CountryTest extends TestCase
         $this->actingAs($this->adminUser);
 
         $countryData = [
-            'cca2' => 'DE',
-            'cca3' => 'DEU',
+            'cca2'               => 'DE',
+            'cca3'               => 'DEU',
             'phone_calling_code' => '49',
-            'flag' => '🇩🇪',
-            'region' => 'Europe',
-            'subregion' => 'Central Europe',
-            'latitude' => 51.165691,
-            'longitude' => 10.451526,
-            'currencies' => ['EUR'],
+            'flag'               => '🇩🇪',
+            'region'             => 'Europe',
+            'subregion'          => 'Central Europe',
+            'latitude'           => 51.165691,
+            'longitude'          => 10.451526,
+            'currencies'         => ['EUR'],
         ];
 
         $response = $this->post(route('filament.admin.resources.countries.create'), $countryData);
@@ -272,10 +272,10 @@ final class CountryTest extends TestCase
         $response->assertRedirect();
 
         $this->assertDatabaseHas('countries', [
-            'cca2' => 'DE',
-            'cca3' => 'DEU',
+            'cca2'               => 'DE',
+            'cca3'               => 'DEU',
             'phone_calling_code' => '49',
-            'region' => 'Europe',
+            'region'             => 'Europe',
         ]);
     }
 
@@ -285,8 +285,8 @@ final class CountryTest extends TestCase
 
         // Test with invalid data
         $invalidData = [
-            'cca2' => '',  // Required
-            'cca3' => '',  // Required
+            'cca2'               => '',  // Required
+            'cca3'               => '',  // Required
             'phone_calling_code' => '',
         ];
 
@@ -301,26 +301,26 @@ final class CountryTest extends TestCase
 
         // Create first country
         Country::create([
-            'cca2' => 'LT',
-            'cca3' => 'LTU',
+            'cca2'               => 'LT',
+            'cca3'               => 'LTU',
             'phone_calling_code' => '370',
-            'flag' => '🇱🇹',
-            'region' => 'Europe',
-            'subregion' => 'Northern Europe',
-            'latitude' => 55.169438,
-            'longitude' => 23.881275,
-            'currencies' => ['EUR'],
-            'is_enabled' => true,
-            'sort_order' => 1,
+            'flag'               => '🇱🇹',
+            'region'             => 'Europe',
+            'subregion'          => 'Northern Europe',
+            'latitude'           => 55.169438,
+            'longitude'          => 23.881275,
+            'currencies'         => ['EUR'],
+            'is_enabled'         => true,
+            'sort_order'         => 1,
         ]);
 
         // Try to create another country with same codes
         $duplicateData = [
-            'cca2' => 'LT',  // Duplicate
-            'cca3' => 'LTU',  // Duplicate
+            'cca2'               => 'LT',  // Duplicate
+            'cca3'               => 'LTU',  // Duplicate
             'phone_calling_code' => '370',
-            'flag' => '🇱🇹',
-            'region' => 'Europe',
+            'flag'               => '🇱🇹',
+            'region'             => 'Europe',
         ];
 
         $response = $this->post(route('filament.admin.resources.countries.create'), $duplicateData);
@@ -331,17 +331,17 @@ final class CountryTest extends TestCase
     public function test_country_soft_deletes(): void
     {
         $country = Country::create([
-            'cca2' => 'LT',
-            'cca3' => 'LTU',
+            'cca2'               => 'LT',
+            'cca3'               => 'LTU',
             'phone_calling_code' => '370',
-            'flag' => '🇱🇹',
-            'region' => 'Europe',
-            'subregion' => 'Northern Europe',
-            'latitude' => 55.169438,
-            'longitude' => 23.881275,
-            'currencies' => ['EUR'],
-            'is_enabled' => true,
-            'sort_order' => 1,
+            'flag'               => '🇱🇹',
+            'region'             => 'Europe',
+            'subregion'          => 'Northern Europe',
+            'latitude'           => 55.169438,
+            'longitude'          => 23.881275,
+            'currencies'         => ['EUR'],
+            'is_enabled'         => true,
+            'sort_order'         => 1,
         ]);
 
         $country->delete();

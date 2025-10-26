@@ -31,40 +31,40 @@ final class ComprehensiveProductVariantSeeder extends Seeder
         // Size attributes
         $sizeAttribute = Attribute::where('slug', 'product-size')->first()
             ?? Attribute::factory()->create([
-                'slug' => 'product-size',
-                'name' => 'Product Size',
-                'type' => 'select',
-                'is_required' => true,
+                'slug'          => 'product-size',
+                'name'          => 'Product Size',
+                'type'          => 'select',
+                'is_required'   => true,
                 'is_filterable' => true,
                 'is_searchable' => false,
-                'is_enabled' => true,
-                'sort_order' => 1,
+                'is_enabled'    => true,
+                'sort_order'    => 1,
             ]);
 
         // Color attributes
         $colorAttribute = Attribute::where('slug', 'product-color')->first()
             ?? Attribute::factory()->create([
-                'slug' => 'product-color',
-                'name' => 'Product Color',
-                'type' => 'select',
-                'is_required' => true,
+                'slug'          => 'product-color',
+                'name'          => 'Product Color',
+                'type'          => 'select',
+                'is_required'   => true,
                 'is_filterable' => true,
                 'is_searchable' => false,
-                'is_enabled' => true,
-                'sort_order' => 2,
+                'is_enabled'    => true,
+                'sort_order'    => 2,
             ]);
 
         // Material attributes
         $materialAttribute = Attribute::where('slug', 'product-material')->first()
             ?? Attribute::factory()->create([
-                'slug' => 'product-material',
-                'name' => 'Product Material',
-                'type' => 'select',
-                'is_required' => false,
+                'slug'          => 'product-material',
+                'name'          => 'Product Material',
+                'type'          => 'select',
+                'is_required'   => false,
                 'is_filterable' => true,
                 'is_searchable' => true,
-                'is_enabled' => true,
-                'sort_order' => 3,
+                'is_enabled'    => true,
+                'sort_order'    => 3,
             ]);
 
         // Create size values
@@ -80,13 +80,13 @@ final class ComprehensiveProductVariantSeeder extends Seeder
         foreach ($sizes as $size) {
             $attributeValue = AttributeValue::where([
                 'attribute_id' => $sizeAttribute->id,
-                'value' => $size['value'],
+                'value'        => $size['value'],
             ])->first() ?? AttributeValue::factory()->for($sizeAttribute)->create([
-                'value' => $size['value'],
-                'slug' => 'product-size-'.Str::slug($size['value']),
+                'value'         => $size['value'],
+                'slug'          => 'product-size-' . Str::slug($size['value']),
                 'display_value' => $size['display'],
-                'sort_order' => $size['sort_order'],
-                'is_enabled' => true,
+                'sort_order'    => $size['sort_order'],
+                'is_enabled'    => true,
             ]);
 
             // Create translations using factory
@@ -94,7 +94,7 @@ final class ComprehensiveProductVariantSeeder extends Seeder
                 $attributeValue->translations()->save(
                     \App\Models\Translations\AttributeValueTranslation::factory()->make([
                         'locale' => 'lt',
-                        'value' => $size['lt'],
+                        'value'  => $size['lt'],
                     ])
                 );
             }
@@ -102,7 +102,7 @@ final class ComprehensiveProductVariantSeeder extends Seeder
                 $attributeValue->translations()->save(
                     \App\Models\Translations\AttributeValueTranslation::factory()->make([
                         'locale' => 'en',
-                        'value' => $size['display'],
+                        'value'  => $size['display'],
                     ])
                 );
             }
@@ -122,13 +122,13 @@ final class ComprehensiveProductVariantSeeder extends Seeder
             $attributeValue = AttributeValue::firstOrCreate(
                 [
                     'attribute_id' => $colorAttribute->id,
-                    'value' => $color['value'],
+                    'value'        => $color['value'],
                 ],
                 [
-                    'slug' => 'product-color-'.Str::slug($color['value']),
+                    'slug'          => 'product-color-' . Str::slug($color['value']),
                     'display_value' => $color['display'],
-                    'sort_order' => $color['sort_order'],
-                    'is_enabled' => true,
+                    'sort_order'    => $color['sort_order'],
+                    'is_enabled'    => true,
                 ]
             );
 
@@ -156,13 +156,13 @@ final class ComprehensiveProductVariantSeeder extends Seeder
             $attributeValue = AttributeValue::firstOrCreate(
                 [
                     'attribute_id' => $materialAttribute->id,
-                    'value' => $material['value'],
+                    'value'        => $material['value'],
                 ],
                 [
-                    'slug' => 'product-material-'.Str::slug($material['value']),
+                    'slug'          => 'product-material-' . Str::slug($material['value']),
                     'display_value' => $material['display'],
-                    'sort_order' => $material['sort_order'],
-                    'is_enabled' => true,
+                    'sort_order'    => $material['sort_order'],
+                    'is_enabled'    => true,
                 ]
             );
 
@@ -182,9 +182,9 @@ final class ComprehensiveProductVariantSeeder extends Seeder
     {
         // Get or create brands
         $brands = [
-            'Nike' => ['name' => 'Nike'],
+            'Nike'   => ['name' => 'Nike'],
             'Adidas' => ['name' => 'Adidas'],
-            'Puma' => ['name' => 'Puma'],
+            'Puma'   => ['name' => 'Puma'],
         ];
 
         $brandModels = [];
@@ -192,9 +192,9 @@ final class ComprehensiveProductVariantSeeder extends Seeder
             $brandModels[$slug] = Brand::firstOrCreate(
                 ['slug' => $slug],
                 array_merge($brandData, [
-                    'slug' => $slug,
-                    'description' => 'Premium '.$brandData['name'].' products',
-                    'is_enabled' => true,
+                    'slug'        => $slug,
+                    'description' => 'Premium ' . $brandData['name'] . ' products',
+                    'is_enabled'  => true,
                 ])
             );
 
@@ -203,8 +203,8 @@ final class ComprehensiveProductVariantSeeder extends Seeder
 
         // Get or create categories
         $categories = [
-            'clothing' => ['name' => 'Clothing'],
-            'shoes' => ['name' => 'Shoes'],
+            'clothing'    => ['name' => 'Clothing'],
+            'shoes'       => ['name' => 'Shoes'],
             'accessories' => ['name' => 'Accessories'],
         ];
 
@@ -213,10 +213,10 @@ final class ComprehensiveProductVariantSeeder extends Seeder
             $categoryModels[$slug] = Category::firstOrCreate(
                 ['slug' => $slug],
                 array_merge($categoryData, [
-                    'slug' => $slug,
-                    'description' => 'High-quality '.$categoryData['name'],
-                    'is_enabled' => true,
-                    'is_visible' => true,
+                    'slug'        => $slug,
+                    'description' => 'High-quality ' . $categoryData['name'],
+                    'is_enabled'  => true,
+                    'is_visible'  => true,
                 ])
             );
 
@@ -226,16 +226,16 @@ final class ComprehensiveProductVariantSeeder extends Seeder
         // Product data with variants
         $products = [
             [
-                'name' => 'Classic T-Shirt',
-                'name_lt' => 'Klasikinis Marškinėlis',
-                'name_en' => 'Classic T-Shirt',
-                'description' => 'Comfortable and stylish classic t-shirt made from premium cotton.',
+                'name'           => 'Classic T-Shirt',
+                'name_lt'        => 'Klasikinis Marškinėlis',
+                'name_en'        => 'Classic T-Shirt',
+                'description'    => 'Comfortable and stylish classic t-shirt made from premium cotton.',
                 'description_lt' => 'Patogus ir stilingas klasikinis marškinėlis iš aukštos kokybės medvilnės.',
                 'description_en' => 'Comfortable and stylish classic t-shirt made from premium cotton.',
-                'base_price' => 29.99,
-                'brand' => 'Nike',
-                'category' => 'clothing',
-                'variants' => [
+                'base_price'     => 29.99,
+                'brand'          => 'Nike',
+                'category'       => 'clothing',
+                'variants'       => [
                     ['size' => 'S', 'color' => 'black', 'material' => 'cotton', 'price_modifier' => 0, 'stock' => 50],
                     ['size' => 'M', 'color' => 'black', 'material' => 'cotton', 'price_modifier' => 0, 'stock' => 75],
                     ['size' => 'L', 'color' => 'black', 'material' => 'cotton', 'price_modifier' => 0, 'stock' => 60],
@@ -247,16 +247,16 @@ final class ComprehensiveProductVariantSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Running Shoes',
-                'name_lt' => 'Bėgimo Batai',
-                'name_en' => 'Running Shoes',
-                'description' => 'High-performance running shoes with advanced cushioning technology.',
+                'name'           => 'Running Shoes',
+                'name_lt'        => 'Bėgimo Batai',
+                'name_en'        => 'Running Shoes',
+                'description'    => 'High-performance running shoes with advanced cushioning technology.',
                 'description_lt' => 'Aukštos kokybės bėgimo batai su pažangia amortizacijos technologija.',
                 'description_en' => 'High-performance running shoes with advanced cushioning technology.',
-                'base_price' => 129.99,
-                'brand' => 'Adidas',
-                'category' => 'shoes',
-                'variants' => [
+                'base_price'     => 129.99,
+                'brand'          => 'Adidas',
+                'category'       => 'shoes',
+                'variants'       => [
                     ['size' => 'S', 'color' => 'black', 'material' => 'polyester', 'price_modifier' => 0, 'stock' => 30],
                     ['size' => 'M', 'color' => 'black', 'material' => 'polyester', 'price_modifier' => 0, 'stock' => 45],
                     ['size' => 'L', 'color' => 'black', 'material' => 'polyester', 'price_modifier' => 0, 'stock' => 40],
@@ -268,16 +268,16 @@ final class ComprehensiveProductVariantSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Leather Jacket',
-                'name_lt' => 'Odinis Striukė',
-                'name_en' => 'Leather Jacket',
-                'description' => 'Premium leather jacket with classic design and modern fit.',
+                'name'           => 'Leather Jacket',
+                'name_lt'        => 'Odinis Striukė',
+                'name_en'        => 'Leather Jacket',
+                'description'    => 'Premium leather jacket with classic design and modern fit.',
                 'description_lt' => 'Aukštos kokybės odinis striukė su klasikiniu dizainu ir moderniu siluetu.',
                 'description_en' => 'Premium leather jacket with classic design and modern fit.',
-                'base_price' => 299.99,
-                'brand' => 'Puma',
-                'category' => 'clothing',
-                'variants' => [
+                'base_price'     => 299.99,
+                'brand'          => 'Puma',
+                'category'       => 'clothing',
+                'variants'       => [
                     ['size' => 'S', 'color' => 'black', 'material' => 'leather', 'price_modifier' => 0, 'stock' => 15],
                     ['size' => 'M', 'color' => 'black', 'material' => 'leather', 'price_modifier' => 0, 'stock' => 20],
                     ['size' => 'L', 'color' => 'black', 'material' => 'leather', 'price_modifier' => 0, 'stock' => 18],
@@ -295,23 +295,23 @@ final class ComprehensiveProductVariantSeeder extends Seeder
             $category = $categoryModels[$productData['category']];
 
             $product = Product::create([
-                'name' => $productData['name'],
-                'slug' => Str::slug($productData['name']),
-                'description' => $productData['description'],
+                'name'              => $productData['name'],
+                'slug'              => Str::slug($productData['name']),
+                'description'       => $productData['description'],
                 'short_description' => substr($productData['description'], 0, 100),
-                'sku' => 'PROD-'.strtoupper(Str::random(8)),
-                'price' => $productData['base_price'],
-                'compare_price' => $productData['base_price'] * 1.2,
-                'cost_price' => $productData['base_price'] * 0.6,
-                'manage_stock' => true,
-                'stock_quantity' => 0,
-                'weight' => 0.5,
-                'is_visible' => true,
-                'is_featured' => true,
-                'published_at' => now(),
-                'brand_id' => $brand->id,
-                'status' => 'published',
-                'type' => 'variable',
+                'sku'               => 'PROD-' . strtoupper(Str::random(8)),
+                'price'             => $productData['base_price'],
+                'compare_price'     => $productData['base_price'] * 1.2,
+                'cost_price'        => $productData['base_price'] * 0.6,
+                'manage_stock'      => true,
+                'stock_quantity'    => 0,
+                'weight'            => 0.5,
+                'is_visible'        => true,
+                'is_featured'       => true,
+                'published_at'      => now(),
+                'brand_id'          => $brand->id,
+                'status'            => 'published',
+                'type'              => 'variable',
             ]);
 
             $this->syncProductTranslations($product, $productData);
@@ -326,39 +326,39 @@ final class ComprehensiveProductVariantSeeder extends Seeder
                 $isBestseller = rand(0, 10) < 1;  // 10% chance of being bestseller
 
                 $variant = ProductVariant::create([
-                    'product_id' => $product->id,
-                    'name' => $productData['name'].' - '.$variantData['size'].' '.$variantData['color'],
-                    'variant_name_lt' => $productData['name_lt'].' - '.$variantData['size'].' '.$this->getLocalizedValue('color', $variantData['color']),
-                    'variant_name_en' => $productData['name_en'].' - '.$variantData['size'].' '.ucfirst($variantData['color']),
-                    'description_lt' => $productData['description_lt'].' Dydis: '.$variantData['size'].', Spalva: '.$this->getLocalizedValue('color', $variantData['color']),
-                    'description_en' => $productData['description_en'].' Size: '.$variantData['size'].', Color: '.ucfirst($variantData['color']),
-                    'sku' => $product->sku.'-'.strtoupper($variantData['size']).'-'.strtoupper($variantData['color']),
-                    'price' => $productData['base_price'] + $variantData['price_modifier'],
-                    'compare_price' => ($productData['base_price'] + $variantData['price_modifier']) * 1.2,
-                    'cost_price' => ($productData['base_price'] + $variantData['price_modifier']) * 0.6,
-                    'wholesale_price' => ($productData['base_price'] + $variantData['price_modifier']) * 0.8,
-                    'member_price' => ($productData['base_price'] + $variantData['price_modifier']) * 0.9,
-                    'stock_quantity' => $variantData['stock'],
-                    'reserved_quantity' => 0,
+                    'product_id'         => $product->id,
+                    'name'               => $productData['name'] . ' - ' . $variantData['size'] . ' ' . $variantData['color'],
+                    'variant_name_lt'    => $productData['name_lt'] . ' - ' . $variantData['size'] . ' ' . $this->getLocalizedValue('color', $variantData['color']),
+                    'variant_name_en'    => $productData['name_en'] . ' - ' . $variantData['size'] . ' ' . ucfirst($variantData['color']),
+                    'description_lt'     => $productData['description_lt'] . ' Dydis: ' . $variantData['size'] . ', Spalva: ' . $this->getLocalizedValue('color', $variantData['color']),
+                    'description_en'     => $productData['description_en'] . ' Size: ' . $variantData['size'] . ', Color: ' . ucfirst($variantData['color']),
+                    'sku'                => $product->sku . '-' . strtoupper($variantData['size']) . '-' . strtoupper($variantData['color']),
+                    'price'              => $productData['base_price'] + $variantData['price_modifier'],
+                    'compare_price'      => ($productData['base_price'] + $variantData['price_modifier']) * 1.2,
+                    'cost_price'         => ($productData['base_price'] + $variantData['price_modifier']) * 0.6,
+                    'wholesale_price'    => ($productData['base_price'] + $variantData['price_modifier']) * 0.8,
+                    'member_price'       => ($productData['base_price'] + $variantData['price_modifier']) * 0.9,
+                    'stock_quantity'     => $variantData['stock'],
+                    'reserved_quantity'  => 0,
                     'available_quantity' => $variantData['stock'],
-                    'sold_quantity' => rand(0, 20),
-                    'weight' => 0.5 + ($variantData['size'] === 'XL' ? 0.1 : 0),
-                    'track_inventory' => true,
-                    'is_default' => $index === 0,
-                    'is_enabled' => true,
-                    'is_on_sale' => $isOnSale,
-                    'sale_start_date' => $isOnSale ? now()->subDays(rand(1, 30)) : null,
-                    'sale_end_date' => $isOnSale ? now()->addDays(rand(1, 30)) : null,
-                    'is_featured' => rand(0, 10) < 3,
-                    'is_new' => $isNew,
-                    'is_bestseller' => $isBestseller,
-                    'seo_title_lt' => $productData['name_lt'].' - '.$variantData['size'].' '.$this->getLocalizedValue('color', $variantData['color']),
-                    'seo_title_en' => $productData['name_en'].' - '.$variantData['size'].' '.ucfirst($variantData['color']),
-                    'seo_description_lt' => $productData['description_lt'].' Aukštos kokybės produktas.',
-                    'seo_description_en' => $productData['description_en'].' High-quality product.',
-                    'views_count' => rand(10, 500),
-                    'clicks_count' => rand(5, 100),
-                    'conversion_rate' => rand(1, 15) / 100,
+                    'sold_quantity'      => rand(0, 20),
+                    'weight'             => 0.5 + ($variantData['size'] === 'XL' ? 0.1 : 0),
+                    'track_inventory'    => true,
+                    'is_default'         => $index === 0,
+                    'is_enabled'         => true,
+                    'is_on_sale'         => $isOnSale,
+                    'sale_start_date'    => $isOnSale ? now()->subDays(rand(1, 30)) : null,
+                    'sale_end_date'      => $isOnSale ? now()->addDays(rand(1, 30)) : null,
+                    'is_featured'        => rand(0, 10) < 3,
+                    'is_new'             => $isNew,
+                    'is_bestseller'      => $isBestseller,
+                    'seo_title_lt'       => $productData['name_lt'] . ' - ' . $variantData['size'] . ' ' . $this->getLocalizedValue('color', $variantData['color']),
+                    'seo_title_en'       => $productData['name_en'] . ' - ' . $variantData['size'] . ' ' . ucfirst($variantData['color']),
+                    'seo_description_lt' => $productData['description_lt'] . ' Aukštos kokybės produktas.',
+                    'seo_description_en' => $productData['description_en'] . ' High-quality product.',
+                    'views_count'        => rand(10, 500),
+                    'clicks_count'       => rand(5, 100),
+                    'conversion_rate'    => rand(1, 15) / 100,
                 ]);
 
                 $this->syncVariantTranslations($variant, $variantData, $productData);
@@ -378,10 +378,10 @@ final class ComprehensiveProductVariantSeeder extends Seeder
             $brand->translations()->updateOrCreate(
                 ['locale' => $locale],
                 [
-                    'name'        => $name,
-                    'slug'        => Str::slug($name.'-'.$locale),
-                    'description' => $brand->description,
-                    'seo_title'   => $brand->seo_title ?? $name,
+                    'name'            => $name,
+                    'slug'            => Str::slug($name . '-' . $locale),
+                    'description'     => $brand->description,
+                    'seo_title'       => $brand->seo_title ?? $name,
                     'seo_description' => $brand->seo_description ?? $brand->description,
                 ],
             );
@@ -400,10 +400,10 @@ final class ComprehensiveProductVariantSeeder extends Seeder
             $category->translations()->updateOrCreate(
                 ['locale' => $locale],
                 [
-                    'name'        => $name,
-                    'slug'        => Str::slug($name.'-'.$locale),
-                    'description' => $category->description,
-                    'seo_title'   => $category->seo_title ?? $name,
+                    'name'            => $name,
+                    'slug'            => Str::slug($name . '-' . $locale),
+                    'description'     => $category->description,
+                    'seo_title'       => $category->seo_title ?? $name,
                     'seo_description' => $category->seo_description ?? $category->description,
                 ],
             );
@@ -436,7 +436,7 @@ final class ComprehensiveProductVariantSeeder extends Seeder
                 ['locale' => $locale],
                 [
                     'name'              => $name,
-                    'slug'              => Str::slug($name.'-'.$locale),
+                    'slug'              => Str::slug($name . '-' . $locale),
                     'summary'           => $shortDescription,
                     'description'       => $description,
                     'short_description' => $shortDescription,
@@ -533,16 +533,16 @@ final class ComprehensiveProductVariantSeeder extends Seeder
 
                     if ($sizeValue) {
                         VariantAttributeValue::firstOrCreate([
-                            'variant_id' => $variant->id,
+                            'variant_id'   => $variant->id,
                             'attribute_id' => $sizeAttribute->id,
                         ], [
-                            'attribute_name' => 'size',
-                            'attribute_value' => $size,
+                            'attribute_name'          => 'size',
+                            'attribute_value'         => $size,
                             'attribute_value_display' => $sizeValue->display_value,
-                            'attribute_value_slug' => $sizeValue->slug,
-                            'sort_order' => $sizeValue->sort_order,
-                            'is_filterable' => true,
-                            'is_searchable' => false,
+                            'attribute_value_slug'    => $sizeValue->slug,
+                            'sort_order'              => $sizeValue->sort_order,
+                            'is_filterable'           => true,
+                            'is_searchable'           => false,
                         ]);
                     }
                 }
@@ -554,16 +554,16 @@ final class ComprehensiveProductVariantSeeder extends Seeder
 
                     if ($colorValue) {
                         VariantAttributeValue::firstOrCreate([
-                            'variant_id' => $variant->id,
+                            'variant_id'   => $variant->id,
                             'attribute_id' => $colorAttribute->id,
                         ], [
-                            'attribute_name' => 'color',
-                            'attribute_value' => $color,
+                            'attribute_name'          => 'color',
+                            'attribute_value'         => $color,
                             'attribute_value_display' => $colorValue->display_value,
-                            'attribute_value_slug' => $colorValue->slug,
-                            'sort_order' => $colorValue->sort_order,
-                            'is_filterable' => true,
-                            'is_searchable' => true,
+                            'attribute_value_slug'    => $colorValue->slug,
+                            'sort_order'              => $colorValue->sort_order,
+                            'is_filterable'           => true,
+                            'is_searchable'           => true,
                         ]);
                     }
                 }
@@ -577,16 +577,16 @@ final class ComprehensiveProductVariantSeeder extends Seeder
 
                     if ($materialValue) {
                         VariantAttributeValue::firstOrCreate([
-                            'variant_id' => $variant->id,
+                            'variant_id'   => $variant->id,
                             'attribute_id' => $materialAttribute->id,
                         ], [
-                            'attribute_name' => 'material',
-                            'attribute_value' => $material,
+                            'attribute_name'          => 'material',
+                            'attribute_value'         => $material,
                             'attribute_value_display' => $materialValue->display_value,
-                            'attribute_value_slug' => $materialValue->slug,
-                            'sort_order' => $materialValue->sort_order,
-                            'is_filterable' => true,
-                            'is_searchable' => true,
+                            'attribute_value_slug'    => $materialValue->slug,
+                            'sort_order'              => $materialValue->sort_order,
+                            'is_filterable'           => true,
+                            'is_searchable'           => true,
                         ]);
                     }
                 }
@@ -600,8 +600,8 @@ final class ComprehensiveProductVariantSeeder extends Seeder
             'color' => [
                 'black' => 'Juoda',
                 'white' => 'Balta',
-                'red' => 'Raudona',
-                'blue' => 'Mėlyna',
+                'red'   => 'Raudona',
+                'blue'  => 'Mėlyna',
                 'green' => 'Žalia',
                 'brown' => 'Ruda',
             ],

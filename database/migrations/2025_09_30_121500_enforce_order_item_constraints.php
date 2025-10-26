@@ -61,7 +61,7 @@ return new class extends Migration
             $this->rebuildSqliteTable($updatedSql);
         }
 
-       $this->ensurePortableIndexes();
+        $this->ensurePortableIndexes();
     }
 
     private function enforceMysqlConstraints(): void

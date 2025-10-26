@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+
 uses(RefreshDatabase::class);
 
 it('defines the expected fillable attributes', function (): void {

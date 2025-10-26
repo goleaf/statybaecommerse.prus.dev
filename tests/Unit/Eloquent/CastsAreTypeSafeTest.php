@@ -103,4 +103,3 @@ final class CastsAreTypeSafeTest extends TestCase
         $this->assertSame('', (string) $emptyString->fresh()->value);
     }
 }
-

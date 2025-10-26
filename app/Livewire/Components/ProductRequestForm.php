@@ -15,14 +15,14 @@ use Livewire\Component;
  * Livewire component for ProductRequestForm with reactive frontend functionality, real-time updates, and user interaction handling.
  *
  * @property Product $product
- * @property string $name
- * @property string $email
- * @property string $phone
- * @property string $message
- * @property int $requested_quantity
- * @property bool $showForm
- * @property mixed $rules
- * @property mixed $messages
+ * @property string  $name
+ * @property string  $email
+ * @property string  $phone
+ * @property string  $message
+ * @property int     $requested_quantity
+ * @property bool    $showForm
+ * @property mixed   $rules
+ * @property mixed   $messages
  */
 final class ProductRequestForm extends Component
 {

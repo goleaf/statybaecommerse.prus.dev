@@ -50,7 +50,7 @@ final class SystemSettingTest extends TestCase
     public function test_system_setting_model_accessors(): void
     {
         $setting = SystemSetting::factory()->create([
-            'type' => 'boolean',
+            'type'  => 'boolean',
             'value' => true,
         ]);
 
@@ -72,7 +72,7 @@ final class SystemSettingTest extends TestCase
     public function test_system_setting_model_static_methods(): void
     {
         $setting = SystemSetting::factory()->create([
-            'key' => 'test_static_method',
+            'key'   => 'test_static_method',
             'value' => 'test_value',
         ]);
 
@@ -83,9 +83,9 @@ final class SystemSettingTest extends TestCase
     public function test_system_setting_model_public_methods(): void
     {
         $setting = SystemSetting::factory()->public()->create([
-            'key' => 'test_public_method',
+            'key'   => 'test_public_method',
             'value' => 'public_value',
-            'type' => 'string',  // Ensure type is string to get string value
+            'type'  => 'string',  // Ensure type is string to get string value
         ]);
 
         $this->assertEquals('public_value', SystemSetting::getPublic('test_public_method'));
@@ -118,9 +118,9 @@ final class SystemSettingTest extends TestCase
     public function test_system_setting_model_api_response(): void
     {
         $setting = SystemSetting::factory()->create([
-            'key' => 'test_api_response',
-            'name' => 'Test API Response',
-            'value' => 'api_value',
+            'key'       => 'test_api_response',
+            'name'      => 'Test API Response',
+            'value'     => 'api_value',
             'is_public' => true,
         ]);
 
@@ -136,7 +136,7 @@ final class SystemSettingTest extends TestCase
     public function test_system_setting_model_display_methods(): void
     {
         $setting = SystemSetting::factory()->create([
-            'type' => 'boolean',
+            'type'  => 'boolean',
             'value' => true,
         ]);
 
@@ -163,8 +163,8 @@ final class SystemSettingTest extends TestCase
     public function test_system_setting_model_badge_methods(): void
     {
         $setting = SystemSetting::factory()->create([
-            'is_public' => true,
-            'is_required' => true,
+            'is_public'    => true,
+            'is_required'  => true,
             'is_encrypted' => true,
         ]);
 
@@ -215,8 +215,8 @@ final class SystemSettingTest extends TestCase
     public function test_system_setting_model_form_config(): void
     {
         $setting = SystemSetting::factory()->create([
-            'name' => 'Test Setting',
-            'help_text' => 'Test help text',
+            'name'        => 'Test Setting',
+            'help_text'   => 'Test help text',
             'is_required' => true,
             'is_readonly' => false,
         ]);
@@ -237,7 +237,7 @@ final class SystemSettingTest extends TestCase
     public function test_system_setting_model_validation_rules_for_form(): void
     {
         $setting = SystemSetting::factory()->create([
-            'is_required' => true,
+            'is_required'      => true,
             'validation_rules' => ['min' => 3, 'max' => 50],
         ]);
 
@@ -251,9 +251,9 @@ final class SystemSettingTest extends TestCase
     public function test_system_setting_model_translated_methods(): void
     {
         $setting = SystemSetting::factory()->create([
-            'name' => 'Original Name',
+            'name'        => 'Original Name',
             'description' => 'Original Description',
-            'help_text' => 'Original Help Text',
+            'help_text'   => 'Original Help Text',
         ]);
 
         $translatedName = $setting->getTranslatedName();
@@ -286,8 +286,8 @@ final class SystemSettingTest extends TestCase
     public function test_system_setting_model_encryption(): void
     {
         $setting = SystemSetting::factory()->create([
-            'type' => 'string',
-            'value' => 'sensitive_data',
+            'type'         => 'string',
+            'value'        => 'sensitive_data',
             'is_encrypted' => true,
         ]);
 
@@ -300,7 +300,7 @@ final class SystemSettingTest extends TestCase
     public function test_system_setting_model_json_handling(): void
     {
         $setting = SystemSetting::factory()->create([
-            'type' => 'json',
+            'type'  => 'json',
             'value' => ['key1' => 'value1', 'key2' => 'value2'],
         ]);
 
@@ -311,7 +311,7 @@ final class SystemSettingTest extends TestCase
     public function test_system_setting_model_array_handling(): void
     {
         $setting = SystemSetting::factory()->create([
-            'type' => 'array',
+            'type'  => 'array',
             'value' => ['item1', 'item2', 'item3'],
         ]);
 
@@ -322,7 +322,7 @@ final class SystemSettingTest extends TestCase
     public function test_system_setting_model_boolean_handling(): void
     {
         $setting = SystemSetting::factory()->create([
-            'type' => 'boolean',
+            'type'  => 'boolean',
             'value' => true,
         ]);
 
@@ -333,7 +333,7 @@ final class SystemSettingTest extends TestCase
     public function test_system_setting_model_integer_handling(): void
     {
         $setting = SystemSetting::factory()->create([
-            'type' => 'integer',
+            'type'  => 'integer',
             'value' => 42,
         ]);
 
@@ -344,7 +344,7 @@ final class SystemSettingTest extends TestCase
     public function test_system_setting_model_float_handling(): void
     {
         $setting = SystemSetting::factory()->create([
-            'type' => 'float',
+            'type'  => 'float',
             'value' => 3.14,
         ]);
 
@@ -442,7 +442,7 @@ final class SystemSettingTest extends TestCase
     public function test_system_setting_model_set_value(): void
     {
         SystemSetting::setValue('test_key', 'test_value', [
-            'type' => 'string',
+            'type'      => 'string',
             'is_public' => true,
         ]);
 
@@ -456,7 +456,7 @@ final class SystemSettingTest extends TestCase
     public function test_system_setting_model_get_value(): void
     {
         $setting = SystemSetting::factory()->create([
-            'key' => 'test_get_value',
+            'key'   => 'test_get_value',
             'value' => 'test_value',
         ]);
 
@@ -467,7 +467,7 @@ final class SystemSettingTest extends TestCase
     public function test_system_setting_model_get_public(): void
     {
         $setting = SystemSetting::factory()->public()->create([
-            'key' => 'test_get_public',
+            'key'   => 'test_get_public',
             'value' => 'public_value',
         ]);
 
@@ -490,11 +490,11 @@ final class SystemSettingTest extends TestCase
     public function test_system_setting_model_casts(): void
     {
         $setting = SystemSetting::factory()->create([
-            'is_public' => '1',
-            'is_required' => '0',
+            'is_public'    => '1',
+            'is_required'  => '0',
             'is_encrypted' => '1',
-            'is_readonly' => '0',
-            'is_active' => '1',
+            'is_readonly'  => '0',
+            'is_active'    => '1',
         ]);
 
         $this->assertTrue($setting->is_public);

@@ -32,13 +32,13 @@ beforeEach(function () {
 
     // Create test data
     $this->testCurrency = Currency::factory()->create([
-        'name' => 'US Dollar',
-        'code' => 'USD',
-        'symbol' => '$',
+        'name'           => 'US Dollar',
+        'code'           => 'USD',
+        'symbol'         => '$',
         'decimal_places' => 2,
-        'is_enabled' => true,
-        'is_default' => false,
-        'exchange_rate' => 1.0,
+        'is_enabled'     => true,
+        'is_default'     => false,
+        'exchange_rate'  => 1.0,
     ]);
 });
 
@@ -52,25 +52,25 @@ it('can create a new currency', function () {
     Livewire::actingAs($this->adminUser)
         ->test(CurrencyResource\Pages\CreateCurrency::class)
         ->fillForm([
-            'name' => 'Euro',
-            'code' => 'EUR',
-            'symbol' => '€',
+            'name'           => 'Euro',
+            'code'           => 'EUR',
+            'symbol'         => '€',
             'decimal_places' => 2,
-            'is_enabled' => true,
-            'is_default' => false,
-            'exchange_rate' => 0.85,
+            'is_enabled'     => true,
+            'is_default'     => false,
+            'exchange_rate'  => 0.85,
         ])
         ->call('create')
         ->assertHasNoFormErrors();
 
     $this->assertDatabaseHas('currencies', [
-        'name' => 'Euro',
-        'code' => 'EUR',
-        'symbol' => '€',
+        'name'           => 'Euro',
+        'code'           => 'EUR',
+        'symbol'         => '€',
         'decimal_places' => 2,
-        'is_enabled' => 1,
-        'is_default' => 0,
-        'exchange_rate' => 0.85,
+        'is_enabled'     => 1,
+        'is_default'     => 0,
+        'exchange_rate'  => 0.85,
     ]);
 });
 
@@ -84,20 +84,20 @@ it('can edit a currency', function () {
     Livewire::actingAs($this->adminUser)
         ->test(CurrencyResource\Pages\EditCurrency::class, ['record' => $this->testCurrency->id])
         ->fillForm([
-            'name' => 'Updated US Dollar',
-            'symbol' => 'US$',
+            'name'          => 'Updated US Dollar',
+            'symbol'        => 'US$',
             'exchange_rate' => 1.1,
-            'is_default' => true,
+            'is_default'    => true,
         ])
         ->call('save')
         ->assertHasNoFormErrors();
 
     $this->assertDatabaseHas('currencies', [
-        'id' => $this->testCurrency->id,
-        'name' => 'Updated US Dollar',
-        'symbol' => 'US$',
+        'id'            => $this->testCurrency->id,
+        'name'          => 'Updated US Dollar',
+        'symbol'        => 'US$',
         'exchange_rate' => 1.1,
-        'is_default' => 1,
+        'is_default'    => 1,
     ]);
 });
 
@@ -120,8 +120,8 @@ it('validates required fields when creating currency', function () {
     Livewire::actingAs($this->adminUser)
         ->test(CurrencyResource\Pages\CreateCurrency::class)
         ->fillForm([
-            'name' => null,
-            'code' => null,
+            'name'           => null,
+            'code'           => null,
             'decimal_places' => null,
         ])
         ->call('create')
@@ -134,9 +134,9 @@ it('validates unique currency code', function () {
     Livewire::actingAs($this->adminUser)
         ->test(CurrencyResource\Pages\CreateCurrency::class)
         ->fillForm([
-            'name' => 'Another Test Currency',
-            'code' => 'TEST', // Duplicate code
-            'symbol' => 'T',
+            'name'           => 'Another Test Currency',
+            'code'           => 'TEST', // Duplicate code
+            'symbol'         => 'T',
             'decimal_places' => 2,
         ])
         ->call('create')
@@ -147,9 +147,9 @@ it('validates currency code length', function () {
     Livewire::actingAs($this->adminUser)
         ->test(CurrencyResource\Pages\CreateCurrency::class)
         ->fillForm([
-            'name' => 'Test Currency',
-            'code' => 'TOOLONG', // Too long
-            'symbol' => '$',
+            'name'           => 'Test Currency',
+            'code'           => 'TOOLONG', // Too long
+            'symbol'         => '$',
             'decimal_places' => 2,
         ])
         ->call('create')
@@ -160,11 +160,11 @@ it('validates numeric fields in currency form', function () {
     Livewire::actingAs($this->adminUser)
         ->test(CurrencyResource\Pages\CreateCurrency::class)
         ->fillForm([
-            'name' => 'Test Currency',
-            'code' => 'TST',
-            'symbol' => '$',
+            'name'           => 'Test Currency',
+            'code'           => 'TST',
+            'symbol'         => '$',
             'decimal_places' => 'not-a-number',
-            'exchange_rate' => 'invalid',
+            'exchange_rate'  => 'invalid',
         ])
         ->call('create')
         ->assertHasFormErrors(['decimal_places', 'exchange_rate']);
@@ -246,9 +246,9 @@ it('validates decimal places range', function () {
     Livewire::actingAs($this->adminUser)
         ->test(CurrencyResource\Pages\CreateCurrency::class)
         ->fillForm([
-            'name' => 'Test Currency',
-            'code' => 'TST',
-            'symbol' => '$',
+            'name'           => 'Test Currency',
+            'code'           => 'TST',
+            'symbol'         => '$',
             'decimal_places' => -1, // Invalid negative value
         ])
         ->call('create')

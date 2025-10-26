@@ -44,16 +44,16 @@ final class ReviewResourceTest extends TestCase
         $user = User::factory()->create();
 
         $reviewData = [
-            'product_id' => $product->id,
-            'user_id' => $user->id,
-            'reviewer_name' => 'John Doe',
+            'product_id'     => $product->id,
+            'user_id'        => $user->id,
+            'reviewer_name'  => 'John Doe',
             'reviewer_email' => 'john@example.com',
-            'rating' => 5,
-            'title' => 'Great Product',
-            'comment' => 'This product is amazing!',
-            'locale' => 'en',
-            'is_approved' => false,
-            'is_featured' => false,
+            'rating'         => 5,
+            'title'          => 'Great Product',
+            'comment'        => 'This product is amazing!',
+            'locale'         => 'en',
+            'is_approved'    => false,
+            'is_featured'    => false,
         ];
 
         $response = $this->post(route('filament.admin.resources.reviews.store'), $reviewData);
@@ -61,16 +61,16 @@ final class ReviewResourceTest extends TestCase
         $response->assertRedirect();
 
         $this->assertDatabaseHas('reviews', [
-            'product_id' => $product->id,
-            'user_id' => $user->id,
-            'reviewer_name' => 'John Doe',
+            'product_id'     => $product->id,
+            'user_id'        => $user->id,
+            'reviewer_name'  => 'John Doe',
             'reviewer_email' => 'john@example.com',
-            'rating' => 5,
-            'title' => 'Great Product',
-            'comment' => 'This product is amazing!',
-            'locale' => 'en',
-            'is_approved' => false,
-            'is_featured' => false,
+            'rating'         => 5,
+            'title'          => 'Great Product',
+            'comment'        => 'This product is amazing!',
+            'locale'         => 'en',
+            'is_approved'    => false,
+            'is_featured'    => false,
         ]);
     }
 
@@ -79,14 +79,14 @@ final class ReviewResourceTest extends TestCase
         $product = Product::factory()->create();
         $review = Review::factory()->create([
             'product_id' => $product->id,
-            'title' => 'Original Title',
-            'comment' => 'Original Comment',
+            'title'      => 'Original Title',
+            'comment'    => 'Original Comment',
         ]);
 
         $updateData = [
-            'title' => 'Updated Title',
+            'title'   => 'Updated Title',
             'comment' => 'Updated Comment',
-            'rating' => 4,
+            'rating'  => 4,
         ];
 
         $response = $this->put(route('filament.admin.resources.reviews.update', $review), $updateData);
@@ -94,10 +94,10 @@ final class ReviewResourceTest extends TestCase
         $response->assertRedirect();
 
         $this->assertDatabaseHas('reviews', [
-            'id' => $review->id,
-            'title' => 'Updated Title',
+            'id'      => $review->id,
+            'title'   => 'Updated Title',
             'comment' => 'Updated Comment',
-            'rating' => 4,
+            'rating'  => 4,
         ]);
     }
 
@@ -131,14 +131,14 @@ final class ReviewResourceTest extends TestCase
     {
         $product = Product::factory()->create();
         $reviews = Review::factory()->count(3)->create([
-            'product_id' => $product->id,
+            'product_id'  => $product->id,
             'is_approved' => false,
             'is_featured' => false,
         ]);
 
         // Test bulk approve action
         $response = $this->post(route('filament.admin.resources.reviews.bulk-action'), [
-            'action' => 'approve',
+            'action'  => 'approve',
             'records' => $reviews->pluck('id')->toArray(),
         ]);
 
@@ -152,7 +152,7 @@ final class ReviewResourceTest extends TestCase
 
         // Test bulk feature action
         $response = $this->post(route('filament.admin.resources.reviews.bulk-action'), [
-            'action' => 'feature',
+            'action'  => 'feature',
             'records' => $reviews->pluck('id')->toArray(),
         ]);
 
@@ -188,14 +188,14 @@ final class ReviewResourceTest extends TestCase
     {
         $product = Product::factory()->create();
         $review = Review::factory()->create([
-            'product_id' => $product->id,
+            'product_id'  => $product->id,
             'is_approved' => false,
             'is_featured' => false,
         ]);
 
         // Test approve action
         $response = $this->post(route('filament.admin.resources.reviews.bulk-action'), [
-            'action' => 'approve',
+            'action'  => 'approve',
             'records' => [$review->id],
         ]);
 
@@ -207,7 +207,7 @@ final class ReviewResourceTest extends TestCase
 
         // Test feature action
         $response = $this->post(route('filament.admin.resources.reviews.bulk-action'), [
-            'action' => 'feature',
+            'action'  => 'feature',
             'records' => [$review->id],
         ]);
 
@@ -222,8 +222,8 @@ final class ReviewResourceTest extends TestCase
         $product = Product::factory()->create();
         $review = Review::factory()->create([
             'product_id' => $product->id,
-            'title' => 'Test Review',
-            'rating' => 5,
+            'title'      => 'Test Review',
+            'rating'     => 5,
         ]);
 
         $response = $this->get(route('filament.admin.resources.reviews.view', $review));
@@ -245,8 +245,8 @@ final class ReviewResourceTest extends TestCase
     public function test_review_resource_validation(): void
     {
         $invalidData = [
-            'rating' => 6, // Invalid rating
-            'title' => '', // Required field
+            'rating'  => 6, // Invalid rating
+            'title'   => '', // Required field
             'comment' => '', // Required field
         ];
 
@@ -262,9 +262,9 @@ final class ReviewResourceTest extends TestCase
         // Test rating too low
         $response = $this->post(route('filament.admin.resources.reviews.store'), [
             'product_id' => $product->id,
-            'rating' => 0,
-            'title' => 'Test',
-            'comment' => 'Test comment',
+            'rating'     => 0,
+            'title'      => 'Test',
+            'comment'    => 'Test comment',
         ]);
 
         $response->assertSessionHasErrors(['rating']);
@@ -272,9 +272,9 @@ final class ReviewResourceTest extends TestCase
         // Test rating too high
         $response = $this->post(route('filament.admin.resources.reviews.store'), [
             'product_id' => $product->id,
-            'rating' => 6,
-            'title' => 'Test',
-            'comment' => 'Test comment',
+            'rating'     => 6,
+            'title'      => 'Test',
+            'comment'    => 'Test comment',
         ]);
 
         $response->assertSessionHasErrors(['rating']);

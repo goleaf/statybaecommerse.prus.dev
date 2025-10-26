@@ -3,7 +3,6 @@
 declare(strict_types=1);
 
 use App\Filament\Resources\PriceListItemResource;
-use App\Filament\Resources\PriceListItemResource\Pages\ListPriceListItems;
 use App\Models\Currency;
 use App\Models\PriceList;
 use App\Models\PriceListItem;
@@ -11,7 +10,6 @@ use App\Models\Product;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Schema;
-use Livewire\Livewire;
 
 use function Pest\Laravel\actingAs;
 

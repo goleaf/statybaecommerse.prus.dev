@@ -6,15 +6,16 @@ namespace App\Support\RouteAudit;
 
 use Faker\Factory as FakerFactory;
 use Faker\Generator;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\Factory as ModelFactory;
 use Illuminate\Database\Eloquent\Factories\FactoryNotFoundException;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Exists;
 use Illuminate\Validation\Rules\Unique;
+use Throwable;
 
 final class PayloadFactory
 {
@@ -28,7 +29,7 @@ final class PayloadFactory
     /**
      * Build a payload for the provided route metadata entry.
      *
-     * @param array<string, mixed> $routeMeta
+     * @param  array<string, mixed> $routeMeta
      * @return array<string, mixed>
      */
     public function build(array $routeMeta): array
@@ -54,7 +55,7 @@ final class PayloadFactory
     }
 
     /**
-     * @param list<class-string> $formRequestClasses
+     * @param  list<class-string>   $formRequestClasses
      * @return array<string, mixed>
      */
     private function buildFromFormRequests(array $formRequestClasses): array
@@ -65,7 +66,7 @@ final class PayloadFactory
         foreach ($formRequestClasses as $class) {
             try {
                 $request = App::make($class);
-            } catch (\Throwable) {
+            } catch (Throwable) {
                 continue;
             }
 
@@ -75,7 +76,7 @@ final class PayloadFactory
 
             try {
                 $rules = $request->rules();
-            } catch (\Throwable) {
+            } catch (Throwable) {
                 continue;
             }
 
@@ -92,6 +93,7 @@ final class PayloadFactory
 
                 if ($this->shouldProduceNull($normalizedRules)) {
                     $payload[$field] = null;
+
                     continue;
                 }
 
@@ -112,7 +114,7 @@ final class PayloadFactory
     }
 
     /**
-     * @param array<string, mixed> $routeMeta
+     * @param  array<string, mixed> $routeMeta
      * @return array<string, mixed>
      */
     private function fallbackPayload(array $routeMeta): array
@@ -148,7 +150,7 @@ final class PayloadFactory
     }
 
     /**
-     * @param array{0?:string}|string|array<int, string|\Illuminate\Contracts\Validation\ValidationRule|Unique|Exists> $ruleSet
+     * @param  array{0?:string}|string|array<int, string|\Illuminate\Contracts\Validation\ValidationRule|Unique|Exists> $ruleSet
      * @return array<int, string>
      */
     private function normaliseRules(mixed $ruleSet): array
@@ -267,7 +269,7 @@ final class PayloadFactory
     }
 
     /**
-     * @param array<int, string> $rules
+     * @param  array<int, string>      $rules
      * @return array{min:int, max:int}
      */
     private function resolveNumericBounds(array $rules, int $defaultMin, int $defaultMax): array
@@ -383,7 +385,7 @@ final class PayloadFactory
             return null;
         }
 
-        $model = new $modelClass();
+        $model = new $modelClass;
 
         if (method_exists($modelClass, 'factory')) {
             try {

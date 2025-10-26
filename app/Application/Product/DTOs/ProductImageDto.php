@@ -31,9 +31,9 @@ final readonly class ProductImageDto
     public function toArray(): array
     {
         return [
-            'url' => $this->url,
+            'url'       => $this->url,
             'thumbnail' => $this->thumbnailUrl,
-            'alt' => $this->altText,
+            'alt'       => $this->altText,
         ];
     }
 }

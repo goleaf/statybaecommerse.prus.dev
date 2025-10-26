@@ -9,6 +9,7 @@ use App\Models\Country;
 use App\Models\Translations\CityTranslation;
 use App\Models\Zone;
 use Illuminate\Database\Seeder;
+use Str;
 
 final class BelgiumCitiesSeeder extends Seeder
 {
@@ -22,13 +23,13 @@ final class BelgiumCitiesSeeder extends Seeder
         $cities = [
             // Brussels
             [
-                'name' => 'Brussels',
-                'code' => 'BE-BRU-BRU',
-                'is_capital' => true,
-                'is_default' => true,
-                'latitude' => 50.8503,
-                'longitude' => 4.3517,
-                'population' => 1218255,
+                'name'         => 'Brussels',
+                'code'         => 'BE-BRU-BRU',
+                'is_capital'   => true,
+                'is_default'   => true,
+                'latitude'     => 50.8503,
+                'longitude'    => 4.3517,
+                'population'   => 1218255,
                 'postal_codes' => ['1000', '1001', '1002'],
                 'translations' => [
                     'lt' => ['name' => 'Briuselis', 'description' => 'Belgijos sostinė'],
@@ -37,11 +38,11 @@ final class BelgiumCitiesSeeder extends Seeder
             ],
             // Flanders
             [
-                'name' => 'Antwerp',
-                'code' => 'BE-VLG-ANT',
-                'latitude' => 51.2194,
-                'longitude' => 4.4025,
-                'population' => 529247,
+                'name'         => 'Antwerp',
+                'code'         => 'BE-VLG-ANT',
+                'latitude'     => 51.2194,
+                'longitude'    => 4.4025,
+                'population'   => 529247,
                 'postal_codes' => ['2000'],
                 'translations' => [
                     'lt' => ['name' => 'Antverpenas', 'description' => 'Uostamiesčis'],
@@ -49,11 +50,11 @@ final class BelgiumCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Ghent',
-                'code' => 'BE-VLG-GHE',
-                'latitude' => 51.0543,
-                'longitude' => 3.7174,
-                'population' => 263927,
+                'name'         => 'Ghent',
+                'code'         => 'BE-VLG-GHE',
+                'latitude'     => 51.0543,
+                'longitude'    => 3.7174,
+                'population'   => 263927,
                 'postal_codes' => ['9000'],
                 'translations' => [
                     'lt' => ['name' => 'Gandas', 'description' => 'Istorinis miestas'],
@@ -61,11 +62,11 @@ final class BelgiumCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Bruges',
-                'code' => 'BE-VLG-BRU',
-                'latitude' => 51.2093,
-                'longitude' => 3.2247,
-                'population' => 118656,
+                'name'         => 'Bruges',
+                'code'         => 'BE-VLG-BRU',
+                'latitude'     => 51.2093,
+                'longitude'    => 3.2247,
+                'population'   => 118656,
                 'postal_codes' => ['8000'],
                 'translations' => [
                     'lt' => ['name' => 'Briugė', 'description' => 'UNESCO miestas'],
@@ -73,11 +74,11 @@ final class BelgiumCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Leuven',
-                'code' => 'BE-VLG-LEU',
-                'latitude' => 50.8798,
-                'longitude' => 4.7005,
-                'population' => 101396,
+                'name'         => 'Leuven',
+                'code'         => 'BE-VLG-LEU',
+                'latitude'     => 50.8798,
+                'longitude'    => 4.7005,
+                'population'   => 101396,
                 'postal_codes' => ['3000'],
                 'translations' => [
                     'lt' => ['name' => 'Leuvenas', 'description' => 'Universitetų miestas'],
@@ -85,11 +86,11 @@ final class BelgiumCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Mechelen',
-                'code' => 'BE-VLG-MEC',
-                'latitude' => 51.0259,
-                'longitude' => 4.4776,
-                'population' => 86921,
+                'name'         => 'Mechelen',
+                'code'         => 'BE-VLG-MEC',
+                'latitude'     => 51.0259,
+                'longitude'    => 4.4776,
+                'population'   => 86921,
                 'postal_codes' => ['2800'],
                 'translations' => [
                     'lt' => ['name' => 'Mechlenas', 'description' => 'Katedros miestas'],
@@ -97,11 +98,11 @@ final class BelgiumCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Aalst',
-                'code' => 'BE-VLG-AAL',
-                'latitude' => 50.9378,
-                'longitude' => 4.0403,
-                'population' => 87000,
+                'name'         => 'Aalst',
+                'code'         => 'BE-VLG-AAL',
+                'latitude'     => 50.9378,
+                'longitude'    => 4.0403,
+                'population'   => 87000,
                 'postal_codes' => ['9300'],
                 'translations' => [
                     'lt' => ['name' => 'Alstas', 'description' => 'Pramonės miestas'],
@@ -109,11 +110,11 @@ final class BelgiumCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Kortrijk',
-                'code' => 'BE-VLG-KOR',
-                'latitude' => 50.8278,
-                'longitude' => 3.2647,
-                'population' => 77000,
+                'name'         => 'Kortrijk',
+                'code'         => 'BE-VLG-KOR',
+                'latitude'     => 50.8278,
+                'longitude'    => 3.2647,
+                'population'   => 77000,
                 'postal_codes' => ['8500'],
                 'translations' => [
                     'lt' => ['name' => 'Kortreikas', 'description' => 'Tekstilės pramonės centras'],
@@ -121,11 +122,11 @@ final class BelgiumCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Hasselt',
-                'code' => 'BE-VLG-HAS',
-                'latitude' => 50.9307,
-                'longitude' => 5.3375,
-                'population' => 78000,
+                'name'         => 'Hasselt',
+                'code'         => 'BE-VLG-HAS',
+                'latitude'     => 50.9307,
+                'longitude'    => 5.3375,
+                'population'   => 78000,
                 'postal_codes' => ['3500'],
                 'translations' => [
                     'lt' => ['name' => 'Haseltas', 'description' => 'Limburgo sostinė'],
@@ -134,11 +135,11 @@ final class BelgiumCitiesSeeder extends Seeder
             ],
             // Wallonia
             [
-                'name' => 'Liège',
-                'code' => 'BE-WAL-LIE',
-                'latitude' => 50.6403,
-                'longitude' => 5.5714,
-                'population' => 197355,
+                'name'         => 'Liège',
+                'code'         => 'BE-WAL-LIE',
+                'latitude'     => 50.6403,
+                'longitude'    => 5.5714,
+                'population'   => 197355,
                 'postal_codes' => ['4000'],
                 'translations' => [
                     'lt' => ['name' => 'Lježas', 'description' => 'Pramonės miestas'],
@@ -146,11 +147,11 @@ final class BelgiumCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Charleroi',
-                'code' => 'BE-WAL-CHA',
-                'latitude' => 50.4108,
-                'longitude' => 4.4446,
-                'population' => 201816,
+                'name'         => 'Charleroi',
+                'code'         => 'BE-WAL-CHA',
+                'latitude'     => 50.4108,
+                'longitude'    => 4.4446,
+                'population'   => 201816,
                 'postal_codes' => ['6000'],
                 'translations' => [
                     'lt' => ['name' => 'Šarleua', 'description' => 'Pramonės centras'],
@@ -158,11 +159,11 @@ final class BelgiumCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Namur',
-                'code' => 'BE-WAL-NAM',
-                'latitude' => 50.4669,
-                'longitude' => 4.8675,
-                'population' => 110939,
+                'name'         => 'Namur',
+                'code'         => 'BE-WAL-NAM',
+                'latitude'     => 50.4669,
+                'longitude'    => 4.8675,
+                'population'   => 110939,
                 'postal_codes' => ['5000'],
                 'translations' => [
                     'lt' => ['name' => 'Namuras', 'description' => 'Valonijos sostinė'],
@@ -170,11 +171,11 @@ final class BelgiumCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Mons',
-                'code' => 'BE-WAL-MON',
-                'latitude' => 50.4542,
-                'longitude' => 3.9569,
-                'population' => 95000,
+                'name'         => 'Mons',
+                'code'         => 'BE-WAL-MON',
+                'latitude'     => 50.4542,
+                'longitude'    => 3.9569,
+                'population'   => 95000,
                 'postal_codes' => ['7000'],
                 'translations' => [
                     'lt' => ['name' => 'Monas', 'description' => 'Henegau sostinė'],
@@ -182,11 +183,11 @@ final class BelgiumCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Tournai',
-                'code' => 'BE-WAL-TOU',
-                'latitude' => 50.6064,
-                'longitude' => 3.3889,
-                'population' => 69000,
+                'name'         => 'Tournai',
+                'code'         => 'BE-WAL-TOU',
+                'latitude'     => 50.6064,
+                'longitude'    => 3.3889,
+                'population'   => 69000,
                 'postal_codes' => ['7500'],
                 'translations' => [
                     'lt' => ['name' => 'Turnė', 'description' => 'Senovinis miestas'],
@@ -194,11 +195,11 @@ final class BelgiumCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'La Louvière',
-                'code' => 'BE-WAL-LOU',
-                'latitude' => 50.4764,
-                'longitude' => 4.1875,
-                'population' => 81000,
+                'name'         => 'La Louvière',
+                'code'         => 'BE-WAL-LOU',
+                'latitude'     => 50.4764,
+                'longitude'    => 4.1875,
+                'population'   => 81000,
                 'postal_codes' => ['7100'],
                 'translations' => [
                     'lt' => ['name' => 'La Luviere', 'description' => 'Pramonės miestas'],
@@ -206,11 +207,11 @@ final class BelgiumCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Verviers',
-                'code' => 'BE-WAL-VER',
-                'latitude' => 50.5908,
-                'longitude' => 5.8667,
-                'population' => 55000,
+                'name'         => 'Verviers',
+                'code'         => 'BE-WAL-VER',
+                'latitude'     => 50.5908,
+                'longitude'    => 5.8667,
+                'population'   => 55000,
                 'postal_codes' => ['4800'],
                 'translations' => [
                     'lt' => ['name' => 'Verve', 'description' => 'Tekstilės pramonės centras'],
@@ -218,11 +219,11 @@ final class BelgiumCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Arlon',
-                'code' => 'BE-WAL-ARL',
-                'latitude' => 49.6839,
-                'longitude' => 5.8167,
-                'population' => 30000,
+                'name'         => 'Arlon',
+                'code'         => 'BE-WAL-ARL',
+                'latitude'     => 49.6839,
+                'longitude'    => 5.8167,
+                'population'   => 30000,
                 'postal_codes' => ['6700'],
                 'translations' => [
                     'lt' => ['name' => 'Arlonas', 'description' => 'Liuksemburgo sostinė'],
@@ -231,11 +232,11 @@ final class BelgiumCitiesSeeder extends Seeder
             ],
             // Additional Flanders cities
             [
-                'name' => 'Sint-Niklaas',
-                'code' => 'BE-VLG-SNI',
-                'latitude' => 51.1653,
-                'longitude' => 4.1394,
-                'population' => 78000,
+                'name'         => 'Sint-Niklaas',
+                'code'         => 'BE-VLG-SNI',
+                'latitude'     => 51.1653,
+                'longitude'    => 4.1394,
+                'population'   => 78000,
                 'postal_codes' => ['9100'],
                 'translations' => [
                     'lt' => ['name' => 'Sint Niklaasas', 'description' => 'Rytų Flandrijos sostinė'],
@@ -243,11 +244,11 @@ final class BelgiumCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Ostend',
-                'code' => 'BE-VLG-OST',
-                'latitude' => 51.2297,
-                'longitude' => 2.9114,
-                'population' => 72000,
+                'name'         => 'Ostend',
+                'code'         => 'BE-VLG-OST',
+                'latitude'     => 51.2297,
+                'longitude'    => 2.9114,
+                'population'   => 72000,
                 'postal_codes' => ['8400'],
                 'translations' => [
                     'lt' => ['name' => 'Ostendė', 'description' => 'Pajūrio kurortas'],
@@ -255,11 +256,11 @@ final class BelgiumCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Genk',
-                'code' => 'BE-VLG-GEN',
-                'latitude' => 50.9650,
-                'longitude' => 5.5008,
-                'population' => 67000,
+                'name'         => 'Genk',
+                'code'         => 'BE-VLG-GEN',
+                'latitude'     => 50.9650,
+                'longitude'    => 5.5008,
+                'population'   => 67000,
                 'postal_codes' => ['3600'],
                 'translations' => [
                     'lt' => ['name' => 'Genkas', 'description' => 'Automobilių pramonės centras'],
@@ -267,11 +268,11 @@ final class BelgiumCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Roeselare',
-                'code' => 'BE-VLG-ROE',
-                'latitude' => 50.9444,
-                'longitude' => 3.1250,
-                'population' => 63000,
+                'name'         => 'Roeselare',
+                'code'         => 'BE-VLG-ROE',
+                'latitude'     => 50.9444,
+                'longitude'    => 3.1250,
+                'population'   => 63000,
                 'postal_codes' => ['8800'],
                 'translations' => [
                     'lt' => ['name' => 'Ruzelarė', 'description' => 'Tekstilės pramonės centras'],
@@ -279,11 +280,11 @@ final class BelgiumCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Dendermonde',
-                'code' => 'BE-VLG-DEN',
-                'latitude' => 51.0294,
-                'longitude' => 4.1006,
-                'population' => 46000,
+                'name'         => 'Dendermonde',
+                'code'         => 'BE-VLG-DEN',
+                'latitude'     => 51.0294,
+                'longitude'    => 4.1006,
+                'population'   => 46000,
                 'postal_codes' => ['9200'],
                 'translations' => [
                     'lt' => ['name' => 'Dendermondė', 'description' => 'Istorinis miestas'],
@@ -291,11 +292,11 @@ final class BelgiumCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Turnhout',
-                'code' => 'BE-VLG-TUR',
-                'latitude' => 51.3228,
-                'longitude' => 4.9447,
-                'population' => 44000,
+                'name'         => 'Turnhout',
+                'code'         => 'BE-VLG-TUR',
+                'latitude'     => 51.3228,
+                'longitude'    => 4.9447,
+                'population'   => 44000,
                 'postal_codes' => ['2300'],
                 'translations' => [
                     'lt' => ['name' => 'Turnhoutas', 'description' => 'Spalvų spaudos centras'],
@@ -303,11 +304,11 @@ final class BelgiumCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Lier',
-                'code' => 'BE-VLG-LIE',
-                'latitude' => 51.1311,
-                'longitude' => 4.5703,
-                'population' => 37000,
+                'name'         => 'Lier',
+                'code'         => 'BE-VLG-LIE',
+                'latitude'     => 51.1311,
+                'longitude'    => 4.5703,
+                'population'   => 37000,
                 'postal_codes' => ['2500'],
                 'translations' => [
                     'lt' => ['name' => 'Lieris', 'description' => 'Pramonės miestas'],
@@ -315,11 +316,11 @@ final class BelgiumCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Geel',
-                'code' => 'BE-VLG-GEE',
-                'latitude' => 51.1611,
-                'longitude' => 4.9906,
-                'population' => 40000,
+                'name'         => 'Geel',
+                'code'         => 'BE-VLG-GEE',
+                'latitude'     => 51.1611,
+                'longitude'    => 4.9906,
+                'population'   => 40000,
                 'postal_codes' => ['2440'],
                 'translations' => [
                     'lt' => ['name' => 'Gelis', 'description' => 'Psichiatrijos centras'],
@@ -327,11 +328,11 @@ final class BelgiumCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Sint-Truiden',
-                'code' => 'BE-VLG-STT',
-                'latitude' => 50.8158,
-                'longitude' => 5.1867,
-                'population' => 42000,
+                'name'         => 'Sint-Truiden',
+                'code'         => 'BE-VLG-STT',
+                'latitude'     => 50.8158,
+                'longitude'    => 5.1867,
+                'population'   => 42000,
                 'postal_codes' => ['3800'],
                 'translations' => [
                     'lt' => ['name' => 'Sint Truidenas', 'description' => 'Vaisių auginimo centras'],
@@ -340,11 +341,11 @@ final class BelgiumCitiesSeeder extends Seeder
             ],
             // Additional Wallonia cities
             [
-                'name' => 'La Louvière',
-                'code' => 'BE-WAL-LAL',
-                'latitude' => 50.4764,
-                'longitude' => 4.1875,
-                'population' => 81000,
+                'name'         => 'La Louvière',
+                'code'         => 'BE-WAL-LAL',
+                'latitude'     => 50.4764,
+                'longitude'    => 4.1875,
+                'population'   => 81000,
                 'postal_codes' => ['7100'],
                 'translations' => [
                     'lt' => ['name' => 'La Luviere', 'description' => 'Pramonės miestas'],
@@ -352,11 +353,11 @@ final class BelgiumCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Seraing',
-                'code' => 'BE-WAL-SER',
-                'latitude' => 50.5833,
-                'longitude' => 5.5000,
-                'population' => 65000,
+                'name'         => 'Seraing',
+                'code'         => 'BE-WAL-SER',
+                'latitude'     => 50.5833,
+                'longitude'    => 5.5000,
+                'population'   => 65000,
                 'postal_codes' => ['4100'],
                 'translations' => [
                     'lt' => ['name' => 'Seraingas', 'description' => 'Metalingų pramonės centras'],
@@ -364,11 +365,11 @@ final class BelgiumCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Herstal',
-                'code' => 'BE-WAL-HER',
-                'latitude' => 50.6667,
-                'longitude' => 5.6333,
-                'population' => 40000,
+                'name'         => 'Herstal',
+                'code'         => 'BE-WAL-HER',
+                'latitude'     => 50.6667,
+                'longitude'    => 5.6333,
+                'population'   => 40000,
                 'postal_codes' => ['4040'],
                 'translations' => [
                     'lt' => ['name' => 'Herstalas', 'description' => 'Ginklų pramonės centras'],
@@ -376,11 +377,11 @@ final class BelgiumCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Tubize',
-                'code' => 'BE-WAL-TUB',
-                'latitude' => 50.6833,
-                'longitude' => 4.2167,
-                'population' => 25000,
+                'name'         => 'Tubize',
+                'code'         => 'BE-WAL-TUB',
+                'latitude'     => 50.6833,
+                'longitude'    => 4.2167,
+                'population'   => 25000,
                 'postal_codes' => ['1480'],
                 'translations' => [
                     'lt' => ['name' => 'Tubizė', 'description' => 'Pramonės miestas'],
@@ -388,11 +389,11 @@ final class BelgiumCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Dinant',
-                'code' => 'BE-WAL-DIN',
-                'latitude' => 50.2611,
-                'longitude' => 4.9111,
-                'population' => 14000,
+                'name'         => 'Dinant',
+                'code'         => 'BE-WAL-DIN',
+                'latitude'     => 50.2611,
+                'longitude'    => 4.9111,
+                'population'   => 14000,
                 'postal_codes' => ['5500'],
                 'translations' => [
                     'lt' => ['name' => 'Dinantas', 'description' => 'Turizmo miestas'],
@@ -400,11 +401,11 @@ final class BelgiumCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Bastogne',
-                'code' => 'BE-WAL-BAS',
-                'latitude' => 50.0000,
-                'longitude' => 5.7167,
-                'population' => 15000,
+                'name'         => 'Bastogne',
+                'code'         => 'BE-WAL-BAS',
+                'latitude'     => 50.0000,
+                'longitude'    => 5.7167,
+                'population'   => 15000,
                 'postal_codes' => ['6600'],
                 'translations' => [
                     'lt' => ['name' => 'Bastonė', 'description' => 'Antrojo pasaulinio karo miestas'],
@@ -412,11 +413,11 @@ final class BelgiumCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Spa',
-                'code' => 'BE-WAL-SPA',
-                'latitude' => 50.4833,
-                'longitude' => 5.8667,
-                'population' => 10000,
+                'name'         => 'Spa',
+                'code'         => 'BE-WAL-SPA',
+                'latitude'     => 50.4833,
+                'longitude'    => 5.8667,
+                'population'   => 10000,
                 'postal_codes' => ['4900'],
                 'translations' => [
                     'lt' => ['name' => 'Spa', 'description' => 'Gydomųjų vandenų kurortas'],
@@ -424,11 +425,11 @@ final class BelgiumCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Couvin',
-                'code' => 'BE-WAL-COU',
-                'latitude' => 50.0500,
-                'longitude' => 4.5000,
-                'population' => 14000,
+                'name'         => 'Couvin',
+                'code'         => 'BE-WAL-COU',
+                'latitude'     => 50.0500,
+                'longitude'    => 4.5000,
+                'population'   => 14000,
                 'postal_codes' => ['5660'],
                 'translations' => [
                     'lt' => ['name' => 'Kuvinas', 'description' => 'Gamtos miestas'],
@@ -436,11 +437,11 @@ final class BelgiumCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Châtelet',
-                'code' => 'BE-WAL-CHT',
-                'latitude' => 50.4000,
-                'longitude' => 4.5167,
-                'population' => 36000,
+                'name'         => 'Châtelet',
+                'code'         => 'BE-WAL-CHT',
+                'latitude'     => 50.4000,
+                'longitude'    => 4.5167,
+                'population'   => 36000,
                 'postal_codes' => ['6200'],
                 'translations' => [
                     'lt' => ['name' => 'Šatle', 'description' => 'Pramonės miestas'],
@@ -448,11 +449,11 @@ final class BelgiumCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Fleurus',
-                'code' => 'BE-WAL-FLE',
-                'latitude' => 50.4833,
-                'longitude' => 4.5500,
-                'population' => 23000,
+                'name'         => 'Fleurus',
+                'code'         => 'BE-WAL-FLE',
+                'latitude'     => 50.4833,
+                'longitude'    => 4.5500,
+                'population'   => 23000,
                 'postal_codes' => ['6220'],
                 'translations' => [
                     'lt' => ['name' => 'Fleuras', 'description' => 'Istorinis miestas'],
@@ -465,19 +466,19 @@ final class BelgiumCitiesSeeder extends Seeder
             $city = City::updateOrCreate(
                 ['code' => $cityData['code']],
                 [
-                    'name' => $cityData['name'],
-                    'slug' => \Str::slug($cityData['name'].'-'.$cityData['code']),
-                    'is_enabled' => true,
-                    'is_default' => $cityData['is_default'] ?? false,
-                    'is_capital' => $cityData['is_capital'] ?? false,
-                    'country_id' => $belgium->id,
-                    'zone_id' => $euZone?->id,
-                    'level' => 1,
-                    'latitude' => $cityData['latitude'],
-                    'longitude' => $cityData['longitude'],
-                    'population' => $cityData['population'],
+                    'name'         => $cityData['name'],
+                    'slug'         => Str::slug($cityData['name'] . '-' . $cityData['code']),
+                    'is_enabled'   => true,
+                    'is_default'   => $cityData['is_default'] ?? false,
+                    'is_capital'   => $cityData['is_capital'] ?? false,
+                    'country_id'   => $belgium->id,
+                    'zone_id'      => $euZone?->id,
+                    'level'        => 1,
+                    'latitude'     => $cityData['latitude'],
+                    'longitude'    => $cityData['longitude'],
+                    'population'   => $cityData['population'],
                     'postal_codes' => $cityData['postal_codes'],
-                    'sort_order' => 0,
+                    'sort_order'   => 0,
                 ]
             );
 
@@ -486,10 +487,10 @@ final class BelgiumCitiesSeeder extends Seeder
                 CityTranslation::updateOrCreate(
                     [
                         'city_id' => $city->id,
-                        'locale' => $locale,
+                        'locale'  => $locale,
                     ],
                     [
-                        'name' => $translation['name'],
+                        'name'        => $translation['name'],
                         'description' => $translation['description'],
                     ]
                 );

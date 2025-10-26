@@ -41,11 +41,11 @@ final class CampaignClickListingTest extends TestCase
     {
         CampaignClick::factory()->count(2)->create([
             'is_converted' => true,
-            'clicked_at' => Carbon::parse('2024-02-10 08:00:00'),
+            'clicked_at'   => Carbon::parse('2024-02-10 08:00:00'),
         ]);
         CampaignClick::factory()->create([
             'is_converted' => false,
-            'clicked_at' => Carbon::parse('2024-02-15 08:00:00'),
+            'clicked_at'   => Carbon::parse('2024-02-15 08:00:00'),
         ]);
 
         $response = $this->getJson('/api/campaign-clicks?is_converted=true&date_from=2024-02-01&date_to=2024-02-28');

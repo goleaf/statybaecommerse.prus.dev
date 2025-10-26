@@ -61,17 +61,17 @@ final class DocumentLegalLocationGlobalScopesTest extends TestCase
     {
         // Create test legal documents
         $enabledPublishedLegal = Legal::factory()->create([
-            'is_enabled' => true,
+            'is_enabled'   => true,
             'published_at' => now()->subDay(),
         ]);
 
         $disabledLegal = Legal::factory()->create([
-            'is_enabled' => false,
+            'is_enabled'   => false,
             'published_at' => now()->subDay(),
         ]);
 
         $unpublishedLegal = Legal::factory()->create([
-            'is_enabled' => true,
+            'is_enabled'   => true,
             'published_at' => now()->addDay(),
         ]);
 
@@ -90,17 +90,17 @@ final class DocumentLegalLocationGlobalScopesTest extends TestCase
     {
         // Create test locations
         $activeEnabledLocation = Location::factory()->create([
-            'is_active' => true,
+            'is_active'  => true,
             'is_enabled' => true,
         ]);
 
         $inactiveLocation = Location::factory()->create([
-            'is_active' => false,
+            'is_active'  => false,
             'is_enabled' => true,
         ]);
 
         $disabledLocation = Location::factory()->create([
-            'is_active' => true,
+            'is_active'  => true,
             'is_enabled' => false,
         ]);
 
@@ -160,12 +160,12 @@ final class DocumentLegalLocationGlobalScopesTest extends TestCase
     {
         // Create test data with relationships
         $activeLocation = Location::factory()->create([
-            'is_active' => true,
+            'is_active'  => true,
             'is_enabled' => true,
         ]);
 
         $inactiveLocation = Location::factory()->create([
-            'is_active' => false,
+            'is_active'  => false,
             'is_enabled' => true,
         ]);
 
@@ -191,17 +191,17 @@ final class DocumentLegalLocationGlobalScopesTest extends TestCase
     {
         // Test different combinations of legal scopes
         $legal1 = Legal::factory()->create([
-            'is_enabled' => true,
+            'is_enabled'   => true,
             'published_at' => now()->subDay(),
         ]);
 
         $legal2 = Legal::factory()->create([
-            'is_enabled' => false,
+            'is_enabled'   => false,
             'published_at' => now()->subDay(),
         ]);
 
         $legal3 = Legal::factory()->create([
-            'is_enabled' => true,
+            'is_enabled'   => true,
             'published_at' => now()->addDay(),
         ]);
 
@@ -217,17 +217,17 @@ final class DocumentLegalLocationGlobalScopesTest extends TestCase
     {
         // Test different combinations of location scopes
         $location1 = Location::factory()->create([
-            'is_active' => true,
+            'is_active'  => true,
             'is_enabled' => true,
         ]);
 
         $location2 = Location::factory()->create([
-            'is_active' => false,
+            'is_active'  => false,
             'is_enabled' => true,
         ]);
 
         $location3 = Location::factory()->create([
-            'is_active' => true,
+            'is_active'  => true,
             'is_enabled' => false,
         ]);
 
@@ -274,17 +274,17 @@ final class DocumentLegalLocationGlobalScopesTest extends TestCase
     {
         // Test published scope with different date scenarios
         $legal1 = Legal::factory()->create([
-            'is_enabled' => true,
+            'is_enabled'   => true,
             'published_at' => now()->subDay(),
         ]);
 
         $legal2 = Legal::factory()->create([
-            'is_enabled' => true,
+            'is_enabled'   => true,
             'published_at' => now()->addDay(),
         ]);
 
         $legal3 = Legal::factory()->create([
-            'is_enabled' => true,
+            'is_enabled'   => true,
             'published_at' => null,
         ]);
 

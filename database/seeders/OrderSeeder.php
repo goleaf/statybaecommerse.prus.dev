@@ -60,13 +60,13 @@ final class OrderSeeder extends Seeder
                     ->for($channel)
                     ->for($zone)
                     ->state([
-                        'number' => 'WEB-'.Str::upper(Str::random(8)),
-                        'currency' => $currency->code,
+                        'number'         => 'WEB-' . Str::upper(Str::random(8)),
+                        'currency'       => $currency->code,
                         'payment_method' => $paymentMethods[array_rand($paymentMethods)]->value,
                         'payment_status' => 'paid',
-                        'status' => 'processing',
-                        'created_at' => $config['date']->copy()->addDays(random_int(0, 3)),
-                        'updated_at' => now(),
+                        'status'         => 'processing',
+                        'created_at'     => $config['date']->copy()->addDays(random_int(0, 3)),
+                        'updated_at'     => now(),
                     ])
                     ->create();
 
@@ -84,11 +84,11 @@ final class OrderSeeder extends Seeder
                         OrderItem::factory()
                             ->for($product)
                             ->state([
-                                'name' => $product->name,
-                                'sku' => $product->sku ?? 'SKU-'.Str::upper(Str::random(6)),
+                                'name'       => $product->name,
+                                'sku'        => $product->sku ?? 'SKU-' . Str::upper(Str::random(6)),
                                 'unit_price' => $unitPrice,
-                                'quantity' => $quantity,
-                                'total' => $lineTotal,
+                                'quantity'   => $quantity,
+                                'total'      => $lineTotal,
                             ])
                             ->make()
                     );
@@ -100,24 +100,24 @@ final class OrderSeeder extends Seeder
                 $total = $subtotal + $shippingCost + $taxAmount - $discount;
 
                 $order->update([
-                    'subtotal' => $subtotal,
+                    'subtotal'        => $subtotal,
                     'shipping_amount' => $shippingCost,
-                    'tax_amount' => $taxAmount,
+                    'tax_amount'      => $taxAmount,
                     'discount_amount' => $discount,
-                    'total' => $total,
+                    'total'           => $total,
                 ]);
 
                 // Create shipping using factory relationship
                 $order->shipping()->save(
                     OrderShipping::factory()
                         ->state([
-                            'carrier_name' => 'standard',
-                            'service' => 'ground',
-                            'cost' => $shippingCost,
-                            'weight' => 1.0,
-                            'tracking_number' => null,
-                            'tracking_url' => null,
-                            'shipped_at' => $config['date']->copy()->addDays(random_int(1, 5)),
+                            'carrier_name'       => 'standard',
+                            'service'            => 'ground',
+                            'cost'               => $shippingCost,
+                            'weight'             => 1.0,
+                            'tracking_number'    => null,
+                            'tracking_url'       => null,
+                            'shipped_at'         => $config['date']->copy()->addDays(random_int(1, 5)),
                             'estimated_delivery' => $config['date']->copy()->addDays(7),
                         ])
                         ->make()

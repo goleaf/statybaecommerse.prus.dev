@@ -15,9 +15,9 @@ final class RegionTranslationFactory extends Factory
     public function definition(): array
     {
         return [
-            'region_id' => Region::factory(),
-            'locale' => $this->faker->randomElement(['en', 'lt']),
-            'name' => $this->faker->city().' Region',
+            'region_id'   => Region::factory(),
+            'locale'      => $this->faker->randomElement(['en', 'lt']),
+            'name'        => $this->faker->city() . ' Region',
             'description' => $this->faker->paragraph(),
         ];
     }
@@ -25,8 +25,8 @@ final class RegionTranslationFactory extends Factory
     public function english(): static
     {
         return $this->state(fn (array $attributes) => [
-            'locale' => 'en',
-            'name' => $this->faker->city().' Region',
+            'locale'      => 'en',
+            'name'        => $this->faker->city() . ' Region',
             'description' => $this->faker->paragraph(),
         ]);
     }
@@ -34,8 +34,8 @@ final class RegionTranslationFactory extends Factory
     public function lithuanian(): static
     {
         return $this->state(fn (array $attributes) => [
-            'locale' => 'lt',
-            'name' => $this->faker->city().' Regionas',
+            'locale'      => 'lt',
+            'name'        => $this->faker->city() . ' Regionas',
             'description' => $this->faker->paragraph(),
         ]);
     }

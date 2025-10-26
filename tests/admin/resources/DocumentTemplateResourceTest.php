@@ -32,10 +32,10 @@ beforeEach(function () {
 
     // Create test data
     $this->testDocumentTemplate = DocumentTemplate::factory()->create([
-        'name' => 'Test Template',
-        'slug' => 'test-template',
-        'type' => 'invoice',
-        'category' => 'business',
+        'name'      => 'Test Template',
+        'slug'      => 'test-template',
+        'type'      => 'invoice',
+        'category'  => 'business',
         'is_active' => true,
     ]);
 });
@@ -51,23 +51,23 @@ it('can create a document template', function () {
     Livewire::actingAs($this->adminUser)
         ->test(DocumentTemplateResource\Pages\CreateDocumentTemplate::class)
         ->fillForm([
-            'name' => 'New Template',
-            'slug' => 'new-template',
+            'name'        => 'New Template',
+            'slug'        => 'new-template',
             'description' => 'A new template',
-            'content' => '<h1>{{title}}</h1><p>{{content}}</p>',
-            'variables' => ['title' => 'Title', 'content' => 'Content'],
-            'type' => 'invoice',
-            'category' => 'business',
-            'is_active' => true,
+            'content'     => '<h1>{{title}}</h1><p>{{content}}</p>',
+            'variables'   => ['title' => 'Title', 'content' => 'Content'],
+            'type'        => 'invoice',
+            'category'    => 'business',
+            'is_active'   => true,
         ])
         ->call('create')
         ->assertHasNoFormErrors();
 
     $this->assertDatabaseHas('document_templates', [
-        'name' => 'New Template',
-        'slug' => 'new-template',
-        'type' => 'invoice',
-        'category' => 'business',
+        'name'      => 'New Template',
+        'slug'      => 'new-template',
+        'type'      => 'invoice',
+        'category'  => 'business',
         'is_active' => true,
     ]);
 });
@@ -90,7 +90,7 @@ it('can edit a document template record', function () {
         ->assertHasNoFormErrors();
 
     $this->assertDatabaseHas('document_templates', [
-        'id' => $this->testDocumentTemplate->id,
+        'id'   => $this->testDocumentTemplate->id,
         'name' => 'Updated Template',
         'type' => 'quote',
     ]);
@@ -113,10 +113,10 @@ it('validates required fields', function () {
     Livewire::actingAs($this->adminUser)
         ->test(DocumentTemplateResource\Pages\CreateDocumentTemplate::class)
         ->fillForm([
-            'name' => '',
-            'type' => '',
+            'name'     => '',
+            'type'     => '',
             'category' => '',
-            'content' => '',
+            'content'  => '',
         ])
         ->call('create')
         ->assertHasFormErrors(['name', 'type', 'category', 'content']);
@@ -157,7 +157,7 @@ it('can search document templates by name', function () {
 
     $this
         ->actingAs($this->adminUser)
-        ->get(DocumentTemplateResource::getUrl('index').'?search=Special')
+        ->get(DocumentTemplateResource::getUrl('index') . '?search=Special')
         ->assertOk();
 });
 
@@ -166,7 +166,7 @@ it('can search document templates by slug', function () {
 
     $this
         ->actingAs($this->adminUser)
-        ->get(DocumentTemplateResource::getUrl('index').'?search=special')
+        ->get(DocumentTemplateResource::getUrl('index') . '?search=special')
         ->assertOk();
 });
 
@@ -176,14 +176,14 @@ it('can sort document templates by name', function () {
 
     $this
         ->actingAs($this->adminUser)
-        ->get(DocumentTemplateResource::getUrl('index').'?sort=name&direction=asc')
+        ->get(DocumentTemplateResource::getUrl('index') . '?sort=name&direction=asc')
         ->assertOk();
 });
 
 it('can sort document templates by created date', function () {
     $this
         ->actingAs($this->adminUser)
-        ->get(DocumentTemplateResource::getUrl('index').'?sort=created_at&direction=desc')
+        ->get(DocumentTemplateResource::getUrl('index') . '?sort=created_at&direction=desc')
         ->assertOk();
 });
 
@@ -232,7 +232,7 @@ it('can duplicate a document template', function () {
 
     $this->assertDatabaseHas('document_templates', [
         'name' => 'Original Template (Copy)',
-        'slug' => $template->slug.'-copy',
+        'slug' => $template->slug . '-copy',
     ]);
 });
 
@@ -356,10 +356,10 @@ it('validates template content is required', function () {
     Livewire::actingAs($this->adminUser)
         ->test(DocumentTemplateResource\Pages\CreateDocumentTemplate::class)
         ->fillForm([
-            'name' => 'Test Template',
-            'type' => 'invoice',
+            'name'     => 'Test Template',
+            'type'     => 'invoice',
             'category' => 'business',
-            'content' => '',
+            'content'  => '',
         ])
         ->call('create')
         ->assertHasFormErrors(['content']);
@@ -368,18 +368,18 @@ it('validates template content is required', function () {
 it('handles template with complex variables', function () {
     $complexVariables = [
         'customer_name' => 'Customer Name',
-        'invoice_date' => 'Invoice Date',
-        'total_amount' => 'Total Amount',
+        'invoice_date'  => 'Invoice Date',
+        'total_amount'  => 'Total Amount',
         'payment_terms' => 'Payment Terms',
     ];
 
     Livewire::actingAs($this->adminUser)
         ->test(DocumentTemplateResource\Pages\CreateDocumentTemplate::class)
         ->fillForm([
-            'name' => 'Complex Template',
-            'type' => 'invoice',
-            'category' => 'business',
-            'content' => '<h1>Invoice for {{customer_name}}</h1><p>Date: {{invoice_date}}</p><p>Total: €{{total_amount}}</p>',
+            'name'      => 'Complex Template',
+            'type'      => 'invoice',
+            'category'  => 'business',
+            'content'   => '<h1>Invoice for {{customer_name}}</h1><p>Date: {{invoice_date}}</p><p>Total: €{{total_amount}}</p>',
             'variables' => $complexVariables,
             'is_active' => true,
         ])
@@ -387,37 +387,37 @@ it('handles template with complex variables', function () {
         ->assertHasNoFormErrors();
 
     $this->assertDatabaseHas('document_templates', [
-        'name' => 'Complex Template',
-        'type' => 'invoice',
+        'name'      => 'Complex Template',
+        'type'      => 'invoice',
         'is_active' => true,
     ]);
 });
 
 it('handles template with settings', function () {
     $settings = [
-        'page_size' => 'A4',
+        'page_size'   => 'A4',
         'orientation' => 'portrait',
-        'margins' => ['top' => 20, 'right' => 20, 'bottom' => 20, 'left' => 20],
-        'header' => 'Company Header',
-        'footer' => 'Company Footer',
+        'margins'     => ['top' => 20, 'right' => 20, 'bottom' => 20, 'left' => 20],
+        'header'      => 'Company Header',
+        'footer'      => 'Company Footer',
     ];
 
     Livewire::actingAs($this->adminUser)
         ->test(DocumentTemplateResource\Pages\CreateDocumentTemplate::class)
         ->fillForm([
-            'name' => 'Template with Settings',
-            'type' => 'report',
-            'category' => 'business',
-            'content' => '<h1>Report</h1><p>Content here</p>',
-            'settings' => $settings,
+            'name'      => 'Template with Settings',
+            'type'      => 'report',
+            'category'  => 'business',
+            'content'   => '<h1>Report</h1><p>Content here</p>',
+            'settings'  => $settings,
             'is_active' => true,
         ])
         ->call('create')
         ->assertHasNoFormErrors();
 
     $this->assertDatabaseHas('document_templates', [
-        'name' => 'Template with Settings',
-        'type' => 'report',
+        'name'      => 'Template with Settings',
+        'type'      => 'report',
         'is_active' => true,
     ]);
 });

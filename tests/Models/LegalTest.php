@@ -8,6 +8,7 @@ use App\Services\Security\HtmlContentSanitizer;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Str;
+
 // Leverage the shared RefreshDatabase trait while the global Pest configuration boots the Laravel TestCase.
 uses(RefreshDatabase::class);
 

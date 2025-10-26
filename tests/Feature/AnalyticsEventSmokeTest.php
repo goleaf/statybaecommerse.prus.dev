@@ -21,8 +21,8 @@ final class AnalyticsEventSmokeTest extends TestCase
         $event = AnalyticsEvent::create([
             'event_name' => 'Test Event',
             'event_type' => 'page_view',
-            'user_id' => $user->id,
-            'session_id' => 'test-session-'.Str::uuid(),
+            'user_id'    => $user->id,
+            'session_id' => 'test-session-' . Str::uuid(),
         ]);
 
         $event->refresh();

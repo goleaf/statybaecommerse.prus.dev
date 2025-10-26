@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 $directory = new RecursiveDirectoryIterator(__DIR__ . '/../app/Filament/Resources', RecursiveDirectoryIterator::SKIP_DOTS);
 $iterator = new RecursiveIteratorIterator($directory);
 $files = [];

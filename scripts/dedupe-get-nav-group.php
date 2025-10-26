@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-$baseDir = __DIR__.'/../app/Filament/Resources';
+$baseDir = __DIR__ . '/../app/Filament/Resources';
 
 $rii = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($baseDir));
 $updated = 0;
@@ -28,7 +28,7 @@ foreach ($rii as $file) {
                 $match = $matches[0][$i];
                 $start = $match[1];
                 $length = strlen($match[0]);
-                $code = substr($code, 0, $start).substr($code, $start + $length);
+                $code = substr($code, 0, $start) . substr($code, $start + $length);
             }
         }
     }

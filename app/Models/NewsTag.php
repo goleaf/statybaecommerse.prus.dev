@@ -17,8 +17,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  *
  * Eloquent model representing the NewsTag entity with comprehensive relationships, scopes, and business logic for the e-commerce system.
  *
- * @property mixed $table
- * @property mixed $fillable
+ * @property mixed  $table
+ * @property mixed  $fillable
  * @property string $translationModel
  *
  * @method static \Illuminate\Database\Eloquent\Builder|NewsTag newModelQuery()
@@ -44,7 +44,7 @@ final class NewsTag extends Model
     {
         return [
             'is_visible' => 'boolean',
-            'is_active' => 'boolean',
+            'is_active'  => 'boolean',
             'sort_order' => 'integer',
         ];
     }

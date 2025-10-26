@@ -16,7 +16,7 @@ uses(RefreshDatabase::class);
 
 beforeEach(function () {
     $this->adminUser = User::factory()->create([
-        'email' => 'admin@example.com',
+        'email'    => 'admin@example.com',
         'is_admin' => true,
     ]);
 });
@@ -25,10 +25,10 @@ it('feature: can list variant price histories', function () {
     $variant = ProductVariant::factory()->create();
     $priceHistory = VariantPriceHistory::factory()->create([
         'variant_id' => $variant->id,
-        'old_price' => 10.00,
-        'new_price' => 12.00,
+        'old_price'  => 10.00,
+        'new_price'  => 12.00,
         'price_type' => 'regular',
-        'reason' => 'manual',
+        'reason'     => 'manual',
         'changed_by' => $this->adminUser->id,
     ]);
 
@@ -48,12 +48,12 @@ it('feature: can create a variant price history', function () {
     Livewire::actingAs($this->adminUser)
         ->test(CreateVariantPriceHistory::class)
         ->fillForm([
-            'variant_id' => $variant->id,
-            'old_price' => 10.00,
-            'new_price' => 12.00,
-            'price_type' => 'regular',
-            'reason' => 'manual',
-            'changed_by' => $this->adminUser->id,
+            'variant_id'     => $variant->id,
+            'old_price'      => 10.00,
+            'new_price'      => 12.00,
+            'price_type'     => 'regular',
+            'reason'         => 'manual',
+            'changed_by'     => $this->adminUser->id,
             'effective_from' => now(),
         ])
         ->call('create')
@@ -62,10 +62,10 @@ it('feature: can create a variant price history', function () {
 
     $this->assertDatabaseHas('variant_price_histories', [
         'variant_id' => $variant->id,
-        'old_price' => 10.00,
-        'new_price' => 12.00,
+        'old_price'  => 10.00,
+        'new_price'  => 12.00,
         'price_type' => 'regular',
-        'reason' => 'manual',
+        'reason'     => 'manual',
         'changed_by' => $this->adminUser->id,
     ]);
 });
@@ -74,10 +74,10 @@ it('feature: can view a variant price history', function () {
     $variant = ProductVariant::factory()->create();
     $priceHistory = VariantPriceHistory::factory()->create([
         'variant_id' => $variant->id,
-        'old_price' => 10.00,
-        'new_price' => 12.00,
+        'old_price'  => 10.00,
+        'new_price'  => 12.00,
         'price_type' => 'regular',
-        'reason' => 'manual',
+        'reason'     => 'manual',
         'changed_by' => $this->adminUser->id,
     ]);
 
@@ -90,31 +90,31 @@ it('feature: can edit a variant price history', function () {
     $variant = ProductVariant::factory()->create();
     $priceHistory = VariantPriceHistory::factory()->create([
         'variant_id' => $variant->id,
-        'old_price' => 10.00,
-        'new_price' => 12.00,
+        'old_price'  => 10.00,
+        'new_price'  => 12.00,
         'price_type' => 'regular',
-        'reason' => 'manual',
+        'reason'     => 'manual',
         'changed_by' => $this->adminUser->id,
     ]);
 
     Livewire::actingAs($this->adminUser)
         ->test(EditVariantPriceHistory::class, ['record' => $priceHistory->id])
         ->fillForm([
-            'old_price' => 10.00,
-            'new_price' => 15.00,
+            'old_price'  => 10.00,
+            'new_price'  => 15.00,
             'price_type' => 'sale',
-            'reason' => 'promotion',
+            'reason'     => 'promotion',
         ])
         ->call('save')
         ->assertHasNoFormErrors()
         ->assertRedirect();
 
     $this->assertDatabaseHas('variant_price_histories', [
-        'id' => $priceHistory->id,
-        'old_price' => 10.00,
-        'new_price' => 15.00,
+        'id'         => $priceHistory->id,
+        'old_price'  => 10.00,
+        'new_price'  => 15.00,
         'price_type' => 'sale',
-        'reason' => 'promotion',
+        'reason'     => 'promotion',
     ]);
 });
 
@@ -138,18 +138,18 @@ it('feature: validates required fields when creating', function () {
     Livewire::actingAs($this->adminUser)
         ->test(CreateVariantPriceHistory::class)
         ->fillForm([
-            'variant_id' => null,
-            'new_price' => null,
-            'price_type' => null,
-            'reason' => null,
+            'variant_id'     => null,
+            'new_price'      => null,
+            'price_type'     => null,
+            'reason'         => null,
             'effective_from' => null,
         ])
         ->call('create')
         ->assertHasFormErrors([
-            'variant_id' => 'required',
-            'new_price' => 'required',
-            'price_type' => 'required',
-            'reason' => 'required',
+            'variant_id'     => 'required',
+            'new_price'      => 'required',
+            'price_type'     => 'required',
+            'reason'         => 'required',
             'effective_from' => 'required',
         ]);
 });
@@ -160,11 +160,11 @@ it('feature: validates numeric fields', function () {
     Livewire::actingAs($this->adminUser)
         ->test(CreateVariantPriceHistory::class)
         ->fillForm([
-            'variant_id' => $variant->id,
-            'old_price' => 'invalid',
-            'new_price' => 'invalid',
-            'price_type' => 'regular',
-            'reason' => 'manual',
+            'variant_id'     => $variant->id,
+            'old_price'      => 'invalid',
+            'new_price'      => 'invalid',
+            'price_type'     => 'regular',
+            'reason'         => 'manual',
             'effective_from' => now(),
         ])
         ->call('create')
@@ -180,11 +180,11 @@ it('feature: validates minimum values for prices', function () {
     Livewire::actingAs($this->adminUser)
         ->test(CreateVariantPriceHistory::class)
         ->fillForm([
-            'variant_id' => $variant->id,
-            'old_price' => -1,
-            'new_price' => -1,
-            'price_type' => 'regular',
-            'reason' => 'manual',
+            'variant_id'     => $variant->id,
+            'old_price'      => -1,
+            'new_price'      => -1,
+            'price_type'     => 'regular',
+            'reason'         => 'manual',
             'effective_from' => now(),
         ])
         ->call('create')
@@ -223,12 +223,12 @@ it('feature: can filter by change reason', function () {
 
     VariantPriceHistory::factory()->create([
         'variant_id' => $variant->id,
-        'reason' => 'manual',
+        'reason'     => 'manual',
     ]);
 
     VariantPriceHistory::factory()->create([
         'variant_id' => $variant->id,
-        'reason' => 'automatic',
+        'reason'     => 'automatic',
     ]);
 
     Livewire::actingAs($this->adminUser)
@@ -261,12 +261,12 @@ it('feature: can sort by effective date', function () {
     $variant = ProductVariant::factory()->create();
 
     $oldRecord = VariantPriceHistory::factory()->create([
-        'variant_id' => $variant->id,
+        'variant_id'     => $variant->id,
         'effective_from' => now()->subDays(2),
     ]);
 
     $newRecord = VariantPriceHistory::factory()->create([
-        'variant_id' => $variant->id,
+        'variant_id'     => $variant->id,
         'effective_from' => now(),
     ]);
 
@@ -280,8 +280,8 @@ it('feature: calculates price change correctly', function () {
     $variant = ProductVariant::factory()->create();
     $priceHistory = VariantPriceHistory::factory()->create([
         'variant_id' => $variant->id,
-        'old_price' => 10.00,
-        'new_price' => 12.00,
+        'old_price'  => 10.00,
+        'new_price'  => 12.00,
     ]);
 
     expect($priceHistory->getChangeAmountAttribute())->toBe(2.00);
@@ -294,8 +294,8 @@ it('feature: handles price decreases correctly', function () {
     $variant = ProductVariant::factory()->create();
     $priceHistory = VariantPriceHistory::factory()->create([
         'variant_id' => $variant->id,
-        'old_price' => 12.00,
-        'new_price' => 10.00,
+        'old_price'  => 12.00,
+        'new_price'  => 10.00,
     ]);
 
     expect($priceHistory->getChangeAmountAttribute())->toBe(-2.00);
@@ -309,20 +309,20 @@ it('feature: sorts price histories by the calculated price change delta', functi
 
     $largestIncrease = VariantPriceHistory::factory()->create([
         'variant_id' => $variant->id,
-        'old_price' => 10.00,
-        'new_price' => 20.00,
+        'old_price'  => 10.00,
+        'new_price'  => 20.00,
     ]);
 
     $smallerIncrease = VariantPriceHistory::factory()->create([
         'variant_id' => $variant->id,
-        'old_price' => 10.00,
-        'new_price' => 12.00,
+        'old_price'  => 10.00,
+        'new_price'  => 12.00,
     ]);
 
     $decrease = VariantPriceHistory::factory()->create([
         'variant_id' => $variant->id,
-        'old_price' => 10.00,
-        'new_price' => 5.00,
+        'old_price'  => 10.00,
+        'new_price'  => 5.00,
     ]);
 
     Livewire::actingAs($this->adminUser)

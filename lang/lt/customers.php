@@ -79,12 +79,12 @@ return [
     'unverified_only' => 'Tik nepatvirtinti',
     'active_only'     => 'Tik aktyvūs',
     'inactive_only'   => 'Tik neaktyvūs',
-    'badges' => [
-        'active' => 'Aktyvus',
+    'badges'          => [
+        'active'   => 'Aktyvus',
         'inactive' => 'Neaktyvus',
     ],
-    'created_from'    => 'Sukurta nuo',
-    'created_until'   => 'Sukurta iki',
+    'created_from'  => 'Sukurta nuo',
+    'created_until' => 'Sukurta iki',
 
     'verify_email'                => 'Patvirtinti el. paštą',
     'activate'                    => 'Aktyvuoti',

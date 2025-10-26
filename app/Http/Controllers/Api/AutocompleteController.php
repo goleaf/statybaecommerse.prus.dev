@@ -29,9 +29,9 @@ final class AutocompleteController extends Controller
     public function search(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
-            'q' => ['required', 'string', 'min:1', 'max:255'],
-            'limit' => ['sometimes', 'integer', 'min:1', 'max:50'],
-            'types' => ['sometimes', 'array'],
+            'q'       => ['required', 'string', 'min:1', 'max:255'],
+            'limit'   => ['sometimes', 'integer', 'min:1', 'max:50'],
+            'types'   => ['sometimes', 'array'],
             'types.*' => ['string'],
         ]);
 
@@ -39,7 +39,7 @@ final class AutocompleteController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Validation failed.',
-                'errors' => $validator->errors(),
+                'errors'  => $validator->errors(),
             ], 422);
         }
 
@@ -53,8 +53,8 @@ final class AutocompleteController extends Controller
 
             return response()->json([
                 'success' => true,
-                'data' => $results,
-                'meta' => [
+                'data'    => $results,
+                'meta'    => [
                     'query' => $query,
                     'limit' => $limit,
                     'types' => $types,
@@ -63,9 +63,9 @@ final class AutocompleteController extends Controller
             ]);
         } catch (Throwable $exception) {
             Log::error('Autocomplete search failed.', [
-                'query' => $query,
-                'limit' => $limit,
-                'types' => $types,
+                'query'     => $query,
+                'limit'     => $limit,
+                'types'     => $types,
                 'exception' => $exception,
             ]);
 
@@ -97,12 +97,12 @@ final class AutocompleteController extends Controller
     }
 
     /**
-     * @param  callable(string, int): array  $searchCallback
+     * @param callable(string, int): array $searchCallback
      */
     private function handleTypedSearch(Request $request, callable $searchCallback, string $type): JsonResponse
     {
         $validator = Validator::make($request->all(), [
-            'q' => ['required', 'string', 'min:1', 'max:255'],
+            'q'     => ['required', 'string', 'min:1', 'max:255'],
             'limit' => ['sometimes', 'integer', 'min:1', 'max:50'],
         ]);
 
@@ -110,7 +110,7 @@ final class AutocompleteController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Validation failed.',
-                'errors' => $validator->errors(),
+                'errors'  => $validator->errors(),
             ], 422);
         }
 
@@ -123,19 +123,19 @@ final class AutocompleteController extends Controller
 
             return response()->json([
                 'success' => true,
-                'data' => $results,
-                'meta' => [
+                'data'    => $results,
+                'meta'    => [
                     'query' => $query,
                     'limit' => $limit,
-                    'type' => $type,
+                    'type'  => $type,
                     'count' => count($results),
                 ],
             ]);
         } catch (Throwable $exception) {
             Log::error('Autocomplete typed search failed.', [
-                'query' => $query,
-                'limit' => $limit,
-                'type' => $type,
+                'query'     => $query,
+                'limit'     => $limit,
+                'type'      => $type,
                 'exception' => $exception,
             ]);
 
@@ -146,4 +146,3 @@ final class AutocompleteController extends Controller
         }
     }
 }
-

@@ -23,23 +23,23 @@ final class AttributeResourceTest extends TestCase
     public function test_can_create_attribute(): void
     {
         $attributeData = [
-            'name' => 'Color',
-            'slug' => 'color',
-            'type' => 'select',
-            'is_active' => true,
+            'name'          => 'Color',
+            'slug'          => 'color',
+            'type'          => 'select',
+            'is_active'     => true,
             'is_filterable' => true,
-            'is_required' => false,
+            'is_required'   => false,
         ];
 
         $attribute = Attribute::create($attributeData);
 
         $this->assertDatabaseHas('attributes', [
-            'name' => 'Color',
-            'slug' => 'color',
-            'type' => 'select',
-            'is_active' => true,
+            'name'          => 'Color',
+            'slug'          => 'color',
+            'type'          => 'select',
+            'is_active'     => true,
             'is_filterable' => true,
-            'is_required' => false,
+            'is_required'   => false,
         ]);
 
         $this->assertEquals('Color', $attribute->name);
@@ -52,7 +52,7 @@ final class AttributeResourceTest extends TestCase
         $attribute = Attribute::factory()->create();
 
         $attribute->update([
-            'name' => 'Updated Color',
+            'name'          => 'Updated Color',
             'is_filterable' => false,
         ]);
 
@@ -63,14 +63,14 @@ final class AttributeResourceTest extends TestCase
     public function test_can_filter_attributes_by_type(): void
     {
         Attribute::factory()->create([
-            'type' => 'select',
-            'is_active' => true,
+            'type'       => 'select',
+            'is_active'  => true,
             'is_enabled' => true,
             'is_visible' => true,
         ]);
         Attribute::factory()->create([
-            'type' => 'text',
-            'is_active' => true,
+            'type'       => 'text',
+            'is_active'  => true,
             'is_enabled' => true,
             'is_visible' => true,
         ]);
@@ -116,15 +116,15 @@ final class AttributeResourceTest extends TestCase
     {
         Attribute::factory()->create([
             'is_required' => true,
-            'is_active' => true,
-            'is_enabled' => true,
-            'is_visible' => true,
+            'is_active'   => true,
+            'is_enabled'  => true,
+            'is_visible'  => true,
         ]);
         Attribute::factory()->create([
             'is_required' => false,
-            'is_active' => true,
-            'is_enabled' => true,
-            'is_visible' => true,
+            'is_active'   => true,
+            'is_enabled'  => true,
+            'is_visible'  => true,
         ]);
 
         $requiredAttributes = Attribute::where('is_required', true)->get();

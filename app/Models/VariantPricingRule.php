@@ -62,14 +62,14 @@ final class VariantPricingRule extends Model
     protected function casts(): array
     {
         return [
-            'value' => 'decimal:2',
-            'min_quantity' => 'integer',
-            'max_quantity' => 'integer',
-            'priority' => 'integer',
-            'is_active' => 'boolean',
+            'value'         => 'decimal:2',
+            'min_quantity'  => 'integer',
+            'max_quantity'  => 'integer',
+            'priority'      => 'integer',
+            'is_active'     => 'boolean',
             'is_cumulative' => 'boolean',
-            'valid_from' => 'datetime',
-            'valid_until' => 'datetime',
+            'valid_from'    => 'datetime',
+            'valid_until'   => 'datetime',
         ];
     }
 
@@ -118,7 +118,7 @@ final class VariantPricingRule extends Model
     /**
      * Handle scopeActive functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeActive($query)
     {
@@ -136,7 +136,7 @@ final class VariantPricingRule extends Model
     /**
      * Handle scopeByType functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeByType($query, string $type)
     {
@@ -146,7 +146,7 @@ final class VariantPricingRule extends Model
     /**
      * Handle scopeByPriority functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeByPriority($query, int $priority)
     {
@@ -156,7 +156,7 @@ final class VariantPricingRule extends Model
     /**
      * Handle scopeOrderedByPriority functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeOrderedByPriority($query)
     {
@@ -178,10 +178,10 @@ final class VariantPricingRule extends Model
 
         return match ($this->type) {
             'percentage' => $variant->price * ($this->value / 100),
-            'fixed' => $this->value,
-            'tier' => $this->calculateTierModifier($variant),
-            'bulk' => $this->calculateBulkModifier($variant),
-            default => 0.0,
+            'fixed'      => $this->value,
+            'tier'       => $this->calculateTierModifier($variant),
+            'bulk'       => $this->calculateBulkModifier($variant),
+            default      => 0.0,
         };
     }
 

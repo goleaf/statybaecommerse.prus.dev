@@ -34,7 +34,7 @@ final class UserBehaviorResourceTest extends TestCase
         parent::setUp();
 
         $this->adminUser = User::factory()->create([
-            'email' => 'admin@example.com',
+            'email'    => 'admin@example.com',
             'is_admin' => true,
         ]);
 
@@ -42,15 +42,15 @@ final class UserBehaviorResourceTest extends TestCase
         $this->category = Category::factory()->create();
 
         $this->userBehavior = UserBehavior::factory()->create([
-            'user_id' => $this->adminUser->id,
-            'product_id' => $this->product->id,
-            'category_id' => $this->category->id,
+            'user_id'       => $this->adminUser->id,
+            'product_id'    => $this->product->id,
+            'category_id'   => $this->category->id,
             'behavior_type' => 'view',
-            'session_id' => 'test-session-123',
-            'referrer' => 'https://example.com',
-            'user_agent' => 'Mozilla/5.0 (Test Browser)',
-            'ip_address' => '192.168.1.1',
-            'metadata' => ['test_key' => 'test_value'],
+            'session_id'    => 'test-session-123',
+            'referrer'      => 'https://example.com',
+            'user_agent'    => 'Mozilla/5.0 (Test Browser)',
+            'ip_address'    => '192.168.1.1',
+            'metadata'      => ['test_key' => 'test_value'],
         ]);
     }
 
@@ -74,22 +74,22 @@ final class UserBehaviorResourceTest extends TestCase
         $newProduct = Product::factory()->create();
 
         $response = $this->post('/admin/user-behaviors', [
-            'user_id' => $newUser->id,
+            'user_id'       => $newUser->id,
             'behavior_type' => 'click',
-            'product_id' => $newProduct->id,
-            'session_id' => 'new-session-456',
-            'referrer' => 'https://google.com',
-            'user_agent' => 'Mozilla/5.0 (New Browser)',
-            'ip_address' => '192.168.1.2',
-            'metadata' => ['new_key' => 'new_value'],
+            'product_id'    => $newProduct->id,
+            'session_id'    => 'new-session-456',
+            'referrer'      => 'https://google.com',
+            'user_agent'    => 'Mozilla/5.0 (New Browser)',
+            'ip_address'    => '192.168.1.2',
+            'metadata'      => ['new_key' => 'new_value'],
         ]);
 
         $response->assertRedirect();
         $this->assertDatabaseHas('user_behaviors', [
-            'user_id' => $newUser->id,
+            'user_id'       => $newUser->id,
             'behavior_type' => 'click',
-            'product_id' => $newProduct->id,
-            'session_id' => 'new-session-456',
+            'product_id'    => $newProduct->id,
+            'session_id'    => 'new-session-456',
         ]);
     }
 
@@ -98,22 +98,22 @@ final class UserBehaviorResourceTest extends TestCase
         $this->actingAs($this->adminUser);
 
         $response = $this->put("/admin/user-behaviors/{$this->userBehavior->id}", [
-            'user_id' => $this->userBehavior->user_id,
+            'user_id'       => $this->userBehavior->user_id,
             'behavior_type' => 'purchase',
-            'product_id' => $this->userBehavior->product_id,
-            'category_id' => $this->userBehavior->category_id,
-            'session_id' => 'updated-session-789',
-            'referrer' => 'https://updated.com',
-            'user_agent' => 'Mozilla/5.0 (Updated Browser)',
-            'ip_address' => '192.168.1.3',
-            'metadata' => ['updated_key' => 'updated_value'],
+            'product_id'    => $this->userBehavior->product_id,
+            'category_id'   => $this->userBehavior->category_id,
+            'session_id'    => 'updated-session-789',
+            'referrer'      => 'https://updated.com',
+            'user_agent'    => 'Mozilla/5.0 (Updated Browser)',
+            'ip_address'    => '192.168.1.3',
+            'metadata'      => ['updated_key' => 'updated_value'],
         ]);
 
         $response->assertRedirect();
         $this->assertDatabaseHas('user_behaviors', [
-            'id' => $this->userBehavior->id,
+            'id'            => $this->userBehavior->id,
             'behavior_type' => 'purchase',
-            'session_id' => 'updated-session-789',
+            'session_id'    => 'updated-session-789',
         ]);
     }
 
@@ -135,12 +135,12 @@ final class UserBehaviorResourceTest extends TestCase
 
         // Create additional behaviors with different types
         UserBehavior::factory()->create([
-            'user_id' => $this->adminUser->id,
+            'user_id'       => $this->adminUser->id,
             'behavior_type' => 'click',
         ]);
 
         UserBehavior::factory()->create([
-            'user_id' => $this->adminUser->id,
+            'user_id'       => $this->adminUser->id,
             'behavior_type' => 'purchase',
         ]);
 
@@ -158,7 +158,7 @@ final class UserBehaviorResourceTest extends TestCase
 
         $anotherUser = User::factory()->create();
         UserBehavior::factory()->create([
-            'user_id' => $anotherUser->id,
+            'user_id'       => $anotherUser->id,
             'behavior_type' => 'search',
         ]);
 
@@ -176,11 +176,11 @@ final class UserBehaviorResourceTest extends TestCase
         // Create behavior from yesterday
         $yesterday = now()->subDay();
         UserBehavior::factory()->create([
-            'user_id' => $this->adminUser->id,
+            'user_id'    => $this->adminUser->id,
             'created_at' => $yesterday,
         ]);
 
-        $response = $this->get('/admin/user-behaviors?tableFilters[created_at][range][start]='.now()->format('Y-m-d'));
+        $response = $this->get('/admin/user-behaviors?tableFilters[created_at][range][start]=' . now()->format('Y-m-d'));
 
         $response->assertOk();
         $response->assertSee($this->userBehavior->behavior_type);
@@ -191,7 +191,7 @@ final class UserBehaviorResourceTest extends TestCase
         $this->actingAs($this->adminUser);
 
         UserBehavior::factory()->create([
-            'user_id' => $this->adminUser->id,
+            'user_id'       => $this->adminUser->id,
             'behavior_type' => 'click',
         ]);
 
@@ -208,7 +208,7 @@ final class UserBehaviorResourceTest extends TestCase
 
         $anotherUser = User::factory()->create();
         UserBehavior::factory()->create([
-            'user_id' => $anotherUser->id,
+            'user_id'       => $anotherUser->id,
             'behavior_type' => 'search',
         ]);
 
@@ -364,7 +364,7 @@ final class UserBehaviorResourceTest extends TestCase
         $this->actingAs($this->adminUser);
 
         $response = $this->post('/admin/user-behaviors', [
-            'user_id' => $this->adminUser->id,
+            'user_id'       => $this->adminUser->id,
             'behavior_type' => 'invalid_type',
         ]);
 
@@ -407,7 +407,7 @@ final class UserBehaviorResourceTest extends TestCase
     {
         $this->actingAs($this->adminUser);
 
-        $response = $this->get('/admin/user-behaviors?search='.$this->adminUser->name);
+        $response = $this->get('/admin/user-behaviors?search=' . $this->adminUser->name);
 
         $response->assertOk();
         $response->assertSee($this->adminUser->name);
@@ -417,7 +417,7 @@ final class UserBehaviorResourceTest extends TestCase
     {
         $this->actingAs($this->adminUser);
 
-        $response = $this->get('/admin/user-behaviors?search='.$this->product->name);
+        $response = $this->get('/admin/user-behaviors?search=' . $this->product->name);
 
         $response->assertOk();
         $response->assertSee($this->product->name);
@@ -448,7 +448,7 @@ final class UserBehaviorResourceTest extends TestCase
         $this->actingAs($this->adminUser);
 
         $olderBehavior = UserBehavior::factory()->create([
-            'user_id' => $this->adminUser->id,
+            'user_id'    => $this->adminUser->id,
             'created_at' => now()->subDays(2),
         ]);
 
@@ -492,7 +492,7 @@ final class UserBehaviorResourceTest extends TestCase
 
         // Create behavior from 10 days ago
         UserBehavior::factory()->create([
-            'user_id' => $this->adminUser->id,
+            'user_id'    => $this->adminUser->id,
             'created_at' => now()->subDays(10),
         ]);
 
@@ -508,7 +508,7 @@ final class UserBehaviorResourceTest extends TestCase
 
         // Create behavior from yesterday
         UserBehavior::factory()->create([
-            'user_id' => $this->adminUser->id,
+            'user_id'    => $this->adminUser->id,
             'created_at' => now()->subDay(),
         ]);
 
@@ -524,7 +524,7 @@ final class UserBehaviorResourceTest extends TestCase
 
         // Create behavior from 2 weeks ago
         UserBehavior::factory()->create([
-            'user_id' => $this->adminUser->id,
+            'user_id'    => $this->adminUser->id,
             'created_at' => now()->subWeeks(2),
         ]);
 
@@ -540,7 +540,7 @@ final class UserBehaviorResourceTest extends TestCase
 
         // Create behavior from last month
         UserBehavior::factory()->create([
-            'user_id' => $this->adminUser->id,
+            'user_id'    => $this->adminUser->id,
             'created_at' => now()->subMonth(),
         ]);
 
@@ -556,7 +556,7 @@ final class UserBehaviorResourceTest extends TestCase
 
         // Create behavior without product
         UserBehavior::factory()->create([
-            'user_id' => $this->adminUser->id,
+            'user_id'    => $this->adminUser->id,
             'product_id' => null,
         ]);
 
@@ -572,7 +572,7 @@ final class UserBehaviorResourceTest extends TestCase
 
         // Create behavior without category
         UserBehavior::factory()->create([
-            'user_id' => $this->adminUser->id,
+            'user_id'     => $this->adminUser->id,
             'category_id' => null,
         ]);
 
@@ -587,12 +587,12 @@ final class UserBehaviorResourceTest extends TestCase
         $this->actingAs($this->adminUser);
 
         UserBehavior::factory()->create([
-            'user_id' => $this->adminUser->id,
+            'user_id'       => $this->adminUser->id,
             'behavior_type' => 'click',
         ]);
 
         UserBehavior::factory()->create([
-            'user_id' => $this->adminUser->id,
+            'user_id'       => $this->adminUser->id,
             'behavior_type' => 'purchase',
         ]);
 

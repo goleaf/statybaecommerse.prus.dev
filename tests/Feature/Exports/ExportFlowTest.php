@@ -18,9 +18,10 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Storage;
-use Spatie\SimpleExcel\SimpleExcelReader;
 
 use function Pest\Laravel\actingAs;
+
+use Spatie\SimpleExcel\SimpleExcelReader;
 
 uses(RefreshDatabase::class);
 
@@ -35,13 +36,13 @@ it('feature: queues, processes, and downloads order exports', function (): void 
     $service = app(ExportService::class);
 
     $request = ExportRequestData::from([
-        'entity' => ExportType::ORDERS->value,
-        'format' => ExportFormat::CSV->value,
-        'columns' => ['number', 'status', 'payment_status', 'total', 'customer', 'items', 'created_at'],
-        'filters' => [],
-        'locale' => 'en',
+        'entity'   => ExportType::ORDERS->value,
+        'format'   => ExportFormat::CSV->value,
+        'columns'  => ['number', 'status', 'payment_status', 'total', 'customer', 'items', 'created_at'],
+        'filters'  => [],
+        'locale'   => 'en',
         'timezone' => 'UTC',
-        'ids' => [],
+        'ids'      => [],
     ]);
 
     $export = $service->queueExport($request, $user);
@@ -91,15 +92,15 @@ it('feature: streams one hundred thousand users without exhausting memory', func
     $batch = [];
     for ($i = 0; $i < 100000; $i++) {
         $batch[] = [
-            'name' => 'Bulk User '.$i,
-            'email' => "bulk{$i}@example.test",
+            'name'              => 'Bulk User ' . $i,
+            'email'             => "bulk{$i}@example.test",
             'email_verified_at' => $now,
-            'password' => $password,
-            'preferred_locale' => 'en',
-            'is_admin' => false,
-            'remember_token' => null,
-            'created_at' => $now,
-            'updated_at' => $now,
+            'password'          => $password,
+            'preferred_locale'  => 'en',
+            'is_admin'          => false,
+            'remember_token'    => null,
+            'created_at'        => $now,
+            'updated_at'        => $now,
         ];
 
         if (count($batch) === 1000) {
@@ -115,13 +116,13 @@ it('feature: streams one hundred thousand users without exhausting memory', func
     $service = app(ExportService::class);
 
     $request = ExportRequestData::from([
-        'entity' => ExportType::USERS->value,
-        'format' => ExportFormat::CSV->value,
-        'columns' => [],
-        'filters' => [],
-        'locale' => 'en',
+        'entity'   => ExportType::USERS->value,
+        'format'   => ExportFormat::CSV->value,
+        'columns'  => [],
+        'filters'  => [],
+        'locale'   => 'en',
         'timezone' => 'UTC',
-        'ids' => [],
+        'ids'      => [],
     ]);
 
     $export = $service->queueExport($request, $requester);
@@ -146,21 +147,21 @@ it('feature: generates aligned columns for csv, xlsx, and pdf formats', function
 
     $user = User::factory()->create();
     $product = Product::factory()->create([
-        'price' => 19.99,
+        'price'          => 19.99,
         'stock_quantity' => 5,
-        'status' => 'published',
+        'status'         => 'published',
     ]);
 
     $service = app(ExportService::class);
 
     $csvRequest = ExportRequestData::from([
-        'entity' => ExportType::PRODUCTS->value,
-        'format' => ExportFormat::CSV->value,
-        'columns' => ['sku', 'name', 'status', 'price', 'stock', 'created_at'],
-        'filters' => ['status' => 'published'],
-        'locale' => 'en',
+        'entity'   => ExportType::PRODUCTS->value,
+        'format'   => ExportFormat::CSV->value,
+        'columns'  => ['sku', 'name', 'status', 'price', 'stock', 'created_at'],
+        'filters'  => ['status' => 'published'],
+        'locale'   => 'en',
         'timezone' => 'UTC',
-        'ids' => [$product->getKey()],
+        'ids'      => [$product->getKey()],
     ]);
 
     $csvExport = $service->queueExport($csvRequest, $user);
@@ -179,13 +180,13 @@ it('feature: generates aligned columns for csv, xlsx, and pdf formats', function
     ]);
 
     $xlsxRequest = ExportRequestData::from([
-        'entity' => ExportType::PRODUCTS->value,
-        'format' => ExportFormat::XLSX->value,
-        'columns' => ['sku', 'name', 'status', 'price', 'stock', 'created_at'],
-        'filters' => ['status' => 'published'],
-        'locale' => 'en',
+        'entity'   => ExportType::PRODUCTS->value,
+        'format'   => ExportFormat::XLSX->value,
+        'columns'  => ['sku', 'name', 'status', 'price', 'stock', 'created_at'],
+        'filters'  => ['status' => 'published'],
+        'locale'   => 'en',
         'timezone' => 'UTC',
-        'ids' => [$product->getKey()],
+        'ids'      => [$product->getKey()],
     ]);
 
     $xlsxExport = $service->queueExport($xlsxRequest, $user);
@@ -204,13 +205,13 @@ it('feature: generates aligned columns for csv, xlsx, and pdf formats', function
     ]);
 
     $pdfRequest = ExportRequestData::from([
-        'entity' => ExportType::ORDERS->value,
-        'format' => ExportFormat::PDF->value,
-        'columns' => ['number', 'status', 'payment_status', 'total', 'customer', 'items', 'created_at'],
-        'filters' => [],
-        'locale' => 'en',
+        'entity'   => ExportType::ORDERS->value,
+        'format'   => ExportFormat::PDF->value,
+        'columns'  => ['number', 'status', 'payment_status', 'total', 'customer', 'items', 'created_at'],
+        'filters'  => [],
+        'locale'   => 'en',
         'timezone' => 'UTC',
-        'ids' => [],
+        'ids'      => [],
     ]);
 
     Order::factory()->create(['total' => 42.50]);

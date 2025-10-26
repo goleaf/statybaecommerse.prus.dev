@@ -9,7 +9,6 @@ use Illuminate\Console\Command;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Str;
 use JsonException;
 use RuntimeException;
 use Throwable;
@@ -210,7 +209,7 @@ final class BackupVerifyCommand extends Command
     }
 
     /**
-     * @param  array<string, mixed>  $info
+     * @param array<string, mixed> $info
      */
     private function assertFilename(array $info, string $label): string
     {

@@ -30,13 +30,13 @@ final class DataPrivacyControllerTest extends TestCase
     public function test_user_can_export_personal_data(): void
     {
         $user = User::factory()->create([
-            'password' => Hash::make('password'),
-            'preferences' => ['language' => 'en'],
+            'password'         => Hash::make('password'),
+            'preferences'      => ['language' => 'en'],
             'privacy_settings' => ['analytics' => false],
         ]);
 
         Address::factory()->for($user)->create([
-            'type' => 'shipping',
+            'type'       => 'shipping',
             'is_default' => true,
         ]);
 
@@ -44,7 +44,7 @@ final class DataPrivacyControllerTest extends TestCase
 
         $order = Order::factory()->for($user)->create([
             'currency' => 'EUR',
-            'total' => 42.50,
+            'total'    => 42.50,
         ]);
 
         $productKey = $product->getKey();
@@ -52,11 +52,11 @@ final class DataPrivacyControllerTest extends TestCase
 
         OrderItem::factory()->for($order)->create([
             'product_id' => $product->getKey(),
-            'name' => $product->name,
-            'sku' => 'SKU-'.$productKeyString,
-            'quantity' => 1,
-            'price' => 42.50,
-            'total' => 42.50,
+            'name'       => $product->name,
+            'sku'        => 'SKU-' . $productKeyString,
+            'quantity'   => 1,
+            'price'      => 42.50,
+            'total'      => 42.50,
         ]);
 
         Review::factory()->for($user)->for($product)->create();
@@ -116,7 +116,7 @@ final class DataPrivacyControllerTest extends TestCase
         $response = $this->actingAs($user)
             ->from(route('frontend.profile.index'))
             ->delete(route('frontend.profile.data.destroy'), [
-                'password' => 'secret-pass',
+                'password'         => 'secret-pass',
                 'confirm_deletion' => '1',
             ]);
 
@@ -130,7 +130,7 @@ final class DataPrivacyControllerTest extends TestCase
         $userKey = $user->getKey();
         $userKeyString = is_scalar($userKey) ? (string) $userKey : '';
 
-        $this->assertStringStartsWith('deleted-user-'.$userKeyString, $user->email);
+        $this->assertStringStartsWith('deleted-user-' . $userKeyString, $user->email);
         $this->assertSame('Deleted User', $user->name);
         $this->assertSame(0, Address::query()->where('user_id', $user->getKey())->count());
     }

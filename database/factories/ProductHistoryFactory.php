@@ -26,20 +26,20 @@ final class ProductHistoryFactory extends Factory
         $currentUserId = auth()->id();
 
         return [
-            'product_id' => Product::factory(),
-            'user_id' => $currentUserId ?? User::factory(),
+            'product_id'  => Product::factory(),
+            'user_id'     => $currentUserId ?? User::factory(),
             'causer_type' => User::class,
-            'causer_id' => $currentUserId ?? User::factory(),
-            'action' => $this->faker->randomElement(['created', 'updated', 'deleted', 'restored', 'price_changed', 'stock_updated', 'status_changed', 'category_changed', 'image_changed', 'custom']),
-            'field_name' => $this->faker->randomElement(['name', 'description', 'price', 'stock_quantity', 'status', 'category_id', 'image', 'meta_title', 'meta_description']),
-            'old_value' => $this->faker->optional()->sentence(),
-            'new_value' => $this->faker->sentence(),
+            'causer_id'   => $currentUserId ?? User::factory(),
+            'action'      => $this->faker->randomElement(['created', 'updated', 'deleted', 'restored', 'price_changed', 'stock_updated', 'status_changed', 'category_changed', 'image_changed', 'custom']),
+            'field_name'  => $this->faker->randomElement(['name', 'description', 'price', 'stock_quantity', 'status', 'category_id', 'image', 'meta_title', 'meta_description']),
+            'old_value'   => $this->faker->optional()->sentence(),
+            'new_value'   => $this->faker->sentence(),
             'description' => $this->faker->sentence(),
-            'ip_address' => $this->faker->ipv4(),
-            'user_agent' => $this->faker->userAgent(),
-            'metadata' => [
-                'source' => $this->faker->randomElement(['admin_panel', 'api', 'import', 'migration']),
-                'version' => '1.0',
+            'ip_address'  => $this->faker->ipv4(),
+            'user_agent'  => $this->faker->userAgent(),
+            'metadata'    => [
+                'source'    => $this->faker->randomElement(['admin_panel', 'api', 'import', 'migration']),
+                'version'   => '1.0',
                 'timestamp' => now()->toISOString(),
             ],
         ];
@@ -51,10 +51,10 @@ final class ProductHistoryFactory extends Factory
     public function created(): static
     {
         return $this->state(fn (array $attributes) => [
-            'action' => 'created',
-            'field_name' => 'name',
-            'old_value' => null,
-            'new_value' => $this->faker->sentence(3),
+            'action'      => 'created',
+            'field_name'  => 'name',
+            'old_value'   => null,
+            'new_value'   => $this->faker->sentence(3),
             'description' => 'Product was created in the system',
         ]);
     }
@@ -65,10 +65,10 @@ final class ProductHistoryFactory extends Factory
     public function updated(): static
     {
         return $this->state(fn (array $attributes) => [
-            'action' => 'updated',
-            'field_name' => $this->faker->randomElement(['name', 'description', 'price', 'stock_quantity']),
-            'old_value' => $this->faker->sentence(),
-            'new_value' => $this->faker->sentence(),
+            'action'      => 'updated',
+            'field_name'  => $this->faker->randomElement(['name', 'description', 'price', 'stock_quantity']),
+            'old_value'   => $this->faker->sentence(),
+            'new_value'   => $this->faker->sentence(),
             'description' => 'Product was updated',
         ]);
     }
@@ -79,10 +79,10 @@ final class ProductHistoryFactory extends Factory
     public function deleted(): static
     {
         return $this->state(fn (array $attributes) => [
-            'action' => 'deleted',
-            'field_name' => 'status',
-            'old_value' => 'active',
-            'new_value' => 'deleted',
+            'action'      => 'deleted',
+            'field_name'  => 'status',
+            'old_value'   => 'active',
+            'new_value'   => 'deleted',
             'description' => 'Product was deleted',
         ]);
     }
@@ -93,10 +93,10 @@ final class ProductHistoryFactory extends Factory
     public function restored(): static
     {
         return $this->state(fn (array $attributes) => [
-            'action' => 'restored',
-            'field_name' => 'status',
-            'old_value' => 'deleted',
-            'new_value' => 'active',
+            'action'      => 'restored',
+            'field_name'  => 'status',
+            'old_value'   => 'deleted',
+            'new_value'   => 'active',
             'description' => 'Product was restored',
         ]);
     }
@@ -110,14 +110,14 @@ final class ProductHistoryFactory extends Factory
         $newPrice = $oldPrice + $this->faker->randomFloat(2, -20, 30);
 
         return $this->state(fn (array $attributes) => [
-            'action' => 'price_changed',
-            'field_name' => 'price',
-            'old_value' => $oldPrice,
-            'new_value' => $newPrice,
+            'action'      => 'price_changed',
+            'field_name'  => 'price',
+            'old_value'   => $oldPrice,
+            'new_value'   => $newPrice,
             'description' => 'Product price was updated',
-            'metadata' => [
+            'metadata'    => [
                 'price_change_percentage' => round((($newPrice - $oldPrice) / $oldPrice) * 100, 2),
-                'reason' => $this->faker->randomElement(['Market adjustment', 'Promotion', 'Cost increase']),
+                'reason'                  => $this->faker->randomElement(['Market adjustment', 'Promotion', 'Cost increase']),
             ],
         ]);
     }
@@ -131,14 +131,14 @@ final class ProductHistoryFactory extends Factory
         $newStock = $oldStock + $this->faker->numberBetween(-20, 100);
 
         return $this->state(fn (array $attributes) => [
-            'action' => 'stock_updated',
-            'field_name' => 'stock_quantity',
-            'old_value' => $oldStock,
-            'new_value' => $newStock,
+            'action'      => 'stock_updated',
+            'field_name'  => 'stock_quantity',
+            'old_value'   => $oldStock,
+            'new_value'   => $newStock,
             'description' => 'Stock quantity was updated',
-            'metadata' => [
+            'metadata'    => [
                 'stock_change' => $newStock - $oldStock,
-                'reason' => $newStock > $oldStock ? 'Restock' : 'Sale',
+                'reason'       => $newStock > $oldStock ? 'Restock' : 'Sale',
             ],
         ]);
     }
@@ -153,12 +153,12 @@ final class ProductHistoryFactory extends Factory
         $newStatus = $this->faker->randomElement(array_diff($statuses, [$oldStatus]));
 
         return $this->state(fn (array $attributes) => [
-            'action' => 'status_changed',
-            'field_name' => 'status',
-            'old_value' => $oldStatus,
-            'new_value' => $newStatus,
+            'action'      => 'status_changed',
+            'field_name'  => 'status',
+            'old_value'   => $oldStatus,
+            'new_value'   => $newStatus,
             'description' => 'Product status was changed',
-            'metadata' => [
+            'metadata'    => [
                 'status_change_reason' => $this->faker->randomElement(['Administrative action', 'Content review', 'Publishing']),
             ],
         ]);
@@ -174,12 +174,12 @@ final class ProductHistoryFactory extends Factory
         $newCategory = $this->faker->randomElement(array_diff($categories, [$oldCategory]));
 
         return $this->state(fn (array $attributes) => [
-            'action' => 'category_changed',
-            'field_name' => 'category_id',
-            'old_value' => $oldCategory,
-            'new_value' => $newCategory,
+            'action'      => 'category_changed',
+            'field_name'  => 'category_id',
+            'old_value'   => $oldCategory,
+            'new_value'   => $newCategory,
             'description' => 'Product category was changed',
-            'metadata' => [
+            'metadata'    => [
                 'category_change_reason' => $this->faker->randomElement(['Better categorization', 'Administrative correction', 'Product reclassification']),
             ],
         ]);
@@ -191,12 +191,12 @@ final class ProductHistoryFactory extends Factory
     public function imageChanged(): static
     {
         return $this->state(fn (array $attributes) => [
-            'action' => 'image_changed',
-            'field_name' => 'image',
-            'old_value' => 'old-image-'.$this->faker->randomNumber(3).'.jpg',
-            'new_value' => 'new-image-'.$this->faker->randomNumber(3).'.jpg',
+            'action'      => 'image_changed',
+            'field_name'  => 'image',
+            'old_value'   => 'old-image-' . $this->faker->randomNumber(3) . '.jpg',
+            'new_value'   => 'new-image-' . $this->faker->randomNumber(3) . '.jpg',
             'description' => 'Product image was updated',
-            'metadata' => [
+            'metadata'    => [
                 'image_change_reason' => $this->faker->randomElement(['Better quality image', 'Updated design', 'New product photo']),
             ],
         ]);
@@ -209,20 +209,20 @@ final class ProductHistoryFactory extends Factory
     {
         $customActions = [
             'bulk_import' => 'Product was imported via bulk import',
-            'api_update' => 'Product was updated via API',
-            'migration' => 'Product data was migrated',
-            'sync' => 'Product was synchronized with external system',
+            'api_update'  => 'Product was updated via API',
+            'migration'   => 'Product data was migrated',
+            'sync'        => 'Product was synchronized with external system',
         ];
 
         $action = $this->faker->randomElement(array_keys($customActions));
 
         return $this->state(fn (array $attributes) => [
-            'action' => 'custom',
-            'field_name' => 'system',
-            'old_value' => null,
-            'new_value' => $action,
+            'action'      => 'custom',
+            'field_name'  => 'system',
+            'old_value'   => null,
+            'new_value'   => $action,
             'description' => $customActions[$action],
-            'metadata' => [
+            'metadata'    => [
                 'custom_action' => $action,
                 'system_source' => 'automated',
             ],
@@ -278,8 +278,8 @@ final class ProductHistoryFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'field_name' => $this->faker->randomElement(['price', 'sale_price', 'stock_quantity', 'status', 'is_visible']),
-            'metadata' => array_merge($attributes['metadata'] ?? [], [
-                'impact' => 'high',
+            'metadata'   => array_merge($attributes['metadata'] ?? [], [
+                'impact'             => 'high',
                 'significant_change' => true,
             ]),
         ]);
@@ -292,8 +292,8 @@ final class ProductHistoryFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'field_name' => $this->faker->randomElement(['meta_title', 'meta_description', 'tags', 'notes']),
-            'metadata' => array_merge($attributes['metadata'] ?? [], [
-                'impact' => 'low',
+            'metadata'   => array_merge($attributes['metadata'] ?? [], [
+                'impact'             => 'low',
                 'significant_change' => false,
             ]),
         ]);

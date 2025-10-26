@@ -589,7 +589,7 @@ if (app()->runningUnitTests()) {
         Route::get('/inventories', function (Request $request) {
             $query = Inventory::query()
                 ->with([
-                    'product' => static fn ($builder) => $builder->withoutGlobalScopes(),
+                    'product'  => static fn ($builder) => $builder->withoutGlobalScopes(),
                     'location' => static fn ($builder) => $builder->withoutGlobalScopes(),
                 ]);
 
@@ -669,7 +669,7 @@ if (app()->runningUnitTests()) {
 
         Route::get('/inventories/{inventory}', function (Inventory $inventory) {
             $inventory->loadMissing([
-                'product' => static fn ($builder) => $builder->withoutGlobalScopes(),
+                'product'  => static fn ($builder) => $builder->withoutGlobalScopes(),
                 'location' => static fn ($builder) => $builder->withoutGlobalScopes(),
             ]);
 

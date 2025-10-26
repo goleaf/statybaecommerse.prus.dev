@@ -26,7 +26,7 @@ PHP;
     file_put_contents($tmp, $content);
     expect(file_exists($tmp))->toBeTrue();
 
-    $service = new CodeStyleService();
+    $service = new CodeStyleService;
     $violations = $service->validateFile($tmp);
     expect($violations)->not->toBeEmpty();
 
@@ -38,4 +38,3 @@ PHP;
 
     @unlink($tmp);
 });
-

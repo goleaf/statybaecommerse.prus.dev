@@ -49,9 +49,9 @@ final class MakeSharedComponentCommand extends Command
     private function getComponentTemplate(string $type, string $className, string $componentName): string
     {
         $templates = [
-            'ui' => $this->getUiComponentTemplate($className, $componentName),
-            'form' => $this->getFormComponentTemplate($className, $componentName),
-            'layout' => $this->getLayoutComponentTemplate($className, $componentName),
+            'ui'        => $this->getUiComponentTemplate($className, $componentName),
+            'form'      => $this->getFormComponentTemplate($className, $componentName),
+            'layout'    => $this->getLayoutComponentTemplate($className, $componentName),
             'ecommerce' => $this->getEcommerceComponentTemplate($className, $componentName),
         ];
 

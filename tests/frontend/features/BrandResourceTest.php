@@ -30,21 +30,21 @@ describe('BrandResource', function () {
 
         Livewire::test(BrandResource\Pages\CreateBrand::class)
             ->fillForm([
-                'name' => $newBrand->name,
-                'slug' => $newBrand->slug,
+                'name'        => $newBrand->name,
+                'slug'        => $newBrand->slug,
                 'description' => $newBrand->description,
-                'website' => $newBrand->website,
-                'is_enabled' => $newBrand->is_enabled,
+                'website'     => $newBrand->website,
+                'is_enabled'  => $newBrand->is_enabled,
             ])
             ->call('create')
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('brands', [
-            'name' => $newBrand->name,
-            'slug' => $newBrand->slug,
+            'name'        => $newBrand->name,
+            'slug'        => $newBrand->slug,
             'description' => $newBrand->description,
-            'website' => $newBrand->website,
-            'is_enabled' => $newBrand->is_enabled,
+            'website'     => $newBrand->website,
+            'is_enabled'  => $newBrand->is_enabled,
         ]);
     });
 
@@ -55,11 +55,11 @@ describe('BrandResource', function () {
             'record' => $brand->getRouteKey(),
         ])
             ->assertFormSet([
-                'name' => $brand->name,
-                'slug' => $brand->slug,
+                'name'        => $brand->name,
+                'slug'        => $brand->slug,
                 'description' => $brand->description,
-                'website' => $brand->website,
-                'is_enabled' => $brand->is_enabled,
+                'website'     => $brand->website,
+                'is_enabled'  => $brand->is_enabled,
             ]);
     });
 
@@ -71,22 +71,22 @@ describe('BrandResource', function () {
             'record' => $brand->getRouteKey(),
         ])
             ->fillForm([
-                'name' => $newData->name,
-                'slug' => $newData->slug,
+                'name'        => $newData->name,
+                'slug'        => $newData->slug,
                 'description' => $newData->description,
-                'website' => $newData->website,
-                'is_enabled' => $newData->is_enabled,
+                'website'     => $newData->website,
+                'is_enabled'  => $newData->is_enabled,
             ])
             ->call('save')
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('brands', [
-            'id' => $brand->id,
-            'name' => $newData->name,
-            'slug' => $newData->slug,
+            'id'          => $brand->id,
+            'name'        => $newData->name,
+            'slug'        => $newData->slug,
             'description' => $newData->description,
-            'website' => $newData->website,
-            'is_enabled' => $newData->is_enabled,
+            'website'     => $newData->website,
+            'is_enabled'  => $newData->is_enabled,
         ]);
     });
 
@@ -117,26 +117,26 @@ describe('BrandResource', function () {
 
         Livewire::test(BrandResource\Pages\CreateBrand::class)
             ->fillForm([
-                'name' => $newBrand->name,
-                'slug' => $newBrand->slug,
-                'description' => $newBrand->description,
-                'website' => $newBrand->website,
-                'is_enabled' => $newBrand->is_enabled,
+                'name'         => $newBrand->name,
+                'slug'         => $newBrand->slug,
+                'description'  => $newBrand->description,
+                'website'      => $newBrand->website,
+                'is_enabled'   => $newBrand->is_enabled,
                 'translations' => [
                     [
-                        'locale' => 'lt',
-                        'name' => 'Test Brand LT',
-                        'slug' => 'test-brand-lt',
-                        'description' => 'Test description LT',
-                        'seo_title' => 'SEO Title LT',
+                        'locale'          => 'lt',
+                        'name'            => 'Test Brand LT',
+                        'slug'            => 'test-brand-lt',
+                        'description'     => 'Test description LT',
+                        'seo_title'       => 'SEO Title LT',
                         'seo_description' => 'SEO Description LT',
                     ],
                     [
-                        'locale' => 'en',
-                        'name' => 'Test Brand EN',
-                        'slug' => 'test-brand-en',
-                        'description' => 'Test description EN',
-                        'seo_title' => 'SEO Title EN',
+                        'locale'          => 'en',
+                        'name'            => 'Test Brand EN',
+                        'slug'            => 'test-brand-en',
+                        'description'     => 'Test description EN',
+                        'seo_title'       => 'SEO Title EN',
                         'seo_description' => 'SEO Description EN',
                     ],
                 ],
@@ -151,14 +151,14 @@ describe('BrandResource', function () {
 
         $this->assertDatabaseHas('brand_translations', [
             'locale' => 'lt',
-            'name' => 'Test Brand LT',
-            'slug' => 'test-brand-lt',
+            'name'   => 'Test Brand LT',
+            'slug'   => 'test-brand-lt',
         ]);
 
         $this->assertDatabaseHas('brand_translations', [
             'locale' => 'en',
-            'name' => 'Test Brand EN',
-            'slug' => 'test-brand-en',
+            'name'   => 'Test Brand EN',
+            'slug'   => 'test-brand-en',
         ]);
     });
 
@@ -200,7 +200,7 @@ describe('BrandResource', function () {
         $brand = Brand::factory()->create();
         BrandTranslation::factory()->create([
             'brand_id' => $brand->id,
-            'locale' => 'lt',
+            'locale'   => 'lt',
         ]);
 
         Livewire::test(BrandResource\Pages\ListBrands::class)
@@ -248,7 +248,7 @@ describe('BrandResource', function () {
 
         foreach ($brands as $brand) {
             $this->assertDatabaseHas('brands', [
-                'id' => $brand->id,
+                'id'         => $brand->id,
                 'is_enabled' => true,
             ]);
         }
@@ -263,7 +263,7 @@ describe('BrandResource', function () {
 
         foreach ($brands as $brand) {
             $this->assertDatabaseHas('brands', [
-                'id' => $brand->id,
+                'id'         => $brand->id,
                 'is_enabled' => false,
             ]);
         }
@@ -290,7 +290,7 @@ describe('BrandResource', function () {
             ->callTableAction('toggle_status', $brand);
 
         $this->assertDatabaseHas('brands', [
-            'id' => $brand->id,
+            'id'         => $brand->id,
             'is_enabled' => false,
         ]);
     });
@@ -320,8 +320,8 @@ describe('BrandResource', function () {
     it('validates URL format for website', function () {
         Livewire::test(BrandResource\Pages\CreateBrand::class)
             ->fillForm([
-                'name' => 'Test Brand',
-                'slug' => 'test-brand',
+                'name'    => 'Test Brand',
+                'slug'    => 'test-brand',
                 'website' => 'invalid-url',
             ])
             ->call('create')

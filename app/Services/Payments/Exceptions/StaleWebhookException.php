@@ -9,6 +9,4 @@ use RuntimeException;
 /**
  * Signifies that the webhook timestamp falls outside the configured tolerance.
  */
-final class StaleWebhookException extends RuntimeException
-{
-}
+final class StaleWebhookException extends RuntimeException {}

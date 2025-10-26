@@ -4,21 +4,21 @@ declare(strict_types=1);
 
 return [
     'storage' => [
-        'collection_name' => 'default',
+        'collection_name'      => 'default',
         'thumbnail_collection' => 'thumbnails',
     ],
 
     'urls' => [
-        'cdn' => env('MEDIA_CDN_URL'),
-        'use_temporary_urls' => env('MEDIA_USE_TEMPORARY_URLS', true),
-        'temporary_url_ttl' => (int) env('MEDIA_TEMPORARY_URL_TTL', 60),
+        'cdn'                    => env('MEDIA_CDN_URL'),
+        'use_temporary_urls'     => env('MEDIA_USE_TEMPORARY_URLS', true),
+        'temporary_url_ttl'      => (int) env('MEDIA_TEMPORARY_URL_TTL', 60),
         'response_cache_control' => env('MEDIA_RESPONSE_CACHE_CONTROL', 'public, max-age=604800'),
     ],
 
     'features' => [
         'category' => 'enabled',
-        'brand' => 'enabled',
-        'review' => 'enabled',
+        'brand'    => 'enabled',
+        'review'   => 'enabled',
         'discount' => 'enabled',
     ],
 
@@ -32,9 +32,9 @@ return [
     ],
 
     'variants' => [
-        'thumb' => ['width' => 180, 'height' => 180],
+        'thumb'  => ['width' => 180, 'height' => 180],
         'medium' => ['width' => 720, 'height' => 720],
-        'large' => ['width' => 1440, 'height' => 1440],
+        'large'  => ['width' => 1440, 'height' => 1440],
     ],
 
     'placeholders' => [
@@ -42,27 +42,27 @@ return [
             'fallback' => 'images/placeholder.jpg',
         ],
         'product' => [
-            'uuid' => env('MEDIA_PLACEHOLDER_PRODUCT_UUID'),
+            'uuid'     => env('MEDIA_PLACEHOLDER_PRODUCT_UUID'),
             'fallback' => 'images/placeholder-product.jpg',
             'variants' => [
-                'thumb' => 'thumb',
-                'medium' => 'medium',
-                'large' => 'large',
+                'thumb'   => 'thumb',
+                'medium'  => 'medium',
+                'large'   => 'large',
                 'default' => null,
             ],
         ],
         'product_png' => [
-            'uuid' => env('MEDIA_PLACEHOLDER_PRODUCT_PNG_UUID'),
+            'uuid'     => env('MEDIA_PLACEHOLDER_PRODUCT_PNG_UUID'),
             'fallback' => 'images/placeholder-product.png',
             'variants' => [
-                'thumb' => 'thumb',
-                'medium' => 'medium',
-                'large' => 'large',
+                'thumb'   => 'thumb',
+                'medium'  => 'medium',
+                'large'   => 'large',
                 'default' => null,
             ],
         ],
         'og' => [
-            'uuid' => env('MEDIA_PLACEHOLDER_OG_UUID'),
+            'uuid'     => env('MEDIA_PLACEHOLDER_OG_UUID'),
             'fallback' => 'images/og-default.jpg',
         ],
     ],

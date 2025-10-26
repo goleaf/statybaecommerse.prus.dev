@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Application\Product\DTOs;
 
+use InvalidArgumentException;
+
 /**
  * Input DTO for keyword-based product search.
  */
@@ -15,7 +17,7 @@ final readonly class SearchProductsInputDto
         private int $timeoutSeconds,
     ) {
         if ($this->limit < 1) {
-            throw new \InvalidArgumentException('Search limit must be at least 1.');
+            throw new InvalidArgumentException('Search limit must be at least 1.');
         }
     }
 

@@ -54,7 +54,7 @@ final class ProductNotification extends Notification implements ShouldQueue
     public function toMail(object $notifiable): MailMessage
     {
         // Provide a brief summary email describing the product event.
-        $mail = (new MailMessage())
+        $mail = (new MailMessage)
             ->subject($this->data['title'])
             ->line($this->data['message']);
 

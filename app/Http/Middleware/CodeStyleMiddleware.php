@@ -81,7 +81,7 @@ final class CodeStyleMiddleware
 
         if (! empty($violations)) {
             Log::warning('Code style violations detected in uploaded file', [
-                'file' => $file->getClientOriginalName(),
+                'file'       => $file->getClientOriginalName(),
                 'violations' => $violations,
             ]);
         }

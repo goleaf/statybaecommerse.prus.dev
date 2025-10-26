@@ -19,11 +19,11 @@ class CampaignConversionTranslationFactory extends Factory
     {
         return [
             'campaign_conversion_id' => CampaignConversion::factory(),
-            'locale' => fake()->randomElement(['lt', 'en']),
-            'notes' => fake()->optional()->sentence(),
-            'custom_attributes' => [
-                'translation_notes' => fake()->optional()->sentence(),
-                'localized_tags' => fake()->optional()->words(3),
+            'locale'                 => fake()->randomElement(['lt', 'en']),
+            'notes'                  => fake()->optional()->sentence(),
+            'custom_attributes'      => [
+                'translation_notes'    => fake()->optional()->sentence(),
+                'localized_tags'       => fake()->optional()->words(3),
                 'region_specific_data' => fake()->optional()->word(),
             ],
         ];
@@ -33,7 +33,7 @@ class CampaignConversionTranslationFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'locale' => 'lt',
-            'notes' => fake('lt_LT')->sentence(),
+            'notes'  => fake('lt_LT')->sentence(),
         ]);
     }
 
@@ -41,7 +41,7 @@ class CampaignConversionTranslationFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'locale' => 'en',
-            'notes' => fake()->sentence(),
+            'notes'  => fake()->sentence(),
         ]);
     }
 }

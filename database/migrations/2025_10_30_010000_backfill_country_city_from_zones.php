@@ -175,9 +175,9 @@ return new class extends Migration
     {
         return [
             'table_name' => $table,
-            'record_id' => $id,
-            'zone_code' => $zoneCode,
-            'note' => Str::limit($note, 255),
+            'record_id'  => $id,
+            'zone_code'  => $zoneCode,
+            'note'       => Str::limit($note, 255),
             'created_at' => now(),
             'updated_at' => now(),
         ];

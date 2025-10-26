@@ -49,7 +49,7 @@ return [
         'reviews_count'             => 'Atsiliepimų Skaičius',
         'average_rating'            => 'Vidutinis Įvertinimas',
         'price_increase_percentage' => 'Kainų Padidinimo Procentas',
-        'variant_attribute_matrix' => 'Variacijų atributų matrica',
+        'variant_attribute_matrix'  => 'Variacijų atributų matrica',
     ],
     'sections' => [
         'variant_matrix' => 'Variacijų prieinamumo matrica',

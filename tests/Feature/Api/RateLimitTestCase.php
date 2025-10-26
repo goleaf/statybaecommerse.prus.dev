@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Tests\Feature\Api;
 
@@ -62,7 +64,7 @@ abstract class RateLimitTestCase extends FeatureTestCase
 
     private function hashedKey(string $limiter, string $key): string
     {
-        return md5($limiter.$key);
+        return md5($limiter . $key);
     }
 
     private function rateLimitKeyForLoopbackIpv6(string $suffix = '', ?string $bucket = null): string

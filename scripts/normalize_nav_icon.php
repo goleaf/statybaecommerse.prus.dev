@@ -6,9 +6,9 @@ declare(strict_types=1);
 
 $root = dirname(__DIR__);
 $targets = [
-    $root.'/app/Filament/Resources',
-    $root.'/app/Filament/Pages',
-    $root.'/app/Filament/Widgets',
+    $root . '/app/Filament/Resources',
+    $root . '/app/Filament/Pages',
+    $root . '/app/Filament/Widgets',
 ];
 
 function navIcon_getPhpFiles(string $dir): array

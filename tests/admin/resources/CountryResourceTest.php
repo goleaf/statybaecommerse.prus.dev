@@ -22,7 +22,7 @@ class CountryResourceTest extends TestCase
         parent::setUp();
 
         $this->actingAs(User::factory()->create([
-            'email' => 'admin@test.com',
+            'email'     => 'admin@test.com',
             'is_active' => true,
         ]));
     }
@@ -85,10 +85,10 @@ class CountryResourceTest extends TestCase
     public function test_country_resource_with_sample_data(): void
     {
         $country = Country::factory()->create([
-            'name' => 'Lithuania',
-            'cca2' => 'LT',
-            'region' => 'Europe',
-            'is_active' => true,
+            'name'         => 'Lithuania',
+            'cca2'         => 'LT',
+            'region'       => 'Europe',
+            'is_active'    => true,
             'is_eu_member' => true,
             'requires_vat' => true,
         ]);
@@ -101,10 +101,10 @@ class CountryResourceTest extends TestCase
         $this->assertTrue(is_callable([$resource, 'table']));
 
         $this->assertDatabaseHas('countries', [
-            'name' => 'Lithuania',
-            'cca2' => 'LT',
-            'region' => 'Europe',
-            'is_active' => true,
+            'name'         => 'Lithuania',
+            'cca2'         => 'LT',
+            'region'       => 'Europe',
+            'is_active'    => true,
             'is_eu_member' => true,
             'requires_vat' => true,
         ]);
@@ -151,22 +151,22 @@ class CountryResourceTest extends TestCase
     {
         // Create test data
         $country = Country::factory()->create([
-            'name' => 'Lithuania',
-            'cca2' => 'LT',
-            'region' => 'Europe',
+            'name'      => 'Lithuania',
+            'cca2'      => 'LT',
+            'region'    => 'Europe',
             'is_active' => true,
         ]);
 
         // Create related cities
         City::factory()->count(3)->create([
             'country_id' => $country->id,
-            'zone_id' => Zone::factory(),
+            'zone_id'    => Zone::factory(),
         ]);
 
         // Create related addresses
         Address::factory()->count(2)->create([
             'country_code' => $country->cca2,
-            'user_id' => User::factory()->create(),
+            'user_id'      => User::factory()->create(),
         ]);
 
         // Test that country has relations
@@ -183,9 +183,9 @@ class CountryResourceTest extends TestCase
     {
         // Test active country
         $activeCountry = Country::factory()->create([
-            'name' => 'Active Country',
-            'cca2' => 'AC',
-            'is_active' => true,
+            'name'         => 'Active Country',
+            'cca2'         => 'AC',
+            'is_active'    => true,
             'is_eu_member' => true,
             'requires_vat' => true,
         ]);
@@ -196,9 +196,9 @@ class CountryResourceTest extends TestCase
 
         // Test inactive country
         $inactiveCountry = Country::factory()->create([
-            'name' => 'Inactive Country',
-            'cca2' => 'IC',
-            'is_active' => false,
+            'name'         => 'Inactive Country',
+            'cca2'         => 'IC',
+            'is_active'    => false,
             'is_eu_member' => false,
             'requires_vat' => false,
         ]);
@@ -211,11 +211,11 @@ class CountryResourceTest extends TestCase
     public function test_country_resource_global_search(): void
     {
         $country = Country::factory()->create([
-            'name' => 'Test Country',
-            'cca2' => 'TC',
-            'region' => 'Test Region',
+            'name'          => 'Test Country',
+            'cca2'          => 'TC',
+            'region'        => 'Test Region',
             'currency_code' => 'EUR',
-            'is_eu_member' => true,
+            'is_eu_member'  => true,
         ]);
 
         // Test global search details
@@ -240,8 +240,8 @@ class CountryResourceTest extends TestCase
     public function test_country_resource_display_name_attribute(): void
     {
         $country = Country::factory()->create([
-            'name' => 'Lithuania',
-            'cca2' => 'LT',
+            'name'               => 'Lithuania',
+            'cca2'               => 'LT',
             'phone_calling_code' => '370',
         ]);
 
@@ -253,9 +253,9 @@ class CountryResourceTest extends TestCase
     public function test_country_resource_translated_attributes(): void
     {
         $country = Country::factory()->create([
-            'name' => 'Test Country',
+            'name'          => 'Test Country',
             'name_official' => 'Official Test Country',
-            'description' => 'Test Description',
+            'description'   => 'Test Description',
         ]);
 
         $translatedName = $country->getTranslatedNameAttribute();
@@ -270,8 +270,8 @@ class CountryResourceTest extends TestCase
     public function test_country_resource_code_attributes(): void
     {
         $country = Country::factory()->create([
-            'name' => 'Test Country',
-            'cca2' => 'TC',
+            'name'     => 'Test Country',
+            'cca2'     => 'TC',
             'iso_code' => 'ISO-TC',
         ]);
 

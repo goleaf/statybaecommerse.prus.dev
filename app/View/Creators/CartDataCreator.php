@@ -29,16 +29,16 @@ final class CartDataCreator
         $summary = $this->cartService->getSummary($userId, Session::getId());
 
         $view->with([
-            'cart' => $summary,
-            'cartCount' => $summary['count'],
-            'cartTotal' => $summary['total'],
+            'cart'         => $summary,
+            'cartCount'    => $summary['count'],
+            'cartTotal'    => $summary['total'],
             'cartSubtotal' => $summary['subtotal'],
-            'cartTax' => $summary['tax'],
+            'cartTax'      => $summary['tax'],
             'cartShipping' => $summary['shipping'],
             'cartDiscount' => $summary['discount'],
-            'cartItems' => $summary['items'],
+            'cartItems'    => $summary['items'],
             'hasCartItems' => $summary['count'] > 0,
-            'isCartEmpty' => $summary['count'] === 0,
+            'isCartEmpty'  => $summary['count'] === 0,
         ]);
     }
 
@@ -52,13 +52,13 @@ final class CartDataCreator
 
         if (empty($cart)) {
             return [
-                'items' => [],
-                'count' => 0,
+                'items'    => [],
+                'count'    => 0,
                 'subtotal' => 0,
-                'tax' => 0,
+                'tax'      => 0,
                 'shipping' => 0,
                 'discount' => 0,
-                'total' => 0,
+                'total'    => 0,
             ];
         }
 
@@ -74,14 +74,14 @@ final class CartDataCreator
             $count += $quantity;
 
             $items[] = [
-                'id' => $item['id'] ?? null,
+                'id'         => $item['id'] ?? null,
                 'product_id' => $item['product_id'] ?? null,
                 'variant_id' => $item['variant_id'] ?? null,
-                'name' => $item['name'] ?? '',
-                'price' => $this->priceCalculator->round($price),
-                'quantity' => $quantity,
-                'total' => $lineTotal,
-                'image' => $item['image'] ?? null,
+                'name'       => $item['name'] ?? '',
+                'price'      => $this->priceCalculator->round($price),
+                'quantity'   => $quantity,
+                'total'      => $lineTotal,
+                'image'      => $item['image'] ?? null,
                 'attributes' => $item['attributes'] ?? [],
             ];
         }
@@ -90,13 +90,13 @@ final class CartDataCreator
         $breakdown = app(PriceCalculator::class)->breakdown($subtotal, $discount);
 
         return [
-            'items' => $items,
-            'count' => $count,
+            'items'    => $items,
+            'count'    => $count,
             'subtotal' => $breakdown->subtotal,
-            'tax' => $breakdown->tax,
+            'tax'      => $breakdown->tax,
             'shipping' => $breakdown->shipping,
             'discount' => $breakdown->discount,
-            'total' => $breakdown->total,
+            'total'    => $breakdown->total,
         ];
     }
 }

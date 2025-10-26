@@ -12,7 +12,7 @@ use Illuminate\Support\Arr;
 final class NotificationPayloadData
 {
     /**
-     * @param array<int, string> $tags
+     * @param array<int, string>   $tags
      * @param array<string, mixed> $meta
      */
     private function __construct(
@@ -27,8 +27,7 @@ final class NotificationPayloadData
         private readonly ?CarbonImmutable $readAt,
         private readonly ?CarbonImmutable $createdAt,
         private readonly array $meta,
-    ) {
-    }
+    ) {}
 
     public static function fromModel(Notification $notification): self
     {
@@ -66,21 +65,21 @@ final class NotificationPayloadData
     public function toArray(): array
     {
         return [
-            'id' => $this->id,
+            'id'                 => $this->id,
             'notification_class' => $this->notificationClass,
-            'notification_type' => $this->notificationClass,
-            'category' => $this->category,
-            'type' => $this->category,
-            'title' => $this->title,
-            'message' => $this->message,
-            'urgent' => $this->urgent,
-            'color' => $this->color,
-            'tags' => $this->tags,
-            'is_read' => $this->readAt !== null,
-            'read_at' => $this->readAt?->toIso8601String(),
-            'created_at' => $this->createdAt?->toIso8601String(),
-            'meta' => $this->meta,
-            'context' => $this->meta,
+            'notification_type'  => $this->notificationClass,
+            'category'           => $this->category,
+            'type'               => $this->category,
+            'title'              => $this->title,
+            'message'            => $this->message,
+            'urgent'             => $this->urgent,
+            'color'              => $this->color,
+            'tags'               => $this->tags,
+            'is_read'            => $this->readAt !== null,
+            'read_at'            => $this->readAt?->toIso8601String(),
+            'created_at'         => $this->createdAt?->toIso8601String(),
+            'meta'               => $this->meta,
+            'context'            => $this->meta,
         ];
     }
 
@@ -95,7 +94,7 @@ final class NotificationPayloadData
         return $trimmed === '' ? null : $trimmed;
     }
 
-    private static function normalizeTimestamp(null|CarbonInterface $timestamp): ?CarbonImmutable
+    private static function normalizeTimestamp(?CarbonInterface $timestamp): ?CarbonImmutable
     {
         if ($timestamp === null) {
             return null;

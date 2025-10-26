@@ -10,7 +10,7 @@ uses(RefreshDatabase::class);
 describe('User Model Tests', function () {
     it('can create a user', function () {
         $user = User::factory()->create([
-            'name' => 'Test User',
+            'name'  => 'Test User',
             'email' => 'test@example.com',
         ]);
 
@@ -29,7 +29,7 @@ describe('User Model Tests', function () {
     it('can test user attributes', function () {
         $user = User::factory()->create([
             'is_active' => true,
-            'is_admin' => false,
+            'is_admin'  => false,
         ]);
 
         expect($user->is_active)->toBeTrue();

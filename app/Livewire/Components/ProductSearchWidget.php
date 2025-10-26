@@ -8,6 +8,7 @@ use App\Models\Attribute;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
+use DB;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Collection;
@@ -21,20 +22,20 @@ use Livewire\WithPagination;
  *
  * Livewire component for ProductSearchWidget with reactive frontend functionality, real-time updates, and user interaction handling.
  *
- * @property string $search
- * @property array $categories
- * @property array $brands
- * @property array $selectedAttributes
+ * @property string     $search
+ * @property array      $categories
+ * @property array      $brands
+ * @property array      $selectedAttributes
  * @property float|null $minPrice
  * @property float|null $maxPrice
- * @property string $sortBy
- * @property string $sortDirection
- * @property bool $inStock
- * @property bool $onSale
- * @property bool $featured
- * @property string $viewMode
- * @property int $perPage
- * @property bool $showFilters
+ * @property string     $sortBy
+ * @property string     $sortDirection
+ * @property bool       $inStock
+ * @property bool       $onSale
+ * @property bool       $featured
+ * @property string     $viewMode
+ * @property int        $perPage
+ * @property bool       $showFilters
  */
 final class ProductSearchWidget extends Component
 {
@@ -202,8 +203,8 @@ final class ProductSearchWidget extends Component
         // Search filter
         if ($this->search) {
             $query->where(function ($q) {
-                $q->where('name', 'like', '%'.$this->search.'%')->orWhere('description', 'like', '%'.$this->search.'%')->orWhere('sku', 'like', '%'.$this->search.'%')->orWhereHas('brand', function ($brandQuery) {
-                    $brandQuery->where('name', 'like', '%'.$this->search.'%');
+                $q->where('name', 'like', '%' . $this->search . '%')->orWhere('description', 'like', '%' . $this->search . '%')->orWhere('sku', 'like', '%' . $this->search . '%')->orWhereHas('brand', function ($brandQuery) {
+                    $brandQuery->where('name', 'like', '%' . $this->search . '%');
                 });
             });
         }
@@ -240,7 +241,7 @@ final class ProductSearchWidget extends Component
         }
         // Sale filter
         if ($this->onSale) {
-            $query->whereNotNull('sale_price')->where('sale_price', '<', \DB::raw('price'));
+            $query->whereNotNull('sale_price')->where('sale_price', '<', DB::raw('price'));
         }
         // Featured filter
         if ($this->featured) {
@@ -248,12 +249,12 @@ final class ProductSearchWidget extends Component
         }
         // Sorting
         match ($this->sortBy) {
-            'name' => $query->orderBy('name', $this->sortDirection),
-            'price' => $query->orderBy('price', $this->sortDirection),
+            'name'       => $query->orderBy('name', $this->sortDirection),
+            'price'      => $query->orderBy('price', $this->sortDirection),
             'created_at' => $query->orderBy('created_at', $this->sortDirection),
             'popularity' => $query->withCount('orderItems')->orderBy('order_items_count', $this->sortDirection),
-            'rating' => $query->withAvg('reviews', 'rating')->orderBy('reviews_avg_rating', $this->sortDirection),
-            default => $query->orderBy('created_at', 'desc'),
+            'rating'     => $query->withAvg('reviews', 'rating')->orderBy('reviews_avg_rating', $this->sortDirection),
+            default      => $query->orderBy('created_at', 'desc'),
         };
 
         return $query->paginate($this->perPage);

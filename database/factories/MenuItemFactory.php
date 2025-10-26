@@ -26,13 +26,13 @@ final class MenuItemFactory extends Factory
     public function definition(): array
     {
         return [
-            'menu_id' => Menu::factory(),
-            'parent_id' => null,
-            'label' => fake()->words(2, true),
-            'url' => fake()->url(),
-            'route_name' => null,
+            'menu_id'      => Menu::factory(),
+            'parent_id'    => null,
+            'label'        => fake()->words(2, true),
+            'url'          => fake()->url(),
+            'route_name'   => null,
             'route_params' => null,
-            'icon' => fake()->randomElement([
+            'icon'         => fake()->randomElement([
                 'heroicon-o-home',
                 'heroicon-o-user',
                 'heroicon-o-cog',
@@ -72,8 +72,8 @@ final class MenuItemFactory extends Factory
     public function withRoute(string $routeName, array $params = []): static
     {
         return $this->state(fn (array $attributes) => [
-            'url' => null,
-            'route_name' => $routeName,
+            'url'          => null,
+            'route_name'   => $routeName,
             'route_params' => $params,
         ]);
     }
@@ -85,7 +85,7 @@ final class MenuItemFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'parent_id' => $parent->id,
-            'menu_id' => $parent->menu_id,
+            'menu_id'   => $parent->menu_id,
         ]);
     }
 
@@ -95,8 +95,8 @@ final class MenuItemFactory extends Factory
     public function external(): static
     {
         return $this->state(fn (array $attributes) => [
-            'url' => fake()->url(),
-            'route_name' => null,
+            'url'          => fake()->url(),
+            'route_name'   => null,
             'route_params' => null,
         ]);
     }

@@ -48,21 +48,21 @@ final class NormalSettingResourceTest extends TestCase
     public function test_index_handles_non_string_values_without_type_errors(): void
     {
         NormalSetting::factory()->create([
-            'key' => 'boolean_setting',
+            'key'   => 'boolean_setting',
             'value' => true,
-            'type' => 'boolean',
+            'type'  => 'boolean',
         ]);
 
         NormalSetting::factory()->create([
-            'key' => 'array_setting',
+            'key'   => 'array_setting',
             'value' => ['foo' => 'bar'],
-            'type' => 'array',
+            'type'  => 'array',
         ]);
 
         NormalSetting::factory()->create([
-            'key' => 'json_setting',
+            'key'   => 'json_setting',
             'value' => ['baz' => ['qux']],
-            'type' => 'json',
+            'type'  => 'json',
         ]);
 
         $this->actingAs($this->admin);

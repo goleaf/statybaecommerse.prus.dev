@@ -17,7 +17,7 @@ class DeactivateAccountRequest extends FormRequest
     {
         return [
             'password' => ['required', 'current_password'],
-            'reason' => ['nullable', 'string', 'max:500'],
+            'reason'   => ['nullable', 'string', 'max:500'],
         ];
     }
 

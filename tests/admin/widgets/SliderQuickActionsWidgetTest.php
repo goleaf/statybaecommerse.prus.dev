@@ -66,14 +66,14 @@ class SliderQuickActionsWidgetTest extends TestCase
         $widget = Livewire::test(SliderQuickActionsWidget::class);
 
         $sliderData = [
-            'title' => 'Test Slider',
-            'description' => 'Test Description',
-            'button_text' => 'Click Me',
-            'button_url' => 'https://example.com',
+            'title'            => 'Test Slider',
+            'description'      => 'Test Description',
+            'button_text'      => 'Click Me',
+            'button_url'       => 'https://example.com',
             'background_color' => '#ffffff',
-            'text_color' => '#000000',
-            'sort_order' => 1,
-            'is_active' => true,
+            'text_color'       => '#000000',
+            'sort_order'       => 1,
+            'is_active'        => true,
         ];
 
         // $widget->call('createSlider', $sliderData);

@@ -71,7 +71,7 @@ it('can create records using model factories', function (string $className): voi
         $model = $className::factory()->create();
         expect($model->exists)->toBeTrue();
     } catch (QueryException $e) {
-        $this->markTestSkipped("Factory for {$className} requires schema not present: ".$e->getMessage());
+        $this->markTestSkipped("Factory for {$className} requires schema not present: " . $e->getMessage());
     }
 })->with('factory_models');
 
@@ -83,19 +83,19 @@ it('product isPublished reflects visibility and published_at correctly', functio
     }
     /** @var App\Models\Product $product */
     $product = App\Models\Product::factory()->create([
-        'is_visible' => true,
+        'is_visible'   => true,
         'published_at' => now()->subMinute(),
     ]);
     expect($product->isPublished())->toBeTrue();
 
     $productHidden = App\Models\Product::factory()->create([
-        'is_visible' => false,
+        'is_visible'   => false,
         'published_at' => now()->subMinute(),
     ]);
     expect($productHidden->isPublished())->toBeFalse();
 
     $productFuture = App\Models\Product::factory()->create([
-        'is_visible' => true,
+        'is_visible'   => true,
         'published_at' => now()->addHour(),
     ]);
     expect($productFuture->isPublished())->toBeFalse();

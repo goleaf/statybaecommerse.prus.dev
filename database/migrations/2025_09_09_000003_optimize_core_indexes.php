@@ -3,9 +3,9 @@
 declare(strict_types=1);
 
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 
 return new class extends Migration
 {
@@ -62,7 +62,7 @@ return new class extends Migration
     }
 
     /**
-     * @param  array<int, array{columns: array<int, string>, name: string, unique?: bool}>  $indexes
+     * @param array<int, array{columns: array<int, string>, name: string, unique?: bool}> $indexes
      */
     private function ensureIndexes(string $table, array $indexes): void
     {

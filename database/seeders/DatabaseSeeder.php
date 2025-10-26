@@ -1,11 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Database\Seeders;
 
+use function array_key_exists;
+
 use Illuminate\Database\Seeder;
 use Spatie\Activitylog\ActivityLogStatus;
-
-use function array_key_exists;
 
 final class DatabaseSeeder extends Seeder
 {
@@ -22,7 +24,7 @@ final class DatabaseSeeder extends Seeder
         $defaultProfile = (string) config('seeds.default_profile', 'full');
         $activeProfile = (string) config('seeds.active_profile', $defaultProfile);
 
-        if (!is_array($profiles) || $profiles === []) {
+        if (! is_array($profiles) || $profiles === []) {
             // Bail out early with the legacy seeder order if configuration is missing.
             $seeders = [
                 CurrencySeeder::class,
@@ -47,7 +49,7 @@ final class DatabaseSeeder extends Seeder
         $activityLogStatus = app(ActivityLogStatus::class);
         $wasLoggingDisabled = $activityLogStatus->disabled();
 
-        if (!$wasLoggingDisabled) {
+        if (! $wasLoggingDisabled) {
             // Temporarily suspend activity logging for cleaner seed runs.
             activity()->disableLogging();
         }
@@ -55,7 +57,7 @@ final class DatabaseSeeder extends Seeder
         try {
             $this->call($seeders);
         } finally {
-            if (!$wasLoggingDisabled) {
+            if (! $wasLoggingDisabled) {
                 // Ensure logging is re-enabled even if a seeder fails midway.
                 activity()->enableLogging();
             }

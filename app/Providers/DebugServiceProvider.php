@@ -22,7 +22,7 @@ class DebugServiceProvider extends ServiceProvider
             $this->app->singleton('debugbar.livewire', fn () => new LivewireDebugCollector);
             $this->app->singleton('debugbar.ecommerce', fn () => new EcommerceDebugCollector);
             $this->app->singleton(AggregatedInspector::class, function () {
-                $detector = new AggregatedInspector();
+                $detector = new AggregatedInspector;
                 $detector->boot();
 
                 return $detector;
@@ -31,7 +31,7 @@ class DebugServiceProvider extends ServiceProvider
 
         if ($this->app->environment('local')) {
             $this->app->singleton(QueryInspector::class, static function (): QueryInspector {
-                $detector = new QueryInspector();
+                $detector = new QueryInspector;
                 $detector->register();
 
                 return $detector;

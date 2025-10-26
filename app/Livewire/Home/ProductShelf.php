@@ -73,7 +73,7 @@ final class ProductShelf extends Component implements HasSchemas
 
             $query = match ($this->preset) {
                 'latest' => $query->orderByDesc('published_at'),
-                'sale' => $query
+                'sale'   => $query
                     ->where(function ($saleQuery): void {
                         $saleQuery
                             ->whereNotNull('sale_price')

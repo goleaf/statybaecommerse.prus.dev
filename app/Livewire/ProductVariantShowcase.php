@@ -45,7 +45,7 @@ final class ProductVariantShowcase extends Component
     {
         $query = Product::with(['variants', 'brand', 'categories']);
 
-        $productsTable = (new Product())->getTable();
+        $productsTable = (new Product)->getTable();
 
         if (Schema::hasColumn($productsTable, 'is_visible')) {
             $query->where('is_visible', true);

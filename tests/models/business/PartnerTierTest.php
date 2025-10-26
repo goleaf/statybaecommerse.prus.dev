@@ -16,24 +16,24 @@ class PartnerTierTest extends TestCase
     public function test_partner_tier_can_be_created(): void
     {
         $tier = PartnerTier::factory()->create([
-            'name' => 'Gold Partner',
-            'code' => 'GOLD',
+            'name'        => 'Gold Partner',
+            'code'        => 'GOLD',
             'description' => 'Gold tier partners with premium benefits',
-            'is_active' => true,
+            'is_active'   => true,
         ]);
 
         $this->assertDatabaseHas('partner_tiers', [
-            'name' => 'Gold Partner',
-            'code' => 'GOLD',
+            'name'        => 'Gold Partner',
+            'code'        => 'GOLD',
             'description' => 'Gold tier partners with premium benefits',
-            'is_active' => true,
+            'is_active'   => true,
         ]);
     }
 
     public function test_partner_tier_casts_work_correctly(): void
     {
         $tier = PartnerTier::factory()->create([
-            'is_active' => true,
+            'is_active'  => true,
             'is_default' => false,
             'sort_order' => 5,
             'created_at' => now(),
@@ -121,10 +121,10 @@ class PartnerTierTest extends TestCase
     {
         $tier = PartnerTier::factory()->create([
             'benefits' => [
-                'priority_support' => true,
+                'priority_support'          => true,
                 'dedicated_account_manager' => true,
-                'early_access' => true,
-                'exclusive_events' => true,
+                'early_access'              => true,
+                'exclusive_events'          => true,
             ],
         ]);
 
@@ -138,8 +138,8 @@ class PartnerTierTest extends TestCase
     public function test_partner_tier_can_have_commission_settings(): void
     {
         $tier = PartnerTier::factory()->create([
-            'commission_rate' => 7.5,
-            'commission_type' => 'percentage',
+            'commission_rate'    => 7.5,
+            'commission_type'    => 'percentage',
             'minimum_commission' => 25.00,
             'maximum_commission' => 2000.00,
         ]);
@@ -154,10 +154,10 @@ class PartnerTierTest extends TestCase
     {
         $tier = PartnerTier::factory()->create([
             'requirements' => [
-                'minimum_orders' => 100,
-                'minimum_revenue' => 50000.00,
+                'minimum_orders'        => 100,
+                'minimum_revenue'       => 50000.00,
                 'customer_satisfaction' => 4.5,
-                'response_time' => '24_hours',
+                'response_time'         => '24_hours',
             ],
         ]);
 
@@ -173,8 +173,8 @@ class PartnerTierTest extends TestCase
         $tier = PartnerTier::factory()->create([
             'metadata' => [
                 'created_by' => 'admin',
-                'version' => '1.0',
-                'tags' => ['premium', 'gold', 'tier'],
+                'version'    => '1.0',
+                'tags'       => ['premium', 'gold', 'tier'],
             ],
         ]);
 

@@ -14,39 +14,39 @@ final class GroupSeeder extends Seeder
     {
         // Create customer groups using factories
         $vipGroup = CustomerGroup::factory()->state([
-            'name' => 'VIP',
-            'code' => 'vip',
-            'description' => 'VIP customers with exclusive benefits',
+            'name'                => 'VIP',
+            'code'                => 'vip',
+            'description'         => 'VIP customers with exclusive benefits',
             'discount_percentage' => 15.0,
-            'is_enabled' => true,
-            'metadata' => [
+            'is_enabled'          => true,
+            'metadata'            => [
                 'priority' => 'high',
                 'benefits' => ['free_shipping', 'priority_support', 'exclusive_products'],
             ],
         ])->create();
 
         $studentGroup = CustomerGroup::factory()->state([
-            'name' => 'Student',
-            'code' => 'student',
-            'description' => 'Students with educational discounts',
+            'name'                => 'Student',
+            'code'                => 'student',
+            'description'         => 'Students with educational discounts',
             'discount_percentage' => 10.0,
-            'is_enabled' => true,
-            'metadata' => [
-                'priority' => 'medium',
-                'benefits' => ['student_discount', 'educational_resources'],
+            'is_enabled'          => true,
+            'metadata'            => [
+                'priority'              => 'medium',
+                'benefits'              => ['student_discount', 'educational_resources'],
                 'verification_required' => true,
             ],
         ])->create();
 
         $wholesaleGroup = CustomerGroup::factory()->state([
-            'name' => 'Wholesale',
-            'code' => 'wholesale',
-            'description' => 'Wholesale customers with bulk pricing',
+            'name'                => 'Wholesale',
+            'code'                => 'wholesale',
+            'description'         => 'Wholesale customers with bulk pricing',
             'discount_percentage' => 25.0,
-            'is_enabled' => true,
-            'metadata' => [
-                'priority' => 'high',
-                'benefits' => ['bulk_pricing', 'extended_payment_terms', 'dedicated_support'],
+            'is_enabled'          => true,
+            'metadata'            => [
+                'priority'      => 'high',
+                'benefits'      => ['bulk_pricing', 'extended_payment_terms', 'dedicated_support'],
                 'minimum_order' => 1000,
             ],
         ])->create();

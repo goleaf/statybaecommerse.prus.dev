@@ -4,12 +4,16 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use function array_key_exists;
+
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Str;
-use const JSON_THROW_ON_ERROR;
-use function array_key_exists;
+
 use function is_array;
 use function is_file;
+
+use const JSON_THROW_ON_ERROR;
+
 use function lang_path;
 
 /**
@@ -67,7 +71,7 @@ final class TranslationService
         if (str_contains($key, '::')) {
             [$namespace, $remainder] = explode('::', $key, 2);
 
-            return $namespace.'::'.str_replace('.', '_', $remainder);
+            return $namespace . '::' . str_replace('.', '_', $remainder);
         }
 
         return str_replace('.', '_', $key);
@@ -111,8 +115,8 @@ final class TranslationService
     }
 
     /**
-     * @param  callable(string, array, string):string  $translator
-     * @param  array<string, mixed>  $fallbackParameters
+     * @param callable(string, array, string):string $translator
+     * @param array<string, mixed>                   $fallbackParameters
      */
     private static function translateUsing(
         string $key,
@@ -170,7 +174,7 @@ final class TranslationService
     }
 
     /**
-     * @param  array<string, mixed>  $parameters
+     * @param array<string, mixed> $parameters
      */
     private static function fallbackTranslation(string $key, array $parameters, string $locale): ?string
     {
@@ -206,7 +210,7 @@ final class TranslationService
     }
 
     /**
-     * @param  array<string, mixed>  $parameters
+     * @param array<string, mixed> $parameters
      */
     private static function makeReplacements(string $line, array $parameters): string
     {
@@ -218,7 +222,7 @@ final class TranslationService
             $value = (string) $value;
 
             $line = str_replace(
-                [':'.Str::ucfirst($key), ':'.Str::upper($key), ':'.$key],
+                [':' . Str::ucfirst($key), ':' . Str::upper($key), ':' . $key],
                 [Str::ucfirst($value), Str::upper($value), $value],
                 $line
             );

@@ -33,17 +33,17 @@ final class CategoryRepository
 
             return $categories->map(static function (Category $category): array {
                 return [
-                    'id' => $category->id,
-                    'name' => $category->getTranslatedName(),
-                    'slug' => $category->slug,
-                    'url' => route('categories.show', $category->slug),
-                    'icon' => $category->icon,
+                    'id'       => $category->id,
+                    'name'     => $category->getTranslatedName(),
+                    'slug'     => $category->slug,
+                    'url'      => route('categories.show', $category->slug),
+                    'icon'     => $category->icon,
                     'children' => $category->children->map(static function (Category $child): array {
                         return [
-                            'id' => $child->id,
+                            'id'   => $child->id,
                             'name' => $child->getTranslatedName(),
                             'slug' => $child->slug,
-                            'url' => route('categories.show', $child->slug),
+                            'url'  => route('categories.show', $child->slug),
                         ];
                     })->all(),
                 ];
@@ -61,7 +61,7 @@ final class CategoryRepository
     }
 
     /**
-     * @param  array<int, string>  $tags
+     * @param array<int, string> $tags
      */
     private function remember(string $key, int $ttlSeconds, callable $callback, array $tags = []): Collection
     {
@@ -81,7 +81,7 @@ final class CategoryRepository
         $cacheKey = CacheKeys::categoryNavigationTree();
 
         if (! $supportsTags) {
-            $cacheKey .= ':'.$resolvedLocale;
+            $cacheKey .= ':' . $resolvedLocale;
         }
 
         $callback = static function () use ($resolvedLocale): Collection {

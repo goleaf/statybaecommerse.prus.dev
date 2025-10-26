@@ -10,9 +10,7 @@ use Illuminate\Support\Str;
 
 final class RequestContext
 {
-    private function __construct()
-    {
-    }
+    private function __construct() {}
 
     public static function resolveLocale(Request $request): string
     {
@@ -80,7 +78,7 @@ final class RequestContext
 
         $apiPrefix = config('app.api_prefix');
         if (is_string($apiPrefix) && $apiPrefix !== '') {
-            return $request->is($apiPrefix.'/*');
+            return $request->is($apiPrefix . '/*');
         }
 
         return $request->is('api/*');

@@ -8,12 +8,12 @@ use App\Support\RouteAudit\PayloadFactory;
 use App\Support\RouteAudit\StaticAnalyzer;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Route as RouteFacade;
 use Illuminate\Routing\Route;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Route as RouteFacade;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Testing\TestResponse;
 use Laravel\Sanctum\Sanctum;
@@ -22,7 +22,7 @@ use Tests\TestCase;
 beforeAll(function (): void {
     Artisan::call('migrate:fresh', [
         '--database' => 'sqlite',
-        '--seed' => true,
+        '--seed'     => true,
     ]);
 });
 
@@ -32,8 +32,8 @@ beforeAll(function (): void {
  * coverage performs HTTP calls as guest and authenticated contexts to surface runtime failures.
  */
 it('probes routes for runtime failures', function (): void {
-    $staticAnalyzer = new StaticAnalyzer();
-    $payloadFactory = new PayloadFactory();
+    $staticAnalyzer = new StaticAnalyzer;
+    $payloadFactory = new PayloadFactory;
     $staticReport = $staticAnalyzer->analyze();
 
     /** @var Router $router */
@@ -54,14 +54,15 @@ it('probes routes for runtime failures', function (): void {
         if (! isset($routeMap[$fingerprint])) {
             $results[] = [
                 'fingerprint' => $fingerprint,
-                'uri' => $entry['uri'],
-                'name' => $entry['name'],
-                'status' => 'failed',
-                'error' => 'Route object not found for fingerprint.',
-                'guest' => null,
-                'auth' => null,
+                'uri'         => $entry['uri'],
+                'name'        => $entry['name'],
+                'status'      => 'failed',
+                'error'       => 'Route object not found for fingerprint.',
+                'guest'       => null,
+                'auth'        => null,
             ];
             $failures[] = sprintf('Unable to resolve route for %s %s', implode(',', $entry['methods']), $entry['uri']);
+
             continue;
         }
 
@@ -71,13 +72,14 @@ it('probes routes for runtime failures', function (): void {
         if ($entry['skipDynamic']) {
             $results[] = [
                 'fingerprint' => $fingerprint,
-                'uri' => $entry['uri'],
-                'name' => $entry['name'],
-                'status' => 'skipped',
-                'guest' => null,
-                'auth' => null,
-                'notes' => 'Route excluded from dynamic checks.',
+                'uri'         => $entry['uri'],
+                'name'        => $entry['name'],
+                'status'      => 'skipped',
+                'guest'       => null,
+                'auth'        => null,
+                'notes'       => 'Route excluded from dynamic checks.',
             ];
+
             continue;
         }
 
@@ -110,18 +112,18 @@ it('probes routes for runtime failures', function (): void {
 
         $results[] = [
             'fingerprint' => $fingerprint,
-            'uri' => $entry['uri'],
-            'name' => $entry['name'],
-            'status' => $status,
-            'error' => $errorMessage,
-            'guest' => $guestResults,
-            'auth' => $authResults,
+            'uri'         => $entry['uri'],
+            'name'        => $entry['name'],
+            'status'      => $status,
+            'error'       => $errorMessage,
+            'guest'       => $guestResults,
+            'auth'        => $authResults,
         ];
     }
 
     $report = [
         'generatedAt' => now()->toIso8601String(),
-        'routes' => $results,
+        'routes'      => $results,
     ];
 
     File::ensureDirectoryExists(storage_path('app/route_audit'));
@@ -170,6 +172,7 @@ it('ensures controller methods are public and resolvable', function (): void {
 
         if (! class_exists($class)) {
             $invalid[] = sprintf('%s controller missing', $class);
+
             continue;
         }
 
@@ -177,6 +180,7 @@ it('ensures controller methods are public and resolvable', function (): void {
             $reflection = new ReflectionClass($class);
             if (! $reflection->hasMethod($method)) {
                 $invalid[] = sprintf('%s::%s missing', $class, $method);
+
                 continue;
             }
 
@@ -249,7 +253,7 @@ function fingerprint_route(Route $route): string
 /**
  * Generate route parameter values leveraging form requests and model factories where available.
  *
- * @param array<string, mixed> $entry
+ * @param  array<string, mixed> $entry
  * @return array<string, mixed>
  */
 function build_route_parameters(array $entry, Route $route): array
@@ -265,6 +269,7 @@ function build_route_parameters(array $entry, Route $route): array
             $model = resolve_model_instance($bindingClass);
             if ($model) {
                 $parameters[$name] = $model->getRouteKey();
+
                 continue;
             }
         }
@@ -277,6 +282,7 @@ function build_route_parameters(array $entry, Route $route): array
 
         if (is_string($constraint) && preg_match('/\\d+/', $constraint)) {
             $parameters[$name] = '1';
+
             continue;
         }
 
@@ -297,7 +303,7 @@ function resolve_model_instance(string $class): ?Model
         return null;
     }
 
-    $model = new $class();
+    $model = new $class;
 
     if (method_exists($class, 'factory')) {
         try {
@@ -313,7 +319,7 @@ function resolve_model_instance(string $class): ?Model
 /**
  * Resolve default headers for a route.
  *
- * @param array<string, mixed> $entry
+ * @param  array<string, mixed>  $entry
  * @return array<string, string>
  */
 function headers_for_route(array $entry): array
@@ -332,10 +338,10 @@ function headers_for_route(array $entry): array
 /**
  * Probe a route either as guest or authenticated context, returning the collected metadata.
  *
- * @param array<string, mixed> $entry
- * @param array<string, mixed> $params
- * @param array<string, mixed> $payload
- * @param array<string, string> $headers
+ * @param  array<string, mixed>  $entry
+ * @param  array<string, mixed>  $params
+ * @param  array<string, mixed>  $payload
+ * @param  array<string, string> $headers
  * @return array<string, mixed>
  */
 function probe_route(
@@ -411,9 +417,9 @@ function probe_route(
 /**
  * Send a request to the route under test with optional authentication context.
  *
- * @param array<string, mixed> $entry
- * @param array<string, mixed> $params
- * @param array<string, mixed> $payload
+ * @param array<string, mixed>  $entry
+ * @param array<string, mixed>  $params
+ * @param array<string, mixed>  $payload
  * @param array<string, string> $headers
  */
 function send_request(

@@ -8,6 +8,9 @@ use App\Models\Location;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Models\VariantInventory;
+
+use function collect;
+
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
@@ -16,7 +19,6 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\LazyCollection;
 use Throwable;
-use function collect;
 
 /**
  * ImportInventoryChunk
@@ -38,11 +40,9 @@ class ImportInventoryChunk implements ShouldQueue
     public int $tries = 5;
 
     /**
-     * @param  array<int, array<string, mixed>>  $rows
+     * @param array<int, array<string, mixed>> $rows
      */
-    public function __construct(private readonly array $rows)
-    {
-    }
+    public function __construct(private readonly array $rows) {}
 
     /**
      * Define retry backoff windows (in seconds).
@@ -102,16 +102,16 @@ class ImportInventoryChunk implements ShouldQueue
                 } catch (Throwable $exception) {
                     // Bubble up enough context for observability without crashing the whole chunk
                     Log::error('Inventory import row failed.', [
-                        'sku' => $row['sku'] ?? null,
+                        'sku'           => $row['sku'] ?? null,
                         'location_code' => $row['location_code'] ?? null,
-                        'error' => $exception->getMessage(),
+                        'error'         => $exception->getMessage(),
                     ]);
                 }
             });
     }
 
     /**
-     * @param  array<string, mixed>  $row
+     * @param array<string, mixed> $row
      */
     private function processRow(array $row): void
     {
@@ -129,7 +129,7 @@ class ImportInventoryChunk implements ShouldQueue
 
         if ($productId === null) {
             Log::warning('Inventory import skipped because SKU could not be resolved.', [
-                'sku' => $sku,
+                'sku'           => $sku,
                 'location_code' => $locationCode,
             ]);
 
@@ -235,10 +235,10 @@ class ImportInventoryChunk implements ShouldQueue
             $location = Location::query()->firstOrCreate(
                 ['code' => $code],
                 [
-                    'name' => $code === 'default' ? 'Default Warehouse' : $code,
+                    'name'       => $code === 'default' ? 'Default Warehouse' : $code,
                     'is_enabled' => true,
                     'is_default' => $code === 'default',
-                    'type' => 'warehouse',
+                    'type'       => 'warehouse',
                 ]
             );
 

@@ -26,9 +26,9 @@ test('key storefront pages render without missing navigation translations for ev
     expect($locales)->not->toBeEmpty();
 
     $pages = [
-        'home' => '/',
-        'brands' => '/brands',
-        'categories' => '/categories',
+        'home'        => '/',
+        'brands'      => '/brands',
+        'categories'  => '/categories',
         'collections' => '/collections',
     ];
 

@@ -16,16 +16,16 @@ class PartnerTest extends TestCase
     public function test_partner_can_be_created(): void
     {
         $partner = Partner::factory()->create([
-            'name' => 'Test Partner',
-            'code' => 'PARTNER001',
-            'type' => 'supplier',
+            'name'      => 'Test Partner',
+            'code'      => 'PARTNER001',
+            'type'      => 'supplier',
             'is_active' => true,
         ]);
 
         $this->assertDatabaseHas('partners', [
-            'name' => 'Test Partner',
-            'code' => 'PARTNER001',
-            'type' => 'supplier',
+            'name'      => 'Test Partner',
+            'code'      => 'PARTNER001',
+            'type'      => 'supplier',
             'is_active' => true,
         ]);
     }
@@ -42,10 +42,10 @@ class PartnerTest extends TestCase
     public function test_partner_casts_work_correctly(): void
     {
         $partner = Partner::factory()->create([
-            'is_active' => true,
+            'is_active'   => true,
             'is_verified' => false,
-            'sort_order' => 5,
-            'created_at' => now(),
+            'sort_order'  => 5,
+            'created_at'  => now(),
         ]);
 
         $this->assertIsBool($partner->is_active);
@@ -114,9 +114,9 @@ class PartnerTest extends TestCase
     {
         $partner = Partner::factory()->create([
             'contact_person' => 'John Doe',
-            'email' => 'john@partner.com',
-            'phone' => '+37012345678',
-            'website' => 'https://partner.com',
+            'email'          => 'john@partner.com',
+            'phone'          => '+37012345678',
+            'website'        => 'https://partner.com',
         ]);
 
         $this->assertEquals('John Doe', $partner->contact_person);
@@ -128,10 +128,10 @@ class PartnerTest extends TestCase
     public function test_partner_can_have_address(): void
     {
         $partner = Partner::factory()->create([
-            'address' => '123 Business Street',
-            'city' => 'Vilnius',
+            'address'     => '123 Business Street',
+            'city'        => 'Vilnius',
             'postal_code' => 'LT-01234',
-            'country' => 'Lithuania',
+            'country'     => 'Lithuania',
         ]);
 
         $this->assertEquals('123 Business Street', $partner->address);
@@ -143,10 +143,10 @@ class PartnerTest extends TestCase
     public function test_partner_can_have_business_information(): void
     {
         $partner = Partner::factory()->create([
-            'company_name' => 'Partner Company Ltd',
-            'tax_number' => 'LT123456789',
+            'company_name'        => 'Partner Company Ltd',
+            'tax_number'          => 'LT123456789',
             'registration_number' => '123456789',
-            'business_license' => 'BL123456',
+            'business_license'    => 'BL123456',
         ]);
 
         $this->assertEquals('Partner Company Ltd', $partner->company_name);
@@ -158,8 +158,8 @@ class PartnerTest extends TestCase
     public function test_partner_can_have_commission_settings(): void
     {
         $partner = Partner::factory()->create([
-            'commission_rate' => 5.00,
-            'commission_type' => 'percentage',
+            'commission_rate'    => 5.00,
+            'commission_type'    => 'percentage',
             'minimum_commission' => 10.00,
             'maximum_commission' => 1000.00,
         ]);
@@ -173,10 +173,10 @@ class PartnerTest extends TestCase
     public function test_partner_can_have_payment_settings(): void
     {
         $partner = Partner::factory()->create([
-            'payment_terms' => 'net_30',
+            'payment_terms'  => 'net_30',
             'payment_method' => 'bank_transfer',
-            'bank_account' => 'LT123456789012345678',
-            'bank_name' => 'Swedbank',
+            'bank_account'   => 'LT123456789012345678',
+            'bank_name'      => 'Swedbank',
         ]);
 
         $this->assertEquals('net_30', $partner->payment_terms);
@@ -189,9 +189,9 @@ class PartnerTest extends TestCase
     {
         $partner = Partner::factory()->create([
             'agreement_start_date' => now(),
-            'agreement_end_date' => now()->addYear(),
-            'agreement_type' => 'exclusive',
-            'agreement_status' => 'active',
+            'agreement_end_date'   => now()->addYear(),
+            'agreement_type'       => 'exclusive',
+            'agreement_status'     => 'active',
         ]);
 
         $this->assertInstanceOf(\Carbon\Carbon::class, $partner->agreement_start_date);
@@ -204,9 +204,9 @@ class PartnerTest extends TestCase
     {
         $partner = Partner::factory()->create([
             'performance_metrics' => [
-                'total_orders' => 150,
-                'total_revenue' => 50000.00,
-                'average_order_value' => 333.33,
+                'total_orders'          => 150,
+                'total_revenue'         => 50000.00,
+                'average_order_value'   => 333.33,
                 'customer_satisfaction' => 4.5,
             ],
         ]);
@@ -222,10 +222,10 @@ class PartnerTest extends TestCase
     {
         $partner = Partner::factory()->create([
             'metadata' => [
-                'created_by' => 'admin',
+                'created_by'      => 'admin',
                 'approval_status' => 'approved',
-                'special_notes' => 'Preferred supplier',
-                'tags' => ['reliable', 'fast_shipping', 'quality'],
+                'special_notes'   => 'Preferred supplier',
+                'tags'            => ['reliable', 'fast_shipping', 'quality'],
             ],
         ]);
 
@@ -261,7 +261,7 @@ class PartnerTest extends TestCase
     public function test_partner_can_have_rating(): void
     {
         $partner = Partner::factory()->create([
-            'rating' => 4.5,
+            'rating'       => 4.5,
             'rating_count' => 25,
         ]);
 

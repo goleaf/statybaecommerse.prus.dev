@@ -33,9 +33,9 @@ final class UserProductInteractionSeeder extends Seeder
                         $isAnonymous = fake()->boolean(20);
 
                         return [
-                            'notes' => fake()->optional()->realText(160),
+                            'notes'        => fake()->optional()->realText(160),
                             'is_anonymous' => $isAnonymous,
-                            'ip_address' => $isAnonymous ? null : fake()->ipv4(),
+                            'ip_address'   => $isAnonymous ? null : fake()->ipv4(),
                         ];
                     })
                     ->create();

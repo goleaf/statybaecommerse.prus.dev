@@ -27,7 +27,7 @@ final class CouponUsageResourceTest extends TestCase
         parent::setUp();
 
         $this->actingAs(User::factory()->create([
-            'email' => 'admin@example.com',
+            'email'    => 'admin@example.com',
             'is_admin' => true,
         ]));
     }
@@ -47,11 +47,11 @@ final class CouponUsageResourceTest extends TestCase
         $order = Order::factory()->create();
 
         $couponUsageData = [
-            'coupon_id' => $coupon->id,
-            'user_id' => $user->id,
-            'order_id' => $order->id,
+            'coupon_id'       => $coupon->id,
+            'user_id'         => $user->id,
+            'order_id'        => $order->id,
             'discount_amount' => 15.0,
-            'used_at' => now(),
+            'used_at'         => now(),
         ];
 
         Livewire::test(CouponUsageResource\Pages\CreateCouponUsage::class)
@@ -61,8 +61,8 @@ final class CouponUsageResourceTest extends TestCase
 
         $this->assertDatabaseHas('coupon_usages', [
             'coupon_id' => $coupon->id,
-            'user_id' => $user->id,
-            'order_id' => $order->id,
+            'user_id'   => $user->id,
+            'order_id'  => $order->id,
         ]);
     }
 
@@ -244,8 +244,8 @@ final class CouponUsageResourceTest extends TestCase
     {
         Livewire::test(CouponUsageResource\Pages\CreateCouponUsage::class)
             ->fillForm([
-                'coupon_id' => '',
-                'user_id' => User::factory()->create()->id,
+                'coupon_id'       => '',
+                'user_id'         => User::factory()->create()->id,
                 'discount_amount' => 10.0,
             ])
             ->call('create')
@@ -256,8 +256,8 @@ final class CouponUsageResourceTest extends TestCase
     {
         Livewire::test(CouponUsageResource\Pages\CreateCouponUsage::class)
             ->fillForm([
-                'coupon_id' => Coupon::factory()->create()->id,
-                'user_id' => '',
+                'coupon_id'       => Coupon::factory()->create()->id,
+                'user_id'         => '',
                 'discount_amount' => 10.0,
             ])
             ->call('create')
@@ -268,8 +268,8 @@ final class CouponUsageResourceTest extends TestCase
     {
         Livewire::test(CouponUsageResource\Pages\CreateCouponUsage::class)
             ->fillForm([
-                'coupon_id' => Coupon::factory()->create()->id,
-                'user_id' => User::factory()->create()->id,
+                'coupon_id'       => Coupon::factory()->create()->id,
+                'user_id'         => User::factory()->create()->id,
                 'discount_amount' => '',
             ])
             ->call('create')
@@ -280,8 +280,8 @@ final class CouponUsageResourceTest extends TestCase
     {
         Livewire::test(CouponUsageResource\Pages\CreateCouponUsage::class)
             ->fillForm([
-                'coupon_id' => Coupon::factory()->create()->id,
-                'user_id' => User::factory()->create()->id,
+                'coupon_id'       => Coupon::factory()->create()->id,
+                'user_id'         => User::factory()->create()->id,
                 'discount_amount' => 'invalid',
             ])
             ->call('create')
@@ -292,8 +292,8 @@ final class CouponUsageResourceTest extends TestCase
     {
         Livewire::test(CouponUsageResource\Pages\CreateCouponUsage::class)
             ->fillForm([
-                'coupon_id' => Coupon::factory()->create()->id,
-                'user_id' => User::factory()->create()->id,
+                'coupon_id'       => Coupon::factory()->create()->id,
+                'user_id'         => User::factory()->create()->id,
                 'discount_amount' => -10.0,
             ])
             ->call('create')
@@ -304,10 +304,10 @@ final class CouponUsageResourceTest extends TestCase
     {
         Livewire::test(CouponUsageResource\Pages\CreateCouponUsage::class)
             ->fillForm([
-                'coupon_id' => Coupon::factory()->create()->id,
-                'user_id' => User::factory()->create()->id,
+                'coupon_id'       => Coupon::factory()->create()->id,
+                'user_id'         => User::factory()->create()->id,
                 'discount_amount' => 10.0,
-                'used_at' => '',
+                'used_at'         => '',
             ])
             ->call('create')
             ->assertHasFormErrors(['used_at' => 'required']);
@@ -464,7 +464,7 @@ final class CouponUsageResourceTest extends TestCase
         $couponUsage->restore();
 
         $this->assertDatabaseHas('coupon_usages', [
-            'id' => $couponUsage->id,
+            'id'         => $couponUsage->id,
             'deleted_at' => null,
         ]);
     }

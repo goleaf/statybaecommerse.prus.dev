@@ -29,7 +29,7 @@ final class CampaignFactory extends Factory
         // Avoid hitting missing tables when migrations are not loaded yet (e.g. during in-memory tests).
         $slug = Schema::hasTable('discount_campaigns')
             ? $this->generateUniqueSlug($baseSlug)
-            : $baseSlug.'-'.Str::random(6);
+            : $baseSlug . '-' . Str::random(6);
 
         $attributes = [
             'name'       => $name,
@@ -49,9 +49,9 @@ final class CampaignFactory extends Factory
 
                 return \App\Models\Channel::factory();
             },
-            'country_id'   => null,
-            'status'    => 'active',
-            'metadata'  => [
+            'country_id' => null,
+            'status'     => 'active',
+            'metadata'   => [
                 'source' => $this->faker->randomElement(['manual', 'automated', 'imported']),
                 'tags'   => $this->faker->words(3),
             ],
@@ -106,7 +106,7 @@ final class CampaignFactory extends Factory
         $counter = 1;
 
         while ($this->slugExists($slug)) {
-            $slug = $baseSlug.'-'.$counter;
+            $slug = $baseSlug . '-' . $counter;
             $counter++;
         }
 
@@ -137,12 +137,12 @@ final class CampaignFactory extends Factory
         }
 
         $optional = [
-            'is_active' => true,
-            'is_featured' => $this->faker->boolean(20),
+            'is_active'          => true,
+            'is_featured'        => $this->faker->boolean(20),
             'send_notifications' => $this->faker->boolean(80),
-            'track_conversions' => $this->faker->boolean(90),
-            'max_uses' => $this->faker->numberBetween(100, 10000),
-            'budget_limit' => $this->faker->randomFloat(2, 500, 50000),
+            'track_conversions'  => $this->faker->boolean(90),
+            'max_uses'           => $this->faker->numberBetween(100, 10000),
+            'budget_limit'       => $this->faker->randomFloat(2, 500, 50000),
         ];
 
         $attributes = [];

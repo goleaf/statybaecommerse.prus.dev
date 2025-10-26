@@ -14,8 +14,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * Eloquent model representing the ReviewTranslation entity with comprehensive relationships, scopes, and business logic for the e-commerce system.
  *
  * @property string $factory
- * @property mixed $table
- * @property mixed $fillable
+ * @property mixed  $table
+ * @property mixed  $fillable
  *
  * @method static \Illuminate\Database\Eloquent\Builder|ReviewTranslation newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|ReviewTranslation newQuery()

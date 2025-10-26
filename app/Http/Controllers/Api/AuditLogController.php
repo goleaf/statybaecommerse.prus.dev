@@ -22,24 +22,24 @@ final class AuditLogController extends Controller
         $definition = new ListQueryDefinition(
             filters: [
                 'entity_type' => [
-                    'type' => 'string',
+                    'type'     => 'string',
                     'nullable' => true,
-                    'column' => 'audit_logs.entity_type',
+                    'column'   => 'audit_logs.entity_type',
                 ],
                 'entity_id' => [
-                    'type' => 'string',
+                    'type'     => 'string',
                     'nullable' => true,
-                    'column' => 'audit_logs.entity_id',
+                    'column'   => 'audit_logs.entity_id',
                 ],
                 'action' => [
-                    'type' => 'string',
+                    'type'     => 'string',
                     'nullable' => true,
-                    'column' => 'audit_logs.action',
+                    'column'   => 'audit_logs.action',
                 ],
             ],
             sortable: [
                 'created_at' => [
-                    'column' => 'audit_logs.created_at',
+                    'column'            => 'audit_logs.created_at',
                     'default_direction' => 'desc',
                 ],
                 'id' => [
@@ -73,7 +73,7 @@ final class AuditLogController extends Controller
 
         return AuditLogResource::collection($paginator)
             ->additional([
-                'meta' => ListResponse::meta($listQuery, $paginator),
+                'meta'  => ListResponse::meta($listQuery, $paginator),
                 'links' => ListResponse::links($paginator),
             ]);
     }

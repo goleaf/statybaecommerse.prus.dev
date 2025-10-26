@@ -42,12 +42,12 @@ final class StockManagementTest extends TestCase
         $this->location = Location::factory()->create();
         $this->supplier = Partner::factory()->create();
         $this->stockItem = VariantInventory::factory()->create([
-            'variant_id' => $this->variant->id,
-            'location_id' => $this->location->id,
-            'supplier_id' => $this->supplier->id,
-            'stock' => 100,
-            'reserved' => 10,
-            'threshold' => 20,
+            'variant_id'    => $this->variant->id,
+            'location_id'   => $this->location->id,
+            'supplier_id'   => $this->supplier->id,
+            'stock'         => 100,
+            'reserved'      => 10,
+            'threshold'     => 20,
             'cost_per_unit' => 15.50,
         ]);
     }
@@ -76,7 +76,7 @@ final class StockManagementTest extends TestCase
     {
         $anotherLocation = Location::factory()->create();
         $anotherStockItem = VariantInventory::factory()->create([
-            'variant_id' => $this->variant->id,
+            'variant_id'  => $this->variant->id,
             'location_id' => $anotherLocation->id,
         ]);
 
@@ -94,7 +94,7 @@ final class StockManagementTest extends TestCase
     {
         $anotherSupplier = Partner::factory()->create();
         $anotherStockItem = VariantInventory::factory()->create([
-            'variant_id' => $this->variant->id,
+            'variant_id'  => $this->variant->id,
             'location_id' => $this->location->id,
             'supplier_id' => $anotherSupplier->id,
         ]);
@@ -112,10 +112,10 @@ final class StockManagementTest extends TestCase
     public function test_can_filter_low_stock_items(): void
     {
         $lowStockItem = VariantInventory::factory()->create([
-            'variant_id' => $this->variant->id,
+            'variant_id'  => $this->variant->id,
             'location_id' => $this->location->id,
-            'stock' => 5,
-            'threshold' => 10,
+            'stock'       => 5,
+            'threshold'   => 10,
         ]);
 
         $response = $this->get(route('stock.index', ['stock_status' => 'low_stock']));
@@ -131,9 +131,9 @@ final class StockManagementTest extends TestCase
     public function test_can_filter_out_of_stock_items(): void
     {
         $outOfStockItem = VariantInventory::factory()->create([
-            'variant_id' => $this->variant->id,
+            'variant_id'  => $this->variant->id,
             'location_id' => $this->location->id,
-            'stock' => 0,
+            'stock'       => 0,
         ]);
 
         $response = $this->get(route('stock.index', ['stock_status' => 'out_of_stock']));
@@ -151,7 +151,7 @@ final class StockManagementTest extends TestCase
         $anotherProduct = Product::factory()->create(['name' => 'Another Product']);
         $anotherVariant = ProductVariant::factory()->create(['product_id' => $anotherProduct->id]);
         $anotherStockItem = VariantInventory::factory()->create([
-            'variant_id' => $anotherVariant->id,
+            'variant_id'  => $anotherVariant->id,
             'location_id' => $this->location->id,
         ]);
 
@@ -172,8 +172,8 @@ final class StockManagementTest extends TestCase
 
         $response = $this->post(route('stock.adjust', $this->stockItem), [
             'quantity' => $adjustmentQuantity,
-            'reason' => 'manual_adjustment',
-            'notes' => 'Test adjustment',
+            'reason'   => 'manual_adjustment',
+            'notes'    => 'Test adjustment',
         ]);
 
         $response->assertStatus(200);
@@ -185,9 +185,9 @@ final class StockManagementTest extends TestCase
         // Check that stock movement was created
         $this->assertDatabaseHas('stock_movements', [
             'variant_inventory_id' => $this->stockItem->id,
-            'quantity' => $adjustmentQuantity,
-            'type' => 'in',
-            'reason' => 'manual_adjustment',
+            'quantity'             => $adjustmentQuantity,
+            'type'                 => 'in',
+            'reason'               => 'manual_adjustment',
         ]);
     }
 
@@ -198,7 +198,7 @@ final class StockManagementTest extends TestCase
 
         $response = $this->post(route('stock.reserve', $this->stockItem), [
             'quantity' => $reserveQuantity,
-            'notes' => 'Test reservation',
+            'notes'    => 'Test reservation',
         ]);
 
         $response->assertStatus(200);
@@ -215,7 +215,7 @@ final class StockManagementTest extends TestCase
 
         $response = $this->post(route('stock.reserve', $this->stockItem), [
             'quantity' => $reserveQuantity,
-            'notes' => 'Test reservation',
+            'notes'    => 'Test reservation',
         ]);
 
         $response->assertStatus(400);
@@ -229,7 +229,7 @@ final class StockManagementTest extends TestCase
 
         $response = $this->post(route('stock.unreserve', $this->stockItem), [
             'quantity' => $unreserveQuantity,
-            'notes' => 'Test unreservation',
+            'notes'    => 'Test unreservation',
         ]);
 
         $response->assertStatus(200);
@@ -302,10 +302,10 @@ final class StockManagementTest extends TestCase
     public function test_stock_item_identifies_low_stock(): void
     {
         $lowStockItem = VariantInventory::factory()->create([
-            'variant_id' => $this->variant->id,
+            'variant_id'  => $this->variant->id,
             'location_id' => $this->location->id,
-            'stock' => 5,
-            'threshold' => 10,
+            'stock'       => 5,
+            'threshold'   => 10,
         ]);
 
         $this->assertTrue($lowStockItem->isLowStock());
@@ -315,9 +315,9 @@ final class StockManagementTest extends TestCase
     public function test_stock_item_identifies_out_of_stock(): void
     {
         $outOfStockItem = VariantInventory::factory()->create([
-            'variant_id' => $this->variant->id,
+            'variant_id'  => $this->variant->id,
             'location_id' => $this->location->id,
-            'stock' => 0,
+            'stock'       => 0,
         ]);
 
         $this->assertTrue($outOfStockItem->isOutOfStock());
@@ -327,9 +327,9 @@ final class StockManagementTest extends TestCase
     public function test_stock_item_identifies_needs_reorder(): void
     {
         $needsReorderItem = VariantInventory::factory()->create([
-            'variant_id' => $this->variant->id,
-            'location_id' => $this->location->id,
-            'stock' => 5,
+            'variant_id'    => $this->variant->id,
+            'location_id'   => $this->location->id,
+            'stock'         => 5,
             'reorder_point' => 10,
         ]);
 
@@ -342,18 +342,18 @@ final class StockManagementTest extends TestCase
         $this->assertEquals('in_stock', $this->stockItem->stock_status);
 
         $lowStockItem = VariantInventory::factory()->create([
-            'variant_id' => $this->variant->id,
+            'variant_id'  => $this->variant->id,
             'location_id' => $this->location->id,
-            'stock' => 5,
-            'threshold' => 10,
+            'stock'       => 5,
+            'threshold'   => 10,
         ]);
 
         $this->assertEquals('low_stock', $lowStockItem->stock_status);
 
         $outOfStockItem = VariantInventory::factory()->create([
-            'variant_id' => $this->variant->id,
+            'variant_id'  => $this->variant->id,
             'location_id' => $this->location->id,
-            'stock' => 0,
+            'stock'       => 0,
         ]);
 
         $this->assertEquals('out_of_stock', $outOfStockItem->stock_status);

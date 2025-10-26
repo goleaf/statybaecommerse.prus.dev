@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 return [
     /*
     |--------------------------------------------------------------------------
@@ -16,24 +18,24 @@ return [
     ],
 
     'formats' => [
-        'date' => 'Y-m-d',
-        'datetime' => 'Y-m-d H:i',
+        'date'          => 'Y-m-d',
+        'datetime'      => 'Y-m-d H:i',
         'datetime_full' => 'Y-m-d H:i:s',
-        'time' => 'H:i',
-        'date_short' => 'y-m-d',
-        'month_year' => 'Y-m',
-        'year_month' => 'Y-m',
+        'time'          => 'H:i',
+        'date_short'    => 'y-m-d',
+        'month_year'    => 'Y-m',
+        'year_month'    => 'Y-m',
     ],
 
     'filament_formats' => [
-        'date' => 'Y-m-d',
-        'datetime' => 'Y-m-d H:i',
+        'date'          => 'Y-m-d',
+        'datetime'      => 'Y-m-d H:i',
         'datetime_full' => 'Y-m-d H:i:s',
     ],
 
     'fallback_formats' => [
-        'date' => 'Y-m-d',
-        'datetime' => 'Y-m-d H:i',
+        'date'          => 'Y-m-d',
+        'datetime'      => 'Y-m-d H:i',
         'datetime_full' => 'Y-m-d H:i:s',
     ],
 

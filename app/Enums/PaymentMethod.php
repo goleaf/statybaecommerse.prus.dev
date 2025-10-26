@@ -17,4 +17,3 @@ enum PaymentMethod: string
     case APPLE_PAY = 'apple_pay';
     case GOOGLE_PAY = 'google_pay';
 }
-

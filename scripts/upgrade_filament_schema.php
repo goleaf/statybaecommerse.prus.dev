@@ -43,6 +43,7 @@ foreach ($iterator as $fileInfo) {
             $state = 'function';
             $currentFunction = null;
             $output .= $text;
+
             continue;
         }
 
@@ -55,18 +56,21 @@ foreach ($iterator as $fileInfo) {
                 if ($name === 'form') {
                     $currentFunction = 'form';
                     $state = 'params';
+
                     continue;
                 }
 
                 if ($name === 'infolist') {
                     $currentFunction = 'infolist';
                     $state = 'params';
+
                     continue;
                 }
 
                 if ($name === 'table') {
                     $currentFunction = 'table';
                     $state = 'params';
+
                     continue;
                 }
 
@@ -80,6 +84,7 @@ foreach ($iterator as $fileInfo) {
             if ($text === '(') {
                 $paramDepth++;
                 $output .= $text;
+
                 continue;
             }
 
@@ -97,26 +102,31 @@ foreach ($iterator as $fileInfo) {
             if ($paramDepth > 0) {
                 if ($currentFunction === 'form' && $id === T_STRING && trim($text) === 'Form') {
                     $output .= 'Schema';
+
                     continue;
                 }
 
                 if ($currentFunction === 'infolist' && $id === T_STRING && trim($text) === 'Infolist') {
                     $output .= 'Schema';
+
                     continue;
                 }
 
                 if (($currentFunction === 'form' || $currentFunction === 'infolist') && $id === T_VARIABLE && $text === '$form') {
                     $output .= '$schema';
+
                     continue;
                 }
 
                 if (($currentFunction === 'infolist') && $id === T_VARIABLE && $text === '$infolist') {
                     $output .= '$schema';
+
                     continue;
                 }
             }
 
             $output .= $text;
+
             continue;
         }
 
@@ -125,6 +135,7 @@ foreach ($iterator as $fileInfo) {
                 $state = 'body';
                 $braceDepth = 1;
                 $output .= $text;
+
                 continue;
             }
 
@@ -138,6 +149,7 @@ foreach ($iterator as $fileInfo) {
                 }
 
                 $returnSkipping = true;
+
                 continue;
             }
 
@@ -156,6 +168,7 @@ foreach ($iterator as $fileInfo) {
                     $braceDepth = 1;
                     $output .= $text;
                     $returnSkipping = false;
+
                     continue;
                 }
 
@@ -164,6 +177,7 @@ foreach ($iterator as $fileInfo) {
             }
 
             $output .= $text;
+
             continue;
         }
 
@@ -171,6 +185,7 @@ foreach ($iterator as $fileInfo) {
             if ($text === '{') {
                 $braceDepth++;
                 $output .= $text;
+
                 continue;
             }
 
@@ -188,16 +203,19 @@ foreach ($iterator as $fileInfo) {
 
             if ($currentFunction === 'form' && $id === T_VARIABLE && $text === '$form') {
                 $output .= '$schema';
+
                 continue;
             }
 
             if ($currentFunction === 'infolist' && $id === T_VARIABLE && in_array($text, ['$infolist', '$list'], true)) {
                 $replacement = $text === '$list' ? '$schema' : '$schema';
                 $output .= $replacement;
+
                 continue;
             }
 
             $output .= $text;
+
             continue;
         }
 
@@ -225,8 +243,8 @@ foreach ($iterator as $fileInfo) {
         if (str_contains($output, 'function form(') || str_contains($output, 'function infolist(')) {
             if (! str_contains($output, 'use Filament\\Schemas\\Schema;')) {
                 $output = preg_replace(
-                        '/(namespace [^;]+;\s*)/m',
-                        "$1\nuse Filament\\\\Schemas\\\\Schema;\n",
+                    '/(namespace [^;]+;\s*)/m',
+                    "$1\nuse Filament\\\\Schemas\\\\Schema;\n",
                     $output,
                     1
                 );

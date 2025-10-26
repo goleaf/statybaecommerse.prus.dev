@@ -18,8 +18,8 @@ use App\Models\User;
 use App\Support\Storage\SecureStorage;
 use App\Support\Uploads\SecureUpload;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\UploadedFile;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
@@ -118,9 +118,9 @@ final class UserController extends Controller
         $user->update(['avatar_url' => $avatarPath]);
 
         return response()->json([
-            'success' => true,
+            'success'    => true,
             'avatar_url' => SecureStorage::temporarySignedUrl($avatarPath),
-            'message' => __('users.avatar_updated_successfully'),
+            'message'    => __('users.avatar_updated_successfully'),
         ]);
     }
 

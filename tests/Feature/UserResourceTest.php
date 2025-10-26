@@ -34,19 +34,19 @@ it('feature: can create a user', function () {
     Livewire::test(CreateUser::class)
         ->fillForm([
             'first_name' => $newUserData->first_name,
-            'last_name' => $newUserData->last_name,
-            'name' => $newUserData->name,
-            'email' => $newUserData->email,
-            'password' => 'password123',
-            'is_active' => true,
+            'last_name'  => $newUserData->last_name,
+            'name'       => $newUserData->name,
+            'email'      => $newUserData->email,
+            'password'   => 'password123',
+            'is_active'  => true,
         ])
         ->call('create')
         ->assertHasNoFormErrors();
 
     assertDatabaseHas(User::class, [
         'first_name' => $newUserData->first_name,
-        'last_name' => $newUserData->last_name,
-        'email' => $newUserData->email,
+        'last_name'  => $newUserData->last_name,
+        'email'      => $newUserData->email,
     ]);
 });
 
@@ -64,17 +64,17 @@ it('feature: can edit a user', function () {
     Livewire::test(EditUser::class, ['record' => $user->id])
         ->fillForm([
             'first_name' => $newUserData->first_name,
-            'last_name' => $newUserData->last_name,
-            'email' => $newUserData->email,
+            'last_name'  => $newUserData->last_name,
+            'email'      => $newUserData->email,
         ])
         ->call('save')
         ->assertHasNoFormErrors();
 
     assertDatabaseHas(User::class, [
-        'id' => $user->id,
+        'id'         => $user->id,
         'first_name' => $newUserData->first_name,
-        'last_name' => $newUserData->last_name,
-        'email' => $newUserData->email,
+        'last_name'  => $newUserData->last_name,
+        'email'      => $newUserData->email,
     ]);
 });
 
@@ -99,7 +99,7 @@ it('feature: can activate users in bulk', function () {
 
     foreach ($users as $user) {
         assertDatabaseHas(User::class, [
-            'id' => $user->id,
+            'id'        => $user->id,
             'is_active' => true,
         ]);
     }
@@ -114,7 +114,7 @@ it('feature: can deactivate users in bulk', function () {
 
     foreach ($users as $user) {
         assertDatabaseHas(User::class, [
-            'id' => $user->id,
+            'id'        => $user->id,
             'is_active' => false,
         ]);
     }
@@ -125,7 +125,7 @@ it('feature: can load addresses relation manager', function () {
 
     Livewire::test(AddressesRelationManager::class, [
         'ownerRecord' => $user,
-        'pageClass' => EditUser::class,
+        'pageClass'   => EditUser::class,
     ])
         ->assertOk();
 });
@@ -135,7 +135,7 @@ it('feature: can load orders relation manager', function () {
 
     Livewire::test(OrdersRelationManager::class, [
         'ownerRecord' => $user,
-        'pageClass' => EditUser::class,
+        'pageClass'   => EditUser::class,
     ])
         ->assertOk();
 });
@@ -145,7 +145,7 @@ it('feature: can load reviews relation manager', function () {
 
     Livewire::test(ReviewsRelationManager::class, [
         'ownerRecord' => $user,
-        'pageClass' => EditUser::class,
+        'pageClass'   => EditUser::class,
     ])
         ->assertOk();
 });
@@ -155,7 +155,7 @@ it('feature: can load wishlist relation manager', function () {
 
     Livewire::test(WishlistRelationManager::class, [
         'ownerRecord' => $user,
-        'pageClass' => EditUser::class,
+        'pageClass'   => EditUser::class,
     ])
         ->assertOk();
 });

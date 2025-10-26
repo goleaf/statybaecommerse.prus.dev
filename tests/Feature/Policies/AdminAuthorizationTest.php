@@ -6,8 +6,8 @@ namespace Tests\Feature\Policies;
 
 use App\Filament\Resources\OrderResource;
 use App\Filament\Resources\ProductResource;
-use App\Support\Authorization\AuthorizationMatrix;
 use App\Models\AdminUser;
+use App\Support\Authorization\AuthorizationMatrix;
 use Database\Seeders\AdminAuthorizationSeeder;
 use Filament\Facades\Filament;
 use Filament\Panel;

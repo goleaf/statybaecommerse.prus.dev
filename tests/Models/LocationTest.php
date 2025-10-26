@@ -86,21 +86,21 @@ final class LocationTest extends TestCase
 
         // Compose a realistic address and business configuration payload.
         $location = Location::factory()->create([
-            'name' => 'Vilnius Warehouse',
+            'name'           => 'Vilnius Warehouse',
             'address_line_1' => 'Vilniaus g. 1',
             'address_line_2' => 'Suite 5',
-            'city' => 'Vilnius',
-            'state' => 'Vilniaus apskritis',
-            'postal_code' => '01103',
-            'type' => 'warehouse',
-            'latitude' => 54.6872,
-            'longitude' => 25.2797,
-            'opening_hours' => [
+            'city'           => 'Vilnius',
+            'state'          => 'Vilniaus apskritis',
+            'postal_code'    => '01103',
+            'type'           => 'warehouse',
+            'latitude'       => 54.6872,
+            'longitude'      => 25.2797,
+            'opening_hours'  => [
                 [
-                    'day' => 'monday',
-                    'open_time' => '09:00',
+                    'day'        => 'monday',
+                    'open_time'  => '09:00',
                     'close_time' => '17:00',
-                    'is_closed' => false,
+                    'is_closed'  => false,
                 ],
             ],
             'country_code' => 'LT',

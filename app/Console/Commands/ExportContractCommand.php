@@ -58,7 +58,7 @@ final class ExportContractCommand extends Command
             $disk->makeDirectory($exportsPath);
         }
 
-        $relativePath = $exportsPath.'/'.$filename;
+        $relativePath = $exportsPath . '/' . $filename;
         $contract->export($format, $disk, $relativePath);
 
         $absolutePath = $disk->path($relativePath);
@@ -66,8 +66,8 @@ final class ExportContractCommand extends Command
         Log::channel((string) config('data-transfer.log_channel', 'maintenance'))
             ->info('Data contract export completed.', [
                 'contract' => $contractKey,
-                'format' => $format,
-                'path' => $absolutePath,
+                'format'   => $format,
+                'path'     => $absolutePath,
             ]);
 
         $this->components->info("Export created: {$absolutePath}");

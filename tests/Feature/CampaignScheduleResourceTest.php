@@ -28,7 +28,7 @@ final class CampaignScheduleResourceTest extends TestCase
         parent::setUp();
 
         $this->adminUser = User::factory()->create([
-            'email' => 'admin@example.com',
+            'email'    => 'admin@example.com',
             'is_admin' => true,
         ]);
     }
@@ -38,17 +38,17 @@ final class CampaignScheduleResourceTest extends TestCase
         $campaign = Campaign::factory()->create();
 
         CampaignSchedule::factory()->create([
-            'campaign_id' => $campaign->id,
+            'campaign_id'   => $campaign->id,
             'schedule_type' => ScheduleType::DAILY,
-            'next_run_at' => now()->addDay(),
-            'is_active' => true,
+            'next_run_at'   => now()->addDay(),
+            'is_active'     => true,
         ]);
 
         CampaignSchedule::factory()->create([
-            'campaign_id' => $campaign->id,
+            'campaign_id'   => $campaign->id,
             'schedule_type' => ScheduleType::WEEKLY,
-            'next_run_at' => now()->addWeek(),
-            'is_active' => false,
+            'next_run_at'   => now()->addWeek(),
+            'is_active'     => false,
         ]);
 
         $this->actingAs($this->adminUser);
@@ -77,12 +77,12 @@ final class CampaignScheduleResourceTest extends TestCase
             'resource' => CampaignScheduleResource::class,
         ])
             ->fillForm([
-                'campaign_id' => $campaign->id,
-                'schedule_type' => ScheduleType::DAILY,
-                'next_run_at' => now()->addDay(),
-                'is_active' => true,
+                'campaign_id'     => $campaign->id,
+                'schedule_type'   => ScheduleType::DAILY,
+                'next_run_at'     => now()->addDay(),
+                'is_active'       => true,
                 'schedule_config' => [
-                    'time' => '09:00',
+                    'time'     => '09:00',
                     'timezone' => 'UTC',
                 ],
             ])
@@ -91,9 +91,9 @@ final class CampaignScheduleResourceTest extends TestCase
             ->assertRedirect();
 
         $this->assertDatabaseHas('campaign_schedules', [
-            'campaign_id' => $campaign->id,
+            'campaign_id'   => $campaign->id,
             'schedule_type' => ScheduleType::DAILY->value,
-            'is_active' => true,
+            'is_active'     => true,
         ]);
     }
 
@@ -101,21 +101,21 @@ final class CampaignScheduleResourceTest extends TestCase
     {
         $campaign = Campaign::factory()->create();
         $schedule = CampaignSchedule::factory()->create([
-            'campaign_id' => $campaign->id,
+            'campaign_id'   => $campaign->id,
             'schedule_type' => ScheduleType::DAILY,
-            'is_active' => true,
+            'is_active'     => true,
         ]);
 
         $this->actingAs($this->adminUser);
 
         Livewire::test(EditRecord::class, [
             'resource' => CampaignScheduleResource::class,
-            'record' => $schedule->id,
+            'record'   => $schedule->id,
         ])
             ->fillForm([
                 'schedule_type' => ScheduleType::WEEKLY,
-                'next_run_at' => now()->addWeek(),
-                'is_active' => false,
+                'next_run_at'   => now()->addWeek(),
+                'is_active'     => false,
             ])
             ->call('save')
             ->assertHasNoFormErrors()
@@ -130,16 +130,16 @@ final class CampaignScheduleResourceTest extends TestCase
     {
         $campaign = Campaign::factory()->create();
         $schedule = CampaignSchedule::factory()->create([
-            'campaign_id' => $campaign->id,
+            'campaign_id'   => $campaign->id,
             'schedule_type' => ScheduleType::MONTHLY,
-            'is_active' => true,
+            'is_active'     => true,
         ]);
 
         $this->actingAs($this->adminUser);
 
         Livewire::test(ViewRecord::class, [
             'resource' => CampaignScheduleResource::class,
-            'record' => $schedule->id,
+            'record'   => $schedule->id,
         ])
             ->assertCanSeeTableRecords([$schedule]);
     }
@@ -172,12 +172,12 @@ final class CampaignScheduleResourceTest extends TestCase
         $campaign = Campaign::factory()->create();
 
         $dailySchedule = CampaignSchedule::factory()->create([
-            'campaign_id' => $campaign->id,
+            'campaign_id'   => $campaign->id,
             'schedule_type' => ScheduleType::DAILY,
         ]);
 
         $weeklySchedule = CampaignSchedule::factory()->create([
-            'campaign_id' => $campaign->id,
+            'campaign_id'   => $campaign->id,
             'schedule_type' => ScheduleType::WEEKLY,
         ]);
 
@@ -197,12 +197,12 @@ final class CampaignScheduleResourceTest extends TestCase
 
         $activeSchedule = CampaignSchedule::factory()->create([
             'campaign_id' => $campaign->id,
-            'is_active' => true,
+            'is_active'   => true,
         ]);
 
         $inactiveSchedule = CampaignSchedule::factory()->create([
             'campaign_id' => $campaign->id,
-            'is_active' => false,
+            'is_active'   => false,
         ]);
 
         $this->actingAs($this->adminUser);
@@ -222,13 +222,13 @@ final class CampaignScheduleResourceTest extends TestCase
         $overdueSchedule = CampaignSchedule::factory()->create([
             'campaign_id' => $campaign->id,
             'next_run_at' => now()->subDay(),
-            'is_active' => true,
+            'is_active'   => true,
         ]);
 
         $futureSchedule = CampaignSchedule::factory()->create([
             'campaign_id' => $campaign->id,
             'next_run_at' => now()->addDay(),
-            'is_active' => true,
+            'is_active'   => true,
         ]);
 
         $this->actingAs($this->adminUser);
@@ -246,7 +246,7 @@ final class CampaignScheduleResourceTest extends TestCase
         $campaign = Campaign::factory()->create();
         $schedule = CampaignSchedule::factory()->create([
             'campaign_id' => $campaign->id,
-            'is_active' => false,
+            'is_active'   => false,
         ]);
 
         $this->actingAs($this->adminUser);
@@ -266,7 +266,7 @@ final class CampaignScheduleResourceTest extends TestCase
         $campaign = Campaign::factory()->create();
         $schedule = CampaignSchedule::factory()->create([
             'campaign_id' => $campaign->id,
-            'is_active' => true,
+            'is_active'   => true,
         ]);
 
         $this->actingAs($this->adminUser);
@@ -286,7 +286,7 @@ final class CampaignScheduleResourceTest extends TestCase
         $campaign = Campaign::factory()->create();
         $schedule = CampaignSchedule::factory()->create([
             'campaign_id' => $campaign->id,
-            'is_active' => true,
+            'is_active'   => true,
         ]);
 
         $this->actingAs($this->adminUser);
@@ -307,12 +307,12 @@ final class CampaignScheduleResourceTest extends TestCase
 
         $schedule1 = CampaignSchedule::factory()->create([
             'campaign_id' => $campaign->id,
-            'is_active' => false,
+            'is_active'   => false,
         ]);
 
         $schedule2 = CampaignSchedule::factory()->create([
             'campaign_id' => $campaign->id,
-            'is_active' => false,
+            'is_active'   => false,
         ]);
 
         $this->actingAs($this->adminUser);
@@ -335,12 +335,12 @@ final class CampaignScheduleResourceTest extends TestCase
 
         $schedule1 = CampaignSchedule::factory()->create([
             'campaign_id' => $campaign->id,
-            'is_active' => true,
+            'is_active'   => true,
         ]);
 
         $schedule2 = CampaignSchedule::factory()->create([
             'campaign_id' => $campaign->id,
-            'is_active' => true,
+            'is_active'   => true,
         ]);
 
         $this->actingAs($this->adminUser);
@@ -363,13 +363,13 @@ final class CampaignScheduleResourceTest extends TestCase
 
         $activeSchedule = CampaignSchedule::factory()->create([
             'campaign_id' => $campaign->id,
-            'is_active' => true,
+            'is_active'   => true,
             'next_run_at' => now()->addDay(),
         ]);
 
         $inactiveSchedule = CampaignSchedule::factory()->create([
             'campaign_id' => $campaign->id,
-            'is_active' => false,
+            'is_active'   => false,
         ]);
 
         $this->actingAs($this->adminUser);
@@ -386,7 +386,7 @@ final class CampaignScheduleResourceTest extends TestCase
 
         foreach (ScheduleType::cases() as $type) {
             CampaignSchedule::factory()->create([
-                'campaign_id' => $campaign->id,
+                'campaign_id'   => $campaign->id,
                 'schedule_type' => $type,
             ]);
         }
@@ -403,9 +403,9 @@ final class CampaignScheduleResourceTest extends TestCase
     {
         $campaign = Campaign::factory()->create();
         $config = [
-            'time' => '09:00',
+            'time'     => '09:00',
             'timezone' => 'UTC',
-            'days' => ['monday', 'wednesday', 'friday'],
+            'days'     => ['monday', 'wednesday', 'friday'],
         ];
 
         $this->actingAs($this->adminUser);
@@ -414,18 +414,18 @@ final class CampaignScheduleResourceTest extends TestCase
             'resource' => CampaignScheduleResource::class,
         ])
             ->fillForm([
-                'campaign_id' => $campaign->id,
-                'schedule_type' => ScheduleType::WEEKLY,
-                'next_run_at' => now()->addWeek(),
-                'is_active' => true,
+                'campaign_id'     => $campaign->id,
+                'schedule_type'   => ScheduleType::WEEKLY,
+                'next_run_at'     => now()->addWeek(),
+                'is_active'       => true,
                 'schedule_config' => $config,
             ])
             ->call('create')
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('campaign_schedules', [
-            'campaign_id' => $campaign->id,
-            'schedule_type' => ScheduleType::WEEKLY->value,
+            'campaign_id'     => $campaign->id,
+            'schedule_type'   => ScheduleType::WEEKLY->value,
             'schedule_config' => json_encode($config),
         ]);
     }
@@ -453,9 +453,9 @@ final class CampaignScheduleResourceTest extends TestCase
             'resource' => CampaignScheduleResource::class,
         ])
             ->fillForm([
-                'campaign_id' => null,
+                'campaign_id'   => null,
                 'schedule_type' => null,
-                'next_run_at' => null,
+                'next_run_at'   => null,
             ])
             ->call('create')
             ->assertHasFormErrors(['campaign_id', 'schedule_type', 'next_run_at']);
@@ -471,16 +471,16 @@ final class CampaignScheduleResourceTest extends TestCase
             'resource' => CampaignScheduleResource::class,
         ])
             ->fillForm([
-                'campaign_id' => $campaign->id,
+                'campaign_id'   => $campaign->id,
                 'schedule_type' => ScheduleType::ONCE,
-                'next_run_at' => now()->addHour(),
+                'next_run_at'   => now()->addHour(),
             ])
             ->call('create')
             ->assertHasNoFormErrors()
             ->assertRedirect();
 
         $this->assertDatabaseHas('campaign_schedules', [
-            'campaign_id' => $campaign->id,
+            'campaign_id'   => $campaign->id,
             'schedule_type' => ScheduleType::ONCE->value,
         ]);
     }

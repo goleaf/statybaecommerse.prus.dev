@@ -1,14 +1,16 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
+declare(strict_types=1);
+
 use App\Models\SystemSetting;
 use App\Models\SystemSettingDependency;
 use App\Models\User;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
-require __DIR__.'/../vendor/autoload.php';
+require __DIR__ . '/../vendor/autoload.php';
 
-$app = require __DIR__.'/../bootstrap/app.php';
+$app = require __DIR__ . '/../bootstrap/app.php';
 $app->loadEnvironmentFrom('.env');
 
 $kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
@@ -75,8 +77,8 @@ Schema::create('system_setting_dependencies', function (Blueprint $table) {
 });
 
 User::create([
-    'name' => 'Test User',
-    'email' => 'system@statyba.test',
+    'name'     => 'Test User',
+    'email'    => 'system@statyba.test',
     'password' => bcrypt('password'),
 ]);
 
@@ -84,10 +86,10 @@ $setting1 = SystemSetting::create(['key' => 'setting1', 'name' => 'Setting 1']);
 $setting2 = SystemSetting::create(['key' => 'setting2', 'name' => 'Setting 2']);
 
 $dependency1 = SystemSettingDependency::create([
-    'setting_id' => $setting1->id,
+    'setting_id'            => $setting1->id,
     'depends_on_setting_id' => $setting2->id,
-    'condition' => 'setting2.value == "enabled"',
-    'is_active' => true,
+    'condition'             => 'setting2.value == "enabled"',
+    'is_active'             => true,
 ]);
 
 echo "Created dependency ID: {$dependency1->id}\n";
@@ -97,8 +99,7 @@ echo 'Belongs to setting ID: ' . $dependency1->setting->id . "\n";
 echo 'Belongs to dependsOnSetting ID: ' . ($dependency1->dependsOnSetting?->id ?? 'null') . "\n";
 
 $found = SystemSettingDependency::search('setting2')->get();
-echo 'Search result count: '. $found->count() ."\n";
+echo 'Search result count: ' . $found->count() . "\n";
 
 $ordered = SystemSettingDependency::orderByCreatedAt()->get();
-echo 'First ordered ID: '. $ordered->first()->id ."\n";
-
+echo 'First ordered ID: ' . $ordered->first()->id . "\n";

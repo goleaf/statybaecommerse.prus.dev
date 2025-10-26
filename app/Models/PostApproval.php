@@ -9,11 +9,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
- * @property int $id
- * @property int $post_id
- * @property int $user_id
- * @property string $decision
- * @property string|null $notes
+ * @property int                        $id
+ * @property int                        $post_id
+ * @property int                        $user_id
+ * @property string                     $decision
+ * @property string|null                $notes
  * @property \Illuminate\Support\Carbon $decided_at
  */
 final class PostApproval extends Model
@@ -27,8 +27,8 @@ final class PostApproval extends Model
     {
         // Ensure native PHP types are returned for common attributes when hydrating the model.
         return [
-            'post_id' => 'integer',
-            'user_id' => 'integer',
+            'post_id'    => 'integer',
+            'user_id'    => 'integer',
             'decided_at' => 'datetime',
         ];
     }

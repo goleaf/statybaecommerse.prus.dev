@@ -19,8 +19,8 @@ final class AttributeTranslationFactory extends Factory
     {
         return [
             'attribute_id' => Attribute::factory(),
-            'locale' => $this->faker->randomElement(['en', 'lt']),
-            'name' => $this->faker->words(3, true),
+            'locale'       => $this->faker->randomElement(['en', 'lt']),
+            'name'         => $this->faker->words(3, true),
         ];
     }
 
@@ -28,7 +28,7 @@ final class AttributeTranslationFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'locale' => 'en',
-            'name' => $this->faker->words(3, true),
+            'name'   => $this->faker->words(3, true),
         ]);
     }
 
@@ -36,7 +36,7 @@ final class AttributeTranslationFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'locale' => 'lt',
-            'name' => $this->faker->words(3, true),
+            'name'   => $this->faker->words(3, true),
         ]);
     }
 }

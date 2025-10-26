@@ -39,24 +39,24 @@ final class DiscountCodeDocumentActionTest extends TestCase
         $this->actingAs($this->user);
 
         $this->discount = Discount::factory()->create([
-            'name' => 'Test Discount',
+            'name'  => 'Test Discount',
             'value' => 10.0,
-            'type' => 'percentage',
+            'type'  => 'percentage',
         ]);
 
         $this->discountCode = DiscountCode::factory()->create([
-            'discount_id' => $this->discount->id,
-            'code' => 'TEST10',
+            'discount_id'    => $this->discount->id,
+            'code'           => 'TEST10',
             'description_lt' => 'Test discount code',
             'description_en' => 'Test discount code',
-            'usage_limit' => 100,
-            'usage_count' => 0,
-            'is_active' => true,
-            'status' => 'active',
+            'usage_limit'    => 100,
+            'usage_count'    => 0,
+            'is_active'      => true,
+            'status'         => 'active',
         ]);
 
         $this->template = DocumentTemplate::factory()->active()->create([
-            'name' => 'Discount Code Template',
+            'name'    => 'Discount Code Template',
             'content' => 'Discount Code: {{DISCOUNT_CODE}} - Value: {{DISCOUNT_VALUE}}',
         ]);
     }
@@ -103,12 +103,12 @@ final class DiscountCodeDocumentActionTest extends TestCase
 
         $data = [
             'template_id' => $this->template->id,
-            'format' => 'html',
-            'title' => 'Test Document',
+            'format'      => 'html',
+            'title'       => 'Test Document',
         ];
 
         $document = Document::make([
-            'title' => $data['title'],
+            'title'   => $data['title'],
             'content' => '<p>Generated</p>',
         ]);
 
@@ -141,12 +141,12 @@ final class DiscountCodeDocumentActionTest extends TestCase
 
         $data = [
             'template_id' => $this->template->id,
-            'format' => 'pdf',
-            'title' => 'Test PDF Document',
+            'format'      => 'pdf',
+            'title'       => 'Test PDF Document',
         ];
 
         $document = Document::make([
-            'title' => $data['title'],
+            'title'   => $data['title'],
             'content' => '<p>Generated</p>',
         ]);
 
@@ -177,8 +177,8 @@ final class DiscountCodeDocumentActionTest extends TestCase
 
         $data = [
             'template_id' => 999999,
-            'format' => 'html',
-            'title' => 'Missing Template',
+            'format'      => 'html',
+            'title'       => 'Missing Template',
         ];
 
         $service = $this->makeDocumentServiceFake(

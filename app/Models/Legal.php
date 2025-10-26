@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models;
 
@@ -7,9 +9,9 @@ use App\Models\Scopes\PublishedScope;
 use App\Services\Security\HtmlContentSanitizer;
 use App\Traits\HasTranslations;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -48,6 +50,7 @@ final class Legal extends Model
 {
     /** @use HasFactory<\Database\Factories\LegalFactory> */
     use HasFactory;
+
     use HasTranslations;
 
     protected $table = 'legals';
@@ -139,7 +142,7 @@ final class Legal extends Model
     protected function isPublished(): Attribute
     {
         return Attribute::make(
-            get: fn(): bool => $this->published_at && $this->published_at->isPast()
+            get: fn (): bool => $this->published_at && $this->published_at->isPast()
         );
     }
 
@@ -151,10 +154,10 @@ final class Legal extends Model
     protected function status(): Attribute
     {
         return Attribute::make(
-            get: fn(): string => match (true) {
-                !$this->is_enabled => 'disabled',
-                !$this->is_published => 'draft',
-                default => 'published',
+            get: fn (): string => match (true) {
+                ! $this->is_enabled   => 'disabled',
+                ! $this->is_published => 'draft',
+                default               => 'published',
             }
         );
     }
@@ -177,7 +180,7 @@ final class Legal extends Model
     public function getTranslatedContent(?string $locale = null): ?string
     {
         $content = $this->trans('content', $locale);
-        if ($content === null || !is_string($content)) {
+        if ($content === null || ! is_string($content)) {
             return null;
         }
 
@@ -251,10 +254,10 @@ final class Legal extends Model
         $translation = $this->translations()->firstOrCreate(
             ['locale' => $locale],
             [
-                'title' => $this->key,
-                'slug' => \Illuminate\Support\Str::slug($this->key) . '-' . $locale,
-                'content' => '',
-                'seo_title' => $this->key,
+                'title'           => $this->key,
+                'slug'            => \Illuminate\Support\Str::slug($this->key) . '-' . $locale,
+                'content'         => '',
+                'seo_title'       => $this->key,
                 'seo_description' => '',
             ]
         );
@@ -270,7 +273,7 @@ final class Legal extends Model
     public function updateTranslation(string $locale, array $data): bool
     {
         $translation = $this->translations()->where('locale', $locale)->first();
-        if (!$translation) {
+        if (! $translation) {
             $translation = $this->getOrCreateTranslation($locale);
         }
 
@@ -335,15 +338,15 @@ final class Legal extends Model
     public static function getTypes(): array
     {
         return [
-            'privacy_policy' => 'Privatumo politika',
-            'terms_of_use' => 'Naudojimosi sąlygos',
-            'refund_policy' => 'Grąžinimo politika',
+            'privacy_policy'  => 'Privatumo politika',
+            'terms_of_use'    => 'Naudojimosi sąlygos',
+            'refund_policy'   => 'Grąžinimo politika',
             'shipping_policy' => 'Pristatymo politika',
-            'cookie_policy' => 'Slapukų politika',
-            'gdpr_policy' => 'GDPR politika',
-            'legal_notice' => 'Teisinė informacija',
-            'imprint' => 'Imprint',
-            'legal_document' => 'Teisinis dokumentas',
+            'cookie_policy'   => 'Slapukų politika',
+            'gdpr_policy'     => 'GDPR politika',
+            'legal_notice'    => 'Teisinė informacija',
+            'imprint'         => 'Imprint',
+            'legal_document'  => 'Teisinis dokumentas',
         ];
     }
 

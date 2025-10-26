@@ -43,10 +43,10 @@ final class NotificationClassTest extends TestCase
     public function test_order_notification_can_be_created(): void
     {
         $orderData = [
-            'id' => 1,
+            'id'           => 1,
             'order_number' => 'ORD-001',
-            'total' => 100.00,
-            'status' => 'pending',
+            'total'        => 100.00,
+            'status'       => 'pending',
         ];
 
         $notification = new OrderNotification('created', $orderData, 'Custom message');
@@ -60,7 +60,7 @@ final class NotificationClassTest extends TestCase
     {
         $systemData = [
             'maintenance_type' => 'scheduled',
-            'duration' => '2 hours',
+            'duration'         => '2 hours',
         ];
 
         $notification = new SystemNotification('maintenance_started', $systemData, 'Custom message');
@@ -73,8 +73,8 @@ final class NotificationClassTest extends TestCase
     public function test_user_notification_can_be_created(): void
     {
         $userData = [
-            'id' => 1,
-            'name' => 'John Doe',
+            'id'    => 1,
+            'name'  => 'John Doe',
             'email' => 'john@example.com',
         ];
 
@@ -88,9 +88,9 @@ final class NotificationClassTest extends TestCase
     public function test_product_notification_can_be_created(): void
     {
         $productData = [
-            'id' => 1,
-            'name' => 'Test Product',
-            'sku' => 'TEST-001',
+            'id'    => 1,
+            'name'  => 'Test Product',
+            'sku'   => 'TEST-001',
             'price' => 99.99,
         ];
 

@@ -3,10 +3,10 @@
 declare(strict_types=1);
 
 return [
-    'title'  => 'Nuolaidų panaudojimai',
-    'plural' => 'Nuolaidų panaudojimai',
-    'single' => 'Nuolaidos panaudojimas',
-    'list_item_label' => 'Nuolaida :discount',
+    'title'             => 'Nuolaidų panaudojimai',
+    'plural'            => 'Nuolaidų panaudojimai',
+    'single'            => 'Nuolaidos panaudojimas',
+    'list_item_label'   => 'Nuolaida :discount',
     'list_item_tooltip' => 'Sutaupyta :amount su kodu :code',
 
     'sections' => [

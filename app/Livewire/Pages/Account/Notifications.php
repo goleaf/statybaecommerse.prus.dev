@@ -15,10 +15,10 @@ use Livewire\WithPagination;
  *
  * Livewire component for Notifications with reactive frontend functionality, real-time updates, and user interaction handling.
  *
- * @property array $notifications
+ * @property array  $notifications
  * @property string $filter
- * @property bool $showUnreadOnly
- * @property mixed $listeners
+ * @property bool   $showUnreadOnly
+ * @property mixed  $listeners
  */
 final class Notifications extends Component
 {
@@ -133,7 +133,7 @@ final class Notifications extends Component
     /**
      * Handle getTimeAgo functionality with proper error handling.
      *
-     * @param  mixed  $datetime
+     * @param mixed $datetime
      */
     private function getTimeAgo($datetime): string
     {

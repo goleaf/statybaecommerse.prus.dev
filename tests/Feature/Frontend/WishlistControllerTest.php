@@ -52,7 +52,7 @@ final class WishlistControllerTest extends TestCase
                     'name',
                     'items' => [['id', 'product_id', 'quantity']],
                 ],
-                'meta' => ['items_pagination' => ['current_page', 'last_page', 'total']],
+                'meta'  => ['items_pagination' => ['current_page', 'last_page', 'total']],
                 'links' => ['items' => ['first', 'last', 'prev', 'next']],
             ]);
     }
@@ -66,14 +66,14 @@ final class WishlistControllerTest extends TestCase
             ->actingAs($user)
             ->postJson(route('frontend.wishlist.add'), [
                 'product_id' => $product->id,
-                'quantity' => 2,
-                'notes' => 'Add for later',
+                'quantity'   => 2,
+                'notes'      => 'Add for later',
             ]);
 
         $response
             ->assertOk()
             ->assertJsonFragment([
-                'status' => 'added',
+                'status'  => 'added',
                 'message' => __('Product added to your wishlist.'),
             ]);
 
@@ -86,9 +86,9 @@ final class WishlistControllerTest extends TestCase
 
         $this->assertDatabaseHas('wishlist_items', [
             'wishlist_id' => $wishlist->id,
-            'product_id' => $product->id,
-            'quantity' => 2,
-            'notes' => 'Add for later',
+            'product_id'  => $product->id,
+            'quantity'    => 2,
+            'notes'       => 'Add for later',
         ]);
     }
 
@@ -99,7 +99,7 @@ final class WishlistControllerTest extends TestCase
 
         $payload = [
             'product_id' => $product->id,
-            'quantity' => 1,
+            'quantity'   => 1,
         ];
 
         // First addition should create the wishlist item successfully.
@@ -118,8 +118,8 @@ final class WishlistControllerTest extends TestCase
         $this->assertDatabaseCount('wishlist_items', 1);
         $this->assertDatabaseHas('wishlist_items', [
             'wishlist_id' => $wishlist->id,
-            'product_id' => $product->id,
-            'quantity' => 1,
+            'product_id'  => $product->id,
+            'quantity'    => 1,
         ]);
     }
 
@@ -142,7 +142,7 @@ final class WishlistControllerTest extends TestCase
         $response
             ->assertOk()
             ->assertJsonFragment([
-                'status' => 'removed',
+                'status'  => 'removed',
                 'message' => __('Product removed from your wishlist.'),
             ]);
 
@@ -170,8 +170,8 @@ final class WishlistControllerTest extends TestCase
         $response
             ->assertOk()
             ->assertJsonFragment([
-                'status' => 'cleared',
-                'message' => __('Your wishlist has been cleared.'),
+                'status'         => 'cleared',
+                'message'        => __('Your wishlist has been cleared.'),
                 'wishlist_count' => 0,
             ]);
 
@@ -195,7 +195,7 @@ final class WishlistControllerTest extends TestCase
             ->actingAs($user)
             ->postJson(route('frontend.wishlist.add'), [
                 'wishlist_id' => $foreignWishlist->id,
-                'product_id' => Product::factory()->create()->id,
+                'product_id'  => Product::factory()->create()->id,
             ])
             ->assertStatus(403)
             ->assertJsonFragment(['status' => 'error']);

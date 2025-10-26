@@ -42,7 +42,7 @@ class DiscountEngine
     /**
      * Handle collectCandidates functionality with proper error handling.
      *
-     * @param  mixed  $now
+     * @param mixed $now
      */
     protected function collectCandidates(array $context, $now): Collection
     {
@@ -88,7 +88,7 @@ class DiscountEngine
     /**
      * Handle filterEligibility functionality with proper error handling.
      *
-     * @param  mixed  $now
+     * @param mixed $now
      */
     protected function filterEligibility(Collection $discounts, array $context, $now): Collection
     {
@@ -358,18 +358,18 @@ class DiscountEngine
     /**
      * Handle compareOperator functionality with proper error handling.
      *
-     * @param  mixed  $left
-     * @param  mixed  $rawValue
+     * @param mixed $left
+     * @param mixed $rawValue
      */
     protected function compareOperator($left, string $operator, $rawValue): bool
     {
         $value = is_numeric($rawValue) ? Number::parseFloat($rawValue) : Number::parseFloat(is_string($rawValue) ? json_decode($rawValue, true) : $rawValue);
 
         return match ($operator) {
-            'equals_to' => (float) $left == $value,
+            'equals_to'     => (float) $left == $value,
             'not_equals_to' => (float) $left != $value,
-            'less_than' => (float) $left < $value,
-            'greater_than' => (float) $left > $value,
+            'less_than'     => (float) $left < $value,
+            'greater_than'  => (float) $left > $value,
             'starts_with', 'ends_with', 'contains', 'not_contains' => true,
             default => true,
         };
@@ -378,8 +378,8 @@ class DiscountEngine
     /**
      * Handle itemMatches functionality with proper error handling.
      *
-     * @param  mixed  $productToBrand
-     * @param  mixed  $productToCategories
+     * @param mixed $productToBrand
+     * @param mixed $productToCategories
      */
     protected function itemMatches(array $item, Collection $conditions, $productToBrand, $productToCategories): bool
     {

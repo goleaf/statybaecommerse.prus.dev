@@ -23,7 +23,7 @@ final class NewsImageResourceTest extends TestCase
 
         // Create admin user with proper permissions
         $this->admin = User::factory()->create([
-            'email' => 'admin@example.com',
+            'email'    => 'admin@example.com',
             'is_admin' => true,
         ]);
 
@@ -31,21 +31,21 @@ final class NewsImageResourceTest extends TestCase
 
         // Create test news
         $this->news = News::factory()->create([
-            'is_visible' => true,
+            'is_visible'   => true,
             'published_at' => now(),
         ]);
 
         // Create test news image
         $this->newsImage = NewsImage::factory()->create([
-            'news_id' => $this->news->id,
-            'file_path' => 'news-images/test-image.jpg',
-            'alt_text' => 'Test image alt text',
-            'caption' => 'Test image caption',
+            'news_id'     => $this->news->id,
+            'file_path'   => 'news-images/test-image.jpg',
+            'alt_text'    => 'Test image alt text',
+            'caption'     => 'Test image caption',
             'is_featured' => true,
-            'sort_order' => 1,
-            'file_size' => 1024000,  // 1MB
-            'mime_type' => 'image/jpeg',
-            'dimensions' => ['width' => 800, 'height' => 600],
+            'sort_order'  => 1,
+            'file_size'   => 1024000,  // 1MB
+            'mime_type'   => 'image/jpeg',
+            'dimensions'  => ['width' => 800, 'height' => 600],
         ]);
     }
 
@@ -64,7 +64,7 @@ final class NewsImageResourceTest extends TestCase
     {
         $this->actingAs($this->admin);
 
-        $response = $this->get('/admin/news-images/'.$this->newsImage->id);
+        $response = $this->get('/admin/news-images/' . $this->newsImage->id);
 
         $response->assertOk();
         $response->assertSee('Test image alt text');
@@ -85,7 +85,7 @@ final class NewsImageResourceTest extends TestCase
     {
         $this->actingAs($this->admin);
 
-        $response = $this->get('/admin/news-images/'.$this->newsImage->id.'/edit');
+        $response = $this->get('/admin/news-images/' . $this->newsImage->id . '/edit');
 
         $response->assertOk();
         $response->assertSee('Edit News Image');
@@ -95,7 +95,7 @@ final class NewsImageResourceTest extends TestCase
     {
         $this->actingAs($this->admin);
 
-        $response = $this->get('/admin/news-images?filter[news_id]='.$this->news->id);
+        $response = $this->get('/admin/news-images?filter[news_id]=' . $this->news->id);
 
         $response->assertOk();
         $response->assertSee('Test image alt text');
@@ -145,7 +145,7 @@ final class NewsImageResourceTest extends TestCase
     {
         // Create image without alt text
         NewsImage::factory()->create([
-            'news_id' => $this->news->id,
+            'news_id'  => $this->news->id,
             'alt_text' => null,
         ]);
 
@@ -170,12 +170,12 @@ final class NewsImageResourceTest extends TestCase
     {
         // Create additional images with different sort orders
         NewsImage::factory()->create([
-            'news_id' => $this->news->id,
+            'news_id'    => $this->news->id,
             'sort_order' => 3,
         ]);
 
         NewsImage::factory()->create([
-            'news_id' => $this->news->id,
+            'news_id'    => $this->news->id,
             'sort_order' => 2,
         ]);
 
@@ -229,7 +229,7 @@ final class NewsImageResourceTest extends TestCase
     {
         $this->actingAs($this->admin);
 
-        $response = $this->post('/admin/news-images/'.$this->newsImage->id.'/duplicate');
+        $response = $this->post('/admin/news-images/' . $this->newsImage->id . '/duplicate');
 
         $response->assertRedirect();
 
@@ -244,7 +244,7 @@ final class NewsImageResourceTest extends TestCase
     {
         $this->actingAs($this->admin);
 
-        $response = $this->get('/admin/news-images/'.$this->newsImage->id.'/download');
+        $response = $this->get('/admin/news-images/' . $this->newsImage->id . '/download');
 
         $response->assertOk();
     }
@@ -253,7 +253,7 @@ final class NewsImageResourceTest extends TestCase
     {
         // Create additional images
         $images = NewsImage::factory()->count(3)->create([
-            'news_id' => $this->news->id,
+            'news_id'     => $this->news->id,
             'is_featured' => false,
         ]);
 
@@ -275,7 +275,7 @@ final class NewsImageResourceTest extends TestCase
     {
         // Create additional images
         $images = NewsImage::factory()->count(3)->create([
-            'news_id' => $this->news->id,
+            'news_id'     => $this->news->id,
             'is_featured' => true,
         ]);
 
@@ -378,7 +378,7 @@ final class NewsImageResourceTest extends TestCase
         $this->actingAs($this->admin);
 
         $response = $this->post('/admin/news-images', [
-            'news_id' => '',  // Required field
+            'news_id'   => '',  // Required field
             'file_path' => '',  // Required field
         ]);
 
@@ -390,7 +390,7 @@ final class NewsImageResourceTest extends TestCase
         $this->actingAs($this->admin);
 
         $response = $this->post('/admin/news-images', [
-            'news_id' => $this->news->id,
+            'news_id'   => $this->news->id,
             'file_path' => 'invalid-file.txt',  // Invalid file type
         ]);
 
@@ -402,8 +402,8 @@ final class NewsImageResourceTest extends TestCase
         $this->actingAs($this->admin);
 
         $response = $this->post('/admin/news-images', [
-            'news_id' => $this->news->id,
-            'file_path' => 'news-images/test.jpg',
+            'news_id'    => $this->news->id,
+            'file_path'  => 'news-images/test.jpg',
             'sort_order' => -1,  // Invalid negative value
         ]);
 
@@ -415,9 +415,9 @@ final class NewsImageResourceTest extends TestCase
         $this->actingAs($this->admin);
 
         $response = $this->post('/admin/news-images', [
-            'news_id' => $this->news->id,
+            'news_id'   => $this->news->id,
             'file_path' => 'news-images/test.jpg',
-            'alt_text' => str_repeat('a', 256),  // Too long
+            'alt_text'  => str_repeat('a', 256),  // Too long
         ]);
 
         $response->assertSessionHasErrors(['alt_text']);
@@ -428,9 +428,9 @@ final class NewsImageResourceTest extends TestCase
         $this->actingAs($this->admin);
 
         $response = $this->post('/admin/news-images', [
-            'news_id' => $this->news->id,
+            'news_id'   => $this->news->id,
             'file_path' => 'news-images/test.jpg',
-            'caption' => str_repeat('a', 501),  // Too long
+            'caption'   => str_repeat('a', 501),  // Too long
         ]);
 
         $response->assertSessionHasErrors(['caption']);
@@ -448,10 +448,10 @@ final class NewsImageResourceTest extends TestCase
         file_put_contents($testFile, 'fake image content');
 
         $response = $this->post('/admin/news-images', [
-            'news_id' => $this->news->id,
+            'news_id'   => $this->news->id,
             'file_path' => 'news-images/test.jpg',
-            'alt_text' => 'Test alt text',
-            'caption' => 'Test caption',
+            'alt_text'  => 'Test alt text',
+            'caption'   => 'Test caption',
         ]);
 
         $response->assertRedirect();
@@ -469,9 +469,9 @@ final class NewsImageResourceTest extends TestCase
         $this->actingAs($this->admin);
 
         $response = $this->post('/admin/news-images', [
-            'news_id' => $this->news->id,
+            'news_id'   => $this->news->id,
             'file_path' => 'news-images/test.jpg',
-            'alt_text' => 'Test alt text',
+            'alt_text'  => 'Test alt text',
         ]);
 
         $response->assertRedirect();

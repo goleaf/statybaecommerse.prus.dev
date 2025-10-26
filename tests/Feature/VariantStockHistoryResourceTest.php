@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace Tests\Feature;
 
@@ -35,27 +37,27 @@ class VariantStockHistoryResourceTest extends TestCase
 
         Livewire::test(\App\Filament\Resources\VariantStockHistoryResource\Pages\CreateVariantStockHistory::class)
             ->fillForm([
-                'variant_id' => $variant->id,
-                'old_quantity' => 10,
-                'new_quantity' => 15,
-                'change_type' => 'increase',
-                'change_reason' => 'manual',
-                'changed_by' => $user->id,
+                'variant_id'     => $variant->id,
+                'old_quantity'   => 10,
+                'new_quantity'   => 15,
+                'change_type'    => 'increase',
+                'change_reason'  => 'manual',
+                'changed_by'     => $user->id,
                 'reference_type' => 'order',
-                'reference_id' => 123,
+                'reference_id'   => 123,
             ])
             ->call('create')
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('variant_stock_history', [
-            'variant_id' => $variant->id,
-            'old_quantity' => 10,
-            'new_quantity' => 15,
-            'change_type' => 'increase',
-            'change_reason' => 'manual',
-            'changed_by' => $user->id,
+            'variant_id'     => $variant->id,
+            'old_quantity'   => 10,
+            'new_quantity'   => 15,
+            'change_type'    => 'increase',
+            'change_reason'  => 'manual',
+            'changed_by'     => $user->id,
             'reference_type' => 'order',
-            'reference_id' => 123,
+            'reference_id'   => 123,
         ]);
     }
 
@@ -73,7 +75,7 @@ class VariantStockHistoryResourceTest extends TestCase
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('variant_stock_history', [
-            'id' => $stockHistory->id,
+            'id'            => $stockHistory->id,
             'change_reason' => 'sale',
         ]);
     }
@@ -86,7 +88,7 @@ class VariantStockHistoryResourceTest extends TestCase
             'record' => $stockHistory->getRouteKey(),
         ])
             ->assertFormSet([
-                'variant_id' => $stockHistory->variant_id,
+                'variant_id'   => $stockHistory->variant_id,
                 'old_quantity' => $stockHistory->old_quantity,
                 'new_quantity' => $stockHistory->new_quantity,
             ]);
@@ -167,7 +169,7 @@ class VariantStockHistoryResourceTest extends TestCase
     {
         Livewire::test(\App\Filament\Resources\VariantStockHistoryResource\Pages\CreateVariantStockHistory::class)
             ->fillForm([
-                'variant_id' => null,
+                'variant_id'   => null,
                 'new_quantity' => -1,
             ])
             ->call('create')

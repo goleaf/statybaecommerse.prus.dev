@@ -8,8 +8,6 @@ use App\Data\SearchQueryData;
 use App\Repositories\Search\BrandSearchRepository;
 use App\Repositories\Search\CategorySearchRepository;
 use App\Repositories\Search\ProductSearchRepository;
-use App\Services\Search\ScoutSearchEngine;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 
 final class SearchService
@@ -53,12 +51,12 @@ final class SearchService
         }
 
         $cachePayload = array_merge($queryData->context(), [
-            'page' => $queryData->page(),
+            'page'     => $queryData->page(),
             'per_page' => $queryData->perPage(),
-            'types' => $queryData->types(),
-            'filters' => $queryData->filters(),
-            'sort' => $queryData->sort(),
-            'locale' => app()->getLocale(),
+            'types'    => $queryData->types(),
+            'filters'  => $queryData->filters(),
+            'sort'     => $queryData->sort(),
+            'locale'   => app()->getLocale(),
         ]);
         $cacheKey = $this->cacheService->generateCacheKey($queryData->query(), $cachePayload);
 
@@ -85,9 +83,9 @@ final class SearchService
         $pageResults = array_slice($ranked, $offset, $queryData->perPage());
 
         $bucketCounts = [
-            'product' => count($buckets['product'] ?? []),
+            'product'  => count($buckets['product'] ?? []),
             'category' => count($buckets['category'] ?? []),
-            'brand' => count($buckets['brand'] ?? []),
+            'brand'    => count($buckets['brand'] ?? []),
         ];
 
         $groupedResults = $this->groupResultsByType($pageResults, $bucketCounts);
@@ -99,20 +97,20 @@ final class SearchService
         $payload = [
             'data' => $dataPayload,
             'meta' => [
-                'query' => $originalQuery,
-                'page' => $queryData->page(),
-                'per_page' => $queryData->perPage(),
-                'max_per_page' => SearchQueryData::MAX_PER_PAGE,
+                'query'         => $originalQuery,
+                'page'          => $queryData->page(),
+                'per_page'      => $queryData->perPage(),
+                'max_per_page'  => SearchQueryData::MAX_PER_PAGE,
                 'total_results' => $total,
-                'returned' => $returnedCount,
-                'has_more' => ($offset + count($pageResults)) < $total,
-                'took_ms' => (int) round((microtime(true) - $started) * 1000),
-                'types' => $queryData->types(),
-                'filters' => $queryData->filters(),
-                'sort' => $queryData->sort(),
-                'cached' => false,
+                'returned'      => $returnedCount,
+                'has_more'      => ($offset + count($pageResults)) < $total,
+                'took_ms'       => (int) round((microtime(true) - $started) * 1000),
+                'types'         => $queryData->types(),
+                'filters'       => $queryData->filters(),
+                'sort'          => $queryData->sort(),
+                'cached'        => false,
             ],
-            'buckets' => $bucketCounts,
+            'buckets'    => $bucketCounts,
             'correction' => null,
         ];
 
@@ -150,10 +148,10 @@ final class SearchService
         $perPage = $limit ?? SearchQueryData::DEFAULT_PER_PAGE;
 
         return SearchQueryData::fromArray([
-            'query' => $query,
-            'page' => 1,
+            'query'    => $query,
+            'page'     => 1,
             'per_page' => $perPage,
-            'types' => ['product', 'category', 'brand'],
+            'types'    => ['product', 'category', 'brand'],
         ], [
             'source' => 'legacy-search',
             'locale' => app()->getLocale(),
@@ -218,9 +216,9 @@ final class SearchService
     private function resolveBucketLimits(int $perPage): array
     {
         $limits = [
-            'product' => max(1, (int) ceil($perPage * self::PRODUCT_RATIO * 2)),
+            'product'  => max(1, (int) ceil($perPage * self::PRODUCT_RATIO * 2)),
             'category' => max(1, (int) ceil($perPage * self::CATEGORY_RATIO * 2)),
-            'brand' => max(1, (int) ceil($perPage * self::BRAND_RATIO * 2)),
+            'brand'    => max(1, (int) ceil($perPage * self::BRAND_RATIO * 2)),
         ];
 
         $limits['product'] = max($limits['product'], $perPage);
@@ -238,31 +236,31 @@ final class SearchService
     private function blockedAggregatedPayload(SearchQueryData $queryData, ?string $originalQuery = null): array
     {
         $bucketCounts = [
-            'product' => 0,
+            'product'  => 0,
             'category' => 0,
-            'brand' => 0,
+            'brand'    => 0,
         ];
 
         return [
             'data' => [],
             'meta' => [
-                'query' => $originalQuery ?? $queryData->query(),
-                'page' => $queryData->page(),
-                'per_page' => $queryData->perPage(),
-                'max_per_page' => SearchQueryData::MAX_PER_PAGE,
+                'query'         => $originalQuery ?? $queryData->query(),
+                'page'          => $queryData->page(),
+                'per_page'      => $queryData->perPage(),
+                'max_per_page'  => SearchQueryData::MAX_PER_PAGE,
                 'total_results' => 0,
-                'returned' => 0,
-                'has_more' => false,
-                'took_ms' => 0,
-                'types' => $queryData->types(),
-                'filters' => $queryData->filters(),
-                'sort' => $queryData->sort(),
-                'cached' => false,
-                'blocked' => true,
+                'returned'      => 0,
+                'has_more'      => false,
+                'took_ms'       => 0,
+                'types'         => $queryData->types(),
+                'filters'       => $queryData->filters(),
+                'sort'          => $queryData->sort(),
+                'cached'        => false,
+                'blocked'       => true,
             ],
-            'buckets' => $bucketCounts,
+            'buckets'      => $bucketCounts,
             'aggregations' => $this->groupResultsByType([], $bucketCounts),
-            'correction' => null,
+            'correction'   => null,
         ];
     }
 
@@ -272,9 +270,9 @@ final class SearchService
     private function emptyAggregatedPayload(SearchQueryData $queryData, ?string $originalQuery = null): array
     {
         $bucketCounts = [
-            'product' => 0,
+            'product'  => 0,
             'category' => 0,
-            'brand' => 0,
+            'brand'    => 0,
         ];
 
         // We keep the meta structure identical to successful searches so the
@@ -282,16 +280,16 @@ final class SearchService
         return [
             'data' => $this->groupResultsByType([], $bucketCounts),
             'meta' => [
-                'query' => $originalQuery ?? $queryData->query(),
-                'page' => $queryData->page(),
-                'per_page' => $queryData->perPage(),
-                'max_per_page' => SearchQueryData::MAX_PER_PAGE,
+                'query'         => $originalQuery ?? $queryData->query(),
+                'page'          => $queryData->page(),
+                'per_page'      => $queryData->perPage(),
+                'max_per_page'  => SearchQueryData::MAX_PER_PAGE,
                 'total_results' => 0,
-                'returned' => 0,
-                'has_more' => false,
-                'took_ms' => 0,
-                'types' => $queryData->types(),
-                'cached' => false,
+                'returned'      => 0,
+                'has_more'      => false,
+                'took_ms'       => 0,
+                'types'         => $queryData->types(),
+                'cached'        => false,
             ],
             'buckets' => $bucketCounts,
         ];
@@ -313,8 +311,8 @@ final class SearchService
     }
 
     /**
-     * @param  array<int, array<string, mixed>>  $results
-     * @param  array{product:int,category:int,brand:int}  $bucketCounts
+     * @param  array<int, array<string, mixed>>                                                                                                                                                                                     $results
+     * @param  array{product:int,category:int,brand:int}                                                                                                                                                                            $bucketCounts
      * @return array{products: array{items: array<int, array<string, mixed>>, total:int}, categories: array{items: array<int, array<string, mixed>>, total:int}, brands: array{items: array<int, array<string, mixed>>, total:int}}
      */
     private function groupResultsByType(array $results, array $bucketCounts): array
@@ -327,10 +325,10 @@ final class SearchService
             }
 
             $key = match ($result['type'] ?? null) {
-                'product' => 'products',
+                'product'  => 'products',
                 'category' => 'categories',
-                'brand' => 'brands',
-                default => null,
+                'brand'    => 'brands',
+                default    => null,
             };
 
             if ($key === null) {
@@ -349,7 +347,7 @@ final class SearchService
     }
 
     /**
-     * @param  array{product:int,category:int,brand:int}  $bucketCounts
+     * @param  array{product:int,category:int,brand:int}                                                                                                                                                                            $bucketCounts
      * @return array{products: array{items: array<int, array<string, mixed>>, total:int}, categories: array{items: array<int, array<string, mixed>>, total:int}, brands: array{items: array<int, array<string, mixed>>, total:int}}
      */
     private function bucketSkeleton(array $bucketCounts): array
@@ -393,9 +391,9 @@ final class SearchService
 
         return [
             'suggested_query' => $candidates[0],
-            'alternatives' => array_values(array_slice($candidates, 1)),
-            'applied' => false,
-            'reason' => 'no_results_fuzzy_match',
+            'alternatives'    => array_values(array_slice($candidates, 1)),
+            'applied'         => false,
+            'reason'          => 'no_results_fuzzy_match',
         ];
     }
 
@@ -424,8 +422,8 @@ final class SearchService
 
         if ($original === '') {
             return [
-                'query' => '',
-                'blocked' => false,
+                'query'    => '',
+                'blocked'  => false,
                 'modified' => false,
             ];
         }
@@ -453,6 +451,7 @@ final class SearchService
 
             if ($stripped === '') {
                 $modified = true;
+
                 continue;
             }
 
@@ -461,27 +460,32 @@ final class SearchService
             if (str_contains($stripped, '%') || str_contains($stripped, '_')) {
                 $blocked = true;
                 $modified = true;
+
                 continue;
             }
 
             if (preg_match('/[=<>]/', $stripped) === 1) {
                 $modified = true;
+
                 continue;
             }
 
             if (in_array($lower, $reservedKeywords, true)) {
                 $blocked = true;
                 $modified = true;
+
                 continue;
             }
 
             if (in_array($lower, $logicalOperators, true)) {
                 $modified = true;
+
                 continue;
             }
 
             if (preg_match('/^[\\p{L}\\p{N}\\-\\+\\/]+$/u', $stripped) !== 1) {
                 $modified = true;
+
                 continue;
             }
 
@@ -495,8 +499,8 @@ final class SearchService
         }
 
         return [
-            'query' => $cleaned,
-            'blocked' => $blocked,
+            'query'    => $cleaned,
+            'blocked'  => $blocked,
             'modified' => $modified || $cleaned !== $original,
         ];
     }

@@ -68,8 +68,8 @@ class TaxPrice extends Component
         $taxRateDecimal = $calculator->getTaxRate(null, false);
 
         return [
-            'tax_rate' => $taxRatePercent,
-            'tax_amount' => $this->taxAmount,
+            'tax_rate'       => $taxRatePercent,
+            'tax_amount'     => $this->taxAmount,
             'taxable_amount' => $taxRateDecimal > 0 ? $this->taxAmount / $taxRateDecimal : 0.0,
         ];
     }

@@ -37,7 +37,7 @@ final class CampaignSchedule extends Model
      */
     protected $attributes = [
         'schedule_config' => '[]',
-        'is_active' => true,
+        'is_active'       => true,
     ];
 
     /**
@@ -47,10 +47,10 @@ final class CampaignSchedule extends Model
     {
         return [
             'schedule_config' => 'array',
-            'next_run_at' => 'datetime',
-            'last_run_at' => 'datetime',
-            'schedule_type' => ScheduleType::class,
-            'is_active' => 'boolean',
+            'next_run_at'     => 'datetime',
+            'last_run_at'     => 'datetime',
+            'schedule_type'   => ScheduleType::class,
+            'is_active'       => 'boolean',
         ];
     }
 

@@ -16,17 +16,17 @@ final class SimpleCountrySeeder extends Seeder
         $lithuania = Country::firstOrCreate(
             ['cca2' => 'LT'],
             [
-                'cca2' => 'LT',
-                'cca3' => 'LTU',
+                'cca2'               => 'LT',
+                'cca3'               => 'LTU',
                 'phone_calling_code' => '370',
-                'flag' => '🇱🇹',
-                'region' => 'Europe',
-                'subregion' => 'Northern Europe',
-                'latitude' => 55.169438,
-                'longitude' => 23.881275,
-                'currencies' => ['EUR'],
-                'is_enabled' => true,
-                'sort_order' => 1,
+                'flag'               => '🇱🇹',
+                'region'             => 'Europe',
+                'subregion'          => 'Northern Europe',
+                'latitude'           => 55.169438,
+                'longitude'          => 23.881275,
+                'currencies'         => ['EUR'],
+                'is_enabled'         => true,
+                'sort_order'         => 1,
             ]
         );
 
@@ -34,7 +34,7 @@ final class SimpleCountrySeeder extends Seeder
         CountryTranslation::firstOrCreate(
             ['country_id' => $lithuania->id, 'locale' => 'lt'],
             [
-                'name' => 'Lietuva',
+                'name'          => 'Lietuva',
                 'name_official' => 'Lietuvos Respublika',
             ]
         );
@@ -42,7 +42,7 @@ final class SimpleCountrySeeder extends Seeder
         CountryTranslation::firstOrCreate(
             ['country_id' => $lithuania->id, 'locale' => 'en'],
             [
-                'name' => 'Lithuania',
+                'name'          => 'Lithuania',
                 'name_official' => 'Republic of Lithuania',
             ]
         );
@@ -51,17 +51,17 @@ final class SimpleCountrySeeder extends Seeder
         $germany = Country::firstOrCreate(
             ['cca2' => 'DE'],
             [
-                'cca2' => 'DE',
-                'cca3' => 'DEU',
+                'cca2'               => 'DE',
+                'cca3'               => 'DEU',
                 'phone_calling_code' => '49',
-                'flag' => '🇩🇪',
-                'region' => 'Europe',
-                'subregion' => 'Central Europe',
-                'latitude' => 51.165691,
-                'longitude' => 10.451526,
-                'currencies' => ['EUR'],
-                'is_enabled' => true,
-                'sort_order' => 2,
+                'flag'               => '🇩🇪',
+                'region'             => 'Europe',
+                'subregion'          => 'Central Europe',
+                'latitude'           => 51.165691,
+                'longitude'          => 10.451526,
+                'currencies'         => ['EUR'],
+                'is_enabled'         => true,
+                'sort_order'         => 2,
             ]
         );
 
@@ -69,7 +69,7 @@ final class SimpleCountrySeeder extends Seeder
         CountryTranslation::firstOrCreate(
             ['country_id' => $germany->id, 'locale' => 'lt'],
             [
-                'name' => 'Vokietija',
+                'name'          => 'Vokietija',
                 'name_official' => 'Vokietijos Federacinė Respublika',
             ]
         );
@@ -77,7 +77,7 @@ final class SimpleCountrySeeder extends Seeder
         CountryTranslation::firstOrCreate(
             ['country_id' => $germany->id, 'locale' => 'en'],
             [
-                'name' => 'Germany',
+                'name'          => 'Germany',
                 'name_official' => 'Federal Republic of Germany',
             ]
         );
@@ -86,17 +86,17 @@ final class SimpleCountrySeeder extends Seeder
         $usa = Country::firstOrCreate(
             ['cca2' => 'US'],
             [
-                'cca2' => 'US',
-                'cca3' => 'USA',
+                'cca2'               => 'US',
+                'cca3'               => 'USA',
                 'phone_calling_code' => '1',
-                'flag' => '🇺🇸',
-                'region' => 'Americas',
-                'subregion' => 'North America',
-                'latitude' => 37.09024,
-                'longitude' => -95.712891,
-                'currencies' => ['USD'],
-                'is_enabled' => true,
-                'sort_order' => 3,
+                'flag'               => '🇺🇸',
+                'region'             => 'Americas',
+                'subregion'          => 'North America',
+                'latitude'           => 37.09024,
+                'longitude'          => -95.712891,
+                'currencies'         => ['USD'],
+                'is_enabled'         => true,
+                'sort_order'         => 3,
             ]
         );
 
@@ -104,7 +104,7 @@ final class SimpleCountrySeeder extends Seeder
         CountryTranslation::firstOrCreate(
             ['country_id' => $usa->id, 'locale' => 'lt'],
             [
-                'name' => 'Jungtinės Amerikos Valstijos',
+                'name'          => 'Jungtinės Amerikos Valstijos',
                 'name_official' => 'Amerikos Jungtinės Valstijos',
             ]
         );
@@ -112,11 +112,11 @@ final class SimpleCountrySeeder extends Seeder
         CountryTranslation::firstOrCreate(
             ['country_id' => $usa->id, 'locale' => 'en'],
             [
-                'name' => 'United States',
+                'name'          => 'United States',
                 'name_official' => 'United States of America',
             ]
         );
 
-        $this->command->info('Created '.Country::count().' countries with '.CountryTranslation::count().' translations.');
+        $this->command->info('Created ' . Country::count() . ' countries with ' . CountryTranslation::count() . ' translations.');
     }
 }

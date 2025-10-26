@@ -43,7 +43,7 @@ final class NotificationSearchParametersData
 
     public function apply(Builder $builder): Builder
     {
-        $term = '%'.$this->term.'%';
+        $term = '%' . $this->term . '%';
 
         $builder->where(static function (Builder $query) use ($term): void {
             $query->where('data->title', 'like', $term)

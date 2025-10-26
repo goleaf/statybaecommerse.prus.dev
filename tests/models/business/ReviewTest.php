@@ -8,6 +8,7 @@ use App\Models\Product;
 use App\Models\Review;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use InvalidArgumentException;
 use Tests\TestCase;
 
 final class ReviewTest extends TestCase
@@ -18,14 +19,14 @@ final class ReviewTest extends TestCase
     {
         return Product::factory()->create([
             'name' => 'Test Product',
-            'sku' => 'TEST001',
+            'sku'  => 'TEST001',
         ]);
     }
 
     private function createTestUser(): User
     {
         return User::factory()->create([
-            'name' => 'Test User',
+            'name'  => 'Test User',
             'email' => 'test@example.com',
         ]);
     }
@@ -36,16 +37,16 @@ final class ReviewTest extends TestCase
         $user = $this->createTestUser();
 
         $review = Review::factory()->create([
-            'product_id' => $product->id,
-            'user_id' => $user->id,
-            'reviewer_name' => 'John Doe',
+            'product_id'     => $product->id,
+            'user_id'        => $user->id,
+            'reviewer_name'  => 'John Doe',
             'reviewer_email' => 'john@example.com',
-            'rating' => 5,
-            'title' => 'Great Product',
-            'content' => 'This product is amazing!',
-            'is_approved' => false,
-            'is_featured' => false,
-            'locale' => 'en',
+            'rating'         => 5,
+            'title'          => 'Great Product',
+            'content'        => 'This product is amazing!',
+            'is_approved'    => false,
+            'is_featured'    => false,
+            'locale'         => 'en',
         ]);
 
         $this->assertInstanceOf(Review::class, $review);
@@ -66,8 +67,8 @@ final class ReviewTest extends TestCase
         $product = $this->createTestProduct();
         $review = Review::factory()->create([
             'product_id' => $product->id,
-            'title' => 'Original Title',
-            'content' => 'Original Comment',
+            'title'      => 'Original Title',
+            'content'    => 'Original Comment',
         ]);
 
         // Test translation methods
@@ -76,7 +77,7 @@ final class ReviewTest extends TestCase
 
         // Test with translation
         $review->updateTranslation('en', [
-            'title' => 'English Title',
+            'title'   => 'English Title',
             'content' => 'English Comment',
         ]);
 
@@ -93,22 +94,22 @@ final class ReviewTest extends TestCase
 
         // Create test reviews with specific attributes
         $approvedReview = Review::factory()->create([
-            'product_id' => $product->id,
+            'product_id'  => $product->id,
             'is_approved' => true,
-            'rating' => 5,
+            'rating'      => 5,
         ]);
         $pendingReview = Review::factory()->create([
-            'product_id' => $product->id,
+            'product_id'  => $product->id,
             'is_approved' => false,
             'rejected_at' => null,
         ]);
         $featuredReview = Review::factory()->create([
-            'product_id' => $product->id,
+            'product_id'  => $product->id,
             'is_featured' => true,
         ]);
         $highRatedReview = Review::factory()->create([
             'product_id' => $product->id,
-            'rating' => 5,
+            'rating'     => 5,
         ]);
 
         // Test approved scope
@@ -136,11 +137,11 @@ final class ReviewTest extends TestCase
     {
         $product = $this->createTestProduct();
         $review = Review::factory()->create([
-            'product_id' => $product->id,
-            'rating' => 4,
+            'product_id'  => $product->id,
+            'rating'      => 4,
             'is_approved' => true,
             'is_featured' => false,
-            'title' => 'Great Product',
+            'title'       => 'Great Product',
         ]);
 
         // Test info methods
@@ -175,7 +176,7 @@ final class ReviewTest extends TestCase
 
         // Test approved review
         $approvedReview = Review::factory()->create([
-            'product_id' => $product->id,
+            'product_id'  => $product->id,
             'is_approved' => true,
         ]);
         $this->assertEquals('approved', $approvedReview->getStatus());
@@ -185,7 +186,7 @@ final class ReviewTest extends TestCase
 
         // Test rejected review
         $rejectedReview = Review::factory()->create([
-            'product_id' => $product->id,
+            'product_id'  => $product->id,
             'is_approved' => false,
             'rejected_at' => now(),
         ]);
@@ -196,7 +197,7 @@ final class ReviewTest extends TestCase
 
         // Test pending review
         $pendingReview = Review::factory()->create([
-            'product_id' => $product->id,
+            'product_id'  => $product->id,
             'is_approved' => false,
             'rejected_at' => null,
         ]);
@@ -213,7 +214,7 @@ final class ReviewTest extends TestCase
         // Test 5-star review
         $excellentReview = Review::factory()->create([
             'product_id' => $product->id,
-            'rating' => 5,
+            'rating'     => 5,
         ]);
         $this->assertTrue($excellentReview->isHighRated());
         $this->assertFalse($excellentReview->isLowRated());
@@ -222,7 +223,7 @@ final class ReviewTest extends TestCase
         // Test 1-star review
         $poorReview = Review::factory()->create([
             'product_id' => $product->id,
-            'rating' => 1,
+            'rating'     => 1,
         ]);
         $this->assertFalse($poorReview->isHighRated());
         $this->assertTrue($poorReview->isLowRated());
@@ -231,7 +232,7 @@ final class ReviewTest extends TestCase
         // Test 3-star review
         $averageReview = Review::factory()->create([
             'product_id' => $product->id,
-            'rating' => 3,
+            'rating'     => 3,
         ]);
         $this->assertFalse($averageReview->isHighRated());
         $this->assertFalse($averageReview->isLowRated());
@@ -242,7 +243,7 @@ final class ReviewTest extends TestCase
     {
         $product = $this->createTestProduct();
         $review = Review::factory()->create([
-            'product_id' => $product->id,
+            'product_id'  => $product->id,
             'is_approved' => false,
             'approved_at' => null,
             'rejected_at' => null,
@@ -268,7 +269,7 @@ final class ReviewTest extends TestCase
 
         // Test can be featured
         $approvedReview = Review::factory()->create([
-            'product_id' => $product->id,
+            'product_id'  => $product->id,
             'is_approved' => true,
             'is_featured' => false,
         ]);
@@ -277,7 +278,7 @@ final class ReviewTest extends TestCase
 
         // Test can be unfeatured
         $featuredReview = Review::factory()->create([
-            'product_id' => $product->id,
+            'product_id'  => $product->id,
             'is_approved' => true,
             'is_featured' => true,
         ]);
@@ -291,7 +292,7 @@ final class ReviewTest extends TestCase
         $user = $this->createTestUser();
         $review = Review::factory()->create([
             'product_id' => $product->id,
-            'user_id' => $user->id,
+            'user_id'    => $user->id,
         ]);
 
         // Test product relation
@@ -312,8 +313,8 @@ final class ReviewTest extends TestCase
         $product = $this->createTestProduct();
         $review = Review::factory()->create([
             'product_id' => $product->id,
-            'title' => 'Original Title',
-            'content' => 'Original Comment',
+            'title'      => 'Original Title',
+            'content'    => 'Original Comment',
         ]);
 
         // Test available locales (should be empty initially)
@@ -329,7 +330,7 @@ final class ReviewTest extends TestCase
 
         // Test update translation
         $this->assertTrue($review->updateTranslation('en', [
-            'title' => 'English Title',
+            'title'   => 'English Title',
             'content' => 'English Comment',
         ]));
 
@@ -343,8 +344,8 @@ final class ReviewTest extends TestCase
         $product = $this->createTestProduct();
         $review = Review::factory()->create([
             'product_id' => $product->id,
-            'title' => 'Great Product',
-            'rating' => 4,
+            'title'      => 'Great Product',
+            'rating'     => 4,
         ]);
 
         $displayName = $review->getFullDisplayName();
@@ -358,15 +359,15 @@ final class ReviewTest extends TestCase
         // Test valid rating
         $review = Review::factory()->create([
             'product_id' => $product->id,
-            'rating' => 3,
+            'rating'     => 3,
         ]);
         $this->assertEquals(3, $review->rating);
 
         // Test invalid rating (should throw exception)
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         Review::factory()->create([
             'product_id' => $product->id,
-            'rating' => 6, // Invalid rating
+            'rating'     => 6, // Invalid rating
         ]);
     }
 

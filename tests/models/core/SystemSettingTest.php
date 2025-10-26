@@ -40,14 +40,14 @@ final class SystemSettingTest extends TestCase
 
         // Create translations
         $setting->translations()->create([
-            'locale' => 'lt',
-            'name' => 'Lietuviškas pavadinimas',
+            'locale'      => 'lt',
+            'name'        => 'Lietuviškas pavadinimas',
             'description' => 'Lietuviškas aprašymas',
         ]);
 
         $setting->translations()->create([
-            'locale' => 'en',
-            'name' => 'English Name',
+            'locale'      => 'en',
+            'name'        => 'English Name',
             'description' => 'English Description',
         ]);
 
@@ -61,9 +61,9 @@ final class SystemSettingTest extends TestCase
         $setting = SystemSetting::factory()->create();
 
         $setting->history()->create([
-            'old_value' => 'old',
-            'new_value' => 'new',
-            'changed_by' => User::factory()->create()->id,
+            'old_value'     => 'old',
+            'new_value'     => 'new',
+            'changed_by'    => User::factory()->create()->id,
             'change_reason' => 'Test change',
         ]);
 
@@ -77,10 +77,10 @@ final class SystemSettingTest extends TestCase
         $setting2 = SystemSetting::factory()->create();
 
         $dependency = SystemSettingDependency::create([
-            'setting_id' => $setting1->id,
+            'setting_id'            => $setting1->id,
             'depends_on_setting_id' => $setting2->id,
-            'condition' => 'equals',
-            'condition_value' => 'test',
+            'condition'             => 'equals',
+            'condition_value'       => 'test',
         ]);
 
         $this->assertCount(1, $setting1->dependencies);
@@ -115,8 +115,8 @@ final class SystemSettingTest extends TestCase
         $category = SystemSettingCategory::factory()->create();
 
         $category->translations()->create([
-            'locale' => 'lt',
-            'name' => 'Lietuviška kategorija',
+            'locale'      => 'lt',
+            'name'        => 'Lietuviška kategorija',
             'description' => 'Lietuviškas aprašymas',
         ]);
 
@@ -141,7 +141,7 @@ final class SystemSettingTest extends TestCase
     public function test_system_setting_category_helper_methods(): void
     {
         $category = SystemSettingCategory::factory()->create([
-            'icon' => 'heroicon-o-cog',
+            'icon'  => 'heroicon-o-cog',
             'color' => 'primary',
         ]);
 
@@ -186,12 +186,12 @@ final class SystemSettingTest extends TestCase
 
         SystemSettingHistory::factory()->create([
             'system_setting_id' => $setting->id,
-            'created_at' => now()->subDays(5),
+            'created_at'        => now()->subDays(5),
         ]);
 
         SystemSettingHistory::factory()->create([
             'system_setting_id' => $setting->id,
-            'created_at' => now()->subDays(35),
+            'created_at'        => now()->subDays(35),
         ]);
 
         $recentHistory = SystemSettingHistory::recent(30)->get();
@@ -218,10 +218,10 @@ final class SystemSettingTest extends TestCase
         $setting2 = SystemSetting::factory()->create();
 
         $dependency = SystemSettingDependency::create([
-            'setting_id' => $setting1->id,
+            'setting_id'            => $setting1->id,
             'depends_on_setting_id' => $setting2->id,
-            'condition' => 'equals',
-            'condition_value' => 'test',
+            'condition'             => 'equals',
+            'condition_value'       => 'test',
         ]);
 
         $this->assertInstanceOf(SystemSetting::class, $dependency->setting);
@@ -236,24 +236,24 @@ final class SystemSettingTest extends TestCase
         $setting2 = SystemSetting::factory()->create();
 
         $conditions = [
-            'equals' => 'test',
-            'not_equals' => 'different',
+            'equals'       => 'test',
+            'not_equals'   => 'different',
             'greater_than' => '5',
-            'less_than' => '10',
-            'contains' => 'es',
+            'less_than'    => '10',
+            'contains'     => 'es',
             'not_contains' => 'xyz',
-            'is_empty' => '',
+            'is_empty'     => '',
             'is_not_empty' => 'test',
-            'is_true' => '1',
-            'is_false' => '0',
+            'is_true'      => '1',
+            'is_false'     => '0',
         ];
 
         foreach ($conditions as $condition => $value) {
             $dependency = SystemSettingDependency::create([
-                'setting_id' => $setting2->id,
+                'setting_id'            => $setting2->id,
                 'depends_on_setting_id' => $setting1->id,
-                'condition' => $condition,
-                'condition_value' => $value,
+                'condition'             => $condition,
+                'condition_value'       => $value,
             ]);
 
             $this->assertTrue($dependency->isConditionMet(), "Condition {$condition} should be met");

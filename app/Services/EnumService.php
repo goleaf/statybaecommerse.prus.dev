@@ -11,6 +11,7 @@ use App\Enums\OrderStatus;
 use App\Enums\PaymentType;
 use App\Enums\ProductStatus;
 use App\Enums\UserRole;
+use ValueError;
 
 /**
  * EnumService
@@ -25,12 +26,12 @@ final class EnumService
     public function getAllEnums(): array
     {
         return [
-            'address_types' => AddressType::class,
+            'address_types'     => AddressType::class,
             'navigation_groups' => NavigationGroup::class,
-            'order_statuses' => OrderStatus::class,
-            'payment_types' => PaymentType::class,
-            'product_statuses' => ProductStatus::class,
-            'user_roles' => UserRole::class,
+            'order_statuses'    => OrderStatus::class,
+            'payment_types'     => PaymentType::class,
+            'product_statuses'  => ProductStatus::class,
+            'user_roles'        => UserRole::class,
         ];
     }
 
@@ -79,7 +80,7 @@ final class EnumService
         }
         try {
             return is_callable([$enumClass, 'from']) ? $enumClass::from($value) : null;
-        } catch (\ValueError $e) {
+        } catch (ValueError $e) {
             return null;
         }
     }
@@ -139,7 +140,7 @@ final class EnumService
                 continue;
             }
             $statistics[$name] = [
-                'total' => is_callable([$enumClass, 'count']) ? $enumClass::count() : 0,
+                'total'  => is_callable([$enumClass, 'count']) ? $enumClass::count() : 0,
                 'values' => is_callable([$enumClass, 'values']) ? $enumClass::values() : [],
                 'labels' => is_callable([$enumClass, 'labels']) ? $enumClass::labels() : [],
             ];
@@ -337,15 +338,15 @@ final class EnumService
     public function getForUseCase(string $useCase): array
     {
         return match ($useCase) {
-            'api' => $this->getApiData(),
-            'graphql' => $this->getGraphQLData(),
-            'typescript' => $this->getTypeScriptEnums(),
-            'javascript' => $this->getJavaScriptEnums(),
-            'css' => $this->getCssEnums(),
+            'api'           => $this->getApiData(),
+            'graphql'       => $this->getGraphQLData(),
+            'typescript'    => $this->getTypeScriptEnums(),
+            'javascript'    => $this->getJavaScriptEnums(),
+            'css'           => $this->getCssEnums(),
             'documentation' => $this->getDocumentation(),
-            'validation' => $this->getValidationRules(),
-            'database' => $this->getDatabaseEnums(),
-            default => $this->getAllEnumData(),
+            'validation'    => $this->getValidationRules(),
+            'database'      => $this->getDatabaseEnums(),
+            default         => $this->getAllEnumData(),
         };
     }
 
@@ -359,15 +360,15 @@ final class EnumService
             $enumClass = $this->getEnum($name);
             if ($enumClass && class_exists($enumClass)) {
                 $data[$name] = match ($useCase) {
-                    'api' => is_callable([$enumClass, 'forApi']) ? $enumClass::forApi() : [],
-                    'graphql' => is_callable([$enumClass, 'forGraphQL']) ? $enumClass::forGraphQL() : [],
-                    'typescript' => is_callable([$enumClass, 'forTypeScript']) ? $enumClass::forTypeScript() : [],
-                    'javascript' => is_callable([$enumClass, 'forJavaScript']) ? $enumClass::forJavaScript() : [],
-                    'css' => is_callable([$enumClass, 'forCss']) ? $enumClass::forCss() : [],
+                    'api'           => is_callable([$enumClass, 'forApi']) ? $enumClass::forApi() : [],
+                    'graphql'       => is_callable([$enumClass, 'forGraphQL']) ? $enumClass::forGraphQL() : [],
+                    'typescript'    => is_callable([$enumClass, 'forTypeScript']) ? $enumClass::forTypeScript() : [],
+                    'javascript'    => is_callable([$enumClass, 'forJavaScript']) ? $enumClass::forJavaScript() : [],
+                    'css'           => is_callable([$enumClass, 'forCss']) ? $enumClass::forCss() : [],
                     'documentation' => is_callable([$enumClass, 'forDocumentation']) ? $enumClass::forDocumentation() : [],
-                    'validation' => is_callable([$enumClass, 'forValidation']) ? $enumClass::forValidation() : [],
-                    'database' => is_callable([$enumClass, 'forDatabase']) ? $enumClass::forDatabase() : [],
-                    default => is_callable([$enumClass, 'optionsWithDescriptions']) ? $enumClass::optionsWithDescriptions() : [],
+                    'validation'    => is_callable([$enumClass, 'forValidation']) ? $enumClass::forValidation() : [],
+                    'database'      => is_callable([$enumClass, 'forDatabase']) ? $enumClass::forDatabase() : [],
+                    default         => is_callable([$enumClass, 'optionsWithDescriptions']) ? $enumClass::optionsWithDescriptions() : [],
                 };
             }
         }

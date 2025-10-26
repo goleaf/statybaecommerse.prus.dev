@@ -23,25 +23,25 @@ class AddressTest extends TestCase
         $user = User::factory()->create();
 
         $address = Address::factory()->create([
-            'user_id' => $user->id,
-            'type' => AddressType::SHIPPING,
-            'first_name' => 'John',
-            'last_name' => 'Doe',
+            'user_id'        => $user->id,
+            'type'           => AddressType::SHIPPING,
+            'first_name'     => 'John',
+            'last_name'      => 'Doe',
             'address_line_1' => 'Test Street 123',
-            'city' => 'Vilnius',
-            'postal_code' => 'LT-01234',
-            'is_default' => true,
+            'city'           => 'Vilnius',
+            'postal_code'    => 'LT-01234',
+            'is_default'     => true,
         ]);
 
         $this->assertDatabaseHas('addresses', [
-            'user_id' => $user->id,
-            'type' => AddressType::SHIPPING->value,
-            'first_name' => 'John',
-            'last_name' => 'Doe',
+            'user_id'        => $user->id,
+            'type'           => AddressType::SHIPPING->value,
+            'first_name'     => 'John',
+            'last_name'      => 'Doe',
             'address_line_1' => 'Test Street 123',
-            'city' => 'Vilnius',
-            'postal_code' => 'LT-01234',
-            'is_default' => true,
+            'city'           => 'Vilnius',
+            'postal_code'    => 'LT-01234',
+            'is_default'     => true,
         ]);
     }
 
@@ -103,11 +103,11 @@ class AddressTest extends TestCase
     public function test_address_casts_work_correctly(): void
     {
         $address = Address::factory()->create([
-            'is_default' => true,
-            'is_billing' => true,
+            'is_default'  => true,
+            'is_billing'  => true,
             'is_shipping' => false,
-            'is_active' => true,
-            'type' => AddressType::SHIPPING,
+            'is_active'   => true,
+            'type'        => AddressType::SHIPPING,
         ]);
 
         $this->assertIsBool($address->is_default);
@@ -140,10 +140,10 @@ class AddressTest extends TestCase
     {
         $shippingAddress = Address::factory()->create([
             'is_shipping' => true,
-            'is_billing' => false,
+            'is_billing'  => false,
         ]);
         $billingAddress = Address::factory()->create([
-            'is_billing' => true,
+            'is_billing'  => true,
             'is_shipping' => false,
         ]);
 
@@ -157,10 +157,10 @@ class AddressTest extends TestCase
     {
         $shippingAddress = Address::factory()->create([
             'is_shipping' => true,
-            'is_billing' => false,
+            'is_billing'  => false,
         ]);
         $billingAddress = Address::factory()->create([
-            'is_billing' => true,
+            'is_billing'  => true,
             'is_shipping' => false,
         ]);
 
@@ -243,7 +243,7 @@ class AddressTest extends TestCase
     {
         $address = Address::factory()->create([
             'company_name' => 'Test Company',
-            'company_vat' => 'LT123456789',
+            'company_vat'  => 'LT123456789',
         ]);
 
         $this->assertEquals('Test Company', $address->company_name);
@@ -255,9 +255,9 @@ class AddressTest extends TestCase
     {
         $address = Address::factory()->create([
             'first_name' => 'John',
-            'last_name' => 'Doe',
-            'phone' => '+37012345678',
-            'email' => 'john.doe@example.com',
+            'last_name'  => 'Doe',
+            'phone'      => '+37012345678',
+            'email'      => 'john.doe@example.com',
         ]);
 
         $this->assertEquals('John', $address->first_name);
@@ -269,10 +269,10 @@ class AddressTest extends TestCase
     public function test_address_can_have_additional_information(): void
     {
         $address = Address::factory()->create([
-            'apartment' => 'Apt 5B',
-            'floor' => '3rd Floor',
-            'building' => 'Building A',
-            'landmark' => 'Near the shopping center',
+            'apartment'    => 'Apt 5B',
+            'floor'        => '3rd Floor',
+            'building'     => 'Building A',
+            'landmark'     => 'Near the shopping center',
             'instructions' => 'Ring the doorbell twice',
         ]);
 
@@ -288,9 +288,9 @@ class AddressTest extends TestCase
     {
         $address = Address::factory()->create([
             'address_line_1' => 'Test Street 123',
-            'apartment' => 'Apt 5B',
-            'city' => 'Vilnius',
-            'postal_code' => 'LT-01234',
+            'apartment'      => 'Apt 5B',
+            'city'           => 'Vilnius',
+            'postal_code'    => 'LT-01234',
         ]);
 
         $fullAddress = $address->full_address;
@@ -305,7 +305,7 @@ class AddressTest extends TestCase
     {
         $address = Address::factory()->create([
             'first_name' => 'John',
-            'last_name' => 'Doe',
+            'last_name'  => 'Doe',
         ]);
 
         $fullName = $address->full_name;
@@ -316,8 +316,8 @@ class AddressTest extends TestCase
     public function test_address_can_get_display_name(): void
     {
         $address = Address::factory()->create([
-            'first_name' => 'John',
-            'last_name' => 'Doe',
+            'first_name'   => 'John',
+            'last_name'    => 'Doe',
             'company_name' => 'Test Company',
         ]);
 
@@ -330,18 +330,18 @@ class AddressTest extends TestCase
     {
         $country = Country::factory()->create(['name' => 'Lithuania']);
         $address = Address::factory()->create([
-            'first_name' => 'John',
-            'last_name' => 'Doe',
-            'company_name' => 'Test Company',
+            'first_name'     => 'John',
+            'last_name'      => 'Doe',
+            'company_name'   => 'Test Company',
             'address_line_1' => 'Test Street 123',
             'address_line_2' => null, // Ensure no extra address line
-            'apartment' => 'Apt 5B',
-            'floor' => null, // Ensure no floor
-            'building' => null, // Ensure no building
-            'city' => 'Vilnius',
-            'state' => null, // Ensure no state
-            'postal_code' => 'LT-01234',
-            'country_code' => $country->cca2,
+            'apartment'      => 'Apt 5B',
+            'floor'          => null, // Ensure no floor
+            'building'       => null, // Ensure no building
+            'city'           => 'Vilnius',
+            'state'          => null, // Ensure no state
+            'postal_code'    => 'LT-01234',
+            'country_code'   => $country->cca2,
         ]);
 
         $formattedAddress = $address->formatted_address;
@@ -366,14 +366,14 @@ class AddressTest extends TestCase
     public function test_address_type_checking_methods(): void
     {
         $shippingAddress = Address::factory()->create([
-            'type' => AddressType::SHIPPING,
+            'type'        => AddressType::SHIPPING,
             'is_shipping' => true,
-            'is_billing' => false,
+            'is_billing'  => false,
         ]);
         $billingAddress = Address::factory()->create([
-            'type' => AddressType::BILLING,
+            'type'        => AddressType::BILLING,
             'is_shipping' => false,
-            'is_billing' => true,
+            'is_billing'  => true,
         ]);
         $defaultAddress = Address::factory()->create(['is_default' => true]);
         $activeAddress = Address::factory()->create(['is_active' => true]);
@@ -407,47 +407,47 @@ class AddressTest extends TestCase
 
         // Create test addresses manually to avoid factory issues
         $defaultAddress = new Address([
-            'user_id' => $user->id,
-            'first_name' => 'John',
-            'last_name' => 'Doe',
+            'user_id'        => $user->id,
+            'first_name'     => 'John',
+            'last_name'      => 'Doe',
             'address_line_1' => '123 Main St',
-            'city' => 'Test City',
-            'postal_code' => '12345',
-            'country_code' => 'US',
-            'is_default' => true,
-            'is_billing' => false,
-            'is_shipping' => false,
-            'is_active' => true,
+            'city'           => 'Test City',
+            'postal_code'    => '12345',
+            'country_code'   => 'US',
+            'is_default'     => true,
+            'is_billing'     => false,
+            'is_shipping'    => false,
+            'is_active'      => true,
         ]);
         $defaultAddress->save();
 
         $billingAddress = new Address([
-            'user_id' => $user->id,
-            'first_name' => 'Jane',
-            'last_name' => 'Doe',
+            'user_id'        => $user->id,
+            'first_name'     => 'Jane',
+            'last_name'      => 'Doe',
             'address_line_1' => '456 Billing St',
-            'city' => 'Billing City',
-            'postal_code' => '54321',
-            'country_code' => 'US',
-            'is_default' => false,
-            'is_billing' => true,
-            'is_shipping' => false,
-            'is_active' => true,
+            'city'           => 'Billing City',
+            'postal_code'    => '54321',
+            'country_code'   => 'US',
+            'is_default'     => false,
+            'is_billing'     => true,
+            'is_shipping'    => false,
+            'is_active'      => true,
         ]);
         $billingAddress->save();
 
         $shippingAddress = new Address([
-            'user_id' => $user->id,
-            'first_name' => 'Bob',
-            'last_name' => 'Smith',
+            'user_id'        => $user->id,
+            'first_name'     => 'Bob',
+            'last_name'      => 'Smith',
             'address_line_1' => '789 Shipping St',
-            'city' => 'Shipping City',
-            'postal_code' => '98765',
-            'country_code' => 'US',
-            'is_default' => false,
-            'is_billing' => false,
-            'is_shipping' => true,
-            'is_active' => true,
+            'city'           => 'Shipping City',
+            'postal_code'    => '98765',
+            'country_code'   => 'US',
+            'is_default'     => false,
+            'is_billing'     => false,
+            'is_shipping'    => true,
+            'is_active'      => true,
         ]);
         $shippingAddress->save();
 
@@ -468,12 +468,12 @@ class AddressTest extends TestCase
         $user = User::factory()->create();
 
         $address1 = Address::factory()->create([
-            'user_id' => $user->id,
+            'user_id'    => $user->id,
             'is_default' => true,
         ]);
 
         $address2 = Address::factory()->create([
-            'user_id' => $user->id,
+            'user_id'    => $user->id,
             'is_default' => false,
         ]);
 
@@ -491,7 +491,7 @@ class AddressTest extends TestCase
         $user2 = User::factory()->create();
 
         $originalAddress = Address::factory()->create([
-            'user_id' => $user1->id,
+            'user_id'    => $user1->id,
             'is_default' => true,
         ]);
 

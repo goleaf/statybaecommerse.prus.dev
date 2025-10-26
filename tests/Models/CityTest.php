@@ -32,14 +32,14 @@ final class CityTest extends TestCase
     {
         // Create the root city that should act as the parent node.
         $parent = City::factory()->create([
-            'is_active' => true,
+            'is_active'  => true,
             'is_enabled' => true,
         ]);
 
         // Attach a child city to the parent to exercise both relationship directions.
         $child = City::factory()->create([
-            'parent_id' => $parent->id,
-            'is_active' => true,
+            'parent_id'  => $parent->id,
+            'is_active'  => true,
             'is_enabled' => true,
         ]);
 
@@ -53,11 +53,11 @@ final class CityTest extends TestCase
         // Seed two cities with differing enabled flags to validate the scope constraint.
         $enabledCity = City::factory()->create([
             'is_enabled' => true,
-            'is_active' => true,
+            'is_active'  => true,
         ]);
         City::factory()->create([
             'is_enabled' => false,
-            'is_active' => true,
+            'is_active'  => true,
         ]);
 
         // The enabled scope should only include the enabled city.
@@ -69,11 +69,11 @@ final class CityTest extends TestCase
     {
         // Create active and inactive cities so the scope has distinct options to filter.
         $activeCity = City::factory()->create([
-            'is_active' => true,
+            'is_active'  => true,
             'is_enabled' => true,
         ]);
         City::factory()->create([
-            'is_active' => false,
+            'is_active'  => false,
             'is_enabled' => true,
         ]);
 
@@ -86,13 +86,13 @@ final class CityTest extends TestCase
     {
         // Insert cities with deterministic names so alphabetical sorting can be asserted.
         $alpha = City::factory()->create([
-            'name' => 'Alpha City',
-            'is_active' => true,
+            'name'       => 'Alpha City',
+            'is_active'  => true,
             'is_enabled' => true,
         ]);
         $zulu = City::factory()->create([
-            'name' => 'Zulu City',
-            'is_active' => true,
+            'name'       => 'Zulu City',
+            'is_active'  => true,
             'is_enabled' => true,
         ]);
 
@@ -113,11 +113,11 @@ final class CityTest extends TestCase
 
         // Manually create a city without slug and code to exercise the boot event fallback logic.
         $city = City::query()->create([
-            'name' => 'Test Example City',
-            'slug' => null,
-            'code' => null,
+            'name'       => 'Test Example City',
+            'slug'       => null,
+            'code'       => null,
             'country_id' => $country->id,
-            'is_active' => true,
+            'is_active'  => true,
             'is_enabled' => true,
         ]);
 
@@ -130,7 +130,7 @@ final class CityTest extends TestCase
     {
         // Create a city with explicit boolean-flaggable values stored as truthy/falsy integers.
         $city = City::factory()->create([
-            'is_active' => false,
+            'is_active'  => false,
             'is_enabled' => true,
             'is_default' => 1,
             'is_capital' => 0,

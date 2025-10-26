@@ -26,4 +26,3 @@ final class TestingDatabaseTest extends TestCase
         putenv('TEST_TOKEN=' . ($prev === false ? '' : $prev));
     }
 }
-

@@ -18,10 +18,10 @@ class WishlistItemFactory extends Factory
     {
         return [
             'wishlist_id' => UserWishlist::factory(),
-            'product_id' => Product::factory(),
-            'variant_id' => null,
-            'quantity' => $this->faker->numberBetween(1, 5),
-            'notes' => $this->faker->optional(0.3)->sentence(),
+            'product_id'  => Product::factory(),
+            'variant_id'  => null,
+            'quantity'    => $this->faker->numberBetween(1, 5),
+            'notes'       => $this->faker->optional(0.3)->sentence(),
         ];
     }
 
@@ -61,7 +61,7 @@ class WishlistItemFactory extends Factory
         return $this->state(function (array $attributes) {
             return [
                 'quantity' => $this->faker->numberBetween(10, 50),
-                'notes' => 'Bulk order',
+                'notes'    => 'Bulk order',
             ];
         });
     }

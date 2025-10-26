@@ -54,9 +54,9 @@ class AdvancedAnalyticsWidgetTest extends TestCase
         $product = Product::factory()->create();
 
         $order = Order::factory()->create([
-            'user_id' => $user->id,
-            'total' => 100.0,
-            'status' => 'completed',
+            'user_id'    => $user->id,
+            'total'      => 100.0,
+            'status'     => 'completed',
             'created_at' => now(),
         ]);
 
@@ -130,8 +130,8 @@ class AdvancedAnalyticsWidgetTest extends TestCase
     {
         // Create orders for revenue data
         Order::factory()->create([
-            'total' => 100.0,
-            'status' => 'completed',
+            'total'      => 100.0,
+            'status'     => 'completed',
             'created_at' => now(),
         ]);
 

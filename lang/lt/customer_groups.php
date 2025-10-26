@@ -39,9 +39,9 @@ return [
 
     // Sekcijų antraštės
     'basic_information' => 'Pagrindinė informacija',
-    'pricing_settings' => 'Kainodaros nustatymai',
-    'permissions' => 'Leidimai',
-    'settings' => 'Nustatymai',
+    'pricing_settings'  => 'Kainodaros nustatymai',
+    'permissions'       => 'Leidimai',
+    'settings'          => 'Nustatymai',
 
     // Navigation
     'navigation_label' => 'Klientų grupės',
@@ -65,25 +65,25 @@ return [
     'filter_created_date'      => 'Sukūrimo data',
 
     // Actions
-    'action_view'   => 'Peržiūrėti',
-    'action_edit'   => 'Redaguoti',
-    'action_delete' => 'Ištrinti',
-    'action_create' => 'Sukurti naują',
-    'activate' => 'Aktyvuoti',
-    'deactivate' => 'Deaktyvuoti',
-    'set_default' => 'Nustatyti numatytuoju',
-    'activate_selected' => 'Aktyvuoti pasirinktus',
+    'action_view'         => 'Peržiūrėti',
+    'action_edit'         => 'Redaguoti',
+    'action_delete'       => 'Ištrinti',
+    'action_create'       => 'Sukurti naują',
+    'activate'            => 'Aktyvuoti',
+    'deactivate'          => 'Deaktyvuoti',
+    'set_default'         => 'Nustatyti numatytuoju',
+    'activate_selected'   => 'Aktyvuoti pasirinktus',
     'deactivate_selected' => 'Deaktyvuoti pasirinktus',
 
     // Messages
-    'created_successfully' => 'Klientų grupė sėkmingai sukurta',
-    'updated_successfully' => 'Klientų grupė sėkmingai atnaujinta',
-    'deleted_successfully' => 'Klientų grupė sėkmingai ištrinta',
-    'activated_successfully' => 'Klientų grupė sėkmingai aktyvuota',
-    'deactivated_successfully' => 'Klientų grupė sėkmingai deaktyvuota',
+    'created_successfully'        => 'Klientų grupė sėkmingai sukurta',
+    'updated_successfully'        => 'Klientų grupė sėkmingai atnaujinta',
+    'deleted_successfully'        => 'Klientų grupė sėkmingai ištrinta',
+    'activated_successfully'      => 'Klientų grupė sėkmingai aktyvuota',
+    'deactivated_successfully'    => 'Klientų grupė sėkmingai deaktyvuota',
     'set_as_default_successfully' => 'Klientų grupė sėkmingai nustatyta kaip numatytoji',
-    'bulk_activated_success' => 'Pasirinktos klientų grupės sėkmingai aktyvuotos',
-    'bulk_deactivated_success' => 'Pasirinktos klientų grupės sėkmingai deaktyvuotos',
+    'bulk_activated_success'      => 'Pasirinktos klientų grupės sėkmingai aktyvuotos',
+    'bulk_deactivated_success'    => 'Pasirinktos klientų grupės sėkmingai deaktyvuotos',
 
     // Widgets
     'widget_total_groups'         => 'Iš viso grupių',

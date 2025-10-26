@@ -25,27 +25,27 @@ class OrderTest extends TestCase
         $user = User::factory()->create();
 
         $order = Order::create([
-            'number' => 'ORD-123456',
-            'user_id' => $user->id,
-            'status' => 'pending',
-            'subtotal' => 100.00,
-            'tax_amount' => 21.00,
-            'shipping_amount' => 5.00,
-            'discount_amount' => 0.00,
-            'total' => 126.00,
-            'currency' => 'EUR',
-            'billing_address' => ['name' => 'John Doe', 'email' => 'john@example.com'],
+            'number'           => 'ORD-123456',
+            'user_id'          => $user->id,
+            'status'           => 'pending',
+            'subtotal'         => 100.00,
+            'tax_amount'       => 21.00,
+            'shipping_amount'  => 5.00,
+            'discount_amount'  => 0.00,
+            'total'            => 126.00,
+            'currency'         => 'EUR',
+            'billing_address'  => ['name' => 'John Doe', 'email' => 'john@example.com'],
             'shipping_address' => ['name' => 'John Doe', 'address' => '123 Main St'],
-            'notes' => 'Test order',
-            'payment_status' => 'pending',
-            'payment_method' => 'credit_card',
+            'notes'            => 'Test order',
+            'payment_status'   => 'pending',
+            'payment_method'   => 'credit_card',
         ]);
 
         $this->assertDatabaseHas('orders', [
-            'number' => 'ORD-123456',
+            'number'  => 'ORD-123456',
             'user_id' => $user->id,
-            'status' => 'pending',
-            'total' => 126.00,
+            'status'  => 'pending',
+            'total'   => 126.00,
         ]);
     }
 
@@ -83,11 +83,11 @@ class OrderTest extends TestCase
         $order = Order::factory()->create();
         $document1 = Document::factory()->create([
             'documentable_type' => Order::class,
-            'documentable_id' => $order->id,
+            'documentable_id'   => $order->id,
         ]);
         $document2 = Document::factory()->create([
             'documentable_type' => Order::class,
-            'documentable_id' => $order->id,
+            'documentable_id'   => $order->id,
         ]);
 
         $this->assertCount(2, $order->documents);
@@ -239,12 +239,12 @@ class OrderTest extends TestCase
     public function test_order_casts(): void
     {
         $order = Order::factory()->create([
-            'subtotal' => '100.50',
-            'tax_amount' => '21.10',
-            'shipping_amount' => '5.00',
-            'discount_amount' => '10.00',
-            'total' => '116.60',
-            'billing_address' => ['name' => 'John Doe'],
+            'subtotal'         => '100.50',
+            'tax_amount'       => '21.10',
+            'shipping_amount'  => '5.00',
+            'discount_amount'  => '10.00',
+            'total'            => '116.60',
+            'billing_address'  => ['name' => 'John Doe'],
             'shipping_address' => ['address' => '123 Main St'],
         ]);
 

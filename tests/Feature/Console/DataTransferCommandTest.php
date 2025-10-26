@@ -10,6 +10,7 @@ use App\Models\Product;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
+use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
 
@@ -24,11 +25,11 @@ final class DataTransferCommandTest extends TestCase
     {
         return [
             'categories-json' => ['categories', 'json'],
-            'categories-csv' => ['categories', 'csv'],
-            'products-json' => ['products', 'json'],
-            'products-csv' => ['products', 'csv'],
+            'categories-csv'  => ['categories', 'csv'],
+            'products-json'   => ['products', 'json'],
+            'products-csv'    => ['products', 'csv'],
             'attributes-json' => ['attributes', 'json'],
-            'attributes-csv' => ['attributes', 'csv'],
+            'attributes-csv'  => ['attributes', 'csv'],
         ];
     }
 
@@ -43,8 +44,8 @@ final class DataTransferCommandTest extends TestCase
         $path = $this->temporaryPath($format);
 
         self::assertSame(0, Artisan::call('data:export', [
-            'entity' => $entity,
-            'path' => $path,
+            'entity'   => $entity,
+            'path'     => $path,
             '--format' => $format,
         ]));
 
@@ -52,8 +53,8 @@ final class DataTransferCommandTest extends TestCase
         $this->mutateEntity($entity);
 
         self::assertSame(0, Artisan::call('data:import', [
-            'entity' => $entity,
-            'path' => $path,
+            'entity'   => $entity,
+            'path'     => $path,
             '--format' => $format,
         ]));
 
@@ -69,9 +70,9 @@ final class DataTransferCommandTest extends TestCase
     {
         match ($entity) {
             'categories' => Category::factory()->count(3)->create(),
-            'products' => Product::factory()->count(3)->create(),
+            'products'   => Product::factory()->count(3)->create(),
             'attributes' => Attribute::factory()->count(3)->create(),
-            default => throw new \InvalidArgumentException('Unsupported entity ['.$entity.'].')
+            default      => throw new InvalidArgumentException('Unsupported entity [' . $entity . '].')
         };
     }
 
@@ -99,9 +100,9 @@ final class DataTransferCommandTest extends TestCase
     {
         return [
             'categories' => 'categories',
-            'products' => 'products',
+            'products'   => 'products',
             'attributes' => 'attributes',
-        ][$entity] ?? throw new \InvalidArgumentException('Unsupported entity ['.$entity.'].');
+        ][$entity] ?? throw new InvalidArgumentException('Unsupported entity [' . $entity . '].');
     }
 
     private function mutateEntity(string $entity): void
@@ -138,6 +139,6 @@ final class DataTransferCommandTest extends TestCase
 
         @unlink($temp);
 
-        return $temp.'.'.$format;
+        return $temp . '.' . $format;
     }
 }

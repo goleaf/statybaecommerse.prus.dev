@@ -150,10 +150,10 @@ SQL;
                 (bool) ($attributes['is_featured'] ?? false),
                 $queryData->query()
             ),
-            'sales_count'     => is_numeric($salesCount) ? (int) $salesCount : 0,
-            'reviews_count'   => is_numeric($reviewsCount) ? (int) $reviewsCount : 0,
-            'average_rating'  => is_numeric($averageRating) ? (float) $averageRating : 0.0,
-            'is_featured'     => (bool) ($attributes['is_featured'] ?? false),
+            'sales_count'    => is_numeric($salesCount) ? (int) $salesCount : 0,
+            'reviews_count'  => is_numeric($reviewsCount) ? (int) $reviewsCount : 0,
+            'average_rating' => is_numeric($averageRating) ? (float) $averageRating : 0.0,
+            'is_featured'    => (bool) ($attributes['is_featured'] ?? false),
         ];
     }
 
@@ -197,8 +197,8 @@ SQL;
 
         if ($columns === null) {
             $columns = [
-                'sales_count' => Schema::hasColumn('products', 'sales_count'),
-                'reviews_count' => Schema::hasColumn('products', 'reviews_count'),
+                'sales_count'    => Schema::hasColumn('products', 'sales_count'),
+                'reviews_count'  => Schema::hasColumn('products', 'reviews_count'),
                 'average_rating' => Schema::hasColumn('products', 'average_rating'),
             ];
         }

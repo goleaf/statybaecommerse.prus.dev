@@ -57,18 +57,18 @@ final class DocumentGenerated extends Notification implements ShouldQueue
         // Use a graceful fallback for the greeting name so queued jobs never fail.
         $displayName = $this->resolveNotifiableName($notifiable);
 
-        $message = (new MailMessage())
+        $message = (new MailMessage)
             ->subject(__('documents.email.subject', ['title' => $this->document->title], $locale))
             ->greeting(__('documents.email.greeting', ['name' => $displayName], $locale))
             ->line(
                 __('documents.email.generated', [
                     'title' => $this->document->title,
-                    'type' => __('documents.types.' . $this->document->template->type, [], $locale),
+                    'type'  => __('documents.types.' . $this->document->template->type, [], $locale),
                 ], $locale)
             )
             ->line(
                 __('documents.email.details', [
-                    'date' => $this->document->generated_at?->format('Y-m-d H:i'),
+                    'date'   => $this->document->generated_at?->format('Y-m-d H:i'),
                     'status' => __('documents.statuses.' . $this->document->status, [], $locale),
                 ], $locale)
             );
@@ -107,12 +107,12 @@ final class DocumentGenerated extends Notification implements ShouldQueue
     {
         // Persist a lean payload that powers the notification centre and API responses.
         return [
-            'document_id' => $this->document->id,
-            'document_title' => $this->document->title,
-            'document_type' => $this->document->template->type,
+            'document_id'     => $this->document->id,
+            'document_title'  => $this->document->title,
+            'document_type'   => $this->document->template->type,
             'document_status' => $this->document->status,
-            'generated_at' => $this->document->generated_at?->toIso8601String(),
-            'message' => __('documents.notification.generated', ['title' => $this->document->title]),
+            'generated_at'    => $this->document->generated_at?->toIso8601String(),
+            'message'         => __('documents.notification.generated', ['title' => $this->document->title]),
         ];
     }
 

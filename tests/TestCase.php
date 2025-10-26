@@ -4,20 +4,19 @@ declare(strict_types=1);
 
 namespace Tests;
 
-use App\Support\Cache\TagAwareCache;
 use Filament\Facades\Filament;
 use Filament\Panel;
 use Illuminate\Contracts\Translation\Loader as TranslationLoader;
 use Illuminate\Contracts\Translation\Translator as TranslatorContract;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
-use Throwable;
+use RuntimeException;
 use Tests\Support\TestingDatabase;
+use Throwable;
 
 abstract class TestCase extends BaseTestCase
 {
@@ -50,7 +49,7 @@ abstract class TestCase extends BaseTestCase
         $this->sqliteDatabasePath = TestingDatabase::path();
 
         $appBasePath = dirname(__DIR__);
-        $envFile = $appBasePath.'/.env';
+        $envFile = $appBasePath . '/.env';
 
         if (! file_exists($envFile)) {
             file_put_contents($envFile, '');
@@ -99,7 +98,7 @@ abstract class TestCase extends BaseTestCase
         }
 
         $appBasePath = dirname(__DIR__);
-        $envFile = $appBasePath.'/.env';
+        $envFile = $appBasePath . '/.env';
 
         if ($this->createdEnvFile && file_exists($envFile)) {
             unlink($envFile);
@@ -148,7 +147,7 @@ abstract class TestCase extends BaseTestCase
                         if (! Schema::connection('sqlite')->hasTable('users')) {
                             $shouldRetry = true;
                         }
-                    } catch (\Throwable $schemaException) {
+                    } catch (Throwable $schemaException) {
                         $message = strtolower($schemaException->getMessage());
 
                         if (! str_contains($message, 'database disk image is malformed') && ! str_contains($message, 'database is locked')) {
@@ -157,7 +156,7 @@ abstract class TestCase extends BaseTestCase
 
                         $shouldRetry = true;
                     }
-                } catch (\Throwable $exception) {
+                } catch (Throwable $exception) {
                     $message = strtolower($exception->getMessage());
 
                     if (! str_contains($message, 'database disk image is malformed') && ! str_contains($message, 'database is locked')) {
@@ -174,7 +173,7 @@ abstract class TestCase extends BaseTestCase
                 TestingDatabase::teardown();
             }
 
-            throw new \RuntimeException('Unable to prepare the testing database after multiple attempts.');
+            throw new RuntimeException('Unable to prepare the testing database after multiple attempts.');
         };
 
         $ensureMigrations();
@@ -184,7 +183,7 @@ abstract class TestCase extends BaseTestCase
 
             $connection->getPdo()?->exec('PRAGMA busy_timeout = 30000;');
             $connection->getPdo()?->exec('PRAGMA journal_mode = WAL;');
-        } catch (\Throwable $exception) {
+        } catch (Throwable $exception) {
             // Ignore failures when the SQLite connection has not been initialised yet.
         }
 

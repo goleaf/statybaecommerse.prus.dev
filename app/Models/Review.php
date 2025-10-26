@@ -12,16 +12,17 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use InvalidArgumentException;
 
 /**
  * Review
  *
  * Eloquent model representing the Review entity with comprehensive relationships, scopes, and business logic for the e-commerce system.
  *
- * @property mixed $table
- * @property mixed $fillable
+ * @property mixed  $table
+ * @property mixed  $fillable
  * @property string $translationModel
- * @property mixed $appends
+ * @property mixed  $appends
  *
  * @method static \Illuminate\Database\Eloquent\Builder|Review newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Review newQuery()
@@ -42,7 +43,7 @@ final class Review extends Model
         parent::boot();
         self::creating(function ($review) {
             if ($review->rating < 1 || $review->rating > 5) {
-                throw new \InvalidArgumentException('Rating must be between 1 and 5');
+                throw new InvalidArgumentException('Rating must be between 1 and 5');
             }
             // Ensure required reviewer fields are populated
             if (empty($review->reviewer_name) && ! empty($review->user_id)) {
@@ -61,7 +62,7 @@ final class Review extends Model
         });
         self::updating(function ($review) {
             if ($review->rating < 1 || $review->rating > 5) {
-                throw new \InvalidArgumentException('Rating must be between 1 and 5');
+                throw new InvalidArgumentException('Rating must be between 1 and 5');
             }
         });
     }
@@ -116,7 +117,7 @@ final class Review extends Model
     /**
      * Handle scopeApproved functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeApproved($query)
     {
@@ -126,7 +127,7 @@ final class Review extends Model
     /**
      * Handle scopeForLocale functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeForLocale($query, string $locale)
     {
@@ -136,7 +137,7 @@ final class Review extends Model
     /**
      * Handle scopeByRating functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeByRating($query, int $rating)
     {
@@ -146,7 +147,7 @@ final class Review extends Model
     /**
      * Handle scopePending functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopePending($query)
     {
@@ -180,7 +181,7 @@ final class Review extends Model
     /**
      * Handle scopeFeatured functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeFeatured($query)
     {
@@ -190,7 +191,7 @@ final class Review extends Model
     /**
      * Handle scopeRecent functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeRecent($query, int $days = 30)
     {
@@ -200,7 +201,7 @@ final class Review extends Model
     /**
      * Handle scopeHighRated functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeHighRated($query, int $minRating = 4)
     {
@@ -210,7 +211,7 @@ final class Review extends Model
     /**
      * Handle scopeLowRated functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeLowRated($query, int $maxRating = 2)
     {
@@ -264,7 +265,7 @@ final class Review extends Model
     /**
      * Handle scopeWithTranslations functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeWithTranslations($query, ?string $locale = null)
     {
@@ -403,8 +404,8 @@ final class Review extends Model
         return match ($this->getStatus()) {
             'approved' => 'success',
             'rejected' => 'danger',
-            'pending' => 'warning',
-            default => 'gray',
+            'pending'  => 'warning',
+            default    => 'gray',
         };
     }
 
@@ -416,8 +417,8 @@ final class Review extends Model
         return match ($this->getStatus()) {
             'approved' => __('admin.reviews.status.approved'),
             'rejected' => __('admin.reviews.status.rejected'),
-            'pending' => __('admin.reviews.status.pending'),
-            default => __('admin.reviews.status.unknown'),
+            'pending'  => __('admin.reviews.status.pending'),
+            default    => __('admin.reviews.status.unknown'),
         };
     }
 
@@ -427,11 +428,11 @@ final class Review extends Model
     public function getRatingLabel(): string
     {
         return match ($this->rating) {
-            1 => __('admin.reviews.ratings.poor'),
-            2 => __('admin.reviews.ratings.fair'),
-            3 => __('admin.reviews.ratings.good'),
-            4 => __('admin.reviews.ratings.very_good'),
-            5 => __('admin.reviews.ratings.excellent'),
+            1       => __('admin.reviews.ratings.poor'),
+            2       => __('admin.reviews.ratings.fair'),
+            3       => __('admin.reviews.ratings.good'),
+            4       => __('admin.reviews.ratings.very_good'),
+            5       => __('admin.reviews.ratings.excellent'),
             default => __('admin.reviews.ratings.unknown'),
         };
     }

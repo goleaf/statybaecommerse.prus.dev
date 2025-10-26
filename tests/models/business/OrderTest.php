@@ -20,14 +20,14 @@ class OrderTest extends TestCase
         $user = User::factory()->create();
         $order = Order::factory()->create([
             'user_id' => $user->id,
-            'status' => 'pending',
-            'total' => 99.99,
+            'status'  => 'pending',
+            'total'   => 99.99,
         ]);
 
         $this->assertDatabaseHas('orders', [
             'user_id' => $user->id,
-            'status' => 'pending',
-            'total' => 99.99,
+            'status'  => 'pending',
+            'total'   => 99.99,
         ]);
     }
 
@@ -46,7 +46,7 @@ class OrderTest extends TestCase
         $product = Product::factory()->create();
 
         $orderItems = OrderItem::factory()->count(3)->create([
-            'order_id' => $order->id,
+            'order_id'   => $order->id,
             'product_id' => $product->id,
         ]);
 
@@ -57,11 +57,11 @@ class OrderTest extends TestCase
     public function test_order_casts_work_correctly(): void
     {
         $order = Order::factory()->create([
-            'total' => 99.99,
-            'subtotal' => 89.99,
-            'tax_amount' => 10.00,
+            'total'           => 99.99,
+            'subtotal'        => 89.99,
+            'tax_amount'      => 10.00,
             'shipping_amount' => 5.00,
-            'created_at' => now(),
+            'created_at'      => now(),
         ]);
 
         $this->assertIsNumeric($order->total);
@@ -97,8 +97,8 @@ class OrderTest extends TestCase
     public function test_order_can_calculate_totals(): void
     {
         $order = Order::factory()->create([
-            'subtotal' => 100.00,
-            'tax_amount' => 21.00,
+            'subtotal'        => 100.00,
+            'tax_amount'      => 21.00,
             'shipping_amount' => 10.00,
         ]);
 
@@ -110,10 +110,10 @@ class OrderTest extends TestCase
     {
         $order = Order::factory()->create([
             'shipping_address' => [
-                'street' => 'Test Street 123',
-                'city' => 'Vilnius',
+                'street'      => 'Test Street 123',
+                'city'        => 'Vilnius',
                 'postal_code' => 'LT-01234',
-                'country' => 'Lithuania',
+                'country'     => 'Lithuania',
             ],
         ]);
 
@@ -126,10 +126,10 @@ class OrderTest extends TestCase
     {
         $order = Order::factory()->create([
             'billing_address' => [
-                'street' => 'Billing Street 456',
-                'city' => 'Kaunas',
+                'street'      => 'Billing Street 456',
+                'city'        => 'Kaunas',
                 'postal_code' => 'LT-56789',
-                'country' => 'Lithuania',
+                'country'     => 'Lithuania',
             ],
         ]);
 

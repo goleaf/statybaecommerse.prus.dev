@@ -5,15 +5,15 @@ declare(strict_types=1);
 use App\Http\Controllers\Api\AuditLogController;
 use App\Http\Controllers\Api\AuthenticatedUserController;
 use App\Http\Controllers\Api\AutocompleteSearchController;
+use App\Http\Controllers\Api\ExportDownloadController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\ProductHistoryController as ApiProductHistoryController;
-use App\Http\Controllers\Api\ExportDownloadController;
 use App\Http\Controllers\Api\V1\HealthController;
 use App\Http\Controllers\Api\V1\SearchController;
 use App\Http\Controllers\Webhooks\PaymentWebhookController;
-use Illuminate\Support\Facades\Route;
 use App\Support\Authorization\AuthorizationMatrix;
+use Illuminate\Support\Facades\Route;
 
 Route::prefix('webhooks')
     ->name('webhooks.')

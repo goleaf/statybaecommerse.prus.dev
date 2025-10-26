@@ -23,26 +23,26 @@ class OrderTranslationFactory extends Factory
     public function definition(): array
     {
         return [
-            'order_id' => Order::factory(),
-            'locale' => $this->faker->randomElement(['lt', 'en']),
-            'notes' => $this->faker->optional(0.3)->sentence(),
+            'order_id'        => Order::factory(),
+            'locale'          => $this->faker->randomElement(['lt', 'en']),
+            'notes'           => $this->faker->optional(0.3)->sentence(),
             'billing_address' => [
-                'name' => $this->faker->name(),
-                'email' => $this->faker->email(),
-                'phone' => $this->faker->phoneNumber(),
-                'address' => $this->faker->streetAddress(),
-                'city' => $this->faker->city(),
+                'name'        => $this->faker->name(),
+                'email'       => $this->faker->email(),
+                'phone'       => $this->faker->phoneNumber(),
+                'address'     => $this->faker->streetAddress(),
+                'city'        => $this->faker->city(),
                 'postal_code' => $this->faker->postcode(),
-                'country' => $this->faker->country(),
+                'country'     => $this->faker->country(),
             ],
             'shipping_address' => [
-                'name' => $this->faker->name(),
-                'email' => $this->faker->email(),
-                'phone' => $this->faker->phoneNumber(),
-                'address' => $this->faker->streetAddress(),
-                'city' => $this->faker->city(),
+                'name'        => $this->faker->name(),
+                'email'       => $this->faker->email(),
+                'phone'       => $this->faker->phoneNumber(),
+                'address'     => $this->faker->streetAddress(),
+                'city'        => $this->faker->city(),
                 'postal_code' => $this->faker->postcode(),
-                'country' => $this->faker->country(),
+                'country'     => $this->faker->country(),
             ],
         ];
     }
@@ -53,25 +53,25 @@ class OrderTranslationFactory extends Factory
     public function lithuanian(): static
     {
         return $this->state(fn (array $attributes) => [
-            'locale' => 'lt',
-            'notes' => $this->faker->optional(0.3)->sentence(),
+            'locale'          => 'lt',
+            'notes'           => $this->faker->optional(0.3)->sentence(),
             'billing_address' => [
-                'name' => $this->faker->name(),
-                'email' => $this->faker->email(),
-                'phone' => '+370'.$this->faker->numerify('#######'),
-                'address' => $this->faker->streetAddress(),
-                'city' => $this->faker->randomElement(['Vilnius', 'Kaunas', 'Klaipėda', 'Šiauliai', 'Panevėžys']),
-                'postal_code' => 'LT-'.$this->faker->numerify('#####'),
-                'country' => 'Lietuva',
+                'name'        => $this->faker->name(),
+                'email'       => $this->faker->email(),
+                'phone'       => '+370' . $this->faker->numerify('#######'),
+                'address'     => $this->faker->streetAddress(),
+                'city'        => $this->faker->randomElement(['Vilnius', 'Kaunas', 'Klaipėda', 'Šiauliai', 'Panevėžys']),
+                'postal_code' => 'LT-' . $this->faker->numerify('#####'),
+                'country'     => 'Lietuva',
             ],
             'shipping_address' => [
-                'name' => $this->faker->name(),
-                'email' => $this->faker->email(),
-                'phone' => '+370'.$this->faker->numerify('#######'),
-                'address' => $this->faker->streetAddress(),
-                'city' => $this->faker->randomElement(['Vilnius', 'Kaunas', 'Klaipėda', 'Šiauliai', 'Panevėžys']),
-                'postal_code' => 'LT-'.$this->faker->numerify('#####'),
-                'country' => 'Lietuva',
+                'name'        => $this->faker->name(),
+                'email'       => $this->faker->email(),
+                'phone'       => '+370' . $this->faker->numerify('#######'),
+                'address'     => $this->faker->streetAddress(),
+                'city'        => $this->faker->randomElement(['Vilnius', 'Kaunas', 'Klaipėda', 'Šiauliai', 'Panevėžys']),
+                'postal_code' => 'LT-' . $this->faker->numerify('#####'),
+                'country'     => 'Lietuva',
             ],
         ]);
     }
@@ -82,25 +82,25 @@ class OrderTranslationFactory extends Factory
     public function english(): static
     {
         return $this->state(fn (array $attributes) => [
-            'locale' => 'en',
-            'notes' => $this->faker->optional(0.3)->sentence(),
+            'locale'          => 'en',
+            'notes'           => $this->faker->optional(0.3)->sentence(),
             'billing_address' => [
-                'name' => $this->faker->name(),
-                'email' => $this->faker->email(),
-                'phone' => $this->faker->phoneNumber(),
-                'address' => $this->faker->streetAddress(),
-                'city' => $this->faker->city(),
+                'name'        => $this->faker->name(),
+                'email'       => $this->faker->email(),
+                'phone'       => $this->faker->phoneNumber(),
+                'address'     => $this->faker->streetAddress(),
+                'city'        => $this->faker->city(),
                 'postal_code' => $this->faker->postcode(),
-                'country' => $this->faker->country(),
+                'country'     => $this->faker->country(),
             ],
             'shipping_address' => [
-                'name' => $this->faker->name(),
-                'email' => $this->faker->email(),
-                'phone' => $this->faker->phoneNumber(),
-                'address' => $this->faker->streetAddress(),
-                'city' => $this->faker->city(),
+                'name'        => $this->faker->name(),
+                'email'       => $this->faker->email(),
+                'phone'       => $this->faker->phoneNumber(),
+                'address'     => $this->faker->streetAddress(),
+                'city'        => $this->faker->city(),
                 'postal_code' => $this->faker->postcode(),
-                'country' => $this->faker->country(),
+                'country'     => $this->faker->country(),
             ],
         ]);
     }

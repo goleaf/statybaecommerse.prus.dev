@@ -23,7 +23,7 @@ final class NewsCommentResourceTest extends TestCase
         parent::setUp();
 
         $adminUser = User::factory()->create([
-            'email' => 'admin@example.com',
+            'email'    => 'admin@example.com',
             'is_admin' => true,
         ]);
 
@@ -46,12 +46,12 @@ final class NewsCommentResourceTest extends TestCase
         // Arrange
         $news = $this->createTranslatedNews();
         $commentData = [
-            'news_id' => $news->id,
-            'author_name' => 'John Doe',
+            'news_id'      => $news->id,
+            'author_name'  => 'John Doe',
             'author_email' => 'john@example.com',
-            'content' => 'This is a test comment',
-            'is_approved' => false,
-            'is_visible' => true,
+            'content'      => 'This is a test comment',
+            'is_approved'  => false,
+            'is_visible'   => true,
         ];
 
         // Act
@@ -62,12 +62,12 @@ final class NewsCommentResourceTest extends TestCase
 
         // Assert
         $this->assertDatabaseHas('news_comments', [
-            'news_id' => $news->id,
-            'author_name' => 'John Doe',
+            'news_id'      => $news->id,
+            'author_name'  => 'John Doe',
             'author_email' => 'john@example.com',
-            'content' => 'This is a test comment',
-            'is_approved' => false,
-            'is_visible' => true,
+            'content'      => 'This is a test comment',
+            'is_approved'  => false,
+            'is_visible'   => true,
         ]);
     }
 
@@ -76,14 +76,14 @@ final class NewsCommentResourceTest extends TestCase
         // Arrange
         $news = $this->createTranslatedNews();
         $comment = NewsComment::factory()->create([
-            'news_id' => $news->id,
+            'news_id'     => $news->id,
             'author_name' => 'Original Author',
-            'content' => 'Original content',
+            'content'     => 'Original content',
         ]);
 
         $updatedData = [
             'author_name' => 'Updated Author',
-            'content' => 'Updated content',
+            'content'     => 'Updated content',
             'is_approved' => true,
         ];
 
@@ -97,9 +97,9 @@ final class NewsCommentResourceTest extends TestCase
 
         // Assert
         $this->assertDatabaseHas('news_comments', [
-            'id' => $comment->id,
+            'id'          => $comment->id,
             'author_name' => 'Updated Author',
-            'content' => 'Updated content',
+            'content'     => 'Updated content',
             'is_approved' => true,
         ]);
     }
@@ -123,7 +123,7 @@ final class NewsCommentResourceTest extends TestCase
         // Arrange
         $news = News::factory()->create();
         $comment = NewsComment::factory()->create([
-            'news_id' => $news->id,
+            'news_id'     => $news->id,
             'is_approved' => false,
         ]);
 
@@ -133,7 +133,7 @@ final class NewsCommentResourceTest extends TestCase
 
         // Assert
         $this->assertDatabaseHas('news_comments', [
-            'id' => $comment->id,
+            'id'          => $comment->id,
             'is_approved' => true,
         ]);
     }
@@ -158,11 +158,11 @@ final class NewsCommentResourceTest extends TestCase
         // Arrange
         $news = $this->createTranslatedNews();
         $approvedComment = NewsComment::factory()->create([
-            'news_id' => $news->id,
+            'news_id'     => $news->id,
             'is_approved' => true,
         ]);
         $unapprovedComment = NewsComment::factory()->create([
-            'news_id' => $news->id,
+            'news_id'     => $news->id,
             'is_approved' => false,
         ]);
 
@@ -178,11 +178,11 @@ final class NewsCommentResourceTest extends TestCase
         // Arrange
         $news = $this->createTranslatedNews();
         $visibleComment = NewsComment::factory()->create([
-            'news_id' => $news->id,
+            'news_id'    => $news->id,
             'is_visible' => true,
         ]);
         $hiddenComment = NewsComment::factory()->create([
-            'news_id' => $news->id,
+            'news_id'    => $news->id,
             'is_visible' => false,
         ]);
 
@@ -198,7 +198,7 @@ final class NewsCommentResourceTest extends TestCase
         // Arrange
         $news = $this->createTranslatedNews();
         $comments = NewsComment::factory()->count(3)->create([
-            'news_id' => $news->id,
+            'news_id'     => $news->id,
             'is_approved' => false,
         ]);
 
@@ -209,7 +209,7 @@ final class NewsCommentResourceTest extends TestCase
         // Assert
         foreach ($comments as $comment) {
             $this->assertDatabaseHas('news_comments', [
-                'id' => $comment->id,
+                'id'          => $comment->id,
                 'is_approved' => true,
             ]);
         }
@@ -220,7 +220,7 @@ final class NewsCommentResourceTest extends TestCase
         // Arrange
         $news = $this->createTranslatedNews();
         $comments = NewsComment::factory()->count(3)->create([
-            'news_id' => $news->id,
+            'news_id'     => $news->id,
             'is_approved' => true,
         ]);
 
@@ -231,7 +231,7 @@ final class NewsCommentResourceTest extends TestCase
         // Assert
         foreach ($comments as $comment) {
             $this->assertDatabaseHas('news_comments', [
-                'id' => $comment->id,
+                'id'          => $comment->id,
                 'is_approved' => false,
             ]);
         }
@@ -242,9 +242,9 @@ final class NewsCommentResourceTest extends TestCase
         // Act & Assert
         Livewire::test(\App\Filament\Resources\NewsCommentResource\Pages\CreateNewsComment::class)
             ->fillForm([
-                'author_name' => 'John Doe',
+                'author_name'  => 'John Doe',
                 'author_email' => 'john@example.com',
-                'content' => 'Test comment',
+                'content'      => 'Test comment',
             ])
             ->call('create')
             ->assertHasFormErrors(['news_id']);
@@ -258,9 +258,9 @@ final class NewsCommentResourceTest extends TestCase
         // Act & Assert
         Livewire::test(\App\Filament\Resources\NewsCommentResource\Pages\CreateNewsComment::class)
             ->fillForm([
-                'news_id' => $news->id,
+                'news_id'      => $news->id,
                 'author_email' => 'john@example.com',
-                'content' => 'Test comment',
+                'content'      => 'Test comment',
             ])
             ->call('create')
             ->assertHasFormErrors(['author_name']);
@@ -274,9 +274,9 @@ final class NewsCommentResourceTest extends TestCase
         // Act & Assert
         Livewire::test(\App\Filament\Resources\NewsCommentResource\Pages\CreateNewsComment::class)
             ->fillForm([
-                'news_id' => $news->id,
+                'news_id'     => $news->id,
                 'author_name' => 'John Doe',
-                'content' => 'Test comment',
+                'content'     => 'Test comment',
             ])
             ->call('create')
             ->assertHasFormErrors(['author_email']);
@@ -290,8 +290,8 @@ final class NewsCommentResourceTest extends TestCase
         // Act & Assert
         Livewire::test(\App\Filament\Resources\NewsCommentResource\Pages\CreateNewsComment::class)
             ->fillForm([
-                'news_id' => $news->id,
-                'author_name' => 'John Doe',
+                'news_id'      => $news->id,
+                'author_name'  => 'John Doe',
                 'author_email' => 'john@example.com',
             ])
             ->call('create')
@@ -306,10 +306,10 @@ final class NewsCommentResourceTest extends TestCase
         // Act & Assert
         Livewire::test(\App\Filament\Resources\NewsCommentResource\Pages\CreateNewsComment::class)
             ->fillForm([
-                'news_id' => $news->id,
-                'author_name' => 'John Doe',
+                'news_id'      => $news->id,
+                'author_name'  => 'John Doe',
                 'author_email' => 'invalid-email',
-                'content' => 'Test comment',
+                'content'      => 'Test comment',
             ])
             ->call('create')
             ->assertHasFormErrors(['author_email']);
@@ -320,10 +320,10 @@ final class NewsCommentResourceTest extends TestCase
         // Arrange
         $news = News::factory()->create();
         $comment = NewsComment::factory()->create([
-            'news_id' => $news->id,
-            'author_name' => 'John Doe',
+            'news_id'      => $news->id,
+            'author_name'  => 'John Doe',
             'author_email' => 'john@example.com',
-            'content' => 'Test comment content',
+            'content'      => 'Test comment content',
         ]);
 
         // Act & Assert
@@ -331,10 +331,10 @@ final class NewsCommentResourceTest extends TestCase
             'record' => $comment->getRouteKey(),
         ])
             ->assertFormSet([
-                'news_id' => $news->id,
-                'author_name' => 'John Doe',
+                'news_id'      => $news->id,
+                'author_name'  => 'John Doe',
                 'author_email' => 'john@example.com',
-                'content' => 'Test comment content',
+                'content'      => 'Test comment content',
             ]);
     }
 
@@ -343,11 +343,11 @@ final class NewsCommentResourceTest extends TestCase
         // Arrange
         $news = News::factory()->create();
         $searchableComment = NewsComment::factory()->create([
-            'news_id' => $news->id,
+            'news_id'     => $news->id,
             'author_name' => 'Searchable Author',
         ]);
         $otherComment = NewsComment::factory()->create([
-            'news_id' => $news->id,
+            'news_id'     => $news->id,
             'author_name' => 'Other Author',
         ]);
 
@@ -366,11 +366,11 @@ final class NewsCommentResourceTest extends TestCase
 
         Livewire::test(\App\Filament\Resources\NewsCommentResource\Pages\CreateNewsComment::class)
             ->fillForm([
-                'news_id' => $news->id,
+                'news_id'   => $news->id,
                 'parent_id' => $parentComment->id,
             ])
             ->assertFormSet([
-                'news_id' => $news->id,
+                'news_id'   => $news->id,
                 'parent_id' => $parentComment->id,
             ])
             ->set('data.author_name', 'Child Author')
@@ -381,10 +381,10 @@ final class NewsCommentResourceTest extends TestCase
 
         // Assert
         $this->assertDatabaseHas('news_comments', [
-            'news_id' => $news->id,
-            'parent_id' => $parentComment->id,
+            'news_id'     => $news->id,
+            'parent_id'   => $parentComment->id,
             'author_name' => 'Child Author',
-            'content' => 'This is a reply',
+            'content'     => 'This is a reply',
         ]);
     }
 
@@ -395,7 +395,7 @@ final class NewsCommentResourceTest extends TestCase
         foreach (self::SUPPORTED_LOCALES as $locale) {
             NewsTranslation::factory()->create([
                 'news_id' => $news->id,
-                'locale' => $locale,
+                'locale'  => $locale,
             ]);
         }
 

@@ -94,7 +94,7 @@ describe('AnalyticsEvent Resource', function () {
 
         livewire(AnalyticsEventResource\Pages\ListAnalyticsEvents::class)
             ->filterTable('created_at', [
-                'from' => now()->subDays(7)->toDateString(),
+                'from'  => now()->subDays(7)->toDateString(),
                 'until' => now()->toDateString(),
             ])
             ->assertCanSeeTableRecords($recentEvents)
@@ -124,9 +124,9 @@ describe('AnalyticsEvent Resource', function () {
     it('displays event properties correctly', function () {
         $event = AnalyticsEvent::factory()->create([
             'properties' => [
-                'product_id' => 123,
+                'product_id'   => 123,
                 'product_name' => 'Test Product',
-                'price' => 99.99,
+                'price'        => 99.99,
             ],
         ]);
 
@@ -183,21 +183,21 @@ describe('AnalyticsEvent Resource', function () {
 
         // Create events in chronological order
         AnalyticsEvent::factory()->create([
-            'user_id' => $user->id,
+            'user_id'    => $user->id,
             'session_id' => $sessionId,
             'event_type' => 'page_view',
             'created_at' => now()->subMinutes(10),
         ]);
 
         AnalyticsEvent::factory()->create([
-            'user_id' => $user->id,
+            'user_id'    => $user->id,
             'session_id' => $sessionId,
             'event_type' => 'product_view',
             'created_at' => now()->subMinutes(5),
         ]);
 
         AnalyticsEvent::factory()->create([
-            'user_id' => $user->id,
+            'user_id'    => $user->id,
             'session_id' => $sessionId,
             'event_type' => 'add_to_cart',
             'created_at' => now(),

@@ -18,9 +18,9 @@ enum ExportFormat: string
     public function mimeType(): string
     {
         return match ($this) {
-            self::CSV => 'text/csv',
+            self::CSV  => 'text/csv',
             self::XLSX => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-            self::PDF => 'application/pdf',
+            self::PDF  => 'application/pdf',
         };
     }
 }

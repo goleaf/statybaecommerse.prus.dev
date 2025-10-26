@@ -15,18 +15,18 @@ use Livewire\Component;
  * Livewire component for MobileAutocomplete with reactive frontend functionality, real-time updates, and user interaction handling.
  *
  * @property string $query
- * @property array $results
- * @property array $suggestions
- * @property bool $showResults
- * @property bool $showSuggestions
- * @property int $maxResults
- * @property int $minQueryLength
- * @property bool $isSearching
- * @property array $searchTypes
- * @property bool $enableSuggestions
- * @property bool $enableRecentSearches
- * @property bool $enablePopularSearches
- * @property bool $isFullScreen
+ * @property array  $results
+ * @property array  $suggestions
+ * @property bool   $showResults
+ * @property bool   $showSuggestions
+ * @property int    $maxResults
+ * @property int    $minQueryLength
+ * @property bool   $isSearching
+ * @property array  $searchTypes
+ * @property bool   $enableSuggestions
+ * @property bool   $enableRecentSearches
+ * @property bool   $enablePopularSearches
+ * @property bool   $isFullScreen
  */
 final class MobileAutocomplete extends Component
 {
@@ -183,7 +183,7 @@ final class MobileAutocomplete extends Component
     }
 
     /**
-     * @param  array<string, mixed>  $filters
+     * @param  array<string, mixed> $filters
      * @return array<string, mixed>
      */
     private function sanitizeFilters(array $filters): array

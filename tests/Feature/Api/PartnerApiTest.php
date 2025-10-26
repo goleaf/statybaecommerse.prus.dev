@@ -18,8 +18,8 @@ final class PartnerApiTest extends TestCase
         $credentials = ApiKey::generateCredentials();
 
         $apiKey = ApiKey::factory()->create([
-            'key' => $credentials['hashed'],
-            'scopes' => ['orders.read', 'analytics.read'],
+            'key'        => $credentials['hashed'],
+            'scopes'     => ['orders.read', 'analytics.read'],
             'rate_limit' => 5,
         ]);
 
@@ -52,8 +52,8 @@ final class PartnerApiTest extends TestCase
         $credentials = ApiKey::generateCredentials();
 
         ApiKey::factory()->create([
-            'key' => $credentials['hashed'],
-            'scopes' => ['analytics.read'],
+            'key'        => $credentials['hashed'],
+            'scopes'     => ['analytics.read'],
             'rate_limit' => 5,
         ]);
 
@@ -72,8 +72,8 @@ final class PartnerApiTest extends TestCase
         $credentials = ApiKey::generateCredentials();
 
         $apiKey = ApiKey::factory()->create([
-            'key' => $credentials['hashed'],
-            'scopes' => ['orders.read'],
+            'key'        => $credentials['hashed'],
+            'scopes'     => ['orders.read'],
             'rate_limit' => 1,
         ]);
 

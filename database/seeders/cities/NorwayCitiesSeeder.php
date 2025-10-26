@@ -9,6 +9,7 @@ use App\Models\Country;
 use App\Models\Translations\CityTranslation;
 use App\Models\Zone;
 use Illuminate\Database\Seeder;
+use Str;
 
 final class NorwayCitiesSeeder extends Seeder
 {
@@ -20,13 +21,13 @@ final class NorwayCitiesSeeder extends Seeder
         $cities = [
             // Oslo
             [
-                'name' => 'Oslo',
-                'code' => 'NO-03-OSL',
-                'is_capital' => true,
-                'is_default' => true,
-                'latitude' => 59.9139,
-                'longitude' => 10.7522,
-                'population' => 697010,
+                'name'         => 'Oslo',
+                'code'         => 'NO-03-OSL',
+                'is_capital'   => true,
+                'is_default'   => true,
+                'latitude'     => 59.9139,
+                'longitude'    => 10.7522,
+                'population'   => 697010,
                 'postal_codes' => ['0001', '0002', '0003'],
                 'translations' => [
                     'lt' => ['name' => 'Oslas', 'description' => 'Norvegijos sostinė'],
@@ -36,11 +37,11 @@ final class NorwayCitiesSeeder extends Seeder
 
             // Akershus
             [
-                'name' => 'Bærum',
-                'code' => 'NO-02-BAE',
-                'latitude' => 59.9333,
-                'longitude' => 10.5167,
-                'population' => 127000,
+                'name'         => 'Bærum',
+                'code'         => 'NO-02-BAE',
+                'latitude'     => 59.9333,
+                'longitude'    => 10.5167,
+                'population'   => 127000,
                 'postal_codes' => ['1300'],
                 'translations' => [
                     'lt' => ['name' => 'Berumas', 'description' => 'Akershuso miestas'],
@@ -48,11 +49,11 @@ final class NorwayCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Lillestrøm',
-                'code' => 'NO-02-LIL',
-                'latitude' => 59.9556,
-                'longitude' => 11.0472,
-                'population' => 87000,
+                'name'         => 'Lillestrøm',
+                'code'         => 'NO-02-LIL',
+                'latitude'     => 59.9556,
+                'longitude'    => 11.0472,
+                'population'   => 87000,
                 'postal_codes' => ['2000'],
                 'translations' => [
                     'lt' => ['name' => 'Lilestromas', 'description' => 'Akershuso sostinė'],
@@ -62,11 +63,11 @@ final class NorwayCitiesSeeder extends Seeder
 
             // Østfold
             [
-                'name' => 'Fredrikstad',
-                'code' => 'NO-01-FRE',
-                'latitude' => 59.2167,
-                'longitude' => 10.9500,
-                'population' => 83000,
+                'name'         => 'Fredrikstad',
+                'code'         => 'NO-01-FRE',
+                'latitude'     => 59.2167,
+                'longitude'    => 10.9500,
+                'population'   => 83000,
                 'postal_codes' => ['1600'],
                 'translations' => [
                     'lt' => ['name' => 'Fredrikstadas', 'description' => 'Istorinis miestas'],
@@ -74,11 +75,11 @@ final class NorwayCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Sarpsborg',
-                'code' => 'NO-01-SAR',
-                'latitude' => 59.2833,
-                'longitude' => 11.1167,
-                'population' => 57000,
+                'name'         => 'Sarpsborg',
+                'code'         => 'NO-01-SAR',
+                'latitude'     => 59.2833,
+                'longitude'    => 11.1167,
+                'population'   => 57000,
                 'postal_codes' => ['1700'],
                 'translations' => [
                     'lt' => ['name' => 'Sarpsborgas', 'description' => 'Pramonės miestas'],
@@ -88,11 +89,11 @@ final class NorwayCitiesSeeder extends Seeder
 
             // Vestfold
             [
-                'name' => 'Tønsberg',
-                'code' => 'NO-07-TON',
-                'latitude' => 59.2667,
-                'longitude' => 10.4167,
-                'population' => 57000,
+                'name'         => 'Tønsberg',
+                'code'         => 'NO-07-TON',
+                'latitude'     => 59.2667,
+                'longitude'    => 10.4167,
+                'population'   => 57000,
                 'postal_codes' => ['3100'],
                 'translations' => [
                     'lt' => ['name' => 'Tonsbergas', 'description' => 'Vestfoldo sostinė'],
@@ -100,11 +101,11 @@ final class NorwayCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Sandefjord',
-                'code' => 'NO-07-SAN',
-                'latitude' => 59.1333,
-                'longitude' => 10.2167,
-                'population' => 65000,
+                'name'         => 'Sandefjord',
+                'code'         => 'NO-07-SAN',
+                'latitude'     => 59.1333,
+                'longitude'    => 10.2167,
+                'population'   => 65000,
                 'postal_codes' => ['3200'],
                 'translations' => [
                     'lt' => ['name' => 'Sandefjordas', 'description' => 'Uostamiesčis'],
@@ -114,11 +115,11 @@ final class NorwayCitiesSeeder extends Seeder
 
             // Telemark
             [
-                'name' => 'Skien',
-                'code' => 'NO-08-SKI',
-                'latitude' => 59.2000,
-                'longitude' => 9.6000,
-                'population' => 55000,
+                'name'         => 'Skien',
+                'code'         => 'NO-08-SKI',
+                'latitude'     => 59.2000,
+                'longitude'    => 9.6000,
+                'population'   => 55000,
                 'postal_codes' => ['3700'],
                 'translations' => [
                     'lt' => ['name' => 'Skienas', 'description' => 'Telemarko sostinė'],
@@ -126,11 +127,11 @@ final class NorwayCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Porsgrunn',
-                'code' => 'NO-08-POR',
-                'latitude' => 59.1333,
-                'longitude' => 9.6500,
-                'population' => 36000,
+                'name'         => 'Porsgrunn',
+                'code'         => 'NO-08-POR',
+                'latitude'     => 59.1333,
+                'longitude'    => 9.6500,
+                'population'   => 36000,
                 'postal_codes' => ['3900'],
                 'translations' => [
                     'lt' => ['name' => 'Porsgrunas', 'description' => 'Pramonės miestas'],
@@ -140,11 +141,11 @@ final class NorwayCitiesSeeder extends Seeder
 
             // Aust-Agder
             [
-                'name' => 'Arendal',
-                'code' => 'NO-09-ARE',
-                'latitude' => 58.4667,
-                'longitude' => 8.7667,
-                'population' => 45000,
+                'name'         => 'Arendal',
+                'code'         => 'NO-09-ARE',
+                'latitude'     => 58.4667,
+                'longitude'    => 8.7667,
+                'population'   => 45000,
                 'postal_codes' => ['4800'],
                 'translations' => [
                     'lt' => ['name' => 'Arendalas', 'description' => 'Aust-Agderio sostinė'],
@@ -154,11 +155,11 @@ final class NorwayCitiesSeeder extends Seeder
 
             // Vest-Agder
             [
-                'name' => 'Kristiansand',
-                'code' => 'NO-10-KRI',
-                'latitude' => 58.1467,
-                'longitude' => 7.9956,
-                'population' => 112000,
+                'name'         => 'Kristiansand',
+                'code'         => 'NO-10-KRI',
+                'latitude'     => 58.1467,
+                'longitude'    => 7.9956,
+                'population'   => 112000,
                 'postal_codes' => ['4600'],
                 'translations' => [
                     'lt' => ['name' => 'Kristiansandas', 'description' => 'Vest-Agderio sostinė'],
@@ -168,11 +169,11 @@ final class NorwayCitiesSeeder extends Seeder
 
             // Rogaland
             [
-                'name' => 'Stavanger',
-                'code' => 'NO-11-STA',
-                'latitude' => 58.9700,
-                'longitude' => 5.7331,
-                'population' => 144699,
+                'name'         => 'Stavanger',
+                'code'         => 'NO-11-STA',
+                'latitude'     => 58.9700,
+                'longitude'    => 5.7331,
+                'population'   => 144699,
                 'postal_codes' => ['4000'],
                 'translations' => [
                     'lt' => ['name' => 'Stavangeras', 'description' => 'Rogalando sostinė'],
@@ -180,11 +181,11 @@ final class NorwayCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Sandnes',
-                'code' => 'NO-11-SAN',
-                'latitude' => 58.8500,
-                'longitude' => 5.7333,
-                'population' => 80000,
+                'name'         => 'Sandnes',
+                'code'         => 'NO-11-SAN',
+                'latitude'     => 58.8500,
+                'longitude'    => 5.7333,
+                'population'   => 80000,
                 'postal_codes' => ['4300'],
                 'translations' => [
                     'lt' => ['name' => 'Sandnesas', 'description' => 'Pramonės miestas'],
@@ -194,11 +195,11 @@ final class NorwayCitiesSeeder extends Seeder
 
             // Hordaland
             [
-                'name' => 'Bergen',
-                'code' => 'NO-12-BER',
-                'latitude' => 60.3913,
-                'longitude' => 5.3221,
-                'population' => 286930,
+                'name'         => 'Bergen',
+                'code'         => 'NO-12-BER',
+                'latitude'     => 60.3913,
+                'longitude'    => 5.3221,
+                'population'   => 286930,
                 'postal_codes' => ['5000'],
                 'translations' => [
                     'lt' => ['name' => 'Bergenas', 'description' => 'Hordalando sostinė'],
@@ -208,11 +209,11 @@ final class NorwayCitiesSeeder extends Seeder
 
             // Sogn og Fjordane
             [
-                'name' => 'Førde',
-                'code' => 'NO-14-FOR',
-                'latitude' => 61.4500,
-                'longitude' => 5.8500,
-                'population' => 13000,
+                'name'         => 'Førde',
+                'code'         => 'NO-14-FOR',
+                'latitude'     => 61.4500,
+                'longitude'    => 5.8500,
+                'population'   => 13000,
                 'postal_codes' => ['6800'],
                 'translations' => [
                     'lt' => ['name' => 'Forde', 'description' => 'Sogn og Fjordane sostinė'],
@@ -222,11 +223,11 @@ final class NorwayCitiesSeeder extends Seeder
 
             // Møre og Romsdal
             [
-                'name' => 'Ålesund',
-                'code' => 'NO-15-ALE',
-                'latitude' => 62.4722,
-                'longitude' => 6.1549,
-                'population' => 67000,
+                'name'         => 'Ålesund',
+                'code'         => 'NO-15-ALE',
+                'latitude'     => 62.4722,
+                'longitude'    => 6.1549,
+                'population'   => 67000,
                 'postal_codes' => ['6000'],
                 'translations' => [
                     'lt' => ['name' => 'Olesundas', 'description' => 'Uostamiesčis'],
@@ -234,11 +235,11 @@ final class NorwayCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Molde',
-                'code' => 'NO-15-MOL',
-                'latitude' => 62.7333,
-                'longitude' => 7.1833,
-                'population' => 26000,
+                'name'         => 'Molde',
+                'code'         => 'NO-15-MOL',
+                'latitude'     => 62.7333,
+                'longitude'    => 7.1833,
+                'population'   => 26000,
                 'postal_codes' => ['6400'],
                 'translations' => [
                     'lt' => ['name' => 'Moldė', 'description' => 'Møre og Romsdal sostinė'],
@@ -248,11 +249,11 @@ final class NorwayCitiesSeeder extends Seeder
 
             // Sør-Trøndelag
             [
-                'name' => 'Trondheim',
-                'code' => 'NO-16-TRO',
-                'latitude' => 63.4305,
-                'longitude' => 10.3951,
-                'population' => 205332,
+                'name'         => 'Trondheim',
+                'code'         => 'NO-16-TRO',
+                'latitude'     => 63.4305,
+                'longitude'    => 10.3951,
+                'population'   => 205332,
                 'postal_codes' => ['7000'],
                 'translations' => [
                     'lt' => ['name' => 'Trondheimas', 'description' => 'Sør-Trøndelag sostinė'],
@@ -262,11 +263,11 @@ final class NorwayCitiesSeeder extends Seeder
 
             // Nord-Trøndelag
             [
-                'name' => 'Steinkjer',
-                'code' => 'NO-17-STE',
-                'latitude' => 64.0167,
-                'longitude' => 11.5000,
-                'population' => 21000,
+                'name'         => 'Steinkjer',
+                'code'         => 'NO-17-STE',
+                'latitude'     => 64.0167,
+                'longitude'    => 11.5000,
+                'population'   => 21000,
                 'postal_codes' => ['7700'],
                 'translations' => [
                     'lt' => ['name' => 'Steinkjeras', 'description' => 'Nord-Trøndelag sostinė'],
@@ -276,11 +277,11 @@ final class NorwayCitiesSeeder extends Seeder
 
             // Nordland
             [
-                'name' => 'Bodø',
-                'code' => 'NO-18-BOD',
-                'latitude' => 67.2833,
-                'longitude' => 14.3833,
-                'population' => 52000,
+                'name'         => 'Bodø',
+                'code'         => 'NO-18-BOD',
+                'latitude'     => 67.2833,
+                'longitude'    => 14.3833,
+                'population'   => 52000,
                 'postal_codes' => ['8000'],
                 'translations' => [
                     'lt' => ['name' => 'Bodė', 'description' => 'Nordlando sostinė'],
@@ -288,11 +289,11 @@ final class NorwayCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Narvik',
-                'code' => 'NO-18-NAR',
-                'latitude' => 68.4381,
-                'longitude' => 17.4278,
-                'population' => 21000,
+                'name'         => 'Narvik',
+                'code'         => 'NO-18-NAR',
+                'latitude'     => 68.4381,
+                'longitude'    => 17.4278,
+                'population'   => 21000,
                 'postal_codes' => ['8500'],
                 'translations' => [
                     'lt' => ['name' => 'Narvikas', 'description' => 'Uostamiesčis'],
@@ -302,11 +303,11 @@ final class NorwayCitiesSeeder extends Seeder
 
             // Troms
             [
-                'name' => 'Tromsø',
-                'code' => 'NO-19-TRO',
-                'latitude' => 69.6492,
-                'longitude' => 18.9553,
-                'population' => 77000,
+                'name'         => 'Tromsø',
+                'code'         => 'NO-19-TRO',
+                'latitude'     => 69.6492,
+                'longitude'    => 18.9553,
+                'population'   => 77000,
                 'postal_codes' => ['9000'],
                 'translations' => [
                     'lt' => ['name' => 'Tromsė', 'description' => 'Tromso sostinė'],
@@ -316,11 +317,11 @@ final class NorwayCitiesSeeder extends Seeder
 
             // Finnmark
             [
-                'name' => 'Alta',
-                'code' => 'NO-20-ALT',
-                'latitude' => 69.9689,
-                'longitude' => 23.2717,
-                'population' => 21000,
+                'name'         => 'Alta',
+                'code'         => 'NO-20-ALT',
+                'latitude'     => 69.9689,
+                'longitude'    => 23.2717,
+                'population'   => 21000,
                 'postal_codes' => ['9500'],
                 'translations' => [
                     'lt' => ['name' => 'Alta', 'description' => 'Finnmarko miestas'],
@@ -328,11 +329,11 @@ final class NorwayCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Vadsø',
-                'code' => 'NO-20-VAD',
-                'latitude' => 70.0736,
-                'longitude' => 29.7494,
-                'population' => 6000,
+                'name'         => 'Vadsø',
+                'code'         => 'NO-20-VAD',
+                'latitude'     => 70.0736,
+                'longitude'    => 29.7494,
+                'population'   => 6000,
                 'postal_codes' => ['9800'],
                 'translations' => [
                     'lt' => ['name' => 'Vadsė', 'description' => 'Finnmarko sostinė'],
@@ -342,11 +343,11 @@ final class NorwayCitiesSeeder extends Seeder
 
             // Oppland
             [
-                'name' => 'Lillehammer',
-                'code' => 'NO-05-LIL',
-                'latitude' => 61.1167,
-                'longitude' => 10.4667,
-                'population' => 28000,
+                'name'         => 'Lillehammer',
+                'code'         => 'NO-05-LIL',
+                'latitude'     => 61.1167,
+                'longitude'    => 10.4667,
+                'population'   => 28000,
                 'postal_codes' => ['2600'],
                 'translations' => [
                     'lt' => ['name' => 'Lilehameras', 'description' => 'Žiemos sporto miestas'],
@@ -354,11 +355,11 @@ final class NorwayCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Gjøvik',
-                'code' => 'NO-05-GJO',
-                'latitude' => 60.8000,
-                'longitude' => 10.7000,
-                'population' => 30000,
+                'name'         => 'Gjøvik',
+                'code'         => 'NO-05-GJO',
+                'latitude'     => 60.8000,
+                'longitude'    => 10.7000,
+                'population'   => 30000,
                 'postal_codes' => ['2800'],
                 'translations' => [
                     'lt' => ['name' => 'Gjovikas', 'description' => 'Pramonės miestas'],
@@ -368,11 +369,11 @@ final class NorwayCitiesSeeder extends Seeder
 
             // Hedmark
             [
-                'name' => 'Hamar',
-                'code' => 'NO-04-HAM',
-                'latitude' => 60.8000,
-                'longitude' => 11.0667,
-                'population' => 31000,
+                'name'         => 'Hamar',
+                'code'         => 'NO-04-HAM',
+                'latitude'     => 60.8000,
+                'longitude'    => 11.0667,
+                'population'   => 31000,
                 'postal_codes' => ['2300'],
                 'translations' => [
                     'lt' => ['name' => 'Hamaras', 'description' => 'Hedmarko sostinė'],
@@ -380,11 +381,11 @@ final class NorwayCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Kongsvinger',
-                'code' => 'NO-04-KON',
-                'latitude' => 60.1833,
-                'longitude' => 12.0000,
-                'population' => 18000,
+                'name'         => 'Kongsvinger',
+                'code'         => 'NO-04-KON',
+                'latitude'     => 60.1833,
+                'longitude'    => 12.0000,
+                'population'   => 18000,
                 'postal_codes' => ['2200'],
                 'translations' => [
                     'lt' => ['name' => 'Kongsvingeras', 'description' => 'Istorinis miestas'],
@@ -394,11 +395,11 @@ final class NorwayCitiesSeeder extends Seeder
 
             // Buskerud
             [
-                'name' => 'Drammen',
-                'code' => 'NO-06-DRA',
-                'latitude' => 59.7439,
-                'longitude' => 10.2044,
-                'population' => 100000,
+                'name'         => 'Drammen',
+                'code'         => 'NO-06-DRA',
+                'latitude'     => 59.7439,
+                'longitude'    => 10.2044,
+                'population'   => 100000,
                 'postal_codes' => ['3000'],
                 'translations' => [
                     'lt' => ['name' => 'Dramenas', 'description' => 'Buskerudo sostinė'],
@@ -406,11 +407,11 @@ final class NorwayCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Kongsberg',
-                'code' => 'NO-06-KON',
-                'latitude' => 59.6667,
-                'longitude' => 9.6500,
-                'population' => 28000,
+                'name'         => 'Kongsberg',
+                'code'         => 'NO-06-KON',
+                'latitude'     => 59.6667,
+                'longitude'    => 9.6500,
+                'population'   => 28000,
                 'postal_codes' => ['3600'],
                 'translations' => [
                     'lt' => ['name' => 'Kongsbergas', 'description' => 'Kasybos miestas'],
@@ -423,19 +424,19 @@ final class NorwayCitiesSeeder extends Seeder
             $city = City::updateOrCreate(
                 ['code' => $cityData['code']],
                 [
-                    'name' => $cityData['name'],
-                    'slug' => \Str::slug($cityData['name'].'-'.$cityData['code']),
-                    'is_enabled' => true,
-                    'is_default' => $cityData['is_default'] ?? false,
-                    'is_capital' => $cityData['is_capital'] ?? false,
-                    'country_id' => $norway->id,
-                    'zone_id' => $euZone?->id,
-                    'level' => 1,
-                    'latitude' => $cityData['latitude'],
-                    'longitude' => $cityData['longitude'],
-                    'population' => $cityData['population'],
+                    'name'         => $cityData['name'],
+                    'slug'         => Str::slug($cityData['name'] . '-' . $cityData['code']),
+                    'is_enabled'   => true,
+                    'is_default'   => $cityData['is_default'] ?? false,
+                    'is_capital'   => $cityData['is_capital'] ?? false,
+                    'country_id'   => $norway->id,
+                    'zone_id'      => $euZone?->id,
+                    'level'        => 1,
+                    'latitude'     => $cityData['latitude'],
+                    'longitude'    => $cityData['longitude'],
+                    'population'   => $cityData['population'],
                     'postal_codes' => $cityData['postal_codes'],
-                    'sort_order' => 0,
+                    'sort_order'   => 0,
                 ]
             );
 
@@ -444,10 +445,10 @@ final class NorwayCitiesSeeder extends Seeder
                 CityTranslation::updateOrCreate(
                     [
                         'city_id' => $city->id,
-                        'locale' => $locale,
+                        'locale'  => $locale,
                     ],
                     [
-                        'name' => $translation['name'],
+                        'name'        => $translation['name'],
                         'description' => $translation['description'],
                     ]
                 );

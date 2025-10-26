@@ -54,7 +54,7 @@ final class SystemNotification extends Notification implements ShouldQueue
     public function toMail(object $notifiable): MailMessage
     {
         // Provide a simple email containing the system broadcast.
-        return (new MailMessage())
+        return (new MailMessage)
             ->subject($this->data['title'])
             ->line($this->data['message'])
             ->line(__('This message was sent from the system administration console.'));

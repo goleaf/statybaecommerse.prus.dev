@@ -17,10 +17,10 @@ test('it downloads completed export artifacts via signed url', function (): void
     Storage::disk('public')->put($artifactPath, "number,status\n1001,paid");
 
     $export = Export::factory()->create([
-        'status' => ExportStatus::Completed,
-        'format' => 'csv',
-        'artifact_disk' => 'public',
-        'artifact_path' => $artifactPath,
+        'status'            => ExportStatus::Completed,
+        'format'            => 'csv',
+        'artifact_disk'     => 'public',
+        'artifact_path'     => $artifactPath,
         'artifact_filename' => 'orders.csv',
     ]);
 
@@ -44,9 +44,9 @@ test('it returns not found for missing or incomplete exports', function (): void
     $this->get($queuedUrl)->assertNotFound();
 
     $missingExport = Export::factory()->create([
-        'status' => ExportStatus::Completed,
-        'artifact_disk' => 'public',
-        'artifact_path' => 'exports/missing.csv',
+        'status'            => ExportStatus::Completed,
+        'artifact_disk'     => 'public',
+        'artifact_path'     => 'exports/missing.csv',
         'artifact_filename' => 'missing.csv',
     ]);
 

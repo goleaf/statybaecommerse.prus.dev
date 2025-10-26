@@ -33,7 +33,7 @@ final class DocumentActionTest extends TestCase
         $this->actingAs($this->user);
 
         $this->template = DocumentTemplate::factory()->active()->create([
-            'name' => 'Test Template',
+            'name'    => 'Test Template',
             'content' => 'Test content with {{VARIABLE}}',
         ]);
     }
@@ -91,12 +91,12 @@ final class DocumentActionTest extends TestCase
 
         $data = [
             'template_id' => $this->template->id,
-            'format' => 'html',
-            'title' => 'Test Document',
+            'format'      => 'html',
+            'title'       => 'Test Document',
         ];
 
         $document = Document::make([
-            'title' => $data['title'],
+            'title'   => $data['title'],
             'content' => '<p>Generated</p>',
         ]);
 
@@ -135,12 +135,12 @@ final class DocumentActionTest extends TestCase
 
         $data = [
             'template_id' => $this->template->id,
-            'format' => 'pdf',
-            'title' => 'Test PDF Document',
+            'format'      => 'pdf',
+            'title'       => 'Test PDF Document',
         ];
 
         $document = Document::make([
-            'title' => $data['title'],
+            'title'   => $data['title'],
             'content' => '<p>Generated</p>',
         ]);
 

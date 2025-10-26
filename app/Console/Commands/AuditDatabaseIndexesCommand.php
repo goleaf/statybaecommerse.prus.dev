@@ -7,7 +7,6 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use Illuminate\Database\Connection;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 use stdClass;
 
 /**

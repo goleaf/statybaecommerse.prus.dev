@@ -21,7 +21,7 @@ final class SearchRankingService
             return $results;
         }
 
-        $cacheKey = self::CACHE_PREFIX.'ranked_'.md5($query.serialize($context));
+        $cacheKey = self::CACHE_PREFIX . 'ranked_' . md5($query . serialize($context));
 
         return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($results, $query, $context) {
             $rankedResults = [];
@@ -248,7 +248,7 @@ final class SearchRankingService
      */
     private function calculateUserPreferenceScore(array $result, int $userId): float
     {
-        $cacheKey = self::CACHE_PREFIX.'user_prefs_'.$userId;
+        $cacheKey = self::CACHE_PREFIX . 'user_prefs_' . $userId;
 
         return Cache::remember($cacheKey, 1800, function () {
             // This would typically analyze user's past behavior
@@ -292,11 +292,11 @@ final class SearchRankingService
         $resultText = '';
 
         if (isset($result['title'])) {
-            $resultText .= $result['title'].' ';
+            $resultText .= $result['title'] . ' ';
         }
 
         if (isset($result['description'])) {
-            $resultText .= $result['description'].' ';
+            $resultText .= $result['description'] . ' ';
         }
 
         $resultWords = explode(' ', strtolower($resultText));
@@ -354,9 +354,9 @@ final class SearchRankingService
     {
         return [
             'text_matching' => $this->calculateTextMatchingScore($result, $query),
-            'popularity' => $this->calculatePopularityScore($result),
-            'context' => $this->calculateContextScore($result, []),
-            'total_score' => $result['ranking_score'] ?? 0,
+            'popularity'    => $this->calculatePopularityScore($result),
+            'context'       => $this->calculateContextScore($result, []),
+            'total_score'   => $result['ranking_score'] ?? 0,
         ];
     }
 }

@@ -49,7 +49,7 @@ return [
         'reviews_count'             => 'Reviews Count',
         'average_rating'            => 'Average Rating',
         'price_increase_percentage' => 'Price Increase Percentage',
-        'variant_attribute_matrix' => 'Variant attribute availability',
+        'variant_attribute_matrix'  => 'Variant attribute availability',
     ],
     'sections' => [
         'variant_matrix' => 'Variant availability matrix',

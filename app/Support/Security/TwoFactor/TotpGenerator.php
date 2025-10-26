@@ -10,6 +10,7 @@ namespace App\Support\Security\TwoFactor;
 final class TotpGenerator
 {
     private const DEFAULT_STEP_SECONDS = 30;
+
     private const DEFAULT_DIGITS = 6;
 
     /**
@@ -29,11 +30,11 @@ final class TotpGenerator
         $counterBytes = pack('N*', 0, $counter);
         $hash = hash_hmac('sha1', $counterBytes, $binarySecret, true);
 
-        $offset = ord(substr($hash, -1)) & 0x0f;
-        $binary = ((ord($hash[$offset]) & 0x7f) << 24)
-            | ((ord($hash[$offset + 1]) & 0xff) << 16)
-            | ((ord($hash[$offset + 2]) & 0xff) << 8)
-            | (ord($hash[$offset + 3]) & 0xff);
+        $offset = ord(substr($hash, -1)) & 0x0F;
+        $binary = ((ord($hash[$offset]) & 0x7F) << 24)
+            | ((ord($hash[$offset + 1]) & 0xFF) << 16)
+            | ((ord($hash[$offset + 2]) & 0xFF) << 8)
+            | (ord($hash[$offset + 3]) & 0xFF);
 
         $otp = $binary % (10 ** $digits);
 

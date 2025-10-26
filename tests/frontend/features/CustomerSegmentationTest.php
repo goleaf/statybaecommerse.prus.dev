@@ -17,19 +17,19 @@ final class CustomerSegmentationTest extends TestCase
     {
         // Create some customer groups
         CustomerGroup::factory()->create([
-            'name' => 'VIP Customers',
-            'slug' => 'vip-customers',
-            'description' => 'High-value customers',
+            'name'                => 'VIP Customers',
+            'slug'                => 'vip-customers',
+            'description'         => 'High-value customers',
             'discount_percentage' => 15.0,
-            'is_enabled' => true,
+            'is_enabled'          => true,
         ]);
 
         CustomerGroup::factory()->create([
-            'name' => 'Regular Customers',
-            'slug' => 'regular-customers',
-            'description' => 'Standard customers',
+            'name'                => 'Regular Customers',
+            'slug'                => 'regular-customers',
+            'description'         => 'Standard customers',
             'discount_percentage' => 5.0,
-            'is_enabled' => true,
+            'is_enabled'          => true,
         ]);
 
         // Create a user and assign to a group
@@ -46,48 +46,48 @@ final class CustomerSegmentationTest extends TestCase
     {
         // Create customer groups
         $vipGroup = CustomerGroup::factory()->create([
-            'name' => 'VIP Customers',
+            'name'                => 'VIP Customers',
             'discount_percentage' => 15.0,
-            'is_enabled' => true,
+            'is_enabled'          => true,
         ]);
 
         $regularGroup = CustomerGroup::factory()->create([
-            'name' => 'Regular Customers',
+            'name'                => 'Regular Customers',
             'discount_percentage' => 5.0,
-            'is_enabled' => false,
+            'is_enabled'          => false,
         ]);
 
         // Test that groups are displayed
         $this->assertDatabaseHas('customer_groups', [
-            'name' => 'VIP Customers',
+            'name'                => 'VIP Customers',
             'discount_percentage' => 15.0,
-            'is_enabled' => true,
+            'is_enabled'          => true,
         ]);
 
         $this->assertDatabaseHas('customer_groups', [
-            'name' => 'Regular Customers',
+            'name'                => 'Regular Customers',
             'discount_percentage' => 5.0,
-            'is_enabled' => false,
+            'is_enabled'          => false,
         ]);
     }
 
     public function test_customer_group_creation(): void
     {
         $groupData = [
-            'name' => 'Test Group',
-            'slug' => 'test-group',
-            'description' => 'Test description',
+            'name'                => 'Test Group',
+            'slug'                => 'test-group',
+            'description'         => 'Test description',
             'discount_percentage' => 10.0,
-            'is_enabled' => true,
+            'is_enabled'          => true,
         ];
 
         $group = CustomerGroup::create($groupData);
 
         $this->assertDatabaseHas('customer_groups', [
-            'name' => 'Test Group',
-            'slug' => 'test-group',
+            'name'                => 'Test Group',
+            'slug'                => 'test-group',
             'discount_percentage' => 10.0,
-            'is_enabled' => true,
+            'is_enabled'          => true,
         ]);
 
         $this->assertEquals('Test Group', $group->name);

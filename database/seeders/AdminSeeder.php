@@ -1004,7 +1004,7 @@ final class AdminSeeder extends Seeder
                 ['locale' => $locale],
                 [
                     'name'              => $name,
-                    'slug'              => Str::slug($name.'-'.$locale),
+                    'slug'              => Str::slug($name . '-' . $locale),
                     'summary'           => $shortDescription,
                     'description'       => $description,
                     'short_description' => $shortDescription,
@@ -1029,7 +1029,7 @@ final class AdminSeeder extends Seeder
                 ['locale' => $locale],
                 [
                     'name'        => $name,
-                    'slug'        => Str::slug($name.'-'.$locale),
+                    'slug'        => Str::slug($name . '-' . $locale),
                     'description' => $description,
                 ],
             );

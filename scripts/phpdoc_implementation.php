@@ -9,7 +9,7 @@ declare(strict_types=1);
  * to all PHP classes in the Laravel application following PSR-5 standards.
  */
 
-require_once __DIR__.'/../vendor/autoload.php';
+require_once __DIR__ . '/../vendor/autoload.php';
 
 use PhpParser\Node;
 use PhpParser\NodeTraverser;
@@ -74,7 +74,7 @@ class PHPDocImplementation
      */
     private function processDirectory(string $directory): void
     {
-        $fullPath = __DIR__.'/../'.$directory;
+        $fullPath = __DIR__ . '/../' . $directory;
 
         if (! is_dir($fullPath)) {
             echo "⚠️  Directory not found: {$directory}\n";
@@ -115,7 +115,7 @@ class PHPDocImplementation
      */
     private function processFile(string $filePath, string $relativeDirectory): void
     {
-        $relativePath = str_replace(__DIR__.'/../', '', $filePath);
+        $relativePath = str_replace(__DIR__ . '/../', '', $filePath);
 
         try {
             $content = file_get_contents($filePath);
@@ -154,8 +154,8 @@ class PHPDocImplementation
             }
 
         } catch (Exception $e) {
-            $this->errors[] = "Error processing {$relativePath}: ".$e->getMessage();
-            echo "  ❌ {$relativePath} - Error: ".$e->getMessage()."\n";
+            $this->errors[] = "Error processing {$relativePath}: " . $e->getMessage();
+            echo "  ❌ {$relativePath} - Error: " . $e->getMessage() . "\n";
         }
     }
 
@@ -175,12 +175,12 @@ class PHPDocImplementation
      */
     private function generateReport(): void
     {
-        echo "\n".str_repeat('=', 60)."\n";
+        echo "\n" . str_repeat('=', 60) . "\n";
         echo "📊 PHPDoc Implementation Report\n";
-        echo str_repeat('=', 60)."\n\n";
+        echo str_repeat('=', 60) . "\n\n";
 
-        echo '✅ Files Processed: '.count($this->processedFiles)."\n";
-        echo '❌ Errors: '.count($this->errors)."\n\n";
+        echo '✅ Files Processed: ' . count($this->processedFiles) . "\n";
+        echo '❌ Errors: ' . count($this->errors) . "\n\n";
 
         if (! empty($this->processedFiles)) {
             echo "📝 Modified Files:\n";
@@ -235,10 +235,10 @@ class PHPDocVisitor extends NodeVisitorAbstract
     {
         $className = $node->name->name ?? 'Unknown';
         $this->classInfo = [
-            'name' => $className,
-            'type' => 'class',
-            'properties' => [],
-            'methods' => [],
+            'name'          => $className,
+            'type'          => 'class',
+            'properties'    => [],
+            'methods'       => [],
             'relationships' => [],
         ];
 
@@ -276,8 +276,8 @@ class PHPDocVisitor extends NodeVisitorAbstract
     {
         foreach ($property->props as $prop) {
             $this->classInfo['properties'][] = [
-                'name' => $prop->name->name,
-                'type' => $this->getPropertyType($property),
+                'name'       => $prop->name->name,
+                'type'       => $this->getPropertyType($property),
                 'visibility' => $this->getVisibility($property),
             ];
         }
@@ -286,7 +286,7 @@ class PHPDocVisitor extends NodeVisitorAbstract
     private function analyzeMethod(Node\Stmt\ClassMethod $method): void
     {
         $this->classInfo['methods'][] = [
-            'name' => $method->name->name,
+            'name'       => $method->name->name,
             'visibility' => $this->getVisibility($method),
             'parameters' => $this->getMethodParameters($method),
             'returnType' => $this->getReturnType($method),

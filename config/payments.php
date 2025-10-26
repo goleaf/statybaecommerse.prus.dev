@@ -11,10 +11,10 @@ return [
     'stripe' => [
         'enabled' => (bool) env('PAYMENT_STRIPE_ENABLED', true),
         'webhook' => [
-            'secret' => env('STRIPE_WEBHOOK_SECRET', 'whsec_test'),
+            'secret'           => env('STRIPE_WEBHOOK_SECRET', 'whsec_test'),
             'signature_header' => env('STRIPE_WEBHOOK_SIGNATURE_HEADER', 'Stripe-Signature'),
             'timestamp_header' => env('STRIPE_WEBHOOK_TIMESTAMP_HEADER', 'Stripe-Timestamp'),
-            'tolerance' => (int) env('STRIPE_WEBHOOK_TOLERANCE', 300),
+            'tolerance'        => (int) env('STRIPE_WEBHOOK_TOLERANCE', 300),
         ],
     ],
 
@@ -26,10 +26,10 @@ return [
     'notchpay' => [
         'enabled' => (bool) env('PAYMENT_NOTCHPAY_ENABLED', true),
         'webhook' => [
-            'secret' => env('NOTCHPAY_WEBHOOK_SECRET', 'notchpay_test_secret'),
+            'secret'           => env('NOTCHPAY_WEBHOOK_SECRET', 'notchpay_test_secret'),
             'signature_header' => env('NOTCHPAY_WEBHOOK_SIGNATURE_HEADER', 'X-Notchpay-Signature'),
             'timestamp_header' => env('NOTCHPAY_WEBHOOK_TIMESTAMP_HEADER', 'X-Notchpay-Timestamp'),
-            'tolerance' => (int) env('NOTCHPAY_WEBHOOK_TOLERANCE', 300),
+            'tolerance'        => (int) env('NOTCHPAY_WEBHOOK_TOLERANCE', 300),
         ],
     ],
 

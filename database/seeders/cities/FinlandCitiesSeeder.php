@@ -9,6 +9,7 @@ use App\Models\Country;
 use App\Models\Translations\CityTranslation;
 use App\Models\Zone;
 use Illuminate\Database\Seeder;
+use Str;
 
 final class FinlandCitiesSeeder extends Seeder
 {
@@ -22,13 +23,13 @@ final class FinlandCitiesSeeder extends Seeder
         $cities = [
             // Uusimaa
             [
-                'name' => 'Helsinki',
-                'code' => 'FI-18-HEL',
-                'is_capital' => true,
-                'is_default' => true,
-                'latitude' => 60.1699,
-                'longitude' => 24.9384,
-                'population' => 656920,
+                'name'         => 'Helsinki',
+                'code'         => 'FI-18-HEL',
+                'is_capital'   => true,
+                'is_default'   => true,
+                'latitude'     => 60.1699,
+                'longitude'    => 24.9384,
+                'population'   => 656920,
                 'postal_codes' => ['00100', '00101', '00102'],
                 'translations' => [
                     'lt' => ['name' => 'Helsinkis', 'description' => 'Suomijos sostinė'],
@@ -36,11 +37,11 @@ final class FinlandCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Espoo',
-                'code' => 'FI-18-ESP',
-                'latitude' => 60.2052,
-                'longitude' => 24.6522,
-                'population' => 293000,
+                'name'         => 'Espoo',
+                'code'         => 'FI-18-ESP',
+                'latitude'     => 60.2052,
+                'longitude'    => 24.6522,
+                'population'   => 293000,
                 'postal_codes' => ['02000'],
                 'translations' => [
                     'lt' => ['name' => 'Espo', 'description' => 'Technologijų miestas'],
@@ -48,11 +49,11 @@ final class FinlandCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Vantaa',
-                'code' => 'FI-18-VAN',
-                'latitude' => 60.2941,
-                'longitude' => 25.0408,
-                'population' => 240000,
+                'name'         => 'Vantaa',
+                'code'         => 'FI-18-VAN',
+                'latitude'     => 60.2941,
+                'longitude'    => 25.0408,
+                'population'   => 240000,
                 'postal_codes' => ['01000'],
                 'translations' => [
                     'lt' => ['name' => 'Vanta', 'description' => 'Oro uosto miestas'],
@@ -60,11 +61,11 @@ final class FinlandCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Kauniainen',
-                'code' => 'FI-18-KAU',
-                'latitude' => 60.2092,
-                'longitude' => 24.7281,
-                'population' => 10000,
+                'name'         => 'Kauniainen',
+                'code'         => 'FI-18-KAU',
+                'latitude'     => 60.2092,
+                'longitude'    => 24.7281,
+                'population'   => 10000,
                 'postal_codes' => ['02700'],
                 'translations' => [
                     'lt' => ['name' => 'Kaunianenas', 'description' => 'Prabangus miestas'],
@@ -74,11 +75,11 @@ final class FinlandCitiesSeeder extends Seeder
 
             // Varsinais-Suomi
             [
-                'name' => 'Turku',
-                'code' => 'FI-19-TUR',
-                'latitude' => 60.4518,
-                'longitude' => 22.2666,
-                'population' => 195000,
+                'name'         => 'Turku',
+                'code'         => 'FI-19-TUR',
+                'latitude'     => 60.4518,
+                'longitude'    => 22.2666,
+                'population'   => 195000,
                 'postal_codes' => ['20000'],
                 'translations' => [
                     'lt' => ['name' => 'Turku', 'description' => 'Istorinis miestas'],
@@ -86,11 +87,11 @@ final class FinlandCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Salo',
-                'code' => 'FI-19-SAL',
-                'latitude' => 60.3833,
-                'longitude' => 23.1333,
-                'population' => 55000,
+                'name'         => 'Salo',
+                'code'         => 'FI-19-SAL',
+                'latitude'     => 60.3833,
+                'longitude'    => 23.1333,
+                'population'   => 55000,
                 'postal_codes' => ['24100'],
                 'translations' => [
                     'lt' => ['name' => 'Salo', 'description' => 'Pramonės miestas'],
@@ -98,11 +99,11 @@ final class FinlandCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Raisio',
-                'code' => 'FI-19-RAI',
-                'latitude' => 60.4833,
-                'longitude' => 22.1667,
-                'population' => 25000,
+                'name'         => 'Raisio',
+                'code'         => 'FI-19-RAI',
+                'latitude'     => 60.4833,
+                'longitude'    => 22.1667,
+                'population'   => 25000,
                 'postal_codes' => ['21200'],
                 'translations' => [
                     'lt' => ['name' => 'Raisio', 'description' => 'Pramonės centras'],
@@ -112,11 +113,11 @@ final class FinlandCitiesSeeder extends Seeder
 
             // Satakunta
             [
-                'name' => 'Pori',
-                'code' => 'FI-17-POR',
-                'latitude' => 61.4833,
-                'longitude' => 21.8000,
-                'population' => 85000,
+                'name'         => 'Pori',
+                'code'         => 'FI-17-POR',
+                'latitude'     => 61.4833,
+                'longitude'    => 21.8000,
+                'population'   => 85000,
                 'postal_codes' => ['28000'],
                 'translations' => [
                     'lt' => ['name' => 'Pori', 'description' => 'Satakuntos sostinė'],
@@ -124,11 +125,11 @@ final class FinlandCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Rauma',
-                'code' => 'FI-17-RAU',
-                'latitude' => 61.1333,
-                'longitude' => 21.5000,
-                'population' => 40000,
+                'name'         => 'Rauma',
+                'code'         => 'FI-17-RAU',
+                'latitude'     => 61.1333,
+                'longitude'    => 21.5000,
+                'population'   => 40000,
                 'postal_codes' => ['26100'],
                 'translations' => [
                     'lt' => ['name' => 'Rauma', 'description' => 'UNESCO miestas'],
@@ -138,11 +139,11 @@ final class FinlandCitiesSeeder extends Seeder
 
             // Kanta-Häme
             [
-                'name' => 'Hämeenlinna',
-                'code' => 'FI-05-HAM',
-                'latitude' => 61.0000,
-                'longitude' => 24.4667,
-                'population' => 68000,
+                'name'         => 'Hämeenlinna',
+                'code'         => 'FI-05-HAM',
+                'latitude'     => 61.0000,
+                'longitude'    => 24.4667,
+                'population'   => 68000,
                 'postal_codes' => ['13000'],
                 'translations' => [
                     'lt' => ['name' => 'Hämeenlinna', 'description' => 'Kanta-Häme sostinė'],
@@ -152,11 +153,11 @@ final class FinlandCitiesSeeder extends Seeder
 
             // Pirkanmaa
             [
-                'name' => 'Tampere',
-                'code' => 'FI-11-TAM',
-                'latitude' => 61.4981,
-                'longitude' => 23.7608,
-                'population' => 244000,
+                'name'         => 'Tampere',
+                'code'         => 'FI-11-TAM',
+                'latitude'     => 61.4981,
+                'longitude'    => 23.7608,
+                'population'   => 244000,
                 'postal_codes' => ['33000'],
                 'translations' => [
                     'lt' => ['name' => 'Tampere', 'description' => 'Pirkanmaos sostinė'],
@@ -164,11 +165,11 @@ final class FinlandCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Nokia',
-                'code' => 'FI-11-NOK',
-                'latitude' => 61.4667,
-                'longitude' => 23.5000,
-                'population' => 34000,
+                'name'         => 'Nokia',
+                'code'         => 'FI-11-NOK',
+                'latitude'     => 61.4667,
+                'longitude'    => 23.5000,
+                'population'   => 34000,
                 'postal_codes' => ['37100'],
                 'translations' => [
                     'lt' => ['name' => 'Nokia', 'description' => 'Technologijų miestas'],
@@ -178,11 +179,11 @@ final class FinlandCitiesSeeder extends Seeder
 
             // Päijät-Häme
             [
-                'name' => 'Lahti',
-                'code' => 'FI-16-LAH',
-                'latitude' => 60.9833,
-                'longitude' => 25.6500,
-                'population' => 120000,
+                'name'         => 'Lahti',
+                'code'         => 'FI-16-LAH',
+                'latitude'     => 60.9833,
+                'longitude'    => 25.6500,
+                'population'   => 120000,
                 'postal_codes' => ['15000'],
                 'translations' => [
                     'lt' => ['name' => 'Lahti', 'description' => 'Päijät-Häme sostinė'],
@@ -192,11 +193,11 @@ final class FinlandCitiesSeeder extends Seeder
 
             // Kymenlaakso
             [
-                'name' => 'Kotka',
-                'code' => 'FI-09-KOT',
-                'latitude' => 60.4667,
-                'longitude' => 26.9167,
-                'population' => 54000,
+                'name'         => 'Kotka',
+                'code'         => 'FI-09-KOT',
+                'latitude'     => 60.4667,
+                'longitude'    => 26.9167,
+                'population'   => 54000,
                 'postal_codes' => ['48000'],
                 'translations' => [
                     'lt' => ['name' => 'Kotka', 'description' => 'Uostamiesčis'],
@@ -204,11 +205,11 @@ final class FinlandCitiesSeeder extends Seeder
                 ],
             ],
             [
-                'name' => 'Kouvola',
-                'code' => 'FI-09-KOU',
-                'latitude' => 60.8667,
-                'longitude' => 26.7000,
-                'population' => 85000,
+                'name'         => 'Kouvola',
+                'code'         => 'FI-09-KOU',
+                'latitude'     => 60.8667,
+                'longitude'    => 26.7000,
+                'population'   => 85000,
                 'postal_codes' => ['45000'],
                 'translations' => [
                     'lt' => ['name' => 'Kouvola', 'description' => 'Kymenlaakso sostinė'],
@@ -218,11 +219,11 @@ final class FinlandCitiesSeeder extends Seeder
 
             // Etelä-Karjala
             [
-                'name' => 'Lappeenranta',
-                'code' => 'FI-02-LAP',
-                'latitude' => 61.0667,
-                'longitude' => 28.1833,
-                'population' => 73000,
+                'name'         => 'Lappeenranta',
+                'code'         => 'FI-02-LAP',
+                'latitude'     => 61.0667,
+                'longitude'    => 28.1833,
+                'population'   => 73000,
                 'postal_codes' => ['53000'],
                 'translations' => [
                     'lt' => ['name' => 'Lappeenranta', 'description' => 'Etelä-Karjala sostinė'],
@@ -232,11 +233,11 @@ final class FinlandCitiesSeeder extends Seeder
 
             // Etelä-Savo
             [
-                'name' => 'Mikkeli',
-                'code' => 'FI-04-MIK',
-                'latitude' => 61.6833,
-                'longitude' => 27.2667,
-                'population' => 54000,
+                'name'         => 'Mikkeli',
+                'code'         => 'FI-04-MIK',
+                'latitude'     => 61.6833,
+                'longitude'    => 27.2667,
+                'population'   => 54000,
                 'postal_codes' => ['50000'],
                 'translations' => [
                     'lt' => ['name' => 'Mikkeli', 'description' => 'Etelä-Savo sostinė'],
@@ -246,11 +247,11 @@ final class FinlandCitiesSeeder extends Seeder
 
             // Pohjois-Savo
             [
-                'name' => 'Kuopio',
-                'code' => 'FI-15-KUO',
-                'latitude' => 62.9000,
-                'longitude' => 27.6833,
-                'population' => 120000,
+                'name'         => 'Kuopio',
+                'code'         => 'FI-15-KUO',
+                'latitude'     => 62.9000,
+                'longitude'    => 27.6833,
+                'population'   => 120000,
                 'postal_codes' => ['70000'],
                 'translations' => [
                     'lt' => ['name' => 'Kuopio', 'description' => 'Pohjois-Savo sostinė'],
@@ -260,11 +261,11 @@ final class FinlandCitiesSeeder extends Seeder
 
             // Pohjois-Karjala
             [
-                'name' => 'Joensuu',
-                'code' => 'FI-13-JOE',
-                'latitude' => 62.6000,
-                'longitude' => 29.7500,
-                'population' => 76000,
+                'name'         => 'Joensuu',
+                'code'         => 'FI-13-JOE',
+                'latitude'     => 62.6000,
+                'longitude'    => 29.7500,
+                'population'   => 76000,
                 'postal_codes' => ['80000'],
                 'translations' => [
                     'lt' => ['name' => 'Joensuu', 'description' => 'Pohjois-Karjala sostinė'],
@@ -274,11 +275,11 @@ final class FinlandCitiesSeeder extends Seeder
 
             // Kainuu
             [
-                'name' => 'Kajaani',
-                'code' => 'FI-05-KAJ',
-                'latitude' => 64.2167,
-                'longitude' => 27.7333,
-                'population' => 38000,
+                'name'         => 'Kajaani',
+                'code'         => 'FI-05-KAJ',
+                'latitude'     => 64.2167,
+                'longitude'    => 27.7333,
+                'population'   => 38000,
                 'postal_codes' => ['87000'],
                 'translations' => [
                     'lt' => ['name' => 'Kajaani', 'description' => 'Kainuu sostinė'],
@@ -288,11 +289,11 @@ final class FinlandCitiesSeeder extends Seeder
 
             // Keski-Suomi
             [
-                'name' => 'Jyväskylä',
-                'code' => 'FI-08-JYV',
-                'latitude' => 62.2333,
-                'longitude' => 25.7333,
-                'population' => 140000,
+                'name'         => 'Jyväskylä',
+                'code'         => 'FI-08-JYV',
+                'latitude'     => 62.2333,
+                'longitude'    => 25.7333,
+                'population'   => 140000,
                 'postal_codes' => ['40000'],
                 'translations' => [
                     'lt' => ['name' => 'Jyväskylä', 'description' => 'Keski-Suomi sostinė'],
@@ -302,11 +303,11 @@ final class FinlandCitiesSeeder extends Seeder
 
             // Etelä-Pohjanmaa
             [
-                'name' => 'Seinäjoki',
-                'code' => 'FI-03-SEI',
-                'latitude' => 62.7833,
-                'longitude' => 22.8333,
-                'population' => 65000,
+                'name'         => 'Seinäjoki',
+                'code'         => 'FI-03-SEI',
+                'latitude'     => 62.7833,
+                'longitude'    => 22.8333,
+                'population'   => 65000,
                 'postal_codes' => ['60000'],
                 'translations' => [
                     'lt' => ['name' => 'Seinäjoki', 'description' => 'Etelä-Pohjanmaa sostinė'],
@@ -316,11 +317,11 @@ final class FinlandCitiesSeeder extends Seeder
 
             // Pohjanmaa
             [
-                'name' => 'Vaasa',
-                'code' => 'FI-12-VAA',
-                'latitude' => 63.1000,
-                'longitude' => 21.6000,
-                'population' => 68000,
+                'name'         => 'Vaasa',
+                'code'         => 'FI-12-VAA',
+                'latitude'     => 63.1000,
+                'longitude'    => 21.6000,
+                'population'   => 68000,
                 'postal_codes' => ['65000'],
                 'translations' => [
                     'lt' => ['name' => 'Vaasa', 'description' => 'Pohjanmaa sostinė'],
@@ -330,11 +331,11 @@ final class FinlandCitiesSeeder extends Seeder
 
             // Keski-Pohjanmaa
             [
-                'name' => 'Kokkola',
-                'code' => 'FI-07-KOK',
-                'latitude' => 63.8333,
-                'longitude' => 23.1333,
-                'population' => 48000,
+                'name'         => 'Kokkola',
+                'code'         => 'FI-07-KOK',
+                'latitude'     => 63.8333,
+                'longitude'    => 23.1333,
+                'population'   => 48000,
                 'postal_codes' => ['67000'],
                 'translations' => [
                     'lt' => ['name' => 'Kokkola', 'description' => 'Keski-Pohjanmaa sostinė'],
@@ -344,11 +345,11 @@ final class FinlandCitiesSeeder extends Seeder
 
             // Pohjois-Pohjanmaa
             [
-                'name' => 'Oulu',
-                'code' => 'FI-14-OUL',
-                'latitude' => 65.0167,
-                'longitude' => 25.4667,
-                'population' => 210000,
+                'name'         => 'Oulu',
+                'code'         => 'FI-14-OUL',
+                'latitude'     => 65.0167,
+                'longitude'    => 25.4667,
+                'population'   => 210000,
                 'postal_codes' => ['90000'],
                 'translations' => [
                     'lt' => ['name' => 'Oulu', 'description' => 'Pohjois-Pohjanmaa sostinė'],
@@ -358,11 +359,11 @@ final class FinlandCitiesSeeder extends Seeder
 
             // Lappi
             [
-                'name' => 'Rovaniemi',
-                'code' => 'FI-10-ROV',
-                'latitude' => 66.5000,
-                'longitude' => 25.7167,
-                'population' => 65000,
+                'name'         => 'Rovaniemi',
+                'code'         => 'FI-10-ROV',
+                'latitude'     => 66.5000,
+                'longitude'    => 25.7167,
+                'population'   => 65000,
                 'postal_codes' => ['96000'],
                 'translations' => [
                     'lt' => ['name' => 'Rovaniemi', 'description' => 'Lappi sostinė'],
@@ -372,11 +373,11 @@ final class FinlandCitiesSeeder extends Seeder
 
             // Ahvenanmaa
             [
-                'name' => 'Mariehamn',
-                'code' => 'FI-01-MAR',
-                'latitude' => 60.1000,
-                'longitude' => 19.9333,
-                'population' => 12000,
+                'name'         => 'Mariehamn',
+                'code'         => 'FI-01-MAR',
+                'latitude'     => 60.1000,
+                'longitude'    => 19.9333,
+                'population'   => 12000,
                 'postal_codes' => ['22100'],
                 'translations' => [
                     'lt' => ['name' => 'Mariehamn', 'description' => 'Ahvenanmaa sostinė'],
@@ -389,19 +390,19 @@ final class FinlandCitiesSeeder extends Seeder
             $city = City::updateOrCreate(
                 ['code' => $cityData['code']],
                 [
-                    'name' => $cityData['name'],
-                    'slug' => \Str::slug($cityData['name'].'-'.$cityData['code']),
-                    'is_enabled' => true,
-                    'is_default' => $cityData['is_default'] ?? false,
-                    'is_capital' => $cityData['is_capital'] ?? false,
-                    'country_id' => $finland->id,
-                    'zone_id' => $euZone?->id,
-                    'level' => 1,
-                    'latitude' => $cityData['latitude'],
-                    'longitude' => $cityData['longitude'],
-                    'population' => $cityData['population'],
+                    'name'         => $cityData['name'],
+                    'slug'         => Str::slug($cityData['name'] . '-' . $cityData['code']),
+                    'is_enabled'   => true,
+                    'is_default'   => $cityData['is_default'] ?? false,
+                    'is_capital'   => $cityData['is_capital'] ?? false,
+                    'country_id'   => $finland->id,
+                    'zone_id'      => $euZone?->id,
+                    'level'        => 1,
+                    'latitude'     => $cityData['latitude'],
+                    'longitude'    => $cityData['longitude'],
+                    'population'   => $cityData['population'],
                     'postal_codes' => $cityData['postal_codes'],
-                    'sort_order' => 0,
+                    'sort_order'   => 0,
                 ]
             );
 
@@ -410,10 +411,10 @@ final class FinlandCitiesSeeder extends Seeder
                 CityTranslation::updateOrCreate(
                     [
                         'city_id' => $city->id,
-                        'locale' => $locale,
+                        'locale'  => $locale,
                     ],
                     [
-                        'name' => $translation['name'],
+                        'name'        => $translation['name'],
                         'description' => $translation['description'],
                     ]
                 );

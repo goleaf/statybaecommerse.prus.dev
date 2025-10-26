@@ -24,7 +24,7 @@ final class ProductVariantResourceTest extends TestCase
 
         $this->actingAs(User::factory()->create([
             'email' => 'admin@example.com',
-            'name' => 'Variant Admin',
+            'name'  => 'Variant Admin',
         ]));
     }
 
@@ -34,15 +34,15 @@ final class ProductVariantResourceTest extends TestCase
 
         $metadata = [
             'color' => 'Red',
-            'size' => 'M',
+            'size'  => 'M',
         ];
 
         Livewire::test(ProductVariantResource\Pages\CreateProductVariant::class)
             ->fillForm([
-                'product_id' => $product->id,
-                'sku' => 'PV-001',
-                'name' => 'Variant One',
-                'price' => '199.99',
+                'product_id'       => $product->id,
+                'sku'              => 'PV-001',
+                'name'             => 'Variant One',
+                'price'            => '199.99',
                 'variant_metadata' => $metadata,
             ])
             ->call('create')
@@ -62,7 +62,7 @@ final class ProductVariantResourceTest extends TestCase
 
         $metadata = [
             'material' => 'Cotton',
-            'color' => 'Blue',
+            'color'    => 'Blue',
         ];
 
         Livewire::test(ProductVariantResource\Pages\EditProductVariant::class, [
@@ -94,12 +94,12 @@ final class ProductVariantResourceTest extends TestCase
 
         Livewire::test(ProductVariantResource\Pages\CreateProductVariant::class)
             ->fillForm([
-                'product_id' => $product->id,
-                'sku' => 'PV-MATRIX-001',
-                'name' => 'Matrix Variant',
-                'price' => '49.99',
+                'product_id'               => $product->id,
+                'sku'                      => 'PV-MATRIX-001',
+                'name'                     => 'Matrix Variant',
+                'price'                    => '49.99',
                 'variant_attribute_matrix' => [
-                    'attribute_'.$attribute->getKey() => (string) $valueMedium->getKey(),
+                    'attribute_' . $attribute->getKey() => (string) $valueMedium->getKey(),
                 ],
             ])
             ->call('create')
@@ -107,12 +107,12 @@ final class ProductVariantResourceTest extends TestCase
 
         $variant = ProductVariant::where('sku', 'PV-MATRIX-001')->firstOrFail();
 
-        $expectedMatrix = ['attribute_'.$attribute->getKey() => (string) $valueMedium->getKey()];
+        $expectedMatrix = ['attribute_' . $attribute->getKey() => (string) $valueMedium->getKey()];
 
         $this->assertSame($expectedMatrix, $variant->variant_attribute_matrix);
         $this->assertDatabaseHas('product_variant_attributes', [
-            'variant_id' => $variant->getKey(),
-            'attribute_id' => $attribute->getKey(),
+            'variant_id'         => $variant->getKey(),
+            'attribute_id'       => $attribute->getKey(),
             'attribute_value_id' => $valueMedium->getKey(),
         ]);
     }
@@ -131,13 +131,13 @@ final class ProductVariantResourceTest extends TestCase
         $product->attributes()->attach($attribute->getKey(), ['attribute_value_id' => $valueRed->getKey()]);
 
         $variant = ProductVariant::factory()->create([
-            'product_id' => $product->id,
-            'variant_attribute_matrix' => ['attribute_'.$attribute->getKey() => $valueRed->getKey()],
+            'product_id'               => $product->id,
+            'variant_attribute_matrix' => ['attribute_' . $attribute->getKey() => $valueRed->getKey()],
         ]);
 
         $this->assertDatabaseHas('product_variant_attributes', [
-            'variant_id' => $variant->getKey(),
-            'attribute_id' => $attribute->getKey(),
+            'variant_id'         => $variant->getKey(),
+            'attribute_id'       => $attribute->getKey(),
             'attribute_value_id' => $valueRed->getKey(),
         ]);
 
@@ -146,7 +146,7 @@ final class ProductVariantResourceTest extends TestCase
         ])
             ->fillForm([
                 'variant_attribute_matrix' => [
-                    'attribute_'.$attribute->getKey() => (string) $valueBlue->getKey(),
+                    'attribute_' . $attribute->getKey() => (string) $valueBlue->getKey(),
                 ],
             ])
             ->call('save')
@@ -155,18 +155,18 @@ final class ProductVariantResourceTest extends TestCase
         $variant->refresh();
 
         $this->assertSame([
-            'attribute_'.$attribute->getKey() => (string) $valueBlue->getKey(),
+            'attribute_' . $attribute->getKey() => (string) $valueBlue->getKey(),
         ], $variant->variant_attribute_matrix);
 
         $this->assertDatabaseHas('product_variant_attributes', [
-            'variant_id' => $variant->getKey(),
-            'attribute_id' => $attribute->getKey(),
+            'variant_id'         => $variant->getKey(),
+            'attribute_id'       => $attribute->getKey(),
             'attribute_value_id' => $valueBlue->getKey(),
         ]);
 
         $this->assertDatabaseMissing('product_variant_attributes', [
-            'variant_id' => $variant->getKey(),
-            'attribute_id' => $attribute->getKey(),
+            'variant_id'         => $variant->getKey(),
+            'attribute_id'       => $attribute->getKey(),
             'attribute_value_id' => $valueRed->getKey(),
         ]);
     }

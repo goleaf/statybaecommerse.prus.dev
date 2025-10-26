@@ -20,7 +20,7 @@ it('models in the OrderedByName dataset expose consistent configuration', functi
         ->toBeTrue();
 
     /** @var object $model */
-    $model = new $className();
+    $model = new $className;
 
     if (! method_exists($className, 'getNameColumn')) {
         throw new \RuntimeException(sprintf('Model %s must expose a getNameColumn method.', $className));

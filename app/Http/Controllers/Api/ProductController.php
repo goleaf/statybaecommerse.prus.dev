@@ -7,11 +7,11 @@ namespace App\Http\Controllers\Api;
 use App\Application\Product\DTOs\SearchProductsInputDto;
 use App\Application\Product\Presenters\ProductContractPresenter;
 use App\Application\Product\UseCases\SearchProductsUseCase;
+use App\Enums\Api\ProductSort;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\ProductIndexRequest;
 use App\Http\Resources\ProductResource;
 use App\Models\Product;
-use App\Enums\Api\ProductSort;
 use App\Traits\HandlesContentNegotiation;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -97,23 +97,23 @@ final class ProductController extends Controller
         // Surface the filters alongside pagination metadata for transparent caching and diagnostics.
         $resource = ProductResource::collection($products)->additional([
             'contract' => 'product-resource',
-            'version' => 'v2',
-            'meta' => [
+            'version'  => 'v2',
+            'meta'     => [
                 'generated_at' => now()->toISOString(),
-                'filters' => [
-                    'q' => $filters['q'],
-                    'category' => $filters['category'],
+                'filters'      => [
+                    'q'         => $filters['q'],
+                    'category'  => $filters['category'],
                     'price_min' => $filters['price_min'],
                     'price_max' => $filters['price_max'],
-                    'sort' => $filters['sort'],
-                    'per_page' => $filters['per_page'],
-                    'page' => $filters['page'],
+                    'sort'      => $filters['sort'],
+                    'per_page'  => $filters['per_page'],
+                    'page'      => $filters['page'],
                 ],
                 'pagination' => [
                     'current_page' => $products->currentPage(),
-                    'per_page' => $products->perPage(),
-                    'total' => $products->total(),
-                    'last_page' => $products->lastPage(),
+                    'per_page'     => $products->perPage(),
+                    'total'        => $products->total(),
+                    'last_page'    => $products->lastPage(),
                 ],
             ],
         ]);
@@ -148,10 +148,10 @@ final class ProductController extends Controller
 
         $resource = (new ProductResource($product))->additional([
             'contract' => 'product-resource',
-            'version' => 'v2',
-            'meta' => [
+            'version'  => 'v2',
+            'meta'     => [
                 'generated_at' => now()->toISOString(),
-                'etag' => $etag,
+                'etag'         => $etag,
             ],
         ]);
 

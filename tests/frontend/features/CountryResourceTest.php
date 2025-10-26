@@ -41,17 +41,17 @@ final class CountryResourceTest extends TestCase
     public function test_country_resource_can_create_country(): void
     {
         $countryData = [
-            'name' => 'Test Country',
-            'code' => 'TC',
-            'iso_code' => 'TCT',
-            'region' => 'europe',
-            'currency_code' => 'EUR',
+            'name'            => 'Test Country',
+            'code'            => 'TC',
+            'iso_code'        => 'TCT',
+            'region'          => 'europe',
+            'currency_code'   => 'EUR',
             'currency_symbol' => '€',
-            'phone_code' => '+1',
-            'description' => 'Test country description',
-            'is_active' => true,
-            'is_default' => false,
-            'sort_order' => 1,
+            'phone_code'      => '+1',
+            'description'     => 'Test country description',
+            'is_active'       => true,
+            'is_default'      => false,
+            'sort_order'      => 1,
         ];
 
         Livewire::test(\App\Filament\Resources\CountryResource\Pages\CreateCountry::class)
@@ -60,8 +60,8 @@ final class CountryResourceTest extends TestCase
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('countries', [
-            'name' => 'Test Country',
-            'code' => 'TC',
+            'name'     => 'Test Country',
+            'code'     => 'TC',
             'iso_code' => 'TCT',
         ]);
     }
@@ -95,7 +95,7 @@ final class CountryResourceTest extends TestCase
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('countries', [
-            'id' => $country->id,
+            'id'   => $country->id,
             'name' => 'Updated Name',
             'code' => 'UN',
         ]);
@@ -159,7 +159,7 @@ final class CountryResourceTest extends TestCase
 
         foreach ($countries as $country) {
             $this->assertDatabaseHas('countries', [
-                'id' => $country->id,
+                'id'        => $country->id,
                 'is_active' => true,
             ]);
         }
@@ -199,7 +199,7 @@ final class CountryResourceTest extends TestCase
     public function test_country_resource_translation_management(): void
     {
         $country = Country::factory()->create([
-            'name' => 'France',
+            'name'        => 'France',
             'description' => 'A country in Europe',
         ]);
 
@@ -208,18 +208,18 @@ final class CountryResourceTest extends TestCase
             'record' => $country->getRouteKey(),
         ])
             ->fillForm([
-                'name' => 'France',
-                'description' => 'Un pays en Europe',
-                'region' => 'europe',
-                'currency_code' => 'EUR',
+                'name'            => 'France',
+                'description'     => 'Un pays en Europe',
+                'region'          => 'europe',
+                'currency_code'   => 'EUR',
                 'currency_symbol' => '€',
             ])
             ->call('save')
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('countries', [
-            'id' => $country->id,
-            'name' => 'France',
+            'id'          => $country->id,
+            'name'        => 'France',
             'description' => 'Un pays en Europe',
         ]);
     }
@@ -231,7 +231,7 @@ final class CountryResourceTest extends TestCase
 
         // Test global search functionality
         $this
-            ->get(route('filament.admin.resources.countries.index').'?search=Spain')
+            ->get(route('filament.admin.resources.countries.index') . '?search=Spain')
             ->assertOk()
             ->assertSee('Spain')
             ->assertDontSee('Portugal');
@@ -246,7 +246,7 @@ final class CountryResourceTest extends TestCase
             ->assertHasNoTableActionErrors();
 
         $this->assertDatabaseHas('countries', [
-            'id' => $country->id,
+            'id'        => $country->id,
             'is_active' => true,
         ]);
     }
@@ -261,12 +261,12 @@ final class CountryResourceTest extends TestCase
             ->assertHasNoTableActionErrors();
 
         $this->assertDatabaseHas('countries', [
-            'id' => $existingDefault->id,
+            'id'         => $existingDefault->id,
             'is_default' => false,
         ]);
 
         $this->assertDatabaseHas('countries', [
-            'id' => $newDefault->id,
+            'id'         => $newDefault->id,
             'is_default' => true,
         ]);
     }
@@ -281,7 +281,7 @@ final class CountryResourceTest extends TestCase
 
         foreach ($countries as $country) {
             $this->assertDatabaseHas('countries', [
-                'id' => $country->id,
+                'id'        => $country->id,
                 'is_active' => true,
             ]);
         }
@@ -297,7 +297,7 @@ final class CountryResourceTest extends TestCase
 
         foreach ($countries as $country) {
             $this->assertDatabaseHas('countries', [
-                'id' => $country->id,
+                'id'        => $country->id,
                 'is_active' => false,
             ]);
         }

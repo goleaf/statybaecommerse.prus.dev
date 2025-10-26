@@ -38,12 +38,12 @@ final class MultiLanguageTabService
     public static function getLanguageName(string $locale): string
     {
         return match ($locale) {
-            'en' => __('English'),
-            'lt' => __('Lietuvių'),
-            'de' => __('Deutsch'),
-            'fr' => __('Français'),
-            'es' => __('Español'),
-            'ru' => __('Русский'),
+            'en'    => __('English'),
+            'lt'    => __('Lietuvių'),
+            'de'    => __('Deutsch'),
+            'fr'    => __('Français'),
+            'es'    => __('Español'),
+            'ru'    => __('Русский'),
             default => strtoupper($locale),
         };
     }
@@ -54,12 +54,12 @@ final class MultiLanguageTabService
     public static function getLanguageFlag(string $locale): string
     {
         return match ($locale) {
-            'en' => '🇬🇧',
-            'lt' => '🇱🇹',
-            'de' => '🇩🇪',
-            'fr' => '🇫🇷',
-            'es' => '🇪🇸',
-            'ru' => '🇷🇺',
+            'en'    => '🇬🇧',
+            'lt'    => '🇱🇹',
+            'de'    => '🇩🇪',
+            'fr'    => '🇫🇷',
+            'es'    => '🇪🇸',
+            'ru'    => '🇷🇺',
             default => '🌐',
         };
     }
@@ -75,10 +75,10 @@ final class MultiLanguageTabService
             $tabFields = [];
             foreach ($fields as $field => $config) {
                 $tabFields[] = match ($config['type'] ?? 'text') {
-                    'text' => TextInput::make("{$field}_{$language['code']}")->label($config['label'] ?? ucfirst($field))->required($config['required'] ?? false)->maxLength($config['maxLength'] ?? 255),
-                    'textarea' => Textarea::make("{$field}_{$language['code']}")->label($config['label'] ?? ucfirst($field))->required($config['required'] ?? false)->rows($config['rows'] ?? 3)->maxLength($config['maxLength'] ?? 1000),
+                    'text'        => TextInput::make("{$field}_{$language['code']}")->label($config['label'] ?? ucfirst($field))->required($config['required'] ?? false)->maxLength($config['maxLength'] ?? 255),
+                    'textarea'    => Textarea::make("{$field}_{$language['code']}")->label($config['label'] ?? ucfirst($field))->required($config['required'] ?? false)->rows($config['rows'] ?? 3)->maxLength($config['maxLength'] ?? 1000),
                     'rich_editor' => RichEditor::make("{$field}_{$language['code']}")->label($config['label'] ?? ucfirst($field))->required($config['required'] ?? false)->toolbarButtons($config['toolbar'] ?? ['bold', 'italic', 'link', 'bulletList', 'orderedList']),
-                    default => TextInput::make("{$field}_{$language['code']}")->label($config['label'] ?? ucfirst($field))->required($config['required'] ?? false),
+                    default       => TextInput::make("{$field}_{$language['code']}")->label($config['label'] ?? ucfirst($field))->required($config['required'] ?? false),
                 };
             }
             $tabs[] = TabLayoutTab::make($language['name'])->id("tab-{$language['code']}")->icon('heroicon-o-language')->badge($language['flag'])->schema($tabFields);
@@ -116,10 +116,10 @@ final class MultiLanguageTabService
                 $sectionFields = [];
                 foreach ($fields as $field => $config) {
                     $sectionFields[] = match ($config['type'] ?? 'text') {
-                        'text' => TextInput::make("{$field}_{$language['code']}")->label($config['label'] ?? ucfirst($field))->required($config['required'] ?? false)->maxLength($config['maxLength'] ?? 255)->placeholder($config['placeholder'] ?? ''),
-                        'textarea' => Textarea::make("{$field}_{$language['code']}")->label($config['label'] ?? ucfirst($field))->required($config['required'] ?? false)->rows($config['rows'] ?? 3)->maxLength($config['maxLength'] ?? 1000)->placeholder($config['placeholder'] ?? ''),
+                        'text'        => TextInput::make("{$field}_{$language['code']}")->label($config['label'] ?? ucfirst($field))->required($config['required'] ?? false)->maxLength($config['maxLength'] ?? 255)->placeholder($config['placeholder'] ?? ''),
+                        'textarea'    => Textarea::make("{$field}_{$language['code']}")->label($config['label'] ?? ucfirst($field))->required($config['required'] ?? false)->rows($config['rows'] ?? 3)->maxLength($config['maxLength'] ?? 1000)->placeholder($config['placeholder'] ?? ''),
                         'rich_editor' => RichEditor::make("{$field}_{$language['code']}")->label($config['label'] ?? ucfirst($field))->required($config['required'] ?? false)->toolbarButtons($config['toolbar'] ?? ['bold', 'italic', 'link', 'bulletList', 'orderedList', 'h2', 'h3']),
-                        default => TextInput::make("{$field}_{$language['code']}")->label($config['label'] ?? ucfirst($field))->required($config['required'] ?? false),
+                        default       => TextInput::make("{$field}_{$language['code']}")->label($config['label'] ?? ucfirst($field))->required($config['required'] ?? false),
                     };
                 }
                 $sectionComponents[] = Section::make(__("translations.{$sectionName}"))->schema($sectionFields);
@@ -186,7 +186,7 @@ final class MultiLanguageTabService
     /**
      * Handle populateFormWithTranslations functionality with proper error handling.
      *
-     * @param  mixed  $record
+     * @param mixed $record
      */
     public static function populateFormWithTranslations($record, array $translatableFields): array
     {

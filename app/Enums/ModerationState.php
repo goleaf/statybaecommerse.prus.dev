@@ -13,8 +13,8 @@ enum ModerationState: string
     public function label(): string
     {
         return match ($this) {
-            self::Draft => __('moderation.states.draft'),
-            self::Review => __('moderation.states.review'),
+            self::Draft     => __('moderation.states.draft'),
+            self::Review    => __('moderation.states.review'),
             self::Published => __('moderation.states.published'),
         };
     }
@@ -22,8 +22,8 @@ enum ModerationState: string
     public function color(): string
     {
         return match ($this) {
-            self::Draft => 'warning',
-            self::Review => 'info',
+            self::Draft     => 'warning',
+            self::Review    => 'info',
             self::Published => 'success',
         };
     }

@@ -21,16 +21,16 @@ final class UpSellRecommendation extends BaseRecommendation
     protected function getDefaultConfig(): array
     {
         return [
-            'max_results' => 10,
-            'min_score' => 0.1,
+            'max_results'        => 10,
+            'min_score'          => 0.1,
             'min_price_increase' => 1.1,
             // At least 10% more expensive
             'max_price_increase' => 2.0,
             // At most 2x more expensive
             'category_similarity_weight' => 0.5,
-            'price_ratio_weight' => 0.3,
-            'quality_indicators_weight' => 0.2,
-            'quality_indicators' => ['review_rating' => 0.4, 'review_count' => 0.3, 'sales_count' => 0.3],
+            'price_ratio_weight'         => 0.3,
+            'quality_indicators_weight'  => 0.2,
+            'quality_indicators'         => ['review_rating' => 0.4, 'review_count' => 0.3, 'sales_count' => 0.3],
         ];
     }
 

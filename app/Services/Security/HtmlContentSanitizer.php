@@ -50,7 +50,7 @@ final class HtmlContentSanitizer
 
         $document = new DOMDocument('1.0', 'UTF-8');
         $previousState = libxml_use_internal_errors(true);
-        $wrapped = '<!DOCTYPE html><html><body>'.$sanitized.'</body></html>';
+        $wrapped = '<!DOCTYPE html><html><body>' . $sanitized . '</body></html>';
         $document->loadHTML($wrapped, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD | LIBXML_NOERROR | LIBXML_NOWARNING);
         libxml_clear_errors();
         libxml_use_internal_errors($previousState);
@@ -179,7 +179,7 @@ final class HtmlContentSanitizer
     }
 
     /**
-     * @param  DOMNodeList<DOMNode>  $nodes
+     * @param  DOMNodeList<DOMNode> $nodes
      * @return list<DOMElement>
      */
     private function toArray(DOMNodeList $nodes): array

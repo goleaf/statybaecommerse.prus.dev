@@ -8,11 +8,10 @@ use App\Filament\Resources\NotificationResource;
 use App\Models\Notification;
 use App\Models\User;
 use App\Support\Nav;
+use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Livewire\Livewire;
-use Filament\Tables\Filters\SelectFilter;
-use Filament\Tables\Filters\TernaryFilter;
 use Tests\TestCase;
 
 final class NotificationResourceTest extends TestCase

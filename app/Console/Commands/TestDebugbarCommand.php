@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Console\Commands;
 
 use App\Models\Discount;
@@ -59,10 +61,10 @@ class TestDebugbarCommand extends Command
         $this->newLine();
 
         $collectors = [
-            'debugbar.discount' => 'Discount Debug Collector - Tracks discount applications, calculations, and cache operations',
+            'debugbar.discount'    => 'Discount Debug Collector - Tracks discount applications, calculations, and cache operations',
             'debugbar.translation' => 'Translation Debug Collector - Monitors locale changes, translation queries, and missing translations',
-            'debugbar.livewire' => 'Livewire Debug Collector - Logs component lifecycle, property updates, and method calls',
-            'debugbar.ecommerce' => 'E-commerce Debug Collector - Tracks cart operations, orders, product views, and pricing',
+            'debugbar.livewire'    => 'Livewire Debug Collector - Logs component lifecycle, property updates, and method calls',
+            'debugbar.ecommerce'   => 'E-commerce Debug Collector - Tracks cart operations, orders, product views, and pricing',
         ];
 
         foreach ($collectors as $service => $description) {
@@ -84,8 +86,8 @@ class TestDebugbarCommand extends Command
         $environment = app()->environment();
 
         $this->line("Environment: <comment>$environment</comment>");
-        $this->line('Debug Mode: '.($debugEnabled ? '✅ Enabled' : '❌ Disabled'));
-        $this->line('Debugbar: '.($debugbarEnabled ? '✅ Enabled' : '❌ Disabled'));
+        $this->line('Debug Mode: ' . ($debugEnabled ? '✅ Enabled' : '❌ Disabled'));
+        $this->line('Debugbar: ' . ($debugbarEnabled ? '✅ Enabled' : '❌ Disabled'));
 
         if (! $debugEnabled || ! $debugbarEnabled) {
             $this->warn('⚠️  Debugbar may not be visible. Check APP_DEBUG and DEBUGBAR_ENABLED in .env');

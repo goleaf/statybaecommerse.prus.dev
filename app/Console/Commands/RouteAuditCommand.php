@@ -41,7 +41,7 @@ final class RouteAuditCommand extends Command
 
         $dynamicReport = [
             'generatedAt' => now()->toIso8601String(),
-            'routes' => [],
+            'routes'      => [],
         ];
 
         $dynamicPath = $storagePath . '/dynamic_results.json';
@@ -59,9 +59,9 @@ final class RouteAuditCommand extends Command
                 ],
                 base_path(),
                 [
-                    'APP_ENV' => 'testing',
-                    'CACHE_DRIVER' => 'array',
-                    'SESSION_DRIVER' => 'array',
+                    'APP_ENV'          => 'testing',
+                    'CACHE_DRIVER'     => 'array',
+                    'SESSION_DRIVER'   => 'array',
                     'QUEUE_CONNECTION' => 'sync',
                 ]
             );
@@ -107,4 +107,3 @@ final class RouteAuditCommand extends Command
         return self::SUCCESS;
     }
 }
-

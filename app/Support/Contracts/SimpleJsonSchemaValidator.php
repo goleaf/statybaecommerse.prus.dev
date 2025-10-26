@@ -30,9 +30,9 @@ final class SimpleJsonSchemaValidator
      * - validate($payload, $schemaPath) to validate against a full schema file.
      * - validate($contract, $payload) to validate an entity payload against the schema's $defs entry.
      *
-     * @param  array<string, mixed>|list<mixed>|string  $payloadOrContract
-     * @param  array<string, mixed>|list<mixed>|string|null  $schemaOrPayload
-     * @return array<int, string> Validation error messages. Empty when the payload is valid.
+     * @param  array<string, mixed>|list<mixed>|string      $payloadOrContract
+     * @param  array<string, mixed>|list<mixed>|string|null $schemaOrPayload
+     * @return array<int, string>                           Validation error messages. Empty when the payload is valid.
      */
     public function validate(mixed $payloadOrContract, mixed $schemaOrPayload = null): array
     {
@@ -46,7 +46,7 @@ final class SimpleJsonSchemaValidator
 
         throw new InvalidArgumentException(
             'SimpleJsonSchemaValidator::validate expects either (array $payload, string $schemaPath) '
-            .'or (string $contract, array $payload).',
+            . 'or (string $contract, array $payload).',
         );
     }
 
@@ -69,9 +69,9 @@ final class SimpleJsonSchemaValidator
     /**
      * Recursively validate the payload using the provided schema definition.
      *
-     * @param  array<string, mixed>|mixed  $data
-     * @param  array<string, mixed>  $schema
-     * @param  array<string, mixed>  $rootSchema
+     * @param  array<string, mixed>|mixed $data
+     * @param  array<string, mixed>       $schema
+     * @param  array<string, mixed>       $rootSchema
      * @return array<int, string>
      */
     private function validateAgainstSchema(mixed $data, array $schema, string $path, array $rootSchema): array
@@ -94,9 +94,9 @@ final class SimpleJsonSchemaValidator
         }
 
         if (isset($schema['pattern']) && is_string($schema['pattern']) && is_string($data)) {
-            if (@preg_match('/'.$schema['pattern'].'/', '') === false) {
+            if (@preg_match('/' . $schema['pattern'] . '/', '') === false) {
                 $errors[] = sprintf('%s has an invalid pattern definition.', $path);
-            } elseif (! preg_match('/'.$schema['pattern'].'/u', $data)) {
+            } elseif (! preg_match('/' . $schema['pattern'] . '/u', $data)) {
                 $errors[] = sprintf('%s does not match the required pattern.', $path);
             }
         }
@@ -112,7 +112,7 @@ final class SimpleJsonSchemaValidator
                 if (array_key_exists($property, $data)) {
                     $errors = array_merge(
                         $errors,
-                        $this->validateAgainstSchema($data[$property], (array) $definition, $path.'.'.$property, $rootSchema)
+                        $this->validateAgainstSchema($data[$property], (array) $definition, $path . '.' . $property, $rootSchema)
                     );
                 }
             }
@@ -207,14 +207,14 @@ final class SimpleJsonSchemaValidator
     private function valueMatchesType(mixed $value, string $type): bool
     {
         return match ($type) {
-            'object' => is_array($value),
-            'array' => is_array($value),
-            'string' => is_string($value),
+            'object'  => is_array($value),
+            'array'   => is_array($value),
+            'string'  => is_string($value),
             'integer' => is_int($value),
-            'number' => is_int($value) || is_float($value),
+            'number'  => is_int($value) || is_float($value),
             'boolean' => is_bool($value),
-            'null' => $value === null,
-            default => true,
+            'null'    => $value === null,
+            default   => true,
         };
     }
 
@@ -225,17 +225,17 @@ final class SimpleJsonSchemaValidator
         }
 
         return match ($format) {
-            'uri' => filter_var($value, FILTER_VALIDATE_URL) ? [] : [sprintf('%s must be a valid URI.', $path)],
-            'email' => filter_var($value, FILTER_VALIDATE_EMAIL) ? [] : [sprintf('%s must be a valid email address.', $path)],
+            'uri'       => filter_var($value, FILTER_VALIDATE_URL) ? [] : [sprintf('%s must be a valid URI.', $path)],
+            'email'     => filter_var($value, FILTER_VALIDATE_EMAIL) ? [] : [sprintf('%s must be a valid email address.', $path)],
             'date-time' => strtotime($value) !== false ? [] : [sprintf('%s must be a valid date-time string.', $path)],
-            default => [],
+            default     => [],
         };
     }
 
     /**
      * Validate a payload using the schema located at the provided path.
      *
-     * @param  array<string, mixed>|list<mixed>  $payload
+     * @param  array<string, mixed>|list<mixed> $payload
      * @return array<int, string>
      */
     private function validateSchemaPathPayload(array $payload, string $schemaPath): array
@@ -254,7 +254,7 @@ final class SimpleJsonSchemaValidator
     /**
      * Validate a payload against a contract definition stored under the schema's $defs section.
      *
-     * @param  array<string, mixed>|list<mixed>  $payload
+     * @param  array<string, mixed>|list<mixed> $payload
      * @return array<int, string>
      */
     private function validateContractPayload(string $contract, array $payload): array
@@ -311,24 +311,24 @@ final class SimpleJsonSchemaValidator
     private function schemaPathForContract(string $contract): ?string
     {
         return match (strtolower($contract)) {
-            ProductContract::CONTRACT => ProductContract::schemaPath(),
+            ProductContract::CONTRACT  => ProductContract::schemaPath(),
             CategoryContract::CONTRACT => CategoryContract::schemaPath(),
-            BrandContract::CONTRACT => BrandContract::schemaPath(),
-            OrderContract::CONTRACT => OrderContract::schemaPath(),
-            UserContract::CONTRACT => UserContract::schemaPath(),
-            default => null,
+            BrandContract::CONTRACT    => BrandContract::schemaPath(),
+            OrderContract::CONTRACT    => OrderContract::schemaPath(),
+            UserContract::CONTRACT     => UserContract::schemaPath(),
+            default                    => null,
         };
     }
 
     private function definitionKeyForContract(string $contract): string
     {
         return match (strtolower($contract)) {
-            ProductContract::CONTRACT => 'product',
+            ProductContract::CONTRACT  => 'product',
             CategoryContract::CONTRACT => 'category',
-            BrandContract::CONTRACT => 'brand',
-            OrderContract::CONTRACT => 'order',
-            UserContract::CONTRACT => 'user',
-            default => $contract,
+            BrandContract::CONTRACT    => 'brand',
+            OrderContract::CONTRACT    => 'order',
+            UserContract::CONTRACT     => 'user',
+            default                    => $contract,
         };
     }
 }

@@ -64,7 +64,7 @@ it('handles non-string values correctly', function () {
 
     foreach ($nonStringValues as $value) {
         $validator = Validator::make(['url' => $value], ['url' => $rule]);
-        expect($validator->fails())->toBeTrue('Should have failed for non-string value: '.gettype($value));
+        expect($validator->fails())->toBeTrue('Should have failed for non-string value: ' . gettype($value));
     }
 });
 

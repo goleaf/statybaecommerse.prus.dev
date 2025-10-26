@@ -18,9 +18,9 @@ final class ChannelSeeder extends Seeder
             // Create default channel using factory with specific attributes
             Channel::factory()
                 ->state([
-                    'name' => 'Default Store',
-                    'slug' => 'default',
-                    'url' => 'https://statybaecommerse.prus.dev',
+                    'name'       => 'Default Store',
+                    'slug'       => 'default',
+                    'url'        => 'https://statybaecommerse.prus.dev',
                     'is_enabled' => true,
                     'is_default' => true,
                 ])
