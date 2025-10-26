@@ -14,8 +14,6 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms;
-use Filament\Forms\Get;
-use Filament\Forms\Set;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables;
@@ -25,8 +23,8 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Str;
 use UnitEnum;
+use Pixelpeter\FilamentLanguageTabs\Forms\Components\LanguageTabs;
 
 final class LegalResource extends Resource
 {
@@ -106,61 +104,30 @@ final class LegalResource extends Resource
                     ->columns(1),
                 Forms\Components\SchemaSection::make(__('legal.translations'))
                     ->schema([
-                        Forms\Components\Repeater::make('translations')
-                            ->label(__('legal.translations'))
-                            ->relationship('translations')
-                            ->schema([
-                                Forms\Components\SchemaGrid::make(2)
-                                    ->schema([
-                                        Forms\Components\Select::make('locale')
-                                            ->label(__('legal.locale'))
-                                            ->options([
-                                                'en' => 'English',
-                                                'lt' => 'Lietuvių',
-                                                'ru' => 'Русский',
-                                                'de' => 'Deutsch',
-                                            ])
-                                            ->required()
-                                            ->searchable(),
-                                        Forms\Components\TextInput::make('slug')
-                                            ->label(__('legal.slug'))
-                                            ->helperText(__('legal.slug_help'))
-                                            ->required()
-                                            ->maxLength(255)
-                                            ->unique('legal_translations', 'slug', ignoreRecord: true),
-                                    ]),
-                                Forms\Components\TextInput::make('title')
-                                    ->label(__('legal.title'))
-                                    ->required()
-                                    ->maxLength(255)
-                                    ->live(onBlur: true)
-                                    ->afterStateUpdated(function (Set $set, Get $get, ?string $state): void {
-                                        $currentSlug = $get('slug');
-
-                                        if (! filled($currentSlug)) {
-                                            $set('slug', $state ? Str::slug($state) : null);
-                                        }
-                                    }),
-                                Forms\Components\RichEditor::make('content')
-                                    ->label(__('legal.content'))
-                                    ->required()
-                                    ->columnSpanFull(),
-                                Forms\Components\SchemaGrid::make(2)
-                                    ->schema([
-                                        Forms\Components\TextInput::make('seo_title')
-                                            ->label(__('legal.seo_title'))
-                                            ->maxLength(255),
-                                        Forms\Components\Textarea::make('seo_description')
-                                            ->label(__('legal.seo_description'))
-                                            ->rows(3)
-                                            ->maxLength(500),
-                                    ]),
-                            ])
-                            ->minItems(0)
-                            ->columns(1)
-                            ->collapsible()
-                            ->itemLabel(fn (array $state): ?string => $state['locale'] ?? null)
-                            ->defaultItems(0),
+                        LanguageTabs::make([
+                            Forms\Components\TextInput::make('title')
+                                ->label(__('legal.title'))
+                                ->required()
+                                ->maxLength(255),
+                            Forms\Components\TextInput::make('slug')
+                                ->label(__('legal.slug'))
+                                ->helperText(__('legal.slug_help'))
+                                ->required()
+                                ->maxLength(255)
+                                ->unique('legal_translations', 'slug', ignoreRecord: true),
+                            Forms\Components\RichEditor::make('content')
+                                ->label(__('legal.content'))
+                                ->required()
+                                ->columnSpanFull(),
+                            Forms\Components\TextInput::make('seo_title')
+                                ->label(__('legal.seo_title'))
+                                ->maxLength(255),
+                            Forms\Components\Textarea::make('seo_description')
+                                ->label(__('legal.seo_description'))
+                                ->rows(3)
+                                ->maxLength(500),
+                        ])
+                            ->columnSpanFull(),
                     ])
                     ->columns(1),
             ]);

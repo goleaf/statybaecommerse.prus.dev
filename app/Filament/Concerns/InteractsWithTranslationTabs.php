@@ -92,11 +92,19 @@ trait InteractsWithTranslationTabs
             $state = $this->data[$field] ?? null;
 
             if (is_array($state)) {
-                $defaultValue = $state[$defaultLocale] ?? ($state[array_key_first($state)] ?? null);
+                // Resolve the first non-empty value so we can reuse it for any missing locales,
+                // ensuring required tabs inherit sensible defaults instead of failing validation.
+                $defaultValue = $state[$defaultLocale] ?? null;
+                if (blank($defaultValue)) {
+                    $defaultValue = Collection::make($state)
+                        ->first(static fn ($value) => filled($value));
+                }
 
                 foreach ($locales as $locale) {
                     if (! array_key_exists($locale, $state) || blank($state[$locale])) {
-                        $state[$locale] = $defaultValue;
+                        if ($defaultValue !== null && $defaultValue !== '') {
+                            $state[$locale] = $defaultValue;
+                        }
                     }
                 }
 
