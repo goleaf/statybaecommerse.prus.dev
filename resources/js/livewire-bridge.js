@@ -68,7 +68,10 @@ const notify = resolveNotificationHandler();
 
 function updateCartCount() {
     try {
-        const cartItems = JSON.parse(window.sessionStorage.getItem('cart') || '[]');
+        const storedCart = window.sessionStorage.getItem('cart');
+        const parsedCart = storedCart ? JSON.parse(storedCart) : [];
+        // Normalise potential object payloads so legacy keyed snapshots still work.
+        const cartItems = Array.isArray(parsedCart) ? parsedCart : Object.values(parsedCart || {});
         const count = cartItems.reduce((total, item) => total + (Number(item.quantity) || 0), 0);
 
         const badge = document.querySelector(CART_COUNT_SELECTOR);
@@ -83,11 +86,22 @@ function updateCartCount() {
                 node.style.display = count > 0 ? 'inline' : 'none';
             }
         });
+
+        // Emit a browser event so Alpine/vanilla listeners stay in sync with Livewire broadcasts.
+        window.dispatchEvent(
+            new CustomEvent('cart-updated', {
+                detail: { quantity: count },
+            }),
+        );
+
+        return count;
     } catch (error) {
         // Ignore errors (e.g. malformed JSON) to avoid breaking unrelated pages
         if (import.meta.env.DEV) {
             console.debug('Unable to update cart count', error);
         }
+
+        return 0;
     }
 }
 

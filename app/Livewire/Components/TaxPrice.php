@@ -77,7 +77,7 @@ class TaxPrice extends Component
     /**
      * Handle updateAmounts functionality with proper error handling.
      */
-    #[On('cartUpdated')]
+    #[On('cart-updated')] // React to the unified cart update event for tax calculations.
     #[On('coupon-updated')]
     public function updateAmounts(): void
     {

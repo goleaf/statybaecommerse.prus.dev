@@ -75,7 +75,7 @@ class CartTotal extends Component
     /**
      * Handle updateTotals functionality with proper error handling.
      */
-    #[On('cartUpdated')]
+    #[On('cart-updated')] // Keep totals aligned with the canonical cart update event.
     #[On('coupon-updated')]
     public function updateTotals(): void
     {

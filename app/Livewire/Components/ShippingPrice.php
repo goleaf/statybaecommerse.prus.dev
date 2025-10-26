@@ -42,7 +42,7 @@ class ShippingPrice extends Component
     /**
      * Handle updateAmounts functionality with proper error handling.
      */
-    #[On('cartUpdated')]
+    #[On('cart-updated')] // Synchronise whenever the shared cart event fires.
     public function updateAmounts(): void
     {
         // Computed properties will automatically update

@@ -9,6 +9,7 @@ use Darryldecode\Cart\Facades\CartFacade;
 use Filament\Notifications\Notification;
 use Illuminate\Contracts\View\View;
 use Laravelcm\LivewireSlideOvers\SlideOverComponent;
+use Livewire\Attributes\On;
 
 /**
  * ShoppingCart
@@ -49,6 +50,7 @@ class ShoppingCart extends SlideOverComponent
     /**
      * Handle cartUpdated functionality with proper error handling.
      */
+    #[On('cart-updated')] // Refresh the modal contents whenever the cart changes globally.
     public function cartUpdated(): void
     {
         $this->items = CartFacade::session($this->sessionKey)->getContent();
@@ -62,7 +64,7 @@ class ShoppingCart extends SlideOverComponent
     {
         CartFacade::session($this->sessionKey)->remove($id);
         Notification::make()->title(__('Cart updated'))->body(__('The product  has been removed from your cart !'))->success()->send();
-        $this->dispatch('cartUpdated');
+        $this->dispatch('cart-updated'); // Relay the update to other cart-aware components.
         $this->dispatch('closePanel');
     }
 
