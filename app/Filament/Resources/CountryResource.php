@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use App\Support\Concerns\HasNav;
-use Filament\Schemas\Schema;
 use App\Filament\Resources\CountryResource\Pages;
 use App\Filament\Resources\CountryResource\RelationManagers\AddressesRelationManager;
 use App\Filament\Resources\CountryResource\RelationManagers\CitiesRelationManager;
@@ -14,6 +11,7 @@ use App\Filament\Resources\CountryResource\RelationManagers\CustomersRelationMan
 use App\Filament\Resources\CountryResource\RelationManagers\UsersRelationManager;
 use App\Models\Country;
 use App\Models\Scopes\ActiveScope;
+use App\Support\Concerns\HasNav;
 use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
@@ -25,17 +23,17 @@ use Filament\Actions\EditAction as TableEditAction;
 use Filament\Actions\ViewAction as TableViewAction;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\KeyValue;
-use Filament\Schemas\Components\Grid as SchemaGrid;
-use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Infolists\Components\Grid as InfolistGrid;
 use Filament\Infolists\Components\Section as InfolistSection;
 use Filament\Infolists\Components\TextEntry;
-use Filament\Infolists\Infolist;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Grid as SchemaGrid;
+use Filament\Schemas\Components\Section as SchemaSection;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -78,7 +76,7 @@ final class CountryResource extends Resource
         return __('countries.models.countries');
     }
 
-    public static function form(Schema $schema): Schema   
+    public static function form(Schema $schema): Schema
     {
         return $schema
             ->schema([
@@ -243,7 +241,7 @@ final class CountryResource extends Resource
             ]);
     }
 
-    public static function infolist(Infolist $infolist): Infolist
+    public static function infolist(Schema $schema): Schema
     {
         return $infolist
             ->schema([

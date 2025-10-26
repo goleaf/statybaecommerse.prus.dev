@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\ProductResource\Pages;
 
-
-use Filament\Schemas\Schema;
 use App\Filament\Resources\ProductResource;
 use App\Models\Category;
 use App\Models\Collection;
@@ -15,11 +13,11 @@ use App\Models\VariantAttributeValue;
 use Filament\Actions;
 use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
-use Filament\Infolists\Infolist;
 use Filament\Resources\Pages\ViewRecord;
+use Filament\Schemas\Schema;
 use Icetalker\FilamentTableRepeatableEntry\Infolists\Components\TableRepeatableEntry;
-use LaraZeus\ListGroup\Item\ListItem;
 use LaraZeus\ListGroup\Infolists\ListEntry;
+use LaraZeus\ListGroup\Item\ListItem;
 
 final class ViewProduct extends ViewRecord
 {
@@ -32,7 +30,7 @@ final class ViewProduct extends ViewRecord
         ];
     }
 
-    public function infolist(Schema $schema): Schema   
+    public function infolist(Schema $schema): Schema
     {
         return $schema->schema([
             ListEntry::make('productQuickLinks')

@@ -4,27 +4,26 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use Filament\Schemas\Schema;
 use App\Filament\Resources\CurrencyResource\Pages;
 use App\Models\Currency;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteBulkAction;
-use Filament\Tables\Actions\DeleteAction;
 use Filament\Actions\EditAction;
-use Filament\Schemas\Components\Grid as SchemaGrid;
-use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Infolists\Components\IconEntry;
 use Filament\Infolists\Components\TextEntry;
-use Filament\Infolists\Infolist;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Grid as SchemaGrid;
+use Filament\Schemas\Components\Section as SchemaSection;
+use Filament\Schemas\Schema;
 use Filament\Tables;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteAction;
+use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TernaryFilter;
@@ -55,9 +54,9 @@ final class CurrencyResource extends Resource
     /**
      * Configure read-only view for currency details.
      */
-    public static function infolist(Infolist $infolist): Infolist
+    public static function infolist(Schema $schema): Schema
     {
-        return $infolist->schema([
+        return $schema->schema([
             TextEntry::make('name')
                 ->label(__('currencies.name')),
             TextEntry::make('code')
@@ -102,7 +101,7 @@ final class CurrencyResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Schema $schema): Schema   
+    public static function form(Schema $schema): Schema
     {
         return $schema->components([
             SchemaSection::make(__('currencies.basic_information'))
@@ -222,7 +221,7 @@ final class CurrencyResource extends Resource
     /**
      * Configure the Filament table with columns, filters, and actions.
      */
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         // Configure the table definition for the streamlined Filament v4 return type.
         return $table
@@ -397,7 +396,7 @@ final class CurrencyResource extends Resource
                         ->label(__('currencies.update_rates'))
                         ->icon('heroicon-o-arrow-path')
                         ->color('info')
-                    ->action(function (Collection $records): void {
+                        ->action(function (Collection $records): void {
                             // Update exchange rates logic here
                             Notification::make()
                                 ->title(__('currencies.rates_updated_successfully'))
