@@ -13,22 +13,6 @@
 
     @if($addresses->isNotEmpty())
         <form wire:submit="save" class="flex-1 space-y-3">
-            @error('shippingAddressId')
-            <div class="p-4 border-l-4 border-red-400 bg-red-50">
-                <div class="flex">
-                    <div class="flex-shrink-0">
-                        <svg class="w-5 h-5 text-red-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                            <path fill-rule="evenodd" d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 5zm0 9a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" />
-                        </svg>
-                    </div>
-                    <div class="ml-3">
-                        <p class="text-sm text-red-700">
-                            {{ __($message) }}
-                        </p>
-                    </div>
-                </div>
-            </div>
-            @enderror
 
             <div class="max-w-lg mx-auto lg:max-w-none">
                 <div class="space-y-5">
@@ -46,30 +30,37 @@
                             <fieldset aria-label="{{ __('Delivery addresses') }}" class="mt-3 divide-y divide-gray-200">
                                 @foreach($addresses->get('shipping') as $shippingAddress)
                                     <label
+                                        wire:key="shipping-address-{{ $shippingAddress->id }}"
                                         for="shipping-address-{{ $shippingAddress->id }}"
                                         class="relative flex items-start gap-3 py-3 cursor-pointer group focus:outline-none"
                                     >
+                                        {{-- Debounced selection calms recalculation requests when toggling addresses. --}}
                                         <input
                                             type="radio"
-                                            wire:model="shippingAddressId"
+                                            wire:model.live.debounce.300ms="shippingAddressId"
                                             id="shipping-address-{{ $shippingAddress->id }}"
                                             name="shipping"
                                             value="{{ $shippingAddress->id }}"
                                             class="mt-0.5 size-4 shrink-0 cursor-pointer border-gray-300 text-primary-500 focus:ring-primary-600 active:ring-2 active:ring-offset-2"
                                         >
                                         <span class="flex flex-col space-y-0.5 text-sm text-gray-500">
-                                        <span class="font-medium text-gray-900">{{ $shippingAddress->full_name }}</span>
-                                        <span>
-                                            {{ $shippingAddress->street_address }}, {{ $shippingAddress->city }} {{ $shippingAddress->postal_code }}, {{ $shippingAddress->country->name }}
+                                            <span class="font-medium text-gray-900">{{ $shippingAddress->full_name }}</span>
+                                            <span>
+                                                {{ $shippingAddress->street_address }}, {{ $shippingAddress->city }} {{ $shippingAddress->postal_code }}, {{ $shippingAddress->country->name }}
+                                            </span>
+                                            <span>
+                                                {{ __('Phone number') }} : {{ $shippingAddress->phone_number ?? '' }}
+                                            </span>
                                         </span>
-                                        <span>
-                                            {{ __('Phone number') }} : {{ $shippingAddress->phone_number ?? '' }}
-                                        </span>
-                                    </span>
                                     </label>
                                 @endforeach
                             </fieldset>
                         @endif
+
+                        {{-- Sticky validation keeps address errors anchored near the selector. --}}
+                        @error('shippingAddressId')
+                            <p class="mt-2 text-sm text-red-600">{{ __($message) }}</p>
+                        @enderror
                     </div>
                     <div class="space-y-5">
                         <div>
@@ -88,21 +79,9 @@
                             </label>
                         </div>
 
+                        {{-- Inline validation mirrors the shipping selector for billing requirements. --}}
                         @error('billingAddressId')
-                        <div class="p-4 border-l-4 border-red-400 bg-red-50">
-                            <div class="flex">
-                                <div class="flex-shrink-0">
-                                    <svg class="w-5 h-5 text-red-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                                        <path fill-rule="evenodd" d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 5zm0 9a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" />
-                                    </svg>
-                                </div>
-                                <div class="ml-3">
-                                    <p class="text-sm text-red-700">
-                                        {{ __($message) }}
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
+                            <p class="mt-2 text-sm text-red-600">{{ __($message) }}</p>
                         @enderror
 
                         @if(! $sameAsShipping)
@@ -110,12 +89,14 @@
                                 <fieldset aria-label="{{ __('Billing addresses') }}" class="divide-y divide-gray-200">
                                     @foreach($addresses->get('billing') as $billingAddress)
                                         <label
+                                            wire:key="billing-address-{{ $billingAddress->id }}"
                                             for="billing-address-{{ $billingAddress->id }}"
                                             class="relative flex items-start gap-3 py-3 cursor-pointer group focus:outline-none"
                                         >
+                                            {{-- Debounced binding matches the shipping selector for consistent UX. --}}
                                             <input
                                                 type="radio"
-                                                wire:model="billingAddressId"
+                                                wire:model.live.debounce.300ms="billingAddressId"
                                                 id="billing-address-{{ $billingAddress->id }}"
                                                 name="billing"
                                                 value="{{ $billingAddress->id }}"
@@ -142,7 +123,10 @@
                     <x-buttons.submit
                         :title="__('Continue')"
                         class="w-full px-8 py-2 text-sm sm:w-auto"
+                        {{-- Disable the CTA while address mutations recalculate shipping downstream. --}}
+                        wire:loading.attr="disabled"
                         wire:loading.attr="data-loading"
+                        wire:target="save,shippingAddressId,sameAsShipping,billingAddressId"
                     />
                 </div>
             </div>
