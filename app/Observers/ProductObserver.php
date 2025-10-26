@@ -5,11 +5,7 @@ declare(strict_types=1);
 namespace App\Observers;
 
 use App\Models\Product;
-use App\Services\CacheInvalidationService;
-use App\Services\Images\GradientImageService;
-use App\UseCases\Cache\InvalidateProductCache;
-use Illuminate\Support\Facades\Log;
-use Throwable;
+use App\Services\ProductLifecycleService;
 
 /**
  * ProductObserver
@@ -19,68 +15,38 @@ use Throwable;
 final class ProductObserver
 {
     public function __construct(
-        private readonly CacheInvalidationService $cacheInvalidationService,
+        private readonly ProductLifecycleService $productLifecycleService,
     ) {}
 
     /**
-     * Handle created functionality with proper error handling.
+     * React to product creation by delegating to the lifecycle service for cache flushing and media handling.
      */
     public function created(Product $product): void
     {
-        $this->flushProductCaches($product);
-
-        // Skip placeholder image generation during tests to prevent memory issues
-        if (app()->environment('testing')) {
-            app(InvalidateProductCache::class)();
-
-            return;
-        }
-        try {
-            $collection = 'gallery';
-            // Default collection name for product images
-            if ($product->getMedia($collection)->isNotEmpty()) {
-                app(InvalidateProductCache::class)();
-
-                return;
-            }
-            /** @var GradientImageService $generator */
-            $generator = app(GradientImageService::class);
-            $tmpPath = $generator->generateGradientPng(800, 800);
-            $product->addMedia($tmpPath)->withCustomProperties(['placeholder' => true])->preservingOriginal()->toMediaCollection($collection);
-        } catch (Throwable $e) {
-            Log::warning('Failed to attach placeholder image for product', ['product_id' => $product->id, 'error' => $e->getMessage()]);
-        }
-
-        app(InvalidateProductCache::class)();
+        $this->productLifecycleService->handleCreated($product);
     }
 
     public function updated(Product $product): void
     {
-        $this->flushProductCaches($product);
+        // Ensure all mutation events go through the same lifecycle pipeline for consistency.
+        $this->productLifecycleService->handleMutated($product);
     }
 
     public function deleted(Product $product): void
     {
-        $this->flushProductCaches($product);
+        // Mirror the update behaviour so removals also refresh cached aggregates.
+        $this->productLifecycleService->handleMutated($product);
     }
 
     public function restored(Product $product): void
     {
-        $this->flushProductCaches($product);
+        // Restores impact storefront listings, so reuse the shared mutation handler.
+        $this->productLifecycleService->handleMutated($product);
     }
 
     public function forceDeleted(Product $product): void
     {
-        $this->flushProductCaches($product);
-    }
-
-    /**
-     * Flush cache tags tied to the provided product model.
-     */
-    private function flushProductCaches(Product $product): void
-    {
-        // Delegate to the central cache invalidation orchestrator so both taggable
-        // stores and array/file fallbacks are refreshed consistently.
-        $this->cacheInvalidationService->flushProducts($product);
+        // Force deletes should also invalidate caches via the lifecycle service.
+        $this->productLifecycleService->handleMutated($product);
     }
 }
