@@ -69,6 +69,19 @@ it('validates password confirmation', function () {
         ->assertHasFormErrors(['password' => 'same']);
 });
 
+it('requires password confirmation when submitting a password', function () {
+    livewire(Register::class)
+        ->fillForm([
+            // Provide the minimum required payload except the confirmation to isolate the failure.
+            'first_name' => 'Test',
+            'last_name' => 'User',
+            'email' => 'no-confirm@example.com',
+            'password' => 'password123',
+        ])
+        ->call('register')
+        ->assertHasFormErrors(['password_confirmation' => 'required']);
+});
+
 it('registers a new user successfully', function () {
     $userData = [
         'first_name'            => 'John',
