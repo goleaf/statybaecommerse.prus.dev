@@ -19,15 +19,24 @@ final class CheckoutProcessRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'full_name' => $this->contactRequirement(['string', 'max:255']),
-            'email' => $this->contactRequirement(['string', $this->emailValidationRule(), 'max:255']),
-            'phone' => ['nullable', 'string', 'max:50'],
+            'full_name'      => $this->contactRequirement(['string', 'max:255']),
+            'email'          => $this->contactRequirement(['string', $this->emailValidationRule(), 'max:255']),
+            'phone'          => ['nullable', 'string', 'max:50'],
             'address_line_1' => $this->contactRequirement(['string', 'max:255']),
             'address_line_2' => ['nullable', 'string', 'max:255'],
-            'city' => $this->contactRequirement(['string', 'max:255']),
-            'postal_code' => $this->contactRequirement(['string', 'max:25']),
-            'country' => $this->contactRequirement(['string', 'max:120']),
-            'payment_method' => [
+            'city'           => $this->contactRequirement(['string', 'max:255']),
+            'postal_code'    => $this->contactRequirement(['string', 'max:25']),
+            'country'        => $this->contactRequirement(['string', 'max:120']),
+            // Require clients to submit their calculated totals so we can cross-check them server-side.
+            'totals'          => $this->totalsRequirement(['array']),
+            'totals.subtotal' => ['nullable', 'numeric', 'min:0'],
+            'totals.tax'      => ['nullable', 'numeric', 'min:0'],
+            'totals.shipping' => ['nullable', 'numeric', 'min:0'],
+            'totals.discount' => ['nullable', 'numeric', 'min:0'],
+            'totals.total'    => ['nullable', 'numeric', 'min:0'],
+            'totals.lines'    => ['nullable', 'array'],
+            'totals.lines.*'  => ['numeric', 'min:0'],
+            'payment_method'  => [
                 'required',
                 'string',
                 'max:50',
@@ -40,7 +49,7 @@ final class CheckoutProcessRequest extends FormRequest
                     PaymentMethod::CASH_ON_DELIVERY->value,
                 ]),
             ],
-            'notes' => ['nullable', 'string', 'max:2000'],
+            'notes'   => ['nullable', 'string', 'max:2000'],
             'confirm' => ['sometimes', 'accepted'],
         ];
     }
@@ -63,12 +72,25 @@ final class CheckoutProcessRequest extends FormRequest
     }
 
     /**
-     * @param array<int, string> $rules
+     * @param  array<int, string> $rules
      * @return array<int, string>
      */
     private function contactRequirement(array $rules): array
     {
         $presenceRule = $this->isJsonCheckout() ? 'nullable' : 'required';
+
+        return array_merge([$presenceRule], $rules);
+    }
+
+    /**
+     * Decide whether the totals array must be present based on the request format.
+     *
+     * @param  array<int, string> $rules
+     * @return array<int, string>
+     */
+    private function totalsRequirement(array $rules): array
+    {
+        $presenceRule = $this->isJsonCheckout() ? 'required' : 'sometimes';
 
         return array_merge([$presenceRule], $rules);
     }
