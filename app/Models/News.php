@@ -10,6 +10,7 @@ use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\PublishedScope;
 use App\Models\Scopes\VisibleScope;
 use App\Services\Security\HtmlContentSanitizer;
+use App\Support\SearchQuerySanitizer;
 use App\Traits\HasTranslations;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Builder;
@@ -307,8 +308,12 @@ final class News extends Model implements TranslatableRecord
      */
     public function scopeSearch(Builder $query, string $search): Builder
     {
-        return $query->whereHas('translations', function (Builder $q) use ($search): void {
-            $q->where('title', 'like', "%{$search}%")->orWhere('summary', 'like', "%{$search}%")->orWhere('content', 'like', "%{$search}%");
+        $likePattern = SearchQuerySanitizer::toLikePattern($search);
+
+        return $query->whereHas('translations', function (Builder $q) use ($likePattern): void {
+            $q->where('title', 'like', $likePattern)
+                ->orWhere('summary', 'like', $likePattern)
+                ->orWhere('content', 'like', $likePattern);
         });
     }
 

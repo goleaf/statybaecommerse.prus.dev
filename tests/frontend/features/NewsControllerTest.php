@@ -112,6 +112,14 @@ it('can search news', function (): void {
     $response->assertSee('Test News Title');
 });
 
+it('sanitizes incoming news search queries', function (): void {
+    $response = $this->get(route('news.index', ['search' => '<script>alert(1)</script> Test']));
+
+    $response->assertStatus(200);
+    $response->assertViewHas('searchTerm', 'alert(1) Test');
+    $response->assertSee('Test News Title');
+});
+
 it('can filter featured news', function (): void {
     $featuredNews = News::factory()->create([
         'is_visible'   => true,

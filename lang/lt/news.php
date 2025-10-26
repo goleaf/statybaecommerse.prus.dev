@@ -21,6 +21,13 @@ return [
     'end_of_results'     => 'Peržiūrėjote visas naujienas.',
     'search_news'        => 'Ieškoti naujienų',
     'search_placeholder' => 'Įveskite paieškos žodį...',
+    'empty_state'        => [
+        'description'  => 'Pabandykite pakoreguoti filtrus ar paieškos raktažodžius, kad rastumėte daugiau naujienų.',
+        'tip_keywords' => 'Patikrinkite rašybą arba rinkitės bendresnius raktažodžius, kad išplėstumėte paiešką.',
+        'tip_filters'  => 'Atstatykite kategorijų, žymų ar išskirtinių straipsnių filtrus, kad matytumėte platesnį sąrašą.',
+        'tip_latest'   => 'Peržiūrėkite naujausias antraštes ir likite informuoti.',
+        'cta'          => 'Peržiūrėti visas naujienas',
+    ],
     'filter_by_category' => 'Filtruoti pagal kategoriją',
     'filter_by_tag'      => 'Filtruoti pagal žymę',
     'all_categories'     => 'Visos kategorijos',
