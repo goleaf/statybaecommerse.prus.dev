@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\OrdersByName;
 use App\Models\Scopes\ActiveScope;
 use App\Models\Translations\CountryTranslation;
 use App\Traits\HasTranslations;
@@ -35,6 +36,7 @@ use function is_string;
 final class Country extends Model
 {
     use HasFactory, HasTranslations, SoftDeletes;
+    use OrdersByName; // Provide alphabetical ordering for countries when rendering selectors.
 
     protected string $translationModel = CountryTranslation::class;
 

@@ -137,14 +137,4 @@ final class RecommendationBlock extends Model
     {
         return $query->where('name', $key);
     }
-
-    /**
-     * Handle scopeOrderedByName functionality with proper error handling.
-     *
-     * @param Builder<self> $query
-     */
-    public function scopeOrderedByName(Builder $query, string $direction = 'asc'): Builder
-    {
-        return $query->orderBy('name', $direction);
-    }
 }

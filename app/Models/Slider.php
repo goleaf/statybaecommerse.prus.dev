@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\OrdersByName;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -14,6 +15,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
 final class Slider extends Model implements HasMedia
 {
     use HasFactory, InteractsWithMedia;
+    use OrdersByName; // Ensure sliders can be sorted alphabetically when required.
 
     protected $fillable = [
         'title',
@@ -29,10 +31,15 @@ final class Slider extends Model implements HasMedia
     ];
 
     protected $casts = [
-        'is_active' => 'boolean',
-        'settings' => 'array',
+        'is_active'  => 'boolean',
+        'settings'   => 'array',
         'sort_order' => 'integer',
     ];
+
+    /**
+     * Column leveraged for the shared alphabetical ordering scope.
+     */
+    protected string $nameColumn = 'title';
 
     public function registerMediaCollections(): void
     {

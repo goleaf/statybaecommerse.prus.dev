@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\OrdersByName;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -25,6 +26,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 final class CampaignConversionTranslation extends Model
 {
     use HasFactory;
+    use OrdersByName; // Allow translated labels to be sorted consistently for reporting.
 
     /**
      * Explicitly define the table to keep the translation namespace flexible.
@@ -36,7 +38,7 @@ final class CampaignConversionTranslation extends Model
      *
      * @var array<int, string>
      */
-    protected $fillable = ['campaign_conversion_id', 'locale', 'notes', 'custom_attributes'];
+    protected $fillable = ['campaign_conversion_id', 'locale', 'conversion_type_label', 'status_label', 'notes', 'custom_data'];
 
     /**
      * Cast the JSON attribute into an array for convenient access in code.
@@ -44,7 +46,7 @@ final class CampaignConversionTranslation extends Model
      * @var array<string, string>
      */
     protected $casts = [
-        'custom_attributes' => 'array',
+        'custom_data' => 'array',
     ];
 
     /**
@@ -55,6 +57,11 @@ final class CampaignConversionTranslation extends Model
         // Defer to the property to keep assertions consistent while allowing overrides.
         return $this->casts;
     }
+
+    /**
+     * Column utilised by the OrdersByName scope for alphabetic listings.
+     */
+    protected string $nameColumn = 'conversion_type_label';
 
     /**
      * Provide the owning conversion for downstream analytics queries.

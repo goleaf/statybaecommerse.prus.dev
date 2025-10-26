@@ -1,15 +1,18 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\OrdersByName;
 use App\Models\Scopes\ActiveScope;
 use App\Observers\MenuObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * Menu
@@ -29,6 +32,7 @@ use Illuminate\Database\Eloquent\Model;
 final class Menu extends Model
 {
     use HasFactory;
+    use OrdersByName; // Keep menu records alphabetically sorted where required.
 
     protected $fillable = ['key', 'name', 'location', 'description', 'is_active'];
 
@@ -74,19 +78,12 @@ final class Menu extends Model
     public function scopeWithVisibleItems(Builder $query): Builder
     {
         return $query->with([
-            'allItems' => static fn($itemQuery) => $itemQuery->visible()->ordered(),
+            'allItems' => static fn ($itemQuery) => $itemQuery->visible()->ordered(),
         ]);
     }
 
     /**
-     * Scope the query to order menus alphabetically by their display name.
-     *
-     * Including this helper keeps ordering behaviour consistent across the
-     * application whenever menus need to be rendered in a predictable list.
+     * Use the "name" column when invoking the shared OrdersByName scope.
      */
-    public function scopeOrderedByName(Builder $query): Builder
-    {
-        // Always order by the "name" column to keep menu listings readable.
-        return $query->orderBy('name');
-    }
+    protected string $nameColumn = 'name';
 }

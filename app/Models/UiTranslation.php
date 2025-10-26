@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\OrdersByName;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -13,12 +14,12 @@ use Illuminate\Database\Eloquent\Model;
  * Eloquent model for storing UI interface translations in the database.
  * Provides key-value translation storage for admin interface strings.
  *
- * @property int $id
- * @property string $key
- * @property string $locale
- * @property string $value
- * @property string|null $group
- * @property array|null $metadata
+ * @property int            $id
+ * @property string         $key
+ * @property string         $locale
+ * @property string         $value
+ * @property string|null    $group
+ * @property array|null     $metadata
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
  *
@@ -31,6 +32,7 @@ use Illuminate\Database\Eloquent\Model;
 final class UiTranslation extends Model
 {
     use HasFactory;
+    use OrdersByName; // Allow alphabetical ordering by translation key when browsing entries.
 
     protected $table = 'ui_translations';
 
@@ -48,6 +50,11 @@ final class UiTranslation extends Model
             'metadata' => 'array',
         ];
     }
+
+    /**
+     * Column representing the alphabetical ordering key.
+     */
+    protected string $nameColumn = 'key';
 
     /**
      * Scope to filter by translation group

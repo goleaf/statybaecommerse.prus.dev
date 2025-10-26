@@ -6,6 +6,7 @@ namespace App\Models;
 
 use App\Contracts\TranslatableRecord;
 use App\Enums\ModerationState;
+use App\Models\Concerns\OrdersByName;
 use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\PublishedScope;
 use App\Models\Scopes\VisibleScope;
@@ -45,7 +46,8 @@ final class News extends Model implements TranslatableRecord
     use HasFactory;
     use HasTranslations;
     use LogsActivity;
-    use SoftDeletes;
+    use OrdersByName;
+    use SoftDeletes; // Offer alphabetical ordering for news articles in admin listings.
 
     protected $table = 'news';
 
@@ -63,6 +65,11 @@ final class News extends Model implements TranslatableRecord
         'view_count',
         'meta_data',
     ];
+
+    /**
+     * Sort news entries by the primary author name as a stable fallback for alphabetical listings.
+     */
+    protected string $nameColumn = 'author_name';
 
     /**
      * Handle casts functionality with proper error handling.

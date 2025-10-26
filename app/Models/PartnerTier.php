@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\OrdersByName;
 use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\EnabledScope;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
@@ -31,6 +32,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 final class PartnerTier extends Model
 {
     use HasFactory, SoftDeletes;
+    use OrdersByName; // Keep tier dropdowns alphabetically sorted for clarity.
 
     protected $table = 'partner_tiers';
 
@@ -69,11 +71,7 @@ final class PartnerTier extends Model
     }
 
     /**
-     * Handle scopeOrderedByName functionality with proper error handling.
+     * Column consumed by the OrdersByName scope.
      */
-    public function scopeOrderedByName(Builder $query): Builder
-    {
-        // Sort partner tiers alphabetically to provide predictable presentation layers.
-        return $query->orderBy('name');
-    }
+    protected string $nameColumn = 'name';
 }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\OrdersByName;
 use App\Models\Scopes\ActiveScope;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Builder;
@@ -12,14 +13,14 @@ use Illuminate\Database\Eloquent\Model;
 use Stringable;
 
 /**
- * @property string $name
- * @property string $slug
- * @property string $type
- * @property string $event
+ * @property string                     $name
+ * @property string                     $slug
+ * @property string                     $type
+ * @property string                     $event
  * @property array<string, string>|null $subject
  * @property array<string, string>|null $content
- * @property array<int, string>|null $variables
- * @property bool $is_active
+ * @property array<int, string>|null    $variables
+ * @property bool                       $is_active
  *
  * @method static Builder|NotificationTemplate active()
  * @method static Builder|NotificationTemplate byEvent(string $event)
@@ -35,6 +36,7 @@ use Stringable;
 final class NotificationTemplate extends Model
 {
     use HasFactory;
+    use OrdersByName; // Standardise alphabetical ordering for notification templates.
 
     /**
      * @var array<int, string>
@@ -45,11 +47,16 @@ final class NotificationTemplate extends Model
      * @var array<string, string>
      */
     protected $casts = [
-        'subject' => 'array',
-        'content' => 'array',
+        'subject'   => 'array',
+        'content'   => 'array',
         'variables' => 'array',
         'is_active' => 'boolean',
     ];
+
+    /**
+     * Use the template name column for the shared ordering scope.
+     */
+    protected string $nameColumn = 'name';
 
     /**
      * Handle getLocalizedSubject functionality with proper error handling.
@@ -193,7 +200,7 @@ final class NotificationTemplate extends Model
     /**
      * Handle scopeActive functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeActive(Builder $query): Builder
     {
@@ -204,7 +211,7 @@ final class NotificationTemplate extends Model
     /**
      * Handle scopeByType functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeByType(Builder $query, string $type): Builder
     {
@@ -215,7 +222,7 @@ final class NotificationTemplate extends Model
     /**
      * Handle scopeByEvent functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeByEvent(Builder $query, string $event): Builder
     {

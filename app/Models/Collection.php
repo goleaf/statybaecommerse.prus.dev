@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Contracts\TranslatableRecord;
+use App\Models\Concerns\OrdersByName;
 use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\VisibleScope;
 use App\Observers\CollectionObserver;
@@ -46,10 +47,16 @@ final class Collection extends Model implements HasMedia, TranslatableRecord
     use HasFactory, SoftDeletes;
     use HasTranslations;
     use InteractsWithMedia;
+    use OrdersByName; // Ensure merchandising collections sort alphabetically when needed.
 
     protected $table = 'collections';
 
     protected $fillable = ['name', 'slug', 'description', 'is_visible', 'sort_order', 'seo_title', 'seo_description', 'is_automatic', 'is_active', 'meta_title', 'meta_description', 'meta_keywords', 'display_type', 'products_per_page', 'show_filters', 'max_products', 'rules'];
+
+    /**
+     * Column referenced when ordering collections alphabetically.
+     */
+    protected string $nameColumn = 'name';
 
     public static $translatable = ['name', 'description', 'meta_title', 'meta_description', 'meta_keywords', 'slug'];
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\OrdersByName;
 use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\EnabledScope;
 use App\Models\Scopes\StatusScope;
@@ -33,6 +34,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 final class Channel extends Model
 {
     use HasFactory, SoftDeletes;
+    use OrdersByName; // Keep channel selectors sorted alphabetically by name.
 
     protected $table = 'channels';
 
@@ -141,14 +143,5 @@ final class Channel extends Model
         return $query
             ->orderBy('sort_order')
             ->orderedByName();
-    }
-
-    /**
-     * Order channels alphabetically so dropdowns remain stable.
-     */
-    public function scopeOrderedByName(Builder $query): Builder
-    {
-        // Using a simple ascending order keeps the scope database agnostic and easy to reason about.
-        return $query->orderBy('name');
     }
 }

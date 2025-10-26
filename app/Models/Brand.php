@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Contracts\TranslatableRecord;
+use App\Models\Concerns\OrdersByName;
 use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\EnabledScope;
 use App\Observers\BrandObserver;
@@ -30,17 +31,17 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  *
  * Eloquent model representing the Brand entity with comprehensive relationships, scopes, and business logic for the e-commerce system.
  *
- * @property mixed  $fillable
- * @property mixed  $appends
- * @property mixed  $table
- * @property string $translationModel
- * @property mixed $translatable
- * @property int $id
- * @property string $name
+ * @property mixed       $fillable
+ * @property mixed       $appends
+ * @property mixed       $table
+ * @property string      $translationModel
+ * @property mixed       $translatable
+ * @property int         $id
+ * @property string      $name
  * @property string|null $slug
  * @property string|null $description
- * @property bool $is_enabled
- * @property bool $is_visible
+ * @property bool        $is_enabled
+ * @property bool        $is_visible
  * @property-read int|null $products_count
  * @property-read string|null $logo
  *
@@ -59,8 +60,9 @@ final class Brand extends Model implements HasMedia, TranslatableRecord
     use HasTranslations;
     use InteractsWithMedia;
     use LogsActivity;
+    use OrdersByName;
     use Searchable;
-    use SoftDeletes;
+    use SoftDeletes; // Support alphabetical ordering when displaying brand lists.
 
     protected $fillable = ['name', 'slug', 'description', 'website', 'is_enabled', 'is_active', 'is_visible', 'is_featured', 'seo_title', 'seo_description'];
 
@@ -118,15 +120,15 @@ final class Brand extends Model implements HasMedia, TranslatableRecord
         $locale = app()->getLocale();
 
         return [
-            'id' => $this->getKey(),
-            'type' => 'brand',
-            'name' => $this->name,
-            'slug' => $this->slug,
-            'description' => $this->description,
-            'translated_name' => $this->trans('name', $locale),
+            'id'                     => $this->getKey(),
+            'type'                   => 'brand',
+            'name'                   => $this->name,
+            'slug'                   => $this->slug,
+            'description'            => $this->description,
+            'translated_name'        => $this->trans('name', $locale),
             'translated_description' => $this->trans('description', $locale),
-            'products_count' => (int) ($this->products_count ?? 0),
-            'is_enabled' => (bool) $this->is_enabled,
+            'products_count'         => (int) ($this->products_count ?? 0),
+            'is_enabled'             => (bool) $this->is_enabled,
         ];
     }
 

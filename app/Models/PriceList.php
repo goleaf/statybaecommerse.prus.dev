@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\OrdersByName;
 use App\Models\Scopes\DateRangeScope;
 use App\Models\Scopes\EnabledScope;
 use App\Models\Translations\PriceListTranslation;
@@ -24,8 +25,8 @@ use Spatie\Activitylog\Traits\LogsActivity;
  * Eloquent model representing the PriceList entity with comprehensive relationships, scopes, and business logic for the e-commerce system.
  *
  * @property string $translationModel
- * @property mixed $table
- * @property mixed $fillable
+ * @property mixed  $table
+ * @property mixed  $fillable
  *
  * @method static \Illuminate\Database\Eloquent\Builder|PriceList newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|PriceList newQuery()
@@ -36,7 +37,11 @@ use Spatie\Activitylog\Traits\LogsActivity;
 #[ScopedBy([EnabledScope::class, DateRangeScope::class])]
 final class PriceList extends Model
 {
-    use HasFactory, HasTranslations, LogsActivity, SoftDeletes;
+    use HasFactory;
+    use HasTranslations;
+    use LogsActivity;
+    use OrdersByName; // Keep price list selectors alphabetically ordered for merchandising flows.
+    use SoftDeletes;
 
     protected string $translationModel = PriceListTranslation::class;
 
@@ -87,7 +92,7 @@ final class PriceList extends Model
     /**
      * Handle scopeEnabled functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeEnabled($query)
     {
@@ -97,7 +102,7 @@ final class PriceList extends Model
     /**
      * Handle scopeActive functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeActive($query)
     {
@@ -111,7 +116,7 @@ final class PriceList extends Model
     /**
      * Handle scopeByPriority functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeByPriority($query, string $direction = 'asc')
     {
@@ -121,7 +126,7 @@ final class PriceList extends Model
     /**
      * Handle scopeDefault functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeDefault($query)
     {
@@ -131,7 +136,7 @@ final class PriceList extends Model
     /**
      * Handle scopeAutoApply functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeAutoApply($query)
     {
@@ -139,19 +144,9 @@ final class PriceList extends Model
     }
 
     /**
-     * Handle scopeOrderedByName functionality with proper error handling.
-     *
-     * @param  mixed  $query
-     */
-    public function scopeOrderedByName($query, string $direction = 'asc')
-    {
-        return $query->orderBy('name', $direction);
-    }
-
-    /**
      * Handle scopeByCurrency functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeByCurrency($query, int $currencyId)
     {
@@ -161,7 +156,7 @@ final class PriceList extends Model
     /**
      * Handle scopeForOrderAmount functionality with proper error handling.
      *
-     * @param  mixed  $query
+     * @param mixed $query
      */
     public function scopeForOrderAmount($query, float $amount)
     {

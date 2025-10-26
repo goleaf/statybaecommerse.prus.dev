@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\OrdersByName;
 use App\Models\Scopes\ActiveScope;
 use App\Support\Authorization\AuthorizationMatrix;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
@@ -34,8 +35,12 @@ final class AdminUser extends Authenticatable implements FilamentUser
 {
     /** @use HasFactory<\Database\Factories\AdminUserFactory> */
     use HasFactory;
+
     use HasRoles;
     use Notifiable;
+
+    // Ensure administrators can always be listed alphabetically.
+    use OrdersByName;
 
     /**
      * Guard name for Spatie permissions (separate admin guard).
@@ -59,13 +64,9 @@ final class AdminUser extends Authenticatable implements FilamentUser
     }
 
     /**
-     * Handle scopeOrderedByName functionality with proper error handling.
+     * The column leveraged by the shared OrdersByName scope for deterministic lists.
      */
-    public function scopeOrderedByName(Builder $query): Builder
-    {
-        // Always normalize the casing before sorting so administrators appear deterministically.
-        return $query->orderByRaw('LOWER(name) ASC, name ASC');
-    }
+    protected string $nameColumn = 'name';
 
     /**
      * Handle canAccessPanel functionality with proper error handling.
@@ -73,6 +74,15 @@ final class AdminUser extends Authenticatable implements FilamentUser
     public function canAccessPanel(Panel $panel): bool
     {
         return AuthorizationMatrix::check('panel', 'access', $this);
+    }
+
+    /**
+     * Provide access to the audit activity logs for administrative review workflows.
+     */
+    public function activityLogs(): HasMany
+    {
+        // The activity log relation is keyed by the admin user's identifier.
+        return $this->hasMany(ActivityLog::class, 'admin_user_id');
     }
 
     /**

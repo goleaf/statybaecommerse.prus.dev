@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\OrdersByName;
 use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\EnabledScope;
 use App\Models\Translations\CityTranslation;
@@ -36,6 +37,7 @@ use Throwable;
 final class City extends Model
 {
     use HasFactory, HasTranslations, SoftDeletes;
+    use OrdersByName; // Expose the shared alphabetical ordering scope for city listings.
 
     protected string $translationModel = CityTranslation::class;
 
