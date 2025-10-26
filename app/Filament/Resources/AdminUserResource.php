@@ -92,7 +92,8 @@ final class AdminUserResource extends Resource
                                 ->password()
                                 ->required(fn (string $context): bool => $context === 'create')
                                 ->minLength(8)
-                                ->dehydrated(fn (?string $state): bool => filled($state))
+                                // Use the first-class filled() helper so the dehydration guard remains obvious during reviews.
+                                ->dehydrated(filled(...))
                                 ->dehydrateStateUsing(fn (?string $state): ?string => filled($state) ? bcrypt($state) : null)
                                 ->columnSpan(1),
                             TextInput::make('password_confirmation')
@@ -204,23 +205,21 @@ final class AdminUserResource extends Resource
                         'verified'   => __('admin.admin_users.filters.verified'),
                         'unverified' => __('admin.admin_users.filters.unverified'),
                     ])
-                    ->query(function (Builder $query, array $data): Builder {
-                        return $query->when(
-                            $data['value'] ?? null,
-                            function (Builder $query, mixed $value): Builder {
-                                // Guard against unexpected types so the filter gracefully becomes a no-op.
-                                if (! is_string($value)) {
-                                    return $query;
-                                }
-
-                                return match ($value) {
-                                    'verified'   => $query->whereNotNull('email_verified_at'),
-                                    'unverified' => $query->whereNull('email_verified_at'),
-                                    default      => $query,
-                                };
+                    ->query(fn (Builder $query, array $data): Builder => $query->when(
+                        $data['value'] ?? null,
+                        function (Builder $query, mixed $value): Builder {
+                            // Guard against unexpected types so the filter gracefully becomes a no-op.
+                            if (! is_string($value)) {
+                                return $query;
                             }
-                        );
-                    }),
+
+                            return match ($value) {
+                                'verified'   => $query->whereNotNull('email_verified_at'),
+                                'unverified' => $query->whereNull('email_verified_at'),
+                                default      => $query,
+                            };
+                        }
+                    )),
                 Filter::make('created_at')
                     ->label(__('admin.admin_users.filters.created_at'))
                     ->form([
@@ -229,31 +228,29 @@ final class AdminUserResource extends Resource
                         Flatpickr::makeDate('until')
                             ->label(__('admin.admin_users.filters.created_until')),
                     ])
-                    ->query(function (Builder $query, array $data): Builder {
-                        return $query
-                            ->when(
-                                $data['from'] ?? null,
-                                function (Builder $q, mixed $date): Builder {
-                                    // Bail out if the picker returns an unexpected payload.
-                                    if (! is_string($date)) {
-                                        return $q;
-                                    }
-
-                                    return $q->whereDate('created_at', '>=', $date);
+                    ->query(fn (Builder $query, array $data): Builder => $query
+                        ->when(
+                            $data['from'] ?? null,
+                            function (Builder $q, mixed $date): Builder {
+                                // Bail out if the picker returns an unexpected payload.
+                                if (! is_string($date)) {
+                                    return $q;
                                 }
-                            )
-                            ->when(
-                                $data['until'] ?? null,
-                                function (Builder $q, mixed $date): Builder {
-                                    // Apply the upper bound only when the filter contains a valid date string.
-                                    if (! is_string($date)) {
-                                        return $q;
-                                    }
 
-                                    return $q->whereDate('created_at', '<=', $date);
+                                return $q->whereDate('created_at', '>=', $date);
+                            }
+                        )
+                        ->when(
+                            $data['until'] ?? null,
+                            function (Builder $q, mixed $date): Builder {
+                                // Apply the upper bound only when the filter contains a valid date string.
+                                if (! is_string($date)) {
+                                    return $q;
                                 }
-                            );
-                    }),
+
+                                return $q->whereDate('created_at', '<=', $date);
+                            }
+                        )),
                 Filter::make('recent')
                     ->label(__('admin.admin_users.filters.recent'))
                     ->query(fn (Builder $query): Builder => $query->where('created_at', '>=', now()->subDays(30))),
@@ -266,10 +263,8 @@ final class AdminUserResource extends Resource
                     ->label(__('admin.admin_users.actions.verify_email'))
                     ->icon('heroicon-o-check-circle')
                     ->color('success')
-                    ->visible(function (AdminUser $record): bool {
-                        // Hide the manual override once the admin already confirmed their email.
-                        return blank($record->email_verified_at);
-                    })
+                    // Hide the manual override once the admin already confirmed their email.
+                    ->visible(fn (AdminUser $record): bool => blank($record->email_verified_at))
                     ->action(function (AdminUser $record): void {
                         // Delegate to the model helper so both single and bulk flows share the same logic.
                         $record->markEmailAsVerified();
@@ -283,10 +278,8 @@ final class AdminUserResource extends Resource
                     ->label(__('admin.admin_users.actions.send_verification'))
                     ->icon('heroicon-o-envelope')
                     ->color('info')
-                    ->visible(function (AdminUser $record): bool {
-                        // Only allow resending the verification email while the account is still pending.
-                        return blank($record->email_verified_at);
-                    })
+                    // Only allow resending the verification email while the account is still pending.
+                    ->visible(fn (AdminUser $record): bool => blank($record->email_verified_at))
                     ->action(function (AdminUser $record): void {
                         // Placeholder for the outbound email workflow to keep operators informed in the UI.
                         FilamentNotification::make()
