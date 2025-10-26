@@ -17,3 +17,7 @@ Route::get('inventory', InventoryController::class)
 Route::get('orders', OrdersIndexController::class)
     ->middleware('partner.api.scope:orders.read')
     ->name('orders.index');
+
+Route::get('orders/summary', OrderSummaryController::class)
+    ->middleware('partner.api.scope:orders.read')
+    ->name('orders.summary');
