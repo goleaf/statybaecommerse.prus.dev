@@ -923,5 +923,8 @@
     "auth.two_factor.recovery_label": "Atkūrimo kodas (pasirinktinai)",
     "auth.two_factor.recovery_help": "Saugojte atkūrimo kodus. Kiekvieną jų galima panaudoti tik kartą.",
     "auth.two_factor.submit": "Patvirtinti ir tęsti",
-    "auth.two_factor.security_footer": "Mes nesaugome neapdorotų kodų ar įrenginių identifikatorių."
+    "auth.two_factor.security_footer": "Mes nesaugome neapdorotų kodų ar įrenginių identifikatorių.",
+    "Fetching real-time shipping quotes…": "Gaunami pristatymo pasiūlymai realiu laiku…",
+    "Recalculating delivery options…": "Perskaičiuojami pristatymo variantai…",
+    "Live quote from resolver": "Skaičiuoklės pateikta kaina"
 }

@@ -3,7 +3,26 @@
     Lazily fetches shipping options while providing manual refresh controls.
 --}}
 <div class="space-y-6">
-    @if(count($options) === 0)
+    @if($isResolving && count($options) === 0)
+        <div class="space-y-3" role="status" aria-live="polite">
+            @foreach(range(1, 3) as $placeholder)
+                <div class="flex items-center justify-between gap-4 rounded border border-primary-100 bg-primary-50/80 p-4">
+                    <div class="flex items-start gap-3">
+                        <span class="mt-1 size-4 rounded-full border border-primary-200 bg-white"></span>
+                        <span class="space-y-2">
+                            <span class="block h-3 w-32 animate-pulse rounded bg-primary-100"></span>
+                            <span class="block h-3 w-48 animate-pulse rounded bg-primary-100"></span>
+                        </span>
+                    </div>
+                    <span class="block h-3 w-16 animate-pulse rounded bg-primary-100"></span>
+                </div>
+            @endforeach
+
+            <p class="text-xs text-center text-primary-700">
+                {{ __('Fetching real-time shipping quotes…') }}
+            </p>
+        </div>
+    @elseif(count($options) === 0)
         <div class="flex items-center p-4 space-x-4 border border-gray-200">
             <x-untitledui-shopping-bag class="size-5 text-primary-800" stroke-width="1.5" aria-hidden="true" />
             <p class="text-sm text-gray-500">
@@ -11,15 +30,21 @@
             </p>
         </div>
     @else
-        <form wire:submit="save" class="flex-1 space-y-3">
-            {{-- Surface a lightweight loading state so shoppers see when the options are being recalculated. --}}
-            <div
-                wire:loading.flex
-                wire:target="resolveOptions"
-                class="items-center justify-center hidden p-3 text-sm text-primary-600 bg-primary-50 border border-primary-200 rounded"
-            >
-                {{ __('Updating delivery options…') }}
-            </div>
+        <form wire:submit="save" class="flex-1 space-y-3" aria-busy="{{ $isResolving ? 'true' : 'false' }}">
+            @if($isResolving)
+                {{-- Inline status keeps shoppers informed while the resolver crunches numbers. --}}
+                <div
+                    class="flex items-center gap-3 rounded border border-primary-200 bg-primary-50 p-3 text-sm text-primary-700"
+                    role="status"
+                    aria-live="polite"
+                >
+                    <svg class="size-4 animate-spin text-primary-500" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                        <circle class="opacity-20" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+                        <path class="opacity-90" d="M22 12a10 10 0 0 1-10 10" stroke="currentColor" stroke-width="4" stroke-linecap="round" />
+                    </svg>
+                    <span>{{ __('Recalculating delivery options…') }}</span>
+                </div>
+            @endif
             @error('currentSelected')
             <div class="p-4 border-l-4 border-red-400 bg-red-50">
                 <div class="flex">
@@ -38,8 +63,13 @@
             @enderror
 
             <div class="max-w-lg mx-auto lg:max-w-none">
-                <fieldset aria-label="{{ __('Delivery method') }}">
-                    <div class="-space-y-px bg-white">
+                <fieldset aria-label="{{ __('Delivery method') }}" aria-busy="{{ $isResolving ? 'true' : 'false' }}">
+                    <div
+                        class="-space-y-px bg-white"
+                        @class([
+                            'pointer-events-none opacity-60' => $isResolving,
+                        ])
+                    >
                         @foreach($options as $option)
                             <label
                                 wire:key="shipping-option-{{ $option['id'] }}"
@@ -58,6 +88,7 @@
                                         wire:click="selectOption({{ $option['id'] }})"
                                         name="shipping"
                                         value="{{ $option['id'] }}"
+                                        @disabled($isResolving)
                                         class="mt-0.5 size-4 shrink-0 cursor-pointer border-gray-300 text-primary-500 focus:ring-primary-600 active:ring-2 active:ring-offset-2"
                                     >
                                     <span class="flex flex-col ml-3">
@@ -82,8 +113,13 @@
                                         @endif
                                     </span>
                                 </span>
-                                <span class="text-sm font-medium text-primary-950">
-                                    {{ $option['formatted_price'] ?? \Illuminate\Support\Number::currency($option['price'], $option['currency_code'], app()->getLocale()) }}
+                                <span class="flex flex-col items-end text-right">
+                                    <span class="text-sm font-semibold text-primary-950" aria-live="polite">
+                                        {{ $option['formatted_price'] ?? \Illuminate\Support\Number::currency($option['price'], $option['currency_code'], app()->getLocale()) }}
+                                    </span>
+                                    <span class="text-xs text-gray-400">
+                                        {{ __('Live quote from resolver') }}
+                                    </span>
                                 </span>
                             </label>
                         @endforeach
@@ -97,7 +133,7 @@
                         wire:loading.attr="data-loading"
                         wire:loading.attr="disabled"
                         wire:loading.attr="aria-disabled"
-                        wire:target="save,resolveOptions"
+                        wire:target="save"
                         :disabled="$isResolving"
                     />
                 </div>

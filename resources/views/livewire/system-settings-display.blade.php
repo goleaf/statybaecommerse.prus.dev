@@ -38,12 +38,17 @@
         <div class="bg-white shadow overflow-hidden sm:rounded-md">
             <ul class="divide-y divide-gray-200">
                 @foreach($settings as $entry)
+                    @php
+                        $entryKey = data_get($entry, 'key', '');
+                        $entryLabel = data_get($entry, 'label', $entryKey);
+                        $entryValue = data_get($entry, 'value');
+                    @endphp
                     <li class="px-6 py-4">
                         <div class="flex items-center justify-between">
                             <div class="flex-1 min-w-0">
                                 <div class="flex items-center justify-between">
                                     <p class="text-sm font-medium text-gray-900 truncate">
-                                        {{ $entry->key }}
+                                        {{ $entryLabel }}
                                     </p>
                                     <div class="ml-2 flex-shrink-0 flex">
                                         @if($showPublicOnly)
@@ -55,7 +60,7 @@
                                 </div>
                                 <div class="mt-1">
                                     <p class="text-sm text-gray-500">
-                                        {{ $this->formatValue($entry->value) }}
+                                        {{ $this->formatValue($entryValue) }}
                                     </p>
                                 </div>
                             </div>

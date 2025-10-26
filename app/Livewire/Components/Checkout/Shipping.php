@@ -35,21 +35,6 @@ class Shipping extends StepComponent
     public ?int $billingAddressId = null;
 
     /**
-     * React when the customer selects a different shipping address so downstream
-     * delivery options can be recalculated in real time.
-     */
-    public function updatedShippingAddressId(?int $value): void
-    {
-        // Dispatch a recalculation event any time the shipping address changes.
-        $this->dispatchShippingRecalculation();
-
-        if ($this->sameAsShipping) {
-            // Keep the billing selection aligned when using the shipping address for billing.
-            $this->billingAddressId = $value;
-        }
-    }
-
-    /**
      * Sync billing address selection when the "same as shipping" toggle flips
      * so totals remain coherent and shipping recalculations stay accurate.
      */
@@ -61,6 +46,7 @@ class Shipping extends StepComponent
 
         // Ensure shipping options recompute when toggling billing state.
         $this->dispatchShippingRecalculation();
+        $this->broadcastShippingContext($this->shippingAddressId);
     }
 
     /**
@@ -134,12 +120,22 @@ class Shipping extends StepComponent
     }
 
     /**
-     * React to radio button updates in near real-time so the delivery step can
-     * re-evaluate pricing with a slight debounce applied by the Livewire binder.
+     * React to radio button updates with a slight debounce so shipping quotes
+     * refresh smoothly without hammering the resolver.
      */
     public function updatedShippingAddressId(mixed $addressId): void
     {
-        $this->shippingAddressId = is_numeric($addressId) ? (int) $addressId : null;
+        $normalisedId = is_numeric($addressId) ? (int) $addressId : null;
+        $this->shippingAddressId = $normalisedId;
+
+        if ($this->sameAsShipping) {
+            // Mirror the shipping selection across billing when toggled on.
+            $this->billingAddressId = $normalisedId;
+        }
+
+        // Broadcast both the lightweight recalculation signal and the richer
+        // context payload so dependent components stay consistent.
+        $this->dispatchShippingRecalculation();
         $this->broadcastShippingContext($this->shippingAddressId);
     }
 

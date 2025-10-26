@@ -14,14 +14,14 @@ final class CartItemData implements Arrayable
 {
     public function __construct(
         public readonly int $id,
-        public readonly int $productId,
-        public readonly ?int $variantId,
+        public readonly int $product_id,
+        public readonly ?int $variant_id,
         public readonly string $name,
-        public readonly float $unitPrice,
+        public readonly float $unit_price,
         public readonly int $quantity,
-        public readonly float $totalPrice,
+        public readonly float $total_price,
         public readonly array $snapshot,
-        public readonly ?string $imageUrl,
+        public readonly ?string $image_url,
     ) {
         // DTO ensures Livewire receives sanitized data while avoiding accidental lazy loading in the view.
     }
@@ -55,14 +55,14 @@ final class CartItemData implements Arrayable
     {
         return [
             'id'          => $this->id,
-            'product_id'  => $this->productId,
-            'variant_id'  => $this->variantId,
+            'product_id'  => $this->product_id,
+            'variant_id'  => $this->variant_id,
             'name'        => $this->name,
-            'unit_price'  => $this->unitPrice,
+            'unit_price'  => $this->unit_price,
             'quantity'    => $this->quantity,
-            'total_price' => $this->totalPrice,
+            'total_price' => $this->total_price,
             'snapshot'    => $this->snapshot,
-            'image_url'   => $this->imageUrl,
+            'image_url'   => $this->image_url,
         ];
     }
 }

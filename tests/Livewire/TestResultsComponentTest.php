@@ -29,10 +29,22 @@ it('exposes a no data state when the results file is missing', function (): void
     $component = app(TestResults::class);
     $component->mount();
 
+    $results = $component->getResultsProperty();
+
     expect($component->isRunning)->toBeFalse();
     expect($component->progress)->toBe(0);
-    expect($component->resultsData->status)->toBe('no_data');
-    expect($component->getResultsProperty())->toBe($component->resultsData->toArray());
+    expect($results['status'])->toBe('no_data');
+    expect($results)->toMatchArray([
+        'status'          => 'no_data',
+        'total_tests'     => 0,
+        'completed_tests' => 0,
+        'passed_tests'    => 0,
+        'failed_tests'    => 0,
+        'tests'           => [],
+        'errors'          => [],
+        'started_at'      => null,
+        'completed_at'    => null,
+    ]);
 });
 
 it('calculates progress from stored results and refreshes after updates', function (): void {
@@ -57,9 +69,12 @@ it('calculates progress from stored results and refreshes after updates', functi
     $component = app(TestResults::class);
     $component->mount();
 
+    $initialResults = $component->getResultsProperty();
+
     expect($component->isRunning)->toBeTrue();
     expect($component->progress)->toBe(40);
-    expect($component->resultsData->totalTests)->toBe(10);
+    expect($initialResults['total_tests'])->toBe(10);
+    expect($initialResults['status'])->toBe('running');
 
     $updatedPayload = [
         'status'          => 'completed',
@@ -80,10 +95,13 @@ it('calculates progress from stored results and refreshes after updates', functi
 
     $component->refreshResults();
 
+    $updatedResults = $component->getResultsProperty();
+
     expect($component->isRunning)->toBeFalse();
     expect($component->progress)->toBe(100);
-    expect($component->resultsData->failedTests)->toBe(1);
-    expect($component->resultsData->errors)->toBe(['1 failing test']);
+    expect($updatedResults['failed_tests'])->toBe(1);
+    expect($updatedResults['errors'])->toBe(['1 failing test']);
+    expect($updatedResults['status'])->toBe('completed');
 });
 
 it('handles invalid json payloads gracefully', function (): void {
@@ -93,6 +111,6 @@ it('handles invalid json payloads gracefully', function (): void {
     $component = app(TestResults::class);
     $component->mount();
 
-    expect($component->resultsData->status)->toBe('no_data');
+    expect($component->getResultsProperty()['status'])->toBe('no_data');
     expect($component->progress)->toBe(0);
 });

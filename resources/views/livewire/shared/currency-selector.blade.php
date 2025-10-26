@@ -1,8 +1,11 @@
 <div>
     <div class="relative">
-        <select wire:model="activeCurrencyCode" class="rounded-md border-gray-300 text-sm">
-            @foreach ($currencies as $c)
-                <option value="{{ $c->code }}">{{ $c->symbol }} {{ $c->code }}</option>
+        <select wire:change="setCurrency($event.target.value)" class="rounded-md border-gray-300 text-sm">
+            @foreach ($this->currencies as $currency)
+                <option value="{{ data_get($currency, 'code') }}"
+                        @selected(data_get($currency, 'active'))>
+                    {{ data_get($currency, 'symbol') }} {{ data_get($currency, 'code') }}
+                </option>
             @endforeach
         </select>
     </div>

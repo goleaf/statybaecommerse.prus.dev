@@ -17,9 +17,9 @@ use Livewire\Component;
  *
  * Livewire component for LanguageSwitcher with reactive frontend functionality, real-time updates, and user interaction handling.
  *
- * @property array<int, string>              $locales
- * @property string                          $current
- * @property array<string, LanguageLinkData> $links
+ * @property array<int, string>                                                          $locales
+ * @property string                                                                      $current
+ * @property array<string, array{locale:string,label:string,url:string,active:bool}>     $languages
  */
 class LanguageSwitcher extends Component
 {
@@ -31,9 +31,11 @@ class LanguageSwitcher extends Component
     public string $current;
 
     /**
+     * Store the typed link entries privately to avoid Livewire hydration issues.
+     *
      * @var array<string, LanguageLinkData>
      */
-    public array $links = [];
+    private array $languageEntries = [];
 
     /**
      * Initialize the Livewire component with parameters.
@@ -87,9 +89,22 @@ class LanguageSwitcher extends Component
             ]
         );
 
-        $this->links = array_map(
+        $this->languageEntries = array_map(
             static fn (array $entry): LanguageLinkData => LanguageLinkData::fromArray($entry),
             $payload,
+        );
+    }
+
+    /**
+     * Provide the language links as primitive arrays for use in Blade.
+     *
+     * @return array<string, array{locale:string,label:string,url:string,active:bool}>
+     */
+    public function getLanguagesProperty(): array
+    {
+        return array_map(
+            static fn (LanguageLinkData $link): array => $link->toArray(),
+            $this->languageEntries,
         );
     }
 

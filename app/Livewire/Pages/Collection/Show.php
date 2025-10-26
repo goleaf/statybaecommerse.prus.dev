@@ -150,7 +150,7 @@ class Show extends Component
     /**
      * Provide the available attribute filters for the current collection.
      *
-     * @return Collection<int, array{attribute_id:int, attribute_name:string, values:Collection<int, array{id:int, name:string, selected:bool}>}>
+     * @return Collection<int, CollectionFilterGroupData>
      */
     #[Computed]
     public function getAvailableOptionsProperty(): Collection
@@ -250,16 +250,62 @@ class Show extends Component
     }
 
     /**
-     * Provide a lookup map of filter values keyed by their identifier for quick access within the Blade view.
+     * Expose filter groups as primitive arrays for Blade consumption.
      *
-     * @return Collection<int, CollectionFilterValueData>
+     * @return array<int, array{attribute:array{id:int,name:string}, values:array<int, array{id:int,label:string,selected:bool}>}>
      */
     #[Computed]
-    public function getFilterValueLookupProperty(): Collection
+    public function getFilterGroupsProperty(): array
+    {
+        return $this->availableOptions
+            ->map(static fn (CollectionFilterGroupData $group): array => $group->toArray())
+            ->all();
+    }
+
+    /**
+     * Provide a lookup map of filter values keyed by their identifier for quick access within the Blade view.
+     *
+     * @return array<int, array{id:int,label:string,selected:bool}>
+     */
+    #[Computed]
+    public function getFilterValueLookupProperty(): array
     {
         return $this->availableOptions
             ->flatMap(static fn (CollectionFilterGroupData $group): Collection => $group->values)
-            ->keyBy(static fn (CollectionFilterValueData $value): int => $value->id);
+            ->mapWithKeys(
+                static fn (CollectionFilterValueData $value): array => [
+                    $value->id => $value->toArray(),
+                ]
+            )
+            ->all();
+    }
+
+    /**
+     * Provide brand filter options as serialisable arrays to keep Blade decoupled from Eloquent models.
+     *
+     * @return array<int, array{id:int,name:string,slug:string,url:string}>
+     */
+    #[Computed]
+    public function getBrandOptionsProperty(): array
+    {
+        $locale = app()->getLocale();
+
+        return $this->availableBrands
+            ->map(static function (Brand $brand) use ($locale): array {
+                $slug = $brand->trans('slug', $locale) ?? $brand->slug ?? $brand->getKey();
+
+                return [
+                    'id'   => (int) $brand->getKey(),
+                    'name' => (string) ($brand->trans('name', $locale) ?? $brand->name ?? ''),
+                    'slug' => (string) $slug,
+                    'url'  => route('localized.brands.show', [
+                        'locale' => $locale,
+                        'brand'  => $slug,
+                    ]),
+                ];
+            })
+            ->values()
+            ->all();
     }
 
     /**
@@ -313,7 +359,7 @@ class Show extends Component
             return collect();
         }
 
-        return \App\Models\Brand::query()
+        return Brand::query()
             ->whereIn('id', $brandIds)
             ->orderBy('name')
             ->get()
@@ -338,6 +384,38 @@ class Show extends Component
             $this->selectedValues,
             static fn (int|string $id): bool => (int) $id !== $valueId
         ));
+        $this->page = 1;
+    }
+
+    /**
+     * Toggle the provided attribute value within the active selection set.
+     */
+    public function toggleFilter(int $attributeId, int $valueId): void
+    {
+        $valueId = (int) $valueId;
+
+        $lookup = $this->filterValueLookup;
+
+        if ($valueId <= 0 || ! array_key_exists($valueId, $lookup)) {
+            return;
+        }
+
+        $current = collect($this->selectedValues)
+            ->map(static fn (mixed $id): int => (int) $id)
+            ->filter()
+            ->values();
+
+        $this->selectedValues = $current->contains($valueId)
+            ? $current
+                ->reject(static fn (int $id): bool => $id === $valueId)
+                ->values()
+                ->all()
+            : $current
+                ->push($valueId)
+                ->unique()
+                ->values()
+                ->all();
+
         $this->page = 1;
     }
 
@@ -376,9 +454,13 @@ class Show extends Component
     public function render(): View
     {
         return view('livewire.pages.collection.show', [
-            'collection' => $this->collection,
-            'products'   => $this->products,
-            'options'    => $this->availableOptions,
+            'collection'        => $this->collection,
+            'products'          => $this->products,
+            'filterGroups'      => $this->filterGroups,
+            'filterValueLookup' => $this->filterValueLookup,
+            'brandOptions'      => $this->brandOptions,
+            'activeBrandIds'    => array_map('intval', array_filter($this->brandIds)),
+            'activeValueIds'    => array_map('intval', array_filter($this->selectedValues)),
         ])->title($this->collection?->name ?? __('Collection'));
     }
 

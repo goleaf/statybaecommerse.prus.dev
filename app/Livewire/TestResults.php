@@ -12,7 +12,7 @@ use Livewire\Component;
 
 final class TestResults extends Component
 {
-    public TestResultsData $resultsData;
+    private TestResultsData $resultsData;
 
     public bool $isRunning = false;
 

@@ -79,20 +79,38 @@
 
     <div class="mb-4">
         <h2 class="text-xl font-semibold mb-2">{{ __('Filter by brand') }}</h2>
+        @php
+            $brandOptions = $this->availableBrands
+                ->map(static fn (\App\Models\Brand $brand): array => [
+                    'id'   => (int) $brand->id,
+                    'name' => $brand->trans('name') ?? $brand->name,
+                ])
+                ->values()
+                ->all();
+            $activeBrandIds = collect($brandIds ?? [])
+                ->map(static fn ($id): int => (int) $id)
+                ->filter()
+                ->values()
+                ->all();
+            $brandLookup = collect($brandOptions)->keyBy('id');
+        @endphp
         <div class="flex flex-wrap items-center gap-2 mb-2">
-            @foreach (collect($brandIds)->filter() as $bid)
-                @php($b = $this->availableBrands->firstWhere('id', (int) $bid))
-                @if ($b)
-                    <button type="button" wire:click="removeBrandFilter({{ (int) $bid }})"
+            @foreach ($activeBrandIds as $brandId)
+                @php($brand = $brandLookup->get($brandId))
+                @if ($brand)
+                    <button type="button"
+                            wire:key="active-brand-{{ $brandId }}"
+                            wire:click="removeBrandFilter({{ $brandId }})"
                             wire:confirm="{{ __('translations.confirm_remove_brand_filter') }}"
-                            class="inline-flex items-center gap-1 text-xs bg-gray-100 rounded-full px-2 py-1">
-                        <span>{{ $b->trans('name') ?? $b->name }}</span>
+                            class="inline-flex items-center gap-1 text-xs rounded-full bg-gray-100 px-2 py-1">
+                        <span>{{ $brand['name'] }}</span>
                         <span aria-hidden="true">×</span>
                     </button>
                 @endif
             @endforeach
-            @if (collect($brandIds)->filter()->isNotEmpty())
-                <button type="button" wire:click="clearBrandFilters" 
+            @if (! empty($activeBrandIds))
+                <button type="button"
+                        wire:click="clearBrandFilters"
                         wire:confirm="{{ __('translations.confirm_clear_brand_filters') }}"
                         class="text-xs underline">
                     {{ __('Clear all') }}
@@ -100,67 +118,46 @@
             @endif
         </div>
         <div class="flex flex-wrap gap-3">
-            @foreach ($this->availableBrands as $brand)
-                <label class="inline-flex items-center gap-1 text-sm">
-                    <input type="checkbox" wire:model.live="brandIds" value="{{ $brand->id }}" />
-                    <span>{{ $brand->trans('name') ?? $brand->name }}</span>
+            @foreach ($brandOptions as $brand)
+                <label wire:key="brand-option-{{ $brand['id'] }}"
+                       class="inline-flex items-center gap-1 text-sm">
+                    <input type="checkbox"
+                           wire:model.live="brandIds"
+                           value="{{ $brand['id'] }}" />
+                    <span>{{ $brand['name'] }}</span>
                 </label>
             @endforeach
         </div>
     </div>
 
-    @if (isset($options) && $options->isNotEmpty())
-        @php
-            // Normalise both array and object option payloads so the view can treat them consistently.
-            $normalizedOptionGroups = collect($options)->map(static function ($group): array {
-                $attribute = data_get($group, 'attribute');
-
-                // Prefer translated names when the attribute model is available, otherwise fall back to raw labels.
-                $attributeLabel = null;
-                if (is_object($attribute) && method_exists($attribute, 'trans')) {
-                    $attributeLabel = $attribute->trans('name') ?? data_get($attribute, 'name');
-                } else {
-                    $attributeLabel = data_get($group, 'attribute_name') ?? data_get($attribute, 'name');
-                }
-
-                $values = collect(data_get($group, 'values', []))->map(static function ($value): array {
-                    // Cast identifiers to integers and gracefully resolve the stored value/name pair for display.
-                    $valueId = (int) data_get($value, 'id');
-
-                    return [
-                        'id'    => $valueId,
-                        'label' => data_get($value, 'value') ?? data_get($value, 'name'),
-                    ];
-                });
-
-                return [
-                    'label'  => $attributeLabel,
-                    'values' => $values,
-                ];
-            });
-
-            // Keep a keyed map handy for rendering selected chips without walking the full option tree repeatedly.
-            $normalizedOptionValues = $normalizedOptionGroups
-                ->flatMap(static fn (array $group) => $group['values'])
-                ->keyBy('id');
-        @endphp
+    @php
+        $filterGroupCollection = $filterGroups ?? [];
+        $activeValueIds = collect($selectedValues ?? [])
+            ->map(static fn ($id): int => (int) $id)
+            ->filter()
+            ->values()
+            ->all();
+    @endphp
+    @if (! empty($filterGroupCollection))
         <div class="mb-6">
             <h2 class="text-xl font-semibold mb-2">{{ __('Filter by') }}</h2>
             <div class="flex flex-wrap items-center gap-2 mb-2">
-                @foreach (collect($selectedValues)->filter() as $valId)
-                    @php($val = $normalizedOptionValues->get((int) $valId))
-                    @if ($val)
-                        <button type="button" wire:click="removeAttributeFilter({{ (int) $valId }})"
+                @foreach ($activeValueIds as $valueId)
+                    @php($selected = $filterValueLookup[$valueId] ?? null)
+                    @if ($selected)
+                        <button type="button"
+                                wire:key="active-filter-{{ (int) $valueId }}"
+                                wire:click="removeAttributeFilter({{ (int) $valueId }})"
                                 wire:confirm="{{ __('translations.confirm_remove_attribute_filter') }}"
-                                class="inline-flex items-center gap-1 text-xs bg-gray-100 rounded-full px-2 py-1">
-                            {{-- Display the resolved attribute value label for clarity. --}}
-                            <span>{{ $val['label'] }}</span>
+                                class="inline-flex items-center gap-1 text-xs rounded-full bg-gray-100 px-2 py-1">
+                            <span>{{ data_get($selected, 'label') }}</span>
                             <span aria-hidden="true">×</span>
                         </button>
                     @endif
                 @endforeach
-                @if (collect($selectedValues)->filter()->isNotEmpty())
-                    <button type="button" wire:click="clearAttributeFilters" 
+                @if (! empty($activeValueIds))
+                    <button type="button"
+                            wire:click="clearAttributeFilters"
                             wire:confirm="{{ __('translations.confirm_clear_attribute_filters') }}"
                             class="text-xs underline">
                         {{ __('Clear all') }}
@@ -168,17 +165,20 @@
                 @endif
             </div>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                @foreach ($normalizedOptionGroups as $group)
-                    <div>
-                        {{-- Surface either the translated attribute name or the raw fallback label. --}}
-                        <div class="text-sm font-medium mb-2">{{ $group['label'] ?? __('Filters') }}</div>
+                @foreach ($filterGroupCollection as $group)
+                    @php($attribute = $group['attribute'] ?? [])
+                    <div wire:key="filter-group-{{ data_get($attribute, 'id', uniqid('attr-', false)) }}">
+                        <div class="text-sm font-medium mb-2">{{ $attribute['name'] ?? __('Filters') }}</div>
                         <div class="flex flex-wrap gap-2">
-                            @foreach ($group['values'] as $val)
-                                <label class="inline-flex items-center gap-1 text-sm">
-                                    <input type="checkbox" wire:model.live="selectedValues"
-                                           value="{{ $val['id'] }}" />
-                                    {{-- Honour both array and object value payloads by using the resolved label. --}}
-                                    <span>{{ $val['label'] }}</span>
+                            @foreach ($group['values'] ?? [] as $value)
+                                @php($valueId = (int) ($value['id'] ?? 0))
+                                <label wire:key="filter-{{ (int) ($attribute['id'] ?? 0) }}-{{ $valueId }}"
+                                       class="inline-flex items-center gap-1 text-sm">
+                                    <input type="checkbox"
+                                           value="{{ $valueId }}"
+                                           wire:change="toggleFilter({{ (int) ($attribute['id'] ?? 0) }}, {{ $valueId }})"
+                                           @checked(in_array($valueId, $activeValueIds, true))>
+                                    <span>{{ $value['label'] ?? '' }}</span>
                                 </label>
                             @endforeach
                         </div>

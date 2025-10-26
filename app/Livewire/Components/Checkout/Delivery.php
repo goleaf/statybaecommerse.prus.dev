@@ -7,6 +7,7 @@ namespace App\Livewire\Components\Checkout;
 use App\Models\Address;
 use App\Models\CartItem;
 use App\Models\ShippingOption;
+use App\Services\Discounts\DiscountEngine;
 use App\Services\Shipping\ShippingOptionResolver;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
@@ -19,21 +20,20 @@ use Livewire\Attributes\Validate;
 use Spatie\LivewireWizard\Components\StepComponent;
 
 /**
- * Delivery
+ * Delivery step of the checkout wizard responsible for presenting shipping options.
  *
- * Livewire component for Delivery with reactive frontend functionality, real-time updates, and user interaction handling.
- *
- * @property mixed    $options
- * @property int|null $currentSelected
- *
- * @method void nextStep()
+ * @property array<int, array{id:int,name:string,description:string,price:float,resolved_price:float,formatted_price:string,estimated_delivery:string,currency_code:string,badges:array<int, array{type:string,label:string}>}> $resolvedOptions
+ * @property bool                                                                                                                                                $isResolving
+ * @property int|string|null                                                                                                                                      $currentSelected
  */
-class Delivery extends StepComponent
+final class Delivery extends StepComponent
 {
     /**
-     * @var array<int, array{id:int,name:string,description:string,price:float,formatted_price:string,estimated_delivery:string,currency_code:string}>
+     * Normalised shipping options returned by the resolver, including dynamic pricing metadata.
+     *
+     * @var array<int, array{id:int,name:string,description:string,price:float,resolved_price:float,formatted_price:string,estimated_delivery:string,currency_code:string,badges:array<int, array{type:string,label:string}>}>
      */
-    public array $options = [];
+    public array $resolvedOptions = [];
 
     /**
      * Track whether the component is currently resolving shipping options so the
@@ -45,16 +45,14 @@ class Delivery extends StepComponent
     public int|string|null $currentSelected = null;
 
     /**
-     * Initialize the Livewire component with parameters.
+     * Initialise the component by seeding the current selection and resolving options.
      */
     public function mount(): void
     {
-        // Seed the initially selected option from the persisted checkout state.
         $storedOption = data_get(session()->get('checkout'), 'shipping_option');
         $this->currentSelected = $storedOption ? data_get($storedOption, '0.id') : null;
 
-        // Resolve shipping options immediately so the delivery step starts hydrated.
-        $this->recalculateOptions(data_get(session()->get('checkout'), 'shipping_address.id'));
+        $this->resolveOptions(data_get(session()->get('checkout'), 'shipping_address.id'));
     }
 
     /**
@@ -63,87 +61,55 @@ class Delivery extends StepComponent
     #[On('shipping-address-updated')]
     public function handleShippingAddressUpdated(?int $shippingAddressId = null): void
     {
-        // Clearing the validation bag ensures stale errors disappear when the address changes.
         $this->resetErrorBag('currentSelected');
         $this->resetValidation();
 
-        $this->recalculateOptions($shippingAddressId, true);
+        $this->resolveOptions($shippingAddressId, true);
     }
 
     /**
-     * Handle save functionality with proper error handling.
+     * Handle address-driven shipping refresh requests triggered from the preceding step.
+     */
+    #[On('checkout-address-updated')]
+    public function handleCheckoutAddressUpdated(?int $addressId = null, ?string $countryCode = null): void
+    {
+        $this->resolveOptions($addressId, true);
+    }
+
+    /**
+     * Persist the selected shipping option (with computed price) to the checkout session.
      */
     public function save(): void
     {
         $this->validate();
         session()->forget('checkout.shipping_option');
 
-        // Retrieve the hydrated shipping payload that matches the current selection
-        // so we can persist the calculated price back into the session.
         $optionData = $this->findResolvedOption((int) $this->currentSelected);
-        $optionModel = ShippingOption::query()->find($this->currentSelected);
-
-        if ($optionModel === null || $optionData === null) {
-            // Fall back to validation messaging when the selected option disappears
-            // between renders (for example, after an address change).
+        if ($optionData === null) {
             $this->addError('currentSelected', __('Please choose a valid delivery option.'));
 
             return;
         }
 
-        $optionPrice = (float) $optionData['price'];
-        $option = array_merge($optionModel->toArray(), [
-            'price'                   => $optionPrice,
-            'formatted_price'         => (string) $optionData['formatted_price'],
-            'estimated_delivery'      => (string) $optionData['estimated_delivery'],
-            'estimated_delivery_text' => (string) $optionData['estimated_delivery'],
-        ]);
-        $baseAmount = $optionPrice;
-        $channelUrl = config('app.url');
-        $cartSubtotal = session('cart.subtotal');
-        $subtotal = is_numeric($cartSubtotal) ? (float) $cartSubtotal : 0.0;
+        $optionModel = ShippingOption::query()->find($optionData['id']);
+        if ($optionModel === null) {
+            $this->addError('currentSelected', __('Please choose a valid delivery option.'));
 
-        // Apply shipping discount context if any (free shipping or cap)
-        $engine = app(\App\Services\Discounts\DiscountEngine::class);
-        $context = [
-            'currency_code' => current_currency(),
-            'channel_id'    => is_string($channelUrl) ? $channelUrl : null,
-            'user_id'       => Auth::id(),
-            'now'           => now(),
-            'cart'          => ['subtotal' => $subtotal, 'items' => []],
-            'shipping'      => ['base_amount' => $baseAmount],
-        ];
-        $result = $engine->evaluate($context);
-        $discountValue = data_get($result, 'shipping.discount_amount', 0.0);
-        $shippingDiscount = is_numeric($discountValue) ? (float) $discountValue : 0.0;
-        if ($shippingDiscount > 0) {
-            $option['price'] = max(0.0, $baseAmount - $shippingDiscount);
+            return;
         }
 
-        // Persist dynamic price (what user saw) for later order calculations.
-        session()->put('checkout.shipping_option', [$option]);
+        $payload = $this->buildPersistablePayload($optionData, $optionModel);
 
-        // Notify interested listeners about the selection so totals can refresh.
-        $this->dispatch('shippingOptionSaved', $option);
+        session()->put('checkout.shipping_option', [$payload]);
+
+        $this->dispatch('shippingOptionSaved', $payload);
         $this->dispatch('cart-price-update');
 
         $this->nextStep();
     }
 
     /**
-     * Handle address-driven shipping refresh requests triggered from the
-     * preceding address step. The Livewire payload supplies the address id and
-     * country code so we can avoid redundant lookups.
-     */
-    #[On('checkout-address-updated')]
-    public function handleCheckoutAddressUpdated(?int $addressId = null, ?string $countryCode = null): void
-    {
-        $this->recalculateOptions($addressId, true);
-    }
-
-    /**
-     * Optimistically update the selection when a radio item is clicked so the UI
-     * reflects the expected choice before the network round trip finishes.
+     * Optimistically update the selection when a radio item is clicked so the UI reflects the choice.
      */
     public function selectOption(int $optionId): void
     {
@@ -155,9 +121,8 @@ class Delivery extends StepComponent
     }
 
     /**
-     * Handle stepInfo functionality with proper error handling.
-     */
-    /**
+     * Provide wizard metadata so the parent stepper can indicate completion state.
+     *
      * @return array{label:string, complete:bool}
      */
     public function stepInfo(): array
@@ -168,9 +133,6 @@ class Delivery extends StepComponent
         ];
     }
 
-    /**
-     * Render the Livewire component view with current state.
-     */
     public function render(): View
     {
         return view('livewire.components.checkout.delivery');
@@ -179,15 +141,12 @@ class Delivery extends StepComponent
     /**
      * Resolve the current shipping options for the active cart and address.
      */
-    private function recalculateOptions(?int $shippingAddressId = null, bool $emitLifecycleEvents = false): void
+    public function resolveOptions(?int $shippingAddressId = null, bool $emitLifecycleEvents = false): void
     {
         $this->isResolving = true;
-
-        // Forget previously stored shipping option whenever the address changes.
         session()->forget('checkout.shipping_option');
 
         if ($emitLifecycleEvents) {
-            // Broadcast that shipping is recalculating so downstream steps can react (disable pay now, etc.).
             $this->dispatch('shipping-recalculation-started');
         }
 
@@ -195,7 +154,7 @@ class Delivery extends StepComponent
 
         $resolver = app(ShippingOptionResolver::class);
         $cartItems = $this->getCartItems();
-        /** @var SupportCollection<int, array{id:int,name:string,price:float,formatted_price:string,estimated_delivery:string}> $resolved */
+        /** @var SupportCollection<int, array{id:int,name:string,description?:string|null,price:float,formatted_price?:string|null,estimated_delivery?:string|null,currency?:string|null}> $resolved */
         $resolved = $resolver->resolve($cartItems->collect(), $countryCode);
 
         $optionIds = $resolved
@@ -206,27 +165,27 @@ class Delivery extends StepComponent
         /** @var SupportCollection<int, ShippingOption> $optionModels */
         $optionModels = ShippingOption::query()->whereIn('id', $optionIds)->get()->keyBy('id');
 
-        // Normalise the resolved dataset so the view only needs to consume a
-        // predictable array structure, regardless of the underlying model state.
-        $this->options = $resolved
+        $this->resolvedOptions = $resolved
             ->map(function (array $option) use ($optionModels): array {
                 $identifier = (int) $option['id'];
                 $model = $optionModels->get($identifier);
-                $name = (string) $option['name'];
-                $price = (float) $option['price'];
-                $formatted = (string) $option['formatted_price'];
-                $eta = (string) $option['estimated_delivery'];
-                $description = $model !== null ? (string) $model->description : '';
-                $currency = $model !== null ? (string) $model->currency_code : current_currency();
+                $baseAmount = (float) $option['price'];
+                $currency = (string) ($option['currency'] ?? $model?->currency_code ?? current_currency());
+
+                $discount = $this->calculateShippingDiscount($baseAmount);
+                $finalAmount = max(0.0, round($baseAmount - $discount, 2));
+                $formatted = app_money_format($finalAmount, $currency);
 
                 return [
                     'id'                 => $identifier,
-                    'name'               => $name,
-                    'description'        => $description,
-                    'price'              => $price,
-                    'formatted_price'    => $formatted,
-                    'estimated_delivery' => $eta,
+                    'name'               => (string) ($option['name'] ?? $model?->name ?? ''),
+                    'description'        => (string) ($option['description'] ?? $model?->description ?? ''),
+                    'price'              => $finalAmount,
+                    'resolved_price'     => $baseAmount,
+                    'formatted_price'    => (string) ($option['formatted_price'] ?? $formatted),
+                    'estimated_delivery' => (string) ($option['estimated_delivery'] ?? $model?->estimated_delivery_text ?? ''),
                     'currency_code'      => $currency,
+                    'badges'             => $this->buildBadges($baseAmount, $finalAmount, $discount, $currency),
                 ];
             })
             ->values()
@@ -236,15 +195,14 @@ class Delivery extends StepComponent
             $this->currentSelected = null;
         }
 
-        if ($this->currentSelected === null && $this->options !== []) {
-            $firstIdentifier = Arr::get($this->options, '0.id');
+        if ($this->currentSelected === null && $this->resolvedOptions !== []) {
+            $firstIdentifier = Arr::get($this->resolvedOptions, '0.id');
             $this->currentSelected = is_numeric($firstIdentifier) ? (int) $firstIdentifier : null;
         }
 
         $this->isResolving = false;
 
         if ($emitLifecycleEvents) {
-            // Notify listeners that the recalculation finished so UI controls can re-enable.
             $this->dispatch('shipping-recalculation-finished');
         }
     }
@@ -252,18 +210,18 @@ class Delivery extends StepComponent
     /**
      * Attempt to find the resolved option for a specific identifier.
      *
-     * @return array{id:int,name:string,description:string,price:float,formatted_price:string,estimated_delivery:string,currency_code:string}|null
+     * @return array{id:int,name:string,description:string,price:float,formatted_price:string,estimated_delivery:string,currency_code:string,badges:array<int, array{type:string,label:string}>,resolved_price:float}|null
      */
     private function findResolvedOption(int $optionId): ?array
     {
-        foreach ($this->options as $option) {
+        foreach ($this->resolvedOptions as $option) {
             if (! is_array($option)) {
                 continue;
             }
 
             $identifier = $option['id'] ?? null;
             if (is_numeric($identifier) && (int) $identifier === $optionId) {
-                /** @var array{id:int,name:string,description:string,price:float,formatted_price:string,estimated_delivery:string,currency_code:string} $option */
+                /** @var array{id:int,name:string,description:string,price:float,formatted_price:string,estimated_delivery:string,currency_code:string,badges:array<int, array{type:string,label:string}>,resolved_price:float} $option */
                 return $option;
             }
         }
@@ -272,8 +230,34 @@ class Delivery extends StepComponent
     }
 
     /**
-     * Load the cart items for the active shopper so the shipping resolver can
-     * inspect weights and order totals.
+     * Build the payload stored in the session for the selected shipping option.
+     *
+     * @param  array{id:int,name:string,description:string,price:float,formatted_price:string,estimated_delivery:string,currency_code:string,badges:array<int, array{type:string,label:string}>,resolved_price:float} $optionData
+     * @return array{id:int,name:string,description:string,price:float,formatted_price:string,estimated_delivery:string,currency_code:string,badges:array<int, array{type:string,label:string}>,resolved_price:float}
+     */
+    private function buildPersistablePayload(array $optionData, ShippingOption $optionModel): array
+    {
+        $baseAmount = (float) ($optionData['resolved_price'] ?? $optionData['price'] ?? 0.0);
+        $currency = (string) ($optionData['currency_code'] ?? $optionModel->currency_code ?? current_currency());
+
+        $discount = $this->calculateShippingDiscount($baseAmount);
+        $finalAmount = max(0.0, round($baseAmount - $discount, 2));
+
+        return [
+            'id'                 => $optionModel->getKey(),
+            'name'               => (string) ($optionData['name'] ?? $optionModel->name),
+            'description'        => (string) ($optionData['description'] ?? $optionModel->description ?? ''),
+            'price'              => $finalAmount,
+            'resolved_price'     => $baseAmount,
+            'formatted_price'    => app_money_format($finalAmount, $currency),
+            'estimated_delivery' => (string) ($optionData['estimated_delivery'] ?? $optionModel->estimated_delivery_text ?? ''),
+            'currency_code'      => $currency,
+            'badges'             => $this->buildBadges($baseAmount, $finalAmount, $discount, $currency),
+        ];
+    }
+
+    /**
+     * Retrieve cart items for the active shopper so the shipping resolver can inspect weights.
      *
      * @return EloquentCollection<int, CartItem>
      */
@@ -291,8 +275,7 @@ class Delivery extends StepComponent
     }
 
     /**
-     * Derive the most relevant country code from either the dispatched event or
-     * the persisted checkout session so pricing stays accurate.
+     * Resolve the most relevant country code from either the dispatched event or stored checkout state.
      */
     private function resolveCountryCode(?int $addressId = null): ?string
     {
@@ -310,5 +293,62 @@ class Delivery extends StepComponent
         $storedCountry = data_get(session()->get('checkout'), 'shipping_address.country_code');
 
         return is_string($storedCountry) && $storedCountry !== '' ? $storedCountry : null;
+    }
+
+    /**
+     * Calculate a shipping discount for the provided base amount using the discount engine.
+     */
+    private function calculateShippingDiscount(float $baseAmount): float
+    {
+        if ($baseAmount <= 0.0) {
+            return 0.0;
+        }
+
+        $engine = app(DiscountEngine::class);
+        $channelUrl = config('app.url');
+        $cartSubtotal = session('cart.subtotal');
+        $subtotal = is_numeric($cartSubtotal) ? (float) $cartSubtotal : 0.0;
+
+        $context = [
+            'currency_code' => current_currency(),
+            'channel_id'    => is_string($channelUrl) ? $channelUrl : null,
+            'user_id'       => Auth::id(),
+            'now'           => now(),
+            'cart'          => ['subtotal' => $subtotal, 'items' => []],
+            'shipping'      => ['base_amount' => $baseAmount],
+        ];
+
+        $result = $engine->evaluate($context);
+        $discountValue = data_get($result, 'shipping.discount_amount', 0.0);
+
+        return is_numeric($discountValue) ? max(0.0, (float) $discountValue) : 0.0;
+    }
+
+    /**
+     * Derive a set of badges describing how the shipping price is constrained.
+     *
+     * @return array<int, array{type:string,label:string}>
+     */
+    private function buildBadges(float $baseAmount, float $finalAmount, float $discountAmount, string $currency): array
+    {
+        $badges = [];
+
+        if ($finalAmount <= 0.0) {
+            $badges[] = [
+                'type'  => 'free',
+                'label' => __('ecommerce.free_shipping'),
+            ];
+
+            return $badges;
+        }
+
+        if ($discountAmount > 0.0 && $finalAmount < $baseAmount) {
+            $badges[] = [
+                'type'  => 'capped',
+                'label' => __('Shipping capped at :amount', ['amount' => app_money_format($finalAmount, $currency)]),
+            ];
+        }
+
+        return $badges;
     }
 }

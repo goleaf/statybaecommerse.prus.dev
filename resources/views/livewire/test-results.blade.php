@@ -1,5 +1,5 @@
 @php
-    $translation = fn(string $key, array $replace = []): string => __($key, $replace);
+    $translation = fn(string $key, array $replace = ->results[]): string => __($key, $replace);
 @endphp
 
 <div class="min-h-screen bg-slate-950 text-white"
@@ -26,7 +26,7 @@
             @endif
         </header>
 
-        @if ($results['status'] === 'no_data')
+        @if ($this->results->results['status'] === 'no_data')
             <section class="rounded-2xl border border-white/10 bg-white/5 p-8 text-center shadow-xl shadow-black/20">
                 <h2 class="text-xl font-medium text-white">
                     {{ $translation('frontend.test_results.no_data.title') }}
@@ -67,13 +67,13 @@
 
                         <div class="mt-3 flex flex-wrap items-center justify-between text-xs text-indigo-200">
                             <span>
-                                {{ $translation('frontend.test_results.progress.percentage', ['value' => $progress]) }}
+                                {{ $translation('frontend.test_results.progress.percentage', ->results['value' => $progress]) }}
                             </span>
 
                             <span>
-                                {{ $translation('frontend.test_results.progress.completed', [
-                                    'completed' => $results['completed_tests'],
-                                    'total' => $results['total_tests'],
+                                {{ $translation('frontend.test_results.progress.completed', ->results[
+                                    'completed' => $this->results->results['completed_tests'],
+                                    'total' => $this->results->results['total_tests'],
                                 ]) }}
                             </span>
                         </div>
@@ -88,7 +88,7 @@
                             {{ $translation('frontend.test_results.stats.total_tests') }}
                         </p>
                         <p class="mt-2 text-3xl font-semibold text-white">
-                            {{ number_format($results['total_tests']) }}
+                            {{ number_format($this->results->results['total_tests']) }}
                         </p>
                     </article>
 
@@ -98,7 +98,7 @@
                             {{ $translation('frontend.test_results.stats.completed_tests') }}
                         </p>
                         <p class="mt-2 text-3xl font-semibold text-emerald-50">
-                            {{ number_format($results['completed_tests']) }}
+                            {{ number_format($this->results->results['completed_tests']) }}
                         </p>
                     </article>
 
@@ -108,7 +108,7 @@
                             {{ $translation('frontend.test_results.stats.passed_tests') }}
                         </p>
                         <p class="mt-2 text-3xl font-semibold text-emerald-50">
-                            {{ number_format($results['passed_tests']) }}
+                            {{ number_format($this->results->results['passed_tests']) }}
                         </p>
                     </article>
 
@@ -118,7 +118,7 @@
                             {{ $translation('frontend.test_results.stats.failed_tests') }}
                         </p>
                         <p class="mt-2 text-3xl font-semibold text-rose-50">
-                            {{ number_format($results['failed_tests']) }}
+                            {{ number_format($this->results->results['failed_tests']) }}
                         </p>
                     </article>
                 </div>
@@ -131,7 +131,7 @@
                             {{ $translation('frontend.test_results.meta.started_at') }}
                         </p>
                         <p class="text-base font-medium text-white">
-                            {{ $results['started_at'] ?? $translation('frontend.test_results.meta.not_available') }}
+                            {{ $this->results->results['started_at'] ?? $translation('frontend.test_results.meta.not_available') }}
                         </p>
                     </div>
 
@@ -140,7 +140,7 @@
                             {{ $translation('frontend.test_results.meta.completed_at') }}
                         </p>
                         <p class="text-base font-medium text-white">
-                            {{ $results['completed_at'] ?? $translation('frontend.test_results.meta.in_progress') }}
+                            {{ $this->results->results['completed_at'] ?? $translation('frontend.test_results.meta.in_progress') }}
                         </p>
                     </div>
 
@@ -155,13 +155,13 @@
                                       class="absolute inline-flex h-full w-full rounded-full bg-current opacity-60"></span>
                                 <span class="relative inline-flex h-2 w-2 rounded-full bg-current"></span>
                             </span>
-                            {{ $translation('frontend.test_results.status.' . ($results['status'] ?? 'completed')) }}
+                            {{ $translation('frontend.test_results.status.' . ($this->results->results['status'] ?? 'completed')) }}
                         </span>
                     </div>
                 </header>
             </section>
 
-            @if (!empty($results['tests']))
+            @if (!empty($this->results->results['tests']))
                 <section class="flex flex-col gap-6">
                     <header class="flex flex-col gap-2">
                         <h2 class="text-lg font-semibold text-white">
@@ -173,38 +173,38 @@
                     </header>
 
                     <div class="grid gap-4">
-                        @foreach ($results['tests'] as $test)
+                        @foreach ($this->results->results['tests'] as $test)
                             <article
                                      class="rounded-2xl border border-white/10 bg-slate-900/80 p-5 shadow-lg shadow-black/20">
                                 <div class="flex flex-col gap-2">
                                     <div class="flex flex-wrap items-center gap-3">
-                                        <span @class([
+                                        <span @class(->results[
                                             'inline-flex h-8 items-center rounded-full px-3 text-xs font-semibold uppercase tracking-wide',
                                             'bg-emerald-400/10 text-emerald-100 ring-1 ring-inset ring-emerald-400/40' =>
-                                                $test['status'] === 'passed',
+                                                $test->results['status'] === 'passed',
                                             'bg-rose-400/10 text-rose-100 ring-1 ring-inset ring-rose-400/40' =>
-                                                $test['status'] === 'failed',
+                                                $test->results['status'] === 'failed',
                                             'bg-slate-500/10 text-slate-200 ring-1 ring-inset ring-slate-400/30' =>
-                                                $test['status'] === 'running',
+                                                $test->results['status'] === 'running',
                                             'bg-slate-700/10 text-slate-300 ring-1 ring-inset ring-slate-600/30' => !in_array(
-                                                $test['status'],
-                                                ['passed', 'failed', 'running'],
+                                                $test->results['status'],
+                                                ->results['passed', 'failed', 'running'],
                                                 true),
                                         ])>
-                                            {{ $translation('frontend.test_results.tests.status.' . ($test['status'] ?? 'pending')) }}
+                                            {{ $translation('frontend.test_results.tests.status.' . ($test->results['status'] ?? 'pending')) }}
                                         </span>
 
-                                        <p class="truncate text-sm text-slate-300" title="{{ $test['file'] }}">
-                                            {{ $test['file'] }}
+                                        <p class="truncate text-sm text-slate-300" title="{{ $test->results['file'] }}">
+                                            {{ $test->results['file'] }}
                                         </p>
                                     </div>
 
                                     <p class="text-xs text-slate-400">
-                                        {{ $translation('frontend.test_results.tests.executed_at', ['value' => $test['run_at'] ?? '—']) }}
+                                        {{ $translation('frontend.test_results.tests.executed_at', ->results['value' => $test->results['run_at'] ?? '—']) }}
                                     </p>
                                 </div>
 
-                                @if (!empty($test['output']))
+                                @if (!empty($test->results['output']))
                                     <details class="mt-4">
                                         <summary
                                                  class="group inline-flex cursor-pointer items-center gap-2 text-sm font-medium text-indigo-200">
@@ -219,18 +219,18 @@
 
                                         <pre
                                              class="mt-3 max-h-64 overflow-auto rounded-xl border border-indigo-400/20 bg-slate-950/80 p-4 text-xs leading-relaxed text-indigo-100">
-                                            {{ $test['output'] }}
+                                            {{ $test->results['output'] }}
                                         </pre>
                                     </details>
                                 @endif
 
-                                @if (!empty($test['error']))
+                                @if (!empty($test->results['error']))
                                     <div class="mt-4 rounded-xl border border-rose-500/40 bg-rose-500/10 p-4">
                                         <h3 class="text-sm font-semibold text-rose-100">
                                             {{ $translation('frontend.test_results.tests.error_heading') }}
                                         </h3>
                                         <pre class="mt-2 max-h-48 overflow-auto text-xs text-rose-100/90">
-                                            {{ $test['error'] }}
+                                            {{ $test->results['error'] }}
                                         </pre>
                                     </div>
                                 @endif
@@ -240,12 +240,12 @@
                 </section>
             @endif
 
-            @if (!empty($results['errors']))
+            @if (!empty($this->results->results['errors']))
                 <section
                          class="rounded-2xl border border-rose-500/40 bg-rose-500/5 p-6 shadow-inner shadow-rose-900/30">
                     <header class="flex flex-col gap-2">
                         <h2 class="text-lg font-semibold text-rose-100">
-                            {{ $translation('frontend.test_results.errors.title', ['count' => count($results['errors'])]) }}
+                            {{ $translation('frontend.test_results.errors.title', ->results['count' => count($this->results->results['errors'])]) }}
                         </h2>
                         <p class="text-sm text-rose-200">
                             {{ $translation('frontend.test_results.errors.description') }}
@@ -253,28 +253,28 @@
                     </header>
 
                     <div class="mt-5 space-y-6">
-                        @foreach ($results['errors'] as $error)
+                        @foreach ($this->results->results['errors'] as $error)
                             <article class="rounded-2xl border border-rose-500/30 bg-rose-500/10 p-5">
                                 <p class="text-sm font-semibold text-rose-100">
-                                    {{ basename($error['file'] ?? '') }}
+                                    {{ basename($error->results['file'] ?? '') }}
                                 </p>
                                 <p class="mt-1 text-xs text-rose-100/80">
-                                    {{ $error['file'] ?? $translation('frontend.test_results.errors.unknown_file') }}
+                                    {{ $error->results['file'] ?? $translation('frontend.test_results.errors.unknown_file') }}
                                 </p>
 
-                                @if (!empty($error['error']))
+                                @if (!empty($error->results['error']))
                                     <pre class="mt-3 overflow-auto rounded-xl border border-rose-500/40 bg-rose-500/10 p-4 text-xs text-rose-100/90">
-                                        {{ $error['error'] }}
+                                        {{ $error->results['error'] }}
                                     </pre>
                                 @endif
 
-                                @if (!empty($error['output']))
+                                @if (!empty($error->results['output']))
                                     <details class="mt-3">
                                         <summary class="text-xs font-medium text-rose-100/90">
                                             {{ $translation('frontend.test_results.errors.view_full_output') }}
                                         </summary>
                                         <pre class="mt-2 overflow-auto rounded-xl border border-rose-500/40 bg-rose-500/10 p-4 text-xs text-rose-100/90">
-                                            {{ $error['output'] }}
+                                            {{ $error->results['output'] }}
                                         </pre>
                                     </details>
                                 @endif
@@ -287,7 +287,7 @@
 
         <footer class="pt-6 text-center text-xs text-slate-400">
             <p>
-                {{ $translation('frontend.test_results.footer.last_updated', ['value' => now()->toDateTimeString()]) }}
+                {{ $translation('frontend.test_results.footer.last_updated', ->results['value' => now()->toDateTimeString()]) }}
             </p>
 
             @if ($isRunning)

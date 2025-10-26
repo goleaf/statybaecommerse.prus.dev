@@ -1,16 +1,26 @@
 @php
-    use App\Data\Storefront\Home\CollectionShowcaseItemData;
+    use Illuminate\Contracts\Support\Arrayable;
     use Illuminate\Support\Collection;
 
-    /** @var Collection<int, CollectionShowcaseItemData> $collections */
+    /** @var iterable<int, array|Arrayable> $collections */
+    $collectionItems = collect($collections)->map(static function ($collection): array {
+        if ($collection instanceof Arrayable) {
+            $collection = $collection->toArray();
+        } elseif (! is_array($collection)) {
+            $collection = (array) $collection;
+        }
+
+        return $collection;
+    });
 @endphp
 
 <div class="relative">
     <div class="flex gap-6 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-thin scrollbar-thumb-white/20">
-        @foreach ($collections as $collection)
+        @foreach ($collectionItems as $collection)
             @php
-                $image = $collection->primaryImage();
-                $fallbackColor = match ($collection->id % 5) {
+                $id = (int) ($collection['id'] ?? 0);
+                $image = $collection['banner_url'] ?? $collection['image_url'] ?? null;
+                $fallbackColor = match ($id % 5) {
                     0 => 'from-fuchsia-500/70 via-purple-500/70 to-indigo-500/70',
                     1 => 'from-sky-500/70 via-cyan-500/70 to-blue-500/70',
                     2 => 'from-lime-500/70 via-emerald-500/70 to-teal-500/70',
@@ -18,16 +28,16 @@
                     default => 'from-slate-600/70 via-slate-700/70 to-slate-800/70',
                 };
             @endphp
-            <a href="{{ $collection->url }}"
+            <a href="{{ $collection['url'] ?? '#' }}"
                class="group relative flex w-80 min-w-[20rem] max-w-xs snap-start flex-col overflow-hidden rounded-3xl border border-white/10 bg-white/5 shadow">
                 <div class="relative h-56 w-full overflow-hidden">
                     @if ($image)
-                        <img src="{{ $image }}" alt="{{ $collection->name }}"
+                        <img src="{{ $image }}" alt="{{ $collection['name'] ?? '' }}"
                              class="h-full w-full object-cover">
                     @else
                         <div
                              class="h-full w-full bg-gradient-to-br {{ $fallbackColor }} flex items-center justify-center text-3xl font-semibold text-white">
-                            {{ $collection->initials }}
+                            {{ $collection['initials'] ?? '' }}
                         </div>
                     @endif
                     <div class="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-slate-900/20 to-transparent">
@@ -38,14 +48,14 @@
                             {{ __('frontend/home.collections.badge') }}
                         </span>
                         <h3 class="text-xl font-semibold leading-tight line-clamp-2">
-                            {{ $collection->name }}
+                            {{ $collection['name'] ?? '' }}
                         </h3>
                     </div>
                 </div>
                 <div class="space-y-3 px-6 py-6">
-                    @if ($collection->description)
+                    @if (! empty($collection['description']))
                         <p class="text-sm text-white/70 line-clamp-3">
-                            {{ $collection->description }}
+                            {{ $collection['description'] }}
                         </p>
                     @endif
                     <div class="flex items-center justify-between text-xs font-medium text-white/70">
@@ -54,7 +64,8 @@
                                  viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M3 7h18M3 12h18M3 17h18" />
                             </svg>
-                            {{ trans_choice(__('frontend/home.collections.products_count'), $collection->productsCount, ['count' => $collection->productsCount]) }}
+                            @php($productsCount = (int) ($collection['products_count'] ?? 0))
+                            {{ trans_choice(__('frontend/home.collections.products_count'), $productsCount, ['count' => $productsCount]) }}
                         </span>
                         <span class="inline-flex items-center gap-1 text-white/80">
                             {{ __('frontend/home.collections.open') }}

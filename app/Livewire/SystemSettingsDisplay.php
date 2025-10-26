@@ -89,8 +89,13 @@ final class SystemSettingsDisplay extends Component
             ));
         }
 
+        $settings = array_map(
+            static fn (SystemSettingEntryData $entry): array => $entry->toArray(),
+            $entries,
+        );
+
         return view('livewire.system-settings-display', [
-            'settings' => $entries,
+            'settings' => $settings,
             'groups'   => $this->getAvailableGroups(),
         ]);
     }

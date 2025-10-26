@@ -4,6 +4,9 @@
         <livewire:home-slider />
     </section>
 
+    <!-- Hero Stats -->
+    <x-home.hero-stats :stats="$stats ?? []" />
+
     <!-- Featured Shelf (primary) -->
     <section class="relative">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

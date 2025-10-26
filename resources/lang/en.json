@@ -827,5 +827,8 @@
     "auth.two_factor.recovery_label": "Recovery code (optional)",
     "auth.two_factor.recovery_help": "Keep recovery codes safe. Each one can only be used a single time.",
     "auth.two_factor.submit": "Verify and continue",
-    "auth.two_factor.security_footer": "We never store raw codes or device identifiers."
+    "auth.two_factor.security_footer": "We never store raw codes or device identifiers.",
+    "Fetching real-time shipping quotes…": "Fetching real-time shipping quotes…",
+    "Recalculating delivery options…": "Recalculating delivery options…",
+    "Live quote from resolver": "Live quote from resolver"
 }

@@ -44,7 +44,20 @@ final class Register extends Component
             return;
         }
 
+        if ($field === 'email') {
+            // Email validation is handled via the debounced keyup hook for a snappier UX.
+            return;
+        }
+
         $this->registrationForm->validateField($field);
+    }
+
+    /**
+     * Validate the email field on demand so unique checks can surface quickly.
+     */
+    public function validateEmailField(): void
+    {
+        $this->registrationForm->validateField('email');
     }
 
     public function render(): View
