@@ -120,7 +120,18 @@ final class CategoryResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return $schema->components([
+        // Reuse a dedicated component builder so quick-edit modals stay aligned with the primary create/edit form.
+        return $schema->components(self::getFormComponents());
+    }
+
+    /**
+     * Provide a shared component list for the resource and related quick-edit forms.
+     *
+     * @return array<int, SchemaSection>
+     */
+    private static function getFormComponents(): array
+    {
+        return [
             SchemaSection::make(__('categories.basic_information'))
                 ->components([
                     LanguageTabs::make([
@@ -244,7 +255,7 @@ final class CategoryResource extends Resource
                                 ->default(true),
                         ]),
                 ]),
-        ]);
+        ];
     }
 
     public static function table(Table $table): Table
