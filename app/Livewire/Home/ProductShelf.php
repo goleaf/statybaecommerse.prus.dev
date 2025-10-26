@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Livewire\Home;
 
+use App\Data\Storefront\Home\ProductListItemData;
 use App\Livewire\Concerns\WithCart;
 use App\Livewire\Concerns\WithNotifications;
 use App\Models\Product;
@@ -16,7 +17,7 @@ use Filament\Schemas\Concerns\InteractsWithSchemas;
 use Filament\Schemas\Contracts\HasSchemas;
 use Filament\Schemas\Schema;
 use Illuminate\Contracts\View\View;
-use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use Illuminate\Support\Collection;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 
@@ -51,12 +52,12 @@ final class ProductShelf extends Component implements HasSchemas
     }
 
     #[Computed]
-    public function products(): EloquentCollection
+    public function products(): Collection
     {
         $locale = app()->getLocale();
         $cacheKey = CacheKeys::homeShelf($this->preset, $this->limit, $locale);
 
-        $callback = function () use ($locale): EloquentCollection {
+        $callback = function () use ($locale): Collection {
             $query = Product::query()
                 ->with(['brand', 'media', 'categories'])
                 ->with(['translations' => function ($q) use ($locale) {
@@ -97,7 +98,12 @@ final class ProductShelf extends Component implements HasSchemas
                     ->orderByDesc('published_at'),
             };
 
-            return $query->limit($this->limit)->get();
+            return $query->limit($this->limit)
+                ->get()
+                ->map(static function (Product $product) use ($locale): ProductListItemData {
+                    // Convert Eloquent models into cached DTOs so the view works with serialisable payloads.
+                    return ProductListItemData::fromModel($product, $locale);
+                });
         };
 
         $tags = CacheTagHelper::merge(
