@@ -25,11 +25,12 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Validation\Rule;
+use Livewire\Attributes\On;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
 
 /**
- * CheckoutProcess
+ * CheckoutProcess orchestrates the four-step checkout wizard.
  *
  * Livewire component for CheckoutProcess with reactive frontend functionality, real-time updates, and user interaction handling.
  *
@@ -74,27 +75,18 @@ final class CheckoutProcess extends Component
 
     public int $currentStep = 1;
 
-    /**
-     * @var array<int, array{id:int,name:string,price:float,formatted_price:string,estimated_delivery:string}>
-     */
-    public array $availableShippingOptions = [];
-
-    #[Validate('nullable|integer')]
     public ?int $selectedShippingOption = null;
-
-    /**
-     * @var array<string, string>
-     */
-    public array $paymentMethods = [];
-
-    #[Validate('nullable|string|max:255')]
-    public string $selectedPaymentMethod = '';
 
     public float $selectedShippingPrice = 0.0;
 
-    /**
-     * Initialize the Livewire component with parameters.
-     */
+    /** @var list<array{id:int,name:string,price:float,formatted_price:string,estimated_delivery:string}> */
+    public array $availableShippingOptions = [];
+
+    /** @var array<string, string> */
+    public array $paymentMethods = [];
+
+    public string $selectedPaymentMethod = '';
+
     public function mount(): void
     {
         if (auth()->check()) {
@@ -109,44 +101,44 @@ final class CheckoutProcess extends Component
             $this->hydrateSavedAddresses();
         }
 
-        // Default the shipping contact details to mirror the billing information during the first render.
-        $this->synchroniseShippingFromBilling();
-
-        // Preload the payment method list so that validation rules know the allowed values immediately.
         $this->initialisePaymentMethods();
+        $this->refreshShippingOptions();
     }
 
     /**
-     * Handle nextStep functionality with proper error handling.
+     * Allow the UI to jump to a specific step while clamping the range.
      */
-    public function nextStep(): void
+    public function toStep(int $targetStep): void
     {
-        $this->validateCurrentStep();
+        // Clamp the target step so we never render beyond the wizard bounds.
+        $this->currentStep = max(1, min(4, $targetStep));
 
-        if ($this->currentStep === 1) {
-            // Persist address data for authenticated shoppers and refresh the available shipping matrix.
-            $this->persistAuthenticatedAddresses();
-            $this->refreshShippingOptions();
-        }
-
-        if ($this->currentStep === 2) {
-            // Lock in the shipping selection before moving to the payment stage.
-            $this->ensureShippingSelection();
-        }
-
-        if ($this->currentStep < 3) {
-            $this->currentStep++;
-        }
+        // Notify listening components (like the order summary) that the
+        // active step changed, enabling them to adjust their own UI state.
+        $this->dispatch('checkout-step-changed', step: $this->currentStep);
     }
 
     /**
-     * Handle previousStep functionality with proper error handling.
+     * When the delivery component persists a shipping option we can move
+     * forward to the payment selection automatically.
      */
-    public function previousStep(): void
+    #[On('shippingOptionSaved')]
+    public function handleShippingSaved(): void
     {
-        if ($this->currentStep > 1) {
-            $this->currentStep--;
-        }
+        $this->toStep(3);
+    }
+
+    /**
+     * React to downstream recalculation events so the order summary knows
+     * to refresh its totals (shipping rate changes, discounts, etc.).
+     */
+    #[On('cart-price-update')]
+    #[On('orderTotalsRecalculated')]
+    public function handleTotalsChanged(): void
+    {
+        // Emit a dedicated event consumed by the order summary component
+        // which triggers a `$refresh` without forcing a full page rerender.
+        $this->dispatch('refreshOrderSummary');
     }
 
     /**
