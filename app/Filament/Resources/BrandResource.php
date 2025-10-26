@@ -161,7 +161,7 @@ final class BrandResource extends Resource
                         ->columnSpanFull(),
                 ]),
             SchemaSection::make(__('admin/brands.sections.media'))
-                ->schema([
+                ->components([
                     FileUpload::make('logo')
                         ->label(__('admin/brands.fields.logo'))
                         ->image()
@@ -188,7 +188,7 @@ final class BrandResource extends Resource
                         ->visibility('private'),
                 ]),
             SchemaSection::make(__('admin/brands.sections.social'))
-                ->schema([
+                ->components([
                     Repeater::make('social_links')
                         ->label(__('admin/brands.fields.social_links'))
                         ->helperText(__('admin/brands.helpers.social_links'))
@@ -211,7 +211,7 @@ final class BrandResource extends Resource
                         ->reorderable(false),
                 ]),
             SchemaSection::make(__('admin/brands.sections.seo'))
-                ->schema([
+                ->components([
                     LanguageTabs::make([
                         TextInput::make('seo_title')
                             ->label(__('admin/brands.fields.seo_title'))
@@ -224,7 +224,7 @@ final class BrandResource extends Resource
                         ->columnSpanFull(),
                 ]),
             SchemaSection::make(__('admin/brands.sections.settings'))
-                ->schema([
+                ->components([
                     SchemaGrid::make(4)
                         ->components([
                             Toggle::make('is_enabled')
