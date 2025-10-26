@@ -15,7 +15,6 @@ use App\Services\RecommendationService;
 use BackedEnum;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
-use UnitEnum;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use Throwable;
@@ -38,10 +37,8 @@ final class RecommendationSystemManagement extends Page
     /**
      * Aligns the navigation icon with Filament's BackedEnum-aware union expectations while declaring
      * the union type through PHPDoc to satisfy Filament v4 styling requirements.
-     *
-     * @var string|\BackedEnum|null
      */
-    protected static $navigationIcon = 'heroicon-o-sparkles';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-sparkles';
 
     protected string $view = 'filament.pages.recommendation-system-management';
 

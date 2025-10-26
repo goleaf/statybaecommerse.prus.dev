@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace App\Filament\Pages\Auth;
 
-use Filament\Schemas\Schema;
-use Filament\Auth\Pages\EditProfile as BaseEditProfile;
 use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
+use Filament\Auth\Pages\EditProfile as BaseEditProfile;
 use Filament\Forms\Components\FileUpload;
-use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
 
 class EditProfile extends BaseEditProfile
 {

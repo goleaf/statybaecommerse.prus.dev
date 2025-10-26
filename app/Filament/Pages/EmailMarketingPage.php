@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Filament\Pages;
 
+use BackedEnum;
 use Filament\Pages\Page;
 
 final class EmailMarketingPage extends Page
@@ -11,10 +12,8 @@ final class EmailMarketingPage extends Page
     /**
      * Aligns the navigation icon with Filament's BackedEnum-aware union expectations while documenting
      * the accepted value types for static analysis and future contributors.
-     *
-     * @var string|\BackedEnum|null
      */
-    protected static $navigationIcon = 'heroicon-o-envelope-open';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-envelope-open';
 
     protected string $view = 'filament.pages.email-marketing-page';
 

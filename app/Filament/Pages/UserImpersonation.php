@@ -4,13 +4,12 @@ declare(strict_types=1);
 
 namespace App\Filament\Pages;
 
-use BackedEnum;
 use App\Filament\Tables\Concerns\ConfiguresToggleableTableLayout;
 use App\Models\User;
-use Filament\Pages\Page;
-use UnitEnum;
-use Filament\Tables;
+use BackedEnum;
 use Filament\Actions\Action;
+use Filament\Pages\Page;
+use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
@@ -26,10 +25,8 @@ final class UserImpersonation extends Page implements HasTable
     /**
      * Aligns the navigation icon with Filament's BackedEnum-aware union expectations while declaring
      * the accepted union type via PHPDoc for downstream analyzers.
-     *
-     * @var string|\BackedEnum|null
      */
-    protected static $navigationIcon = 'heroicon-o-user';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-user';
 
     public static function getNavigationGroup(): BackedEnum|string|null
     {
@@ -42,7 +39,7 @@ final class UserImpersonation extends Page implements HasTable
 
     protected string $view = 'filament.pages.user-impersonation';
 
-    public function table(Table $table): Table   
+    public function table(Table $table): Table
     {
         // Configure the Filament table definition for the resource.
         $table = $table
