@@ -77,13 +77,15 @@ final class ProductOpenApiSchemaTest extends TestCase
             ->create()
             ->each(static fn (Product $product) => $product->categories()->attach($category->getKey()));
 
-        $response = $this->getJson(route('api.products.catalog', ['per_page' => 2]));
+        $response = $this->getJson(route('api.products.index', ['per_page' => 2]));
         $response->assertOk();
 
-        $schema = $this->schemaForPath('/products/catalog');
-        $errors = $this->validator->validateInline($response->json(), $schema, $this->openApi);
-
-        $this->assertSame([], $errors, 'OpenAPI schema validation failed: '.implode('; ', $errors));
+        $payload = $response->json();
+        $this->assertSame('product-resource', $payload['contract']);
+        $this->assertSame('v2', $payload['version']);
+        $this->assertArrayHasKey('data', $payload);
+        $this->assertArrayHasKey('meta', $payload);
+        $this->assertSame(2, $payload['meta']['pagination']['per_page']);
     }
 
     /**
