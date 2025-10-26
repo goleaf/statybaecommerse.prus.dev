@@ -5,9 +5,8 @@ declare(strict_types=1);
 use App\Models\FailedJob;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
-use Tests\TestCase;
-
-uses(TestCase::class, RefreshDatabase::class);
+// Keep database state isolated for each scenario; the Pest bootstrap wires the Laravel TestCase globally.
+uses(RefreshDatabase::class);
 
 it('derives the job name from the payload display name', function (): void {
     // Create a failed job payload that contains the display name metadata.
