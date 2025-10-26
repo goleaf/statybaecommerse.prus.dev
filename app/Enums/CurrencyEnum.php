@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\Enums;
 
+use App\Services\FeatureToggleService;
+use Illuminate\Support\Facades\Config;
+
 enum CurrencyEnum: string
 {
     case EUR = 'EUR';
@@ -84,9 +87,24 @@ enum CurrencyEnum: string
 
     public function getDecimalPlaces(): int
     {
+        // Avoid resolving the service when the application container is not fully booted,
+        // such as during config:cache warm-up or isolated CLI utilities, by falling back
+        // to the static defaults that mirror the production configuration.
+        if (! app()->bound(FeatureToggleService::class)) {
+            $defaultZeroDecimalCurrencies = Config::get('currency.zero_decimal_currencies.defaults', ['JPY']);
+
+            // Guard against misconfigured values (string/null) by coercing to an array
+            // so in_array receives the correct type even in partially booted contexts.
+            if (! is_array($defaultZeroDecimalCurrencies)) {
+                $defaultZeroDecimalCurrencies = ['JPY'];
+            }
+
+            return in_array($this->value, $defaultZeroDecimalCurrencies, true) ? 0 : 2;
+        }
+
         // Resolve the feature toggle service lazily to avoid coupling the enum
         // directly to configuration lookups when the container is unavailable.
-        $featureToggleService = app(\App\Services\FeatureToggleService::class);
+        $featureToggleService = app(FeatureToggleService::class);
 
         // Zero-decimal currencies are defined by configuration and feature flags,
         // enabling gradual rollout without affecting every currency instantly.
