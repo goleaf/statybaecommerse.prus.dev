@@ -38,10 +38,16 @@ final class AttributeController extends Controller
                 $q->where('name', 'like', "%{$search}%")->orWhere('description', 'like', "%{$search}%")->orWhere('slug', 'like', "%{$search}%");
             });
         }
-        $attributes = $query->get()->skipWhile(function ($attribute) {
-            // Skip attributes that are not properly configured for display
-            return empty($attribute->name) || ! $attribute->is_enabled || empty($attribute->type) || empty($attribute->group_name) || empty($attribute->slug);
-        })->paginate(12);
+        $attributes = $query
+            ->whereNotNull('name') // Ensure attribute has a translated name before pagination
+            ->where('name', '!=', '') // Guard against empty string names in the dataset
+            ->whereNotNull('type') // Enforce attribute type presence for downstream rendering
+            ->where('type', '!=', '') // Avoid attributes where the type column is an empty string
+            ->whereNotNull('group_name') // Require group name so grouping widgets stay stable
+            ->where('group_name', '!=', '') // Filter out records missing a usable group label
+            ->whereNotNull('slug') // Slugs are required for URL generation on the storefront
+            ->where('slug', '!=', '') // Skip attributes that have an empty slug value
+            ->paginate(12);
 
         return view('attributes.index', compact('attributes'));
     }
