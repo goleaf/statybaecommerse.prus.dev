@@ -4,22 +4,21 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use App\Support\Concerns\HasNav;
-use Filament\Schemas\Schema;
 use App\Enums\ModerationState;
 use App\Filament\Resources\PostResource\Pages;
 use App\Filament\Resources\PostResource\RelationManagers;
 use App\Models\Post;
+use App\Support\Concerns\HasNav;
 use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
 use App\Support\Seo\LocaleUrlGenerator;
 use Awcodes\BadgeableColumn\Components\Badge;
 use Awcodes\BadgeableColumn\Components\BadgeableColumn;
 use BackedEnum;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
 use Filament\Forms;
-use Filament\Schemas\Components\Grid as SchemaGrid;
 use Filament\Forms\Components\RichEditor;
-use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Components\TagsInput;
@@ -28,13 +27,10 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Grid as SchemaGrid;
+use Filament\Schemas\Components\Section as SchemaSection;
+use Filament\Schemas\Schema;
 use Filament\Tables;
-use Filament\Actions\Action;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
-use Filament\Tables\Columns\BadgeColumn;
-use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ViewColumn;
@@ -54,7 +50,6 @@ use pxlrbt\FilamentExcel\Actions\ExportBulkAction as ExcelExportBulkAction;
 use pxlrbt\FilamentExcel\Columns\Column as ExcelColumn;
 use pxlrbt\FilamentExcel\Exports\ExcelExport;
 use RuntimeException;
-use UnitEnum;
 
 /**
  * PostResource
@@ -65,8 +60,6 @@ final class PostResource extends Resource
 {
     use HasNav;
 
-    
-
     protected static ?string $model = Post::class;
 
     protected static ?int $navigationSort = 2;
@@ -74,7 +67,7 @@ final class PostResource extends Resource
     protected static ?string $recordTitleAttribute = 'title';
 
     /**
-     * @var string|\BackedEnum|null
+     * @var string|BackedEnum|null
      */
     public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
     {
@@ -108,7 +101,7 @@ final class PostResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Schema $schema): Schema   
+    public static function form(Schema $schema): Schema
     {
         return $schema
             ->components([
@@ -265,7 +258,7 @@ final class PostResource extends Resource
     /**
      * Configure the Filament table with columns, filters, and actions.
      */
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         // Configure the table definition for the streamlined Filament v4 return type.
         return $table

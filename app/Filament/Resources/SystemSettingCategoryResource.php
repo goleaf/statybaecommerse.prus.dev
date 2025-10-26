@@ -4,25 +4,19 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use App\Support\Concerns\HasNav;
-use Filament\Schemas\Schema;
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\SystemSettingCategoryResource\Pages;
 use App\Filament\Resources\SystemSettingCategoryResource\RelationManagers;
 use App\Models\Scopes\ActiveScope;
 use App\Models\SystemSettingCategory;
+use App\Support\Concerns\HasNav;
 use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
-use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
-use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\ColorPicker;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -33,6 +27,9 @@ use Filament\Schemas\Components\Grid as SchemaGrid;
 use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Schemas\Components\Utilities\Get as SchemaGet;
 use Filament\Schemas\Components\Utilities\Set as SchemaSet;
+use Filament\Schemas\Schema;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Columns\ColorColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -58,9 +55,9 @@ final class SystemSettingCategoryResource extends Resource
     /**
      * @var string|BackedEnum|null Keep navigation grouping aligned with the shared enum helper.
      */
-    protected static \UnitEnum|string|null $navigationGroup = NavigationGroup::System->value;
+    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::System->value;
 
-    public static function getNavigationGroup(): \UnitEnum|string|null
+    public static function getNavigationGroup(): UnitEnum|string|null
     {
         // Harmonize enum and string groups to avoid leaking raw enum values in the UI.
         $group = self::$navigationGroup;
@@ -101,7 +98,7 @@ final class SystemSettingCategoryResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Schema $schema): Schema   
+    public static function form(Schema $schema): Schema
     {
         return $schema
             ->schema([
@@ -187,7 +184,7 @@ final class SystemSettingCategoryResource extends Resource
     /**
      * Configure the Filament table with columns, filters, and actions.
      */
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         // Configure the table definition for the streamlined Filament v4 return type.
         return $table

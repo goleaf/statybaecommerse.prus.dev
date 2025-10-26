@@ -15,10 +15,10 @@ use Filament\Actions\ViewAction;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
-use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid as SchemaGrid;
 use Filament\Schemas\Components\Section as SchemaSection;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
@@ -36,7 +36,7 @@ final class ProductSimilarityResource extends Resource
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-rectangle-stack';
 
-    public static function getNavigationGroup(): \UnitEnum|string|null
+    public static function getNavigationGroup(): UnitEnum|string|null
     {
         return NavigationGroup::Products->value;
     }
@@ -186,10 +186,10 @@ final class ProductSimilarityResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListProductSimilarities::route('/'),
+            'index'  => Pages\ListProductSimilarities::route('/'),
             'create' => Pages\CreateProductSimilarity::route('/create'),
-            'view' => Pages\ViewProductSimilarity::route('/{record}'),
-            'edit' => Pages\EditProductSimilarity::route('/{record}/edit'),
+            'view'   => Pages\ViewProductSimilarity::route('/{record}'),
+            'edit'   => Pages\EditProductSimilarity::route('/{record}/edit'),
         ];
     }
 
@@ -199,7 +199,7 @@ final class ProductSimilarityResource extends Resource
     private static function getAlgorithmOptions(): array
     {
         return [
-            'cosine_similarity' => __('product_similarities.algorithm_types.cosine'),
+            'cosine_similarity'  => __('product_similarities.algorithm_types.cosine'),
             'jaccard_similarity' => __('product_similarities.algorithm_types.jaccard'),
         ];
     }

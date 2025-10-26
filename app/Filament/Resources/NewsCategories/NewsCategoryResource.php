@@ -5,16 +5,15 @@ declare(strict_types=1);
 namespace App\Filament\Resources\NewsCategories;
 
 use App\Enums\NavigationGroup;
-use App\Support\Concerns\HasNav;
-use Filament\Schemas\Schema;
 use App\Filament\Resources\NewsCategories\Pages\CreateNewsCategory;
 use App\Filament\Resources\NewsCategories\Pages\EditNewsCategory;
 use App\Filament\Resources\NewsCategories\Pages\ListNewsCategories;
 use App\Filament\Resources\NewsCategories\Schemas\NewsCategoryForm;
 use App\Filament\Resources\NewsCategories\Tables\NewsCategoriesTable;
-use App\Models\NewsCategory;
+use App\Support\Concerns\HasNav;
 use BackedEnum;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 use UnitEnum;
 
@@ -30,9 +29,9 @@ final class NewsCategoryResource extends Resource
     /**
      * @var string|BackedEnum|null Keep the resource grouped with other news modules.
      */
-    protected static \UnitEnum|string|null $navigationGroup = NavigationGroup::News->value;
+    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::News->value;
 
-    public static function getNavigationGroup(): \UnitEnum|string|null
+    public static function getNavigationGroup(): UnitEnum|string|null
     {
         // Delegate to the enum label for localisation support.
         $group = self::$navigationGroup;
@@ -40,12 +39,12 @@ final class NewsCategoryResource extends Resource
         return $group instanceof NavigationGroup ? $group->label() : $group;
     }
 
-    public static function form(Schema $schema): Schema   
+    public static function form(Schema $schema): Schema
     {
         return NewsCategoryForm::configure($schema);
     }
 
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         // Configure the table definition for the streamlined Filament v4 return type.
         return NewsCategoriesTable::configure($table);

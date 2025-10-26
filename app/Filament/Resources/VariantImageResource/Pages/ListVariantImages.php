@@ -10,7 +10,6 @@ use Filament\Actions;
 
 final class ListVariantImages extends BaseListRecords
 {
-    
     protected static string $resource = VariantImageResource::class;
 
     protected function getHeaderActions(): array

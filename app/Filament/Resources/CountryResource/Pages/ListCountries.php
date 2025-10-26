@@ -19,7 +19,7 @@ use Illuminate\Database\Eloquent\Builder;
 
 class ListCountries extends BaseListRecords
 {
-        use HasWidgetTabs;
+    use HasWidgetTabs;
 
     protected static string $resource = CountryResource::class;
 

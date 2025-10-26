@@ -4,25 +4,24 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
 use App\Enums\ApiKeyScope;
 use App\Filament\Resources\ApiKeyResource\Concerns\HandlesApiKeyCredentials;
 use App\Filament\Resources\ApiKeyResource\Pages;
 use App\Models\ApiKey;
 use BackedEnum;
-use Filament\Forms\Components\Actions\Action as FormAction;
-use Filament\Forms\Components\CheckboxList;
-use Filament\Forms\Components\Placeholder;
-use Filament\Schemas\Schema;
-use Filament\Schemas\Components\Section as SchemaSection;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
-use Filament\Resources\Resource;
 use Filament\Actions\Action as TableAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Forms\Components\Actions\Action as FormAction;
+use Filament\Forms\Components\CheckboxList;
+use Filament\Forms\Components\Placeholder;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
+use Filament\Resources\Resource;
+use Filament\Schemas\Components\Section as SchemaSection;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TagsColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -49,7 +48,7 @@ final class ApiKeyResource extends Resource
     /**
      * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
      */
-    protected static \UnitEnum|string|null $navigationGroup = null;
+    protected static UnitEnum|string|null $navigationGroup = null;
 
     protected static ?int $navigationSort = 4;
 
@@ -63,7 +62,7 @@ final class ApiKeyResource extends Resource
         return __('api_keys.navigation.label');
     }
 
-    public static function getNavigationGroup(): string|\UnitEnum|null
+    public static function getNavigationGroup(): string|UnitEnum|null
     {
         return __('navigation.groups.system');
     }
@@ -78,7 +77,7 @@ final class ApiKeyResource extends Resource
         return __('api_keys.navigation.plural');
     }
 
-    public static function form(Schema $schema): Schema   
+    public static function form(Schema $schema): Schema
     {
         return $schema->schema([
             SchemaSection::make(__('api_keys.sections.details'))
@@ -153,7 +152,7 @@ final class ApiKeyResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         // Configure the table definition for the streamlined Filament v4 return type.
         return $table

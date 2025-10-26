@@ -10,7 +10,6 @@ use Filament\Actions;
 
 final class ListUserPreferences extends BaseListRecords
 {
-    
     protected static string $resource = UserPreferenceResource::class;
 
     protected function getHeaderActions(): array

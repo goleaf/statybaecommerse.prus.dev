@@ -10,7 +10,6 @@ use Filament\Actions;
 
 final class ListOrderItems extends BaseListRecords
 {
-    
     protected static string $resource = OrderItemResource::class;
 
     protected function getHeaderActions(): array

@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use BackedEnum;
-use Filament\Schemas\Schema;
 use App\Filament\Resources\WishlistItemResource\Pages;
 use App\Models\Brand;
 use App\Models\CartItem;
@@ -18,6 +15,7 @@ use App\Models\WishlistItem;
 use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
 use App\Support\Filament\SearchableInputHelper;
 use App\Support\Search\ProductSearch;
+use BackedEnum;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Exception;
 use Filament\Actions\Action;
@@ -27,15 +25,16 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Schemas\Components\Grid as FormGrid;
 use Filament\Forms\Components\Placeholder;
-use Filament\Schemas\Components\Section as FormSection;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification as FilamentNotification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Grid as FormGrid;
+use Filament\Schemas\Components\Section as FormSection;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -59,7 +58,7 @@ final class WishlistItemResource extends Resource
     protected static ?string $model = WishlistItem::class;
 
     /**
-     * @var string|\BackedEnum|null Navigation icon used for the sidebar entry.
+     * @var string|BackedEnum|null Navigation icon used for the sidebar entry.
      */
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-heart';
 
@@ -68,7 +67,7 @@ final class WishlistItemResource extends Resource
      */
     protected static ?int $navigationSort = 10;
 
-    public static function getNavigationGroup(): \UnitEnum|string|null
+    public static function getNavigationGroup(): UnitEnum|string|null
     {
         return 'Customers';
     }
@@ -86,7 +85,6 @@ final class WishlistItemResource extends Resource
     /**
      * Handle getNavigationGroup functionality with proper error handling.
      */
-    
 
     /**
      * Handle getPluralModelLabel functionality with proper error handling.
@@ -107,7 +105,7 @@ final class WishlistItemResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Schema $schema): Schema   
+    public static function form(Schema $schema): Schema
     {
         return $schema
             ->schema([
@@ -322,7 +320,7 @@ final class WishlistItemResource extends Resource
     /**
      * Configure the Filament table with columns, filters, and actions.
      */
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         // Configure the table definition for the streamlined Filament v4 return type.
         return $table

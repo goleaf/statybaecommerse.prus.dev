@@ -4,24 +4,23 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use BackedEnum;
-use Filament\Schemas\Schema;
 use App\Filament\Resources\MenuItemResource\Pages;
 use App\Models\Menu;
 use App\Models\MenuItem;
 use App\Models\Scopes\VisibleScope;
+use BackedEnum;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Schemas\Components\Grid as FormGrid;
-use Filament\Schemas\Components\Section as FormSection;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Get;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Grid as FormGrid;
+use Filament\Schemas\Components\Section as FormSection;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -57,7 +56,7 @@ final class MenuItemResource extends Resource
         return __('admin.menu_items.model_label');
     }
 
-    public static function form(Schema $schema): Schema   
+    public static function form(Schema $schema): Schema
     {
         return $schema
             ->schema([
@@ -130,7 +129,7 @@ final class MenuItemResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         // Configure the table definition for the streamlined Filament v4 return type.
         return $table

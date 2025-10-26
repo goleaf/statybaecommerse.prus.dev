@@ -12,22 +12,21 @@ use App\Support\Filament\SearchableInputHelper;
 use DefStudio\SearchableInput\DTO\SearchResult;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Actions\AssociateAction;
-use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
-use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\DissociateAction;
 use Filament\Actions\DissociateBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Set;
-use Filament\Infolists\Components\Grid;
 use Filament\Infolists\Components\Section as InfolistSection;
 use Filament\Infolists\Components\TextEntry;
+use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Schemas\Schema;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -41,7 +40,7 @@ class OrdersRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'orders';
 
-    public function form(Schema $schema): Schema   
+    public function form(Schema $schema): Schema
     {
         return $schema
             ->components([
@@ -221,7 +220,7 @@ class OrdersRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function infolist(Schema $schema): Schema   
+    public function infolist(Schema $schema): Schema
     {
         // Provide the infolist schema using the Filament v4 return type.
         return $schema
@@ -283,7 +282,7 @@ class OrdersRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table   
+    public function table(Table $table): Table
     {
         // Configure the relation manager table to satisfy Filament v4's return type requirements.
         return $table

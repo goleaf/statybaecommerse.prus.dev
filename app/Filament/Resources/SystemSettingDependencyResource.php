@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use Filament\Schemas\Schema;
 use App\Filament\Resources\SystemSettingDependencyResource\Pages;
 use App\Models\SystemSetting;
 use App\Models\SystemSettingDependency;
@@ -24,6 +22,7 @@ use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid as SchemaGrid;
 use Filament\Schemas\Components\Section as SchemaSection;
+use Filament\Schemas\Schema;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Columns\IconColumn;
@@ -46,10 +45,6 @@ final class SystemSettingDependencyResource extends Resource
         return 'heroicon-o-link';
     }
 
-    
-
-    
-
     public static function getNavigationLabel(): string
     {
         return __('admin.system_setting_dependencies.navigation_label');
@@ -65,7 +60,7 @@ final class SystemSettingDependencyResource extends Resource
         return __('admin.system_setting_dependencies.model_label');
     }
 
-    public static function form(Schema $schema): Schema   
+    public static function form(Schema $schema): Schema
     {
         return $schema->schema([
             SchemaSection::make(__('admin.system_setting_dependencies.basic_information'))
@@ -96,16 +91,16 @@ final class SystemSettingDependencyResource extends Resource
                             Select::make('condition')
                                 ->label(__('admin.system_setting_dependencies.condition'))
                                 ->options([
-                                    'equals' => __('admin.system_settings.equals'),
-                                    'not_equals' => __('admin.system_settings.not_equals'),
+                                    'equals'       => __('admin.system_settings.equals'),
+                                    'not_equals'   => __('admin.system_settings.not_equals'),
                                     'greater_than' => __('admin.system_settings.greater_than'),
-                                    'less_than' => __('admin.system_settings.less_than'),
-                                    'contains' => __('admin.system_settings.contains'),
+                                    'less_than'    => __('admin.system_settings.less_than'),
+                                    'contains'     => __('admin.system_settings.contains'),
                                     'not_contains' => __('admin.system_settings.not_contains'),
-                                    'is_empty' => __('admin.system_settings.is_empty'),
+                                    'is_empty'     => __('admin.system_settings.is_empty'),
                                     'is_not_empty' => __('admin.system_settings.is_not_empty'),
-                                    'is_true' => __('admin.system_settings.is_true'),
-                                    'is_false' => __('admin.system_settings.is_false'),
+                                    'is_true'      => __('admin.system_settings.is_true'),
+                                    'is_false'     => __('admin.system_settings.is_false'),
                                 ])
                                 ->required()
                                 ->native(false)
@@ -149,7 +144,7 @@ final class SystemSettingDependencyResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         // Configure the table definition for the streamlined Filament v4 return type.
         return $table

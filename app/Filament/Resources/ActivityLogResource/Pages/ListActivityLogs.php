@@ -9,7 +9,6 @@ use App\Filament\Resources\ActivityLogResource;
 
 final class ListActivityLogs extends BaseListRecords
 {
-    
     protected static string $resource = ActivityLogResource::class;
 
     public function mount(): void

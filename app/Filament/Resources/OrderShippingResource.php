@@ -4,20 +4,19 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use App\Support\Concerns\HasNav;
-use Filament\Schemas\Schema;
 use App\Filament\Resources\OrderShippingResource\Pages;
 use App\Models\Order;
 use App\Models\OrderShipping;
+use App\Support\Concerns\HasNav;
 use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
 use BackedEnum;
 use Filament\Forms\Components\KeyValue;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Grid as SchemaGrid;
+use Filament\Schemas\Components\Section as SchemaSection;
+use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Actions\BulkActionGroup;
@@ -32,7 +31,6 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
-use UnitEnum;
 
 final class OrderShippingResource extends Resource
 {
@@ -44,8 +42,6 @@ final class OrderShippingResource extends Resource
     {
         return Heroicon::OutlinedRectangleStack;
     }
-
-    
 
     protected static ?int $navigationSort = 3;
 
@@ -64,7 +60,7 @@ final class OrderShippingResource extends Resource
         return __('admin.order_shippings.model_label');
     }
 
-    public static function form(Schema $schema): Schema   
+    public static function form(Schema $schema): Schema
     {
         return $schema->schema([
             SchemaSection::make(__('admin.order_shippings.basic_information'))
@@ -149,7 +145,7 @@ final class OrderShippingResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         // Configure the table definition for the streamlined Filament v4 return type.
         return $table

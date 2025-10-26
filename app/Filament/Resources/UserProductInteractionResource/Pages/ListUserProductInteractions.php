@@ -9,6 +9,5 @@ use App\Filament\Resources\UserProductInteractionResource;
 
 final class ListUserProductInteractions extends BaseListRecords
 {
-    
     protected static string $resource = UserProductInteractionResource::class;
 }

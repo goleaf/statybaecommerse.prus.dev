@@ -10,7 +10,6 @@ use Filament\Actions;
 
 class ListSubscribers extends BaseListRecords
 {
-    
     protected static string $resource = SubscriberResource::class;
 
     protected function getHeaderActions(): array

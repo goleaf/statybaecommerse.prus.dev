@@ -10,7 +10,6 @@ use Filament\Actions;
 
 final class ListCollections extends BaseListRecords
 {
-    
     protected static string $resource = CollectionResource::class;
 
     protected function getHeaderActions(): array

@@ -10,7 +10,6 @@ use Filament\Actions;
 
 final class ListProductFeatures extends BaseListRecords
 {
-    
     protected static string $resource = ProductFeatureResource::class;
 
     protected function getHeaderActions(): array

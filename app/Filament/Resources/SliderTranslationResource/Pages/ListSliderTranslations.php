@@ -10,7 +10,6 @@ use Filament\Actions;
 
 final class ListSliderTranslations extends BaseListRecords
 {
-    
     protected static string $resource = SliderTranslationResource::class;
 
     protected function getHeaderActions(): array

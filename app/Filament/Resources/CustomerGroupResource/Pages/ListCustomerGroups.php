@@ -1,13 +1,15 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Filament\Resources\CustomerGroupResource\Pages;
 
 use App\Filament\Pages\Support\BaseListRecords;
 use App\Filament\Resources\CustomerGroupResource;
-use Filament\Tables\Table;
 use Filament\Actions;
-use Illuminate\Database\Eloquent\Relations\Relation;
+use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use LaraZeus\SpatieTranslatable\Actions\LocaleSwitcher;
 use LaraZeus\SpatieTranslatable\Resources\Pages\ListRecords\Concerns\Translatable as SpatieTranslatableListRecords;
 

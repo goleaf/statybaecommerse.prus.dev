@@ -4,15 +4,13 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use Filament\Schemas\Schema;
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\OrderItemResource\Pages;
 use App\Models\OrderItem;
 use App\Models\Product;
+use App\Support\Filament\Filters\DateRangeFilter;
 use App\Support\Filament\ProductVariantFieldHelper;
 use App\Support\Filament\SearchableInputHelper;
-use App\Support\Filament\Filters\DateRangeFilter;
 use App\Support\Search\ProductSearch;
 use App\Support\Search\ProductVariantSearch;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
@@ -24,11 +22,12 @@ use Filament\Forms\Set;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid as SchemaGrid;
 use Filament\Schemas\Components\Section as SchemaSection;
+use Filament\Schemas\Schema;
 use Filament\Tables;
-use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
@@ -42,7 +41,7 @@ use UnitEnum;
  */
 final class OrderItemResource extends Resource
 {
-    public static function getNavigationGroup(): \UnitEnum|string|null
+    public static function getNavigationGroup(): UnitEnum|string|null
     {
         $group = NavigationGroup::Orders;
 
@@ -82,7 +81,7 @@ final class OrderItemResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Schema $schema): Schema   
+    public static function form(Schema $schema): Schema
     {
         return $schema->schema([
             SchemaSection::make(__('orders.sections.order_items'))
@@ -283,7 +282,7 @@ final class OrderItemResource extends Resource
     /**
      * Configure the Filament table with columns, filters, and actions.
      */
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         // Configure the table definition for the streamlined Filament v4 return type.
         return $table

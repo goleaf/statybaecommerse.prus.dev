@@ -10,7 +10,6 @@ use Filament\Actions;
 
 final class ListApiKeys extends BaseListRecords
 {
-    
     protected static string $resource = ApiKeyResource::class;
 
     protected function getHeaderActions(): array

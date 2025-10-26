@@ -4,53 +4,51 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use Filament\Schemas\Schema;
 use App\Filament\Resources\OrderResource\Pages;
 use App\Filament\Resources\OrderResource\RelationManagers;
 use App\Models\Order;
 use App\Models\Partner;
 use App\Models\User;
+use App\Services\Export\Contracts\DefinesExportColumns;
+use App\Services\Export\ExportColumn;
+use App\Services\Export\ExportFormat;
+use App\Services\Export\ExportService;
 use App\Services\Pricing\PriceCalculator;
 use App\Support\Authorization\AuthorizationMatrix;
 use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
-use App\Support\Filament\SearchableInputHelper;
 use App\Support\Filament\Filters\DateRangeFilter;
+use App\Support\Filament\SearchableInputHelper;
 use App\Support\Search\AddressSearch;
 use App\Support\Search\ChannelSearch;
 use App\Support\Search\CustomerSearch;
 use App\Support\Search\PartnerSearch;
-use App\Support\Search\SearchableComponentHelper;
 use App\Support\Seo\LocaleUrlGenerator;
-use App\Services\Export\ExportColumn;
-use App\Services\Export\ExportFormat;
-use App\Services\Export\ExportService;
 use Awcodes\BadgeableColumn\Components\Badge;
 use Awcodes\BadgeableColumn\Components\BadgeableColumn;
 use BackedEnum;
-use App\Services\Export\Contracts\DefinesExportColumns;
 use DefStudio\SearchableInput\DTO\SearchResult;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Exception;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Placeholder;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Set;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Grid as SchemaGrid;
+use Filament\Schemas\Components\Section as SchemaSection;
+use Filament\Schemas\Schema;
 use Filament\Support\Enums\Width;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ViewColumn;
 use Filament\Tables\Filters\Filter;
@@ -71,7 +69,6 @@ use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
 use pxlrbt\FilamentExcel\Columns\Column;
 use pxlrbt\FilamentExcel\Exports\ExcelExport;
 use Tapp\FilamentValueRangeFilter\Filters\ValueRangeFilter;
-use UnitEnum;
 
 /**
  * OrderResource
@@ -130,6 +127,7 @@ final class OrderResource extends Resource implements DefinesExportColumns
     {
         return AuthorizationMatrix::check('orders', 'viewAny');
     }
+
     public static function canForceDelete(Model $record): bool
     {
         return AuthorizationMatrix::check('orders', 'delete');
@@ -140,12 +138,10 @@ final class OrderResource extends Resource implements DefinesExportColumns
         return AuthorizationMatrix::check('orders', 'update');
     }
 
-    public static function getNavigationIcon(): string|\BackedEnum|null
+    public static function getNavigationIcon(): string|BackedEnum|null
     {
         return 'heroicon-o-shopping-bag';
     }
-
-    
 
     /**
      * Get the navigation label with translation support.
@@ -174,7 +170,7 @@ final class OrderResource extends Resource implements DefinesExportColumns
     /**
      * Configure the comprehensive form schema with advanced features.
      */
-    public static function form(Schema $schema): Schema   
+    public static function form(Schema $schema): Schema
     {
         return $schema->schema([
             SchemaSection::make(__('orders.sections.order_details'))
@@ -619,7 +615,7 @@ final class OrderResource extends Resource implements DefinesExportColumns
     /**
      * Configure the comprehensive table with advanced features.
      */
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         // Configure the table definition for the streamlined Filament v4 return type.
         return $table
@@ -689,6 +685,7 @@ final class OrderResource extends Resource implements DefinesExportColumns
                     ->label(__('orders.fields.status'))
                     ->formatStateUsing(function ($state): string {
                         $key = $state instanceof BackedEnum ? $state->value : (string) $state;
+
                         return __('orders.statuses.' . $key);
                     })
                     ->sortable()
@@ -868,6 +865,7 @@ final class OrderResource extends Resource implements DefinesExportColumns
                     ->color('primary')
                     ->visible(function (Order $record): bool {
                         $status = $record->status instanceof BackedEnum ? $record->status->value : (string) $record->status;
+
                         return AuthorizationMatrix::check('orders', 'update') && $status === 'pending';
                     }) // Keep the action hidden unless the operator can update and the order is pending.
                     ->action(function (Order $record): void {
@@ -884,6 +882,7 @@ final class OrderResource extends Resource implements DefinesExportColumns
                     ->color('info')
                     ->visible(function (Order $record): bool {
                         $status = $record->status instanceof BackedEnum ? $record->status->value : (string) $record->status;
+
                         return AuthorizationMatrix::check('orders', 'update') && $status === 'processing';
                     }) // Ensure only authorized staff can advance processing orders.
                     ->action(function (Order $record): void {
@@ -903,6 +902,7 @@ final class OrderResource extends Resource implements DefinesExportColumns
                     ->color('success')
                     ->visible(function (Order $record): bool {
                         $status = $record->status instanceof BackedEnum ? $record->status->value : (string) $record->status;
+
                         return AuthorizationMatrix::check('orders', 'update') && $status === 'shipped';
                     }) // Restrict delivery confirmation to authorized operators.
                     ->action(function (Order $record): void {
@@ -922,6 +922,7 @@ final class OrderResource extends Resource implements DefinesExportColumns
                     ->color('danger')
                     ->visible(function (Order $record): bool {
                         $status = $record->status instanceof BackedEnum ? $record->status->value : (string) $record->status;
+
                         return AuthorizationMatrix::check('orders', 'update') && in_array($status, ['pending', 'processing'], true);
                     }) // Combine status and permission gating for cancellation.
                     ->action(function (Order $record): void {
@@ -938,6 +939,7 @@ final class OrderResource extends Resource implements DefinesExportColumns
                     ->color('secondary')
                     ->visible(function (Order $record): bool {
                         $status = $record->status instanceof BackedEnum ? $record->status->value : (string) $record->status;
+
                         return AuthorizationMatrix::check('orders', 'update') && in_array($status, ['delivered', 'completed'], true);
                     }) // Only show refunds for authorized users when fulfillment is complete.
                     ->action(function (Order $record): void {
@@ -1062,18 +1064,19 @@ final class OrderResource extends Resource implements DefinesExportColumns
             ->striped()
             ->paginated([10, 25, 50, 100]);
     }
+
     /**
      * @return array<string, ExportColumn>
      */
     public static function availableExportColumns(): array
     {
         return [
-            'number' => new ExportColumn('number', self::translate('orders.number', 'Number'), resolver: fn (Order $order): string => (string) $order->number),
-            'status' => new ExportColumn('status', self::translate('orders.status', 'Status'), resolver: fn (Order $order): string => $order->status instanceof BackedEnum ? $order->status->value : (string) $order->status),
+            'number'         => new ExportColumn('number', self::translate('orders.number', 'Number'), resolver: fn (Order $order): string => (string) $order->number),
+            'status'         => new ExportColumn('status', self::translate('orders.status', 'Status'), resolver: fn (Order $order): string => $order->status instanceof BackedEnum ? $order->status->value : (string) $order->status),
             'payment_status' => new ExportColumn('payment_status', self::translate('orders.payment_status', 'Payment Status'), resolver: fn (Order $order): string => $order->payment_status instanceof BackedEnum ? $order->payment_status->value : (string) $order->payment_status),
-            'total' => new ExportColumn('total', self::translate('orders.total', 'Total'), resolver: fn (Order $order): string => (string) $order->total),
-            'customer' => new ExportColumn('customer', self::translate('orders.customer', 'Customer'), resolver: fn (Order $order): string => (string) ($order->user?->name ?? '')),
-            'created_at' => new ExportColumn('created_at', self::translate('orders.created_at', 'Created At'), resolver: fn (Order $order): string => optional($order->created_at)->toDateTimeString() ?? ''),
+            'total'          => new ExportColumn('total', self::translate('orders.total', 'Total'), resolver: fn (Order $order): string => (string) $order->total),
+            'customer'       => new ExportColumn('customer', self::translate('orders.customer', 'Customer'), resolver: fn (Order $order): string => (string) ($order->user?->name ?? '')),
+            'created_at'     => new ExportColumn('created_at', self::translate('orders.created_at', 'Created At'), resolver: fn (Order $order): string => optional($order->created_at)->toDateTimeString() ?? ''),
         ];
     }
 
@@ -1162,6 +1165,7 @@ final class OrderResource extends Resource implements DefinesExportColumns
                 ->heading(__('orders.fields.status'))
                 ->getStateUsing(function (Order $record): ?string {
                     $state = $record->status;
+
                     return $state instanceof BackedEnum ? $state->value : (is_string($state) ? $state : null);
                 })
                 ->formatStateUsing(fn (?string $state): string => $state ? __("orders.status.{$state}") : ''),
@@ -1169,6 +1173,7 @@ final class OrderResource extends Resource implements DefinesExportColumns
                 ->heading(__('orders.fields.payment_status'))
                 ->getStateUsing(function (Order $record): ?string {
                     $state = $record->payment_status;
+
                     return $state instanceof BackedEnum ? $state->value : (is_string($state) ? $state : null);
                 })
                 ->formatStateUsing(fn (?string $state): string => $state ? __("orders.payment_status.{$state}") : ''),
@@ -1279,6 +1284,7 @@ final class OrderResource extends Resource implements DefinesExportColumns
             'edit'   => Pages\EditOrder::route('/{record}/edit'),
         ];
     }
+
     /**
      * Get the global search result details.
      */
@@ -1299,24 +1305,24 @@ final class OrderResource extends Resource implements DefinesExportColumns
         $actions = [];
 
         try {
-            if ($record instanceof Order && static::canView($record)) {
+            if ($record instanceof Order && self::canView($record)) {
                 $actions[] = PageAction::make('view')
                     ->label(__('orders.actions.view'))
                     ->icon('heroicon-o-eye')
                     ->url(self::getUrl('view', ['record' => $record]));
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // Route might not exist, skip this action
         }
 
         try {
-            if ($record instanceof Order && static::canEdit($record)) {
+            if ($record instanceof Order && self::canEdit($record)) {
                 $actions[] = PageAction::make('edit')
                     ->label(__('orders.actions.edit'))
                     ->icon('heroicon-o-pencil')
                     ->url(self::getUrl('edit', ['record' => $record]));
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             // Route might not exist, skip this action
         }
 

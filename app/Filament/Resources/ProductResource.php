@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
 use App\Data\ExportRequestData;
 use App\Enums\NavigationGroup;
+use App\Filament\Forms\Components\Quantity;
 use App\Filament\Resources\ProductResource\Pages;
 use App\Filament\Resources\ProductResource\RelationManagers\AttributesRelationManager;
 use App\Filament\Resources\ProductResource\RelationManagers\CategoriesRelationManager;
@@ -20,20 +20,19 @@ use App\Models\Product;
 use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\PublishedScope;
 use App\Models\Scopes\VisibleScope;
+use App\Services\Export\Contracts\DefinesExportColumns;
+use App\Services\Export\ExportColumn;
+use App\Services\Export\Exporters\ProductExport;
+use App\Services\Export\ExportService;
 use App\Support\Authorization\AuthorizationMatrix;
+use App\Support\Concerns\HasNav;
 use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
 use App\Support\Filament\Schemas\TestingSchemaHost;
 use App\Support\Forms\MatrixFactory;
-use App\Support\Concerns\HasNav;
 use App\Support\Seo\LocaleUrlGenerator;
 use Awcodes\BadgeableColumn\Components\Badge;
 use Awcodes\BadgeableColumn\Components\BadgeableColumn;
 use BackedEnum;
-use App\Filament\Forms\Components\Quantity;
-use App\Services\Export\ExportColumn;
-use App\Services\Export\Contracts\DefinesExportColumns;
-use App\Services\Export\Exporters\ProductExport;
-use App\Services\Export\ExportService;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkAction;
@@ -76,6 +75,7 @@ use pxlrbt\FilamentExcel\Actions\Tables\ExportAction;
 use pxlrbt\FilamentExcel\Columns\Column;
 use pxlrbt\FilamentExcel\Exports\ExcelExport;
 use Tapp\FilamentValueRangeFilter\Filters\ValueRangeFilter;
+use UnitEnum;
 
 /**
  * ProductResource
@@ -87,7 +87,8 @@ final class ProductResource extends Resource implements DefinesExportColumns
     use HasNav;
 
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-cube';
-    protected static \UnitEnum|string|null $navigationGroup = NavigationGroup::Products->value;
+
+    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Products->value;
 
     protected static ?string $model = Product::class;
 
@@ -134,6 +135,7 @@ final class ProductResource extends Resource implements DefinesExportColumns
     protected static ?int $navigationSort = 1;
 
     protected static ?string $recordTitleAttribute = 'name';
+
     public static function getNavigationLabel(): string
     {
         return __('products.title');
@@ -373,7 +375,7 @@ final class ProductResource extends Resource implements DefinesExportColumns
             ]);
     }
 
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         // Configure the table definition for the streamlined Filament v4 return type.
         return $table
@@ -956,7 +958,7 @@ final class ProductResource extends Resource implements DefinesExportColumns
      */
     public static function getRecordRouteBindingEloquentQuery(): Builder
     {
-        return static::getModel()::query()->withoutGlobalScopes([
+        return self::getModel()::query()->withoutGlobalScopes([
             ActiveScope::class,
             PublishedScope::class,
             VisibleScope::class,

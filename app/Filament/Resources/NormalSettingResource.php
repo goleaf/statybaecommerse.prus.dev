@@ -4,18 +4,17 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use App\Support\Concerns\HasNav;
-use Filament\Schemas\Schema;
 use App\Filament\Resources\NormalSettingResource\Pages;
 use App\Models\NormalSetting;
+use App\Support\Concerns\HasNav;
 use Filament\Forms\Components\Select;
-use Filament\Schemas\Components\Tabs as SchemaTabs;
-use Filament\Schemas\Components\Tabs\Tab as SchemaTab;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Tabs as SchemaTabs;
+use Filament\Schemas\Components\Tabs\Tab as SchemaTab;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -32,7 +31,7 @@ final class NormalSettingResource extends Resource
     /**
      * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
      */
-    protected static \UnitEnum|string|null $navigationGroup = 'System';
+    protected static UnitEnum|string|null $navigationGroup = 'System';
 
     protected static ?int $navigationSort = 8;
 
@@ -53,7 +52,7 @@ final class NormalSettingResource extends Resource
         return __('admin.normal_settings.navigation');
     }
 
-    public static function form(Schema $schema): Schema   
+    public static function form(Schema $schema): Schema
     {
         return $schema->schema([
             SchemaTabs::make(__('normal_settings.tabs.label'))
@@ -104,7 +103,7 @@ final class NormalSettingResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         // Configure the table definition for the streamlined Filament v4 return type.
         return $table

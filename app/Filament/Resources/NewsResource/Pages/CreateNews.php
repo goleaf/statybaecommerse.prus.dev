@@ -9,7 +9,6 @@ use App\Filament\Concerns\InteractsWithTranslationTabs;
 use App\Filament\Concerns\ManagesNewsTranslationTabs;
 use App\Filament\Resources\NewsResource;
 use Filament\Resources\Pages\CreateRecord;
-use Illuminate\Database\Eloquent\Model;
 
 final class CreateNews extends CreateRecord
 {

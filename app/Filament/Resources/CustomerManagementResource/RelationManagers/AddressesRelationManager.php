@@ -6,10 +6,8 @@ namespace App\Filament\Resources\CustomerManagementResource\RelationManagers;
 
 use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Actions\AssociateAction;
-use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
-use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\DissociateAction;
 use Filament\Actions\DissociateBulkAction;
 use Filament\Actions\EditAction;
@@ -18,6 +16,8 @@ use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\TextInput;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Schema;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Zvizvi\RelationManagerRepeater\Tables\RelationManagerRepeaterAction;
@@ -26,7 +26,7 @@ class AddressesRelationManager extends BaseRelationManager
 {
     protected static string $relationship = 'addresses';
 
-    public function form(Schema $schema): Schema   
+    public function form(Schema $schema): Schema
     {
         return $schema
             ->components([
@@ -36,7 +36,7 @@ class AddressesRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function infolist(Schema $schema): Schema   
+    public function infolist(Schema $schema): Schema
     {
         // Provide the infolist schema using the Filament v4 return type.
         return $schema
@@ -45,7 +45,7 @@ class AddressesRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table   
+    public function table(Table $table): Table
     {
         // Configure the relation manager table to satisfy Filament v4's return type requirements.
         return $table

@@ -8,13 +8,12 @@ use App\Filament\Resources\UserManagementResource\Pages;
 use App\Filament\Resources\UserManagementResource\RelationManagers\AddressesRelationManager;
 use App\Filament\Resources\UserManagementResource\RelationManagers\OrdersRelationManager;
 use App\Filament\Resources\UserManagementResource\RelationManagers\ReviewsRelationManager;
-use App\Filament\Resources\UserResource;
 use App\Models\Scopes\ActiveScope;
 use App\Models\User;
 use App\Support\Authorization\AuthorizationMatrix;
 use BackedEnum;
-use Filament\Schemas\Schema;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -30,7 +29,7 @@ final class UserManagementResource extends Resource
 
     protected static ?int $navigationSort = 3;
 
-    protected static \UnitEnum|string|null $navigationGroup = 'Users';
+    protected static UnitEnum|string|null $navigationGroup = 'Users';
 
     public static function shouldRegisterNavigation(): bool
     {
@@ -77,9 +76,9 @@ final class UserManagementResource extends Resource
         return __('users.title');
     }
 
-    public static function getNavigationGroup(): \UnitEnum|string|null
+    public static function getNavigationGroup(): UnitEnum|string|null
     {
-        return static::$navigationGroup;
+        return self::$navigationGroup;
     }
 
     public static function getPluralModelLabel(): string
@@ -114,10 +113,10 @@ final class UserManagementResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListUsers::route('/'),
+            'index'  => Pages\ListUsers::route('/'),
             'create' => Pages\CreateUser::route('/create'),
-            'view' => Pages\ViewUser::route('/{record}'),
-            'edit' => Pages\EditUser::route('/{record}/edit'),
+            'view'   => Pages\ViewUser::route('/{record}'),
+            'edit'   => Pages\EditUser::route('/{record}/edit'),
         ];
     }
 
@@ -136,13 +135,13 @@ final class UserManagementResource extends Resource
     public static function getGlobalSearchResultDetails(Model $record): array
     {
         return array_filter([
-            __('users.fields.email') => $record->email,
+            __('users.fields.email')  => $record->email,
             __('users.fields.locale') => $record->locale,
         ]);
     }
 
     public static function getGlobalSearchResultUrl(Model $record): string
     {
-        return static::getUrl('view', ['record' => $record]);
+        return self::getUrl('view', ['record' => $record]);
     }
 }

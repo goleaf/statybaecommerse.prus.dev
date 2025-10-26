@@ -4,20 +4,20 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use BackedEnum;
-use App\Support\Concerns\HasNav;
-use Filament\Schemas\Schema;
 use App\Filament\Resources\PartnerResource\Pages;
 use App\Models\Partner;
-use Filament\Forms;
-use Filament\Forms\Components\Section;
-use Filament\Resources\Resource;
-use Filament\Tables;
+use App\Support\Concerns\HasNav;
+use BackedEnum;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Forms;
+use Filament\Forms\Components\Section;
+use Filament\Resources\Resource;
+use Filament\Schemas\Components\Section as SchemaSection;
+use Filament\Schemas\Schema;
+use Filament\Tables;
 use Filament\Tables\Table;
 use UnitEnum;
 
@@ -33,11 +33,11 @@ final class PartnerResource extends Resource
     /**
      * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
      */
-    protected static \UnitEnum|string|null $navigationGroup = 'Marketing';
+    protected static UnitEnum|string|null $navigationGroup = 'Marketing';
 
     protected static ?int $navigationSort = 1;
 
-    public static function form(Schema $schema): Schema   
+    public static function form(Schema $schema): Schema
     {
         // Ensure compatibility with the Schema-based form builder introduced in Filament v4.
         // Build the Partner form using the Section helper to keep layouts consistent.
@@ -108,7 +108,7 @@ final class PartnerResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         // Configure the table definition for the streamlined Filament v4 return type.
         return $table

@@ -4,32 +4,32 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use Filament\Schemas\Schema;
-use App\Support\Concerns\HasNav;
 use App\Filament\Resources\NewsImageResource\Pages;
 use App\Models\News;
 use App\Models\NewsImage;
+use App\Support\Concerns\HasNav;
 use App\Support\Storage\SecureStorage;
+use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Placeholder;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Tabs as SchemaTabs;
+use Filament\Forms\Components\Tabs\Tab as SchemaTab;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
-use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Components\Tabs as SchemaTabs;
-use Filament\Forms\Components\Tabs\Tab as SchemaTab;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
-use Filament\Actions\ViewAction;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -41,16 +41,12 @@ use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Storage;
-use BackedEnum;
-use UnitEnum;
 
 final class NewsImageResource extends Resource
 {
     use HasNav;
 
     protected static ?string $model = NewsImage::class;
-
-    
 
     public static function getNavigationIcon(): BackedEnum|Htmlable|string|null
     {
@@ -74,7 +70,7 @@ final class NewsImageResource extends Resource
         return __('admin.news_images.model_label');
     }
 
-    public static function form(Schema $schema): Schema   
+    public static function form(Schema $schema): Schema
     {
         return $schema
             ->schema([
@@ -83,7 +79,7 @@ final class NewsImageResource extends Resource
                         SchemaTab::make(__('admin.news_images.basic_information'))
                             ->icon('heroicon-o-photo')
                             ->schema([
-                        Section::make(__('admin.news_images.basic_information'))
+                                Section::make(__('admin.news_images.basic_information'))
                                     ->description(__('admin.news_images.basic_information_description'))
                                     ->schema([
                                         Select::make('news_id')
@@ -162,7 +158,7 @@ final class NewsImageResource extends Resource
 
                                                     if ($imageInfo) {
                                                         $set('dimensions', [
-                                                            'width' => $imageInfo[0],
+                                                            'width'  => $imageInfo[0],
                                                             'height' => $imageInfo[1],
                                                         ]);
                                                     }
@@ -301,7 +297,7 @@ final class NewsImageResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         // Configure the table definition for the streamlined Filament v4 return type.
         return $table

@@ -10,7 +10,6 @@ use Filament\Actions;
 
 final class ListReviews extends BaseListRecords
 {
-    
     protected static string $resource = ReviewResource::class;
 
     protected function getHeaderActions(): array

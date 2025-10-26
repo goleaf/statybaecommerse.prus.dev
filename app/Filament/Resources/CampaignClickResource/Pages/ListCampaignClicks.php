@@ -10,7 +10,6 @@ use Filament\Actions;
 
 final class ListCampaignClicks extends BaseListRecords
 {
-    
     protected static string $resource = CampaignClickResource::class;
 
     protected function getHeaderActions(): array

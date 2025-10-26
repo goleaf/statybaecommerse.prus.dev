@@ -4,24 +4,23 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use BackedEnum;
-use Filament\Schemas\Schema;
 use App\Filament\Resources\ReferralCampaignResource\Pages;
 use App\Models\ReferralCampaign;
 use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
+use BackedEnum;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Schemas\Components\Grid as SchemaGrid;
 use Filament\Forms\Components\KeyValue;
-use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Grid as SchemaGrid;
+use Filament\Schemas\Components\Section as SchemaSection;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -29,6 +28,7 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable as SpatieTranslatableResource;
+use UnitEnum;
 
 final class ReferralCampaignResource extends Resource
 {
@@ -45,7 +45,7 @@ final class ReferralCampaignResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    public static function getNavigationGroup(): \UnitEnum|string|null
+    public static function getNavigationGroup(): UnitEnum|string|null
     {
         return 'System';
     }
@@ -65,7 +65,7 @@ final class ReferralCampaignResource extends Resource
         return __('admin.referral_campaigns.model_label');
     }
 
-    public static function form(Schema $schema): Schema   
+    public static function form(Schema $schema): Schema
     {
         return $schema
             ->schema([
@@ -149,7 +149,7 @@ final class ReferralCampaignResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         // Configure the table definition for the streamlined Filament v4 return type.
         return $table

@@ -4,41 +4,39 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use BackedEnum;
-use Filament\Schemas\Schema;
 use App\Filament\Resources\VariantInventoryResource\Pages;
 use App\Models\Location;
+use App\Models\Product;
+use App\Models\ProductVariant;
 use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\EnabledScope;
 use App\Models\Scopes\StatusScope;
 use App\Models\Scopes\TrackedScope;
-use App\Models\Product;
-use App\Models\ProductVariant;
 use App\Models\VariantInventory;
 use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
 use App\Support\Filament\SearchableInputHelper;
 use App\Support\Search\LocationSearch;
-use App\Support\Search\PartnerSearch;
 use App\Support\Search\ProductVariantSearch;
+use BackedEnum;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Placeholder;
-use Filament\Schemas\Components\Section as SchemaSection;
-use Filament\Forms\Components\Select; // Select component import keeps dropdown definitions consistent across the resource.
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Set;
+use Filament\Forms\Set; // Select component import keeps dropdown definitions consistent across the resource.
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ListRecords;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Section as SchemaSection;
+use Filament\Schemas\Schema;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
@@ -48,6 +46,7 @@ use Filament\Tables\Grouping\Group;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Log;
 use UnitEnum;
 
 final class VariantInventoryResource extends Resource
@@ -62,7 +61,7 @@ final class VariantInventoryResource extends Resource
     /**
      * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
      */
-    protected static \UnitEnum|string|null $navigationGroup = 'Inventory';
+    protected static UnitEnum|string|null $navigationGroup = 'Inventory';
 
     public static function getNavigationLabel(): string
     {
@@ -82,7 +81,7 @@ final class VariantInventoryResource extends Resource
     /**
      * Configure the Variant Inventory form schema for Filament administrators.
      */
-    public static function form(Schema $schema): Schema   
+    public static function form(Schema $schema): Schema
     {
         return $schema
             ->schema([
@@ -388,7 +387,7 @@ final class VariantInventoryResource extends Resource
         ];
     }
 
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         // Configure the table definition for the streamlined Filament v4 return type.
         return $table
@@ -564,26 +563,26 @@ final class VariantInventoryResource extends Resource
                         $record = $livewire->getMountedTableActionRecord();
                         $quantity = (int) ($data['quantity'] ?? 0);
                         $type = $data['adjustment_type'] ?? 'add';
-                        \Log::info('adjust_stock action triggered', [
+                        Log::info('adjust_stock action triggered', [
                             'record_class' => get_class($record),
-                            'record_id' => $record->getKey(),
-                            'type' => $type,
-                            'quantity' => $quantity,
+                            'record_id'    => $record->getKey(),
+                            'type'         => $type,
+                            'quantity'     => $quantity,
                         ]);
 
                         switch ($type) {
                             case 'add':
                                 $result = $record->addStock($quantity);
-                                \Log::info('addStock result', ['result' => $result]);
+                                Log::info('addStock result', ['result' => $result]);
                                 break;
                             case 'subtract':
                                 $result = $record->removeStock($quantity);
-                                \Log::info('removeStock result', ['result' => $result]);
+                                Log::info('removeStock result', ['result' => $result]);
                                 break;
                             case 'set':
                                 $record->stock = $quantity;
                                 $result = $record->updateAvailableStock();
-                                \Log::info('setStock result', ['result' => $result]);
+                                Log::info('setStock result', ['result' => $result]);
                                 break;
                         }
 

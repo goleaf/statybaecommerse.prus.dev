@@ -6,10 +6,10 @@ namespace App\Filament\Resources\CustomerManagementResource\Pages;
 
 use App\Filament\Resources\CustomerManagementResource;
 use Filament\Resources\Pages\CreateRecord;
-use LaraZeus\SpatieTranslatable\Actions\LocaleSwitcher;
-use LaraZeus\SpatieTranslatable\Resources\Pages\CreateRecord\Concerns\Translatable as TranslatableCreateRecord;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use LaraZeus\SpatieTranslatable\Actions\LocaleSwitcher;
+use LaraZeus\SpatieTranslatable\Resources\Pages\CreateRecord\Concerns\Translatable as TranslatableCreateRecord;
 
 final class CreateCustomer extends CreateRecord
 {
@@ -67,7 +67,7 @@ final class CreateCustomer extends CreateRecord
 
         $notificationPreferences = [
             'newsletter_subscription' => (bool) ($notificationPreferencesInput['newsletter_subscription'] ?? false),
-            'sms_notifications' => (bool) ($notificationPreferencesInput['sms_notifications'] ?? false),
+            'sms_notifications'       => (bool) ($notificationPreferencesInput['sms_notifications'] ?? false),
         ];
         $data['notification_preferences'] = json_encode($notificationPreferences, JSON_THROW_ON_ERROR);
         unset($data['newsletter_subscription'], $data['sms_notifications']);

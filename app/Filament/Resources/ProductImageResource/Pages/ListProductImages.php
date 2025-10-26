@@ -10,7 +10,6 @@ use Filament\Actions;
 
 final class ListProductImages extends BaseListRecords
 {
-    
     protected static string $resource = ProductImageResource::class;
 
     protected function getHeaderActions(): array

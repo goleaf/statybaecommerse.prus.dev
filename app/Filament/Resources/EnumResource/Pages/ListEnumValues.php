@@ -10,7 +10,6 @@ use Filament\Actions;
 
 final class ListEnumValues extends BaseListRecords
 {
-    
     protected static string $resource = EnumResource::class;
 
     protected function getHeaderActions(): array

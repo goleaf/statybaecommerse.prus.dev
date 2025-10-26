@@ -11,7 +11,6 @@ use Filament\Actions;
 
 class ListDocumentTemplates extends BaseListRecords
 {
-    
     protected static string $resource = DocumentTemplateResource::class;
 
     protected function getHeaderActions(): array

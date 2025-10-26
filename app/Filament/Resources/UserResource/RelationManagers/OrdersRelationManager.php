@@ -8,7 +8,6 @@ use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
-use Filament\Schemas\Schema;
 
 class OrdersRelationManager extends BaseRelationManager
 {
@@ -20,7 +19,7 @@ class OrdersRelationManager extends BaseRelationManager
 
     protected static ?string $pluralModelLabel = 'Orders';
 
-    public function table(Table $table): Table   
+    public function table(Table $table): Table
     {
         // Configure the relation manager table to satisfy Filament v4's return type requirements.
         return $table

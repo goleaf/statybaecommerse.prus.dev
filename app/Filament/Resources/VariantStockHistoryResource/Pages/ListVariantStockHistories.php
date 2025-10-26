@@ -10,7 +10,6 @@ use Filament\Actions;
 
 final class ListVariantStockHistories extends BaseListRecords
 {
-    
     protected static string $resource = VariantStockHistoryResource::class;
 
     protected function getHeaderActions(): array

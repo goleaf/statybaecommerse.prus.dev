@@ -4,32 +4,30 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use App\Support\Concerns\HasNav;
-use Filament\Schemas\Schema;
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\RecommendationBlockResource\Pages;
 use App\Models\RecommendationBlock;
 use App\Models\Scopes\ActiveScope;
+use App\Support\Concerns\HasNav;
 use App\Support\Recommendations\RecommendationBlockOptions;
 use BackedEnum;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section as SchemaSection;
-use Novadaemon\FilamentCombobox\Combobox;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Novadaemon\FilamentCombobox\Combobox;
 use UnitEnum;
 
 /**
@@ -46,7 +44,7 @@ final class RecommendationBlockResource extends Resource
     /**
      * @var string|BackedEnum|null Tracks the navigation group while remaining Filament compatible.
      */
-    protected static \UnitEnum|string|null $navigationGroup = NavigationGroup::Products->value;
+    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Products->value;
 
     protected static ?int $navigationSort = 13;
 
@@ -60,7 +58,7 @@ final class RecommendationBlockResource extends Resource
         return __('recommendation_blocks.title');
     }
 
-    public static function getNavigationGroup(): \UnitEnum|string|null
+    public static function getNavigationGroup(): UnitEnum|string|null
     {
         // Delegates to the enum value so Filament keeps grouping consistent while still
         // accepting plain strings when Filament expects a literal label.
@@ -88,7 +86,7 @@ final class RecommendationBlockResource extends Resource
     /**
      * Configure the Filament form schema with fields and validation.
      */
-    public static function form(Schema $schema): Schema   
+    public static function form(Schema $schema): Schema
     {
         return $schema->schema([
             SchemaSection::make(__('recommendation_blocks.basic_information'))
@@ -164,7 +162,7 @@ final class RecommendationBlockResource extends Resource
     /**
      * Configure the Filament table with columns, filters, and actions.
      */
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         // Configure the table definition for the streamlined Filament v4 return type.
         return $table
@@ -257,10 +255,10 @@ final class RecommendationBlockResource extends Resource
     {
         return [
             'featured' => __('recommendation_blocks.types.featured'),
-            'related' => __('recommendation_blocks.types.related'),
-            'similar' => __('recommendation_blocks.types.similar'),
+            'related'  => __('recommendation_blocks.types.related'),
+            'similar'  => __('recommendation_blocks.types.similar'),
             'trending' => __('recommendation_blocks.types.trending'),
-            'recent' => __('recommendation_blocks.types.recent'),
+            'recent'   => __('recommendation_blocks.types.recent'),
         ];
     }
 
@@ -272,10 +270,10 @@ final class RecommendationBlockResource extends Resource
     protected static function getPositionOptions(): array
     {
         return [
-            'top' => __('recommendation_blocks.positions.top'),
-            'bottom' => __('recommendation_blocks.positions.bottom'),
+            'top'     => __('recommendation_blocks.positions.top'),
+            'bottom'  => __('recommendation_blocks.positions.bottom'),
             'sidebar' => __('recommendation_blocks.positions.sidebar'),
-            'inline' => __('recommendation_blocks.positions.inline'),
+            'inline'  => __('recommendation_blocks.positions.inline'),
         ];
     }
 

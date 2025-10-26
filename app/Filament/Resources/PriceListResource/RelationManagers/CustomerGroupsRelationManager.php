@@ -6,10 +6,8 @@ namespace App\Filament\Resources\PriceListResource\RelationManagers;
 
 use App\Filament\RelationManagers\Support\BaseRelationManager;
 use Filament\Actions\AttachAction;
-use Filament\Actions\DetachAction;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Model;
 
 final class CustomerGroupsRelationManager extends BaseRelationManager
@@ -21,7 +19,7 @@ final class CustomerGroupsRelationManager extends BaseRelationManager
         return __('price_lists.relation_managers.customer_groups.title');
     }
 
-    public function table(Table $table): Table   
+    public function table(Table $table): Table
     {
         // Configure the relation manager table to satisfy Filament v4's return type requirements.
         return $table

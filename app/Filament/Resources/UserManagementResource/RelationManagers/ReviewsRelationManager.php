@@ -4,14 +4,13 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\UserManagementResource\RelationManagers;
 
-
 use App\Filament\RelationManagers\Support\BaseRelationManager;
-use Filament\Schemas\Schema;
 use Filament\Actions\DeleteAction;
-use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms;
+use Filament\Schemas\Schema;
 use Filament\Tables;
+use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -27,7 +26,7 @@ final class ReviewsRelationManager extends BaseRelationManager
 
     protected static ?string $title = 'Reviews';
 
-    public function form(Schema $schema): Schema   
+    public function form(Schema $schema): Schema
     {
         return $schema
             ->components([
@@ -51,7 +50,7 @@ final class ReviewsRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table   
+    public function table(Table $table): Table
     {
         // Configure the relation manager table to satisfy Filament v4's return type requirements.
         return $table

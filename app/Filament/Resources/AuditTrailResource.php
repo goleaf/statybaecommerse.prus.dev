@@ -21,7 +21,7 @@ final class AuditTrailResource extends Resource
 {
     protected static ?string $model = AuditTrail::class;
 
-    protected static \UnitEnum|string|null $navigationGroup = 'Security';
+    protected static UnitEnum|string|null $navigationGroup = 'Security';
 
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-clipboard-document-check';
 
@@ -74,8 +74,8 @@ final class AuditTrailResource extends Resource
                 SelectFilter::make('event')
                     ->label(__('admin.audit_trails.filters.event'))
                     ->options([
-                        'price.updated' => __('admin.audit_trails.events.price_updated'),
-                        'inventory.updated' => __('admin.audit_trails.events.inventory_updated'),
+                        'price.updated'            => __('admin.audit_trails.events.price_updated'),
+                        'inventory.updated'        => __('admin.audit_trails.events.inventory_updated'),
                         'admin_user.roles.updated' => __('admin.audit_trails.events.roles_updated'),
                     ]),
             ])
@@ -122,7 +122,7 @@ final class AuditTrailResource extends Resource
     {
         return [
             'index' => Pages\ListAuditTrails::route('/'),
-            'view' => Pages\ViewAuditTrail::route('/{record}'),
+            'view'  => Pages\ViewAuditTrail::route('/{record}'),
         ];
     }
 }

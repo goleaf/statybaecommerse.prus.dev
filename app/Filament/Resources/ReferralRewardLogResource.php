@@ -4,23 +4,20 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use App\Support\Concerns\HasNav;
-use Filament\Schemas\Schema;
 use App\Filament\Resources\ReferralRewardLogResource\Pages;
 use App\Models\ReferralReward;
 use App\Models\ReferralRewardLog;
 use App\Models\User;
+use App\Support\Concerns\HasNav;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
-use Filament\Actions\ViewAction;
-use Filament\Schemas\Components\Grid as SchemaGrid;
-use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Grid as SchemaGrid;
+use Filament\Schemas\Components\Section as SchemaSection;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
@@ -44,7 +41,7 @@ final class ReferralRewardLogResource extends Resource
     /**
      * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
      */
-    protected static \UnitEnum|string|null $navigationGroup = 'Analytics';
+    protected static UnitEnum|string|null $navigationGroup = 'Analytics';
 
     public static function getNavigationLabel(): string
     {
@@ -61,7 +58,7 @@ final class ReferralRewardLogResource extends Resource
         return __('admin.referral_reward_logs.model_label');
     }
 
-    public static function form(Schema $schema): Schema   
+    public static function form(Schema $schema): Schema
     {
         return $schema
             ->schema([
@@ -105,7 +102,7 @@ final class ReferralRewardLogResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         // Configure the table definition for the streamlined Filament v4 return type.
         return $table
@@ -124,11 +121,11 @@ final class ReferralRewardLogResource extends Resource
                     ->label(__('admin.referral_reward_logs.action'))
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        ReferralRewardLog::ACTION_EARNED => 'success',
-                        ReferralRewardLog::ACTION_REDEEMED => 'info',
-                        ReferralRewardLog::ACTION_EXPIRED => 'warning',
+                        ReferralRewardLog::ACTION_EARNED    => 'success',
+                        ReferralRewardLog::ACTION_REDEEMED  => 'info',
+                        ReferralRewardLog::ACTION_EXPIRED   => 'warning',
                         ReferralRewardLog::ACTION_CANCELLED => 'danger',
-                        default => 'gray',
+                        default                             => 'gray',
                     }),
 
                 TextColumn::make('ip_address')

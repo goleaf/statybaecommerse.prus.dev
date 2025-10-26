@@ -10,7 +10,6 @@ use Filament\Actions;
 
 final class ListMenus extends BaseListRecords
 {
-    
     protected static string $resource = MenuResource::class;
 
     protected function getHeaderActions(): array

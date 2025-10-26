@@ -14,7 +14,7 @@ use Illuminate\Database\Eloquent\Builder;
 
 final class ListProducts extends BaseListRecords
 {
-        use HasWidgetTabs;
+    use HasWidgetTabs;
 
     protected static string $resource = ProductResource::class;
 

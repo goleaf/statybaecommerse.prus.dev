@@ -10,7 +10,6 @@ use Filament\Actions;
 
 final class ListCoupons extends BaseListRecords
 {
-    
     protected static string $resource = CouponResource::class;
 
     protected function getHeaderActions(): array

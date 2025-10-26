@@ -3,18 +3,16 @@
 declare(strict_types=1);
 
 namespace App\Filament\Resources\Sliders;
-use App\Support\Concerns\HasNav;
 
-
-use Filament\Schemas\Schema;
 use App\Filament\Resources\Sliders\Pages\CreateSlider;
 use App\Filament\Resources\Sliders\Pages\EditSlider;
 use App\Filament\Resources\Sliders\Pages\ListSliders;
 use App\Filament\Resources\Sliders\Schemas\SliderForm;
 use App\Filament\Resources\Sliders\Tables\SlidersTable;
-use App\Models\Slider;
+use App\Support\Concerns\HasNav;
 use BackedEnum;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use UnitEnum;
@@ -31,21 +29,21 @@ final class SliderResource extends Resource
     /**
      * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
      */
-    protected static \UnitEnum|string|null $navigationGroup = NavigationGroup::Content->value;
+    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Content->value;
 
     /**
-     * @var \UnitEnum|string|null
+     * @var UnitEnum|string|null
      */
     protected static ?int $navigationSort = 1;
 
     protected static ?string $recordTitleAttribute = 'title';
 
-    public static function form(Schema $schema): Schema   
+    public static function form(Schema $schema): Schema
     {
         return SliderForm::configure($schema);
     }
 
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         // Configure the table definition for the streamlined Filament v4 return type.
         return SlidersTable::configure($table);

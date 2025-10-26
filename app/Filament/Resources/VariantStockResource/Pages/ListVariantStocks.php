@@ -9,6 +9,5 @@ use App\Filament\Resources\VariantStockResource;
 
 final class ListVariantStocks extends BaseListRecords
 {
-    
     protected static string $resource = VariantStockResource::class;
 }

@@ -4,20 +4,19 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use App\Support\Concerns\HasNav;
-use Filament\Schemas\Schema;
 use App\Filament\Resources\PriceResource\Pages;
 use App\Models\Price;
 use App\Models\Product;
+use App\Support\Concerns\HasNav;
 use App\Support\Filament\SearchableInputHelper;
 use App\Support\Search\ProductSearch;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
-use Filament\Schemas\Components\Grid as SchemaGrid;
-use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Set;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Grid as SchemaGrid;
+use Filament\Schemas\Components\Section as SchemaSection;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
@@ -34,11 +33,11 @@ final class PriceResource extends Resource
     /**
      * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
      */
-    protected static \UnitEnum|string|null $navigationGroup = 'Products';
+    protected static UnitEnum|string|null $navigationGroup = 'Products';
 
     protected static ?int $navigationSort = 12;
 
-    public static function form(Schema $schema): Schema   
+    public static function form(Schema $schema): Schema
     {
         return $schema
             ->schema([
@@ -148,8 +147,8 @@ final class PriceResource extends Resource
                         Select::make('type')
                             ->label(__('admin.prices.price_type'))
                             ->options([
-                                'regular' => __('admin.prices.price_types.regular'),
-                                'sale' => __('admin.prices.price_types.sale'),
+                                'regular'   => __('admin.prices.price_types.regular'),
+                                'sale'      => __('admin.prices.price_types.sale'),
                                 'wholesale' => __('admin.prices.price_types.wholesale'),
                             ])
                             ->required()
@@ -234,7 +233,7 @@ final class PriceResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         // Configure the table definition for the streamlined Filament v4 return type.
         return $table
@@ -273,11 +272,11 @@ final class PriceResource extends Resource
                 TextColumn::make('type')
                     ->label(__('admin.prices.price_type'))
                     ->badge()
-                    ->formatStateUsing(static fn (?string $state): string => __('admin.prices.price_types.'.($state ?? 'regular')))
+                    ->formatStateUsing(static fn (?string $state): string => __('admin.prices.price_types.' . ($state ?? 'regular')))
                     ->color(static fn (?string $state): string => match ($state) {
-                        'sale' => 'success',
+                        'sale'      => 'success',
                         'wholesale' => 'warning',
-                        default => 'primary',
+                        default     => 'primary',
                     })
                     ->sortable(),
                 IconColumn::make('is_enabled')
@@ -322,7 +321,7 @@ final class PriceResource extends Resource
                 SelectFilter::make('priceable_type')
                     ->label(__('admin.prices.filters.priceable_type'))
                     ->options([
-                        Product::class => __('admin.prices.priceable_types.product'),
+                        Product::class        => __('admin.prices.priceable_types.product'),
                         ProductVariant::class => __('admin.prices.priceable_types.variant'),
                     ]),
                 SelectFilter::make('currency_id')
@@ -338,9 +337,9 @@ final class PriceResource extends Resource
                         Select::make('stage')
                             ->label(__('admin.prices.filters.lifecycle_stage'))
                             ->options([
-                                'active' => __('admin.prices.filters.lifecycle_options.active'),
+                                'active'   => __('admin.prices.filters.lifecycle_options.active'),
                                 'upcoming' => __('admin.prices.filters.lifecycle_options.upcoming'),
-                                'expired' => __('admin.prices.filters.lifecycle_options.expired'),
+                                'expired'  => __('admin.prices.filters.lifecycle_options.expired'),
                             ]),
                     ])
                     ->query(static function (Builder $query, array $data): Builder {

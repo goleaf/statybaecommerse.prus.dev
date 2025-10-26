@@ -12,7 +12,6 @@ use Filament\Actions;
 
 final class ListCustomers extends BaseListRecords
 {
-    
     protected static string $resource = CustomerResource::class;
 
     protected function getHeaderActions(): array

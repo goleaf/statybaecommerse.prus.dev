@@ -3,19 +3,17 @@
 declare(strict_types=1);
 
 namespace App\Filament\Resources\UserProductInteractions;
-use App\Support\Concerns\HasNav;
 
-
-use Filament\Schemas\Schema;
 use App\Filament\Resources\UserProductInteractions\Pages\CreateUserProductInteraction;
 use App\Filament\Resources\UserProductInteractions\Pages\EditUserProductInteraction;
 use App\Filament\Resources\UserProductInteractions\Pages\ListUserProductInteractions;
 use App\Filament\Resources\UserProductInteractions\Schemas\UserProductInteractionForm;
 use App\Filament\Resources\UserProductInteractions\Tables\UserProductInteractionsTable;
 use App\Models\UserProductInteraction;
+use App\Support\Concerns\HasNav;
 use BackedEnum;
 use Filament\Resources\Resource;
-use Filament\Support\Icons\Heroicon;
+use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
 
@@ -37,12 +35,12 @@ class UserProductInteractionResource extends Resource
         return 'user-product-interactions-v4';
     }
 
-    public static function form(Schema $schema): Schema   
+    public static function form(Schema $schema): Schema
     {
         return UserProductInteractionForm::configure($schema);
     }
 
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         // Configure the table definition for the streamlined Filament v4 return type.
         return UserProductInteractionsTable::configure($table);

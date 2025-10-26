@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\DiscountResource\RelationManagers;
 
-
-use Filament\Schemas\Schema;
-use Filament\Forms;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
+use Filament\Forms;
+use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 
@@ -21,7 +20,7 @@ final class ConditionsRelationManager extends BaseRelationManager
 
     protected static ?string $pluralModelLabel = 'Conditions';
 
-    public function form(Schema $schema): Schema   
+    public function form(Schema $schema): Schema
     {
         return $schema
             ->schema([
@@ -63,7 +62,7 @@ final class ConditionsRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table   
+    public function table(Table $table): Table
     {
         // Configure the relation manager table to satisfy Filament v4's return type requirements.
         return $table

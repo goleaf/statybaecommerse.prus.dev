@@ -4,31 +4,29 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use App\Support\Concerns\HasNav;
-use Filament\Schemas\Schema;
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\NewsTagResource\Pages;
 use App\Models\NewsTag;
-use App\Models\Translations\NewsTagTranslation;
+use App\Support\Concerns\HasNav;
 use BackedEnum;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteBulkAction;
+use Filament\Actions\Action;
+use Filament\Actions\BulkAction as TableBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\ColorPicker;
-use Filament\Schemas\Components\Grid as FormGrid;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Repeater;
-use Filament\Schemas\Components\Section as FormSection;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Actions\Action;
-use Filament\Actions\BulkAction as TableBulkAction;
+use Filament\Schemas\Components\Grid as FormGrid;
+use Filament\Schemas\Components\Section as FormSection;
+use Filament\Schemas\Schema;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -52,7 +50,7 @@ final class NewsTagResource extends Resource
         return 'heroicon-o-tag';
     }
 
-    public static function getNavigationGroup(): \UnitEnum|string|null
+    public static function getNavigationGroup(): UnitEnum|string|null
     {
         // Returning the localized label keeps Filament aware of the navigation metadata introduced in v4.
         $group = NavigationGroup::News;
@@ -72,7 +70,7 @@ final class NewsTagResource extends Resource
         return __('admin.news_tags.single');
     }
 
-    public static function form(Schema $schema): Schema   
+    public static function form(Schema $schema): Schema
     {
         return $schema->schema([
             FormSection::make(__('admin.news_tags.form.sections.basic_information'))
@@ -157,7 +155,7 @@ final class NewsTagResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         // Configure the table definition for the streamlined Filament v4 return type.
         return $table

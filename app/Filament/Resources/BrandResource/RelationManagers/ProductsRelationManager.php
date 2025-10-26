@@ -4,15 +4,14 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\BrandResource\RelationManagers;
 
-
 use App\Filament\RelationManagers\Support\BaseRelationManager;
-use Filament\Schemas\Schema;
 use App\Models\Product;
 use Filament\Actions\DeleteAction;
-use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms;
+use Filament\Schemas\Schema;
 use Filament\Tables;
+use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -23,7 +22,7 @@ final class ProductsRelationManager extends BaseRelationManager
 
     protected static ?string $title = 'Brand Products';
 
-    public function form(Schema $schema): Schema   
+    public function form(Schema $schema): Schema
     {
         return $schema
             ->schema([
@@ -58,7 +57,7 @@ final class ProductsRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table   
+    public function table(Table $table): Table
     {
         // Configure the relation manager table to satisfy Filament v4's return type requirements.
         return $table

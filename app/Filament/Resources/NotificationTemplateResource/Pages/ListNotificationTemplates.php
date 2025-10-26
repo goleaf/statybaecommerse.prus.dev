@@ -10,7 +10,6 @@ use Filament\Actions;
 
 final class ListNotificationTemplates extends BaseListRecords
 {
-    
     protected static string $resource = NotificationTemplateResource::class;
 
     protected function getHeaderActions(): array

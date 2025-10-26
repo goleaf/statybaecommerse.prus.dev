@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Builder;
 
 final class ListProductVariants extends BaseListRecords
 {
-        use HasWidgetTabs;
+    use HasWidgetTabs;
 
     protected static string $resource = ProductVariantResource::class;
 

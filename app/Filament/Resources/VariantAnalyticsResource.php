@@ -4,25 +4,23 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use Filament\Schemas\Schema;
 use App\Enums\NavigationGroup;
-use BackedEnum;
-use UnitEnum;
 use App\Filament\Resources\VariantAnalyticsResource\Pages;
-use App\Models\ProductVariant;
 use App\Models\VariantAnalytics;
-use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
-use Filament\Forms;
 use App\Support\DateRange;
+use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
+use BackedEnum;
+use Filament\Forms;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Support\Facades\FilamentNumber;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Contracts\Support\Htmlable;
+use UnitEnum;
 
 final class VariantAnalyticsResource extends Resource
 {
@@ -36,9 +34,9 @@ final class VariantAnalyticsResource extends Resource
     /**
      * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
      */
-    protected static \UnitEnum|string|null $navigationGroup = NavigationGroup::Inventory->value;
+    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Inventory->value;
 
-    public static function getNavigationGroup(): \UnitEnum|string|null
+    public static function getNavigationGroup(): UnitEnum|string|null
     {
         // Centralize the NavigationGroup handling to leverage enum labels.
         $group = self::$navigationGroup;
@@ -68,7 +66,7 @@ final class VariantAnalyticsResource extends Resource
         return __('admin.variant_analytics.model_label');
     }
 
-    public static function form(Schema $schema): Schema   
+    public static function form(Schema $schema): Schema
     {
         return $schema
             ->schema([
@@ -108,6 +106,7 @@ final class VariantAnalyticsResource extends Resource
                                                             return '';
                                                         }
                                                         $variant = \App\Models\ProductVariant::query()->with('product:id,name')->find($variantId);
+
                                                         return $variant?->name ?? '';
                                                     })
                                                     ->visible(static function (callable $get, ?VariantAnalytics $record): bool {
@@ -125,6 +124,7 @@ final class VariantAnalyticsResource extends Resource
                                                             return '';
                                                         }
                                                         $variant = \App\Models\ProductVariant::query()->with('product:id,name')->find($variantId);
+
                                                         return $variant?->product?->name ?? '';
                                                     })
                                                     ->visible(static function (callable $get, ?VariantAnalytics $record): bool {
@@ -264,7 +264,7 @@ final class VariantAnalyticsResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         // Configure the table definition for the streamlined Filament v4 return type.
         return $table

@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\DiscountRedemptionResource\RelationManagers;
 
-
-use Filament\Schemas\Schema;
-use Filament\Forms;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
+use Filament\Forms;
+use Filament\Schemas\Schema;
 use Filament\Support\Enums\FontWeight;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -22,7 +21,7 @@ class DiscountRelationManager extends BaseRelationManager
 
     protected static ?string $pluralModelLabel = 'Discounts';
 
-    public function form(Schema $schema): Schema   
+    public function form(Schema $schema): Schema
     {
         return $schema
             ->schema([
@@ -55,7 +54,7 @@ class DiscountRelationManager extends BaseRelationManager
             ]);
     }
 
-    public function table(Table $table): Table   
+    public function table(Table $table): Table
     {
         // Configure the relation manager table to satisfy Filament v4's return type requirements.
         return $table

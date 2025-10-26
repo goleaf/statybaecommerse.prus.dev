@@ -11,7 +11,6 @@ use Filament\Actions;
 
 final class ListBrands extends BaseListRecords
 {
-    
     protected static string $resource = BrandResource::class;
 
     protected function getHeaderActions(): array

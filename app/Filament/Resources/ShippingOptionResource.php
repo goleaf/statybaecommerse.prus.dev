@@ -4,25 +4,24 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use App\Support\Concerns\HasNav;
-use App\Models\City;
-use Filament\Schemas\Schema;
 use App\Filament\Resources\ShippingOptionResource\Pages;
+use App\Models\City;
 use App\Models\ShippingOption;
+use App\Support\Concerns\HasNav;
 use App\Support\Forms\MatrixFactory;
-use Filament\Tables\Actions\BulkActionGroup;
-use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Schemas\Components\Grid as SchemaGrid;
-use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Get;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Grid as SchemaGrid;
+use Filament\Schemas\Components\Section as SchemaSection;
+use Filament\Schemas\Schema;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -31,7 +30,6 @@ use Filament\Tables\Table;
 use Illuminate\Support\Number;
 use Illuminate\Support\Str;
 use Tapp\FilamentValueRangeFilter\Filters\ValueRangeFilter;
-use UnitEnum;
 
 /**
  * ShippingOptionResource

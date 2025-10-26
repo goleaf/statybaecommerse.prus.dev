@@ -4,25 +4,23 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use App\Support\Concerns\HasNav;
-use Filament\Schemas\Schema;
 use App\Filament\Resources\ReferralCodeStatisticsResource\Pages;
-use App\Models\ReferralCode;
 use App\Models\ReferralCodeStatistics;
+use App\Support\Concerns\HasNav;
 use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Schemas\Components\Grid as SchemaGrid;
-use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Grid as SchemaGrid;
+use Filament\Schemas\Components\Section as SchemaSection;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use UnitEnum;
 
@@ -44,7 +42,7 @@ final class ReferralCodeStatisticsResource extends Resource
     /**
      * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
      */
-    protected static \UnitEnum|string|null $navigationGroup = 'Analytics';
+    protected static UnitEnum|string|null $navigationGroup = 'Analytics';
 
     public static function getNavigationLabel(): string
     {
@@ -61,7 +59,7 @@ final class ReferralCodeStatisticsResource extends Resource
         return __('admin.referral_code_statistics.model_label');
     }
 
-    public static function form(Schema $schema): Schema   
+    public static function form(Schema $schema): Schema
     {
         return $schema
             ->schema([
@@ -125,7 +123,7 @@ final class ReferralCodeStatisticsResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         // Configure the table definition for the streamlined Filament v4 return type.
         return $table
@@ -180,11 +178,11 @@ final class ReferralCodeStatisticsResource extends Resource
                         $indicators = [];
 
                         if ($data['from'] ?? null) {
-                            $indicators[] = __('admin.referral_code_statistics.date').' ≥ '.($data['from']);
+                            $indicators[] = __('admin.referral_code_statistics.date') . ' ≥ ' . ($data['from']);
                         }
 
                         if ($data['until'] ?? null) {
-                            $indicators[] = __('admin.referral_code_statistics.date').' ≤ '.($data['until']);
+                            $indicators[] = __('admin.referral_code_statistics.date') . ' ≤ ' . ($data['until']);
                         }
 
                         return $indicators;

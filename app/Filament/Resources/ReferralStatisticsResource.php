@@ -4,16 +4,14 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Support\DateRange;
 use App\Filament\Resources\ReferralStatisticsResource\Pages;
 use App\Models\ReferralStatistics;
+use App\Support\DateRange;
 use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
 use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
-use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
-use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\KeyValue;
@@ -24,6 +22,8 @@ use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Schemas\Schema;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
@@ -31,10 +31,11 @@ use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use UnitEnum;
 
 final class ReferralStatisticsResource extends Resource
 {
-    public static function getNavigationGroup(): \UnitEnum|string|null
+    public static function getNavigationGroup(): UnitEnum|string|null
     {
         return 'Referral';
     }
@@ -65,7 +66,7 @@ final class ReferralStatisticsResource extends Resource
         return __('referral_statistics.single');
     }
 
-    public static function form(Schema $schema): Schema   
+    public static function form(Schema $schema): Schema
     {
         return $schema
             ->columns(3)
@@ -145,7 +146,7 @@ final class ReferralStatisticsResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         // Configure the table definition for the streamlined Filament v4 return type.
         return $table
@@ -275,7 +276,7 @@ final class ReferralStatisticsResource extends Resource
             ->defaultSort('date', 'desc');
     }
 
-    public static function infolist(Schema $schema): Schema   
+    public static function infolist(Schema $schema): Schema
     {
         // Provide the infolist schema using the Filament v4 return type.
         return $schema

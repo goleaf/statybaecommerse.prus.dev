@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources\OrderResource\RelationManagers;
 
-
-use Filament\Schemas\Schema;
 use App\Filament\RelationManagers\Support\BaseRelationManager;
 use App\Models\OrderItem;
 use App\Support\Filament\ProductVariantFieldHelper;
@@ -16,7 +14,6 @@ use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
-use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Repeater;
@@ -27,6 +24,7 @@ use Filament\Forms\Set;
 use Filament\Notifications\Notification;
 use Filament\Schemas\Components\Grid as SchemaGrid;
 use Filament\Schemas\Components\Section as SchemaSection;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -59,7 +57,7 @@ final class OrderItemsRelationManager extends BaseRelationManager
     /**
      * Configure the form schema for order items.
      */
-    public function form(Schema $schema): Schema   
+    public function form(Schema $schema): Schema
     {
         return $schema
             ->schema([
@@ -83,11 +81,11 @@ final class OrderItemsRelationManager extends BaseRelationManager
                                             // Clear dependent pricing fields when the variant selection resets.
                                             SearchableInputHelper::clear($component, $set, [
                                                 'product_variant_id' => null,
-                                                'product_id' => null,
-                                                'name' => null,
-                                                'sku' => null,
-                                                'unit_price' => null,
-                                                'total' => 0,
+                                                'product_id'         => null,
+                                                'name'               => null,
+                                                'sku'                => null,
+                                                'unit_price'         => null,
+                                                'total'              => 0,
                                             ]);
 
                                             ProductVariantFieldHelper::handleVariantSelection(null, $set, $get, $component);
@@ -180,7 +178,7 @@ final class OrderItemsRelationManager extends BaseRelationManager
     /**
      * Configure the table for order items.
      */
-    public function table(Table $table): Table   
+    public function table(Table $table): Table
     {
         // Configure the relation manager table to satisfy Filament v4's return type requirements.
         return $table

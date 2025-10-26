@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace App\Filament\Resources\NewsTags\Tables;
 
 use App\Models\NewsTag;
+use Filament\Actions\Action;
+use Filament\Actions\BulkAction as TableBulkAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Notifications\Notification;
-use Filament\Actions\Action;
-use Filament\Actions\BulkAction as TableBulkAction;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;

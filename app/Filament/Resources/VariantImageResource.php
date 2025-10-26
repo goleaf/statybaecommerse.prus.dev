@@ -4,13 +4,11 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use BackedEnum;
-use Filament\Schemas\Schema;
 use App\Filament\Resources\VariantImageResource\Pages;
 use App\Models\ProductVariant;
 use App\Models\VariantImage;
 use App\Support\Storage\SecureStorage;
+use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
@@ -18,16 +16,16 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\FileUpload;
-use Filament\Schemas\Components\Grid as SchemaGrid;
-use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Placeholder;
-use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Grid as SchemaGrid;
+use Filament\Schemas\Components\Section as SchemaSection;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -37,6 +35,8 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Throwable;
+use UnitEnum;
 
 final class VariantImageResource extends Resource
 {
@@ -47,7 +47,7 @@ final class VariantImageResource extends Resource
      */
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-photo';
 
-    public static function getNavigationGroup(): \UnitEnum|string|null
+    public static function getNavigationGroup(): UnitEnum|string|null
     {
         return 'Inventory';
     }
@@ -69,7 +69,7 @@ final class VariantImageResource extends Resource
         return __('admin.variant_images.model_label');
     }
 
-    public static function form(Schema $schema): Schema   
+    public static function form(Schema $schema): Schema
     {
         return $schema->components([
             SchemaSection::make(__('admin.variant_images.basic_information'))
@@ -143,7 +143,7 @@ final class VariantImageResource extends Resource
                                         if ($dimensions !== false) {
                                             $set('dimensions', sprintf('%d×%d', $dimensions[0], $dimensions[1]));
                                         }
-                                    } catch (\Throwable) {
+                                    } catch (Throwable) {
                                         // Ignore failures while reading dimensions.
                                     }
                                 })
@@ -197,7 +197,7 @@ final class VariantImageResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         // Configure the table definition for the streamlined Filament v4 return type.
         return $table

@@ -15,7 +15,7 @@ use LaraZeus\SpatieTranslatable\Resources\Pages\ListRecords\Concerns\Translatabl
 
 final class ListSeoData extends BaseListRecords
 {
-        use HasWidgetTabs;
+    use HasWidgetTabs;
     use SpatieTranslatableListRecords; // Track the active locale for listing translated records.
 
     protected static string $resource = SeoDataResource::class;

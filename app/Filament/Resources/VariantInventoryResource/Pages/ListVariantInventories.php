@@ -10,7 +10,6 @@ use Filament\Actions\CreateAction;
 
 class ListVariantInventories extends BaseListRecords
 {
-    
     protected static string $resource = VariantInventoryResource::class;
 
     protected function getHeaderActions(): array

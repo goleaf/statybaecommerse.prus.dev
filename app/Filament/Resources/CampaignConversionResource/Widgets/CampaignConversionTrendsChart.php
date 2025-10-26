@@ -60,18 +60,18 @@ final class CampaignConversionTrendsChart extends ChartWidget
         return [
             'datasets' => [
                 [
-                    'label' => __('campaign_conversions.widgets.conversion_count'),
-                    'data' => $counts,
-                    'borderColor' => 'rgb(59, 130, 246)',
+                    'label'           => __('campaign_conversions.widgets.conversion_count'),
+                    'data'            => $counts,
+                    'borderColor'     => 'rgb(59, 130, 246)',
                     'backgroundColor' => 'rgba(59, 130, 246, 0.2)',
-                    'yAxisID' => 'y',
+                    'yAxisID'         => 'y',
                 ],
                 [
-                    'label' => __('campaign_conversions.widgets.conversion_value'),
-                    'data' => $values,
-                    'borderColor' => 'rgb(16, 185, 129)',
+                    'label'           => __('campaign_conversions.widgets.conversion_value'),
+                    'data'            => $values,
+                    'borderColor'     => 'rgb(16, 185, 129)',
                     'backgroundColor' => 'rgba(16, 185, 129, 0.2)',
-                    'yAxisID' => 'y1',
+                    'yAxisID'         => 'y1',
                 ],
             ],
             'labels' => $labels,
@@ -82,13 +82,13 @@ final class CampaignConversionTrendsChart extends ChartWidget
     {
         return [
             'maintainAspectRatio' => false,
-            'scales' => [
+            'scales'              => [
                 'y' => [
                     'beginAtZero' => true,
                 ],
                 'y1' => [
                     'beginAtZero' => true,
-                    'position' => 'right',
+                    'position'    => 'right',
                 ],
             ],
         ];

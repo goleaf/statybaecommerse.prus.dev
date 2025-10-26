@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use Filament\Schemas\Schema;
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\ReferralResource\Pages;
 use App\Models\Referral;
@@ -13,19 +11,20 @@ use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
 use BackedEnum;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
-use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\KeyValue;
-use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Section as SchemaSection;
+use Filament\Schemas\Schema;
+use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-use UnitEnum;
 use LaraZeus\SpatieTranslatable\Resources\Concerns\Translatable as SpatieTranslatableResource;
+use UnitEnum;
 
 final class ReferralResource extends Resource
 {
@@ -41,13 +40,13 @@ final class ReferralResource extends Resource
     /**
      * Navigation group for organizing the resource in the admin panel.
      */
-    protected static \UnitEnum|string|null $navigationGroup = NavigationGroup::Marketing->value; // Keep referrals with other marketing touchpoints.
+    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::Marketing->value; // Keep referrals with other marketing touchpoints.
 
     protected static ?int $navigationSort = 17;
 
     protected static ?string $recordTitleAttribute = 'referral_code';
 
-    public static function form(Schema $schema): Schema   
+    public static function form(Schema $schema): Schema
     {
         // Use the schema-based configuration to stay aligned with Filament v4 resource expectations.
         return $schema
@@ -137,7 +136,7 @@ final class ReferralResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         // Configure the table definition for the streamlined Filament v4 return type.
         return $table

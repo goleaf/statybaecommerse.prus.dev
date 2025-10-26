@@ -4,13 +4,11 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\NormalSettingTranslationResource\Pages;
 use App\Models\NormalSetting;
 use App\Models\NormalSettingTranslation;
 use BackedEnum;
-use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -42,7 +40,7 @@ final class NormalSettingTranslationResource extends Resource
     /**
      * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
      */
-    protected static \UnitEnum|string|null $navigationGroup = NavigationGroup::System->value;
+    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::System->value;
 
     protected static ?int $navigationSort = 16;
 
@@ -53,7 +51,7 @@ final class NormalSettingTranslationResource extends Resource
         return 'heroicon-o-language';
     }
 
-    public static function getNavigationGroup(): \UnitEnum|string|null
+    public static function getNavigationGroup(): UnitEnum|string|null
     {
         $group = NavigationGroup::System;
 
@@ -75,7 +73,7 @@ final class NormalSettingTranslationResource extends Resource
         return __('admin.normal_setting_translations.model_label');
     }
 
-    public static function form(Schema $schema): Schema   
+    public static function form(Schema $schema): Schema
     {
         return $schema
             ->schema([
@@ -115,7 +113,7 @@ final class NormalSettingTranslationResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         // Configure the table definition for the streamlined Filament v4 return type.
         return $table
@@ -130,11 +128,11 @@ final class NormalSettingTranslationResource extends Resource
                     ->label(__('admin.system_settings.normal_setting_translations.locale'))
                     ->badge()
                     ->color(fn (?string $state): string => match ($state) {
-                        'en' => 'success',
-                        'lt' => 'info',
-                        'de' => 'warning',
-                        'fr' => 'danger',
-                        'es' => 'primary',
+                        'en'    => 'success',
+                        'lt'    => 'info',
+                        'de'    => 'warning',
+                        'fr'    => 'danger',
+                        'es'    => 'primary',
                         default => 'gray',
                     })
                     ->formatStateUsing(fn (?string $state): ?string => Arr::get(self::getLocaleOptions(), $state, $state)),

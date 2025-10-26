@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Builder;
 
 class ListNormalSettings extends BaseListRecords
 {
-        use HasWidgetTabs;
+    use HasWidgetTabs;
 
     protected static string $resource = NormalSettingResource::class;
 

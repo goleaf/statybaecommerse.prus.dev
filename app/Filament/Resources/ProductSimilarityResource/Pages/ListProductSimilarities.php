@@ -10,7 +10,6 @@ use Filament\Actions;
 
 class ListProductSimilarities extends BaseListRecords
 {
-    
     protected static string $resource = ProductSimilarityResource::class;
 
     protected function getHeaderActions(): array

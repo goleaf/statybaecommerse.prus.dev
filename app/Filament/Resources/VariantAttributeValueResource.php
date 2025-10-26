@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use BackedEnum;
-use Filament\Schemas\Schema;
 use App\Filament\Resources\VariantAttributeValueResource\Pages;
 use App\Models\Attribute;
 use App\Models\ProductVariant;
@@ -15,6 +12,7 @@ use App\Models\Scopes\EnabledScope;
 use App\Models\Scopes\StatusScope;
 use App\Models\Scopes\VisibleScope;
 use App\Models\VariantAttributeValue;
+use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
@@ -22,14 +20,14 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Schemas\Components\Grid as SchemaGrid;
-use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Set;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Grid as SchemaGrid;
+use Filament\Schemas\Components\Section as SchemaSection;
+use Filament\Schemas\Schema;
 use Filament\Support\Enums\FontWeight;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -55,7 +53,7 @@ final class VariantAttributeValueResource extends Resource
     /**
      * Keeps the navigation group compatible with Filament's enum-based sidebar metadata.
      */
-    protected static \UnitEnum|string|null $navigationGroup = 'Inventory';
+    protected static UnitEnum|string|null $navigationGroup = 'Inventory';
 
     protected static ?int $navigationSort = 18;
 
@@ -74,7 +72,7 @@ final class VariantAttributeValueResource extends Resource
         return __('admin.variant_attribute_values.model_label');
     }
 
-    public static function form(Schema $schema): Schema   
+    public static function form(Schema $schema): Schema
     {
         return $schema->schema([
             SchemaSection::make(__('admin.variant_attribute_values.basic_information'))
@@ -203,7 +201,7 @@ final class VariantAttributeValueResource extends Resource
         ]);
     }
 
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         // Configure the table definition for the streamlined Filament v4 return type.
         return $table

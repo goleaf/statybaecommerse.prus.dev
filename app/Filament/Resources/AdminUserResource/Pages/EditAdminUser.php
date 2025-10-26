@@ -91,7 +91,7 @@ class EditAdminUser extends EditRecord
         AuditTrail::record($admin, [
             'roles' => [
                 'previous' => $this->originalRoleNames,
-                'current' => $freshRoleNames,
+                'current'  => $freshRoleNames,
             ],
         ], 'admin_user.roles.updated', $this->auditReason);
 
@@ -102,7 +102,7 @@ class EditAdminUser extends EditRecord
     }
 
     /**
-     * @param  array<int, int>|null  $ids
+     * @param array<int, int>|null $ids
      */
     private function rolesChanged(?array $ids = null): bool
     {
@@ -112,7 +112,7 @@ class EditAdminUser extends EditRecord
     }
 
     /**
-     * @param  array<mixed>  $ids
+     * @param  array<mixed>    $ids
      * @return array<int, int>
      */
     private function normalizeIds(array $ids): array
@@ -131,7 +131,7 @@ class EditAdminUser extends EditRecord
     }
 
     /**
-     * @param  array<mixed>  $names
+     * @param  array<mixed>       $names
      * @return array<int, string>
      */
     private function normalizeRoleNames(array $names): array

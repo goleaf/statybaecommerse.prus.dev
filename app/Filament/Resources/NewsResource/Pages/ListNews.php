@@ -16,7 +16,7 @@ use Illuminate\Database\Eloquent\Builder;
 
 final class ListNews extends BaseListRecords
 {
-        use HasWidgetTabs;
+    use HasWidgetTabs;
 
     protected static string $resource = NewsResource::class;
 

@@ -9,7 +9,6 @@ use Filament\Actions\AttachAction;
 use Filament\Actions\DetachAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
-use Filament\Schemas\Schema;
 
 class CollectionsRelationManager extends BaseRelationManager
 {
@@ -21,7 +20,7 @@ class CollectionsRelationManager extends BaseRelationManager
 
     protected static ?string $pluralModelLabel = 'Collections';
 
-    public function table(Table $table): Table   
+    public function table(Table $table): Table
     {
         // Configure the relation manager table to satisfy Filament v4's return type requirements.
         return $table

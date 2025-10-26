@@ -10,7 +10,6 @@ use Filament\Actions;
 
 class ListCampaignSchedules extends BaseListRecords
 {
-    
     protected static string $resource = CampaignScheduleResource::class;
 
     protected function getHeaderActions(): array

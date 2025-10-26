@@ -4,20 +4,17 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-use App\Support\Concerns\HasNav;
-use UnitEnum;
-use BackedEnum;
 use App\Enums\NavigationGroup;
 use App\Filament\Resources\ReviewResource\Pages;
 use App\Models\Review;
+use App\Support\Concerns\HasNav;
+use BackedEnum;
 use EncoreDigitalGroup\Filament\Helpers\InputTypes\Select\NumericScale;
 use EncoreDigitalGroup\Filament\Helpers\InputTypes\Select\Select as SelectInput;
 use EncoreDigitalGroup\Filament\Helpers\InputTypes\Text\TextInput as TextInputInput;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
-use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
-use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\Textarea;
@@ -26,9 +23,11 @@ use Filament\Infolists\Components\IconEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Schemas\Components\Section as InfolistSection;
+use Filament\Schemas\Components\Section as SchemaSection;
 use Filament\Schemas\Schema;
+use Filament\Tables\Actions\BulkActionGroup;
+use Filament\Tables\Actions\DeleteBulkAction;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -38,6 +37,7 @@ use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use UnitEnum;
 
 final class ReviewResource extends Resource
 {
@@ -55,9 +55,9 @@ final class ReviewResource extends Resource
     /**
      * @var string|BackedEnum|null Allow enum-backed navigation grouping.
      */
-    protected static \UnitEnum|string|null $navigationGroup = NavigationGroup::ContentManagement->value;
+    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::ContentManagement->value;
 
-    public static function getNavigationGroup(): \UnitEnum|string|null
+    public static function getNavigationGroup(): UnitEnum|string|null
     {
         // Convert enum-backed navigation groups into translated labels automatically.
         $group = self::$navigationGroup;
@@ -80,7 +80,7 @@ final class ReviewResource extends Resource
         return __('reviews.single');
     }
 
-    public static function form(Schema $schema): Schema   
+    public static function form(Schema $schema): Schema
     {
         return $schema
             ->schema([
@@ -153,7 +153,7 @@ final class ReviewResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         // Configure the table definition for the streamlined Filament v4 return type.
         return $table
@@ -396,7 +396,7 @@ final class ReviewResource extends Resource
             ->defaultSort('created_at', 'desc');
     }
 
-    public static function infolist(Schema $schema): Schema   
+    public static function infolist(Schema $schema): Schema
     {
         // Provide the infolist schema using the Filament v4 return type.
         return $schema

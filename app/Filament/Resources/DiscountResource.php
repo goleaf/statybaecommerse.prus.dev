@@ -21,20 +21,18 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
-use Filament\Tables;
-use Filament\Tables\Table;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
-use Filament\Notifications\Notification;
+use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
@@ -45,18 +43,18 @@ final class DiscountResource extends Resource
     use HasNav;
 
     private const TYPE_OPTIONS = [
-        'percentage' => 'Percentage',
-        'fixed' => 'Fixed Amount',
+        'percentage'    => 'Percentage',
+        'fixed'         => 'Fixed Amount',
         'free_shipping' => 'Free Shipping',
-        'bogo' => 'Buy One Get One',
+        'bogo'          => 'Buy One Get One',
     ];
 
     private const STATUS_OPTIONS = [
-        'draft' => 'Draft',
-        'active' => 'Active',
+        'draft'     => 'Draft',
+        'active'    => 'Active',
         'scheduled' => 'Scheduled',
-        'expired' => 'Expired',
-        'archived' => 'Archived',
+        'expired'   => 'Expired',
+        'archived'  => 'Archived',
     ];
 
     protected static ?string $model = Discount::class;
@@ -65,8 +63,6 @@ final class DiscountResource extends Resource
     {
         return 'heroicon-o-tag';
     }
-
-    
 
     protected static ?int $navigationSort = 1;
 
@@ -123,11 +119,11 @@ final class DiscountResource extends Resource
                 BadgeColumn::make('type')
                     ->label(__('translations.type'))
                     ->colors([
-                        'percentage' => 'success',
-                        'fixed' => 'info',
-                        'free_shipping' => 'primary',
+                        'percentage'      => 'success',
+                        'fixed'           => 'info',
+                        'free_shipping'   => 'primary',
                         'buy_one_get_one' => 'warning',
-                        'bogo' => 'warning',
+                        'bogo'            => 'warning',
                     ])
                     ->formatStateUsing(fn (?string $state): string => self::getTypeLabel($state))
                     ->sortable()
@@ -135,11 +131,11 @@ final class DiscountResource extends Resource
                 BadgeColumn::make('status')
                     ->label(__('translations.status'))
                     ->colors([
-                        'active' => 'success',
-                        'draft' => 'gray',
+                        'active'    => 'success',
+                        'draft'     => 'gray',
                         'scheduled' => 'warning',
-                        'expired' => 'danger',
-                        'paused' => 'warning',
+                        'expired'   => 'danger',
+                        'paused'    => 'warning',
                     ])
                     ->formatStateUsing(fn (?string $state): string => self::getStatusLabel($state))
                     ->sortable()
@@ -411,7 +407,6 @@ final class DiscountResource extends Resource
             ]);
     }
 
-
     public static function duplicateDiscount(Discount $discount): Discount
     {
         $newDiscount = $discount->replicate();
@@ -464,7 +459,7 @@ final class DiscountResource extends Resource
 
     private static function generateDuplicateName(string $name): string
     {
-        return trim($name.' (Copy)');
+        return trim($name . ' (Copy)');
     }
 
     private static function generateDuplicateSlug(?string $slug, string $name): ?string
@@ -475,11 +470,11 @@ final class DiscountResource extends Resource
             return null;
         }
 
-        $candidate = $base.'-copy';
+        $candidate = $base . '-copy';
         $counter = 2;
 
         while (Discount::where('slug', $candidate)->exists()) {
-            $candidate = $base.'-copy-'.$counter;
+            $candidate = $base . '-copy-' . $counter;
             $counter++;
         }
 

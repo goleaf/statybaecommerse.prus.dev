@@ -4,20 +4,19 @@ declare(strict_types=1);
 
 namespace App\Filament\Resources;
 
-
-use App\Support\Concerns\HasNav;
-use Filament\Schemas\Schema;
 use App\Enums\NavigationGroup;
-use BackedEnum;
-use UnitEnum;
 use App\Filament\Resources\VariantPriceHistoryResource\Pages;
 use App\Models\VariantPriceHistory;
+use App\Support\Concerns\HasNav;
 use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
+use BackedEnum;
 use Filament\Forms;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use UnitEnum;
 
 final class VariantPriceHistoryResource extends Resource
 {
@@ -29,11 +28,11 @@ final class VariantPriceHistoryResource extends Resource
     protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-currency-euro';
 
     /** @var string|BackedEnum|null Navigation grouping centralized via enum. */
-    protected static \UnitEnum|string|null $navigationGroup = NavigationGroup::System->value;
+    protected static UnitEnum|string|null $navigationGroup = NavigationGroup::System->value;
 
     protected static ?int $navigationSort = 20;
 
-    public static function getNavigationGroup(): \UnitEnum|string|null
+    public static function getNavigationGroup(): UnitEnum|string|null
     {
         // Resolve enum-backed navigation label so the sidebar remains localized.
         $group = self::$navigationGroup;
@@ -51,7 +50,7 @@ final class VariantPriceHistoryResource extends Resource
         return $group;
     }
 
-    public static function form(Schema $schema): Schema   
+    public static function form(Schema $schema): Schema
     {
         return $schema
             ->schema([
@@ -106,7 +105,7 @@ final class VariantPriceHistoryResource extends Resource
             ]);
     }
 
-    public static function table(Table $table): Table   
+    public static function table(Table $table): Table
     {
         // Configure the table definition for the streamlined Filament v4 return type.
         return $table

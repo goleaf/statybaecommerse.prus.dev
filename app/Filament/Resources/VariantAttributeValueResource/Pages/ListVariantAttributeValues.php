@@ -10,7 +10,6 @@ use Filament\Actions;
 
 final class ListVariantAttributeValues extends BaseListRecords
 {
-    
     protected static string $resource = VariantAttributeValueResource::class;
 
     protected function getHeaderActions(): array

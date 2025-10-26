@@ -10,7 +10,6 @@ use Filament\Actions\CreateAction;
 
 final class ListChannels extends BaseListRecords
 {
-    
     protected static string $resource = ChannelResource::class;
 
     protected function getHeaderActions(): array
