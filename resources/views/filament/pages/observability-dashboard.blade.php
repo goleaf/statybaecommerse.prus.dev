@@ -3,6 +3,63 @@
 <x-filament-panels::page>
     <div class="space-y-6">
         <x-filament::card>
+            {{-- Open PR watch list surfaces engineering efforts awaiting merge readiness. --}}
+            <div class="space-y-4">
+                <div class="flex flex-col justify-between gap-2 md:flex-row md:items-center">
+                    <div>
+                        <h2 class="text-lg font-semibold text-gray-900">Open PR watch list</h2>
+                        <p class="text-sm text-gray-600">Track pending pull requests slated for a follow-up merge.</p>
+                    </div>
+                    <span class="inline-flex items-center gap-2 rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-amber-700">
+                        <span class="h-2 w-2 rounded-full bg-amber-500"></span>
+                        Watching
+                    </span>
+                </div>
+                <div class="overflow-hidden rounded-lg border border-gray-200">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th scope="col" class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">PR</th>
+                                <th scope="col" class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Summary</th>
+                                <th scope="col" class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200 bg-white">
+                            @forelse ($this->openPrWatchList as $pullRequest)
+                                <tr>
+                                    <td class="px-4 py-3 text-sm font-semibold text-gray-900">
+                                        {{-- Link directly to GitHub when a URL is available for deeper review context. --}}
+                                        @if (! empty($pullRequest['url']))
+                                            <a
+                                                href="{{ $pullRequest['url'] }}"
+                                                target="_blank"
+                                                rel="noreferrer"
+                                                class="inline-flex items-center gap-1 text-primary-600 hover:text-primary-700"
+                                            >
+                                                #{{ $pullRequest['number'] }}
+                                                <x-heroicon-o-arrow-top-right-on-square class="h-4 w-4" />
+                                            </a>
+                                        @else
+                                            #{{ $pullRequest['number'] }}
+                                        @endif
+                                    </td>
+                                    <td class="px-4 py-3 text-sm text-gray-900">
+                                        <span class="font-medium">{{ $pullRequest['title'] }}</span>
+                                    </td>
+                                    <td class="px-4 py-3 text-sm text-gray-600">{{ $pullRequest['description'] }}</td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="3" class="px-4 py-3 text-sm text-gray-500">No pull requests require additional monitoring right now.</td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </x-filament::card>
+
+        <x-filament::card>
             <div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
                 <div class="rounded-lg bg-gray-50 p-4">
                     <dt class="text-sm font-medium text-gray-500">Active queues</dt>
