@@ -50,6 +50,21 @@ class Delivery extends StepComponent
     }
 
     /**
+     * Allow the frontend to explicitly trigger a shipping refresh.
+     *
+     * This method is invoked both on initial render via `wire:init` and when the
+     * shopper taps the "Recalculate" control to pull the latest resolver output.
+     */
+    public function recalculate(): void
+    {
+        // Normalise the identifier from the checkout payload to guard against nulls.
+        $shippingAddressId = data_get(session()->get('checkout'), 'shipping_address.id');
+        $normalizedId = is_numeric($shippingAddressId) ? (int) $shippingAddressId : null;
+
+        $this->recalculateOptions($normalizedId);
+    }
+
+    /**
      * Refresh shipping options whenever the shipping address changes upstream.
      */
     #[On('shipping-address-updated')]
