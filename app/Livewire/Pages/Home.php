@@ -38,10 +38,11 @@ final class Home extends Component
     {
         $locale = app()->getLocale();
 
-        return TagAwareCache::remember(
+        /** @var array<string, int|float> $stats */
+        $stats = TagAwareCache::remember(
             CacheKeys::homeStats($locale),
             now()->addSeconds(60),
-            function (): array {
+            static function (): array {
                 return [
                     'products_count' => Product::query()->where('is_visible', true)->count(),
                     'categories_count' => Category::query()->where('is_visible', true)->count(),
@@ -60,6 +61,8 @@ final class Home extends Component
                 CacheKeys::productAggregateTag(),
             ]
         );
+
+        return $stats;
     }
 
     /**
@@ -70,7 +73,8 @@ final class Home extends Component
     {
         $locale = app()->getLocale();
 
-        return TagAwareCache::remember(
+        /** @var Collection<int, Product> $products */
+        $products = TagAwareCache::remember(
             CacheKeys::homeFeaturedProducts($locale),
             now()->addSeconds(60),
             static function (): Collection {
@@ -91,6 +95,8 @@ final class Home extends Component
                 CacheKeys::homeTag(),
             ]
         );
+
+        return $products;
     }
 
     /**
@@ -101,7 +107,8 @@ final class Home extends Component
     {
         $locale = app()->getLocale();
 
-        return TagAwareCache::remember(
+        /** @var Collection<int, Product> $products */
+        $products = TagAwareCache::remember(
             CacheKeys::homeLatestProducts($locale),
             now()->addSeconds(60),
             static function (): Collection {
@@ -121,6 +128,8 @@ final class Home extends Component
                 CacheKeys::homeTag(),
             ]
         );
+
+        return $products;
     }
 
     /**
@@ -131,7 +140,8 @@ final class Home extends Component
     {
         $locale = app()->getLocale();
 
-        return TagAwareCache::remember(
+        /** @var Collection<int, Review> $reviews */
+        $reviews = TagAwareCache::remember(
             CacheKeys::homeLatestReviews($locale),
             now()->addSeconds(60),
             static function (): Collection {
@@ -150,6 +160,8 @@ final class Home extends Component
                 CacheKeys::homeTag(),
             ]
         );
+
+        return $reviews;
     }
 
     public function addToCart(int $productId): void
