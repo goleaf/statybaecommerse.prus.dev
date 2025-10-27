@@ -201,7 +201,12 @@ final class Notification extends DatabaseNotification
      */
     public function scopeUrgent(Builder $query): Builder
     {
-        return $query->whereJsonContains('data->urgent', true);
+        $expression = self::jsonBooleanEqualsExpression($query, 'data', 'urgent', true);
+
+        return $query->where(function (Builder $builder) use ($expression): void {
+            $builder->whereJsonContains('data->urgent', true)
+                ->orWhereRaw($expression);
+        });
     }
 
     /**
@@ -213,11 +218,14 @@ final class Notification extends DatabaseNotification
      */
     public function scopeNormal(Builder $query): Builder
     {
-        return $query->where(function (Builder $builder): void {
+        $extract = self::jsonExtractExpression($query, 'data', 'urgent');
+        $falseExpression = self::jsonBooleanEqualsExpression($query, 'data', 'urgent', false);
+
+        return $query->where(function (Builder $builder) use ($extract, $falseExpression): void {
             // Match notifications that explicitly declare non-urgent status or never set the flag.
-            $builder
-                ->whereJsonDoesntContain('data->urgent', true)
-                ->orWhereNull('data->urgent');
+            $builder->whereJsonContains('data->urgent', false)
+                ->orWhereRaw($falseExpression)
+                ->orWhereRaw(sprintf('%s IS NULL', $extract));
         });
     }
 
@@ -297,10 +305,17 @@ final class Notification extends DatabaseNotification
      */
     public function scopeWithTags(Builder $query, array $tags): Builder
     {
+        $tags = array_values(array_unique(array_filter($tags, static fn ($tag): bool => is_string($tag) && $tag !== '')));
+
+        if ($tags === []) {
+            return $query;
+        }
+
         return $query->where(function (Builder $builder) use ($tags): void {
             // Build an or-chain to match notifications containing any of the requested tags.
-            foreach ($tags as $tag) {
-                $builder->orWhereJsonContains('data->tags', $tag);
+            foreach ($tags as $index => $tag) {
+                $method = $index === 0 ? 'whereJsonContains' : 'orWhereJsonContains';
+                $builder->{$method}('data->tags', $tag);
             }
         });
     }
@@ -707,5 +722,55 @@ final class Notification extends DatabaseNotification
         /** @var int $updated */
 
         return $updated;
+    }
+
+    /**
+     * Build a JSON extraction expression that remains portable across supported database drivers.
+     */
+    private static function jsonExtractExpression(Builder $query, string $column, string $path): string
+    {
+        $grammar = $query->getQuery()->getGrammar();
+        $qualifiedColumn = $query->qualifyColumn($column);
+        $wrappedColumn = $grammar->wrap($qualifiedColumn);
+        $jsonPath = '$.' . str_replace("'", "\\'", $path);
+        $driver = $query->getConnection()->getDriverName();
+
+        if ($driver === 'sqlite') {
+            return sprintf("json_extract(%s, '%s')", $wrappedColumn, $jsonPath);
+        }
+
+        if ($driver === 'pgsql') {
+            $segments = array_map(
+                static fn (string $segment): string => str_replace(['\\', "'"], ['\\\\', "''"], $segment),
+                explode('.', $path)
+            );
+            $pgsqlPath = '{' . implode(',', $segments) . '}';
+
+            return sprintf('(%s #>> \'%s\')', $wrappedColumn, $pgsqlPath);
+        }
+
+        return sprintf("JSON_EXTRACT(%s, '%s')", $wrappedColumn, $jsonPath);
+    }
+
+    /**
+     * Create a raw comparison that treats JSON boolean values consistently across drivers.
+     */
+    private static function jsonBooleanEqualsExpression(Builder $query, string $column, string $path, bool $value): string
+    {
+        $extract = self::jsonExtractExpression($query, $column, $path);
+        $driver = $query->getConnection()->getDriverName();
+
+        if ($driver === 'pgsql') {
+            return sprintf(
+                "(coalesce((%s)::text, '') = '%s')",
+                $extract,
+                $value ? 'true' : 'false'
+            );
+        }
+
+        $truthy = "1, true, '1', 'true'";
+        $falsy = "0, false, '0', 'false'";
+
+        return sprintf('(%s in (%s))', $extract, $value ? $truthy : $falsy);
     }
 }

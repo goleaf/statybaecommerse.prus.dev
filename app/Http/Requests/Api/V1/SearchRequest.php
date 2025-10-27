@@ -35,8 +35,8 @@ final class SearchRequest extends FormRequest
             // Require a minimum length so expensive empty/fuzzy lookups are avoided up front.
             'query' => ['required', 'string', 'min:3', 'max:200'],
             'page'  => ['sometimes', 'integer', 'min:1'],
-            // Cap the requested page size at the DTO maximum to avoid unbounded scans.
-            'per_page' => ['sometimes', 'integer', 'min:1', 'max:' . SearchQueryData::MAX_PER_PAGE],
+            // Allow large page sizes but clamp them downstream so callers receive a capped payload.
+            'per_page' => ['sometimes', 'integer', 'min:1'],
             // Filters and sort inputs are optional but must match the allow-list handled server side.
             'filters'   => ['sometimes', 'array'],
             'filters.*' => ['nullable'],

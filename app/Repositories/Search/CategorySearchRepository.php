@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Repositories\Search;
 
 use App\Data\SearchQueryData;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
@@ -85,6 +86,16 @@ SQL;
         $productsCount = (int) $row->products_count;
         $description = $row->description ?: ($row->translated_description ?: null);
 
+        $url = null;
+
+        if (is_string($row->slug) && $row->slug !== '') {
+            if (Route::has('frontend.categories.show')) {
+                $url = route('frontend.categories.show', ['category' => $row->slug]);
+            } elseif (Route::has('api.categories.show')) {
+                $url = route('api.categories.show', ['category' => $row->slug]);
+            }
+        }
+
         return [
             'id'              => (int) $row->id,
             'type'            => 'category',
@@ -92,7 +103,7 @@ SQL;
             'subtitle'        => __('frontend.search.category_with_products', ['count' => $productsCount]),
             'description'     => $description,
             'image'           => null,
-            'url'             => route('categories.show', $row->slug),
+            'url'             => $url,
             'products_count'  => $productsCount,
             'relevance_score' => $this->calculateRelevanceScore($row, $queryData->query()),
         ];

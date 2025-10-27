@@ -7,11 +7,20 @@ namespace App\Support\Search;
 use App\Models\Product;
 use DefStudio\SearchableInput\DTO\SearchResult;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Schema;
 use JsonException;
+use Throwable;
 
 final class ProductSearch
 {
+    /**
+     * Cache for SQLite JSON function capability probes keyed by connection name.
+     *
+     * @var array<string, bool>
+     */
+    private static array $sqliteJsonSupport = [];
+
     /**
      * @return array<int, string>
      */
@@ -135,32 +144,30 @@ final class ProductSearch
         $driver = $query->getConnection()->getDriverName();
         $table = $query->getModel()->getTable();
         $column = "{$table}.name";
+        $fallbackOperator = 'like';
 
         if (in_array($driver, ['mysql', 'mariadb'], true)) {
             $query
                 ->orWhereRaw("JSON_UNQUOTE(JSON_EXTRACT({$column}, '$.en')) LIKE ?", [$like])
                 ->orWhereRaw("JSON_UNQUOTE(JSON_EXTRACT({$column}, '$.lt')) LIKE ?", [$like]);
-
-            return;
-        }
-
-        if ($driver === 'pgsql') {
+        } elseif ($driver === 'pgsql') {
             $query
                 ->orWhereRaw("({$column}->>'en') ILIKE ?", [$like])
                 ->orWhereRaw("({$column}->>'lt') ILIKE ?", [$like]);
+            $fallbackOperator = 'ilike';
+        } elseif ($driver === 'sqlite') {
+            if (! self::sqliteSupportsJsonFunctions($query)) {
+                $query->orWhere($column, $fallbackOperator, $like);
 
-            return;
-        }
+                return;
+            }
 
-        if ($driver === 'sqlite') {
             $query
                 ->orWhereRaw("json_extract({$column}, '$.en') LIKE ?", [$like])
                 ->orWhereRaw("json_extract({$column}, '$.lt') LIKE ?", [$like]);
-
-            return;
         }
 
-        $query->orWhere($column, 'like', $like);
+        $query->orWhere($column, $fallbackOperator, $like);
     }
 
     private static function formatLabel(Product $product): string
@@ -206,5 +213,23 @@ final class ProductSearch
         }
 
         return is_array($decoded) ? $decoded : $value;
+    }
+
+    private static function sqliteSupportsJsonFunctions(Builder $query): bool
+    {
+        $connection = $query->getConnection();
+        $cacheKey = $connection->getName() ?? spl_object_hash($connection);
+
+        if (array_key_exists($cacheKey, self::$sqliteJsonSupport)) {
+            return self::$sqliteJsonSupport[$cacheKey];
+        }
+
+        try {
+            $connection->selectOne("select json_extract('{\"probe\": \"ok\"}', '$.probe') as value");
+        } catch (QueryException|Throwable) {
+            return self::$sqliteJsonSupport[$cacheKey] = false;
+        }
+
+        return self::$sqliteJsonSupport[$cacheKey] = true;
     }
 }

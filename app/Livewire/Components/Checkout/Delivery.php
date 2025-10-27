@@ -22,18 +22,18 @@ use Spatie\LivewireWizard\Components\StepComponent;
 /**
  * Delivery step of the checkout wizard responsible for presenting shipping options.
  *
- * @property array<int, array{id:int,name:string,description:string,price:float,resolved_price:float,formatted_price:string,estimated_delivery:string,currency_code:string,badges:array<int, array{type:string,label:string}>}> $resolvedOptions
- * @property bool                                                                                                                                                $isResolving
- * @property int|string|null                                                                                                                                      $currentSelected
+ * @property array<int, array{id:int,name:string,description:string,price:float,original_price:float,formatted_price:string,estimated_delivery:string,currency_code:string,badges:array<int, array{type:string,label:string}>}> $options
+ * @property bool                                                                                                                                                                              $isResolving
+ * @property int|string|null                                                                                                                                                                   $currentSelected
  */
 final class Delivery extends StepComponent
 {
     /**
      * Normalised shipping options returned by the resolver, including dynamic pricing metadata.
      *
-     * @var array<int, array{id:int,name:string,description:string,price:float,resolved_price:float,formatted_price:string,estimated_delivery:string,currency_code:string,badges:array<int, array{type:string,label:string}>}>
+     * @var array<int, array{id:int,name:string,description:string,price:float,original_price:float,formatted_price:string,estimated_delivery:string,currency_code:string,badges:array<int, array{type:string,label:string}>}>
      */
-    public array $resolvedOptions = [];
+    public array $options = [];
 
     /**
      * Track whether the component is currently resolving shipping options so the
@@ -165,7 +165,7 @@ final class Delivery extends StepComponent
         /** @var SupportCollection<int, ShippingOption> $optionModels */
         $optionModels = ShippingOption::query()->whereIn('id', $optionIds)->get()->keyBy('id');
 
-        $this->resolvedOptions = $resolved
+        $this->options = $resolved
             ->map(function (array $option) use ($optionModels): array {
                 $identifier = (int) $option['id'];
                 $model = $optionModels->get($identifier);
@@ -175,15 +175,13 @@ final class Delivery extends StepComponent
                 $discount = $this->calculateShippingDiscount($baseAmount);
                 $finalAmount = max(0.0, round($baseAmount - $discount, 2));
                 $formattedFinal = app_money_format($finalAmount, $currency);
-                $formattedResolved = app_money_format($baseAmount, $currency);
 
                 return [
                     'id'                        => $identifier,
                     'name'                      => (string) ($option['name'] ?? $model?->name ?? ''),
                     'description'               => (string) ($option['description'] ?? $model?->description ?? ''),
                     'price'                     => $finalAmount,
-                    'resolved_price'            => $baseAmount,
-                    'resolved_formatted_price'  => $formattedResolved,
+                    'original_price'            => $baseAmount,
                     'formatted_price'           => $formattedFinal,
                     'estimated_delivery'        => (string) ($option['estimated_delivery'] ?? $model?->estimated_delivery_text ?? ''),
                     'currency_code'             => $currency,
@@ -197,8 +195,8 @@ final class Delivery extends StepComponent
             $this->currentSelected = null;
         }
 
-        if ($this->currentSelected === null && $this->resolvedOptions !== []) {
-            $firstIdentifier = Arr::get($this->resolvedOptions, '0.id');
+        if ($this->currentSelected === null && $this->options !== []) {
+            $firstIdentifier = Arr::get($this->options, '0.id');
             $this->currentSelected = is_numeric($firstIdentifier) ? (int) $firstIdentifier : null;
         }
 
@@ -212,18 +210,18 @@ final class Delivery extends StepComponent
     /**
      * Attempt to find the resolved option for a specific identifier.
      *
-     * @return array{id:int,name:string,description:string,price:float,formatted_price:string,estimated_delivery:string,currency_code:string,badges:array<int, array{type:string,label:string}>,resolved_price:float}|null
+     * @return array{id:int,name:string,description:string,price:float,formatted_price:string,estimated_delivery:string,currency_code:string,badges:array<int, array{type:string,label:string}>,original_price:float}|null
      */
     private function findResolvedOption(int $optionId): ?array
     {
-        foreach ($this->resolvedOptions as $option) {
+        foreach ($this->options as $option) {
             if (! is_array($option)) {
                 continue;
             }
 
             $identifier = $option['id'] ?? null;
             if (is_numeric($identifier) && (int) $identifier === $optionId) {
-                /** @var array{id:int,name:string,description:string,price:float,formatted_price:string,estimated_delivery:string,currency_code:string,badges:array<int, array{type:string,label:string}>,resolved_price:float} $option */
+                /** @var array{id:int,name:string,description:string,price:float,formatted_price:string,estimated_delivery:string,currency_code:string,badges:array<int, array{type:string,label:string}>,original_price:float} $option */
                 return $option;
             }
         }
@@ -234,27 +232,27 @@ final class Delivery extends StepComponent
     /**
      * Build the payload stored in the session for the selected shipping option.
      *
-     * @param  array{id:int,name:string,description:string,price:float,formatted_price:string,estimated_delivery:string,currency_code:string,badges:array<int, array{type:string,label:string}>,resolved_price:float} $optionData
-     * @return array{id:int,name:string,description:string,price:float,formatted_price:string,estimated_delivery:string,currency_code:string,badges:array<int, array{type:string,label:string}>,resolved_price:float}
+     * @param  array{id:int,name:string,description:string,price:float,formatted_price:string,estimated_delivery:string,currency_code:string,badges:array<int, array{type:string,label:string}>,original_price:float} $optionData
+     * @return array{id:int,name:string,description:string,price:float,formatted_price:string,estimated_delivery:string,currency_code:string,badges:array<int, array{type:string,label:string}>,original_price:float}
      */
     private function buildPersistablePayload(array $optionData, ShippingOption $optionModel): array
     {
-        $baseAmount = (float) ($optionData['resolved_price'] ?? $optionData['price'] ?? 0.0);
+        $baseAmount = (float) ($optionData['original_price'] ?? $optionData['price'] ?? 0.0);
         $currency = (string) ($optionData['currency_code'] ?? $optionModel->currency_code ?? current_currency());
 
         $discount = $this->calculateShippingDiscount($baseAmount);
         $finalAmount = max(0.0, round($baseAmount - $discount, 2));
 
         return [
-            'id'                 => $optionModel->getKey(),
-            'name'               => (string) ($optionData['name'] ?? $optionModel->name),
-            'description'        => (string) ($optionData['description'] ?? $optionModel->description ?? ''),
-            'price'              => $finalAmount,
-            'resolved_price'     => $baseAmount,
-            'formatted_price'    => app_money_format($finalAmount, $currency),
-            'estimated_delivery' => (string) ($optionData['estimated_delivery'] ?? $optionModel->estimated_delivery_text ?? ''),
-            'currency_code'      => $currency,
-            'badges'             => $this->buildBadges($baseAmount, $finalAmount, $discount, $currency),
+            'id'                        => $optionModel->getKey(),
+            'name'                      => (string) ($optionData['name'] ?? $optionModel->name),
+            'description'               => (string) ($optionData['description'] ?? $optionModel->description ?? ''),
+            'price'                     => $finalAmount,
+            'original_price'            => $baseAmount,
+            'formatted_price'           => app_money_format($finalAmount, $currency),
+            'estimated_delivery'        => (string) ($optionData['estimated_delivery'] ?? $optionModel->estimated_delivery_text ?? ''),
+            'currency_code'             => $currency,
+            'badges'                    => $this->buildBadges($baseAmount, $finalAmount, $discount, $currency),
         ];
     }
 

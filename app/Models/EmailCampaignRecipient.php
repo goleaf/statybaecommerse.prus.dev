@@ -17,10 +17,9 @@ final class EmailCampaignRecipient extends Model
     use OrdersByName;
 
     /**
-     * Sort recipients by email by default because that column is guaranteed to
-     * be unique and present even when no display name is provided.
+     * Sort recipients by display name to keep alphabetical scopes predictable.
      */
-    protected string $nameColumn = 'email';
+    protected string $nameColumn = 'name';
 
     protected $fillable = [
         'email_campaign_id',

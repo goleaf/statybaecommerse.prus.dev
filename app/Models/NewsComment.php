@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use function filter_var;
 
 /**
  * NewsComment
@@ -33,6 +34,16 @@ final class NewsComment extends Model
 {
     use HasFactory;
 
+    /**
+     * Provide scope hints so the shared Active and Visible global scopes avoid schema introspection during tests.
+     *
+     * @var array<string, bool>
+     */
+    public const SCOPE_COLUMN_HINTS = [
+        'is_active'  => true,
+        'is_visible' => true,
+    ];
+
     protected $table = 'news_comments';
 
     protected $fillable = ['news_id', 'parent_id', 'author_name', 'author_email', 'content', 'is_approved', 'is_visible', 'is_active'];
@@ -47,13 +58,22 @@ final class NewsComment extends Model
 
     protected static function booted(): void
     {
-        self::addGlobalScope('active_flag', function (Builder $builder): void {
-            $builder->where('is_active', true);
-        });
-        self::creating(function (self $comment): void {
-            if (! array_key_exists('is_active', $comment->getAttributes())) {
-                $comment->is_active = (bool) ($comment->is_visible ?? true);
+        static::creating(function (self $comment): void {
+            if ($comment->isDirty('is_active') && $comment->getAttribute('is_active') !== null) {
+                return;
             }
+
+            $isVisible = $comment->getAttribute('is_visible');
+
+            if ($isVisible === null) {
+                $comment->is_active = true;
+
+                return;
+            }
+
+            $normalizedVisibility = filter_var($isVisible, FILTER_VALIDATE_BOOL, ['flags' => FILTER_NULL_ON_FAILURE]);
+
+            $comment->is_active = $normalizedVisibility ?? true;
         });
     }
 

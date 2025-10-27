@@ -58,6 +58,7 @@ final class ExportDownloadRateLimitTest extends TestCase
             'artifact_disk'     => 'public',
             'artifact_path'     => 'exports/report.csv',
             'artifact_filename' => 'report.csv',
+            'requested_by'      => null,
         ]);
 
         Storage::disk('public')->put('exports/report.csv', 'csv-content');
@@ -78,6 +79,7 @@ final class ExportDownloadRateLimitTest extends TestCase
             'artifact_disk'     => 'public',
             'artifact_path'     => 'exports/report.csv',
             'artifact_filename' => 'report.csv',
+            'requested_by'      => null,
         ]);
 
         Storage::disk('public')->put('exports/report.csv', 'csv-content');

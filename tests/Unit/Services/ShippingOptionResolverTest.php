@@ -7,8 +7,39 @@ use App\Models\Country;
 use App\Models\Product;
 use App\Models\ShippingOption;
 use App\Services\Shipping\ShippingOptionResolver;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
+
+uses(RefreshDatabase::class);
+
+beforeEach(function (): void {
+    if (Schema::hasTable('cart_items')) {
+        return;
+    }
+
+    Schema::create('cart_items', static function (Blueprint $table): void {
+        $table->id();
+        $table->string('session_id')->nullable();
+        $table->unsignedBigInteger('user_id')->nullable();
+        $table->unsignedBigInteger('product_id')->nullable();
+        $table->unsignedBigInteger('variant_id')->nullable();
+        $table->unsignedBigInteger('product_variant_id')->nullable();
+        $table->unsignedInteger('quantity')->default(1);
+        $table->unsignedInteger('minimum_quantity')->default(1);
+        $table->decimal('unit_price', 12, 2)->default(0);
+        $table->decimal('discount_amount', 12, 2)->default(0);
+        $table->decimal('price', 12, 2)->nullable();
+        $table->decimal('total_price', 12, 2)->default(0);
+        $table->json('product_snapshot')->nullable();
+        $table->json('attributes')->nullable();
+        $table->text('notes')->nullable();
+        $table->timestamps();
+        $table->softDeletes();
+    });
+});
 
 it('filters shipping options by geography and weight constraints', function (): void {
     // Bootstrap a predictable session identifier for the resolver to locate cart items.

@@ -10,7 +10,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Schema;
 use Tests\Support\AssertsRelations;
 
-uses(RefreshDatabase::class);
+uses(Tests\TestCase::class, RefreshDatabase::class);
 
 it('orders categories alphabetically when the name column exists', function (): void {
     // Ensure the schema is compatible before attempting to assert ordering.

@@ -9,7 +9,7 @@ use Tests\TestCase;
 uses(TestCase::class);
 
 // Dataset enumerating the expected relations on UserBehavior so they remain documented.
-dataset('user_behavior_relations_matrix', [
+dataset('user_behavior_relations_matrix_pairs', [
     // User relationship keeps behaviour analytics anchored to the account owner.
     ['user', BelongsTo::class],
     // Product relationship maps engagements back to catalogue items for interaction analytics.
@@ -22,4 +22,4 @@ it('maps documented UserBehavior relations to their expected relation types', fu
     $model = new UserBehavior;
 
     expect($model->{$relation}())->toBeInstanceOf($expectedType);
-})->with('user_behavior_relations_matrix');
+})->with('user_behavior_relations_matrix_pairs');

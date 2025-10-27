@@ -97,7 +97,10 @@ final class Channel extends Model
     public function products(): BelongsToMany
     {
         // Skip global scopes so pivot checks in tests do not filter freshly attached products.
-        return $this->belongsToMany(Product::class)->withoutGlobalScopes();
+        return $this
+            ->belongsToMany(Product::class, 'channel_product', 'channel_id', 'product_id')
+            ->withTimestamps()
+            ->withoutGlobalScopes();
     }
 
     /**
@@ -148,7 +151,9 @@ final class Channel extends Model
      */
     public function scopeOrderedByName(Builder $query): Builder
     {
-        // Using a simple ascending order keeps the scope database agnostic and easy to reason about.
-        return $query->orderBy('name');
+        // Using LOWER keeps ordering deterministic across SQLite, MySQL, and Postgres collations.
+        return $query
+            ->orderByRaw('LOWER(name) ASC')
+            ->orderBy('name');
     }
 }

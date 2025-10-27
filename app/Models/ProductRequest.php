@@ -74,6 +74,7 @@ final class ProductRequest extends Model
     protected $casts = [
         'requested_quantity' => 'integer',
         'responded_at'       => 'datetime',
+        'deleted_at'         => 'datetime',
     ];
 
     /**

@@ -6,12 +6,17 @@ namespace App\Models;
 
 use App\Models\Concerns\OrdersByName;
 use App\Models\Scopes\ActiveScope;
+use Illuminate\Config\Repository;
+use Illuminate\Container\Container;
+use Illuminate\Database\Connection;
+use Illuminate\Database\ConnectionResolverInterface;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\Facades\Schema;
 
 /**
@@ -85,7 +90,7 @@ final class Inventory extends Model
     /**
      * Cache schema lookups so repeated attribute writes remain inexpensive.
      *
-     * @var array<string, bool>
+     * @var array<string, bool|null>
      */
     private static array $columnPresence = [];
 
@@ -97,18 +102,83 @@ final class Inventory extends Model
     private ?array $metaCache = null;
 
     /**
+     * Ensure relations can be resolved even when the application container has
+     * not bootstrapped a database connection (e.g. lightweight unit tests).
+     */
+    private static function ensureConnectionResolver(): void
+    {
+        if (self::getConnectionResolver() !== null) {
+            return;
+        }
+
+        $app = Facade::getFacadeApplication();
+
+        if (! $app instanceof Container) {
+            $app = new Container();
+            Container::setInstance($app);
+            Facade::setFacadeApplication($app);
+        }
+
+        if (! $app->bound('config')) {
+            $app->instance('config', new Repository([
+                'app'          => ['fallback_locale' => 'en'],
+                'filesystems'  => ['default' => 'public'],
+            ]));
+        }
+
+        $connection = new Connection(null);
+
+        self::setConnectionResolver(new class($connection) implements ConnectionResolverInterface {
+            public function __construct(private Connection $connection)
+            {
+            }
+
+            public function connection($name = null): Connection
+            {
+                return $this->connection;
+            }
+
+            public function getDefaultConnection(): string
+            {
+                return 'null';
+            }
+
+            public function setDefaultConnection($name): void
+            {
+                // noop – only a single in-memory connection is required.
+            }
+        });
+    }
+
+    /**
      * Determine whether the inventories table currently exposes the provided
      * column, caching the response for the lifetime of the request.
      */
     private static function hasColumn(string $column): bool
     {
-        if (! array_key_exists($column, self::$columnPresence)) {
+        if (! array_key_exists($column, self::$columnPresence) || self::$columnPresence[$column] === null) {
+            $app = Facade::getFacadeApplication();
+
+            if (! is_object($app) || ! method_exists($app, 'bound') || ! $app->bound('db.schema')) {
+                // Defer caching until the database layer has been bootstrapped.
+                self::$columnPresence[$column] = null;
+
+                return false;
+            }
+
             $instance = new self;
             $table = $instance->getTable();
-            self::$columnPresence[$column] = Schema::hasTable($table) && Schema::hasColumn($table, $column);
+
+            if (! Schema::hasTable($table)) {
+                self::$columnPresence[$column] = null;
+
+                return false;
+            }
+
+            self::$columnPresence[$column] = Schema::hasColumn($table, $column);
         }
 
-        return self::$columnPresence[$column];
+        return (bool) self::$columnPresence[$column];
     }
 
     /**
@@ -139,6 +209,8 @@ final class Inventory extends Model
      */
     public function product(): BelongsTo
     {
+        self::ensureConnectionResolver();
+
         return $this->belongsTo(Product::class);
     }
 
@@ -147,6 +219,8 @@ final class Inventory extends Model
      */
     public function variant(): BelongsTo
     {
+        self::ensureConnectionResolver();
+
         $foreignKey = self::hasColumn('product_variant_id') ? 'product_variant_id' : 'variant_id';
 
         return $this->belongsTo(ProductVariant::class, $foreignKey);
@@ -157,6 +231,8 @@ final class Inventory extends Model
      */
     public function warehouse(): BelongsTo
     {
+        self::ensureConnectionResolver();
+
         $foreignKey = self::hasColumn('warehouse_id') ? 'warehouse_id' : 'location_id';
 
         return $this->belongsTo(Location::class, $foreignKey);
@@ -175,6 +251,8 @@ final class Inventory extends Model
      */
     public function movements(): HasMany
     {
+        self::ensureConnectionResolver();
+
         $foreignKey = self::hasColumn('inventory_id') ? 'inventory_id' : 'variant_inventory_id';
 
         return $this->hasMany(StockMovement::class, $foreignKey);

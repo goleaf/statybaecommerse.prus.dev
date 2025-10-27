@@ -191,6 +191,40 @@ abstract class TestCase extends BaseTestCase
         $this->afterRefreshingDatabase();
     }
 
+    /**
+     * Polyfill strict canonicalizing assertion that disappeared from newer PHPUnit builds.
+     */
+    protected function assertSameCanonicalizing(mixed $expected, mixed $actual, string $message = ''): void
+    {
+        $this->assertSame(
+            $this->canonicalizeValue($expected),
+            $this->canonicalizeValue($actual),
+            $message
+        );
+    }
+
+    /**
+     * Normalise array-like values to support canonicalized comparisons while keeping strict types.
+     */
+    private function canonicalizeValue(mixed $value): mixed
+    {
+        if ($value instanceof \Traversable) {
+            $value = iterator_to_array($value, false);
+        }
+
+        if (is_array($value)) {
+            $value = array_map(fn ($item) => $this->canonicalizeValue($item), $value);
+
+            if (array_is_list($value)) {
+                sort($value);
+            } else {
+                ksort($value);
+            }
+        }
+
+        return $value;
+    }
+
     protected function resolveAdminPanel(): Panel
     {
         if ($this->resolvedAdminPanel instanceof Panel) {

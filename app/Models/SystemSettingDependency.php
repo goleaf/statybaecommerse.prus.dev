@@ -277,6 +277,14 @@ final class SystemSettingDependency extends Model
         $dependsOnSetting = $this->getRelationValue('dependsOnSettingRelation');
 
         if (! $dependsOnSetting instanceof SystemSetting) {
+            $dependsOnSetting = $this->dependsOnSettingRelation()->getResults();
+
+            if ($dependsOnSetting instanceof SystemSetting) {
+                $this->setRelation('dependsOnSettingRelation', $dependsOnSetting);
+            }
+        }
+
+        if (! $dependsOnSetting instanceof SystemSetting) {
             return false;
         }
 
@@ -343,11 +351,13 @@ final class SystemSettingDependency extends Model
         }
 
         if (is_numeric($actual) && is_numeric($expected)) {
-            return $actual <=> $expected;
+            return (float) $actual <=> (float) $expected;
         }
 
         /** @phpstan-ignore-next-line Safe type casting for comparison */
-        return strcmp((string) $actual, (string) $expected);
+        $comparison = strcmp((string) $actual, (string) $expected);
+
+        return $comparison <=> 0;
     }
 
     /**

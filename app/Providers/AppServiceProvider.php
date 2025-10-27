@@ -88,6 +88,8 @@ use function is_array;
 use Livewire\Features\SupportTesting\Testable;
 use Livewire\Livewire;
 use Throwable;
+use Faker\Factory as FakerFactory;
+use Faker\Generator as FakerGenerator;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -113,6 +115,11 @@ class AppServiceProvider extends ServiceProvider
             return $limiter instanceof ExtendedRateLimiter
                 ? $limiter
                 : ExtendedRateLimiter::fromBase($limiter);
+        });
+        $this->app->singleton(FakerGenerator::class, static function ($app): FakerGenerator {
+            $locale = (string) ($app->make('config')->get('app.faker_locale') ?? 'en_US');
+
+            return FakerFactory::create($locale !== '' ? $locale : 'en_US');
         });
 
         if ($this->app->runningInConsole()) {

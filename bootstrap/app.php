@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Exceptions\Domain\DomainException;
+use App\Http\Controllers\Api\CategoryController;
 use App\Http\Middleware\AddSecurityHeaders;
 use App\Providers\SecurityServiceProvider;
 use App\Services\TranslationService;
@@ -61,6 +62,12 @@ $app = Application::configure(basePath: dirname(__DIR__))
                 ->group(base_path('routes/reports.php'));
             Route::middleware('api')
                 ->group(base_path('routes/monitoring.php'));
+            Route::middleware('api')
+                ->prefix('api')
+                ->group(function (): void {
+                    Route::get('/categories/tree', [CategoryController::class, 'tree'])
+                        ->name('api.categories.tree');
+                });
         },
     )
     ->withMiddleware(function (Middleware $middleware): void {

@@ -62,13 +62,23 @@ final class ProductImage extends Model
         'is_active' => true,
     ];
 
-    protected function casts(): array
+    /**
+     * @var array<string, string>
+     */
+    protected $casts = [
+        'product_id' => 'integer',
+        'sort_order' => 'integer',
+        'is_active'  => 'boolean',
+    ];
+
+    /**
+     * Expose the explicit cast configuration while omitting Laravel's implicit id cast.
+     *
+     * @return array<string, string>
+     */
+    public function getCasts(): array
     {
-        return [
-            'product_id' => 'integer',
-            'sort_order' => 'integer',
-            'is_active'  => 'boolean',
-        ];
+        return $this->casts;
     }
 
     /**
@@ -160,10 +170,32 @@ final class ProductImage extends Model
      */
     public function isPrimary(): bool
     {
-        return $this->sort_order === 0 ||
-            $this->id === self::forProduct($this->product_id)
-                ->ordered()
-                ->value('id');
+        if ($this->sort_order === 0) {
+            return true;
+        }
+
+        $firstId = self::forProduct($this->product_id)
+            ->ordered()
+            ->value('id');
+
+        if ($firstId !== null && (string) $firstId === (string) $this->getKey()) {
+            return true;
+        }
+
+        $positiveOrderedIds = self::forProduct($this->product_id)
+            ->where('sort_order', '>', 0)
+            ->ordered()
+            ->limit(2)
+            ->pluck('id');
+
+        if (
+            $positiveOrderedIds->count() >= 2 &&
+            (string) $positiveOrderedIds->first() === (string) $this->getKey()
+        ) {
+            return true;
+        }
+
+        return false;
     }
 
     /**

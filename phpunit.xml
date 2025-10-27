@@ -36,7 +36,7 @@
     </testsuites>
     <logging>
         <!-- Ensure CI always collects a JUnit report so GitHub records deterministic statuses. -->
-        <log type="junit" target="junit.xml"/>
+        <junit outputFile="junit.xml"/>
     </logging>
     <source>
         <include>

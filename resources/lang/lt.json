@@ -926,5 +926,6 @@
     "auth.two_factor.security_footer": "Mes nesaugome neapdorotų kodų ar įrenginių identifikatorių.",
     "Fetching real-time shipping quotes…": "Gaunami pristatymo pasiūlymai realiu laiku…",
     "Recalculating delivery options…": "Perskaičiuojami pristatymo variantai…",
+    "Shipping capped at :amount": "Pristatymo kaina ribojama iki :amount",
     "Live quote from resolver": "Skaičiuoklės pateikta kaina"
 }

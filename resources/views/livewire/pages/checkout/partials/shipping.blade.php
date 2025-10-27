@@ -52,9 +52,9 @@
                 <h3 class="text-sm font-semibold text-gray-900">{{ __('Delivery options') }}</h3>
                 <button
                     type="button"
-                    wire:click="refreshShippingOptions(true)"
+                    wire:click="resolveShippingOptions(true)"
                     wire:loading.attr="disabled"
-                    wire:target="refreshShippingOptions"
+                    wire:target="resolveShippingOptions"
                     class="text-xs font-medium text-primary-600 hover:text-primary-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500"
                 >
                     {{ __('Refresh options') }}
@@ -63,7 +63,7 @@
 
             <div
                 wire:loading.flex
-                wire:target="refreshShippingOptions"
+                wire:target="resolveShippingOptions"
                 class="items-center gap-2 rounded-lg border border-dashed border-primary-200 bg-primary-50 px-4 py-3 text-sm text-primary-700"
                 role="status"
             >
@@ -71,29 +71,56 @@
                 <span>{{ __('Updating delivery options…') }}</span>
             </div>
 
-            <fieldset class="space-y-3" aria-label="{{ __('Delivery options') }}" wire:loading.remove wire:target="refreshShippingOptions">
+            <fieldset class="space-y-3" aria-label="{{ __('Delivery options') }}" wire:loading.remove wire:target="resolveShippingOptions">
                 @forelse ($options as $option)
                     <label
+                        wire:key="checkout-delivery-option-{{ $option['id'] }}"
                         @class([
                             'flex flex-wrap items-start justify-between gap-4 rounded-lg border p-4 transition',
                             'border-primary-200 bg-primary-50 shadow-sm' => (int) $selectedShippingOption === (int) $option['id'],
                             'border-gray-200 hover:border-primary-200 hover:bg-primary-50/50' => (int) $selectedShippingOption !== (int) $option['id'],
                         ])
                     >
-                        <span class="flex items-center gap-3">
+                        <span class="flex flex-1 items-start gap-3">
                             <input
                                 type="radio"
                                 value="{{ $option['id'] }}"
                                 wire:model="selectedShippingOption"
                                 class="size-4 rounded border-gray-300 text-primary-600 focus:ring-primary-600"
                             >
-                            <span>
+                            <span class="flex flex-col">
                                 <span class="block text-sm font-semibold text-gray-900">{{ $option['name'] }}</span>
-                                <span class="block text-xs text-gray-500">{{ $option['estimated_delivery'] ?? __('Estimated delivery data not available') }}</span>
+                                @if(! empty($option['estimated_delivery']))
+                                    <span class="block text-xs text-gray-500">{{ $option['estimated_delivery'] }}</span>
+                                @endif
+                                @if(! empty($option['badges']) && is_array($option['badges']))
+                                    <span class="mt-2 flex flex-wrap gap-2">
+                                        @foreach($option['badges'] as $badge)
+                                            @if(is_array($badge) && ! empty($badge['label']))
+                                                <span
+                                                    @class([
+                                                        'inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold uppercase tracking-wide',
+                                                        'bg-green-100 text-green-800' => ($badge['type'] ?? null) === 'free',
+                                                        'bg-primary-100 text-primary-800' => ($badge['type'] ?? null) !== 'free',
+                                                    ])
+                                                >
+                                                    {{ $badge['label'] }}
+                                                </span>
+                                            @endif
+                                        @endforeach
+                                    </span>
+                                @endif
                             </span>
                         </span>
-                        <span class="text-sm font-semibold text-primary-700">
-                            {{ $option['formatted_price'] ?? \Illuminate\Support\Number::currency($option['price'], current_currency(), app()->getLocale()) }}
+                        <span class="flex flex-col items-end text-right">
+                            <span class="text-sm font-semibold text-primary-700">
+                                {{ $option['formatted_price'] ?? app_money_format($option['price'], $option['currency_code'] ?? current_currency()) }}
+                            </span>
+                            @if(isset($option['original_price']) && $option['original_price'] > $option['price'])
+                                <span class="text-xs text-gray-400 line-through">
+                                    {{ app_money_format($option['original_price'], $option['currency_code'] ?? current_currency()) }}
+                                </span>
+                            @endif
                         </span>
                     </label>
                 @empty
@@ -115,7 +142,7 @@
                     type="submit"
                     class="px-6 py-2 text-sm"
                     wire:loading.attr="disabled"
-                    wire:target="toStep"
+                    wire:target="toStep,resolveShippingOptions"
                 >
                     {{ __('Continue to payment') }}
                 </x-buttons.primary>

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Models\Concerns\OrdersByName;
+use DateTimeInterface;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -214,7 +215,12 @@ final class UserProductInteraction extends Model
                 return $raw instanceof Carbon ? $raw : Carbon::parse($raw);
             },
             set: static function ($value): array {
-                $carbon = $value instanceof Carbon ? $value : ($value !== null ? Carbon::parse((string) $value) : null);
+                $carbon = match (true) {
+                    $value instanceof Carbon => $value,
+                    $value instanceof DateTimeInterface => Carbon::instance($value),
+                    $value === null || $value === '' => null,
+                    default => Carbon::make($value) ?? Carbon::parse((string) $value),
+                };
 
                 return [
                     'occurred_at'      => $carbon,

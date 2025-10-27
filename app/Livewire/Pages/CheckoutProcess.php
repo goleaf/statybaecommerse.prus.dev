@@ -80,7 +80,7 @@ final class CheckoutProcess extends Component
 
     public float $selectedShippingPrice = 0.0;
 
-    /** @var list<array{id:int,name:string,price:float,formatted_price:string,estimated_delivery:string,currency?:string|null,resolved_price?:float,badges?:array<int, array{type:string,label:string}>}> */
+    /** @var list<array{id:int,name:string,price:float,formatted_price:string,estimated_delivery:string,currency?:string|null,original_price?:float,badges?:array<int, array{type:string,label:string}>}> */
     public array $availableShippingOptions = [];
 
     /**
@@ -88,7 +88,7 @@ final class CheckoutProcess extends Component
      */
     public bool $isResolvingShippingOptions = false;
 
-    /** @var array{id:int,name:string,price:float,formatted_price?:string|null,estimated_delivery?:string|null,currency_code?:string|null,resolved_price?:float,badges?:array<int, array{type:string,label:string}>}|array{} */
+    /** @var array{id:int,name:string,price:float,formatted_price?:string|null,estimated_delivery?:string|null,currency_code?:string|null,original_price?:float,badges?:array<int, array{type:string,label:string}>}|array{} */
     public array $selectedShippingSnapshot = [];
 
     /** @var array<string, string> */
@@ -220,6 +220,15 @@ final class CheckoutProcess extends Component
             $this->redirect(route('order.confirmation', $order->number));
         });
     }
+
+    /**
+     * Alias invoked from the payment step CTA so Livewire targets stay descriptive.
+     */
+    public function submitOrder(): void
+    {
+        $this->placeOrder();
+    }
+
 
     /**
      * @param EloquentCollection<int, CartItem> $cartItems
@@ -542,7 +551,7 @@ final class CheckoutProcess extends Component
                     $discount = $this->calculateShippingDiscount($baseAmount);
                     $finalAmount = max(0.0, round($baseAmount - $discount, 2));
 
-                    $payload['resolved_price'] = $baseAmount;
+                    $payload['original_price'] = $baseAmount;
                     $payload['price'] = $finalAmount;
                     $payload['formatted_price'] = (string) ($payload['formatted_price'] ?? app_money_format($finalAmount, $currency));
                     $payload['currency'] = $currency;

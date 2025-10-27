@@ -24,7 +24,8 @@ final class NewsTagFactory extends Factory
             'name'        => $name,
             'slug'        => Str::slug($name),
             'description' => $this->faker->sentence(),
-            'is_visible'  => $this->faker->boolean(80),  // 80% chance of being visible
+            'is_visible'  => true,
+            'is_active'   => true,
             'color'       => $this->faker->randomElement([
                 '#3B82F6',  // Blue
                 '#10B981',  // Green
@@ -70,6 +71,7 @@ final class NewsTagFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'is_visible' => true,
+            'is_active'  => true,
         ]);
     }
 
@@ -77,6 +79,7 @@ final class NewsTagFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'is_visible' => false,
+            'is_active'  => false,
         ]);
     }
 

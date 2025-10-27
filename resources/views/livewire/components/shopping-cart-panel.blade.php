@@ -69,8 +69,8 @@
                                 $snapshot = isset($item['snapshot']) && is_array($item['snapshot']) ? $item['snapshot'] : [];
                                 $itemId = (int) ($item['id'] ?? 0);
                                 $quantity = max(1, (int) ($item['quantity'] ?? 1));
-                                $unitPrice = (float) ($item['unit_price'] ?? 0.0);
-                                $lineTotal = (float) ($item['total_price'] ?? ($unitPrice * $quantity));
+                                $unitPrice = (float) ($item['unitPrice'] ?? $item['unit_price'] ?? 0.0);
+                                $lineTotal = (float) ($item['totalPrice'] ?? $item['total_price'] ?? ($unitPrice * $quantity));
                                 $itemName = $snapshot['name'] ?? $item['name'] ?? __('translations.product');
                                 $variantAttributes = isset($snapshot['variant_attributes']) && is_array($snapshot['variant_attributes'])
                                     ? $snapshot['variant_attributes']
@@ -78,9 +78,11 @@
                                 $variantLabel = collect($variantAttributes)
                                     ->map(static fn ($value, $key) => sprintf('%s: %s', (string) $key, (string) $value))
                                     ->implode(', ');
-                                $imageUrl = $item['image_url'] ?? $snapshot['image'] ?? null;
+                                $imageUrl = $item['imageUrl'] ?? $item['image_url'] ?? $snapshot['image'] ?? null;
+                                $formattedUnitPrice = \Illuminate\Support\Number::currency($unitPrice, current_currency(), app()->getLocale());
+                                $formattedLineTotal = \Illuminate\Support\Number::currency($lineTotal, current_currency(), app()->getLocale());
                             @endphp
-                            <div class="flex items-center space-x-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                            <div class="flex items-center space-x-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg" wire:key="cart-item-{{ $itemId }}">
                                 <!-- Product Image -->
                                 <div class="flex-shrink-0">
                                     <img 
@@ -100,8 +102,11 @@
                                             {{ $variantLabel }}
                                         </p>
                                     @endif
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">
+                                        {{ $quantity }} × {{ $formattedUnitPrice }}
+                                    </p>
                                     <p class="text-sm font-semibold text-blue-600 dark:text-blue-400">
-                                        {{ app_money_format($lineTotal) }}
+                                        {{ $formattedLineTotal }}
                                     </p>
                                 </div>
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\OrdersByName;
 use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\EnabledScope;
 use App\Models\Scopes\VisibleScope;
@@ -104,7 +105,7 @@ use Stringable;
 #[ScopedBy([ActiveScope::class, EnabledScope::class, VisibleScope::class])]
 final class Attribute extends Model
 {
-    use HasFactory, HasTranslations, SoftDeletes;
+    use HasFactory, HasTranslations, OrdersByName, SoftDeletes;
 
     protected $table = 'attributes';
 
@@ -315,17 +316,6 @@ final class Attribute extends Model
     public function scopeOrdered($query)
     {
         return $query->orderBy('sort_order');
-    }
-
-    /**
-     * Scope to order attributes alphabetically by their name column.
-     *
-     * @param Builder $query The current query builder instance for chaining.
-     */
-    public function scopeOrderedByName(Builder $query): Builder
-    {
-        // Order by the raw name column to keep deterministic alphabetical ordering.
-        return $query->orderBy('name');
     }
 
     /**

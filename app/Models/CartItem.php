@@ -259,11 +259,17 @@ final class CartItem extends Model
         $this->quantity = max(0, (int) ($this->quantity ?? 0));
 
         // Resolve a base unit price and ensure fallbacks behave consistently.
-        $unitPrice = round((float) ($this->unit_price ?? 0.0), 2);
+        $unitPrice = round((float) ($this->unit_price ?? $this->price ?? 0.0), 2);
         $this->unit_price = $unitPrice;
 
+        // If callers adjust the unit price without explicitly overriding "price", keep them in sync.
+        $resolvedPriceSource = $this->price;
+        if ($this->isDirty('unit_price') && ! $this->isDirty('price')) {
+            $resolvedPriceSource = null;
+        }
+
         // Ensure the "price" column mirrors the current unit price when not explicitly provided.
-        $resolvedPrice = round((float) ($this->price ?? $unitPrice), 2);
+        $resolvedPrice = round((float) ($resolvedPriceSource ?? $unitPrice), 2);
         $this->price = $resolvedPrice;
 
         // Respect stored discount values, guarding against negative totals.

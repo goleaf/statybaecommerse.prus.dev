@@ -45,11 +45,6 @@ final class ProductSeries
     ];
 
     /**
-     * Cache the presence of the optional payment_status column on the orders table.
-     */
-    private static ?bool $ordersTableHasPaymentStatus = null;
-
-    /**
      * Return a cached set of labels, quantities, and revenue totals for the recent period.
      *
      * @return array{labels: array<int, string>, quantities: array<int, int>, revenue: array<int, float>}
@@ -116,12 +111,12 @@ final class ProductSeries
      */
     private static function ordersTableHasPaymentStatus(): bool
     {
-        if (self::$ordersTableHasPaymentStatus !== null) {
-            return self::$ordersTableHasPaymentStatus;
+        $table = (new Order)->getTable();
+
+        if (! Schema::hasTable($table)) {
+            return false;
         }
 
-        self::$ordersTableHasPaymentStatus = Schema::hasColumn((new Order)->getTable(), 'payment_status');
-
-        return self::$ordersTableHasPaymentStatus;
+        return Schema::hasColumn($table, 'payment_status');
     }
 }

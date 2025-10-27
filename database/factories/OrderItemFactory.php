@@ -9,6 +9,7 @@ use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Facades\Schema;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\OrderItem>
@@ -23,7 +24,7 @@ final class OrderItemFactory extends Factory
         $unitPrice = $this->faker->randomFloat(2, 1, 100);
         $total = $quantity * $unitPrice;
 
-        return [
+        $attributes = [
             'order_id'           => Order::factory(),
             'product_id'         => Product::factory(),
             'product_variant_id' => null,
@@ -37,6 +38,8 @@ final class OrderItemFactory extends Factory
             'discount_amount'    => 0,
             'status'             => 'pending',
         ];
+
+        return $this->filterOrderItemColumns($attributes);
     }
 
     public function configure(): static
@@ -115,5 +118,28 @@ final class OrderItemFactory extends Factory
             'unit_price' => $this->faker->randomFloat(2, 0.1, 10),
             'price'      => $this->faker->randomFloat(2, 0.1, 10),
         ]);
+}
+
+    /**
+     * Strip attributes for columns that are not present on the order_items table.
+     *
+     * @param array<string, mixed> $attributes
+     * @return array<string, mixed>
+     */
+    private function filterOrderItemColumns(array $attributes): array
+    {
+        $table = (new OrderItem)->getTable();
+
+        if (! Schema::hasTable($table)) {
+            return $attributes;
+        }
+
+        foreach (array_keys($attributes) as $column) {
+            if (! Schema::hasColumn($table, $column)) {
+                unset($attributes[$column]);
+            }
+        }
+
+        return $attributes;
     }
 }

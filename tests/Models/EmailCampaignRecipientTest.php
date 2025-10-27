@@ -5,9 +5,10 @@ declare(strict_types=1);
 use App\Models\EmailCampaign;
 use App\Models\EmailCampaignRecipient;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 
 // Provide database refreshing while the central Pest configuration loads the Laravel TestCase scaffold.
-uses(RefreshDatabase::class);
+uses(TestCase::class, RefreshDatabase::class);
 
 function createEmailCampaign(): EmailCampaign
 {
@@ -31,7 +32,7 @@ function createEmailCampaign(): EmailCampaign
     ]);
 }
 
-it('exposes expected fillable attributes', function (): void {
+it('exposes expected fillable attributes for recipients', function (): void {
     // Arrange: instantiate the model so we can read its fillable configuration.
     $model = new EmailCampaignRecipient;
 

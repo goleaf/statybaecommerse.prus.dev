@@ -17,16 +17,16 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
-use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Grid as SchemaGrid;
-use Filament\Schemas\Components\Section as SchemaSection;
+use App\Support\FilamentCompat\Schemas\Components\Grid as SchemaGrid;
+use App\Support\FilamentCompat\Schemas\Components\Section as SchemaSection;
 use Filament\Schemas\Schema;
 use Filament\Tables\Actions\BulkActionGroup;
 use Filament\Tables\Actions\DeleteBulkAction;
@@ -162,7 +162,7 @@ final class BrandResource extends Resource
                 ]),
             SchemaSection::make(__('admin/brands.sections.media'))
                 ->components([
-                    FileUpload::make('logo')
+                    SpatieMediaLibraryFileUpload::make('logo')
                         ->label(__('admin/brands.fields.logo'))
                         ->image()
                         ->imageEditor()
@@ -175,7 +175,7 @@ final class BrandResource extends Resource
                         ->maxFiles(1)
                         ->preserveFilenames()
                         ->visibility('private'),
-                    FileUpload::make('banner')
+                    SpatieMediaLibraryFileUpload::make('banner')
                         ->label(__('admin/brands.fields.banner'))
                         ->image()
                         ->imageEditor()

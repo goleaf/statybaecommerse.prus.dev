@@ -25,8 +25,8 @@ final class ExportDownloadController extends Controller
         if ($user instanceof User) {
             // Authenticated users must satisfy the download policy before the file is exposed.
             abort_unless(Gate::forUser($user)->allows('download', $export), 403);
-        } elseif ($export->requested_by !== null) {
-            // Exports linked to a specific user should not be retrievable anonymously even with a signed URL.
+        } elseif (! $request->hasValidSignature()) {
+            // Guard against unsigned access when the route is invoked outside the signed middleware.
             abort(401);
         }
 

@@ -259,25 +259,22 @@ class Show extends Component
     {
         return $this->availableOptions
             ->map(static fn (CollectionFilterGroupData $group): array => $group->toArray())
+            ->values()
             ->all();
     }
 
     /**
      * Provide a lookup map of filter values keyed by their identifier for quick access within the Blade view.
      *
-     * @return array<int, array{id:int,label:string,selected:bool}>
+     * @return Collection<int, array{id:int,label:string,selected:bool}>
      */
     #[Computed]
-    public function getFilterValueLookupProperty(): array
+    public function getFilterValueLookupProperty(): Collection
     {
         return $this->availableOptions
             ->flatMap(static fn (CollectionFilterGroupData $group): Collection => $group->values)
-            ->mapWithKeys(
-                static fn (CollectionFilterValueData $value): array => [
-                    $value->id => $value->toArray(),
-                ]
-            )
-            ->all();
+            ->keyBy(static fn (CollectionFilterValueData $value): int => $value->id)
+            ->map(static fn (CollectionFilterValueData $value): array => $value->toArray());
     }
 
     /**
@@ -396,7 +393,7 @@ class Show extends Component
 
         $lookup = $this->filterValueLookup;
 
-        if ($valueId <= 0 || ! array_key_exists($valueId, $lookup)) {
+        if ($valueId <= 0 || ! $lookup->has($valueId)) {
             return;
         }
 

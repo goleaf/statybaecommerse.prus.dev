@@ -14,40 +14,50 @@
             "pattern": "^v1(\\.\\d+)?$"
         },
         "data": {
-            "type": "object",
-            "additionalProperties": false,
-            "properties": {
-                "brand": {
-                    "$ref": "#/$defs/brand"
-                },
-                "brands": {
+            "oneOf": [
+                {
                     "type": "array",
                     "items": {
                         "$ref": "#/$defs/brand"
                     }
                 },
-                "item": {
-                    "$ref": "#/$defs/brand"
-                },
-                "items": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/$defs/brand"
-                    }
-                }
-            },
-            "anyOf": [
                 {
-                    "required": ["brand"]
-                },
-                {
-                    "required": ["brands"]
-                },
-                {
-                    "required": ["item"]
-                },
-                {
-                    "required": ["items"]
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                        "brand": {
+                            "$ref": "#/$defs/brand"
+                        },
+                        "brands": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/$defs/brand"
+                            }
+                        },
+                        "item": {
+                            "$ref": "#/$defs/brand"
+                        },
+                        "items": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/$defs/brand"
+                            }
+                        }
+                    },
+                    "anyOf": [
+                        {
+                            "required": ["brand"]
+                        },
+                        {
+                            "required": ["brands"]
+                        },
+                        {
+                            "required": ["item"]
+                        },
+                        {
+                            "required": ["items"]
+                        }
+                    ]
                 }
             ]
         },

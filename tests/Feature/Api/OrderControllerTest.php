@@ -6,12 +6,32 @@ namespace Tests\Feature\Api;
 
 use App\Models\Order;
 use App\Models\User;
+use Database\Seeders\AdminAuthorizationSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 final class OrderControllerTest extends TestCase
 {
     use RefreshDatabase;
+
+    private bool $previousSkipChecks = true;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->previousSkipChecks = (bool) config('authorization.testing.skip_checks', true);
+        config(['authorization.testing.skip_checks' => false]);
+
+        $this->seed(AdminAuthorizationSeeder::class);
+    }
+
+    protected function tearDown(): void
+    {
+        config(['authorization.testing.skip_checks' => $this->previousSkipChecks]);
+
+        parent::tearDown();
+    }
 
     public function test_customer_can_view_their_own_order(): void
     {
@@ -40,6 +60,7 @@ final class OrderControllerTest extends TestCase
 
         // Acting as a second user ensures we exercise the authorization policy.
         $supportUser = User::factory()->create();
+        $supportUser->assignRole('support');
         $this->actingAs($supportUser);
 
         $response = $this->getJson(route('api.orders.show', ['order' => $foreignOrder->number]));
@@ -50,25 +71,17 @@ final class OrderControllerTest extends TestCase
 
     public function test_user_without_permission_cannot_view_foreign_order(): void
     {
-        // Disable the testing bypass so the authorization matrix behaves as production.
-        config(['authorization.testing.skip_checks' => false]);
+        $orderOwner = User::factory()->create();
+        $restrictedOrder = Order::factory()->confirmed()->create([
+            'user_id' => $orderOwner->getKey(),
+        ]);
 
-        try {
-            $orderOwner = User::factory()->create();
-            $restrictedOrder = Order::factory()->confirmed()->create([
-                'user_id' => $orderOwner->getKey(),
-            ]);
+        // Authenticate as a different user who lacks the required permission.
+        $anotherUser = User::factory()->create();
+        $this->actingAs($anotherUser);
 
-            // Authenticate as a different user who lacks the required permission.
-            $anotherUser = User::factory()->create();
-            $this->actingAs($anotherUser);
+        $response = $this->getJson(route('api.orders.show', ['order' => $restrictedOrder->number]));
 
-            $response = $this->getJson(route('api.orders.show', ['order' => $restrictedOrder->number]));
-
-            $response->assertForbidden();
-        } finally {
-            // Restore the default configuration to avoid bleeding into later tests.
-            config(['authorization.testing.skip_checks' => true]);
-        }
+        $response->assertForbidden();
     }
 }

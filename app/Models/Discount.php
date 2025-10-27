@@ -283,10 +283,13 @@ final class Discount extends Model
     public function scopeOrderedByName(Builder $query, string $direction = 'asc'): Builder
     {
         // Guard against unexpected direction values to keep the query predictable and safe.
-        $direction = strtolower($direction) === 'desc' ? 'desc' : 'asc';
+        $direction = strtolower(trim($direction)) === 'desc' ? 'desc' : 'asc';
 
-        // Apply the ordering so API responses and UI dropdowns remain sorted consistently for shoppers.
-        return $query->orderBy('name', $direction);
+        // Apply the ordering using the configured column with qualification to avoid ambiguous column errors.
+        return $query->orderBy(
+            $query->qualifyColumn($this->getNameColumn()),
+            $direction
+        );
     }
 
     /**

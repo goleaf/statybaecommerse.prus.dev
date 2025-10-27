@@ -7,6 +7,8 @@ namespace App\Models;
 use App\Models\Concerns\OrdersByName;
 use App\Models\Scopes\UserOwnedScope;
 use Database\Factories\UserPreferenceFactory;
+use DateTimeInterface;
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -14,6 +16,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
+use JsonSerializable;
 
 /**
  * UserPreference
@@ -72,7 +75,10 @@ final class UserPreference extends Model
      *
      * @var array<string, string>
      */
-    protected $casts = ['meta' => 'array'];
+    protected $casts = [
+        'meta'      => 'array',
+        'metadata'  => 'array',
+    ];
 
     /**
      * Translate legacy attribute names into the modern aliases so existing factories continue to work.
@@ -185,7 +191,29 @@ final class UserPreference extends Model
 
                 return is_array($payload) ? $payload : null;
             },
-            set: static fn (mixed $value): array => ['metadata' => is_array($value) ? $value : null],
+            set: static function (mixed $value): array {
+                if ($value instanceof JsonSerializable) {
+                    $value = $value->jsonSerialize();
+                }
+
+                if ($value instanceof Arrayable) {
+                    $value = $value->toArray();
+                }
+
+                if (is_string($value)) {
+                    $decoded = json_decode($value, true);
+
+                    if (json_last_error() === JSON_ERROR_NONE) {
+                        $value = $decoded;
+                    }
+                }
+
+                if (! is_array($value)) {
+                    return ['metadata' => null];
+                }
+
+                return ['metadata' => json_encode($value, JSON_PRESERVE_ZERO_FRACTION)];
+            },
         );
     }
 
@@ -211,10 +239,10 @@ final class UserPreference extends Model
         return Attribute::make(
             get: static fn (mixed $value): ?Carbon => $value === null ? null : Carbon::parse((string) $value),
             set: static fn (mixed $value): ?string => match (true) {
-                $value instanceof Carbon => $value->toDateTimeString(),
-                is_string($value)        => $value,
-                $value === null          => null,
-                default                  => (string) $value,
+                $value instanceof DateTimeInterface => Carbon::instance($value)->toDateTimeString(),
+                is_string($value)                   => $value,
+                $value === null                     => null,
+                default                             => (string) $value,
             },
         );
     }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Repositories\Search;
 
 use App\Data\SearchQueryData;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Number;
 use Illuminate\Support\Str;
@@ -132,6 +133,16 @@ SQL;
         $averageRating = $attributes['average_rating'] ?? 0.0;
         $sku = $this->resolveTextValue($attributes['sku'] ?? null) ?? '';
 
+        $url = null;
+
+        if ($resolvedSlug !== '') {
+            if (Route::has('frontend.products.show')) {
+                $url = route('frontend.products.show', ['product' => $resolvedSlug]);
+            } elseif (Route::has('api.products.show')) {
+                $url = route('api.products.show', ['product' => $resolvedSlug]);
+            }
+        }
+
         return [
             'id'              => is_numeric($attributes['id'] ?? null) ? (int) $attributes['id'] : 0,
             'type'            => 'product',
@@ -141,7 +152,7 @@ SQL;
             'price'           => $price,
             'formatted_price' => Number::currency($price, 'EUR', app()->getLocale()),
             'image'           => null,
-            'url'             => $resolvedSlug !== '' ? route('products.show', $resolvedSlug) : null,
+            'url'             => $url,
             'relevance_score' => $this->calculateRelevanceScore(
                 $resolvedName,
                 $sku,

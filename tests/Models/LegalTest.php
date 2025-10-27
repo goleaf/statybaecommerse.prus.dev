@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Str;
 
 // Leverage the shared RefreshDatabase trait while the global Pest configuration boots the Laravel TestCase.
-uses(RefreshDatabase::class);
+uses(Tests\TestCase::class, RefreshDatabase::class);
 
 beforeEach(function (): void {
     // Ensure the framework resolves content translations against a predictable locale.

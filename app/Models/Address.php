@@ -176,10 +176,18 @@ final class Address extends Model
     /**
      * Handle scopeByType functionality with proper error handling.
      */
-    public function scopeByType(Builder $query, string $type): Builder
+    public function scopeByType(Builder $query, AddressType|string $type): Builder
     {
         // Filter addresses by the provided type (billing, shipping, etc.).
-        return $query->where('type', $type);
+        if (! $type instanceof AddressType) {
+            if (is_string($type)) {
+                $type = AddressType::tryFrom(strtolower($type)) ?? AddressType::tryFrom($type) ?? $type;
+            }
+        }
+
+        $typeValue = $type instanceof AddressType ? $type->value : $type;
+
+        return $query->where($query->qualifyColumn('type'), $typeValue);
     }
 
     /**
@@ -252,10 +260,17 @@ final class Address extends Model
     /**
      * Provide a reusable ordering scope for alphabetic listings by customer name.
      */
-    public function scopeOrderedByName(Builder $query): Builder
+    public function scopeOrderedByName(Builder $query, string $direction = 'asc'): Builder
     {
         // Order by first and last name columns to offer predictable directory views.
-        return $query->orderBy('first_name')->orderBy('last_name');
+        $direction = strtolower($direction) === 'desc' ? 'desc' : 'asc';
+        $firstNameColumn = $query->qualifyColumn('first_name');
+        $lastNameColumn = $query->qualifyColumn('last_name');
+
+        return $query
+            ->orderByRaw(sprintf('CASE WHEN %s IS NULL THEN 1 ELSE 0 END', $firstNameColumn))
+            ->orderByRaw(sprintf('LOWER(COALESCE(%s, \'\')) %s', $firstNameColumn, $direction))
+            ->orderByRaw(sprintf('LOWER(COALESCE(%s, \'\')) %s', $lastNameColumn, $direction));
     }
 
     /**

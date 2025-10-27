@@ -5,11 +5,12 @@ declare(strict_types=1);
 use App\Models\Customer;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Schema;
 use Tests\Support\AssertsRelations;
+use Tests\TestCase;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
-uses(RefreshDatabase::class);
+uses(TestCase::class, RefreshDatabase::class);
 
 it('confirms the customer factory can create records when present', function (): void {
     // Attempt to exercise the factory while gracefully skipping if it is unavailable.

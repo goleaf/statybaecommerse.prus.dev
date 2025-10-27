@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use InvalidArgumentException;
 
 /**
  * CampaignSchedule
@@ -27,7 +28,37 @@ final class CampaignSchedule extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['campaign_id', 'schedule_type', 'schedule_config', 'next_run_at', 'last_run_at', 'is_active'];
+    public const FILLABLE = [
+        'campaign_id',
+        'schedule_type',
+        'schedule_config',
+        'next_run_at',
+        'last_run_at',
+        'is_active',
+    ];
+
+    protected $table = 'campaign_schedules';
+
+    /**
+     * Define the attributes that are mass assignable so factories and user
+     * input can safely persist schedules.
+     *
+     * @var array<int, string>
+     */
+    protected $fillable = self::FILLABLE;
+
+    /**
+     * Cast complex attributes so consumers always work with rich types.
+     *
+     * @var array<string, string>
+     */
+    protected $casts = [
+        'schedule_config' => 'array',
+        'next_run_at'     => 'datetime',
+        'last_run_at'     => 'datetime',
+        'schedule_type'   => ScheduleType::class,
+        'is_active'       => 'boolean',
+    ];
 
     /**
      * Provide sensible defaults to make working with optional attributes safer.
@@ -39,20 +70,6 @@ final class CampaignSchedule extends Model
         'schedule_config' => '[]',
         'is_active'       => true,
     ];
-
-    /**
-     * Handle casts functionality with proper error handling.
-     */
-    protected function casts(): array
-    {
-        return [
-            'schedule_config' => 'array',
-            'next_run_at'     => 'datetime',
-            'last_run_at'     => 'datetime',
-            'schedule_type'   => ScheduleType::class,
-            'is_active'       => 'boolean',
-        ];
-    }
 
     /**
      * Provide a reusable scope for callers that specifically need only active schedules.
@@ -89,7 +106,22 @@ final class CampaignSchedule extends Model
      */
     public function scopeForType(Builder $query, ScheduleType|string $type): Builder
     {
-        $resolvedType = $type instanceof ScheduleType ? $type : ScheduleType::from((string) $type);
+        $resolvedType = $type instanceof ScheduleType
+            ? $type
+            : ScheduleType::tryFrom(strtolower(trim((string) $type)));
+
+        if ($resolvedType === null) {
+            $validTypes = implode(', ', array_map(
+                static fn (ScheduleType $case): string => $case->value,
+                ScheduleType::cases(),
+            ));
+
+            throw new InvalidArgumentException(sprintf(
+                'Invalid schedule type "%s". Expected one of: %s.',
+                $type,
+                $validTypes,
+            ));
+        }
 
         return $query->where('schedule_type', $resolvedType->value);
     }

@@ -10,9 +10,10 @@ use App\Models\User;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
+use Tests\TestCase;
 
 // Refresh the database between scenarios while the global Pest bootstrap loads the application TestCase.
-uses(RefreshDatabase::class);
+uses(TestCase::class, RefreshDatabase::class);
 
 it('resolves its belongs to relationships', function (): void {
     // Arrange: create a fully-related redemption record for inspection.
@@ -116,12 +117,14 @@ it('evaluates amount-based scopes and aggregations', function (): void {
     $user = User::factory()->create();
 
     $higher = DiscountRedemption::factory()->forDiscount($discount)->create([
-        'user_id'      => $user->getKey(),
-        'amount_saved' => 50,
+        'user_id'       => $user->getKey(),
+        'amount_saved'  => 50,
+        'currency_code' => 'EUR',
     ]);
     $lower = DiscountRedemption::factory()->forDiscount($discount)->create([
-        'user_id'      => $user->getKey(),
-        'amount_saved' => 10,
+        'user_id'       => $user->getKey(),
+        'amount_saved'  => 10,
+        'currency_code' => 'EUR',
     ]);
 
     DiscountRedemption::factory()->create(['amount_saved' => 5]);

@@ -8,6 +8,7 @@ use App\Models\CustomerGroup;
 use App\Models\Discount;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
 final class CustomerGroupTest extends TestCase
@@ -118,6 +119,29 @@ final class CustomerGroupTest extends TestCase
         $this->assertTrue($first->is_enabled);
     }
 
+    public function test_customer_group_scope_enabled_handles_string_storage(): void
+    {
+        $enabledGroup = CustomerGroup::factory()->create(['is_enabled' => true, 'is_active' => true]);
+        $disabledGroup = CustomerGroup::factory()->create(['is_enabled' => false, 'is_active' => false]);
+
+        // Simulate legacy datasets where boolean flags were persisted as strings while newer rows
+        // continue to use integer storage. This mirrors production databases that switched drivers.
+        DB::table('customer_groups')->whereKey($enabledGroup->getKey())->update([
+            'is_enabled' => 'TRUE',
+            'is_active'  => 'TRUE',
+        ]);
+        DB::table('customer_groups')->whereKey($disabledGroup->getKey())->update([
+            'is_enabled' => '0',
+            'is_active'  => '0',
+        ]);
+
+        $sql = CustomerGroup::withoutGlobalScopes()->enabled()->toSql();
+        $resolved = CustomerGroup::withoutGlobalScopes()->enabled()->pluck('id')->all();
+
+        $this->assertStringContainsString('CAST(', $sql);
+        $this->assertSame([$enabledGroup->getKey()], $resolved);
+    }
+
     public function test_customer_group_scope_disabled(): void
     {
         CustomerGroup::factory()->create(['is_enabled' => true]);
@@ -135,7 +159,10 @@ final class CustomerGroupTest extends TestCase
     {
         CustomerGroup::factory()->create(['is_enabled' => true, 'is_active' => true]);
         CustomerGroup::factory()->create(['is_enabled' => false, 'is_active' => false]);
-        CustomerGroup::factory()->create(['is_enabled' => true, 'is_active' => false]);
+        $enabledButInactive = CustomerGroup::factory()->create(['is_enabled' => true, 'is_active' => false])->fresh();
+
+        $this->assertTrue($enabledButInactive->is_enabled);
+        $this->assertFalse($enabledButInactive->is_active);
 
         $activeGroups = CustomerGroup::active()->get();
 

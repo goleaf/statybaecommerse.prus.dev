@@ -830,5 +830,6 @@
     "auth.two_factor.security_footer": "We never store raw codes or device identifiers.",
     "Fetching real-time shipping quotes…": "Fetching real-time shipping quotes…",
     "Recalculating delivery options…": "Recalculating delivery options…",
+    "Shipping capped at :amount": "Shipping capped at :amount",
     "Live quote from resolver": "Live quote from resolver"
 }

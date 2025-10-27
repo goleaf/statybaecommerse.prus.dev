@@ -22,7 +22,7 @@
                 @if ($this->cartItems->count() > 0)
                     <div class="space-y-3 max-h-64 overflow-y-auto">
                         @foreach ($this->cartItems as $item)
-                            <div wire:key="cart-item-{{ $item->id }}" class="flex items-center space-x-3 border-b border-gray-100 pb-3">
+                            <div wire:key="cart-item-{{ $item['id'] }}" class="flex items-center space-x-3 border-b border-gray-100 pb-3">
                                 @if (! empty($item['image_url']))
                                     <img src="{{ $item['image_url'] }}"
                                          alt="{{ $item['name'] }}"

@@ -6,7 +6,7 @@ use App\Models\ContactMessage;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 
-uses(RefreshDatabase::class);
+uses(Tests\TestCase::class, RefreshDatabase::class);
 
 describe('ContactMessage model', function (): void {
     it('stores fillable attributes correctly', function (): void {

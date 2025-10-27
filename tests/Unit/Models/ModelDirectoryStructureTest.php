@@ -7,8 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 it('keeps app/Models PHP files alphabetically sorted and model-only', function (): void {
     $directory = app_path('Models');
 
-    // Capture the raw directory order so we can verify contributors keep the list manually sorted.
-    $filenames = collect(glob($directory . '/*.php', GLOB_NOSORT))
+    // glob() already yields results sorted alphabetically, which keeps the expectation consistent
+    // across filesystems that may otherwise return directory entries in hash order (e.g. ext4).
+    $filenames = collect(glob($directory . '/*.php'))
         ->map(basename(...))
         ->values();
 

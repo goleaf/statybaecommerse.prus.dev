@@ -65,7 +65,7 @@ final class NewsCategory extends Model
             }
 
             // Retrieve the name attribute, falling back to an empty string when unavailable for predictable slugs.
-            $name = $category->getAttribute('name');
+            $name = $category->getAttributeValue('name');
             $category->slug = Str::slug(is_string($name) ? $name : '');
         });
     }
@@ -138,7 +138,12 @@ final class NewsCategory extends Model
      */
     public function scopeOrdered(Builder $query): Builder
     {
-        return $query->orderBy('sort_order')->orderBy('id');
+        $model = $query->getModel();
+
+        return $query
+            ->visible()
+            ->orderBy('sort_order')
+            ->orderBy($model->getKeyName());
     }
 
     /**
@@ -150,7 +155,9 @@ final class NewsCategory extends Model
     public function scopeOrderedByName(Builder $query): Builder
     {
         // Sort by the base name column so both translated and non-translated contexts remain stable.
-        return $query->orderBy('name');
+        return $query
+            ->visible()
+            ->orderBy('name');
     }
 
     /**

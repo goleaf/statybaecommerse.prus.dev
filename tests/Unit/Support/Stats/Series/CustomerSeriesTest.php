@@ -51,6 +51,7 @@ final class CustomerSeriesTest extends TestCase
             $table->unsignedBigInteger('country_id')->nullable();
             $table->string('status')->default('completed');
             $table->string('payment_status')->nullable();
+            $table->string('payment_state')->default('created');
             $table->string('payment_method')->nullable();
             $table->string('payment_reference')->nullable();
             $table->decimal('subtotal', 12, 2)->default(0);

@@ -49,7 +49,8 @@ trait OrdersByName
         // Normalise the direction argument so callers cannot influence the
         // generated SQL beyond toggling ascending or descending order.
         $direction = strtolower($direction) === 'desc' ? 'desc' : 'asc';
+        $column = $query->qualifyColumn($this->getNameColumn());
 
-        return $query->orderBy($this->getNameColumn(), $direction);
+        return $query->orderBy($column, $direction);
     }
 }

@@ -20,7 +20,7 @@ class TopNavigation extends Widget
     /**
      * Match the parent widget signature while forcing a full-width layout by default.
      */
-    protected int|string|array|null $columnSpan = 'full';
+    protected array|string|int $columnSpan = 'full';
 
     protected static ?int $sort = -100;
 

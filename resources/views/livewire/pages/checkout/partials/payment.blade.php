@@ -61,7 +61,7 @@
                 type="submit"
                 class="px-6 py-2 text-sm"
                 wire:loading.attr="disabled"
-                wire:target="placeOrder"
+                wire:target="resolveShippingOptions,placeOrder"
             >
                 <span class="flex items-center gap-2">
                     <span wire:loading.flex wire:target="placeOrder">

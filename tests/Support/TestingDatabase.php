@@ -466,6 +466,26 @@ final class TestingDatabase
             });
         }
 
+        if (! $schema->hasTable('enum_values')) {
+            $schema->create('enum_values', function (Blueprint $table): void {
+                $table->id();
+                $table->string('type');
+                $table->string('key');
+                $table->string('value');
+                $table->string('name');
+                $table->text('description')->nullable();
+                $table->integer('sort_order')->default(0);
+                $table->boolean('is_active')->default(true);
+                $table->boolean('is_default')->default(false);
+                $table->json('metadata')->nullable();
+                $table->timestamps();
+
+                $table->unique(['type', 'key']);
+                $table->index(['type', 'is_active']);
+                $table->index(['type', 'is_default']);
+            });
+        }
+
         if (! $schema->hasTable('users')) {
             $schema->create('users', function (Blueprint $table): void {
                 $table->id();

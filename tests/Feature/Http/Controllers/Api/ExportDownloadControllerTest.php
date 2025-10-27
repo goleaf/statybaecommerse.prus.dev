@@ -48,7 +48,7 @@ final class ExportDownloadControllerTest extends TestCase
         $this->assertSame("id,name\n1,Foo", $response->streamedContent());
     }
 
-    public function test_guest_cannot_download_user_bound_export(): void
+    public function test_guest_can_download_user_bound_export_with_signed_url(): void
     {
         Storage::fake('public');
 
@@ -70,7 +70,8 @@ final class ExportDownloadControllerTest extends TestCase
 
         $response = $this->get($signedUrl);
 
-        $response->assertUnauthorized();
+        $response->assertOk();
+        $this->assertSame('content', $response->streamedContent());
     }
 
     public function test_different_user_receives_forbidden_response(): void

@@ -28,7 +28,8 @@ final class CustomerGroupFactory extends Factory
             'description'         => $this->faker->sentence(),
             'slug'                => $this->faker->slug(),
             'discount_percentage' => $this->faker->randomFloat(2, 0, 50),
-            'is_enabled'          => $this->faker->boolean(80),
+            'is_enabled'          => true,
+            'is_active'           => true,
             // Provide sensible B2B defaults so credit limits and terms based
             // assertions in tests have data to interact with out of the box.
             'minimum_order_amount' => $this->faker->randomFloat(2, 0, 500),

@@ -8,7 +8,6 @@ use App\Models\Concerns\OrdersByName;
 use App\Models\Scopes\ActiveScope;
 use App\Models\Translations\DiscountConditionTranslation;
 use App\Traits\HasTranslations;
-use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -31,7 +30,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  *
  * @mixin \Eloquent
  */
-#[ScopedBy([ActiveScope::class])]
 final class DiscountCondition extends Model
 {
     use HasFactory;
@@ -125,7 +123,9 @@ final class DiscountCondition extends Model
     public function scopeByType(Builder $query, string $type): Builder
     {
         // Allow filtering the scope to a concrete discriminator.
-        return $query->where('type', $type);
+        return $query
+            ->withoutGlobalScopes([ActiveScope::class])
+            ->where('type', $type);
     }
 
     /**
@@ -136,7 +136,9 @@ final class DiscountCondition extends Model
     public function scopeByOperator(Builder $query, string $operator): Builder
     {
         // Let callers target specific comparison semantics.
-        return $query->where('operator', $operator);
+        return $query
+            ->withoutGlobalScopes([ActiveScope::class])
+            ->where('operator', $operator);
     }
 
     /**
@@ -147,7 +149,9 @@ final class DiscountCondition extends Model
     public function scopeByPriority(Builder $query, string $direction = 'asc'): Builder
     {
         // Provide a predictable ordering for UI displays and rule evaluation.
-        return $query->orderBy('priority', $direction);
+        return $query
+            ->withoutGlobalScopes([ActiveScope::class])
+            ->orderBy('priority', $direction);
     }
 
     /**
@@ -160,6 +164,7 @@ final class DiscountCondition extends Model
 
         // Order through a subquery to avoid repeated joins in chained builders.
         return $query
+            ->withoutGlobalScopes([ActiveScope::class])
             ->orderBy(
                 DiscountConditionTranslation::query()
                     ->select('name')
