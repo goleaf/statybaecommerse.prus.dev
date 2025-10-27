@@ -2,6 +2,10 @@ import './bootstrap';
 import './shared/utilities.js';
 import './frontend.js';
 import './modern-interactions.js';
+// Register Alpine data factories that keep search/autocomplete widgets CSP-compliant.
+import './alpine/search-components.js';
+// Bind cart badge helpers that avoid inline Alpine expressions.
+import './alpine/cart.js';
 // import '../../vendor/shopper/framework/resources/js/index.js'; // Temporarily disabled
 // Local fonts are now loaded via CSS @font-face declarations
 

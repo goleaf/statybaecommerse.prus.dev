@@ -1,65 +1,25 @@
-<div class="enhanced-live-search relative" 
-     x-data="{ 
-         showResults: @entangle('showResults'),
-         showSuggestions: @entangle('showSuggestions'),
-         query: @entangle('query'),
-         isSearching: @entangle('isSearching'),
-         selectedIndex: -1,
-         results: @entangle('results'),
-         suggestions: @entangle('suggestions'),
-         showFilters: false,
-         selectedCategory: @entangle('selectedCategory'),
-         selectedBrand: @entangle('selectedBrand'),
-         minPrice: @entangle('minPrice'),
-         maxPrice: @entangle('maxPrice'),
-         inStockOnly: @entangle('inStockOnly'),
-         sortBy: @entangle('sortBy')
-     }" 
-     x-init="
-         $watch('query', value => {
-             if (value.length < {{ $minQueryLength }}) {
-                 showResults = false;
-                 if (value.length === 0) {
-                     showSuggestions = true;
-                 }
-             }
-         });
-         
-         // Close results when clicking outside
-         $el.addEventListener('clickoutside', () => {
-             showResults = false;
-             showSuggestions = false;
-             selectedIndex = -1;
-             showFilters = false;
-         });
-         
-         // Keyboard navigation
-         $el.addEventListener('keydown', (e) => {
-             const totalItems = showResults ? results.length : suggestions.length;
-             
-             if (e.key === 'ArrowDown') {
-                 e.preventDefault();
-                 selectedIndex = Math.min(selectedIndex + 1, totalItems - 1);
-             } else if (e.key === 'ArrowUp') {
-                 e.preventDefault();
-                 selectedIndex = Math.max(selectedIndex - 1, -1);
-             } else if (e.key === 'Enter') {
-                 e.preventDefault();
-                 if (selectedIndex >= 0) {
-                     if (showResults) {
-                         $wire.selectResult(results[selectedIndex]);
-                     } else if (showSuggestions) {
-                         $wire.selectSuggestion(suggestions[selectedIndex]);
-                     }
-                 }
-             } else if (e.key === 'Escape') {
-                 showResults = false;
-                 showSuggestions = false;
-                 selectedIndex = -1;
-                 showFilters = false;
-             }
-         });
-     ">
+<div class="enhanced-live-search relative"
+     x-data="createEnhancedSearchComponent({
+         entangle: {
+             showResults: @entangle('showResults'),
+             showSuggestions: @entangle('showSuggestions'),
+             query: @entangle('query'),
+             isSearching: @entangle('isSearching'),
+             results: @entangle('results'),
+             suggestions: @entangle('suggestions'),
+            showFilters: false,
+             selectedCategory: @entangle('selectedCategory'),
+             selectedBrand: @entangle('selectedBrand'),
+             minPrice: @entangle('minPrice'),
+             maxPrice: @entangle('maxPrice'),
+             inStockOnly: @entangle('inStockOnly'),
+             sortBy: @entangle('sortBy'),
+         },
+         minQueryLength: {{ $minQueryLength }},
+     })"
+     x-on:keydown="handleKeydown($event)"
+     x-on:click.outside="closeDropdowns()"
+>
     
     <!-- Enhanced Search Input -->
     <div class="relative">
@@ -82,7 +42,7 @@
         <div class="absolute inset-y-0 right-0 flex items-center gap-2 pr-3">
             <!-- Filters Toggle -->
             <button
-                @click="showFilters = !showFilters"
+                x-on:click="showFilters = !showFilters"
                 :class="showFilters ? 'bg-blue-100 text-blue-600' : 'text-gray-400 hover:text-gray-600'"
                 type="button"
                 class="p-2 rounded-lg transition-colors duration-200"
