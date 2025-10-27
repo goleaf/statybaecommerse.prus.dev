@@ -1,7 +1,5 @@
 import './bootstrap';
 import './shared/utilities.js';
-import './frontend.js';
-import './modern-interactions.js';
 // Register Alpine data factories that keep search/autocomplete widgets CSP-compliant.
 import './alpine/search-components.js';
 // Bind cart badge helpers that avoid inline Alpine expressions.
@@ -9,129 +7,98 @@ import './alpine/cart.js';
 // import '../../vendor/shopper/framework/resources/js/index.js'; // Temporarily disabled
 // Local fonts are now loaded via CSS @font-face declarations
 
-// Modern frontend enhancements
-document.addEventListener('DOMContentLoaded', function () {
-    // Initialize all modern features
+// -----------------------------------------------------------------------------
+// CSP-friendly frontend enhancements
+// -----------------------------------------------------------------------------
+
+// Reusable class names keep JavaScript expressive while delegating presentation
+// to static styles that satisfy the strict Content Security Policy requirements.
+const ANIMATE_CLASS = 'csp-animate';
+const ANIMATE_VISIBLE_CLASS = 'csp-animate--visible';
+const CARD_BASE_CLASS = 'csp-interactive-card';
+const CARD_ACTIVE_CLASS = 'csp-interactive-card--active';
+const BUTTON_BASE_CLASS = 'csp-interactive-button';
+const BUTTON_HOVER_CLASS = 'csp-button--hover';
+const BUTTON_PRESSED_CLASS = 'csp-button--pressed';
+const NOTIFICATION_BASE_CLASS = 'csp-notification';
+const NOTIFICATION_VISIBLE_CLASS = 'csp-notification--visible';
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Initialise core UX behaviours once the DOM is ready.
     initializeScrollAnimations();
-    initializeParallaxEffects();
     initializeEnhancedInteractions();
     initializeCartNotifications();
     initializeSearchEnhancements();
     initializeLoadingStates();
     initializeThemeSystem();
-    initializeDataAttributes();
 });
 
-// Scroll-triggered animations
+// Scroll-triggered animations rely on class toggles instead of inline styles so
+// CSP rules remain satisfied on every page.
 function initializeScrollAnimations() {
     const observerOptions = {
         threshold: 0.1,
         rootMargin: '0px 0px -50px 0px',
     };
 
+    if (!('IntersectionObserver' in window)) {
+        return;
+    }
+
     const observer = new IntersectionObserver((entries) => {
         entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('visible');
-                // Add stagger effect for multiple elements
-                const siblings = entry.target.parentElement.children;
-                Array.from(siblings).forEach((sibling, index) => {
-                    if (sibling.classList.contains('animate-on-scroll')) {
-                        setTimeout(() => {
-                            sibling.classList.add('visible');
-                        }, index * 100);
-                    }
-                });
+            if (!entry.isIntersecting) {
+                return;
             }
+
+            entry.target.classList.add(ANIMATE_VISIBLE_CLASS);
         });
     }, observerOptions);
 
-    // Observe all elements with animate-on-scroll class
-    document.querySelectorAll('.animate-on-scroll').forEach((el) => {
-        observer.observe(el);
+    document.querySelectorAll('.animate-on-scroll').forEach((element) => {
+        element.classList.add(ANIMATE_CLASS);
+        observer.observe(element);
     });
 }
 
-// Parallax effects for hero sections
-function initializeParallaxEffects() {
-    const parallaxElements = document.querySelectorAll('.parallax');
-
-    if (parallaxElements.length === 0) return;
-
-    const handleScroll = () => {
-        const scrolled = window.pageYOffset;
-
-        parallaxElements.forEach((element) => {
-            const rate = scrolled * -0.5;
-            const rect = element.getBoundingClientRect();
-
-            if (rect.bottom >= 0 && rect.top <= window.innerHeight) {
-                element.style.transform = `translateY(${rate}px)`;
-            }
-        });
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-}
-
-// Enhanced interactions for cards and buttons
+// Hover and focus feedback for cards/buttons is now expressed purely through
+// CSS class toggles so no inline style mutations are required.
 function initializeEnhancedInteractions() {
-    // Product card hover effects
     document.querySelectorAll('.product-card, .card-hover').forEach((card) => {
-        card.addEventListener('mouseenter', function () {
-            this.style.transform = 'translateY(-8px) scale(1.02)';
-            this.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+        card.classList.add(CARD_BASE_CLASS);
+
+        card.addEventListener('mouseenter', () => {
+            card.classList.add(CARD_ACTIVE_CLASS);
         });
 
-        card.addEventListener('mouseleave', function () {
-            this.style.transform = 'translateY(0) scale(1)';
+        card.addEventListener('mouseleave', () => {
+            card.classList.remove(CARD_ACTIVE_CLASS);
         });
     });
 
-    // Button ripple effect
     document.querySelectorAll('.btn-gradient, .btn-primary').forEach((button) => {
-        button.addEventListener('click', function (e) {
-            const ripple = document.createElement('span');
-            const rect = this.getBoundingClientRect();
-            const size = Math.max(rect.width, rect.height);
-            const x = e.clientX - rect.left - size / 2;
-            const y = e.clientY - rect.top - size / 2;
+        button.classList.add(BUTTON_BASE_CLASS);
 
-            ripple.style.cssText = `
-                position: absolute;
-                width: ${size}px;
-                height: ${size}px;
-                left: ${x}px;
-                top: ${y}px;
-                background: rgba(255, 255, 255, 0.3);
-                border-radius: 50%;
-                transform: scale(0);
-                animation: ripple 0.6s linear;
-                pointer-events: none;
-            `;
+        const reset = () => {
+            button.classList.remove(BUTTON_HOVER_CLASS);
+            button.classList.remove(BUTTON_PRESSED_CLASS);
+        };
 
-            this.style.position = 'relative';
-            this.style.overflow = 'hidden';
-            this.appendChild(ripple);
+        button.addEventListener('mouseenter', () => {
+            button.classList.add(BUTTON_HOVER_CLASS);
+        });
 
-            setTimeout(() => ripple.remove(), 600);
+        button.addEventListener('mouseleave', reset);
+        button.addEventListener('blur', reset);
+
+        button.addEventListener('mousedown', () => {
+            button.classList.add(BUTTON_PRESSED_CLASS);
+        });
+
+        button.addEventListener('mouseup', () => {
+            button.classList.remove(BUTTON_PRESSED_CLASS);
         });
     });
-
-    // Add ripple animation CSS
-    if (!document.querySelector('#ripple-styles')) {
-        const style = document.createElement('style');
-        style.id = 'ripple-styles';
-        style.textContent = `
-            @keyframes ripple {
-                to {
-                    transform: scale(4);
-                    opacity: 0;
-                }
-            }
-        `;
-        document.head.appendChild(style);
-    }
 }
 
 // Enhanced cart notifications with modern design
@@ -167,52 +134,82 @@ function initializeCartNotifications() {
 // Modern notification system
 function createNotification({ type = 'info', title, message, duration = 3000 }) {
     const notification = document.createElement('div');
-    const icons = {
-        success: `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-        </svg>`,
-        error: `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    notification.classList.add(NOTIFICATION_BASE_CLASS, `csp-notification--${type}`);
+
+    const iconWrapper = document.createElement('div');
+    iconWrapper.classList.add('csp-notification__icon');
+    iconWrapper.innerHTML = getNotificationIcon(type);
+
+    const contentWrapper = document.createElement('div');
+    contentWrapper.classList.add('csp-notification__content');
+
+    if (title) {
+        const titleElement = document.createElement('h4');
+        titleElement.classList.add('csp-notification__title');
+        titleElement.textContent = title;
+        contentWrapper.appendChild(titleElement);
+    }
+
+    const messageElement = document.createElement('p');
+    messageElement.classList.add('csp-notification__message');
+    messageElement.textContent = message;
+    contentWrapper.appendChild(messageElement);
+
+    const closeButton = document.createElement('button');
+    closeButton.type = 'button';
+    closeButton.classList.add('csp-notification__close');
+    closeButton.setAttribute('aria-label', 'Dismiss notification');
+    closeButton.innerHTML = `
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-        </svg>`,
-        info: `<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-        </svg>`,
-    };
-
-    const colors = {
-        success: 'bg-success-500',
-        error: 'bg-danger-500',
-        info: 'bg-primary-500',
-    };
-
-    notification.className = `fixed top-4 right-4 ${colors[type]} text-white px-6 py-4 rounded-xl shadow-large z-50 transform translate-x-full transition-all duration-300 flex items-start gap-3 max-w-sm`;
-    notification.innerHTML = `
-        <div class="flex-shrink-0 mt-0.5">
-            ${icons[type]}
-        </div>
-        <div class="flex-1">
-            <h4 class="font-semibold text-sm">${title}</h4>
-            <p class="text-sm opacity-90 mt-1">${message}</p>
-        </div>
-        <button class="flex-shrink-0 ml-2 opacity-70 hover:opacity-100 transition-opacity" onclick="this.parentElement.remove()">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-            </svg>
-        </button>
+        </svg>
     `;
+
+    closeButton.addEventListener('click', () => dismissNotification(notification));
+
+    notification.appendChild(iconWrapper);
+    notification.appendChild(contentWrapper);
+    notification.appendChild(closeButton);
 
     document.body.appendChild(notification);
 
-    // Animate in
     requestAnimationFrame(() => {
-        notification.classList.remove('translate-x-full');
+        notification.classList.add(NOTIFICATION_VISIBLE_CLASS);
     });
 
-    // Auto remove
-    setTimeout(() => {
-        notification.classList.add('translate-x-full');
-        setTimeout(() => notification.remove(), 300);
-    }, duration);
+    window.setTimeout(() => dismissNotification(notification), duration);
+}
+
+// Centralised helper to close and remove notifications without inline events.
+function dismissNotification(notification) {
+    if (!notification?.classList) {
+        return;
+    }
+
+    notification.classList.remove(NOTIFICATION_VISIBLE_CLASS);
+    window.setTimeout(() => notification.remove(), 250);
+}
+
+function getNotificationIcon(type) {
+    const icons = {
+        success: `
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+            </svg>
+        `,
+        error: `
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+        `,
+        info: `
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+        `,
+    };
+
+    return icons[type] || icons.info;
 }
 
 // Enhanced search functionality
@@ -299,63 +296,12 @@ function debounce(func, wait) {
 
 // Smooth scroll to element
 function smoothScrollTo(element, offset = 0) {
-    const targetPosition = element.offsetTop - offset;
+    const top = element?.offsetTop ?? 0;
     window.scrollTo({
-        top: targetPosition,
+        top: Math.max(top - offset, 0),
         behavior: 'smooth',
     });
 }
-
-// Initialize data attributes for dynamic styling
-function initializeDataAttributes() {
-    // Handle animation delays
-    document.querySelectorAll('[data-delay]').forEach((element) => {
-        const delay = element.getAttribute('data-delay');
-        element.style.setProperty('--delay', `${delay}s`);
-    });
-
-    // Handle progress bar widths
-    document.querySelectorAll('[data-width]').forEach((element) => {
-        const width = element.getAttribute('data-width');
-        element.style.setProperty('--w', `${width}%`);
-    });
-
-    // Handle dynamic transforms
-    document.querySelectorAll('[data-transform]').forEach((element) => {
-        const transform = element.getAttribute('data-transform');
-        element.style.setProperty('--tx', transform);
-    });
-
-    // Handle dynamic colors
-    document.querySelectorAll('[data-color]').forEach((element) => {
-        const color = element.getAttribute('data-color');
-        element.style.setProperty('--color', color);
-    });
-
-    // Handle dynamic background images
-    document.querySelectorAll('[data-bg-img]').forEach((element) => {
-        const bgImg = element.getAttribute('data-bg-img');
-        element.style.setProperty('--bg-img', `url('${bgImg}')`);
-    });
-
-    // Handle dynamic text colors
-    document.querySelectorAll('[data-text-color]').forEach((element) => {
-        const textColor = element.getAttribute('data-text-color');
-        element.style.setProperty('--text-color', textColor);
-    });
-
-    // Handle dynamic positioning
-    document.querySelectorAll('[data-left]').forEach((element) => {
-        const left = element.getAttribute('data-left');
-        element.style.setProperty('--left', `${left}px`);
-    });
-
-    document.querySelectorAll('[data-top]').forEach((element) => {
-        const top = element.getAttribute('data-top');
-        element.style.setProperty('--top', `${top}px`);
-    });
-}
-
 // Make functions globally available
 window.smoothScrollTo = smoothScrollTo;
 window.createNotification = createNotification;
