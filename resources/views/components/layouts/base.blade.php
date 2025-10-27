@@ -115,7 +115,8 @@
     <div id="notifications" class="fixed top-4 right-4 z-50 space-y-2"></div>
 
     <!-- Livewire Scripts -->
-    @livewireScripts
+    {{-- Pass the CSP nonce so Livewire's inline boot scripts execute without violations. --}}
+    @livewireScripts(['nonce' => csp_nonce()])
 
     <!-- Livewire client hardening: avoid accidental $wire.toJSON() server calls -->
     <script nonce="{{ csp_nonce() }}">

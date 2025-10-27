@@ -10,7 +10,7 @@ The defaults are tuned for our Laravel + Vite frontend and Livewire components:
 - `X-Content-Type-Options: nosniff`
 - `Referrer-Policy: strict-origin-when-cross-origin`
 - `Permissions-Policy: accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()`
-- `Content-Security-Policy` directives that allow our compiled Vite assets, Livewire, Alpine.js (from the CDN), Swagger UI (in the docs area), and Bunny Fonts.
+- `Content-Security-Policy` directives that allow our compiled Vite assets, Livewire, Alpine.js (from the CDN), Swagger UI (in the docs area), and Bunny Fonts. We explicitly permit `'unsafe-eval'` for `script-src` and `'unsafe-inline'` for `style-src` so Filament's Alpine-powered widgets continue to function while we refactor away dynamic evaluation and inline CSS variables.
 
 ## Extending the CSP for third-party services
 
