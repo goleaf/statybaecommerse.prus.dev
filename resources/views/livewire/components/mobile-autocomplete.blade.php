@@ -1,58 +1,19 @@
-<div class="mobile-autocomplete relative" 
-     x-data="{
-         showResults: @entangle('showResults'),
-         showSuggestions: @entangle('showSuggestions'),
-         query: @entangle('query'),
-         isSearching: @entangle('isSearching'),
-         selectedIndex: -1,
-         results: @entangle('results'),
-         suggestions: @entangle('suggestions'),
-         isFullScreen: @entangle('isFullScreen')
-     }" 
-     x-init="
-         $watch('query', value => {
-             if (value.length < {{ $minQueryLength }}) {
-                 showResults = false;
-                 if (value.length === 0) {
-                     showSuggestions = true;
-                 }
-             }
-         });
-         
-         // Close results when clicking outside
-         $el.addEventListener('clickoutside', () => {
-             showResults = false;
-             showSuggestions = false;
-             selectedIndex = -1;
-         });
-         
-         // Keyboard navigation
-         $el.addEventListener('keydown', (e) => {
-             const totalItems = showResults ? results.length : suggestions.length;
-
-             if (e.key === 'ArrowDown') {
-                 e.preventDefault();
-                 selectedIndex = Math.min(selectedIndex + 1, totalItems - 1);
-             } else if (e.key === 'ArrowUp') {
-                 e.preventDefault();
-                 selectedIndex = Math.max(selectedIndex - 1, -1);
-             } else if (e.key === 'Enter') {
-                 e.preventDefault();
-                 if (selectedIndex >= 0) {
-                     if (showResults) {
-                         $wire.selectResult(results[selectedIndex]);
-                     } else if (showSuggestions) {
-                         $wire.selectSuggestion(suggestions[selectedIndex]);
-                     }
-                 }
-             } else if (e.key === 'Escape') {
-                 showResults = false;
-                 showSuggestions = false;
-                 selectedIndex = -1;
-                 isFullScreen = false;
-             }
-         });
-     ">
+<div class="mobile-autocomplete relative"
+     x-data="createMobileSearchComponent({
+         entangle: {
+             showResults: @entangle('showResults'),
+             showSuggestions: @entangle('showSuggestions'),
+             query: @entangle('query'),
+             isSearching: @entangle('isSearching'),
+             results: @entangle('results'),
+             suggestions: @entangle('suggestions'),
+             isFullScreen: @entangle('isFullScreen'),
+         },
+         minQueryLength: {{ $minQueryLength }},
+     })"
+     x-on:keydown="handleKeydown($event)"
+     x-on:click.outside="closeDropdowns()"
+>
     
     {{-- Mobile Search Input --}}
     <div class="relative">
@@ -69,7 +30,7 @@
             class="block w-full pl-10 pr-12 py-3 border border-gray-300 rounded-lg bg-white text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             autocomplete="off"
             x-ref="searchInput"
-            @focus="isFullScreen = true"
+            x-on:focus="setFullScreen(true)"
         />
         
         {{-- Loading Spinner --}}
@@ -150,7 +111,7 @@
             </div>
             
             <button
-                @click="isFullScreen = false"
+                x-on:click="setFullScreen(false)"
                 type="button"
                 class="ml-3 text-gray-500 hover:text-gray-700 focus:outline-none"
             >
@@ -167,7 +128,7 @@
                 <div class="space-y-3">
                     <template x-for="(result, index) in results" :key="result.id">
                         <button
-                            @click="$wire.selectResult(result)"
+                            x-on:click="selectResultByIndex(index)"
                             class="w-full text-left p-3 rounded-lg border border-gray-200 hover:bg-gray-50 focus:bg-gray-50 focus:outline-none"
                             :class="{ 'bg-gray-50': selectedIndex === index }"
                         >
@@ -206,8 +167,8 @@
                 <h3 class="text-sm font-medium text-gray-900 mb-3">{{ __('frontend.search.suggestions') }}</h3>
                 <div class="space-y-2">
                     <template x-for="(suggestion, index) in suggestions" :key="index">
-                        <button
-                            @click="$wire.selectSuggestion(suggestion)"
+                    <button
+                        x-on:click="selectSuggestionByIndex(index)"
                             class="w-full text-left p-3 rounded-lg hover:bg-gray-50 focus:bg-gray-50 focus:outline-none"
                             :class="{ 'bg-gray-50': selectedIndex === index }"
                         >

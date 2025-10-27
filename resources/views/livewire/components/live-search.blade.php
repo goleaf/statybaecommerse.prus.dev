@@ -20,57 +20,22 @@
     }
 @endphp
 
-<div class="relative" x-data="{ 
-    showResults: @entangle('showResults'),
-    showSuggestions: @entangle('showSuggestions'),
-    query: @entangle('query'),
-    isSearching: @entangle('isSearching'),
-    selectedIndex: -1,
-    results: @entangle('results'),
-    suggestions: @entangle('suggestions')
-}" x-init="
-    $watch('query', value => {
-        if (value.length < {{ $minQueryLength }}) {
-            showResults = false;
-            if (value.length === 0) {
-                showSuggestions = true;
-            }
-        }
-    });
-    
-    // Close results when clicking outside
-    $el.addEventListener('clickoutside', () => {
-        showResults = false;
-        showSuggestions = false;
-        selectedIndex = -1;
-    });
-    
-    // Keyboard navigation
-    $el.addEventListener('keydown', (e) => {
-        const totalItems = showResults ? results.length : suggestions.length;
-        
-        if (e.key === 'ArrowDown') {
-            e.preventDefault();
-            selectedIndex = Math.min(selectedIndex + 1, totalItems - 1);
-        } else if (e.key === 'ArrowUp') {
-            e.preventDefault();
-            selectedIndex = Math.max(selectedIndex - 1, -1);
-        } else if (e.key === 'Enter') {
-            e.preventDefault();
-            if (selectedIndex >= 0) {
-                if (showResults) {
-                    $wire.selectResult(results[selectedIndex]);
-                } else if (showSuggestions) {
-                    $wire.selectSuggestion(suggestions[selectedIndex]);
-                }
-            }
-        } else if (e.key === 'Escape') {
-            showResults = false;
-            showSuggestions = false;
-            selectedIndex = -1;
-        }
-    });
-">
+<div
+    class="relative"
+    x-data="createDesktopSearchComponent({
+        entangle: {
+            showResults: @entangle('showResults'),
+            showSuggestions: @entangle('showSuggestions'),
+            query: @entangle('query'),
+            isSearching: @entangle('isSearching'),
+            results: @entangle('results'),
+            suggestions: @entangle('suggestions'),
+        },
+        minQueryLength: {{ $minQueryLength }},
+    })"
+    x-on:keydown="handleKeydown($event)"
+    x-on:click.outside="closeDropdowns()"
+>
     {{-- Search Input --}}
     <div class="relative">
         <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
