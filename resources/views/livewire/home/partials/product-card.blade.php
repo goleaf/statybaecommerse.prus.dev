@@ -1,5 +1,4 @@
 @php
-    use Closure;
     use Illuminate\Contracts\Support\Arrayable;
     use Illuminate\Support\Number;
     use Illuminate\View\ComponentAttributeBag;
@@ -13,7 +12,7 @@
     ]);
 
     foreach ($attributes->getAttributes() as $attributeKey => $attributeValue) {
-        if ($attributeValue instanceof Closure) {
+        if ($attributeValue instanceof \Closure) {
             \Log::error('Closure attribute detected on product card.', [
                 'attribute'  => $attributeKey,
                 'product_id' => $productData['id'] ?? null,

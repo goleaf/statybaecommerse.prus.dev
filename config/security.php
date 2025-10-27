@@ -50,14 +50,19 @@ return [
                     '@nonce',
                     'https://unpkg.com',
                 ],
-                'script-src-attr' => ["'none'"],
+                'script-src-attr' => [
+                    "'unsafe-inline'",
+                ],
                 'style-src'       => [
                     "'self'",
                     '@nonce',
                     'https://fonts.bunny.net',
                     'https://unpkg.com',
                 ],
-                'style-src-attr' => ["'self'"],
+                'style-src-attr' => [
+                    "'self'",
+                    "'unsafe-inline'",
+                ],
                 'font-src'       => [
                     "'self'",
                     'https://fonts.bunny.net',

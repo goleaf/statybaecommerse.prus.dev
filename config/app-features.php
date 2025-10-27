@@ -52,7 +52,7 @@ return [
      * | The locales supported by the application
      * |
      */
-    'supported_locales' => ['en', 'lt'],
+    'supported_locales' => ['lt', 'en', 'ru', 'de'],
 
     /*
      * |--------------------------------------------------------------------------
