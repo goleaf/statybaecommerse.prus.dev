@@ -50,8 +50,8 @@ final class DatabaseSeeder extends Seeder
         $wasLoggingDisabled = $activityLogStatus->disabled();
 
         if (! $wasLoggingDisabled) {
-            // Temporarily suspend activity logging for cleaner seed runs.
-            activity()->disableLogging();
+            // Temporarily suspend activity logging for cleaner seed runs without touching the logger facade.
+            $activityLogStatus->disable();
         }
 
         try {
@@ -59,7 +59,7 @@ final class DatabaseSeeder extends Seeder
         } finally {
             if (! $wasLoggingDisabled) {
                 // Ensure logging is re-enabled even if a seeder fails midway.
-                activity()->enableLogging();
+                $activityLogStatus->enable();
             }
         }
     }
