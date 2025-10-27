@@ -195,12 +195,12 @@ final class SimpleSystemSettingsSeeder extends Seeder
             'value'       => 'lt',
             'group'       => 'general',
             'description' => 'Default language for the application',
-            'options'     => json_encode([
+            'options'     => [
                 'lt' => 'Lietuvių',
                 'en' => 'English',
                 'de' => 'Deutsch',
                 'ru' => 'Русский',
-            ]),
+            ],
             'sort_order'  => 5,
         ])->create();
 

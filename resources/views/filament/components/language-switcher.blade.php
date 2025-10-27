@@ -1,6 +1,6 @@
 @php
     $currentLocale = app()->getLocale();
-    $availableLocales = ['lt' => 'Lietuvių', 'en' => 'English', 'de' => 'Deutsch'];
+    $availableLocales = ['lt' => 'Lietuvių', 'en' => 'English', 'ru' => 'Русский', 'de' => 'Deutsch'];
 @endphp
 
 <div class="filament-language-switcher">
