@@ -1,30 +1,24 @@
-<div class="advanced-search relative" 
-     x-data="{
-         showResults: @entangle('showResults'),
-         showFilters: @entangle('showFilters'),
-         query: @entangle('query'),
-         isSearching: @entangle('isSearching'),
-         results: @entangle('results'),
-         selectedCategories: @entangle('selectedCategories'),
-         selectedBrands: @entangle('selectedBrands'),
-         selectedCollections: @entangle('selectedCollections'),
-         minPrice: @entangle('minPrice'),
-         maxPrice: @entangle('maxPrice'),
-         inStockOnly: @entangle('inStockOnly'),
-         sortBy: @entangle('sortBy')
-     }" 
-     x-init="
-         $watch('query', value => {
-             if (value.length < {{ $minQueryLength }}) {
-                 showResults = false;
-             }
-         });
-         
-         // Close results when clicking outside
-         $el.addEventListener('clickoutside', () => {
-             showResults = false;
-         });
-     ">
+<div class="advanced-search relative"
+     x-data="createAdvancedSearchComponent({
+         entangle: {
+             showResults: @entangle('showResults'),
+             showFilters: @entangle('showFilters'),
+             query: @entangle('query'),
+             isSearching: @entangle('isSearching'),
+             results: @entangle('results'),
+             selectedCategories: @entangle('selectedCategories'),
+             selectedBrands: @entangle('selectedBrands'),
+             selectedCollections: @entangle('selectedCollections'),
+             minPrice: @entangle('minPrice'),
+             maxPrice: @entangle('maxPrice'),
+             inStockOnly: @entangle('inStockOnly'),
+             sortBy: @entangle('sortBy'),
+         },
+         minQueryLength: {{ $minQueryLength }},
+     })"
+     x-on:keydown="handleKeydown($event)"
+     x-on:click.outside="closeDropdowns()"
+>
     
     {{-- Search Input with Filters Toggle --}}
     <div class="relative">

@@ -1,41 +1,17 @@
-<div class="relative" x-data="{ 
-    showResults: @entangle('showResults'),
-    query: @entangle('query'),
-    isSearching: @entangle('isSearching'),
-    selectedIndex: -1,
-    results: @entangle('results')
-}" x-init="
-    $watch('query', value => {
-        if (value.length < {{ $minQueryLength }}) {
-            showResults = false;
-        }
-    });
-    
-    // Close results when clicking outside
-    $el.addEventListener('clickoutside', () => {
-        showResults = false;
-        selectedIndex = -1;
-    });
-    
-    // Keyboard navigation
-    $el.addEventListener('keydown', (e) => {
-        if (e.key === 'ArrowDown') {
-            e.preventDefault();
-            selectedIndex = Math.min(selectedIndex + 1, results.length - 1);
-        } else if (e.key === 'ArrowUp') {
-            e.preventDefault();
-            selectedIndex = Math.max(selectedIndex - 1, -1);
-        } else if (e.key === 'Enter') {
-            e.preventDefault();
-            if (selectedIndex >= 0 && results[selectedIndex]) {
-                $wire.selectResult(results[selectedIndex]);
-            }
-        } else if (e.key === 'Escape') {
-            showResults = false;
-            selectedIndex = -1;
-        }
-    });
-">
+<div
+    class="relative"
+    x-data="createDesktopSearchComponent({
+        entangle: {
+            showResults: @entangle('showResults'),
+            query: @entangle('query'),
+            isSearching: @entangle('isSearching'),
+            results: @entangle('results'),
+        },
+        minQueryLength: {{ $minQueryLength }},
+    })"
+    x-on:keydown="handleKeydown($event)"
+    x-on:click.outside="closeDropdowns()"
+>
     {{-- Hidden input for form submission --}}
     <input type="hidden" name="{{ $name }}" value="{{ $selectedProductId }}" />
     

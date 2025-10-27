@@ -1,5 +1,8 @@
 {{-- Keep the Alpine badge in sync with the standard cart-updated browser event. --}}
-<div class="relative ml-4 flow-root lg:ml-6" x-data="{ qty: {{ (int) ($cartTotalItems ?? 0) }} }" x-init="window.addEventListener('cart-updated', e => { qty = e.detail?.quantity ?? qty })">
+<div
+    class="relative ml-4 flow-root lg:ml-6"
+    x-data="createCartButtonComponent({ quantity: {{ (int) ($cartTotalItems ?? 0) }} })"
+>
     <button
             wire:click="$dispatch('openPanel', { component: 'modals.shopping-cart' })"
             type="button"
