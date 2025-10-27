@@ -80,18 +80,8 @@
     <div class="mb-4">
         <h2 class="text-xl font-semibold mb-2">{{ __('Filter by brand') }}</h2>
         @php
-            $brandOptions = $this->availableBrands
-                ->map(static fn (\App\Models\Brand $brand): array => [
-                    'id'   => (int) $brand->id,
-                    'name' => $brand->trans('name') ?? $brand->name,
-                ])
-                ->values()
-                ->all();
-            $activeBrandIds = collect($brandIds ?? [])
-                ->map(static fn ($id): int => (int) $id)
-                ->filter()
-                ->values()
-                ->all();
+            $brandOptions = $brandOptions ?? [];
+            $activeBrandIds = $activeBrandIds ?? [];
             $brandLookup = collect($brandOptions)->keyBy('id');
         @endphp
         <div class="flex flex-wrap items-center gap-2 mb-2">
@@ -131,19 +121,16 @@
     </div>
 
     @php
-        $filterGroupCollection = $filterGroups ?? [];
-        $activeValueIds = collect($selectedValues ?? [])
-            ->map(static fn ($id): int => (int) $id)
-            ->filter()
-            ->values()
-            ->all();
+        $filterGroups = $filterGroups ?? [];
+        $filterValueLookup = collect($filterValueLookup ?? []);
+        $activeValueIds = $activeValueIds ?? [];
     @endphp
-    @if (! empty($filterGroupCollection))
+    @if (! empty($filterGroups))
         <div class="mb-6">
             <h2 class="text-xl font-semibold mb-2">{{ __('Filter by') }}</h2>
             <div class="flex flex-wrap items-center gap-2 mb-2">
                 @foreach ($activeValueIds as $valueId)
-                    @php($selected = $filterValueLookup[$valueId] ?? null)
+                    @php($selected = $filterValueLookup->get($valueId))
                     @if ($selected)
                         <button type="button"
                                 wire:key="active-filter-{{ (int) $valueId }}"
@@ -164,27 +151,34 @@
                     </button>
                 @endif
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                @foreach ($filterGroupCollection as $group)
+            <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
+                @foreach ($filterGroups as $group)
                     @php
                         $attribute = $group['attribute'] ?? [];
                         $attributeId = (int) ($attribute['id'] ?? 0);
-                        $attributeKey = $attributeId > 0 ? $attributeId : uniqid('attr-', false);
+                        $attributeName = $attribute['name'] ?? __('Filters');
                     @endphp
-                    <div wire:key="filter-group-{{ $attributeKey }}">
-                        <div class="text-sm font-medium mb-2">{{ $attribute['name'] ?? __('Filters') }}</div>
-                        <div class="flex flex-wrap gap-2">
+                    <div wire:key="filter-group-{{ $attributeId ?: uniqid('attr-', false) }}">
+                        <h3 class="text-sm font-semibold text-gray-900 mb-3">
+                            {{ $attributeName }}
+                        </h3>
+                        <ul class="flex flex-wrap gap-2">
                             @foreach ($group['values'] ?? [] as $value)
                                 @php($valueId = (int) ($value['id'] ?? 0))
-                                <label wire:key="filter-{{ $attributeId }}-{{ $valueId }}"
-                                       class="inline-flex items-center gap-1 text-sm">
-                                    <input type="checkbox"
-                                           wire:click="toggleFilter({{ $attributeId }}, {{ $valueId }})"
-                                           @checked(! empty($value['selected']))>
-                                    <span>{{ $value['label'] ?? '' }}</span>
-                                </label>
+                                <li wire:key="filter-{{ $attributeId }}-{{ $valueId }}">
+                                    <button
+                                        type="button"
+                                        class="inline-flex items-center gap-1 rounded-full px-3 py-1 text-sm transition {{ ! empty($value['selected']) ? 'bg-primary-600 text-white shadow-sm' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' }}"
+                                        wire:click="toggleFilter({{ $attributeId }}, {{ $valueId }})"
+                                    >
+                                        <span>{{ $value['label'] ?? '' }}</span>
+                                        @if (! empty($value['selected']))
+                                            <span aria-hidden="true">×</span>
+                                        @endif
+                                    </button>
+                                </li>
                             @endforeach
-                        </div>
+                        </ul>
                     </div>
                 @endforeach
             </div>

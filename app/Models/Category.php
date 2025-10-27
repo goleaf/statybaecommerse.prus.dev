@@ -231,7 +231,9 @@ final class Category extends Model implements HasMedia
      */
     public function scopeOrdered($query)
     {
-        return $query->orderBy('sort_order')->orderBy('name');
+        return $query
+            ->orderBy($query->qualifyColumn('sort_order'))
+            ->orderedByName();
     }
 
     // Alphabetical ordering now flows through the OrdersByName trait to share

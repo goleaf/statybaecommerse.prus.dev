@@ -163,6 +163,16 @@ if (! function_exists('post')) {
     }
 }
 
+if (! function_exists('markTestSkipped')) {
+    /**
+     * Allow Pest style tests to skip dynamically without depending on PHPUnit's base TestCase.
+     */
+    function markTestSkipped(string $reason): void
+    {
+        test()->markTestSkipped($reason);
+    }
+}
+
 expect()->extend('toHaveCountLessThan', function (int $expected) {
     $value = $this->value;
 

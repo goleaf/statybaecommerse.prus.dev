@@ -1,38 +1,46 @@
 {{--
-    Delivery step radio list.
-    Lazily fetches shipping options while providing manual refresh controls.
+    Delivery step: renders resolved shipping options with loading states and discount badges.
 --}}
 <div class="space-y-6">
-    @if($isResolving && count($options) === 0)
-        <div class="space-y-3" role="status" aria-live="polite">
-            @foreach(range(1, 3) as $placeholder)
-                <div class="flex items-center justify-between gap-4 rounded border border-primary-100 bg-primary-50/80 p-4">
-                    <div class="flex items-start gap-3">
-                        <span class="mt-1 size-4 rounded-full border border-primary-200 bg-white"></span>
-                        <span class="space-y-2">
-                            <span class="block h-3 w-32 animate-pulse rounded bg-primary-100"></span>
-                            <span class="block h-3 w-48 animate-pulse rounded bg-primary-100"></span>
-                        </span>
-                    </div>
-                    <span class="block h-3 w-16 animate-pulse rounded bg-primary-100"></span>
+    {{-- Skeleton loader surfaced while Livewire fetches updated options --}}
+    <div
+        wire:loading.flex
+        wire:target="resolveOptions"
+        class="space-y-3"
+        role="status"
+        aria-live="polite"
+    >
+        @foreach(range(1, 3) as $placeholder)
+            <div class="flex items-center justify-between gap-4 rounded border border-primary-100 bg-primary-50/80 p-4">
+                <div class="flex items-start gap-3">
+                    <span class="mt-1 size-4 rounded-full border border-primary-200 bg-white"></span>
+                    <span class="space-y-2">
+                        <span class="block h-3 w-32 animate-pulse rounded bg-primary-100"></span>
+                        <span class="block h-3 w-48 animate-pulse rounded bg-primary-100"></span>
+                    </span>
                 </div>
-            @endforeach
+                <span class="block h-3 w-16 animate-pulse rounded bg-primary-100"></span>
+            </div>
+        @endforeach
 
-            <p class="text-xs text-center text-primary-700">
-                {{ __('Fetching real-time shipping quotes…') }}
+        <p class="text-xs text-center text-primary-700">
+            {{ __('Recalculating delivery options…') }}
+        </p>
+    </div>
+
+    {{-- No data state once resolver completes --}}
+    @if(! $isResolving && count($options) === 0)
+        <div class="flex items-center gap-3 rounded border border-amber-200 bg-amber-50 p-4" role="alert">
+            <x-untitledui-truck class="size-5 text-amber-600" stroke-width="1.5" aria-hidden="true" />
+            <p class="text-sm text-amber-800">
+                {{ __('No delivery option available for your address. Please confirm your details or contact support.') }}
             </p>
         </div>
-    @elseif(count($options) === 0)
-        <div class="flex items-center p-4 space-x-4 border border-gray-200">
-            <x-untitledui-shopping-bag class="size-5 text-primary-800" stroke-width="1.5" aria-hidden="true" />
-            <p class="text-sm text-gray-500">
-                {{ __('No delivery option available for your address.') }}
-            </p>
-        </div>
-    @else
+    @endif
+
+    @if(count($options) > 0)
         <form wire:submit="save" class="flex-1 space-y-3" aria-busy="{{ $isResolving ? 'true' : 'false' }}">
             @if($isResolving)
-                {{-- Inline status keeps shoppers informed while the resolver crunches numbers. --}}
                 <div
                     class="flex items-center gap-3 rounded border border-primary-200 bg-primary-50 p-3 text-sm text-primary-700"
                     role="status"
@@ -45,6 +53,7 @@
                     <span>{{ __('Recalculating delivery options…') }}</span>
                 </div>
             @endif
+
             @error('currentSelected')
             <div class="p-4 border-l-4 border-red-400 bg-red-50">
                 <div class="flex">
@@ -72,7 +81,7 @@
                     >
                         @foreach($options as $option)
                             <label
-                                wire:key="shipping-option-{{ $option['id'] }}"
+                                wire:key="delivery-option-{{ $option['id'] }}"
                                 aria-label="{{ $option['name'] }}"
                                 aria-description="{{ $option['description'] }}"
                                 @class([
@@ -92,33 +101,50 @@
                                         class="mt-0.5 size-4 shrink-0 cursor-pointer border-gray-300 text-primary-500 focus:ring-primary-600 active:ring-2 active:ring-offset-2"
                                     >
                                     <span class="flex flex-col ml-3">
-                                        <span
-                                            @class([
-                                                'block text-sm font-heading',
-                                                'text-primary-950 font-medium' => (int) $currentSelected === (int) $option['id'],
-                                                'text-gray-600' => (int) $currentSelected !== (int) $option['id'],
-                                            ])
-                                        >{{ $option['name'] }}</span>
-                                        <span
-                                            @class([
-                                                'block text-sm',
-                                                'text-primary-700' => (int) $currentSelected === (int) $option['id'],
-                                                'text-gray-500' => (int) $currentSelected !== (int) $option['id'],
-                                            ])
-                                        >{{ $option['description'] }}</span>
+                                    <span
+                                        @class([
+                                            'block text-sm font-heading',
+                                            'text-primary-950 font-medium' => (int) $currentSelected === (int) $option['id'],
+                                            'text-gray-600' => (int) $currentSelected !== (int) $option['id'],
+                                        ])
+                                    >{{ $option['name'] }}</span>
+                                        @if(! empty($option['description']))
+                                            <span
+                                                class="block text-sm text-gray-500"
+                                            >{{ $option['description'] }}</span>
+                                        @endif
                                         @if(! empty($option['estimated_delivery']))
                                             <span class="mt-1 text-xs text-gray-400">
                                                 {{ $option['estimated_delivery'] }}
                                             </span>
                                         @endif
+                                        @if(! empty($option['badges']) && is_array($option['badges']))
+                                            <span class="mt-2 flex flex-wrap gap-2">
+                                                @foreach($option['badges'] as $badge)
+                                                    @if(is_array($badge) && ! empty($badge['label']))
+                                                        <span
+                                                            @class([
+                                                                'inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium',
+                                                                'bg-green-100 text-green-800' => ($badge['type'] ?? null) === 'free',
+                                                                'bg-primary-100 text-primary-800' => ($badge['type'] ?? null) !== 'free',
+                                                            ])
+                                                        >
+                                                            {{ $badge['label'] }}
+                                                        </span>
+                                                    @endif
+                                                @endforeach
+                                            </span>
+                                        @endif
                                     </span>
                                 </span>
                                 <span class="flex flex-col items-end text-right">
+                                    @if(($option['original_price'] ?? null) !== null && $option['original_price'] > $option['price'])
+                                        <span class="text-xs text-gray-400 line-through">
+                                            {{ app_money_format($option['original_price'], $option['currency_code'] ?? current_currency()) }}
+                                        </span>
+                                    @endif
                                     <span class="text-sm font-semibold text-primary-950" aria-live="polite">
                                         {{ $option['formatted_price'] ?? \Illuminate\Support\Number::currency($option['price'], $option['currency_code'], app()->getLocale()) }}
-                                    </span>
-                                    <span class="text-xs text-gray-400">
-                                        {{ __('Live quote from resolver') }}
                                     </span>
                                 </span>
                             </label>
@@ -133,7 +159,7 @@
                         wire:loading.attr="data-loading"
                         wire:loading.attr="disabled"
                         wire:loading.attr="aria-disabled"
-                        wire:target="save"
+                        wire:target="save,resolveOptions"
                         :disabled="$isResolving"
                     />
                 </div>

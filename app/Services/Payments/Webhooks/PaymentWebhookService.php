@@ -278,6 +278,8 @@ final class PaymentWebhookService
      */
     private function applyStateTransition(Order $order, OrderPaymentState $targetState): void
     {
+        $shouldDispatchFulfillmentEmail = false;
+
         switch ($targetState) {
             case OrderPaymentState::CREATED:
                 $order->payment_status = PaymentStatus::PENDING;
@@ -290,7 +292,7 @@ final class PaymentWebhookService
                 $order->fulfillment_status = 'fulfilled';
                 $order->status = OrderStatus::DELIVERED;
                 $order->delivered_at = $order->delivered_at ?? Carbon::now();
-                SendOrderFulfillmentEmail::dispatch($order->id);
+                $shouldDispatchFulfillmentEmail = true;
                 break;
             case OrderPaymentState::PARTIALLY_REFUNDED:
                 $order->payment_status = PaymentStatus::PARTIALLY_REFUNDED;
@@ -300,6 +302,14 @@ final class PaymentWebhookService
                 $order->status = OrderStatus::REFUNDED;
                 $order->fulfillment_status = 'refunded';
                 break;
+        }
+
+        if ($order->isDirty()) {
+            $order->save();
+        }
+
+        if ($shouldDispatchFulfillmentEmail) {
+            SendOrderFulfillmentEmail::dispatch($order->id);
         }
     }
 }

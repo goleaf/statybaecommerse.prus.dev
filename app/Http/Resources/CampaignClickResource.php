@@ -67,12 +67,11 @@ class CampaignClickResource extends JsonResource
             return null;
         }
 
-        // Always parse the original timestamp in UTC and then convert it to the
-        // configured application timezone so reporting stays consistent.
+        // Interpret stored timestamps as UTC and project them into the configured application timezone so
+        // downstream analytics see the same wall-clock time that the platform records internally.
         $localized = CarbonImmutable::parse($value, 'UTC')->setTimezone(config('app.timezone', 'UTC'));
 
-        // Return a full ISO-8601 string with microsecond precision and the
-        // actual timezone offset instead of forcing a misleading `Z` suffix.
-        return $localized->format('Y-m-d\TH:i:s.uP');
+        // Emit ISO-8601 with microseconds and a literal Z suffix to stay aligned with the documented contract.
+        return $localized->format('Y-m-d\TH:i:s.u') . 'Z';
     }
 }

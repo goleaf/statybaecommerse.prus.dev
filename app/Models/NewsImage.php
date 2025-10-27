@@ -87,7 +87,7 @@ final class NewsImage extends Model
             return $this->file_path;
         }
 
-        return url('storage/' . ltrim($this->file_path, '/'));
+        return $this->buildAbsoluteUrl('storage/' . ltrim($this->file_path, '/'));
     }
 
     /**
@@ -96,9 +96,11 @@ final class NewsImage extends Model
     public function getThumbnailUrlAttribute(): string
     {
         $pathInfo = pathinfo($this->file_path);
-        $thumbnailPath = $pathInfo['dirname'] . '/thumbnails/' . $pathInfo['filename'] . '_thumb.' . $pathInfo['extension'];
+        $directory = $pathInfo['dirname'] ?? '';
+        $directory = $directory === '.' ? '' : trim($directory, '/');
+        $thumbnailPath = ($directory !== '' ? $directory . '/' : '') . 'thumbnails/' . $pathInfo['filename'] . '_thumb.' . $pathInfo['extension'];
 
-        return url('storage/' . ltrim($thumbnailPath, '/'));
+        return $this->buildAbsoluteUrl('storage/' . ltrim($thumbnailPath, '/'));
     }
 
     /**
@@ -131,5 +133,16 @@ final class NewsImage extends Model
         }
 
         return number_format($bytes, 2, '.', '') . ' ' . $units[$i];
+    }
+
+    private function buildAbsoluteUrl(string $path): string
+    {
+        $root = (string) config('app.url', '');
+
+        if ($root === '') {
+            $root = url('/');
+        }
+
+        return rtrim($root, '/') . '/' . ltrim($path, '/');
     }
 }

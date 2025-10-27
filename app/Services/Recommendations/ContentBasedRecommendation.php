@@ -85,12 +85,16 @@ final class ContentBasedRecommendation extends BaseRecommendation
         );
 
         // Persist only lightweight identifiers and scores so cache entries stay serializable while keeping runtime results hydrated.
-        $this->cacheResult(
-            $cacheKey,
-            $recommendations->map(static fn (Product $product): array => [
+        $cachePayload = $recommendations
+            ->map(static fn (Product $product): array => [
                 'product_id' => $product->getKey(),
                 'score'      => (float) ($product->relevance_score ?? 0.0),
-            ]),
+            ])
+            ->values();
+
+        $this->cacheResult(
+            $cacheKey,
+            new EloquentCollection($cachePayload->all()),
             $this->config['cache_ttl'] ?? 3600
         );
 

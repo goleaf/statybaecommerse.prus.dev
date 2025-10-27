@@ -14,6 +14,7 @@ use App\Support\Html\HtmlSanitizer;
 use App\Traits\HasProductPricing;
 use App\Traits\HasTranslations;
 use DateTimeInterface;
+use Illuminate\Container\Container;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Builder;
@@ -76,7 +77,12 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
 #[ScopedBy([ActiveScope::class, PublishedScope::class, VisibleScope::class])]
 final class Product extends Model implements HasMedia, TranslatableRecord
 {
-    use HasFactory, OrdersByName, Searchable, SoftDeletes;
+    use HasFactory;
+    use OrdersByName;
+    use Searchable {
+        Searchable::bootSearchable as scoutBootSearchable;
+    }
+    use SoftDeletes;
     use HasProductPricing;
     use HasTranslations;
     use InteractsWithMedia;
@@ -165,6 +171,17 @@ final class Product extends Model implements HasMedia, TranslatableRecord
                 }
             }
         });
+    }
+
+    public static function bootSearchable(): void
+    {
+        $container = Container::getInstance();
+
+        if ($container === null || ! $container->bound('events')) {
+            return;
+        }
+
+        static::scoutBootSearchable();
     }
 
     /**

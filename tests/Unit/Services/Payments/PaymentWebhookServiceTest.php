@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Unit\Services\Payments;
 
 use App\Enums\OrderPaymentState;
+use App\Enums\PaymentStatus;
 use App\Jobs\SendOrderFulfillmentEmail;
 use App\Models\Order;
 use App\Services\Payments\Webhooks\PaymentWebhookService;
@@ -12,6 +13,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Bus;
 use ReflectionClass;
 use Tests\TestCase;
+use BackedEnum;
 
 final class PaymentWebhookServiceTest extends TestCase
 {
@@ -25,7 +27,7 @@ final class PaymentWebhookServiceTest extends TestCase
         // Create a processing order that mirrors the state prior to a fulfillment webhook.
         $order = Order::factory()->create([
             'status'         => 'processing',
-            'payment_status' => null,
+            'payment_status' => PaymentStatus::PENDING,
             'delivered_at'   => null,
         ]);
 
@@ -41,8 +43,11 @@ final class PaymentWebhookServiceTest extends TestCase
         $order->refresh();
 
         // Ensure the order lifecycle advanced to delivered with a paid status and timestamp.
-        $this->assertSame('delivered', (string) $order->status);
-        $this->assertSame('paid', method_exists($order->payment_status, 'value') ? $order->payment_status->value : (string) $order->payment_status);
+        $status = $order->status instanceof BackedEnum ? $order->status->value : (string) $order->status;
+        $paymentStatus = $order->payment_status instanceof BackedEnum ? $order->payment_status->value : (string) $order->payment_status;
+
+        $this->assertSame('delivered', $status);
+        $this->assertSame('paid', $paymentStatus);
         $this->assertNotNull($order->delivered_at);
 
         // Confirm the fulfillment notification was dispatched for asynchronous processing.

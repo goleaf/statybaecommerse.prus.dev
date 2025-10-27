@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 // Dataset enumerating each relation and the expected Eloquent relation type so regressions surface quickly.
-dataset('inventory_relations_matrix', [
+dataset('inventory_relations_matrix_pairs', [
     ['product', BelongsTo::class],
     ['variant', BelongsTo::class],
     ['warehouse', BelongsTo::class],
@@ -19,4 +19,4 @@ it('exposes the documented relations via a dedicated matrix dataset', function (
     $inventory = new Inventory;
 
     expect($inventory->{$relation}())->toBeInstanceOf($expectedType);
-})->with('inventory_relations_matrix');
+})->with('inventory_relations_matrix_pairs');

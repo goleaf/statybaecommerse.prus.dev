@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Livewire\Components;
 
+use App\Data\Storefront\Shared\CartItemData;
 use App\Models\CartItem;
 use App\Models\Discount;
 use App\Models\DiscountCode;
@@ -11,6 +12,7 @@ use App\Models\Product;
 use App\Services\Pricing\PriceCalculator;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Collection;
 use Livewire\Attributes\On;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
@@ -246,11 +248,15 @@ final class ShoppingCartWidget extends Component
     }
 
     /**
-     * Handle getCartItemsProperty functionality with proper error handling.
+     * Provide cart items as sanitized arrays backed by the CartItemData DTO so the Blade view
+     * never touches Eloquent relationships directly.
+     *
+     * @return Collection<int, array{id:int, productId:int, product_id:int, variantId:int|null, variant_id:int|null, name:string, unitPrice:float, unit_price:float, quantity:int, totalPrice:float, total_price:float, snapshot:array<string,mixed>, imageUrl:?string, image_url:?string}>
      */
-    public function getCartItemsProperty()
+    public function getCartItemsProperty(): Collection
     {
-        return $this->getCartItems();
+        return $this->getCartItems()
+            ->map(static fn (CartItem $item): array => CartItemData::fromModel($item)->toArray());
     }
 
     /**

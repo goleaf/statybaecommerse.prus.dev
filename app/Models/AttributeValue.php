@@ -72,12 +72,14 @@ final class AttributeValue extends Model
     protected function casts(): array
     {
         return [
+            'id'            => 'int',
             'sort_order'    => 'integer',
             'is_enabled'    => 'boolean',
             'is_active'     => 'boolean',
             'is_default'    => 'boolean',
             'is_searchable' => 'boolean',
             'metadata'      => 'array',
+            'deleted_at'    => 'datetime',
         ];
     }
 
@@ -158,7 +160,6 @@ final class AttributeValue extends Model
         // Prefer the human friendly display value and gracefully fall back to the raw value field.
         return $query
             ->orderByRaw("COALESCE(NULLIF(display_value, ''), value)")
-            ->orderBy('display_value')
             ->orderBy('value');
     }
 

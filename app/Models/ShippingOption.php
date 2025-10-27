@@ -261,10 +261,15 @@ final class ShippingOption extends Model
      */
     public function isEligibleForOrderAmount(float $amount): bool
     {
-        if ($this->min_order_amount !== null && $amount < (float) $this->min_order_amount) {
+        $normalizedAmount = round($amount, 2);
+        $minimum = $this->min_order_amount !== null ? round((float) $this->min_order_amount, 2) : null;
+        $maximum = $this->max_order_amount !== null ? round((float) $this->max_order_amount, 2) : null;
+
+        if ($minimum !== null && $normalizedAmount < $minimum) {
             return false;
         }
-        if ($this->max_order_amount !== null && $amount > (float) $this->max_order_amount) {
+
+        if ($maximum !== null && $normalizedAmount > $maximum) {
             return false;
         }
 

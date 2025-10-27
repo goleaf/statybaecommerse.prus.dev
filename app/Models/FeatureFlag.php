@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
@@ -48,6 +49,9 @@ final class FeatureFlag extends Model
     public function isEnabled(?User $user = null): bool
     {
         if (! $this->is_active) {
+            return false;
+        }
+        if (! $this->is_enabled) {
             return false;
         }
         // Check environment
@@ -134,7 +138,7 @@ final class FeatureFlag extends Model
      *
      * @param mixed $query
      */
-    public function scopeActive($query)
+    public function scopeActive(Builder $query): Builder
     {
         return $query->where('is_active', true);
     }
@@ -144,7 +148,7 @@ final class FeatureFlag extends Model
      *
      * @param mixed $query
      */
-    public function scopeEnabled($query)
+    public function scopeEnabled(Builder $query): Builder
     {
         return $query->where('is_enabled', true);
     }
@@ -154,7 +158,7 @@ final class FeatureFlag extends Model
      *
      * @param mixed $query
      */
-    public function scopeDisabled($query)
+    public function scopeDisabled(Builder $query): Builder
     {
         return $query->where('is_enabled', false);
     }
@@ -164,7 +168,7 @@ final class FeatureFlag extends Model
      *
      * @param mixed $query
      */
-    public function scopeGlobal($query)
+    public function scopeGlobal(Builder $query): Builder
     {
         return $query->where('is_global', true);
     }
@@ -174,7 +178,7 @@ final class FeatureFlag extends Model
      *
      * @param mixed $query
      */
-    public function scopeByKey($query, string $key)
+    public function scopeByKey(Builder $query, string $key): Builder
     {
         return $query->where('key', $key);
     }
@@ -184,7 +188,7 @@ final class FeatureFlag extends Model
      *
      * @param mixed $query
      */
-    public function scopeEnvironment($query, string $environment)
+    public function scopeEnvironment(Builder $query, string $environment): Builder
     {
         return $query->where('environment', $environment);
     }
@@ -194,7 +198,7 @@ final class FeatureFlag extends Model
      *
      * @param mixed $query
      */
-    public function scopeOrderedByName($query)
+    public function scopeOrderedByName(Builder $query): Builder
     {
         // Order feature flags alphabetically by their human readable name for deterministic listings.
         return $query->orderBy('name');

@@ -43,9 +43,9 @@ final class ProductHistoryController extends Controller
         $definition = ProductHistoryListConfiguration::definition();
         $listQuery = ListQueryValidator::fromRequest($request, $definition);
 
-        $query = $product
-            ->histories()
-            ->with(['user:id,name,email']);
+        $query = ProductHistory::query()
+            ->where('product_id', $product->getKey())
+            ->with(['user:id,name,email,preferred_locale']);
 
         // Apply the allow-listed filters and sorts so callers cannot project
         // arbitrary columns or SQL snippets into the query builder.
@@ -71,7 +71,7 @@ final class ProductHistoryController extends Controller
             ],
         ]);
 
-        return $this->handleContentNegotiation($request, $payload);
+        return $this->handleContentNegotiation($request, $payload, wrap: false);
     }
 
     /**
@@ -85,7 +85,7 @@ final class ProductHistoryController extends Controller
 
         $this->authorize('view', [$history, $product]);
 
-        $history->load(['user:id,name,email', 'product:id,name,sku']);
+        $history->load(['user:id,name,email,preferred_locale', 'product:id,name,sku']);
         $data = [
             'history' => $history,
             'product' => [
@@ -123,7 +123,7 @@ final class ProductHistoryController extends Controller
             ->groupBy('field_name')
             ->pluck('count', 'field_name');
         $recentActivity = (clone $baseQuery)
-            ->with(['user:id,name'])
+            ->with(['user:id,name,preferred_locale'])
             ->orderByDesc('created_at')
             ->limit(5)
             ->get(['id', 'action', 'field_name', 'description', 'created_at', 'user_id']);
@@ -205,7 +205,7 @@ final class ProductHistoryController extends Controller
                 'event'        => 'queued',
                 'export_id'    => $export->getKey(),
                 'uuid'         => $export->uuid,
-                'status'       => (string) $export->status,
+                'status'       => $export->status->value ?? (string) $export->status,
                 'download_url' => $downloadUrl,
             ];
 
@@ -253,7 +253,7 @@ final class ProductHistoryController extends Controller
             user: $actor instanceof User ? $actor : null,
         );
 
-        $history->load(['user:id,name,email']);
+        $history->load(['user:id,name,email,preferred_locale']);
 
         return response()->json([
             'data'    => $history,

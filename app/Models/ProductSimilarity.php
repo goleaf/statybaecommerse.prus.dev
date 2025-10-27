@@ -97,4 +97,13 @@ final class ProductSimilarity extends Model
     {
         return $query->where('calculated_at', '>=', now()->subDays($days));
     }
+
+    public function getCasts(): array
+    {
+        $casts = parent::getCasts();
+
+        unset($casts[$this->getKeyName()]);
+
+        return $casts;
+    }
 }

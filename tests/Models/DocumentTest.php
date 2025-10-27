@@ -11,7 +11,9 @@ use App\Support\Storage\SecureStorage;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\URL;
+use Tests\TestCase;
 
+uses(TestCase::class);
 uses(RefreshDatabase::class);
 
 // Ensure the whitelist of assignable attributes stays aligned with the migration surface.
@@ -84,14 +86,18 @@ it('resolves related template, users, audit logs, and polymorphic parents', func
         'updated_by'           => $updater->getKey(),
     ]);
 
+    $manualAction = 'manual_entry';
+
     AuditLog::query()->create([
         'entity_type' => Document::class,
         'entity_id'   => (string) $document->getKey(),
-        'action'      => 'created',
+        'action'      => $manualAction,
         'user_id'     => $creator->getKey(),
     ]);
 
     $document->unsetRelation('auditLogs');
+
+    $logs = $document->auditLogs()->get();
 
     expect($document->template)->toBeInstanceOf(DocumentTemplate::class)
         ->and($document->template->is($template))->toBeTrue()
@@ -101,7 +107,8 @@ it('resolves related template, users, audit logs, and polymorphic parents', func
         ->and($document->updater->is($updater))->toBeTrue()
         ->and($document->documentable)->toBeInstanceOf(Order::class)
         ->and($document->documentable->is($order))->toBeTrue()
-        ->and($document->auditLogs()->count())->toBe(1);
+        ->and($logs)->toHaveCount(2)
+        ->and($logs->pluck('action'))->toContain($manualAction);
 });
 
 // Guard the behaviour around optional variables storage.
@@ -145,9 +152,21 @@ it('returns null for download url when no file path exists', function (): void {
 
 // Keep alphabetical ordering deterministic for admin dropdowns and exports.
 it('orders documents by name with title as a fallback', function (): void {
-    $alpha = Document::factory()->create(['name' => 'Alpha Summary', 'title' => 'Alpha Title']);
-    $noName = Document::factory()->create(['name' => null, 'title' => 'Bravo Overview']);
-    $zulu = Document::factory()->create(['name' => 'Zulu Contract', 'title' => 'Zulu Title']);
+    $alpha = Document::factory()->create([
+        'name'   => 'Alpha Summary',
+        'title'  => 'Alpha Title',
+        'status' => Document::STATUS_PUBLISHED,
+    ]);
+    $noName = Document::factory()->create([
+        'name'   => null,
+        'title'  => 'Bravo Overview',
+        'status' => Document::STATUS_PUBLISHED,
+    ]);
+    $zulu = Document::factory()->create([
+        'name'   => 'Zulu Contract',
+        'title'  => 'Zulu Title',
+        'status' => Document::STATUS_PUBLISHED,
+    ]);
 
     $orderedIds = Document::query()->orderedByName()->pluck('id')->all();
 
@@ -179,7 +198,7 @@ it('filters by status, format, and owning model', function (): void {
 
     expect($statusMatches->pluck('id'))->toContain($matching->getKey())
         ->and($formatMatches->pluck('id'))->toContain($matching->getKey())
-        ->and($orderedMatches->pluck('id'))->toBe([$matching->getKey()]);
+        ->and($orderedMatches->pluck('id')->all())->toBe([$matching->getKey()]);
 });
 
 // Regression proofing for helper methods that wrap status and format constants.

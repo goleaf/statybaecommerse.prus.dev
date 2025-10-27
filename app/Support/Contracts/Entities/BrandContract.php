@@ -41,12 +41,10 @@ final class BrandContract
     {
         $paginator = $brands instanceof LengthAwarePaginator ? $brands : null;
         $items = $paginator?->getCollection() ?? Collection::make($brands);
-        $mapped = $items->map(fn (Brand $brand): array => self::mapBrand($brand))->values()->all();
-
-        $data = [
-            'brands' => $mapped,
-            'items'  => $mapped,
-        ];
+        $mapped = $items
+            ->map(fn (Brand $brand): array => self::mapBrand($brand))
+            ->values()
+            ->all();
 
         if ($paginator instanceof LengthAwarePaginator) {
             // Surface pagination details alongside other metadata to respect the
@@ -63,7 +61,7 @@ final class BrandContract
             $meta['total'] = count($mapped);
         }
 
-        return self::envelope($data, $meta);
+        return self::envelope($mapped, $meta);
     }
 
     private static function mapBrand(Brand $brand): array

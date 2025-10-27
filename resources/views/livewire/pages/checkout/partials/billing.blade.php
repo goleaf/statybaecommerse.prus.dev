@@ -158,7 +158,7 @@
                 </label>
                 <select
                     id="billing_country"
-                    wire:model="billing.country"
+                    wire:model.debounce.500ms="billing.country"
                     autocomplete="country"
                     class="mt-1 block w-full rounded-lg border-gray-300 bg-white text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500"
                 >
@@ -312,7 +312,7 @@
                         </label>
                         <select
                             id="shipping_country"
-                            wire:model="shipping.country"
+                            wire:model.debounce.500ms="shipping.country"
                             autocomplete="shipping country"
                             class="mt-1 block w-full rounded-lg border-gray-300 bg-white text-sm shadow-sm focus:border-primary-500 focus:ring-primary-500"
                         >
@@ -328,12 +328,22 @@
             </div>
         @endif
 
+        <div
+            wire:loading.flex
+            wire:target="resolveShippingOptions"
+            class="mt-4 flex flex-col gap-2 rounded-lg border border-dashed border-primary-200 bg-primary-50 p-4 text-sm text-primary-700 animate-pulse"
+            role="status"
+        >
+            <div class="h-3 w-2/3 rounded bg-primary-200/60"></div>
+            <div class="h-3 w-1/2 rounded bg-primary-200/40"></div>
+        </div>
+
         <div class="flex items-center justify-end">
             <x-buttons.primary
                 type="submit"
                 class="px-6 py-2 text-sm"
                 wire:loading.attr="disabled"
-                wire:target="toStep"
+                wire:target="toStep,resolveShippingOptions"
             >
                 {{ __('Continue to shipping') }}
             </x-buttons.primary>

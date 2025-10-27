@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Tests\Support;
 
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use PHPUnit\Framework\ExpectationFailedException;
 
@@ -35,6 +37,16 @@ final class AssertsRelations
                 $method,
                 is_object($relation) ? $relation::class : gettype($relation)
             ));
+        }
+
+        if ($relationClass === HasMany::class && $relation instanceof MorphMany) {
+            \PHPUnit\Framework\Assert::assertInstanceOf(
+                MorphMany::class,
+                $relation,
+                sprintf('Expected %s::%s() to be instance of %s', $modelInstance::class, $method, MorphMany::class)
+            );
+
+            return;
         }
 
         \PHPUnit\Framework\Assert::assertInstanceOf(

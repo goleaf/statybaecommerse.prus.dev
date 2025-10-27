@@ -16,9 +16,6 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Str;
 use Livewire\Livewire;
-use Tests\TestCase;
-
-uses(TestCase::class);
 
 it('allows guests to complete a multi-step checkout with dynamic shipping and payment selection', function (): void {
     // Emulate a guest session so cart items can be discovered by the component.

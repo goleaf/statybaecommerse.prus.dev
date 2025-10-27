@@ -46,7 +46,14 @@ final class SystemSettingTranslation extends Model
         'name',
         'description',
         'help_text',
+        'rich_description',
+        'attachments',
         'meta',
+        'metadata',
+        'tags',
+        'is_active',
+        'is_public',
+        'sort_order',
     ];
 
     protected $casts = [

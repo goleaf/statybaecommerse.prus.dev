@@ -48,27 +48,33 @@ final class CurrencyFactory extends Factory
 
     public function definition(): array
     {
-        // Generate deterministic yet unique codes so SQLite and MySQL behave consistently during tests.
-        $code = strtoupper($this->faker->unique()->lexify('???'));
-        $isoNumeric = str_pad((string) $this->faker->unique()->numberBetween(1, 999), 3, '0', STR_PAD_LEFT);
+        $code = $this->generateCurrencyCode();
+        $isoNumeric = $this->nextIsoNumericCode();
+
+        $sequenceOrder = max(0, static::$codeSequence - 1);
+
+        $symbols = ['€', '$', '£', '¥', '₿'];
+        $symbolPositionOptions = ['before', 'after'];
+        $thousandsSeparators = [',', ' ', '.'];
+        $decimalSeparators = ['.', ','];
 
         return [
             'name'                => sprintf('%s Currency', $code),
             'code'                => $code,
             'iso_code'            => sprintf('%s-%s', $code, $isoNumeric),
-            'symbol'              => $this->faker->randomElement(['€', '$', '£', '¥', '₿']),
-            'exchange_rate'       => $this->faker->randomFloat(4, 0.2, 2.5),
+            'symbol'              => $symbols[array_rand($symbols)],
+            'exchange_rate'       => round(mt_rand(20, 250) / 100, 4),
             'base_currency'       => 'EUR',
-            'decimal_places'      => $this->faker->numberBetween(0, 4),
-            'symbol_position'     => $this->faker->randomElement(['before', 'after']),
-            'thousands_separator' => $this->faker->randomElement([',', ' ', '.']),
-            'decimal_separator'   => $this->faker->randomElement(['.', ',']),
+            'decimal_places'      => random_int(0, 4),
+            'symbol_position'     => $symbolPositionOptions[array_rand($symbolPositionOptions)],
+            'thousands_separator' => $thousandsSeparators[array_rand($thousandsSeparators)],
+            'decimal_separator'   => $decimalSeparators[array_rand($decimalSeparators)],
             'is_active'           => true,
             'is_enabled'          => true,
             'is_default'          => false,
-            'sort_order'          => $this->faker->numberBetween(0, 100),
+            'sort_order'          => $sequenceOrder,
             'auto_update_rate'    => false,
-            'description'         => $this->faker->sentence(),
+            'description'         => sprintf('Auto-generated currency %s', $code),
         ];
     }
 
@@ -141,5 +147,38 @@ final class CurrencyFactory extends Factory
             'sort_order'       => array_search($key, array_keys(self::PRESET_CURRENCIES), true) ?: 0,
             'auto_update_rate' => false,
         ], $preset);
+    }
+
+    private static int $codeSequence = 0;
+
+    private static int $isoNumericSequence = 1;
+
+    private function generateCurrencyCode(): string
+    {
+        $sequence = static::$codeSequence++ % (26 ** 3);
+
+        $code = '';
+
+        for ($index = 0; $index < 3; $index++) {
+            $code = chr(ord('A') + ($sequence % 26)) . $code;
+            $sequence = intdiv($sequence, 26);
+        }
+
+        return $code;
+    }
+
+    private function nextIsoNumericCode(): string
+    {
+        $value = static::$isoNumericSequence++ % 1000;
+
+        if ($value === 0) {
+            $value = static::$isoNumericSequence++ % 1000;
+        }
+
+        if ($value === 0) {
+            $value = 1;
+        }
+
+        return str_pad((string) $value, 3, '0', STR_PAD_LEFT);
     }
 }

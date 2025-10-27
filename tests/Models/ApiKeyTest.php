@@ -5,10 +5,11 @@ declare(strict_types=1);
 use App\Enums\ApiKeyScope;
 use App\Models\ApiKey;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 
-uses(RefreshDatabase::class);
+uses(TestCase::class, RefreshDatabase::class);
 
 it('generates credentials with hashed values', function (): void {
     // Act: generate a new set of credentials for an API key.

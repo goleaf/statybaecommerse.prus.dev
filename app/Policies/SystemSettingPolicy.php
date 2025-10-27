@@ -7,43 +7,32 @@ namespace App\Policies;
 use App\Models\AdminUser;
 use App\Models\SystemSetting;
 use App\Models\User;
+use App\Support\Authorization\AuthorizationMatrix;
 
-/**
- * Authorization policy for managing system settings.
- */
 final class SystemSettingPolicy
 {
     public function viewAny(User|AdminUser $user): bool
     {
-        return $this->hasPermission($user, 'view_settings');
+        return AuthorizationMatrix::check('system_settings', 'viewAny', $user);
     }
 
     public function view(User|AdminUser $user, SystemSetting $setting): bool
     {
-        return $this->hasPermission($user, 'view_settings');
+        return AuthorizationMatrix::check('system_settings', 'view', $user);
     }
 
     public function create(User|AdminUser $user): bool
     {
-        return $this->hasPermission($user, 'edit_settings');
+        return AuthorizationMatrix::check('system_settings', 'create', $user);
     }
 
     public function update(User|AdminUser $user, SystemSetting $setting): bool
     {
-        return $this->hasPermission($user, 'edit_settings');
+        return AuthorizationMatrix::check('system_settings', 'update', $user);
     }
 
     public function delete(User|AdminUser $user, SystemSetting $setting): bool
     {
-        return $this->hasPermission($user, 'edit_settings');
-    }
-
-    private function hasPermission(User|AdminUser $user, string $permission): bool
-    {
-        if (! method_exists($user, 'can')) {
-            return false;
-        }
-
-        return (bool) $user->can($permission);
+        return AuthorizationMatrix::check('system_settings', 'delete', $user);
     }
 }

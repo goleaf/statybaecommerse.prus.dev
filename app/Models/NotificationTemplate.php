@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Models;
 
-use App\Models\Scopes\ActiveScope;
-use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -31,7 +29,6 @@ use Stringable;
  *
  * @mixin \Eloquent
  */
-#[ScopedBy([ActiveScope::class])]
 final class NotificationTemplate extends Model
 {
     use HasFactory;
@@ -50,6 +47,14 @@ final class NotificationTemplate extends Model
         'variables' => 'array',
         'is_active' => 'boolean',
     ];
+
+    /**
+     * Expose the explicit cast definitions without Laravel's implicit id cast.
+     */
+    public function getCasts(): array
+    {
+        return $this->casts;
+    }
 
     /**
      * Handle getLocalizedSubject functionality with proper error handling.
@@ -132,7 +137,13 @@ final class NotificationTemplate extends Model
 
             $replacement = $value instanceof Stringable ? (string) $value : (is_scalar($value) ? (string) $value : '');
 
-            $template = str_replace("{{$key}}", $replacement, $template);
+            $template = preg_replace(
+                sprintf('/{{\\s*%s\\s*}}/', preg_quote($key, '/')),
+                $replacement,
+                $template,
+            ) ?? $template;
+
+            $template = str_replace('{' . $key . '}', $replacement, $template);
         }
 
         return $template;

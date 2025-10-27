@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Models;
 
 use App\Models\Scopes\ActiveScope;
+use App\Models\Scopes\VisibleScope;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -70,7 +71,11 @@ final class CollectionRule extends Model
      */
     public function collection(): BelongsTo
     {
-        return $this->belongsTo(Collection::class);
+        // Always expose the owning collection even if it is hidden by storefront scopes.
+        return $this->belongsTo(Collection::class)->withoutGlobalScopes([
+            ActiveScope::class,
+            VisibleScope::class,
+        ])->withTrashed();
     }
 
     /**

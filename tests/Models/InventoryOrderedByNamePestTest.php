@@ -6,8 +6,9 @@ use App\Models\Inventory;
 use App\Models\Location;
 use App\Models\Product;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 
-uses(RefreshDatabase::class);
+uses(TestCase::class, RefreshDatabase::class);
 
 // Dataset capturing the primary and fallback columns used when ordering inventory records.
 dataset('ordered_by_name_inventory', [

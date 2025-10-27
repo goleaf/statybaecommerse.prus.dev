@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Concerns\OrdersByName;
 use App\Models\Scopes\ActiveCampaignScope;
 use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\StatusScope;
@@ -42,6 +43,7 @@ final class Campaign extends Model
 {
     use HasFactory, SoftDeletes;
     use HasTranslations;
+    use OrdersByName;
 
     protected $table = 'discount_campaigns';
 
@@ -282,15 +284,6 @@ final class Campaign extends Model
     public function scopeByPriority(Builder $query): Builder
     {
         return $query->orderBy('display_priority', 'desc');
-    }
-
-    /**
-     * Handle scopeOrderedByName functionality with proper error handling.
-     */
-    public function scopeOrderedByName(Builder $query): Builder
-    {
-        // Ensure campaigns are retrieved in a predictable alphabetical order by their name.
-        return $query->orderBy('name');
     }
 
     /**

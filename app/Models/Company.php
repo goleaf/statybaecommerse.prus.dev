@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Scopes\ActiveScope;
 use Database\Factories\CompanyFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -47,6 +48,7 @@ final class Company extends Model
 
     // Attribute casting configuration ensures metadata remains structured and the active flag is always boolean.
     protected $casts = [
+        'id'        => 'int',
         'metadata'  => 'array',
         'is_active' => 'boolean',
     ];
@@ -59,7 +61,10 @@ final class Company extends Model
      */
     public function subscribers(): HasMany
     {
-        return $this->hasMany(Subscriber::class, 'company', 'name');
+        // Subscribers use a string company linkage and may opt-out of global active scoping.
+        return $this
+            ->hasMany(Subscriber::class, 'company', 'name')
+            ->withoutGlobalScopes([ActiveScope::class]);
     }
 
     // Scopes

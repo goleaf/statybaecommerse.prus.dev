@@ -9,6 +9,7 @@ use App\Models\Scopes\UserOwnedScope;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Auth\Factory as AuthFactory;
 use Illuminate\Contracts\Session\Session as SessionContract;
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -18,6 +19,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Throwable;
+use Traversable;
 
 /**
  * AnalyticsEvent
@@ -45,7 +47,13 @@ final class AnalyticsEvent extends Model
 
     public function setConversionCurrencyAttribute($value): void
     {
-        $this->attributes['conversion_currency'] = $value ?? 'EUR';
+        $currency = is_string($value) ? strtoupper(trim($value)) : $value;
+
+        if ($currency === null || $currency === '') {
+            $currency = 'EUR';
+        }
+
+        $this->attributes['conversion_currency'] = $currency;
     }
 
     protected $fillable = [
@@ -198,8 +206,13 @@ final class AnalyticsEvent extends Model
      */
     public function scopeOrderedByName(Builder $query): Builder
     {
-        // Sort using a lower-cased projection so analytics appear consistently regardless of database collation rules.
-        return self::withoutOwnershipScope($query)->orderByRaw('event_name IS NULL, LOWER(event_name) ASC, event_name ASC');
+        $normalizedNameExpression = "NULLIF(TRIM(event_name), '')";
+        $collatedNameExpression = "COALESCE($normalizedNameExpression, '')";
+
+        return self::withoutOwnershipScope($query)
+            ->orderByRaw("CASE WHEN $normalizedNameExpression IS NULL THEN 1 ELSE 0 END")
+            ->orderByRaw("LOWER($collatedNameExpression)")
+            ->orderByRaw("$collatedNameExpression");
     }
 
     /**
@@ -497,18 +510,35 @@ final class AnalyticsEvent extends Model
             'updated_at' => now(),
         ];
 
-        // If data contains properties, use them; otherwise treat the entire data as properties
-        if (isset($data['properties'])) {
-            $eventData['properties'] = $data['properties'];
+        $propertiesPayload = [];
+        $usingFallbackPropertyBag = false;
+
+        if (array_key_exists('properties', $data)) {
+            $propertiesPayload = self::normalisePropertiesPayload($data['properties']);
             unset($data['properties']);
-        } elseif ($data !== []) {
-            // Treat the data array as properties if it's not empty
-            $eventData['properties'] = $data;
-            $data = [];
-            // Clear data so it doesn't get merged again
         }
 
-        // Merge remaining data
+        if ($propertiesPayload === [] && $data !== []) {
+            $propertiesPayload = self::normalisePropertiesPayload($data);
+            $usingFallbackPropertyBag = true;
+        }
+
+        $existingProperties = self::normalisePropertiesPayload($eventData['properties'] ?? []);
+
+        if ($propertiesPayload !== [] && $usingFallbackPropertyBag) {
+            $propertiesPayload = self::discardAttributeKeysFromProperties($propertiesPayload);
+        }
+
+        $combinedProperties = $propertiesPayload !== []
+            ? array_merge($existingProperties, $propertiesPayload)
+            : $existingProperties;
+
+        if ($combinedProperties !== []) {
+            $eventData['properties'] = $combinedProperties;
+        } else {
+            unset($eventData['properties']);
+        }
+
         $eventData = array_merge($eventData, $data);
 
         if ($trackable && is_object($trackable)) {
@@ -610,5 +640,55 @@ final class AnalyticsEvent extends Model
         }
 
         return null;
+    }
+
+    /**
+     * Normalize a property payload into a plain array representation.
+     */
+    private static function normalisePropertiesPayload(mixed $value): array
+    {
+        if ($value instanceof Arrayable) {
+            $value = $value->toArray();
+        } elseif ($value instanceof Traversable) {
+            $value = iterator_to_array($value);
+        } elseif ($value instanceof \JsonSerializable) {
+            $value = $value->jsonSerialize();
+        }
+
+        if (is_object($value)) {
+            $value = (array) $value;
+        }
+
+        if (! is_array($value)) {
+            return $value === null ? [] : [$value];
+        }
+
+        return $value;
+    }
+
+    /**
+     * Strip known model attributes from an inferred properties payload.
+     */
+    private static function discardAttributeKeysFromProperties(array $properties): array
+    {
+        static $attributeLookup = null;
+
+        if ($attributeLookup === null) {
+            $instance = new self();
+            $columns = array_filter(
+                array_merge(
+                    $instance->getFillable(),
+                    [
+                        $instance->getKeyName(),
+                        $instance->getCreatedAtColumn(),
+                        $instance->getUpdatedAtColumn(),
+                    ]
+                ),
+                static fn ($column) => is_string($column) && $column !== ''
+            );
+            $attributeLookup = array_fill_keys($columns, true);
+        }
+
+        return array_diff_key($properties, $attributeLookup);
     }
 }

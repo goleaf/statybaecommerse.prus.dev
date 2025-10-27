@@ -8,7 +8,7 @@ use App\Models\Concerns\OrdersByName;
 use App\Models\Scopes\ActiveScope;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory as LaravelHasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -40,7 +40,7 @@ use Throwable;
 #[ScopedBy([ActiveScope::class])]
 final class SystemSettingCategory extends Model
 {
-    use HasFactory;
+    use LaravelHasFactory;
     use HasSlug;
     use LogsActivity;
     use OrdersByName;

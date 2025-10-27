@@ -256,6 +256,18 @@ final class ProductVariant extends Model implements HasMedia, TranslatableRecord
     }
 
     /**
+     * Handle scopeOrderedByName functionality with proper error handling.
+     *
+     * @param mixed $query
+     */
+    public function scopeOrderedByName(Builder $query, string $direction = 'asc'): Builder
+    {
+        $direction = strtolower($direction) === 'desc' ? 'desc' : 'asc';
+
+        return $query->orderBy('name', $direction);
+    }
+
+    /**
      * Handle scopeEnabled functionality with proper error handling.
      *
      * @param mixed $query

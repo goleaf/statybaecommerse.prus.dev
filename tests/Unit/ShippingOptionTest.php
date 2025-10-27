@@ -129,6 +129,19 @@ test('shipping option can check order amount eligibility', function () {
     expect($shippingOption->isEligibleForOrderAmount(1000))->toBeTrue();
 });
 
+test('shipping option handles floating point order amount precision', function () {
+    $shippingOption = ShippingOption::factory()
+        ->for($this->zone)
+        ->create([
+            'min_order_amount' => 0.3,
+            'max_order_amount' => 0.3,
+        ]);
+
+    $orderAmount = 0.1 + 0.2; // Produces 0.30000000000000004 with standard floating point math.
+
+    expect($shippingOption->isEligibleForOrderAmount($orderAmount))->toBeTrue();
+});
+
 test('shipping option can calculate price for order', function () {
     $shippingOption = ShippingOption::factory()
         ->for($this->zone)

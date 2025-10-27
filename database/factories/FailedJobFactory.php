@@ -15,6 +15,11 @@ use Illuminate\Support\Str;
 final class FailedJobFactory extends Factory
 {
     /**
+     * Provide a monotonic counter for generating deterministic display names without Faker formatters.
+     */
+    private static int $displayNameSequence = 1;
+
+    /**
      * Tie the factory to the FailedJob model.
      */
     protected $model = FailedJob::class;
@@ -26,15 +31,15 @@ final class FailedJobFactory extends Factory
     {
         // Build a realistic payload that mirrors the stored job metadata structure.
         $payload = [
-            'displayName' => $this->faker->unique()->jobTitle(),
+            'displayName' => $this->generateJobDisplayName(),
         ];
 
         return [
             'uuid'       => (string) Str::uuid(),
-            'connection' => $this->faker->randomElement(['redis', 'database']),
-            'queue'      => $this->faker->randomElement(['default', 'high', 'low']),
+            'connection' => 'redis',
+            'queue'      => 'default',
             'payload'    => json_encode($payload, JSON_THROW_ON_ERROR),
-            'exception'  => $this->faker->sentence(),
+            'exception'  => sprintf('Example failure message %d', self::$displayNameSequence),
             'failed_at'  => Carbon::now(),
         ];
     }
@@ -45,7 +50,7 @@ final class FailedJobFactory extends Factory
     public function withDisplayName(?string $displayName = null): self
     {
         // Allow tests to inject deterministic display names for assertions.
-        $name = $displayName ?? $this->faker->unique()->jobTitle();
+        $name = $displayName ?? $this->generateJobDisplayName();
 
         return $this->state(fn (array $attributes): array => [
             'payload' => json_encode(['displayName' => $name], JSON_THROW_ON_ERROR),
@@ -61,5 +66,15 @@ final class FailedJobFactory extends Factory
         return $this->state(fn (array $attributes): array => [
             'payload' => '{}',
         ]);
+    }
+
+    /**
+     * Produce a plausible job class name for the payload display name field.
+     */
+    private function generateJobDisplayName(): string
+    {
+        $sequence = self::$displayNameSequence++;
+
+        return sprintf('App\\Jobs\\ExampleJob%d', $sequence);
     }
 }

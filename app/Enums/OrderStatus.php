@@ -18,6 +18,7 @@ enum OrderStatus: string implements EnumInterface
     case PROCESSING = 'processing';
     case SHIPPED = 'shipped';
     case DELIVERED = 'delivered';
+    case COMPLETED = 'completed';
     case CANCELLED = 'cancelled';
     case REFUNDED = 'refunded';
     case RETURNED = 'returned';
@@ -27,6 +28,7 @@ enum OrderStatus: string implements EnumInterface
         'processing' => 'Processing',
         'shipped'    => 'Shipped',
         'delivered'  => 'Delivered',
+        'completed'  => 'Completed',
         'cancelled'  => 'Cancelled',
         'refunded'   => 'Refunded',
         'returned'   => 'Returned',
@@ -37,6 +39,7 @@ enum OrderStatus: string implements EnumInterface
         'processing' => 'Order is being prepared for shipment.',
         'shipped'    => 'Order has left the warehouse and is in transit.',
         'delivered'  => 'Order successfully delivered to the customer.',
+        'completed'  => 'Order fulfilled and closed out.',
         'cancelled'  => 'Order cancelled before fulfillment.',
         'refunded'   => 'Order refunded to the customer.',
         'returned'   => 'Order returned by the customer.',
@@ -47,6 +50,7 @@ enum OrderStatus: string implements EnumInterface
         'processing' => 'heroicon-o-cog-6-tooth',
         'shipped'    => 'heroicon-o-truck',
         'delivered'  => 'heroicon-o-check-badge',
+        'completed'  => 'heroicon-o-check-circle',
         'cancelled'  => 'heroicon-o-x-circle',
         'refunded'   => 'heroicon-o-arrow-uturn-left',
         'returned'   => 'heroicon-o-arrow-uturn-right',
@@ -57,6 +61,7 @@ enum OrderStatus: string implements EnumInterface
         'processing' => 'primary',
         'shipped'    => 'success',
         'delivered'  => 'success',
+        'completed'  => 'success',
         'cancelled'  => 'danger',
         'refunded'   => 'secondary',
         'returned'   => 'warning',
@@ -67,9 +72,10 @@ enum OrderStatus: string implements EnumInterface
         'processing' => 2,
         'shipped'    => 3,
         'delivered'  => 4,
-        'cancelled'  => 5,
-        'refunded'   => 6,
-        'returned'   => 7,
+        'completed'  => 5,
+        'cancelled'  => 6,
+        'refunded'   => 7,
+        'returned'   => 8,
     ];
 
     /**

@@ -70,6 +70,15 @@ final class RecommendationBlock extends Model
         'meta'             => 'array',
     ];
 
+    public function getCasts(): array
+    {
+        $casts = parent::getCasts();
+
+        unset($casts[$this->getKeyName()]);
+
+        return $casts;
+    }
+
     /**
      * Connect products to recommendation blocks to drive personalised widget
      * output on the storefront.

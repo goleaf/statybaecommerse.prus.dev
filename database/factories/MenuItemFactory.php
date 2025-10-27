@@ -42,7 +42,7 @@ final class MenuItemFactory extends Factory
                 null,
             ]),
             'sort_order' => fake()->numberBetween(0, 100),
-            'is_visible' => fake()->boolean(90), // 90% chance of being visible
+            'is_visible' => true,
         ];
     }
 

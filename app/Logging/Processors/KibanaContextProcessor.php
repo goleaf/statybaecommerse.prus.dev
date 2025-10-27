@@ -36,15 +36,31 @@ final class KibanaContextProcessor
         ];
 
         // Expose the environment separately so search filters in Kibana can
-        // query logs by the current Laravel environment quickly.
-        $record->extra['environment'] = app()->environment();
+        // query logs by the current Laravel environment quickly. Default to the
+        // configured value when the global helper is not backed by a full
+        // Laravel application instance (e.g. during isolated unit tests).
+        $appEnvironment = $environment;
+
+        if (function_exists('app')) {
+            $app = app();
+
+            if (is_object($app) && method_exists($app, 'environment')) {
+                $appEnvironment = $app->environment();
+            }
+        }
+
+        $record->extra['environment'] = $appEnvironment;
 
         // Capture the current PHP process identifier so log aggregators can
         // group events reliably, while guarding against hosting environments
         // that disable getmypid().
         $pid = function_exists('getmypid') ? getmypid() : false;
 
-        if (is_int($pid) && $pid > 0) {
+        if ((! is_int($pid) || $pid <= 0) && function_exists('posix_getpid')) {
+            $pid = posix_getpid();
+        }
+
+        if (is_int($pid)) {
             $processContext = $record->extra['process'] ?? [];
 
             if (! is_array($processContext)) {

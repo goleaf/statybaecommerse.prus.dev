@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Request;
 
@@ -14,6 +15,8 @@ use Illuminate\Support\Facades\Request;
  */
 abstract class Controller
 {
+    use AuthorizesRequests;
+
     /**
      * Initialize the class instance with required dependencies.
      */

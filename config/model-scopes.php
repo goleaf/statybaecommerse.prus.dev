@@ -59,7 +59,6 @@ return [
         App\Models\Price::class,
         App\Models\PriceList::class,
         App\Models\PriceListItem::class,
-        App\Models\Document::class,
         App\Models\DocumentTemplate::class,
         App\Models\Legal::class,
         App\Models\Location::class,

@@ -19,17 +19,18 @@ final class CountryFactory extends Factory
         $regions = ['Europe', 'Asia', 'Africa', 'North America', 'South America', 'Oceania', 'Antarctica'];
         $currencies = ['EUR', 'USD', 'GBP', 'JPY', 'CHF', 'CAD', 'AUD', 'CNY', 'RUB', 'INR'];
 
-        $uniqueIndex = $this->faker->unique()->numberBetween(100, 999);
+        $cca2 = $this->faker->unique()->regexify('[A-Z][A-Z0-9]');
+        $cca3 = $this->faker->unique()->regexify('[A-Z][A-Z0-9]{2}');
 
         return [
             'name'               => $this->faker->country(),
             'name_official'      => $this->faker->optional(0.7)->country(),
             'description'        => $this->faker->optional(0.6)->paragraph(),
-            'cca2'               => sprintf('T%02d', $uniqueIndex % 100),
-            'cca3'               => sprintf('T%03d', $uniqueIndex),
+            'cca2'               => $cca2,
+            'cca3'               => $cca3,
             'ccn3'               => $this->faker->optional(0.8)->numerify('###'),
-            'code'               => $this->faker->optional(0.5)->lexify('???'),
-            'iso_code'           => $this->faker->optional(0.5)->lexify('???'),
+            'code'               => $this->faker->optional(0.5)->regexify('[A-Z]{3}'),
+            'iso_code'           => $this->faker->optional(0.5)->regexify('[A-Z]{3}'),
             'currency_code'      => $this->faker->randomElement($currencies),
             'currency_symbol'    => $this->faker->optional(0.7)->randomElement(['€', '$', '£', '¥', 'CHF', 'C$', 'A$', '¥', '₽', '₹']),
             'phone_code'         => $this->faker->optional(0.8)->numerify('###'),

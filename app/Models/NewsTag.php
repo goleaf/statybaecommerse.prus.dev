@@ -49,6 +49,19 @@ final class NewsTag extends Model
         ];
     }
 
+    /**
+     * Surface the configured casts while hiding framework-provided defaults
+     * like the auto-incrementing key so contract assertions stay focused on
+     * the explicit model configuration.
+     */
+    public function getCasts(): array
+    {
+        $casts = parent::getCasts();
+        unset($casts[$this->getKeyName()]);
+
+        return $casts;
+    }
+
     protected string $translationModel = \App\Models\Translations\NewsTagTranslation::class;
 
     /**
@@ -56,7 +69,7 @@ final class NewsTag extends Model
      */
     public function news(): BelongsToMany
     {
-        return $this->belongsToMany(News::class, 'news_tag_pivot', 'news_tag_id', 'news_id')->withTimestamps();
+        return $this->belongsToMany(News::class, 'news_tag_pivot', 'news_tag_id', 'news_id');
     }
 
     /**

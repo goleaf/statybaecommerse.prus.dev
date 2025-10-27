@@ -5,12 +5,15 @@ declare(strict_types=1);
 namespace App\Models;
 
 use Carbon\CarbonInterface;
+use Illuminate\Contracts\Auth\Factory as AuthFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use JsonException;
+use InvalidArgumentException;
 
 /**
  * @property array<string, array{previous:mixed,current:mixed}>|null $diff
@@ -62,9 +65,16 @@ final class AuditTrail extends Model
      */
     public function getAuditableLabelAttribute(): string
     {
-        $type = class_basename($this->auditable_type ?? '');
+        $type = $this->auditable_type ?? '';
 
-        return trim(sprintf('%s #%s', $type, $this->auditable_id));
+        if ($type !== '') {
+            $resolved = Relation::getMorphedModel($type) ?? $type;
+            $type = class_basename($resolved);
+        }
+
+        $identifier = $this->auditable_id !== null ? sprintf('#%s', $this->auditable_id) : '';
+
+        return trim(sprintf('%s %s', $type, $identifier));
     }
 
     /**
@@ -149,7 +159,7 @@ final class AuditTrail extends Model
             return;
         }
 
-        $actor = auth('admin')->user() ?? auth()->user();
+        $actor = self::resolveActor();
 
         $requestId = self::resolveRequestId();
 
@@ -260,5 +270,39 @@ final class AuditTrail extends Model
         }
 
         return Str::uuid()->toString();
+    }
+
+    private static function resolveActor(): ?Model
+    {
+        $auth = auth();
+
+        if (! $auth instanceof AuthFactory) {
+            return null;
+        }
+
+        $guards = array_keys(config('auth.guards', []));
+        $defaultGuard = method_exists($auth, 'getDefaultDriver') ? $auth->getDefaultDriver() : null;
+
+        $preferredGuards = array_unique(array_filter([
+            'admin',
+            $defaultGuard,
+            ...$guards,
+        ]));
+
+        foreach ($preferredGuards as $guard) {
+            try {
+                $user = $auth->guard($guard)->user();
+            } catch (InvalidArgumentException) {
+                continue;
+            }
+
+            if ($user instanceof Model) {
+                return $user;
+            }
+        }
+
+        $user = $auth->user();
+
+        return $user instanceof Model ? $user : null;
     }
 }

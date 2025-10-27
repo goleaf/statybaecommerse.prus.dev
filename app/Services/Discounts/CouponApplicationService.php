@@ -10,6 +10,7 @@ use App\Models\Coupon;
 use App\Models\CouponUsage;
 use App\Models\Order;
 use App\Models\Product;
+use App\Models\Scopes\StatusScope;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Session\Session;
 use Illuminate\Support\Arr;
@@ -291,6 +292,7 @@ final class CouponApplicationService
 
         // Treat any existing order as a signal the shopper is no longer a first-time customer.
         return ! Order::query()
+            ->withoutGlobalScope(StatusScope::class)
             ->where('user_id', (int) $userId)
             ->exists();
     }

@@ -346,7 +346,7 @@ final class CustomerGroup extends Model
      */
     public function scopeEnabled(Builder $query): Builder
     {
-        return $query->where('is_enabled', true);
+        return self::applyBooleanScope($query, 'is_enabled', true);
     }
 
     /**
@@ -363,10 +363,13 @@ final class CustomerGroup extends Model
     {
         // Match either percentage based or fixed discounts so B2B pricing rules
         // surface every configured incentive when building dashboards.
-        return $query->where(static function (Builder $innerQuery): void {
+        $percentageColumn = $query->qualifyColumn('discount_percentage');
+        $fixedColumn = $query->qualifyColumn('discount_fixed');
+
+        return $query->where(static function (Builder $innerQuery) use ($percentageColumn, $fixedColumn): void {
             $innerQuery
-                ->where('discount_percentage', '>', 0)
-                ->orWhere('discount_fixed', '>', 0);
+                ->whereRaw("COALESCE($percentageColumn, 0) + 0 > 0")
+                ->orWhereRaw("COALESCE($fixedColumn, 0) + 0 > 0");
         });
     }
 
@@ -378,7 +381,9 @@ final class CustomerGroup extends Model
      */
     public function scopeInactive(Builder $query): Builder
     {
-        return $query->where('is_enabled', false)->where('is_active', false);
+        $query = self::applyBooleanScope($query, 'is_enabled', false);
+
+        return self::applyBooleanScope($query, 'is_active', false);
     }
 
     /**
@@ -389,7 +394,9 @@ final class CustomerGroup extends Model
      */
     public function scopeActive(Builder $query): Builder
     {
-        return $query->where('is_enabled', true)->where('is_active', true);
+        $query = self::applyBooleanScope($query, 'is_enabled', true);
+
+        return self::applyBooleanScope($query, 'is_active', true);
     }
 
     /**
@@ -400,7 +407,7 @@ final class CustomerGroup extends Model
      */
     public function scopeDisabled(Builder $query): Builder
     {
-        return $query->where('is_enabled', false);
+        return self::applyBooleanScope($query, 'is_enabled', false);
     }
 
     /**
@@ -411,7 +418,7 @@ final class CustomerGroup extends Model
      */
     public function scopeWithSpecialPricing(Builder $query): Builder
     {
-        return $query->where('has_special_pricing', true);
+        return self::applyBooleanScope($query, 'has_special_pricing', true);
     }
 
     /**
@@ -433,7 +440,7 @@ final class CustomerGroup extends Model
      */
     public function scopeDefault(Builder $query): Builder
     {
-        return $query->where('is_default', true);
+        return self::applyBooleanScope($query, 'is_default', true);
     }
 
     /**
@@ -444,7 +451,13 @@ final class CustomerGroup extends Model
      */
     public function scopeOrderByPriority(Builder $query): Builder
     {
-        return $query->orderBy('sort_order', 'asc');
+        $sortColumn = $query->qualifyColumn('sort_order');
+        $keyColumn = $query->getModel()->getQualifiedKeyName();
+
+        return $query
+            ->orderByRaw("CASE WHEN $sortColumn IS NULL THEN 1 ELSE 0 END")
+            ->orderBy($sortColumn)
+            ->orderBy($keyColumn);
     }
 
     /**
@@ -535,7 +548,10 @@ final class CustomerGroup extends Model
         $normalized = $this->normalizeBoolean($value);
 
         $this->attributes['is_active'] = $normalized;
-        $this->attributes['is_enabled'] = $normalized;
+
+        if (! array_key_exists('is_enabled', $this->attributes) || $this->attributes['is_enabled'] === null) {
+            $this->attributes['is_enabled'] = $normalized;
+        }
     }
 
     /**
@@ -548,7 +564,10 @@ final class CustomerGroup extends Model
         $normalized = $this->normalizeBoolean($value);
 
         $this->attributes['is_enabled'] = $normalized;
-        $this->attributes['is_active'] = $normalized;
+
+        if (! array_key_exists('is_active', $this->attributes) || $this->attributes['is_active'] === null) {
+            $this->attributes['is_active'] = $normalized;
+        }
     }
 
     /**
@@ -628,6 +647,41 @@ final class CustomerGroup extends Model
         }
 
         return (bool) $value;
+    }
+
+    /**
+     * Apply a tolerant boolean comparison so legacy truthy/falsey values stay queryable.
+     */
+    private static function applyBooleanScope(Builder $query, string $column, bool $expected): Builder
+    {
+        $qualifiedColumn = $query->qualifyColumn($column);
+
+        $normalizedCandidates = $expected
+            ? [1, true, '1']
+            : [0, false, '0', ''];
+        $normalizedCandidates = array_values(array_unique($normalizedCandidates, SORT_REGULAR));
+
+        $stringCandidates = $expected
+            ? ['true', 't', 'yes']
+            : ['false', 'f', 'no'];
+
+        return $query->where(static function (Builder $booleanQuery) use ($qualifiedColumn, $expected, $normalizedCandidates, $stringCandidates): void {
+            $booleanQuery->whereIn($qualifiedColumn, $normalizedCandidates);
+
+            if ($stringCandidates !== []) {
+                $placeholders = implode(', ', array_fill(0, count($stringCandidates), '?'));
+                $loweredValues = array_map(static fn (string $value): string => strtolower($value), $stringCandidates);
+
+                $booleanQuery->orWhereRaw(
+                    sprintf('LOWER(CAST(%s AS CHAR)) IN (%s)', $qualifiedColumn, $placeholders),
+                    $loweredValues
+                );
+            }
+
+            if (! $expected) {
+                $booleanQuery->orWhereNull($qualifiedColumn);
+            }
+        });
     }
 
     /**

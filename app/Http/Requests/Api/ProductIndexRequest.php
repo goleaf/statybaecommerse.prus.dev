@@ -64,7 +64,12 @@ final class ProductIndexRequest extends FormRequest
             'q'         => ['nullable', 'string', 'max:120'],
             'category'  => ['nullable', 'string', 'max:120', 'regex:/^[A-Za-z0-9_-]+$/'],
             'price_min' => ['nullable', 'numeric', 'min:0'],
-            'price_max' => ['nullable', 'numeric', 'min:0', 'gte:price_min'],
+            'price_max' => [
+                'nullable',
+                'numeric',
+                'min:0',
+                Rule::when($this->filled('price_min'), 'gte:price_min'),
+            ],
             'sort'      => ['nullable', Rule::enum(ProductSort::class)],
             'per_page'  => ['nullable', 'integer', 'min:1', 'max:50'],
             'page'      => ['nullable', 'integer', 'min:1'],

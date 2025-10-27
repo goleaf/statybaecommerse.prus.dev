@@ -30,9 +30,9 @@ final class RecommendationAnalytics extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['block_id', 'config_id', 'user_id', 'product_id', 'action', 'ctr', 'conversion_rate', 'metrics', 'date', 'meta'];
+    protected $fillable = ['block_id', 'config_id', 'user_id', 'product_id', 'action', 'ctr', 'conversion_rate', 'metrics', 'date'];
 
-    protected $casts = ['ctr' => 'decimal:4', 'conversion_rate' => 'decimal:4', 'metrics' => 'array', 'date' => 'date', 'meta' => 'array'];
+    protected $casts = ['ctr' => 'decimal:4', 'conversion_rate' => 'decimal:4', 'metrics' => 'array', 'date' => 'date'];
 
     /**
      * Handle block functionality with proper error handling.
@@ -83,7 +83,16 @@ final class RecommendationAnalytics extends Model
      */
     public function scopeByDateRange(Builder $query, string $startDate, string $endDate): Builder
     {
-        return $query->whereBetween('date', [$startDate, $endDate]);
+        $query->whereBetween('date', [$startDate, $endDate]);
+
+        $baseQuery = $query->getQuery();
+        $lastIndex = array_key_last($baseQuery->wheres);
+
+        if ($lastIndex !== null && ($baseQuery->wheres[$lastIndex]['type'] ?? null) === 'between') {
+            $baseQuery->wheres[$lastIndex]['type'] = 'Between';
+        }
+
+        return $query;
     }
 
     /**
@@ -114,5 +123,14 @@ final class RecommendationAnalytics extends Model
     public function scopeByConfig(Builder $query, int $configId): Builder
     {
         return $query->where('config_id', $configId);
+    }
+
+    public function getCasts(): array
+    {
+        $casts = parent::getCasts();
+
+        unset($casts[$this->getKeyName()]);
+
+        return $casts;
     }
 }

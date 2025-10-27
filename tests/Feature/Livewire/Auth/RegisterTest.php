@@ -7,9 +7,6 @@ use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Livewire\Livewire;
-use Tests\TestCase;
-
-uses(TestCase::class);
 
 it('registers a new account and authenticates the user', function (): void {
     // Arrange: ensure we operate within a predictable locale for the preferred locale assertion.

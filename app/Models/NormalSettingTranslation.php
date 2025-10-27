@@ -31,7 +31,16 @@ final class NormalSettingTranslation extends Model
 
     protected $table = 'enhanced_settings_translations';
 
-    protected $fillable = ['enhanced_setting_id', 'locale', 'description', 'display_name', 'help_text'];
+    /**
+     * @var list<string>
+     */
+    protected $fillable = [
+        'enhanced_setting_id',
+        'locale',
+        'description',
+        'display_name',
+        'help_text',
+    ];
 
     /**
      * Handle enhancedSetting functionality with proper error handling.
@@ -56,6 +65,6 @@ final class NormalSettingTranslation extends Model
     public function scopeOrderedByName(Builder $query): Builder
     {
         // Sorting by display_name keeps listings predictable for administrators and storefront consumers.
-        return $query->orderBy('display_name');
+        return $query->orderBy('display_name', 'asc');
     }
 }

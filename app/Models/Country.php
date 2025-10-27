@@ -8,6 +8,7 @@ use App\Models\Scopes\ActiveScope;
 use App\Models\Translations\CountryTranslation;
 use App\Traits\HasTranslations;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -243,10 +244,16 @@ final class Country extends Model
      *
      * @param mixed $query
      */
-    public function scopeOrderedByName($query)
+    public function scopeOrderedByName(Builder $query, string $direction = 'asc'): Builder
     {
-        // Using LOWER keeps the sort stable regardless of the database collation settings.
-        return $query->orderByRaw('LOWER(name) asc')->orderBy('name');
+        $direction = strtolower($direction) === 'desc' ? 'desc' : 'asc';
+        $qualifiedColumn = $query->qualifyColumn('name');
+        $wrappedColumn = $query->getQuery()->getGrammar()->wrap($qualifiedColumn);
+
+        return $query
+            // Normalise case before sorting so mixed-case names remain deterministic across collations.
+            ->orderByRaw(sprintf('LOWER(%s) %s', $wrappedColumn, $direction))
+            ->orderBy($qualifiedColumn, $direction);
     }
 
     // Helper methods

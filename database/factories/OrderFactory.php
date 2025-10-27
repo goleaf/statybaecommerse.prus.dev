@@ -34,13 +34,20 @@ class OrderFactory extends Factory
         $discountAmount = $this->faker->randomFloat(2, 0, $subtotal * 0.1);  // Max 10% discount
         $total = $subtotal + $taxAmount + $shippingAmount - $discountAmount;
 
-        return [
+        $scopedStatuses = [
+            OrderStatus::PENDING->value,
+            OrderStatus::PROCESSING->value,
+            OrderStatus::SHIPPED->value,
+            OrderStatus::DELIVERED->value,
+        ];
+
+        $attributes = [
             'number'     => 'ORD-' . strtoupper($this->faker->unique()->bothify('######')),
             'user_id'    => null,
             'channel_id' => null,
             'country_id' => null,
             'partner_id' => null,
-            'status'     => $this->faker->randomElement(OrderStatus::values()),
+            'status'     => $this->faker->randomElement($scopedStatuses),
             // Keep payment statuses aligned with the enum so factories exercise every supported lifecycle case.
             'payment_status'    => $this->faker->randomElement(collect(PaymentStatus::cases())->map(fn (PaymentStatus $status): string => $status->value)->all()),
             'payment_state'     => OrderPaymentState::CREATED->value,
@@ -74,6 +81,8 @@ class OrderFactory extends Factory
             'shipped_at'   => $this->faker->optional(0.4)->dateTimeBetween('-30 days', 'now'),
             'delivered_at' => $this->faker->optional(0.2)->dateTimeBetween('-30 days', 'now'),
         ];
+
+        return $this->ensureOptionalColumns($attributes);
     }
 
     /**
@@ -81,13 +90,13 @@ class OrderFactory extends Factory
      */
     public function pending(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn (array $attributes) => $this->ensureOptionalColumns([
             'status'         => OrderStatus::PENDING->value,
             'payment_status' => PaymentStatus::PENDING->value,
             'payment_state'  => OrderPaymentState::CREATED->value,
             'shipped_at'     => null,
             'delivered_at'   => null,
-        ]);
+        ]));
     }
 
     /**
@@ -95,13 +104,13 @@ class OrderFactory extends Factory
      */
     public function processing(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn (array $attributes) => $this->ensureOptionalColumns([
             'status'         => OrderStatus::PROCESSING->value,
             'payment_status' => PaymentStatus::PAID->value,
             'payment_state'  => OrderPaymentState::PAID->value,
             'shipped_at'     => null,
             'delivered_at'   => null,
-        ]);
+        ]));
     }
 
     /**
@@ -109,13 +118,13 @@ class OrderFactory extends Factory
      */
     public function confirmed(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn (array $attributes) => $this->ensureOptionalColumns([
             'status'         => OrderStatus::PROCESSING->value,
             'payment_status' => PaymentStatus::PAID->value,
             'payment_state'  => OrderPaymentState::PAID->value,
             'shipped_at'     => null,
             'delivered_at'   => null,
-        ]);
+        ]));
     }
 
     /**
@@ -123,13 +132,13 @@ class OrderFactory extends Factory
      */
     public function shipped(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn (array $attributes) => $this->ensureOptionalColumns([
             'status'         => OrderStatus::SHIPPED->value,
             'payment_status' => PaymentStatus::PAID->value,
             'payment_state'  => OrderPaymentState::PAID->value,
             'shipped_at'     => $this->faker->dateTimeBetween('-7 days', 'now'),
             'delivered_at'   => null,
-        ]);
+        ]));
     }
 
     /**
@@ -137,13 +146,13 @@ class OrderFactory extends Factory
      */
     public function delivered(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn (array $attributes) => $this->ensureOptionalColumns([
             'status'         => OrderStatus::DELIVERED->value,
             'payment_status' => PaymentStatus::PAID->value,
             'payment_state'  => OrderPaymentState::PAID->value,
             'shipped_at'     => $this->faker->dateTimeBetween('-14 days', '-7 days'),
             'delivered_at'   => $this->faker->dateTimeBetween('-7 days', 'now'),
-        ]);
+        ]));
     }
 
     /**
@@ -151,14 +160,14 @@ class OrderFactory extends Factory
      */
     public function completed(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn (array $attributes) => $this->ensureOptionalColumns([
             // Map legacy "completed" into the delivered enum case to stay aligned with the new status set.
             'status'         => OrderStatus::DELIVERED->value,
             'payment_status' => PaymentStatus::PAID->value,
             'payment_state'  => OrderPaymentState::PAID->value,
             'shipped_at'     => $this->faker->dateTimeBetween('-30 days', '-14 days'),
             'delivered_at'   => $this->faker->dateTimeBetween('-14 days', '-7 days'),
-        ]);
+        ]));
     }
 
     /**
@@ -166,13 +175,13 @@ class OrderFactory extends Factory
      */
     public function cancelled(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn (array $attributes) => $this->ensureOptionalColumns([
             'status'         => OrderStatus::CANCELLED->value,
             'payment_status' => PaymentStatus::PENDING->value,
             'payment_state'  => OrderPaymentState::CREATED->value,
             'shipped_at'     => null,
             'delivered_at'   => null,
-        ]);
+        ]));
     }
 
     /**
@@ -180,10 +189,10 @@ class OrderFactory extends Factory
      */
     public function paid(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn (array $attributes) => $this->ensureOptionalColumns([
             'payment_status' => PaymentStatus::PAID->value,
             'payment_state'  => OrderPaymentState::PAID->value,
-        ]);
+        ]));
     }
 
     /**
@@ -191,11 +200,11 @@ class OrderFactory extends Factory
      */
     public function paymentFailed(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn (array $attributes) => $this->ensureOptionalColumns([
             'payment_status' => PaymentStatus::FAILED->value,
             'status'         => OrderStatus::PENDING->value,
             'payment_state'  => OrderPaymentState::CREATED->value,
-        ]);
+        ]));
     }
 
     /**
@@ -203,10 +212,10 @@ class OrderFactory extends Factory
      */
     public function refunded(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn (array $attributes) => $this->ensureOptionalColumns([
             'payment_status' => PaymentStatus::REFUNDED->value,
             'payment_state'  => OrderPaymentState::REFUNDED->value,
-        ]);
+        ]));
     }
 
     public function configure(): static
@@ -298,5 +307,35 @@ class OrderFactory extends Factory
         return $this->state(fn (array $attributes) => [
             'created_at' => $this->faker->dateTimeBetween('-1 year', '-30 days'),
         ]);
+    }
+
+    /**
+     * Remove optional payment attributes when the backing column is missing.
+     *
+     * @param array<string, mixed> $attributes
+     * @return array<string, mixed>
+     */
+    private function ensureOptionalColumns(array $attributes): array
+    {
+        if (! $this->ordersTableHasColumn('payment_status')) {
+            unset($attributes['payment_status']);
+        }
+
+        if (! $this->ordersTableHasColumn('payment_state')) {
+            unset($attributes['payment_state']);
+        }
+
+        return $attributes;
+    }
+
+    private function ordersTableHasColumn(string $column): bool
+    {
+        $table = (new Order)->getTable();
+
+        if (! Schema::hasTable($table)) {
+            return false;
+        }
+
+        return Schema::hasColumn($table, $column);
     }
 }

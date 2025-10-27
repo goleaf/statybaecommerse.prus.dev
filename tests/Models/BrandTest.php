@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 use App\Models\Brand;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 
-uses(RefreshDatabase::class);
+uses(TestCase::class, RefreshDatabase::class);
 
 it('orders brands alphabetically by default', function (): void {
     // Create a small dataset with deliberately shuffled brand names.

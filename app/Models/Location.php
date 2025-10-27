@@ -38,6 +38,13 @@ final class Location extends Model
 {
     use HasFactory, HasTranslations, LogsActivity, SoftDeletes;
 
+    public const SCOPE_COLUMN_HINTS = [
+        'is_active'  => false,
+        'is_visible' => false,
+        'is_enabled' => false,
+        'status'     => false,
+    ];
+
     protected string $translationModel = LocationTranslation::class;
 
     protected $table = 'locations';

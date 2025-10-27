@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Models\Translations;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
  * DiscountConditionTranslation
@@ -23,6 +25,8 @@ use Illuminate\Database\Eloquent\Model;
  */
 final class DiscountConditionTranslation extends Model
 {
+    use HasFactory;
+
     protected $table = 'discount_condition_translations';
 
     protected $fillable = ['discount_condition_id', 'locale', 'name', 'description', 'metadata'];
@@ -33,6 +37,14 @@ final class DiscountConditionTranslation extends Model
     protected function casts(): array
     {
         return ['metadata' => 'array'];
+    }
+
+    /**
+     * Ensure Laravel resolves the correct factory path for this translation model.
+     */
+    protected static function newFactory(): Factory
+    {
+        return \Database\Factories\DiscountConditionTranslationFactory::new();
     }
 
     public $timestamps = true;

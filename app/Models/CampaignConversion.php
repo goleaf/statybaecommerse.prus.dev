@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\Models;
 
+use App\Models\Scopes\ActiveCampaignScope;
+use App\Models\Scopes\ActiveScope;
+use App\Models\Scopes\StatusScope;
 use App\Models\Translations\CampaignConversionTranslation;
 use App\Traits\HasTranslations;
 use Illuminate\Database\Eloquent\Builder;
@@ -34,7 +37,7 @@ final class CampaignConversion extends Model
 {
     use HasFactory, HasTranslations;
 
-    public $timestamps = true;
+    public $timestamps = false;
 
     public const SCOPE_COLUMN_HINTS = [
         'is_active'  => false,
@@ -150,7 +153,8 @@ final class CampaignConversion extends Model
      */
     public function campaign(): BelongsTo
     {
-        return $this->belongsTo(Campaign::class);
+        return $this->belongsTo(Campaign::class)
+            ->withoutGlobalScopes([ActiveScope::class, StatusScope::class, ActiveCampaignScope::class]);
     }
 
     /**
@@ -290,7 +294,10 @@ final class CampaignConversion extends Model
     public function scopeOrderedByName(Builder $query): Builder
     {
         // Always order by the stored campaign_name so marketing tables remain predictable.
-        return $query->orderBy('campaign_name');
+        return $query
+            ->orderByRaw('LOWER(campaign_name) ASC')
+            ->orderBy('campaign_name')
+            ->orderBy('id');
     }
 
     /**
@@ -318,7 +325,7 @@ final class CampaignConversion extends Model
     {
         $value = $this->conversion_value === null ? 0 : (float) $this->conversion_value;
 
-        return '€' . number_format($value, 2, '.', ' ');
+        return '€' . number_format($value, 2, '.', ',');
     }
 
     /**
@@ -328,7 +335,7 @@ final class CampaignConversion extends Model
     {
         $roi = $this->roi ?? 0.0;
 
-        return number_format((float) $roi * 100, 2, '.', ' ') . '%';
+        return number_format((float) $roi * 100, 2, '.', ',') . '%';
     }
 
     /**
@@ -338,7 +345,7 @@ final class CampaignConversion extends Model
     {
         $rate = $this->conversion_rate ?? 0.0;
 
-        return number_format((float) $rate * 100, 2, '.', ' ') . '%';
+        return number_format((float) $rate * 100, 2, '.', ',') . '%';
     }
 
     /**
@@ -379,6 +386,8 @@ final class CampaignConversion extends Model
     public function calculateRoi(float $cost): float
     {
         if ($cost <= 0) {
+            $this->roi = 0.0;
+
             return 0.0;
         }
 
@@ -394,6 +403,8 @@ final class CampaignConversion extends Model
     public function calculateRoas(float $cost): float
     {
         if ($cost <= 0) {
+            $this->roas = 0.0;
+
             return 0.0;
         }
 
@@ -409,7 +420,7 @@ final class CampaignConversion extends Model
      */
     public function isHighValue(float $threshold = 100): bool
     {
-        return $this->conversion_value >= $threshold;
+        return (float) ($this->conversion_value ?? 0) >= $threshold;
     }
 
     /**
@@ -417,7 +428,11 @@ final class CampaignConversion extends Model
      */
     public function isRecent(int $days = 7): bool
     {
-        return $this->converted_at->isAfter(now()->subDays($days));
+        if (! $this->converted_at instanceof Carbon) {
+            return false;
+        }
+
+        return $this->converted_at->greaterThanOrEqualTo(now()->subDays($days));
     }
 
     /**
@@ -425,13 +440,13 @@ final class CampaignConversion extends Model
      */
     public function getAttributionValue(string $model = 'last_click'): float
     {
-        return match ($model) {
+        return (float) match ($model) {
             'first_click'    => $this->first_click_attribution ?? 0,
             'linear'         => $this->linear_attribution ?? 0,
             'time_decay'     => $this->time_decay_attribution ?? 0,
             'position_based' => $this->position_based_attribution ?? 0,
             'data_driven'    => $this->data_driven_attribution ?? 0,
-            default          => $this->last_click_attribution ?? $this->conversion_value,
+            default          => $this->last_click_attribution ?? $this->conversion_value ?? 0,
         };
     }
 }

@@ -412,12 +412,18 @@ final class SystemSettingTranslationResource extends Resource
                             ->send();
                     }),
                 DeleteAction::make()
-                    ->requiresConfirmation(),
+                    ->requiresConfirmation()
+                    ->action(function (SystemSettingTranslation $record): void {
+                        $record->forceDelete();
+                    }),
             ])
             ->bulkActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make()
-                        ->requiresConfirmation(),
+                        ->requiresConfirmation()
+                        ->action(function (Collection $records): void {
+                            $records->each->forceDelete();
+                        }),
                     BulkAction::make('activate')
                         ->label(__('admin.common.activate'))
                         ->icon('heroicon-o-check-circle')

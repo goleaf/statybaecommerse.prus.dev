@@ -22,6 +22,7 @@ test('it downloads completed export artifacts via signed url', function (): void
         'artifact_disk'     => 'public',
         'artifact_path'     => $artifactPath,
         'artifact_filename' => 'orders.csv',
+        'requested_by'      => null,
     ]);
 
     $url = URL::temporarySignedRoute('api.exports.download', now()->addMinutes(5), ['export' => $export]);
@@ -29,15 +30,16 @@ test('it downloads completed export artifacts via signed url', function (): void
     $response = $this->get($url);
 
     $response->assertOk();
-    $response->assertHeader('content-disposition', 'attachment; filename="orders.csv"');
+    $response->assertHeader('content-disposition', 'attachment; filename=orders.csv');
     $response->assertHeader('content-type', 'text/csv; charset=UTF-8');
-    $response->assertSee('number');
+    expect($response->streamedContent())->toContain('number');
 });
 
 test('it returns not found for missing or incomplete exports', function (): void {
     $queuedExport = Export::factory()->create([
         'status' => ExportStatus::Queued,
         'format' => 'csv',
+        'requested_by' => null,
     ]);
 
     $queuedUrl = URL::temporarySignedRoute('api.exports.download', now()->addMinutes(5), ['export' => $queuedExport]);
@@ -48,6 +50,7 @@ test('it returns not found for missing or incomplete exports', function (): void
         'artifact_disk'     => 'public',
         'artifact_path'     => 'exports/missing.csv',
         'artifact_filename' => 'missing.csv',
+        'requested_by'      => null,
     ]);
 
     $missingUrl = URL::temporarySignedRoute('api.exports.download', now()->addMinutes(5), ['export' => $missingExport]);

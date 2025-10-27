@@ -73,6 +73,14 @@ final class Customer extends Model
     }
 
     /**
+     * Associate the customer with a primary customer group when segmentation is in use.
+     */
+    public function group(): BelongsTo
+    {
+        return $this->belongsTo(CustomerGroup::class, 'customer_group_id');
+    }
+
+    /**
      * Handle orders relationship with proper error handling.
      */
     public function orders(): HasMany
