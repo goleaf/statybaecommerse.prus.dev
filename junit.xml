@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <testsuites>
-  <testsuite name="Tests\Feature\AdminPanelTest" file="Admin Panel (Tests\Feature\AdminPanel)" tests="4" assertions="7" errors="0" failures="0" skipped="0" time="19.406307">
-    <testcase name="Admin panel redirects to login when not authenticated" file="Admin Panel (Tests\Feature\AdminPanel)::Admin panel redirects to login when not authenticated" class="Tests\Feature\AdminPanelTest" classname="Tests.Feature.AdminPanelTest" assertions="2" time="16.636670"/>
-    <testcase name="Admin panel can be accessed when authenticated" file="Admin Panel (Tests\Feature\AdminPanel)::Admin panel can be accessed when authenticated" class="Tests\Feature\AdminPanelTest" classname="Tests.Feature.AdminPanelTest" assertions="3" time="0.882028"/>
-    <testcase name="Dashboard route exists" file="Admin Panel (Tests\Feature\AdminPanel)::Dashboard route exists" class="Tests\Feature\AdminPanelTest" classname="Tests.Feature.AdminPanelTest" assertions="1" time="0.785744"/>
-    <testcase name="Admin login page is accessible" file="Admin Panel (Tests\Feature\AdminPanel)::Admin login page is accessible" class="Tests\Feature\AdminPanelTest" classname="Tests.Feature.AdminPanelTest" assertions="1" time="1.101866"/>
+  <testsuite name="Tests\frontend\features\NavigationLocalizationTest" file="tests/frontend/features/NavigationLocalizationTest.php" tests="1" assertions="209" errors="0" failures="0" skipped="0" time="28.393114">
+    <testcase name="key storefront pages render without missing navigation translations for every supported locale" file="tests/frontend/features/NavigationLocalizationTest.php::key storefront pages render without missing navigation translations for every supported locale" class="Tests\frontend\features\NavigationLocalizationTest" classname="Tests.frontend.features.NavigationLocalizationTest" assertions="209" time="28.393114"/>
   </testsuite>
 </testsuites>
