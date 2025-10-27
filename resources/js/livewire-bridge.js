@@ -1,6 +1,10 @@
 const CART_COUNT_SELECTOR = '#cart-count';
 const CART_COUNT_ATTRIBUTE = '[data-cart-count]';
 const NOTIFICATION_CONTAINER_ID = 'notifications';
+const NOTIFICATION_BASE_CLASS = 'csp-notification';
+const NOTIFICATION_VISIBLE_CLASS = 'csp-notification--visible';
+const NOTIFICATION_STACK_CLASS = 'csp-notification-stack';
+const HIDDEN_CLASS = 'csp-hidden';
 
 function resolveNotificationHandler() {
     if (typeof window.showNotification === 'function') {
@@ -10,44 +14,46 @@ function resolveNotificationHandler() {
     return (type, message, title = '') => {
         const container = ensureNotificationContainer();
         const notification = document.createElement('div');
-        notification.className = `max-w-sm w-full border rounded-lg shadow-lg p-4 transform transition-all duration-300 translate-x-full ${
-            type === 'success'
-                ? 'bg-green-50 border-green-200 text-green-800'
-                : type === 'error'
-                  ? 'bg-red-50 border-red-200 text-red-800'
-                  : type === 'warning'
-                    ? 'bg-yellow-50 border-yellow-200 text-yellow-800'
-                    : 'bg-blue-50 border-blue-200 text-blue-800'
-        }`;
+        const variant = ['success', 'error', 'warning', 'info'].includes(type) ? type : 'info';
+        notification.classList.add(NOTIFICATION_BASE_CLASS, `csp-notification--${variant}`);
 
-        notification.innerHTML = `
-            <div class="flex">
-                <div class="flex-1">
-                    ${title ? `<div class="font-medium text-sm">${title}</div>` : ''}
-                    <div class="text-sm ${title ? 'mt-1' : ''}">${message}</div>
-                </div>
-                <button type="button" class="ml-4 text-gray-400 hover:text-gray-600" aria-label="Close notification">
-                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                    </svg>
-                </button>
-            </div>
+        const content = document.createElement('div');
+        content.classList.add('csp-notification__content');
+
+        if (title) {
+            const heading = document.createElement('div');
+            heading.classList.add('csp-notification__title');
+            heading.textContent = title;
+            content.appendChild(heading);
+        }
+
+        const messageElement = document.createElement('div');
+        messageElement.classList.add('csp-notification__message');
+        messageElement.textContent = message;
+        content.appendChild(messageElement);
+
+        const closeButton = document.createElement('button');
+        closeButton.type = 'button';
+        closeButton.classList.add('csp-notification__close');
+        closeButton.setAttribute('aria-label', 'Close notification');
+        closeButton.innerHTML = `
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
         `;
 
-        notification.querySelector('button')?.addEventListener('click', () => {
-            notification.remove();
-        });
+        closeButton.addEventListener('click', () => dismissNotification(notification));
+
+        notification.appendChild(content);
+        notification.appendChild(closeButton);
 
         container.appendChild(notification);
 
         window.requestAnimationFrame(() => {
-            notification.classList.remove('translate-x-full');
+            notification.classList.add(NOTIFICATION_VISIBLE_CLASS);
         });
 
-        window.setTimeout(() => {
-            notification.classList.add('translate-x-full');
-            window.setTimeout(() => notification.remove(), 300);
-        }, 5000);
+        window.setTimeout(() => dismissNotification(notification), 5000);
     };
 }
 
@@ -57,7 +63,7 @@ function ensureNotificationContainer() {
     if (!container) {
         container = document.createElement('div');
         container.id = NOTIFICATION_CONTAINER_ID;
-        container.className = 'fixed top-4 right-4 z-50 space-y-2';
+        container.classList.add(NOTIFICATION_STACK_CLASS);
         document.body.appendChild(container);
     }
 
@@ -77,13 +83,15 @@ const fallbackUpdateCartCount = () => {
         const badge = document.querySelector(CART_COUNT_SELECTOR);
         if (badge) {
             badge.textContent = String(count);
-            badge.style.display = count > 0 ? 'inline' : 'none';
+            if (badge instanceof HTMLElement) {
+                badge.classList.toggle(HIDDEN_CLASS, count <= 0);
+            }
         }
 
         document.querySelectorAll(CART_COUNT_ATTRIBUTE).forEach((node) => {
             node.textContent = String(count);
             if (node instanceof HTMLElement) {
-                node.style.display = count > 0 ? 'inline' : 'none';
+                node.classList.toggle(HIDDEN_CLASS, count <= 0);
             }
         });
 
@@ -143,3 +151,16 @@ if (typeof window.Livewire !== 'undefined') {
 }
 
 export { updateCartCount };
+
+function dismissNotification(notification) {
+    if (!notification?.classList) {
+        return;
+    }
+
+    notification.classList.remove(NOTIFICATION_VISIBLE_CLASS);
+    window.setTimeout(() => {
+        if (notification.parentElement) {
+            notification.remove();
+        }
+    }, 250);
+}

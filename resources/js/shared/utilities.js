@@ -1,55 +1,69 @@
 /**
- * Shared JavaScript utilities for the e-commerce platform
+ * Shared JavaScript utilities for the e-commerce platform.
+ * All helpers avoid inline styles so they remain compatible with strict CSP headers.
  */
+
+const NOTIFICATION_BASE_CLASS = 'csp-notification';
+const NOTIFICATION_VISIBLE_CLASS = 'csp-notification--visible';
+const HIDDEN_CLASS = 'csp-hidden';
+const FADE_BASE_CLASS = 'csp-fade';
+const FADE_VISIBLE_CLASS = 'csp-fade--visible';
 
 // Notification system
 export const notifications = {
     show(type, message, title = null, duration = 5000) {
+        const variant = this.resolveVariant(type);
         const notification = document.createElement('div');
-        notification.className = this.getNotificationClasses(type);
+        notification.classList.add(NOTIFICATION_BASE_CLASS, `csp-notification--${variant}`);
+        notification.setAttribute('role', 'status');
+        notification.setAttribute('aria-live', 'polite');
 
-        const icon = this.getNotificationIcon(type);
-        const titleHtml = title ? `<h4 class="font-medium">${title}</h4>` : '';
+        const iconWrapper = document.createElement('div');
+        iconWrapper.classList.add('csp-notification__icon');
+        iconWrapper.innerHTML = this.getNotificationIcon(variant);
 
-        notification.innerHTML = `
-            <div class="flex items-start">
-                <div class="flex-shrink-0">
-                    ${icon}
-                </div>
-                <div class="ml-3 flex-1">
-                    ${titleHtml}
-                    <p class="${title ? 'mt-1 ' : ''}text-sm">${message}</p>
-                </div>
-                <button onclick="this.parentElement.parentElement.remove()" class="ml-4 flex-shrink-0">
-                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                </button>
-            </div>
+        const contentWrapper = document.createElement('div');
+        contentWrapper.classList.add('csp-notification__content');
+
+        if (title) {
+            const heading = document.createElement('h4');
+            heading.classList.add('csp-notification__title');
+            heading.textContent = title;
+            contentWrapper.appendChild(heading);
+        }
+
+        const messageParagraph = document.createElement('p');
+        messageParagraph.classList.add('csp-notification__message');
+        messageParagraph.textContent = message;
+        contentWrapper.appendChild(messageParagraph);
+
+        const closeButton = document.createElement('button');
+        closeButton.type = 'button';
+        closeButton.classList.add('csp-notification__close');
+        closeButton.setAttribute('aria-label', 'Dismiss notification');
+        closeButton.innerHTML = `
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
         `;
+
+        closeButton.addEventListener('click', () => dismissNotification(notification));
+
+        notification.appendChild(iconWrapper);
+        notification.appendChild(contentWrapper);
+        notification.appendChild(closeButton);
 
         document.body.appendChild(notification);
 
-        // Auto-remove after duration
-        setTimeout(() => {
-            if (notification.parentElement) {
-                notification.remove();
-            }
-        }, duration);
+        requestAnimationFrame(() => {
+            notification.classList.add(NOTIFICATION_VISIBLE_CLASS);
+        });
+
+        window.setTimeout(() => dismissNotification(notification), duration);
     },
 
-    getNotificationClasses(type) {
-        const baseClasses =
-            'fixed top-4 right-4 z-50 max-w-sm w-full bg-white rounded-lg shadow-lg border p-4 transform translate-x-full transition-transform duration-300';
-
-        const typeClasses = {
-            success: 'border-green-200 bg-green-50 text-green-800',
-            error: 'border-red-200 bg-red-50 text-red-800',
-            warning: 'border-yellow-200 bg-yellow-50 text-yellow-800',
-            info: 'border-blue-200 bg-blue-50 text-blue-800',
-        };
-
-        return `${baseClasses} ${typeClasses[type] || typeClasses.info}`;
+    resolveVariant(type) {
+        return ['success', 'error', 'warning', 'info'].includes(type) ? type : 'info';
     },
 
     getNotificationIcon(type) {
@@ -70,26 +84,21 @@ export const notifications = {
 export const cart = {
     addAnimation(productName) {
         const notification = document.createElement('div');
-        notification.className =
-            'fixed top-4 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 transform translate-x-full transition-transform duration-300';
+        notification.classList.add(NOTIFICATION_BASE_CLASS, 'csp-notification--success');
         notification.textContent = `${productName} added to cart!`;
+
         document.body.appendChild(notification);
-
-        // Animate in
-        setTimeout(() => notification.classList.remove('translate-x-full'), 100);
-
-        // Animate out and remove
-        setTimeout(() => {
-            notification.classList.add('translate-x-full');
-            setTimeout(() => notification.remove(), 300);
-        }, 3000);
+        requestAnimationFrame(() => notification.classList.add(NOTIFICATION_VISIBLE_CLASS));
+        window.setTimeout(() => dismissNotification(notification), 3000);
     },
 
     updateCounter(count) {
         const counters = document.querySelectorAll('[data-cart-count]');
         counters.forEach((counter) => {
             counter.textContent = count;
-            counter.style.display = count > 0 ? 'inline' : 'none';
+            if (counter instanceof HTMLElement) {
+                counter.classList.toggle(HIDDEN_CLASS, count <= 0);
+            }
         });
     },
 };
@@ -154,51 +163,55 @@ export const ui = {
         }
     },
 
-    fadeIn(element, duration = 300) {
+    fadeIn(element, _duration = 300) {
         if (typeof element === 'string') {
             element = document.querySelector(element);
         }
-        if (element) {
-            element.style.opacity = '0';
-            element.style.display = 'block';
-
-            const start = performance.now();
-            const animate = (currentTime) => {
-                const elapsed = currentTime - start;
-                const progress = Math.min(elapsed / duration, 1);
-                element.style.opacity = progress;
-
-                if (progress < 1) {
-                    requestAnimationFrame(animate);
-                }
-            };
-            requestAnimationFrame(animate);
+        if (!element) {
+            return;
         }
+
+        element.classList.add(FADE_BASE_CLASS);
+        element.classList.remove(HIDDEN_CLASS);
+
+        requestAnimationFrame(() => {
+            element.classList.add(FADE_VISIBLE_CLASS);
+        });
     },
 
-    fadeOut(element, duration = 300) {
+    fadeOut(element, _duration = 300) {
         if (typeof element === 'string') {
             element = document.querySelector(element);
         }
-        if (element) {
-            const start = performance.now();
-            const initialOpacity = parseFloat(getComputedStyle(element).opacity);
-
-            const animate = (currentTime) => {
-                const elapsed = currentTime - start;
-                const progress = Math.min(elapsed / duration, 1);
-                element.style.opacity = initialOpacity * (1 - progress);
-
-                if (progress < 1) {
-                    requestAnimationFrame(animate);
-                } else {
-                    element.style.display = 'none';
-                }
-            };
-            requestAnimationFrame(animate);
+        if (!element) {
+            return;
         }
+
+        element.classList.add(FADE_BASE_CLASS);
+        element.classList.remove(FADE_VISIBLE_CLASS);
+
+        const handleTransitionEnd = () => {
+            element.classList.add(HIDDEN_CLASS);
+            element.removeEventListener('transitionend', handleTransitionEnd);
+        };
+
+        element.addEventListener('transitionend', handleTransitionEnd);
     },
 };
+
+function dismissNotification(notification) {
+    if (!notification?.classList) {
+        return;
+    }
+
+    notification.classList.remove(NOTIFICATION_VISIBLE_CLASS);
+
+    window.setTimeout(() => {
+        if (notification.parentElement) {
+            notification.remove();
+        }
+    }, 250);
+}
 
 // Price formatting
 export const price = {
