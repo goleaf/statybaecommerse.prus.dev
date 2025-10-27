@@ -88,6 +88,7 @@ $settings = [
             'lt' => 'Lietuvių',
             'en' => 'English',
             'de' => 'Deutsch',
+            'ru' => 'Русский',
         ]),
         'sort_order' => 4,
         'created_at' => now(),

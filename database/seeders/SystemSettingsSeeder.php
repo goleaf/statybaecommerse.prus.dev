@@ -231,6 +231,7 @@ final class SystemSettingsSeeder extends Seeder
                     'lt' => 'Lietuvių',
                     'en' => 'English',
                     'de' => 'Deutsch',
+                    'ru' => 'Русский',
                 ],
                 'sort_order' => 5,
             ],
