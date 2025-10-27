@@ -92,7 +92,8 @@
     <x-shared.notifications />
 
     {{-- Livewire Scripts --}}
-    @livewireScripts
+    {{-- Pass the CSP nonce so Livewire's inline boot scripts execute without violations. --}}
+    @livewireScripts(['nonce' => csp_nonce()])
 
     {{-- Livewire client hardening: avoid accidental $wire.toJSON() server calls --}}
     <script nonce="{{ csp_nonce() }}">
