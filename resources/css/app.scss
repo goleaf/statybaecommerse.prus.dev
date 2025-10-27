@@ -4981,3 +4981,148 @@ html {
 @function get-continuous-askey-wilson-dual-dual-dual-dual-dual-dual-dual-dual-dual-dual($n, $alpha, $beta, $gamma, $delta, $x) {
   @return get-continuous-askey-wilson-dual-dual-dual-dual-dual-dual-dual-dual-dual($n, $alpha, $beta, $gamma, $delta, $x);
 }
+
+// -----------------------------------------------------------------------------
+// CSP friendly helper classes (keep inline styles out of JavaScript)
+// -----------------------------------------------------------------------------
+
+.csp-hidden {
+  display: none !important;
+}
+
+.csp-animate {
+  opacity: 0;
+  transform: translateY(0.75rem);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.csp-animate--visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.csp-interactive-card {
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform;
+}
+
+.csp-interactive-card--active {
+  transform: translateY(-8px) scale(1.02);
+}
+
+.csp-interactive-button {
+  transition: transform 0.2s ease-in-out;
+}
+
+.csp-button--hover {
+  transform: scale(1.05);
+}
+
+.csp-button--pressed {
+  transform: scale(0.98);
+}
+
+.csp-fade {
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+}
+
+.csp-fade--visible {
+  opacity: 1;
+}
+
+.csp-notification-stack {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  pointer-events: none;
+}
+
+.csp-notification {
+  pointer-events: auto;
+  max-width: 20rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  border-radius: 0.75rem;
+  padding: 0.9rem 1rem;
+  box-shadow: 0 12px 30px -12px rgba(15, 23, 42, 0.45);
+  transform: translateX(120%);
+  transition: transform 0.25s ease, opacity 0.25s ease;
+  opacity: 0;
+  color: #0f172a;
+  background-color: #f8fafc;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+}
+
+.csp-notification--visible {
+  transform: translateX(0);
+  opacity: 1;
+}
+
+.csp-notification--success {
+  background-color: rgba(134, 239, 172, 0.2);
+  border-color: rgba(34, 197, 94, 0.35);
+  color: #166534;
+}
+
+.csp-notification--error {
+  background-color: rgba(254, 202, 202, 0.3);
+  border-color: rgba(239, 68, 68, 0.35);
+  color: #b91c1c;
+}
+
+.csp-notification--warning {
+  background-color: rgba(254, 240, 138, 0.4);
+  border-color: rgba(234, 179, 8, 0.4);
+  color: #a16207;
+}
+
+.csp-notification--info {
+  background-color: rgba(191, 219, 254, 0.35);
+  border-color: rgba(59, 130, 246, 0.35);
+  color: #1d4ed8;
+}
+
+.csp-notification__icon {
+  flex-shrink: 0;
+}
+
+.csp-notification__content {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.csp-notification__title {
+  margin: 0 0 0.25rem;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.csp-notification__message {
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.35;
+}
+
+.csp-notification__close {
+  margin-left: 0.5rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
+}
+
+.csp-notification__close:hover,
+.csp-notification__close:focus {
+  opacity: 1;
+}
