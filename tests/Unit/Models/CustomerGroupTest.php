@@ -116,6 +116,7 @@ final class CustomerGroupTest extends TestCase
         $this->assertCount(1, $enabledGroups);
         $first = $enabledGroups->first();
         $this->assertNotNull($first);
+        $this->assertInstanceOf(CustomerGroup::class, $first);
         $this->assertTrue($first->is_enabled);
     }
 
@@ -126,11 +127,11 @@ final class CustomerGroupTest extends TestCase
 
         // Simulate legacy datasets where boolean flags were persisted as strings while newer rows
         // continue to use integer storage. This mirrors production databases that switched drivers.
-        DB::table('customer_groups')->whereKey($enabledGroup->getKey())->update([
+        DB::table('customer_groups')->where('id', $enabledGroup->getKey())->update([
             'is_enabled' => 'TRUE',
             'is_active'  => 'TRUE',
         ]);
-        DB::table('customer_groups')->whereKey($disabledGroup->getKey())->update([
+        DB::table('customer_groups')->where('id', $disabledGroup->getKey())->update([
             'is_enabled' => '0',
             'is_active'  => '0',
         ]);
@@ -140,6 +141,41 @@ final class CustomerGroupTest extends TestCase
 
         $this->assertStringContainsString('CAST(', $sql);
         $this->assertSame([$enabledGroup->getKey()], $resolved);
+    }
+
+    public function test_customer_group_boolean_scopes_ignore_noise_values(): void
+    {
+        $truthyGroup = CustomerGroup::factory()->create(['is_enabled' => true, 'is_active' => true]);
+        $falseyGroup = CustomerGroup::factory()->create(['is_enabled' => false, 'is_active' => false]);
+        $nullGroup = CustomerGroup::factory()->create(['is_enabled' => null, 'is_active' => null]);
+        $noiseGroup = CustomerGroup::factory()->create(['is_enabled' => true, 'is_active' => true]);
+
+        // Simulate legacy persistence layers that stored boolean flags as strings with
+        // different casing or synonyms (e.g. ON/OFF) so the scope logic has mixed inputs.
+        DB::table('customer_groups')->where('id', $truthyGroup->getKey())->update([
+            'is_enabled' => 'YES',
+            'is_active'  => 'TrUe',
+        ]);
+        DB::table('customer_groups')->where('id', $falseyGroup->getKey())->update([
+            'is_enabled' => 'off',
+            'is_active'  => 'FALSE',
+        ]);
+        DB::table('customer_groups')->where('id', $noiseGroup->getKey())->update([
+            'is_enabled' => 'pending',
+            'is_active'  => 'later',
+        ]);
+
+        $enabledIds = CustomerGroup::withoutGlobalScopes()->enabled()->pluck('id')->all();
+        sort($enabledIds);
+
+        $disabledIds = CustomerGroup::withoutGlobalScopes()->disabled()->pluck('id')->all();
+        sort($disabledIds);
+
+        $this->assertSame([$truthyGroup->getKey()], $enabledIds);
+        $this->assertSame([
+            $falseyGroup->getKey(),
+            $nullGroup->getKey(),
+        ], $disabledIds);
     }
 
     public function test_customer_group_scope_disabled(): void
@@ -152,6 +188,7 @@ final class CustomerGroupTest extends TestCase
         $this->assertCount(1, $disabledGroups);
         $firstDisabled = $disabledGroups->first();
         $this->assertNotNull($firstDisabled);
+        $this->assertInstanceOf(CustomerGroup::class, $firstDisabled);
         $this->assertFalse($firstDisabled->is_enabled);
     }
 
@@ -161,6 +198,8 @@ final class CustomerGroupTest extends TestCase
         CustomerGroup::factory()->create(['is_enabled' => false, 'is_active' => false]);
         $enabledButInactive = CustomerGroup::factory()->create(['is_enabled' => true, 'is_active' => false])->fresh();
 
+        $this->assertNotNull($enabledButInactive);
+        $this->assertInstanceOf(CustomerGroup::class, $enabledButInactive);
         $this->assertTrue($enabledButInactive->is_enabled);
         $this->assertFalse($enabledButInactive->is_active);
 
@@ -169,6 +208,7 @@ final class CustomerGroupTest extends TestCase
         $this->assertCount(1, $activeGroups);
         $firstActive = $activeGroups->first();
         $this->assertNotNull($firstActive);
+        $this->assertInstanceOf(CustomerGroup::class, $firstActive);
         $this->assertTrue($firstActive->is_enabled);
         $this->assertTrue($firstActive->is_active);
     }
@@ -183,6 +223,7 @@ final class CustomerGroupTest extends TestCase
         $this->assertCount(1, $inactiveGroups);
         $firstInactive = $inactiveGroups->first();
         $this->assertNotNull($firstInactive);
+        $this->assertInstanceOf(CustomerGroup::class, $firstInactive);
         $this->assertFalse($firstInactive->is_enabled);
         $this->assertFalse($firstInactive->is_active);
     }
