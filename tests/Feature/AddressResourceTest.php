@@ -64,6 +64,8 @@ final class AddressResourceTest extends TestCase
             'postal_code'    => '01001',
             'country_code'   => 'LT',
             'is_active'      => true,
+            // Explicitly provide a phone number so the Filament form passes validation under stricter rules.
+            'phone' => '+37060000000',
         ];
 
         // Act & Assert
@@ -87,7 +89,11 @@ final class AddressResourceTest extends TestCase
     public function test_can_edit_address(): void
     {
         // Arrange
-        $address = Address::factory()->for($this->adminUser)->create(['country_code' => 'LT']);
+        $address = Address::factory()->for($this->adminUser)->create([
+            'country_code' => 'LT',
+            // Seed a deterministic phone number to avoid nullable factory output that violates validation.
+            'phone' => '+37060000000',
+        ]);
         $newCity = 'Kaunas';
 
         // Act & Assert
@@ -97,6 +103,12 @@ final class AddressResourceTest extends TestCase
                 'user_id'      => (string) $address->user_id,
                 'city'         => $newCity,
                 'country_code' => $address->country_code,
+                // Preserve existing required fields to satisfy validation while focusing the test on the city update.
+                'first_name'     => $address->first_name,
+                'last_name'      => $address->last_name,
+                'address_line_1' => $address->address_line_1,
+                'postal_code'    => $address->postal_code,
+                'phone'          => '+37060000000',
             ], 'form')
             ->call('save')
             ->assertHasNoFormErrors();

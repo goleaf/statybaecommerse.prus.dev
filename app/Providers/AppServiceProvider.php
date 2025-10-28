@@ -41,6 +41,8 @@ use App\View\Creators\UserDataCreator;
 use DateInterval;
 use DateTimeInterface;
 use DefStudio\SearchableInput\Forms\Components\SearchableInput;
+use Faker\Factory as FakerFactory;
+use Faker\Generator as FakerGenerator;
 use Filament\Facades\Filament;
 use Filament\Support\Facades\FilamentView;
 use Filament\Tables\Testing\TestsActions;
@@ -88,8 +90,6 @@ use function is_array;
 use Livewire\Features\SupportTesting\Testable;
 use Livewire\Livewire;
 use Throwable;
-use Faker\Factory as FakerFactory;
-use Faker\Generator as FakerGenerator;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -162,8 +162,11 @@ class AppServiceProvider extends ServiceProvider
         }
 
         if ($this->app->runningUnitTests()) {
-            config()->set('filament.testing.autodiscover_resources', false);
-            config()->set('filament.testing.resources', []);
+            // Ensure Filament keeps the full resource registry during tests so snapshot
+            // assertions operate on the same canonical ordering as production while
+            // still allowing individual tests to override the configuration explicitly.
+            config()->set('filament.testing.autodiscover_resources', config('filament.testing.autodiscover_resources', true));
+            config()->set('filament.testing.resources', config('filament.testing.resources', []));
         }
 
         $this->registerModelObservers();
