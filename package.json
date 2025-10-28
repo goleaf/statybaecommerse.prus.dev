@@ -37,7 +37,7 @@
         "@fontsource-variable/instrument-sans": "^5.2.8",
         "@fontsource-variable/inter": "^5.2.8",
         "@fontsource-variable/space-grotesk": "^5.2.10",
-        "shiki": "^3.12.0",
+        "shiki": "^3.14.0",
         "sortablejs": "^1.15.6",
         "treeselectjs": "^0.13.1"
     },
