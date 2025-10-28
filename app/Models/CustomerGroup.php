@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Spatie\Translatable\HasTranslations;
 
@@ -346,7 +347,7 @@ final class CustomerGroup extends Model
      */
     public function scopeEnabled(Builder $query): Builder
     {
-        return self::applyBooleanScope($query, 'is_enabled', true);
+        return $this->applyBooleanScope($query, 'is_enabled', true);
     }
 
     /**
@@ -381,9 +382,9 @@ final class CustomerGroup extends Model
      */
     public function scopeInactive(Builder $query): Builder
     {
-        $query = self::applyBooleanScope($query, 'is_enabled', false);
+        $query = $this->applyBooleanScope($query, 'is_enabled', false);
 
-        return self::applyBooleanScope($query, 'is_active', false);
+        return $this->applyBooleanScope($query, 'is_active', false);
     }
 
     /**
@@ -394,9 +395,9 @@ final class CustomerGroup extends Model
      */
     public function scopeActive(Builder $query): Builder
     {
-        $query = self::applyBooleanScope($query, 'is_enabled', true);
+        $query = $this->applyBooleanScope($query, 'is_enabled', true);
 
-        return self::applyBooleanScope($query, 'is_active', true);
+        return $this->applyBooleanScope($query, 'is_active', true);
     }
 
     /**
@@ -407,7 +408,7 @@ final class CustomerGroup extends Model
      */
     public function scopeDisabled(Builder $query): Builder
     {
-        return self::applyBooleanScope($query, 'is_enabled', false);
+        return $this->applyBooleanScope($query, 'is_enabled', false);
     }
 
     /**
@@ -418,7 +419,7 @@ final class CustomerGroup extends Model
      */
     public function scopeWithSpecialPricing(Builder $query): Builder
     {
-        return self::applyBooleanScope($query, 'has_special_pricing', true);
+        return $this->applyBooleanScope($query, 'has_special_pricing', true);
     }
 
     /**
@@ -440,7 +441,7 @@ final class CustomerGroup extends Model
      */
     public function scopeDefault(Builder $query): Builder
     {
-        return self::applyBooleanScope($query, 'is_default', true);
+        return $this->applyBooleanScope($query, 'is_default', true);
     }
 
     /**
@@ -652,7 +653,11 @@ final class CustomerGroup extends Model
     /**
      * Apply a tolerant boolean comparison so legacy truthy/falsey values stay queryable.
      */
-    private static function applyBooleanScope(Builder $query, string $column, bool $expected): Builder
+    /**
+     * @param  Builder<self> $query
+     * @return Builder<self>
+     */
+    private function applyBooleanScope(Builder $query, string $column, bool $expected): Builder
     {
         $qualifiedColumn = $query->qualifyColumn($column);
 
@@ -662,21 +667,29 @@ final class CustomerGroup extends Model
         $normalizedCandidates = array_values(array_unique($normalizedCandidates, SORT_REGULAR));
 
         $stringCandidates = $expected
-            ? ['true', 't', 'yes']
-            : ['false', 'f', 'no'];
+            ? ['true', 't', 'yes', 'on']
+            : ['false', 'f', 'no', 'off'];
 
-        return $query->where(static function (Builder $booleanQuery) use ($qualifiedColumn, $expected, $normalizedCandidates, $stringCandidates): void {
+        $normalizedStringCandidates = array_values(array_unique(array_map(
+            static fn (string $value): string => // Normalise spacing and casing so legacy datasets using mixed casing
+                // (e.g. "TrUe" or " Off ") continue to be interpreted correctly.
+                strtolower(trim($value)),
+            array_merge(
+                array_map(
+                    static fn (mixed $value): string => strtolower(trim((string) $value)),
+                    $normalizedCandidates
+                ),
+                $stringCandidates
+            )
+        )));
+
+        return $query->where(static function (Builder $booleanQuery) use ($qualifiedColumn, $expected, $normalizedCandidates, $normalizedStringCandidates): void {
             $booleanQuery->whereIn($qualifiedColumn, $normalizedCandidates);
 
-            if ($stringCandidates !== []) {
-                $placeholders = implode(', ', array_fill(0, count($stringCandidates), '?'));
-                $loweredValues = array_map(static fn (string $value): string => strtolower($value), $stringCandidates);
-
-                $booleanQuery->orWhereRaw(
-                    sprintf('LOWER(CAST(%s AS CHAR)) IN (%s)', $qualifiedColumn, $placeholders),
-                    $loweredValues
-                );
-            }
+            $booleanQuery->orWhereIn(
+                DB::raw(sprintf('LOWER(TRIM(CAST(%s AS CHAR)))', $qualifiedColumn)),
+                $normalizedStringCandidates
+            );
 
             if (! $expected) {
                 $booleanQuery->orWhereNull($qualifiedColumn);
