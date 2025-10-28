@@ -451,3 +451,8 @@
 
 ## Conclusion
 The Laravel e-commerce platform is in an excellent state with 96% completion and production-ready architecture. The test suite has been significantly improved with comprehensive fixes to multilingual and enhanced settings functionality. The platform demonstrates exceptional technical quality and advanced features that exceed typical e-commerce requirements.
+
+### ✅ Address ownership and navigation policy fixes (2025-10-26)
+- Address creation in Filament now honours the selected customer instead of defaulting to the acting admin because `user_id` is mass assignable on the model, restoring accurate ownership tracking.
+- Updated `ProductHistoryPolicy::viewAny` to accept optional product context so Filament's navigation boot no longer triggers argument count errors while building menus during address filtering scenarios.
+- `tests/Feature/AddressResourceTest.php` passes all 19 scenarios locally via `vendor/bin/phpunit tests/Feature/AddressResourceTest.php`.
