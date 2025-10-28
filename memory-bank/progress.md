@@ -116,6 +116,10 @@
 ## Current Implementation Details
 
 ### Recently Completed
+**Logging & Customer Groups Hardening (January 2025):**
+- Added defensive configuration access inside `App\\Logging\\Processors\\KibanaContextProcessor` so plain PHP/unit execution no longer triggers container binding errors; introduced explicit tests covering fallback behaviour when the Laravel application is unbootstrapped.
+- Tightened `App\\Models\\CustomerGroup` boolean scopes to trim/normalise legacy string values (`YES`, `off`, etc.) via a shared helper, preventing over-inclusive query results and expanding unit coverage to assert deterministic counts across mixed data representations.
+
 **Test Suite Fixes (January 2025):**
 - Fixed MultilanguageTest.php - All 22 tests now passing
 - Resolved role assignment errors by seeding RolesAndPermissionsSeeder

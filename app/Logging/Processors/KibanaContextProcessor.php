@@ -4,31 +4,37 @@ declare(strict_types=1);
 
 namespace App\Logging\Processors;
 
-use DateTimeInterface;
 use DateTimeZone;
+use Illuminate\Contracts\Container\BindingResolutionException;
 use Monolog\LogRecord;
+use Throwable;
 
-final class KibanaContextProcessor
+final readonly class KibanaContextProcessor
 {
     public function __construct(
-        private readonly string $serviceName = '',
-        private readonly string $environment = '',
-        private readonly DateTimeZone $timezone = new DateTimeZone('UTC'),
+        private string $serviceName = '',
+        private string $environment = '',
+        private DateTimeZone $timezone = new DateTimeZone('UTC'),
     ) {}
 
     public function __invoke(LogRecord $record): LogRecord
     {
-        if ($record->datetime instanceof DateTimeInterface) {
-            // Provide an ISO8601 timestamp for Kibana-compatible ingestion.
-            $timestamp = $record->datetime->setTimezone($this->timezone)->format('Y-m-d\\TH:i:s.v\\Z');
-            $record->extra['@timestamp'] = $timestamp;
-            $record->extra['formatted_datetime'] = $timestamp;
-        }
+        // Provide an ISO8601 timestamp for Kibana-compatible ingestion.
+        $timestamp = $record->datetime->setTimezone($this->timezone)->format('Y-m-d\\TH:i:s.v\\Z');
+        $record->extra['@timestamp'] = $timestamp;
+        $record->extra['formatted_datetime'] = $timestamp;
 
         // Surface the service metadata so dashboards can differentiate between
         // multiple Laravel workers feeding into the same Logstash pipeline.
-        $serviceName = $this->serviceName !== '' ? $this->serviceName : config('app.name', 'laravel');
-        $environment = $this->environment !== '' ? $this->environment : (string) config('app.env', 'production');
+        $serviceConfig = $this->getConfigValue('app.name', 'laravel');
+        $serviceName = $this->serviceName !== ''
+            ? $this->serviceName
+            : (is_string($serviceConfig) ? $serviceConfig : 'laravel');
+
+        $environmentConfig = $this->getConfigValue('app.env', 'production');
+        $environment = $this->environment !== ''
+            ? $this->environment
+            : (is_string($environmentConfig) ? $environmentConfig : 'production');
 
         $record->extra['service'] = [
             'name'        => $serviceName,
@@ -42,10 +48,26 @@ final class KibanaContextProcessor
         $appEnvironment = $environment;
 
         if (function_exists('app')) {
+            /** @var mixed $app */
             $app = app();
 
             if (is_object($app) && method_exists($app, 'environment')) {
-                $appEnvironment = $app->environment();
+                $resolvedEnvironment = null;
+
+                try {
+                    $resolvedEnvironment = $app->environment();
+                } catch (BindingResolutionException) {
+                    // When the container has not been fully bootstrapped the environment
+                    // helper attempts to resolve bindings that do not exist yet. In those
+                    // scenarios we gracefully fall back to the configured environment.
+                }
+
+                if (is_string($resolvedEnvironment) && $resolvedEnvironment !== '') {
+                    // Honour the resolved environment when the Laravel application is
+                    // bootstrapped while still allowing unit tests or CLI entry points
+                    // to rely on the constructor provided fallback string.
+                    $appEnvironment = $resolvedEnvironment;
+                }
             }
         }
 
@@ -72,5 +94,23 @@ final class KibanaContextProcessor
         }
 
         return $record;
+    }
+
+    /**
+     * Safely resolve configuration values without assuming the Laravel container has been booted.
+     */
+    private function getConfigValue(string $key, mixed $default = null): mixed
+    {
+        if (! function_exists('config')) {
+            return $default;
+        }
+
+        try {
+            return config($key, $default);
+        } catch (Throwable) {
+            // During isolated unit tests or CLI usage the config repository may not be bound yet.
+            // Returning the default keeps the processor usable in those stripped-down contexts.
+            return $default;
+        }
     }
 }
