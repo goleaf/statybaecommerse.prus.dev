@@ -1,9 +1,13 @@
 # Active Context: Laravel E-commerce Platform
 
 ## Current Project State
-**Status:** 95% Complete - Production Ready  
-**Phase:** Final testing and critical issue resolution  
-**Priority:** Resolve admin access and implement comprehensive testing  
+**Status:** 95% Complete - Production Ready
+**Phase:** Final testing and critical issue resolution
+**Priority:** Resolve admin access and implement comprehensive testing
+
+### Latest Updates (Jan 2025)
+- Hardened logging bootstrap so Kibana context processor falls back to configured metadata when the Laravel container or config repository are unavailable, preventing BindingResolutionException crashes during plain PHP/unit execution.
+- Normalised customer group boolean scopes to ignore noisy legacy values (`YES/NO`, `ON/OFF`, mixed casing) and added regression coverage to keep scope counts deterministic even with string-persisted flags.
 
 ## Technical Environment
 - **Laravel:** 12.x (composer requires `laravel/framework:^12.0`), PHP ^8.2
