@@ -21,6 +21,11 @@
             "sort": 2,
             "resources": [
                 {
+                    "class": "App\\Filament\\Resources\\CollectionResource",
+                    "icon": "heroicon-o-folder",
+                    "sort": null
+                },
+                {
                     "class": "App\\Filament\\Resources\\ProductResource",
                     "icon": "heroicon-o-cube",
                     "sort": 1
@@ -79,11 +84,6 @@
                     "class": "App\\Filament\\Resources\\ProductFeatureResource",
                     "icon": "heroicon-o-star",
                     "sort": 17
-                },
-                {
-                    "class": "App\\Filament\\Resources\\CollectionResource",
-                    "icon": "heroicon-o-folder",
-                    "sort": null
                 },
                 {
                     "class": "App\\Filament\\Resources\\ProductSimilarityResource",
@@ -165,16 +165,6 @@
             "sort": 5,
             "resources": [
                 {
-                    "class": "App\\Filament\\Resources\\AnalyticsEventResource",
-                    "icon": "heroicon-o-chart-bar-square",
-                    "sort": 1
-                },
-                {
-                    "class": "App\\Filament\\Resources\\AnalyticsResource",
-                    "icon": "heroicon-o-chart-bar-square",
-                    "sort": null
-                },
-                {
                     "class": "App\\Filament\\Resources\\ReferralCodeStatisticsResource",
                     "icon": null,
                     "sort": 9
@@ -202,6 +192,11 @@
             "icon": "heroicon-o-cog-6-tooth",
             "sort": 6,
             "resources": [
+                {
+                    "class": "App\\Filament\\Resources\\ActivityLogResource",
+                    "icon": null,
+                    "sort": 9
+                },
                 {
                     "class": "App\\Filament\\Resources\\EnumValueResource",
                     "icon": "heroicon-o-squares-2x2",
@@ -267,6 +262,19 @@
             "resources": []
         },
         {
+            "label": "translations.nav_group_campaigns",
+            "label_key": "Campaigns",
+            "icon": "heroicon-o-megaphone",
+            "sort": 7,
+            "resources": [
+                {
+                    "class": "App\\Filament\\Resources\\EmailCampaignResource",
+                    "icon": "heroicon-o-envelope",
+                    "sort": 4
+                }
+            ]
+        },
+        {
             "label": "Inventory",
             "label_key": "Inventory",
             "icon": "heroicon-o-archive-box",
@@ -320,19 +328,6 @@
             ]
         },
         {
-            "label": "Orders",
-            "label_key": "Orders",
-            "icon": "heroicon-o-shopping-bag",
-            "sort": 200,
-            "resources": [
-                {
-                    "class": "App\\Filament\\Resources\\AddressResource",
-                    "icon": "heroicon-o-map-pin",
-                    "sort": 3
-                }
-            ]
-        },
-        {
             "label": "Customers",
             "label_key": "Customers",
             "icon": "heroicon-o-user-group",
@@ -342,11 +337,6 @@
                     "class": "App\\Filament\\Resources\\WishlistItemResource",
                     "icon": "heroicon-o-heart",
                     "sort": 10
-                },
-                {
-                    "class": "App\\Filament\\Resources\\CustomerGroupResource",
-                    "icon": null,
-                    "sort": null
                 }
             ]
         },
@@ -399,29 +389,11 @@
             ]
         },
         {
-            "label": "Kampanijos",
-            "label_key": "Campaigns",
-            "icon": "heroicon-o-rocket-launch",
-            "sort": 310,
-            "resources": [
-                {
-                    "class": "App\\Filament\\Resources\\CampaignConversionResource",
-                    "icon": "heroicon-o-rocket-launch",
-                    "sort": null
-                }
-            ]
-        },
-        {
             "label": "Nuolaidos",
             "label_key": "Discounts",
             "icon": "heroicon-o-tag",
             "sort": 320,
             "resources": [
-                {
-                    "class": "App\\Filament\\Resources\\DiscountConditionResource",
-                    "icon": "heroicon-o-adjustments-horizontal",
-                    "sort": null
-                },
                 {
                     "class": "App\\Filament\\Resources\\DiscountRedemptionResource",
                     "icon": "heroicon-o-receipt-percent",
@@ -477,11 +449,6 @@
             "sort": 600,
             "resources": [
                 {
-                    "class": "App\\Filament\\Resources\\SystemSettingCategoryTranslationResource",
-                    "icon": "heroicon-o-language",
-                    "sort": null
-                },
-                {
                     "class": "App\\Filament\\Resources\\SystemSettingResource",
                     "icon": "heroicon-o-cog-6-tooth",
                     "sort": null
@@ -508,11 +475,6 @@
                     "class": "App\\Filament\\Resources\\ApiKeyResource",
                     "icon": "heroicon-o-key",
                     "sort": 4
-                },
-                {
-                    "class": "App\\Filament\\Resources\\ActivityLogResource",
-                    "icon": "heroicon-o-document-text",
-                    "sort": 9
                 }
             ]
         },
@@ -530,6 +492,19 @@
             ]
         },
         {
+            "label": "translations.nav_group_campaigns",
+            "label_key": "translations.nav_group_campaigns",
+            "icon": null,
+            "sort": null,
+            "resources": [
+                {
+                    "class": "App\\Filament\\Resources\\CampaignConversionResource",
+                    "icon": "heroicon-o-rocket-launch",
+                    "sort": null
+                }
+            ]
+        },
+        {
             "label": "Analitika",
             "label_key": "Analitika",
             "icon": null,
@@ -539,19 +514,6 @@
                     "class": "App\\Filament\\Resources\\ReportResource",
                     "icon": "heroicon-o-document-chart-bar",
                     "sort": 17
-                }
-            ]
-        },
-        {
-            "label": "Documents",
-            "label_key": "Documents",
-            "icon": null,
-            "sort": null,
-            "resources": [
-                {
-                    "class": "App\\Filament\\Resources\\DocumentTemplateResource",
-                    "icon": "heroicon-o-document-text",
-                    "sort": 3
                 }
             ]
         },
@@ -593,11 +555,55 @@
                     "sort": 3
                 }
             ]
+        },
+        {
+            "label": "Documents",
+            "label_key": "Documents",
+            "icon": null,
+            "sort": null,
+            "resources": [
+                {
+                    "class": "App\\Filament\\Resources\\DocumentTemplateResource",
+                    "icon": "heroicon-o-document-text",
+                    "sort": 3
+                }
+            ]
+        },
+        {
+            "label": "Nuolaidos",
+            "label_key": "Nuolaidos",
+            "icon": null,
+            "sort": null,
+            "resources": [
+                {
+                    "class": "App\\Filament\\Resources\\DiscountConditionResource",
+                    "icon": "heroicon-o-adjustments-horizontal",
+                    "sort": null
+                }
+            ]
+        },
+        {
+            "label": "Klient\u0173 valdymas",
+            "label_key": "Klient\u0173 valdymas",
+            "icon": null,
+            "sort": null,
+            "resources": [
+                {
+                    "class": "App\\Filament\\Resources\\CustomerGroupResource",
+                    "icon": null,
+                    "sort": null
+                }
+            ]
         }
     ],
     "ungrouped": [
         {
             "class": "App\\Filament\\Resources\\AdminUserResource",
+            "icon": null,
+            "sort": 1
+        },
+        {
+            "class": "App\\Filament\\Resources\\AnalyticsEventResource",
             "icon": null,
             "sort": 1
         },
@@ -672,11 +678,6 @@
             "sort": 3
         },
         {
-            "class": "App\\Filament\\Resources\\EmailCampaignResource",
-            "icon": "heroicon-o-envelope",
-            "sort": 4
-        },
-        {
             "class": "App\\Filament\\Resources\\NewsImageResource",
             "icon": null,
             "sort": 4
@@ -732,6 +733,16 @@
             "sort": 20
         },
         {
+            "class": "App\\Filament\\Resources\\AddressResource",
+            "icon": "heroicon-o-map-pin",
+            "sort": null
+        },
+        {
+            "class": "App\\Filament\\Resources\\AnalyticsResource",
+            "icon": null,
+            "sort": null
+        },
+        {
             "class": "App\\Filament\\Resources\\AttributeResource",
             "icon": "heroicon-o-tag",
             "sort": null
@@ -779,6 +790,11 @@
         {
             "class": "App\\Filament\\Resources\\LocationResource",
             "icon": null,
+            "sort": null
+        },
+        {
+            "class": "App\\Filament\\Resources\\SystemSettingCategoryTranslationResource",
+            "icon": "heroicon-o-language",
             "sort": null
         },
         {
