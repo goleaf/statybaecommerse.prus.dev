@@ -8,6 +8,7 @@
 | Cities dataset | ⚠️ Partial | Cities include comprehensive relationships and scoped queries, but the “all countries” seeder only defines curated lists for 11 countries, leaving most of the world without city data.【F:app/Models/City.php†L35-L198】【F:database/seeders/AllCountriesComprehensiveCitiesSeeder.php†L14-L147】 |
 | Shipping zones | ⚠️ Partial | Zone model exists and multiple seeders create EU/NA/UK/Baltic zones, yet configuration leaves rate matrices largely blank, limiting runtime differentiation.【F:app/Models/Zone.php†L11-L45】【F:database/seeders/ComprehensiveMultilanguageSeeder.php†L98-L116】【F:database/seeders/ComprehensiveOrderSeeder.php†L72-L124】【F:config/shipping.php†L5-L26】 |
 | Postal code validation | ⚠️ Partial | Address requests enforce pattern validation and sanitisation, but configuration and normalisation only recognise Lithuanian formats, so other countries fail validation despite seeded data.【F:app/Http/Requests/Frontend/AddressRequest.php†L26-L153】【F:config/addresses.php†L5-L42】【F:app/Support/Address/AddressDataSanitizer.php†L138-L166】 |
+| Admin address ownership | ✅ Implemented | Address resource creation now honours the customer selected in the form because the model accepts the `user_id`, avoiding fallback ownership to the logged-in admin and keeping audit trails accurate.【F:app/Models/Address.php†L39-L67】 |
 
 ## Detailed Findings
 

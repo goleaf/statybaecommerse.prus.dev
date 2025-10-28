@@ -19,10 +19,12 @@ final class ProductHistoryPolicy
     /**
      * Check whether the actor may browse the history collection for the product.
      */
-    public function viewAny(AdminUser|User $user, Product $product): bool
+    public function viewAny(AdminUser|User $user, ?Product $product = null): bool
     {
         // Require both the dedicated history permission and general product
         // visibility so read-only staff cannot bypass product restrictions.
+        // The product context is optional because Filament's navigation audit
+        // checks only provide the authenticated user when booting menus.
         return AuthorizationMatrix::check('product_histories', 'viewAny', $user)
             && AuthorizationMatrix::check('products', 'view', $user);
     }
