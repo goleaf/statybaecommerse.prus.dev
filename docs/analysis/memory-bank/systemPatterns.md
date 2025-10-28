@@ -205,6 +205,7 @@
 - **Feature Tests:** HTTP endpoint and component testing
 - **Integration Tests:** End-to-end workflow testing
 - **Browser Tests:** Critical user flow testing with Playwright
+- **Filament snapshots:** Leave Filament's resource auto-discovery enabled in tests so navigation snapshots and resource audits operate on the canonical ordering registered in production.
 
 ### 2. Code Quality Pattern
 **Pattern:** Automated code quality enforcement
