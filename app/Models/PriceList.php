@@ -111,11 +111,14 @@ final class PriceList extends Model
      */
     public function scopeActive($query)
     {
-        return $query->where('is_enabled', true)->where(function ($q) {
-            $q->whereNull('starts_at')->orWhere('starts_at', '<=', now());
-        })->where(function ($q) {
-            $q->whereNull('ends_at')->orWhere('ends_at', '>=', now());
-        });
+        // Filter to enabled price lists that already started while still tolerating open-ended end dates.
+        return $query
+            ->where('is_enabled', true)
+            ->whereNotNull('starts_at')
+            ->where('starts_at', '<=', now())
+            ->where(function ($q) {
+                $q->whereNull('ends_at')->orWhere('ends_at', '>=', now());
+            });
     }
 
     /**
@@ -180,11 +183,19 @@ final class PriceList extends Model
         if (! $this->is_enabled) {
             return false;
         }
-        $now = now();
-        if ($this->starts_at && $this->starts_at->gt($now)) {
+
+        // Require a concrete start timestamp so indefinite price lists do not accidentally surface as active.
+        if ($this->starts_at === null) {
             return false;
         }
-        if ($this->ends_at && $this->ends_at->lt($now)) {
+
+        $now = now();
+
+        if ($this->starts_at->gt($now)) {
+            return false;
+        }
+
+        if ($this->ends_at !== null && $this->ends_at->lt($now)) {
             return false;
         }
 
@@ -214,7 +225,8 @@ final class PriceList extends Model
     {
         $item = $this->items()->where('product_id', $product->id)->first();
 
-        return $item ? $item->net_amount : null;
+        // Cast the persisted decimal string into a float so callers receive a numeric payload.
+        return $item ? (float) $item->net_amount : null;
     }
 
     /**
@@ -224,7 +236,8 @@ final class PriceList extends Model
     {
         $item = $this->items()->where('variant_id', $variant->id)->first();
 
-        return $item ? $item->net_amount : null;
+        // Provide a floating-point response even though the database stores the decimal value as a string.
+        return $item ? (float) $item->net_amount : null;
     }
 
     /**
