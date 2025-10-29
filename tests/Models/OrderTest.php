@@ -5,8 +5,10 @@ declare(strict_types=1);
 use App\Models\Order;
 use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
 
-uses(RefreshDatabase::class);
+// Boot the full Laravel testing harness so facades like Schema resolve during factory execution.
+uses(TestCase::class, RefreshDatabase::class);
 
 it('filters orders that were created on a specific day', function (): void {
     // Establish a deterministic window spanning three consecutive days.
