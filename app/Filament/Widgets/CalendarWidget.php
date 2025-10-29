@@ -1,33 +1,31 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Filament\Widgets;
 
 use App\Filament\Resources\CampaignResource;
-use App\Models\Campaign;
-use App\Models\Channel;
 use App\Models\Scopes\ActiveCampaignScope;
 use App\Models\Scopes\ActiveScope;
 use App\Models\Scopes\StatusScope;
+use App\Models\Campaign;
+use App\Models\Channel;
 use App\Support\Filament\Components\Flatpickr as SupportFlatpickr;
 use Carbon\Carbon;
 use Carbon\CarbonInterface;
-use DateTimeInterface;
 use Filament\Actions\Action;
-use Filament\Forms;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Form;
 use Filament\Schemas\Components\Component as SchemaComponent;
+use Filament\Schemas\Schema;
+use Filament\Forms;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
-use LogicException;
-use Saade\FilamentFullCalendar\Actions;
 use Saade\FilamentFullCalendar\Data\EventData;
 use Saade\FilamentFullCalendar\Widgets\FullCalendarWidget;
+use Saade\FilamentFullCalendar\Actions;
+use DateTimeInterface;
+use LogicException;
 
 final class CalendarWidget extends FullCalendarWidget
 {
@@ -73,7 +71,7 @@ final class CalendarWidget extends FullCalendarWidget
                 // Resolve the key early and guard against non-scalar identifiers.
                 $key = $campaign->getKey();
 
-                if (! is_int($key) && ! is_string($key)) {
+                if (!is_int($key) && !is_string($key)) {
                     throw new LogicException('Campaign identifier must be a scalar value.');
                 }
 
@@ -87,7 +85,7 @@ final class CalendarWidget extends FullCalendarWidget
                 /** @var CarbonInterface|null $startAt */
                 $startAt = $campaign->starts_at;
 
-                if (! $startAt instanceof CarbonInterface) {
+                if (!$startAt instanceof CarbonInterface) {
                     // The column is nullable, but the widget requires a valid value, so default to now.
                     $startAt = now();
                 }
@@ -98,11 +96,11 @@ final class CalendarWidget extends FullCalendarWidget
                     ->start($startAt)
                     ->url(CampaignResource::getUrl('view', ['record' => $campaign]))
                     ->extendedProps([
-                        'status'    => $campaign->status,
+                        'status' => $campaign->status,
                         'is_active' => (bool) $campaign->is_active,
-                        'channel'   => $channelName,
-                        'color'     => $color,
-                        'tooltip'   => $this->buildTooltip($campaign),
+                        'channel' => $channelName,
+                        'color' => $color,
+                        'tooltip' => $this->buildTooltip($campaign),
                     ]);
 
                 /** @var CarbonInterface|null $endAt */
@@ -133,34 +131,34 @@ final class CalendarWidget extends FullCalendarWidget
     public function config(): array
     {
         return [
-            'initialView'             => 'dayGridMonth',
-            'firstDay'                => 1,
-            'locale'                  => app()->getLocale(),
-            'selectable'              => true,
-            'selectMirror'            => true,
-            'editable'                => true,
+            'initialView' => 'dayGridMonth',
+            'firstDay' => 1,
+            'locale' => app()->getLocale(),
+            'selectable' => true,
+            'selectMirror' => true,
+            'editable' => true,
             'eventResizableFromStart' => true,
-            'navLinks'                => true,
-            'dayMaxEvents'            => true,
-            'headerToolbar'           => [
-                'start'  => 'prev,next today',
+            'navLinks' => true,
+            'dayMaxEvents' => true,
+            'headerToolbar' => [
+                'start' => 'prev,next today',
                 'center' => 'title',
-                'end'    => 'dayGridMonth,timeGridWeek,timeGridDay,listWeek',
+                'end' => 'dayGridMonth,timeGridWeek,timeGridDay,listWeek',
             ],
             'buttonText' => [
                 'today' => __('Today'),
                 'month' => __('Month'),
-                'week'  => __('Week'),
-                'day'   => __('Day'),
-                'list'  => __('List'),
+                'week' => __('Week'),
+                'day' => __('Day'),
+                'list' => __('List'),
             ],
             'eventTimeFormat' => [
-                'hour'   => '2-digit',
+                'hour' => '2-digit',
                 'minute' => '2-digit',
                 'hour12' => false,
             ],
             'slotLabelFormat' => [
-                'hour'   => '2-digit',
+                'hour' => '2-digit',
                 'minute' => '2-digit',
                 'hour12' => false,
             ],
@@ -179,7 +177,7 @@ final class CalendarWidget extends FullCalendarWidget
                 ->maxLength(255)
                 ->live(onBlur: true)
                 ->afterStateUpdated(function (string $operation, $state, Forms\Set $set): void {
-                    if ($operation !== 'create' || ! is_string($state)) {
+                    if ($operation !== 'create' || !is_string($state)) {
                         return;
                     }
 
@@ -199,10 +197,10 @@ final class CalendarWidget extends FullCalendarWidget
             Select::make('status')
                 ->label($this->translate('campaigns.fields.status', 'Status'))
                 ->options([
-                    'draft'     => $this->translate('campaigns.status.draft', 'Draft'),
-                    'active'    => $this->translate('campaigns.status.active', 'Active'),
+                    'draft' => $this->translate('campaigns.status.draft', 'Draft'),
+                    'active' => $this->translate('campaigns.status.active', 'Active'),
                     'scheduled' => $this->translate('campaigns.status.scheduled', 'Scheduled'),
-                    'paused'    => $this->translate('campaigns.status.paused', 'Paused'),
+                    'paused' => $this->translate('campaigns.status.paused', 'Paused'),
                     'completed' => $this->translate('campaigns.status.completed', 'Completed'),
                     'cancelled' => $this->translate('campaigns.status.cancelled', 'Cancelled'),
                 ])
@@ -230,8 +228,8 @@ final class CalendarWidget extends FullCalendarWidget
     {
         return [
             Actions\CreateAction::make()
-                ->mountUsing(function (?Form $schema, array $arguments = []): void {
-                    if (! $schema) {
+                ->mountUsing(function (?Schema $schema, array $arguments = []): void {
+                    if (!$schema) {
                         return;
                     }
 
@@ -265,8 +263,8 @@ final class CalendarWidget extends FullCalendarWidget
     {
         return [
             Actions\EditAction::make()
-                ->mountUsing(function (?Form $schema, array $arguments = []): void {
-                    if (! $schema) {
+                ->mountUsing(function (?Schema $schema, array $arguments = []): void {
+                    if (!$schema) {
                         return;
                     }
 
@@ -296,19 +294,19 @@ final class CalendarWidget extends FullCalendarWidget
     public function eventDidMount(): string
     {
         return <<<'JS'
-            function(info) {
-                const tooltip = info.event.extendedProps?.tooltip;
-                if (tooltip) {
-                    info.el.setAttribute('title', tooltip);
-                }
+                function(info) {
+                    const tooltip = info.event.extendedProps?.tooltip;
+                    if (tooltip) {
+                        info.el.setAttribute('title', tooltip);
+                    }
 
-                const color = info.event.extendedProps?.color;
-                if (color) {
-                    info.el.style.setProperty('--fc-event-bg-color', color);
-                    info.el.style.setProperty('--fc-event-border-color', color);
+                    const color = info.event.extendedProps?.color;
+                    if (color) {
+                        info.el.style.setProperty('--fc-event-bg-color', color);
+                        info.el.style.setProperty('--fc-event-border-color', color);
+                    }
                 }
-            }
-        JS;
+            JS;
     }
 
     /**
@@ -340,7 +338,7 @@ final class CalendarWidget extends FullCalendarWidget
     {
         $event = $arguments['event'] ?? null;
 
-        if (! is_array($event)) {
+        if (!is_array($event)) {
             return null;
         }
 
@@ -356,8 +354,8 @@ final class CalendarWidget extends FullCalendarWidget
     {
         $event = $arguments['event'] ?? null;
 
-        return is_array($event)
-            && (array_key_exists('end', $event) || array_key_exists('endStr', $event));
+        return is_array($event) &&
+            (array_key_exists('end', $event) || array_key_exists('endStr', $event));
     }
 
     private function normaliseArgumentDate(mixed $value): ?string
@@ -384,7 +382,7 @@ final class CalendarWidget extends FullCalendarWidget
     /**
      * @return array<string, mixed>
      */
-    private function normaliseFormState(Form $schema): array
+    private function normaliseFormState(Schema $schema): array
     {
         $state = $schema->getRawState();
 
@@ -396,7 +394,7 @@ final class CalendarWidget extends FullCalendarWidget
         }
 
         // @phpstan-ignore-next-line The runtime may hand back scalars when the form is pristine.
-        if (! is_array($state)) {
+        if (!is_array($state)) {
             $state = [];
         }
 
@@ -441,12 +439,12 @@ final class CalendarWidget extends FullCalendarWidget
     private function resolveStatusColor(?string $status): ?string
     {
         return match ($status) {
-            'active'    => '#16a34a',
+            'active' => '#16a34a',
             'scheduled' => '#0ea5e9',
-            'paused'    => '#f59e0b',
+            'paused' => '#f59e0b',
             'completed' => '#6366f1',
             'cancelled' => '#ef4444',
-            default     => null,
+            default => null,
         };
     }
 

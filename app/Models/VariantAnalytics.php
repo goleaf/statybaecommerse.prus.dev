@@ -45,6 +45,7 @@ final class VariantAnalytics extends Model
     {
         return [
             'product_id'      => 'integer',
+            'variant_id'      => 'integer',
             'date'            => 'date',
             'date_bucket'     => 'string',
             'views'           => 'integer',
@@ -238,11 +239,22 @@ final class VariantAnalytics extends Model
             $updates
         );
 
-        return self::query()
+        $analytics = self::query()
             ->where('product_id', $productId)
             ->where('variant_id', $variantId)
             ->where('date_bucket', $bucket)
             ->firstOrFail();
+
+        if (
+            ! array_key_exists('conversion_rate', $data)
+            && (array_key_exists('views', $data) || array_key_exists('purchases', $data))
+        ) {
+            // Recalculate the conversion rate when raw metrics changed so derived data remains consistent.
+            $analytics->updateConversionRate();
+            $analytics->refresh();
+        }
+
+        return $analytics;
     }
 
     private static function normalizeDate(string|DateTimeInterface $date, string $granularity = self::BUCKET_DAILY): string
@@ -313,10 +325,11 @@ final class VariantAnalytics extends Model
      */
     public function updateConversionRate(): bool
     {
-        $conversionRate = 0;
+        $conversionRate = 0.0;
 
         if ($this->views > 0) {
-            $conversionRate = ($this->purchases / $this->views) * 100;
+            // Round to four decimal places so the stored value matches the column precision.
+            $conversionRate = round(($this->purchases / $this->views) * 100, 4);
         }
 
         return $this->update(['conversion_rate' => $conversionRate]);

@@ -33,10 +33,14 @@ final class OrderController extends Controller
         OrderStatus::PROCESSING->value,
         OrderStatus::SHIPPED->value,
         OrderStatus::DELIVERED->value,
+        // Preserve visibility for legacy "completed" rows that still appear in
+        // historical datasets so the API keeps parity with the admin panels.
+        OrderStatus::COMPLETED->value,
     ];
 
-    public function show(Request $request, string $orderIdentifier): JsonResponse|View|Response
+    public function show(Request $request, string $order): JsonResponse|View|Response
     {
+        $orderIdentifier = $order; // Normalise the route placeholder so existing contract helpers keep working.
         // Resolve the order lazily so we can tailor error responses and apply
         // additional ownership constraints without relying on implicit binding,
         // which currently collides with the scoped model configuration.
@@ -49,12 +53,19 @@ final class OrderController extends Controller
                 $query->where('number', $orderIdentifier);
 
                 if (ctype_digit($orderIdentifier)) {
-                    $query->orWhereKey((int) $orderIdentifier);
+                    // Fallback to the primary key comparison so numeric route
+                    // segments continue to work alongside the public order
+                    // number identifier.
+                    $column = $query->qualifyColumn($query->getModel()->getKeyName());
+
+                    $query->orWhere($column, (int) $orderIdentifier);
                 }
             })
             ->firstOrFail();
 
-        $statusValue = $order->status instanceof BackedEnum ? $order->status->value : (string) $order->status;
+        /** @var BackedEnum|string $status */
+        $status = $order->status;
+        $statusValue = $status instanceof BackedEnum ? $status->value : (string) $status;
 
         // Abort with a not found response when the order is in a terminal state
         // (such as cancelled or refunded) to avoid leaking sensitive details.

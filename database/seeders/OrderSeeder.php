@@ -6,6 +6,7 @@ namespace Database\Seeders;
 
 use App\Enums\PaymentMethod;
 use App\Models\Channel;
+use App\Models\Country;
 use App\Models\Currency;
 use App\Models\Order;
 use App\Models\OrderItem;
@@ -25,6 +26,26 @@ final class OrderSeeder extends Seeder
         $currency = Currency::where('code', 'EUR')->first() ?: Currency::factory()->eur()->default()->create();
         $zone = Zone::first() ?: Zone::factory()->create();
         $channel = Channel::first() ?: Channel::factory()->create();
+        $country = Country::query()->firstOrCreate(
+            ['code' => 'LTU'],
+            [
+                // Persist a deterministic Lithuanian record so repeated seeding runs do not trip unique ISO/CCA constraints.
+                'name'               => 'Lithuania',
+                'name_official'      => 'Republic of Lithuania',
+                'cca2'               => 'LT',
+                'cca3'               => 'LTU',
+                'ccn3'               => '440',
+                'iso_code'           => 'LTU',
+                'currency_code'      => $currency->code,
+                'currency_symbol'    => '€',
+                'phone_code'         => '370',
+                'phone_calling_code' => '+370',
+                'region'             => 'Europe',
+                'subregion'          => 'Northern Europe',
+                'is_active'          => true,
+                'is_enabled'         => true,
+            ],
+        );
 
         $visibleProducts = Product::where('is_visible', true)
             ->whereNotNull('published_at')
@@ -59,9 +80,11 @@ final class OrderSeeder extends Seeder
                     ->for($user)
                     ->for($channel)
                     ->for($zone)
+                    ->for($country)
                     ->state([
                         'number'         => 'WEB-' . Str::upper(Str::random(8)),
                         'currency'       => $currency->code,
+                        'country_id'     => $country->getKey(),
                         'payment_method' => $paymentMethods[array_rand($paymentMethods)]->value,
                         'payment_status' => 'paid',
                         'status'         => 'processing',
