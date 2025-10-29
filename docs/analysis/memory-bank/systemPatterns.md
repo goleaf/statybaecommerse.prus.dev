@@ -20,6 +20,7 @@
 - **PaymentService:** Multi-provider payment processing abstraction
 - **TaxCalculator:** Geographic tax calculation service
 - **DocumentService:** Template processing and PDF generation
+- **SimpleJsonSchemaValidator:** Schema enforcement utility with `oneOf`/array handling to keep public contracts aligned with published specs.
 
 ### 4. Action Pattern
 **Implementation:** Complex operations as single-purpose action classes
