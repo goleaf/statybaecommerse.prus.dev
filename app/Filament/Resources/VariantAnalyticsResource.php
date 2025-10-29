@@ -14,7 +14,8 @@ use Filament\Forms;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
-use Filament\Support\Facades\FilamentNumber;
+use Filament\Schemas\Components\Tabs as SchemaTabs;
+use Filament\Schemas\Components\Tabs\Tab as SchemaTab;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
@@ -70,9 +71,9 @@ final class VariantAnalyticsResource extends Resource
     {
         return $schema
             ->schema([
-                Forms\Components\SchemaTabs::make(__('admin.variant_analytics.tabs'))
+                SchemaTabs::make(__('admin.variant_analytics.tabs'))
                     ->tabs([
-                        Forms\Components\Tabs\SchemaTab::make(__('admin.variant_analytics.basic_info'))
+                        SchemaTab::make(__('admin.variant_analytics.basic_info'))
                             ->icon('heroicon-o-information-circle')
                             ->schema([
                                 Forms\Components\SchemaSection::make(__('admin.variant_analytics.basic_info'))
@@ -134,7 +135,7 @@ final class VariantAnalyticsResource extends Resource
                                             ]),
                                     ]),
                             ]),
-                        Forms\Components\Tabs\SchemaTab::make(__('admin.variant_analytics.metrics'))
+                        SchemaTab::make(__('admin.variant_analytics.metrics'))
                             ->icon('heroicon-o-chart-bar')
                             ->schema([
                                 Forms\Components\SchemaSection::make(__('admin.variant_analytics.traffic_metrics'))
@@ -162,12 +163,12 @@ final class VariantAnalyticsResource extends Resource
                                                         $clicks = (float) $get('clicks');
 
                                                         if ($views > 0.0) {
-                                                            // Respect Filament's locale-aware formatting when presenting the calculated percentage.
-                                                            return FilamentNumber::format(($clicks / $views) * 100, 2) . '%';
+                                                            // Reuse the shared percentage formatter so UI renders and exports match.
+                                                            return self::formatPercentage(($clicks / $views) * 100);
                                                         }
 
                                                         // Ensure even the zero state flows through the same formatter pipeline.
-                                                        return FilamentNumber::format(0, 2) . '%';
+                                                        return self::formatPercentage(0);
                                                     }),
                                             ]),
                                     ]),
@@ -210,12 +211,12 @@ final class VariantAnalyticsResource extends Resource
                                                         $addToCart = (float) $get('add_to_cart');
 
                                                         if ($clicks > 0.0) {
-                                                            // Respect Filament's locale-aware formatting when presenting the calculated percentage.
-                                                            return FilamentNumber::format(($addToCart / $clicks) * 100, 2) . '%';
+                                                            // Reuse the shared percentage formatter so UI renders and exports match.
+                                                            return self::formatPercentage(($addToCart / $clicks) * 100);
                                                         }
 
                                                         // Ensure even the zero state flows through the same formatter pipeline.
-                                                        return FilamentNumber::format(0, 2) . '%';
+                                                        return self::formatPercentage(0);
                                                     }),
                                                 Forms\Components\Placeholder::make('purchase_rate')
                                                     ->label(__('admin.variant_analytics.purchase_rate'))
@@ -224,12 +225,12 @@ final class VariantAnalyticsResource extends Resource
                                                         $purchases = (float) $get('purchases');
 
                                                         if ($addToCart > 0.0) {
-                                                            // Respect Filament's locale-aware formatting when presenting the calculated percentage.
-                                                            return FilamentNumber::format(($purchases / $addToCart) * 100, 2) . '%';
+                                                            // Reuse the shared percentage formatter so UI renders and exports match.
+                                                            return self::formatPercentage(($purchases / $addToCart) * 100);
                                                         }
 
                                                         // Ensure even the zero state flows through the same formatter pipeline.
-                                                        return FilamentNumber::format(0, 2) . '%';
+                                                        return self::formatPercentage(0);
                                                     }),
                                                 Forms\Components\TextInput::make('conversion_rate')
                                                     ->label(__('admin.variant_analytics.conversion_rate'))
@@ -243,7 +244,7 @@ final class VariantAnalyticsResource extends Resource
                                             ]),
                                     ]),
                             ]),
-                        Forms\Components\Tabs\SchemaTab::make(__('admin.variant_analytics.additional_data'))
+                        SchemaTab::make(__('admin.variant_analytics.additional_data'))
                             ->icon('heroicon-o-document-text')
                             ->schema([
                                 Forms\Components\SchemaSection::make(__('admin.variant_analytics.additional_info'))
@@ -305,8 +306,8 @@ final class VariantAnalyticsResource extends Resource
                     ->label(__('admin.variant_analytics.ctr'))
                     ->getStateUsing(static fn (VariantAnalytics $record): float => (float) $record->click_through_rate)
                     ->formatStateUsing(static function (float|int|null $state): string {
-                        // Use FilamentNumber so table exports and renders share the same percentage formatter.
-                        return FilamentNumber::format((float) ($state ?? 0), 2) . '%';
+                        // Delegate to the centralized helper to avoid mismatched formatting between exports and UI renders.
+                        return self::formatPercentage($state);
                     })
                     ->sortable(false)
                     ->toggleable()
@@ -336,8 +337,8 @@ final class VariantAnalyticsResource extends Resource
                     ->label(__('admin.variant_analytics.atc_rate'))
                     ->getStateUsing(static fn (VariantAnalytics $record): float => (float) $record->add_to_cart_rate)
                     ->formatStateUsing(static function (float|int|null $state): string {
-                        // Use FilamentNumber so table exports and renders share the same percentage formatter.
-                        return FilamentNumber::format((float) ($state ?? 0), 2) . '%';
+                        // Delegate to the centralized helper to avoid mismatched formatting between exports and UI renders.
+                        return self::formatPercentage($state);
                     })
                     ->sortable(false)
                     ->toggleable()
@@ -367,8 +368,8 @@ final class VariantAnalyticsResource extends Resource
                     ->label(__('admin.variant_analytics.purchase_rate'))
                     ->getStateUsing(static fn (VariantAnalytics $record): float => (float) $record->purchase_rate)
                     ->formatStateUsing(static function (float|int|null $state): string {
-                        // Use FilamentNumber so table exports and renders share the same percentage formatter.
-                        return FilamentNumber::format((float) ($state ?? 0), 2) . '%';
+                        // Delegate to the centralized helper to avoid mismatched formatting between exports and UI renders.
+                        return self::formatPercentage($state);
                     })
                     ->sortable(false)
                     ->toggleable()
@@ -404,8 +405,8 @@ final class VariantAnalyticsResource extends Resource
                 Tables\Columns\TextColumn::make('conversion_rate')
                     ->label(__('admin.variant_analytics.conversion_rate'))
                     ->formatStateUsing(static function (float|int|null $state): string {
-                        // Use FilamentNumber so table exports and renders share the same percentage formatter.
-                        return FilamentNumber::format((float) ($state ?? 0), 2) . '%';
+                        // Delegate to the centralized helper to avoid mismatched formatting between exports and UI renders.
+                        return self::formatPercentage($state);
                     })
                     ->sortable()
                     ->toggleable()
@@ -714,9 +715,9 @@ final class VariantAnalyticsResource extends Resource
     /**
      * Keep percentage formatting consistent between table columns and placeholders.
      */
-    protected static function formatPercentage(float|int|null $value): string
+    public static function formatPercentage(float|int|null $value): string
     {
-        // Fall back to zero for null entries while preserving decimal precision.
+        // Fall back to zero for null entries while preserving decimal precision and the trailing percent sign.
         return number_format((float) $value, 2) . '%';
     }
 
