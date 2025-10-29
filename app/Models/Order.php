@@ -226,6 +226,18 @@ final class Order extends Model
     }
 
     /**
+     * Provide access to the fulfilment zone linked to this order so
+     * downstream services (like logistics dashboards) can scope queries
+     * without re-implementing join logic.
+     */
+    public function zone(): BelongsTo
+    {
+        // We keep the relationship lean—only the foreign key is required,
+        // letting seeders call ->for($zone) while avoiding redundant selects.
+        return $this->belongsTo(Zone::class);
+    }
+
+    /**
      * Provide convenient access to the country associated with the order.
      */
     public function country(): BelongsTo
@@ -322,7 +334,7 @@ final class Order extends Model
         // analytics roll-ups and dashboard aggregations.
         $this->enforceCreatedAtIndex($query);
 
-        return $query->where($query->qualifyColumn('created_at'), '>=', self::toImmutableCarbon($start));
+        return $query->where($query->qualifyColumn('created_at'), '>=', $this->toImmutableCarbon($start));
     }
 
     /**
@@ -335,7 +347,7 @@ final class Order extends Model
         // scans remain fast even under heavy data volumes.
         $this->enforceCreatedAtIndex($query);
 
-        return $query->where($query->qualifyColumn('created_at'), '<=', self::toImmutableCarbon($end));
+        return $query->where($query->qualifyColumn('created_at'), '<=', $this->toImmutableCarbon($end));
     }
 
     /**
@@ -374,7 +386,7 @@ final class Order extends Model
 
     public function scopeCreatedInMonth(Builder $query, CarbonInterface|DateTimeInterface|string $date): Builder
     {
-        $month = self::toImmutableCarbon($date);
+        $month = $this->toImmutableCarbon($date);
 
         return $this->scopeCreatedBetween($query, $month->copy()->startOfMonth(), $month->copy()->endOfMonth());
     }
@@ -427,9 +439,9 @@ final class Order extends Model
      */
     public function isPaid(): bool
     {
-        $enum = self::resolveStatusEnum($this->status);
+        $enum = $this->resolveStatusEnum($this->status);
 
-        return $enum !== null && in_array($enum, [OrderStatus::PROCESSING, OrderStatus::SHIPPED, OrderStatus::DELIVERED], true);
+        return $enum instanceof \App\Enums\OrderStatus && in_array($enum, [OrderStatus::PROCESSING, OrderStatus::SHIPPED, OrderStatus::DELIVERED], true);
     }
 
     /**
@@ -439,7 +451,7 @@ final class Order extends Model
     {
         $status = $this->status;
 
-        $enum = self::resolveStatusEnum($status);
+        $enum = $this->resolveStatusEnum($status);
 
         return $enum === OrderStatus::PROCESSING;
     }
@@ -451,9 +463,9 @@ final class Order extends Model
     {
         $status = $this->status;
 
-        $enum = self::resolveStatusEnum($status);
+        $enum = $this->resolveStatusEnum($status);
 
-        return $enum !== null && in_array($enum, [OrderStatus::PENDING, OrderStatus::PROCESSING], true);
+        return $enum instanceof \App\Enums\OrderStatus && in_array($enum, [OrderStatus::PENDING, OrderStatus::PROCESSING], true);
     }
 
     /**
@@ -463,7 +475,7 @@ final class Order extends Model
     {
         $status = $this->status;
 
-        $enum = self::resolveStatusEnum($status);
+        $enum = $this->resolveStatusEnum($status);
 
         return $enum === OrderStatus::DELIVERED;
     }
@@ -487,7 +499,7 @@ final class Order extends Model
     /**
      * Normalise dynamic date inputs into an immutable Carbon instance so scope helpers behave consistently.
      */
-    private static function toImmutableCarbon(CarbonInterface|DateTimeInterface|string $value): CarbonImmutable
+    private function toImmutableCarbon(CarbonInterface|DateTimeInterface|string $value): CarbonImmutable
     {
         if ($value instanceof CarbonImmutable) {
             return $value;
@@ -510,8 +522,8 @@ final class Order extends Model
      */
     private function normalizeRange(CarbonInterface|DateTimeInterface|string $start, CarbonInterface|DateTimeInterface|string $end): array
     {
-        $startAt = self::toImmutableCarbon($start)->startOfSecond();
-        $endAt = self::toImmutableCarbon($end)->endOfSecond();
+        $startAt = $this->toImmutableCarbon($start)->startOfSecond();
+        $endAt = $this->toImmutableCarbon($end)->endOfSecond();
 
         if ($startAt->greaterThan($endAt)) {
             [$startAt, $endAt] = [$endAt, $startAt];
@@ -528,7 +540,7 @@ final class Order extends Model
     private function normalizeDayRange(CarbonInterface|DateTimeInterface|string $date): array
     {
         // Convert the incoming value into an immutable carbon instance for consistent manipulation.
-        $day = self::toImmutableCarbon($date);
+        $day = $this->toImmutableCarbon($date);
 
         return [$day->startOfDay(), $day->endOfDay()];
     }
@@ -652,7 +664,7 @@ final class Order extends Model
     /**
      * Normalise legacy string statuses into the modern enum representation.
      */
-    private static function resolveStatusEnum(mixed $status): ?OrderStatus
+    private function resolveStatusEnum(mixed $status): ?OrderStatus
     {
         if ($status instanceof OrderStatus) {
             return $status;
