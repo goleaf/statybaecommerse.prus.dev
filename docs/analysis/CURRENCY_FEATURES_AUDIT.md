@@ -42,6 +42,7 @@
 
 ### Feature Toggle Cache Resilience
 - `FeatureToggleService` now bakes the most recent feature flag `updated_at` timestamp into cache keys, ensuring evaluations refresh automatically after administrators create or update environment-scoped toggles.【F:app/Services/FeatureToggleService.php†L41-L87】
+- Environment-scoped flags take precedence over global definitions thanks to explicit ordering, so staging rollouts are no longer masked by previously created production toggles.【F:app/Services/FeatureToggleService.php†L57-L83】
 - Regression coverage confirms cached fallback results give way to persisted flags without manual cache clearing, preventing stale toggle states from leaking between test scenarios or queued jobs.【F:tests/Unit/Services/FeatureToggleServiceTest.php†L118-L141】
 
 ## Recommendations
