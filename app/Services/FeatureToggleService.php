@@ -10,6 +10,7 @@ use App\Models\User;
 use Illuminate\Contracts\Auth\Factory as AuthFactory;
 use Illuminate\Contracts\Session\Session as SessionContract;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Str;
@@ -41,12 +42,29 @@ final class FeatureToggleService
         $user = $this->resolveUser($context);
         $environment = $context['environment'] ?? app()->environment();
 
-        // Cache evaluations briefly to avoid hammering the database in loops.
+        // Capture the latest update timestamp for any matching feature flags so cache
+        // entries automatically roll when administrators create or edit toggles.
+        $latestFlagUpdate = FeatureFlag::query()
+            ->select('updated_at')
+            ->where('key', $featureKey)
+            ->where(function ($query) use ($environment): void {
+                $query->whereNull('environment')->orWhere('environment', $environment);
+            })
+            ->latest('updated_at')
+            ->value('updated_at');
+
+        $cacheVersion = $latestFlagUpdate !== null
+            ? Carbon::parse($latestFlagUpdate)->format('YmdHisu')
+            : 'none';
+
+        // Cache evaluations briefly to avoid hammering the database in loops while still
+        // differentiating entries by the most recent flag mutation timestamp.
         $cacheKey = sprintf(
-            'feature-toggle:%s:%s:%s',
+            'feature-toggle:%s:%s:%s:%s',
             $featureKey,
             $environment,
-            $user?->getAuthIdentifier() ?? 'guest'
+            $user?->getAuthIdentifier() ?? 'guest',
+            $cacheVersion,
         );
 
         $enabled = Cache::remember($cacheKey, now()->addSeconds(30), function () use ($featureKey, $environment, $user, $context): bool {
