@@ -90,6 +90,10 @@ For every file under `app/Filament/**`:
 - Keep change descriptions focused and concise; avoid generating additional documentation files unless requested.
 - Git operations (add/commit/push) are allowed unless a higher-priority instruction forbids them.
 
+## User Behaviour Reference
+
+- When working on preference or interaction tracking, review `docs/analysis/USER_BEHAVIOR_MODELS_UPDATE.md` for the latest aliasing and metadata guidelines introduced after the regression fixes.
+
 ## Memory Bank Utilities
 
 - The `memory-bank/` directory contains support files (`tasks.md`, `activeContext.md`, etc.). Ensure these remain consistent; do not delete or repurpose them without stakeholder approval.
