@@ -46,7 +46,7 @@ final class UserPreferenceModelTest extends TestCase
     public function test_it_exposes_expected_fillable_aliases(): void
     {
         // Act: resolve the fillable array so we can guard mass-assignment behaviour.
-        $fillable = (new UserPreference())->getFillable();
+        $fillable = (new UserPreference)->getFillable();
 
         // Assert: confirm the streamlined aliases stay in sync with the documented contract.
         $this->assertSame(['user_id', 'name', 'key', 'value', 'meta'], $fillable);
@@ -81,9 +81,21 @@ final class UserPreferenceModelTest extends TestCase
     public function test_query_scope_filters_by_type(): void
     {
         // Arrange: seed a blend of preference types so the scope has multiple rows to filter.
-        $this->createPreference(['name' => 'category']);
-        $this->createPreference(['name' => 'brand']);
-        $this->createPreference(['name' => 'category']);
+        $this->createPreference([
+            'name' => 'category',
+            // Use a distinct key so the composite unique index (user_id, type, key) is never violated.
+            'key' => 'workshop-tools',
+        ]);
+        $this->createPreference([
+            'name' => 'brand',
+            // Maintain variety in the dataset while preserving uniqueness for the seeded trio.
+            'key' => 'artisan-collective',
+        ]);
+        $this->createPreference([
+            'name' => 'category',
+            // Provide a second unique key to keep the scenario focused on the type filtering logic.
+            'key' => 'finishing-supplies',
+        ]);
 
         // Act: query for a single type using the dedicated scope.
         $categoryPreferences = UserPreference::byType('category')->pluck('preference_type')->all();
@@ -101,7 +113,10 @@ final class UserPreferenceModelTest extends TestCase
         $this->createPreference(['value' => 0.9]);
 
         // Act: filter using the minimum score scope boundary.
-        $filteredScores = UserPreference::withMinScore(0.7)->pluck('preference_score');
+        $filteredScores = UserPreference::withMinScore(0.7)
+            // Explicitly order by the primary key so the assertion remains stable regardless of SQLite iteration quirks.
+            ->orderBy('id')
+            ->pluck('preference_score');
 
         // Assert: ensure only scores meeting or exceeding the threshold are returned.
         $this->assertSame([0.7, 0.9], $filteredScores->all());
@@ -210,7 +225,7 @@ final class UserPreferenceModelTest extends TestCase
     public function test_fill_translates_legacy_column_names(): void
     {
         // Arrange: instantiate the model manually to exercise the overridden fill logic.
-        $preference = new UserPreference();
+        $preference = new UserPreference;
 
         // Act: fill using the legacy column names and then persist the model.
         $preference->fill([
@@ -249,4 +264,3 @@ final class UserPreferenceModelTest extends TestCase
         $this->assertSame([], $preference->metadata);
     }
 }
-

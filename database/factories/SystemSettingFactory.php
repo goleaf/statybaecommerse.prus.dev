@@ -25,12 +25,12 @@ final class SystemSettingFactory extends Factory
         $type = 'string';
 
         return [
-            'category_id' => static function (): int {
-                return SystemSettingCategory::factory()
-                    ->state(['is_active' => true])
-                    ->createQuietly()
-                    ->id;
-            },
+            // Creating the category through the factory reference keeps the
+            // foreign key relationship valid without manually inserting a
+            // placeholder identifier that might not exist during tests.
+            'category_id' => SystemSettingCategory::factory()->state([
+                'is_active' => true,
+            ]),
             'key'              => $this->faker->unique()->slug(2),
             'name'             => $this->faker->sentence(3),
             'description'      => $this->faker->paragraph(),
@@ -114,7 +114,7 @@ final class SystemSettingFactory extends Factory
      */
     public function active(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn (array $attributes): array => [
             'is_active' => true,
         ]);
     }
@@ -124,7 +124,7 @@ final class SystemSettingFactory extends Factory
      */
     public function inactive(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn (array $attributes): array => [
             'is_active' => false,
         ]);
     }
@@ -134,7 +134,7 @@ final class SystemSettingFactory extends Factory
      */
     public function public(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn (array $attributes): array => [
             'is_public' => true,
         ]);
     }
@@ -144,7 +144,7 @@ final class SystemSettingFactory extends Factory
      */
     public function private(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn (array $attributes): array => [
             'is_public' => false,
         ]);
     }
@@ -154,7 +154,7 @@ final class SystemSettingFactory extends Factory
      */
     public function required(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn (array $attributes): array => [
             'is_required' => true,
         ]);
     }
@@ -164,7 +164,7 @@ final class SystemSettingFactory extends Factory
      */
     public function optional(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn (array $attributes): array => [
             'is_required' => false,
         ]);
     }
@@ -174,7 +174,7 @@ final class SystemSettingFactory extends Factory
      */
     public function readonly(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn (array $attributes): array => [
             'is_readonly' => true,
         ]);
     }
@@ -184,7 +184,7 @@ final class SystemSettingFactory extends Factory
      */
     public function encrypted(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn (array $attributes): array => [
             'is_encrypted' => true,
         ]);
     }
@@ -224,7 +224,7 @@ final class SystemSettingFactory extends Factory
      */
     public function ofType(string $type): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn (array $attributes): array => [
             'type'          => $type,
             'value'         => $this->getValueForType($type),
             'default_value' => $this->getDefaultValueForType($type),
@@ -236,7 +236,7 @@ final class SystemSettingFactory extends Factory
      */
     public function inGroup(string $group): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn (array $attributes): array => [
             'group' => $group,
         ]);
     }
@@ -246,7 +246,7 @@ final class SystemSettingFactory extends Factory
      */
     public function inCategory(SystemSettingCategory $category): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn (array $attributes): array => [
             'category_id' => $category->id,
         ]);
     }

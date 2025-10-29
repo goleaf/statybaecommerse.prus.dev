@@ -11,6 +11,8 @@
 - Campaign conversion translations keep marketing metadata focused by restricting mass assignment to locale, notes, and JSON-backed attributes while exposing a dedicated locale scope for analytics queries.【F:app/Models/Translations/CampaignConversionTranslation.php†L29-L63】
 - `UiTranslation` provides a centralised repository for admin/UI keys with query scopes, metadata casting, and helper methods to fetch or set values with language fallbacks; the News seeder populates Lithuanian and English variants to guarantee parity.【F:app/Models/UiTranslation.php†L32-L127】【F:database/seeders/NewsTranslationSeeder.php†L10-L84】
 - System setting category translations now persist locale-specific UI metadata through the new `meta` JSON column, keeping administrative tabs and storefront breadcrumbs aligned with structured payloads stored alongside translated copy while anchoring the column after existing sort metadata to avoid MySQL install issues.【F:database/migrations/2025_01_31_000003_add_meta_columns_to_system_setting_tables.php†L15-L50】
+- System setting factories now attach active categories via factory relationships instead of ad-hoc identifiers so SQLite-based
+  suites never trip foreign key constraints when generating translated settings during regression runs.【F:database/factories/SystemSettingFactory.php†L27-L35】
 
 ## JSON & PHP Language Files
 - Storefront copy is surfaced through locale JSON dictionaries that mirror storefront flows (cart, checkout, analytics) to enable string-based lookups without namespace prefixes.【F:resources/lang/en.json†L1-L120】
