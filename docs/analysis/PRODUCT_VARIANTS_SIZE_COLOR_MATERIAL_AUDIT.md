@@ -26,3 +26,4 @@
 ## Observations & Risks
 - The baseline `ProductVariantSeeder` assigns a random color value when building the matrix but never associates materials, so environments relying solely on this seeder will lack material coverage until `ComprehensiveProductVariantSeeder` (or similar) is executed.【F:database/seeders/ProductVariantSeeder.php†L281-L312】
 - Consider standardizing on the comprehensive seeder—or extending the baseline seeder—to ensure material selections appear consistently in admin filters, storefront selectors, and analytics dashboards.【F:database/seeders/ProductVariantSeeder.php†L281-L312】【F:database/seeders/ComprehensiveProductVariantSeeder.php†L512-L591】
+- Variant combination maintenance now resolves product attributes with explicit column selection so SQLite-based admin flows avoid ambiguous `id` lookups when hydrating available attribute lists.【F:app/Filament/Resources/VariantCombinationResource.php†L132-L154】
